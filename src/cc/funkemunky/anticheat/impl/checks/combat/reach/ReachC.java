@@ -24,7 +24,7 @@ public class ReachC extends Check {
     }
 
     @Setting
-    private float boxExpand = 3.02f;
+    private float boxExpand = 3.08f;
 
     @Setting
     private long range = 200;

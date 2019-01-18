@@ -38,13 +38,13 @@ public class ReachD extends Check {
     }
 
     @Setting
-    private long pingRange = 185;
+    private long pingRange = 160;
 
     @Setting
-    private float maxReach = 3.02f;
+    private float maxReach = 3.08f;
 
     @Setting
-    private int maxVL = 4;
+    private int maxVL = 8;
 
     private Player target;
     private boolean attacked;
@@ -102,7 +102,7 @@ public class ReachD extends Check {
                     vl = vl > 0 ? 1 : 0;
                 }
 
-                Bukkit.broadcastMessage("REACH: " + calculatedReach + " COLLIDED: " + collided);
+                debug("VL: " + vl +  "REACH: " + calculatedReach + " COLLIDED: " + collided);
             }
 
             attacked = false;

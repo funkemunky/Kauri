@@ -47,7 +47,7 @@ public class CheckManager {
         checks.add(new Fly("Fly", CancelType.MOTION, 225));
         checks.add(new SpeedA("Speed (Type A)", CancelType.MOTION, 100));
         checks.add(new SpeedB("Speed (Type B)", CancelType.MOTION, 125));
-        checks.add(new SpeedC("Speed (Type C)", CancelType.MOTION, 100));
+        //checks.add(new SpeedC("Speed (Type C)", CancelType.MOTION, 100));
         checks.add(new ReachA("Reach (Type A)", CancelType.COMBAT, 60));
         checks.add(new ReachB("Reach (Type B)", CancelType.COMBAT, 60));
         checks.add(new ReachC("Reach (Type C)", CancelType.MOTION, 50));

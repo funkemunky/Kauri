@@ -77,6 +77,7 @@ public class Fly extends Check {
             if (getData().getMovementProcessor().getAirTicks() > 4
                     && getData().getMovementProcessor().getDistanceToGround() > 2.0
                     && motionY > 0
+                    && getData().getVelocityProcessor().getLastVelocity().hasPassed()
                     && acceleration > 0) {
                 flag(motionY + ">-" + lastMotionY, false, false);
             }
