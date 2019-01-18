@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Iris">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/out/artifacts/Iris_jar/Iris.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
