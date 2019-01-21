@@ -20,11 +20,11 @@ public class SpeedB extends Check {
     }
 
     @Override
-    public void onPacket(Object packet, String packetType, long timeStamp) {
+    public Object onPacket(Object packet, String packetType, long timeStamp) {
         //The client will always send a position packet when teleported or dictated to move by the server, so we need to account for that to prevent false-positives.
         if (getData().getLastServerPos().hasNotPassed(1) || getData().isGeneralCancel()) {
             verboseA = verboseB = verboseC = 0;
-            return;
+            return packet;
         }
         val to = getData().getMovementProcessor().getTo();
         val from = getData().getMovementProcessor().getFrom();
@@ -76,6 +76,7 @@ public class SpeedB extends Check {
         }
         lastMotionXZ = motionXZ;
         lastTimeStamp = timeStamp;
+        return packet;
     }
 
     @Override

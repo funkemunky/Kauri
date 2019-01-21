@@ -5,6 +5,7 @@ import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
+import cc.funkemunky.api.utils.MathUtils;
 import org.bukkit.event.Event;
 
 
@@ -12,7 +13,7 @@ import org.bukkit.event.Event;
 public class Fly extends Check {
 
     private float lastMotionY = 0, lastAccelerationPacket = 0;
-    private int verbose;
+    private int verbose, verbose2;
     private Verbose verboseLow = new Verbose();
     private long lastTimeStamp;
 
@@ -22,9 +23,9 @@ public class Fly extends Check {
     }
 
     @Override
-    public void onPacket(Object packet, String packetType, long timeStamp) {
+    public Object onPacket(Object packet, String packetType, long timeStamp) {
         if (getData().getLastServerPos().hasNotPassed(1) || getData().isGeneralCancel() || getData().getMovementProcessor().getTo().toVector().distance(getData().getMovementProcessor().getFrom().toVector()) < 0.005)
-            return;
+            return packet;
         float motionY = (float) (getData().getMovementProcessor().getTo().getY() - getData().getMovementProcessor().getFrom().getY()), acceleration = motionY - lastMotionY;
 
         /* This checks for the acceleration of the player being too low. The average acceleration for a legitimate player is around 0.08.
@@ -63,30 +64,23 @@ public class Fly extends Check {
             }
 
             if (motionY > getData().getMovementProcessor().getServerYVelocity() + 0.002
-                    && Math.abs(getData().getMovementProcessor().getServerYAcceleration()) > 0.02
+                    && MathUtils.getDelta(getData().getMovementProcessor().getClientYAcceleration(), getData().getMovementProcessor().getServerYAcceleration()) > 0.02
                     && !getData().getMovementProcessor().isBlocksOnTop()
                     && !getData().getMovementProcessor().isServerOnGround()
-                    && (motionY > 0 || getData().getMovementProcessor().getDistanceToGround() > 1.0)
+                    && motionY > -2.5
+                    && getData().getVelocityProcessor().getLastVelocity().hasPassed(5)
                     && !getData().isOnSlimeBefore()
                     && getData().getMovementProcessor().getClimbTicks() == 0
                     && !getData().getMovementProcessor().isInLiquid()
                     && !getData().getMovementProcessor().isInWeb()) {
                 flag(motionY + ">-" + getData().getMovementProcessor().getServerYVelocity(), true, false);
             }
-
-            if (getData().getMovementProcessor().getAirTicks() > 4
-                    && getData().getMovementProcessor().getDistanceToGround() > 2.0
-                    && motionY > 0
-                    && getData().getVelocityProcessor().getLastVelocity().hasPassed()
-                    && acceleration > 0) {
-                flag(motionY + ">-" + lastMotionY, false, false);
-            }
-
             debug(getData().getMovementProcessor().isServerOnGround() + ", " + getData().getMovementProcessor().isBlocksOnTop() + ", " + Math.abs(getData().getMovementProcessor().getServerYAcceleration()) + ", " + getData().getMovementProcessor().getServerYVelocity() + ", " + motionY + ", " + getData().getMovementProcessor().getDistanceToGround());
         }
         lastAccelerationPacket = acceleration;
         lastMotionY = motionY;
         lastTimeStamp = timeStamp;
+        return packet;
     }
 
     @Override

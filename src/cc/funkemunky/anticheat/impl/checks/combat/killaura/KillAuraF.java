@@ -15,7 +15,7 @@ public class KillAuraF extends Check {
     }
 
     @Override
-    public void onPacket(Object packet, String packetType, long timeStamp) {
+    public Object onPacket(Object packet, String packetType, long timeStamp) {
         switch (packetType) {
             case Packet.Client.LOOK:
             case Packet.Client.POSITION_LOOK:
@@ -25,7 +25,7 @@ public class KillAuraF extends Check {
                 val data = getData();
 
                 if (data.isLagging() || data.getLastServerPos().hasNotPassed(2))
-                    return;
+                    return packet;
 
                 val from = data.getMovementProcessor().getFrom();
                 val to = data.getMovementProcessor().getTo();
@@ -38,6 +38,7 @@ public class KillAuraF extends Check {
                     this.flag("0|0", true, true);
                 }
         }
+        return packet;
     }
 
     @Override

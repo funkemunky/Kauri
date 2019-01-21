@@ -13,94 +13,103 @@ import org.bukkit.Location;
 import org.bukkit.event.Event;
 import org.bukkit.potion.PotionEffectType;
 
-@Packets(packets = {Packet.Client.POSITION_LOOK,
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicInteger;
+
+@Packets(packets = {
+        Packet.Client.POSITION_LOOK,
         Packet.Client.POSITION,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_POSITION})
 public class SpeedC extends Check {
-    private long lastTimeStamp;
-    private int threshold;
-    private double lastSpeed;
+    private double lastX, lastY, lastZ;
+    private int vl;
+
+    private final Deque<Double> offsetDeque = new LinkedList<>();
 
     public SpeedC(String name, CancelType cancelType, int maxVL) {
         super(name, cancelType, maxVL);
     }
 
     @Override
-    public void onPacket(Object packet, String packetType, long timeStamp) {
-        WrappedInFlyingPacket flying = new WrappedInFlyingPacket(packet, getData().getPlayer());
-        if (getData().getLastServerPos().hasNotPassed(2) || getData().isGeneralCancel()) return;
+    public Object onPacket(Object packet, String packetType, long timeStamp) {
+        val player = getData().getPlayer();
 
-        if (timeStamp - lastTimeStamp > 1) {
+        val from = getData().getMovementProcessor().getFrom();
+        val to = getData().getMovementProcessor().getTo();
 
-            val to = getData().getMovementProcessor().getTo();
-            val from = getData().getMovementProcessor().getFrom();
+        val fromVec = from.toVector();
+        val toVec = to.toVector();
 
-            val dx = to.getX() - from.getX();
-            val dy = to.getY() - from.getY();
-            val dz = to.getZ() - from.getZ();
+        val motionX = to.getX() - from.getX();
+        val motionY = to.getY() - from.getY();
+        val motionZ = to.getZ() - from.getZ();
 
-            var f5 = 0.91f;
+        val lastMotLoc = new Location(player.getWorld(), lastX, lastY, lastZ).toVector();
+        val currMotLoc = new Location(player.getWorld(), motionX, motionY, motionZ).toVector();
 
-            val onGround = flying.isGround();
+        val locOffset = MathUtils.offset(fromVec, toVec);
+        val motOffset = MathUtils.offset(lastMotLoc, currMotLoc);
 
-            //noinspection
-            @SuppressWarnings("UnusedAssignment")
-            var moveSpeed = 0.0f;
+        val offsetChange = Math.abs(locOffset - motOffset);
 
-            if (onGround) {
-                f5 = ReflectionsUtil.getFriction(BlockUtils.getBlock(new Location(getData().getPlayer().getWorld(), MathUtils.floor(to.getX()),
-                        MathUtils.floor(getData().getBoundingBox().minY) - 1,
-                        MathUtils.floor(to.getZ())))) * 0.91F;
-            }
+        val streak = new AtomicInteger();
 
-            val f6 = 0.16277136F / (f5 * f5 * f5);
-
-            if (onGround) {
-                moveSpeed = Atlas.getInstance().getBlockBoxManager().getBlockBox().getMovementFactor(getData().getPlayer()) * f6;
-
-                //fixes a speed bug
-                if (getData().getPlayer().isSprinting() && moveSpeed < 0.129) {
-                    moveSpeed *= 1.3;
-                }
-
-                //fixes momentum when you land
-                if (dy > 0.0001) {
-                    moveSpeed += 0.2;
-                }
-            } else {
-                moveSpeed = (getData().getPlayer().isSprinting() ? 0.026f : 0.02f) + 0.00001f;
-
-                if (dy < -0.08 && getData().getPlayer().getFallDistance() == 0.0) {
-                    moveSpeed *= Math.abs(dy) * 1.3;
-                }
-            }
-
-            val previousSpeed = this.lastSpeed;
-            val speed = Math.sqrt(dx * dx + dz * dz);
-
-            val speedChange = speed - previousSpeed;
-
-            moveSpeed += Math.sqrt(this.getData().getVelocityProcessor().getMaxHorizontal());
-
-            if (speed > 0.24 && speedChange - moveSpeed > 0.001) {
-                if ((threshold += 10) > 15) {
-                    flag(speedChange + ">-" + moveSpeed, true, true);
-                }
-            } else {
-                threshold = Math.max(threshold - 1, 0);
-            }
-
-            this.lastSpeed = speed * f5;
+        if (getData().getMovementProcessor().isOnSlimeBefore()|| getData().getMovementProcessor().getIceTicks() > 0 || getData().getMovementProcessor().getBlockAboveTicks() > 0 || player.getAllowFlight()) {
+            // return packet;
         }
 
-        lastTimeStamp = timeStamp;
+        offsetDeque.add(offsetChange);
 
-        debug(getData().getMovementProcessor().getDeltaXZ() + ", " + getData().getMovementProcessor().getDeltaY() + ", " + getData().getMovementProcessor().getDistanceToGround() + ", " + getData().getMovementProcessor().getHalfBlockTicks() + ", " + getData().getMovementProcessor().getBlockAboveTicks());
+        if (offsetDeque.size() == 5) {
+            val maxOffset = 0.33 + account();
+
+            offsetDeque.forEach(offset -> {
+                if (offset > maxOffset) {
+                    streak.incrementAndGet();
+                }
+            });
+
+            var maxStreak = 2;
+
+            if (player.hasPotionEffect(PotionEffectType.SPEED)) {
+                maxStreak++;
+            }
+
+            if (streak.get() >= maxStreak) {
+                if (++vl > 2) {
+                    flag( "" + (double) (streak.get() * 100) / maxStreak + "%", true, true);
+                }
+            } else {
+                vl = 0;
+            }
+
+            debug(streak.get() + ", " + maxStreak);
+
+            offsetDeque.clear();
+        }
+
+        lastX = motionX;
+        lastY = motionY;
+        lastZ = motionZ;
+        return packet;
     }
 
     @Override
     public void onBukkitEvent(Event event) {
 
+    }
+
+    private float account() {
+        float total = 0;
+
+        total += PlayerUtils.getPotionEffectLevel(getData().getPlayer(), PotionEffectType.SPEED) * (getData().getMovementProcessor().isServerOnGround() ? 0.057f : 0.044f);
+        total += getData().getMovementProcessor().getIceTicks() > 0 && (getData().getMovementProcessor().getAirTicks() > 0 || getData().getMovementProcessor().getGroundTicks() < 5) ? 0.14 : 0;
+        total += (getData().getPlayer().getWalkSpeed() - 0.2) * 1.65;
+        total += getData().getMovementProcessor().isOnSlimeBefore() ? 0.05 : 0;
+        total += getData().getMovementProcessor().getBlockAboveTicks() > 0 ? getData().getMovementProcessor().isOnIce() ? 0.4 : 0.2  : 0;
+        total += getData().getMovementProcessor().getHalfBlockTicks() > 0 ? 0.12 : 0;
+        return total;
     }
 }

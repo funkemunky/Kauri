@@ -29,7 +29,7 @@ public class ReachB extends Check {
     }
 
     @Override
-    public void onPacket(Object packet, String packetType, long timeStamp) {
+    public Object onPacket(Object packet, String packetType, long timeStamp) {
         WrappedInUseEntityPacket useEvent = new WrappedInUseEntityPacket(packet, getData().getPlayer());
         if (useEvent.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK) && useEvent.getEntity() instanceof Player) {
             val player = getData().getPlayer();
@@ -37,7 +37,7 @@ public class ReachB extends Check {
 
             val entityData = Kauri.getInstance().getDataManager().getPlayerData(entity.getUniqueId());
 
-            if (entityData == null) return;
+            if (entityData == null) return packet;
 
             double var9 = entity.getLocation().getX() - player.getLocation().getX();
             double var7;
@@ -56,7 +56,7 @@ public class ReachB extends Check {
                 val dZ = Math.abs(entityData.getMovementProcessor().getFrom().getZ() - player.getLocation().getZ());
 
                 if (dXX + dZZ < dX + dZ) {
-                    return;
+                    return packet;
                 }
             }
 
@@ -88,7 +88,7 @@ public class ReachB extends Check {
             val reachDistance = Math.sqrt(dX * dX + dZ * dZ - distance);
 
             if (!entity.isOnGround()) {
-                return;
+                return packet;
             }
 
             reachAvg.add(reachDistance);
@@ -109,6 +109,7 @@ public class ReachB extends Check {
                 reachAvg.clearValues();
             }
         }
+        return packet;
     }
 
     @Override

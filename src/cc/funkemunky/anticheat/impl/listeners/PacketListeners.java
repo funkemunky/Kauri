@@ -1,12 +1,14 @@
 package cc.funkemunky.anticheat.impl.listeners;
 
 import cc.funkemunky.anticheat.Kauri;
+import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.event.custom.PacketRecieveEvent;
 import cc.funkemunky.api.event.custom.PacketSendEvent;
 import cc.funkemunky.api.event.system.EventMethod;
 import cc.funkemunky.api.event.system.Listener;
+import cc.funkemunky.api.tinyprotocol.api.NMSObject;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
@@ -58,6 +60,7 @@ public class PacketListeners implements Listener {
                     break;
                 }
             }
+
             data.getChecks().stream().filter(check -> check.isEnabled() && check.isEnabled() && check.isEnabled() && check.isEnabled() && check.getClass().isAnnotationPresent(Packets.class) && Arrays.asList(check.getClass().getAnnotation(Packets.class).packets()).contains(event.getType())).forEach(check -> check.onPacket(event.getPacket(), event.getType(), event.getTimeStamp()));
         }
     }
@@ -121,6 +124,7 @@ public class PacketListeners implements Listener {
                     WrappedInFlyingPacket packet = new WrappedInFlyingPacket(event.getPacket(), event.getPlayer());
 
                     data.getMovementProcessor().update(data, packet);
+                    data.getVelocityProcessor().update(packet);
                     break;
                 }
                 case Packet.Client.BLOCK_DIG: {
@@ -145,9 +149,24 @@ public class PacketListeners implements Listener {
                     }
                     break;
                 }
+                case Packet.Client.USE_ENTITY:
+                    break;
             }
 
-            data.getChecks().stream().filter(check -> check.isEnabled() && check.isEnabled() && check.isEnabled() && check.isEnabled() && check.isEnabled() && check.getClass().isAnnotationPresent(Packets.class) && Arrays.asList(check.getClass().getAnnotation(Packets.class).packets()).contains(event.getType())).forEach(check -> check.onPacket(event.getPacket(), event.getType(), event.getTimeStamp()));
+            for (Check check : data.getChecks()) {
+                if(check.isEnabled() && check.getClass().isAnnotationPresent(Packets.class) && Arrays.asList(check.getClass().getAnnotation(Packets.class).packets()).contains(event.getType())) {
+                    Object object = check.onPacket(event.getPacket(), event.getType(), event.getTimeStamp());
+
+                    if(object instanceof NMSObject) {
+                        NMSObject nObject = (NMSObject) object;
+
+                        event.setCancelled(nObject.isCancelled());
+                        event.setPacket(nObject.getObject());
+
+                        if(nObject.isCancelled()) break;
+                    }
+                }
+            }
         }
     }
 }

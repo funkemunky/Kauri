@@ -27,7 +27,7 @@ public class KillauraE extends Check {
     }
 
     @Override
-    public void onPacket(Object packet, String packetType, long timeStamp) {
+    public Object onPacket(Object packet, String packetType, long timeStamp) {
         val yaw = this.getData().getPlayer().getLocation().getYaw();
         val pitch = this.getData().getPlayer().getLocation().getPitch();
 
@@ -62,6 +62,7 @@ public class KillauraE extends Check {
         this.lastPitch = pitch;
 
         debug(vl + ": " + yawChange);
+        return packet;
     }
 
     @Override

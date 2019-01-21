@@ -23,7 +23,7 @@ public class KillauraC extends Check {
     }
 
     @Override
-    public void onPacket(Object packet, String packetType, long timeStamp) {
+    public Object onPacket(Object packet, String packetType, long timeStamp) {
         if (packetType.equalsIgnoreCase(Packet.Client.ENTITY_ACTION)) { //We don't use the player object since it is always 1 tick behind.
             WrappedInEntityActionPacket action = new WrappedInEntityActionPacket(packet, getData().getPlayer());
 
@@ -49,6 +49,7 @@ public class KillauraC extends Check {
                 }
             }
         }
+        return packet;
     }
 
     @Override

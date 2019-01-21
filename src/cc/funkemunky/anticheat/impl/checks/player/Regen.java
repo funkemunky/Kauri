@@ -18,8 +18,8 @@ public class Regen extends Check {
     }
 
     @Override
-    public void onPacket(Object packet, String packetType, long timeStamp) {
-
+    public Object onPacket(Object packet, String packetType, long timeStamp) {
+        return packet;
     }
 
     @Override

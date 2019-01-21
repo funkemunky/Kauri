@@ -25,7 +25,7 @@ public class AimAssistA extends Check {
     }
 
     @Override
-    public void onPacket(Object packet, String packetType, long timeStamp) {
+    public Object onPacket(Object packet, String packetType, long timeStamp) {
         switch (packetType) {
             case Packet.Client.POSITION_LOOK:
             case Packet.Client.LOOK:
@@ -56,6 +56,8 @@ public class AimAssistA extends Check {
                 break;
             }
         }
+
+        return packet;
     }
 
     @Override

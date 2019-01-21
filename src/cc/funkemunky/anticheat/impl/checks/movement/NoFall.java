@@ -21,9 +21,9 @@ public class NoFall extends Check {
     }
 
     @Override
-    public void onPacket(Object packet, String packetType, long timeStamp) {
+    public Object onPacket(Object packet, String packetType, long timeStamp) {
         if (getData().getLastServerPos().hasNotPassed(1) || getData().getMovementProcessor().getTo().toVector().distance(getData().getMovementProcessor().getFrom().toVector()) < 0.005)
-            return;
+            return packet;
         WrappedInFlyingPacket flying = new WrappedInFlyingPacket(packet, getData().getPlayer());
 
         if (!getData().isGeneralCancel()) {
@@ -52,6 +52,7 @@ public class NoFall extends Check {
         }
 
         lastOnGround = flying.isGround();
+        return packet;
     }
 
     @Override

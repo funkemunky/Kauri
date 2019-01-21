@@ -14,17 +14,17 @@ import org.bukkit.event.Event;
         Packet.Client.LEGACY_POSITION,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
-public class Timer extends Check {
+public class TimerA extends Check {
 
     private Verbose verbose = new Verbose();
     private int timerTicks;
     private long time;
-    public Timer(String name, CancelType cancelType, int maxVL) {
+    public TimerA(String name, CancelType cancelType, int maxVL) {
         super(name, cancelType, maxVL);
     }
 
     @Override
-    public void onPacket(Object packet, String packetType, long timeStamp) {
+    public Object onPacket(Object packet, String packetType, long timeStamp) {
         if (getData().getLastServerPos().hasPassed(2) && getData().getLastLogin().hasPassed(40)) {
             if (System.currentTimeMillis() - time >= 1000L) {
                 if (timerTicks > 21) {
@@ -39,6 +39,7 @@ public class Timer extends Check {
                 timerTicks++;
             }
         }
+        return packet;
     }
 
     @Override

@@ -32,7 +32,7 @@ public class AutoclickerB extends Check {
     }
 
     @Override
-    public void onPacket(Object packet, String packetType, long timeStamp) {
+    public Object onPacket(Object packet, String packetType, long timeStamp) {
         switch (packetType) {
             case Packet.Client.FLYING:
             case Packet.Client.POSITION:
@@ -88,6 +88,7 @@ public class AutoclickerB extends Check {
                 break;
             }
         }
+        return packet;
     }
 
     @Override

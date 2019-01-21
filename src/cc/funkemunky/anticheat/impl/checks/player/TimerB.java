@@ -27,7 +27,7 @@ public class TimerB extends Check {
     }
 
     @Override
-    public void onPacket(Object packet, String packetType, long timeStamp) {
+    public Object onPacket(Object packet, String packetType, long timeStamp) {
         switch (packetType) {
             case Packet.Client.FLYING:
             case Packet.Client.LEGACY_LOOK:
@@ -45,11 +45,11 @@ public class TimerB extends Check {
                 if (getData().getLastLogin().hasPassed(20))
 
                     if (deviationDifference > 0.99999F) {
-                        if (++vl > 4) {
+                        if (++vl > 15) {
                             flag("D: " + deviationDifference, false, false);
                         }
                     } else {
-                        vl = Math.max(vl - 2, 0);
+                        vl = Math.max(vl - 3, 0);
                     }
 
                 val max = Math.sqrt(Kauri.getInstance().getServerSpeed());
@@ -61,10 +61,13 @@ public class TimerB extends Check {
                     }
                 }
 
+                debug("VL: " + vl + " DELTA: " + flyingDifference + "ms DEVIATIONDIF: " + deviationDifference + " STDEV: " + stdDev);
+
                 this.timestamp = timeStamp;
                 break;
             }
         }
+        return packet;
     }
 
     @Override

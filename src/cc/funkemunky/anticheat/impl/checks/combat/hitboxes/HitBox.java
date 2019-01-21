@@ -33,18 +33,18 @@ public class HitBox extends Check {
     }
 
     @Override
-    public void onPacket(Object packet, String packetType, long timeStamp) {
+    public Object onPacket(Object packet, String packetType, long timeStamp) {
         WrappedInUseEntityPacket use = new WrappedInUseEntityPacket(packet, getData().getPlayer());
 
         if (use.getEntity() instanceof Player) {
             val entityData = Kauri.getInstance().getDataManager().getPlayerData(use.getEntity().getUniqueId());
 
-            if (entityData == null || entityData.getTransPing() > 400 || getData().getTransPing() > 400) return;
+            if (entityData == null || entityData.getTransPing() > 400 || getData().getTransPing() > 400) return packet;
             List<BoundingBox> boxes = new ArrayList<>();
 
             val locs = entityData.getMovementProcessor().getPastLocation().getEstimatedLocation(getData().getTransPing(), Math.abs(getData().getTransPing() - getData().getLastTransPing()) + pingLeniency);
 
-            if (locs.size() == 0) return;
+            if (locs.size() == 0) return packet;
             locs.forEach(loc -> boxes.add(getHitbox(loc)));
             val eyeLoc = getData().getMovementProcessor().getTo().clone();
 
@@ -65,6 +65,7 @@ public class HitBox extends Check {
 
             debug("VL: " + vl + " COLLIDED: " + collided + " LOCSIZE: " + locs.size() + " PING: " + getData().getTransPing() + " BOXSIZE: " + boxes.size() + " DELTA: " + Math.abs(getData().getTransPing() - getData().getLastTransPing()) + pingLeniency);
         }
+        return packet;
     }
 
     @Override

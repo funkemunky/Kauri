@@ -14,9 +14,7 @@ import cc.funkemunky.anticheat.impl.checks.combat.reach.ReachB;
 import cc.funkemunky.anticheat.impl.checks.combat.reach.ReachC;
 import cc.funkemunky.anticheat.impl.checks.combat.reach.ReachD;
 import cc.funkemunky.anticheat.impl.checks.movement.*;
-import cc.funkemunky.anticheat.impl.checks.player.BadPacketsA;
-import cc.funkemunky.anticheat.impl.checks.player.Regen;
-import cc.funkemunky.anticheat.impl.checks.player.Timer;
+import cc.funkemunky.anticheat.impl.checks.player.*;
 import com.google.common.collect.Lists;
 import lombok.Getter;
 
@@ -28,7 +26,7 @@ import java.util.Optional;
 public class CheckManager {
     private List<Check> checks = Lists.newArrayList();
 
-    public CheckManager() {
+    public void init() {
         checks = loadChecks();
     }
 
@@ -47,17 +45,19 @@ public class CheckManager {
         checks.add(new Fly("Fly", CancelType.MOTION, 225));
         checks.add(new SpeedA("Speed (Type A)", CancelType.MOTION, 100));
         checks.add(new SpeedB("Speed (Type B)", CancelType.MOTION, 125));
-        //checks.add(new SpeedC("Speed (Type C)", CancelType.MOTION, 100));
+        checks.add(new SpeedC("Speed (Type C)", CancelType.MOTION, 100));
         checks.add(new ReachA("Reach (Type A)", CancelType.COMBAT, 60));
         checks.add(new ReachB("Reach (Type B)", CancelType.COMBAT, 60));
         checks.add(new ReachC("Reach (Type C)", CancelType.MOTION, 50));
         checks.add(new ReachD("Reach (Type D)", CancelType.COMBAT, 50));
-        checks.add(new Timer("Timer", CancelType.MOTION, 100));
+        checks.add(new TimerA("Timer (Type A)", CancelType.MOTION, 100));
+        checks.add(new TimerB("Timer (Type B)", CancelType.MOTION, 200));
         checks.add(new NoFall("NoFall", CancelType.MOTION, 100));
         checks.add(new Regen("Regen", CancelType.HEALTH, 20));
         checks.add(new Fastbow("Fastbow", CancelType.INTERACT, 40));
         checks.add(new HitBox("HitBox", CancelType.COMBAT, 30));
         checks.add(new BadPacketsA("BadPackets (Type A)", CancelType.MOTION, 40));
+        checks.add(new BadPacketsB("BadPackets (Type B)", CancelType.COMBAT, 50));
 
         for (Check check : checks) {
             Arrays.stream(check.getClass().getDeclaredFields()).filter(field -> {
@@ -67,19 +67,34 @@ public class CheckManager {
             }).forEach(field -> {
                 try {
                     field.setAccessible(true);
-                    check.getSettings().put(field.getName(), field.get(check));
+
+                    String path = "checks." + check.getName() + ".settings." + field.getName();
+                    if (Kauri.getInstance().getConfig().get(path) != null) {
+                        Object val = Kauri.getInstance().getConfig().get(path);
+
+                        if (val instanceof Double && field.get(check) instanceof Float) {
+                            field.set(check, (float) (double) val);
+                        } else {
+                            field.set(check, val);
+                        }
+                    } else {
+                        Kauri.getInstance().getConfig().set("checks." + check.getName() + ".settings." + field.getName(), field.get(check));
+                        Kauri.getInstance().saveConfig();
+                    }
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
             });
-
-            check.loadFromConfig();
         }
         return checks;
     }
 
     public void registerCheck(Check check) {
         checks.add(check);
+    }
+
+    public boolean isCheck(String name) {
+        return checks.stream().anyMatch(check -> check.getName().equalsIgnoreCase(name));
     }
 
     public void reloadChecks() {

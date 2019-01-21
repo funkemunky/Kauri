@@ -19,7 +19,7 @@ public class KillauraB extends Check {
     }
 
     @Override
-    public void onPacket(Object packet, String packetType, long timeStamp) {
+    public Object onPacket(Object packet, String packetType, long timeStamp) {
         WrappedInUseEntityPacket use = new WrappedInUseEntityPacket(packet, getData().getPlayer());
 
         if (use.getEntity() instanceof LivingEntity) { //We check if it's a LivingEntity since the MathUtils#getOffsetFromEntity requires it.
@@ -36,6 +36,7 @@ public class KillauraB extends Check {
             }
             //Bukkit.broadcastMessage("offset: " + offset);
         }
+        return packet;
     }
 
     @Override

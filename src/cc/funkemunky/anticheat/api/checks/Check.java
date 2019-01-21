@@ -2,12 +2,9 @@ package cc.funkemunky.anticheat.api.checks;
 
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
-import cc.funkemunky.anticheat.api.utils.ConfigSetting;
-import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.event.system.Listener;
 import cc.funkemunky.api.utils.Color;
-import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.JsonMessage;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,7 +17,6 @@ import java.util.Map;
 
 @Getter
 @Setter
-@Init
 public abstract class Check implements Listener, org.bukkit.event.Listener {
     private String name;
     private CancelType cancelType;
@@ -28,15 +24,10 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
     private int vl, maxVL;
     private boolean enabled, executable, cancellable;
     private Verbose lagVerbose = new Verbose();
-    private long lastAlert, alertDelay = 0;
+    private long lastAlert;
     private String execCommand;
     private Map<String, Object> settings = new HashMap<>();
-
-    @ConfigSetting
-    private String alertMessage = "&8[&b&lKauri&8] &f%player% &7has failed &f%check% &c(x%vl%)";
-
-    @ConfigSetting
-    private long alertsDelay = 1000;
+    private String alertMessage = "";
 
     public Check(String name, CancelType cancelType, int maxVL) {
         this.name = name;
@@ -46,7 +37,7 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
 
         enabled = executable = true;
 
-        alertMessage = alertMessage.replaceAll("%check%", getName());
+        alertMessage = CheckSettings.alertMessage.replaceAll("%check%", name);
 
         loadFromConfig();
     }
@@ -60,14 +51,15 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
 
         enabled = executable = true;
 
-        alertMessage = alertMessage.replaceAll("%check%", getName());
+        alertMessage = CheckSettings.alertMessage.replaceAll("%check%", name);
         loadFromConfig();
     }
 
     protected void flag(String information, boolean cancel, boolean ban) {
-        if (data.getLagTicks() == 0 || lagVerbose.flag(4, 500L)) {
-            if (vl++ > maxVL && executable && ban) {
-                MiscUtils.allahAkbar(getData().getPlayer());
+        if (data.getLastLag().hasPassed() || lagVerbose.flag(4, 500L)) {
+            vl++;
+            int vl = Kauri.getInstance().getLoggerManager().addViolationToLogAndSave(this, data.getUuid());
+            if(!data.isLagging() && Kauri.getInstance().getTPS() > 19 && ban && vl++ > maxVL && executable) {
                 new BukkitRunnable() {
                     public void run() {
                         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), execCommand.replaceAll("%player%", getData().getPlayer().getName()));
@@ -77,12 +69,13 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
 
             if (cancel && cancellable) data.setCancelType(cancelType);
 
-            if (System.currentTimeMillis() - lastAlert > alertDelay) {
+            if (System.currentTimeMillis() - lastAlert > CheckSettings.alertsDelay) {
                 JsonMessage message = new JsonMessage();
 
                 message.addText(Color.translate(alertMessage.replaceAll("%player%", data.getPlayer().getName()).replaceAll("%vl%", String.valueOf(vl)).replaceAll("%info%", information))).addHoverText(Color.Gray + information);
                 Bukkit.getOnlinePlayers().stream().filter(player -> player.hasPermission("fiona.alerts")).forEach(message::sendToPlayer);
                 lastAlert = System.currentTimeMillis();
+                Kauri.getInstance().getLoggerManager().addAlertToLog(getData(), this, "failed " + name + " VL " + vl + " [info: " + information + " lagTicks: " + getData().getLagTicks() + " transPing: " + getData().getTransPing() + "ms]");
             }
         }
     }
@@ -93,27 +86,12 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
             enabled = Kauri.getInstance().getConfig().getBoolean("checks." + name + ".enabled");
             executable = Kauri.getInstance().getConfig().getBoolean("checks." + name + ".executable");
             cancellable = Kauri.getInstance().getConfig().getBoolean("checks." + name + ".cancellable");
-            alertDelay = Kauri.getInstance().getConfig().getLong("checks." + name + ".alertDelay");
-
-            for (String key : settings.keySet()) {
-                String path = "checks." + name + ".settings." + key;
-                if (Kauri.getInstance().getConfig().get(path) != null) {
-                    settings.put(key, Kauri.getInstance().getConfig().get(path));
-                } else {
-                    Kauri.getInstance().getConfig().set("checks." + name + ".settings." + key, settings.get(key));
-                    Kauri.getInstance().saveConfig();
-                }
-            }
         } else {
             Kauri.getInstance().getConfig().set("checks." + name + ".maxVL", maxVL);
             Kauri.getInstance().getConfig().set("checks." + name + ".enabled", enabled);
             Kauri.getInstance().getConfig().set("checks." + name + ".executable", executable);
             Kauri.getInstance().getConfig().set("checks." + name + ".cancellable", cancellable);
-            Kauri.getInstance().getConfig().set("checks." + name + ".alertDelay", alertDelay);
 
-            for (String key : settings.keySet()) {
-                Kauri.getInstance().getConfig().set("checks." + name + ".settings." + key, settings.get(key));
-            }
             Kauri.getInstance().saveConfig();
         }
 
@@ -126,7 +104,7 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
                 .forEach(dData -> dData.getPlayer().sendMessage(Color.translate("&8[&cDebug&8] &7" + debugString)));
     }
 
-    public abstract void onPacket(Object packet, String packetType, long timeStamp);
+    public abstract Object onPacket(Object packet, String packetType, long timeStamp);
 
     public abstract void onBukkitEvent(Event event);
 }

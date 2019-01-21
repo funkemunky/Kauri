@@ -20,7 +20,7 @@ public class BadPacketsA extends Check {
     }
 
     @Override
-    public void onPacket(Object packet, String packetType, long timeStamp) {
+    public Object onPacket(Object packet, String packetType, long timeStamp) {
         if (packetType.equalsIgnoreCase(Packet.Server.ABILITIES)) {
             WrappedOutAbilitiesPacket abilities = new WrappedOutAbilitiesPacket(packet, getData().getPlayer());
 
@@ -38,6 +38,7 @@ public class BadPacketsA extends Check {
                 vl -= vl > 0 ? 1 : 0;
             }
         }
+        return packet;
     }
 
     @Override

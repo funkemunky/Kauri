@@ -5,6 +5,7 @@ import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.utils.CustomLocation;
 import cc.funkemunky.anticheat.api.utils.Packets;
+import cc.funkemunky.anticheat.api.utils.PastLocation;
 import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
@@ -14,9 +15,7 @@ import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.math.RayTrace;
 import com.google.common.collect.Lists;
 import lombok.val;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
 import org.bukkit.util.Vector;
 
@@ -38,75 +37,92 @@ public class ReachD extends Check {
     }
 
     @Setting
-    private long pingRange = 160;
+    private long pingRange = 100;
 
     @Setting
-    private float maxReach = 3.08f;
+    private float maxReach = 3.0f;
 
     @Setting
-    private int maxVL = 8;
+    private int maxVL = 5;
 
-    private Player target;
-    private boolean attacked;
-    private int vl;
+    private LivingEntity target;
+    private boolean attacked, cancel = false;
+    private double vl;
+
+    private PastLocation targetLocs = new PastLocation();
 
     @Override
-    public void onPacket(Object packet, String packetType, long timeStamp) {
+    public Object onPacket(Object packet, String packetType, long timeStamp) {
         if(packetType.equals(Packet.Client.USE_ENTITY)) {
             WrappedInUseEntityPacket use = new WrappedInUseEntityPacket(packet, getData().getPlayer());
 
-            if(use.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK) && use.getEntity() instanceof Player) {
+            if(use.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) {
                 attacked = true;
-                target = (Player) use.getEntity();
+                target = (LivingEntity) use.getEntity();
+
+                if(cancel) {
+                    use.setCancelled(true);
+                    cancel = false;
+                    return use;
+                }
             }
-        } else if(attacked) {
-            WrappedInFlyingPacket flying = new WrappedInFlyingPacket(packet, getData().getPlayer());
+        } else if(target != null) {
+            if (attacked) {
+                val entityData = Kauri.getInstance().getDataManager().getPlayerData(target.getUniqueId());
 
-            if(target == null) return;
-
-            val entityData = Kauri.getInstance().getDataManager().getPlayerData(target.getUniqueId());
-
-            if(entityData == null || entityData.getTransPing() > 450 || getData().getTransPing() > 450) return;
-
-            val origin = getData().getMovementProcessor().getTo().clone().toLocation(flying.getPlayer().getWorld()).add(0, 1.53f, 0);
-
-            RayTrace trace = new RayTrace(origin.toVector(), origin.getDirection());
-
-            List<Vector> vecs = trace.traverse(entityData.getMovementProcessor().getTo().toVector().distance(origin.toVector()), 0.05);
-
-            List<BoundingBox> entityBoxes = Lists.newArrayList();
-
-            entityData.getMovementProcessor().getPastLocation()
-                    .getEstimatedLocation(getData().getTransPing(), pingRange + MathUtils.getDelta(getData().getTransPing(), getData().getLastTransPing()))
-                    .forEach(loc -> entityBoxes.add(getHitbox(loc)));
-
-            List<Vector> finalVecs = Lists.newArrayList();
-
-            vecs.stream().filter(vec -> entityBoxes.stream().anyMatch(box -> box.collides(vec))).forEach(finalVecs::add);
-
-            double calculatedReach = 0;
-            int collided = 0;
-            for(Vector vec : finalVecs) {
-                double reach = origin.toVector().distance(vec);
-
-                calculatedReach = calculatedReach > 0 ? Math.min(calculatedReach, reach) : reach;
-                collided++;
-            }
-
-            if(collided > 0) {
-                if(calculatedReach > maxReach) {
-                    if(vl++ > maxVL) {
-                        flag(calculatedReach + ">-" + maxReach, false, true);
-                    }
-                } else {
-                    vl = vl > 0 ? 1 : 0;
+                if(entityData == null) {
+                    targetLocs.addLocation(new CustomLocation(target.getLocation()));
                 }
 
-                debug("VL: " + vl +  "REACH: " + calculatedReach + " COLLIDED: " + collided);
-            }
+                WrappedInFlyingPacket flying = new WrappedInFlyingPacket(packet, getData().getPlayer());
 
-            attacked = false;
+                val origin = getData().getMovementProcessor().getTo().clone().toLocation(flying.getPlayer().getWorld()).add(0, 1.53f, 0);
+
+                RayTrace trace = new RayTrace(origin.toVector(), origin.getDirection());
+
+                List<Vector> vecs = trace.traverse( ((entityData != null ? entityData.getMovementProcessor().getTo().toVector() : target.getLocation().toVector()).distance(origin.toVector()) - 0.3) / 2, (entityData != null ? entityData.getMovementProcessor().getTo().toVector() : target.getLocation().toVector()).distance(origin.toVector()), 0.025);
+
+                List<BoundingBox> entityBoxes = Lists.newArrayList();
+
+                if(entityData == null) {
+                    targetLocs.getEstimatedLocation(getData().getTransPing(), pingRange + MathUtils.getDelta(getData().getTransPing(), getData().getLastTransPing()))
+                            .forEach(loc -> entityBoxes.add(getHitbox(loc)));
+                } else {
+                    entityData.getMovementProcessor().getPastLocation()
+                            .getEstimatedLocation(getData().getTransPing(), pingRange + MathUtils.getDelta(getData().getTransPing(), getData().getLastTransPing()))
+                            .forEach(loc -> entityBoxes.add(getHitbox(loc)));
+                }
+
+                List<Vector> finalVecs = Lists.newArrayList();
+
+                vecs.stream().filter(vec -> entityBoxes.stream().anyMatch(box -> box.collides(vec))).forEach(finalVecs::add);
+
+                double calculatedReach = 0;
+                int collided = 0;
+                for (Vector vec : finalVecs) {
+                    double reach = origin.toVector().distance(vec);
+
+                    calculatedReach = calculatedReach > 0 ? Math.min(calculatedReach, reach) : reach;
+                    collided++;
+                }
+
+                if (collided > 0) {
+                    if (calculatedReach > maxReach) {
+                        if (vl++ > maxVL) {
+                            flag(calculatedReach + ">-" + maxReach, false, true);
+                        }
+                        cancel = true;
+                    } else {
+                        vl = vl > 0 ? 0.25 : 0;
+                    }
+
+                    debug("VL: " + vl + "/" + maxVL + " REACH: " + calculatedReach + " COLLIDED: " + collided + " MAX: " + maxReach + " RANGE: " + pingRange);
+                }
+
+                attacked = false;
+            }
         }
+        return packet;
     }
 
     @Override
@@ -115,7 +131,7 @@ public class ReachD extends Check {
     }
 
     private BoundingBox getHitbox(CustomLocation l) {
-        return new BoundingBox(0,0,0,0,0,0).add((float) l.getX(), (float) l.getY(), (float) l.getZ()).grow(.3f, 0, .3f)
+        return new BoundingBox(0,0,0,0,0,0).add((float) l.getX(), (float) l.getY(), (float) l.getZ()).grow(.4f, 0, .4f)
                 .add(0,0,0,0, 1.85f, 0);
     }
 }

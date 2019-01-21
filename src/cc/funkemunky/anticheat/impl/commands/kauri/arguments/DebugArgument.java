@@ -22,7 +22,10 @@ public class DebugArgument extends FunkeArgument {
 
         addTabComplete(2, "none");
         List<String> checks = Lists.newArrayList();
-        Kauri.getInstance().getCheckManager().getChecks().forEach(check -> checks.add(check.getName().replaceAll(" ", "_")));
+
+        for (Check check : Kauri.getInstance().getCheckManager().getChecks()) {
+            checks.add(check.getName().replaceAll(" ", "_"));
+        }
 
         String[] checkArray = new String[checks.size()];
 

@@ -29,8 +29,8 @@ public class AutoclickerA extends Check {
     }
 
     @Override
-    public void onPacket(Object packet, String packetType, long timeStamp) {
-        if (MiscUtils.shouldReturnArmAnimation(getData())) return;
+    public Object onPacket(Object packet, String packetType, long timeStamp) {
+        if (MiscUtils.shouldReturnArmAnimation(getData())) return packet;;
 
         val cps = (double) lastTimeStamp / timeStamp;
 
@@ -43,6 +43,7 @@ public class AutoclickerA extends Check {
         }
 
         lastTimeStamp = timeStamp;
+        return packet;
     }
 
     @Override

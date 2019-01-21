@@ -64,7 +64,7 @@ public class AutoclickerC extends Check {
      */
 
     @Override
-    public void onPacket(Object packet, String packetType, long timeStamp) {
+    public Object onPacket(Object packet, String packetType, long timeStamp) {
         switch (packetType) {
             case Packet.Client.FLYING:
             case Packet.Client.POSITION:
@@ -103,11 +103,12 @@ public class AutoclickerC extends Check {
             }
 
             case Packet.Client.ARM_ANIMATION: {
-                if (MiscUtils.shouldReturnArmAnimation(getData())) return;
+                if (MiscUtils.shouldReturnArmAnimation(getData())) return packet;
                 cps++;
                 break;
             }
         }
+        return packet;
     }
 
     @Override

@@ -2,15 +2,16 @@ package cc.funkemunky.anticheat;
 
 import cc.funkemunky.anticheat.api.checks.CheckManager;
 import cc.funkemunky.anticheat.api.data.DataManager;
-import cc.funkemunky.anticheat.api.utils.ConfigSetting;
+import cc.funkemunky.anticheat.api.events.TickEvent;
+import cc.funkemunky.anticheat.api.log.LoggerManager;
+import cc.funkemunky.anticheat.api.mongo.Mongo;
 import cc.funkemunky.anticheat.impl.commands.kauri.KauriCommand;
 import cc.funkemunky.anticheat.impl.listeners.BukkitListeners;
 import cc.funkemunky.anticheat.impl.listeners.PacketListeners;
 import cc.funkemunky.anticheat.impl.listeners.PlayerConnectionListeners;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.event.system.EventManager;
-import cc.funkemunky.api.utils.ClassScanner;
-import cc.funkemunky.api.utils.MiscUtils;
+import cc.funkemunky.api.utils.*;
 import lombok.Getter;
 import lombok.val;
 import org.bukkit.Bukkit;
@@ -28,8 +29,10 @@ public class Kauri extends JavaPlugin {
     private static Kauri instance;
     private DataManager dataManager;
     private CheckManager checkManager;
+    private LoggerManager loggerManager;
+    private Mongo mongo;
     private int currentTicks;
-    private long serverSpeed, timestamp;
+    private long serverSpeed, lastTick;
     private ScheduledExecutorService executorService;
 
     @Override
@@ -38,9 +41,17 @@ public class Kauri extends JavaPlugin {
         instance = this;
         saveDefaultConfig();
 
+        startScanner();
+
         //Starting up our utilities, managers, and tasks.
         checkManager = new CheckManager();
+        checkManager.init();
         dataManager = new DataManager();
+        mongo = new Mongo();
+
+        mongo.connect();
+
+        loggerManager = new LoggerManager();
         runTasks();
 
         executorService = Executors.newSingleThreadScheduledExecutor();
@@ -58,7 +69,9 @@ public class Kauri extends JavaPlugin {
     public void onDisable() {
         EventManager.clearRegistered();
         org.bukkit.event.HandlerList.unregisterAll(this);
+        Atlas.getInstance().getFunkeCommandManager().removeCommand("kauri");
         Kauri.getInstance().getDataManager().getDataObjects().clear();
+        getServer().getScheduler().cancelTasks(this);
     }
 
     private void runTasks() {
@@ -66,16 +79,18 @@ public class Kauri extends JavaPlugin {
         //and it also has the added benefit of being lighter than using System.currentTimeMillis.
         new BukkitRunnable() {
             public void run() {
-                currentTicks++;
+                TickEvent tickEvent = new TickEvent(currentTicks++);
 
-                val now = System.currentTimeMillis();
-
-                val difference = now - timestamp;
-
-                serverSpeed = difference;
-                timestamp = now;
+                EventManager.callEvent(tickEvent);
             }
-        }.runTaskTimerAsynchronously(this, 0L, 1L);
+        }.runTaskTimer(this, 0L, 1L);
+
+        new BukkitRunnable() {
+            public void run() {
+                serverSpeed = MathUtils.elapsed(lastTick) / 2;
+                lastTick = System.currentTimeMillis();
+            }
+        }.runTaskTimer(this, 1L, 2L);
     }
 
     private void registerCommands() {
@@ -83,40 +98,10 @@ public class Kauri extends JavaPlugin {
     }
 
     private void startScanner() {
-        ClassScanner.scanFile(null, getClass()).forEach(c -> {
-            try {
-                Class clazz = Class.forName(c);
-                Object obj = clazz.newInstance();
+        Atlas.getInstance().initializeScanner(getClass(), this);
+    }
 
-                Bukkit.broadcastMessage(clazz.getName());
-                if (obj instanceof Listener) {
-                    MiscUtils.printToConsole("&eFound " + clazz.getSimpleName() + " Bukkit listener. Registering...");
-                    Bukkit.getPluginManager().registerEvents((Listener) obj, this);
-                } else if (obj instanceof cc.funkemunky.api.event.system.Listener) {
-                    MiscUtils.printToConsole("&eFound " + clazz.getSimpleName() + " Atlas listener. Registering...");
-                    EventManager.register((cc.funkemunky.api.event.system.Listener) obj);
-                }
-
-                Arrays.stream(clazz.getDeclaredFields()).filter(field -> field.isAnnotationPresent(ConfigSetting.class)).forEach(field -> {
-                    String path = field.getAnnotation(ConfigSetting.class).path() + "." + field.getName();
-                    try {
-                        field.setAccessible(true);
-                        MiscUtils.printToConsole("&eFound " + field.getName() + " ConfigSetting (default=" + field.get(obj) + ").");
-                        if (getConfig().get(path) == null) {
-                            MiscUtils.printToConsole("&eValue not found in configuration! Setting default into config...");
-                            getConfig().set(path, field.get(obj));
-                            saveConfig();
-                        } else {
-                            field.set(obj, getConfig().get(path));
-                            MiscUtils.printToConsole("&eValue found in configuration! Set value to &a" + getConfig().get(path));
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+    public double getTPS() {
+        return 1000D / serverSpeed;
     }
 }

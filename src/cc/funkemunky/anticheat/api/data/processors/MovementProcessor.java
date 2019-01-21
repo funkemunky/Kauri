@@ -10,6 +10,7 @@ import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.PlayerUtils;
 import cc.funkemunky.api.utils.ReflectionsUtil;
 import lombok.Getter;
+import org.bukkit.Material;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -20,9 +21,9 @@ import java.util.List;
 @Setting
 public class MovementProcessor {
     private boolean clientOnGround, serverOnGround, fullyInAir, inAir, hasJumped, inLiquid, blocksOnTop, pistonsNear, onHalfBlock,
-            onClimbable, onIce, collidesHorizontally, inWeb, onSlimeBefore;
-    private int airTicks, groundTicks, iceTicks, climbTicks, halfBlockTicks, blockAboveTicks, optifineTicks;
-    private float deltaY, deltaXZ, distanceToGround, serverYVelocity, lastServerYVelocity, serverYAcceleration, jumpVelocity;
+            onClimbable, onIce, collidesHorizontally, inWeb, onSlimeBefore, onSoulSand;
+    private int airTicks, groundTicks, iceTicks, climbTicks, halfBlockTicks, soulSandTicks, blockAboveTicks, optifineTicks, liquidTicks;
+    private float deltaY, lastDeltaY, deltaXZ, distanceToGround, serverYVelocity, lastServerYVelocity, serverYAcceleration, clientYAcceleration, jumpVelocity;
     private CustomLocation from, to;
     private PastLocation pastLocation = new PastLocation();
 
@@ -63,6 +64,7 @@ public class MovementProcessor {
             inWeb = assessment.isInWeb();
             onClimbable = assessment.isOnClimbable();
             fullyInAir = assessment.isFullyInAir();
+            onSoulSand = assessment.getMaterialsCollided().contains(Material.SOUL_SAND);
 
             jumpVelocity = 0.42f + (PlayerUtils.getPotionEffectLevel(packet.getPlayer(), PotionEffectType.JUMP) * 0.1f);
 
@@ -76,8 +78,10 @@ public class MovementProcessor {
                 groundTicks = 0;
             }
 
+            lastDeltaY = deltaY;
             deltaY = (float) (to.getY() - from.getY());
             deltaXZ = (float) (Math.hypot(to.getX() - from.getX(), to.getZ() - from.getZ()));
+            clientYAcceleration = deltaY - lastDeltaY;
 
             //Hear we use the client's ground packet being sent since whatever motion the client says it has
             //will line up with this since ground is sent along with positional packets (flying, poslook, pos, look)
@@ -115,10 +119,12 @@ public class MovementProcessor {
                 distanceToGround += deltaY;
             }
 
-            iceTicks = onIce ? Math.min(40, iceTicks + 1) : Math.max(0, iceTicks - 1);
+            iceTicks = onIce ? Math.min(40, iceTicks + 2) : Math.max(0, iceTicks - 1);
             climbTicks = onClimbable ? Math.min(40, climbTicks + 1) : Math.max(0, climbTicks - 1);
             halfBlockTicks = onHalfBlock ? Math.min(40, halfBlockTicks + 2) : Math.max(0, halfBlockTicks - 1);
             blockAboveTicks = blocksOnTop ? Math.min(40, blockAboveTicks + 2) : Math.max(0, blockAboveTicks - 1);
+            liquidTicks = inLiquid ? Math.min(50, liquidTicks + 1) : Math.max(0, liquidTicks - 1);
+            soulSandTicks = onSoulSand ? Math.min(40, soulSandTicks + 1) : Math.max(0, soulSandTicks - 1);
         }
 
         if (packet.isLook()) {
@@ -140,7 +146,6 @@ public class MovementProcessor {
             }
         }
 
-        data.lagTicks = data.isLagging() ? Math.min(100, data.lagTicks + 5) : Math.max(0, data.lagTicks - 1);
         pastLocation.addLocation(new CustomLocation(to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch()));
         data.setGeneralCancel(data.isAbleToFly() || packet.getPlayer().getAllowFlight() || data.isCreativeMode() || data.isRiptiding() || data.getLastLogin().hasNotPassed(50) || data.getVelocityProcessor().getLastVelocity().hasNotPassed(40));
     }
