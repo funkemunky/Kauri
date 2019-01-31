@@ -40,28 +40,19 @@ public class TimerB extends Check {
 
                 movingStats.addValue(flyingDifference);
 
-                val deviationDifference = Math.abs(Math.sqrt(flyingDifference) - Math.sqrt(Kauri.getInstance().getServerSpeed()));
+                val deviationDifference = Math.abs(Math.sqrt(flyingDifference) - Math.sqrt(7.071));
 
-                if (getData().getLastLogin().hasPassed(20))
+                if (getData().getLastLogin().hasPassed(20) && !getData().isLagging())
 
                     if (deviationDifference > 0.99999F) {
-                        if (++vl > 15) {
+                        if (++vl > 20) {
                             flag("D: " + deviationDifference, false, false);
                         }
                     } else {
-                        vl = Math.max(vl - 3, 0);
+                        vl = Math.max(vl - 5, 0);
                     }
 
-                val max = Math.sqrt(Kauri.getInstance().getServerSpeed());
-                val stdDev = movingStats.getStdDev(max);
-
-                if (stdDev != 0.0E00 / 0.0E00) {
-                    if (stdDev < max || stdDev > max) {
-                        flag("D: " + stdDev + " > " + max, false, false);
-                    }
-                }
-
-                debug("VL: " + vl + " DELTA: " + flyingDifference + "ms DEVIATIONDIF: " + deviationDifference + " STDEV: " + stdDev);
+                val max = Math.sqrt(Kauri.getInstance().getTickElapsed());
 
                 this.timestamp = timeStamp;
                 break;

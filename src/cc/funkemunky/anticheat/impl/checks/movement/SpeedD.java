@@ -23,15 +23,15 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 @Packets(packets = {
-        Packet.Server.POSITION,
-        Packet.Server.ENTITY_VELOCITY,
-        Packet.Server.ABILITIES,
-        Packet.Client.KEEP_ALIVE,
-        Packet.Client.ABILITIES,
-        Packet.Client.ENTITY_ACTION,
+        Packet.Server.POSITION, 
+        Packet.Server.ENTITY_VELOCITY, 
+        Packet.Server.ABILITIES, 
+        Packet.Client.KEEP_ALIVE, 
+        Packet.Client.ABILITIES, 
+        Packet.Client.ENTITY_ACTION, 
         Packet.Client.BLOCK_PLACE,
-        Packet.Client.USE_ENTITY,
-        Packet.Client.BLOCK_DIG,
+        Packet.Client.USE_ENTITY, 
+        Packet.Client.BLOCK_DIG, 
         Packet.Client.HELD_ITEM_SLOT,
         Packet.Client.POSITION_LOOK,
         Packet.Client.LOOK,
@@ -210,7 +210,7 @@ public class SpeedD extends Check {
                 if (lastOnGround) {
                     multiplier = 0.60000005239967D;
                     rmotionX *= multiplier;
-                    rmotionZ *= multiplier;
+                     rmotionZ *= multiplier;
                 }
 
                 if (Math.abs(rmotionX) < 0.005D) // the client sets the motionX,Y and Z to 0 if its slower than 0.005D

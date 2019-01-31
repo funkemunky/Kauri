@@ -15,8 +15,7 @@ public class ReloadArgument extends FunkeArgument {
     @Override
     public void onArgument(CommandSender commandSender, Command command, String[] strings) {
         commandSender.sendMessage(Color.Red + "Reloading configuration...");
-        Kauri.getInstance().reloadConfig();
-        Kauri.getInstance().getCheckManager().reloadChecks();
+        Kauri.getInstance().reloadKauri();
         commandSender.sendMessage(Color.Green + "Completed!");
     }
 }

@@ -3,8 +3,9 @@ package cc.funkemunky.anticheat.impl.checks.player;
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.utils.Packets;
-import cc.funkemunky.anticheat.api.utils.Verbose;
+import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
+import lombok.val;
 import org.bukkit.event.Event;
 
 @Packets(packets = {Packet.Client.FLYING,
@@ -16,28 +17,30 @@ import org.bukkit.event.Event;
         Packet.Client.LEGACY_LOOK})
 public class TimerA extends Check {
 
-    private Verbose verbose = new Verbose();
-    private int timerTicks;
-    private long time;
+    @Setting(name = "threshold")
+    private long threshold = 960L;
+
+    private int ticks, vl;
+    private long lastReset;
     public TimerA(String name, CancelType cancelType, int maxVL) {
         super(name, cancelType, maxVL);
     }
 
     @Override
     public Object onPacket(Object packet, String packetType, long timeStamp) {
-        if (getData().getLastServerPos().hasPassed(2) && getData().getLastLogin().hasPassed(40)) {
-            if (System.currentTimeMillis() - time >= 1000L) {
-                if (timerTicks > 21) {
-                    if (verbose.flag(3, 2500L)) {
-                        flag(timerTicks + ">-21", false, true);
-                    }
-                }
-                debug(verbose.getVerbose() + ": " + timerTicks);
-                timerTicks = 0;
-                time = System.currentTimeMillis();
-            } else if (!getData().isLagging()) {
-                timerTicks++;
-            }
+        if (getData().getLastServerPos().hasPassed(2)  && getData().getLastLogin().hasPassed(40)) {
+           if(ticks++ >= 20) {
+               val elapsed = timeStamp - lastReset;
+               if(elapsed < threshold) {
+                   if(vl++ > 2) {
+                       flag(elapsed + "-<" + threshold, true, true);
+                   }
+               } else {
+                   vl -= vl > 0 ? 1 : 0;
+               }
+               ticks = 0;
+               lastReset = timeStamp;
+           }
         }
         return packet;
     }

@@ -4,26 +4,33 @@ import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.utils.Packets;
+import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.event.custom.PacketRecieveEvent;
 import cc.funkemunky.api.event.custom.PacketSendEvent;
 import cc.funkemunky.api.event.system.EventMethod;
 import cc.funkemunky.api.event.system.Listener;
 import cc.funkemunky.api.tinyprotocol.api.NMSObject;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.*;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutEntityMetadata;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
+import cc.funkemunky.api.utils.Init;
+import org.bukkit.entity.LivingEntity;
 
+import java.util.AbstractMap;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 
+@Init
 public class PacketListeners implements Listener {
 
     @EventMethod
     public void onEvent(PacketSendEvent event) {
-        if (event.getPlayer() == null) return;
+        if (event.getPlayer() == null || !event.getPlayer().isOnline()) return;
+        Kauri.getInstance().getProfiler().start("event:PacketSendEvent");
         PlayerData data = Kauri.getInstance().getDataManager().getPlayerData(event.getPlayer().getUniqueId());
 
         if (data != null) {
@@ -50,24 +57,22 @@ public class PacketListeners implements Listener {
                     data.getVelocityProcessor().update(packet);
                     break;
                 }
-                case Packet.Server.ENTITY_METADATA: {
-                    WrappedOutEntityMetadata packet = new WrappedOutEntityMetadata(event.getPacket(), event.getPlayer());
-
-                    if (ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_13) && packet.getObjects().size() > 6) {
-                        int rt = ((Byte) packet.getObjects().get(6).getObject() & 0x04);
-                        data.setRiptiding(rt == 1);
-                    }
-                    break;
-                }
             }
 
-            data.getChecks().stream().filter(check -> check.isEnabled() && check.isEnabled() && check.isEnabled() && check.isEnabled() && check.getClass().isAnnotationPresent(Packets.class) && Arrays.asList(check.getClass().getAnnotation(Packets.class).packets()).contains(event.getType())).forEach(check -> check.onPacket(event.getPacket(), event.getType(), event.getTimeStamp()));
+            Map.Entry<Object, Boolean> result = hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
+
+            if(result != null) {
+                event.setCancelled(result.getValue());
+                event.setPacket(result.getKey());
+            }
         }
+        Kauri.getInstance().getProfiler().stop("event:PacketSendEvent");
     }
 
     @EventMethod
     public void onEvent(PacketRecieveEvent event) {
         if (event.getPlayer() == null) return;
+        Kauri.getInstance().getProfiler().start("event:PacketReceiveEvent");
         PlayerData data = Kauri.getInstance().getDataManager().getPlayerData(event.getPlayer().getUniqueId());
 
         if (data != null) {
@@ -84,6 +89,8 @@ public class PacketListeners implements Listener {
                         //I have not seen anyone create a spoof for it or even talk about the possibility of needing one.
                         //Large jumps in latency most of the time mean lag.
                         data.setLagging(Math.abs(data.getTransPing() - data.getLastTransPing()) > 35);
+
+                        if(data.isLagging()) data.getLastLag().reset();
                     }
                     break;
                 }
@@ -144,29 +151,56 @@ public class PacketListeners implements Listener {
                 case Packet.Client.BLOCK_PLACE: {
                     WrappedInBlockPlacePacket packet = new WrappedInBlockPlacePacket(event.getPacket(), event.getPlayer());
 
-                    if (packet.getItemStack() != null && packet.getPosition() != null) {
+                    if (packet.getItemStack() != null && packet.getPosition() != null && packet.getPosition().getX() != -1 && packet.getPosition().getY() != -1 && packet.getPosition().getZ() != -1) {
                         data.getLastBlockPlace().reset();
                     }
                     break;
                 }
                 case Packet.Client.USE_ENTITY:
+                    WrappedInUseEntityPacket packet = new WrappedInUseEntityPacket(event.getPacket(), event.getPlayer());
+
+                    if(packet.getEntity() instanceof LivingEntity) {
+                        data.getLastAttack().reset();
+                    }
                     break;
             }
+            Map.Entry<Object, Boolean> result = hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
 
+            if(result != null) {
+                event.setCancelled(result.getValue());
+                event.setPacket(result.getKey());
+            }
+        }
+        Kauri.getInstance().getProfiler().stop("event:PacketReceiveEvent");
+    }
+
+    private Map.Entry<Object, Boolean> hopper(Object packet, String packetType, long timeStamp, PlayerData data) {
+        FutureTask<Map.Entry<Object, Boolean>> task = new FutureTask<>(() -> {
             for (Check check : data.getChecks()) {
-                if(check.isEnabled() && check.getClass().isAnnotationPresent(Packets.class) && Arrays.asList(check.getClass().getAnnotation(Packets.class).packets()).contains(event.getType())) {
-                    Object object = check.onPacket(event.getPacket(), event.getType(), event.getTimeStamp());
+                if(check.isEnabled() && check.getClass().isAnnotationPresent(Packets.class) && Arrays.asList(check.getClass().getAnnotation(Packets.class).packets()).contains(packetType)) {
+                    Kauri.getInstance().getProfiler().start("check:" + check.getName());
+                    Object object = check.onPacket(packet, packetType, timeStamp);
 
                     if(object instanceof NMSObject) {
                         NMSObject nObject = (NMSObject) object;
 
-                        event.setCancelled(nObject.isCancelled());
-                        event.setPacket(nObject.getObject());
-
-                        if(nObject.isCancelled()) break;
+                        if(nObject.isCancelled() || packet != nObject.getObject()) {
+                            new AbstractMap.SimpleEntry<>(nObject.getObject(), nObject.isCancelled());
+                        }
                     }
+                    Kauri.getInstance().getProfiler().stop("check:" + check.getName());
                 }
             }
+            return null;
+        });
+
+        Atlas.getInstance().getThreadPool().submit(task);
+
+        try {
+            return task.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
         }
+        return null;
     }
 }

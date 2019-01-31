@@ -3,12 +3,14 @@ package cc.funkemunky.anticheat.impl.listeners;
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
+import cc.funkemunky.api.utils.Init;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+@Init
 public class PlayerConnectionListeners implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)

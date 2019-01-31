@@ -4,30 +4,48 @@ import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockDigPacket;
-import org.bukkit.Bukkit;
+import lombok.val;
 import org.bukkit.event.Event;
 
-@Packets(packets = {Packet.Client.BLOCK_DIG, Packet.Client.BLOCK_PLACE})
+@Packets(packets = {Packet.Client.LOOK, Packet.Client.POSITION_LOOK, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_LOOK})
 public class BadPacketsB extends Check {
     public BadPacketsB(String name, CancelType cancelType, int maxVL) {
         super(name, cancelType, maxVL);
     }
 
-    private long lastDig;
+    private int vl;
+
     @Override
     public Object onPacket(Object packet, String packetType, long timeStamp) {
-        if(packetType.equals(Packet.Client.BLOCK_DIG)) {
-            WrappedInBlockDigPacket dig = new WrappedInBlockDigPacket(packet, getData().getPlayer());
+        switch (packetType) {
+            case Packet.Client.LOOK:
+            case Packet.Client.POSITION_LOOK:
+            case Packet.Client.LEGACY_LOOK:
+            case Packet.Client.LEGACY_POSITION_LOOK:
 
-            if(dig.getAction().equals(WrappedInBlockDigPacket.EnumPlayerDigType.RELEASE_USE_ITEM)) {
-                Bukkit.broadcastMessage((timeStamp - lastDig) + "");
+                val data = getData();
+
+                if (data.isLagging() || data.getLastServerPos().hasNotPassed(4))
+                    return packet;
+
+                val from = data.getMovementProcessor().getFrom();
+                val to = data.getMovementProcessor().getTo();
+
+                val yawDiff = Math.abs(from.getYaw() - to.getYaw());
+                val pitchDiff = Math.abs(from.getPitch() - to.getPitch());
+
+                // Some stupid clients actually do this
+                if (yawDiff == 0.0 && pitchDiff == 0.0) {
+                    if(vl++ > 4) {
+                        this.flag("0|0", true, true);
+                    }
+                } else {
+                    vl -= vl > 0 ? 1 : 0;
             }
-        } else {
-            lastDig = timeStamp;
         }
         return packet;
     }
+
 
     @Override
     public void onBukkitEvent(Event event) {

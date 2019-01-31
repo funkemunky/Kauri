@@ -1,2 +1,2 @@
 #Kauri 1.0 Configuration File
-executableCommand: "kick %player% [IRIS] You have been kicked for failing %check%"
+executableCommand: "kick %player% [Kauri] You have been kicked for failing %check%"

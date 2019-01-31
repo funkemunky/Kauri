@@ -6,12 +6,12 @@ import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.api.commands.FunkeArgument;
 import cc.funkemunky.api.commands.FunkeCommand;
 import cc.funkemunky.api.utils.Color;
-import com.google.common.collect.Lists;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DebugArgument extends FunkeArgument {
@@ -21,11 +21,8 @@ public class DebugArgument extends FunkeArgument {
         super(parent, name, display, description, permission);
 
         addTabComplete(2, "none");
-        List<String> checks = Lists.newArrayList();
-
-        for (Check check : Kauri.getInstance().getCheckManager().getChecks()) {
-            checks.add(check.getName().replaceAll(" ", "_"));
-        }
+        List<String> checks = new ArrayList<>();
+        Kauri.getInstance().getCheckManager().getChecks().forEach(check -> checks.add(check.getName().replaceAll(" ", "_")));
 
         String[] checkArray = new String[checks.size()];
 

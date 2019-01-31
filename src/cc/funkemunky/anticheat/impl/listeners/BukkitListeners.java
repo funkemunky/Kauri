@@ -4,6 +4,15 @@ import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.utils.BukkitEvents;
+import cc.funkemunky.anticheat.api.utils.MiscUtils;
+import cc.funkemunky.api.Atlas;
+import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumParticle;
+import cc.funkemunky.api.utils.BoundingBox;
+import cc.funkemunky.api.utils.Color;
+import cc.funkemunky.api.utils.Init;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -14,9 +23,12 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.util.Vector;
 
 import java.util.Arrays;
+import java.util.List;
 
+@Init
 public class BukkitListeners implements Listener {
 
     @EventHandler
@@ -27,9 +39,16 @@ public class BukkitListeners implements Listener {
             callChecks(data, event);
 
             if (data.getCancelType().equals(CancelType.MOTION)) {
-                event.getPlayer().teleport(data.getSetbackLocation());
+                if(data.getSetbackLocation() != null) {
+                    event.getPlayer().teleport(data.getSetbackLocation());
+                } else {
+                    Location to = event.getTo().clone();
+
+                    to.setY(MiscUtils.getDistanceToGround(data, Math.max(0, (float) to.getY())));
+                    event.getPlayer().teleport(to);
+                }
                 data.setCancelType(CancelType.NONE);
-            } else if (data.getMovementProcessor().isServerOnGround()) {
+            } else if (data.getMovementProcessor().isServerOnGround() && data.getLastFlag().hasPassed()) {
                 data.setSetbackLocation(event.getTo());
             }
         }
@@ -54,6 +73,9 @@ public class BukkitListeners implements Listener {
         PlayerData data = Kauri.getInstance().getDataManager().getPlayerData(event.getPlayer().getUniqueId());
 
         if (data != null) {
+            if(event.getBlockPlaced() != null && event.getBlockPlaced().getType().isSolid()) {
+                data.getLastBlockPlace().reset();
+            }
             callChecks(data, event);
 
             if (data.getCancelType().equals(CancelType.PLACE)) {
@@ -74,6 +96,12 @@ public class BukkitListeners implements Listener {
                 event.setCancelled(true);
                 data.setCancelType(CancelType.NONE);
             }
+
+            if(event.getItem() != null && event.getItem().isSimilar(cc.funkemunky.api.utils.MiscUtils.createItem(Material.BLAZE_ROD, 1, Color.Gold + "Magic Box Wand")) && event.getClickedBlock() != null) {
+                List<BoundingBox> boxes = Atlas.getInstance().getBlockBoxManager().getBlockBox().getSpecificBox(event.getClickedBlock().getLocation());
+
+                boxes.forEach(box -> cc.funkemunky.api.utils.MiscUtils.createParticlesForBoundingBox(event.getPlayer(), box, WrappedEnumParticle.FLAME, 0.1f));
+            }
         }
     }
 
@@ -85,6 +113,11 @@ public class BukkitListeners implements Listener {
 
             if (data != null) {
                 callChecks(data, event);
+
+                if(data.getCancelType() == CancelType.PROJECTILE) {
+                    event.setCancelled(true);
+                    data.setCancelType(CancelType.NONE);
+                }
             }
         }
     }

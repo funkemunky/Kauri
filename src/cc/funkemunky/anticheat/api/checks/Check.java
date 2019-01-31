@@ -6,6 +6,7 @@ import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.event.system.Listener;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.JsonMessage;
+import cc.funkemunky.api.utils.MiscUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -21,8 +22,8 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
     private String name;
     private CancelType cancelType;
     private PlayerData data;
-    private int vl, maxVL;
-    private boolean enabled, executable, cancellable;
+    private int maxVL;
+    private boolean enabled, executable, cancellable, developer;
     private Verbose lagVerbose = new Verbose();
     private long lastAlert;
     private String execCommand;
@@ -32,10 +33,11 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
     public Check(String name, CancelType cancelType, int maxVL) {
         this.name = name;
         this.cancelType = cancelType;
-        this.vl = 0;
         this.maxVL = maxVL;
 
         enabled = executable = true;
+
+        developer = false;
 
         alertMessage = CheckSettings.alertMessage.replaceAll("%check%", name);
 
@@ -46,10 +48,25 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
         this.name = name;
         this.cancelType = cancelType;
         this.data = data;
-        this.vl = 0;
         this.maxVL = maxVL;
 
-        enabled = executable = true;
+        enabled = executable = cancellable = true;
+
+        developer = false;
+
+        alertMessage = CheckSettings.alertMessage.replaceAll("%check%", name);
+        loadFromConfig();
+    }
+
+    public Check(String name, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
+        this.name = name;
+        this.cancelType = cancelType;
+        this.maxVL = maxVL;
+        this.enabled = enabled;
+        this.executable = executable;
+        this.cancellable = cancellable;
+
+        developer = false;
 
         alertMessage = CheckSettings.alertMessage.replaceAll("%check%", name);
         loadFromConfig();
@@ -57,15 +74,17 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
 
     protected void flag(String information, boolean cancel, boolean ban) {
         if (data.getLastLag().hasPassed() || lagVerbose.flag(4, 500L)) {
-            vl++;
-            int vl = Kauri.getInstance().getLoggerManager().addViolationToLogAndSave(this, data.getUuid());
-            if(!data.isLagging() && Kauri.getInstance().getTPS() > 19 && ban && vl++ > maxVL && executable) {
+            int vl = Kauri.getInstance().getLoggerManager().addAndGetViolation(data.getUuid(), this);
+            if (vl > maxVL && executable && ban && !Kauri.getInstance().getStatsManager().isPlayerBanned(data.getUuid())) {
                 new BukkitRunnable() {
                     public void run() {
                         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), execCommand.replaceAll("%player%", getData().getPlayer().getName()));
                     }
                 }.runTaskLater(Kauri.getInstance(), 30);
+                Kauri.getInstance().getLoggerManager().addBan(data.getUuid(), this);
             }
+
+            Kauri.getInstance().getStatsManager().addFlag();
 
             if (cancel && cancellable) data.setCancelType(cancelType);
 
@@ -73,14 +92,24 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
                 JsonMessage message = new JsonMessage();
 
                 message.addText(Color.translate(alertMessage.replaceAll("%player%", data.getPlayer().getName()).replaceAll("%vl%", String.valueOf(vl)).replaceAll("%info%", information))).addHoverText(Color.Gray + information);
-                Bukkit.getOnlinePlayers().stream().filter(player -> player.hasPermission("fiona.alerts")).forEach(message::sendToPlayer);
+                Kauri.getInstance().getDataManager().getDataObjects().values().stream().filter(PlayerData::isAlertsEnabled).forEach(data -> message.sendToPlayer(data.getPlayer()));
                 lastAlert = System.currentTimeMillis();
-                Kauri.getInstance().getLoggerManager().addAlertToLog(getData(), this, "failed " + name + " VL " + vl + " [info: " + information + " lagTicks: " + getData().getLagTicks() + " transPing: " + getData().getTransPing() + "ms]");
+            }
+
+            if(CheckSettings.testMode && !data.isAlertsEnabled()) {
+                JsonMessage message = new JsonMessage();
+
+                message.addText(Color.translate(alertMessage.replaceAll("%player%", data.getPlayer().getName()).replaceAll("%vl%", String.valueOf(vl)).replaceAll("%info%", information))).addHoverText(Color.Gray + information);
+                message.sendToPlayer(data.getPlayer());
+            }
+
+            if(CheckSettings.printToConsole) {
+                MiscUtils.printToConsole(alertMessage.replaceAll("%player%", data.getPlayer().getName()).replaceAll("%vl%", String.valueOf(vl)));
             }
         }
     }
 
-    protected void loadFromConfig() {
+    private void loadFromConfig() {
         if (Kauri.getInstance().getConfig().get("checks." + name) != null) {
             maxVL = Kauri.getInstance().getConfig().getInt("checks." + name + ".maxVL");
             enabled = Kauri.getInstance().getConfig().getBoolean("checks." + name + ".enabled");
@@ -95,11 +124,11 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
             Kauri.getInstance().saveConfig();
         }
 
-        execCommand = Kauri.getInstance().getConfig().getString("executableCommand").replaceAll("%check%", getName());
+        execCommand = CheckSettings.executableCommand.replaceAll("%check%", getName());
     }
 
     public void debug(String debugString) {
-        Kauri.getInstance().getDataManager().getDataObjects().stream()
+        Kauri.getInstance().getDataManager().getDataObjects().values().stream()
                 .filter(dData -> dData.getDebuggingPlayer() != null && dData.getDebuggingCheck() != null && dData.getDebuggingCheck().getName().equals(name) && dData.getDebuggingPlayer().equals(data.getUuid()))
                 .forEach(dData -> dData.getPlayer().sendMessage(Color.translate("&8[&cDebug&8] &7" + debugString)));
     }

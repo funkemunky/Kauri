@@ -53,7 +53,7 @@ public class SpeedA extends Check {
         baseSpeed *= getData().getMovementProcessor().getIceTicks() > 0 && getData().getMovementProcessor().getGroundTicks() < 6 ? 2.5f : 1.0;
         baseSpeed += getData().getLastBlockPlace().hasNotPassed(15) ? 0.1 : 0;
         baseSpeed += (getData().getPlayer().getWalkSpeed() - 0.2) * 1.8f;
-        baseSpeed += getData().isOnSlimeBefore() ? 0.1 : 0;
+        baseSpeed += getData().getMovementProcessor().isOnSlimeBefore() ? 0.1 : 0;
 
         if (timeStamp - lastTimeStamp > 1) {
             if (motionXZ > baseSpeed && !getData().getVelocityProcessor().getLastVelocity().hasNotPassed(40)) {

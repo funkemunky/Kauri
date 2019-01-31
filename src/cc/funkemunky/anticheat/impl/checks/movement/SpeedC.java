@@ -3,10 +3,9 @@ package cc.funkemunky.anticheat.impl.checks.movement;
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.utils.Packets;
-import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.*;
+import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.PlayerUtils;
 import lombok.val;
 import lombok.var;
 import org.bukkit.Location;
@@ -56,8 +55,8 @@ public class SpeedC extends Check {
 
         val streak = new AtomicInteger();
 
-        if (getData().getMovementProcessor().isOnSlimeBefore()|| getData().getMovementProcessor().getIceTicks() > 0 || getData().getMovementProcessor().getBlockAboveTicks() > 0 || player.getAllowFlight()) {
-            // return packet;
+        if (getData().isGeneralCancel()) {
+            return packet;
         }
 
         offsetDeque.add(offsetChange);

@@ -8,6 +8,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="depends" level="project" />
+    <orderEntry type="library" name="org.mongodb:mongo-java-driver:3.8.0" level="project" />
+    <orderEntry type="library" name="Atlas" level="project" />
   </component>
 </module>

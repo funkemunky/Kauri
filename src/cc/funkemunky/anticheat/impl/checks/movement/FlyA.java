@@ -5,19 +5,18 @@ import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.utils.MathUtils;
 import org.bukkit.event.Event;
 
 
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.POSITION, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION})
-public class Fly extends Check {
+public class FlyA extends Check {
 
     private float lastMotionY = 0, lastAccelerationPacket = 0;
     private int verbose, verbose2;
     private Verbose verboseLow = new Verbose();
     private long lastTimeStamp;
 
-    public Fly(String name, CancelType cancelType, int maxVL) {
+    public FlyA(String name, CancelType cancelType, int maxVL) {
         super(name, cancelType, maxVL);
 
     }
@@ -37,7 +36,7 @@ public class Fly extends Check {
                     && Math.abs(acceleration) < 1E-5
                     && Math.abs(lastAccelerationPacket) < 1E-5
                     && !getData().getMovementProcessor().isServerOnGround()
-                    && !getData().isOnSlimeBefore()
+                    && getData().getMovementProcessor().getDistanceToGround() > 0.25
                     && getData().getMovementProcessor().getClimbTicks() == 0
                     && !getData().getMovementProcessor().isInLiquid()
                     && !getData().getMovementProcessor().isInWeb()) {
@@ -50,7 +49,8 @@ public class Fly extends Check {
             if (Math.abs(acceleration) > 0.1
                     && !getData().getMovementProcessor().isBlocksOnTop()
                     && !getData().getMovementProcessor().isOnHalfBlock()
-                    && !getData().isOnSlimeBefore()
+                    && !getData().getMovementProcessor().isOnSlimeBefore()
+                    && getData().getMovementProcessor().getLastRiptide().hasPassed()
                     && getData().getVelocityProcessor().getLastVelocity().hasPassed(20)
                     && getData().getMovementProcessor().getClimbTicks() == 0
                     && Math.abs(lastAccelerationPacket) > 0.1) {
@@ -61,19 +61,6 @@ public class Fly extends Check {
                 }
             } else {
                 verbose = 0;
-            }
-
-            if (motionY > getData().getMovementProcessor().getServerYVelocity() + 0.002
-                    && MathUtils.getDelta(getData().getMovementProcessor().getClientYAcceleration(), getData().getMovementProcessor().getServerYAcceleration()) > 0.02
-                    && !getData().getMovementProcessor().isBlocksOnTop()
-                    && !getData().getMovementProcessor().isServerOnGround()
-                    && motionY > -2.5
-                    && getData().getVelocityProcessor().getLastVelocity().hasPassed(5)
-                    && !getData().isOnSlimeBefore()
-                    && getData().getMovementProcessor().getClimbTicks() == 0
-                    && !getData().getMovementProcessor().isInLiquid()
-                    && !getData().getMovementProcessor().isInWeb()) {
-                flag(motionY + ">-" + getData().getMovementProcessor().getServerYVelocity(), true, false);
             }
             debug(getData().getMovementProcessor().isServerOnGround() + ", " + getData().getMovementProcessor().isBlocksOnTop() + ", " + Math.abs(getData().getMovementProcessor().getServerYAcceleration()) + ", " + getData().getMovementProcessor().getServerYVelocity() + ", " + motionY + ", " + getData().getMovementProcessor().getDistanceToGround());
         }

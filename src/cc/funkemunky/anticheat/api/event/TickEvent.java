@@ -1,4 +1,4 @@
-package cc.funkemunky.anticheat.api.events;
+package cc.funkemunky.anticheat.api.event;
 
 import cc.funkemunky.api.event.system.Event;
 import lombok.AllArgsConstructor;

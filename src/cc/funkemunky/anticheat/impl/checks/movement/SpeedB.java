@@ -4,83 +4,121 @@ import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
+import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.PlayerUtils;
 import lombok.val;
+import lombok.var;
+import org.bukkit.Location;
 import org.bukkit.event.Event;
+import org.bukkit.potion.PotionEffectType;
 
-@Packets(packets = {Packet.Client.POSITION_LOOK,
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicInteger;
+
+@Packets(packets = {
+        Packet.Client.POSITION_LOOK,
         Packet.Client.POSITION,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_POSITION})
 public class SpeedB extends Check {
-    private int verboseA, verboseB, verboseC;
-    private float lastMotionXZ;
-    private long lastTimeStamp;
+    private double lastX, lastY, lastZ;
+    private int vl;
+
+    private final Deque<Double> offsetDeque = new LinkedList<>();
+
     public SpeedB(String name, CancelType cancelType, int maxVL) {
         super(name, cancelType, maxVL);
     }
 
+    private int verboseA, verboseB, verboseC;
+    private float lastMotionXZ;
+    private long lastTimeStamp;
+
+    public SpeedB(String name, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
+        super(name, cancelType, maxVL, enabled, executable, cancellable);
+    }
+
+
     @Override
     public Object onPacket(Object packet, String packetType, long timeStamp) {
-        //The client will always send a position packet when teleported or dictated to move by the server, so we need to account for that to prevent false-positives.
-        if (getData().getLastServerPos().hasNotPassed(1) || getData().isGeneralCancel()) {
-            verboseA = verboseB = verboseC = 0;
+        val player = getData().getPlayer();
+
+        val from = getData().getMovementProcessor().getFrom();
+        val to = getData().getMovementProcessor().getTo();
+
+        val fromVec = from.toVector();
+        val toVec = to.toVector();
+
+        val motionX = to.getX() - from.getX();
+        val motionY = to.getY() - from.getY();
+        val motionZ = to.getZ() - from.getZ();
+
+        val lastMotLoc = new Location(player.getWorld(), lastX, lastY, lastZ).toVector();
+        val currMotLoc = new Location(player.getWorld(), motionX, motionY, motionZ).toVector();
+
+        val locOffset = MathUtils.offset(fromVec, toVec);
+        val motOffset = MathUtils.offset(lastMotLoc, currMotLoc);
+
+        val offsetChange = Math.abs(locOffset - motOffset);
+
+        val streak = new AtomicInteger();
+
+        if (player.getAllowFlight() || player.getVehicle() != null || getData().getMovementProcessor().isRiptiding() || PlayerUtils.isGliding(player)) {
             return packet;
         }
-        val to = getData().getMovementProcessor().getTo();
-        val from = getData().getMovementProcessor().getFrom();
 
-        /* We we do just a basic calculation of the maximum allowed movement of a player */
-        float motionXZ = (float) Math.hypot(to.getX() - from.getX(), to.getZ() - from.getZ()), acceleration = motionXZ - lastMotionXZ;
+        offsetDeque.add(offsetChange);
 
-        if (timeStamp - lastTimeStamp > 1) {
-            /* This checks if the horizontal velocity of the player increases while in the air, which is impossible with a vanilla client
-             * We use this as a counter to a potential verbose bypass (similar to one for Janitor) for the check above. */
+        if (offsetDeque.size() == 5) {
+            val maxOffset = 0.33 + account();
 
-            if (acceleration > 0.16
-                    && getData().getMovementProcessor().getAirTicks() > 3 //We want to make sure the player is in the air and not jumping.
-                    && !getData().getMovementProcessor().isInLiquid()
-                    && getData().getMovementProcessor().getClimbTicks() == 0) { //A player in liquid can register as though he/she is in the air.
-                if (verboseB++ > 3) {
-                    flag("t: high;" + motionXZ + ">-" + lastMotionXZ, true, false);
+            offsetDeque.forEach(offset -> {
+                if (offset > maxOffset) {
+                    streak.incrementAndGet();
                 }
-            } else {
-                verboseB = 0;
+            });
+
+            var maxStreak = 2;
+
+            if (player.hasPotionEffect(PotionEffectType.SPEED)) {
+                maxStreak++;
             }
 
-        /* This checks if the speed has consistent deceleration or acceleration. Whenever a player moves in the air, the player must
-           always decelerate at a constant rate.
-         */
-            if (Math.abs(acceleration) < 1E-4
-                    && motionXZ > 0
-                    && getData().getMovementProcessor().getClimbTicks() == 0
-                    && getData().getLastBlockPlace().hasPassed(4)
-                    && getData().getMovementProcessor().getAirTicks() < 20 //This is a light and quick fix for the horizontal velocity being constant legitimately.
-                    && getData().getMovementProcessor().getAirTicks() > 3) { //We check 3 instead of 2 for airTicks as an added measure. This is for the same reason as the previous detection.
-                if (verboseA++ > 8) { //We have to add a slight verbose due to the occasional hiccup in the flow of packets.
-                    flag("t: low; " + motionXZ + "≈" + lastMotionXZ, true, false);
+            if (streak.get() >= maxStreak) {
+                if (vl++ > 2) {
+                    flag( "" + (double) (streak.get() * 100) / maxStreak + "%", true, true);
                 }
-            } else {
-                verboseA = 0;
+            } else if(streak.get() == 0) {
+                vl = 0;
             }
 
-            if (Math.abs(acceleration) > 0.25
-                    && getData().getMovementProcessor().isServerOnGround()
-                    && getData().getMovementProcessor().getClimbTicks() == 0) {
-                if (verboseC++ > 2) {
-                    flag("t: ground; " + acceleration + ">-0.2", true, false);
-                }
-            } else {
-                verboseC = 0;
-            }
+            debug(vl + ": " + streak.get() + ", " + maxStreak);
 
+            offsetDeque.clear();
         }
-        lastMotionXZ = motionXZ;
-        lastTimeStamp = timeStamp;
+
+        lastX = motionX;
+        lastY = motionY;
+        lastZ = motionZ;
         return packet;
     }
 
     @Override
     public void onBukkitEvent(Event event) {
 
+    }
+
+    private float account() {
+        float total = 0;
+
+        total += PlayerUtils.getPotionEffectLevel(getData().getPlayer(), PotionEffectType.SPEED) * (getData().getMovementProcessor().isServerOnGround() ? 0.057f : 0.044f);
+        total += getData().getMovementProcessor().getIceTicks() > 0 && (getData().getMovementProcessor().getAirTicks() > 0 || getData().getMovementProcessor().getGroundTicks() < 7) ? 0.23 : 0;
+        total += (getData().getPlayer().getWalkSpeed() - 0.2) * 1.65;
+        total += (getData().getLastBlockPlace().hasNotPassed(7)) ? 0.1 : 0;
+        total += getData().getMovementProcessor().isOnSlimeBefore() ? 0.1 : 0;
+        total += getData().getMovementProcessor().getBlockAboveTicks() > 0 ? getData().getMovementProcessor().isOnIce() ? 0.4 : 0.2  : 0;
+        total += getData().getMovementProcessor().getHalfBlockTicks() > 0 ? 0.12 : 0;
+        return total;
     }
 }

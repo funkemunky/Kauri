@@ -7,19 +7,27 @@ import cc.funkemunky.anticheat.api.utils.CustomLocation;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.PastLocation;
 import cc.funkemunky.anticheat.api.utils.Setting;
+import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedPacketPlayOutWorldParticle;
+import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumParticle;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.math.RayTrace;
 import com.google.common.collect.Lists;
 import lombok.val;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Packets(packets = {
         Packet.Client.USE_ENTITY,
@@ -32,8 +40,19 @@ import java.util.List;
         Packet.Client.LEGACY_LOOK})
 public class ReachD extends Check {
 
+    private LivingEntity target;
+    private PastLocation targetLocs = new PastLocation();
+
     public ReachD(String name, CancelType cancelType, int maxVL) {
         super(name, cancelType, maxVL);
+
+        new BukkitRunnable() {
+            public void run() {
+                if(getData() != null && target != null && (!(target instanceof Player) || !Kauri.getInstance().getDataManager().getDataObjects().containsKey(target.getUniqueId()))) {
+                    targetLocs.addLocation(new CustomLocation(target.getLocation()));
+                }
+            }
+        }.runTaskTimer(Kauri.getInstance(), 20L, 1L);
     }
 
     @Setting
@@ -45,11 +64,9 @@ public class ReachD extends Check {
     @Setting
     private int maxVL = 5;
 
-    private LivingEntity target;
-    private boolean attacked, cancel = false;
+    private boolean attacked;
     private double vl;
 
-    private PastLocation targetLocs = new PastLocation();
 
     @Override
     public Object onPacket(Object packet, String packetType, long timeStamp) {
@@ -59,19 +76,13 @@ public class ReachD extends Check {
             if(use.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) {
                 attacked = true;
                 target = (LivingEntity) use.getEntity();
-
-                if(cancel) {
-                    use.setCancelled(true);
-                    cancel = false;
-                    return use;
-                }
             }
         } else if(target != null) {
             if (attacked) {
                 val entityData = Kauri.getInstance().getDataManager().getPlayerData(target.getUniqueId());
 
-                if(entityData == null) {
-                    targetLocs.addLocation(new CustomLocation(target.getLocation()));
+                if(getData().getPing() > 400 || (entityData != null && getData().getPing() > 400)) {
+                    return packet;
                 }
 
                 WrappedInFlyingPacket flying = new WrappedInFlyingPacket(packet, getData().getPlayer());
@@ -80,40 +91,43 @@ public class ReachD extends Check {
 
                 RayTrace trace = new RayTrace(origin.toVector(), origin.getDirection());
 
-                List<Vector> vecs = trace.traverse( ((entityData != null ? entityData.getMovementProcessor().getTo().toVector() : target.getLocation().toVector()).distance(origin.toVector()) - 0.3) / 2, (entityData != null ? entityData.getMovementProcessor().getTo().toVector() : target.getLocation().toVector()).distance(origin.toVector()), 0.025);
+                List<Vector> vecs = trace.traverse(target.getEyeLocation().distance(origin), 0.1);
 
-                List<BoundingBox> entityBoxes = Lists.newArrayList();
+                List<BoundingBox> entityBoxes = new CopyOnWriteArrayList<>();
 
                 if(entityData == null) {
                     targetLocs.getEstimatedLocation(getData().getTransPing(), pingRange + MathUtils.getDelta(getData().getTransPing(), getData().getLastTransPing()))
-                            .forEach(loc -> entityBoxes.add(getHitbox(loc)));
+                            .forEach(loc -> entityBoxes.add(getHitbox(target, loc)));
                 } else {
                     entityData.getMovementProcessor().getPastLocation()
                             .getEstimatedLocation(getData().getTransPing(), pingRange + MathUtils.getDelta(getData().getTransPing(), getData().getLastTransPing()))
-                            .forEach(loc -> entityBoxes.add(getHitbox(loc)));
+                            .forEach(loc -> entityBoxes.add(getHitbox(target, loc)));
                 }
-
-                List<Vector> finalVecs = Lists.newArrayList();
-
-                vecs.stream().filter(vec -> entityBoxes.stream().anyMatch(box -> box.collides(vec))).forEach(finalVecs::add);
 
                 double calculatedReach = 0;
                 int collided = 0;
-                for (Vector vec : finalVecs) {
-                    double reach = origin.toVector().distance(vec);
+                
+                vecs.sort(Comparator.comparingDouble(vec -> vec.distance(origin.toVector())));
 
-                    calculatedReach = calculatedReach > 0 ? Math.min(calculatedReach, reach) : reach;
+                List<Vector> finalVecs = new ArrayList<>();
+                vecs.stream().filter(vec -> entityBoxes.stream().anyMatch(box -> box.collides(vec))).forEach(finalVecs::add);
+
+                for(Vector vec : finalVecs) {
+                    double reach = origin.toVector().distance(vec);
+                    calculatedReach = calculatedReach == 0 ? reach : Math.min(reach, calculatedReach);
+                   // WrappedPacketPlayOutWorldParticle particle = new WrappedPacketPlayOutWorldParticle(WrappedEnumParticle.FIREWORKS_SPARK, true, (float) vec.getX(), (float) vec.getY(), (float) vec.getZ(), 0, 0, 0, 0, 1);
+
+                    //particle.sendPacket(getData().getPlayer());
                     collided++;
                 }
 
-                if (collided > 0) {
+                if (collided > 1) {
                     if (calculatedReach > maxReach) {
                         if (vl++ > maxVL) {
                             flag(calculatedReach + ">-" + maxReach, false, true);
                         }
-                        cancel = true;
                     } else {
-                        vl = vl > 0 ? 0.25 : 0;
+                        vl -= vl > 0 ? 0.2 : 0;
                     }
 
                     debug("VL: " + vl + "/" + maxVL + " REACH: " + calculatedReach + " COLLIDED: " + collided + " MAX: " + maxReach + " RANGE: " + pingRange);
@@ -130,8 +144,9 @@ public class ReachD extends Check {
 
     }
 
-    private BoundingBox getHitbox(CustomLocation l) {
-        return new BoundingBox(0,0,0,0,0,0).add((float) l.getX(), (float) l.getY(), (float) l.getZ()).grow(.4f, 0, .4f)
-                .add(0,0,0,0, 1.85f, 0);
+    private BoundingBox getHitbox(LivingEntity entity, CustomLocation l) {
+        val dimensions = MiscUtils.entityDimensions.getOrDefault(entity.getType(), new Vector(0.3f,1.85f,0.3f));
+
+        return new BoundingBox(l.toVector(), l.toVector()).grow((float) dimensions.getX(), 0, (float) dimensions.getZ()).add(0,0,0,0, (float) dimensions.getY(),0);
     }
 }

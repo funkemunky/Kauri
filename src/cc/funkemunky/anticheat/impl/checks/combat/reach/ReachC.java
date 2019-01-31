@@ -52,7 +52,8 @@ public class ReachC extends Check {
 
             locations.forEach(loc -> boxes.add(getHitbox(loc)));
 
-            if(boxes.stream().noneMatch(box -> box.collides(playerBox))) {
+            val count = boxes.stream().filter(box -> box.collides(playerBox)).count();
+            if(count == 0) {
                 if(vl++ > vlMax) {
                     flag("reach is greater than " + boxExpand, false, true);
                 }
@@ -60,6 +61,8 @@ public class ReachC extends Check {
             } else {
                 vl -= vl > 0 ? 0.5f : 0;
             }
+
+            debug("COUNT: " + count + " VL: " + vl + "/" + vlMax);
         }
         return packet;
     }

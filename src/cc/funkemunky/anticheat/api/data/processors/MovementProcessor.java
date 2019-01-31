@@ -18,14 +18,14 @@ import org.bukkit.util.Vector;
 import java.util.List;
 
 @Getter
-@Setting
 public class MovementProcessor {
     private boolean clientOnGround, serverOnGround, fullyInAir, inAir, hasJumped, inLiquid, blocksOnTop, pistonsNear, onHalfBlock,
-            onClimbable, onIce, collidesHorizontally, inWeb, onSlimeBefore, onSoulSand;
+            onClimbable, onIce, collidesHorizontally, inWeb, onSlimeBefore, onSoulSand, isRiptiding;
     private int airTicks, groundTicks, iceTicks, climbTicks, halfBlockTicks, soulSandTicks, blockAboveTicks, optifineTicks, liquidTicks;
-    private float deltaY, lastDeltaY, deltaXZ, distanceToGround, serverYVelocity, lastServerYVelocity, serverYAcceleration, clientYAcceleration, jumpVelocity;
+    private float deltaY, lastDeltaY, deltaXZ, distanceToGround, serverYVelocity, lastServerYVelocity, serverYAcceleration, clientYAcceleration, jumpVelocity, cinematicYawDelta, cinematicPitchDelta;
     private CustomLocation from, to;
     private PastLocation pastLocation = new PastLocation();
+    private TickTimer lastRiptide = new TickTimer(6);
 
     public void update(PlayerData data, WrappedInFlyingPacket packet) {
 
@@ -44,7 +44,7 @@ public class MovementProcessor {
             data.setBoundingBox(new BoundingBox(to.toVector(), to.toVector().add(new Vector(0, 1.85, 0))).grow(0.3f, 0, 0.3f));
 
             //Here we get the colliding boundingboxes surrounding the player.
-            List<BoundingBox> box = Atlas.getInstance().getBlockBoxManager().getBlockBox().getCollidingBoxes(packet.getPlayer().getWorld(), data.getBoundingBox().grow(0.5f, 0.1f, 0.5f).subtract(0, 0.5f, 0, 0, 0, 0));
+            List<BoundingBox> box = Atlas.getInstance().getBlockBoxManager().getBlockBox().getCollidingBoxes(packet.getPlayer().getWorld(), data.getBoundingBox().grow(0.5f, 0.35f, 0.5f).subtract(0, 0.5f, 0, 0, 0, 0));
 
             CollisionAssessment assessment = new CollisionAssessment(data.getBoundingBox(), data);
 
@@ -83,6 +83,10 @@ public class MovementProcessor {
             deltaXZ = (float) (Math.hypot(to.getX() - from.getX(), to.getZ() - from.getZ()));
             clientYAcceleration = deltaY - lastDeltaY;
 
+            if(isRiptiding = Atlas.getInstance().getBlockBoxManager().getBlockBox().isRiptiding(packet.getPlayer())) {
+                lastRiptide.reset();
+            }
+
             //Hear we use the client's ground packet being sent since whatever motion the client says it has
             //will line up with this since ground is sent along with positional packets (flying, poslook, pos, look)
             if (hasJumped) {
@@ -119,7 +123,7 @@ public class MovementProcessor {
                 distanceToGround += deltaY;
             }
 
-            iceTicks = onIce ? Math.min(40, iceTicks + 2) : Math.max(0, iceTicks - 1);
+            iceTicks = onIce ? Math.min(40, iceTicks + 1) : Math.max(0, iceTicks - 1);
             climbTicks = onClimbable ? Math.min(40, climbTicks + 1) : Math.max(0, climbTicks - 1);
             halfBlockTicks = onHalfBlock ? Math.min(40, halfBlockTicks + 2) : Math.max(0, halfBlockTicks - 1);
             blockAboveTicks = blocksOnTop ? Math.min(40, blockAboveTicks + 2) : Math.max(0, blockAboveTicks - 1);
@@ -137,16 +141,16 @@ public class MovementProcessor {
             float yawShit = MiscUtils.convertToMouseDelta(yawDelta), pitchShit = MiscUtils.convertToMouseDelta(pitchDelta);
             float smooth = data.getYawSmooth().smooth(yawShit, yawShit * 0.05f), smooth2 = data.getPitchSmooth().smooth(pitchShit, pitchShit * 0.05f);
 
-            data.setCinematicMode(MathUtils.getDelta(smooth, yawShit) < 0.08f || MathUtils.getDelta(smooth2, pitchShit) < 0.04f);
+            data.setCinematicMode((cinematicYawDelta = MathUtils.getDelta(smooth, yawShit)) < 0.08f && (cinematicPitchDelta = MathUtils.getDelta(smooth2, pitchShit)) < 0.06f);
 
             if (data.isCinematicMode()) {
-                optifineTicks++;
-            } else if (optifineTicks > 0) {
+                optifineTicks+= optifineTicks < 60 ? 1 : 0;
+            } else if(optifineTicks > 0) {
                 optifineTicks--;
             }
         }
 
         pastLocation.addLocation(new CustomLocation(to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch()));
-        data.setGeneralCancel(data.isAbleToFly() || packet.getPlayer().getAllowFlight() || data.isCreativeMode() || data.isRiptiding() || data.getLastLogin().hasNotPassed(50) || data.getVelocityProcessor().getLastVelocity().hasNotPassed(40));
+        data.setGeneralCancel(data.isAbleToFly() || packet.getPlayer().getAllowFlight() || PlayerUtils.isGliding(data.getPlayer()) || data.getPlayer().getVehicle() != null || data.isCreativeMode() || isRiptiding || data.getLastLogin().hasNotPassed(50) || data.getVelocityProcessor().getLastVelocity().hasNotPassed(40));
     }
 }

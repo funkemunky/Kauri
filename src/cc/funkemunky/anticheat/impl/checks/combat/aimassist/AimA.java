@@ -16,11 +16,11 @@ import org.bukkit.event.Event;
         Packet.Client.LEGACY_POSITION,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
-public class AimAssistA extends Check {
+public class AimA extends Check {
 
     private float lastYaw, lastPitch, lastWrapped, lastChange;
     private int vl;
-    public AimAssistA(String name, CancelType cancelType, int maxVL) {
+    public AimA(String name, CancelType cancelType, int maxVL) {
         super(name, cancelType, maxVL);
     }
 

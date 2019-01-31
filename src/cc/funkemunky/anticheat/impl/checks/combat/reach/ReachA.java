@@ -33,7 +33,7 @@ public class ReachA extends Check {
 
             double delta = player.getEyeLocation().distance(((LivingEntity) use.getEntity()).getEyeLocation()) - 0.3;
 
-            double threshold = player.getEyeLocation().toVector().subtract(new Vector(0, (float) (player.getEyeHeight() / 2), 0)).subtract(((LivingEntity) use.getEntity()).getEyeLocation().toVector().subtract(new Vector(0, (float) ((LivingEntity) use.getEntity()).getEyeHeight() / 2, 0))).angle(player.getEyeLocation().getDirection()) + 0.5f;
+            double threshold = player.getEyeLocation().toVector().subtract(new Vector(0, (float) (player.getEyeHeight() / 2), 0)).subtract(((LivingEntity) use.getEntity()).getEyeLocation().toVector().subtract(new Vector(0, (float) ((LivingEntity) use.getEntity()).getEyeHeight() / 2, 0))).angle(player.getEyeLocation().getDirection()) + 1.0f;
 
             double combinedPing = getData().getTransPing();
 
