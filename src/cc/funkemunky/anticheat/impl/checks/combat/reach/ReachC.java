@@ -3,6 +3,7 @@ package cc.funkemunky.anticheat.impl.checks.combat.reach;
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.CustomLocation;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
@@ -19,8 +20,8 @@ import java.util.List;
 
 @Packets(packets = {Packet.Client.USE_ENTITY})
 public class ReachC extends Check {
-    public ReachC(String name, CancelType cancelType, int maxVL) {
-        super(name, cancelType, maxVL);
+    public ReachC(String name, CheckType type, CancelType cancelType, int maxVL) {
+        super(name, type, cancelType, maxVL);
     }
 
     @Setting

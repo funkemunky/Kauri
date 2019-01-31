@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.combat.killaura;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
@@ -18,8 +19,8 @@ public class KillauraC extends Check {
     private Verbose verbose = new Verbose();
     private boolean isSprinting;
 
-    public KillauraC(String name, CancelType cancelType, int maxVL) {
-        super(name, cancelType, maxVL);
+    public KillauraC(String name, CheckType type, CancelType cancelType, int maxVL) {
+        super(name, type, cancelType, maxVL);
     }
 
     @Override
@@ -40,7 +41,7 @@ public class KillauraC extends Check {
         } else {
             WrappedInUseEntityPacket use = new WrappedInUseEntityPacket(packet, getData().getPlayer());
 
-            if (use.getEntity() instanceof Player) { //A player only stops sprinting when hitting a player.
+            if (use.getEntity() instanceof Player && use.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) { //A player only stops sprinting when hitting a player.
                 double deltaXZ = MathUtils.getHorizontalDistance(getData().getMovementProcessor().getTo().toLocation(use.getPlayer().getWorld()), getData().getMovementProcessor().getFrom().toLocation(use.getPlayer().getWorld()));
                 if (!getData().isGeneralCancel() && (deltaXZ > getBaseSpeed() && isSprinting)) {
                     if (verbose.flag(10, 850L)) { //We add a verbose or redundancy.

@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.movement;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.MathUtils;
@@ -27,8 +28,8 @@ public class SpeedC extends Check {
 
     private final Deque<Double> offsetDeque = new LinkedList<>();
 
-    public SpeedC(String name, CancelType cancelType, int maxVL) {
-        super(name, cancelType, maxVL);
+    public SpeedC(String name, CheckType type, CancelType cancelType, int maxVL) {
+        super(name, type, cancelType, maxVL);
     }
 
     @Override

@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.combat.autoclicker;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
@@ -24,8 +25,8 @@ public class AutoclickerA extends Check {
     private long lastTimeStamp;
     private int vl;
 
-    public AutoclickerA(String name, CancelType cancelType, int maxVL) {
-        super(name, cancelType, maxVL);
+    public AutoclickerA(String name, CheckType type, CancelType cancelType, int maxVL) {
+        super(name, type, cancelType, maxVL);
     }
 
     @Override

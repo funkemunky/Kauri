@@ -3,16 +3,20 @@ package cc.funkemunky.anticheat.impl.checks.combat.hitboxes;
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.*;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.utils.BoundingBox;
+import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.math.RayTrace;
 import lombok.val;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,13 +40,13 @@ public class HitBox extends Check {
 
     private int vl;
     private PastLocation mobLocation = new PastLocation();
-    private Entity target;
+    private LivingEntity target;
     private TickTimer lastAttack = new TickTimer(2);
 
     private List<EntityType> type = new ArrayList<>(Arrays.asList(EntityType.PLAYER, EntityType.VILLAGER, EntityType.SKELETON, EntityType.BLAZE, EntityType.ZOMBIE, EntityType.PIG_ZOMBIE, EntityType.CREEPER, EntityType.SNOWMAN));
 
-    public HitBox(String name, CancelType cancelType, int maxVL) {
-        super(name, cancelType, maxVL);
+    public HitBox(String name, CheckType type, CancelType cancelType, int maxVL) {
+        super(name, type, cancelType, maxVL);
     }
 
     @Override
@@ -50,8 +54,10 @@ public class HitBox extends Check {
         if(packetType.equalsIgnoreCase(Packet.Client.USE_ENTITY)) {
             WrappedInUseEntityPacket use = new WrappedInUseEntityPacket(packet, getData().getPlayer());
 
-            target = use.getEntity();
-            lastAttack.reset();
+            if(use.getEntity() instanceof LivingEntity) {
+                target = (LivingEntity) use.getEntity();
+                lastAttack.reset();
+            }
         } else if(target != null && type.contains(target.getType())) {
             PastLocation location;
             if(target instanceof Player) {
@@ -75,7 +81,7 @@ public class HitBox extends Check {
                 val locs = location.getEstimatedLocation(getData().getTransPing(), Math.abs(getData().getTransPing() - getData().getLastTransPing()) + pingLeniency);
 
                 if (locs.size() == 0) return packet;
-                locs.forEach(loc -> boxes.add(getHitbox(loc)));
+                locs.forEach(loc -> boxes.add(getHitbox(target, loc)));
                 val eyeLoc = getData().getMovementProcessor().getTo().clone();
 
                 eyeLoc.setY(eyeLoc.getY() + (getData().getPlayer().isSneaking() ? 1.53 : getData().getPlayer().getEyeHeight()));
@@ -90,7 +96,7 @@ public class HitBox extends Check {
                         flag(collided + "=0", true, false);
                     }
                 } else {
-                    vl -= vl > 0 ? 1 : 0;
+                    vl -= vl > 0 ? 2 : 0;
                 }
 
                 debug("VL: " + vl + " COLLIDED: " + collided + " LOCSIZE: " + locs.size() + " PING: " + getData().getTransPing() + " BOXSIZE: " + boxes.size() + " DELTA: " + Math.abs(getData().getTransPing() - getData().getLastTransPing()) + pingLeniency);
@@ -104,8 +110,9 @@ public class HitBox extends Check {
 
     }
 
-    private BoundingBox getHitbox(CustomLocation l) {
-        return new BoundingBox(0, 0, 0, 0, 0, 0).add((float) l.getX(), (float) l.getY(), (float) l.getZ()).grow(.45f, 0, .45f)
-                .add(0, 0, 0, 0, 2f, 0).grow(getData().getMovementProcessor().getDeltaXZ() / 1.25f, 0, getData().getMovementProcessor().getDeltaXZ() / 1.25f);
+    private BoundingBox getHitbox(LivingEntity entity, CustomLocation l) {
+        Vector dimensions = MiscUtils.entityDimensions.getOrDefault(entity.getType(), new Vector(0.4, 2,0.4));
+        return new BoundingBox(0, 0, 0, 0, 0, 0).add((float) l.getX(), (float) l.getY(), (float) l.getZ()).grow((float) dimensions.getX(), (float) dimensions.getY(), (float) dimensions.getZ()).grow(.1f, 0.1f, .1f)
+                .grow((entity.getVelocity().getY() > 0 ? 0.15f : 0) + getData().getMovementProcessor().getDeltaXZ() / 1.25f, 0, (entity.getVelocity().getY() > 0 ? 0.15f : 0) + getData().getMovementProcessor().getDeltaXZ() / 1.25f);
     }
 }

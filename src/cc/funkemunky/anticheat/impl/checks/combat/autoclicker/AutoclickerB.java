@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.combat.autoclicker;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import lombok.val;
@@ -27,8 +28,8 @@ public class AutoclickerB extends Check {
     private final double[] averages = new double[]{0.0, 0.0, 0.0, 0.0};
     private int ticks, vl;
     private long timestamp;
-    public AutoclickerB(String name, CancelType cancelType, int maxVL) {
-        super(name, cancelType, maxVL);
+    public AutoclickerB(String name, CheckType type, CancelType cancelType, int maxVL) {
+        super(name, type, cancelType, maxVL);
     }
 
     @Override

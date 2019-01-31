@@ -3,12 +3,10 @@ package cc.funkemunky.anticheat.api.data.processors;
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.utils.*;
+import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.BoundingBox;
-import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.PlayerUtils;
-import cc.funkemunky.api.utils.ReflectionsUtil;
+import cc.funkemunky.api.utils.*;
 import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.entity.Vehicle;
@@ -20,8 +18,8 @@ import java.util.List;
 @Getter
 public class MovementProcessor {
     private boolean clientOnGround, serverOnGround, fullyInAir, inAir, hasJumped, inLiquid, blocksOnTop, pistonsNear, onHalfBlock,
-            onClimbable, onIce, collidesHorizontally, inWeb, onSlimeBefore, onSoulSand, isRiptiding;
-    private int airTicks, groundTicks, iceTicks, climbTicks, halfBlockTicks, soulSandTicks, blockAboveTicks, optifineTicks, liquidTicks;
+            onClimbable, onIce, collidesHorizontally, inWeb, onSlimeBefore, onSoulSand, isRiptiding, halfBlocksAround;
+    private int airTicks, groundTicks, iceTicks, climbTicks, halfBlockTicks, soulSandTicks, blockAboveTicks, optifineTicks, liquidTicks, webTicks;
     private float deltaY, lastDeltaY, deltaXZ, distanceToGround, serverYVelocity, lastServerYVelocity, serverYAcceleration, clientYAcceleration, jumpVelocity, cinematicYawDelta, cinematicPitchDelta;
     private CustomLocation from, to;
     private PastLocation pastLocation = new PastLocation();
@@ -65,6 +63,7 @@ public class MovementProcessor {
             onClimbable = assessment.isOnClimbable();
             fullyInAir = assessment.isFullyInAir();
             onSoulSand = assessment.getMaterialsCollided().contains(Material.SOUL_SAND);
+            halfBlocksAround = assessment.getMaterialsCollided().stream().anyMatch(material -> material.toString().contains("STAIR") || material.toString().contains("STEP") || material.toString().contains("SLAB") || material.toString().contains("SNOW") || material.toString().contains("CAKE") || material.toString().contains("BED") || material.toString().contains("SKULL"));
 
             jumpVelocity = 0.42f + (PlayerUtils.getPotionEffectLevel(packet.getPlayer(), PotionEffectType.JUMP) * 0.1f);
 
@@ -129,6 +128,7 @@ public class MovementProcessor {
             blockAboveTicks = blocksOnTop ? Math.min(40, blockAboveTicks + 2) : Math.max(0, blockAboveTicks - 1);
             liquidTicks = inLiquid ? Math.min(50, liquidTicks + 1) : Math.max(0, liquidTicks - 1);
             soulSandTicks = onSoulSand ? Math.min(40, soulSandTicks + 1) : Math.max(0, soulSandTicks - 1);
+            webTicks = inWeb ? Math.min(30, webTicks + 1) : Math.max(webTicks, webTicks - 1);
         }
 
         if (packet.isLook()) {
@@ -141,7 +141,7 @@ public class MovementProcessor {
             float yawShit = MiscUtils.convertToMouseDelta(yawDelta), pitchShit = MiscUtils.convertToMouseDelta(pitchDelta);
             float smooth = data.getYawSmooth().smooth(yawShit, yawShit * 0.05f), smooth2 = data.getPitchSmooth().smooth(pitchShit, pitchShit * 0.05f);
 
-            data.setCinematicMode((cinematicYawDelta = MathUtils.getDelta(smooth, yawShit)) < 0.08f && (cinematicPitchDelta = MathUtils.getDelta(smooth2, pitchShit)) < 0.06f);
+            data.setCinematicMode((cinematicYawDelta = MathUtils.getDelta(smooth, yawShit)) < 0.1f && (cinematicPitchDelta = MathUtils.getDelta(smooth2, pitchShit)) < 0.08f);
 
             if (data.isCinematicMode()) {
                 optifineTicks+= optifineTicks < 60 ? 1 : 0;

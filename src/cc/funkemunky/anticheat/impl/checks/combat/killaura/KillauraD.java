@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.combat.killaura;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import lombok.val;
@@ -22,8 +23,8 @@ public class KillauraD extends Check {
             pitchDeque = new LinkedList<>();
     private int vl;
 
-    public KillauraD(String name, CancelType cancelType, int maxVL) {
-        super(name, cancelType, maxVL);
+    public KillauraD(String name, CheckType type, CancelType cancelType, int maxVL) {
+        super(name, type, cancelType, maxVL);
     }
 
     @Override

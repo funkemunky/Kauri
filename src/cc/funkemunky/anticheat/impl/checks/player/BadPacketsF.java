@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.player;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
@@ -15,15 +16,15 @@ import org.bukkit.event.Event;
         Packet.Client.LEGACY_POSITION,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
-public class TimerA extends Check {
+public class BadPacketsF extends Check {
 
     @Setting(name = "threshold")
     private long threshold = 960L;
 
     private int ticks, vl;
     private long lastReset;
-    public TimerA(String name, CancelType cancelType, int maxVL) {
-        super(name, cancelType, maxVL);
+    public BadPacketsF(String name, CheckType type, CancelType cancelType, int maxVL) {
+        super(name, type, cancelType, maxVL);
     }
 
     @Override

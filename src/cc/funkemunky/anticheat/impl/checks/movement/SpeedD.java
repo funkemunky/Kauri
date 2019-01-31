@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.movement;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
@@ -41,8 +42,8 @@ import java.math.RoundingMode;
         Packet.Client.LEGACY_POSITION,
         Packet.Client.FLYING})
 public class SpeedD extends Check {
-    public SpeedD(String name, CancelType cancelType, int maxVL) {
-        super(name, cancelType, maxVL);
+    public SpeedD(String name, CheckType type, CancelType cancelType, int maxVL) {
+        super(name, type, cancelType, maxVL);
     }
 
     public float yaw = 0, walkSpeed = 0.1f;

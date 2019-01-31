@@ -3,6 +3,7 @@ package cc.funkemunky.anticheat.impl.checks.combat.reach;
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.CustomLocation;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.PastLocation;
@@ -43,8 +44,8 @@ public class ReachD extends Check {
     private LivingEntity target;
     private PastLocation targetLocs = new PastLocation();
 
-    public ReachD(String name, CancelType cancelType, int maxVL) {
-        super(name, cancelType, maxVL);
+    public ReachD(String name, CheckType type, CancelType cancelType, int maxVL) {
+        super(name, type, cancelType, maxVL);
 
         new BukkitRunnable() {
             public void run() {
@@ -145,7 +146,7 @@ public class ReachD extends Check {
     }
 
     private BoundingBox getHitbox(LivingEntity entity, CustomLocation l) {
-        val dimensions = MiscUtils.entityDimensions.getOrDefault(entity.getType(), new Vector(0.3f,1.85f,0.3f));
+        val dimensions = MiscUtils.entityDimensions.getOrDefault(entity.getType(), new Vector(0.35f,1.85f,0.35f));
 
         return new BoundingBox(l.toVector(), l.toVector()).grow((float) dimensions.getX(), 0, (float) dimensions.getZ()).add(0,0,0,0, (float) dimensions.getY(),0);
     }

@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.movement;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
@@ -20,8 +21,8 @@ public class SpeedA extends Check {
     private Verbose verbose = new Verbose();
     private long lastTimeStamp;
 
-    public SpeedA(String name, CancelType cancelType, int maxVL) {
-        super(name, cancelType, maxVL);
+    public SpeedA(String name, CheckType type, CancelType cancelType, int maxVL) {
+        super(name, type, cancelType, maxVL);
 
     }
 

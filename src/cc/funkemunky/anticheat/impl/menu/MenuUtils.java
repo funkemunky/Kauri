@@ -40,7 +40,7 @@ public class MenuUtils {
         Map<String, Integer> logs = Kauri.getInstance().getLoggerManager().getViolations(target.getUniqueId());
         String banReason = Kauri.getInstance().getLoggerManager().getBanReason(target.getUniqueId());
         logs.keySet().forEach(key -> {
-            menu.addItem(createButton(false, MiscUtils.createItem(key.equalsIgnoreCase(banReason) ? Material.ENCHANTED_BOOK : Material.BOOK, 1, Color.Blue + key, "", "&bViolations&8: &f" + logs.get(key)), null));
+            menu.addItem(createButton(false, MiscUtils.createItem(key.equalsIgnoreCase(banReason) ? Material.ENCHANTED_BOOK : Material.BOOK, 1, Color.Blue + key, "", "&eViolations&8: &f" + logs.get(key)), null));
         });
 
         menu.setItem(49, createButton(false, MiscUtils.createItem(Material.REDSTONE, 1, Color.Red + "Clear Logs"),
@@ -64,17 +64,17 @@ public class MenuUtils {
 
         menu.setItem(
                 13,
-                createButton(false, MiscUtils.createItem(Material.SIGN, 1, Color.Blue + "Kauri Anticheat", "", "&7You are using &bv" + Kauri.getInstance().getDescription().getVersion() + "&7.", "", "&bBanned&8: &f" + Kauri.getInstance().getStatsManager().getBanned(), "&bFlagged&8: &f" + Kauri.getInstance().getStatsManager().getFlagged() , "", "&7If you have any issues or questions, please", "&fLeft Click &7to get the link to our Support Discord."),
+                createButton(false, MiscUtils.createItem(Material.SIGN, 1, Color.Blue + "Kauri Anticheat", "", "&7You are using &ev" + Kauri.getInstance().getDescription().getVersion() + "&7.", "", "&eBanned&8: &f" + Kauri.getInstance().getStatsManager().getBanned(), "&eFlagged&8: &f" + Kauri.getInstance().getStatsManager().getFlagged() , "", "&7If you have any issues or questions, please", "&fLeft Click &7to get the link to our Support Discord."),
                         ((player, infopair) -> {
                             if(infopair.getClickType().toString().contains("LEFT")) {
-                                player.sendMessage(Color.translate("&bOur Support Discord&8: &fhttp://discord.me/Kauri"));
+                                player.sendMessage(Color.translate("&eOur Support Discord&8: &fhttp://discord.me/Kauri"));
                                 infopair.getMenu().close(player);
                             }
                         })));
 
         menu.setItem(15, createButton(false, MiscUtils.createItem(Material.WATCH, 1, Color.Blue + "Reload Kauri"), ((player, infoPair) -> {
             infoPair.getMenu().close(player);
-            player.sendMessage(Color.translate("&8[&b&lKauri&8] &7Fully unloading and loading Kauri..."));
+            player.sendMessage(Color.translate("&8[&e&lKauri&8] &7Fully unloading and loading Kauri..."));
             Kauri.getInstance().reloadKauri();
         })));
 
@@ -88,11 +88,11 @@ public class MenuUtils {
                         1,
                         Color.Blue + check.getName(),
                         "",
-                        "&bEnabled&7: &f" + check.isEnabled(),
-                        "&bExecutable&7: &f" + check.isExecutable(),
-                        "&bCancellable&7: &f" + check.isCancellable(),
-                        "",
-                        "&bInstructions&7:",
+                        "&eEnabled&7: &f" + check.isEnabled(),
+                        "&eExecutable&7: &f" + check.isExecutable(),
+                        "&eCancellable&7: &f" + check.isCancellable(),
+                        "&eType&7: &f" + check.getType().toString(),
+                        "&eInstructions&7:",
                         "&8- &fLeft Click &7to toggle check on/off.",
                         "&8- &fShift + Left Click &7to toggle check executable-abilities.",
                         "&8- &fRight Click &7to toggle check cancellable-abilities."),

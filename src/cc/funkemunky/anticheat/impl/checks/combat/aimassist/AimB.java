@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.combat.aimassist;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
@@ -14,8 +15,10 @@ import org.bukkit.event.Event;
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
 public class AimB extends Check {
-    public AimB(String name, CancelType cancelType, int maxVL) {
-        super(name, cancelType, maxVL);
+    public AimB(String name, CheckType type, CancelType cancelType, int maxVL) {
+        super(name, type, cancelType, maxVL);
+
+        setDeveloper(true);
     }
 
     private float lastPitchDelta, lastYawDelta;
@@ -32,8 +35,8 @@ public class AimB extends Check {
         val offset = 16777216L;
         val pitchGCD = MiscUtils.gcd((long) (pitchDifference * offset), (long) (lastPitchDelta * offset));
 
-        if (Math.abs(to.getPitch()) < 88.0f && getData().getMovementProcessor().getOptifineTicks() < 10 && (pitchGCD < 131072L || pitchGCD == lastGCD)) {
-            if(vl++ > 100) {
+        if (Math.abs(to.getPitch()) < 88.0f && pitchDifference > 0 && getData().getMovementProcessor().getOptifineTicks() < 10 && (pitchGCD < 131072L || pitchGCD == lastGCD)) {
+            if(vl++ > 150) {
                 flag(String.valueOf(pitchGCD / 2000), true, true);
             }
         } else {

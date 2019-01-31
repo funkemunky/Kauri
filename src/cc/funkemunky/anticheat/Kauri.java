@@ -44,7 +44,7 @@ public class Kauri extends JavaPlugin {
     private LoggerManager loggerManager;
 
 
-    private String requiredVersionOfAtlas = "1.0.7";
+    private String requiredVersionOfAtlas = "1.0.8";
 
     @Override
     public void onEnable() {
@@ -57,11 +57,11 @@ public class Kauri extends JavaPlugin {
             profiler = new BaseProfiler();
             profileStart = System.currentTimeMillis();
 
-            startScanner();
-
             //Starting up our utilities, managers, and tasks.
             checkManager = new CheckManager();
             dataManager = new DataManager();
+
+            startScanner();
 
             statsManager = new StatsManager();
             loggerManager = new LoggerManager();

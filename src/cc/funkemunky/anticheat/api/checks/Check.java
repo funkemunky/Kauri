@@ -20,6 +20,7 @@ import java.util.Map;
 @Setter
 public abstract class Check implements Listener, org.bukkit.event.Listener {
     private String name;
+    private CheckType type;
     private CancelType cancelType;
     private PlayerData data;
     private int maxVL;
@@ -30,7 +31,8 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
     private Map<String, Object> settings = new HashMap<>();
     private String alertMessage = "";
 
-    public Check(String name, CancelType cancelType, int maxVL) {
+    public Check(String name, CheckType type, CancelType cancelType, int maxVL) {
+        this.type = type;
         this.name = name;
         this.cancelType = cancelType;
         this.maxVL = maxVL;
@@ -44,8 +46,9 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
         loadFromConfig();
     }
 
-    public Check(String name, CancelType cancelType, PlayerData data, int maxVL) {
+    public Check(String name, CheckType type, CancelType cancelType, PlayerData data, int maxVL) {
         this.name = name;
+        this.type = type;
         this.cancelType = cancelType;
         this.data = data;
         this.maxVL = maxVL;
@@ -58,8 +61,9 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
         loadFromConfig();
     }
 
-    public Check(String name, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
+    public Check(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
         this.name = name;
+        this.type = type;
         this.cancelType = cancelType;
         this.maxVL = maxVL;
         this.enabled = enabled;
@@ -76,11 +80,18 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
         if (data.getLastLag().hasPassed() || lagVerbose.flag(4, 500L)) {
             int vl = Kauri.getInstance().getLoggerManager().addAndGetViolation(data.getUuid(), this);
             if (vl > maxVL && executable && ban && !Kauri.getInstance().getStatsManager().isPlayerBanned(data.getUuid())) {
+                if(CheckSettings.broadcastEnabled) {
+                    new BukkitRunnable() {
+                        public void run() {
+                            Bukkit.broadcastMessage(Color.translate(CheckSettings.broadcastMessage));
+                        }
+                    }.runTask(Kauri.getInstance());
+                }
                 new BukkitRunnable() {
                     public void run() {
                         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), execCommand.replaceAll("%player%", getData().getPlayer().getName()));
                     }
-                }.runTaskLater(Kauri.getInstance(), 30);
+                }.runTaskLater(Kauri.getInstance(), 10);
                 Kauri.getInstance().getLoggerManager().addBan(data.getUuid(), this);
             }
 

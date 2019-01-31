@@ -33,10 +33,10 @@ public class CollisionAssessment {
 
     public void assessBox(BoundingBox bb, World world, boolean isEntity) {
         Location location = bb.getMinimum().toLocation(world);
-        Block block = location.getBlock();
+        Block block = BlockUtils.getBlock(location);
 
         if (BlockUtils.isSolid(block) || isEntity) {
-            if (bb.getMinimum().getY() < (playerBox.getMinimum().getY() + 0.1) && bb.collidesVertically(playerBox.subtract(0, 0.001f, 0, 0, 0, 0))) {
+            if (bb.getMinimum().getY() < (playerBox.getMinimum().getY() + 0.1) && bb.collidesVertically(playerBox.subtract(0, 0.1f, 0, 0, 0, 0))) {
                 onGround = true;
             }
 
@@ -56,12 +56,20 @@ public class CollisionAssessment {
                 onIce = true;
             }
 
-            if (bb.collidesHorizontally(playerBox.grow(0.05f + (ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_13) ? 0.05f : 0), 0, 0.05f + (ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_13) ? 0.05f : 0)))) {
+            if (bb.collidesHorizontally(playerBox.grow((ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_13) ? 0.05f : 0), 0, (ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_13) ? 0.05f : 0)))) {
                 collidesHorizontally = true;
 
             }
 
-            if (BlockUtils.isClimbableBlock(block) && playerBox.grow(0.3f, 0, 0.3f).collidesHorizontally(bb)) {
+            if(bb.collidesVertically(playerBox.subtract(0, 0.1f,0,0,0,0)) && block.getType().toString().contains("SLIME")) {
+                onSlime = true;
+            }
+
+            Location loc = new Location(data.getPlayer().getWorld(), data.getMovementProcessor().getTo().getX(), data.getBoundingBox().minY, data.getMovementProcessor().getTo().getZ());
+
+            Block footBlock = BlockUtils.getBlock(loc);
+
+            if (BlockUtils.isClimbableBlock(footBlock) && (getData().getMovementProcessor().getDeltaY() < 0 || collidesHorizontally)) {
                 onClimbable = true;
             }
         } else {

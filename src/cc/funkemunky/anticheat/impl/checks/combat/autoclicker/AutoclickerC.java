@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.combat.autoclicker;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.DynamicRollingAverage;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
@@ -23,8 +24,8 @@ public class AutoclickerC extends Check {
 
     private final DynamicRollingAverage cpsAverage = new DynamicRollingAverage(5);
     private int cps, ticks, vl;
-    public AutoclickerC(String name, CancelType cancelType, int maxVL) {
-        super(name, cancelType, maxVL);
+    public AutoclickerC(String name, CheckType type, CancelType cancelType, int maxVL) {
+        super(name, type, cancelType, maxVL);
     }
 
     /*

@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.movement;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.BukkitEvents;
 import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.utils.Color;
@@ -13,8 +14,8 @@ import org.bukkit.potion.PotionEffectType;
 
 @BukkitEvents(events = {PlayerMoveEvent.class})
 public class FastLadder extends Check {
-    public FastLadder(String name, CancelType cancelType, int maxVL) {
-        super(name, cancelType, maxVL);
+    public FastLadder(String name, CheckType type, CancelType cancelType, int maxVL) {
+        super(name, type, cancelType, maxVL);
     }
 
     @Setting(name = "threshold.verboseMaxSpeed")
