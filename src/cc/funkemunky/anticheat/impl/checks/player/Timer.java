@@ -11,10 +11,12 @@ import lombok.val;
 import org.bukkit.event.Event;
 
 @Packets(packets = {
-        Packet.Client.LOOK,
-        Packet.Client.POSITION_LOOK,
-        Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.FLYING,
+        Packet.Client.POSITION,
+        Packet.Client.POSITION_LOOK,
+        Packet.Client.LOOK,
+        Packet.Client.LEGACY_POSITION,
+        Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
 public class Timer extends Check {
 
