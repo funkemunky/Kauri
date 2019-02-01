@@ -3,12 +3,22 @@ package cc.funkemunky.anticheat.impl.checks.combat.killaura;
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.utils.Packets;
+import cc.funkemunky.api.tinyprotocol.api.Packet;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import lombok.val;
-import net.minecraft.server.v1_8_R3.PacketPlayInArmAnimation;
 import org.bukkit.event.Event;
 
+@Packets(packets = {
+        Packet.Client.USE_ENTITY,
+        Packet.Client.ARM_ANIMATION,
+        Packet.Client.LOOK,
+        Packet.Client.POSITION_LOOK,
+        Packet.Client.LEGACY_POSITION_LOOK,
+        Packet.Client.FLYING,
+        Packet.Client.LEGACY_LOOK})
 public class KillAuraH extends Check {
 
     public KillAuraH(String name, CheckType type, CancelType cancelType, int maxVL) {
@@ -34,7 +44,7 @@ public class KillAuraH extends Check {
             }
         } else if (packet instanceof WrappedInFlyingPacket) {
             this.swing = false;
-        } else if (packet instanceof PacketPlayInArmAnimation) {
+        } else if (packet instanceof WrappedInArmAnimationPacket) {
             this.swing = true;
         }
         return packet;
