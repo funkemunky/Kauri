@@ -19,9 +19,9 @@ import org.bukkit.event.Event;
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.FLYING,
         Packet.Client.LEGACY_LOOK})
-public class KillAuraH extends Check {
+public class KillauraH extends Check {
 
-    public KillAuraH(String name, CheckType type, CancelType cancelType, int maxVL) {
+    public KillauraH(String name, CheckType type, CancelType cancelType, int maxVL) {
         super(name, type, cancelType, maxVL);
     }
 

@@ -51,6 +51,7 @@ public class CheckManager {
         checks.add(new KillauraE("Killaura (Type E)", CheckType.KILLAURA, CancelType.COMBAT, 100, true, true, true));
         checks.add(new KillauraF("Killaura (Type F)", CheckType.KILLAURA, CancelType.COMBAT, 12));
         checks.add(new KillauraG("Killaura (Type G)", CheckType.KILLAURA, CancelType.COMBAT, 50, true, false, true));
+        checks.add(new KillauraH("Killaura (Type H)", CheckType.KILLAURA, CancelType.COMBAT, 3));
         checks.add(new FlyA("Fly (Type A)", CheckType.MOVEMENT, CancelType.MOTION, 225));
         checks.add(new FlyB("Fly (Type B)", CheckType.MOVEMENT, CancelType.MOTION, 225, true, false, true));
         checks.add(new SpeedA("Speed (Type A)", CheckType.MOVEMENT, CancelType.MOTION, 100));
@@ -70,6 +71,7 @@ public class CheckManager {
         checks.add(new BadPacketsD("BadPackets (Type D)", CheckType.BADPACKETS, CancelType.COMBAT, 50));
         checks.add(new BadPacketsE("BadPackets (Type E)", CheckType.BADPACKETS, CancelType.HEALTH, 20));
         checks.add(new BadPacketsF("BadPackets (Type F)", CheckType.BADPACKETS, CancelType.MOTION, 100));
+        checks.add(new Timer("Timer", CheckType.BADPACKETS, CancelType.NONE, 20));
         checks.add(new VelocityH("Velocity (Type H)", CheckType.VELOCITY, CancelType.MOTION,  40));
         checks.add(new VelocityV("Velocity (Type v)", CheckType.VELOCITY, CancelType.MOTION,  40));
 
