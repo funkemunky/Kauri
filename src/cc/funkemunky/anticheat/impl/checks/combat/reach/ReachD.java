@@ -15,6 +15,7 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedPacketPlayOutWorldParticle;
 import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumParticle;
 import cc.funkemunky.api.utils.BoundingBox;
+import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.math.RayTrace;
@@ -57,7 +58,7 @@ public class ReachD extends Check {
     }
 
     @Setting
-    private long pingRange = 100;
+    private long pingRange = 150;
 
     @Setting
     private float maxReach = 3.0f;
@@ -88,7 +89,7 @@ public class ReachD extends Check {
 
                 WrappedInFlyingPacket flying = new WrappedInFlyingPacket(packet, getData().getPlayer());
 
-                val origin = getData().getMovementProcessor().getTo().clone().toLocation(flying.getPlayer().getWorld()).add(0, 1.53f, 0);
+                val origin = getData().getMovementProcessor().getTo().clone().toLocation(flying.getPlayer().getWorld()).add(0, getData().getPlayer().getEyeHeight(), 0);
 
                 RayTrace trace = new RayTrace(origin.toVector(), origin.getDirection());
 
@@ -123,15 +124,17 @@ public class ReachD extends Check {
                 }
 
                 if (collided > 1) {
-                    if (calculatedReach > maxReach) {
+                    if (calculatedReach > maxReach + 0.0001) {
                         if (vl++ > maxVL) {
                             flag(calculatedReach + ">-" + maxReach, false, true);
                         }
+
+                        debug(Color.Green + "REACH: " + calculatedReach);
                     } else {
                         vl -= vl > 0 ? 0.2 : 0;
                     }
 
-                    debug("VL: " + vl + "/" + maxVL + " REACH: " + calculatedReach + " COLLIDED: " + collided + " MAX: " + maxReach + " RANGE: " + pingRange);
+                    debug("VL: " + vl + "/" + maxVL + " REACH: " + calculatedReach + " COLLIDED: " + collided + " MAX: " + maxReach + " RANGE: " + pingRange + " HEIGHT: " + getData().getPlayer().getEyeHeight());
                 }
 
                 attacked = false;
