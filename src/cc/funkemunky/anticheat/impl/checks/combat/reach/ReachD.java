@@ -32,6 +32,7 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Packets(packets = {
+        Packet.Client.ARM_ANIMATION,
         Packet.Client.USE_ENTITY,
         Packet.Client.FLYING,
         Packet.Client.POSITION,
@@ -79,6 +80,8 @@ public class ReachD extends Check {
                 attacked = true;
                 target = (LivingEntity) use.getEntity();
             }
+        } else if(packetType.equals(Packet.Client.ARM_ANIMATION)) {
+            vl -= vl > 0 ? 0.01 : 0;
         } else if(target != null) {
             if (attacked) {
                 val entityData = Kauri.getInstance().getDataManager().getPlayerData(target.getUniqueId());
@@ -89,11 +92,11 @@ public class ReachD extends Check {
 
                 WrappedInFlyingPacket flying = new WrappedInFlyingPacket(packet, getData().getPlayer());
 
-                val origin = getData().getMovementProcessor().getTo().clone().toLocation(flying.getPlayer().getWorld()).add(0, getData().getPlayer().getEyeHeight(), 0);
+                val origin = getData().getMovementProcessor().getTo().clone().toLocation(flying.getPlayer().getWorld()).add(0, 1.53, 0);
 
                 RayTrace trace = new RayTrace(origin.toVector(), origin.getDirection());
 
-                List<Vector> vecs = trace.traverse(target.getEyeLocation().distance(origin), 0.1);
+                List<Vector> vecs = trace.traverse(target.getEyeLocation().distance(origin), 0.05);
 
                 List<BoundingBox> entityBoxes = new CopyOnWriteArrayList<>();
 
@@ -134,7 +137,7 @@ public class ReachD extends Check {
                         vl -= vl > 0 ? 0.2 : 0;
                     }
 
-                    debug("VL: " + vl + "/" + maxVL + " REACH: " + calculatedReach + " COLLIDED: " + collided + " MAX: " + maxReach + " RANGE: " + pingRange + " HEIGHT: " + getData().getPlayer().getEyeHeight());
+                    debug("VL: " + vl + "/" + maxVL + " REACH: " + calculatedReach + " COLLIDED: " + collided + " MAX: " + maxReach + " RANGE: " + pingRange);
                 }
 
                 attacked = false;
@@ -151,6 +154,6 @@ public class ReachD extends Check {
     private BoundingBox getHitbox(LivingEntity entity, CustomLocation l) {
         val dimensions = MiscUtils.entityDimensions.getOrDefault(entity.getType(), new Vector(0.35f,1.85f,0.35f));
 
-        return new BoundingBox(l.toVector(), l.toVector()).grow((float) dimensions.getX(), 0, (float) dimensions.getZ()).add(0,0,0,0, (float) dimensions.getY(),0);
+        return new BoundingBox(l.toVector(), l.toVector()).grow(.1f, .1f, .1f).grow((float) dimensions.getX(), 0, (float) dimensions.getZ()).add(0,0,0,0, (float) dimensions.getY(),0);
     }
 }

@@ -132,18 +132,6 @@ public class Kauri extends JavaPlugin {
         });
     }
 
-    public void reloadKauri(Player player) {
-        Atlas.getInstance().getThreadPool().execute(() -> {
-            cc.funkemunky.anticheat.api.utils.MiscUtils.unloadPlugin("Kauri");
-            cc.funkemunky.anticheat.api.utils.MiscUtils.loadPlugin("Kauri");
-            new BukkitRunnable() {
-                public void run() {
-                    MenuUtils.openCheckEditGUI(player);
-                }
-            }.runTask(Kauri.getInstance());
-        });
-    }
-
     private void initializeScanner(Class<?> mainClass, Plugin plugin) {
         ClassScanner.scanFile(null, mainClass).stream().filter(c -> {
             try {

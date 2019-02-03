@@ -50,11 +50,14 @@ public class CheckManager {
         checks.add(new KillauraF("Killaura (Type F)", CheckType.KILLAURA, CancelType.COMBAT, 12));
         checks.add(new KillauraG("Killaura (Type G)", CheckType.KILLAURA, CancelType.COMBAT, 50, true, false, true));
         checks.add(new KillauraH("Killaura (Type H)", CheckType.KILLAURA, CancelType.COMBAT, 3));
-        checks.add(new FlyA("Fly (Type A)", CheckType.MOVEMENT, CancelType.MOTION, 225));
-        checks.add(new FlyB("Fly (Type B)", CheckType.MOVEMENT, CancelType.MOTION, 225, true, false, true));
-        checks.add(new SpeedA("Speed (Type A)", CheckType.MOVEMENT, CancelType.MOTION, 100));
-        checks.add(new SpeedB("Speed (Type B)", CheckType.MOVEMENT, CancelType.MOTION, 125));
-        checks.add(new SpeedC("Speed (Type C)", CheckType.MOVEMENT, CancelType.MOTION, 100));
+        checks.add(new FlyA("Fly (Type A)", CheckType.FLY, CancelType.MOTION, 225));
+        checks.add(new FlyB("Fly (Type B)", CheckType.FLY, CancelType.MOTION, 225, true, false, true));
+        checks.add(new FlyC("Fly (Type C)", CheckType.FLY, CancelType.MOTION, 100));
+        checks.add(new FlyD("Fly (Type D)", CheckType.FLY, CancelType.MOTION, 200));
+        checks.add(new SpeedA("Speed (Type A)", CheckType.SPEED, CancelType.MOTION, 100));
+        checks.add(new SpeedB("Speed (Type B)", CheckType.SPEED, CancelType.MOTION, 125));
+        checks.add(new SpeedC("Speed (Type C)", CheckType.SPEED, CancelType.MOTION, 100));
+        checks.add(new SpeedD("Speed (Type D)", CheckType.SPEED, CancelType.MOTION, 100));
         checks.add(new ReachA("Reach (Type A)", CheckType.REACH, CancelType.COMBAT, 60));
         checks.add(new ReachB("Reach (Type B)", CheckType.REACH, CancelType.COMBAT, 60));
         checks.add(new ReachC("Reach (Type C)", CheckType.REACH, CancelType.MOTION, 50));
@@ -69,9 +72,9 @@ public class CheckManager {
         checks.add(new BadPacketsD("BadPackets (Type D)", CheckType.BADPACKETS, CancelType.COMBAT, 50));
         checks.add(new BadPacketsE("BadPackets (Type E)", CheckType.BADPACKETS, CancelType.HEALTH, 20));
         checks.add(new BadPacketsF("BadPackets (Type F)", CheckType.BADPACKETS, CancelType.MOTION, 100));
-        checks.add(new Timer("Timer", CheckType.BADPACKETS, CancelType.NONE, 20));
-        checks.add(new VelocityH("Velocity (Type H)", CheckType.VELOCITY, CancelType.MOTION,  40));
-        checks.add(new VelocityV("Velocity (Type v)", CheckType.VELOCITY, CancelType.MOTION,  40));
+        checks.add(new Timer("BadPackets (Type G)", CheckType.BADPACKETS, CancelType.NONE, 20));
+        checks.add(new VelocityH("Velocity (H)", CheckType.VELOCITY, CancelType.MOTION,  40));
+        checks.add(new VelocityV("Velocity (V)", CheckType.VELOCITY, CancelType.MOTION,  40));
 
         for (Check check : checks) {
             Arrays.stream(check.getClass().getDeclaredFields()).filter(field -> {

@@ -40,7 +40,7 @@ public class KillauraG extends Check {
 
         if(use.getEntity() instanceof LivingEntity) {
 
-            val origin = getData().getPlayer().getLocation().clone().add(0, 1.53, 0);
+            val origin = getData().getPlayer().getEyeLocation();
 
             val distance = origin.distance(use.getEntity().getLocation());
 
@@ -48,10 +48,15 @@ public class KillauraG extends Check {
 
             List<Vector> vectors = trace.traverse(distance, 0.2);
 
+            //vectors.forEach(position -> origin.getWorld().playEffect(position.toLocation(origin.getWorld()), ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_13) ? Effect.SMOKE : Effect.valueOf("COLOURED_DUST"), 0));
+
             var amount = 0;
 
             var finalVec = vectors.get(0);
 
+            BoundingBox boxToCheck = new BoundingBox(getData().getPlayer().getEyeLocation().toVector(), use.getEntity().getLocation().toVector()).grow(1,1,1);
+
+            List<BoundingBox> collidingBlocks = boxToCheck.getCollidingBlockBoxes(getData().getPlayer());
             for (Vector vec : vectors) {
                 if (MiscUtils.getEntityBoundingBox((LivingEntity) use.getEntity()).grow(0.25f,0,0.25f).intersectsWithBox(vec)) {
                     finalVec = vec;
@@ -59,9 +64,7 @@ public class KillauraG extends Check {
                 }
                 if (!BlockUtils.getBlock(vec.toLocation(origin.getWorld())).getType().isSolid()) continue;
 
-                List<BoundingBox> boxes = Atlas.getInstance().getBlockBoxManager().getBlockBox().getCollidingBoxes(origin.getWorld(), new BoundingBox(vec, vec).grow(0.1f, 0.1f, 0.1f));
-
-                if (boxes.stream().anyMatch(box -> box.intersectsWithBox(vec))) {
+                if (collidingBlocks.stream().anyMatch(box -> box.intersectsWithBox(vec))) {
                     amount++;
                 }
             }

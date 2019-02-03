@@ -5,6 +5,9 @@ import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
+import cc.funkemunky.api.utils.MathUtils;
+import lombok.val;
+import org.bukkit.Material;
 import org.bukkit.event.Event;
 
 import java.util.*;
@@ -15,23 +18,21 @@ public class FlyC extends Check {
         super(name, type, cancelType, maxVL);
     }
 
-    private Set<Float> set = new HashSet<>();
-    private int ticks;
+    private float lastMotion;
+
 
     @Override
     public Object onPacket(Object packet, String packetType, long timeStamp) {
-        if(!getData().getMovementProcessor().isServerOnGround() && getData().getMovementProcessor().getDistanceToGround() > 1.2 && getData().getMovementProcessor().getClimbTicks() == 0 && getData().getMovementProcessor().getLiquidTicks() == 0 && !getData().isGeneralCancel() && !getData().getMovementProcessor().isOnHalfBlock()) {
-            if(ticks++ == 10) {
-                debug("SIZE: " + set.size());
+        if(getData().getBoundingBox().grow(1.5F, 1.5F, 1.5F).getCollidingBlocks(this.getData().getPlayer()).size() == 0) {
+            val move = getData().getMovementProcessor();
+            val motion = move.getDeltaY();
 
-                if(set.size() < 7) {
-                    flag(set.size() + "<-7", true, true);
+            if(move.getClimbTicks() == 0 && move.getLiquidTicks() == 0 && move.getWebTicks() == 0 && move.getAirTicks() > 4) {
+                if(motion > lastMotion) {
+                    flag(motion + ">-" + lastMotion, true, true);
                 }
-                set.clear();
-                ticks = 0;
-            } else {
-                set.add(getData().getMovementProcessor().getDeltaY());
             }
+            lastMotion = motion;
         }
         return packet;
     }

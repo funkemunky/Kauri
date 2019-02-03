@@ -14,8 +14,7 @@ import org.bukkit.event.Event;
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_POSITION})
 public class NoFall extends Check {
-    private boolean lastOnGround;
-    private int verbose;
+    private int vl;
     private long lastTimeStamp;
     public NoFall(String name, CheckType type, CancelType cancelType, int maxVL) {
         super(name, type, cancelType, maxVL);
@@ -23,36 +22,22 @@ public class NoFall extends Check {
 
     @Override
     public Object onPacket(Object packet, String packetType, long timeStamp) {
-        if (getData().getLastServerPos().hasNotPassed(1) || getData().getMovementProcessor().getTo().toVector().distance(getData().getMovementProcessor().getFrom().toVector()) < 0.005)
+        if (getData().getLastServerPos().hasNotPassed(2) || getData().getMovementProcessor().getTo().toVector().distance(getData().getMovementProcessor().getFrom().toVector()) < 0.005)
             return packet;
-        WrappedInFlyingPacket flying = new WrappedInFlyingPacket(packet, getData().getPlayer());
 
         if (!getData().isGeneralCancel()) {
             if (timeStamp - lastTimeStamp > 1) {
-                if (!getData().getMovementProcessor().isServerOnGround()
-                        && getData().getMovementProcessor().getAirTicks() > 3
-                        && flying.isGround()
-                        && !BlockUtils.getBlock(getData().getMovementProcessor().getTo().toLocation(getData().getPlayer().getWorld())).getType().isSolid()
-                        && getData().getMovementProcessor().getDistanceToGround() > 3.0
-                        && getData().getLastBlockPlace().hasPassed(5)) {
-                    flag("t: air;" + lastOnGround + "!=" + flying.isGround(), true, false);
-                }
-
-                if (getData().getMovementProcessor().isServerOnGround() != flying.isGround()
-                        && getData().getMovementProcessor().getAirTicks() > 4
-                        && getData().getMovementProcessor().getGroundTicks() > 4
-                        && !BlockUtils.getBlock(getData().getMovementProcessor().getTo().toLocation(getData().getPlayer().getWorld()).add(0, 0.1, 0)).getType().isSolid()) {
-                    if (verbose++ > 6) {
-                        flag("t: full;" + getData().getMovementProcessor().isServerOnGround() + "!=" + flying.isGround(), true, true);
+                if(getData().getMovementProcessor().isClientOnGround() != getData().getMovementProcessor().isServerOnGround()) {
+                    if((getData().getMovementProcessor().getDistanceToGround() > 2.0f && getData().getMovementProcessor().getAirTicks() > 4) || vl++ > 3) {
+                        flag(getData().getMovementProcessor().isClientOnGround() + "!=" + getData().getMovementProcessor().isServerOnGround(), true, true);
                     }
                 } else {
-                    verbose = 0;
+                    vl -= vl > 0 ? 1 : 0;
                 }
+                debug("VL: " + vl + "CLIENT: " + getData().getMovementProcessor().isClientOnGround() + " SERVER: " + getData().getMovementProcessor().isServerOnGround());
             }
             lastTimeStamp = timeStamp;
         }
-
-        lastOnGround = flying.isGround();
         return packet;
     }
 

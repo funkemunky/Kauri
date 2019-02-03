@@ -80,7 +80,7 @@ public class SpeedB extends Check {
                 }
             });
 
-            var maxStreak = 2;
+            var maxStreak = 1;
 
             if (player.hasPotionEffect(PotionEffectType.SPEED)) {
                 maxStreak++;

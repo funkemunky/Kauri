@@ -20,7 +20,7 @@ public class MovementProcessor {
     private boolean clientOnGround, serverOnGround, fullyInAir, inAir, hasJumped, inLiquid, blocksOnTop, pistonsNear, onHalfBlock,
             onClimbable, onIce, collidesHorizontally, inWeb, onSlimeBefore, onSoulSand, isRiptiding, halfBlocksAround;
     private int airTicks, groundTicks, iceTicks, climbTicks, halfBlockTicks, soulSandTicks, blockAboveTicks, optifineTicks, liquidTicks, webTicks;
-    private float deltaY, lastDeltaY, deltaXZ, distanceToGround, serverYVelocity, lastServerYVelocity, serverYAcceleration, clientYAcceleration, jumpVelocity, cinematicYawDelta, cinematicPitchDelta;
+    private float deltaY, lastDeltaY, deltaXZ, distanceToGround, serverYVelocity, lastServerYVelocity, serverYAcceleration, clientYAcceleration, jumpVelocity, cinematicYawDelta, cinematicPitchDelta, yawDelta, pitchDelta, lastYawDelta, lastPitchDelta;
     private CustomLocation from, to;
     private PastLocation pastLocation = new PastLocation();
     private TickTimer lastRiptide = new TickTimer(6);
@@ -137,16 +137,16 @@ public class MovementProcessor {
 
             //Algorithm stripped from the MC client which calculates the deceleration of rotation when using cinematic/optifine zoom.
             //Used to separate a legitimate aimbot-like rotation from a cheat.
-            float yawDelta = MathUtils.getDelta(to.getYaw(), from.getYaw()), pitchDelta = MathUtils.getDelta(to.getPitch(), from.getPitch());
+            this.lastYawDelta = yawDelta;
+            float yawDelta = this.yawDelta = MathUtils.getDelta(to.getYaw(), from.getYaw()), pitchDelta = this.pitchDelta = MathUtils.getDelta(to.getPitch(), from.getPitch());
             float yawShit = MiscUtils.convertToMouseDelta(yawDelta), pitchShit = MiscUtils.convertToMouseDelta(pitchDelta);
             float smooth = data.getYawSmooth().smooth(yawShit, yawShit * 0.05f), smooth2 = data.getPitchSmooth().smooth(pitchShit, pitchShit * 0.05f);
-
-            data.setCinematicMode((cinematicYawDelta = MathUtils.getDelta(smooth, yawShit)) < 0.1f && (cinematicPitchDelta = MathUtils.getDelta(smooth2, pitchShit)) < 0.08f);
+            data.setCinematicMode(lastYawDelta + 0.01 > yawDelta && (cinematicYawDelta = MathUtils.getDelta(smooth, yawShit)) < 0.1f && (cinematicPitchDelta = MathUtils.getDelta(smooth2, pitchShit)) < 0.08f);
 
             if (data.isCinematicMode()) {
                 optifineTicks+= optifineTicks < 60 ? 1 : 0;
             } else if(optifineTicks > 0) {
-                optifineTicks--;
+                optifineTicks -= 3;
             }
         }
 
