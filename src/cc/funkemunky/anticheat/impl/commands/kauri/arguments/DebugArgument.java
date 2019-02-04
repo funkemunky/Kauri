@@ -39,9 +39,15 @@ public class DebugArgument extends FunkeArgument {
             PlayerData data = Kauri.getInstance().getDataManager().getPlayerData(player.getUniqueId());
 
             if (data != null) {
-                if (!args[1].equalsIgnoreCase("none")) {
+                if (args[1].equalsIgnoreCase("box")) {
+                    data.setDebuggingBox(!data.isDebuggingBox());
+                    sender.sendMessage(Color.Gray + "Set box debug to: " + Color.White + data.isDebuggingBox());
+                } else if(args[1].equalsIgnoreCase("none")) {
+                    data.setDebuggingCheck(null);
+                    data.setDebuggingPlayer(null);
+                    sender.sendMessage(Color.Red + "Stopped any debug messages from being sent to you.");
+                } else {
                     Check check = Kauri.getInstance().getCheckManager().getCheck(args[1].replaceAll("_", " "));
-
 
                     if (check == null) {
                         sender.sendMessage(Color.Red + "The check \"" + args[1] + "\" does not exist!");
@@ -64,10 +70,6 @@ public class DebugArgument extends FunkeArgument {
                             sender.sendMessage(Color.Red + "The player \"" + args[2] + "\" is not online!");
                         }
                     }
-                } else {
-                    data.setDebuggingCheck(null);
-                    data.setDebuggingPlayer(null);
-                    sender.sendMessage(Color.Red + "Stopped any debug messages from being sent to you.");
                 }
             } else {
                 sender.sendMessage(Color.Red + "There was an error trying to find your data object.");

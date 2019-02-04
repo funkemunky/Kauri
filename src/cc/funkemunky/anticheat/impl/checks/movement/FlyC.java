@@ -20,14 +20,13 @@ public class FlyC extends Check {
 
     private float lastMotion;
 
-
     @Override
     public Object onPacket(Object packet, String packetType, long timeStamp) {
-        if(getData().getBoundingBox().grow(1.5F, 1.5F, 1.5F).getCollidingBlocks(this.getData().getPlayer()).size() == 0) {
+        if(!getData().getPlayer().getAllowFlight() && getData().getPlayer().getVehicle() == null && getData().getBoundingBox().grow(2F, 2F, 2F).getCollidingBlocks(this.getData().getPlayer()).size() == 0) {
             val move = getData().getMovementProcessor();
             val motion = move.getDeltaY();
 
-            if(move.getClimbTicks() == 0 && move.getLiquidTicks() == 0 && move.getWebTicks() == 0 && move.getAirTicks() > 4) {
+            if(move.getClimbTicks() == 0 && getData().getLastBlockPlace().hasPassed(8) && move.getHalfBlockTicks() == 0 && move.getLiquidTicks() == 0 && getData().getVelocityProcessor().getLastVelocity().hasPassed(10) && move.getWebTicks() == 0 && move.getAirTicks() > 4) {
                 if(motion > lastMotion) {
                     flag(motion + ">-" + lastMotion, true, true);
                 }

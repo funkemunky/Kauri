@@ -1,9 +1,13 @@
 package cc.funkemunky.anticheat.api.utils;
 
+import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
+import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
+import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumParticle;
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.BoundingBox;
+import cc.funkemunky.api.utils.MiscUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
@@ -38,6 +42,10 @@ public class CollisionAssessment {
         if (BlockUtils.isSolid(block) || isEntity) {
             if (bb.getMinimum().getY() <= (playerBox.getMinimum().getY()) && bb.collidesVertically(playerBox.subtract(0, 0.1f, 0, 0, 0, 0))) {
                 onGround = true;
+            }
+
+            if(getData().isDebuggingBox() && bb.collides(playerBox) && Kauri.getInstance().getCurrentTicks() % 2 == 0) {
+                Atlas.getInstance().getThreadPool().submit(() -> MiscUtils.createParticlesForBoundingBox(getData().getPlayer(), bb, WrappedEnumParticle.FLAME, 0.25f));
             }
 
             if ((bb.getMaximum().getY()) >= playerBox.getMaximum().getY() && bb.collidesVertically(playerBox.add(0, 0, 0, 0, 0.35f, 0))) {

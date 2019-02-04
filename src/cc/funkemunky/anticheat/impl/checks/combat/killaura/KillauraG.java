@@ -15,6 +15,7 @@ import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.math.RayTrace;
 import lombok.val;
 import lombok.var;
+import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
 import org.bukkit.util.Vector;
@@ -62,7 +63,9 @@ public class KillauraG extends Check {
                     finalVec = vec;
                     break;
                 }
-                if (!BlockUtils.getBlock(vec.toLocation(origin.getWorld())).getType().isSolid()) continue;
+
+                Block block = BlockUtils.getBlock(vec.toLocation(origin.getWorld()));
+                if (!block.getType().isSolid() || BlockUtils.isClimbableBlock(block)) continue;
 
                 if (collidingBlocks.stream().anyMatch(box -> box.intersectsWithBox(vec))) {
                     amount++;

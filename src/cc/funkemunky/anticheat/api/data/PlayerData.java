@@ -31,7 +31,7 @@ public class PlayerData {
     private List<Check> checks = new ArrayList<>();
     private CancelType cancelType = CancelType.NONE;
     private boolean ableToFly, creativeMode, invulnerable, flying, generalCancel, breakingBlock,
-            cinematicMode, lagging, alertsEnabled;
+            cinematicMode, lagging, alertsEnabled, debuggingBox;
     private Vector lastVelocityVector;
     private BoundingBox boundingBox;
     private TickTimer lastMovementCancel = new TickTimer(4),
