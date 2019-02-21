@@ -28,7 +28,7 @@ public class BadPacketsA extends Check {
     }
 
     @Override
-    public Object onPacket(Object packet, String packetType, long timeStamp) {
+    public void onPacket(Object packet, String packetType, long timeStamp) {
         if (packetType.equalsIgnoreCase(Packet.Server.ABILITIES)) {
             WrappedOutAbilitiesPacket abilities = new WrappedOutAbilitiesPacket(packet, getData().getPlayer());
 
@@ -65,7 +65,7 @@ public class BadPacketsA extends Check {
                 flag("fake news abilities packet", true, true);
             }
         }
-        return packet;
+        return;
     }
 
     @Override

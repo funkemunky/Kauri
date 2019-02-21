@@ -13,7 +13,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -27,9 +29,10 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
     private boolean enabled, executable, cancellable, developer;
     private Verbose lagVerbose = new Verbose();
     private long lastAlert;
-    private String execCommand;
+    private List<String> execCommand;
     private Map<String, Object> settings = new HashMap<>();
     private String alertMessage = "";
+    private int vl;
 
     public Check(String name, CheckType type, CancelType cancelType, int maxVL) {
         this.type = type;
@@ -78,24 +81,20 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
 
     protected void flag(String information, boolean cancel, boolean ban) {
         if (data.getLastLag().hasPassed() || lagVerbose.flag(4, 500L)) {
-            int vl = Kauri.getInstance().getLoggerManager().addAndGetViolation(data.getUuid(), this);
+            vl++;
+            Kauri.getInstance().getLoggerManager().addViolation(data.getUuid(), this);
             if (vl > maxVL && executable && ban && !Kauri.getInstance().getStatsManager().isPlayerBanned(data.getUuid())) {
-                if(CheckSettings.broadcastEnabled) {
-                    new BukkitRunnable() {
-                        public void run() {
-                            Bukkit.broadcastMessage(Color.translate(CheckSettings.broadcastMessage));
-                        }
-                    }.runTask(Kauri.getInstance());
-                }
                 new BukkitRunnable() {
                     public void run() {
-                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), execCommand.replaceAll("%player%", getData().getPlayer().getName()));
+                        execCommand.forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replaceAll("%player%", getData().getPlayer().getName()).replaceAll("%check%", getName())));
                     }
-                }.runTaskLater(Kauri.getInstance(), 10);
+                }.runTaskLater(Kauri.getInstance(), 30);
                 Kauri.getInstance().getLoggerManager().addBan(data.getUuid(), this);
             }
 
             Kauri.getInstance().getStatsManager().addFlag();
+
+            data.getLastFlag().reset();
 
             if (cancel && cancellable) data.setCancelType(cancelType);
 
@@ -126,16 +125,22 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
             enabled = Kauri.getInstance().getConfig().getBoolean("checks." + name + ".enabled");
             executable = Kauri.getInstance().getConfig().getBoolean("checks." + name + ".executable");
             cancellable = Kauri.getInstance().getConfig().getBoolean("checks." + name + ".cancellable");
+            Kauri.getInstance().getConfig().getStringList("checks." + name + ".execCommands").forEach(cmd -> {
+                if(cmd.equals("%global%")) {
+                    execCommand.addAll(CheckSettings.executableCommand);
+                } else {
+                    execCommand.add(cmd);
+                }
+            });
         } else {
             Kauri.getInstance().getConfig().set("checks." + name + ".maxVL", maxVL);
             Kauri.getInstance().getConfig().set("checks." + name + ".enabled", enabled);
             Kauri.getInstance().getConfig().set("checks." + name + ".executable", executable);
             Kauri.getInstance().getConfig().set("checks." + name + ".cancellable", cancellable);
+            Kauri.getInstance().getConfig().set("checks." + name + ".execCommands", Collections.singletonList("%global%"));
 
             Kauri.getInstance().saveConfig();
         }
-
-        execCommand = CheckSettings.executableCommand.replaceAll("%check%", getName());
     }
 
     public void debug(String debugString) {
@@ -144,7 +149,7 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
                 .forEach(dData -> dData.getPlayer().sendMessage(Color.translate("&8[&cDebug&8] &7" + debugString)));
     }
 
-    public abstract Object onPacket(Object packet, String packetType, long timeStamp);
+    public abstract void onPacket(Object packet, String packetType, long timeStamp);
 
     public abstract void onBukkitEvent(Event event);
 }

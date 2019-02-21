@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.api.data.logging;
 
+import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.database.Database;
@@ -77,6 +78,15 @@ public class LoggerManager {
         Database database = Atlas.getInstance().getDatabaseManager().getDatabase("KauriLogs");
         return database.getDatabaseValues().keySet().stream().anyMatch(key -> key.startsWith(uuid.toString()));
     }
+
+    public void removeBan(UUID uuid) {
+        Database database = Atlas.getInstance().getDatabaseManager().getDatabase("KauriLogs");
+
+        database.getDatabaseValues().remove(uuid.toString() + ";banned");
+
+        Kauri.getInstance().getStatsManager().removeBan();
+    }
+
 
     public String getBanReason(UUID uuid) {
         Database database = Atlas.getInstance().getDatabaseManager().getDatabase("KauriLogs");

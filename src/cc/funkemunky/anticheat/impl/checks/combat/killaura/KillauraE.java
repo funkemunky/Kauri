@@ -29,7 +29,7 @@ public class KillauraE extends Check {
     }
 
     @Override
-    public Object onPacket(Object packet, String packetType, long timeStamp) {
+    public void onPacket(Object packet, String packetType, long timeStamp) {
         val from = getData().getMovementProcessor().getFrom();
         val to = getData().getMovementProcessor().getTo();
 
@@ -64,7 +64,7 @@ public class KillauraE extends Check {
             pitchDeque.clear();
             level.set(0);
         }
-        return packet;
+        return;
     }
 
     @Override

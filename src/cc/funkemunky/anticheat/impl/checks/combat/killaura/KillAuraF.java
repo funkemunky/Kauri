@@ -30,11 +30,11 @@ public class KillauraF extends Check {
     private float vl;
 
     @Override
-    public Object onPacket(Object packet, String packetType, long timeStamp) {
+    public void onPacket(Object packet, String packetType, long timeStamp) {
         if(packetType.equals(Packet.Client.USE_ENTITY)) {
             WrappedInUseEntityPacket use = new WrappedInUseEntityPacket(packet, getData().getPlayer());
 
-            if(!(use.getEntity() instanceof LivingEntity)) return packet;
+            if(!(use.getEntity() instanceof LivingEntity)) return;
 
             target = (LivingEntity) use.getEntity();
             timer.reset();
@@ -55,7 +55,7 @@ public class KillauraF extends Check {
             debug(average + ", " + offset + ", " + vl);
             this.average.add(offset, System.currentTimeMillis());
         }
-        return packet;
+        return;
     }
 
     @Override

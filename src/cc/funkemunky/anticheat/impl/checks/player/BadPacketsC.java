@@ -16,7 +16,7 @@ public class BadPacketsC extends Check {
     }
 
     @Override
-    public Object onPacket(Object packet, String packetType, long timeStamp) {
+    public void onPacket(Object packet, String packetType, long timeStamp) {
         WrappedInFlyingPacket flying = new WrappedInFlyingPacket(packet, getData().getPlayer());
 
         val pitch = Math.abs(flying.getPitch());
@@ -24,7 +24,7 @@ public class BadPacketsC extends Check {
         if(pitch > 90) {
             flag(pitch + ">-90", true, true);
         }
-        return packet;
+        return;
     }
 
     @Override

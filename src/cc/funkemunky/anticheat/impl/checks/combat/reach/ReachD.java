@@ -73,7 +73,7 @@ public class ReachD extends Check {
 
 
     @Override
-    public Object onPacket(Object packet, String packetType, long timeStamp) {
+    public void onPacket(Object packet, String packetType, long timeStamp) {
         if(packetType.equals(Packet.Client.USE_ENTITY)) {
             WrappedInUseEntityPacket use = new WrappedInUseEntityPacket(packet, getData().getPlayer());
 
@@ -88,7 +88,7 @@ public class ReachD extends Check {
                 val entityData = Kauri.getInstance().getDataManager().getPlayerData(target.getUniqueId());
 
                 if(getData().getPing() > 400 || (entityData != null && getData().getPing() > 400)) {
-                    return packet;
+                    return;
                 }
 
                 WrappedInFlyingPacket flying = new WrappedInFlyingPacket(packet, getData().getPlayer());
@@ -144,7 +144,7 @@ public class ReachD extends Check {
                 attacked = false;
             }
         }
-        return packet;
+        return;
     }
 
     @Override

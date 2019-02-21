@@ -31,7 +31,7 @@ public class KillauraH extends Check {
     private int vl;
 
     @Override
-    public Object onPacket(Object packet, String packetType, long timeStamp) {
+    public void onPacket(Object packet, String packetType, long timeStamp) {
         if (packet instanceof WrappedInUseEntityPacket) {
             val useEntity = (WrappedInUseEntityPacket)packet;
 
@@ -49,7 +49,7 @@ public class KillauraH extends Check {
         } else if (packet instanceof WrappedInArmAnimationPacket) {
             this.swing = true;
         }
-        return packet;
+        return;
     }
 
     @Override

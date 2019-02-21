@@ -26,7 +26,7 @@ public class AimB extends Check {
     private long lastGCD;
 
     @Override
-    public Object onPacket(Object packet, String packetType, long timeStamp) {
+    public void onPacket(Object packet, String packetType, long timeStamp) {
         val to = getData().getMovementProcessor().getTo();
         val from = getData().getMovementProcessor().getFrom();
         val pitchDifference = Math.abs(from.getPitch() - to.getPitch());
@@ -48,7 +48,7 @@ public class AimB extends Check {
         lastPitchDelta = pitchDifference;
         lastYawDelta = yawDifference;
         lastGCD = pitchGCD;
-        return packet;
+        return;
     }
 
     @Override

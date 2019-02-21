@@ -23,7 +23,7 @@ public class ReachA extends Check {
     }
 
     @Override
-    public Object onPacket(Object packet, String packetType, long timeStamp) {
+    public void onPacket(Object packet, String packetType, long timeStamp) {
         /* A very simple maximum-reach distance check for a player in combat */
         WrappedInUseEntityPacket use = new WrappedInUseEntityPacket(packet, getData().getPlayer());
 
@@ -55,7 +55,7 @@ public class ReachA extends Check {
                 verbose.deduct(2);
             }
         }
-        return packet;
+        return;
     }
 
     @Override

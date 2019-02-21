@@ -29,7 +29,7 @@ public class KillauraA extends Check {
     }
 
     @Override
-    public Object onPacket(Object packet, String packetType, long timeStamp) {
+    public void onPacket(Object packet, String packetType, long timeStamp) {
         if (packetType.equals(Packet.Client.USE_ENTITY)) {
             WrappedInUseEntityPacket use = new WrappedInUseEntityPacket(packet, getData().getPlayer());
             /*Checks the time difference between a flying packet and a use packet. If legit, it should normally be around 50ms.
@@ -52,7 +52,7 @@ public class KillauraA extends Check {
             }
             lastFlying = System.currentTimeMillis();
         }
-        return packet;
+        return;
     }
 
     @Override

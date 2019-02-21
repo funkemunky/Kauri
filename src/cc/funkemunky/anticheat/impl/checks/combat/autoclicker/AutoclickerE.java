@@ -32,7 +32,7 @@ public class AutoclickerE extends Check {
     private long lastArm, lastRange;
 
     @Override
-    public Object onPacket(Object packet, String packetType, long timeStamp) {
+    public void onPacket(Object packet, String packetType, long timeStamp) {
         if (packet instanceof WrappedInBlockDigPacket) {
             val digPacket = (WrappedInBlockDigPacket)packet;
 
@@ -61,7 +61,7 @@ public class AutoclickerE extends Check {
             this.lastArm = now;
             this.lastRange = delay;
         }
-        return packet;
+        return;
     }
 
     @Override

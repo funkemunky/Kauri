@@ -28,21 +28,13 @@ public class SpeedB extends Check {
 
     private final Deque<Double> offsetDeque = new LinkedList<>();
 
-    public SpeedB(String name, CheckType type, CancelType cancelType, int maxVL) {
-        super(name, type, cancelType, maxVL);
-    }
-
-    private int verboseA, verboseB, verboseC;
-    private float lastMotionXZ;
-    private long lastTimeStamp;
-
     public SpeedB(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
         super(name, type, cancelType, maxVL, enabled, executable, cancellable);
     }
 
 
     @Override
-    public Object onPacket(Object packet, String packetType, long timeStamp) {
+    public void onPacket(Object packet, String packetType, long timeStamp) {
         val player = getData().getPlayer();
 
         val from = getData().getMovementProcessor().getFrom();
@@ -66,7 +58,7 @@ public class SpeedB extends Check {
         val streak = new AtomicInteger();
 
         if (player.getAllowFlight() || player.getVehicle() != null || getData().getMovementProcessor().isRiptiding() || PlayerUtils.isGliding(player)) {
-            return packet;
+            return;
         }
 
         offsetDeque.add(offsetChange);
@@ -102,7 +94,6 @@ public class SpeedB extends Check {
         lastX = motionX;
         lastY = motionY;
         lastZ = motionZ;
-        return packet;
     }
 
     @Override
@@ -112,14 +103,16 @@ public class SpeedB extends Check {
 
     private float account() {
         float total = 0;
+        
+        val move = getData().getMovementProcessor();
 
-        total += PlayerUtils.getPotionEffectLevel(getData().getPlayer(), PotionEffectType.SPEED) * (getData().getMovementProcessor().isServerOnGround() ? 0.057f : 0.044f);
-        total += getData().getMovementProcessor().getIceTicks() > 0 && (getData().getMovementProcessor().getAirTicks() > 0 || getData().getMovementProcessor().getGroundTicks() < 7) ? 0.23 : 0;
+        total += PlayerUtils.getPotionEffectLevel(getData().getPlayer(), PotionEffectType.SPEED) * (move.isServerOnGround() ? 0.057f : 0.044f);
+        total += move.getIceTicks() > 0 && (move.getDeltaY() > 0.001 || move.getGroundTicks() < 6) ? 0.23 : 0;
         total += (getData().getPlayer().getWalkSpeed() - 0.2) * 1.65;
         total += (getData().getLastBlockPlace().hasNotPassed(7)) ? 0.1 : 0;
-        total += getData().getMovementProcessor().isOnSlimeBefore() ? 0.1 : 0;
-        total += getData().getMovementProcessor().getBlockAboveTicks() > 0 ? getData().getMovementProcessor().isOnIce() ? 0.4 : 0.2  : 0;
-        total += getData().getMovementProcessor().getHalfBlockTicks() > 0 ? 0.12 : 0;
+        total += move.isOnSlimeBefore() ? 0.1 : 0;
+        total += move.getBlockAboveTicks() > 0 ? move.getIceTicks() > 0 ? 0.4 : 0.2  : 0;
+        total += move.getHalfBlockTicks() > 0 ? 0.12 : 0;
         return total;
     }
 }

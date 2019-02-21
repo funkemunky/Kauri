@@ -19,8 +19,8 @@ public class BadPacketsE extends Check {
     }
 
     @Override
-    public Object onPacket(Object packet, String packetType, long timeStamp) {
-        return packet;
+    public void onPacket(Object packet, String packetType, long timeStamp) {
+        return;
     }
 
     @Override

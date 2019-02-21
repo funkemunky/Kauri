@@ -50,7 +50,7 @@ public class HitBox extends Check {
     }
 
     @Override
-    public Object onPacket(Object packet, String packetType, long timeStamp) {
+    public void onPacket(Object packet, String packetType, long timeStamp) {
         if(packetType.equalsIgnoreCase(Packet.Client.USE_ENTITY)) {
             WrappedInUseEntityPacket use = new WrappedInUseEntityPacket(packet, getData().getPlayer());
 
@@ -75,12 +75,12 @@ public class HitBox extends Check {
             }
 
             if(lastAttack.hasNotPassed()) {
-                if (getData().getTransPing() > 400) return packet;
+                if (getData().getTransPing() > 400) return;
                 List<BoundingBox> boxes = new ArrayList<>();
 
                 val locs = location.getEstimatedLocation(getData().getTransPing(), Math.abs(getData().getTransPing() - getData().getLastTransPing()) + pingLeniency);
 
-                if (locs.size() == 0) return packet;
+                if (locs.size() == 0) return;
                 locs.forEach(loc -> boxes.add(getHitbox(target, loc)));
                 val eyeLoc = getData().getMovementProcessor().getTo().clone();
 
@@ -102,7 +102,7 @@ public class HitBox extends Check {
                 debug("VL: " + vl + " COLLIDED: " + collided + " LOCSIZE: " + locs.size() + " PING: " + getData().getTransPing() + " BOXSIZE: " + boxes.size() + " DELTA: " + Math.abs(getData().getTransPing() - getData().getLastTransPing()) + pingLeniency);
             }
         }
-        return packet;
+        return;
     }
 
     @Override

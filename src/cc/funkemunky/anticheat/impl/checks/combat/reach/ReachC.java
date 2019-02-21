@@ -36,13 +36,13 @@ public class ReachC extends Check {
     private double vl;
 
     @Override
-    public Object onPacket(Object packet, String packetType, long timeStamp) {
+    public void onPacket(Object packet, String packetType, long timeStamp) {
         WrappedInUseEntityPacket use = new WrappedInUseEntityPacket(packet, getData().getPlayer());
 
         if(use.getEntity() instanceof Player && use.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK) && use.getPlayer().getGameMode().equals(GameMode.SURVIVAL)) {
             val entityData = Kauri.getInstance().getDataManager().getPlayerData(use.getEntity().getUniqueId());
 
-            if(entityData == null) return packet;
+            if(entityData == null) return;
             List<CustomLocation> locations = entityData.getMovementProcessor().getPastLocation().getEstimatedLocation(getData().getTransPing(), range + Math.abs(getData().getLastTransPing() - getData().getTransPing()));
 
             List<BoundingBox> boxes = new ArrayList<>();
@@ -65,7 +65,7 @@ public class ReachC extends Check {
 
             debug("COUNT: " + count + " VL: " + vl + "/" + vlMax);
         }
-        return packet;
+        return;
     }
 
     @Override

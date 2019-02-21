@@ -18,7 +18,7 @@ import org.bukkit.event.Event;
         Packet.Client.FLYING,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_POSITION})
-public class VelocityV extends Check {
+public class VelocityA extends Check {
 
 
     @Setting(name = "thresoldVL")
@@ -27,12 +27,12 @@ public class VelocityV extends Check {
     private float lastVelocity;
     private int vl;
 
-    public VelocityV(String name, CheckType type, CancelType cancelType, int maxVL) {
+    public VelocityA(String name, CheckType type, CancelType cancelType, int maxVL) {
         super(name, type, cancelType, maxVL);
     }
 
     @Override
-    public Object onPacket(Object packet, String packetType, long timeStamp) {
+    public void onPacket(Object packet, String packetType, long timeStamp) {
         if(packetType.equals(Packet.Server.ENTITY_VELOCITY)) {
             WrappedOutVelocityPacket velocity = new WrappedOutVelocityPacket(packet, getData().getPlayer());
 
@@ -60,7 +60,7 @@ public class VelocityV extends Check {
 
             lastVelocity = 0;
         }
-        return packet;
+        return;
     }
 
     @Override

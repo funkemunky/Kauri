@@ -4,10 +4,16 @@ import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.Priority;
 
+import java.util.Collections;
+import java.util.List;
+
 @Init(priority = Priority.HIGHEST)
 public class CheckSettings {
-    @ConfigSetting(name = "executable.command")
-    static String executableCommand = "ban %player% [Kauri] Unfair Advantage";
+    @ConfigSetting(name = "executableCommand")
+    static List<String> executableCommand = Collections.singletonList("kick %player% [IRIS] You have been kicked for failing %check%");
+
+    @ConfigSetting(name = "key")
+    public static String key = "";
 
     @ConfigSetting(path = "alerts", name = "alertMessage")
     static String alertMessage = "&8[&6&lKauri&8] &f%player% &7failed &f%check% &c(x%vl%)";

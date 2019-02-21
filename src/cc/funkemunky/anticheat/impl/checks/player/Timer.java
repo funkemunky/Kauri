@@ -28,14 +28,14 @@ public class Timer extends Check {
     private StatisticalAnalysis statisticalAnalysis = new StatisticalAnalysis(20);
 
     @Override
-    public Object onPacket(Object packet, String packetType, long timeStamp) {
+    public void onPacket(Object packet, String packetType, long timeStamp) {
         if (Packet.isPositionLook(packetType) || Packet.isPosition(packetType) || Packet.isLook(packetType) || packet instanceof WrappedInFlyingPacket) {
             val now = System.currentTimeMillis();
 
             val data = this.getData();
 
             if (data.isLagging() || data.getLastLogin().hasNotPassed(9) || data.getLastServerPos().hasNotPassed(9)) {
-                return packet;
+                return;
             }
 
             this.statisticalAnalysis.addValue(now - lastFlying);
@@ -49,7 +49,7 @@ public class Timer extends Check {
 
             this.lastFlying = now;
         }
-        return packet;
+        return;
     }
 
     @Override

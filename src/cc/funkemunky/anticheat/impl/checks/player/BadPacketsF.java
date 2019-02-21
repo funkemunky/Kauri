@@ -28,7 +28,7 @@ public class BadPacketsF extends Check {
     }
 
     @Override
-    public Object onPacket(Object packet, String packetType, long timeStamp) {
+    public void onPacket(Object packet, String packetType, long timeStamp) {
         if (getData().getLastServerPos().hasPassed(2)  && getData().getLastLogin().hasPassed(40)) {
            if(ticks++ >= 20) {
                val elapsed = timeStamp - lastReset;
@@ -43,7 +43,7 @@ public class BadPacketsF extends Check {
                lastReset = timeStamp;
            }
         }
-        return packet;
+        return;
     }
 
     @Override

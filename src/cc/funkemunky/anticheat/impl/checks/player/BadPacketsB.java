@@ -17,7 +17,7 @@ public class BadPacketsB extends Check {
     private int vl;
 
     @Override
-    public Object onPacket(Object packet, String packetType, long timeStamp) {
+    public void onPacket(Object packet, String packetType, long timeStamp) {
         switch (packetType) {
             case Packet.Client.LOOK:
             case Packet.Client.POSITION_LOOK:
@@ -27,7 +27,7 @@ public class BadPacketsB extends Check {
                 val data = getData();
 
                 if (data.isLagging() || data.getLastServerPos().hasNotPassed(4))
-                    return packet;
+                    return;
 
                 val from = data.getMovementProcessor().getFrom();
                 val to = data.getMovementProcessor().getTo();
@@ -44,7 +44,7 @@ public class BadPacketsB extends Check {
                     vl -= vl > 0 ? 1 : 0;
             }
         }
-        return packet;
+        return;
     }
 
 

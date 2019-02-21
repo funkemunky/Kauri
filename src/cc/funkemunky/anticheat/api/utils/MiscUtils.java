@@ -4,12 +4,14 @@ import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.ReflectionsUtil;
-import com.google.common.collect.Lists;
+import lombok.val;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.*;
+import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -39,6 +41,36 @@ public class MiscUtils {
         return (previous <= 16384L) ? current : gcd(previous, current % previous);
     }
 
+    public static boolean cancelForFlight(PlayerData data) {
+        return cancelForFlight(data, 40);
+    }
+
+    public static boolean cancelForFlight(PlayerData data, int velocityTicks) {
+        val move = data.getMovementProcessor();
+        val player = data.getPlayer();
+        val velocity = data.getVelocityProcessor();
+
+        return player.getAllowFlight()
+                || data.getLastServerPos().hasNotPassed(2)
+                || move.getLastVehicle().hasNotPassed(5)
+                || move.getLiquidTicks() > 0
+                || move.getWebTicks() > 0
+                || move.isLagging()
+                || Atlas.getInstance().getBlockBoxManager().getBlockBox().isChunkLoaded(data.getPlayer().getLocation())
+                || data.getLastLogin().hasNotPassed(50)
+                || move.getClimbTicks() > 0
+                || data.getLastBlockPlace().hasNotPassed(5)
+                || player.getActivePotionEffects().stream().anyMatch(effect -> effect.toString().toLowerCase().contains("levi"))
+                || move.isOnHalfBlock()
+                || move.isServerOnGround()
+                || move.isRiptiding()
+                || move.isOnSlimeBefore()
+                || move.getLastRiptide().hasNotPassed(8)
+                || move.isPistonsNear()
+                || move.getTo().toVector().distance(move.getFrom().toVector()) < 0.005
+                || velocity.getLastVelocity().hasNotPassed(velocityTicks);
+    }
+
     public static float wrapAngleTo180_float(float value) {
         value = value % 360.0F;
 
@@ -51,6 +83,16 @@ public class MiscUtils {
         }
 
         return value;
+    }
+
+    public static Class<?> getClass(String string) {
+        try {
+            return Class.forName(string);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     public static String unloadPlugin(String pl) {
@@ -180,6 +222,12 @@ public class MiscUtils {
         }
     }
 
+    public static String getPlayerID(Player player) {
+        if(player != null) {
+            return player.getUniqueId().toString();
+        }
+        return "%%__NONCE__%%";
+    }
 
     private static Plugin getPlugin(final String p) {
         for (final Plugin pl : Atlas.getInstance().getServer().getPluginManager().getPlugins()) {
@@ -189,4 +237,5 @@ public class MiscUtils {
         }
         return null;
     }
+
 }

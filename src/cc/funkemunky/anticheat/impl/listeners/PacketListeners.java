@@ -3,26 +3,23 @@ package cc.funkemunky.anticheat.impl.listeners;
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.data.PlayerData;
-import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.event.custom.PacketRecieveEvent;
 import cc.funkemunky.api.event.custom.PacketSendEvent;
 import cc.funkemunky.api.event.system.EventMethod;
 import cc.funkemunky.api.event.system.Listener;
-import cc.funkemunky.api.tinyprotocol.api.NMSObject;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.*;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.Init;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 
-import java.util.AbstractMap;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
+import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 @Init
 public class PacketListeners implements Listener {
@@ -30,6 +27,7 @@ public class PacketListeners implements Listener {
     @EventMethod
     public void onEvent(PacketSendEvent event) {
         if (event.getPlayer() == null || !event.getPlayer().isOnline()) return;
+
         Kauri.getInstance().getProfiler().start("event:PacketSendEvent");
         PlayerData data = Kauri.getInstance().getDataManager().getPlayerData(event.getPlayer().getUniqueId());
 
@@ -59,12 +57,7 @@ public class PacketListeners implements Listener {
                 }
             }
 
-            Map.Entry<Object, Boolean> result = hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
-
-            if(result != null) {
-                event.setCancelled(result.getValue());
-                event.setPacket(result.getKey());
-            }
+            hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
         }
         Kauri.getInstance().getProfiler().stop("event:PacketSendEvent");
     }
@@ -72,14 +65,17 @@ public class PacketListeners implements Listener {
     @EventMethod
     public void onEvent(PacketRecieveEvent event) {
         if (event.getPlayer() == null) return;
+
         Kauri.getInstance().getProfiler().start("event:PacketReceiveEvent");
         PlayerData data = Kauri.getInstance().getDataManager().getPlayerData(event.getPlayer().getUniqueId());
+
+        Player player = Bukkit.getPlayer(event.getPlayer().getUniqueId());
 
         if (data != null) {
             switch (event.getType()) {
                 //I use transaction packets for checking transPing rather than keepAlives since there really isn't anyone who would spoof the times of these.
                 case Packet.Client.TRANSACTION: {
-                    WrappedInTransactionPacket packet = new WrappedInTransactionPacket(event.getPacket(), event.getPlayer());
+                    WrappedInTransactionPacket packet = new WrappedInTransactionPacket(event.getPacket(), player);
 
                     if (packet.getAction() == (short) 69) {
                         data.setLastTransPing(data.getTransPing());
@@ -95,13 +91,13 @@ public class PacketListeners implements Listener {
                     break;
                 }
                 case Packet.Client.ENTITY_ACTION: {
-                    WrappedInEntityActionPacket packet = new WrappedInEntityActionPacket(event.getPacket(), event.getPlayer());
+                    WrappedInEntityActionPacket packet = new WrappedInEntityActionPacket(event.getPacket(), player);
 
                     data.getActionProcessor().update(packet);
                     break;
                 }
                 case Packet.Client.CLOSE_WINDOW: {
-                    WrappedInCloseWindowPacket packet = new WrappedInCloseWindowPacket(event.getPacket(), event.getPlayer());
+                    WrappedInCloseWindowPacket packet = new WrappedInCloseWindowPacket(event.getPacket(), player);
 
                     data.getActionProcessor().update(packet);
                     break;
@@ -111,7 +107,7 @@ public class PacketListeners implements Listener {
                     data.setPing(event.getTimeStamp() - data.getLastKeepAlive());
                     break;
                 case Packet.Client.ABILITIES: {
-                    WrappedInAbilitiesPacket packet = new WrappedInAbilitiesPacket(event.getPacket(), event.getPlayer());
+                    WrappedInAbilitiesPacket packet = new WrappedInAbilitiesPacket(event.getPacket(), player);
 
                     data.setAbleToFly(packet.isAllowedFlight());
                     data.setCreativeMode(packet.isCreativeMode());
@@ -128,14 +124,14 @@ public class PacketListeners implements Listener {
                 case Packet.Client.FLYING:
                 case Packet.Client.LEGACY_POSITION_LOOK:
                 case Packet.Client.LEGACY_LOOK: {
-                    WrappedInFlyingPacket packet = new WrappedInFlyingPacket(event.getPacket(), event.getPlayer());
+                    WrappedInFlyingPacket packet = new WrappedInFlyingPacket(event.getPacket(), player);
 
                     data.getMovementProcessor().update(data, packet);
                     data.getVelocityProcessor().update(packet);
                     break;
                 }
                 case Packet.Client.BLOCK_DIG: {
-                    WrappedInBlockDigPacket blockDig = new WrappedInBlockDigPacket(event.getPacket(), event.getPlayer());
+                    WrappedInBlockDigPacket blockDig = new WrappedInBlockDigPacket(event.getPacket(), player);
 
                     switch (blockDig.getAction()) {
                         case START_DESTROY_BLOCK:
@@ -149,7 +145,7 @@ public class PacketListeners implements Listener {
                     break;
                 }
                 case Packet.Client.BLOCK_PLACE: {
-                    WrappedInBlockPlacePacket packet = new WrappedInBlockPlacePacket(event.getPacket(), event.getPlayer());
+                    WrappedInBlockPlacePacket packet = new WrappedInBlockPlacePacket(event.getPacket(), player);
 
                     if (packet.getItemStack() != null && packet.getPosition() != null && packet.getPosition().getX() != -1 && packet.getPosition().getY() != -1 && packet.getPosition().getZ() != -1) {
                         data.getLastBlockPlace().reset();
@@ -157,50 +153,25 @@ public class PacketListeners implements Listener {
                     break;
                 }
                 case Packet.Client.USE_ENTITY:
-                    WrappedInUseEntityPacket packet = new WrappedInUseEntityPacket(event.getPacket(), event.getPlayer());
+                    WrappedInUseEntityPacket packet = new WrappedInUseEntityPacket(event.getPacket(), player);
 
                     if(packet.getEntity() instanceof LivingEntity) {
                         data.getLastAttack().reset();
+                        data.setTarget((LivingEntity) packet.getEntity());
                     }
                     break;
             }
-            Map.Entry<Object, Boolean> result = hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
-
-            if(result != null) {
-                event.setCancelled(result.getValue());
-                event.setPacket(result.getKey());
-            }
+            hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
         }
         Kauri.getInstance().getProfiler().stop("event:PacketReceiveEvent");
     }
 
-    private Map.Entry<Object, Boolean> hopper(Object packet, String packetType, long timeStamp, PlayerData data) {
-        FutureTask<Map.Entry<Object, Boolean>> task = new FutureTask<>(() -> {
-            for (Check check : data.getChecks()) {
-                if(check.isEnabled() && check.getClass().isAnnotationPresent(Packets.class) && Arrays.asList(check.getClass().getAnnotation(Packets.class).packets()).contains(packetType)) {
+    private void hopper(Object packet, String packetType, long timeStamp, PlayerData data) {
+        Atlas.getInstance().getThreadPool().execute(() ->
+                data.getPacketChecks().getOrDefault(packetType, new ArrayList<>()).stream().filter(Check::isEnabled).forEach(check -> {
                     Kauri.getInstance().getProfiler().start("check:" + check.getName());
-                    Object object = check.onPacket(packet, packetType, timeStamp);
-
-                    if(object instanceof NMSObject) {
-                        NMSObject nObject = (NMSObject) object;
-
-                        if(nObject.isCancelled() || packet != nObject.getObject()) {
-                            new AbstractMap.SimpleEntry<>(nObject.getObject(), nObject.isCancelled());
-                        }
-                    }
+                    check.onPacket(packet, packetType, timeStamp);
                     Kauri.getInstance().getProfiler().stop("check:" + check.getName());
-                }
-            }
-            return null;
-        });
-
-        Atlas.getInstance().getThreadPool().submit(task);
-
-        try {
-            return task.get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
-        return null;
+                }));
     }
 }

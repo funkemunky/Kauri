@@ -24,7 +24,7 @@ public class KillauraB extends Check {
     private long lastGCD;
 
     @Override
-    public Object onPacket(Object packet, String packetType, long timeStamp) {
+    public void onPacket(Object packet, String packetType, long timeStamp) {
         if(getData().getLastAttack().hasNotPassed(4)) {
             val to = getData().getMovementProcessor().getTo();
             val from = getData().getMovementProcessor().getFrom();
@@ -48,7 +48,7 @@ public class KillauraB extends Check {
             lastYawDelta = yawDifference;
             lastGCD = pitchGCD;
         }
-        return packet;
+        return;
     }
 
     @Override

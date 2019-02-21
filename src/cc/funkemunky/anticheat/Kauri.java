@@ -44,7 +44,7 @@ public class Kauri extends JavaPlugin {
     private LoggerManager loggerManager;
 
 
-    private String requiredVersionOfAtlas = "1.0.8.1";
+    private String requiredVersionOfAtlas = "1.1.3";
 
     @Override
     public void onEnable() {
@@ -99,14 +99,16 @@ public class Kauri extends JavaPlugin {
 
                 EventManager.callEvent(tickEvent);
             }
-        }.runTaskTimer(this, 0L, 1L);
+        }.runTaskTimerAsynchronously(this, 1L, 1L);
 
         new BukkitRunnable() {
             public void run() {
-                tickElapsed = MathUtils.elapsed(lastTick);
-                lastTick = System.currentTimeMillis();
+                long timeStamp = System.currentTimeMillis();
+                tickElapsed = timeStamp - lastTick;
+                //Bukkit.broadcastMessage(tickElapsed + "ms" + ", " + getTPS());
+                lastTick = timeStamp;
             }
-        }.runTaskTimer(this, 0L, 1L);
+        }.runTaskTimer(Kauri.getInstance(), 0L, 1L);
     }
 
     public void startScanner() {

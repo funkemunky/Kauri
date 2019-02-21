@@ -27,7 +27,7 @@ public class AutoclickerD extends Check {
     private Interval fraction = new Interval(0, 5);
 
     @Override
-    public Object onPacket(Object packet, String packetType, long timeStamp) {
+    public void onPacket(Object packet, String packetType, long timeStamp) {
         if (packetType.contains("Position") || packetType.contains("Look") || packetType.equals(Packet.Client.FLYING)) {
             if (++ticks == 20) {
                 if (cps > 0) {
@@ -56,7 +56,7 @@ public class AutoclickerD extends Check {
         } else {
             ++cps;
         }
-        return packet;
+        return;
     }
 
     @Override
