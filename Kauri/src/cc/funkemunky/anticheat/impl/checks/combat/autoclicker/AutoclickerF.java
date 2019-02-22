@@ -31,10 +31,9 @@ public class AutoclickerF extends Check {
             swingTicks++;
 
             if (swingTicks == 5) {
+                
                 if (flyingTicks == lastFlyingTicks) {
                     outliner++;
-                } else {
-                    Math.max(outliner - 5, 0);
                 }
 
                 if (outliner == lastOutliner) {
