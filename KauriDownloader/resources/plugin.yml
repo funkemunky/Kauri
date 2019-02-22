@@ -1,0 +1,4 @@
+name: KauriLoader
+main: cc.funkemunky.kauri.KauriDownloader
+version: 1.0
+author: funkemunky
