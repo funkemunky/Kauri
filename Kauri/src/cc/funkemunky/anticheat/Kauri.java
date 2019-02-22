@@ -23,6 +23,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.lang.reflect.Field;
 import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -44,7 +45,7 @@ public class Kauri extends JavaPlugin {
     private LoggerManager loggerManager;
 
 
-    private String requiredVersionOfAtlas = "1.1.3";
+    private String requiredVersionOfAtlas = "1.1.3.1";
 
     @Override
     public void onEnable() {
@@ -52,16 +53,18 @@ public class Kauri extends JavaPlugin {
         instance = this;
         saveDefaultConfig();
 
+        if(!Bukkit.getPluginManager().isPluginEnabled("KauriDownloader")) return;
+
         if(Bukkit.getPluginManager().isPluginEnabled("Atlas") && Bukkit.getPluginManager().getPlugin("Atlas").getDescription().getVersion().equals(requiredVersionOfAtlas)) {
 
             profiler = new BaseProfiler();
             profileStart = System.currentTimeMillis();
 
+            startScanner();
+
             //Starting up our utilities, managers, and tasks.
             checkManager = new CheckManager();
             dataManager = new DataManager();
-
-            startScanner();
 
             statsManager = new StatsManager();
             loggerManager = new LoggerManager();
@@ -71,7 +74,7 @@ public class Kauri extends JavaPlugin {
             registerCommands();
 
         } else {
-            Bukkit.getLogger().log(Level.SEVERE, "You do not the required Atlas dependency installed! You must download Atlas v" + requiredVersionOfAtlas + " for Kauri to work properly.");
+            Bukkit.getLogger().log(Level.SEVERE, "You do not the required Atlas dependency installed! Try restarting the server to see if the downloader will do it properly next time.");
         }
 
         executorService = Executors.newSingleThreadScheduledExecutor();
@@ -161,34 +164,40 @@ public class Kauri extends JavaPlugin {
 
                 if(clazz.isAnnotationPresent(Init.class)) {
                     Object obj = clazz.getSimpleName().equals(mainClass.getSimpleName()) ? plugin : clazz.newInstance();
-
+                    Init init = (Init) clazz.getAnnotation(Init.class);
                     if (obj instanceof Listener) {
                         MiscUtils.printToConsole("&eFound " + clazz.getSimpleName() + " Bukkit listener. Registering...");
                         Bukkit.getPluginManager().registerEvents((Listener) obj, plugin);
                     } else if(obj instanceof cc.funkemunky.api.event.system.Listener) {
                         MiscUtils.printToConsole("&eFound " + clazz.getSimpleName() + " Atlas listener. Registering...");
-                        EventManager.register((cc.funkemunky.api.event.system.Listener) obj);
+                        EventManager.register(plugin, (cc.funkemunky.api.event.system.Listener) obj);
                     }
 
-                    Arrays.stream(clazz.getDeclaredFields()).filter(field -> field.isAnnotationPresent(ConfigSetting.class)).forEach(field -> {
-                        String name = field.getAnnotation(ConfigSetting.class).name();
-                        String path = field.getAnnotation(ConfigSetting.class).path() + "." + (name.length() > 0 ? name : field.getName());
-                        try {
-                            field.setAccessible(true);
-                            MiscUtils.printToConsole("&eFound " + field.getName() + " ConfigSetting (default=" + field.get(obj) + ").");
-                            if(plugin.getConfig().get(path) == null) {
-                                MiscUtils.printToConsole("&eValue not found in configuration! Setting default into config...");
-                                plugin.getConfig().set(path, field.get(obj));
-                                plugin.saveConfig();
-                            } else {
-                                field.set(obj, plugin.getConfig().get(path));
+                    if(init.commands()) {
+                        Atlas.getInstance().getCommandManager().registerCommands(obj);
+                    }
 
-                                MiscUtils.printToConsole("&eValue found in configuration! Set value to &a" + plugin.getConfig().get(path));
+                    for (Field field : clazz.getDeclaredFields()) {
+                        field.setAccessible(true);
+                        if(field.isAnnotationPresent(ConfigSetting.class)) {
+                            String name = field.getAnnotation(ConfigSetting.class).name();
+                            String path = field.getAnnotation(ConfigSetting.class).path() + "." + (name.length() > 0 ? name : field.getName());
+                            try {
+                                MiscUtils.printToConsole("&eFound " + field.getName() + " ConfigSetting (default=" + field.get(obj) + ").");
+                                if(plugin.getConfig().get(path) == null) {
+                                    MiscUtils.printToConsole("&eValue not found in configuration! Setting default into config...");
+                                    plugin.getConfig().set(path, field.get(obj));
+                                    plugin.saveConfig();
+                                } else {
+                                    field.set(obj, plugin.getConfig().get(path));
+
+                                    MiscUtils.printToConsole("&eValue found in configuration! Set value to &a" + plugin.getConfig().get(path));
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
-                        } catch (Exception e) {
-                            e.printStackTrace();
                         }
-                    });
+                    }
 
                 }
             } catch (Exception e) {

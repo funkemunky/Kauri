@@ -128,7 +128,7 @@ public class ReachD extends Check {
                 }
 
                 if (collided > 1) {
-                    if (calculatedReach > maxReach + 0.0001) {
+                    if (calculatedReach > maxReach + 0.2) {
                         if (vl++ > maxVL) {
                             flag(calculatedReach + ">-" + maxReach, false, true);
                         }

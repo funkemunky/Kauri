@@ -13,10 +13,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Getter
 @Setter
@@ -29,7 +26,7 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
     private boolean enabled, executable, cancellable, developer;
     private Verbose lagVerbose = new Verbose();
     private long lastAlert;
-    private List<String> execCommand;
+    private List<String> execCommand = new ArrayList<>();
     private Map<String, Object> settings = new HashMap<>();
     private String alertMessage = "";
     private int vl;
@@ -125,7 +122,7 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
             enabled = Kauri.getInstance().getConfig().getBoolean("checks." + name + ".enabled");
             executable = Kauri.getInstance().getConfig().getBoolean("checks." + name + ".executable");
             cancellable = Kauri.getInstance().getConfig().getBoolean("checks." + name + ".cancellable");
-            Kauri.getInstance().getConfig().getStringList("checks." + name + ".execCommands").forEach(cmd -> {
+            Kauri.getInstance().getConfig().getStringList("checks." + name + ".executableCommands").forEach(cmd -> {
                 if(cmd.equals("%global%")) {
                     execCommand.addAll(CheckSettings.executableCommand);
                 } else {
@@ -137,7 +134,7 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
             Kauri.getInstance().getConfig().set("checks." + name + ".enabled", enabled);
             Kauri.getInstance().getConfig().set("checks." + name + ".executable", executable);
             Kauri.getInstance().getConfig().set("checks." + name + ".cancellable", cancellable);
-            Kauri.getInstance().getConfig().set("checks." + name + ".execCommands", Collections.singletonList("%global%"));
+            Kauri.getInstance().getConfig().set("checks." + name + ".executableCommands", Collections.singletonList("%global%"));
 
             Kauri.getInstance().saveConfig();
         }

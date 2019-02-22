@@ -8,10 +8,7 @@ import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.util.logging.Level;
 
@@ -20,26 +17,23 @@ public class KauriDownloader extends JavaPlugin {
 
     @Getter
     private static KauriDownloader instance;
-    private String[] requitedVersionOfAlias = new String[] {"1.1.3"};
+    private String[] requitedVersionOfAlias = new String[] {"1.1.3.1"};
 
     public void onEnable() {
         saveDefaultConfig();
         instance = this;
+        getLogger().log(Level.INFO, "Downloading Atlas...");
         DownloaderUtils.downloadAppropriateVersion();
 
         try {
+            getLogger().log(Level.INFO, "Finding suitable server location...");
             URL url = new URL("https://funkemunky.cc/download?name=Kauri_Lite&license=" + getConfig().getString("license") + "&version=" + getDescription().getVersion());
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            getLogger().log(Level.INFO, "Downloading Kauri...");
             InputStream is = null;
             try {
-                is = url.openStream ();
-                byte[] byteChunk = new byte[4096]; // Or whatever size you want to read in at a time.
-                int n;
-
-                while ( (n = is.read(byteChunk)) > 0 ) {
-                    baos.write(byteChunk, 0, n);
-                }
-
+                is = url.openStream();
+                ObjectInputStream baos = new ObjectInputStream(is);
+                byte[] byteChunk = (byte[]) baos.readObject(); // Or whatever size you want to read in at a time.
 
                 File kauri;
                 if(ReflectionsUtil.version.contains("7")) {
@@ -57,10 +51,9 @@ public class KauriDownloader extends JavaPlugin {
                 if (kauri.delete()) getLogger().log(Level.INFO, "Loaded successfully!");
             }
             catch (IOException e) {
-                System.err.printf ("Failed while reading bytes from %s: %s", url.toExternalForm(), e.getMessage());
-                e.printStackTrace ();
+                System.err.print("An error occurred in the attempt to download Kauri. Please double check your licence key in the config.");
                 // Perform any other exception handling that's appropriate.
-            } catch (InvalidDescriptionException | InvalidPluginException e) {
+            } catch (InvalidDescriptionException | InvalidPluginException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
         } catch(IOException e) {
