@@ -36,7 +36,7 @@ public class Fastbow extends Check {
 
         if (arrow.getVelocity().length() > .14 && lastShoot.hasNotPassed(6)) {
             if (verbose.flagB(5, 1)) {
-                flag("t: " + lastShoot + "; v: " + MathUtils.round(arrow.getVelocity().length(), 5), false, true);
+                flag("t: " + lastShoot.getPassed() + "; v: " + MathUtils.round(arrow.getVelocity().length(), 5), false, true);
             }
         } else {
             verbose.deduct();

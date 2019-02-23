@@ -21,11 +21,9 @@ public class DownloaderUtils {
 
             if(!KauriDownloader.getInstance().getServer().getPluginManager().isPluginEnabled("Atlas")) {
                 MiscUtils.loadPlugin("Atlas");
-                pluginLocation.delete();
             } else {
                 MiscUtils.unloadPlugin("Atlas");
                 MiscUtils.loadPlugin("Atlas");
-                pluginLocation.delete();
             }
         } catch (IOException e) {
             e.printStackTrace();

@@ -26,7 +26,7 @@ public class PacketListeners implements Listener {
 
     @EventMethod
     public void onEvent(PacketSendEvent event) {
-        if (event.getPlayer() == null || !event.getPlayer().isOnline()) return;
+        if (event.getPlayer() == null || !event.getPlayer().isOnline() || !Kauri.getInstance().getDataManager().getDataObjects().containsKey(event.getPlayer().getUniqueId())) return;
 
         Kauri.getInstance().getProfiler().start("event:PacketSendEvent");
         PlayerData data = Kauri.getInstance().getDataManager().getPlayerData(event.getPlayer().getUniqueId());
@@ -64,7 +64,7 @@ public class PacketListeners implements Listener {
 
     @EventMethod
     public void onEvent(PacketRecieveEvent event) {
-        if (event.getPlayer() == null) return;
+        if (event.getPlayer() == null || !Kauri.getInstance().getDataManager().getDataObjects().containsKey(event.getPlayer().getUniqueId())) return;
 
         Kauri.getInstance().getProfiler().start("event:PacketReceiveEvent");
         PlayerData data = Kauri.getInstance().getDataManager().getPlayerData(event.getPlayer().getUniqueId());

@@ -1,12 +1,15 @@
 package cc.funkemunky.anticheat.impl.checks.player;
 
+import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
+import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.anticheat.api.utils.StatisticalAnalysis;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
 import org.bukkit.event.Event;
 
@@ -24,7 +27,14 @@ public class Timer extends Check {
         super(name, type, cancelType, maxVL);
     }
 
+    @Setting(name = "usingPaperSpigot")
+    public boolean usingPaper = false;
+
+    @Setting(name = "lenience")
+    public float deltaBalance = 0.02f;
+
     private long lastFlying;
+    private int vl;
     private StatisticalAnalysis statisticalAnalysis = new StatisticalAnalysis(20);
 
     @Override
@@ -40,12 +50,14 @@ public class Timer extends Check {
 
             this.statisticalAnalysis.addValue(now - lastFlying);
 
-            val max = 7.07;
-            val stdDev = this.statisticalAnalysis.getStdDev(max);
+            val max = usingPaper ? 7.071f : Math.sqrt(Kauri.getInstance().getTickElapsed());
+            val stdDev = this.statisticalAnalysis.getStdDev();
 
-            if (stdDev != 0.00E0 / 0.00E0 && stdDev < max) {
-                this.flag("S: " + stdDev, false, true);
-            }
+            if (!MathUtils.approxEquals(deltaBalance, max, stdDev) && stdDev < max) {
+                if(vl++ > 9) {
+                    this.flag("S: " + stdDev, false, true);
+                }
+            } else vl -= vl > 0 ? 2 : 0;
 
             this.lastFlying = now;
         }

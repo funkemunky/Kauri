@@ -53,18 +53,18 @@ public class Kauri extends JavaPlugin {
         instance = this;
         saveDefaultConfig();
 
-        if(!Bukkit.getPluginManager().isPluginEnabled("KauriDownloader")) return;
+        if(!Bukkit.getPluginManager().isPluginEnabled("KauriLoader")) return;
 
         if(Bukkit.getPluginManager().isPluginEnabled("Atlas") && Bukkit.getPluginManager().getPlugin("Atlas").getDescription().getVersion().equals(requiredVersionOfAtlas)) {
 
             profiler = new BaseProfiler();
             profileStart = System.currentTimeMillis();
 
-            startScanner();
-
             //Starting up our utilities, managers, and tasks.
             checkManager = new CheckManager();
             dataManager = new DataManager();
+
+            startScanner();
 
             statsManager = new StatsManager();
             loggerManager = new LoggerManager();
@@ -131,11 +131,15 @@ public class Kauri extends JavaPlugin {
     }
 
     public void reloadKauri() {
-        Atlas.getInstance().getThreadPool().execute(() -> {
-            cc.funkemunky.anticheat.api.utils.MiscUtils.unloadPlugin("Kauri");
-            cc.funkemunky.anticheat.api.utils.MiscUtils.loadPlugin("Kauri");
-        });
+        Kauri.getInstance().saveConfig();
+        Kauri.getInstance().getCheckManager().getChecks().clear();
+        Kauri.getInstance().getDataManager().getDataObjects().clear();
+        Bukkit.getOnlinePlayers().forEach((player -> Kauri.getInstance().getDataManager().addData(player.getUniqueId())));
+        Kauri.getInstance().getDataManager().getDataObjects().values().forEach(data -> Kauri.getInstance().getCheckManager().loadChecksIntoData(data));
+        Kauri.getInstance().getCheckManager().setChecks(Kauri.getInstance().getCheckManager().loadChecks());
     }
+
+    //Credits: Luke.
 
     private void initializeScanner(Class<?> mainClass, Plugin plugin) {
         ClassScanner.scanFile(null, mainClass).stream().filter(c -> {

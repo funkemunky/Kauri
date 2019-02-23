@@ -9,6 +9,7 @@ import cc.funkemunky.anticheat.api.utils.menu.button.ClickAction;
 import cc.funkemunky.anticheat.api.utils.menu.type.impl.ChestMenu;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MiscUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -252,9 +253,7 @@ public class MenuUtils {
     private static Button saveChangesButton(int page) {
         return createButton(false, MiscUtils.createItem(Material.BOOK_AND_QUILL, 1, Color.Red + "Save Changes"), ((player2, infoPair) -> {
             hasModifiedChecks = false;
-            Kauri.getInstance().saveConfig();
-            Kauri.getInstance().getDataManager().getDataObjects().values().forEach(data -> Kauri.getInstance().getCheckManager().loadChecksIntoData(data));
-            Kauri.getInstance().getCheckManager().setChecks(Kauri.getInstance().getCheckManager().loadChecks());
+            Kauri.getInstance().reloadKauri();
             openCheckEditGUI(player2, page);
         }));
     }

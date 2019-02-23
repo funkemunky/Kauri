@@ -47,8 +47,8 @@ public class CheckManager {
         checks.add(new KillauraC("Killaura (Type C)", CheckType.KILLAURA, CancelType.COMBAT, 100));
         checks.add(new KillauraD("Killaura (Type D)", CheckType.KILLAURA, CancelType.COMBAT, 100));
         checks.add(new KillauraD("Killaura (Type D)", CheckType.KILLAURA, CancelType.COMBAT, 75));
-        checks.add(new KillauraE("Killaura (Type E)", CheckType.KILLAURA, CancelType.COMBAT, 100, true, true, true));
-        checks.add(new KillauraF("Killaura (Type F)", CheckType.KILLAURA, CancelType.COMBAT, 12));
+        //checks.add(new KillauraE("Killaura (Type E)", CheckType.KILLAURA, CancelType.COMBAT, 100, true, true, true));
+        //checks.add(new KillauraF("Killaura (Type F)", CheckType.KILLAURA, CancelType.COMBAT, 12));
         checks.add(new KillauraG("Killaura (Type G)", CheckType.KILLAURA, CancelType.COMBAT, 50, true, false, true));
         checks.add(new KillauraH("Killaura (Type H)", CheckType.KILLAURA, CancelType.COMBAT, 3));
         checks.add(new FlyA("Fly (Type A)", CheckType.FLY, CancelType.MOTION, 225));
@@ -66,12 +66,11 @@ public class CheckManager {
         checks.add(new Fastbow("Fastbow", CheckType.COMBAT, CancelType.INTERACT, 40));
         checks.add(new HitBox("HitBox", CheckType.COMBAT, CancelType.COMBAT, 30));
         checks.add(new BadPacketsA("BadPackets (Type A)", CheckType.BADPACKETS, CancelType.MOTION, 40));
-        checks.add(new BadPacketsB("BadPackets (Type B)", CheckType.BADPACKETS, CancelType.COMBAT, 50));
         checks.add(new BadPacketsC("BadPackets (Type C)", CheckType.BADPACKETS, CancelType.COMBAT, 50));
         checks.add(new BadPacketsD("BadPackets (Type D)", CheckType.BADPACKETS, CancelType.COMBAT, 50));
         checks.add(new BadPacketsE("BadPackets (Type E)", CheckType.BADPACKETS, CancelType.HEALTH, 20));
         checks.add(new BadPacketsF("BadPackets (Type F)", CheckType.BADPACKETS, CancelType.MOTION, 100));
-        checks.add(new Timer("BadPackets (Type G)", CheckType.BADPACKETS, CancelType.NONE, 20));
+        checks.add(new Timer("Timer", CheckType.BADPACKETS, CancelType.NONE, 20));
         checks.add(new VelocityA("Velocity (Type A)", CheckType.VELOCITY, CancelType.MOTION,  40));
         checks.add(new VelocityB("Velocity (Type B)", CheckType.VELOCITY, CancelType.MOTION,  40));
 

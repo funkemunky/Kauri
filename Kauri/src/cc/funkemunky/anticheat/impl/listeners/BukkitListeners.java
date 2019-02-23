@@ -42,14 +42,11 @@ public class BukkitListeners implements Listener {
                 if(data.getSetbackLocation() != null) {
                     event.getPlayer().teleport(data.getSetbackLocation());
                 } else {
-                    Location to = event.getTo().clone();
-
-                    to.setY(MiscUtils.getDistanceToGround(data, Math.max(0, (float) to.getY())));
-                    event.getPlayer().teleport(to);
+                    event.setCancelled(true);
                 }
                 data.setCancelType(CancelType.NONE);
             } else if (data.getMovementProcessor().isServerOnGround() && data.getLastFlag().hasPassed()) {
-                data.setSetbackLocation(event.getTo());
+                data.setSetbackLocation(event.getFrom());
             }
         }
     }

@@ -27,7 +27,7 @@ public class PlayerData {
     public Location setbackLocation;
     private UUID uuid, debuggingPlayer;
     private Check debuggingCheck;
-    private boolean debuggingBox;
+    private boolean debuggingBox, banned = false;
     private Player player;
     private List<Check> checks = new ArrayList<>();
     private Map<String, List<Check>> packetChecks = new HashMap<>();

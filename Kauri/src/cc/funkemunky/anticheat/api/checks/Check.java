@@ -80,7 +80,8 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
         if (data.getLastLag().hasPassed() || lagVerbose.flag(4, 500L)) {
             vl++;
             Kauri.getInstance().getLoggerManager().addViolation(data.getUuid(), this);
-            if (vl > maxVL && executable && ban && !Kauri.getInstance().getStatsManager().isPlayerBanned(data.getUuid())) {
+            if (vl > maxVL && executable && ban && !getData().isBanned()) {
+                getData().setBanned(true);
                 new BukkitRunnable() {
                     public void run() {
                         execCommand.forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replaceAll("%player%", getData().getPlayer().getName()).replaceAll("%check%", getName())));

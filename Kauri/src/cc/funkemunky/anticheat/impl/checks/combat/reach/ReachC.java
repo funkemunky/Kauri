@@ -39,6 +39,7 @@ public class ReachC extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         WrappedInUseEntityPacket use = new WrappedInUseEntityPacket(packet, getData().getPlayer());
 
+        if(getData().isGeneralCancel()) return;
         if(use.getEntity() instanceof Player && use.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK) && use.getPlayer().getGameMode().equals(GameMode.SURVIVAL)) {
             val entityData = Kauri.getInstance().getDataManager().getPlayerData(use.getEntity().getUniqueId());
 

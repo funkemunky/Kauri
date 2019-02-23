@@ -10,10 +10,7 @@ import java.util.List;
 @Init(priority = Priority.HIGHEST)
 public class CheckSettings {
     @ConfigSetting(name = "executableCommand")
-    static List<String> executableCommand = Collections.singletonList("kick %player% [Kauri] You have been kicked for failing %check%");
-
-    @ConfigSetting(name = "key")
-    public static String key = "";
+    static List<String> executableCommand = Collections.singletonList("ban %player% [Kauri] Unfair Advantage");
 
     @ConfigSetting(path = "alerts", name = "alertMessage")
     static String alertMessage = "&8[&6&lKauri&8] &f%player% &7failed &f%check% &c(x%vl%)";
