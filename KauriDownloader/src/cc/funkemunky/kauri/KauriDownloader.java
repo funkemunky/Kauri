@@ -27,7 +27,7 @@ public class KauriDownloader extends JavaPlugin {
 
         try {
             getLogger().log(Level.INFO, "Finding suitable server location...");
-            URL url = new URL("https://funkemunky.cc/download?name=Kauri_Lite&license=" + getConfig().getString("license") + "&version=" + getDescription().getVersion());
+            URL url = new URL("https://funkemunky.cc/download?name=Kauri&license=" + getConfig().getString("license") + "&version=" + getDescription().getVersion());
             getLogger().log(Level.INFO, "Downloading Kauri...");
             InputStream is = null;
             try {
