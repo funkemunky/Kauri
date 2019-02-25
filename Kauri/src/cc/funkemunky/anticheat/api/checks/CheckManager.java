@@ -39,6 +39,7 @@ public class CheckManager {
         checks.add(new AutoclickerD("Autoclicker (Type D)", CheckType.AUTOCLICKER, CancelType.COMBAT, 20));
         checks.add(new AutoclickerE("Autoclicker (Type E)", CheckType.AUTOCLICKER, CancelType.COMBAT, 20));
         checks.add(new AutoclickerF("Autoclicker (Type F)", CheckType.AUTOCLICKER, CancelType.COMBAT, 5));
+        checks.add(new AutoclickerG("Autoclicker (Type G)", CheckType.AUTOCLICKER, CancelType.COMBAT, 50, true, false, true));
         checks.add(new KillauraA("Killaura (Type A)", CheckType.KILLAURA, CancelType.COMBAT, 150));
         checks.add(new KillauraB("Killaura (Type B)", CheckType.KILLAURA, CancelType.COMBAT, 200));
         checks.add(new KillauraC("Killaura (Type C)", CheckType.KILLAURA, CancelType.COMBAT, 100));

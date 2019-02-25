@@ -60,4 +60,8 @@ public class KauriDownloader extends JavaPlugin {
             e.printStackTrace();
         }
     }
+
+    public void onDisable() {
+
+    }
 }
