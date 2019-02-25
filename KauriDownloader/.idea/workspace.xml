@@ -10,11 +10,10 @@
       <change beforePath="$PROJECT_DIR$/../Kauri/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Kauri/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Kauri/out/artifacts/Kauri_jar/Kauri.jar" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/out/artifacts/Kauri_jar/Kauri.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/api/checks/CheckManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/api/checks/CheckManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/api/checks/Check.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/api/checks/Check.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/combat/reach/ReachE.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/combat/reach/ReachE.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/cc/funkemunky/kauri/KauriDownloader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/cc/funkemunky/kauri/KauriDownloader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/cc/funkemunky/kauri/utils/DownloaderUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/cc/funkemunky/kauri/utils/DownloaderUtils.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -39,11 +38,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/kauri/KauriDownloader.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="709">
-              <caret line="64" selection-start-line="64" selection-end-line="64" />
+            <state relative-caret-position="127">
+              <caret line="29" column="30" lean-forward="true" selection-start-line="29" selection-start-column="30" selection-end-line="29" selection-end-column="168" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -54,7 +53,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/resources/plugin.yml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="45">
+            <state relative-caret-position="51">
               <caret line="3" column="18" selection-start-line="3" selection-start-column="18" selection-end-line="3" selection-end-column="18" />
             </state>
           </provider>
@@ -69,10 +68,10 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/kauri/utils/DownloaderUtils.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="435">
+            <state relative-caret-position="493">
               <caret line="29" column="44" selection-start-line="29" selection-start-column="44" selection-end-line="29" selection-end-column="44" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -84,7 +83,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/kauri/utils/MiscUtils.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2100">
+            <state relative-caret-position="926">
               <caret line="149" column="73" selection-start-line="149" selection-start-column="73" selection-end-line="149" selection-end-column="73" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -137,8 +136,8 @@
         <option value="$PROJECT_DIR$/src/cc/funkemunky/kauri/utils/ReflectionsUtil.java" />
         <option value="$PROJECT_DIR$/resources/config.yml" />
         <option value="$PROJECT_DIR$/resources/plugin.yml" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/kauri/KauriDownloader.java" />
         <option value="$PROJECT_DIR$/src/cc/funkemunky/kauri/utils/DownloaderUtils.java" />
+        <option value="$PROJECT_DIR$/src/cc/funkemunky/kauri/KauriDownloader.java" />
       </list>
     </option>
   </component>
@@ -148,7 +147,7 @@
       <select />
     </treeState>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6" fullScreen="true">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="width" value="1920" />
     <option name="height" value="1080" />
   </component>
@@ -229,17 +228,18 @@
       <workItem from="1550850133792" duration="2543000" />
       <workItem from="1550875047473" duration="1074000" />
       <workItem from="1550961134477" duration="347000" />
+      <workItem from="1551060170656" duration="787000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="5190000" />
+    <option name="totallyTimeSpent" value="5977000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1440" height="900" extended-state="6" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.26037195" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.26332623" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -276,7 +276,7 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/resources/plugin.yml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
+        <state relative-caret-position="51">
           <caret line="3" column="18" selection-start-line="3" selection-start-column="18" selection-end-line="3" selection-end-column="18" />
         </state>
       </provider>
@@ -288,9 +288,19 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/kauri/utils/DownloaderUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="493">
+          <caret line="29" column="44" selection-start-line="29" selection-start-column="44" selection-end-line="29" selection-end-column="44" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/kauri/utils/MiscUtils.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2100">
+        <state relative-caret-position="926">
           <caret line="149" column="73" selection-start-line="149" selection-start-column="73" selection-end-line="149" selection-end-column="73" />
           <folding>
             <element signature="imports" expanded="true" />
@@ -310,18 +320,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/kauri/KauriDownloader.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="709">
-          <caret line="64" selection-start-line="64" selection-end-line="64" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/kauri/utils/DownloaderUtils.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="435">
-          <caret line="29" column="44" selection-start-line="29" selection-start-column="44" selection-end-line="29" selection-end-column="44" />
+        <state relative-caret-position="127">
+          <caret line="29" column="30" lean-forward="true" selection-start-line="29" selection-start-column="30" selection-end-line="29" selection-end-column="168" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

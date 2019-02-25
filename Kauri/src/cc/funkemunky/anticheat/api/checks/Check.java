@@ -78,8 +78,11 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
 
     protected void flag(String information, boolean cancel, boolean ban) {
         if (data.getLastLag().hasPassed() || lagVerbose.flag(4, 500L)) {
-            vl++;
-            Kauri.getInstance().getLoggerManager().addViolation(data.getUuid(), this);
+            if(ban) {
+                vl++;
+                Kauri.getInstance().getLoggerManager().addViolation(data.getUuid(), this);
+                Kauri.getInstance().getStatsManager().addFlag();
+            }
             if (vl > maxVL && executable && ban && !getData().isBanned()) {
                 getData().setBanned(true);
                 new BukkitRunnable() {
@@ -89,8 +92,6 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
                 }.runTaskLater(Kauri.getInstance(), 30);
                 Kauri.getInstance().getLoggerManager().addBan(data.getUuid(), this);
             }
-
-            Kauri.getInstance().getStatsManager().addFlag();
 
             data.getLastFlag().reset();
 
