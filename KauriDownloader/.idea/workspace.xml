@@ -9,26 +9,11 @@
     <list default="true" id="2d14aa2c-9c78-41d0-af1f-71b7478bae86" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/../Kauri/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Kauri/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Kauri/Kauri.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/Kauri.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Kauri/out/artifacts/Kauri_jar/Kauri.jar" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/out/artifacts/Kauri_jar/Kauri.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/Kauri.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/Kauri.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/api/checks/Check.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/api/checks/Check.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/api/checks/CheckManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/api/checks/CheckManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/api/checks/CheckSettings.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/api/checks/CheckSettings.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/api/data/PlayerData.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/api/data/PlayerData.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/api/utils/MiscUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/api/utils/MiscUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/combat/fastbow/Fastbow.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/combat/fastbow/Fastbow.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/combat/reach/ReachB.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/combat/reach/ReachB.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/combat/reach/ReachC.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/combat/reach/ReachC.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/movement/FlyB.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/movement/FlyB.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/player/BadPacketsB.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/player/BadPacketsF.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/player/BadPacketsF.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/player/Timer.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/player/Timer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/listeners/BukkitListeners.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/listeners/BukkitListeners.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/listeners/PacketListeners.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/listeners/PacketListeners.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/menu/MenuUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/menu/MenuUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/artifacts/KauriDownloader_jar/KauriDownloader.jar" beforeDir="false" afterPath="$PROJECT_DIR$/out/artifacts/KauriDownloader_jar/KauriDownloader.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cc/funkemunky/kauri/KauriDownloader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/cc/funkemunky/kauri/KauriDownloader.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/cc/funkemunky/kauri/utils/DownloaderUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/cc/funkemunky/kauri/utils/DownloaderUtils.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -57,8 +42,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/kauri/KauriDownloader.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="498">
-              <caret line="50" column="39" selection-start-line="50" selection-start-column="39" selection-end-line="50" selection-end-column="39" />
+            <state relative-caret-position="709">
+              <caret line="64" selection-start-line="64" selection-end-line="64" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -87,8 +72,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/kauri/utils/DownloaderUtils.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="330">
-              <caret line="22" column="46" selection-start-line="22" selection-start-column="46" selection-end-line="22" selection-end-column="46" />
+            <state relative-caret-position="435">
+              <caret line="29" column="44" selection-start-line="29" selection-start-column="44" selection-end-line="29" selection-end-column="44" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -163,7 +148,7 @@
       <select />
     </treeState>
   </component>
-  <component name="ProjectFrameBounds">
+  <component name="ProjectFrameBounds" extendedState="6" fullScreen="true">
     <option name="width" value="1920" />
     <option name="height" value="1080" />
   </component>
@@ -173,7 +158,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -204,6 +188,7 @@
         </subPane>
       </pane>
       <pane id="PackagesPane" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -243,17 +228,18 @@
       <workItem from="1550844004599" duration="1226000" />
       <workItem from="1550850133792" duration="2543000" />
       <workItem from="1550875047473" duration="1074000" />
+      <workItem from="1550961134477" duration="347000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="4843000" />
+    <option name="totallyTimeSpent" value="5190000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1440" height="900" extended-state="0" />
+    <frame x="0" y="0" width="1440" height="900" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25679544" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.26037195" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -288,16 +274,6 @@
     <option name="version" value="1" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/kauri/KauriDownloader.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="498">
-          <caret line="50" column="39" selection-start-line="50" selection-start-column="39" selection-end-line="50" selection-end-column="39" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/resources/plugin.yml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="45">
@@ -332,10 +308,20 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/kauri/KauriDownloader.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="709">
+          <caret line="64" selection-start-line="64" selection-end-line="64" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/kauri/utils/DownloaderUtils.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="22" column="46" selection-start-line="22" selection-start-column="46" selection-end-line="22" selection-end-column="46" />
+        <state relative-caret-position="435">
+          <caret line="29" column="44" selection-start-line="29" selection-start-column="44" selection-end-line="29" selection-end-column="44" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

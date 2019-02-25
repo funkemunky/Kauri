@@ -59,10 +59,10 @@ public class ReachD extends Check {
         }.runTaskTimer(Kauri.getInstance(), 20L, 1L);
     }
 
-    @Setting
+    @Setting(name = "pingRange")
     private long pingRange = 150;
 
-    @Setting
+    @Setting(name = "maxReach")
     private float maxReach = 3.0f;
 
     @Setting
