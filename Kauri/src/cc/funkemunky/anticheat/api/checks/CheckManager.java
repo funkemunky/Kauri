@@ -5,6 +5,7 @@ import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.anticheat.impl.checks.combat.aimassist.AimA;
 import cc.funkemunky.anticheat.impl.checks.combat.aimassist.AimB;
+import cc.funkemunky.anticheat.impl.checks.combat.aimassist.AimD;
 import cc.funkemunky.anticheat.impl.checks.combat.autoclicker.*;
 import cc.funkemunky.anticheat.impl.checks.combat.fastbow.Fastbow;
 import cc.funkemunky.anticheat.impl.checks.combat.hitboxes.HitBox;
@@ -33,6 +34,7 @@ public class CheckManager {
         List<Check> checks = new ArrayList<>();
         checks.add(new AimA("Aim (Type A)", CheckType.AIM, CancelType.COMBAT, 80));
         checks.add(new AimB("Aim (Type B)", CheckType.AIM, CancelType.COMBAT, 50));
+        checks.add(new AimD("Aim (Type D", CheckType.AIM, CancelType.COMBAT, 50));
         checks.add(new AutoclickerA("Autoclicker (Type A)", CheckType.AUTOCLICKER, CancelType.COMBAT, 20));
         checks.add(new AutoclickerB("Autoclicker (Type B)", CheckType.AUTOCLICKER, CancelType.COMBAT, 20));
         checks.add(new AutoclickerC("Autoclicker (Type C)", CheckType.AUTOCLICKER, CancelType.COMBAT, 20));
