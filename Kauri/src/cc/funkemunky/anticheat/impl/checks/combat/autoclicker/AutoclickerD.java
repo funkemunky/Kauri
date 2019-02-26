@@ -19,8 +19,8 @@ import org.bukkit.event.Event;
         Packet.Client.LEGACY_LOOK,
         Packet.Client.ARM_ANIMATION})
 public class AutoclickerD extends Check {
-    public AutoclickerD(String name, CheckType type, CancelType cancelType, int maxVL) {
-        super(name, type, cancelType, maxVL);
+    public AutoclickerD(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
+        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
     }
 
     private int cps, ticks, vl;

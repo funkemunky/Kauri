@@ -4,6 +4,7 @@ import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.event.system.Listener;
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.JsonMessage;
 import cc.funkemunky.api.utils.MiscUtils;
@@ -20,6 +21,7 @@ import java.util.*;
 public abstract class Check implements Listener, org.bukkit.event.Listener {
     private String name;
     private CheckType type;
+    private String description;
     private CancelType cancelType;
     private PlayerData data;
     private int maxVL;
@@ -30,39 +32,11 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
     private Map<String, Object> settings = new HashMap<>();
     private String alertMessage = "";
     private int vl;
+    private ProtocolVersion minimum, maximum;
 
-    public Check(String name, CheckType type, CancelType cancelType, int maxVL) {
-        this.type = type;
+    public Check(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
         this.name = name;
-        this.cancelType = cancelType;
-        this.maxVL = maxVL;
-
-        enabled = executable = true;
-
-        developer = false;
-
-        alertMessage = CheckSettings.alertMessage.replaceAll("%check%", name);
-
-        loadFromConfig();
-    }
-
-    public Check(String name, CheckType type, CancelType cancelType, PlayerData data, int maxVL) {
-        this.name = name;
-        this.type = type;
-        this.cancelType = cancelType;
-        this.data = data;
-        this.maxVL = maxVL;
-
-        enabled = executable = cancellable = true;
-
-        developer = false;
-
-        alertMessage = CheckSettings.alertMessage.replaceAll("%check%", name);
-        loadFromConfig();
-    }
-
-    public Check(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        this.name = name;
+        this.description = description;
         this.type = type;
         this.cancelType = cancelType;
         this.maxVL = maxVL;

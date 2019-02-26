@@ -40,8 +40,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
         Packet.Client.LEGACY_LOOK})
 public class ReachE extends Check {
 
-    public ReachE(String name, CheckType type, CancelType cancelType, int maxVL) {
-        super(name, type, cancelType, maxVL);
+    public ReachE(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
+        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
     }
 
     @Setting(name = "pingRange")

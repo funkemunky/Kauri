@@ -16,8 +16,8 @@ import org.bukkit.event.Event;
         Packet.Client.LEGACY_LOOK})
 public class AimD extends Check {
 
-    public AimD(String name, CheckType type, CancelType cancelType, int maxVL) {
-        super(name, type, cancelType, maxVL);
+    public AimD(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
+        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
     }
 
     private final MCSmooth mouseFilterXAxis = new MCSmooth(), mouseFilterYAxis = new MCSmooth();
@@ -47,6 +47,8 @@ public class AimD extends Check {
         } else {
             streak = 0;
         }
+
+        debug(yawRaw + ", " + pitchRaw + ", " + getData().isCinematicMode());
 
         this.lastYawChange = yawChange;
         this.lastPitchChange = pitchChange;

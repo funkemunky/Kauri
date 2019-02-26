@@ -20,8 +20,8 @@ import org.bukkit.event.Event;
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
 public class KillauraF extends Check {
-    public KillauraF(String name, CheckType type, CancelType cancelType, int maxVL) {
-        super(name, type, cancelType, maxVL);
+    public KillauraF(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
+        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
     }
 
     private RollingAverage average = new RollingAverage(20);
@@ -46,7 +46,7 @@ public class KillauraF extends Check {
 
             double offset = offsetArray[0], average = this.average.getAverage();
 
-            if (average < 5.0 && (player.isSprinting() || yawDelta > 2.0) && yawDelta > 0.15 && getData().getMovementProcessor().getDeltaXZ() > 0.15 && vl++ > 50) {
+            if (average < 5.0 && (player.isSprinting() || yawDelta > 2.0) && yawDelta > 0.3 && getData().getMovementProcessor().getDeltaXZ() > 0.15 && vl++ > 50) {
                 flag(average + "<-4.0->" + vl, true, true);
             } else {
                 vl-= vl > 0 ? 0.5f : 0;

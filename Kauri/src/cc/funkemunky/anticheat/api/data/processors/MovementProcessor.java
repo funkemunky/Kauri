@@ -114,7 +114,7 @@ public class MovementProcessor {
 
             lastDeltaY = deltaY;
             deltaY = (float) (to.getY() - from.getY());
-            deltaXZ = (float) (Math.hypot(to.getX() - from.getX(), to.getZ() - from.getZ()));
+            deltaXZ = (float) (cc.funkemunky.anticheat.api.utils.MiscUtils.hypot(to.getX() - from.getX(), to.getZ() - from.getZ()));
             lastClientYAcceleration = clientYAcceleration;
             clientYAcceleration = deltaY - lastDeltaY;
 
@@ -192,7 +192,7 @@ public class MovementProcessor {
         }
 
         pastLocation.addLocation(new CustomLocation(to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch()));
-        data.setGeneralCancel(isLagging || Atlas.getInstance().getBlockBoxManager().getBlockBox().isChunkLoaded(data.getPlayer().getLocation()) || packet.getPlayer().getAllowFlight() || packet.getPlayer().getActivePotionEffects().stream().anyMatch(effect -> effect.getType().getName().toLowerCase().contains("levi")) || packet.getPlayer().getGameMode().toString().contains("CREATIVE") || packet.getPlayer().getGameMode().toString().contains("SPEC") || lastVehicle.hasNotPassed() || getLastRiptide().hasNotPassed(10) || data.getLastLogin().hasNotPassed(50) || data.getVelocityProcessor().getLastVelocity().hasNotPassed(40));
+        data.setGeneralCancel(isLagging || !Atlas.getInstance().getBlockBoxManager().getBlockBox().isChunkLoaded(data.getPlayer().getLocation()) || packet.getPlayer().getAllowFlight() || packet.getPlayer().getActivePotionEffects().stream().anyMatch(effect -> effect.getType().getName().toLowerCase().contains("levi")) || packet.getPlayer().getGameMode().toString().contains("CREATIVE") || packet.getPlayer().getGameMode().toString().contains("SPEC") || lastVehicle.hasNotPassed() || getLastRiptide().hasNotPassed(10) || data.getLastLogin().hasNotPassed(50) || data.getVelocityProcessor().getLastVelocity().hasNotPassed(40));
         Kauri.getInstance().getProfiler().stop("MovementProcessor:update");
     }
 

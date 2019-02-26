@@ -28,8 +28,8 @@ public class AutoclickerB extends Check {
     private final double[] averages = new double[]{0.0, 0.0, 0.0, 0.0};
     private int ticks, vl;
     private long timestamp;
-    public AutoclickerB(String name, CheckType type, CancelType cancelType, int maxVL) {
-        super(name, type, cancelType, maxVL);
+    public AutoclickerB(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
+        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
     }
 
     @Override

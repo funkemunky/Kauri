@@ -23,8 +23,8 @@ import org.bukkit.event.Event;
         Packet.Client.BLOCK_DIG})
 public class AutoclickerE extends Check {
 
-    public AutoclickerE(String name, CheckType type, CancelType cancelType, int maxVL) {
-        super(name, type, cancelType, maxVL);
+    public AutoclickerE(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
+        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
     }
 
     private boolean sent;

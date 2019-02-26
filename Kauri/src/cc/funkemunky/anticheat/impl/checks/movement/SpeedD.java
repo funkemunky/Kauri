@@ -11,9 +11,10 @@ import lombok.val;
 import org.bukkit.block.Block;
 import org.bukkit.event.Event;
 
+
 @Packets(packets = {Packet.Client.LEGACY_POSITION, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.POSITION, Packet.Client.POSITION_LOOK})
-public class SpeedC extends Check {
-    public SpeedC(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
+public class SpeedD extends Check {
+    public SpeedD(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
         super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
     }
 
@@ -39,14 +40,7 @@ public class SpeedC extends Check {
             val delta = deltaXZ - predicted;
 
 
-            if(!onGround && !lastLastOnGround && !lastOnGround) {
-                if (delta > 0.028) {
-                    if(delta > 0.2f && vl++ > 3) {
-                        flag(delta + "", true, true);
-                    }
-                } else vl -= vl > 0 ? 1 : 0;
-                debug("VL:" + vl + "DIFFERENCE: " + delta);
-            }
+            debug("VL:" + vl + "DIFFERENCE: " + delta);
 
             lastMotion = deltaXZ;
         }
@@ -60,3 +54,4 @@ public class SpeedC extends Check {
 
     }
 }
+

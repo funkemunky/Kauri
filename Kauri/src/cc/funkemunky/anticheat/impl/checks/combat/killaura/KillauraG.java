@@ -23,8 +23,8 @@ import java.util.List;
 
 @Packets(packets = {Packet.Client.USE_ENTITY})
 public class KillauraG extends Check {
-    public KillauraG(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, type, cancelType, maxVL, enabled, executable, cancellable);
+    public KillauraG(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
+        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
 
         setDeveloper(true);
     }

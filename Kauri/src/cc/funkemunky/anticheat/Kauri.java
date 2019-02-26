@@ -53,8 +53,6 @@ public class Kauri extends JavaPlugin {
         instance = this;
         saveDefaultConfig();
 
-        if(!Bukkit.getPluginManager().isPluginEnabled("KauriLoader")) return;
-
         if(Bukkit.getPluginManager().isPluginEnabled("Atlas") && Bukkit.getPluginManager().getPlugin("Atlas").getDescription().getVersion().equals(requiredVersionOfAtlas)) {
 
             profiler = new BaseProfiler();

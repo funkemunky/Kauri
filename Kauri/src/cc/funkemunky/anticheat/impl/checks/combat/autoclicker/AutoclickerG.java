@@ -22,8 +22,8 @@ public class AutoclickerG extends Check {
     private double vl;
     private List<Long> times = new ArrayList<>();
 
-    public AutoclickerG(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, type, cancelType, maxVL, enabled, executable, cancellable);
+    public AutoclickerG(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
+        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
     }
 
     @Override

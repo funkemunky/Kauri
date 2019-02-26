@@ -24,8 +24,8 @@ public class KillauraA extends Check {
     private int verbose;
     private boolean dontFlag;
 
-    public KillauraA(String name, CheckType type, CancelType cancelType, int maxVL) {
-        super(name, type, cancelType, maxVL);
+    public KillauraA(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
+        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
     }
 
     @Override

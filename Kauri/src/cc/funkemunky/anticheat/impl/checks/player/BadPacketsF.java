@@ -23,8 +23,8 @@ public class BadPacketsF extends Check {
 
     private int ticks, vl;
     private long lastReset;
-    public BadPacketsF(String name, CheckType type, CancelType cancelType, int maxVL) {
-        super(name, type, cancelType, maxVL);
+    public BadPacketsF(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
+        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
     }
 
     @Override

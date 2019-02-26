@@ -8,6 +8,7 @@ import cc.funkemunky.anticheat.api.utils.menu.button.Button;
 import cc.funkemunky.anticheat.api.utils.menu.button.ClickAction;
 import cc.funkemunky.anticheat.api.utils.menu.type.impl.ChestMenu;
 import cc.funkemunky.api.utils.Color;
+import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.MiscUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -15,10 +16,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class MenuUtils {
     public static boolean hasModifiedChecks = false;
@@ -110,20 +108,41 @@ public class MenuUtils {
     }
 
     private static Button checkButton(Check check, int page) {
+        List<String> lore = new ArrayList<>(Arrays.asList("&eEnabled&7: &f" + check.isEnabled(),
+                "&eExecutable&7: &f" + check.isExecutable(),
+                "&eCancellable&7: &f" + check.isCancellable(),
+                "&eDescription&7: &f"));
+
+                if(check.getDescription().length() > 15) {
+                    List<String> description = new ArrayList<>();
+                    int amount = MathUtils.floor(check.getDescription().length() / 20D);
+                    for(int i = 0 ; i < amount ; i++) {
+                        int max = Math.max(check.getDescription().length() - 1, (i + 1) * 15);
+                        if(check.getDescription().substring(max, max).equals(" ")) {
+                            description.add("&f" + check.getDescription().substring(i * 15, (i + 1) * 15));
+                        } else {
+                            for(int i2 = max ; i2 < check.getDescription().length() ; i2++) {
+                                if(check.getDescription().substring(i2, i2).equals(" ") || i2 <= (check.getDescription().length() - 1)) {
+                                    description.add("&f" + check.getDescription().substring(i * 15, i2));
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    lore.addAll(description);
+                } else {
+                    lore.add("&f" + check.getDescription());
+                }
+                lore.addAll(Arrays.asList( "&eInstructions&7:",
+                        "&8- &fLeft Click &7to toggle check on/off.",
+                        "&8- &fShift + Left Click &7to toggle check executable-abilities.",
+                        "&8- &fRight Click &7to toggle check cancellable-abilities."));
         return createButton(false,
                 MiscUtils.createItem(
                         Material.PAPER,
                         1,
-                        Color.Gold + check.getName(),
-                        "",
-                        "&eEnabled&7: &f" + check.isEnabled(),
-                        "&eExecutable&7: &f" + check.isExecutable(),
-                        "&eCancellable&7: &f" + check.isCancellable(),
-                        "&eType&7: &f" + check.getType().toString(),
-                        "&eInstructions&7:",
-                        "&8- &fLeft Click &7to toggle check on/off.",
-                        "&8- &fShift + Left Click &7to toggle check executable-abilities.",
-                        "&8- &fRight Click &7to toggle check cancellable-abilities."),
+                        Color.Gold + check.getName(), lore.toArray(new String[] {})),
                 ((player2, infoPair) -> {
                     switch(infoPair.getClickType()) {
                         case LEFT: {

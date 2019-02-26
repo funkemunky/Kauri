@@ -18,8 +18,8 @@ import org.bukkit.util.Vector;
 public class ReachA extends Check {
     private Verbose verbose = new Verbose();
 
-    public ReachA(String name, CheckType type, CancelType cancelType, int maxVL) {
-        super(name, type, cancelType, maxVL);
+    public ReachA(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
+        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
     }
 
     @Override

@@ -19,8 +19,8 @@ public class KillauraC extends Check {
     private Verbose verbose = new Verbose();
     private boolean isSprinting;
 
-    public KillauraC(String name, CheckType type, CancelType cancelType, int maxVL) {
-        super(name, type, cancelType, maxVL);
+    public KillauraC(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
+        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
     }
 
     @Override

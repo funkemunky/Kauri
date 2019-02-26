@@ -23,8 +23,8 @@ public class BadPacketsA extends Check {
 
     private boolean serverSent, clientSent, lastCreative;
     private int vl;
-    public BadPacketsA(String name, CheckType type, CancelType cancelType, int maxVL) {
-        super(name, type, cancelType, maxVL);
+    public BadPacketsA(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
+        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
     }
 
     @Override

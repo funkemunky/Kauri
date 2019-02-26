@@ -24,8 +24,8 @@ public class AutoclickerC extends Check {
 
     private final DynamicRollingAverage cpsAverage = new DynamicRollingAverage(5);
     private int cps, ticks, vl;
-    public AutoclickerC(String name, CheckType type, CancelType cancelType, int maxVL) {
-        super(name, type, cancelType, maxVL);
+    public AutoclickerC(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
+        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
     }
 
     /*
@@ -83,7 +83,7 @@ public class AutoclickerC extends Check {
                         if (average >= 9.0) {
                             if (Math.round(average) == average || Math.round(average) == average - 0.5) {
                                 if (++vl > 4) {
-                                    flag(average + " -> " + (double) Math.round(average) + " -> " + "0.0", false, false);
+                                    flag(average + " -> " + (double) Math.round(average) + " -> " + "0.0", false, true);
                                 }
                             } else {
                                 vl -= vl > 0 ? 2 : 0;
@@ -109,7 +109,6 @@ public class AutoclickerC extends Check {
                 break;
             }
         }
-        return;
     }
 
     @Override

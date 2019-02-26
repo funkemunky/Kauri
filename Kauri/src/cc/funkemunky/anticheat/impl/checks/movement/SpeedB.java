@@ -28,8 +28,8 @@ public class SpeedB extends Check {
 
     private final Deque<Double> offsetDeque = new LinkedList<>();
 
-    public SpeedB(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, type, cancelType, maxVL, enabled, executable, cancellable);
+    public SpeedB(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
+        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
     }
 
 

@@ -13,6 +13,8 @@ import cc.funkemunky.anticheat.impl.checks.combat.killaura.*;
 import cc.funkemunky.anticheat.impl.checks.combat.reach.*;
 import cc.funkemunky.anticheat.impl.checks.movement.*;
 import cc.funkemunky.anticheat.impl.checks.player.*;
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
+import cc.funkemunky.api.utils.MiscUtils;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -32,48 +34,49 @@ public class CheckManager {
 
     public List<Check> loadChecks() {
         List<Check> checks = new ArrayList<>();
-        checks.add(new AimA("Aim (Type A)", CheckType.AIM, CancelType.COMBAT, 80));
-        checks.add(new AimB("Aim (Type B)", CheckType.AIM, CancelType.COMBAT, 50));
-        checks.add(new AimD("Aim (Type D", CheckType.AIM, CancelType.COMBAT, 50));
-        checks.add(new AutoclickerA("Autoclicker (Type A)", CheckType.AUTOCLICKER, CancelType.COMBAT, 20));
-        checks.add(new AutoclickerB("Autoclicker (Type B)", CheckType.AUTOCLICKER, CancelType.COMBAT, 20));
-        checks.add(new AutoclickerC("Autoclicker (Type C)", CheckType.AUTOCLICKER, CancelType.COMBAT, 20));
-        checks.add(new AutoclickerD("Autoclicker (Type D)", CheckType.AUTOCLICKER, CancelType.COMBAT, 20));
-        checks.add(new AutoclickerE("Autoclicker (Type E)", CheckType.AUTOCLICKER, CancelType.COMBAT, 20));
-        checks.add(new AutoclickerF("Autoclicker (Type F)", CheckType.AUTOCLICKER, CancelType.COMBAT, 5));
-        checks.add(new AutoclickerG("Autoclicker (Type G)", CheckType.AUTOCLICKER, CancelType.COMBAT, 50, true, false, true));
-        checks.add(new KillauraA("Killaura (Type A)", CheckType.KILLAURA, CancelType.COMBAT, 150));
-        checks.add(new KillauraB("Killaura (Type B)", CheckType.KILLAURA, CancelType.COMBAT, 200));
-        checks.add(new KillauraC("Killaura (Type C)", CheckType.KILLAURA, CancelType.COMBAT, 100));
-        checks.add(new KillauraD("Killaura (Type D)", CheckType.KILLAURA, CancelType.COMBAT, 100));
-        checks.add(new KillauraD("Killaura (Type D)", CheckType.KILLAURA, CancelType.COMBAT, 75));
-        //checks.add(new KillauraE("Killaura (Type E)", CheckType.KILLAURA, CancelType.COMBAT, 100, true, true, true));
-        //checks.add(new KillauraF("Killaura (Type F)", CheckType.KILLAURA, CancelType.COMBAT, 12));
-        checks.add(new KillauraG("Killaura (Type G)", CheckType.KILLAURA, CancelType.COMBAT, 50, true, false, true));
-        checks.add(new KillauraH("Killaura (Type H)", CheckType.KILLAURA, CancelType.COMBAT, 3));
-        checks.add(new FlyA("Fly (Type A)", CheckType.FLY, CancelType.MOTION, 225));
-        checks.add(new FlyB("Fly (Type B)", CheckType.FLY, CancelType.MOTION, 225, true, false, true));
-        checks.add(new FlyC("Fly (Type C)", CheckType.FLY, CancelType.MOTION, 100, true, true, true));
-        checks.add(new FlyD("Fly (Type D)", CheckType.FLY, CancelType.MOTION, 200));
-        checks.add(new SpeedA("Speed (Type A)", CheckType.SPEED, CancelType.MOTION, 100));
-        checks.add(new SpeedB("Speed (Type B)", CheckType.SPEED, CancelType.MOTION, 125, true, true, true));
-        checks.add(new SpeedC("Speed (Type C)", CheckType.SPEED, CancelType.MOTION, 100));
-        checks.add(new ReachA("Reach (Type A)", CheckType.REACH, CancelType.COMBAT, 60));
-        checks.add(new ReachB("Reach (Type B)", CheckType.REACH, CancelType.COMBAT, 60));
-        checks.add(new ReachC("Reach (Type C)", CheckType.REACH, CancelType.MOTION, 50));
-        checks.add(new ReachD("Reach (Type D)", CheckType.REACH, CancelType.COMBAT, 50));
-        checks.add(new ReachE("Reach (Type E)", CheckType.REACH, CancelType.COMBAT, 50));
-        //checks.add(new TimerB("Timer (Type B)", CancelType.MOTION, 200));
-        checks.add(new Fastbow("Fastbow", CheckType.COMBAT, CancelType.INTERACT, 40));
-        checks.add(new HitBox("HitBox", CheckType.COMBAT, CancelType.COMBAT, 30));
-        checks.add(new BadPacketsA("BadPackets (Type A)", CheckType.BADPACKETS, CancelType.MOTION, 40));
-        checks.add(new BadPacketsC("BadPackets (Type C)", CheckType.BADPACKETS, CancelType.COMBAT, 50));
-        checks.add(new BadPacketsD("BadPackets (Type D)", CheckType.BADPACKETS, CancelType.COMBAT, 50));
-        checks.add(new BadPacketsE("BadPackets (Type E)", CheckType.BADPACKETS, CancelType.HEALTH, 20));
-        checks.add(new BadPacketsF("BadPackets (Type F)", CheckType.BADPACKETS, CancelType.MOTION, 100));
-        checks.add(new Timer("Timer", CheckType.BADPACKETS, CancelType.NONE, 20));
-        checks.add(new VelocityA("Velocity (Type A)", CheckType.VELOCITY, CancelType.MOTION,  40));
-        checks.add(new VelocityB("Velocity (Type B)", CheckType.VELOCITY, CancelType.MOTION,  40));
+        registerCheck(checks, new AimA("Aim (Type A)", "Checks for the consistency in aim overall", CheckType.AIM, CancelType.COMBAT, 80, true, false, true));
+        registerCheck(checks, new AimB("Aim (Type B)", "Checks for common denominators in the pitch.", CheckType.AIM, CancelType.COMBAT, 50, true, true, true));
+        registerCheck(checks, new AimD("Aim (Type D)", "An overall calcluation of past aim inputs.", CheckType.AIM, CancelType.COMBAT, 50, true, true, true));
+        registerCheck(checks, new AutoclickerA("Autoclicker (Type A)", "A unique fast click check that detects jumps in CPS much faster.", CheckType.AUTOCLICKER, CancelType.COMBAT, 20, true, true, true));
+        registerCheck(checks, new AutoclickerB("Autoclicker (Type B)", "Looks for suspicious consistencies in CPS averages.", CheckType.AUTOCLICKER, CancelType.COMBAT, 20, true, true, true));
+        registerCheck(checks, new AutoclickerC("Autoclicker (Type C)", "An overall average CPS check.", CheckType.AUTOCLICKER, CancelType.COMBAT, 20, true, false, true));
+        registerCheck(checks, new AutoclickerD("Autoclicker (Type D)", "Checks for very common autoclicker mistakes.", CheckType.AUTOCLICKER, CancelType.COMBAT, 20, true, false, true));
+        registerCheck(checks, new AutoclickerE("Autoclicker (Type E)", "An unreasonable amount of CPS while breaking a block.", CheckType.AUTOCLICKER, CancelType.COMBAT, 20, true, true, true));
+        registerCheck(checks, new AutoclickerF("Autoclicker (Type F)", "Compares the CPS of an autoclicker a certain frequency.", CheckType.AUTOCLICKER, CancelType.COMBAT, 5, true, true, true));
+        registerCheck(checks, new AutoclickerG("Autoclicker (Type G)", "A normal click consistency check.", CheckType.AUTOCLICKER, CancelType.COMBAT, 50, true, false, true));
+        registerCheck(checks, new KillauraA("Killaura (Type A)", "Checks the time between certain packets and attacks.", CheckType.KILLAURA, CancelType.COMBAT, 150, true, true, true));
+        registerCheck(checks, new KillauraB("Killaura (Type B)", "Checks for an overall flaw in the rotations of many killauras", CheckType.KILLAURA, CancelType.COMBAT, 200, true, true, true));
+        registerCheck(checks, new KillauraC("Killaura (Type C)", "Checks for clients sprinting while attacking.", CheckType.KILLAURA, CancelType.COMBAT, 100, true, true, true));
+        registerCheck(checks, new KillauraD("Killaura (Type D)", "Detects over-randomization in killauras.", CheckType.KILLAURA, CancelType.COMBAT, 100, true, true, true));
+        //registerCheck(checks, new KillauraE("Killaura (Type E)", CheckType.KILLAURA, CancelType.COMBAT, 100, true, true, true));
+        //registerCheck(checks, new KillauraF("Killaura (Type F)", CheckType.KILLAURA, CancelType.COMBAT, 12));
+        registerCheck(checks, new KillauraG("Killaura (Type G)", "Raytraces to check if there are blocks obstructing the path of attack.", CheckType.KILLAURA, CancelType.COMBAT, 50, true, false, true));
+        registerCheck(checks, new KillauraH("Killaura (Type H)", "Detects if clients are swinging impossibly.", CheckType.KILLAURA, CancelType.COMBAT, 3, true, true, true));
+        registerCheck(checks, new FlyA("Fly (Type A)", "An acceleration check for flight.", CheckType.FLY, CancelType.MOTION, 225, true, true, true));
+        registerCheck(checks, new FlyB("Fly (Type B)", "Calculates what the actual vertical speed of a player should be.", CheckType.FLY, CancelType.MOTION, 225, true, false, true));
+        registerCheck(checks, new FlyC("Fly (Type C)", "A different style of acceleration check.", CheckType.FLY, CancelType.MOTION, 100, true, true, true));
+        registerCheck(checks, new FlyD("Fly (Type D)", "Makes sure the client is accelerating towards the ground properly.", CheckType.FLY, CancelType.MOTION, 200, true, true, true));
+        registerCheck(checks, new FlyE("Fly (Type E)", "Checks if a client moves vertically faster than what is possible.", CheckType.FLY, CancelType.MOTION, 150, true, true, true));
+        registerCheck(checks, new SpeedA("Speed (Type A)", "A basic maximum speed check with a verbose threshold.", CheckType.SPEED, CancelType.MOTION, 100, true, true, true));
+        registerCheck(checks, new SpeedB("Speed (Type B)", "A simple but effective speed check.", CheckType.SPEED, CancelType.MOTION, 125, true, true, true));
+        registerCheck(checks, new SpeedC("Speed (Type C)", "Checks the in-air horizontal deceleration of the client. More accurate.", CheckType.SPEED, CancelType.MOTION, 100, true, true, true));
+        registerCheck(checks, new SpeedD("Speed (Type D)", "Checks the in-air and on-ground deceleration of the client. Less accurate.", CheckType.SPEED, CancelType.MOTION, 120, true, false, true));
+        registerCheck(checks, new ReachA("Reach (Type A)", "A basic maximum reach calculation.", CheckType.REACH, CancelType.COMBAT, 60, true, true, true));
+        registerCheck(checks, new ReachB("Reach (Type B)", "A simple and light, but extremely effective maximum reach calculation. However, slightly experimental.", CheckType.REACH, CancelType.COMBAT, 60, true, false, true));
+        registerCheck(checks, new ReachC("Reach (Type C)", "Uses expanded bounding-boxes to set a maximum hit reach.", CheckType.REACH, CancelType.MOTION, 50, true, true, true));
+        registerCheck(checks, new ReachD("Reach (Type D)", "Uses a mixture of lighter but less accurate ray-tracing to determine the client's actual reach distance.", CheckType.REACH, CancelType.COMBAT, 50, true, true, true));
+        registerCheck(checks, new ReachE("Reach (Type E)", "A ray-tracing check but is less light, however it detects 3.1 reach very accurately.", CheckType.REACH, CancelType.COMBAT, 50, true, true, true));
+        //registerCheck(checks, new TimerB("Timer (Type B)", CancelType.MOTION, 200));
+        registerCheck(checks, new Fastbow("Fastbow", "Makes sure the rate of fire is legitimate.", CheckType.COMBAT, CancelType.INTERACT, 40, true, true, true));
+        registerCheck(checks, new HitBox("HitBox", "A very accurate hit-box check, using a mixture of ray-tracing and bounding-boxes.", CheckType.COMBAT, CancelType.COMBAT, 30, true, true, true));
+        registerCheck(checks, new BadPacketsA("BadPackets (Type A)", "Prevents the client from spoofing the ability to fly.", CheckType.BADPACKETS, CancelType.MOTION, 40, true, true, true));
+        registerCheck(checks, new BadPacketsC("BadPackets (Type C)", "Checks for impossible pitch rotation.", CheckType.BADPACKETS, CancelType.COMBAT, 50, true, true, true));
+        registerCheck(checks, new BadPacketsD("BadPackets (Type D)", "Compares the rate of interact packets to a certain frequency.", CheckType.BADPACKETS, CancelType.INTERACT, 50, true, true, true));
+        registerCheck(checks, new BadPacketsE("BadPackets (Type E)", "Checks the rate of healing.", CheckType.BADPACKETS, CancelType.HEALTH, 20, true, true, true));
+        registerCheck(checks, new BadPacketsF("BadPackets (Type F)", "Checks frequency of incoming packets. More reliable, but less detection.", CheckType.BADPACKETS, CancelType.MOTION, 100, true, true, true));
+        registerCheck(checks, new Timer("BadPackets (Type G)", "Checks frequency of incoming packets. More detection, but less reliable.", CheckType.BADPACKETS, CancelType.MOTION, 20, true, false, true));
+        registerCheck(checks, new VelocityA("Velocity (Type A)", "Detects any vertical velocity modification below 100%.", CheckType.VELOCITY, CancelType.MOTION,  40, true, true, true));
+        registerCheck(checks, new VelocityB("Velocity (Type B)", "Checks for horizontal velocity modifications.", CheckType.VELOCITY, CancelType.MOTION,  40, true, false, true));
 
         for (Check check : checks) {
             Arrays.stream(check.getClass().getDeclaredFields()).filter(field -> {
@@ -105,8 +108,10 @@ public class CheckManager {
         return checks;
     }
 
-    public void registerCheck(Check check) {
-        checks.add(check);
+    public void registerCheck(List<Check> checks, Check check) {
+        if((check.getMinimum() == null || ProtocolVersion.getGameVersion().isOrAbove(check.getMinimum())) && (check.getMaximum() == null || ProtocolVersion.getGameVersion().isBelow(check.getMaximum()))) {
+            checks.add(check);
+        }
     }
 
     public boolean isCheck(String name) {

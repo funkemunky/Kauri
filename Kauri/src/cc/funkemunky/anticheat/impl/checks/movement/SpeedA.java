@@ -21,8 +21,8 @@ public class SpeedA extends Check {
     private Verbose verbose = new Verbose();
     private long lastTimeStamp;
 
-    public SpeedA(String name, CheckType type, CancelType cancelType, int maxVL) {
-        super(name, type, cancelType, maxVL);
+    public SpeedA(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
+        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
 
     }
 
@@ -37,7 +37,7 @@ public class SpeedA extends Check {
         val from = move.getFrom();
 
         /* We we do just a basic calculation of the maximum allowed movement of a player */
-        float motionXZ = (float) Math.hypot(to.getX() - from.getX(), to.getZ() - from.getZ());
+        float motionXZ = (float) cc.funkemunky.anticheat.api.utils.MiscUtils.hypot(to.getX() - from.getX(), to.getZ() - from.getZ());
 
         /* We we do just a basic calculation of the maximum allowed movement of a player */
         double baseSpeed;
@@ -70,7 +70,6 @@ public class SpeedA extends Check {
         lastTimeStamp = timeStamp;
 
         debug(verbose.getVerbose() + ": " + motionXZ + ", " + baseSpeed + ", " + move.getDistanceToGround() + ", " + move.getAirTicks() + ", " + move.getGroundTicks() + ", " + getData().getPlayer().getWalkSpeed());
-        return;
     }
 
     @Override

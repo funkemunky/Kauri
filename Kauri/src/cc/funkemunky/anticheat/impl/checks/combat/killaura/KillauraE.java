@@ -24,8 +24,8 @@ public class KillauraE extends Check {
     private final AtomicInteger level = new AtomicInteger();
     private TickTimer lastAttack = new TickTimer(4);
 
-    public KillauraE(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, type, cancelType, maxVL, enabled, executable, cancellable);
+    public KillauraE(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
+        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
     }
 
     @Override
