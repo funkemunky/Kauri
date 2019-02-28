@@ -36,7 +36,7 @@ public class AimD extends Check {
         val yawRaw = mouseFilterXAxis.smooth(yawChange, lastYawChange);
         val pitchRaw = mouseFilterYAxis.smooth(pitchChange, lastPitchChange);
 
-        if (yawRaw < 0 || pitchRaw < 0) {
+        if (yawRaw < 0 && pitchRaw < 0) {
             if (++streak > 5) {
                 if (++vl > 3) {
                     this.flag("Y &R P < 0", false, false);

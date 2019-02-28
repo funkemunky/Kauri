@@ -60,12 +60,12 @@ public class ReachE extends Check {
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
        if(packetType.equals(Packet.Client.ARM_ANIMATION)) {
-            vl -= vl > 0 ? 0.01 : 0;
-        } else if(getData().getTarget() != null && getData().getLastAttack().hasNotPassed(2) && getData().getPlayer().getGameMode().equals(GameMode.SURVIVAL)) {
+            vl -= vl > 0 ? 0.005 : 0;
+        } else if(getData().getTarget() != null && getData().getLastAttack().hasNotPassed(0) && getData().getPlayer().getGameMode().equals(GameMode.SURVIVAL)) {
            val target = getData().getTarget();
            val entityData = Kauri.getInstance().getDataManager().getPlayerData(target.getUniqueId());
 
-           if(getData().getPing() > 400 || (entityData != null && getData().getPing() > 400)) {
+           if(getData().getPing() > 400 || (entityData != null && getData().getPing() > 400) || getData().isLagging()) {
                return;
            }
 
@@ -75,7 +75,7 @@ public class ReachE extends Check {
 
            RayTrace trace = new RayTrace(origin.toVector(), origin.getDirection());
 
-           List<Vector> vecs = trace.traverse(target.getEyeLocation().distance(origin), 0.1);
+           List<Vector> vecs = trace.traverse(target.getEyeLocation().distance(origin), 0.05);
 
            List<BoundingBox> entityBoxes = new CopyOnWriteArrayList<>();
 
@@ -107,7 +107,7 @@ public class ReachE extends Check {
 
            if (collided > 1) {
                if (calculatedReach > maxReach + 0.0001) {
-                   if (vl++ > 2) {
+                   if (vl++ > 1.4 + (getData().getMovementProcessor().getDeltaXZ() * 5)) {
                        if(vl > maxVL) {
                            flag(calculatedReach + ">-" + maxReach, false, true);
                        } else {
@@ -117,7 +117,7 @@ public class ReachE extends Check {
 
                    debug(Color.Green + "REACH: " + calculatedReach);
                } else {
-                   vl -= vl > 0 ? 0.2 : 0;
+                   vl -= vl > 0 ? 0.25 : 0;
                }
 
                debug("VL: " + vl + "/" + maxVL + " REACH: " + calculatedReach + " COLLIDED: " + collided + " MAX: " + maxReach + " RANGE: " + pingRange);

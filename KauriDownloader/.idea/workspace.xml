@@ -6,7 +6,24 @@
     </artifacts-to-build>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2d14aa2c-9c78-41d0-af1f-71b7478bae86" name="Default Changelist" comment="" />
+    <list default="true" id="2d14aa2c-9c78-41d0-af1f-71b7478bae86" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/../Kauri/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Kauri/out/artifacts/Kauri_jar/Kauri.jar" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/out/artifacts/Kauri_jar/Kauri.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/api/checks/Check.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/api/checks/Check.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/api/checks/CheckManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/api/checks/CheckManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/api/utils/CollisionAssessment.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/api/utils/CollisionAssessment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimC.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimD.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimD.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/combat/autoclicker/AutoclickerG.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/combat/autoclicker/AutoclickerG.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/combat/reach/ReachE.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/combat/reach/ReachE.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/artifacts/KauriDownloader_jar/KauriDownloader.jar" beforeDir="false" afterPath="$PROJECT_DIR$/out/artifacts/KauriDownloader_jar/KauriDownloader.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/KauriDownloader/plugin.yml" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/KauriDownloader/plugin.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/plugin.yml" beforeDir="false" afterPath="$PROJECT_DIR$/resources/plugin.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cc/funkemunky/kauri/KauriDownloader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/cc/funkemunky/kauri/KauriDownloader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cc/funkemunky/kauri/utils/DownloaderUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/cc/funkemunky/kauri/utils/DownloaderUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../KauriLite/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../KauriLite/.idea/workspace.xml" afterDir="false" />
+    </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -33,20 +50,11 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/kauri/KauriDownloader.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="127">
-              <caret line="29" column="30" selection-start-line="29" selection-start-column="30" selection-end-line="29" selection-end-column="168" />
+            <state relative-caret-position="1184">
+              <caret line="86" column="22" selection-start-line="86" selection-start-column="22" selection-end-line="86" selection-end-column="22" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/resources/plugin.yml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="51">
-              <caret line="3" column="18" selection-start-line="3" selection-start-column="18" selection-end-line="3" selection-end-column="18" />
             </state>
           </provider>
         </entry>
@@ -61,37 +69,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/kauri/utils/DownloaderUtils.java">
+        <entry file="file://$PROJECT_DIR$/resources/plugin.yml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="323">
-              <caret line="29" column="44" selection-start-line="29" selection-start-column="44" selection-end-line="29" selection-end-column="44" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/kauri/utils/MiscUtils.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2380">
-              <caret line="149" column="73" selection-start-line="149" selection-start-column="73" selection-end-line="149" selection-end-column="73" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/kauri/utils/ReflectionsUtil.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="102">
-              <caret line="13" column="10" selection-start-line="13" selection-start-column="10" selection-end-line="13" selection-end-column="10" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+            <state relative-caret-position="34">
+              <caret line="2" column="12" lean-forward="true" selection-start-line="2" selection-start-column="12" selection-end-line="2" selection-end-column="12" />
             </state>
           </provider>
         </entry>
@@ -111,6 +92,7 @@
       <find>Atlas</find>
       <find>fio</find>
       <find>fiona</find>
+      <find>loadPlugin</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -127,8 +109,8 @@
         <option value="$PROJECT_DIR$/src/cc/funkemunky/kauri/utils/MiscUtils.java" />
         <option value="$PROJECT_DIR$/src/cc/funkemunky/kauri/utils/ReflectionsUtil.java" />
         <option value="$PROJECT_DIR$/resources/config.yml" />
-        <option value="$PROJECT_DIR$/resources/plugin.yml" />
         <option value="$PROJECT_DIR$/src/cc/funkemunky/kauri/utils/DownloaderUtils.java" />
+        <option value="$PROJECT_DIR$/resources/plugin.yml" />
         <option value="$PROJECT_DIR$/src/cc/funkemunky/kauri/KauriDownloader.java" />
       </list>
     </option>
@@ -139,7 +121,7 @@
       <select />
     </treeState>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" extendedState="7">
     <option name="width" value="1920" />
     <option name="height" value="1080" />
   </component>
@@ -149,14 +131,19 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
       <pane id="Scope" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
             <path>
               <item name="KauriDownloader" type="b2602c69:ProjectViewProjectNode" />
               <item name="KauriDownloader" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="KauriDownloader" type="b2602c69:ProjectViewProjectNode" />
+              <item name="KauriDownloader" type="462c0819:PsiDirectoryNode" />
+              <item name="resources" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="KauriDownloader" type="b2602c69:ProjectViewProjectNode" />
@@ -183,13 +170,17 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
+    <property name="GenerateAntBuildDialog.backupFiles" value="true" />
+    <property name="GenerateAntBuildDialog.enableUiFormCompile" value="true" />
+    <property name="GenerateAntBuildDialog.forceTargetJdk" value="true" />
+    <property name="GenerateAntBuildDialog.outputFileNameProperty" value="kauridownloader" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1550845238313" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1551387608983" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
-    <property name="project.structure.last.edited" value="Libraries" />
+    <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="settings.editor.selected.configurable" value="reference.projectsettings.compiler.annotationProcessors" />
@@ -221,16 +212,18 @@
       <workItem from="1550875047473" duration="1074000" />
       <workItem from="1550961134477" duration="347000" />
       <workItem from="1551060170656" duration="787000" />
+      <workItem from="1551360539283" duration="5596000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="5979000" />
+    <option name="totallyTimeSpent" value="11575000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.26865673" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.27132195" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -238,7 +231,7 @@
       <window_info id="Capture Tool" order="5" />
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32936078" />
       <window_info anchor="bottom" id="Run" order="2" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
@@ -249,7 +242,7 @@
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Terminal" order="10" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
-      <window_info anchor="bottom" id="Messages" order="12" />
+      <window_info anchor="bottom" id="Messages" order="12" weight="0.32936078" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -265,33 +258,44 @@
     <option name="version" value="1" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/resources/plugin.yml">
+    <entry file="jar://$PROJECT_DIR$/../Kauri/depends/spigot-1.8.8-R0.1-SNAPSHOT-latest.jar!/org/bukkit/plugin/SimplePluginManager.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
-          <caret line="3" column="18" selection-start-line="3" selection-start-column="18" selection-end-line="3" selection-end-column="18" />
+        <state relative-caret-position="493">
+          <caret line="301" column="39" selection-start-line="301" selection-start-column="39" selection-end-line="301" selection-end-column="39" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/resources/config.yml">
+    <entry file="jar://$PROJECT_DIR$/../Kauri/depends/spigot-1.8.8-R0.1-SNAPSHOT-latest.jar!/org/bukkit/plugin/PluginLoader.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="19" selection-start-column="19" selection-end-column="19" />
+        <state relative-caret-position="102">
+          <caret line="14" column="24" selection-start-line="14" selection-start-column="24" selection-end-line="14" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/../Kauri/depends/spigot-1.8.8-R0.1-SNAPSHOT-latest.jar!/org/bukkit/plugin/java/JavaPluginLoader.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="459">
+          <caret line="109" column="46" selection-start-line="109" selection-start-column="46" selection-end-line="109" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/../Kauri/depends/spigot-1.8.8-R0.1-SNAPSHOT-latest.jar!/org/bukkit/plugin/java/PluginClassLoader.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-414">
+          <caret line="48" column="4" selection-start-line="48" selection-start-column="4" selection-end-line="48" selection-end-column="4" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/kauri/utils/DownloaderUtils.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="29" column="44" selection-start-line="29" selection-start-column="44" selection-end-line="29" selection-end-column="44" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state relative-caret-position="238">
+          <caret line="14" column="40" lean-forward="true" selection-start-line="14" selection-start-column="40" selection-end-line="14" selection-end-column="40" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/kauri/utils/MiscUtils.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2380">
+        <state relative-caret-position="-75">
           <caret line="149" column="73" selection-start-line="149" selection-start-column="73" selection-end-line="149" selection-end-column="73" />
           <folding>
             <element signature="imports" expanded="true" />
@@ -309,10 +313,24 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/resources/config.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="19" selection-start-column="19" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/plugin.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="2" column="12" lean-forward="true" selection-start-line="2" selection-start-column="12" selection-end-line="2" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/kauri/KauriDownloader.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="127">
-          <caret line="29" column="30" selection-start-line="29" selection-start-column="30" selection-end-line="29" selection-end-column="168" />
+        <state relative-caret-position="1184">
+          <caret line="86" column="22" selection-start-line="86" selection-start-column="22" selection-end-line="86" selection-end-column="22" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -362,7 +380,7 @@
       </state>
       <state key="JdkListConfigurable.UI">
         <settings>
-          <last-edited>1.8.0_172</last-edited>
+          <last-edited>1.8</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>

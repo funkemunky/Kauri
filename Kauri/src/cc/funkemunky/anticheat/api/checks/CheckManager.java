@@ -14,7 +14,6 @@ import cc.funkemunky.anticheat.impl.checks.combat.reach.*;
 import cc.funkemunky.anticheat.impl.checks.movement.*;
 import cc.funkemunky.anticheat.impl.checks.player.*;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
-import cc.funkemunky.api.utils.MiscUtils;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -56,7 +55,7 @@ public class CheckManager {
         registerCheck(checks, new FlyB("Fly (Type B)", "Calculates what the actual vertical speed of a player should be.", CheckType.FLY, CancelType.MOTION, 225, true, false, true));
         registerCheck(checks, new FlyC("Fly (Type C)", "A different style of acceleration check.", CheckType.FLY, CancelType.MOTION, 100, true, true, true));
         registerCheck(checks, new FlyD("Fly (Type D)", "Makes sure the client is accelerating towards the ground properly.", CheckType.FLY, CancelType.MOTION, 200, true, true, true));
-        registerCheck(checks, new FlyE("Fly (Type E)", "Checks if a client moves vertically faster than what is possible.", CheckType.FLY, CancelType.MOTION, 150, true, true, true));
+       // registerCheck(checks, new FlyE("Fly (Type E)", "Checks if a client moves vertically faster than what is possible.", CheckType.FLY, CancelType.MOTION, 150, true, true, true));
         registerCheck(checks, new SpeedA("Speed (Type A)", "A basic maximum speed check with a verbose threshold.", CheckType.SPEED, CancelType.MOTION, 100, true, true, true));
         registerCheck(checks, new SpeedB("Speed (Type B)", "A simple but effective speed check.", CheckType.SPEED, CancelType.MOTION, 125, true, true, true));
         registerCheck(checks, new SpeedC("Speed (Type C)", "Checks the in-air horizontal deceleration of the client. More accurate.", CheckType.SPEED, CancelType.MOTION, 100, true, true, true));
