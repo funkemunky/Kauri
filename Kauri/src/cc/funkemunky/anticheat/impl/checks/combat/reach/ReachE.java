@@ -45,7 +45,7 @@ public class ReachE extends Check {
     }
 
     @Setting(name = "pingRange")
-    private long pingRange = 150;
+    private long pingRange = 175;
 
     @Setting(name = "maxReach")
     private float maxReach = 3.0f;
@@ -53,7 +53,6 @@ public class ReachE extends Check {
     @Setting(name = "maxVL")
     private int maxVL = 5;
 
-    private boolean attacked;
     private double vl;
 
 
@@ -105,7 +104,7 @@ public class ReachE extends Check {
                collided++;
            }
 
-           if (collided > 1) {
+           if (collided > 8) {
                if (calculatedReach > maxReach + 0.0001) {
                    if (vl++ > 1.4 + (getData().getMovementProcessor().getDeltaXZ() * 5)) {
                        if(vl > maxVL) {
@@ -119,9 +118,10 @@ public class ReachE extends Check {
                } else {
                    vl -= vl > 0 ? 0.25 : 0;
                }
-
-               debug("VL: " + vl + "/" + maxVL + " REACH: " + calculatedReach + " COLLIDED: " + collided + " MAX: " + maxReach + " RANGE: " + pingRange);
+           } else {
+               vl-= vl > 0 ? 0.1f : 0;
            }
+           debug("VL: " + vl + "/" + maxVL + " REACH: " + calculatedReach + " COLLIDED: " + collided + " MAX: " + maxReach + " RANGE: " + pingRange);
         }
     }
 

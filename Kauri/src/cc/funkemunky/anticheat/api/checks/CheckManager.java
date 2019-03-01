@@ -35,7 +35,7 @@ public class CheckManager {
         List<Check> checks = new ArrayList<>();
         registerCheck(checks, new AimA("Aim (Type A)", "Checks for the consistency in aim overall", CheckType.AIM, CancelType.COMBAT, 80, true, false, true));
         registerCheck(checks, new AimB("Aim (Type B)", "Checks for common denominators in the pitch.", CheckType.AIM, CancelType.COMBAT, 50, true, true, true));
-        registerCheck(checks, new AimD("Aim (Type D)", "An overall calcluation of past aim inputs.", CheckType.AIM, CancelType.COMBAT, 50, true, true, true));
+        //registerCheck(checks, new AimD("Aim (Type D)", "An overall calcluation of past aim inputs.", CheckType.AIM, CancelType.COMBAT, 50, true, true, true));
         registerCheck(checks, new AutoclickerA("Autoclicker (Type A)", "A unique fast click check that detects jumps in CPS much faster.", CheckType.AUTOCLICKER, CancelType.COMBAT, 20, true, true, true));
         registerCheck(checks, new AutoclickerB("Autoclicker (Type B)", "Looks for suspicious consistencies in CPS averages.", CheckType.AUTOCLICKER, CancelType.COMBAT, 20, true, true, true));
         registerCheck(checks, new AutoclickerC("Autoclicker (Type C)", "An overall average CPS check.", CheckType.AUTOCLICKER, CancelType.COMBAT, 20, true, false, true));

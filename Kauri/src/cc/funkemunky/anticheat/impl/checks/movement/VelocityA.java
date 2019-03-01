@@ -40,7 +40,7 @@ public class VelocityA extends Check {
                 lastVelocity = (float) velocity.getY();
             }
         } else if(packetType.equals(Packet.Client.FLYING)) {
-            if(lastVelocity > 0 && getData().getVelocityProcessor().getLastVelocity().hasPassed(6)) {
+            if(lastVelocity > 0 && !getData().getMovementProcessor().isBlocksOnTop() && getData().getVelocityProcessor().getLastVelocity().hasPassed(6)) {
                 flag("velocity: 0% (Standing still)", true, true);
                 lastVelocity = 0;
             }
