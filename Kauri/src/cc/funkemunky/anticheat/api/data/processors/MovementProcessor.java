@@ -24,7 +24,7 @@ public class MovementProcessor {
     private boolean isLagging, clientOnGround, serverOnGround, fullyInAir, inAir, hasJumped, inLiquid, blocksOnTop, pistonsNear, onHalfBlock,
             onClimbable, onIce, collidesHorizontally, inWeb, onSlimeBefore, onSoulSand, isRiptiding, halfBlocksAround, isNearGround;
     private int airTicks, groundTicks, iceTicks, climbTicks, halfBlockTicks, soulSandTicks, blockAboveTicks, optifineTicks, liquidTicks, webTicks;
-    private float deltaY, yawDelta, pitchDelta, lastDeltaY, deltaXZ, distanceToGround, serverYVelocity, lastServerYVelocity, serverYAcceleration, clientYAcceleration, lastClientYAcceleration, lastServerYAcceleration, jumpVelocity, cinematicYawDelta, cinematicPitchDelta, lastCinematicPitchDelta, lastCinematicYawDelta;
+    private float deltaY, yawDelta, pitchDelta, lastYawDelta, lastPitchDelta, lastDeltaY, deltaXZ, distanceToGround, serverYVelocity, lastServerYVelocity, serverYAcceleration, clientYAcceleration, lastClientYAcceleration, lastServerYAcceleration, jumpVelocity, cinematicYawDelta, cinematicPitchDelta, lastCinematicPitchDelta, lastCinematicYawDelta;
     private CustomLocation from, to;
     private PastLocation pastLocation = new PastLocation();
     private TickTimer lastRiptide = new TickTimer(6), lastVehicle = new TickTimer(4);
@@ -177,10 +177,16 @@ public class MovementProcessor {
 
             //Algorithm stripped from the MC client which calculates the deceleration of rotation when using cinematic/optifine zoom.
             //Used to separate a legitimate aimbot-like rotation from a cheat.
+            lastYawDelta = yawDelta;
+            lastPitchDelta = pitchDelta;
             float yawDelta = this.yawDelta = MathUtils.getDelta(to.getYaw(), from.getYaw()), pitchDelta = this.pitchDelta = MathUtils.getDelta(to.getPitch(), from.getPitch());
-            float smooth = data.getYawSmooth().smooth(MathUtils.yawTo180F(from.getYaw()), yawDelta * 0.05f), smooth2 = data.getPitchSmooth().smooth(from.getPitch(), pitchDelta * 0.05f);
+            float smooth = data.getYawSmooth().smooth(yawDelta, lastYawDelta * 0.05f), smooth2 = data.getPitchSmooth().smooth(pitchDelta, lastPitchDelta * 0.05f);
 
-            data.setCinematicMode(MathUtils.getDelta(lastCinematicYawDelta , cinematicYawDelta = MathUtils.getDelta(smooth, MathUtils.yawTo180F(to.getYaw()))) < 0.1 || (pitchDelta > 0 && MathUtils.getDelta(lastCinematicPitchDelta, cinematicPitchDelta = MathUtils.getDelta(smooth2, to.getPitch())) < 0.1f));
+            val smoothDelta = MathUtils.getDelta(yawDelta, smooth);
+            val smoothDelta2 = MathUtils.getDelta(pitchDelta, smooth2);
+
+            Bukkit.broadcastMessage("yaw: " + smoothDelta + " pitch: " + smoothDelta2);
+            data.setCinematicMode((cinematicYawDelta = smoothDelta) < 0.008 || (pitchDelta > 0 && (cinematicPitchDelta = smoothDelta2) < 0.003));
 
             if (data.isCinematicMode()) {
                 optifineTicks+= optifineTicks < 60 ? 1 : 0;
