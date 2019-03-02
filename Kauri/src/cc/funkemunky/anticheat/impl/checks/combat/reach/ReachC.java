@@ -55,7 +55,7 @@ public class ReachC extends Check {
             locations.forEach(loc -> boxes.add(getHitbox(loc)));
 
             val count = boxes.stream().filter(box -> box.collides(playerBox)).count();
-            if(count == 0) {
+            if(count == 0 && !getData().isLagging()) {
                 if(vl++ > vlMax) {
                     flag("reach is greater than " + boxExpand, false, true);
                 }

@@ -91,7 +91,7 @@ public class HitBox extends Check {
                 int collided = (int) boxes.stream()
                         .filter(box -> trace.intersects(box, box.getMinimum().distance(eyeLoc.toVector()) + 1.0, 0.2)).count();
 
-                if (collided == 0) {
+                if (collided == 0 && !getData().isLagging()) {
                     if (vl++ > maxVL) {
                         flag(collided + "=0", true, false);
                     }

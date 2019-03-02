@@ -185,7 +185,6 @@ public class MovementProcessor {
             val smoothDelta = MathUtils.getDelta(yawDelta, smooth);
             val smoothDelta2 = MathUtils.getDelta(pitchDelta, smooth2);
 
-            Bukkit.broadcastMessage("yaw: " + smoothDelta + " pitch: " + smoothDelta2);
             data.setCinematicMode((cinematicYawDelta = smoothDelta) < 0.008 || (pitchDelta > 0 && (cinematicPitchDelta = smoothDelta2) < 0.003));
 
             if (data.isCinematicMode()) {

@@ -42,7 +42,7 @@ public class AutoclickerA extends Check {
         if(elapsed < 2) return;
         val cps = 1000D / elapsed;
 
-        if (cps > maxCPS) {
+        if (cps > maxCPS && !getData().isLagging()) {
             if (vl++ > verboseThreshold) {
                 flag(cps + ">-" + maxCPS, false, cps > banCPS);
             }

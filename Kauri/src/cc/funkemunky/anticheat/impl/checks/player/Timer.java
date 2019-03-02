@@ -54,7 +54,7 @@ public class Timer extends Check {
             val stdDev = this.statisticalAnalysis.getStdDev();
 
             if (!MathUtils.approxEquals(deltaBalance, max, stdDev) && stdDev < max) {
-                if(vl++ > 9) {
+                if(vl++ > 14) {
                     this.flag("S: " + stdDev, false, true);
                 }
             } else vl -= vl > 0 ? 2 : 0;

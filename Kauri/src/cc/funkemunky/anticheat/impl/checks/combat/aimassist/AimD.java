@@ -3,11 +3,14 @@ package cc.funkemunky.anticheat.impl.checks.combat.aimassist;
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
+import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
 import org.bukkit.event.Event;
 
+@Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LOOK, Packet.Client.LEGACY_LOOK, Packet.Client.LEGACY_POSITION_LOOK})
 public class AimD extends Check {
 
     public AimD(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
@@ -31,7 +34,7 @@ public class AimD extends Check {
         val yawDelta = move.getYawDelta();
         val pitchAcceleration = MathUtils.getDelta(move.getPitchDelta(), move.getLastPitchDelta());
 
-        if(pitchAcceleration == 0 && yawDelta > minYawDelta) {
+        if(pitchAcceleration == 0 && Math.abs(move.getTo().getPitch()) < 80 && yawDelta > minYawDelta) {
             if(vl++ > vlMax) {
                 flag("yaw: " + MathUtils.round(yawDelta, 3), true, true);
             }
