@@ -44,7 +44,7 @@ public class Timer extends Check {
 
             val data = this.getData();
 
-            if (data.isLagging() || data.getLastLogin().hasNotPassed(9) || data.getLastServerPos().hasNotPassed(9)) {
+            if (data.getLastLogin().hasNotPassed(9) || data.getLastServerPos().hasNotPassed(9)) {
                 return;
             }
 
@@ -53,11 +53,11 @@ public class Timer extends Check {
             val max = usingPaper ? 7.071f : Math.sqrt(Kauri.getInstance().getTickElapsed());
             val stdDev = this.statisticalAnalysis.getStdDev();
 
-            if (!MathUtils.approxEquals(deltaBalance, max, stdDev) && stdDev < max) {
+            if (!MathUtils.approxEquals(deltaBalance, max, stdDev) && !data.isLagging() && stdDev < max) {
                 if(vl++ > 14) {
                     this.flag("S: " + stdDev, false, true);
                 }
-            } else vl -= vl > 0 ? 2 : 0;
+            } else vl -= vl > 0 ? 4 : 0;
 
             this.lastFlying = now;
         }

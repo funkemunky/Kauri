@@ -38,8 +38,8 @@ public class AimF extends Check {
 
         val delta = MathUtils.getDelta(lastSmoothing, smoothing);
 
-        if(delta < 5 && verbose.flag(15, 250L)) {
-            debug(Color.Green + "Flagged: " + delta);
+        if(delta < 5 && verbose.flag(30, 250L)) {
+            flag(delta + ";" + verbose.getVerbose(), true, true);
         }
 
         debug("VERBOSE: " + verbose.getVerbose() + " SMOOTHING: " + smoothing + "  YAWDELTA: " + yawDelta + " ANGLE: " + angledYaw + " DELTA: " + delta);
