@@ -55,7 +55,6 @@ public class KillauraF extends Check {
             debug(average + ", " + offset + ", " + vl);
             this.average.add(offset, System.currentTimeMillis());
         }
-        return;
     }
 
     @Override

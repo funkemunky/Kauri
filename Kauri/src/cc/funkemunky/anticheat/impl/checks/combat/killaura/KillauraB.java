@@ -48,7 +48,6 @@ public class KillauraB extends Check {
             lastYawDelta = yawDifference;
             lastGCD = pitchGCD;
         }
-        return;
     }
 
     @Override

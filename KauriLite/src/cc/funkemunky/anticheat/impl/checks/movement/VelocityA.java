@@ -39,12 +39,7 @@ public class VelocityA extends Check {
             if(velocity.getId() == velocity.getPlayer().getEntityId()) {
                 lastVelocity = (float) velocity.getY();
             }
-        } else if(packetType.equals(Packet.Client.FLYING)) {
-            if(lastVelocity > 0 && getData().getVelocityProcessor().getLastVelocity().hasPassed(6)) {
-                flag("velocity: 0% (Standing still)", true, true);
-                lastVelocity = 0;
-            }
-        } else if(lastVelocity > 0 && getData().getMovementProcessor().getDeltaY() > 0) {
+        } if(lastVelocity > 0 && getData().getMovementProcessor().getDeltaY() > 0) {
             val ratio = Math.abs(getData().getMovementProcessor().getDeltaY() / lastVelocity);
             val percentage = MathUtils.round(ratio * 100D, 1);
 
@@ -60,7 +55,6 @@ public class VelocityA extends Check {
 
             lastVelocity = 0;
         }
-        return;
     }
 
     @Override

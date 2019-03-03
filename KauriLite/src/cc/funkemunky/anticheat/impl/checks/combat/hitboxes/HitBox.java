@@ -91,7 +91,7 @@ public class HitBox extends Check {
                 int collided = (int) boxes.stream()
                         .filter(box -> trace.intersects(box, box.getMinimum().distance(eyeLoc.toVector()) + 1.0, 0.2)).count();
 
-                if (collided == 0) {
+                if (collided == 0 && !getData().isLagging()) {
                     if (vl++ > maxVL) {
                         flag(collided + "=0", true, false);
                     }
@@ -102,7 +102,6 @@ public class HitBox extends Check {
                 debug("VL: " + vl + " COLLIDED: " + collided + " LOCSIZE: " + locs.size() + " PING: " + getData().getTransPing() + " BOXSIZE: " + boxes.size() + " DELTA: " + Math.abs(getData().getTransPing() - getData().getLastTransPing()) + pingLeniency);
             }
         }
-        return;
     }
 
     @Override

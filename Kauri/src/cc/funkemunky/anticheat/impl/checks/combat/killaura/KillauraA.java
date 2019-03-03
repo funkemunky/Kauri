@@ -52,7 +52,6 @@ public class KillauraA extends Check {
             }
             lastFlying = System.currentTimeMillis();
         }
-        return;
     }
 
     @Override

@@ -24,13 +24,13 @@ public class ReachC extends Check {
         super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
     }
 
-    @Setting
+    @Setting(name = "boxExpand")
     private float boxExpand = 3.0f;
 
-    @Setting
+    @Setting(name = "range")
     private long range = 200;
 
-    @Setting
+    @Setting(name = "vlMax")
     private double vlMax = 5;
 
     private double vl;
@@ -66,7 +66,6 @@ public class ReachC extends Check {
 
             debug("COUNT: " + count + " VL: " + vl + "/" + vlMax);
         }
-        return;
     }
 
     @Override

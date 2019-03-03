@@ -3,6 +3,7 @@ package cc.funkemunky.anticheat.api.utils;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.utils.BoundingBox;
+import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.ReflectionsUtil;
 import com.google.common.util.concurrent.AtomicDouble;
 import lombok.val;
@@ -47,6 +48,10 @@ public class MiscUtils {
     }
 
     public static long gcd(long current, long previous) {
+        return (previous <= 16384L) ? current : gcd(previous, current % previous);
+    }
+
+    public static float gcd(float current, float previous) {
         return (previous <= 16384L) ? current : gcd(previous, current % previous);
     }
 

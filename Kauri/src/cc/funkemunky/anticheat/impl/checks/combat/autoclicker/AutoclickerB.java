@@ -89,7 +89,6 @@ public class AutoclickerB extends Check {
                 break;
             }
         }
-        return;
     }
 
     @Override

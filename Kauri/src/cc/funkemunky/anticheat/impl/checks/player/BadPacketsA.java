@@ -65,7 +65,6 @@ public class BadPacketsA extends Check {
                 flag("fake news abilities packet", true, true);
             }
         }
-        return;
     }
 
     @Override

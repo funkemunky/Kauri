@@ -60,7 +60,6 @@ public class AimA extends Check {
             }
         }
 
-        return;
     }
 
     @Override

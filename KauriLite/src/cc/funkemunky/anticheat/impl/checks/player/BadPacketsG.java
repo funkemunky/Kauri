@@ -21,9 +21,9 @@ import org.bukkit.event.Event;
         Packet.Client.LEGACY_POSITION,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
-public class Timer extends Check {
+public class BadPacketsG extends Check {
 
-    public Timer(String name, CheckType type, CancelType cancelType, int maxVL) {
+    public BadPacketsG(String name, CheckType type, CancelType cancelType, int maxVL) {
         super(name, type, cancelType, maxVL);
     }
 
@@ -54,14 +54,13 @@ public class Timer extends Check {
             val stdDev = this.statisticalAnalysis.getStdDev();
 
             if (!MathUtils.approxEquals(deltaBalance, max, stdDev) && stdDev < max) {
-                if(vl++ > 9) {
+                if(vl++ > 14) {
                     this.flag("S: " + stdDev, false, true);
                 }
             } else vl -= vl > 0 ? 2 : 0;
 
             this.lastFlying = now;
         }
-        return;
     }
 
     @Override

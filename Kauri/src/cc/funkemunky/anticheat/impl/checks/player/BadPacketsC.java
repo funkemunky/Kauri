@@ -24,7 +24,6 @@ public class BadPacketsC extends Check {
         if(pitch > 90) {
             flag(pitch + ">-90", true, true);
         }
-        return;
     }
 
     @Override

@@ -15,11 +15,11 @@ import org.bukkit.event.Event;
 
 @Packets(packets = {Packet.Client.USE_ENTITY})
 public class ReachB extends Check {
-    @Setting
+    @Setting(name = "threshold.vl.max")
     static double maxVL = 8.0;
-    @Setting
+    @Setting(name = "threshold.vl.deduct")
     static double deductVL = 0.5;
-    @Setting
+    @Setting(name = "threshold.reach")
     static double maxReach = 3.4;
 
     private DynamicRollingAverage reachAvg = new DynamicRollingAverage(5);
@@ -112,7 +112,6 @@ public class ReachB extends Check {
                 reachAvg.clearValues();
             }
         }
-        return;
     }
 
     @Override

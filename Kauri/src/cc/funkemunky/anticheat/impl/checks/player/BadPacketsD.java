@@ -39,7 +39,6 @@ public class BadPacketsD extends Check {
         } else {
             lastFlying = timeStamp;
         }
-        return;
     }
 
     @Override

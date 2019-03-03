@@ -50,7 +50,6 @@ public class KillauraC extends Check {
                 }
             }
         }
-        return;
     }
 
     @Override

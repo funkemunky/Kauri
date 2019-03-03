@@ -24,13 +24,14 @@ public class ReachC extends Check {
         super(name, type, cancelType, maxVL);
     }
 
-    @Setting
+
+    @Setting(name = "boxExpand")
     private float boxExpand = 3.0f;
 
-    @Setting
+    @Setting(name = "range")
     private long range = 200;
 
-    @Setting
+    @Setting(name = "vlMax")
     private double vlMax = 5;
 
     private double vl;
@@ -55,7 +56,7 @@ public class ReachC extends Check {
             locations.forEach(loc -> boxes.add(getHitbox(loc)));
 
             val count = boxes.stream().filter(box -> box.collides(playerBox)).count();
-            if(count == 0) {
+            if(count == 0 && !getData().isLagging()) {
                 if(vl++ > vlMax) {
                     flag("reach is greater than " + boxExpand, false, true);
                 }
@@ -66,7 +67,6 @@ public class ReachC extends Check {
 
             debug("COUNT: " + count + " VL: " + vl + "/" + vlMax);
         }
-        return;
     }
 
     @Override

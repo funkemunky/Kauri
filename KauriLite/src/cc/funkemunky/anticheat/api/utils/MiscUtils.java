@@ -4,6 +4,7 @@ import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.ReflectionsUtil;
+import com.google.common.util.concurrent.AtomicDouble;
 import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -93,6 +94,14 @@ public class MiscUtils {
         }
 
         return null;
+    }
+
+    public static double hypot(double... value) {
+        AtomicDouble total = new AtomicDouble(0);
+
+        Arrays.stream(value).forEach(val -> total.addAndGet(val * val));
+
+        return Math.sqrt(total.get());
     }
 
     public static String unloadPlugin(String pl) {

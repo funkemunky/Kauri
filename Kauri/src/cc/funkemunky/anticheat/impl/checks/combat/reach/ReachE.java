@@ -11,6 +11,8 @@ import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedPacketPlayOutWorldParticle;
+import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumParticle;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MathUtils;
@@ -97,10 +99,10 @@ public class ReachE extends Check {
 
            for(Vector vec : finalVecs) {
                double reach = origin.toVector().distance(vec);
-               calculatedReach = calculatedReach == 0 ? reach : Math.min(reach, calculatedReach);
-               // WrappedPacketPlayOutWorldParticle particle = new WrappedPacketPlayOutWorldParticle(WrappedEnumParticle.FIREWORKS_SPARK, true, (float) vec.getX(), (float) vec.getY(), (float) vec.getZ(), 0, 0, 0, 0, 1);
+               calculatedReach = calculatedReach == 0 ? reach + .2 : Math.min(reach + .2, calculatedReach);
+               WrappedPacketPlayOutWorldParticle particle = new WrappedPacketPlayOutWorldParticle(WrappedEnumParticle.FIREWORKS_SPARK, true, (float) vec.getX(), (float) vec.getY(), (float) vec.getZ(), 0, 0, 0, 0, 1);
 
-               //particle.sendPacket(getData().getPlayer());
+               particle.sendPacket(getData().getPlayer());
                collided++;
            }
 
@@ -133,6 +135,6 @@ public class ReachE extends Check {
     private BoundingBox getHitbox(LivingEntity entity, CustomLocation l) {
         val dimensions = MiscUtils.entityDimensions.getOrDefault(entity.getType(), new Vector(0.35f,1.85f,0.35f));
 
-        return new BoundingBox(l.toVector(), l.toVector()).grow(.15f, .15f, .15f).grow((float) dimensions.getX(), 0, (float) dimensions.getZ()).add(0,0,0,0, (float) dimensions.getY(),0);
+        return new BoundingBox(l.toVector(), l.toVector()).grow(.2f, .2f, .2f).grow((float) dimensions.getX(), 0, (float) dimensions.getZ()).add(0,0,0,0, (float) dimensions.getY(),0);
     }
 }

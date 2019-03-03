@@ -57,7 +57,7 @@ public class SpeedB extends Check {
 
         val streak = new AtomicInteger();
 
-        if (player.getAllowFlight() || player.getVehicle() != null || getData().getMovementProcessor().isRiptiding() || PlayerUtils.isGliding(player)) {
+        if (player.getAllowFlight() || getData().getVelocityProcessor().getLastVelocity().hasNotPassed(8) || player.getVehicle() != null || getData().getMovementProcessor().isRiptiding() || PlayerUtils.isGliding(player)) {
             return;
         }
 
@@ -103,7 +103,7 @@ public class SpeedB extends Check {
 
     private float account() {
         float total = 0;
-        
+
         val move = getData().getMovementProcessor();
 
         total += PlayerUtils.getPotionEffectLevel(getData().getPlayer(), PotionEffectType.SPEED) * (move.isServerOnGround() ? 0.057f : 0.044f);

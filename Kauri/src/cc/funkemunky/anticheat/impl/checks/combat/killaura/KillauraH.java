@@ -49,7 +49,6 @@ public class KillauraH extends Check {
         } else if (packet instanceof WrappedInArmAnimationPacket) {
             this.swing = true;
         }
-        return;
     }
 
     @Override

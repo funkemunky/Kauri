@@ -24,6 +24,7 @@ public class FlyB extends Check {
     private int vl;
     private Verbose verbose = new Verbose();
     private long lastTimeStamp;
+
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();

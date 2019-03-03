@@ -64,7 +64,6 @@ public class KillauraE extends Check {
             pitchDeque.clear();
             level.set(0);
         }
-        return;
     }
 
     @Override

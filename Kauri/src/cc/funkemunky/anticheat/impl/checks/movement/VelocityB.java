@@ -51,7 +51,6 @@ public class VelocityB extends Check {
         }
 
         //debug("KBXZ: " + kbxz + " COLLIDE:" + noneCollide + " DXZ: " + dxz + " DY: " + dy + " KBY: " + getData().getVelocityProcessor().getMotionY());
-        return;
     }
 
     @Override

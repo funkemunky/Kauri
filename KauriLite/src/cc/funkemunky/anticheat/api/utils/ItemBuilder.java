@@ -1,6 +1,5 @@
 package cc.funkemunky.anticheat.api.utils;
 
-import com.google.common.collect.Lists;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -100,7 +99,7 @@ public class ItemBuilder {
 
     public ItemBuilder lore(String... lore) {
         ItemMeta meta = is.getItemMeta();
-        List<String> lores = Lists.newArrayList();
+        List<String> lores = new ArrayList<>();
         for (final String s : lore) {
             lores.add(ChatColor.translateAlternateColorCodes('&', s));
         }

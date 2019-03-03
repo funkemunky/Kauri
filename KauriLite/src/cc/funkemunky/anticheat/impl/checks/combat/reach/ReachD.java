@@ -19,10 +19,8 @@ import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.math.RayTrace;
-import com.google.common.collect.Lists;
 import lombok.val;
 import org.bukkit.GameMode;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -112,7 +110,7 @@ public class ReachD extends Check {
 
                 double calculatedReach = 0;
                 int collided = 0;
-                
+
                 vecs.sort(Comparator.comparingDouble(vec -> vec.distance(origin.toVector())));
 
                 List<Vector> finalVecs = new ArrayList<>();
@@ -121,7 +119,7 @@ public class ReachD extends Check {
                 for(Vector vec : finalVecs) {
                     double reach = origin.toVector().distance(vec);
                     calculatedReach = calculatedReach == 0 ? reach : Math.min(reach, calculatedReach);
-                   // WrappedPacketPlayOutWorldParticle particle = new WrappedPacketPlayOutWorldParticle(WrappedEnumParticle.FIREWORKS_SPARK, true, (float) vec.getX(), (float) vec.getY(), (float) vec.getZ(), 0, 0, 0, 0, 1);
+                    // WrappedPacketPlayOutWorldParticle particle = new WrappedPacketPlayOutWorldParticle(WrappedEnumParticle.FIREWORKS_SPARK, true, (float) vec.getX(), (float) vec.getY(), (float) vec.getZ(), 0, 0, 0, 0, 1);
 
                     //particle.sendPacket(getData().getPlayer());
                     collided++;
@@ -144,7 +142,6 @@ public class ReachD extends Check {
                 attacked = false;
             }
         }
-        return;
     }
 
     @Override

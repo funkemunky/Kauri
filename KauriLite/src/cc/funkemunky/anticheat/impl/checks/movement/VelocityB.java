@@ -24,10 +24,10 @@ public class VelocityB extends Check {
         if(getData().getVelocityProcessor().getLastVelocity().hasPassed(2)) return;
 
         val dy = getData().getMovementProcessor().getTo().getY() - getData().getMovementProcessor().getFrom().getY();
-        val dxz = Math.hypot(getData().getMovementProcessor().getTo().getX() - getData().getMovementProcessor().getFrom().getX(),
+        val dxz = cc.funkemunky.anticheat.api.utils.MiscUtils.hypot(getData().getMovementProcessor().getTo().getX() - getData().getMovementProcessor().getFrom().getX(),
                 getData().getMovementProcessor().getTo().getZ() - getData().getMovementProcessor().getFrom().getZ());
 
-        val kbxz = Math.hypot(getData().getVelocityProcessor().getMotionX(), getData().getVelocityProcessor().getMotionZ());
+        val kbxz = cc.funkemunky.anticheat.api.utils.MiscUtils.hypot(getData().getVelocityProcessor().getMotionX(), getData().getVelocityProcessor().getMotionZ());
 
         val noneCollide = getData().getBoundingBox().grow(1.5f, 0, 1.5f).getCollidingBlockBoxes(player).size() == 0;
         //the only accurate way to check horizontal kb is to check it in the air, if the player is on ground it won't work

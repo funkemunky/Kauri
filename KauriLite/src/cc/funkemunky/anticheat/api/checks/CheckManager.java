@@ -31,9 +31,10 @@ public class CheckManager {
     public List<Check> loadChecks() {
         List<Check> checks = new ArrayList<>();
         checks.add(new AimA("Aim (Type A)", CheckType.AIM, CancelType.COMBAT, 80));
-        checks.add(new AutoclickerA("Autoclicker (Type A)", CheckType.AUTOCLICKER, CancelType.COMBAT, 20));
-        checks.add(new AutoclickerB("Autoclicker (Type B)", CheckType.AUTOCLICKER, CancelType.COMBAT, 20));
-        checks.add(new AutoclickerC("Autoclicker (Type C)", CheckType.AUTOCLICKER, CancelType.COMBAT, 20));
+        checks.add(new AutoclickerA("Autoclicker (Type A)", CheckType.AUTOCLICKER, CancelType.COMBAT, 50));
+        checks.add(new AutoclickerB("Autoclicker (Type B)", CheckType.AUTOCLICKER, CancelType.COMBAT, 30));
+        checks.add(new AutoclickerC("Autoclicker (Type C)", CheckType.AUTOCLICKER, CancelType.COMBAT, 40));
+        checks.add(new AutoclickerD("Autoclicker (Type D)", CheckType.AUTOCLICKER, CancelType.COMBAT, 50));
         checks.add(new KillauraA("Killaura (Type A)", CheckType.KILLAURA, CancelType.COMBAT, 150));
         checks.add(new KillauraB("Killaura (Type B)", CheckType.KILLAURA, CancelType.COMBAT, 200));
         checks.add(new KillauraC("Killaura (Type C)", CheckType.KILLAURA, CancelType.COMBAT, 100));
@@ -52,8 +53,6 @@ public class CheckManager {
         checks.add(new ReachB("Reach (Type B)", CheckType.REACH, CancelType.COMBAT, 60));
         checks.add(new ReachC("Reach (Type C)", CheckType.REACH, CancelType.MOTION, 50));
         checks.add(new ReachD("Reach (Type D)", CheckType.REACH, CancelType.COMBAT, 50));
-        checks.add(new ReachE("Reach (Type E)", CheckType.REACH, CancelType.COMBAT, 50));
-        //checks.add(new TimerB("Timer (Type B)", CancelType.MOTION, 200));
         checks.add(new Fastbow("Fastbow", CheckType.COMBAT, CancelType.INTERACT, 40));
         checks.add(new HitBox("HitBox", CheckType.COMBAT, CancelType.COMBAT, 30));
         checks.add(new BadPacketsA("BadPackets (Type A)", CheckType.BADPACKETS, CancelType.MOTION, 40));
@@ -61,7 +60,7 @@ public class CheckManager {
         checks.add(new BadPacketsD("BadPackets (Type D)", CheckType.BADPACKETS, CancelType.COMBAT, 50));
         checks.add(new BadPacketsE("BadPackets (Type E)", CheckType.BADPACKETS, CancelType.HEALTH, 20));
         checks.add(new BadPacketsF("BadPackets (Type F)", CheckType.BADPACKETS, CancelType.MOTION, 100));
-        checks.add(new Timer("Timer", CheckType.BADPACKETS, CancelType.NONE, 20));
+        checks.add(new BadPacketsG("BadPackets (Type G)", CheckType.BADPACKETS, CancelType.NONE, 20));
         checks.add(new VelocityA("Velocity (Type A)", CheckType.VELOCITY, CancelType.MOTION,  40));
         checks.add(new VelocityB("Velocity (Type B)", CheckType.VELOCITY, CancelType.MOTION,  40));
 

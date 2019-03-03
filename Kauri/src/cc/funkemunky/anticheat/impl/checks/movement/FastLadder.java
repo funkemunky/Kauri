@@ -28,7 +28,6 @@ public class FastLadder extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        return;
     }
 
     @Override

@@ -16,7 +16,7 @@ public class VelocityProcessor {
         if(packet.getId() != packet.getPlayer().getEntityId()) return;
 
         maxVertical = motionY = (float) packet.getY();
-        maxHorizontal = (float) Math.hypot(packet.getX(), packet.getZ());
+        maxHorizontal = (float) cc.funkemunky.anticheat.api.utils.MiscUtils.hypot(packet.getX(), packet.getZ());
 
         lastVelocity.reset();
 

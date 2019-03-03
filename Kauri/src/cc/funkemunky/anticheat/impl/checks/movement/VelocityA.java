@@ -55,7 +55,6 @@ public class VelocityA extends Check {
 
             lastVelocity = 0;
         }
-        return;
     }
 
     @Override

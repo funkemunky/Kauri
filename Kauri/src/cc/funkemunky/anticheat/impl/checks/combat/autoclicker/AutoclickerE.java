@@ -61,7 +61,6 @@ public class AutoclickerE extends Check {
             this.lastArm = now;
             this.lastRange = delay;
         }
-        return;
     }
 
     @Override

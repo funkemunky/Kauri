@@ -55,7 +55,6 @@ public class ReachA extends Check {
                 verbose.deduct(2);
             }
         }
-        return;
     }
 
     @Override

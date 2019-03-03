@@ -48,7 +48,6 @@ public class AimB extends Check {
         lastPitchDelta = pitchDifference;
         lastYawDelta = yawDifference;
         lastGCD = pitchGCD;
-        return;
     }
 
     @Override

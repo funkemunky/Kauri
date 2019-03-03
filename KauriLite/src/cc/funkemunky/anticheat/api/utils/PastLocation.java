@@ -1,22 +1,23 @@
 package cc.funkemunky.anticheat.api.utils;
 
-import com.google.common.collect.Lists;
 import lombok.Getter;
 import org.bukkit.Location;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Getter
 public class PastLocation {
-    private List<CustomLocation> previousLocations = Lists.newCopyOnWriteArrayList();
+    private List<CustomLocation> previousLocations = new CopyOnWriteArrayList<>();
 
     public CustomLocation getPreviousLocation(long time) {
         return previousLocations.stream().min(Comparator.comparingLong(loc -> Math.abs(loc.getTimeStamp() - (System.currentTimeMillis() - time)))).orElse(previousLocations.get(previousLocations.size() - 1));
     }
 
     public List<CustomLocation> getEstimatedLocation(long time, long delta) {
-        List<CustomLocation> locs = Lists.newArrayList();
+        List<CustomLocation> locs = new ArrayList<>();
 
         previousLocations.stream()
                 .sorted(Comparator.comparingLong(loc -> Math.abs(loc.getTimeStamp() - (System.currentTimeMillis() - time))))

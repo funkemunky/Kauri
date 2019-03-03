@@ -36,6 +36,7 @@ public class CheckManager {
         registerCheck(checks, new AimC("Aim (Type C)", "Makes sure the aim acceleration is legitimate", CheckType.AIM, CancelType.COMBAT, 20, true, true, true));
         registerCheck(checks, new AimD("Aim (Type D)", "Checks for impossible pitch acceleration", CheckType.AIM, CancelType.COMBAT, 50, true, true, true));
         registerCheck(checks, new AimE("Aim (Type E)", "Looks for suspicious yaw and pitch movements. Not recommended for banning.", CheckType.AIM, CancelType.COMBAT, 200, true, false, false));
+        registerCheck(checks, new AimF("Aim (Type F)", "Looks for any common variables.", CheckType.AIM, CancelType.COMBAT, 100, true, false, true));
         registerCheck(checks, new AutoclickerA("Autoclicker (Type A)", "A unique fast click check that detects jumps in CPS much faster.", CheckType.AUTOCLICKER, CancelType.COMBAT, 20, true, true, true));
         registerCheck(checks, new AutoclickerB("Autoclicker (Type B)", "Looks for suspicious consistencies in CPS averages.", CheckType.AUTOCLICKER, CancelType.COMBAT, 20, true, true, true));
         registerCheck(checks, new AutoclickerC("Autoclicker (Type C)", "An overall average CPS check.", CheckType.AUTOCLICKER, CancelType.COMBAT, 20, true, false, true));
@@ -62,8 +63,8 @@ public class CheckManager {
         registerCheck(checks, new SpeedD("Speed (Type D)", "Checks the in-air and on-ground deceleration of the client. Less accurate.", CheckType.SPEED, CancelType.MOTION, 120, true, false, true));
         registerCheck(checks, new ReachA("Reach (Type A)", "A basic maximum reach calculation.", CheckType.REACH, CancelType.COMBAT, 60, true, true, true));
         registerCheck(checks, new ReachB("Reach (Type B)", "A simple and light, but extremely effective maximum reach calculation. However, slightly experimental.", CheckType.REACH, CancelType.COMBAT, 60, true, false, true));
-        registerCheck(checks, new ReachC("Reach (Type C)", "Uses expanded bounding-boxes to set a maximum hit reach.", CheckType.REACH, CancelType.MOTION, 50, true, true, true));
-        registerCheck(checks, new ReachD("Reach (Type D)", "Uses a mixture of lighter but less accurate ray-tracing to determine the client's actual reach distance.", CheckType.REACH, CancelType.COMBAT, 50, true, true, true));
+        registerCheck(checks, new ReachC("Reach (Type C)", "Uses expanded bounding-boxes to set a maximum hit reach.", CheckType.REACH, CancelType.MOTION, 50, false, true, true));
+        registerCheck(checks, new ReachD("Reach (Type D)", "Uses a mixture of lighter but less accurate ray-tracing to determine the client's actual reach distance.", CheckType.REACH, CancelType.COMBAT, 50, false, true, true));
         registerCheck(checks, new ReachE("Reach (Type E)", "A ray-tracing check but is less light, however it detects 3.1 reach very accurately.", CheckType.REACH, CancelType.COMBAT, 50, true, true, true));
         //registerCheck(checks, new TimerB("Timer (Type B)", CancelType.MOTION, 200));
         registerCheck(checks, new Fastbow("Fastbow", "Makes sure the rate of fire is legitimate.", CheckType.COMBAT, CancelType.INTERACT, 40, true, true, true));

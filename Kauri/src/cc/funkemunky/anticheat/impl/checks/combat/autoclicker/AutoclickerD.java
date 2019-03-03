@@ -56,7 +56,6 @@ public class AutoclickerD extends Check {
         } else {
             ++cps;
         }
-        return;
     }
 
     @Override

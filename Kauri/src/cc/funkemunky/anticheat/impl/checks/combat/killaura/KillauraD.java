@@ -61,7 +61,6 @@ public class KillauraD extends Check {
         this.lastPitch = pitch;
 
         debug(vl + ": " + yawChange);
-        return;
     }
 
     @Override

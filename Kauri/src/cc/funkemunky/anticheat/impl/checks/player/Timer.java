@@ -61,7 +61,6 @@ public class Timer extends Check {
 
             this.lastFlying = now;
         }
-        return;
     }
 
     @Override

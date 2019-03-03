@@ -30,7 +30,7 @@ public class VelocityC extends Check {
 
         if(!colliding) {
             val deltaXZ = move.getDeltaXZ();
-            val velocityXZ = Math.hypot(velocity.getMotionX(), velocity.getMotionZ());
+            val velocityXZ = cc.funkemunky.anticheat.api.utils.MiscUtils.hypot(velocity.getMotionX(), velocity.getMotionZ());
 
             if(velocityXZ < 1E-4) return;
             val ratio = Math.abs(deltaXZ - velocityXZ);

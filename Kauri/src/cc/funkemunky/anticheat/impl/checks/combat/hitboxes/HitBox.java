@@ -102,7 +102,6 @@ public class HitBox extends Check {
                 debug("VL: " + vl + " COLLIDED: " + collided + " LOCSIZE: " + locs.size() + " PING: " + getData().getTransPing() + " BOXSIZE: " + boxes.size() + " DELTA: " + Math.abs(getData().getTransPing() - getData().getLastTransPing()) + pingLeniency);
             }
         }
-        return;
     }
 
     @Override

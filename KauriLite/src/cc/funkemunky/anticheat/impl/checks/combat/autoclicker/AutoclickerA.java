@@ -13,14 +13,17 @@ import org.bukkit.event.Event;
 @Packets(packets = {Packet.Client.ARM_ANIMATION})
 public class AutoclickerA extends Check {
 
-    @Setting
+    @Setting(name = "maxCPS")
     private int maxCPS = 20;
 
-    @Setting
+    @Setting(name = "banCPS")
     private int banCPS = 30;
 
-    @Setting
+    @Setting(name = "verboseThreshold")
     private int verboseThreshold = 6;
+
+    @Setting(name = "verboseDeduct")
+    private double deduct = 0.25;
 
     private long lastTimeStamp;
     private int vl;
@@ -31,20 +34,24 @@ public class AutoclickerA extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if (MiscUtils.shouldReturnArmAnimation(getData())) return;;
+        if (MiscUtils.shouldReturnArmAnimation(getData())) return;
 
-        val cps = (double) lastTimeStamp / timeStamp;
+        val elapsed = timeStamp - lastTimeStamp;
 
-        if (cps > maxCPS) {
+        if(elapsed < 2) return;
+        val cps = 1000D / elapsed;
+
+        if (cps > maxCPS && !getData().isLagging()) {
             if (vl++ > verboseThreshold) {
                 flag(cps + ">-" + maxCPS, false, cps > banCPS);
             }
         } else {
-            vl -= vl > 0 ? 1 : 0;
+            vl -= vl > 0 ? deduct : 0;
         }
 
+        debug("VL: " + vl + " CPS: " + cps);
+
         lastTimeStamp = timeStamp;
-        return;
     }
 
     @Override

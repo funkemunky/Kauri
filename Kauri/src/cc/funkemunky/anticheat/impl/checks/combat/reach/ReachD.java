@@ -62,10 +62,10 @@ public class ReachD extends Check {
     @Setting(name = "pingRange")
     private long pingRange = 150;
 
-    @Setting(name = "maxReach")
+    @Setting(name = "threshold.reach")
     private float maxReach = 3.0f;
 
-    @Setting
+    @Setting(name = "threshold.vl.max")
     private int maxVL = 5;
 
     private boolean attacked;
@@ -144,7 +144,6 @@ public class ReachD extends Check {
                 attacked = false;
             }
         }
-        return;
     }
 
     @Override
