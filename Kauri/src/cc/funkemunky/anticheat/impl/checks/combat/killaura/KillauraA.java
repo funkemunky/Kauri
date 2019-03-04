@@ -31,7 +31,6 @@ public class KillauraA extends Check {
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         if (packetType.equals(Packet.Client.USE_ENTITY)) {
-            WrappedInUseEntityPacket use = new WrappedInUseEntityPacket(packet, getData().getPlayer());
             /*Checks the time difference between a flying packet and a use packet. If legit, it should normally be around 50ms.
             KillauraA modules tend to be made using a motion event, and client developers usually forget to make sure that the motion
             and the attack packets are being sent in separate ticks */
