@@ -11,7 +11,6 @@ import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.math.RayTrace;
 import lombok.val;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -58,7 +57,7 @@ public class HitBox extends Check {
                 target = (LivingEntity) use.getEntity();
                 lastAttack.reset();
             }
-        } else if(target != null && type.contains(target.getType())) {
+        } else if(target != null && target.getWorld().getUID().equals(getData().getPlayer().getWorld().getUID()) && type.contains(target.getType())) {
             PastLocation location;
             if(target instanceof Player) {
                 val entityData = Kauri.getInstance().getDataManager().getPlayerData(target.getUniqueId());
@@ -93,7 +92,7 @@ public class HitBox extends Check {
 
                 if (collided == 0 && !getData().isLagging()) {
                     if (vl++ > maxVL) {
-                        flag(collided + "=0", true, false);
+                        flag(collided + "=0", true, true);
                     }
                 } else {
                     vl -= vl > 0 ? 2 : 0;

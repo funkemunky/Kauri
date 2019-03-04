@@ -25,8 +25,8 @@ public class ReachB extends Check {
     private DynamicRollingAverage reachAvg = new DynamicRollingAverage(5);
     private double vl;
 
-    public ReachB(String name, CheckType type, CancelType cancelType, int maxVL) {
-        super(name, type, cancelType, maxVL);
+    public ReachB(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
+        super(name, type, cancelType, maxVL, enabled, executable, cancellable);
     }
 
     @Override

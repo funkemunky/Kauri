@@ -31,36 +31,6 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
     private String alertMessage = "";
     private int vl;
 
-    public Check(String name, CheckType type, CancelType cancelType, int maxVL) {
-        this.type = type;
-        this.name = name;
-        this.cancelType = cancelType;
-        this.maxVL = maxVL;
-
-        enabled = executable = true;
-
-        developer = false;
-
-        alertMessage = CheckSettings.alertMessage.replaceAll("%check%", name);
-
-        loadFromConfig();
-    }
-
-    public Check(String name, CheckType type, CancelType cancelType, PlayerData data, int maxVL) {
-        this.name = name;
-        this.type = type;
-        this.cancelType = cancelType;
-        this.data = data;
-        this.maxVL = maxVL;
-
-        enabled = executable = cancellable = true;
-
-        developer = false;
-
-        alertMessage = CheckSettings.alertMessage.replaceAll("%check%", name);
-        loadFromConfig();
-    }
-
     public Check(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
         this.name = name;
         this.type = type;

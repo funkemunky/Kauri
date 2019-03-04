@@ -44,12 +44,12 @@ public class SpeedA extends Check {
 
 
         if (move.getAirTicks() > 0) {
-            baseSpeed = 0.369 * Math.pow(0.988, Math.min(16, move.getAirTicks()));
+            baseSpeed = 0.374 * Math.pow(0.988, Math.min(16, move.getAirTicks()));
         } else {
             baseSpeed = 0.341 - (0.0052 * Math.min(9, move.getGroundTicks()));
         }
 
-        baseSpeed += PlayerUtils.getPotionEffectLevel(getData().getPlayer(), PotionEffectType.SPEED) * (move.isServerOnGround() ? 0.058f : 0.044f);
+        baseSpeed += PlayerUtils.getPotionEffectLevel(getData().getPlayer(), PotionEffectType.SPEED) * (move.isServerOnGround() ? 0.058f : 0.052f);
         baseSpeed *= move.getHalfBlockTicks() > 0 ? 2.5 : 1;
         baseSpeed *= move.getBlockAboveTicks() > 0 ? 3.4 : 1;
         baseSpeed *= move.getIceTicks() > 0 && (move.getDeltaY() > 0.001 || move.getGroundTicks() < 6) ? 2.5f : 1.0;

@@ -23,8 +23,8 @@ import org.bukkit.event.Event;
         Packet.Client.LEGACY_LOOK})
 public class BadPacketsG extends Check {
 
-    public BadPacketsG(String name, CheckType type, CancelType cancelType, int maxVL) {
-        super(name, type, cancelType, maxVL);
+    public BadPacketsG(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
+        super(name, type, cancelType, maxVL, enabled, executable, cancellable);
     }
 
     @Setting(name = "usingPaperSpigot")
@@ -44,7 +44,7 @@ public class BadPacketsG extends Check {
 
             val data = this.getData();
 
-            if (data.isLagging() || data.getLastLogin().hasNotPassed(9) || data.getLastServerPos().hasNotPassed(9)) {
+            if (data.getLastLogin().hasNotPassed(9) || data.getLastServerPos().hasNotPassed(9)) {
                 return;
             }
 
@@ -53,7 +53,7 @@ public class BadPacketsG extends Check {
             val max = usingPaper ? 7.071f : Math.sqrt(Kauri.getInstance().getTickElapsed());
             val stdDev = this.statisticalAnalysis.getStdDev();
 
-            if (!MathUtils.approxEquals(deltaBalance, max, stdDev) && stdDev < max) {
+            if (!MathUtils.approxEquals(deltaBalance, max, stdDev) && stdDev < max && !data.isLagging()) {
                 if(vl++ > 14) {
                     this.flag("S: " + stdDev, false, true);
                 }

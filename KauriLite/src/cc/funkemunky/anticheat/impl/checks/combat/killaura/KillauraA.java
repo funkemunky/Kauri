@@ -24,8 +24,8 @@ public class KillauraA extends Check {
     private int verbose;
     private boolean dontFlag;
 
-    public KillauraA(String name, CheckType type, CancelType cancelType, int maxVL) {
-        super(name, type, cancelType, maxVL);
+    public KillauraA(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
+        super(name, type, cancelType, maxVL, enabled, executable, cancellable);
     }
 
     @Override
@@ -38,7 +38,7 @@ public class KillauraA extends Check {
             long elapsed = MathUtils.elapsed(lastFlying);
             if (elapsed < 20 && !dontFlag) {
                 if (verbose++ > 12) {
-                    flag("t: post; " + elapsed + "<-10", true, false);
+                    flag("t: post; " + elapsed + "<-10", true, true);
                 }
             } else {
                 verbose = 0;

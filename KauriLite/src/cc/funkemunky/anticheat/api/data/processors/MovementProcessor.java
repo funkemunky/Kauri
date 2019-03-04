@@ -2,17 +2,14 @@ package cc.funkemunky.anticheat.api.data.processors;
 
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
-import cc.funkemunky.anticheat.api.utils.*;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
+import cc.funkemunky.anticheat.api.utils.*;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.*;
 import lombok.Getter;
 import lombok.val;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.potion.PotionEffectType;
 
@@ -61,28 +58,6 @@ public class MovementProcessor {
             //Now we scrub through the colliding boxes for any important information that could be fed into detections.
             box.forEach(bb -> assessment.assessBox(bb, player.getWorld(), false));
 
-
-            int startX = Location.locToBlock(getTo().getX() - 0.31);
-            int endX = Location.locToBlock(getTo().getX()  + 0.31);
-            int startY = Location.locToBlock(getTo().getY()  -0.51);
-            int endY = Location.locToBlock(getTo().getY()  + 2.01);
-            int startZ = Location.locToBlock(getTo().getZ()  - 0.31);
-            int endZ = Location.locToBlock(getTo().getZ()  + 0.31);
-
-
-            List<Block> blocks = new ArrayList<>();
-            for (int bx = startX; bx <= endX; bx++) {
-                for (int by = startY; by <= endY; by++) {
-                    for (int bz = startZ; bz <= endZ; bz++) {
-                        Block block = BlockUtils.getBlock(new Location(player.getWorld(), bx, by, bz));
-                        if (block != null) {
-                            if (block.getType() != Material.AIR) {
-                                blocks.add(block);
-                            }
-                        }
-                    }
-                }
-            }
 
             serverOnGround = assessment.isOnGround();
             blocksOnTop = assessment.isBlocksOnTop();
@@ -180,13 +155,14 @@ public class MovementProcessor {
             lastYawDelta = yawDelta;
             lastPitchDelta = pitchDelta;
             float yawDelta = this.yawDelta = MathUtils.getDelta(to.getYaw(), from.getYaw()), pitchDelta = this.pitchDelta = MathUtils.getDelta(to.getPitch(), from.getPitch());
-            float smooth = data.getYawSmooth().smooth(yawDelta, lastYawDelta * 0.05f), smooth2 = data.getPitchSmooth().smooth(pitchDelta, lastPitchDelta * 0.05f);
+            float smooth = data.getYawSmooth().smooth(yawDelta, MiscUtils.convertToMouseDelta(yawDelta)), smooth2 = data.getPitchSmooth().smooth(pitchDelta, MiscUtils.convertToMouseDelta(pitchDelta));
 
             val smoothDelta = MathUtils.getDelta(yawDelta, smooth);
             val smoothDelta2 = MathUtils.getDelta(pitchDelta, smooth2);
 
-            data.setCinematicMode((cinematicYawDelta = smoothDelta) < 0.008 || (pitchDelta > 0 && (cinematicPitchDelta = smoothDelta2) < 0.003));
+            data.setCinematicMode((smoothDelta / yawDelta) < 0.08 || (smoothDelta2 / pitchDelta) < 0.04);
 
+            //Bukkit.broadcastMessage(smoothDelta + "," + smoothDelta2 + ": " + "(" + smoothDelta / yawDelta + "), " + "(" + (smoothDelta2 / pitchDelta) + "): " + data.isCinematicMode());
             if (data.isCinematicMode()) {
                 optifineTicks+= optifineTicks < 60 ? 1 : 0;
             } else if(optifineTicks > 0) {

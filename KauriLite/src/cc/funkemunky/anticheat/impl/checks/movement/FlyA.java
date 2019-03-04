@@ -18,8 +18,8 @@ public class FlyA extends Check {
     private Verbose verboseLow = new Verbose();
     private long lastTimeStamp;
 
-    public FlyA(String name, CheckType type, CancelType cancelType, int maxVL) {
-        super(name, type, cancelType, maxVL);
+    public FlyA(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
+        super(name, type, cancelType, maxVL, enabled, executable, cancellable);
 
     }
 

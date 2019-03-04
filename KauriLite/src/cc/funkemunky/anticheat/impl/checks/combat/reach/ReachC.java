@@ -20,8 +20,8 @@ import java.util.List;
 
 @Packets(packets = {Packet.Client.USE_ENTITY})
 public class ReachC extends Check {
-    public ReachC(String name, CheckType type, CancelType cancelType, int maxVL) {
-        super(name, type, cancelType, maxVL);
+    public ReachC(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
+        super(name, type, cancelType, maxVL, enabled, executable, cancellable);
     }
 
 
