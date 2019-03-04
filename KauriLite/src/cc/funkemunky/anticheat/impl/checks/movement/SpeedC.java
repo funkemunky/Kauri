@@ -13,8 +13,8 @@ import org.bukkit.event.Event;
 
 @Packets(packets = {Packet.Client.LEGACY_POSITION, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.POSITION, Packet.Client.POSITION_LOOK})
 public class SpeedC extends Check {
-    public SpeedC(String name, CheckType type, CancelType cancelType, int maxVL) {
-        super(name, type, cancelType, maxVL);
+    public SpeedC(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
+        super(name, type, cancelType, maxVL, enabled, executable, cancellable);
     }
 
     private float lastMotion;

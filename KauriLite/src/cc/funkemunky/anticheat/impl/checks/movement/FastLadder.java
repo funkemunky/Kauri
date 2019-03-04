@@ -14,8 +14,8 @@ import org.bukkit.potion.PotionEffectType;
 
 @BukkitEvents(events = {PlayerMoveEvent.class})
 public class FastLadder extends Check {
-    public FastLadder(String name, CheckType type, CancelType cancelType, int maxVL) {
-        super(name, type, cancelType, maxVL);
+    public FastLadder(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
+        super(name, type, cancelType, maxVL, enabled, executable, cancellable);
     }
 
     @Setting(name = "threshold.verboseMaxSpeed")

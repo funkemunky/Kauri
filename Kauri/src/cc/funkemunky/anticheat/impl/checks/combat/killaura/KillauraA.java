@@ -37,7 +37,7 @@ public class KillauraA extends Check {
             long elapsed = MathUtils.elapsed(lastFlying);
             if (elapsed < 20 && !dontFlag) {
                 if (verbose++ > 12) {
-                    flag("t: post; " + elapsed + "<-10", true, false);
+                    flag("t: post; " + elapsed + "<-10", true, true);
                 }
             } else {
                 verbose = 0;

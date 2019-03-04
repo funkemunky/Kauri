@@ -8,7 +8,6 @@ import cc.funkemunky.api.database.DatabaseType;
 import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.Priority;
-import org.bukkit.Bukkit;
 
 import java.util.HashMap;
 import java.util.Map;

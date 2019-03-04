@@ -24,8 +24,8 @@ public class AutoclickerC extends Check {
 
     private final DynamicRollingAverage cpsAverage = new DynamicRollingAverage(5);
     private int cps, ticks, vl;
-    public AutoclickerC(String name, CheckType type, CancelType cancelType, int maxVL) {
-        super(name, type, cancelType, maxVL);
+    public AutoclickerC(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
+        super(name, type, cancelType, maxVL, enabled, executable, cancellable);
     }
 
     /*

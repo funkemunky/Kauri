@@ -4,7 +4,6 @@ import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
-import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.utils.BlockUtils;

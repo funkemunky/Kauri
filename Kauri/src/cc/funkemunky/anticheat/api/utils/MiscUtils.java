@@ -3,17 +3,12 @@ package cc.funkemunky.anticheat.api.utils;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.utils.BoundingBox;
-import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.ReflectionsUtil;
-import com.google.common.util.concurrent.AtomicDouble;
 import lombok.val;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.*;
-import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -40,13 +35,14 @@ public class MiscUtils {
     }
 
     public static double hypot(double... value) {
-        AtomicDouble total = new AtomicDouble(0);
+        double total = 0;
 
-        Arrays.stream(value).forEach(val -> total.addAndGet(val * val));
+        for(double val : value) {
+            total+= (val * val);
+        }
 
-        return Math.sqrt(total.get());
+        return Math.sqrt(total);
     }
-
     public static long gcd(long current, long previous) {
         return (previous <= 16384L) ? current : gcd(previous, current % previous);
     }

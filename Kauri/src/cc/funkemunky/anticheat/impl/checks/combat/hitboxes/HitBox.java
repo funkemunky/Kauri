@@ -11,7 +11,6 @@ import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.math.RayTrace;
 import lombok.val;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -53,7 +52,33 @@ public class HitBox extends Check {
             if (getData().getTransPing() > 400) return;
             List<BoundingBox> boxes = new ArrayList<>();
 
+<<<<<<< HEAD
             val locs = location.getEstimatedLocation(getData().getTransPing(), Math.abs(getData().getTransPing() - getData().getLastTransPing()) + pingLeniency);
+=======
+            if(use.getEntity() instanceof LivingEntity) {
+                target = (LivingEntity) use.getEntity();
+                lastAttack.reset();
+            }
+        } else if(target != null && target.getWorld().getUID().equals(getData().getPlayer().getWorld().getUID()) && type.contains(target.getType())) {
+            PastLocation location;
+            if(target instanceof Player) {
+                val entityData = Kauri.getInstance().getDataManager().getPlayerData(target.getUniqueId());
+
+                if(entityData != null) {
+                    location = entityData.getMovementProcessor().getPastLocation();
+                } else {
+                    mobLocation.addLocation(target.getLocation());
+                    location = mobLocation;
+                }
+            } else {
+                mobLocation.addLocation(target.getLocation());
+                location = mobLocation;
+            }
+
+            if(lastAttack.hasNotPassed()) {
+                if (getData().getTransPing() > 400) return;
+                List<BoundingBox> boxes = new ArrayList<>();
+>>>>>>> aff83c727800c6466137f8e7263de1882b69d326
 
             if (locs.size() == 0) return;
             locs.forEach(loc -> boxes.add(getHitbox(target, loc)));
@@ -66,9 +91,21 @@ public class HitBox extends Check {
             int collided = (int) boxes.stream()
                     .filter(box -> trace.intersects(box, box.getMinimum().distance(eyeLoc.toVector()) + 1.0, 0.2)).count();
 
+<<<<<<< HEAD
             if (collided == 0 && !getData().isLagging()) {
                 if (vl++ > maxVL) {
                     flag(collided + "=0", true, false);
+=======
+                int collided = (int) boxes.stream()
+                        .filter(box -> trace.intersects(box, box.getMinimum().distance(eyeLoc.toVector()) + 1.0, 0.2)).count();
+
+                if (collided == 0 && !getData().isLagging()) {
+                    if (vl++ > maxVL) {
+                        flag(collided + "=0", true, true);
+                    }
+                } else {
+                    vl -= vl > 0 ? 2 : 0;
+>>>>>>> aff83c727800c6466137f8e7263de1882b69d326
                 }
             } else {
                 vl -= vl > 0 ? 2 : 0;

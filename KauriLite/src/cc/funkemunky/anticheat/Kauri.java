@@ -1,6 +1,5 @@
 package cc.funkemunky.anticheat;
 
-import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckManager;
 import cc.funkemunky.anticheat.api.data.DataManager;
 import cc.funkemunky.anticheat.api.data.logging.LoggerManager;
@@ -9,15 +8,12 @@ import cc.funkemunky.anticheat.api.event.TickEvent;
 import cc.funkemunky.anticheat.impl.commands.kauri.KauriCommand;
 import cc.funkemunky.anticheat.impl.listeners.FunkeListeners;
 import cc.funkemunky.anticheat.impl.listeners.PacketListeners;
-import cc.funkemunky.anticheat.impl.menu.MenuUtils;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.event.system.EventManager;
-import cc.funkemunky.api.metrics.Metrics;
 import cc.funkemunky.api.profiling.BaseProfiler;
 import cc.funkemunky.api.utils.*;
 import lombok.Getter;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -25,7 +21,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.lang.reflect.Field;
 import java.math.RoundingMode;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;

@@ -1,6 +1,8 @@
 package cc.funkemunky.anticheat.api.utils;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.LinkedList;
 
 public class Interval {
 
