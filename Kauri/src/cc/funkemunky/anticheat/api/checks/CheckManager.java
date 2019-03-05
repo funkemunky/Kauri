@@ -15,15 +15,13 @@ import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Getter
 @Setter
 public class CheckManager {
     private List<Check> checks = new ArrayList<>();
+    private Set<UUID> bypassingPlayers = new HashSet<>();;
 
     public CheckManager() {
         checks = loadChecks();
@@ -131,6 +129,26 @@ public class CheckManager {
 
     public Check getCheck(String name) {
         return checks.stream().filter(check -> check.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+    }
+
+    public boolean isBypassing(PlayerData data) {
+        return isBypassing(data.getUuid());
+    }
+
+    public boolean isBypassing(UUID uuid) {
+        return bypassingPlayers.contains(uuid);
+    }
+
+    public void setBypassing(UUID uuid, boolean bypassing) {
+        if(bypassing) {
+            bypassingPlayers.add(uuid);
+        } else {
+            bypassingPlayers.remove(uuid);
+        }
+    }
+
+    public void setBypassing(UUID uuid) {
+        setBypassing(uuid, !isBypassing(uuid));
     }
 
     public void removeCheck(String name) {

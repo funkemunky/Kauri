@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.listeners;
 
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckSettings;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.event.custom.PacketRecieveEvent;
@@ -168,11 +169,14 @@ public class PacketListeners implements Listener {
     }
 
     private void hopper(Object packet, String packetType, long timeStamp, PlayerData data) {
-        Atlas.getInstance().getThreadPool().execute(() ->
-                data.getPacketChecks().getOrDefault(packetType, new ArrayList<>()).stream().filter(Check::isEnabled).forEach(check -> {
-                    Kauri.getInstance().getProfiler().start("check:" + check.getName());
-                    check.onPacket(packet, packetType, timeStamp);
-                    Kauri.getInstance().getProfiler().stop("check:" + check.getName());
-                }));
+        if((!CheckSettings.bypassEnabled || !data.getPlayer().hasPermission(CheckSettings.bypassPermission)) && !Kauri.getInstance().getCheckManager().isBypassing(data.getUuid())) {
+            Atlas.getInstance().getThreadPool().execute(() ->
+                    data.getPacketChecks().getOrDefault(packetType, new ArrayList<>()).stream().filter(Check::isEnabled).forEach(check ->
+                    {
+                        Kauri.getInstance().getProfiler().start("check:" + check.getName());
+                        check.onPacket(packet, packetType, timeStamp);
+                        Kauri.getInstance().getProfiler().stop("check:" + check.getName());
+                    }));
+        }
     }
 }

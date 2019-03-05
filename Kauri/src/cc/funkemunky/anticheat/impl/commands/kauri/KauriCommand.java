@@ -15,9 +15,11 @@ public class KauriCommand extends FunkeCommand {
         getArguments().add(new DebugArgument(this, "debug", "debug <check,none> [player]", "debug a check.", "kauri.debug"));
         getArguments().add(new LagArgument(this, "lag", "lag <profile,server,player> [args]", "view extensive lag information.", "kauri.lag"));
         getArguments().add(new MenuArgument(this, "menu", "menu", "open check editor.", "kauri.menu"));
+        getArguments().add(new DelayArgument(this, "delay", "delay <ms>", "set the delay of the alerts.", "kauri.delay"));
         getArguments().add(new AlertsArgument(this, "alerts", "alerts", "toggle your alerts", "kauri.alerts"));
         getArguments().add(new SaveArgument(this, "save", "save", "save all data", "kauri.save"));
         getArguments().add(new LogArgument(this, "logs", "logs <player>", "view the logs of a player", "kauri.logs"));
         getArguments().add(new BoxWandArgument(this, "boxwand", "boxwand", "receive the magic box wand.", "kauri.boxwand"));
+        getArguments().add(new BypassingArgument(this, "bypass", "bypass <player> [boolean]", "set a player to bypass detection without permissions.", "kauri.bypass.command"));
     }
 }
