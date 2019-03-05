@@ -14,6 +14,7 @@ import cc.funkemunky.api.tinyprotocol.packet.in.*;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.Init;
+import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -154,9 +155,10 @@ public class PacketListeners implements Listener {
                 case Packet.Client.USE_ENTITY:
                     WrappedInUseEntityPacket packet = new WrappedInUseEntityPacket(event.getPacket(), player);
 
-                    if(packet.getEntity() instanceof LivingEntity) {
+                    val entity = packet.getEntity();
+                    if(entity instanceof LivingEntity) {
                         data.getLastAttack().reset();
-                        data.setTarget((LivingEntity) packet.getEntity());
+                        data.setTarget((LivingEntity) entity);
                     }
                     break;
             }

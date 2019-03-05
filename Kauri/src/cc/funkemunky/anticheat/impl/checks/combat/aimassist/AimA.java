@@ -43,11 +43,11 @@ public class AimA extends Check {
                 val wrappedChange = Math.abs(wrappedCombined - lastWrapped);
 
                 if (wrappedCombined > 1.5 && !getData().isCinematicMode() && wrappedChange < 0.3F && wrappedChange > 0.001F && wrappedChange != lastChange) {
-                    if (++vl > 4) {
+                    if (++vl > 5) {
                         flag(wrappedCombined + " -> " + lastWrapped + " -> " + (double) Math.round(wrappedChange), true, false);
                     }
                 } else {
-                    vl -= vl > 0 ? 1 : 0;
+                    vl -= vl > 0 ? 2 : 0;
                 }
 
                 debug(vl + ": " + wrappedCombined + ", " + wrappedChange + ", " + lastChange + ", " + getData().getMovementProcessor().getOptifineTicks());
