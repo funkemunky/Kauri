@@ -67,7 +67,7 @@ public class CheckManager {
         registerCheck(checks, new ReachC("Reach (Type C)", "Uses expanded bounding-boxes to set a maximum hit reach.", CheckType.REACH, CancelType.MOTION, 50, false, true, true));
         registerCheck(checks, new ReachD("Reach (Type D)", "Uses a mixture of lighter but less accurate ray-tracing to determine the client's actual reach distance.", CheckType.REACH, CancelType.COMBAT, 50, false, true, true));
         registerCheck(checks, new ReachE("Reach (Type E)", "A ray-tracing check but is less light, however it detects 3.1 reach very accurately.", CheckType.REACH, CancelType.COMBAT, 50, true, true, true));
-        //registerCheck(checks, new TimerB("Timer (Type B)", CancelType.MOTION, 200));
+        //registerCheck(checks, new TimerB("BadPacketsG (Type B)", CancelType.MOTION, 200));
         registerCheck(checks, new Fastbow("Fastbow", "Makes sure the rate of fire is legitimate.", CheckType.COMBAT, CancelType.INTERACT, 40, true, true, true));
         registerCheck(checks, new HitBox("HitBox", "A very accurate hit-box check, using a mixture of ray-tracing and bounding-boxes.", CheckType.COMBAT, CancelType.COMBAT, 30, true, true, true));
         registerCheck(checks, new BadPacketsA("BadPackets (Type A)", "Prevents the client from spoofing the ability to fly.", CheckType.BADPACKETS, CancelType.MOTION, 40, true, true, true));
@@ -75,7 +75,7 @@ public class CheckManager {
         registerCheck(checks, new BadPacketsD("BadPackets (Type D)", "Compares the rate of interact packets to a certain frequency.", CheckType.BADPACKETS, CancelType.INTERACT, 50, true, true, true));
         registerCheck(checks, new BadPacketsE("BadPackets (Type E)", "Checks the rate of healing.", CheckType.BADPACKETS, CancelType.HEALTH, 20, true, true, true));
         registerCheck(checks, new BadPacketsF("BadPackets (Type F)", "Checks frequency of incoming packets. More reliable, but less detection.", CheckType.BADPACKETS, CancelType.MOTION, 100, true, true, true));
-        registerCheck(checks, new Timer("BadPackets (Type G)", "Checks frequency of incoming packets. More detection, but less reliable.", CheckType.BADPACKETS, CancelType.MOTION, 20, true, false, true));
+        registerCheck(checks, new BadPacketsG("BadPackets (Type G)", "Checks frequency of incoming packets. More detection, but less reliable.", CheckType.BADPACKETS, CancelType.MOTION, 20, true, false, true));
         registerCheck(checks, new VelocityA("Velocity (Type A)", "Detects any vertical velocity modification below 100%.", CheckType.VELOCITY, CancelType.MOTION,  40, true, true, true));
         registerCheck(checks, new VelocityB("Velocity (Type B)", "Checks for horizontal velocity modifications.", CheckType.VELOCITY, CancelType.MOTION,  40, true, false, true));
 

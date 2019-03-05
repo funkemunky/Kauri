@@ -18,22 +18,25 @@ import org.bukkit.event.Event;
         Packet.Client.LEGACY_LOOK})
 public class BadPacketsF extends Check {
 
-    @Setting(name = "threshold")
+    @Setting(name = "threshold.time")
     private long threshold = 960L;
 
+    @Setting(name = "threshold.vl.max")
+    private int maxVL = 4;
+
     private int ticks, vl;
-    private long lastReset;
+    private long lastReset, lastTimeStamp;
     public BadPacketsF(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
         super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
     }
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if (!getData().isLagging() && getData().getLastServerPos().hasPassed(2)  && getData().getLastLogin().hasPassed(40)) {
+        if (!getData().isLagging() && timeStamp > lastTimeStamp + 5 && getData().getLastServerPos().hasPassed(2) && getData().getLastLogin().hasPassed(40)) {
            if(ticks++ >= 20) {
                val elapsed = timeStamp - lastReset;
                if(elapsed < threshold) {
-                   if(vl++ > 3) {
+                   if(vl++ > maxVL) {
                        flag(elapsed + "-<" + threshold, true, true);
                    }
                } else {
@@ -43,6 +46,7 @@ public class BadPacketsF extends Check {
                lastReset = timeStamp;
            }
         }
+        lastTimeStamp = timeStamp;
     }
 
     @Override

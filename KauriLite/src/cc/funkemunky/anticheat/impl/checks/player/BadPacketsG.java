@@ -33,34 +33,35 @@ public class BadPacketsG extends Check {
     @Setting(name = "lenience")
     public float deltaBalance = 0.02f;
 
+    @Setting(name = "threshold.vl.max")
+    private int maxVL = 14;
+
     private long lastFlying;
     private int vl;
     private StatisticalAnalysis statisticalAnalysis = new StatisticalAnalysis(20);
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if (Packet.isPositionLook(packetType) || Packet.isPosition(packetType) || Packet.isLook(packetType) || packet instanceof WrappedInFlyingPacket) {
-            val now = System.currentTimeMillis();
-
+        if(timeStamp > lastFlying + 5) {
             val data = this.getData();
 
-            if (data.getLastLogin().hasNotPassed(9) || data.getLastServerPos().hasNotPassed(9)) {
+            if (data.getLastLogin().hasNotPassed(15) || data.getLastServerPos().hasNotPassed(5)) {
                 return;
             }
 
-            this.statisticalAnalysis.addValue(now - lastFlying);
+            this.statisticalAnalysis.addValue(timeStamp - lastFlying);
 
             val max = usingPaper ? 7.071f : Math.sqrt(Kauri.getInstance().getTickElapsed());
             val stdDev = this.statisticalAnalysis.getStdDev();
 
             if (!MathUtils.approxEquals(deltaBalance, max, stdDev) && stdDev < max && !data.isLagging()) {
-                if(vl++ > 14) {
+                if(vl++ > maxVL) {
                     this.flag("S: " + stdDev, false, true);
                 }
             } else vl -= vl > 0 ? 2 : 0;
-
-            this.lastFlying = now;
         }
+
+        this.lastFlying = timeStamp;
     }
 
     @Override

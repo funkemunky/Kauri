@@ -95,19 +95,15 @@ public class ReachD extends Check {
 
             for(Vector vec : finalVecs) {
                 double reach = origin.toVector().distance(vec);
-                calculatedReach = calculatedReach == 0 ? reach + .2 : Math.min(reach + .2, calculatedReach);
-                WrappedPacketPlayOutWorldParticle particle = new WrappedPacketPlayOutWorldParticle(WrappedEnumParticle.FIREWORKS_SPARK, true, (float) vec.getX(), (float) vec.getY(), (float) vec.getZ(), 0, 0, 0, 0, 1);
+                calculatedReach = calculatedReach == 0 ? reach + .12 : Math.min(reach + .12, calculatedReach);
 
-                particle.sendPacket(getData().getPlayer());
                 collided++;
             }
 
-            if (collided > 3) {
+            if (collided > 7) {
                 if (calculatedReach > maxReach + 0.2) {
                     if(vl++ > maxVL) {
                         flag(calculatedReach + ">-" + maxReach, false, true);
-                    } else {
-                        flag(calculatedReach + ">-" + maxReach, false, false);
                     }
                     debug(Color.Green + "REACH: " + calculatedReach);
                 } else {

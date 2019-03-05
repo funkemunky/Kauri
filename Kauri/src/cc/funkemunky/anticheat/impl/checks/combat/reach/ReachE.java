@@ -96,9 +96,7 @@ public class ReachE extends Check {
            for(Vector vec : finalVecs) {
                double reach = origin.toVector().distance(vec);
                calculatedReach = calculatedReach == 0 ? reach + .2 : Math.min(reach + .2, calculatedReach);
-               WrappedPacketPlayOutWorldParticle particle = new WrappedPacketPlayOutWorldParticle(WrappedEnumParticle.FIREWORKS_SPARK, true, (float) vec.getX(), (float) vec.getY(), (float) vec.getZ(), 0, 0, 0, 0, 1);
 
-               particle.sendPacket(getData().getPlayer());
                collided++;
            }
 
