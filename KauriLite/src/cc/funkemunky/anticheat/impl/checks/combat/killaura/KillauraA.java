@@ -5,7 +5,6 @@ import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.utils.MathUtils;
 import org.bukkit.event.Event;
 
@@ -44,12 +43,8 @@ public class KillauraA extends Check {
             }
 
         } else {
-            if (System.currentTimeMillis() - lastFlying < 5) {
-                dontFlag = true;
-            } else {
-                dontFlag = false;
-            }
-            lastFlying = System.currentTimeMillis();
+            dontFlag = timeStamp - lastFlying < 5;
+            lastFlying = timeStamp;
         }
     }
 

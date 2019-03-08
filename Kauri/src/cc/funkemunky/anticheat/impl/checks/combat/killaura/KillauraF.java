@@ -22,6 +22,8 @@ import org.bukkit.event.Event;
 public class KillauraF extends Check {
     public KillauraF(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
         super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+
+        setDeveloper(true);
     }
 
     private RollingAverage average = new RollingAverage(20);

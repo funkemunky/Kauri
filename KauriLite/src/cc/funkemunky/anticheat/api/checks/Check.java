@@ -42,49 +42,47 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
 
         developer = false;
 
-        alertMessage = CheckSettings.alertMessage.replaceAll("%check%", name);
+        alertMessage = CheckSettings.alertMessage;
         loadFromConfig();
     }
 
     protected void flag(String information, boolean cancel, boolean ban) {
-        if (data.getLastLag().hasPassed() || lagVerbose.flag(4, 500L)) {
-            vl++;
-            Kauri.getInstance().getLoggerManager().addViolation(data.getUuid(), this);
-            if (vl > maxVL && executable && ban && !getData().isBanned()) {
-                getData().setBanned(true);
-                new BukkitRunnable() {
-                    public void run() {
-                        execCommand.forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replaceAll("%player%", getData().getPlayer().getName()).replaceAll("%check%", getName())));
-                    }
-                }.runTaskLater(Kauri.getInstance(), 30);
-                Kauri.getInstance().getLoggerManager().addBan(data.getUuid(), this);
-            }
+        Kauri.getInstance().getCheckManager().getAlertsExecutable().execute(() -> {
+            if (data.getLastLag().hasPassed() || lagVerbose.flag(4, 500L)) {
+                if(ban) {
+                    vl++;
+                }
+                Kauri.getInstance().getLoggerManager().addViolation(data.getUuid(), this);
+                Kauri.getInstance().getStatsManager().addFlag();
+                if (vl > maxVL && executable && ban && !developer && !getData().isBanned()) {
+                    getData().setBanned(true);
+                    new BukkitRunnable() {
+                        public void run() {
+                            execCommand.forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replaceAll("%player%", getData().getPlayer().getName()).replaceAll("%check%", getName())));
+                        }
+                    }.runTaskLater(Kauri.getInstance(), 10);
+                    if(CheckSettings.broadcastEnabled) Bukkit.broadcastMessage(Color.translate(CheckSettings.broadcastMessage.replaceAll("%player%", getData().getPlayer().getName())));
+                    Kauri.getInstance().getLoggerManager().addBan(data.getUuid(), this);
+                }
 
-            Kauri.getInstance().getStatsManager().addFlag();
+                data.getLastFlag().reset();
 
-            data.getLastFlag().reset();
+                if (cancel && cancellable) data.setCancelType(cancelType);
 
-            if (cancel && cancellable) data.setCancelType(cancelType);
-
-            if (System.currentTimeMillis() - lastAlert > CheckSettings.alertsDelay) {
                 JsonMessage message = new JsonMessage();
+                message.addText(Color.translate(alertMessage.replaceAll("%check%", (developer ? Color.Red + Color.Italics : "") + getName()).replaceAll("%player%", data.getPlayer().getName()).replaceAll("%vl%", String.valueOf(vl)).replaceAll("%info%", information))).addHoverText((!ban || developer ? Color.Red + "This alert does not count towards their ban-violations." + "\n" : "") + Color.Gray + information);
+                if (System.currentTimeMillis() - lastAlert > CheckSettings.alertsDelay) {
+                    Kauri.getInstance().getDataManager().getDataObjects().values().stream().filter(PlayerData::isAlertsEnabled).forEach(data -> message.sendToPlayer(data.getPlayer()));
+                    lastAlert = System.currentTimeMillis();
+                }
 
-                message.addText(Color.translate(alertMessage.replaceAll("%player%", data.getPlayer().getName()).replaceAll("%vl%", String.valueOf(vl)).replaceAll("%info%", information))).addHoverText(Color.Gray + information);
-                Kauri.getInstance().getDataManager().getDataObjects().values().stream().filter(PlayerData::isAlertsEnabled).forEach(data -> message.sendToPlayer(data.getPlayer()));
-                lastAlert = System.currentTimeMillis();
+                if(CheckSettings.testMode && !data.isAlertsEnabled()) message.sendToPlayer(data.getPlayer());
+
+                if(CheckSettings.printToConsole) {
+                    MiscUtils.printToConsole(alertMessage.replaceAll("%check%", (developer ? Color.Red + Color.Italics : "") + getName()).replaceAll("%player%", data.getPlayer().getName()).replaceAll("%vl%", String.valueOf(vl)));
+                }
             }
-
-            if(CheckSettings.testMode && !data.isAlertsEnabled()) {
-                JsonMessage message = new JsonMessage();
-
-                message.addText(Color.translate(alertMessage.replaceAll("%player%", data.getPlayer().getName()).replaceAll("%vl%", String.valueOf(vl)).replaceAll("%info%", information))).addHoverText(Color.Gray + information);
-                message.sendToPlayer(data.getPlayer());
-            }
-
-            if(CheckSettings.printToConsole) {
-                MiscUtils.printToConsole(alertMessage.replaceAll("%player%", data.getPlayer().getName()).replaceAll("%vl%", String.valueOf(vl)));
-            }
-        }
+        });
     }
 
     private void loadFromConfig() {

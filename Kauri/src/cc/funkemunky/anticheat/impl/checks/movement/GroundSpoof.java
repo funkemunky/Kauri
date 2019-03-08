@@ -17,6 +17,8 @@ public class GroundSpoof extends Check {
     private long lastTimeStamp;
     public GroundSpoof(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
         super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+
+        setDeveloper(true);
     }
 
     @Override

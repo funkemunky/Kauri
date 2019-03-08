@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.listeners;
 
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckSettings;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.event.custom.PacketRecieveEvent;
@@ -14,6 +15,7 @@ import cc.funkemunky.api.tinyprotocol.packet.in.*;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.Init;
+import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -154,9 +156,10 @@ public class PacketListeners implements Listener {
                 case Packet.Client.USE_ENTITY:
                     WrappedInUseEntityPacket packet = new WrappedInUseEntityPacket(event.getPacket(), player);
 
-                    if(packet.getEntity() instanceof LivingEntity) {
+                    val entity = packet.getEntity();
+                    if(entity instanceof LivingEntity) {
                         data.getLastAttack().reset();
-                        data.setTarget((LivingEntity) packet.getEntity());
+                        data.setTarget((LivingEntity) entity);
                     }
                     break;
             }
@@ -166,11 +169,14 @@ public class PacketListeners implements Listener {
     }
 
     private void hopper(Object packet, String packetType, long timeStamp, PlayerData data) {
-        Atlas.getInstance().getThreadPool().execute(() ->
-                data.getPacketChecks().getOrDefault(packetType, new ArrayList<>()).stream().filter(Check::isEnabled).forEach(check -> {
-                    Kauri.getInstance().getProfiler().start("check:" + check.getName());
-                    check.onPacket(packet, packetType, timeStamp);
-                    Kauri.getInstance().getProfiler().stop("check:" + check.getName());
-                }));
+        if((!CheckSettings.bypassEnabled || !data.getPlayer().hasPermission(CheckSettings.bypassPermission)) && !Kauri.getInstance().getCheckManager().isBypassing(data.getUuid())) {
+            Atlas.getInstance().getThreadPool().execute(() ->
+                    data.getPacketChecks().getOrDefault(packetType, new ArrayList<>()).stream().filter(Check::isEnabled).forEach(check ->
+                    {
+                        Kauri.getInstance().getProfiler().start("check:" + check.getName());
+                        check.onPacket(packet, packetType, timeStamp);
+                        Kauri.getInstance().getProfiler().stop("check:" + check.getName());
+                    }));
+        }
     }
 }

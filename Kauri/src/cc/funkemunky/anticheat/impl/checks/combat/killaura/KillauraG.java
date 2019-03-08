@@ -90,7 +90,6 @@ public class KillauraG extends Check {
         }
     }
 
-
     @Override
     public void onBukkitEvent(Event event) {
 

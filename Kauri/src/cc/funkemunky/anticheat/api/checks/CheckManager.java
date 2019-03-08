@@ -16,14 +16,18 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Getter
 @Setter
 public class CheckManager {
     private List<Check> checks = new ArrayList<>();
-    private Set<UUID> bypassingPlayers = new HashSet<>();;
+    private Set<UUID> bypassingPlayers = new HashSet<>();
+    private ExecutorService alertsExecutable;
 
     public CheckManager() {
+        alertsExecutable = Executors.newFixedThreadPool(2);
         checks = loadChecks();
     }
 
@@ -45,20 +49,20 @@ public class CheckManager {
         registerCheck(checks, new KillauraB("Killaura (Type B)", "Checks for an overall flaw in the rotations of many killauras", CheckType.KILLAURA, CancelType.COMBAT, 200, true, true, true));
         registerCheck(checks, new KillauraC("Killaura (Type C)", "Checks for clients sprinting while attacking.", CheckType.KILLAURA, CancelType.COMBAT, 100, true, true, true));
         registerCheck(checks, new KillauraD("Killaura (Type D)", "Detects over-randomization in killauras.", CheckType.KILLAURA, CancelType.COMBAT, 100, true, true, true));
-        //registerCheck(checks, new KillauraE("Killaura (Type E)", CheckType.KILLAURA, CancelType.COMBAT, 100, true, true, true));
-        //registerCheck(checks, new KillauraF("Killaura (Type F)", CheckType.KILLAURA, CancelType.COMBAT, 12));
+        registerCheck(checks, new KillauraE("Killaura (Type E)", "A heuristic which factors in the rotations to look for any patterns.", CheckType.KILLAURA, CancelType.COMBAT, 100, true, false, false));
+        registerCheck(checks, new KillauraF("Killaura (Type F)", "A simple angle consistency check.", CheckType.KILLAURA, CancelType.COMBAT, 12, true, false, false));
         registerCheck(checks, new KillauraG("Killaura (Type G)", "Raytraces to check if there are blocks obstructing the path of attack.", CheckType.KILLAURA, CancelType.COMBAT, 50, true, false, true));
-        registerCheck(checks, new KillauraH("Killaura (Type H)", "Detects if clients are swinging impossibly.", CheckType.KILLAURA, CancelType.COMBAT, 3, true, true, true));
+        registerCheck(checks, new KillauraH("Killaura (Type H)", "Detects if clients are swinging impossibly.", CheckType.KILLAURA, CancelType.COMBAT, 15, true, false, false));
         registerCheck(checks, new FlyA("Fly (Type A)", "An acceleration check for flight.", CheckType.FLY, CancelType.MOTION, 225, true, true, true));
         registerCheck(checks, new FlyB("Fly (Type B)", "Calculates what the actual vertical speed of a player should be.", CheckType.FLY, CancelType.MOTION, 225, true, false, true));
         registerCheck(checks, new FlyC("Fly (Type C)", "A different style of acceleration check.", CheckType.FLY, CancelType.MOTION, 100, true, true, true));
         registerCheck(checks, new FlyD("Fly (Type D)", "Makes sure the client is accelerating towards the ground properly.", CheckType.FLY, CancelType.MOTION, 200, true, true, true));
-       // registerCheck(checks, new FlyE("Fly (Type E)", "Checks if a client moves vertically faster than what is possible.", CheckType.FLY, CancelType.MOTION, 150, true, true, true));
-        //registerCheck(checks, new FlyF("Fly (Type F)", "Prevents clients from using velocity exploits for an unfair advantage.", CheckType.FLY, CancelType.MOTION, 100, true, false, true));
+        registerCheck(checks, new FlyE("Fly (Type E)", "Checks if a client moves vertically faster than what is possible.", CheckType.FLY, CancelType.MOTION, 150, true, false, false));
         registerCheck(checks, new SpeedA("Speed (Type A)", "A basic maximum speed check with a verbose threshold.", CheckType.SPEED, CancelType.MOTION, 100, true, true, true));
         registerCheck(checks, new SpeedB("Speed (Type B)", "A simple but effective speed check.", CheckType.SPEED, CancelType.MOTION, 125, true, true, true));
         registerCheck(checks, new SpeedC("Speed (Type C)", "Checks the in-air horizontal deceleration of the client. More accurate.", CheckType.SPEED, CancelType.MOTION, 100, true, true, true));
         registerCheck(checks, new SpeedD("Speed (Type D)", "Checks the in-air and on-ground deceleration of the client. Less accurate.", CheckType.SPEED, CancelType.MOTION, 120, true, false, true));
+        registerCheck(checks, new GroundSpoof("GroundSpoof", "Makes sure the ground boolean received from the client is legitimate", CheckType.MOVEMENT, CancelType.MOTION, 200, true, false, true));
         registerCheck(checks, new ReachA("Reach (Type A)", "A basic maximum reach calculation.", CheckType.REACH, CancelType.COMBAT, 60, true, true, true));
         registerCheck(checks, new ReachB("Reach (Type B)", "A simple and light, but extremely effective maximum reach calculation. However, slightly experimental.", CheckType.REACH, CancelType.COMBAT, 60, true, false, true));
         registerCheck(checks, new ReachC("Reach (Type C)", "Uses expanded bounding-boxes to set a maximum hit reach.", CheckType.REACH, CancelType.MOTION, 50, false, true, true));

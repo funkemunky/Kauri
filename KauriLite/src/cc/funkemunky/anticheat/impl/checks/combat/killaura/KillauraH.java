@@ -3,10 +3,9 @@ package cc.funkemunky.anticheat.impl.checks.combat.killaura;
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import lombok.val;
 import org.bukkit.event.Event;
@@ -32,7 +31,7 @@ public class KillauraH extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if (packet instanceof WrappedInUseEntityPacket) {
+        if (packetType.equals(Packet.Client.USE_ENTITY)) {
             val useEntity = (WrappedInUseEntityPacket)packet;
 
             if (useEntity.getAction() == WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK) {
@@ -44,12 +43,11 @@ public class KillauraH extends Check {
                     vl = 0;
                 }
             }
-        } else if (packet instanceof WrappedInFlyingPacket) {
+        } else if(packetType.contains("Position") || packetType.contains("Look") || packetType.equals(Packet.Client.FLYING)) {
             this.swing = false;
-        } else if (packet instanceof WrappedInArmAnimationPacket) {
+        } else if(!MiscUtils.shouldReturnArmAnimation(getData())) {
             this.swing = true;
         }
-        return;
     }
 
     @Override
