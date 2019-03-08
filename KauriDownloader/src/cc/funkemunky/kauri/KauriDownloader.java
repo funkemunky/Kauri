@@ -27,7 +27,7 @@ public class KauriDownloader extends JavaPlugin {
     private static KauriDownloader instance;
     private File kauri;
     private ScheduledExecutorService scheduledExecutorService;
-    private String[] requitedVersionOfAlias = new String[] {"1.1.3.1"};
+    private String[] requitedVersionOfAlias = new String[] {"1.1.3.3"};
     private Plugin plugin;
 
     public void onEnable() {
@@ -40,7 +40,7 @@ public class KauriDownloader extends JavaPlugin {
         try {
             if(Bukkit.getPluginManager().getPlugin("Kauri") == null || !Bukkit.getPluginManager().getPlugin("Kauri").isEnabled()) {
                 getLogger().log(Level.INFO, "Finding suitable server location...");
-                URL url = new URL("https://funkemunky.cc/download?name=Kauri_Trial&license=" + getConfig().getString("license") + "&version=" + getDescription().getVersion());
+                URL url = new URL("https://funkemunky.cc/download?name=Kauri&license=" + getConfig().getString("license") + "&version=" + getDescription().getVersion());
                 getLogger().log(Level.INFO, "Downloading Kauri...");
                 InputStream is = null;
                 try {

@@ -40,7 +40,7 @@ public class Kauri extends JavaPlugin {
     private LoggerManager loggerManager;
 
 
-    private String requiredVersionOfAtlas = "1.1.3.1";
+    private String requiredVersionOfAtlas = "1.1.3.3";
 
     @Override
     public void onEnable() {

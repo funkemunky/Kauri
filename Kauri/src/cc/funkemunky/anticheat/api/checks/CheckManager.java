@@ -34,7 +34,6 @@ public class CheckManager {
         registerCheck(checks, new AimC("Aim (Type C)", "Makes sure the aim acceleration is legitimate", CheckType.AIM, CancelType.COMBAT, 20, true, true, true));
         registerCheck(checks, new AimD("Aim (Type D)", "Checks for impossible pitch acceleration", CheckType.AIM, CancelType.COMBAT, 50, true, true, true));
         registerCheck(checks, new AimE("Aim (Type E)", "Looks for suspicious yaw and pitch movements. Not recommended for banning.", CheckType.AIM, CancelType.COMBAT, 200, true, false, false));
-        registerCheck(checks, new AimF("Aim (Type F)", "Looks for any common variables.", CheckType.AIM, CancelType.COMBAT, 100, true, false, true));
         registerCheck(checks, new AutoclickerA("Autoclicker (Type A)", "A unique fast click check that detects jumps in CPS much faster.", CheckType.AUTOCLICKER, CancelType.COMBAT, 20, true, true, true));
         registerCheck(checks, new AutoclickerB("Autoclicker (Type B)", "Looks for suspicious consistencies in CPS averages.", CheckType.AUTOCLICKER, CancelType.COMBAT, 20, true, true, true));
         registerCheck(checks, new AutoclickerC("Autoclicker (Type C)", "An overall average CPS check.", CheckType.AUTOCLICKER, CancelType.COMBAT, 20, true, false, true));

@@ -6,10 +6,9 @@ import org.bukkit.plugin.InvalidDescriptionException;
 import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.Plugin;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -20,7 +19,7 @@ public class DownloaderUtils {
         File pluginLocation = MiscUtils.findPluginFile("Atlas");
         try {
             if(Bukkit.getPluginManager().getPlugin("Atlas") == null) {
-                String link = "https://github.com/funkemunky/Atlas/releases/download/%ver%/Atlas.jar".replaceAll("%ver%", KauriDownloader.getInstance().getRequitedVersionOfAlias()[0]);
+                String link = "https://github.com/funkemunky/Atlas/releases/download/%ver%/Atlas.jar".replaceAll("%ver%", readFromUpdaterPastebin());
                 InputStream in = new URL(link).openStream();
                 Files.copy(in, Paths.get(pluginLocation.getPath()), StandardCopyOption.REPLACE_EXISTING);
 
@@ -38,5 +37,22 @@ public class DownloaderUtils {
         } catch (IOException | InvalidDescriptionException | InvalidPluginException e) {
             e.printStackTrace();
         }
+    }
+
+    private static String readFromUpdaterPastebin() {
+        try {
+            URL url = new URL("https://pastebin.com/raw/Mv7yFKHx");
+            URLConnection connection = url.openConnection();
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+            String line = reader.readLine();
+
+            if(line != null) return line;
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        return "1.1.3.3";
     }
 }

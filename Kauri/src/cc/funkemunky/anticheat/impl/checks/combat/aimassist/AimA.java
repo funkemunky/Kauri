@@ -42,7 +42,10 @@ public class AimA extends Check {
 
                 val wrappedChange = Math.abs(wrappedCombined - lastWrapped);
 
-                if (wrappedCombined > 1.5 && !getData().isCinematicMode() && wrappedChange < 0.3F && wrappedChange > 0.001F && wrappedChange != lastChange) {
+                if (wrappedCombined > 1.5
+                        && !getData().getPlayer().isInsideVehicle()
+                        && !getData().isCinematicMode()
+                        && wrappedChange < 0.3F && wrappedChange > 0.001F && wrappedChange != lastChange) {
                     if (++vl > 5) {
                         flag(wrappedCombined + " -> " + lastWrapped + " -> " + (double) Math.round(wrappedChange), true, false);
                     }

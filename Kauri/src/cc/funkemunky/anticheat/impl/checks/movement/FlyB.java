@@ -34,7 +34,7 @@ public class FlyB extends Check {
         if(!move.isServerOnGround()
                 && move.getDeltaY() > move.getServerYVelocity() + 0.001
                 && !MathUtils.approxEquals(0.002, move.getServerYAcceleration(), move.getClientYAcceleration())) {
-            if((!move.isNearGround() && move.getAirTicks() > 4 && verbose.flag(2, 800L)) || vl++ > 4)
+            if((!move.isNearGround() && move.getAirTicks() > 4 && verbose.flag(3, 500L)) || vl++ > 4)
             flag(move.getDeltaY() + ">-" + (move.getServerYVelocity() + 0.001), true, true);
         } else vl-= vl > 0 ? 1 : 0;
         debug("MOTIONY: " + MathUtils.round(move.getDeltaY(), 4) + " SERVERY: " + MathUtils.round(move.getServerYVelocity(), 4));

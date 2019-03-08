@@ -18,13 +18,13 @@ import java.util.List;
 
 @Getter
 public class MovementProcessor {
-    private boolean isLagging, clientOnGround, serverOnGround, fullyInAir, inAir, hasJumped, inLiquid, blocksOnTop, pistonsNear, onHalfBlock,
+    private boolean lastFlight, flight, isLagging, clientOnGround, serverOnGround, fullyInAir, inAir, hasJumped, inLiquid, blocksOnTop, pistonsNear, onHalfBlock,
             onClimbable, onIce, collidesHorizontally, inWeb, onSlimeBefore, onSoulSand, isRiptiding, halfBlocksAround, isNearGround;
     private int airTicks, groundTicks, iceTicks, climbTicks, halfBlockTicks, soulSandTicks, blockAboveTicks, optifineTicks, liquidTicks, webTicks;
     private float deltaY, yawDelta, pitchDelta, lastYawDelta, lastPitchDelta, lastDeltaY, deltaXZ, distanceToGround, serverYVelocity, lastServerYVelocity, serverYAcceleration, clientYAcceleration, lastClientYAcceleration, lastServerYAcceleration, jumpVelocity, cinematicYawDelta, cinematicPitchDelta, lastCinematicPitchDelta, lastCinematicYawDelta;
     private CustomLocation from, to;
     private PastLocation pastLocation = new PastLocation();
-    private TickTimer lastRiptide = new TickTimer(6), lastVehicle = new TickTimer(4);
+    private TickTimer lastRiptide = new TickTimer(6), lastVehicle = new TickTimer(4), lastFlightToggle = new TickTimer(10);
     private List<BoundingBox> boxes = new ArrayList<>();
     private long lastTimeStamp;
 
@@ -96,6 +96,12 @@ public class MovementProcessor {
             lastClientYAcceleration = clientYAcceleration;
             clientYAcceleration = deltaY - lastDeltaY;
 
+            lastFlight = flight;
+            flight = player.getAllowFlight();
+            if(flight != lastFlight) {
+                getLastFlightToggle().reset();
+            }
+
             if(isRiptiding = Atlas.getInstance().getBlockBoxManager().getBlockBox().isRiptiding(packet.getPlayer())) lastRiptide.reset();
 
             //Hear we use the client's ground packet being sent since whatever motion the client says it has
@@ -118,6 +124,10 @@ public class MovementProcessor {
                 serverYVelocity *= 0.98f;
             } else {
                 serverYVelocity = 0;
+            }
+
+            if(getLastFlightToggle().hasNotPassed(3)) {
+                serverYVelocity = deltaY;
             }
 
             lastServerYAcceleration = serverYAcceleration;

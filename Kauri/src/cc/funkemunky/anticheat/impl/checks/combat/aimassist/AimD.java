@@ -34,7 +34,7 @@ public class AimD extends Check {
         val yawDelta = move.getYawDelta();
         val pitchAcceleration = MathUtils.getDelta(move.getPitchDelta(), move.getLastPitchDelta());
 
-        if(pitchAcceleration == 0 && Math.abs(move.getTo().getPitch()) < 80 && yawDelta > minYawDelta) {
+        if(pitchAcceleration == 0 && getData().getPlayer().getVehicle() == null && Math.abs(move.getTo().getPitch()) < 80 && yawDelta > minYawDelta) {
             if(vl++ > vlMax) {
                 flag("yaw: " + MathUtils.round(yawDelta, 3), true, true);
             }
