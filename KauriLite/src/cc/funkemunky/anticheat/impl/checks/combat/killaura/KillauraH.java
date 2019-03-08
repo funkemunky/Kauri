@@ -32,7 +32,7 @@ public class KillauraH extends Check {
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         if (packetType.equals(Packet.Client.USE_ENTITY)) {
-            val useEntity = (WrappedInUseEntityPacket)packet;
+            val useEntity = new WrappedInUseEntityPacket(packet, getData().getPlayer());
 
             if (useEntity.getAction() == WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK) {
                 if (!swing) {

@@ -126,7 +126,7 @@ public class Kauri extends JavaPlugin {
     }
 
     public void reloadKauri() {
-        Kauri.getInstance().saveConfig();
+        Kauri.getInstance().reloadConfig();
         Kauri.getInstance().getCheckManager().getChecks().clear();
         Kauri.getInstance().getDataManager().getDataObjects().clear();
         Bukkit.getOnlinePlayers().forEach((player -> Kauri.getInstance().getDataManager().addData(player.getUniqueId())));
