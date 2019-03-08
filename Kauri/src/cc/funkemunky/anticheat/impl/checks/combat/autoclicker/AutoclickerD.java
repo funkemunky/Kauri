@@ -4,6 +4,7 @@ import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Interval;
+import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import lombok.val;
@@ -53,7 +54,7 @@ public class AutoclickerD extends Check {
                 cps = 0;
                 fraction.clearIfMax();
             }
-        } else {
+        } else if(!MiscUtils.shouldReturnArmAnimation(getData())) {
             ++cps;
         }
     }

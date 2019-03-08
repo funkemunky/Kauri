@@ -29,7 +29,7 @@ public class AutoclickerG extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val elapsed = timeStamp - lastTimeStamp;
 
-        if(elapsed > 0 && !MiscUtils.shouldReturnArmAnimation(getData())) {
+        if(elapsed > 2 && !MiscUtils.shouldReturnArmAnimation(getData())) {
             if(times.size() >= 20) {
                 val range = getRange(times);
                 val average = getAverageCPS(times);

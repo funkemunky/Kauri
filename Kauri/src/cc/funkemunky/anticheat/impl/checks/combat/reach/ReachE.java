@@ -45,11 +45,32 @@ public class ReachE extends Check {
     @Setting(name = "pingRange")
     private long pingRange = 175;
 
-    @Setting(name = "maxReach")
+    @Setting(name = "theshold.reach")
     private float maxReach = 3.0f;
 
-    @Setting(name = "maxVL")
+    @Setting(name = "threshold.vl.max")
     private int maxVL = 5;
+
+    @Setting(name = "threshold.vl.nonBanMax")
+    private double nonBanMaxVL = 2.0;
+
+    @Setting(name = "threshold.vl.nonBanMult")
+    private double nonBanMult = 5.0;
+
+    @Setting(name = "threshold.vl.add")
+    private double vlAdd = 1;
+
+    @Setting(name = "threshold.vl.subtract.arm")
+    private double armSubtract = 0.005;
+
+    @Setting(name = "threshold.vl.subtract.belowThreshold")
+    private double belowTSubtract = 0.25;
+
+    @Setting(name = "threshold.vl.subtract.belowCollisionMin")
+    private double belowCollisionSubtract = 0.1;
+
+    @Setting(name = "threshold.collisionMin")
+    private int collisionMin = 8;
 
     private double vl;
 
@@ -57,7 +78,7 @@ public class ReachE extends Check {
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
        if(packetType.equals(Packet.Client.ARM_ANIMATION)) {
-            vl -= vl > 0 ? 0.005 : 0;
+            vl -= vl > 0 ? armSubtract : 0;
         } else if(getData().getTarget() != null && getData().getTarget().getWorld().getUID().equals(getData().getPlayer().getWorld().getUID()) && getData().getLastAttack().hasNotPassed(0) && getData().getPlayer().getGameMode().equals(GameMode.SURVIVAL)) {
            val target = getData().getTarget();
            val entityData = Kauri.getInstance().getDataManager().getPlayerData(target.getUniqueId());
@@ -100,9 +121,9 @@ public class ReachE extends Check {
                collided++;
            }
 
-           if (collided > 8) {
+           if (collided > collisionMin) {
                if (calculatedReach > maxReach + 0.0001) {
-                   if (vl++ > 1.4 + (getData().getMovementProcessor().getDeltaXZ() * 5)) {
+                   if ((vl+= vlAdd) > nonBanMaxVL + (getData().getMovementProcessor().getDeltaXZ() * nonBanMult)) {
                        if(vl > maxVL) {
                            flag(calculatedReach + ">-" + maxReach, false, true);
                        } else {
@@ -112,10 +133,10 @@ public class ReachE extends Check {
 
                    debug(Color.Green + "REACH: " + calculatedReach);
                } else {
-                   vl -= vl > 0 ? 0.25 : 0;
+                   vl -= vl > 0 ? belowTSubtract : 0;
                }
            } else {
-               vl-= vl > 0 ? 0.1f : 0;
+               vl-= vl > 0 ? belowCollisionSubtract : 0;
            }
            debug("VL: " + vl + "/" + maxVL + " REACH: " + calculatedReach + " COLLIDED: " + collided + " MAX: " + maxReach + " RANGE: " + pingRange);
         }

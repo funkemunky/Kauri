@@ -3,6 +3,7 @@ package cc.funkemunky.anticheat.impl.checks.combat.autoclicker;
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
@@ -33,6 +34,7 @@ public class AutoclickerE extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
+        if(MiscUtils.shouldReturnArmAnimation(getData())) return;
         if (packet instanceof WrappedInBlockDigPacket) {
             val digPacket = (WrappedInBlockDigPacket)packet;
 
@@ -54,7 +56,7 @@ public class AutoclickerE extends Check {
             }
         } else if (Packet.isPositionLook(packetType) || Packet.isPosition(packetType) || Packet.isLook(packetType) || packet instanceof WrappedInFlyingPacket) {
             sent = false;
-        } else if (packet instanceof WrappedInArmAnimationPacket) {
+        } else if (packetType.equals(Packet.Client.ARM_ANIMATION)) {
             val now = System.currentTimeMillis();
             val delay = now - this.lastArm;
 

@@ -3,6 +3,7 @@ package cc.funkemunky.anticheat.impl.checks.combat.autoclicker;
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import lombok.val;
@@ -34,60 +35,48 @@ public class AutoclickerB extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        switch (packetType) {
-            case Packet.Client.FLYING:
-            case Packet.Client.POSITION:
-            case Packet.Client.POSITION_LOOK:
-            case Packet.Client.LOOK:
-            case Packet.Client.LEGACY_LOOK:
-            case Packet.Client.LEGACY_POSITION:
-            case Packet.Client.LEGACY_POSITION_LOOK: {
-                ticks++;
+        if(packetType.contains("Position") || packetType.contains("Look") || packetType.equals(Packet.Client.FLYING)) {
+            ticks++;
 
-                if (ticks == 20 && cps[3] > 4) { // 20 ticks = 1 second
-                    val now = System.currentTimeMillis();
+            if (ticks == 20 && cps[3] > 4) { // 20 ticks = 1 second
+                val now = timestamp;
 
-                    val cpsAverage = Arrays.stream(cps).average().orElse(0.0);
-                    val avgAverage = Arrays.stream(averages).average().orElse(0.0);
-                    averages[3] = cpsAverage;
+                val cpsAverage = Arrays.stream(cps).average().orElse(0.0);
+                val avgAverage = Arrays.stream(averages).average().orElse(0.0);
+                averages[3] = cpsAverage;
 
-                    val averageDiff = Math.round(Math.abs(cpsAverage - avgAverage) * 100.0) / 100.0;
+                val averageDiff = Math.round(Math.abs(cpsAverage - avgAverage) * 100.0) / 100.0;
 
-                    if (averageDiff > 0.d && now - timestamp < 1000L) {
-                        averageDeque.add(averageDiff);
-                    }
-
-                    if (averageDeque.size() == 5) {
-                        val distinct = averageDeque.stream().distinct().count();
-                        val duplicates = averageDeque.size() - distinct;
-
-                        if (duplicates > 0) {
-                            vl += duplicates;
-
-                            if (vl > 3) {
-                                this.flag("D: " + duplicates, false, false);
-                            }
-                        } else {
-                            vl -= vl > 0 ? 1 : 0;
-                        }
-
-                        averageDeque.clear();
-                    }
-
-                    this.pass();
-                    ticks = 0;
+                if (averageDiff > 0.d && now - timestamp < 1000L) {
+                    averageDeque.add(averageDiff);
                 }
-                break;
+
+                if (averageDeque.size() == 5) {
+                    val distinct = averageDeque.stream().distinct().count();
+                    val duplicates = averageDeque.size() - distinct;
+
+                    if (duplicates > 0) {
+                        vl += duplicates;
+
+                        if (vl > 3) {
+                            this.flag("D: " + duplicates, false, false);
+                        }
+                    } else {
+                        vl -= vl > 0 ? 1 : 0;
+                    }
+
+                    averageDeque.clear();
+                }
+
+                this.pass();
+                ticks = 0;
             }
+        } else if(!MiscUtils.shouldReturnArmAnimation(getData())) {
+            cps[3] = cps[3] + 1;
 
-            case Packet.Client.ARM_ANIMATION: {
-                cps[3] = cps[3] + 1;
+            val now = timestamp;
 
-                val now = System.currentTimeMillis();
-
-                timestamp = now;
-                break;
-            }
+            timestamp = now;
         }
     }
 
