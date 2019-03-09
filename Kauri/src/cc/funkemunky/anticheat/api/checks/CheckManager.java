@@ -45,6 +45,7 @@ public class CheckManager {
         registerCheck(checks, new AutoclickerE("Autoclicker (Type E)", "An unreasonable amount of CPS while breaking a block.", CheckType.AUTOCLICKER, CancelType.COMBAT, 20, true, true, true));
         registerCheck(checks, new AutoclickerF("Autoclicker (Type F)", "Compares the CPS of an autoclicker a certain frequency.", CheckType.AUTOCLICKER, CancelType.COMBAT, 5, true, true, true));
         registerCheck(checks, new AutoclickerG("Autoclicker (Type G)", "A normal click consistency check.", CheckType.AUTOCLICKER, CancelType.COMBAT, 50, true, false, true));
+        registerCheck(checks, new AutoclickerH("Autoclicker (Type H)", "Looks for suspicious clicking averages compares to actual clicks.", CheckType.AUTOCLICKER, CancelType.COMBAT, 50, true, false, true));
         registerCheck(checks, new KillauraA("Killaura (Type A)", "Checks the time between certain packets and attacks.", CheckType.KILLAURA, CancelType.COMBAT, 150, true, true, true));
         registerCheck(checks, new KillauraB("Killaura (Type B)", "Checks for an overall flaw in the rotations of many killauras", CheckType.KILLAURA, CancelType.COMBAT, 200, true, true, true));
         registerCheck(checks, new KillauraC("Killaura (Type C)", "Checks for clients sprinting while attacking.", CheckType.KILLAURA, CancelType.COMBAT, 100, true, true, true));

@@ -56,6 +56,8 @@ public class PlayerData {
     private ActionProcessor actionProcessor;
     private VelocityProcessor velocityProcessor;
 
+    private long lastDig;
+
     public PlayerData(UUID uuid) {
         this.uuid = uuid;
         this.player = Bukkit.getPlayer(uuid);
