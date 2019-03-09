@@ -69,7 +69,6 @@ public class CheckManager {
         registerCheck(checks, new ReachC("Reach (Type C)", "Uses expanded bounding-boxes to set a maximum hit reach.", CheckType.REACH, CancelType.MOTION, 50, false, true, true));
         registerCheck(checks, new ReachD("Reach (Type D)", "Uses a mixture of lighter but less accurate ray-tracing to determine the client's actual reach distance.", CheckType.REACH, CancelType.COMBAT, 50, false, true, true));
         registerCheck(checks, new ReachE("Reach (Type E)", "A ray-tracing check but is less light, however it detects 3.1 reach very accurately.", CheckType.REACH, CancelType.COMBAT, 50, true, true, true));
-        //registerCheck(checks, new TimerB("BadPacketsG (Type B)", CancelType.MOTION, 200));
         registerCheck(checks, new Fastbow("Fastbow", "Makes sure the rate of fire is legitimate.", CheckType.COMBAT, CancelType.INTERACT, 40, true, true, true));
         registerCheck(checks, new HitBox("HitBox", "A very accurate hit-box check, using a mixture of ray-tracing and bounding-boxes.", CheckType.COMBAT, CancelType.COMBAT, 30, true, true, true));
         registerCheck(checks, new BadPacketsA("BadPackets (Type A)", "Prevents the client from spoofing the ability to fly.", CheckType.BADPACKETS, CancelType.MOTION, 40, true, true, true));

@@ -59,7 +59,7 @@ public class BadPacketsG extends Check {
                 if(vl++ > maxVL) {
                     this.flag("S: " + stdDev, false, true);
                 }
-            } else vl -= vl > 0 ? 2 : 0;
+            } else vl -= vl > 0 ? 3 : 0;
         }
 
         this.lastFlying = timeStamp;
