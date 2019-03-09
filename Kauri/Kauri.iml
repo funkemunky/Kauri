@@ -9,5 +9,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Atlas" level="project" />
+    <orderEntry type="library" name="depends" level="project" />
+    <orderEntry type="library" name="Kauri" level="project" />
   </component>
 </module>

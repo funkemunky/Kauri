@@ -30,6 +30,7 @@ public class AutoclickerD extends Check {
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         if (packetType.contains("Position") || packetType.contains("Look") || packetType.equals(Packet.Client.FLYING)) {
+            if (MiscUtils.shouldReturnArmAnimation(getData())) return;
             if (++ticks == 20) {
                 if (cps > 0) {
                     fraction.add(cps);
