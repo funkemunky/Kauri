@@ -114,7 +114,7 @@ public class ReachE extends Check {
 
            for(Vector vec : finalVecs) {
                double reach = origin.toVector().distance(vec);
-               calculatedReach = calculatedReach == 0 ? reach + .2 : Math.min(reach + .2, calculatedReach);
+               calculatedReach = calculatedReach == 0 ? reach + .15 : Math.min(reach + .15, calculatedReach);
 
                collided++;
            }
@@ -148,6 +148,6 @@ public class ReachE extends Check {
     private BoundingBox getHitbox(LivingEntity entity, CustomLocation l) {
         val dimensions = MiscUtils.entityDimensions.getOrDefault(entity.getType(), new Vector(0.35f,1.85f,0.35f));
 
-        return new BoundingBox(l.toVector(), l.toVector()).grow(.2f, .2f, .2f).grow((float) dimensions.getX(), 0, (float) dimensions.getZ()).add(0,0,0,0, (float) dimensions.getY(),0);
+        return new BoundingBox(l.toVector(), l.toVector()).grow(.25f, .25f, .25f).grow((float) dimensions.getX(), 0, (float) dimensions.getZ()).add(0,0,0,0, (float) dimensions.getY(),0);
     }
 }

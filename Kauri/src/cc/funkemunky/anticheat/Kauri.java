@@ -48,7 +48,7 @@ public class Kauri extends JavaPlugin {
         instance = this;
         saveDefaultConfig();
 
-        if(Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled()) return;
+        //if(Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled()) return;
 
         if(Bukkit.getPluginManager().isPluginEnabled("Atlas") && Bukkit.getPluginManager().getPlugin("Atlas").getDescription().getVersion().equals(requiredVersionOfAtlas)) {
 
