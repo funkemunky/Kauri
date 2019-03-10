@@ -19,9 +19,8 @@ public class KillauraB extends Check {
         super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
     }
 
-    private float lastPitchDelta, lastYawDelta;
+    private float lastPitchDelta;
     private double vl;
-    private long lastGCD;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
@@ -29,7 +28,6 @@ public class KillauraB extends Check {
             val to = getData().getMovementProcessor().getTo();
             val from = getData().getMovementProcessor().getFrom();
             val pitchDifference = Math.abs(from.getPitch() - to.getPitch());
-            val yawDifference = Math.abs(from.getYaw() - to.getYaw());
 
             val offset = 16777216L;
             val pitchGCD = MiscUtils.gcd((long) (pitchDifference * offset), (long) (lastPitchDelta * offset));
@@ -45,8 +43,6 @@ public class KillauraB extends Check {
             debug("VL: " + vl + " PITCH: " + pitchGCD + " OPTIFINE: " + getData().isCinematicMode());
 
             lastPitchDelta = pitchDifference;
-            lastYawDelta = yawDifference;
-            lastGCD = pitchGCD;
         }
     }
 

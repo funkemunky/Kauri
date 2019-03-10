@@ -37,7 +37,7 @@ public class SpeedD extends Check {
 
         val max = move.isServerOnGround() ? 0.5 : 0.24;
 
-        if(delta > max && getData().getLastBlockPlace().hasPassed(8) && !getData().isGeneralCancel() && timeStamp > lastTimeStamp + 5) {
+        if(delta > max && getData().getLastBlockPlace().hasPassed(8) && getData().getLastServerPos().hasPassed(2) && !getData().isGeneralCancel() && timeStamp > lastTimeStamp + 5) {
             flag(delta + ">-" + max + ";" + move.isServerOnGround(), true, true);
         }
 

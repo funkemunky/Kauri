@@ -55,11 +55,11 @@ public class Kauri extends JavaPlugin {
             profiler = new BaseProfiler();
             profileStart = System.currentTimeMillis();
 
+            startScanner(false);
+
             //Starting up our utilities, managers, and tasks.
             checkManager = new CheckManager();
             dataManager = new DataManager();
-
-            startScanner();
 
             statsManager = new StatsManager();
             loggerManager = new LoggerManager();
@@ -109,8 +109,8 @@ public class Kauri extends JavaPlugin {
         }.runTaskTimer(Kauri.getInstance(), 0L, 1L);
     }
 
-    public void startScanner() {
-        initializeScanner(getClass(), this);
+    public void startScanner(boolean configOnly) {
+        initializeScanner(getClass(), this, configOnly);
     }
 
     private void registerCommands() {
@@ -126,17 +126,17 @@ public class Kauri extends JavaPlugin {
     }
 
     public void reloadKauri() {
-        Kauri.getInstance().reloadConfig();
-        Kauri.getInstance().getCheckManager().getChecks().clear();
-        Kauri.getInstance().getDataManager().getDataObjects().clear();
-        Bukkit.getOnlinePlayers().forEach((player -> Kauri.getInstance().getDataManager().addData(player.getUniqueId())));
-        Kauri.getInstance().getDataManager().getDataObjects().values().forEach(data -> Kauri.getInstance().getCheckManager().loadChecksIntoData(data));
-        Kauri.getInstance().getCheckManager().setChecks(Kauri.getInstance().getCheckManager().loadChecks());
+        reloadConfig();
+        getCheckManager().getChecks().clear();
+        getDataManager().getDataObjects().clear();
+        startScanner(true);
+        checkManager = new CheckManager();
+        dataManager = new DataManager();
     }
 
     //Credits: Luke.
 
-    private void initializeScanner(Class<?> mainClass, Plugin plugin) {
+    private void initializeScanner(Class<?> mainClass, Plugin plugin, boolean configOnly) {
         ClassScanner.scanFile(null, mainClass).stream().filter(c -> {
             try {
                 Class clazz = Class.forName(c);
@@ -164,18 +164,21 @@ public class Kauri extends JavaPlugin {
                 if(clazz.isAnnotationPresent(Init.class)) {
                     Object obj = clazz.getSimpleName().equals(mainClass.getSimpleName()) ? plugin : clazz.newInstance();
                     Init init = (Init) clazz.getAnnotation(Init.class);
-                    if (obj instanceof Listener) {
-                        MiscUtils.printToConsole("&eFound " + clazz.getSimpleName() + " Bukkit listener. Registering...");
-                        Bukkit.getPluginManager().registerEvents((Listener) obj, plugin);
-                    } else if(obj instanceof cc.funkemunky.api.event.system.Listener) {
-                        MiscUtils.printToConsole("&eFound " + clazz.getSimpleName() + " Atlas listener. Registering...");
-                        EventManager.register(plugin, (cc.funkemunky.api.event.system.Listener) obj);
-                    }
 
-                    if(init.commands()) {
-                        Atlas.getInstance().getCommandManager().registerCommands(obj);
-                    }
+                    if(!configOnly) {
+                        if (obj instanceof Listener) {
+                            MiscUtils.printToConsole("&eFound " + clazz.getSimpleName() + " Bukkit listener. Registering...");
+                            Bukkit.getPluginManager().registerEvents((Listener) obj, plugin);
+                        } else if(obj instanceof cc.funkemunky.api.event.system.Listener) {
+                            MiscUtils.printToConsole("&eFound " + clazz.getSimpleName() + " Atlas listener. Registering...");
+                            EventManager.register(plugin, (cc.funkemunky.api.event.system.Listener) obj);
+                        }
 
+                        if(init.commands()) {
+                            Atlas.getInstance().getCommandManager().registerCommands(obj);
+                        }
+
+                    }
                     for (Field field : clazz.getDeclaredFields()) {
                         field.setAccessible(true);
                         if(field.isAnnotationPresent(ConfigSetting.class)) {

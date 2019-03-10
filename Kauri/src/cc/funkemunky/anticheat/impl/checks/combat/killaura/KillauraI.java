@@ -4,9 +4,17 @@ import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
+import cc.funkemunky.anticheat.api.utils.Packets;
+import cc.funkemunky.api.tinyprotocol.api.Packet;
+import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
 import org.bukkit.event.Event;
 
+@Packets(packets = {
+        Packet.Client.POSITION_LOOK,
+        Packet.Client.LOOK,
+        Packet.Client.LEGACY_POSITION_LOOK,
+        Packet.Client.LEGACY_LOOK})
 public class KillauraI extends Check {
     public KillauraI(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
         super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
@@ -14,22 +22,18 @@ public class KillauraI extends Check {
         setDeveloper(true);
     }
 
-    private float lastYawDelta;
     private double vl;
-    private long lastGCD;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         if(getData().getLastAttack().hasNotPassed(4)) {
-            val to = getData().getMovementProcessor().getTo();
-            val from = getData().getMovementProcessor().getFrom();
-            val pitchDifference = Math.abs(from.getPitch() - to.getPitch());
-            val yawDifference = Math.abs(from.getYaw() - to.getYaw());
+            val move = getData().getMovementProcessor();
 
             val offset = 16777216L;
-            val gcd = MiscUtils.gcd((long) (yawDifference * offset), (long) (lastYawDelta * offset));
+            val gcd = MiscUtils.gcd((long) (move.getYawDelta() * offset), (long) (move.getLastYawDelta() * offset));
+            val acceleration = MathUtils.getDelta(move.getLastYawDelta(), move.getYawDelta());
 
-            if (Math.abs(to.getPitch()) < 88.0f && pitchDifference > 0  && getData().getMovementProcessor().getOptifineTicks() < 10 && gcd < 131072L) {
+            if (Math.abs(move.getTo().getPitch()) < 88.0f && move.getYawDelta() > 0 && acceleration > 0  && getData().getMovementProcessor().getOptifineTicks() < 10 && gcd < 131072L) {
                 if(vl++ > 100) {
                     flag(String.valueOf(gcd / 2000), true, true);
                 }
@@ -38,9 +42,6 @@ public class KillauraI extends Check {
             }
 
             debug("VL: " + vl + " YAW: " + gcd + " OPTIFINE: " + getData().isCinematicMode());
-
-            lastYawDelta = yawDifference;
-            lastGCD = gcd;
         }
     }
 

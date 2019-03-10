@@ -13,13 +13,14 @@ import org.bukkit.event.Event;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Packets(packets = {Packet.Client.ARM_ANIMATION})
 public class AutoclickerG extends Check {
 
     private long lastTimeStamp, lastRange;
     private double vl;
-    private List<Long> times = new ArrayList<>();
+    private List<Long> times = new CopyOnWriteArrayList<>();
 
     public AutoclickerG(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
         super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
