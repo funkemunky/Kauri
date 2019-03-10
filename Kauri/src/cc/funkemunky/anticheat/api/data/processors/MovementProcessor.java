@@ -9,6 +9,7 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.*;
 import lombok.Getter;
 import lombok.val;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.potion.PotionEffectType;
@@ -172,7 +173,7 @@ public class MovementProcessor {
             val smoothDelta = MathUtils.getDelta(yawDelta, smooth);
             val smoothDelta2 = MathUtils.getDelta(pitchDelta, smooth2);
 
-            data.setCinematicMode((smoothDelta / yawDelta) < 0.08 || (smoothDelta2 / pitchDelta) < 0.04);
+            data.setCinematicMode((smoothDelta) < 0.1 || (smoothDelta2) < 0.04);
 
             //Bukkit.broadcastMessage(smoothDelta + "," + smoothDelta2 + ": " + "(" + smoothDelta / yawDelta + "), " + "(" + (smoothDelta2 / pitchDelta) + "): " + data.isCinematicMode());
             if (data.isCinematicMode()) {
@@ -185,7 +186,7 @@ public class MovementProcessor {
         }
 
         pastLocation.addLocation(new CustomLocation(to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch()));
-        data.setGeneralCancel(isLagging || !chunkLoaded || packet.getPlayer().getAllowFlight() || packet.getPlayer().getActivePotionEffects().stream().anyMatch(effect -> effect.getType().getName().toLowerCase().contains("levi")) || packet.getPlayer().getGameMode().toString().contains("CREATIVE") || packet.getPlayer().getGameMode().toString().contains("SPEC") || lastVehicle.hasNotPassed() || getLastRiptide().hasNotPassed(10) || data.getLastLogin().hasNotPassed(50) || data.getVelocityProcessor().getLastVelocity().hasNotPassed(40));
+        data.setGeneralCancel(isLagging || getLastFlightToggle().hasNotPassed(8) || !chunkLoaded || packet.getPlayer().getAllowFlight() || packet.getPlayer().getActivePotionEffects().stream().anyMatch(effect -> effect.getType().getName().toLowerCase().contains("levi")) || packet.getPlayer().getGameMode().toString().contains("CREATIVE") || packet.getPlayer().getGameMode().toString().contains("SPEC") || lastVehicle.hasNotPassed() || getLastRiptide().hasNotPassed(10) || data.getLastLogin().hasNotPassed(50) || data.getVelocityProcessor().getLastVelocity().hasNotPassed(40));
         Kauri.getInstance().getProfiler().stop("MovementProcessor:update");
     }
 

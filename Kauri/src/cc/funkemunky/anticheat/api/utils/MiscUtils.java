@@ -52,10 +52,10 @@ public class MiscUtils {
     }
 
     public static boolean cancelForFlight(PlayerData data) {
-        return cancelForFlight(data, 40);
+        return cancelForFlight(data, 40, true);
     }
 
-    public static boolean cancelForFlight(PlayerData data, int velocityTicks) {
+    public static boolean cancelForFlight(PlayerData data, int velocityTicks, boolean groundCheck) {
         val move = data.getMovementProcessor();
         val player = data.getPlayer();
         val velocity = data.getVelocityProcessor();
@@ -70,10 +70,10 @@ public class MiscUtils {
                 || !Atlas.getInstance().getBlockBoxManager().getBlockBox().isChunkLoaded(data.getPlayer().getLocation())
                 || data.getLastLogin().hasNotPassed(50)
                 || move.getClimbTicks() > 0
-                || data.getLastBlockPlace().hasNotPassed(5)
+                || data.getLastBlockPlace().hasNotPassed(10)
                 || player.getActivePotionEffects().stream().anyMatch(effect -> effect.toString().toLowerCase().contains("levi"))
-                || move.isOnHalfBlock()
-                || move.isServerOnGround()
+                || (move.isServerOnGround() && move.isOnHalfBlock())
+                || (move.isServerOnGround() && groundCheck)
                 || move.isRiptiding()
                 || move.isOnSlimeBefore()
                 || move.getLastRiptide().hasNotPassed(8)

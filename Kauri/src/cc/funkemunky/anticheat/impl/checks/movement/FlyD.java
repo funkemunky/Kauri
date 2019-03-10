@@ -30,7 +30,7 @@ public class FlyD extends Check {
         val predictedY = (lastYChange - 0.08D) * 0.9800000190734863D;
         this.lastYChange = yChange;
 
-        if (MiscUtils.cancelForFlight(getData(), 10)) return;
+        if (MiscUtils.cancelForFlight(getData(), 10, true)) return;
 
         if (!move.isNearGround()) {
             val offset = Math.abs(yChange - predictedY);
