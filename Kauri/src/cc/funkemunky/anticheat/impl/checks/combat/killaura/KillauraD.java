@@ -35,6 +35,10 @@ public class KillauraD extends Check {
         val yawChange = Math.abs(yaw - lastYaw);
         val pitchChange = Math.abs(pitch - lastPitch);
 
+        if (yawChange > 25.f) {
+            return;
+        }
+
         yawDeque.add(yawChange);
         yawDeque.add(pitchChange);
 

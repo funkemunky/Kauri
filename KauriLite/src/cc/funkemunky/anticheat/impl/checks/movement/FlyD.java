@@ -45,7 +45,6 @@ public class FlyD extends Check {
 
             debug("VL: " + vl + "DIF: " + Math.abs(yChange - predictedY));
         }
-        return;
     }
 
     @Override

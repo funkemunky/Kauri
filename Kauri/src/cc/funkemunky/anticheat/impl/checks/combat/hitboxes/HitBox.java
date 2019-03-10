@@ -1,19 +1,19 @@
 package cc.funkemunky.anticheat.impl.checks.combat.hitboxes;
 
-import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckType;
-import cc.funkemunky.anticheat.api.utils.*;
+import cc.funkemunky.anticheat.api.utils.CustomLocation;
+import cc.funkemunky.anticheat.api.utils.Packets;
+import cc.funkemunky.anticheat.api.utils.PastLocation;
+import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.math.RayTrace;
 import lombok.val;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.util.Vector;
 

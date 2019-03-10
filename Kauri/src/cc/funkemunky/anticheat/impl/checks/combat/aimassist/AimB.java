@@ -5,6 +5,7 @@ import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
+import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import lombok.val;
 import org.bukkit.event.Event;
@@ -22,7 +23,7 @@ public class AimB extends Check {
     }
 
     private float lastPitchDelta, lastYawDelta;
-    private double vl;
+    private Verbose verbose = new Verbose();
     private long lastGCD;
 
     @Override
@@ -36,14 +37,12 @@ public class AimB extends Check {
         val pitchGCD = MiscUtils.gcd((long) (pitchDifference * offset), (long) (lastPitchDelta * offset));
 
         if (Math.abs(to.getPitch()) < 88.0f && pitchDifference > 0 && getData().getMovementProcessor().getOptifineTicks() < 10 && (pitchGCD < 131072L || pitchGCD == lastGCD)) {
-            if(vl++ > 150) {
+            if(verbose.flag(150, 5000L)) {
                 flag(String.valueOf(pitchGCD / 2000), true, true);
             }
-        } else {
-            vl -= vl > 0 ? 2 : 0;
-        }
+        } else verbose.deduct(2);
 
-        debug("VL: " + vl + " PITCH: " + pitchGCD + " OPTIFINE: " + getData().isCinematicMode());
+        debug("VL: " + verbose.getVerbose() + " PITCH: " + pitchGCD + " OPTIFINE: " + getData().isCinematicMode());
 
         lastPitchDelta = pitchDifference;
         lastYawDelta = yawDifference;

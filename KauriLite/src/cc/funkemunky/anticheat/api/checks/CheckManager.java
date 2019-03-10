@@ -20,17 +20,20 @@ import cc.funkemunky.anticheat.impl.checks.player.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Getter
 @Setter
 public class CheckManager {
     private List<Check> checks = new ArrayList<>();
+    private ExecutorService alertsExecutable;
+
+    private Set<UUID> bypassingPlayers = new HashSet<>();
 
     public CheckManager() {
+        alertsExecutable = Executors.newFixedThreadPool(2);
         checks = loadChecks();
     }
 
@@ -54,6 +57,7 @@ public class CheckManager {
         checks.add(new SpeedA("Speed (Type A)", CheckType.SPEED, CancelType.MOTION, 100, true, false, true));
         checks.add(new SpeedB("Speed (Type B)", CheckType.SPEED, CancelType.MOTION, 125, true, true, true));
         checks.add(new SpeedC("Speed (Type C)", CheckType.SPEED, CancelType.MOTION, 100, true, false, true));
+        checks.add(new GroundSpoof("GroundSpoof", CheckType.MOVEMENT, CancelType.MOTION, 200, true, false, true));
         checks.add(new ReachA("Reach (Type A)", CheckType.REACH, CancelType.COMBAT, 60, true, true, true));
         checks.add(new ReachB("Reach (Type B)", CheckType.REACH, CancelType.COMBAT, 60, true, false, true));
         checks.add(new ReachC("Reach (Type C)", CheckType.REACH, CancelType.MOTION, 50, true, false, true));
@@ -120,6 +124,27 @@ public class CheckManager {
     public Check getCheck(String name) {
         return checks.stream().filter(check -> check.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
+
+    public boolean isBypassing(PlayerData data) {
+        return isBypassing(data.getUuid());
+    }
+
+    public boolean isBypassing(UUID uuid) {
+        return bypassingPlayers.contains(uuid);
+    }
+
+    public void setBypassing(UUID uuid, boolean bypassing) {
+        if(bypassing) {
+            bypassingPlayers.add(uuid);
+        } else {
+            bypassingPlayers.remove(uuid);
+        }
+    }
+
+    public void setBypassing(UUID uuid) {
+        setBypassing(uuid, !isBypassing(uuid));
+    }
+
 
     public void removeCheck(String name) {
         Optional<Check> opCheck = checks.stream().filter(check -> check.getName().equalsIgnoreCase(name)).findFirst();

@@ -119,7 +119,7 @@ public class MenuUtils {
                     List<String> description = new ArrayList<>();
                     int amount = MathUtils.floor(check.getDescription().length() / 20D);
                     for(int i = 0 ; i < amount ; i++) {
-                        int max = Math.max(check.getDescription().length() - 1, (i + 1) * 15);
+                        int max = Math.min(check.getDescription().length() - 1, (i + 1) * 15);
                         if(check.getDescription().substring(max, max).equals(" ")) {
                             description.add("&f" + check.getDescription().substring(i * 15, (i + 1) * 15));
                         } else {

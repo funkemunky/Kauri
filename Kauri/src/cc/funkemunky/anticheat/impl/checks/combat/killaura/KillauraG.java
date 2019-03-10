@@ -4,6 +4,7 @@ import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
+import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.utils.BlockUtils;
@@ -27,6 +28,12 @@ public class KillauraG extends Check {
 
         setDeveloper(true);
     }
+
+    @Setting(name = "threshold.collision")
+    private int threshold = 2;
+
+    @Setting(name = "multipliers.blockBoxShrink")
+    private double shrinkMult = 0.1;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
@@ -68,19 +75,20 @@ public class KillauraG extends Check {
                 Block block = BlockUtils.getBlock(vec.toLocation(origin.getWorld()));
                 if (!block.getType().isSolid() || BlockUtils.isClimbableBlock(block)) continue;
 
-                if (collidingBlocks.stream().anyMatch(box -> box.intersectsWithBox(vec))) {
+                float shrink = (float) shrinkMult;
+
+                if (collidingBlocks.stream().anyMatch(box -> box.shrink(shrink, shrink, shrink).intersectsWithBox(vec))) {
                     amount++;
                 }
             }
 
-            if (amount > 3) {
-                flag(amount + ">-3", true, true);
+            if (amount > threshold) {
+                flag(amount + ">-" + threshold, true, true);
             }
 
             debug("COLLIDED: " + amount + " AMOUNT: " + vectors.size() + " DISTANCE: " + MathUtils.round(distance, 4));
         }
     }
-
 
     @Override
     public void onBukkitEvent(Event event) {

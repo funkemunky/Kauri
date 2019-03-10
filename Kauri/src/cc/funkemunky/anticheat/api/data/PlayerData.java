@@ -45,7 +45,7 @@ public class PlayerData {
             lastFlag = new TickTimer(40),
             lastAttack = new TickTimer(4);
     private float walkSpeed, flySpeed;
-    private LivingEntity target;
+    private LivingEntity target, attacker;
     private long transPing, lastTransaction, lastTransPing, ping, lastPing, lastKeepAlive;
     private MCSmooth yawSmooth = new MCSmooth(), pitchSmooth = new MCSmooth();
     private CustomLocation entityFrom, entityTo;
@@ -55,6 +55,8 @@ public class PlayerData {
     private MovementProcessor movementProcessor;
     private ActionProcessor actionProcessor;
     private VelocityProcessor velocityProcessor;
+
+    private long lastDig;
 
     public PlayerData(UUID uuid) {
         this.uuid = uuid;

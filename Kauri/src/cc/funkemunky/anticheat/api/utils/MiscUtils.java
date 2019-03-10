@@ -2,9 +2,13 @@ package cc.funkemunky.anticheat.api.utils;
 
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.api.Atlas;
+import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.BoundingBox;
+import cc.funkemunky.api.utils.ReflectionsUtil;
 import lombok.val;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.entity.Player;
@@ -233,11 +237,19 @@ public class MiscUtils {
         }
     }
 
-    public static String getPlayerID(Player player) {
-        if(player != null) {
-            return player.getUniqueId().toString();
+    public static Location findGroundLocation(Player player) {
+        for(int y = player.getLocation().getBlockY() ; y > 0 ; y--) {
+            Location location = new Location(player.getWorld(), player.getLocation().getBlockX(), y, player.getLocation().getBlockZ());
+
+            Block block = BlockUtils.getBlock(location);
+
+            if(BlockUtils.isSolid(block)) {
+                Location toReturn = location.clone();
+                toReturn.setY(ReflectionsUtil.getBlockBoundingBox(block).maxY);
+                return location;
+            }
         }
-        return "%%__NONCE__%%";
+        return player.getLocation();
     }
 
     private static Plugin getPlugin(final String p) {

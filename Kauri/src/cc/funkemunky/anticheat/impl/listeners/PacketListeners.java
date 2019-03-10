@@ -53,7 +53,9 @@ public class PacketListeners implements Listener {
                 case Packet.Server.ENTITY_VELOCITY: {
                     WrappedOutVelocityPacket packet = new WrappedOutVelocityPacket(event.getPacket(), event.getPlayer());
 
-                    data.getVelocityProcessor().update(packet);
+                    if((Math.abs(packet.getX()) > 0.1 || Math.abs(packet.getZ()) > 0.1) && Math.abs(packet.getY()) > 0.1) {
+                        data.getVelocityProcessor().update(packet);
+                    }
                     break;
                 }
             }
@@ -160,6 +162,14 @@ public class PacketListeners implements Listener {
                     if(entity instanceof LivingEntity) {
                         data.getLastAttack().reset();
                         data.setTarget((LivingEntity) entity);
+
+                        if(entity instanceof Player) {
+                            PlayerData dataEntity = Kauri.getInstance().getDataManager().getPlayerData(entity.getUniqueId());
+
+                            if(dataEntity != null) {
+                                dataEntity.setAttacker(packet.getPlayer());
+                            }
+                        }
                     }
                     break;
             }

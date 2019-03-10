@@ -3,44 +3,68 @@ package cc.funkemunky.anticheat.impl.checks.movement;
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
+import cc.funkemunky.api.utils.Color;
+import cc.funkemunky.api.utils.PlayerUtils;
 import lombok.val;
+import lombok.var;
 import org.bukkit.Material;
 import org.bukkit.event.Event;
+import org.bukkit.potion.PotionEffectType;
 
-@Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.POSITION, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION})
+@Packets(packets = {Packet.Server.ENTITY_VELOCITY, Packet.Client.POSITION_LOOK, Packet.Client.POSITION, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION})
 public class VelocityC extends Check {
     public VelocityC(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
         super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
     }
 
     private double vl;
+    private double velocity;
 
-    //TODO Test
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        val player = getData().getPlayer();
-        val velocity = getData().getVelocityProcessor();
-        val move = getData().getMovementProcessor();
-        val hasTakenVelocity = velocity.getLastVelocity().hasNotPassed(8);
+        if(packetType.equalsIgnoreCase(Packet.Server.ENTITY_VELOCITY)) {
+            WrappedOutVelocityPacket velocity = new WrappedOutVelocityPacket(packet, getData().getPlayer());
 
-        if(!hasTakenVelocity) return;
-        val colliding = getData().getBoundingBox().grow(1,0,1).add(0,0.00000001f,0,0,0.25f,0).getCollidingBlocks(player).stream().anyMatch(block -> !block.getType().equals(Material.AIR));
+            if(velocity.getId() == velocity.getPlayer().getEntityId()) {
+                this.velocity = MiscUtils.hypot(velocity.getX(), velocity.getZ());
+            }
+        } else {
+            var getAIMoveSpeed = getData().getPlayer().getWalkSpeed() / 2;
+            val player = getData().getPlayer();
+            val action = getData().getActionProcessor();
+            val move = getData().getMovementProcessor();
+            val velocity = getData().getVelocityProcessor();
 
-        if(!colliding) {
-            val deltaXZ = move.getDeltaXZ();
-            val velocityXZ = cc.funkemunky.anticheat.api.utils.MiscUtils.hypot(velocity.getMotionX(), velocity.getMotionZ());
+            val noneCollide = getData().getBoundingBox().grow(1.5f, 0, 1.5f).getCollidingBlockBoxes(player).size() == 0;
 
-            if(velocityXZ < 1E-4) return;
-            val ratio = Math.abs(deltaXZ - velocityXZ);
-            if(ratio < 0.5) {
-                if(vl++ > 10) {
-                    flag("velocity: " + ratio + "%", true, true);
+            if(this.velocity > 0 && !move.isBlocksOnTop() && !noneCollide) {
+                val velocityXZ = this.velocity;
+                val ratio = move.getDeltaXZ() / velocityXZ;
+                float max = 1;
+                if (action.isSprinting())
+                    getAIMoveSpeed += 0.03000001F;
+
+                if(getData().getPlayer().hasPotionEffect(PotionEffectType.SPEED)) {
+                    getAIMoveSpeed += (PlayerUtils.getPotionEffectLevel(player, PotionEffectType.SPEED) * (0.20000000298023224D)) * getAIMoveSpeed;
                 }
-            } else vl-= vl > 0 ? 0.6 : 0;
+                if(player.hasPotionEffect(PotionEffectType.SLOW)) {
+                    getAIMoveSpeed += (PlayerUtils.getPotionEffectLevel(player, PotionEffectType.SLOW) * (-0.15000000596046448D)) * getAIMoveSpeed;
+                }
+                getAIMoveSpeed+= (player.getWalkSpeed() - 0.2) * 5 * 0.45;
 
-            debug("VL: " + vl + " RATIO: " + ratio + " DELTAXZ: " + deltaXZ + " VELOCITYXZ: " + velocityXZ);
+                max/= (getAIMoveSpeed / 0.08);
+
+                if(ratio < max) {
+                    debug(Color.Green + "Flag");
+                }
+
+                debug(max + ", " +  (getAIMoveSpeed / 0.08) + ", " + getAIMoveSpeed + ", " + ratio + ", " + velocityXZ + ", " + move.getDeltaXZ());
+                this.velocity = 0;
+            }
         }
     }
 

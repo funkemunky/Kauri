@@ -2,9 +2,13 @@ package cc.funkemunky.anticheat.api.utils;
 
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.api.Atlas;
+import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.BoundingBox;
+import cc.funkemunky.api.utils.ReflectionsUtil;
 import lombok.val;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.entity.Player;
@@ -34,7 +38,20 @@ public class MiscUtils {
         return data.getBoundingBox().minY - highestBox.maxY;
     }
 
+    public static double hypot(double... value) {
+        double total = 0;
+
+        for(double val : value) {
+            total+= (val * val);
+        }
+
+        return Math.sqrt(total);
+    }
     public static long gcd(long current, long previous) {
+        return (previous <= 16384L) ? current : gcd(previous, current % previous);
+    }
+
+    public static float gcd(float current, float previous) {
         return (previous <= 16384L) ? current : gcd(previous, current % previous);
     }
 
@@ -52,6 +69,7 @@ public class MiscUtils {
                 || move.getLastVehicle().hasNotPassed(5)
                 || move.getLiquidTicks() > 0
                 || move.getWebTicks() > 0
+                || move.getLastFlightToggle().hasNotPassed(10)
                 || move.isLagging()
                 || !Atlas.getInstance().getBlockBoxManager().getBlockBox().isChunkLoaded(data.getPlayer().getLocation())
                 || data.getLastLogin().hasNotPassed(50)
@@ -66,6 +84,21 @@ public class MiscUtils {
                 || move.isPistonsNear()
                 || move.getTo().toVector().distance(move.getFrom().toVector()) < 0.005
                 || velocity.getLastVelocity().hasNotPassed(velocityTicks);
+    }
+
+    public static Location findGroundLocation(Player player) {
+        for(int y = player.getLocation().getBlockY() ; y > 0 ; y--) {
+            Location location = new Location(player.getWorld(), player.getLocation().getBlockX(), y, player.getLocation().getBlockZ());
+
+            Block block = BlockUtils.getBlock(location);
+
+            if(BlockUtils.isSolid(block)) {
+                Location toReturn = location.clone();
+                toReturn.setY(ReflectionsUtil.getBlockBoundingBox(block).maxY);
+                return location;
+            }
+        }
+        return player.getLocation();
     }
 
     public static float wrapAngleTo180_float(float value) {
@@ -90,16 +123,6 @@ public class MiscUtils {
         }
 
         return null;
-    }
-
-    public static double hypot(double... value) {
-        double total = 0;
-
-        for(double val : value) {
-            total+= (val * val);
-        }
-
-        return Math.sqrt(total);
     }
 
     public static String unloadPlugin(String pl) {
@@ -227,13 +250,6 @@ public class MiscUtils {
         catch (UnknownDependencyException | InvalidPluginException | InvalidDescriptionException e3) {
             e3.printStackTrace();
         }
-    }
-
-    public static String getPlayerID(Player player) {
-        if(player != null) {
-            return player.getUniqueId().toString();
-        }
-        return "%%__NONCE__%%";
     }
 
     private static Plugin getPlugin(final String p) {

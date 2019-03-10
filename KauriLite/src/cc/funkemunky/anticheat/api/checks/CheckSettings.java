@@ -22,7 +22,7 @@ public class CheckSettings {
     static String broadcastMessage = "&8[&6&lKauri&8] &e%player% &7has been removed for cheating.";
 
     @ConfigSetting(path = "alerts", name = "alertsDelay")
-    static long alertsDelay = 1000;
+    public static long alertsDelay = 1000;
 
     @ConfigSetting(path = "alerts", name = "testMode")
     public static boolean testMode = false;
@@ -32,4 +32,10 @@ public class CheckSettings {
 
     @ConfigSetting(path = "alerts", name = "enableOnJoin")
     public static boolean enableOnJoin = true;
+
+    @ConfigSetting(path = "bypass", name = "enabled")
+    public static boolean bypassEnabled = true;
+
+    @ConfigSetting(path = "bypass", name = "permission")
+    public static String bypassPermission = "kauri.bypass";
 }

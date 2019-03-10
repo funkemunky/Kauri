@@ -40,7 +40,7 @@ public class Kauri extends JavaPlugin {
     private LoggerManager loggerManager;
 
 
-    private String requiredVersionOfAtlas = "1.1.3.1";
+    private String requiredVersionOfAtlas = "1.1.3.3";
 
     @Override
     public void onEnable() {
@@ -48,7 +48,7 @@ public class Kauri extends JavaPlugin {
         instance = this;
         saveDefaultConfig();
 
-        if(!Bukkit.getPluginManager().isPluginEnabled("KauriLoader")) return;
+        if(Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled()) return;
 
         if(Bukkit.getPluginManager().isPluginEnabled("Atlas") && Bukkit.getPluginManager().getPlugin("Atlas").getDescription().getVersion().equals(requiredVersionOfAtlas)) {
 
@@ -126,7 +126,7 @@ public class Kauri extends JavaPlugin {
     }
 
     public void reloadKauri() {
-        Kauri.getInstance().saveConfig();
+        Kauri.getInstance().reloadConfig();
         Kauri.getInstance().getCheckManager().getChecks().clear();
         Kauri.getInstance().getDataManager().getDataObjects().clear();
         Bukkit.getOnlinePlayers().forEach((player -> Kauri.getInstance().getDataManager().addData(player.getUniqueId())));

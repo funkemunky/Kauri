@@ -14,6 +14,8 @@ import org.bukkit.event.Event;
 public class AimE extends Check {
     public AimE(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
         super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+
+        setDeveloper(true);
     }
 
     private int vl;
