@@ -21,7 +21,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.lang.reflect.Field;
 import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Level;
@@ -39,8 +42,8 @@ public class Kauri extends JavaPlugin {
     private BaseProfiler profiler;
     private LoggerManager loggerManager;
 
-
-    private String requiredVersionOfAtlas = "1.1.3.3";
+    private String requiredVersionOfAtlas = "1.1.3.4";
+    private List<String> usableVersionsOfAtlas = Arrays.asList("1.1.3.4", "1.1.3.3");
 
     @Override
     public void onEnable() {
@@ -50,16 +53,19 @@ public class Kauri extends JavaPlugin {
 
         //if(Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled()) return;
 
-        if(Bukkit.getPluginManager().isPluginEnabled("Atlas") && Bukkit.getPluginManager().getPlugin("Atlas").getDescription().getVersion().equals(requiredVersionOfAtlas)) {
+        if(Bukkit.getPluginManager().isPluginEnabled("Atlas") && usableVersionsOfAtlas.contains(Bukkit.getPluginManager().getPlugin("Atlas").getDescription().getVersion())) {
 
             profiler = new BaseProfiler();
             profileStart = System.currentTimeMillis();
 
+            dataManager = new DataManager();
+
             startScanner(false);
 
-            //Starting up our utilities, managers, and tasks.
             checkManager = new CheckManager();
-            dataManager = new DataManager();
+            dataManager.registerAllPlayers();
+
+            //Starting up our utilities, managers, and tasks.
 
             statsManager = new StatsManager();
             loggerManager = new LoggerManager();
@@ -68,6 +74,7 @@ public class Kauri extends JavaPlugin {
             runTasks();
             registerCommands();
 
+            MiscUtils.printToConsole("&aSuccessfully loaded Kauri and all of its libraries!");
         } else {
             Bukkit.getLogger().log(Level.SEVERE, "You do not the required Atlas dependency installed! Try restarting the server to see if the downloader will do it properly next time.");
         }

@@ -21,7 +21,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.lang.reflect.Field;
 import java.math.RoundingMode;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Level;
@@ -39,8 +41,8 @@ public class Kauri extends JavaPlugin {
     private BaseProfiler profiler;
     private LoggerManager loggerManager;
 
-
-    private String requiredVersionOfAtlas = "1.1.3.3";
+    private String requiredVersionOfAtlas = "1.1.3.4";
+    private List<String> usableVersionsOfAtlas = Arrays.asList("1.1.3.4", "1.1.3.3");
 
     @Override
     public void onEnable() {
@@ -48,18 +50,21 @@ public class Kauri extends JavaPlugin {
         instance = this;
         saveDefaultConfig();
 
-        if(Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled()) return;
+        //if(Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled()) return;
 
-        if(Bukkit.getPluginManager().isPluginEnabled("Atlas") && Bukkit.getPluginManager().getPlugin("Atlas").getDescription().getVersion().equals(requiredVersionOfAtlas)) {
+        if(Bukkit.getPluginManager().isPluginEnabled("Atlas") && usableVersionsOfAtlas.contains(Bukkit.getPluginManager().getPlugin("Atlas").getDescription().getVersion())) {
 
             profiler = new BaseProfiler();
             profileStart = System.currentTimeMillis();
 
-            //Starting up our utilities, managers, and tasks.
-            checkManager = new CheckManager();
             dataManager = new DataManager();
 
-            startScanner();
+            startScanner(false);
+
+            checkManager = new CheckManager();
+            dataManager.registerAllPlayers();
+
+            //Starting up our utilities, managers, and tasks.
 
             statsManager = new StatsManager();
             loggerManager = new LoggerManager();
@@ -68,6 +73,7 @@ public class Kauri extends JavaPlugin {
             runTasks();
             registerCommands();
 
+            MiscUtils.printToConsole("&aSuccessfully loaded Kauri and all of its libraries!");
         } else {
             Bukkit.getLogger().log(Level.SEVERE, "You do not the required Atlas dependency installed! Try restarting the server to see if the downloader will do it properly next time.");
         }
@@ -76,6 +82,7 @@ public class Kauri extends JavaPlugin {
 
         //Registering all the commands
     }
+
 
     public void onDisable() {
         statsManager.saveStats();
@@ -109,8 +116,8 @@ public class Kauri extends JavaPlugin {
         }.runTaskTimer(Kauri.getInstance(), 0L, 1L);
     }
 
-    public void startScanner() {
-        initializeScanner(getClass(), this);
+    public void startScanner(boolean configOnly) {
+        initializeScanner(getClass(), this, configOnly);
     }
 
     private void registerCommands() {
@@ -126,17 +133,17 @@ public class Kauri extends JavaPlugin {
     }
 
     public void reloadKauri() {
-        Kauri.getInstance().reloadConfig();
-        Kauri.getInstance().getCheckManager().getChecks().clear();
-        Kauri.getInstance().getDataManager().getDataObjects().clear();
-        Bukkit.getOnlinePlayers().forEach((player -> Kauri.getInstance().getDataManager().addData(player.getUniqueId())));
-        Kauri.getInstance().getDataManager().getDataObjects().values().forEach(data -> Kauri.getInstance().getCheckManager().loadChecksIntoData(data));
-        Kauri.getInstance().getCheckManager().setChecks(Kauri.getInstance().getCheckManager().loadChecks());
+        reloadConfig();
+        getCheckManager().getChecks().clear();
+        getDataManager().getDataObjects().clear();
+        startScanner(true);
+        checkManager = new CheckManager();
+        dataManager = new DataManager();
     }
 
     //Credits: Luke.
 
-    private void initializeScanner(Class<?> mainClass, Plugin plugin) {
+    private void initializeScanner(Class<?> mainClass, Plugin plugin, boolean configOnly) {
         ClassScanner.scanFile(null, mainClass).stream().filter(c -> {
             try {
                 Class clazz = Class.forName(c);
@@ -164,18 +171,21 @@ public class Kauri extends JavaPlugin {
                 if(clazz.isAnnotationPresent(Init.class)) {
                     Object obj = clazz.getSimpleName().equals(mainClass.getSimpleName()) ? plugin : clazz.newInstance();
                     Init init = (Init) clazz.getAnnotation(Init.class);
-                    if (obj instanceof Listener) {
-                        MiscUtils.printToConsole("&eFound " + clazz.getSimpleName() + " Bukkit listener. Registering...");
-                        Bukkit.getPluginManager().registerEvents((Listener) obj, plugin);
-                    } else if(obj instanceof cc.funkemunky.api.event.system.Listener) {
-                        MiscUtils.printToConsole("&eFound " + clazz.getSimpleName() + " Atlas listener. Registering...");
-                        EventManager.register(plugin, (cc.funkemunky.api.event.system.Listener) obj);
-                    }
 
-                    if(init.commands()) {
-                        Atlas.getInstance().getCommandManager().registerCommands(obj);
-                    }
+                    if(!configOnly) {
+                        if (obj instanceof Listener) {
+                            MiscUtils.printToConsole("&eFound " + clazz.getSimpleName() + " Bukkit listener. Registering...");
+                            Bukkit.getPluginManager().registerEvents((Listener) obj, plugin);
+                        } else if(obj instanceof cc.funkemunky.api.event.system.Listener) {
+                            MiscUtils.printToConsole("&eFound " + clazz.getSimpleName() + " Atlas listener. Registering...");
+                            EventManager.register(plugin, (cc.funkemunky.api.event.system.Listener) obj);
+                        }
 
+                        if(init.commands()) {
+                            Atlas.getInstance().getCommandManager().registerCommands(obj);
+                        }
+
+                    }
                     for (Field field : clazz.getDeclaredFields()) {
                         field.setAccessible(true);
                         if(field.isAnnotationPresent(ConfigSetting.class)) {

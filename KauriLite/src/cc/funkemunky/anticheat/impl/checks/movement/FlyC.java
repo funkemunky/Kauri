@@ -22,7 +22,7 @@ public class FlyC extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(MiscUtils.cancelForFlight(getData(), 12)) return;
+        if(MiscUtils.cancelForFlight(getData(), 12, true)) return;
 
         val move = getData().getMovementProcessor();
 

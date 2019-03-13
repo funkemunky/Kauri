@@ -24,6 +24,8 @@ public class BadPacketsG extends Check {
 
     public BadPacketsG(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
         super(name, type, cancelType, maxVL, enabled, executable, cancellable);
+
+        setDeveloper(true);
     }
 
     @Setting(name = "usingPaperSpigot")
@@ -33,7 +35,7 @@ public class BadPacketsG extends Check {
     public float deltaBalance = 0.02f;
 
     @Setting(name = "threshold.vl.max")
-    private int maxVL = 14;
+    private int maxVL = 30;
 
     private long lastFlying;
     private int vl;
@@ -53,11 +55,11 @@ public class BadPacketsG extends Check {
             val max = usingPaper ? 7.071f : Math.sqrt(Kauri.getInstance().getTickElapsed());
             val stdDev = this.statisticalAnalysis.getStdDev();
 
-            if (!MathUtils.approxEquals(deltaBalance, max, stdDev) && stdDev < max && !data.isLagging()) {
+            if (!MathUtils.approxEquals(deltaBalance, max, stdDev) && stdDev < max && getData().getLastLag().hasNotPassed(10)) {
                 if(vl++ > maxVL) {
                     this.flag("S: " + stdDev, false, true);
                 }
-            } else vl -= vl > 0 ? 2 : 0;
+            } else vl -= vl > 0 ? 3 : 0;
         }
 
         this.lastFlying = timeStamp;

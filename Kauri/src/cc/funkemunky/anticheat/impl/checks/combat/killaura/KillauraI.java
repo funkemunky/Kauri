@@ -18,8 +18,6 @@ import org.bukkit.event.Event;
 public class KillauraI extends Check {
     public KillauraI(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
         super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
-
-        setDeveloper(true);
     }
 
     private double vl;
@@ -38,7 +36,7 @@ public class KillauraI extends Check {
                     flag(String.valueOf(gcd / 2000), true, true);
                 }
             } else {
-                vl -= vl > 0 ? 3 : 0;
+                vl -= vl > 0 ? 2 : 0;
             }
 
             debug("VL: " + vl + " YAW: " + gcd + " OPTIFINE: " + getData().isCinematicMode());

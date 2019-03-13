@@ -14,9 +14,9 @@ public class DelayArgument extends FunkeArgument {
 
     @Override
     public void onArgument(CommandSender sender, Command command, String[] args) {
-        if(args.length > 0) {
+        if(args.length > 1) {
             try {
-                long delay = Long.parseLong(args[0]);
+                long delay = Long.parseLong(args[1]);
 
                 Kauri.getInstance().getConfig().set("alerts.alertsDelay", CheckSettings.alertsDelay = delay);
                 Kauri.getInstance().saveConfig();

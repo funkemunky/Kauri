@@ -7,6 +7,7 @@ import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.event.custom.PacketRecieveEvent;
 import cc.funkemunky.api.event.custom.PacketSendEvent;
+import cc.funkemunky.api.event.system.EnumPriority;
 import cc.funkemunky.api.event.system.EventMethod;
 import cc.funkemunky.api.event.system.Listener;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
@@ -14,18 +15,21 @@ import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.*;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
+import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.Init;
 import lombok.val;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventPriority;
 
 import java.util.ArrayList;
 
 @Init
 public class PacketListeners implements Listener {
 
-    @EventMethod
+    @EventMethod(priority = EnumPriority.HIGHEST)
     public void onEvent(PacketSendEvent event) {
         if (event.getPlayer() == null || !event.getPlayer().isOnline() || !Kauri.getInstance().getDataManager().getDataObjects().containsKey(event.getPlayer().getUniqueId())) return;
 
@@ -151,7 +155,11 @@ public class PacketListeners implements Listener {
                     WrappedInBlockPlacePacket packet = new WrappedInBlockPlacePacket(event.getPacket(), player);
 
                     if (packet.getItemStack() != null && packet.getPosition() != null && packet.getPosition().getX() != -1 && packet.getPosition().getY() != -1 && packet.getPosition().getZ() != -1) {
-                        data.getLastBlockPlace().reset();
+                        Location location = new Location(packet.getPlayer().getWorld(), packet.getPosition().getX(), packet.getPosition().getY(), packet.getPosition().getZ());
+
+                        if(location.distance(packet.getPlayer().getLocation()) < 15 && BlockUtils.getBlock(location).getType().isSolid() && packet.getItemStack().getType().isSolid()) {
+                            data.getLastBlockPlace().reset();
+                        }
                     }
                     break;
                 }

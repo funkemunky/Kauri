@@ -173,7 +173,7 @@ public class MovementProcessor {
             val smoothDelta = MathUtils.getDelta(yawDelta, smooth);
             val smoothDelta2 = MathUtils.getDelta(pitchDelta, smooth2);
 
-            data.setCinematicMode((smoothDelta) < 0.1 || (smoothDelta2) < 0.04);
+            data.setCinematicMode((smoothDelta / yawDelta) < 0.1 || (smoothDelta2) < 0.02);
 
             //Bukkit.broadcastMessage(smoothDelta + "," + smoothDelta2 + ": " + "(" + smoothDelta / yawDelta + "), " + "(" + (smoothDelta2 / pitchDelta) + "): " + data.isCinematicMode());
             if (data.isCinematicMode()) {

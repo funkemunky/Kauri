@@ -48,10 +48,10 @@ public class KillauraF extends Check {
 
             double offset = offsetArray[0], average = this.average.getAverage();
 
-            if (average < 5.0 && (player.isSprinting() || yawDelta > 2.0) && yawDelta > 0.3 && getData().getMovementProcessor().getDeltaXZ() > 0.15 && vl++ > 50) {
+            if (average < 5.0 && (player.isSprinting() || yawDelta > 2.0) && yawDelta > 0.3 && getData().getMovementProcessor().getDeltaXZ() > 0.15 && vl++ > 100) {
                 flag(average + "<-4.0->" + vl, true, true);
             } else {
-                vl-= vl > 0 ? 0.5f : 0;
+                vl-= vl > 0 ? 2f : 0;
             }
 
             debug(average + ", " + offset + ", " + vl);

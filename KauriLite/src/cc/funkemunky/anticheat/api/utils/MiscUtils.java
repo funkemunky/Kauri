@@ -56,10 +56,10 @@ public class MiscUtils {
     }
 
     public static boolean cancelForFlight(PlayerData data) {
-        return cancelForFlight(data, 40);
+        return cancelForFlight(data, 40, true);
     }
 
-    public static boolean cancelForFlight(PlayerData data, int velocityTicks) {
+    public static boolean cancelForFlight(PlayerData data, int velocityTicks, boolean groundCheck) {
         val move = data.getMovementProcessor();
         val player = data.getPlayer();
         val velocity = data.getVelocityProcessor();
@@ -74,31 +74,16 @@ public class MiscUtils {
                 || !Atlas.getInstance().getBlockBoxManager().getBlockBox().isChunkLoaded(data.getPlayer().getLocation())
                 || data.getLastLogin().hasNotPassed(50)
                 || move.getClimbTicks() > 0
-                || data.getLastBlockPlace().hasNotPassed(5)
+                || data.getLastBlockPlace().hasNotPassed(10)
                 || player.getActivePotionEffects().stream().anyMatch(effect -> effect.toString().toLowerCase().contains("levi"))
-                || move.isOnHalfBlock()
-                || move.isServerOnGround()
+                || (move.isServerOnGround() && move.isOnHalfBlock())
+                || (move.isServerOnGround() && groundCheck)
                 || move.isRiptiding()
                 || move.isOnSlimeBefore()
                 || move.getLastRiptide().hasNotPassed(8)
                 || move.isPistonsNear()
                 || move.getTo().toVector().distance(move.getFrom().toVector()) < 0.005
                 || velocity.getLastVelocity().hasNotPassed(velocityTicks);
-    }
-
-    public static Location findGroundLocation(Player player) {
-        for(int y = player.getLocation().getBlockY() ; y > 0 ; y--) {
-            Location location = new Location(player.getWorld(), player.getLocation().getBlockX(), y, player.getLocation().getBlockZ());
-
-            Block block = BlockUtils.getBlock(location);
-
-            if(BlockUtils.isSolid(block)) {
-                Location toReturn = location.clone();
-                toReturn.setY(ReflectionsUtil.getBlockBoundingBox(block).maxY);
-                return location;
-            }
-        }
-        return player.getLocation();
     }
 
     public static float wrapAngleTo180_float(float value) {
@@ -250,6 +235,21 @@ public class MiscUtils {
         catch (UnknownDependencyException | InvalidPluginException | InvalidDescriptionException e3) {
             e3.printStackTrace();
         }
+    }
+
+    public static Location findGroundLocation(Player player) {
+        for(int y = player.getLocation().getBlockY() ; y > 0 ; y--) {
+            Location location = new Location(player.getWorld(), player.getLocation().getBlockX(), y, player.getLocation().getBlockZ());
+
+            Block block = BlockUtils.getBlock(location);
+
+            if(BlockUtils.isSolid(block)) {
+                Location toReturn = location.clone();
+                toReturn.setY(ReflectionsUtil.getBlockBoundingBox(block).maxY);
+                return location;
+            }
+        }
+        return player.getLocation();
     }
 
     private static Plugin getPlugin(final String p) {

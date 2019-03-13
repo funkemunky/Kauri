@@ -11,10 +11,6 @@ import java.util.UUID;
 public class DataManager {
     private Map<UUID, PlayerData> dataObjects = new HashMap<>();
 
-    public DataManager() {
-        Bukkit.getOnlinePlayers().forEach(player -> addData(player.getUniqueId()));
-    }
-
     public PlayerData getPlayerData(UUID uuid) {
         return dataObjects.getOrDefault(uuid, null);
     }
@@ -25,5 +21,9 @@ public class DataManager {
 
     public void removeData(UUID uuid) {
         dataObjects.remove(uuid);
+    }
+
+    public void registerAllPlayers() {
+        Bukkit.getOnlinePlayers().forEach(player -> addData(player.getUniqueId()));
     }
 }

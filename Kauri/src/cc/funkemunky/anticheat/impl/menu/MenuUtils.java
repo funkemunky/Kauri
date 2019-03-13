@@ -10,15 +10,14 @@ import cc.funkemunky.anticheat.api.utils.menu.type.impl.ChestMenu;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.MiscUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class MenuUtils {
     public static boolean hasModifiedChecks = false;
@@ -115,31 +114,12 @@ public class MenuUtils {
                 "&eCancellable&7: &f" + check.isCancellable(),
                 "&eDescription&7: &f"));
 
-                if(check.getDescription().length() > 15) {
-                    List<String> description = new ArrayList<>();
-                    int amount = MathUtils.floor(check.getDescription().length() / 20D);
-                    for(int i = 0 ; i < amount ; i++) {
-                        int max = Math.min(check.getDescription().length() - 1, (i + 1) * 15);
-                        if(check.getDescription().substring(max, max).equals(" ")) {
-                            description.add("&f" + check.getDescription().substring(i * 15, (i + 1) * 15));
-                        } else {
-                            for(int i2 = max ; i2 < check.getDescription().length() ; i2++) {
-                                if(check.getDescription().substring(i2, i2).equals(" ") || i2 <= (check.getDescription().length() - 1)) {
-                                    description.add("&f" + check.getDescription().substring(i * 15, i2));
-                                    break;
-                                }
-                            }
-                        }
-                    }
+        lore.addAll(Arrays.asList(splitIntoLine(check.getDescription(), 35)));
+        lore.addAll(Arrays.asList( "&eInstructions&7:",
+                "&8- &fLeft Click &7to toggle check on/off.",
+                "&8- &fShift + Left Click &7to toggle check executable-abilities.",
+                "&8- &fRight Click &7to toggle check cancellable-abilities."));
 
-                    lore.addAll(description);
-                } else {
-                    lore.add("&f" + check.getDescription());
-                }
-                lore.addAll(Arrays.asList( "&eInstructions&7:",
-                        "&8- &fLeft Click &7to toggle check on/off.",
-                        "&8- &fShift + Left Click &7to toggle check executable-abilities.",
-                        "&8- &fRight Click &7to toggle check cancellable-abilities."));
         return createButton(false,
                 MiscUtils.createItem(
                         Material.PAPER,
@@ -269,6 +249,33 @@ public class MenuUtils {
                         }
                     }
                 }));
+    }
+
+    private static String[] splitIntoLine(String input, int maxCharInLine){
+
+        StringTokenizer tok = new StringTokenizer(input, " ");
+        StringBuilder output = new StringBuilder(input.length());
+        int lineLen = 0;
+        while (tok.hasMoreTokens()) {
+            String word = tok.nextToken();
+
+            while(word.length() > maxCharInLine){
+                output.append(word.substring(0, maxCharInLine-lineLen) + "\n");
+                word = word.substring(maxCharInLine-lineLen);
+                lineLen = 0;
+            }
+
+            if (lineLen + word.length() > maxCharInLine) {
+                output.append("\n");
+                lineLen = 0;
+            }
+            output.append("&f" + word + " ");
+
+            lineLen += word.length() + 1;
+        }
+        // output.split();
+        // return output.toString();
+        return output.toString().split("\n");
     }
 
     private static Button saveChangesButton(int page) {

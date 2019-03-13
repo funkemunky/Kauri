@@ -82,7 +82,7 @@ public class MiscUtils {
                 || move.isOnSlimeBefore()
                 || move.getLastRiptide().hasNotPassed(8)
                 || move.isPistonsNear()
-                || move.getTo().toVector().distance(move.getFrom().toVector()) < 0.005
+                || move.getTo() != null &&  move.getTo().toVector().distance(move.getFrom().toVector()) < 0.005
                 || velocity.getLastVelocity().hasNotPassed(velocityTicks);
     }
 

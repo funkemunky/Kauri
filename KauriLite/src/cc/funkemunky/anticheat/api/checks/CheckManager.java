@@ -49,14 +49,16 @@ public class CheckManager {
         checks.add(new KillauraC("Killaura (Type C)", CheckType.KILLAURA, CancelType.COMBAT, 100, true, true, true));
         checks.add(new KillauraD("Killaura (Type D)", CheckType.KILLAURA, CancelType.COMBAT, 75, true, false, true));
         checks.add(new KillauraG("Killaura (Type G)", CheckType.KILLAURA, CancelType.COMBAT, 50, true, false, true));
-        checks.add(new KillauraH("Killaura (Type H)", CheckType.KILLAURA, CancelType.COMBAT, 20, true, true, true));
+        //checks.add(new KillauraH("Killaura (Type H)", CheckType.KILLAURA, CancelType.COMBAT, 20, true, true, true));
         checks.add(new FlyA("Fly (Type A)", CheckType.FLY, CancelType.MOTION, 225, true, true, true));
         checks.add(new FlyB("Fly (Type B)", CheckType.FLY, CancelType.MOTION, 225, true, false, true));
         checks.add(new FlyC("Fly (Type C)", CheckType.FLY, CancelType.MOTION, 100, true, true, true));
         checks.add(new FlyD("Fly (Type D)", CheckType.FLY, CancelType.MOTION, 200, true, false, true));
+        checks.add(new FlyE("Fly (Type E)", CheckType.FLY, CancelType.MOTION, 150, true, false, true));
         checks.add(new SpeedA("Speed (Type A)", CheckType.SPEED, CancelType.MOTION, 100, true, false, true));
         checks.add(new SpeedB("Speed (Type B)", CheckType.SPEED, CancelType.MOTION, 125, true, true, true));
         checks.add(new SpeedC("Speed (Type C)", CheckType.SPEED, CancelType.MOTION, 100, true, false, true));
+        checks.add(new SpeedD("Speed (Type D)", CheckType.SPEED, CancelType.MOTION, 125, true, false, true));
         checks.add(new GroundSpoof("GroundSpoof", CheckType.MOVEMENT, CancelType.MOTION, 200, true, false, true));
         checks.add(new ReachA("Reach (Type A)", CheckType.REACH, CancelType.COMBAT, 60, true, true, true));
         checks.add(new ReachB("Reach (Type B)", CheckType.REACH, CancelType.COMBAT, 60, true, false, true));

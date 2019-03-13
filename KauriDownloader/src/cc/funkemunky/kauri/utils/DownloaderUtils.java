@@ -41,7 +41,7 @@ public class DownloaderUtils {
 
     private static String readFromUpdaterPastebin() {
         try {
-            URL url = new URL("https://pastebin.com/raw/Mv7yFKHx");
+            URL url = new URL("https://pastebin.com/raw/1G0kFzkx");
             URLConnection connection = url.openConnection();
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));

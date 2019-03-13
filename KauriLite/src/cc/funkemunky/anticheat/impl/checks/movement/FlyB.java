@@ -29,7 +29,7 @@ public class FlyB extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        if(MiscUtils.cancelForFlight(getData(), 30) || timeStamp < lastTimeStamp + 5) return;
+        if(MiscUtils.cancelForFlight(getData(), 30,false) || timeStamp < lastTimeStamp + 5) return;
 
         if(!move.isServerOnGround()
                 && move.getDeltaY() > move.getServerYVelocity() + 0.001

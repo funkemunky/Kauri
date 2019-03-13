@@ -4,7 +4,7 @@ import cc.funkemunky.anticheat.Kauri;
 
 
 public class TickTimer {
-    private int ticks = 0, defaultPassed;
+    private int ticks = Kauri.getInstance().getCurrentTicks(), defaultPassed;
 
     public TickTimer(int defaultPassed) {
         this.defaultPassed = defaultPassed;

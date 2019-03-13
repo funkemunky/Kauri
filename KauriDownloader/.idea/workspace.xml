@@ -7,24 +7,49 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2d14aa2c-9c78-41d0-af1f-71b7478bae86" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../Kauri/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimF.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimG.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimH.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/impl/checks/movement/FlyE.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/impl/checks/movement/SpeedD.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/impl/checks/movement/StepA.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Kauri/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Kauri/Kauri.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/Kauri.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Kauri/out/artifacts/Kauri_jar/Kauri.jar" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/out/artifacts/Kauri_jar/Kauri.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Kauri/out/production/Kauri/plugin.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/out/production/Kauri/plugin.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Kauri/resources/plugin.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/resources/plugin.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/Kauri.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/Kauri.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/api/checks/CheckManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/api/checks/CheckManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/api/data/DataManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/api/data/DataManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/api/data/processors/MovementProcessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/api/data/processors/MovementProcessor.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/api/utils/MiscUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/api/utils/MiscUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimA.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimA.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimC.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimC.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimD.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimD.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimE.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimE.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimF.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/api/utils/TickTimer.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/api/utils/TickTimer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/combat/killaura/KillauraF.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/combat/killaura/KillauraF.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/combat/killaura/KillauraI.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/combat/killaura/KillauraI.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/movement/FlyB.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/movement/FlyB.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/cc/funkemunky/kauri/KauriDownloader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/cc/funkemunky/kauri/KauriDownloader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/movement/FlyE.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/movement/FlyE.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/movement/SpeedD.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/checks/movement/SpeedD.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/listeners/PacketListeners.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/listeners/PacketListeners.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/menu/MenuUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Kauri/src/cc/funkemunky/anticheat/impl/menu/MenuUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/artifacts/KauriDownloader_jar/KauriDownloader.jar" beforeDir="false" afterPath="$PROJECT_DIR$/out/artifacts/KauriDownloader_jar/KauriDownloader.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/cc/funkemunky/kauri/utils/DownloaderUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/cc/funkemunky/kauri/utils/DownloaderUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../KauriLite/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../KauriLite/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../KauriLite/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../KauriLite/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../KauriLite/out/artifacts/Kauri_jar/Kauri.jar" beforeDir="false" afterPath="$PROJECT_DIR$/../KauriLite/out/artifacts/Kauri_jar/Kauri.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../KauriLite/out/production/Kauri/plugin.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../KauriLite/out/production/Kauri/plugin.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../KauriLite/resources/plugin.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../KauriLite/resources/plugin.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/Kauri.java" beforeDir="false" afterPath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/Kauri.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/api/checks/CheckManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/api/checks/CheckManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/api/data/DataManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/api/data/DataManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/api/utils/MiscUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/api/utils/MiscUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/impl/checks/movement/FlyB.java" beforeDir="false" afterPath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/impl/checks/movement/FlyB.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/impl/checks/movement/FlyC.java" beforeDir="false" afterPath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/impl/checks/movement/FlyC.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/impl/checks/movement/FlyD.java" beforeDir="false" afterPath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/impl/checks/movement/FlyD.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/impl/checks/movement/VelocityC.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/impl/checks/player/BadPacketsG.java" beforeDir="false" afterPath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/impl/checks/player/BadPacketsG.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/impl/commands/kauri/arguments/DelayArgument.java" beforeDir="false" afterPath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/impl/commands/kauri/arguments/DelayArgument.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/impl/listeners/PacketListeners.java" beforeDir="false" afterPath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/impl/listeners/PacketListeners.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -52,8 +77,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/kauri/KauriDownloader.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="360">
-              <caret line="42" column="76" selection-start-line="42" selection-start-column="76" selection-end-line="42" selection-end-column="76" />
+            <state relative-caret-position="425">
+              <caret line="43" column="35" selection-start-line="43" selection-start-column="35" selection-end-line="43" selection-end-column="35" />
             </state>
           </provider>
         </entry>
@@ -61,7 +86,7 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/kauri/utils/DownloaderUtils.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="620">
+            <state relative-caret-position="535">
               <caret line="43" column="64" selection-start-line="43" selection-start-column="64" selection-end-line="43" selection-end-column="64" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -157,7 +182,7 @@
   <component name="ProjectFrameBounds" extendedState="6">
     <option name="y" value="23" />
     <option name="width" value="1440" />
-    <option name="height" value="790" />
+    <option name="height" value="787" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -165,6 +190,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -199,8 +226,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
-      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -254,17 +279,18 @@
       <workItem from="1551729886623" duration="615000" />
       <workItem from="1551788190651" duration="10000" />
       <workItem from="1552054268594" duration="723000" />
+      <workItem from="1552428616596" duration="2664000" />
+      <workItem from="1552476028666" duration="68000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="18449000" />
+    <option name="totallyTimeSpent" value="21181000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.21641791" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.22068231" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -339,8 +365,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/kauri/KauriDownloader.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="42" column="76" selection-start-line="42" selection-start-column="76" selection-end-line="42" selection-end-column="76" />
+        <state relative-caret-position="425">
+          <caret line="43" column="35" selection-start-line="43" selection-start-column="35" selection-end-line="43" selection-end-column="35" />
         </state>
       </provider>
     </entry>
@@ -377,7 +403,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/kauri/utils/DownloaderUtils.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="620">
+        <state relative-caret-position="535">
           <caret line="43" column="64" selection-start-line="43" selection-start-column="64" selection-end-line="43" selection-end-column="64" />
           <folding>
             <element signature="imports" expanded="true" />

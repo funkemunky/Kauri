@@ -7,6 +7,7 @@ import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.event.custom.PacketRecieveEvent;
 import cc.funkemunky.api.event.custom.PacketSendEvent;
+import cc.funkemunky.api.event.system.EnumPriority;
 import cc.funkemunky.api.event.system.EventMethod;
 import cc.funkemunky.api.event.system.Listener;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
@@ -25,7 +26,7 @@ import java.util.ArrayList;
 @Init
 public class PacketListeners implements Listener {
 
-    @EventMethod
+    @EventMethod(priority = EnumPriority.HIGHEST)
     public void onEvent(PacketSendEvent event) {
         if (event.getPlayer() == null || !event.getPlayer().isOnline() || !Kauri.getInstance().getDataManager().getDataObjects().containsKey(event.getPlayer().getUniqueId())) return;
 
@@ -53,7 +54,9 @@ public class PacketListeners implements Listener {
                 case Packet.Server.ENTITY_VELOCITY: {
                     WrappedOutVelocityPacket packet = new WrappedOutVelocityPacket(event.getPacket(), event.getPlayer());
 
-                    data.getVelocityProcessor().update(packet);
+                    if((Math.abs(packet.getX()) > 0.1 || Math.abs(packet.getZ()) > 0.1) && Math.abs(packet.getY()) > 0.1) {
+                        data.getVelocityProcessor().update(packet);
+                    }
                     break;
                 }
             }
