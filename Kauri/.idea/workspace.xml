@@ -12,49 +12,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="851cd6bf-ff2d-422b-9065-7b08de60f34f" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimF.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimG.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimH.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/impl/checks/movement/FlyE.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/impl/checks/movement/SpeedD.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/impl/checks/movement/StepA.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/artifacts/Kauri_jar/Kauri.jar" beforeDir="false" afterPath="$PROJECT_DIR$/out/artifacts/Kauri_jar/Kauri.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Kauri/plugin.yml" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Kauri/plugin.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/plugin.yml" beforeDir="false" afterPath="$PROJECT_DIR$/resources/plugin.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/cc/funkemunky/anticheat/Kauri.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/cc/funkemunky/anticheat/Kauri.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/checks/CheckManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/checks/CheckManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/data/DataManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/data/DataManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/data/processors/MovementProcessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/data/processors/MovementProcessor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/utils/MiscUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/utils/MiscUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/utils/TickTimer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/utils/TickTimer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/combat/killaura/KillauraF.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/combat/killaura/KillauraF.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/combat/killaura/KillauraI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/combat/killaura/KillauraI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/FlyB.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/FlyB.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/FlyE.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/FlyE.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/SpeedD.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/SpeedD.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/listeners/PacketListeners.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/listeners/PacketListeners.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/menu/MenuUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/menu/MenuUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KauriDownloader/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../KauriDownloader/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KauriDownloader/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../KauriDownloader/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KauriDownloader/out/artifacts/KauriDownloader_jar/KauriDownloader.jar" beforeDir="false" afterPath="$PROJECT_DIR$/../KauriDownloader/out/artifacts/KauriDownloader_jar/KauriDownloader.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KauriDownloader/src/cc/funkemunky/kauri/utils/DownloaderUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/../KauriDownloader/src/cc/funkemunky/kauri/utils/DownloaderUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KauriLite/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../KauriLite/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KauriLite/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../KauriLite/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KauriLite/out/artifacts/Kauri_jar/Kauri.jar" beforeDir="false" afterPath="$PROJECT_DIR$/../KauriLite/out/artifacts/Kauri_jar/Kauri.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KauriLite/out/production/Kauri/plugin.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../KauriLite/out/production/Kauri/plugin.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KauriLite/resources/plugin.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../KauriLite/resources/plugin.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/Kauri.java" beforeDir="false" afterPath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/Kauri.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/api/checks/CheckManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/api/checks/CheckManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/api/data/DataManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/api/data/DataManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/api/utils/MiscUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/api/utils/MiscUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/impl/checks/movement/FlyB.java" beforeDir="false" afterPath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/impl/checks/movement/FlyB.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/impl/checks/movement/FlyC.java" beforeDir="false" afterPath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/impl/checks/movement/FlyC.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/impl/checks/movement/FlyD.java" beforeDir="false" afterPath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/impl/checks/movement/FlyD.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/impl/checks/movement/VelocityC.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/impl/checks/player/BadPacketsG.java" beforeDir="false" afterPath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/impl/checks/player/BadPacketsG.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/impl/commands/kauri/arguments/DelayArgument.java" beforeDir="false" afterPath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/impl/commands/kauri/arguments/DelayArgument.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/impl/listeners/PacketListeners.java" beforeDir="false" afterPath="$PROJECT_DIR$/../KauriLite/src/cc/funkemunky/anticheat/impl/listeners/PacketListeners.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -66,36 +26,10 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/resources/plugin.yml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="51">
-              <caret line="3" column="12" selection-start-line="3" selection-start-column="12" selection-end-line="3" selection-end-column="12" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/data/DataManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="153">
-              <caret line="16" selection-end-line="29" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#409#410#0" expanded="true" />
-                <element signature="e#468#469#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimH.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="323">
-              <caret line="27" column="35" selection-start-line="27" selection-start-column="35" selection-end-line="27" selection-end-column="35" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+            <state relative-caret-position="255">
+              <caret line="19" column="5" selection-start-line="19" selection-start-column="5" selection-end-line="19" selection-end-column="5" />
             </state>
           </provider>
         </entry>
@@ -103,53 +37,83 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/data/PlayerData.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="357">
-              <caret line="40" column="21" selection-start-line="40" selection-start-column="21" selection-end-line="40" selection-end-column="21" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/listeners/PacketListeners.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2295">
-              <caret line="159" column="181" selection-start-line="159" selection-start-column="181" selection-end-line="159" selection-end-column="181" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/player/BadPacketsG.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="544">
-              <caret line="42" selection-start-line="42" selection-end-line="42" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/checks/CheckManager.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="935">
-              <caret line="72" column="114" selection-start-line="72" selection-start-column="114" selection-end-line="72" selection-end-column="114" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/menu/MenuUtils.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1683">
-              <caret line="116" column="74" selection-start-line="116" selection-start-column="74" selection-end-line="116" selection-end-column="74" />
+            <state relative-caret-position="390">
+              <caret line="45" column="19" selection-start-line="45" selection-start-column="19" selection-end-line="45" selection-end-column="19" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/listeners/PacketListeners.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="118">
+              <caret line="168" column="104" selection-start-line="168" selection-start-column="104" selection-end-line="168" selection-end-column="104" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/checks/CheckSettings.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="240">
+              <caret line="21" column="38" selection-start-line="21" selection-start-column="38" selection-end-line="21" selection-end-column="176" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/combat/killaura/KillauraI.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="315">
+              <caret line="29" column="12" selection-start-line="29" selection-start-column="12" selection-end-line="29" selection-end-column="12" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/combat/reach/ReachE.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="209">
+              <caret line="79" column="168" selection-start-line="79" selection-start-column="168" selection-end-line="79" selection-end-column="168" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/combat/killaura/KillauraB.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="45">
+              <caret line="10" selection-start-line="10" selection-end-line="15" selection-end-column="35" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/checks/Check.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="825">
+              <caret line="69" column="55" selection-start-line="69" selection-start-column="55" selection-end-line="69" selection-end-column="55" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/SpeedD.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="765">
-              <caret line="55" selection-start-line="55" selection-end-line="55" />
+            <state relative-caret-position="300">
+              <caret line="30" selection-start-line="30" selection-end-line="30" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/combat/reach/ReachB.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="75">
+              <caret line="16" column="13" selection-start-line="16" selection-start-column="13" selection-end-line="16" selection-end-column="13" />
             </state>
           </provider>
         </entry>
@@ -303,8 +267,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
-      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -420,26 +382,6 @@
               <item name="impl" type="462c0819:PsiDirectoryNode" />
               <item name="checks" type="462c0819:PsiDirectoryNode" />
               <item name="combat" type="462c0819:PsiDirectoryNode" />
-              <item name="fastbow" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Kauri" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Kauri" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="anticheat" type="462c0819:PsiDirectoryNode" />
-              <item name="impl" type="462c0819:PsiDirectoryNode" />
-              <item name="checks" type="462c0819:PsiDirectoryNode" />
-              <item name="combat" type="462c0819:PsiDirectoryNode" />
-              <item name="hitboxes" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Kauri" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Kauri" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="anticheat" type="462c0819:PsiDirectoryNode" />
-              <item name="impl" type="462c0819:PsiDirectoryNode" />
-              <item name="checks" type="462c0819:PsiDirectoryNode" />
-              <item name="combat" type="462c0819:PsiDirectoryNode" />
               <item name="killaura" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -495,18 +437,12 @@
               <item name="impl" type="462c0819:PsiDirectoryNode" />
               <item name="listeners" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="Kauri" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Kauri" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="anticheat" type="462c0819:PsiDirectoryNode" />
-              <item name="impl" type="462c0819:PsiDirectoryNode" />
-              <item name="menu" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -520,10 +456,10 @@
     <property name="SearchEverywhereHistoryKey" value="&#9;FILE&#9;file:///Users/dawson/Documents/GitHub/Kauri/src/cc/funkemunky/anticheat/api/checks/CheckManager.java&#10;PacketPlayOutEntityMetadata&#9;PSI&#9;JAVA://net.minecraft.server.v1_8_R3.PacketPlayOutEntityMetadata" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1552436694272" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1552521011604" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../../Boredom/FionaTab" />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.last.edited" value="Project" />
     <property name="project.structure.proportion" value="0.15820312" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="settings.editor.selected.configurable" value="reference.projectsettings.compiler.annotationProcessors" />
@@ -624,13 +560,13 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="91448000" />
+    <option name="totallyTimeSpent" value="91481000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <frame x="0" y="23" width="1440" height="787" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.27985075" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.26323318" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -752,24 +688,17 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/checks/CheckSettings.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="21" column="38" selection-start-line="21" selection-start-column="38" selection-end-line="21" selection-end-column="174" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/combat/killaura/KillauraB.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
+        <state relative-caret-position="45">
           <caret line="10" selection-start-line="10" selection-end-line="15" selection-end-column="35" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/checks/Check.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="884">
-          <caret line="66" column="55" selection-start-line="66" selection-start-column="55" selection-end-line="66" selection-end-column="55" />
+        <state relative-caret-position="825">
+          <caret line="69" column="55" selection-start-line="69" selection-start-column="55" selection-end-line="69" selection-end-column="55" />
         </state>
       </provider>
     </entry>
@@ -796,8 +725,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/combat/killaura/KillauraI.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="510">
-          <caret line="38" column="32" selection-start-line="38" selection-start-column="32" selection-end-line="38" selection-end-column="32" />
+        <state relative-caret-position="315">
+          <caret line="29" column="12" selection-start-line="29" selection-start-column="12" selection-end-line="29" selection-end-column="12" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -987,13 +916,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/data/DataManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="16" selection-end-line="29" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#409#410#0" expanded="true" />
-            <element signature="e#468#469#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="255">
+          <caret line="19" column="5" selection-start-line="19" selection-start-column="5" selection-end-line="19" selection-end-column="5" />
         </state>
       </provider>
     </entry>
@@ -1009,15 +933,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/data/PlayerData.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="40" column="21" selection-start-line="40" selection-start-column="21" selection-end-line="40" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/listeners/PacketListeners.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2295">
-          <caret line="159" column="181" selection-start-line="159" selection-start-column="181" selection-end-line="159" selection-end-column="181" />
+        <state relative-caret-position="390">
+          <caret line="45" column="19" selection-start-line="45" selection-start-column="19" selection-end-line="45" selection-end-column="19" />
         </state>
       </provider>
     </entry>
@@ -1044,8 +961,22 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/SpeedD.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="765">
-          <caret line="55" selection-start-line="55" selection-end-line="55" />
+        <state relative-caret-position="300">
+          <caret line="30" selection-start-line="30" selection-end-line="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/checks/CheckSettings.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="21" column="38" selection-start-line="21" selection-start-column="38" selection-end-line="21" selection-end-column="176" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/listeners/PacketListeners.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="118">
+          <caret line="168" column="104" selection-start-line="168" selection-start-column="104" selection-end-line="168" selection-end-column="104" />
         </state>
       </provider>
     </entry>
@@ -1092,7 +1023,7 @@
       </state>
       <state key="JdkListConfigurable.UI">
         <settings>
-          <last-edited>1.8</last-edited>
+          <last-edited>1.8.0_172</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
@@ -1109,6 +1040,7 @@
             <option name="proportions">
               <list>
                 <option value="0.2" />
+                <option value="0.6" />
               </list>
             </option>
           </splitter-proportions>

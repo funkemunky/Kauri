@@ -166,16 +166,18 @@ public class PacketListeners implements Listener {
                 case Packet.Client.USE_ENTITY:
                     WrappedInUseEntityPacket packet = new WrappedInUseEntityPacket(event.getPacket(), player);
 
-                    val entity = packet.getEntity();
-                    if(entity instanceof LivingEntity) {
-                        data.getLastAttack().reset();
-                        data.setTarget((LivingEntity) entity);
+                    if(packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) {
+                        val entity = packet.getEntity();
+                        if(entity instanceof LivingEntity) {
+                            data.getLastAttack().reset();
+                            data.setTarget((LivingEntity) entity);
 
-                        if(entity instanceof Player) {
-                            PlayerData dataEntity = Kauri.getInstance().getDataManager().getPlayerData(entity.getUniqueId());
+                            if(entity instanceof Player) {
+                                PlayerData dataEntity = Kauri.getInstance().getDataManager().getPlayerData(entity.getUniqueId());
 
-                            if(dataEntity != null) {
-                                dataEntity.setAttacker(packet.getPlayer());
+                                if(dataEntity != null) {
+                                    dataEntity.setAttacker(packet.getPlayer());
+                                }
                             }
                         }
                     }
