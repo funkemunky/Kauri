@@ -21,7 +21,7 @@ public class JesusA extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        if(move.isInLiquid() && move.getLiquidTicks() > 4) {
+        if (move.isInLiquid() && move.getLiquidTicks() > 4) {
         }
     }
 

@@ -26,6 +26,7 @@ public class BadPacketsF extends Check {
 
     private int ticks, vl;
     private long lastReset, lastTimeStamp;
+
     public BadPacketsF(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
         super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
     }
@@ -33,18 +34,18 @@ public class BadPacketsF extends Check {
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         if (!getData().isLagging() && timeStamp > lastTimeStamp + 5 && getData().getLastServerPos().hasPassed(2) && getData().getLastLogin().hasPassed(40)) {
-           if(ticks++ >= 20) {
-               val elapsed = timeStamp - lastReset;
-               if(elapsed < threshold) {
-                   if(vl++ > maxVL) {
-                       flag(elapsed + "-<" + threshold, true, true);
-                   }
-               } else {
-                   vl -= vl > 0 ? 1 : 0;
-               }
-               ticks = 0;
-               lastReset = timeStamp;
-           }
+            if (ticks++ >= 20) {
+                val elapsed = timeStamp - lastReset;
+                if (elapsed < threshold) {
+                    if (vl++ > maxVL) {
+                        flag(elapsed + "-<" + threshold, true, true);
+                    }
+                } else {
+                    vl -= vl > 0 ? 1 : 0;
+                }
+                ticks = 0;
+                lastReset = timeStamp;
+            }
         }
         lastTimeStamp = timeStamp;
     }

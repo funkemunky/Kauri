@@ -27,7 +27,7 @@ public class AutoclickerF extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(MiscUtils.shouldReturnArmAnimation(getData())) return;
+        if (MiscUtils.shouldReturnArmAnimation(getData())) return;
         if (packetType.equals(Packet.Client.ARM_ANIMATION)) {
             swingTicks++;
 

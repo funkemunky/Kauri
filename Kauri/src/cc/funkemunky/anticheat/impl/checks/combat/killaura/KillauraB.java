@@ -24,7 +24,7 @@ public class KillauraB extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(getData().getLastAttack().hasNotPassed(4)) {
+        if (getData().getLastAttack().hasNotPassed(4)) {
             val to = getData().getMovementProcessor().getTo();
             val from = getData().getMovementProcessor().getFrom();
             val pitchDifference = Math.abs(from.getPitch() - to.getPitch());
@@ -32,8 +32,8 @@ public class KillauraB extends Check {
             val offset = 16777216L;
             val pitchGCD = MiscUtils.gcd((long) (pitchDifference * offset), (long) (lastPitchDelta * offset));
 
-            if (Math.abs(to.getPitch()) < 88.0f && pitchDifference > 0  && getData().getMovementProcessor().getOptifineTicks() < 10 && pitchGCD < 131072L) {
-                if(vl++ > 100) {
+            if (Math.abs(to.getPitch()) < 88.0f && pitchDifference > 0 && getData().getMovementProcessor().getOptifineTicks() < 10 && pitchGCD < 131072L) {
+                if (vl++ > 100) {
                     flag(String.valueOf(pitchGCD / 2000), true, true);
                 }
             } else {

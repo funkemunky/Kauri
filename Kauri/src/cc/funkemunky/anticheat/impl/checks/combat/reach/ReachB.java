@@ -33,7 +33,7 @@ public class ReachB extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         WrappedInUseEntityPacket useEvent = new WrappedInUseEntityPacket(packet, getData().getPlayer());
 
-        if(getData().isGeneralCancel()) return;
+        if (getData().isGeneralCancel()) return;
         if (useEvent.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK) && useEvent.getEntity() instanceof Player) {
             val player = getData().getPlayer();
             val entity = (Player) useEvent.getEntity();

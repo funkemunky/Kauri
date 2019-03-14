@@ -35,21 +35,21 @@ public class FastLadder extends Check {
         PlayerMoveEvent e = (PlayerMoveEvent) event;
         val deltaY = (float) (e.getTo().getY() - e.getFrom().getY());
 
-        if(getData().isGeneralCancel()) return;
+        if (getData().isGeneralCancel()) return;
 
-        if(getData().getMovementProcessor().isOnClimbable()) {
-            if(deltaY > verboseMaxSpeed) {
-                if(vl++ > 7) {
+        if (getData().getMovementProcessor().isOnClimbable()) {
+            if (deltaY > verboseMaxSpeed) {
+                if (vl++ > 7) {
                     flag(deltaY + ">-" + verboseMaxSpeed, true, true);
                 }
             } else {
-                vl-= vl > 0 ? 1 : 0;
+                vl -= vl > 0 ? 1 : 0;
             }
 
             val maxThreshold = maxSpeed + PlayerUtils.getPotionEffectLevel(e.getPlayer(), PotionEffectType.JUMP) * 0.1;
 
-            if(deltaY > maxThreshold) {
-                flag(deltaY  + ">-" + maxThreshold, true, true);
+            if (deltaY > maxThreshold) {
+                flag(deltaY + ">-" + maxThreshold, true, true);
             }
 
             debug(vl + ": " + deltaY);

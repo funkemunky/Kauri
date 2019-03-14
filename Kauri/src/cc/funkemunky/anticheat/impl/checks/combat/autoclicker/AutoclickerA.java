@@ -39,7 +39,7 @@ public class AutoclickerA extends Check {
 
         val elapsed = timeStamp - lastTimeStamp;
 
-        if(elapsed < 2) return;
+        if (elapsed < 2) return;
         val cps = 1000D / elapsed;
 
         if (cps > maxCPS && !getData().isLagging()) {

@@ -11,7 +11,7 @@ public class VPNResponse {
     private String ip, hostName, countryCode, countryName, ISP, city;
 
     public VPNResponse(Map<String, String> response) {
-        if(this.status = response.get("status").equals("success")) {
+        if (this.status = response.get("status").equals("success")) {
             this.usingProxy = Boolean.parseBoolean(response.get("hostIP"));
             this.hostName = response.get("hostname");
             this.ISP = response.get("org");

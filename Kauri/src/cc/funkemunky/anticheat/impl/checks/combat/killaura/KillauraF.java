@@ -33,14 +33,14 @@ public class KillauraF extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(packetType.equals(Packet.Client.USE_ENTITY)) {
+        if (packetType.equals(Packet.Client.USE_ENTITY)) {
             WrappedInUseEntityPacket use = new WrappedInUseEntityPacket(packet, getData().getPlayer());
 
-            if(!(use.getEntity() instanceof LivingEntity)) return;
+            if (!(use.getEntity() instanceof LivingEntity)) return;
 
             target = (LivingEntity) use.getEntity();
             timer.reset();
-        } else if(target != null && timer.hasNotPassed()) {
+        } else if (target != null && timer.hasNotPassed()) {
             val player = getData().getPlayer();
             val offsetArray = MathUtils.getOffsetFromEntity(getData().getPlayer(), target);
 
@@ -51,7 +51,7 @@ public class KillauraF extends Check {
             if (average < 5.0 && (player.isSprinting() || yawDelta > 2.0) && yawDelta > 0.3 && getData().getMovementProcessor().getDeltaXZ() > 0.15 && vl++ > 100) {
                 flag(average + "<-4.0->" + vl, true, true);
             } else {
-                vl-= vl > 0 ? 2f : 0;
+                vl -= vl > 0 ? 2f : 0;
             }
 
             debug(average + ", " + offset + ", " + vl);

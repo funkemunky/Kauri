@@ -54,13 +54,13 @@ public class ReachD extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(packetType.equals(Packet.Client.ARM_ANIMATION)) {
+        if (packetType.equals(Packet.Client.ARM_ANIMATION)) {
             vl -= vl > 0 ? 0.005 : 0;
-        } else if(getData().getTarget() != null && getData().getTarget().getWorld().getUID().equals(getData().getPlayer().getWorld().getUID()) && getData().getLastAttack().hasNotPassed(0) && getData().getPlayer().getGameMode().equals(GameMode.SURVIVAL)) {
+        } else if (getData().getTarget() != null && getData().getTarget().getWorld().getUID().equals(getData().getPlayer().getWorld().getUID()) && getData().getLastAttack().hasNotPassed(0) && getData().getPlayer().getGameMode().equals(GameMode.SURVIVAL)) {
             val target = getData().getTarget();
             val entityData = Kauri.getInstance().getDataManager().getPlayerData(target.getUniqueId());
 
-            if(getData().getPing() > 400 || (entityData != null && getData().getPing() > 400) || getData().isLagging()) {
+            if (getData().getPing() > 400 || (entityData != null && getData().getPing() > 400) || getData().isLagging()) {
                 return;
             }
 
@@ -74,7 +74,7 @@ public class ReachD extends Check {
 
             List<BoundingBox> entityBoxes = new CopyOnWriteArrayList<>();
 
-            if(entityData == null) {
+            if (entityData == null) {
                 getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), pingRange + MathUtils.getDelta(getData().getTransPing(), getData().getLastTransPing()))
                         .forEach(loc -> entityBoxes.add(getHitbox(target, loc)));
             } else {
@@ -91,7 +91,7 @@ public class ReachD extends Check {
             List<Vector> finalVecs = new ArrayList<>();
             vecs.stream().filter(vec -> entityBoxes.stream().anyMatch(box -> box.collides(vec))).forEach(finalVecs::add);
 
-            for(Vector vec : finalVecs) {
+            for (Vector vec : finalVecs) {
                 double reach = origin.toVector().distance(vec);
                 calculatedReach = calculatedReach == 0 ? reach + .12 : Math.min(reach + .12, calculatedReach);
 
@@ -100,7 +100,7 @@ public class ReachD extends Check {
 
             if (collided > 7) {
                 if (calculatedReach > maxReach + 0.2) {
-                    if(vl++ > maxVL) {
+                    if (vl++ > maxVL) {
                         flag(calculatedReach + ">-" + maxReach, false, true);
                     }
                     debug(Color.Green + "REACH: " + calculatedReach);
@@ -108,7 +108,7 @@ public class ReachD extends Check {
                     vl -= vl > 0 ? 0.25 : 0;
                 }
             } else {
-                vl-= vl > 0 ? 0.1f : 0;
+                vl -= vl > 0 ? 0.1f : 0;
             }
             debug("VL: " + vl + "/" + maxVL + " REACH: " + calculatedReach + " COLLIDED: " + collided + " MAX: " + maxReach + " RANGE: " + pingRange);
         }
@@ -120,8 +120,8 @@ public class ReachD extends Check {
     }
 
     private BoundingBox getHitbox(LivingEntity entity, CustomLocation l) {
-        val dimensions = MiscUtils.entityDimensions.getOrDefault(entity.getType(), new Vector(0.35f,1.85f,0.35f));
+        val dimensions = MiscUtils.entityDimensions.getOrDefault(entity.getType(), new Vector(0.35f, 1.85f, 0.35f));
 
-        return new BoundingBox(l.toVector(), l.toVector()).grow(.25f, .25f, .25f).grow((float) dimensions.getX(), 0, (float) dimensions.getZ()).add(0,0,0,0, (float) dimensions.getY(),0);
+        return new BoundingBox(l.toVector(), l.toVector()).grow(.25f, .25f, .25f).grow((float) dimensions.getX(), 0, (float) dimensions.getZ()).add(0, 0, 0, 0, (float) dimensions.getY(), 0);
     }
 }

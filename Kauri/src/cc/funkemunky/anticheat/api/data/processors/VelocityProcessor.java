@@ -28,27 +28,27 @@ public class VelocityProcessor {
 
         var multiplier = 0.91f;
 
-        if(packet.isGround()) multiplier= 0.68f;
+        if (packet.isGround()) multiplier = 0.68f;
 
         motionX *= multiplier;
         motionZ *= multiplier;
 
-        if(packet.isGround()) {
+        if (packet.isGround()) {
             motionY = 0;
-        } else if(motionY > 0) {
+        } else if (motionY > 0) {
             motionY -= 0.08f;
             motionY *= 0.98f;
         }
 
-        if(motionY < 0.0005) {
+        if (motionY < 0.0005) {
             motionY = 0;
         }
 
-        if(motionX < 0.0005) {
+        if (motionX < 0.0005) {
             motionX = 0;
         }
 
-        if(motionZ < 0.0005) {
+        if (motionZ < 0.0005) {
             motionZ = 0;
         }
         lastMotionX = this.motionX;

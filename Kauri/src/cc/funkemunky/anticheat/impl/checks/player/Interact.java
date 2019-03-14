@@ -10,7 +10,6 @@ import cc.funkemunky.api.utils.math.RayTrace;
 import lombok.val;
 import org.bukkit.block.Block;
 import org.bukkit.event.Event;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.util.Vector;
 
@@ -32,20 +31,21 @@ public class Interact extends Check {
     public void onBukkitEvent(Event event) {
         PlayerInteractEvent e = (PlayerInteractEvent) event;
 
-        if(e.getAction().toString().contains("BLOCK")) {
+        if (e.getAction().toString().contains("BLOCK")) {
             Block block = e.getClickedBlock();
             val origin = e.getPlayer().getLocation().clone().add(0, 1.53, 0);
 
-            val direction = MathUtils.getRotations(origin, block.getLocation().add(0.2f,0.2f,0.2f));
+            val direction = MathUtils.getRotations(origin, block.getLocation().add(0.2f, 0.2f, 0.2f));
 
             origin.setYaw(direction[0]);
             origin.setPitch(direction[1]);
 
             val distance = origin.distance(block.getLocation());
 
-            if(distance < 1 || MathUtils.getVerticalDistance(e.getPlayer().getLocation(), block.getLocation()) < 0.35) return;
+            if (distance < 1 || MathUtils.getVerticalDistance(e.getPlayer().getLocation(), block.getLocation()) < 0.35)
+                return;
 
-            if(distance > 12) {
+            if (distance > 12) {
                 flag("Out of bounds", true, true);
                 return;
             }
@@ -59,7 +59,7 @@ public class Interact extends Check {
             vectors.forEach(vec -> {
                 List<BoundingBox> collided = getBox(vec).getCollidingBlockBoxes(getData().getPlayer());
 
-                if(collided.size() > 0) {
+                if (collided.size() > 0) {
                     collidedBlocks.addAll(collided);
                 }
             });

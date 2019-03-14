@@ -30,14 +30,15 @@ public class AutoclickerG extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val elapsed = timeStamp - lastTimeStamp;
 
-        if(elapsed > 2 && !MiscUtils.shouldReturnArmAnimation(getData())) {
-            if(times.size() >= 20) {
+        if (elapsed > 2 && !MiscUtils.shouldReturnArmAnimation(getData())) {
+            if (times.size() >= 20) {
                 val range = getRange(times);
                 val average = getAverageCPS(times);
 
-                if(average > 9 && (range < 65 || MathUtils.getDelta(range, lastRange) < 3)) {
-                    if(vl++ > 5) flag(range + "<-65 || " + range + "≈" + lastRange + " [" + MathUtils.round(average, 2) + " CPS]", true, true);
-                } else vl-= vl > 0 ? 0.5 : 0;
+                if (average > 9 && (range < 65 || MathUtils.getDelta(range, lastRange) < 3)) {
+                    if (vl++ > 5)
+                        flag(range + "<-65 || " + range + "≈" + lastRange + " [" + MathUtils.round(average, 2) + " CPS]", true, true);
+                } else vl -= vl > 0 ? 0.5 : 0;
 
                 debug("VL: " + vl + " RANGE: " + range + " AVERAGE: " + average);
                 lastRange = range;
@@ -72,10 +73,10 @@ public class AutoclickerG extends Check {
         double total = 0;
 
         for (double value : use) {
-            total+= value;
+            total += value;
         }
 
-        total/= use.size();
+        total /= use.size();
 
         return total;
     }

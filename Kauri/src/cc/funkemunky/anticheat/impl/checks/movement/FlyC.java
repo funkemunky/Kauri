@@ -22,19 +22,19 @@ public class FlyC extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(MiscUtils.cancelForFlight(getData(), 12, true)) return;
+        if (MiscUtils.cancelForFlight(getData(), 12, true)) return;
 
         val move = getData().getMovementProcessor();
 
-        if(move.isNearGround()) return;
+        if (move.isNearGround()) return;
 
         val collides = getData().getBoundingBox().grow(1.5f, 1.5f, 1.5f).getCollidingBlocks(getData().getPlayer()).stream().anyMatch(BlockUtils::isSolid);
 
-        if(!MathUtils.approxEquals(0.01, move.getLastClientYAcceleration(), move.getClientYAcceleration())) {
-            if((!collides && move.getAirTicks() > 2) || vl++ > 4) {
+        if (!MathUtils.approxEquals(0.01, move.getLastClientYAcceleration(), move.getClientYAcceleration())) {
+            if ((!collides && move.getAirTicks() > 2) || vl++ > 4) {
                 flag(move.getClientYAcceleration() + ", " + move.getLastClientYAcceleration(), true, true);
             }
-        } else vl-= vl > 0 ? 0.75 : 0;
+        } else vl -= vl > 0 ? 0.75 : 0;
     }
 
     @Override

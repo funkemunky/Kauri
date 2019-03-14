@@ -24,15 +24,15 @@ public class KillauraI extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(getData().getLastAttack().hasNotPassed(4)) {
+        if (getData().getLastAttack().hasNotPassed(4)) {
             val move = getData().getMovementProcessor();
 
             val offset = 16777216L;
             val gcd = MiscUtils.gcd((long) (move.getYawDelta() * offset), (long) (move.getLastYawDelta() * offset));
             val acceleration = MathUtils.getDelta(move.getLastYawDelta(), move.getYawDelta());
 
-            if (Math.abs(move.getTo().getPitch()) < 88.0f && move.getYawDelta() > 0 && acceleration > 0  && getData().getMovementProcessor().getOptifineTicks() < 10 && gcd < 131072L) {
-                if(vl++ > 100) {
+            if (Math.abs(move.getTo().getPitch()) < 88.0f && move.getYawDelta() > 0 && acceleration > 0 && getData().getMovementProcessor().getOptifineTicks() < 10 && gcd < 131072L) {
+                if (vl++ > 100) {
                     flag(String.valueOf(gcd / 2000), true, true);
                 }
             } else {

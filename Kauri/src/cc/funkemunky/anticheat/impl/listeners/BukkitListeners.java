@@ -36,7 +36,7 @@ public class BukkitListeners implements Listener {
             callChecks(data, event);
 
             if (data.getCancelType().equals(CancelType.MOTION)) {
-                if(data.getSetbackLocation() != null) {
+                if (data.getSetbackLocation() != null) {
                     event.getPlayer().teleport(data.getSetbackLocation());
                 } else {
                     event.setCancelled(true);
@@ -67,7 +67,7 @@ public class BukkitListeners implements Listener {
         PlayerData data = Kauri.getInstance().getDataManager().getPlayerData(event.getPlayer().getUniqueId());
 
         if (data != null) {
-            if(event.getBlockPlaced() != null && event.getBlockPlaced().getType().isSolid()) {
+            if (event.getBlockPlaced() != null && event.getBlockPlaced().getType().isSolid()) {
                 data.getLastBlockPlace().reset();
             }
             callChecks(data, event);
@@ -91,7 +91,7 @@ public class BukkitListeners implements Listener {
                 data.setCancelType(CancelType.NONE);
             }
 
-            if(event.getItem() != null && event.getItem().isSimilar(cc.funkemunky.api.utils.MiscUtils.createItem(Material.BLAZE_ROD, 1, Color.Gold + "Magic Box Wand")) && event.getClickedBlock() != null) {
+            if (event.getItem() != null && event.getItem().isSimilar(cc.funkemunky.api.utils.MiscUtils.createItem(Material.BLAZE_ROD, 1, Color.Gold + "Magic Box Wand")) && event.getClickedBlock() != null) {
                 List<BoundingBox> boxes = Atlas.getInstance().getBlockBoxManager().getBlockBox().getSpecificBox(event.getClickedBlock().getLocation());
 
                 boxes.forEach(box -> cc.funkemunky.api.utils.MiscUtils.createParticlesForBoundingBox(event.getPlayer(), box, WrappedEnumParticle.FLAME, 0.1f));
@@ -108,7 +108,7 @@ public class BukkitListeners implements Listener {
             if (data != null) {
                 callChecks(data, event);
 
-                if(data.getCancelType() == CancelType.PROJECTILE) {
+                if (data.getCancelType() == CancelType.PROJECTILE) {
                     event.setCancelled(true);
                     data.setCancelType(CancelType.NONE);
                 }

@@ -25,13 +25,14 @@ public class AutoclickerC extends Check {
     private final DynamicRollingAverage cpsAverage = new DynamicRollingAverage(5);
     private int cps, ticks;
     private double vl;
+
     public AutoclickerC(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
         super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
     }
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(packetType.contains("Position") || packetType.contains("Look") || packetType.equals(Packet.Client.FLYING)) {
+        if (packetType.contains("Position") || packetType.contains("Look") || packetType.equals(Packet.Client.FLYING)) {
             if (++ticks == 20) {
                 if (cps > 0) {
                     cpsAverage.add(cps);
@@ -47,7 +48,7 @@ public class AutoclickerC extends Check {
                             vl -= vl > 0 ? 1 : 0;
                         }
                     } else {
-                        vl-= vl > 0 ? 0.05 : 0;
+                        vl -= vl > 0 ? 0.05 : 0;
                     }
 
                     if (cpsAverage.isReachedSize()) {
@@ -60,7 +61,7 @@ public class AutoclickerC extends Check {
 
                 debug("AV: " + cpsAverage.getAverage() + " VL: " + vl);
             }
-        } else if(!MiscUtils.shouldReturnArmAnimation(getData())) {
+        } else if (!MiscUtils.shouldReturnArmAnimation(getData())) {
             cps++;
         }
     }

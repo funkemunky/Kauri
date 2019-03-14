@@ -39,18 +39,18 @@ public class KillauraG extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         WrappedInUseEntityPacket use = new WrappedInUseEntityPacket(packet, getData().getPlayer());
 
-        if(!use.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) return;
+        if (!use.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) return;
 
-        if(use.getEntity() instanceof LivingEntity) {
+        if (use.getEntity() instanceof LivingEntity) {
 
-            val origin = getData().getPlayer().getLocation().add(0, 1.53,0);
+            val origin = getData().getPlayer().getLocation().add(0, 1.53, 0);
             val entity = (LivingEntity) use.getEntity();
 
             val pitchOffset = MathUtils.getOffsetFromLocation(getData().getPlayer().getLocation(), entity.getLocation())[1];
 
             val distance = origin.distance(((LivingEntity) use.getEntity()).getEyeLocation()) / 1.6 - 0.2;
 
-            if(pitchOffset > 35 || distance < 1 || !getData().getMovementProcessor().isServerOnGround()) return;
+            if (pitchOffset > 35 || distance < 1 || !getData().getMovementProcessor().isServerOnGround()) return;
 
 
             RayTrace trace = new RayTrace(origin.toVector(), origin.getDirection());
@@ -62,11 +62,11 @@ public class KillauraG extends Check {
 
             var amount = 0;
 
-            val boxToCheck = new BoundingBox(getData().getPlayer().getEyeLocation().toVector(), use.getEntity().getLocation().toVector()).grow(1,1,1);
+            val boxToCheck = new BoundingBox(getData().getPlayer().getEyeLocation().toVector(), use.getEntity().getLocation().toVector()).grow(1, 1, 1);
 
             val collidingBlocks = boxToCheck.getCollidingBlockBoxes(getData().getPlayer());
 
-            val entityBox = MiscUtils.getEntityBoundingBox((LivingEntity) use.getEntity()).grow(0.35f,0.35f,0.35f);
+            val entityBox = MiscUtils.getEntityBoundingBox((LivingEntity) use.getEntity()).grow(0.35f, 0.35f, 0.35f);
             for (Vector vec : vectors) {
                 if (entityBox.intersectsWithBox(vec)) {
                     break;

@@ -43,7 +43,7 @@ public class BadPacketsG extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(timeStamp > lastFlying + 5) {
+        if (timeStamp > lastFlying + 5) {
             val data = this.getData();
 
             if (data.getLastLogin().hasNotPassed(15) || data.getLastServerPos().hasNotPassed(5)) {
@@ -56,7 +56,7 @@ public class BadPacketsG extends Check {
             val stdDev = this.statisticalAnalysis.getStdDev();
 
             if (!MathUtils.approxEquals(deltaBalance, max, stdDev) && stdDev < max && getData().getLastLag().hasNotPassed(10)) {
-                if(vl++ > maxVL) {
+                if (vl++ > maxVL) {
                     this.flag("S: " + stdDev, false, true);
                 }
             } else vl -= vl > 0 ? 3 : 0;

@@ -28,14 +28,14 @@ public class FlyE extends Check {
     public void onBukkitEvent(Event event) {
         PlayerMoveEvent e = (PlayerMoveEvent) event;
 
-        if(MiscUtils.cancelForFlight(getData(), 15, false)) return;
+        if (MiscUtils.cancelForFlight(getData(), 15, false)) return;
 
         val deltaY = (float) (e.getTo().getY() - e.getFrom().getY());
         val player = e.getPlayer();
         val totalMaxY = 0.6 + PlayerUtils.getPotionEffectLevel(player, PotionEffectType.JUMP) * 0.12f;
 
-        if(deltaY > totalMaxY) {
-            flag(deltaY + ">-" + totalMaxY, true,true);
+        if (deltaY > totalMaxY) {
+            flag(deltaY + ">-" + totalMaxY, true, true);
         }
     }
 }

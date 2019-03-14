@@ -47,7 +47,7 @@ public class HitBox extends Check {
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val target = getData().getTarget();
-        if(getData().getLastAttack().hasNotPassed(0) && target != null && type.contains(target.getType()) && target.getWorld().getUID().equals(getData().getPlayer().getWorld().getUID())) {
+        if (getData().getLastAttack().hasNotPassed(0) && target != null && type.contains(target.getType()) && target.getWorld().getUID().equals(getData().getPlayer().getWorld().getUID())) {
             PastLocation location = getData().getEntityPastLocation();
             if (getData().getTransPing() > 400) return;
             List<BoundingBox> boxes = new ArrayList<>();
@@ -82,7 +82,7 @@ public class HitBox extends Check {
     }
 
     private BoundingBox getHitbox(LivingEntity entity, CustomLocation l) {
-        Vector dimensions = MiscUtils.entityDimensions.getOrDefault(entity.getType(), new Vector(0.4, 2,0.4));
+        Vector dimensions = MiscUtils.entityDimensions.getOrDefault(entity.getType(), new Vector(0.4, 2, 0.4));
         return new BoundingBox(0, 0, 0, 0, 0, 0).add((float) l.getX(), (float) l.getY(), (float) l.getZ()).grow((float) dimensions.getX(), (float) dimensions.getY(), (float) dimensions.getZ()).grow(.15f, 0.15f, .15f);
     }
 }

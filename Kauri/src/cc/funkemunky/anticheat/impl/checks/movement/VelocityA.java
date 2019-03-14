@@ -33,18 +33,19 @@ public class VelocityA extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(packetType.equals(Packet.Server.ENTITY_VELOCITY)) {
+        if (packetType.equals(Packet.Server.ENTITY_VELOCITY)) {
             WrappedOutVelocityPacket velocity = new WrappedOutVelocityPacket(packet, getData().getPlayer());
 
-            if(velocity.getId() == velocity.getPlayer().getEntityId()) {
+            if (velocity.getId() == velocity.getPlayer().getEntityId()) {
                 lastVelocity = (float) velocity.getY();
             }
-        } if(lastVelocity > 0 && getData().getMovementProcessor().getDeltaY() > 0) {
+        }
+        if (lastVelocity > 0 && getData().getMovementProcessor().getDeltaY() > 0) {
             val ratio = Math.abs(getData().getMovementProcessor().getDeltaY() / lastVelocity);
             val percentage = MathUtils.round(ratio * 100D, 1);
 
-            if(ratio < 1 && !getData().getMovementProcessor().isBlocksOnTop() && !getData().isAbleToFly()) {
-                if(vl++ > maxVL) {
+            if (ratio < 1 && !getData().getMovementProcessor().isBlocksOnTop() && !getData().isAbleToFly()) {
+                if (vl++ > maxVL) {
                     flag("velocity: " + percentage + "%", true, true);
                 }
             } else {

@@ -18,6 +18,7 @@ public class AimA extends Check {
 
     private float lastYaw, lastPitch, lastWrapped, lastChange;
     private int vl;
+
     public AimA(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
         super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
     }

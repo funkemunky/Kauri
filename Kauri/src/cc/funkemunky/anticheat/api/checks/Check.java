@@ -53,7 +53,7 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
     protected void flag(String information, boolean cancel, boolean ban) {
         Kauri.getInstance().getCheckManager().getAlertsExecutable().execute(() -> {
             if (data.getLastLag().hasPassed() || lagVerbose.flag(4, 500L)) {
-                if(ban) {
+                if (ban) {
                     vl++;
                 }
                 Kauri.getInstance().getLoggerManager().addViolation(data.getUuid(), this);
@@ -68,7 +68,8 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
                             execCommand.forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replaceAll("%player%", getData().getPlayer().getName()).replaceAll("%check%", getName())));
                         }
                     }.runTaskLater(Kauri.getInstance(), 10);
-                    if(CheckSettings.broadcastEnabled) Bukkit.broadcastMessage(Color.translate(CheckSettings.broadcastMessage.replaceAll("%player%", getData().getPlayer().getName())));
+                    if (CheckSettings.broadcastEnabled)
+                        Bukkit.broadcastMessage(Color.translate(CheckSettings.broadcastMessage.replaceAll("%player%", getData().getPlayer().getName())));
                     Kauri.getInstance().getLoggerManager().addBan(data.getUuid(), this);
                 }
 
@@ -83,9 +84,9 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
                     lastAlert = System.currentTimeMillis();
                 }
 
-                if(CheckSettings.testMode && !data.isAlertsEnabled()) message.sendToPlayer(data.getPlayer());
+                if (CheckSettings.testMode && !data.isAlertsEnabled()) message.sendToPlayer(data.getPlayer());
 
-                if(CheckSettings.printToConsole) {
+                if (CheckSettings.printToConsole) {
                     MiscUtils.printToConsole(alertMessage.replaceAll("%check%", (developer ? Color.Red + Color.Italics : "") + getName()).replaceAll("%player%", data.getPlayer().getName()).replaceAll("%vl%", String.valueOf(vl)));
                 }
             }
@@ -99,7 +100,7 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
             executable = Kauri.getInstance().getConfig().getBoolean("checks." + name + ".executable");
             cancellable = Kauri.getInstance().getConfig().getBoolean("checks." + name + ".cancellable");
             Kauri.getInstance().getConfig().getStringList("checks." + name + ".executableCommands").forEach(cmd -> {
-                if(cmd.equals("%global%")) {
+                if (cmd.equals("%global%")) {
                     execCommand.addAll(CheckSettings.executableCommand);
                 } else {
                     execCommand.add(cmd);

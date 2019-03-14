@@ -55,7 +55,7 @@ public class AutoclickerD extends Check {
                 cps = 0;
                 fraction.clearIfMax();
             }
-        } else if(!MiscUtils.shouldReturnArmAnimation(getData())) {
+        } else if (!MiscUtils.shouldReturnArmAnimation(getData())) {
             ++cps;
         }
     }

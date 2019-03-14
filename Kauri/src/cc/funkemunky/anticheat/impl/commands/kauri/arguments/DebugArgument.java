@@ -42,7 +42,7 @@ public class DebugArgument extends FunkeArgument {
                 if (args[1].equalsIgnoreCase("box")) {
                     data.setDebuggingBox(!data.isDebuggingBox());
                     sender.sendMessage(Color.Gray + "Set box debug to: " + Color.White + data.isDebuggingBox());
-                } else if(args[1].equalsIgnoreCase("none")) {
+                } else if (args[1].equalsIgnoreCase("none")) {
                     data.setDebuggingCheck(null);
                     data.setDebuggingPlayer(null);
                     sender.sendMessage(Color.Red + "Stopped any debug messages from being sent to you.");

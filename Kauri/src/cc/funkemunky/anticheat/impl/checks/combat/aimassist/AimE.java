@@ -43,13 +43,13 @@ public class AimE extends Check {
         val yawAccel = MathUtils.getDelta(yawDelta, move.getLastYawDelta());
         val pitchAccel = MathUtils.getDelta(pitchDelta, move.getLastPitchDelta());
 
-        if(yawDelta > minYawDelta && getData().getPlayer().getVehicle() == null && Math.abs(move.getTo().getPitch()) < 80 && (pitchAccel < pitchAccelMax || yawAccel < yawAccelMax)) {
-            if(vl++ > vlMax) {
+        if (yawDelta > minYawDelta && getData().getPlayer().getVehicle() == null && Math.abs(move.getTo().getPitch()) < 80 && (pitchAccel < pitchAccelMax || yawAccel < yawAccelMax)) {
+            if (vl++ > vlMax) {
                 flag("YAW: " + MathUtils.round(yawAccel, 7) + " PITCH: " + MathUtils.round(pitchAccel, 7), true, true);
             }
-        } else vl-= vl > 0 ? vlSub : 0;
+        } else vl -= vl > 0 ? vlSub : 0;
 
-        debug("VL: " + vl + " YAW: " + yawAccel +  " PITCH: " + pitchAccel + " YAWD: " + yawDelta);
+        debug("VL: " + vl + " YAW: " + yawAccel + " PITCH: " + pitchAccel + " YAWD: " + yawDelta);
     }
 
     @Override

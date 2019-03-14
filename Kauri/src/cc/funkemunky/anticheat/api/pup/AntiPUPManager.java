@@ -1,12 +1,14 @@
 package cc.funkemunky.anticheat.api.pup;
 
 import cc.funkemunky.anticheat.Kauri;
-import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
+import cc.funkemunky.anticheat.impl.pup.bot.ConsoleClient;
+import cc.funkemunky.anticheat.impl.pup.crashers.ArmSwing;
+import cc.funkemunky.anticheat.impl.pup.crashers.Boxer;
+import cc.funkemunky.anticheat.impl.pup.crashers.YLevel;
 import cc.funkemunky.anticheat.impl.pup.vpn.AntiVPN;
-import org.bukkit.Bukkit;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,6 +26,10 @@ public class AntiPUPManager {
         List<AntiPUP> list = new ArrayList<>();
 
         addMethod(new AntiVPN("AntiVPN", true), list);
+        addMethod(new ConsoleClient("ConsoleClient", true), list);
+        addMethod(new ArmSwing("ArmSwing", true), list);
+        addMethod(new Boxer("Boxer", true), list);
+        addMethod(new YLevel("YLevel", true), list);
 
         for (AntiPUP pup : list) {
             Arrays.stream(pup.getClass().getDeclaredFields()).filter(field -> {
@@ -52,7 +58,7 @@ public class AntiPUPManager {
                 }
             });
 
-            if(Kauri.getInstance().getConfig().get("antipup." + pup.getName() + ".enabled") == null) {
+            if (Kauri.getInstance().getConfig().get("antipup." + pup.getName() + ".enabled") == null) {
                 Kauri.getInstance().getConfig().set("antipup." + pup.getName() + ".enabled", pup.isEnabled());
             } else {
                 pup.setEnabled(Kauri.getInstance().getConfig().getBoolean("antipup." + pup.getName() + ".enabled"));
@@ -63,8 +69,6 @@ public class AntiPUPManager {
     }
 
     public void addMethod(AntiPUP pup, List<AntiPUP> list) {
-        Bukkit.getPluginManager().registerEvents(pup, Kauri.getInstance());
-
         list.add(pup);
     }
 

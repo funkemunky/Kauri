@@ -29,13 +29,14 @@ public class AutoclickerB extends Check {
     private final double[] averages = new double[]{0.0, 0.0, 0.0, 0.0};
     private int ticks, vl;
     private long timestamp;
+
     public AutoclickerB(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
         super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
     }
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(packetType.contains("Position") || packetType.contains("Look") || packetType.equals(Packet.Client.FLYING)) {
+        if (packetType.contains("Position") || packetType.contains("Look") || packetType.equals(Packet.Client.FLYING)) {
             ticks++;
 
             if (ticks == 20 && cps[3] > 4) { // 20 ticks = 1 second
@@ -71,7 +72,7 @@ public class AutoclickerB extends Check {
                 this.pass();
                 ticks = 0;
             }
-        } else if(!MiscUtils.shouldReturnArmAnimation(getData())) {
+        } else if (!MiscUtils.shouldReturnArmAnimation(getData())) {
             cps[3] = cps[3] + 1;
 
             val now = timestamp;

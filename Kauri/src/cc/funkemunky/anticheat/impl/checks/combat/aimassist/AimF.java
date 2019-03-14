@@ -40,13 +40,13 @@ public class AimF extends Check {
         val gcd = MiscUtils.gcd((long) (move.getYawDelta() * offset), (long) (move.getLastYawDelta() * offset));
 
         if (Math.abs(move.getTo().getPitch()) < 86.0f && move.getYawDelta() > 0.2 && gcd > 121072L) {
-            if(gcdValues.size() >= 5) {
+            if (gcdValues.size() >= 5) {
                 gcdValues.sort(Comparator.naturalOrder());
                 double range = gcdValues.get(gcdValues.size() - 1) - gcdValues.get(0);
 
                 double delta = MathUtils.getDelta(lastRange, range);
 
-                if((delta < 5 || range < 0.1) && verbose.flag(1, 1750L)) {
+                if ((delta < 5 || range < 0.1) && verbose.flag(1, 1750L)) {
                     flag("delta: " + delta + " range: " + range, true, true);
                 }
                 debug(Color.Green + "Range: " + range);

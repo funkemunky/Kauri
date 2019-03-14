@@ -54,7 +54,7 @@ public class StatsManager {
     }
 
     public void addFlag(int amount) {
-        flagged+= amount;
+        flagged += amount;
     }
 
     public void addBan() {

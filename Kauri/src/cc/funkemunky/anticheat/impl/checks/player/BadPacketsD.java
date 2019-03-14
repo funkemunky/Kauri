@@ -27,14 +27,14 @@ public class BadPacketsD extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(packetType.equals(Packet.Client.BLOCK_PLACE)) {
+        if (packetType.equals(Packet.Client.BLOCK_PLACE)) {
             val elapsed = timeStamp - lastFlying;
-            if(elapsed < 10) {
-                if(vl++ > 5) {
+            if (elapsed < 10) {
+                if (vl++ > 5) {
                     flag(elapsed + "<-10", true, true);
                 }
             } else {
-                vl-= vl > 0 ? 1 : 0;
+                vl -= vl > 0 ? 1 : 0;
             }
         } else {
             lastFlying = timeStamp;

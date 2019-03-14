@@ -23,7 +23,7 @@ public class AlertsArgument extends FunkeArgument {
     public void onArgument(CommandSender sender, Command command, String[] args) {
         PlayerData data = Kauri.getInstance().getDataManager().getPlayerData(((Player) sender).getUniqueId());
 
-        if(data == null) {
+        if (data == null) {
             sender.sendMessage(getParent().getCommandMessages().getErrorColor() + "There was an error trying to find your data object.");
             return;
         }

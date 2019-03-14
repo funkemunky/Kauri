@@ -1,11 +1,11 @@
 package cc.funkemunky.anticheat;
 
-import cc.funkemunky.anticheat.api.pup.AntiPUPManager;
 import cc.funkemunky.anticheat.api.checks.CheckManager;
 import cc.funkemunky.anticheat.api.data.DataManager;
 import cc.funkemunky.anticheat.api.data.logging.LoggerManager;
 import cc.funkemunky.anticheat.api.data.stats.StatsManager;
 import cc.funkemunky.anticheat.api.event.TickEvent;
+import cc.funkemunky.anticheat.api.pup.AntiPUPManager;
 import cc.funkemunky.anticheat.impl.commands.kauri.KauriCommand;
 import cc.funkemunky.anticheat.impl.listeners.FunkeListeners;
 import cc.funkemunky.anticheat.impl.listeners.PacketListeners;
@@ -58,7 +58,7 @@ public class Kauri extends JavaPlugin {
 
         //if(Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled()) return;
 
-        if(Bukkit.getPluginManager().isPluginEnabled("Atlas") && usableVersionsOfAtlas.contains(Bukkit.getPluginManager().getPlugin("Atlas").getDescription().getVersion())) {
+        if (Bukkit.getPluginManager().isPluginEnabled("Atlas") && usableVersionsOfAtlas.contains(Bukkit.getPluginManager().getPlugin("Atlas").getDescription().getVersion())) {
 
             profiler = new BaseProfiler();
             profileStart = System.currentTimeMillis();
@@ -155,7 +155,7 @@ public class Kauri extends JavaPlugin {
                 Class clazz = Class.forName(c);
 
                 return clazz.isAnnotationPresent(Init.class);
-            } catch(Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             return false;
@@ -166,7 +166,7 @@ public class Kauri extends JavaPlugin {
                 Init annotation = (Init) clazz.getAnnotation(Init.class);
 
                 return annotation.priority().getPriority();
-            } catch(Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             return 3;
@@ -174,32 +174,32 @@ public class Kauri extends JavaPlugin {
             try {
                 Class clazz = Class.forName(c);
 
-                if(clazz.isAnnotationPresent(Init.class)) {
+                if (clazz.isAnnotationPresent(Init.class)) {
                     Object obj = clazz.getSimpleName().equals(mainClass.getSimpleName()) ? plugin : clazz.newInstance();
                     Init init = (Init) clazz.getAnnotation(Init.class);
 
-                    if(!configOnly) {
+                    if (!configOnly) {
                         if (obj instanceof Listener) {
                             MiscUtils.printToConsole("&eFound " + clazz.getSimpleName() + " Bukkit listener. Registering...");
                             Bukkit.getPluginManager().registerEvents((Listener) obj, plugin);
-                        } else if(obj instanceof cc.funkemunky.api.event.system.Listener) {
+                        } else if (obj instanceof cc.funkemunky.api.event.system.Listener) {
                             MiscUtils.printToConsole("&eFound " + clazz.getSimpleName() + " Atlas listener. Registering...");
                             EventManager.register(plugin, (cc.funkemunky.api.event.system.Listener) obj);
                         }
 
-                        if(init.commands()) {
+                        if (init.commands()) {
                             Atlas.getInstance().getCommandManager().registerCommands(obj);
                         }
 
                     }
                     for (Field field : clazz.getDeclaredFields()) {
                         field.setAccessible(true);
-                        if(field.isAnnotationPresent(ConfigSetting.class)) {
+                        if (field.isAnnotationPresent(ConfigSetting.class)) {
                             String name = field.getAnnotation(ConfigSetting.class).name();
                             String path = field.getAnnotation(ConfigSetting.class).path() + "." + (name.length() > 0 ? name : field.getName());
                             try {
                                 MiscUtils.printToConsole("&eFound " + field.getName() + " ConfigSetting (default=" + field.get(obj) + ").");
-                                if(plugin.getConfig().get(path) == null) {
+                                if (plugin.getConfig().get(path) == null) {
                                     MiscUtils.printToConsole("&eValue not found in configuration! Setting default into config...");
                                     plugin.getConfig().set(path, field.get(obj));
                                     plugin.saveConfig();

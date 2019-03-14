@@ -11,7 +11,6 @@ import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.PlayerUtils;
 import lombok.val;
 import lombok.var;
-import org.bukkit.Material;
 import org.bukkit.event.Event;
 import org.bukkit.potion.PotionEffectType;
 
@@ -26,10 +25,10 @@ public class VelocityC extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(packetType.equalsIgnoreCase(Packet.Server.ENTITY_VELOCITY)) {
+        if (packetType.equalsIgnoreCase(Packet.Server.ENTITY_VELOCITY)) {
             WrappedOutVelocityPacket velocity = new WrappedOutVelocityPacket(packet, getData().getPlayer());
 
-            if(velocity.getId() == velocity.getPlayer().getEntityId()) {
+            if (velocity.getId() == velocity.getPlayer().getEntityId()) {
                 this.velocity = MiscUtils.hypot(velocity.getX(), velocity.getZ());
             }
         } else {
@@ -41,28 +40,28 @@ public class VelocityC extends Check {
 
             val noneCollide = getData().getBoundingBox().grow(1.5f, 0, 1.5f).getCollidingBlockBoxes(player).size() == 0;
 
-            if(this.velocity > 0 && !move.isBlocksOnTop() && !noneCollide) {
+            if (this.velocity > 0 && !move.isBlocksOnTop() && !noneCollide) {
                 val velocityXZ = this.velocity;
                 val ratio = move.getDeltaXZ() / velocityXZ;
                 float max = 1;
                 if (action.isSprinting())
                     getAIMoveSpeed += 0.03000001F;
 
-                if(getData().getPlayer().hasPotionEffect(PotionEffectType.SPEED)) {
+                if (getData().getPlayer().hasPotionEffect(PotionEffectType.SPEED)) {
                     getAIMoveSpeed += (PlayerUtils.getPotionEffectLevel(player, PotionEffectType.SPEED) * (0.20000000298023224D)) * getAIMoveSpeed;
                 }
-                if(player.hasPotionEffect(PotionEffectType.SLOW)) {
+                if (player.hasPotionEffect(PotionEffectType.SLOW)) {
                     getAIMoveSpeed += (PlayerUtils.getPotionEffectLevel(player, PotionEffectType.SLOW) * (-0.15000000596046448D)) * getAIMoveSpeed;
                 }
-                getAIMoveSpeed+= (player.getWalkSpeed() - 0.2) * 5 * 0.45;
+                getAIMoveSpeed += (player.getWalkSpeed() - 0.2) * 5 * 0.45;
 
-                max/= (getAIMoveSpeed / 0.08);
+                max /= (getAIMoveSpeed / 0.08);
 
-                if(ratio < max) {
+                if (ratio < max) {
                     debug(Color.Green + "Flag");
                 }
 
-                debug(max + ", " +  (getAIMoveSpeed / 0.08) + ", " + getAIMoveSpeed + ", " + ratio + ", " + velocityXZ + ", " + move.getDeltaXZ());
+                debug(max + ", " + (getAIMoveSpeed / 0.08) + ", " + getAIMoveSpeed + ", " + ratio + ", " + velocityXZ + ", " + move.getDeltaXZ());
                 this.velocity = 0;
             }
         }

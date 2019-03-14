@@ -15,6 +15,7 @@ import org.bukkit.event.Event;
 public class GroundSpoof extends Check {
     private int vl;
     private long lastTimeStamp;
+
     public GroundSpoof(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
         super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
 
@@ -29,8 +30,8 @@ public class GroundSpoof extends Check {
             return;
 
         if (!getData().isGeneralCancel() && !move.isBlocksOnTop()) {
-            if(move.isClientOnGround() != move.isServerOnGround()) {
-                if((!move.isNearGround() && getData().getLastServerPos().hasPassed(6) && move.getAirTicks() > 2) || vl++ > 5) {
+            if (move.isClientOnGround() != move.isServerOnGround()) {
+                if ((!move.isNearGround() && getData().getLastServerPos().hasPassed(6) && move.getAirTicks() > 2) || vl++ > 5) {
                     flag(getData().getMovementProcessor().isClientOnGround() + "!=" + getData().getMovementProcessor().isServerOnGround(), true, true);
                 }
             } else {

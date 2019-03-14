@@ -13,7 +13,7 @@ public class ActionProcessor {
     private TickTimer lastUseItem = new TickTimer(10);
 
     public void update(WrappedInEntityActionPacket packet) {
-        switch(packet.getAction()) {
+        switch (packet.getAction()) {
             case START_SPRINTING:
                 sprinting = true;
                 break;
@@ -44,7 +44,7 @@ public class ActionProcessor {
     public void update(WrappedInCloseWindowPacket packet) {
         openInventory = false;
     }
-    
+
     public void update(PlayerData data) {
         if ((isUsingItem = Atlas.getInstance().getBlockBoxManager().getBlockBox().isUsingItem(data.getPlayer()))) {
             lastUseItem.reset();

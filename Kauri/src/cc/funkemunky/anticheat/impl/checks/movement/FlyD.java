@@ -21,7 +21,7 @@ public class FlyD extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(getData().getLastServerPos().hasNotPassed(1)) return;
+        if (getData().getLastServerPos().hasNotPassed(1)) return;
         val move = getData().getMovementProcessor();
         val from = move.getFrom();
         val to = move.getTo();
@@ -36,7 +36,7 @@ public class FlyD extends Check {
             val offset = Math.abs(yChange - predictedY);
 
             if (!MathUtils.approxEquals(0.00001, yChange, predictedY)) {
-                if(vl++ > 2) {
+                if (vl++ > 2) {
                     this.flag("O -> " + offset, false, true);
                 }
             } else {

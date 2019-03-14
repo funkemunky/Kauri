@@ -37,7 +37,7 @@ public class AimB extends Check {
         val pitchGCD = MiscUtils.gcd((long) (pitchDifference * offset), (long) (lastPitchDelta * offset));
 
         if (Math.abs(to.getPitch()) < 88.0f && pitchDifference > 0 && getData().getMovementProcessor().getOptifineTicks() < 10 && (pitchGCD < 131072L || pitchGCD == lastGCD)) {
-            if(verbose.flag(150, 5000L)) {
+            if (verbose.flag(150, 5000L)) {
                 flag(String.valueOf(pitchGCD / 2000), true, true);
             }
         } else verbose.deduct(2);

@@ -55,10 +55,10 @@ public class CheckManager {
         registerCheck(checks, new KillauraB("Killaura (Type B)", "Checks for an overall flaw in the rotations of many killauras", CheckType.KILLAURA, CancelType.COMBAT, 200, true, true, true));
         registerCheck(checks, new KillauraC("Killaura (Type C)", "Checks for clients sprinting while attacking.", CheckType.KILLAURA, CancelType.COMBAT, 100, true, true, true));
         registerCheck(checks, new KillauraD("Killaura (Type D)", "Detects over-randomization in killauras.", CheckType.KILLAURA, CancelType.COMBAT, 100, true, true, true));
-       // registerCheck(checks, new KillauraE("Killaura (Type E)", "A heuristic which factors in the rotations to look for any patterns.", CheckType.KILLAURA, CancelType.COMBAT, 100, true, false, false));
+        // registerCheck(checks, new KillauraE("Killaura (Type E)", "A heuristic which factors in the rotations to look for any patterns.", CheckType.KILLAURA, CancelType.COMBAT, 100, true, false, false));
         registerCheck(checks, new KillauraF("Killaura (Type F)", "A simple angle consistency check.", CheckType.KILLAURA, CancelType.COMBAT, 12, true, false, false));
         registerCheck(checks, new KillauraG("Killaura (Type G)", "Raytraces to check if there are blocks obstructing the path of attack.", CheckType.KILLAURA, CancelType.COMBAT, 50, true, false, true));
-       // registerCheck(checks, new KillauraH("Killaura (Type H)", "Detects if clients are swinging impossibly.", CheckType.KILLAURA, CancelType.COMBAT, 15, true, false, false));
+        // registerCheck(checks, new KillauraH("Killaura (Type H)", "Detects if clients are swinging impossibly.", CheckType.KILLAURA, CancelType.COMBAT, 15, true, false, false));
         registerCheck(checks, new KillauraI("Killaura (Type I)", "Checks for another overall flaw in the rotations of many killauras.", CheckType.KILLAURA, CancelType.COMBAT, 200, true, false, true));
         registerCheck(checks, new FlyA("Fly (Type A)", "An acceleration check for flight.", CheckType.FLY, CancelType.MOTION, 225, true, true, true));
         registerCheck(checks, new FlyB("Fly (Type B)", "Calculates what the actual vertical speed of a player should be.", CheckType.FLY, CancelType.MOTION, 225, true, false, true));
@@ -84,10 +84,10 @@ public class CheckManager {
         registerCheck(checks, new BadPacketsE("BadPackets (Type E)", "Checks the rate of healing.", CheckType.BADPACKETS, CancelType.HEALTH, 20, true, true, true));
         registerCheck(checks, new BadPacketsF("BadPackets (Type F)", "Checks frequency of incoming packets. More reliable, but less detection.", CheckType.BADPACKETS, CancelType.MOTION, 100, true, true, true));
         registerCheck(checks, new BadPacketsG("BadPackets (Type G)", "Checks frequency of incoming packets. More detection, but less reliable.", CheckType.BADPACKETS, CancelType.MOTION, 20, true, false, true));
-        registerCheck(checks, new VelocityA("Velocity (Type A)", "Detects any vertical velocity modification below 100%.", CheckType.VELOCITY, CancelType.MOTION,  40, true, true, true));
-        registerCheck(checks, new VelocityB("Velocity (Type B)", "Checks for horizontal velocity modifications.", CheckType.VELOCITY, CancelType.MOTION,  40, true, false, true));
+        registerCheck(checks, new VelocityA("Velocity (Type A)", "Detects any vertical velocity modification below 100%.", CheckType.VELOCITY, CancelType.MOTION, 40, true, true, true));
+        registerCheck(checks, new VelocityB("Velocity (Type B)", "Checks for horizontal velocity modifications.", CheckType.VELOCITY, CancelType.MOTION, 40, true, false, true));
         //registerCheck(checks, new Interact("Interact", "Makes sure the interaction of a block is legitimate", CheckType.WORLD, CancelType.INTERACT, 200, true, false, true));
-       // registerCheck(checks, new VelocityC("Velocity (Type C)", "Uses advanced mathmatical calculations to check for horizontal velocity.", CheckType.VELOCITY, CancelType.MOTION, 50, true, false, false));
+        // registerCheck(checks, new VelocityC("Velocity (Type C)", "Uses advanced mathmatical calculations to check for horizontal velocity.", CheckType.VELOCITY, CancelType.MOTION, 50, true, false, false));
 
         for (Check check : checks) {
             Arrays.stream(check.getClass().getDeclaredFields()).filter(field -> {
@@ -120,7 +120,7 @@ public class CheckManager {
     }
 
     public void registerCheck(List<Check> checks, Check check) {
-        if((check.getMinimum() == null || ProtocolVersion.getGameVersion().isOrAbove(check.getMinimum())) && (check.getMaximum() == null || ProtocolVersion.getGameVersion().isBelow(check.getMaximum()))) {
+        if ((check.getMinimum() == null || ProtocolVersion.getGameVersion().isOrAbove(check.getMinimum())) && (check.getMaximum() == null || ProtocolVersion.getGameVersion().isBelow(check.getMaximum()))) {
             checks.add(check);
         }
     }
@@ -172,7 +172,7 @@ public class CheckManager {
     }
 
     public void setBypassing(UUID uuid, boolean bypassing) {
-        if(bypassing) {
+        if (bypassing) {
             bypassingPlayers.add(uuid);
         } else {
             bypassingPlayers.remove(uuid);

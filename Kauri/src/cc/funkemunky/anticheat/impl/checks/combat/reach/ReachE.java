@@ -75,68 +75,68 @@ public class ReachE extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-       if(packetType.equals(Packet.Client.ARM_ANIMATION)) {
+        if (packetType.equals(Packet.Client.ARM_ANIMATION)) {
             vl -= vl > 0 ? armSubtract : 0;
-        } else if(getData().getTarget() != null && getData().getTarget().getWorld().getUID().equals(getData().getPlayer().getWorld().getUID()) && getData().getLastAttack().hasNotPassed(0) && getData().getPlayer().getGameMode().equals(GameMode.SURVIVAL)) {
-           val target = getData().getTarget();
-           val entityData = Kauri.getInstance().getDataManager().getPlayerData(target.getUniqueId());
+        } else if (getData().getTarget() != null && getData().getTarget().getWorld().getUID().equals(getData().getPlayer().getWorld().getUID()) && getData().getLastAttack().hasNotPassed(0) && getData().getPlayer().getGameMode().equals(GameMode.SURVIVAL)) {
+            val target = getData().getTarget();
+            val entityData = Kauri.getInstance().getDataManager().getPlayerData(target.getUniqueId());
 
-           if(getData().getPing() > 400 || (entityData != null && getData().getPing() > 400) || getData().isLagging()) {
-               return;
-           }
+            if (getData().getPing() > 400 || (entityData != null && getData().getPing() > 400) || getData().isLagging()) {
+                return;
+            }
 
-           WrappedInFlyingPacket flying = new WrappedInFlyingPacket(packet, getData().getPlayer());
+            WrappedInFlyingPacket flying = new WrappedInFlyingPacket(packet, getData().getPlayer());
 
-           val origin = getData().getMovementProcessor().getTo().clone().toLocation(flying.getPlayer().getWorld()).add(0, 1.53, 0);
+            val origin = getData().getMovementProcessor().getTo().clone().toLocation(flying.getPlayer().getWorld()).add(0, 1.53, 0);
 
-           RayTrace trace = new RayTrace(origin.toVector(), origin.getDirection());
+            RayTrace trace = new RayTrace(origin.toVector(), origin.getDirection());
 
-           List<Vector> vecs = trace.traverse(target.getEyeLocation().distance(origin), 0.05);
+            List<Vector> vecs = trace.traverse(target.getEyeLocation().distance(origin), 0.05);
 
-           List<BoundingBox> entityBoxes = new CopyOnWriteArrayList<>();
+            List<BoundingBox> entityBoxes = new CopyOnWriteArrayList<>();
 
-           if(entityData == null) {
-               getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), pingRange + MathUtils.getDelta(getData().getTransPing(), getData().getLastTransPing()))
-                       .forEach(loc -> entityBoxes.add(getHitbox(target, loc)));
-           } else {
-               entityData.getMovementProcessor().getPastLocation()
-                       .getEstimatedLocation(getData().getTransPing(), pingRange + MathUtils.getDelta(getData().getTransPing(), getData().getLastTransPing()))
-                       .forEach(loc -> entityBoxes.add(getHitbox(target, loc)));
-           }
+            if (entityData == null) {
+                getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), pingRange + MathUtils.getDelta(getData().getTransPing(), getData().getLastTransPing()))
+                        .forEach(loc -> entityBoxes.add(getHitbox(target, loc)));
+            } else {
+                entityData.getMovementProcessor().getPastLocation()
+                        .getEstimatedLocation(getData().getTransPing(), pingRange + MathUtils.getDelta(getData().getTransPing(), getData().getLastTransPing()))
+                        .forEach(loc -> entityBoxes.add(getHitbox(target, loc)));
+            }
 
-           double calculatedReach = 0;
-           int collided = 0;
+            double calculatedReach = 0;
+            int collided = 0;
 
-           vecs.sort(Comparator.comparingDouble(vec -> vec.distance(origin.toVector())));
+            vecs.sort(Comparator.comparingDouble(vec -> vec.distance(origin.toVector())));
 
-           List<Vector> finalVecs = new ArrayList<>();
-           vecs.stream().filter(vec -> entityBoxes.stream().anyMatch(box -> box.collides(vec))).forEach(finalVecs::add);
+            List<Vector> finalVecs = new ArrayList<>();
+            vecs.stream().filter(vec -> entityBoxes.stream().anyMatch(box -> box.collides(vec))).forEach(finalVecs::add);
 
-           for(Vector vec : finalVecs) {
-               double reach = origin.toVector().distance(vec);
-               calculatedReach = calculatedReach == 0 ? reach + .15 : Math.min(reach + .15, calculatedReach);
+            for (Vector vec : finalVecs) {
+                double reach = origin.toVector().distance(vec);
+                calculatedReach = calculatedReach == 0 ? reach + .15 : Math.min(reach + .15, calculatedReach);
 
-               collided++;
-           }
+                collided++;
+            }
 
-           if (collided > collisionMin) {
-               if (calculatedReach > maxReach + 0.0001) {
-                   if ((vl+= vlAdd) > nonBanMaxVL + (getData().getMovementProcessor().getDeltaXZ() * nonBanMult)) {
-                       if(vl > maxVL) {
-                           flag(calculatedReach + ">-" + maxReach, false, true);
-                       } else {
-                           flag(calculatedReach + ">-" + maxReach, false, false);
-                       }
-                   }
+            if (collided > collisionMin) {
+                if (calculatedReach > maxReach + 0.0001) {
+                    if ((vl += vlAdd) > nonBanMaxVL + (getData().getMovementProcessor().getDeltaXZ() * nonBanMult)) {
+                        if (vl > maxVL) {
+                            flag(calculatedReach + ">-" + maxReach, false, true);
+                        } else {
+                            flag(calculatedReach + ">-" + maxReach, false, false);
+                        }
+                    }
 
-                   debug(Color.Green + "REACH: " + calculatedReach);
-               } else {
-                   vl -= vl > 0 ? belowTSubtract : 0;
-               }
-           } else {
-               vl-= vl > 0 ? belowCollisionSubtract : 0;
-           }
-           debug("VL: " + vl + "/" + maxVL + " REACH: " + calculatedReach + " COLLIDED: " + collided + " MAX: " + maxReach + " RANGE: " + pingRange);
+                    debug(Color.Green + "REACH: " + calculatedReach);
+                } else {
+                    vl -= vl > 0 ? belowTSubtract : 0;
+                }
+            } else {
+                vl -= vl > 0 ? belowCollisionSubtract : 0;
+            }
+            debug("VL: " + vl + "/" + maxVL + " REACH: " + calculatedReach + " COLLIDED: " + collided + " MAX: " + maxReach + " RANGE: " + pingRange);
         }
     }
 
@@ -146,8 +146,8 @@ public class ReachE extends Check {
     }
 
     private BoundingBox getHitbox(LivingEntity entity, CustomLocation l) {
-        val dimensions = MiscUtils.entityDimensions.getOrDefault(entity.getType(), new Vector(0.35f,1.85f,0.35f));
+        val dimensions = MiscUtils.entityDimensions.getOrDefault(entity.getType(), new Vector(0.35f, 1.85f, 0.35f));
 
-        return new BoundingBox(l.toVector(), l.toVector()).grow(.25f, .25f, .25f).grow((float) dimensions.getX(), 0, (float) dimensions.getZ()).add(0,0,0,0, (float) dimensions.getY(),0);
+        return new BoundingBox(l.toVector(), l.toVector()).grow(.25f, .25f, .25f).grow((float) dimensions.getX(), 0, (float) dimensions.getZ()).add(0, 0, 0, 0, (float) dimensions.getY(), 0);
     }
 }

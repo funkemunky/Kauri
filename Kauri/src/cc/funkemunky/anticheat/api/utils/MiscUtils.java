@@ -48,12 +48,13 @@ public class MiscUtils {
     public static double hypot(double... value) {
         double total = 0;
 
-        for(double val : value) {
-            total+= (val * val);
+        for (double val : value) {
+            total += (val * val);
         }
 
         return Math.sqrt(total);
     }
+
     public static long gcd(long current, long previous) {
         return (previous <= 16384L) ? current : gcd(previous, current % previous);
     }
@@ -89,7 +90,7 @@ public class MiscUtils {
                 || move.isOnSlimeBefore()
                 || move.getLastRiptide().hasNotPassed(8)
                 || move.isPistonsNear()
-                || move.getTo() != null &&  move.getTo().toVector().distance(move.getFrom().toVector()) < 0.005
+                || move.getTo() != null && move.getTo().toVector().distance(move.getFrom().toVector()) < 0.005
                 || velocity.getLastVelocity().hasNotPassed(velocityTicks);
     }
 
@@ -110,7 +111,7 @@ public class MiscUtils {
     public static Class<?> getClass(String string) {
         try {
             return Class.forName(string);
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -185,37 +186,37 @@ public class MiscUtils {
 
     public static String unloadPlugin(String pl) {
         PluginManager pm = Bukkit.getServer().getPluginManager();
-        SimplePluginManager spm = (SimplePluginManager)pm;
+        SimplePluginManager spm = (SimplePluginManager) pm;
         SimpleCommandMap cmdMap = null;
         List plugins = null;
         Map names = null;
         Map commands = null;
         Map listeners = null;
         boolean reloadlisteners = true;
-        if(spm != null) {
+        if (spm != null) {
             try {
                 Field tp = spm.getClass().getDeclaredField("plugins");
                 tp.setAccessible(true);
-                plugins = (List)tp.get(spm);
+                plugins = (List) tp.get(spm);
                 Field arr$ = spm.getClass().getDeclaredField("lookupNames");
                 arr$.setAccessible(true);
-                names = (Map)arr$.get(spm);
+                names = (Map) arr$.get(spm);
 
                 Field len$;
                 try {
                     len$ = spm.getClass().getDeclaredField("listeners");
                     len$.setAccessible(true);
-                    listeners = (Map)len$.get(spm);
+                    listeners = (Map) len$.get(spm);
                 } catch (Exception var19) {
                     reloadlisteners = false;
                 }
 
                 len$ = spm.getClass().getDeclaredField("commandMap");
                 len$.setAccessible(true);
-                cmdMap = (SimpleCommandMap)len$.get(spm);
+                cmdMap = (SimpleCommandMap) len$.get(spm);
                 Field i$ = cmdMap.getClass().getDeclaredField("knownCommands");
                 i$.setAccessible(true);
-                commands = (Map)i$.get(cmdMap);
+                commands = (Map) i$.get(cmdMap);
             } catch (IllegalAccessException | NoSuchFieldException var20) {
                 return "Failed to unload plugin!";
             }
@@ -225,44 +226,44 @@ public class MiscUtils {
         Plugin[] var22 = Bukkit.getServer().getPluginManager().getPlugins();
         int var23 = var22.length;
 
-        for(int var24 = 0; var24 < var23; ++var24) {
+        for (int var24 = 0; var24 < var23; ++var24) {
             Plugin p = var22[var24];
-            if(p.getDescription().getName().equalsIgnoreCase(pl)) {
+            if (p.getDescription().getName().equalsIgnoreCase(pl)) {
                 pm.disablePlugin(p);
                 var21 = var21 + p.getName() + " ";
-                if(plugins != null && plugins.contains(p)) {
+                if (plugins != null && plugins.contains(p)) {
                     plugins.remove(p);
                 }
 
-                if(names != null && names.containsKey(pl)) {
+                if (names != null && names.containsKey(pl)) {
                     names.remove(pl);
                 }
 
                 Iterator it;
-                if(listeners != null && reloadlisteners) {
+                if (listeners != null && reloadlisteners) {
                     it = listeners.values().iterator();
 
-                    while(it.hasNext()) {
-                        SortedSet entry = (SortedSet)it.next();
+                    while (it.hasNext()) {
+                        SortedSet entry = (SortedSet) it.next();
                         Iterator c = entry.iterator();
 
-                        while(c.hasNext()) {
-                            RegisteredListener value = (RegisteredListener)c.next();
-                            if(value.getPlugin() == p) {
+                        while (c.hasNext()) {
+                            RegisteredListener value = (RegisteredListener) c.next();
+                            if (value.getPlugin() == p) {
                                 c.remove();
                             }
                         }
                     }
                 }
 
-                if(cmdMap != null) {
+                if (cmdMap != null) {
                     it = commands.entrySet().iterator();
 
-                    while(it.hasNext()) {
+                    while (it.hasNext()) {
                         Map.Entry var25 = (Map.Entry) it.next();
-                        if(var25.getValue() instanceof PluginCommand) {
-                            PluginCommand var26 = (PluginCommand)var25.getValue();
-                            if(var26.getPlugin() == p) {
+                        if (var25.getValue() instanceof PluginCommand) {
+                            PluginCommand var26 = (PluginCommand) var25.getValue();
+                            if (var26.getPlugin() == p) {
                                 var26.unregister(cmdMap);
                                 it.remove();
                             }
@@ -294,8 +295,7 @@ public class MiscUtils {
                             break;
                         }
                     }
-                }
-                catch (InvalidDescriptionException e2) {
+                } catch (InvalidDescriptionException e2) {
                     return;
                 }
             }
@@ -304,19 +304,18 @@ public class MiscUtils {
             Atlas.getInstance().getServer().getPluginManager().loadPlugin(pluginFile);
             targetPlugin = getPlugin(pl);
             Atlas.getInstance().getServer().getPluginManager().enablePlugin(targetPlugin);
-        }
-        catch (UnknownDependencyException | InvalidPluginException | InvalidDescriptionException e3) {
+        } catch (UnknownDependencyException | InvalidPluginException | InvalidDescriptionException e3) {
             e3.printStackTrace();
         }
     }
 
     public static Location findGroundLocation(Player player) {
-        for(int y = player.getLocation().getBlockY() ; y > 0 ; y--) {
+        for (int y = player.getLocation().getBlockY(); y > 0; y--) {
             Location location = new Location(player.getWorld(), player.getLocation().getBlockX(), y, player.getLocation().getBlockZ());
 
             Block block = BlockUtils.getBlock(location);
 
-            if(BlockUtils.isSolid(block)) {
+            if (BlockUtils.isSolid(block)) {
                 Location toReturn = location.clone();
                 toReturn.setY(ReflectionsUtil.getBlockBoundingBox(block).maxY);
                 return location;

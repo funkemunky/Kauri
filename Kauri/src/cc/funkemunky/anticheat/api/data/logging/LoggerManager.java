@@ -35,7 +35,7 @@ public class LoggerManager {
         database.getDatabaseValues().keySet().forEach(key -> {
             String[] toFormat = key.split(";");
 
-            if(!toFormat[1].equals("banned")) {
+            if (!toFormat[1].equals("banned")) {
                 UUID uuid = UUID.fromString(toFormat[0]);
 
                 Map<String, Integer> vls = violations.getOrDefault(uuid, new HashMap<>());
@@ -100,7 +100,7 @@ public class LoggerManager {
     }
 
     public int addAndGetViolation(UUID uuid, Check check, int amount) {
-        if(!violations.containsKey(uuid)) {
+        if (!violations.containsKey(uuid)) {
             violations.put(uuid, new HashMap<>());
         }
 

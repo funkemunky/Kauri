@@ -44,7 +44,7 @@ public class CollisionAssessment {
                 onGround = true;
             }
 
-            if(getData().isDebuggingBox() && bb.collides(playerBox) && Kauri.getInstance().getCurrentTicks() % 2 == 0) {
+            if (getData().isDebuggingBox() && bb.collides(playerBox) && Kauri.getInstance().getCurrentTicks() % 2 == 0) {
                 Atlas.getInstance().getThreadPool().submit(() -> MiscUtils.createParticlesForBoundingBox(getData().getPlayer(), bb, WrappedEnumParticle.FLAME, 0.25f));
             }
 
@@ -69,7 +69,7 @@ public class CollisionAssessment {
 
             }
 
-            if(bb.collidesVertically(playerBox.subtract(0, 0.1f,0,0,0,0)) && block.getType().toString().contains("SLIME")) {
+            if (bb.collidesVertically(playerBox.subtract(0, 0.1f, 0, 0, 0, 0)) && block.getType().toString().contains("SLIME")) {
                 onSlime = true;
             }
 

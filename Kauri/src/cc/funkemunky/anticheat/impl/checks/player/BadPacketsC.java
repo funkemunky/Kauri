@@ -21,7 +21,7 @@ public class BadPacketsC extends Check {
 
         val pitch = Math.abs(flying.getPitch());
 
-        if(pitch > 90) {
+        if (pitch > 90) {
             flag(pitch + ">-90", true, true);
         }
     }

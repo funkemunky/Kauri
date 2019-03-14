@@ -80,9 +80,9 @@ public class SpeedB extends Check {
 
             if (streak.get() >= maxStreak) {
                 if (vl++ > 2) {
-                    flag( "" + (double) (streak.get() * 100) / maxStreak + "%", true, true);
+                    flag("" + (double) (streak.get() * 100) / maxStreak + "%", true, true);
                 }
-            } else if(streak.get() == 0) {
+            } else if (streak.get() == 0) {
                 vl = 0;
             }
 
@@ -103,7 +103,7 @@ public class SpeedB extends Check {
 
     private float account() {
         float total = 0;
-        
+
         val move = getData().getMovementProcessor();
 
         total += PlayerUtils.getPotionEffectLevel(getData().getPlayer(), PotionEffectType.SPEED) * (move.isServerOnGround() ? 0.057f : 0.044f);
@@ -111,7 +111,7 @@ public class SpeedB extends Check {
         total += (getData().getPlayer().getWalkSpeed() - 0.2) * 1.65;
         total += (getData().getLastBlockPlace().hasNotPassed(7)) ? 0.1 : 0;
         total += move.isOnSlimeBefore() ? 0.1 : 0;
-        total += move.getBlockAboveTicks() > 0 ? move.getIceTicks() > 0 ? 0.4 : 0.2  : 0;
+        total += move.getBlockAboveTicks() > 0 ? move.getIceTicks() > 0 ? 0.4 : 0.2 : 0;
         total += move.getHalfBlockTicks() > 0 ? 0.12 : 0;
         return total;
     }

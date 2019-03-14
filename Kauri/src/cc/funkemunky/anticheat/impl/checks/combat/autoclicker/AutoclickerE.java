@@ -33,9 +33,9 @@ public class AutoclickerE extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(MiscUtils.shouldReturnArmAnimation(getData())) return;
+        if (MiscUtils.shouldReturnArmAnimation(getData())) return;
         if (packet instanceof WrappedInBlockDigPacket) {
-            val digPacket = (WrappedInBlockDigPacket)packet;
+            val digPacket = (WrappedInBlockDigPacket) packet;
 
             val digType = digPacket.getAction();
 

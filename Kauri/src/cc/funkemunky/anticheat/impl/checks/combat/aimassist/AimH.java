@@ -7,7 +7,6 @@ import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import lombok.val;
 import org.bukkit.event.Event;
-
 import org.bukkit.util.Vector;
 
 @Packets(packets = {
@@ -25,7 +24,7 @@ public class AimH extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        if(getData().getLastServerPos().hasNotPassed(4) && getData().getLastLogin().hasNotPassed(20)) return;
+        if (getData().getLastServerPos().hasNotPassed(4) && getData().getLastLogin().hasNotPassed(20)) return;
 
         Vector vector = new Vector(move.getTo().getX() - move.getFrom().getX(), 0, move.getTo().getZ() - move.getFrom().getZ());
         double angleMove = vector.distanceSquared((new Vector(move.getTo().getYaw() - move.getFrom().getYaw(), 0, move.getTo().getYaw() - move.getFrom().getYaw())));

@@ -23,6 +23,7 @@ public class BadPacketsA extends Check {
 
     private boolean serverSent, clientSent, lastCreative;
     private int vl;
+
     public BadPacketsA(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
         super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
     }
@@ -35,7 +36,7 @@ public class BadPacketsA extends Check {
             if (abilities.isAllowedFlight() && !getData().isCreativeMode()) {
                 serverSent = true;
             }
-        } else if(packetType.equalsIgnoreCase(Packet.Client.ABILITIES)) {
+        } else if (packetType.equalsIgnoreCase(Packet.Client.ABILITIES)) {
             WrappedInAbilitiesPacket abilities = new WrappedInAbilitiesPacket(packet, getData().getPlayer());
 
             if (abilities.isAllowedFlight() && !getData().isCreativeMode() && !serverSent) {
@@ -48,20 +49,20 @@ public class BadPacketsA extends Check {
 
             clientSent = true;
 
-            if(!abilities.isAllowedFlight()) {
+            if (!abilities.isAllowedFlight()) {
                 clientSent = serverSent = false;
             }
 
-            if(abilities.isCreativeMode() != lastCreative) {
+            if (abilities.isCreativeMode() != lastCreative) {
                 clientSent = serverSent = false;
             }
 
-            if((lastCreative = abilities.isCreativeMode())) {
+            if ((lastCreative = abilities.isCreativeMode())) {
                 clientSent = serverSent = false;
             }
 
         } else {
-            if(!serverSent && !getData().isCreativeMode() && clientSent) {
+            if (!serverSent && !getData().isCreativeMode() && clientSent) {
                 flag("fake news abilities packet", true, true);
             }
         }
