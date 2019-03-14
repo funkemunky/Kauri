@@ -1,7 +1,12 @@
 package cc.funkemunky.anticheat.api.pup;
 
+import cc.funkemunky.anticheat.Kauri;
+import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.utils.Packets;
+import cc.funkemunky.anticheat.api.utils.Setting;
+import cc.funkemunky.anticheat.impl.pup.vpn.AntiVPN;
+import org.bukkit.Bukkit;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,8 +23,49 @@ public class AntiPUPManager {
     public List<AntiPUP> registerMethods() {
         List<AntiPUP> list = new ArrayList<>();
 
+        addMethod(new AntiVPN("AntiVPN", true), list);
+
+        for (AntiPUP pup : list) {
+            Arrays.stream(pup.getClass().getDeclaredFields()).filter(field -> {
+                field.setAccessible(true);
+
+                return field.isAnnotationPresent(Setting.class);
+            }).forEach(field -> {
+                try {
+                    field.setAccessible(true);
+
+                    String path = "antipup." + pup.getName() + ".settings." + field.getName();
+                    if (Kauri.getInstance().getConfig().get(path) != null) {
+                        Object val = Kauri.getInstance().getConfig().get(path);
+
+                        if (val instanceof Double && field.get(pup) instanceof Float) {
+                            field.set(pup, (float) (double) val);
+                        } else {
+                            field.set(pup, val);
+                        }
+                    } else {
+                        Kauri.getInstance().getConfig().set("antipup." + pup.getName() + ".settings." + field.getName(), field.get(pup));
+                        Kauri.getInstance().saveConfig();
+                    }
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            });
+
+            if(Kauri.getInstance().getConfig().get("antipup." + pup.getName() + ".enabled") == null) {
+                Kauri.getInstance().getConfig().set("antipup." + pup.getName() + ".enabled", pup.isEnabled());
+            } else {
+                pup.setEnabled(Kauri.getInstance().getConfig().getBoolean("antipup." + pup.getName() + ".enabled"));
+            }
+        }
 
         return list;
+    }
+
+    public void addMethod(AntiPUP pup, List<AntiPUP> list) {
+        Bukkit.getPluginManager().registerEvents(pup, Kauri.getInstance());
+
+        list.add(pup);
     }
 
     public AntiPUP getMethodByName(String name) {

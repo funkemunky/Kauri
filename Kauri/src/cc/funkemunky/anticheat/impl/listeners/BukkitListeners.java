@@ -21,6 +21,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -133,7 +134,7 @@ public class BukkitListeners implements Listener {
     }
 
     private void callChecks(PlayerData data, Event event) {
-        data.getChecks().stream()
+        data.getBukkitChecks().getOrDefault(event.getClass(), new ArrayList<>()).stream()
                 .filter(check -> check.isEnabled() && check.getClass().isAnnotationPresent(BukkitEvents.class) && Arrays.asList(check.getClass().getAnnotation(BukkitEvents.class).events()).contains(event.getClass()))
                 .forEach(check -> check.onBukkitEvent(event));
     }

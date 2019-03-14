@@ -65,6 +65,9 @@ public class PacketListeners implements Listener {
             }
 
             hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
+
+            if(hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
+
         }
         Kauri.getInstance().getProfiler().stop("event:PacketSendEvent");
     }
@@ -184,6 +187,7 @@ public class PacketListeners implements Listener {
                     break;
             }
             hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
+            if(hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
         }
         Kauri.getInstance().getProfiler().stop("event:PacketReceiveEvent");
     }
@@ -198,5 +202,9 @@ public class PacketListeners implements Listener {
                         Kauri.getInstance().getProfiler().stop("check:" + check.getName());
                     }));
         }
+    }
+
+    private boolean hopperPup(Object packet, String packetType, long timestamp, PlayerData data) {
+        return data.getAntiPupMethods().getOrDefault(packetType, new ArrayList<>()).stream().anyMatch(pup -> pup.onPacket(packet, packetType, timestamp));
     }
 }
