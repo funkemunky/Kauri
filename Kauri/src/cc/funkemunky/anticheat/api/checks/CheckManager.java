@@ -2,6 +2,8 @@ package cc.funkemunky.anticheat.api.checks;
 
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
+import cc.funkemunky.anticheat.api.utils.BukkitEvents;
+import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.anticheat.impl.checks.combat.aimassist.*;
 import cc.funkemunky.anticheat.impl.checks.combat.autoclicker.*;
@@ -128,13 +130,33 @@ public class CheckManager {
     }
 
     public void loadChecksIntoData(PlayerData data) {
-        List<Check> checks = loadChecks();
+        List<Check> checkList = loadChecks();
 
-        data.getChecks().clear();
+        checkList.forEach(check -> check.setData(data));
 
-        checks.forEach(check -> check.setData(data));
+        checkList.stream().filter(check -> check.getClass().isAnnotationPresent(Packets.class)).forEach(check -> {
+            Packets packets = check.getClass().getAnnotation(Packets.class);
 
-        data.setChecks(checks);
+            Arrays.stream(packets.packets()).forEach(packet -> {
+                List<Check> checks = data.getPacketChecks().getOrDefault(packet, new ArrayList<>());
+
+                checks.add(check);
+
+                data.getPacketChecks().put(packet, checks);
+            });
+        });
+
+        checkList.stream().filter(check -> check.getClass().isAnnotationPresent(BukkitEvents.class)).forEach(check -> {
+            BukkitEvents events = check.getClass().getAnnotation(BukkitEvents.class);
+
+            Arrays.stream(events.events()).forEach(event -> {
+                List<Check> checks = data.getBukkitChecks().getOrDefault(event, new ArrayList<>());
+
+                checks.add(check);
+
+                data.getBukkitChecks().put(event, checks);
+            });
+        });
     }
 
     public Check getCheck(String name) {

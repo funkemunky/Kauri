@@ -110,6 +110,10 @@ public class MiscUtils {
         return null;
     }
 
+    public static int millisToTicks(long millis) {
+        return (int) Math.ceil(millis / 50D);
+    }
+
     public static String unloadPlugin(String pl) {
         PluginManager pm = Bukkit.getServer().getPluginManager();
         SimplePluginManager spm = (SimplePluginManager)pm;

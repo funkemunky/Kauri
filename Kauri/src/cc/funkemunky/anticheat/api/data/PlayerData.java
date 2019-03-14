@@ -1,6 +1,7 @@
 package cc.funkemunky.anticheat.api.data;
 
 import cc.funkemunky.anticheat.Kauri;
+import cc.funkemunky.anticheat.api.pup.AntiPUP;
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckSettings;
@@ -29,9 +30,12 @@ public class PlayerData {
     private Check debuggingCheck;
     private boolean debuggingBox, banned = false;
     private Player player;
-    private List<Check> checks = new ArrayList<>();
+
     private Map<String, List<Check>> packetChecks = new HashMap<>();
     private Map<Class, List<Check>> bukkitChecks = new HashMap<>();
+
+    private Map<String, List<AntiPUP>> antiPupMethods = new HashMap<>();
+
     private CancelType cancelType = CancelType.NONE;
     private boolean ableToFly, creativeMode, invulnerable, flying, generalCancel, breakingBlock,
             cinematicMode, lagging, alertsEnabled;
@@ -70,30 +74,9 @@ public class PlayerData {
         movementProcessor = new MovementProcessor();
 
         Kauri.getInstance().getCheckManager().loadChecksIntoData(this);
+        Kauri.getInstance().getAntiPUPManager().loadMethodsIntoData(this);
 
-        checks.stream().filter(check -> check.getClass().isAnnotationPresent(Packets.class)).forEach(check -> {
-            Packets packets = check.getClass().getAnnotation(Packets.class);
 
-            Arrays.stream(packets.packets()).forEach(packet -> {
-                List<Check> checks = packetChecks.getOrDefault(packet, new ArrayList<>());
-
-                checks.add(check);
-
-                packetChecks.put(packet, checks);
-            });
-        });
-
-        checks.stream().filter(check -> check.getClass().isAnnotationPresent(BukkitEvents.class)).forEach(check -> {
-            BukkitEvents events = check.getClass().getAnnotation(BukkitEvents.class);
-
-            Arrays.stream(events.events()).forEach(event -> {
-                List<Check> checks = bukkitChecks.getOrDefault(event, new ArrayList<>());
-
-                checks.add(check);
-
-                bukkitChecks.put(event, checks);
-            });
-        });
         Atlas.getInstance().getSchedular().scheduleAtFixedRate(() -> {
             if(target != null && !target.isDead()) {
                 entityFrom = entityTo;

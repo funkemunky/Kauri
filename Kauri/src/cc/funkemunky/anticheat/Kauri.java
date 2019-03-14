@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat;
 
+import cc.funkemunky.anticheat.api.pup.AntiPUPManager;
 import cc.funkemunky.anticheat.api.checks.CheckManager;
 import cc.funkemunky.anticheat.api.data.DataManager;
 import cc.funkemunky.anticheat.api.data.logging.LoggerManager;
@@ -21,7 +22,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.lang.reflect.Field;
 import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -33,12 +33,17 @@ import java.util.logging.Level;
 public class Kauri extends JavaPlugin {
     @Getter
     private static Kauri instance;
+
     private DataManager dataManager;
     private CheckManager checkManager;
     private StatsManager statsManager;
+    private AntiPUPManager antiPUPManager;
+
     private int currentTicks;
     private long lastTick, tickElapsed, profileStart;
+
     private ScheduledExecutorService executorService;
+
     private BaseProfiler profiler;
     private LoggerManager loggerManager;
 
@@ -63,6 +68,7 @@ public class Kauri extends JavaPlugin {
             startScanner(false);
 
             checkManager = new CheckManager();
+            antiPUPManager = new AntiPUPManager();
             dataManager.registerAllPlayers();
 
             //Starting up our utilities, managers, and tasks.
