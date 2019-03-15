@@ -126,7 +126,7 @@ public class MiscUtils {
         Map<String, String> toReturn = new HashMap<>();
         try {
             StringBuilder response = new StringBuilder();
-            String url = "http://api.vpnblocker.net/v2/json/" + ipAddress + "/gklH7N4NU5S8gpO6Tdk6UF68hrBTZ1";
+            String url = "http://funkemunky.cc/vpn?ip=" + ipAddress + "&license=FWd2EdCvm5CcSj9JFbiIWxkC73IFeDTlroLKrPvS";
             URLConnection connection = new URL(url).openConnection();
             connection.setRequestProperty("User-Agent", "Kauri");
             connection.setConnectTimeout(10000);

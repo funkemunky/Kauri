@@ -8,13 +8,18 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
-@Getter
-@Setter
 public abstract class AntiPUP implements Listener {
 
+    @Getter
     private String name;
-    private boolean enabled;
+
+    @Getter
+    @Setter
     private PlayerData data;
+
+    @Getter
+    @Setter
+    private boolean enabled;
 
     public AntiPUP(String name, boolean enabled) {
         this.name = name;
