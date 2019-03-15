@@ -1,0 +1,7 @@
+name: Iris
+main: cc.funkemunky.anticheat.Iris
+desciption: Think outside the box.
+version: 1.4
+authors: [funkemunky, Elevated]
+commands:
+  iris:
