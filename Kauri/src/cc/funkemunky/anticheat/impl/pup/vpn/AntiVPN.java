@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.pup.vpn;
 
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.pup.AntiPUP;
+import cc.funkemunky.anticheat.api.pup.PuPType;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.anticheat.api.utils.VPNResponse;
@@ -26,8 +27,8 @@ public class AntiVPN extends AntiPUP {
     @Setting(name = "kickReason.blockedCountry")
     private String blockedCountry = "&cThe country %countryName% is blocked from this server";
 
-    public AntiVPN(String name, boolean enabled) {
-        super(name, enabled);
+    public AntiVPN(String name, PuPType type, boolean enabled) {
+        super(name, type, enabled);
     }
 
     @Override

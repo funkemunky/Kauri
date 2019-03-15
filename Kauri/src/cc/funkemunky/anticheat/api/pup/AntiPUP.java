@@ -14,6 +14,9 @@ public abstract class AntiPUP implements Listener {
     private String name;
 
     @Getter
+    private PuPType type;
+
+    @Getter
     @Setter
     private PlayerData data;
 
@@ -21,8 +24,9 @@ public abstract class AntiPUP implements Listener {
     @Setter
     private boolean enabled;
 
-    public AntiPUP(String name, boolean enabled) {
+    public AntiPUP(String name, PuPType type, boolean enabled) {
         this.name = name;
+        this.type = type;
         this.enabled = enabled;
     }
 

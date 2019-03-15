@@ -5,9 +5,8 @@ import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.anticheat.impl.pup.bot.ConsoleClient;
-import cc.funkemunky.anticheat.impl.pup.crashers.ArmSwing;
-import cc.funkemunky.anticheat.impl.pup.crashers.Boxer;
-import cc.funkemunky.anticheat.impl.pup.crashers.YLevel;
+import cc.funkemunky.anticheat.impl.pup.crashers.*;
+import cc.funkemunky.anticheat.impl.pup.exploits.BookEnchant;
 import cc.funkemunky.anticheat.impl.pup.vpn.AntiVPN;
 
 import java.util.ArrayList;
@@ -25,11 +24,15 @@ public class AntiPUPManager {
     public List<AntiPUP> registerMethods() {
         List<AntiPUP> list = new ArrayList<>();
 
-        addMethod(new AntiVPN("AntiVPN", true), list);
-        addMethod(new ConsoleClient("ConsoleClient", true), list);
-        addMethod(new ArmSwing("ArmSwing", true), list);
-        addMethod(new Boxer("Boxer", true), list);
-        addMethod(new YLevel("YLevel", true), list);
+        addMethod(new AntiVPN("AntiVPN", PuPType.VPN, true), list);
+        addMethod(new ConsoleClient("ConsoleClient", PuPType.BOT, true), list);
+        addMethod(new ArmSwing("ArmSwing", PuPType.CRASH, true), list);
+        addMethod(new Boxer("Boxer", PuPType.CRASH, true), list);
+        addMethod(new YLevel("YLevel", PuPType.CRASH, true), list);
+        addMethod(new CommandSpam("CommandSpam", PuPType.SPAM, true), list);
+        addMethod(new ChatSpam("ChatSpam", PuPType.SPAM, true), list);
+        addMethod(new BookEnchant("BookEnchant", PuPType.EXPLOIT, true), list);
+
 
         for (AntiPUP pup : list) {
             Arrays.stream(pup.getClass().getDeclaredFields()).filter(field -> {

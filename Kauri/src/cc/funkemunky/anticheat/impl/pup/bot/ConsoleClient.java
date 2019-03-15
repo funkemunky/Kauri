@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.pup.bot;
 
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.pup.AntiPUP;
+import cc.funkemunky.anticheat.api.pup.PuPType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
@@ -14,8 +15,8 @@ public class ConsoleClient extends AntiPUP {
     @Setting(name = "kickMessage")
     private String message = "&cConsole clients are not allowed./n&7&lNot a console client? &fDon't freeze your game!";
 
-    public ConsoleClient(String name, boolean enabled) {
-        super(name, enabled);
+    public ConsoleClient(String name, PuPType type, boolean enabled) {
+        super(name, type, enabled);
     }
 
     long lastFlying;

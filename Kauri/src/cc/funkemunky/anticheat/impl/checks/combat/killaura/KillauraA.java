@@ -4,7 +4,9 @@ import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
+import cc.funkemunky.anticheat.api.utils.TickTimer;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.utils.MathUtils;
 import org.bukkit.event.Event;
 
@@ -21,7 +23,7 @@ public class KillauraA extends Check {
 
     private long lastFlying = 0;
     private int verbose;
-    private boolean dontFlag;
+    private TickTimer lastLag = new TickTimer(4);
 
     public KillauraA(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
         super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
@@ -30,12 +32,16 @@ public class KillauraA extends Check {
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         if (packetType.equals(Packet.Client.USE_ENTITY)) {
+            WrappedInUseEntityPacket use = new WrappedInUseEntityPacket(packet, getData().getPlayer());
+
+            if(!use.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) return;
+
             /*Checks the time difference between a flying packet and a use packet. If legit, it should normally be around 50ms.
             KillauraA modules tend to be made using a motion event, and client developers usually forget to make sure that the motion
             and the attack packets are being sent in separate ticks */
             long elapsed = MathUtils.elapsed(lastFlying);
-            if (elapsed < 20 && !dontFlag) {
-                if (verbose++ > 12) {
+            if (elapsed < 20) {
+                if (lastLag.hasPassed() && verbose++ > 12) {
                     flag("t: post; " + elapsed + "<-10", true, true);
                 }
             } else {
@@ -43,7 +49,7 @@ public class KillauraA extends Check {
             }
 
         } else {
-            dontFlag = timeStamp - lastFlying < 5;
+            if(MathUtils.getDelta(timeStamp, lastFlying) < 5) lastLag.reset();
             lastFlying = timeStamp;
         }
     }

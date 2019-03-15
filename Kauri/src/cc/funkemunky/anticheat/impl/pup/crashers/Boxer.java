@@ -1,6 +1,7 @@
 package cc.funkemunky.anticheat.impl.pup.crashers;
 
 import cc.funkemunky.anticheat.api.pup.AntiPUP;
+import cc.funkemunky.anticheat.api.pup.PuPType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.TickTimer;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
@@ -11,8 +12,8 @@ public class Boxer extends AntiPUP {
     private long lastTimeStamp;
     private int vl;
 
-    public Boxer(String name, boolean enabled) {
-        super(name, enabled);
+    public Boxer(String name, PuPType type, boolean enabled) {
+        super(name, type, enabled);
     }
 
     @Override

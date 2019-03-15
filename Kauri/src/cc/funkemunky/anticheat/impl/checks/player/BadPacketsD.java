@@ -4,7 +4,9 @@ import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
+import cc.funkemunky.anticheat.api.utils.TickTimer;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
+import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
 import org.bukkit.event.Event;
 
@@ -23,6 +25,7 @@ public class BadPacketsD extends Check {
     }
 
     private long lastFlying;
+    private TickTimer lastLag = new TickTimer(4);
     private int vl;
 
     @Override
@@ -30,13 +33,14 @@ public class BadPacketsD extends Check {
         if (packetType.equals(Packet.Client.BLOCK_PLACE)) {
             val elapsed = timeStamp - lastFlying;
             if (elapsed < 10) {
-                if (vl++ > 5) {
+                if(lastLag.hasPassed() && vl++ > 5) {
                     flag(elapsed + "<-10", true, true);
                 }
             } else {
                 vl -= vl > 0 ? 1 : 0;
             }
         } else {
+            if(MathUtils.getDelta(timeStamp, lastFlying) < 5) lastLag.reset();
             lastFlying = timeStamp;
         }
     }

@@ -7,6 +7,7 @@ import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.anticheat.api.utils.StatisticalAnalysis;
+import cc.funkemunky.anticheat.api.utils.TickTimer;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
@@ -38,29 +39,33 @@ public class BadPacketsG extends Check {
     private int maxVL = 30;
 
     private long lastFlying;
+    private TickTimer lastLag = new TickTimer(5);
     private int vl;
     private StatisticalAnalysis statisticalAnalysis = new StatisticalAnalysis(20);
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if (timeStamp > lastFlying + 5) {
             val data = this.getData();
 
             if (data.getLastLogin().hasNotPassed(15) || data.getLastServerPos().hasNotPassed(5)) {
                 return;
             }
 
-            this.statisticalAnalysis.addValue(timeStamp - lastFlying);
+            if(MathUtils.getDelta(timeStamp, lastFlying) < 5) {
+                lastLag.reset();
+                statisticalAnalysis.addValue(50);
+            } else if(lastLag.hasPassed(2)) {
+                this.statisticalAnalysis.addValue(timeStamp - lastFlying);
+            }
 
             val max = usingPaper ? 7.071f : Math.sqrt(Kauri.getInstance().getTickElapsed());
             val stdDev = this.statisticalAnalysis.getStdDev();
 
             if (!MathUtils.approxEquals(deltaBalance, max, stdDev) && stdDev < max && getData().getLastLag().hasNotPassed(10)) {
-                if (vl++ > maxVL) {
+                if (lastLag.hasPassed() && vl++ > maxVL) {
                     this.flag("S: " + stdDev, false, true);
                 }
             } else vl -= vl > 0 ? 3 : 0;
-        }
 
         this.lastFlying = timeStamp;
     }
