@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.impl.commands;
 
+import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.utils.ItemBuilder;
 import cc.funkemunky.anticheat.api.utils.VPNResponse;
 import cc.funkemunky.anticheat.api.utils.menu.button.Button;
@@ -47,16 +48,16 @@ public class AntiVPNCommand {
             return;
         }
 
-        VPNResponse apiResponse = cc.funkemunky.anticheat.api.utils.MiscUtils.getResponse(player);
+        VPNResponse apiResponse = Kauri.getInstance().getVpnUtils().getResponse(player);
 
         ChestMenu menu = new ChestMenu(player.getName() + "'s IP Information", 1);
 
         boolean showInfo = !privacyMode || (override && args.getSender().hasPermission(overridePerm));
         if (apiResponse.isStatus()) {
             menu.setItem(1, getButton(Color.Aqua + "Using VPN", Material.REDSTONE, Color.Gray + apiResponse.isUsingProxy()));
-            menu.setItem(3, getButton(Color.Aqua + "Location", Material.MAP, Color.Gray + (!showInfo ? "[redacted]" : apiResponse.getCity() + ", " + apiResponse.getCountryName())));
-            menu.setItem(5, getButton(Color.Aqua + "HostName", Material.WATCH, Color.Gray + (!showInfo ? "[redacted]" : apiResponse.getHostName())));
-            menu.setItem(7, getButton(Color.Aqua + "ISP", Material.PAPER, Color.Gray + (!showInfo ? "[redacted]" : apiResponse.getISP())));
+           // menu.setItem(3, getButton(Color.Aqua + "Location", Material.MAP, Color.Gray + (!showInfo ? "[redacted]" : apiResponse.getCity() + ", " + apiResponse.getCountryName())));
+            //menu.setItem(5, getButton(Color.Aqua + "HostName", Material.WATCH, Color.Gray + (!showInfo ? "[redacted]" : apiResponse.getHostName())));
+            //menu.setItem(7, getButton(Color.Aqua + "ISP", Material.PAPER, Color.Gray + (!showInfo ? "[redacted]" : apiResponse.getISP())));
         } else {
             for (int i = 0; i < 9; i++) {
                 menu.addItem(getButton(Color.Red + Color.Bold + "FAILED", Material.REDSTONE_BLOCK, ""));

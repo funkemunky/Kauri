@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.api.utils;
 
+import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.utils.json.JSONException;
 import cc.funkemunky.anticheat.api.utils.json.JSONObject;
@@ -23,6 +24,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.*;
 
 public class MiscUtils {
@@ -118,67 +120,6 @@ public class MiscUtils {
         return null;
     }
 
-    public static VPNResponse getResponse(Player player) {
-        return getResponse(player.getAddress().getAddress().getHostAddress());
-    }
-
-    public static VPNResponse getResponse(String ipAddress) {
-        Map<String, String> toReturn = new HashMap<>();
-        try {
-            StringBuilder response = new StringBuilder();
-            String url = "http://funkemunky.cc/vpn?ip=" + ipAddress + "&license=FWd2EdCvm5CcSj9JFbiIWxkC73IFeDTlroLKrPvS";
-            URLConnection connection = new URL(url).openConnection();
-            connection.setRequestProperty("User-Agent", "Kauri");
-            connection.setConnectTimeout(10000);
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            Throwable localThrowable3 = null;
-            try {
-                while ((url = in.readLine()) != null) {
-                    response.append(url);
-                }
-                in.close();
-            } catch (Throwable localThrowable1) {
-                localThrowable3 = localThrowable1;
-                throw localThrowable1;
-            } finally {
-                if (localThrowable3 != null) {
-                    try {
-                        in.close();
-                    } catch (Throwable localThrowable2) {
-                        localThrowable3.addSuppressed(localThrowable2);
-                    }
-                } else {
-                    in.close();
-                }
-            }
-            String result = response.toString();
-            JSONObject object = new JSONObject(result);
-            String status = object.getString("status");
-
-            toReturn.put("status", status);
-            if (status.equalsIgnoreCase("success")) {
-                String ip = object.getString("ipaddress");
-                String hostIP = object.getBoolean("host-ip") ? "true" : "false";
-                JSONObject country = object.getJSONObject("country");
-                String countryName = country.getString("name");
-                String countryCode = country.getString("code");
-
-                toReturn.put("hostname", object.getString("hostname"));
-                toReturn.put("org", object.getString("org"));
-                toReturn.put("ip", ip);
-                toReturn.put("city", object.getString("city"));
-                toReturn.put("hostIP", hostIP);
-                toReturn.put("countryName", countryName);
-                toReturn.put("countryCode", countryCode);
-            }
-
-            return new VPNResponse(toReturn);
-        } catch (IOException | JSONException e) {
-            e.printStackTrace();
-        }
-        toReturn.put("status", "failure");
-        return new VPNResponse(toReturn);
-    }
 
     public static int millisToTicks(long millis) {
         return (int) Math.ceil(millis / 50D);

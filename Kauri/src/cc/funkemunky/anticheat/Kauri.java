@@ -6,6 +6,7 @@ import cc.funkemunky.anticheat.api.data.logging.LoggerManager;
 import cc.funkemunky.anticheat.api.data.stats.StatsManager;
 import cc.funkemunky.anticheat.api.event.TickEvent;
 import cc.funkemunky.anticheat.api.pup.AntiPUPManager;
+import cc.funkemunky.anticheat.api.utils.VPNUtils;
 import cc.funkemunky.anticheat.impl.commands.kauri.KauriCommand;
 import cc.funkemunky.anticheat.impl.listeners.FunkeListeners;
 import cc.funkemunky.anticheat.impl.listeners.PacketListeners;
@@ -47,6 +48,8 @@ public class Kauri extends JavaPlugin {
     private BaseProfiler profiler;
     private LoggerManager loggerManager;
 
+    private VPNUtils vpnUtils;
+
     private String requiredVersionOfAtlas = "1.1.3.4";
     private List<String> usableVersionsOfAtlas = Arrays.asList("1.1.3.4", "1.1.3.3");
 
@@ -76,6 +79,8 @@ public class Kauri extends JavaPlugin {
             statsManager = new StatsManager();
             loggerManager = new LoggerManager();
             loggerManager.loadFromDatabase();
+
+            vpnUtils = new VPNUtils();
 
             runTasks();
             registerCommands();
