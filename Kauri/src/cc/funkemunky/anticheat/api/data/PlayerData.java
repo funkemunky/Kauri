@@ -60,6 +60,7 @@ public class PlayerData {
     private MCSmooth yawSmooth = new MCSmooth(), pitchSmooth = new MCSmooth();
     private CustomLocation entityFrom, entityTo;
     private PastLocation entityPastLocation = new PastLocation();
+    private boolean inventoryOpen;
 
     /* Processors */
     private MovementProcessor movementProcessor;

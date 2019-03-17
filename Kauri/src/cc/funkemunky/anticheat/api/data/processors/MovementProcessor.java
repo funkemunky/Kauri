@@ -88,7 +88,7 @@ public class MovementProcessor {
             }
             jumpVelocity = 0.42f + (PlayerUtils.getPotionEffectLevel(packet.getPlayer(), PotionEffectType.JUMP) * 0.1f);
 
-            isLagging = timeStamp < lastTimeStamp + 5;
+            isLagging = MathUtils.getDelta(timeStamp, lastTimeStamp) < 5;
 
             lastDeltaY = deltaY;
             deltaY = (float) (to.getY() - from.getY());

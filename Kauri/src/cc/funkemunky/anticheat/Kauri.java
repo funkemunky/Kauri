@@ -16,6 +16,7 @@ import cc.funkemunky.api.profiling.BaseProfiler;
 import cc.funkemunky.api.utils.*;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -50,8 +51,8 @@ public class Kauri extends JavaPlugin {
 
     private VPNUtils vpnUtils;
 
-    private String requiredVersionOfAtlas = "1.1.3.4";
-    private List<String> usableVersionsOfAtlas = Arrays.asList("1.1.3.4", "1.1.3.3");
+    private String requiredVersionOfAtlas = "1.1.3.5";
+    private List<String> usableVersionsOfAtlas = Arrays.asList("1.1.3.4", "1.1.3.3", "1.1.3.5");
 
     @Override
     public void onEnable() {
@@ -147,8 +148,11 @@ public class Kauri extends JavaPlugin {
         reloadConfig();
         getCheckManager().getChecks().clear();
         getDataManager().getDataObjects().clear();
-        startScanner(true);
+        EventManager.unregisterAll(this);
+        HandlerList.unregisterAll(this);
+        startScanner(false);
         checkManager = new CheckManager();
+        antiPUPManager = new AntiPUPManager();
         dataManager = new DataManager();
     }
 

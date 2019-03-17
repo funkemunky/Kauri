@@ -12,13 +12,15 @@ public class VelocityProcessor {
     private TickTimer lastVelocity = new TickTimer(40);
 
     public void update(WrappedOutVelocityPacket packet) {
-        maxVertical = motionY = (float) packet.getY();
-        maxHorizontal = (float) cc.funkemunky.anticheat.api.utils.MiscUtils.hypot(packet.getX(), packet.getZ());
+        if(packet.getId() == packet.getPlayer().getEntityId()) {
+            maxVertical = motionY = (float) packet.getY();
+            maxHorizontal = (float) cc.funkemunky.anticheat.api.utils.MiscUtils.hypot(packet.getX(), packet.getZ());
 
-        lastVelocity.reset();
+            lastVelocity.reset();
 
-        motionX = (float) packet.getX();
-        motionZ = (float) packet.getZ();
+            motionX = (float) packet.getX();
+            motionZ = (float) packet.getZ();
+        }
     }
 
     public void update(WrappedInFlyingPacket packet) {

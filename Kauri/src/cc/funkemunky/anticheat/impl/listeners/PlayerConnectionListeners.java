@@ -3,6 +3,7 @@ package cc.funkemunky.anticheat.impl.listeners;
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.utils.Init;
+import org.bukkit.Achievement;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -20,6 +21,8 @@ public class PlayerConnectionListeners implements Listener {
                 Kauri.getInstance().getLoggerManager().removeBan(event.getPlayer().getUniqueId());
             }
         });
+        if(event.getPlayer().hasAchievement(Achievement.OPEN_INVENTORY))
+            event.getPlayer().removeAchievement(Achievement.OPEN_INVENTORY);
     }
 
     @EventHandler

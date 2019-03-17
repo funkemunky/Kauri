@@ -9,6 +9,7 @@ import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumParticle;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
+import org.bukkit.Achievement;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -18,6 +19,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.player.PlayerAchievementAwardedEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
@@ -112,6 +114,18 @@ public class BukkitListeners implements Listener {
                     event.setCancelled(true);
                     data.setCancelType(CancelType.NONE);
                 }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onEvent(PlayerAchievementAwardedEvent event) {
+        if(event.getAchievement().equals(Achievement.OPEN_INVENTORY)) {
+            PlayerData data = Kauri.getInstance().getDataManager().getPlayerData(event.getPlayer().getUniqueId());
+
+            if(data != null) {
+                data.getActionProcessor().setOpenInventory(true);
+                event.setCancelled(true);
             }
         }
     }

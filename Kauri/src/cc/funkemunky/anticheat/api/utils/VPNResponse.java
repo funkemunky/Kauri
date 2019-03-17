@@ -10,14 +10,16 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class VPNResponse {
-    private String ip, country, state, city, isp;
-    private boolean proxy;
+    private String ip, countryName, countryCode, state, city, isp;
+    private boolean success, proxy;
 
     public JSONObject toJson() throws JSONException {
         JSONObject json = new JSONObject();
 
+        json.put("success", success);
         json.put("ip", ip);
-        json.put("country", country);
+        json.put("countryName", countryName);
+        json.put("countryCode", countryCode);
         json.put("state", state);
         json.put("city", city);
         json.put("isp", isp);
@@ -29,7 +31,7 @@ public class VPNResponse {
     public static VPNResponse fromJson(String json)throws JSONException {
         JSONObject jsonObject = new JSONObject(json);
 
-        return new VPNResponse(jsonObject.getString("ip"), jsonObject.getString("country"), jsonObject.getString("state"), jsonObject.getString("city"), jsonObject.getString("isp"), jsonObject.getBoolean("proxy"));
+        return new VPNResponse(jsonObject.getString("ip"), jsonObject.getString("countryName"), jsonObject.getString("countryCode"), jsonObject.getString("state"), jsonObject.getString("city"), jsonObject.getString("isp"), jsonObject.getBoolean("success"), jsonObject.getBoolean("proxy"));
     }
 
 }

@@ -39,9 +39,9 @@ public class AntiVPN extends AntiPUP {
     @EventHandler(priority = EventPriority.LOW)
     public void onPlayerJoin(PlayerJoinEvent event) {
         Atlas.getInstance().getThreadPool().execute(() -> {
-            VPNResponse response = MiscUtils.getResponse(event.getPlayer());
+            VPNResponse response = Kauri.getInstance().getVpnUtils().getResponse(event.getPlayer());
 
-            if (response.isUsingProxy()) {
+            if (response.isProxy()) {
                 new BukkitRunnable() {
                     public void run() {
                         event.getPlayer().kickPlayer(Color.translate(usingProxy));

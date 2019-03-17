@@ -26,7 +26,7 @@ public class AutoclickerH extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if (MiscUtils.shouldReturnArmAnimation(getData())) {
+        if (!MiscUtils.shouldReturnArmAnimation(getData())) {
             val now = System.currentTimeMillis();
 
             val delay = now - lastSwing;

@@ -41,8 +41,8 @@ public class Kauri extends JavaPlugin {
     private BaseProfiler profiler;
     private LoggerManager loggerManager;
 
-    private String requiredVersionOfAtlas = "1.1.3.4";
-    private List<String> usableVersionsOfAtlas = Arrays.asList("1.1.3.4", "1.1.3.3");
+    private String requiredVersionOfAtlas = "1.1.3.5";
+    private List<String> usableVersionsOfAtlas = Arrays.asList("1.1.3.4", "1.1.3.3", "1.1.3.5");
 
     @Override
     public void onEnable() {

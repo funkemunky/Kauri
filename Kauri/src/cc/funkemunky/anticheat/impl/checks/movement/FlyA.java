@@ -32,7 +32,7 @@ public class FlyA extends Check {
            We check if it's less than 1E-4 for some compensation of inconsistencies that happen very often due to netty.
          */
 
-        if (timeStamp - lastTimeStamp > 1) {
+        if (timeStamp - lastTimeStamp > 12) {
             if (move.getAirTicks() > 2
                     && Math.abs(move.getClientYAcceleration()) < 1E-5) {
                 if (verboseLow.flag(4, 800))

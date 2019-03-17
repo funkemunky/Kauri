@@ -29,7 +29,7 @@ public class AimH extends Check {
         Vector vector = new Vector(move.getTo().getX() - move.getFrom().getX(), 0, move.getTo().getZ() - move.getFrom().getZ());
         double angleMove = vector.distanceSquared((new Vector(move.getTo().getYaw() - move.getFrom().getYaw(), 0, move.getTo().getYaw() - move.getFrom().getYaw())));
 
-        if (angleMove > 100000 && move.getDeltaXZ() > 0.2f) {
+        if (angleMove > 100000 && move.getDeltaXZ() > 0.2f && move.getDeltaXZ() < 1) {
             flag("angle: " + angleMove, true, true);
         }
 

@@ -84,6 +84,7 @@ public class CheckManager {
         registerCheck(checks, new BadPacketsE("BadPackets (Type E)", "Checks the rate of healing.", CheckType.BADPACKETS, CancelType.HEALTH, 20, true, true, true));
         registerCheck(checks, new BadPacketsF("BadPackets (Type F)", "Checks frequency of incoming packets. More reliable, but less detection.", CheckType.BADPACKETS, CancelType.MOTION, 100, true, true, true));
         registerCheck(checks, new BadPacketsG("BadPackets (Type G)", "Checks frequency of incoming packets. More detection, but less reliable.", CheckType.BADPACKETS, CancelType.MOTION, 20, true, false, true));
+        registerCheck(checks, new BadPacketsH("BadPackets (Type H)", "Looks for any invalid movements related to inventory windows.", CheckType.BADPACKETS, CancelType.MOTION, 150, true, false, true));
         registerCheck(checks, new VelocityA("Velocity (Type A)", "Detects any vertical velocity modification below 100%.", CheckType.VELOCITY, CancelType.MOTION, 40, true, true, true));
         registerCheck(checks, new VelocityB("Velocity (Type B)", "Checks for horizontal velocity modifications.", CheckType.VELOCITY, CancelType.MOTION, 40, true, false, true));
         //registerCheck(checks, new Interact("Interact", "Makes sure the interaction of a block is legitimate", CheckType.WORLD, CancelType.INTERACT, 200, true, false, true));

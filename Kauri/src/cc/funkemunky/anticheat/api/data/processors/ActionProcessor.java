@@ -6,11 +6,15 @@ import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInCloseWindowPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInEntityActionPacket;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 public class ActionProcessor {
-    private boolean sprinting, openInventory, sneaking, flyFall, horseJump, isUsingItem;
+    private boolean sprinting, sneaking, flyFall, horseJump, isUsingItem;
     private TickTimer lastUseItem = new TickTimer(10);
+
+    @Setter
+    private boolean openInventory;
 
     public void update(WrappedInEntityActionPacket packet) {
         switch (packet.getAction()) {

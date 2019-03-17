@@ -113,10 +113,11 @@ public class PacketListeners implements Listener {
                     data.getActionProcessor().update(packet);
                     break;
                 }
-                case Packet.Client.KEEP_ALIVE:
+                case Packet.Client.KEEP_ALIVE: {
                     data.setLastPing(data.getPing());
                     data.setPing(event.getTimeStamp() - data.getLastKeepAlive());
                     break;
+                }
                 case Packet.Client.ABILITIES: {
                     WrappedInAbilitiesPacket packet = new WrappedInAbilitiesPacket(event.getPacket(), player);
 
@@ -167,7 +168,7 @@ public class PacketListeners implements Listener {
                     }
                     break;
                 }
-                case Packet.Client.USE_ENTITY:
+                case Packet.Client.USE_ENTITY: {
                     WrappedInUseEntityPacket packet = new WrappedInUseEntityPacket(event.getPacket(), player);
 
                     if (packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) {
@@ -186,6 +187,7 @@ public class PacketListeners implements Listener {
                         }
                     }
                     break;
+                }
             }
             hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
             if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
