@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.combat.aimassist;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
@@ -15,6 +16,7 @@ import org.bukkit.event.Event;
         Packet.Client.LOOK,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
+@CheckInfo(name = "Aim (Type B)", description = "Checks for common denominators in the pitch.", maxVL = 50, cancelType = CancelType.MOTION, type = CheckType.AIM)
 public class AimB extends Check {
     public AimB(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
         super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);

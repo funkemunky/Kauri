@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.combat.fastbow;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.BukkitEvents;
 import cc.funkemunky.anticheat.api.utils.TickTimer;
@@ -13,6 +14,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 
 @BukkitEvents(events = {ProjectileLaunchEvent.class})
+@CheckInfo(name = "Fastbow", description =  "Makes sure the rate of fire is legitimate.", type = CheckType.COMBAT, cancelType = CancelType.INTERACT, maxVL = 20)
 public class Fastbow extends Check {
     private TickTimer lastShoot = new TickTimer(10);
     private Verbose verbose = new Verbose();

@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.combat.aimassist;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
@@ -11,6 +12,7 @@ import lombok.val;
 import org.bukkit.event.Event;
 
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LOOK, Packet.Client.LEGACY_LOOK, Packet.Client.LEGACY_POSITION_LOOK})
+@CheckInfo(name = "Aim (Type E)", description = "Looks for suspicious yaw and pitch movements. Not recommended for banning.", type = CheckType.AIM, cancelType = CancelType.MOTION, maxVL = 200, executable = false, cancellable = false)
 public class AimE extends Check {
     public AimE(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
         super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);

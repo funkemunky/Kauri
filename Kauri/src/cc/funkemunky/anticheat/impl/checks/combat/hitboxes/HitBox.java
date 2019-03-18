@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.combat.hitboxes;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.CustomLocation;
 import cc.funkemunky.anticheat.api.utils.Packets;
@@ -29,6 +30,7 @@ import java.util.List;
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_POSITION,
         Packet.Client.LEGACY_LOOK})
+@CheckInfo(name = "HitBox", description = "A very accurate hit-box check, using a mixture of ray-tracing and bounding-boxes.", type = CheckType.COMBAT, cancelType = CancelType.COMBAT, maxVL = 50)
 public class HitBox extends Check {
     @Setting(name = "pingLeniency")
     private int pingLeniency = 200;

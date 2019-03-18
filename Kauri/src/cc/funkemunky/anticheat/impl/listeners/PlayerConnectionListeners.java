@@ -21,8 +21,8 @@ public class PlayerConnectionListeners implements Listener {
                 Kauri.getInstance().getLoggerManager().removeBan(event.getPlayer().getUniqueId());
             }
         });
-        if(event.getPlayer().hasAchievement(Achievement.OPEN_INVENTORY))
-            event.getPlayer().removeAchievement(Achievement.OPEN_INVENTORY);
+
+        event.getPlayer().removeAchievement(Achievement.OPEN_INVENTORY);
     }
 
     @EventHandler

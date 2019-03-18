@@ -1,4 +1,4 @@
-package cc.funkemunky.anticheat.impl.checks.player;
+package cc.funkemunky.anticheat.impl.checks.player.badpackets;
 
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.CancelType;

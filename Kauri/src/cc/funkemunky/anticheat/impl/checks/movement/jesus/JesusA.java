@@ -1,4 +1,4 @@
-package cc.funkemunky.anticheat.impl.checks.movement;
+package cc.funkemunky.anticheat.impl.checks.movement.jesus;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;

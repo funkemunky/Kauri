@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.combat.autoclicker;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.DynamicRollingAverage;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
@@ -19,6 +20,7 @@ import org.bukkit.event.Event;
         Packet.Client.LEGACY_POSITION,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
+@CheckInfo(name = "Autoclicker (Type C)", description = "An overall average CPS check.", type = CheckType.AUTOCLICKER, cancelType = CancelType.BREAK, maxVL = 20, executable = false)
 public class AutoclickerC extends Check {
 
 

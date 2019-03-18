@@ -12,7 +12,13 @@ import cc.funkemunky.anticheat.impl.checks.combat.hitboxes.HitBox;
 import cc.funkemunky.anticheat.impl.checks.combat.killaura.*;
 import cc.funkemunky.anticheat.impl.checks.combat.reach.*;
 import cc.funkemunky.anticheat.impl.checks.movement.*;
-import cc.funkemunky.anticheat.impl.checks.player.*;
+import cc.funkemunky.anticheat.impl.checks.movement.fly.*;
+import cc.funkemunky.anticheat.impl.checks.movement.jesus.JesusA;
+import cc.funkemunky.anticheat.impl.checks.movement.speed.SpeedA;
+import cc.funkemunky.anticheat.impl.checks.movement.speed.SpeedB;
+import cc.funkemunky.anticheat.impl.checks.movement.speed.SpeedC;
+import cc.funkemunky.anticheat.impl.checks.movement.speed.SpeedD;
+import cc.funkemunky.anticheat.impl.checks.player.badpackets.*;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,7 +40,7 @@ public class CheckManager {
     }
 
     public List<Check> loadChecks() {
-        List<Check> checks = new ArrayList<>();
+        /*List<Check> checks = new ArrayList<>();
         registerCheck(checks, new AimA("Aim (Type A)", "Checks for the consistency in aim overall", CheckType.AIM, CancelType.COMBAT, 80, true, false, true));
         registerCheck(checks, new AimB("Aim (Type B)", "Checks for common denominators in the pitch.", CheckType.AIM, CancelType.COMBAT, 50, true, true, true));
         registerCheck(checks, new AimC("Aim (Type C)", "Makes sure the aim acceleration is legitimate", CheckType.AIM, CancelType.COMBAT, 20, true, true, true));
@@ -89,39 +95,12 @@ public class CheckManager {
         registerCheck(checks, new VelocityA("Velocity (Type A)", "Detects any vertical velocity modification below 100%.", CheckType.VELOCITY, CancelType.MOTION, 40, true, true, true));
         registerCheck(checks, new VelocityB("Velocity (Type B)", "Checks for horizontal velocity modifications.", CheckType.VELOCITY, CancelType.MOTION, 40, true, false, true));
         //registerCheck(checks, new Interact("Interact", "Makes sure the interaction of a block is legitimate", CheckType.WORLD, CancelType.INTERACT, 200, true, false, true));
-        // registerCheck(checks, new VelocityC("Velocity (Type C)", "Uses advanced mathmatical calculations to check for horizontal velocity.", CheckType.VELOCITY, CancelType.MOTION, 50, true, false, false));
+        // registerCheck(checks, new VelocityC("Velocity (Type C)", "Uses advanced mathmatical calculations to check for horizontal velocity.", CheckType.VELOCITY, CancelType.MOTION, 50, true, false, false));*/
 
-        for (Check check : checks) {
-            Arrays.stream(check.getClass().getDeclaredFields()).filter(field -> {
-                field.setAccessible(true);
-
-                return field.isAnnotationPresent(Setting.class);
-            }).forEach(field -> {
-                try {
-                    field.setAccessible(true);
-
-                    String path = "checks." + check.getName() + ".settings." + field.getName();
-                    if (Kauri.getInstance().getConfig().get(path) != null) {
-                        Object val = Kauri.getInstance().getConfig().get(path);
-
-                        if (val instanceof Double && field.get(check) instanceof Float) {
-                            field.set(check, (float) (double) val);
-                        } else {
-                            field.set(check, val);
-                        }
-                    } else {
-                        Kauri.getInstance().getConfig().set("checks." + check.getName() + ".settings." + field.getName(), field.get(check));
-                        Kauri.getInstance().saveConfig();
-                    }
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            });
-        }
         return checks;
     }
 
-    public void registerCheck(List<Check> checks, Check check) {
+    public void registerCheck(Check check) {
         if ((check.getMinimum() == null || ProtocolVersion.getGameVersion().isOrAbove(check.getMinimum())) && (check.getMaximum() == null || ProtocolVersion.getGameVersion().isBelow(check.getMaximum()))) {
             checks.add(check);
         }

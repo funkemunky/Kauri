@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.combat.autoclicker;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
@@ -21,6 +22,7 @@ import org.bukkit.event.Event;
         Packet.Client.LEGACY_LOOK,
         Packet.Client.ARM_ANIMATION,
         Packet.Client.BLOCK_DIG})
+@CheckInfo(name = "Autoclicker (Type E)", description = "An unreasonable amount of CPS while breaking a block.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 20)
 public class AutoclickerE extends Check {
 
     public AutoclickerE(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {

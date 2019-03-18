@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.combat.autoclicker;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Packets(packets = {Packet.Client.ARM_ANIMATION})
+@CheckInfo(name = "Autoclicker (Type G)", description = "A normal click consistency check.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 50, executable = false)
 public class AutoclickerG extends Check {
 
     private long lastTimeStamp, lastRange;

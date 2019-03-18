@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.combat.aimassist;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
@@ -14,6 +15,7 @@ import org.bukkit.event.Event;
         Packet.Client.LOOK,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
+@CheckInfo(name = "Aim (Type A)", type = CheckType.AIM, cancelType = CancelType.MOTION, description = "Checks for the consistency in aim overall", executable = false, maxVL = 80)
 public class AimA extends Check {
 
     private float lastYaw, lastPitch, lastWrapped, lastChange;

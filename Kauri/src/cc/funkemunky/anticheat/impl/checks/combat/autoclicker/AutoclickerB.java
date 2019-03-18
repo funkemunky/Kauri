@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.combat.autoclicker;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
@@ -22,6 +23,7 @@ import java.util.LinkedList;
         Packet.Client.LEGACY_POSITION,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
+@CheckInfo(name = "AutoClicker (Type B)", description = "Looks for suspicious consistencies in CPS averages.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 20)
 public class AutoclickerB extends Check {
 
     private final Deque<Double> averageDeque = new LinkedList<>();
