@@ -67,6 +67,7 @@ public class BadPacketsG extends Check {
                 }
             } else vl -= vl > 0 ? 3 : 0;
 
+            debug("STD: " + stdDev + " VL: " + vl);
         this.lastFlying = timeStamp;
     }
 

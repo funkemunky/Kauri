@@ -7,10 +7,12 @@ import cc.funkemunky.anticheat.api.utils.json.JSONObject;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.BoundingBox;
+import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.ReflectionsUtil;
 import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.SimpleCommandMap;
@@ -57,6 +59,24 @@ public class MiscUtils {
         return Math.sqrt(total);
     }
 
+    public static CustomLocation findGround(World world, CustomLocation point) {
+        for(int y = point.toVector().getBlockY() ; y > 0 ; y--) {
+            CustomLocation loc = new CustomLocation(point.getX(), point.getY(), point.getZ());
+
+            if(getBlocks(new BoundingBox(loc.toVector(), loc.toVector()).subtract(0, 0.1f,0,0,0,0), world).stream().anyMatch(BlockUtils::isSolid)) {
+                return loc;
+            }
+        }
+        return point;
+    }
+
+    public static List<Block> getBlocks(BoundingBox box, World world) {
+        List<Block> block = new ArrayList<>();
+
+        Atlas.getInstance().getBlockBoxManager().getBlockBox().getCollidingBoxes(world, box).forEach(box2 -> BlockUtils.getBlock(box2.getMinimum().toLocation(world)));
+        return block;
+    }
+
     public static long gcd(long current, long previous) {
         return (previous <= 16384L) ? current : gcd(previous, current % previous);
     }
@@ -75,12 +95,12 @@ public class MiscUtils {
         val velocity = data.getVelocityProcessor();
 
         return player.getAllowFlight()
-                || data.getLastServerPos().hasNotPassed(2)
+                || data.getLastServerPos().hasNotPassed(12)
                 || move.getLastVehicle().hasNotPassed(5)
                 || move.getLiquidTicks() > 0
                 || move.getWebTicks() > 0
                 || move.getLastFlightToggle().hasNotPassed(10)
-                || move.isLagging()
+                || (move.isLagging() && data.isLagging())
                 || !Atlas.getInstance().getBlockBoxManager().getBlockBox().isChunkLoaded(data.getPlayer().getLocation())
                 || data.getLastLogin().hasNotPassed(50)
                 || move.getClimbTicks() > 0

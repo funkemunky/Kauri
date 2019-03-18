@@ -4,6 +4,7 @@ import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
+import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.ReflectionsUtil;
@@ -20,6 +21,7 @@ public class SpeedD extends Check {
 
     private float lastMotion;
     private long lastTimeStamp;
+    private Verbose verbose = new Verbose();
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
@@ -34,10 +36,12 @@ public class SpeedD extends Check {
         val predicted = lastMotion * resistance;
         val delta = deltaXZ - predicted;
 
-        val max = move.isServerOnGround() ? 0.52 : 0.34;
+        val max = move.isServerOnGround() ? 0.24 : 0.03;
 
-        if (delta > max && getData().getLastBlockPlace().hasPassed(8) && getData().getLastServerPos().hasPassed(2) && !getData().isGeneralCancel() && timeStamp > lastTimeStamp + 5) {
-            flag(delta + ">-" + max + ";" + move.isServerOnGround(), true, true);
+        if (getData().getLastBlockPlace().hasPassed(8) && getData().getLastServerPos().hasPassed(2) && !getData().isGeneralCancel() && timeStamp > lastTimeStamp + 5 && delta > max) {
+            if((delta > max + 0.4) || verbose.flag(3, 650L)) {
+                flag(delta + ">-" + max + ";" + move.isServerOnGround(), true, true);
+            }
         }
 
         debug("DIFFERENCE: " + delta + " GROUND: " + move.isServerOnGround());

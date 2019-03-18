@@ -53,7 +53,7 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
     protected void flag(String information, boolean cancel, boolean ban) {
         Kauri.getInstance().getCheckManager().getAlertsExecutable().execute(() -> {
             if (data.getLastLag().hasPassed() || lagVerbose.flag(4, 500L)) {
-                if (ban) {
+                if (ban && !data.getMovementProcessor().isLagging()) {
                     vl++;
                 }
                 Kauri.getInstance().getLoggerManager().addViolation(data.getUuid(), this);

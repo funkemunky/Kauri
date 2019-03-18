@@ -4,6 +4,7 @@ import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.utils.BukkitEvents;
+import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumParticle;
 import cc.funkemunky.api.utils.BoundingBox;
@@ -41,11 +42,11 @@ public class BukkitListeners implements Listener {
                 if (data.getSetbackLocation() != null) {
                     event.getPlayer().teleport(data.getSetbackLocation());
                 } else {
-                    event.setCancelled(true);
+                    event.getPlayer().teleport(MiscUtils.findGround(event.getTo().getWorld(), data.getMovementProcessor().getTo()).toLocation(event.getTo().getWorld()));
                 }
                 data.setCancelType(CancelType.NONE);
             } else if (data.getMovementProcessor().isServerOnGround() && data.getLastFlag().hasPassed()) {
-                data.setSetbackLocation(event.getFrom());
+                data.setSetbackLocation(data.getMovementProcessor().getTo().toLocation(event.getPlayer().getWorld()));
             }
         }
     }

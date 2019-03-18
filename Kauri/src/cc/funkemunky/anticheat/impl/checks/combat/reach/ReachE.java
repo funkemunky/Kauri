@@ -59,10 +59,10 @@ public class ReachE extends Check {
     private double vlAdd = 1;
 
     @Setting(name = "threshold.vl.subtract.arm")
-    private double armSubtract = 0.005;
+    private double armSubtract = 0.01;
 
     @Setting(name = "threshold.vl.subtract.belowThreshold")
-    private double belowTSubtract = 0.25;
+    private double belowTSubtract = 0.35;
 
     @Setting(name = "threshold.vl.subtract.belowCollisionMin")
     private double belowCollisionSubtract = 0.1;
@@ -91,7 +91,7 @@ public class ReachE extends Check {
 
             RayTrace trace = new RayTrace(origin.toVector(), origin.getDirection());
 
-            List<Vector> vecs = trace.traverse(target.getEyeLocation().distance(origin), 0.05);
+            List<Vector> vecs = trace.traverse(target.getEyeLocation().distance(origin), 0.1);
 
             List<BoundingBox> entityBoxes = new CopyOnWriteArrayList<>();
 

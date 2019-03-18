@@ -16,14 +16,17 @@ import cc.funkemunky.api.tinyprotocol.packet.in.*;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.BlockUtils;
+import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
 import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 @Init
 public class PacketListeners implements Listener {
@@ -65,7 +68,7 @@ public class PacketListeners implements Listener {
             }
 
             hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
-
+            debug(event.getType(), data);
             if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
 
         }
@@ -189,6 +192,7 @@ public class PacketListeners implements Listener {
                     break;
                 }
             }
+            debug(event.getType(), data);
             hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
             if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
         }
@@ -196,14 +200,26 @@ public class PacketListeners implements Listener {
     }
 
     private void hopper(Object packet, String packetType, long timeStamp, PlayerData data) {
-        if ((!CheckSettings.bypassEnabled || !data.getPlayer().hasPermission(CheckSettings.bypassPermission)) && !Kauri.getInstance().getCheckManager().isBypassing(data.getUuid())) {
-            Atlas.getInstance().getThreadPool().execute(() ->
-                    data.getPacketChecks().getOrDefault(packetType, new ArrayList<>()).stream().filter(Check::isEnabled).forEach(check ->
-                    {
-                        Kauri.getInstance().getProfiler().start("check:" + check.getName());
-                        check.onPacket(packet, packetType, timeStamp);
-                        Kauri.getInstance().getProfiler().stop("check:" + check.getName());
-                    }));
+        Atlas.getInstance().getSchedular().schedule(() -> {
+            if ((!CheckSettings.bypassEnabled || !data.getPlayer().hasPermission(CheckSettings.bypassPermission)) && !Kauri.getInstance().getCheckManager().isBypassing(data.getUuid())) {
+                Atlas.getInstance().getThreadPool().execute(() ->
+                        data.getPacketChecks().getOrDefault(packetType, new ArrayList<>()).stream().filter(Check::isEnabled).forEach(check ->
+                        {
+                            Kauri.getInstance().getProfiler().start("check:" + check.getName());
+                            check.onPacket(packet, packetType, timeStamp);
+                            Kauri.getInstance().getProfiler().stop("check:" + check.getName());
+                        }));
+            }
+        }, 5, TimeUnit.MILLISECONDS);
+    }
+
+    private void debug(String packetType, PlayerData data) {
+        if(!packetType.contains("Chat") && !packetType.contains("Chunk") && !packetType.contains("Equip")) {
+            Atlas.getInstance().getThreadPool().execute(() -> {
+                Kauri.getInstance().getDataManager().getDataObjects().values().stream().filter(debugData -> debugData.isDebuggingPackets() && debugData.getDebuggingPlayer().equals(data.getUuid()) && (debugData.getSpecificPacketDebug().equals("*") || packetType.contains(debugData.getSpecificPacketDebug()))).forEach(debugData -> {
+                    debugData.getPlayer().sendMessage(Color.translate("&8[&cPacketDebug&8] &7" + packetType));
+                });
+            });
         }
     }
 
