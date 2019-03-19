@@ -3,6 +3,7 @@ package cc.funkemunky.anticheat.impl.checks.combat.reach;
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.DynamicRollingAverage;
 import cc.funkemunky.anticheat.api.utils.Packets;
@@ -14,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 
 @Packets(packets = {Packet.Client.USE_ENTITY})
+@CheckInfo(name = "Reach (Type B)", description = "A simple and light, but extremely effective maximum reach calculation. However, slightly experimental.", developer = true, maxVL = 60, executable = false)
 public class ReachB extends Check {
     @Setting(name = "threshold.vl.max")
     static double maxVL = 8.0;

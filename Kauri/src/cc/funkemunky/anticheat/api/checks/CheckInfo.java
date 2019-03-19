@@ -11,6 +11,7 @@ public @interface CheckInfo {
     boolean enabled() default true;
     boolean executable() default true;
     boolean cancellable() default true;
+    boolean developer() default false;
     ProtocolVersion maxVersion() default ProtocolVersion.V1_13_2;
 
 }

@@ -3,6 +3,7 @@ package cc.funkemunky.anticheat.impl.checks.combat.reach;
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.utils.Packets;
@@ -15,6 +16,7 @@ import org.bukkit.event.Event;
 import org.bukkit.util.Vector;
 
 @Packets(packets = {Packet.Client.USE_ENTITY})
+@CheckInfo(name = "Reach (Type A)", description = "A basic maximum reach calculation", type = CheckType.REACH, cancelType = CancelType.COMBAT, maxVL = 60)
 public class ReachA extends Check {
     private Verbose verbose = new Verbose();
 

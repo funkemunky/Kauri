@@ -3,6 +3,7 @@ package cc.funkemunky.anticheat.impl.checks.combat.reach;
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.CustomLocation;
 import cc.funkemunky.anticheat.api.utils.Packets;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Packets(packets = {Packet.Client.USE_ENTITY})
+@CheckInfo(name = "Reach (Type C)", description = "Uses expanded bounding-boxes to set a maximum hit reach.", type = CheckType.REACH, cancelType = CancelType.COMBAT, developer = true, executable = false)
 public class ReachC extends Check {
     public ReachC(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
         super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);

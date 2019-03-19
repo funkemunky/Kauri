@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.movement.fly;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
@@ -12,6 +13,7 @@ import org.bukkit.event.Event;
 
 
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.POSITION, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION})
+@CheckInfo(name = "Fly (Type A)", description =  "A simple acceleration check for flight.", type = CheckType.FLY, cancelType = CancelType.MOTION, maxVL = 150)
 public class FlyA extends Check {
 
     private int verbose;

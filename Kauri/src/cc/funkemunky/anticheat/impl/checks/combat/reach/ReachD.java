@@ -3,6 +3,7 @@ package cc.funkemunky.anticheat.impl.checks.combat.reach;
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.CustomLocation;
 import cc.funkemunky.anticheat.api.utils.Packets;
@@ -34,6 +35,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
         Packet.Client.LEGACY_POSITION,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
+@CheckInfo(name = "Reach (Type D)", description = "Uses a mixture of lighter but less accurate ray-tracing to determine the client's actual reach distance.", type = CheckType.REACH, cancelType = CancelType.COMBAT, maxVL = 30)
 public class ReachD extends Check {
 
     public ReachD(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {

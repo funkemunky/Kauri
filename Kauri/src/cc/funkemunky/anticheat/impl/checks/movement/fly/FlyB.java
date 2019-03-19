@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.movement.fly;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
@@ -16,6 +17,7 @@ import org.bukkit.event.Event;
         Packet.Client.POSITION,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_POSITION})
+@CheckInfo(name = "Fly (Type B)", description = "Calculates what the actual vertical speed of a player should be.", type = CheckType.FLY, cancelType = CancelType.MOTION, maxVL = 175, executable = false)
 public class FlyB extends Check {
     public FlyB(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
         super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);

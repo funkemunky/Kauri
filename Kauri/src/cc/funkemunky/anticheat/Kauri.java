@@ -240,6 +240,7 @@ public class Kauri extends JavaPlugin {
                     check.setType(info.type());
                     check.setCancelType(info.cancelType());
                     check.setName(info.name());
+                    check.setDeveloper(info.developer());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
