@@ -13,11 +13,12 @@ import lombok.val;
 import org.bukkit.event.Event;
 
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.POSITION, Packet.Client.LEGACY_POSITION, Packet.Client.LEGACY_POSITION_LOOK})
+@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Fly (Type C)", description = "A different style of acceleration check.", type = CheckType.FLY, cancelType = CancelType.MOTION)
 public class FlyC extends Check {
 
-    public FlyC(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+    public FlyC() {
+
     }
 
     private double vl;

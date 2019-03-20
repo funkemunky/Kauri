@@ -2,7 +2,9 @@ package cc.funkemunky.anticheat.impl.checks.movement.speed;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.MathUtils;
@@ -22,14 +24,16 @@ import java.util.concurrent.atomic.AtomicInteger;
         Packet.Client.POSITION,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_POSITION})
+@cc.funkemunky.api.utils.Init
+@CheckInfo(name = "Speed (Type B)", description = "A simple but effective speed check.", type = CheckType.SPEED, maxVL = 60)
 public class SpeedB extends Check {
     private double lastX, lastY, lastZ;
     private int vl;
 
     private final Deque<Double> offsetDeque = new LinkedList<>();
 
-    public SpeedB(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+    public SpeedB() {
+
     }
 
 
@@ -42,6 +46,8 @@ public class SpeedB extends Check {
 
         val fromVec = from.toVector();
         val toVec = to.toVector();
+
+        val velocity = getData().getVelocityProcessor();
 
         val motionX = to.getX() - from.getX();
         val motionY = to.getY() - from.getY();
@@ -64,6 +70,7 @@ public class SpeedB extends Check {
         offsetDeque.add(offsetChange);
 
         if (offsetDeque.size() == 5) {
+            val account = account();
             val maxOffset = 0.33 + account();
 
             offsetDeque.forEach(offset -> {
@@ -86,7 +93,7 @@ public class SpeedB extends Check {
                 vl = 0;
             }
 
-            debug(vl + ": " + streak.get() + ", " + maxStreak);
+            debug(vl + ": " + streak.get() + ", " + maxStreak + "," + MiscUtils.hypot(velocity.getMotionX(), velocity.getMotionZ()) + ", " + account);
 
             offsetDeque.clear();
         }
@@ -105,6 +112,7 @@ public class SpeedB extends Check {
         float total = 0;
 
         val move = getData().getMovementProcessor();
+        val velocity = getData().getVelocityProcessor();
 
         total += PlayerUtils.getPotionEffectLevel(getData().getPlayer(), PotionEffectType.SPEED) * (move.isServerOnGround() ? 0.057f : 0.044f);
         total += move.getIceTicks() > 0 && (move.getDeltaY() > 0.001 || move.getGroundTicks() < 6) ? 0.23 : 0;
@@ -113,6 +121,7 @@ public class SpeedB extends Check {
         total += move.isOnSlimeBefore() ? 0.1 : 0;
         total += move.getBlockAboveTicks() > 0 ? move.getIceTicks() > 0 ? 0.4 : 0.2 : 0;
         total += move.getHalfBlockTicks() > 0 ? 0.12 : 0;
+        total += Math.max(0, MiscUtils.hypot(velocity.getMotionX(), velocity.getMotionZ()) - total);
         return total;
     }
 }

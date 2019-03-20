@@ -20,10 +20,11 @@ import org.bukkit.event.Event;
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK,
         Packet.Client.ARM_ANIMATION})
+@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Autoclicker (Type D)", description = "Checks for very common autoclicker mistakes.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, executable = false, maxVL = 20)
 public class AutoclickerD extends Check {
-    public AutoclickerD(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+    public AutoclickerD() {
+
     }
 
     private int cps, ticks, vl;

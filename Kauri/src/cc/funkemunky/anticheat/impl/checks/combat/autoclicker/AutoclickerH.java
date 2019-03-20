@@ -15,11 +15,12 @@ import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Packets(packets = {Packet.Client.ARM_ANIMATION})
+@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Autoclicker (Type H)", description = "Looks for suspicious clicking averages compares to actual clicks.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 50, executable = false)
 public class AutoclickerH extends Check {
 
-    public AutoclickerH(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+    public AutoclickerH() {
+
     }
 
     private long lastSwing;

@@ -6,9 +6,11 @@ import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.event.system.Listener;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.utils.Color;
+import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.JsonMessage;
 import cc.funkemunky.api.utils.MiscUtils;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
@@ -34,18 +36,7 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
     private int vl;
     private ProtocolVersion minimum, maximum;
 
-    public Check(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        this.name = name;
-        this.description = description;
-        this.type = type;
-        this.cancelType = cancelType;
-        this.maxVL = maxVL;
-        this.enabled = enabled;
-        this.executable = executable;
-        this.cancellable = cancellable;
-
-        developer = false;
-
+    public Check() {
         alertMessage = CheckSettings.alertMessage;
         loadFromConfig();
     }

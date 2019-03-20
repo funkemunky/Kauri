@@ -17,10 +17,11 @@ import org.bukkit.event.Event;
         Packet.Client.POSITION,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_POSITION})
+@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Fly (Type B)", description = "Calculates what the actual vertical speed of a player should be.", type = CheckType.FLY, cancelType = CancelType.MOTION, maxVL = 175, executable = false)
 public class FlyB extends Check {
-    public FlyB(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+    public FlyB() {
+
     }
 
     private int vl;

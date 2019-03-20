@@ -23,6 +23,7 @@ import java.util.LinkedList;
         Packet.Client.LEGACY_POSITION,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
+@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "AutoClicker (Type B)", description = "Looks for suspicious consistencies in CPS averages.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 20)
 public class AutoclickerB extends Check {
 
@@ -32,8 +33,8 @@ public class AutoclickerB extends Check {
     private int ticks, vl;
     private long timestamp;
 
-    public AutoclickerB(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+    public AutoclickerB() {
+
     }
 
     @Override

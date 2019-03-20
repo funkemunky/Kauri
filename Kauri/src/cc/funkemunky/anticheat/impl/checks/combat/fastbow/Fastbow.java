@@ -14,13 +14,13 @@ import org.bukkit.event.Event;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 
 @BukkitEvents(events = {ProjectileLaunchEvent.class})
-@CheckInfo(name = "Fastbow", description =  "Makes sure the rate of fire is legitimate.", type = CheckType.COMBAT, cancelType = CancelType.INTERACT, maxVL = 20)
+@cc.funkemunky.api.utils.Init
+@CheckInfo(name = "Fastbow", description = "Makes sure the rate of fire is legitimate.", type = CheckType.COMBAT, cancelType = CancelType.INTERACT, maxVL = 20)
 public class Fastbow extends Check {
     private TickTimer lastShoot = new TickTimer(10);
     private Verbose verbose = new Verbose();
 
-    public Fastbow(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+    public Fastbow() {
 
     }
 

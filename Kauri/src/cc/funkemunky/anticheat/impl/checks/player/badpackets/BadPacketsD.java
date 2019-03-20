@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.player.badpackets;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.TickTimer;
@@ -19,9 +20,11 @@ import org.bukkit.event.Event;
         Packet.Client.LEGACY_POSITION,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
+@cc.funkemunky.api.utils.Init
+@CheckInfo(name = "BadPackets (Type D)", description = "Compares the rate of interact packets to a certain frequency.", type = CheckType.BADPACKETS, cancelType = CancelType.INTERACT, maxVL = 50)
 public class BadPacketsD extends Check {
-    public BadPacketsD(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+    public BadPacketsD() {
+
     }
 
     private long lastFlying;
@@ -33,14 +36,14 @@ public class BadPacketsD extends Check {
         if (packetType.equals(Packet.Client.BLOCK_PLACE)) {
             val elapsed = timeStamp - lastFlying;
             if (elapsed < 10) {
-                if(lastLag.hasPassed() && vl++ > 5) {
+                if (lastLag.hasPassed() && vl++ > 5) {
                     flag(elapsed + "<-10", true, true);
                 }
             } else {
                 vl -= vl > 0 ? 1 : 0;
             }
         } else {
-            if(MathUtils.getDelta(timeStamp, lastFlying) < 5) lastLag.reset();
+            if (MathUtils.getDelta(timeStamp, lastFlying) < 5) lastLag.reset();
             lastFlying = timeStamp;
         }
     }

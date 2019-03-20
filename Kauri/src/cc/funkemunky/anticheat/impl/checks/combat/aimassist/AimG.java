@@ -16,12 +16,11 @@ import org.bukkit.event.Event;
         Packet.Client.LOOK,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
+@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Aim (Type G)", description = "Checks for common denominators in the yaw.", type = CheckType.AIM, executable = false, cancellable = false, maxVL = 125)
 public class AimG extends Check {
-    public AimG(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+    public AimG() {
 
-        setDeveloper(true);
     }
 
     private double vl;

@@ -35,11 +35,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
         Packet.Client.LEGACY_POSITION,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
+@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Reach (Type E)", description = "A ray-tracing check but is less light, however it detects 3.1 reach very accurately.", type = CheckType.REACH, cancelType = CancelType.COMBAT, maxVL = 125)
 public class ReachE extends Check {
 
-    public ReachE(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+    public ReachE() {
+
     }
 
     @Setting(name = "pingRange")

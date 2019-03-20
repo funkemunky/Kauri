@@ -30,6 +30,7 @@ import java.util.List;
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_POSITION,
         Packet.Client.LEGACY_LOOK})
+@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "HitBox", description = "A very accurate hit-box check, using a mixture of ray-tracing and bounding-boxes.", type = CheckType.COMBAT, cancelType = CancelType.COMBAT, maxVL = 50)
 public class HitBox extends Check {
     @Setting(name = "pingLeniency")
@@ -42,8 +43,8 @@ public class HitBox extends Check {
 
     private List<EntityType> type = new ArrayList<>(Arrays.asList(EntityType.PLAYER, EntityType.VILLAGER, EntityType.SKELETON, EntityType.BLAZE, EntityType.ZOMBIE, EntityType.PIG_ZOMBIE, EntityType.CREEPER, EntityType.SNOWMAN));
 
-    public HitBox(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+    public HitBox() {
+
     }
 
     @Override

@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 
 @Packets(packets = {Packet.Client.USE_ENTITY})
+@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Reach (Type B)", description = "A simple and light, but extremely effective maximum reach calculation. However, slightly experimental.", developer = true, maxVL = 60, executable = false)
 public class ReachB extends Check {
     @Setting(name = "threshold.vl.max")
@@ -27,8 +28,8 @@ public class ReachB extends Check {
     private DynamicRollingAverage reachAvg = new DynamicRollingAverage(5);
     private double vl;
 
-    public ReachB(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+    public ReachB() {
+
     }
 
     @Override

@@ -16,8 +16,8 @@ public class ArmSwing extends AntiPUP {
 
     @Override
     public boolean onPacket(Object packet, String packetType, long timeStamp) {
-        if(timeStamp - lastTimeStamp < 6) {
-            if(vl++ > 6) {
+        if (timeStamp - lastTimeStamp < 6) {
+            if (vl++ > 6) {
                 lastTimeStamp = timeStamp;
                 return true;
             }

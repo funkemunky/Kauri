@@ -23,12 +23,11 @@ import org.bukkit.util.Vector;
 import java.util.List;
 
 @Packets(packets = {Packet.Client.USE_ENTITY})
+@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Killaura (Type G)", description = "Raytraces to check if there are blocks obstructing the path of attack.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, executable = false)
 public class KillauraG extends Check {
-    public KillauraG(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+    public KillauraG() {
 
-        setDeveloper(true);
     }
 
     @Setting(name = "threshold.collision")

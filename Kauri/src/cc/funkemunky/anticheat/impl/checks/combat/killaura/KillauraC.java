@@ -16,13 +16,14 @@ import org.bukkit.event.Event;
 import org.bukkit.potion.PotionEffectType;
 
 @Packets(packets = {Packet.Client.USE_ENTITY, Packet.Client.ENTITY_ACTION})
+@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Killaura (Type C)", description = "Checks for clients sprinting while attacking.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, maxVL = 60)
 public class KillauraC extends Check {
     private Verbose verbose = new Verbose();
     private boolean isSprinting;
 
-    public KillauraC(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+    public KillauraC() {
+
     }
 
     @Override

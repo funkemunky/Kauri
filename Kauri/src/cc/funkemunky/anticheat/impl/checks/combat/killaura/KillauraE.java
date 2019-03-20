@@ -16,6 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
         Packet.Client.LOOK,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
+@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Killaura (Type E)", description = "A heuristic which factors in the rotations to look for any patterns.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT)
 @LoadExempt
 public class KillauraE extends Check {
@@ -24,10 +25,8 @@ public class KillauraE extends Check {
     private final AtomicInteger level = new AtomicInteger();
     private TickTimer lastAttack = new TickTimer(4);
 
-    public KillauraE(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+    public KillauraE() {
 
-        setDeveloper(true);
     }
 
     @Override

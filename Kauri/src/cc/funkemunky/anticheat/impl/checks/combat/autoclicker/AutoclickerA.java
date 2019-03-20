@@ -12,6 +12,7 @@ import lombok.val;
 import org.bukkit.event.Event;
 
 @Packets(packets = {Packet.Client.ARM_ANIMATION})
+@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Autoclicker (Type A)", description = "A unique fast click check that detects jumps in CPS much faster.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT)
 public class AutoclickerA extends Check {
 
@@ -30,8 +31,8 @@ public class AutoclickerA extends Check {
     private long lastTimeStamp;
     private double vl;
 
-    public AutoclickerA(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+    public AutoclickerA() {
+
     }
 
 

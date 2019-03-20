@@ -49,7 +49,7 @@ public class DebugArgument extends FunkeArgument {
                     data.setDebuggingPackets(false);
                     data.setDebuggingPlayer(null);
                     sender.sendMessage(Color.Red + "Stopped any debug messages from being sent to you.");
-                } else if(args[1].equalsIgnoreCase("packets")) {
+                } else if (args[1].equalsIgnoreCase("packets")) {
                     if (args.length == 3) {
                         data.setDebuggingPlayer(player.getUniqueId());
                         data.setDebuggingPackets(true);

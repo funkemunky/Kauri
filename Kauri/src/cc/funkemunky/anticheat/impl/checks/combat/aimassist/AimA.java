@@ -15,14 +15,15 @@ import org.bukkit.event.Event;
         Packet.Client.LOOK,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
+@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Aim (Type A)", type = CheckType.AIM, cancelType = CancelType.MOTION, description = "Checks for the consistency in aim overall", executable = false, maxVL = 80)
 public class AimA extends Check {
 
     private float lastYaw, lastPitch, lastWrapped, lastChange;
     private int vl;
 
-    public AimA(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+    public AimA() {
+
     }
 
     @Override

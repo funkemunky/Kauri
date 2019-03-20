@@ -9,7 +9,6 @@ import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumParticle;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.Color;
-import cc.funkemunky.api.utils.Init;
 import org.bukkit.Achievement;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -28,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@Init
+@cc.funkemunky.api.utils.Init
 public class BukkitListeners implements Listener {
 
     @EventHandler
@@ -121,10 +120,10 @@ public class BukkitListeners implements Listener {
 
     @EventHandler
     public void onEvent(PlayerAchievementAwardedEvent event) {
-        if(event.getAchievement().equals(Achievement.OPEN_INVENTORY)) {
+        if (event.getAchievement().equals(Achievement.OPEN_INVENTORY)) {
             PlayerData data = Kauri.getInstance().getDataManager().getPlayerData(event.getPlayer().getUniqueId());
 
-            if(data != null) {
+            if (data != null) {
                 data.getActionProcessor().setOpenInventory(true);
                 event.setCancelled(true);
             }

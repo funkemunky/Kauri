@@ -20,6 +20,7 @@ import org.bukkit.event.Event;
         Packet.Client.LEGACY_POSITION,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
+@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Killaura (Type A)", description = "Checks the time between certain packets and attacks.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, maxVL = 150)
 public class KillauraA extends Check {
 
@@ -27,8 +28,8 @@ public class KillauraA extends Check {
     private int verbose;
     private TickTimer lastLag = new TickTimer(4);
 
-    public KillauraA(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+    public KillauraA() {
+
     }
 
     @Override
@@ -36,7 +37,7 @@ public class KillauraA extends Check {
         if (packetType.equals(Packet.Client.USE_ENTITY)) {
             WrappedInUseEntityPacket use = new WrappedInUseEntityPacket(packet, getData().getPlayer());
 
-            if(!use.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) return;
+            if (!use.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) return;
 
             /*Checks the time difference between a flying packet and a use packet. If legit, it should normally be around 50ms.
             KillauraA modules tend to be made using a motion event, and client developers usually forget to make sure that the motion
@@ -51,7 +52,7 @@ public class KillauraA extends Check {
             }
 
         } else {
-            if(MathUtils.getDelta(timeStamp, lastFlying) < 5) lastLag.reset();
+            if (MathUtils.getDelta(timeStamp, lastFlying) < 5) lastLag.reset();
             lastFlying = timeStamp;
         }
     }

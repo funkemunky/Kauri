@@ -23,8 +23,8 @@ public class ConsoleClient extends AntiPUP {
 
     @Override
     public boolean onPacket(Object packet, String packetType, long timeStamp) {
-        if(packetType.equalsIgnoreCase(Packet.Client.KEEP_ALIVE)) {
-            if(timeStamp - lastFlying > 8000L) {
+        if (packetType.equalsIgnoreCase(Packet.Client.KEEP_ALIVE)) {
+            if (timeStamp - lastFlying > 8000L) {
                 new BukkitRunnable() {
                     public void run() {
                         getData().getPlayer().kickPlayer(Color.translate(message));

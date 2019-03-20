@@ -20,10 +20,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Packets(packets = {Packet.Client.USE_ENTITY})
+@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Reach (Type C)", description = "Uses expanded bounding-boxes to set a maximum hit reach.", type = CheckType.REACH, cancelType = CancelType.COMBAT, developer = true, executable = false)
 public class ReachC extends Check {
-    public ReachC(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+    public ReachC() {
+
     }
 
     @Setting(name = "boxExpand")

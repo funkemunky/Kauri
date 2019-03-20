@@ -16,9 +16,6 @@ public class YLevel extends AntiPUP {
     public boolean onPacket(Object packet, String packetType, long timeStamp) {
         WrappedInFlyingPacket flying = new WrappedInFlyingPacket(packet, getData().getPlayer());
 
-        if(Math.abs(flying.getY()) > 300) {
-            return true;
-        }
-        return false;
+        return Math.abs(flying.getY()) > 300;
     }
 }

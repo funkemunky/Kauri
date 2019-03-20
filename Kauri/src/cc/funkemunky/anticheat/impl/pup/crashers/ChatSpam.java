@@ -23,6 +23,7 @@ public class ChatSpam extends AntiPUP {
 
     @Setting(name = "noSpamMessage")
     private String message = "&8[&4!&8] &7You must wait &c%timeLeft% seconds &7 until you can chat.";
+
     @Override
     public boolean onPacket(Object packet, String packetType, long timeStamp) {
         return false;
@@ -32,17 +33,17 @@ public class ChatSpam extends AntiPUP {
     public void onEvent(AsyncPlayerChatEvent event) {
         String message = event.getMessage();
 
-        if(!message.startsWith("/")) {
+        if (!message.startsWith("/")) {
             long timeStamp = System.currentTimeMillis();
             long delta = timeStamp - lastMessage;
-            if(delta < chatDelay) {
-                if(vl++ > spamMax) {
+            if (delta < chatDelay) {
+                if (vl++ > spamMax) {
                     double seconds = MathUtils.round(delta / 1000D, 1);
 
                     event.getPlayer().sendMessage(message);
                     event.setCancelled(true);
                 }
-            } else vl-= vl > 0 ? 1 : 0;
+            } else vl -= vl > 0 ? 1 : 0;
             lastMessage = timeStamp;
         }
     }

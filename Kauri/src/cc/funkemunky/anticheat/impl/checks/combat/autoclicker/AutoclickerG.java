@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Packets(packets = {Packet.Client.ARM_ANIMATION})
+@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Autoclicker (Type G)", description = "A normal click consistency check.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 50, executable = false)
 public class AutoclickerG extends Check {
 
@@ -24,8 +25,8 @@ public class AutoclickerG extends Check {
     private double vl;
     private List<Long> times = new CopyOnWriteArrayList<>();
 
-    public AutoclickerG(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+    public AutoclickerG() {
+
     }
 
     @Override

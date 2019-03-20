@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.player.badpackets;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.BukkitEvents;
 import cc.funkemunky.anticheat.api.utils.Verbose;
@@ -10,12 +11,14 @@ import org.bukkit.event.Event;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 
 @BukkitEvents(events = {EntityRegainHealthEvent.class})
+@cc.funkemunky.api.utils.Init
+@CheckInfo(name = "BadPackets (Type E)", description = "Checks the rate of healing.", type = CheckType.BADPACKETS, cancelType = CancelType.HEALTH, maxVL = 20)
 public class BadPacketsE extends Check {
 
     private Verbose verbose = new Verbose();
 
-    public BadPacketsE(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+    public BadPacketsE() {
+
     }
 
     @Override

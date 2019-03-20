@@ -18,13 +18,14 @@ import org.bukkit.event.Event;
         Packet.Client.LEGACY_POSITION,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
+@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Autoclicker (Type F)", description = "Compares the CPS of an autoclicker a certain frequency.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 8)
 public class AutoclickerF extends Check {
 
     private int swingTicks, flyingTicks, lastFlyingTicks, outliner, lastOutliner;
 
-    public AutoclickerF(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+    public AutoclickerF() {
+
     }
 
     @Override

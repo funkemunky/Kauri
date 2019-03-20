@@ -16,12 +16,13 @@ import org.bukkit.event.Event;
 import org.bukkit.util.Vector;
 
 @Packets(packets = {Packet.Client.USE_ENTITY})
+@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Reach (Type A)", description = "A basic maximum reach calculation", type = CheckType.REACH, cancelType = CancelType.COMBAT, maxVL = 60)
 public class ReachA extends Check {
     private Verbose verbose = new Verbose();
 
-    public ReachA(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+    public ReachA() {
+
     }
 
     @Override

@@ -16,10 +16,11 @@ import org.bukkit.event.Event;
         Packet.Client.LOOK,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
+@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Killaura (Type I)", description = "Checks for another overall flaw in the rotations of many killauras.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, maxVL = 200)
 public class KillauraI extends Check {
-    public KillauraI(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+    public KillauraI() {
+
     }
 
     private double vl;

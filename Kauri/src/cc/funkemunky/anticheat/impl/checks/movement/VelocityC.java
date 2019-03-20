@@ -16,8 +16,8 @@ import org.bukkit.potion.PotionEffectType;
 
 @Packets(packets = {Packet.Server.ENTITY_VELOCITY, Packet.Client.POSITION_LOOK, Packet.Client.POSITION, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION})
 public class VelocityC extends Check {
-    public VelocityC(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+    public VelocityC() {
+
     }
 
     private double vl;

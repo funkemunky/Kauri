@@ -13,15 +13,15 @@ import org.bukkit.event.Event;
 
 
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.POSITION, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION})
-@CheckInfo(name = "Fly (Type A)", description =  "A simple acceleration check for flight.", type = CheckType.FLY, cancelType = CancelType.MOTION, maxVL = 150)
+@cc.funkemunky.api.utils.Init
+@CheckInfo(name = "Fly (Type A)", description = "A simple acceleration check for flight.", type = CheckType.FLY, cancelType = CancelType.MOTION, maxVL = 150)
 public class FlyA extends Check {
 
     private int verbose;
     private Verbose verboseLow = new Verbose();
     private long lastTimeStamp;
 
-    public FlyA(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+    public FlyA() {
 
     }
 

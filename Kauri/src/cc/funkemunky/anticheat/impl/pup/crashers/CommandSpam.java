@@ -24,7 +24,7 @@ public class CommandSpam extends AntiPUP {
     @EventHandler
     public void onPreprocessCommand(PlayerCommandPreprocessEvent event) {
         long timeStamp = System.currentTimeMillis();
-        if(timeStamp - lastPreprocess < minimumDelay) {
+        if (timeStamp - lastPreprocess < minimumDelay) {
             event.setCancelled(true);
         }
         lastPreprocess = timeStamp;

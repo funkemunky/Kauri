@@ -6,9 +6,8 @@ import cc.funkemunky.anticheat.api.event.TickEvent;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.event.system.EventMethod;
 import cc.funkemunky.api.event.system.Listener;
-import cc.funkemunky.api.utils.Init;
 
-@Init
+@cc.funkemunky.api.utils.Init
 public class FunkeListeners implements Listener {
 
     @EventMethod

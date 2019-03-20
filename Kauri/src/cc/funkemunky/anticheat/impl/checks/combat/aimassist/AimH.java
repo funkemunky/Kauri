@@ -15,11 +15,12 @@ import org.bukkit.util.Vector;
         Packet.Client.POSITION_LOOK,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK,})
+@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Aim (Type H)", description = "Looks for a common angle mistake in clients. By Itz_Lucky.", type = CheckType.AIM, cancelType = CancelType.MOTION, maxVL = 10)
 public class AimH extends Check {
 
-    public AimH(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+    public AimH() {
+
     }
 
     @Override

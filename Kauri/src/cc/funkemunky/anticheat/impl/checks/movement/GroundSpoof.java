@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.movement;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
@@ -14,14 +15,14 @@ import org.bukkit.event.Event;
         Packet.Client.POSITION,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_POSITION})
+@cc.funkemunky.api.utils.Init
+@CheckInfo(name = "GroundSpoof", description = "Makes sure the ground boolean received from the client is legitimate", maxVL = 200, executable = false, developer = true)
 public class GroundSpoof extends Check {
     private int vl;
     private long lastTimeStamp;
 
-    public GroundSpoof(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+    public GroundSpoof() {
 
-        setDeveloper(true);
     }
 
     @Override

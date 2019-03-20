@@ -14,10 +14,11 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.potion.PotionEffectType;
 
 @BukkitEvents(events = {PlayerMoveEvent.class})
+@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "FastLadder", description = "Looks for any suspicious vertical speed values while climbing.", type = CheckType.MOVEMENT, cancelType = CancelType.MOTION)
 public class FastLadder extends Check {
-    public FastLadder(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+    public FastLadder() {
+
     }
 
     @Setting(name = "threshold.verboseMaxSpeed")

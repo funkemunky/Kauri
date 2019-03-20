@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.movement.speed;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Verbose;
@@ -14,9 +15,11 @@ import org.bukkit.event.Event;
 
 
 @Packets(packets = {Packet.Client.LEGACY_POSITION, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.POSITION, Packet.Client.POSITION_LOOK})
+@cc.funkemunky.api.utils.Init
+@CheckInfo(name = "Speed (Type D)", description = "Checks the in-air and on-ground deceleration of the client. Less accurate.", type = CheckType.SPEED, maxVL = 125, executable = false, developer = true)
 public class SpeedD extends Check {
-    public SpeedD(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+    public SpeedD() {
+
     }
 
     private float lastMotion;
@@ -39,7 +42,7 @@ public class SpeedD extends Check {
         val max = move.isServerOnGround() ? 0.24 : 0.03;
 
         if (getData().getLastBlockPlace().hasPassed(8) && getData().getLastServerPos().hasPassed(2) && !getData().isGeneralCancel() && timeStamp > lastTimeStamp + 5 && delta > max) {
-            if((delta > max + 0.4) || verbose.flag(3, 650L)) {
+            if ((delta > max + 0.4) || verbose.flag(3, 650L)) {
                 flag(delta + ">-" + max + ";" + move.isServerOnGround(), true, true);
             }
         }

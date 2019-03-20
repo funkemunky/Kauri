@@ -22,11 +22,12 @@ import org.bukkit.event.Event;
         Packet.Client.LEGACY_LOOK,
         Packet.Client.ARM_ANIMATION,
         Packet.Client.BLOCK_DIG})
+@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Autoclicker (Type E)", description = "An unreasonable amount of CPS while breaking a block.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 20)
 public class AutoclickerE extends Check {
 
-    public AutoclickerE(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+    public AutoclickerE() {
+
     }
 
     private boolean sent;

@@ -9,7 +9,6 @@ import cc.funkemunky.api.commands.FunkeArgument;
 import cc.funkemunky.api.commands.FunkeCommand;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.ConfigSetting;
-import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MiscUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -18,7 +17,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-@Init
 public class AntiVpnArgument extends FunkeArgument {
     @ConfigSetting(path = "antivpn.privacyMode", name = "enabled")
     private boolean privacyMode = false;
@@ -38,12 +36,12 @@ public class AntiVpnArgument extends FunkeArgument {
 
     @Override
     public void onArgument(CommandSender sender, Command command, String[] args) {
-        if(args.length == 1) {
+        if (args.length == 1) {
             sender.sendMessage(MiscUtils.line(Color.Dark_Gray));
             sender.sendMessage(Color.Gold + Color.Bold + "AntiVPN Help");
             sender.sendMessage(Color.translate("&7/%label% &fanalyze <player>".replaceAll("%label%", command.getLabel().toLowerCase())));
             sender.sendMessage(MiscUtils.line(Color.Dark_Gray));
-        } else if(args[1].equalsIgnoreCase("analyze")) {
+        } else if (args[1].equalsIgnoreCase("analyze")) {
             Player player = Bukkit.getPlayer(args[2]);
 
             if (player == null || !player.isOnline()) {

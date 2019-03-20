@@ -3,6 +3,7 @@ package cc.funkemunky.anticheat.impl.checks.player.badpackets;
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
@@ -21,12 +22,12 @@ import org.bukkit.event.Event;
         Packet.Client.LEGACY_POSITION,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
+@cc.funkemunky.api.utils.Init
+@CheckInfo(name = "BadPackets (Type G)", description = "Checks frequency of incoming packets. More detection, but less reliable.", type = CheckType.BADPACKETS, maxVL = 200, executable = false, developer = true)
 public class BadPacketsG extends Check {
 
-    public BadPacketsG(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+    public BadPacketsG() {
 
-        setDeveloper(true);
     }
 
     @Setting(name = "usingPaperSpigot")
@@ -45,29 +46,29 @@ public class BadPacketsG extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-            val data = this.getData();
+        val data = this.getData();
 
-            if (data.getLastLogin().hasNotPassed(15) || data.getLastServerPos().hasNotPassed(5)) {
-                return;
+        if (data.getLastLogin().hasNotPassed(15) || data.getLastServerPos().hasNotPassed(5)) {
+            return;
+        }
+
+        if (MathUtils.getDelta(timeStamp, lastFlying) < 5) {
+            lastLag.reset();
+            statisticalAnalysis.addValue(50);
+        } else if (lastLag.hasPassed(2)) {
+            this.statisticalAnalysis.addValue(timeStamp - lastFlying);
+        }
+
+        val max = usingPaper ? 7.071f : Math.sqrt(Kauri.getInstance().getTickElapsed());
+        val stdDev = this.statisticalAnalysis.getStdDev();
+
+        if (!MathUtils.approxEquals(deltaBalance, max, stdDev) && stdDev < max && getData().getLastLag().hasNotPassed(10)) {
+            if (lastLag.hasPassed() && vl++ > maxVL) {
+                this.flag("S: " + stdDev, false, true);
             }
+        } else vl -= vl > 0 ? 3 : 0;
 
-            if(MathUtils.getDelta(timeStamp, lastFlying) < 5) {
-                lastLag.reset();
-                statisticalAnalysis.addValue(50);
-            } else if(lastLag.hasPassed(2)) {
-                this.statisticalAnalysis.addValue(timeStamp - lastFlying);
-            }
-
-            val max = usingPaper ? 7.071f : Math.sqrt(Kauri.getInstance().getTickElapsed());
-            val stdDev = this.statisticalAnalysis.getStdDev();
-
-            if (!MathUtils.approxEquals(deltaBalance, max, stdDev) && stdDev < max && getData().getLastLag().hasNotPassed(10)) {
-                if (lastLag.hasPassed() && vl++ > maxVL) {
-                    this.flag("S: " + stdDev, false, true);
-                }
-            } else vl -= vl > 0 ? 3 : 0;
-
-            debug("STD: " + stdDev + " VL: " + vl);
+        debug("STD: " + stdDev + " VL: " + vl);
         this.lastFlying = timeStamp;
     }
 

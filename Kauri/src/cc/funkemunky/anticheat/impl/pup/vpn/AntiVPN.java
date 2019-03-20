@@ -3,7 +3,6 @@ package cc.funkemunky.anticheat.impl.pup.vpn;
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.pup.AntiPUP;
 import cc.funkemunky.anticheat.api.pup.PuPType;
-import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.anticheat.api.utils.VPNResponse;
 import cc.funkemunky.api.Atlas;

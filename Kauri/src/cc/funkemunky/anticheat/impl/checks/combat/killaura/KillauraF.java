@@ -20,12 +20,11 @@ import org.bukkit.event.Event;
         Packet.Client.POSITION_LOOK,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
+@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Killaura (Type F)", description = "A simple angle consistency check.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, cancellable = false, executable = false)
 public class KillauraF extends Check {
-    public KillauraF(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+    public KillauraF() {
 
-        setDeveloper(true);
     }
 
     private RollingAverage average = new RollingAverage(20);

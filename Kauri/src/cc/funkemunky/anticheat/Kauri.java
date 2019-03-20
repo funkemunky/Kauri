@@ -18,6 +18,7 @@ import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.event.system.EventManager;
 import cc.funkemunky.api.profiling.BaseProfiler;
 import cc.funkemunky.api.utils.*;
+import com.google.common.reflect.ClassPath;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
@@ -72,10 +73,10 @@ public class Kauri extends JavaPlugin {
             profileStart = System.currentTimeMillis();
 
             dataManager = new DataManager();
+            checkManager = new CheckManager();
 
             startScanner(false);
 
-            checkManager = new CheckManager();
             antiPUPManager = new AntiPUPManager();
             dataManager.registerAllPlayers();
 
@@ -167,7 +168,7 @@ public class Kauri extends JavaPlugin {
             try {
                 Class clazz = Class.forName(c);
 
-                return clazz.isAnnotationPresent(Init.class) || clazz.isInstance(Check.class);
+                return clazz.isAnnotationPresent(Init.class) || clazz.isAnnotationPresent(CheckInfo.class);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -176,9 +177,13 @@ public class Kauri extends JavaPlugin {
             try {
                 Class clazz = Class.forName(c);
 
-                Init annotation = (Init) clazz.getAnnotation(Init.class);
+                if(clazz.isAnnotationPresent(Init.class)) {
+                    Init annotation = (Init) clazz.getAnnotation(Init.class);
 
-                return annotation.priority().getPriority();
+                    return annotation.priority().getPriority();
+                } else {
+                    return 3;
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -187,47 +192,52 @@ public class Kauri extends JavaPlugin {
             try {
                 Class clazz = Class.forName(c);
 
+                Object[] nullObjects = new Object[clazz.getConstructors()[0].getParameterCount()];
+
                 Object obj = clazz.getSimpleName().equals(mainClass.getSimpleName()) ? plugin : clazz.newInstance();
-                Init init = (Init) clazz.getAnnotation(Init.class);
 
-                if (!configOnly) {
-                    if (obj instanceof Listener) {
-                        MiscUtils.printToConsole("&eFound " + clazz.getSimpleName() + " Bukkit listener. Registering...");
-                        Bukkit.getPluginManager().registerEvents((Listener) obj, plugin);
-                    } else if (obj instanceof cc.funkemunky.api.event.system.Listener) {
-                        MiscUtils.printToConsole("&eFound " + clazz.getSimpleName() + " Atlas listener. Registering...");
-                        EventManager.register(plugin, (cc.funkemunky.api.event.system.Listener) obj);
+                if(clazz.isAnnotationPresent(Init.class)) {
+                    Init init = (Init) clazz.getAnnotation(Init.class);
+
+                    if (!configOnly) {
+                        if (obj instanceof Listener) {
+                            MiscUtils.printToConsole("&eFound " + clazz.getSimpleName() + " Bukkit listener. Registering...");
+                            Bukkit.getPluginManager().registerEvents((Listener) obj, plugin);
+                        } else if (obj instanceof cc.funkemunky.api.event.system.Listener) {
+                            MiscUtils.printToConsole("&eFound " + clazz.getSimpleName() + " Atlas listener. Registering...");
+                            EventManager.register(plugin, (cc.funkemunky.api.event.system.Listener) obj);
+                        }
+
+                        if (init.commands()) {
+                            Atlas.getInstance().getCommandManager().registerCommands(obj);
+                        }
+
                     }
+                    for (Field field : clazz.getDeclaredFields()) {
+                        field.setAccessible(true);
+                        if (field.isAnnotationPresent(ConfigSetting.class)) {
+                            String name = field.getAnnotation(ConfigSetting.class).name();
+                            String path = field.getAnnotation(ConfigSetting.class).path() + "." + (name.length() > 0 ? name : field.getName());
+                            try {
+                                MiscUtils.printToConsole("&eFound " + field.getName() + " ConfigSetting (default=" + field.get(obj) + ").");
+                                if (plugin.getConfig().get(path) == null) {
+                                    MiscUtils.printToConsole("&eValue not found in configuration! Setting default into config...");
+                                    plugin.getConfig().set(path, field.get(obj));
+                                    plugin.saveConfig();
+                                } else {
+                                    field.set(obj, plugin.getConfig().get(path));
 
-                    if (init.commands()) {
-                        Atlas.getInstance().getCommandManager().registerCommands(obj);
-                    }
-
-                }
-                for (Field field : clazz.getDeclaredFields()) {
-                    field.setAccessible(true);
-                    if (field.isAnnotationPresent(ConfigSetting.class)) {
-                        String name = field.getAnnotation(ConfigSetting.class).name();
-                        String path = field.getAnnotation(ConfigSetting.class).path() + "." + (name.length() > 0 ? name : field.getName());
-                        try {
-                            MiscUtils.printToConsole("&eFound " + field.getName() + " ConfigSetting (default=" + field.get(obj) + ").");
-                            if (plugin.getConfig().get(path) == null) {
-                                MiscUtils.printToConsole("&eValue not found in configuration! Setting default into config...");
-                                plugin.getConfig().set(path, field.get(obj));
-                                plugin.saveConfig();
-                            } else {
-                                field.set(obj, plugin.getConfig().get(path));
-
-                                MiscUtils.printToConsole("&eValue found in configuration! Set value to &a" + plugin.getConfig().get(path));
+                                    MiscUtils.printToConsole("&eValue found in configuration! Set value to &a" + plugin.getConfig().get(path));
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
-                        } catch (Exception e) {
-                            e.printStackTrace();
                         }
                     }
+
                 }
 
-
-                if(clazz.isInstance(Check.class) && clazz.isAnnotationPresent(CheckInfo.class) && !clazz.isAnnotationPresent(LoadExempt.class)) {
+                if(clazz.isAnnotationPresent(CheckInfo.class) && !clazz.isAnnotationPresent(LoadExempt.class)) {
                     Check check = (Check) obj;
                     CheckInfo info = (CheckInfo) clazz.getAnnotation(CheckInfo.class);
 
@@ -241,11 +251,14 @@ public class Kauri extends JavaPlugin {
                     check.setCancelType(info.cancelType());
                     check.setName(info.name());
                     check.setDeveloper(info.developer());
+
+                    MiscUtils.printToConsole("&eFound check &a" + check.getName() + "&e! Registering...");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
+        MiscUtils.printToConsole("&7Applying configuration values...");
         for (Check check : Kauri.getInstance().getCheckManager().getChecks()) {
             Arrays.stream(check.getClass().getDeclaredFields()).filter(field -> {
                 field.setAccessible(true);
@@ -273,5 +286,6 @@ public class Kauri extends JavaPlugin {
                 }
             });
         }
+        MiscUtils.printToConsole("&aCompleted!");
     }
 }

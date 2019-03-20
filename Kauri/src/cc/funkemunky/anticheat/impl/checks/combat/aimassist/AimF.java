@@ -19,13 +19,12 @@ import java.util.List;
         Packet.Client.LOOK,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
+@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Aim (Type F)", description = "Finds any suspiciously consistent variables.")
 @LoadExempt
 public class AimF extends Check {
-    public AimF(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+    public AimF() {
 
-        setDeveloper(true);
     }
 
     private List<Double> gcdValues = new ArrayList<>();

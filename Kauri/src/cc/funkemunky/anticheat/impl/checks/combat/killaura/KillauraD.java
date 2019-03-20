@@ -17,6 +17,7 @@ import java.util.LinkedList;
         Packet.Client.LOOK,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
+@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Killaura (Type D)", description = "Detects over-randomization in killauras.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT)
 public class KillauraD extends Check {
 
@@ -25,8 +26,8 @@ public class KillauraD extends Check {
             pitchDeque = new LinkedList<>();
     private int vl;
 
-    public KillauraD(String name, String description, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, description, type, cancelType, maxVL, enabled, executable, cancellable);
+    public KillauraD() {
+
     }
 
     @Override
