@@ -18,9 +18,7 @@ import org.bukkit.event.Event;
         Packet.Client.LEGACY_POSITION,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
-@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Killaura (Type H)", description = "Detects if clients are swinging impossibly.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, executable = false, cancellable = false, maxVL = 15, developer = true)
-@LoadExempt
 public class KillauraH extends Check {
 
     public KillauraH() {

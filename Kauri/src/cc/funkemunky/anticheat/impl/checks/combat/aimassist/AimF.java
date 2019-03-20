@@ -19,9 +19,7 @@ import java.util.List;
         Packet.Client.LOOK,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
-@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Aim (Type F)", description = "Finds any suspiciously consistent variables.")
-@LoadExempt
 public class AimF extends Check {
     public AimF() {
 

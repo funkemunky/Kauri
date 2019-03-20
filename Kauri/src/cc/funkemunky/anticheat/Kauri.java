@@ -3,7 +3,6 @@ package cc.funkemunky.anticheat;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckManager;
-import cc.funkemunky.anticheat.api.checks.LoadExempt;
 import cc.funkemunky.anticheat.api.data.DataManager;
 import cc.funkemunky.anticheat.api.data.logging.LoggerManager;
 import cc.funkemunky.anticheat.api.data.stats.StatsManager;
@@ -18,7 +17,6 @@ import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.event.system.EventManager;
 import cc.funkemunky.api.profiling.BaseProfiler;
 import cc.funkemunky.api.utils.*;
-import com.google.common.reflect.ClassPath;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
@@ -238,7 +236,7 @@ public class Kauri extends JavaPlugin {
 
                 }
 
-                if(clazz.isAnnotationPresent(CheckInfo.class) && !clazz.isAnnotationPresent(LoadExempt.class)) {
+                if(clazz.isAnnotationPresent(CheckInfo.class)) {
                     Check check = (Check) obj;
                     CheckInfo info = (CheckInfo) clazz.getAnnotation(CheckInfo.class);
 

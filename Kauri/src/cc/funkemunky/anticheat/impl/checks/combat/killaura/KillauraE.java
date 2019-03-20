@@ -16,9 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
         Packet.Client.LOOK,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
-@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Killaura (Type E)", description = "A heuristic which factors in the rotations to look for any patterns.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT)
-@LoadExempt
 public class KillauraE extends Check {
 
     private final Deque<Float> pitchDeque = new LinkedList<>(), yawDeque = new LinkedList<>();
