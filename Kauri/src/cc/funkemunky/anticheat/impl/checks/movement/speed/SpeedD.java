@@ -39,10 +39,10 @@ public class SpeedD extends Check {
         val predicted = lastMotion * resistance;
         val delta = deltaXZ - predicted;
 
-        val max = move.isServerOnGround() ? 0.24 : 0.03;
+        val max = move.isServerOnGround() || move.getAirTicks() < 3 ? 0.24 : 0.03;
 
         if (getData().getLastBlockPlace().hasPassed(8) && getData().getLastServerPos().hasPassed(2) && !getData().isGeneralCancel() && timeStamp > lastTimeStamp + 5 && delta > max) {
-            if ((delta > max + 0.4) || verbose.flag(3, 650L)) {
+            if ((delta > max + 0.4) || verbose.flag(3, 400L)) {
                 flag(delta + ">-" + max + ";" + move.isServerOnGround(), true, true);
             }
         }

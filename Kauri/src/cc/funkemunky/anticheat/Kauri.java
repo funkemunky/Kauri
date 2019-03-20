@@ -56,8 +56,8 @@ public class Kauri extends JavaPlugin {
 
     private VPNUtils vpnUtils;
 
-    private String requiredVersionOfAtlas = "1.1.3.5";
-    private List<String> usableVersionsOfAtlas = Arrays.asList("1.1.3.4", "1.1.3.3", "1.1.3.5");
+    private String requiredVersionOfAtlas = "1.1.3.6";
+    private List<String> usableVersionsOfAtlas = Arrays.asList("1.1.3.4", "1.1.3.3", "1.1.3.5", "1.1.3.6");
 
     @Override
     public void onEnable() {
@@ -65,7 +65,7 @@ public class Kauri extends JavaPlugin {
         instance = this;
         saveDefaultConfig();
 
-        //if(Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled()) return;
+        if(Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled()) return;
 
         if (Bukkit.getPluginManager().isPluginEnabled("Atlas") && usableVersionsOfAtlas.contains(Bukkit.getPluginManager().getPlugin("Atlas").getDescription().getVersion())) {
 
@@ -159,6 +159,7 @@ public class Kauri extends JavaPlugin {
         checkManager = new CheckManager();
         antiPUPManager = new AntiPUPManager();
         dataManager = new DataManager();
+        dataManager.registerAllPlayers();
     }
 
     //Credits: Luke.
@@ -251,6 +252,8 @@ public class Kauri extends JavaPlugin {
                     check.setCancelType(info.cancelType());
                     check.setName(info.name());
                     check.setDeveloper(info.developer());
+
+                    Kauri.getInstance().getCheckManager().getChecks().add(check);
 
                     MiscUtils.printToConsole("&eFound check &a" + check.getName() + "&e! Registering...");
                 }

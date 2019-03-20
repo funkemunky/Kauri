@@ -2,18 +2,24 @@ package cc.funkemunky.anticheat.impl.commands.kauri.arguments;
 
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
+import cc.funkemunky.anticheat.api.utils.Pastebin;
 import cc.funkemunky.api.commands.FunkeArgument;
 import cc.funkemunky.api.commands.FunkeCommand;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.MiscUtils;
 import lombok.val;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 public class LagArgument extends FunkeArgument {
@@ -54,24 +60,40 @@ public class LagArgument extends FunkeArgument {
         } else {
             switch (args[1].toLowerCase()) {
                 case "profile": {
-                    sender.sendMessage(MiscUtils.line(Color.Dark_Gray));
+                    List<String> body = new ArrayList<>();
+                    body.add(MiscUtils.lineNoStrike());
                     float totalPCT = 0;
                     long totalTime = MathUtils.elapsed(Kauri.getInstance().getProfileStart());
                     for (String string : Kauri.getInstance().getProfiler().total.keySet()) {
-                        sender.sendMessage(Color.Red + Color.Underline + string);
+                        body.add(string);
                         double stringTotal = TimeUnit.NANOSECONDS.toMillis(Kauri.getInstance().getProfiler().total.get(string));
                         int calls = Kauri.getInstance().getProfiler().calls.get(string);
                         double pct = stringTotal / totalTime;
-                        sender.sendMessage(Color.White + "Latency: " + stringTotal / calls + "ms");
-                        sender.sendMessage(Color.White + "Calls: " + calls);
-                        sender.sendMessage(Color.White + "STD: " + Kauri.getInstance().getProfiler().stddev.get(string));
-                        sender.sendMessage(Color.White + "PCT: " + MathUtils.round(pct, 8));
+                        body.add("Latency: " + stringTotal / calls + "ms");
+                        body.add("Calls: " + calls);
+                        body.add("STD: " + Kauri.getInstance().getProfiler().stddev.get(string));
+                        body.add("PCT: " + MathUtils.round(pct, 8));
                         totalPCT += (pct);
                     }
-                    sender.sendMessage(Color.Yellow + "Total PCT: " + Color.White + totalPCT);
-                    sender.sendMessage(Color.Yellow + "Total Time: " + Color.White + totalTime + "ms");
-                    sender.sendMessage(Color.Yellow + "Total Calls: " + Color.White + Kauri.getInstance().getProfiler().totalCalls);
-                    sender.sendMessage(MiscUtils.line(Color.Dark_Gray));
+                    body.add("Total PCT: " + MathUtils.round(totalPCT, 4) + "%");
+                    body.add("Total Time: " + totalTime + "ms");
+                    body.add("Total Calls: " + Kauri.getInstance().getProfiler().totalCalls);
+                    body.add(MiscUtils.lineNoStrike());
+
+                    StringBuilder builder = new StringBuilder();
+                    for (String aBody : body) {
+                        builder.append(aBody).append(";");
+                    }
+
+                    builder.deleteCharAt(body.size() - 1);
+
+                    String bodyString = builder.toString().replaceAll(";", "\n");
+
+                    try {
+                        sender.sendMessage(Color.Green + "Results: " + Pastebin.makePaste(bodyString, "Kauri Profile: " + DateFormatUtils.format(System.currentTimeMillis(), ", ", TimeZone.getTimeZone("604")), Pastebin.Privacy.UNLISTED));
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 }
                 case "server":
