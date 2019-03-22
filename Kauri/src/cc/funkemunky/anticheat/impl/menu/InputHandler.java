@@ -14,8 +14,4 @@ public class InputHandler implements Listener {
     public void onEvent(SignChangeEvent event) {
 
     }
-
-    public String openInput(Player player) {
-        player.openInventory(Bukkit.createInventory(null, InventoryType.))
-    }
 }
