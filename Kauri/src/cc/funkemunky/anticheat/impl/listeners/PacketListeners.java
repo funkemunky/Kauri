@@ -139,8 +139,10 @@ public class PacketListeners implements Listener {
                 case Packet.Client.LEGACY_LOOK: {
                     WrappedInFlyingPacket packet = new WrappedInFlyingPacket(event.getPacket(), player);
 
-                    data.getMovementProcessor().update(data, packet);
-                    data.getVelocityProcessor().update(packet);
+                    Atlas.getInstance().getThreadPool().execute(() -> {
+                        data.getMovementProcessor().update(data, packet);
+                        data.getVelocityProcessor().update(packet);
+                    });
                     break;
                 }
                 case Packet.Client.BLOCK_DIG: {
