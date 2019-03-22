@@ -3,6 +3,7 @@ package cc.funkemunky.anticheat.impl.pup.crashers;
 import cc.funkemunky.anticheat.api.pup.AntiPUP;
 import cc.funkemunky.anticheat.api.pup.PuPType;
 import cc.funkemunky.anticheat.api.utils.Setting;
+import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MathUtils;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
@@ -40,7 +41,7 @@ public class ChatSpam extends AntiPUP {
                 if (vl++ > spamMax) {
                     double seconds = MathUtils.round(delta / 1000D, 1);
 
-                    event.getPlayer().sendMessage(message);
+                    event.getPlayer().sendMessage(Color.translate(this.message.replaceAll("%timeLeft%", seconds + "")));
                     event.setCancelled(true);
                 }
             } else vl -= vl > 0 ? 1 : 0;

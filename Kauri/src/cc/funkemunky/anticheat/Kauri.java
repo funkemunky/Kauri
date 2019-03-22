@@ -54,8 +54,8 @@ public class Kauri extends JavaPlugin {
 
     private VPNUtils vpnUtils;
 
-    private String requiredVersionOfAtlas = "1.1.3.6";
-    private List<String> usableVersionsOfAtlas = Arrays.asList("1.1.3.4", "1.1.3.3", "1.1.3.5", "1.1.3.6");
+    private String requiredVersionOfAtlas = "1.1.4";
+    private List<String> usableVersionsOfAtlas = Arrays.asList("1.1.4");
 
     @Override
     public void onEnable() {

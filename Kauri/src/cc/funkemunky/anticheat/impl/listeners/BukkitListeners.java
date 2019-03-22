@@ -4,12 +4,15 @@ import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.utils.BukkitEvents;
+import cc.funkemunky.anticheat.api.utils.CustomLocation;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumParticle;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.Color;
 import org.bukkit.Achievement;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -34,18 +37,21 @@ public class BukkitListeners implements Listener {
     public void onEvent(PlayerMoveEvent event) {
         PlayerData data = Kauri.getInstance().getDataManager().getPlayerData(event.getPlayer().getUniqueId());
 
-        if (data != null && data.getLastMovementCancel().hasPassed(1)) {
+        if (data != null) {
             callChecks(data, event);
 
             if (data.getCancelType().equals(CancelType.MOTION)) {
                 if (data.getSetbackLocation() != null) {
                     event.getPlayer().teleport(data.getSetbackLocation());
                 } else {
-                    event.getPlayer().teleport(MiscUtils.findGround(event.getTo().getWorld(), data.getMovementProcessor().getTo()).toLocation(event.getTo().getWorld()));
+                    event.getPlayer().teleport(MiscUtils.findGround(event.getTo().getWorld(), new CustomLocation(event.getTo())).toLocation(event.getTo().getWorld()));
                 }
                 data.setCancelType(CancelType.NONE);
             } else if (data.getMovementProcessor().isServerOnGround() && data.getLastFlag().hasPassed()) {
-                data.setSetbackLocation(data.getMovementProcessor().getTo().toLocation(event.getPlayer().getWorld()));
+                Location setback = data.getMovementProcessor().getTo().toLocation(event.getPlayer().getWorld()).clone();
+
+                setback.setY(setback.getBlockY());
+                data.setSetbackLocation(setback);
             }
         }
     }

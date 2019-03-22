@@ -5,7 +5,7 @@ import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckSettings;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.api.Atlas;
-import cc.funkemunky.api.event.custom.PacketRecieveEvent;
+import cc.funkemunky.api.event.custom.PacketReceiveEvent;
 import cc.funkemunky.api.event.custom.PacketSendEvent;
 import cc.funkemunky.api.event.system.EnumPriority;
 import cc.funkemunky.api.event.system.EventMethod;
@@ -74,7 +74,7 @@ public class PacketListeners implements Listener {
     }
 
     @EventMethod
-    public void onEvent(PacketRecieveEvent event) {
+    public void onEvent(PacketReceiveEvent event) {
         if (event.getPlayer() == null || !Kauri.getInstance().getDataManager().getDataObjects().containsKey(event.getPlayer().getUniqueId()))
             return;
 

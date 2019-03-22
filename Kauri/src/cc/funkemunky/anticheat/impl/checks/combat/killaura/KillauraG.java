@@ -8,10 +8,7 @@ import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
-import cc.funkemunky.api.utils.BlockUtils;
-import cc.funkemunky.api.utils.BoundingBox;
-import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.MiscUtils;
+import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.math.RayTrace;
 import lombok.val;
 import lombok.var;
@@ -23,12 +20,9 @@ import org.bukkit.util.Vector;
 import java.util.List;
 
 @Packets(packets = {Packet.Client.USE_ENTITY})
-@cc.funkemunky.api.utils.Init
+//@Init
 @CheckInfo(name = "Killaura (Type G)", description = "Raytraces to check if there are blocks obstructing the path of attack.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, executable = false)
 public class KillauraG extends Check {
-    public KillauraG() {
-
-    }
 
     @Setting(name = "threshold.collision")
     private int threshold = 2;

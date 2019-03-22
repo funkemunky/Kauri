@@ -13,18 +13,18 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class ConsoleClient extends AntiPUP {
 
     @Setting(name = "kickMessage")
-    private String message = "&cConsole clients are not allowed./n&7&lNot a console client? &fDon't freeze your game!";
+    private String message = "&cConsole clients are not allowed.\n&7&oNot a console client? &fDon't freeze your game!";
 
     public ConsoleClient(String name, PuPType type, boolean enabled) {
         super(name, type, enabled);
     }
 
-    long lastFlying;
+    private long lastFlying;
 
     @Override
     public boolean onPacket(Object packet, String packetType, long timeStamp) {
         if (packetType.equalsIgnoreCase(Packet.Client.KEEP_ALIVE)) {
-            if (timeStamp - lastFlying > 8000L) {
+            if (timeStamp - lastFlying > 8000L && getData().getLastLogin().hasPassed(10)) {
                 new BukkitRunnable() {
                     public void run() {
                         getData().getPlayer().kickPlayer(Color.translate(message));

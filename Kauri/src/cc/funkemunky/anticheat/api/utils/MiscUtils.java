@@ -61,10 +61,15 @@ public class MiscUtils {
 
     public static CustomLocation findGround(World world, CustomLocation point) {
         for(int y = point.toVector().getBlockY() ; y > 0 ; y--) {
-            CustomLocation loc = new CustomLocation(point.getX(), point.getY(), point.getZ());
+            CustomLocation loc = new CustomLocation(point.getX(), y, point.getZ());
+            Block block = BlockUtils.getBlock(loc.toLocation(world));
 
-            if(getBlocks(new BoundingBox(loc.toVector(), loc.toVector()).subtract(0, 0.1f,0,0,0,0), world).stream().anyMatch(BlockUtils::isSolid)) {
-                return loc;
+            if(block.getType().isBlock() && block.getType().isSolid() && !block.isEmpty()) {
+                CustomLocation toReturn = loc.clone();
+
+                toReturn.setY(y + 1);
+
+                return toReturn;
             }
         }
         return point;
