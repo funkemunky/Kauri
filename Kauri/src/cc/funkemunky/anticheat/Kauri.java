@@ -191,8 +191,6 @@ public class Kauri extends JavaPlugin {
             try {
                 Class clazz = Class.forName(c);
 
-                Object[] nullObjects = new Object[clazz.getConstructors()[0].getParameterCount()];
-
                 Object obj = clazz.getSimpleName().equals(mainClass.getSimpleName()) ? plugin : clazz.newInstance();
 
                 if(clazz.isAnnotationPresent(Init.class)) {

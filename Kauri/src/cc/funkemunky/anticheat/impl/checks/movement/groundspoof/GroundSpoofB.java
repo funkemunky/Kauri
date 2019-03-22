@@ -34,7 +34,7 @@ public class GroundSpoofB extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        if(getData().isGeneralCancel()) return;
+        if(getData().isGeneralCancel() || getData().getLastServerPos().hasNotPassed(1)) return;
 
         if(move.getDistanceToGround() > distanceFG && move.getAirTicks() > ticksInAir && !move.isServerOnGround() && move.isClientOnGround()) {
             if(verbose.flag(vlMax, resetTime)) {

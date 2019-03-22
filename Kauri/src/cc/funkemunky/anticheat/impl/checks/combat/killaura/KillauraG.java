@@ -56,8 +56,8 @@ public class KillauraG extends Check {
 
             RayTrace trace = new RayTrace(origin.toVector(), origin.getDirection());
 
-            //TODO Test with 0.5 and see if it has false positives. If so, put it back to 0.2.
-            List<Vector> vectors = trace.traverse(distance, 0.2);
+            //TODO Test with 0.25 and see if it has false positives. If so, put it back to 0.2.
+            List<Vector> vectors = trace.traverse(distance, 0.25);
 
             //vectors.forEach(position -> origin.getWorld().playEffect(position.toLocation(origin.getWorld()), ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_13) ? Effect.SMOKE : Effect.valueOf("COLOURED_DUST"), 0));
 
