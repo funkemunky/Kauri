@@ -143,6 +143,7 @@ public class PacketListeners implements Listener {
                         data.getMovementProcessor().update(data, packet);
                         data.getVelocityProcessor().update(packet);
                     });
+                    if(data.getMovementProcessor().getTo() == null) return;
                     break;
                 }
                 case Packet.Client.BLOCK_DIG: {
