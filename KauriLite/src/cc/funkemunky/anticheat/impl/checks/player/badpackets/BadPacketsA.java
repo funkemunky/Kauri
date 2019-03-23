@@ -1,7 +1,7 @@
-package cc.funkemunky.anticheat.impl.checks.player;
+package cc.funkemunky.anticheat.impl.checks.player.badpackets;
 
-import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
@@ -17,14 +17,17 @@ import org.bukkit.event.Event;
         Packet.Client.POSITION_LOOK,
         Packet.Client.LEGACY_POSITION,
         Packet.Client.LEGACY_POSITION_LOOK,})
+@cc.funkemunky.api.utils.Init
+@CheckInfo(name = "BadPackets (Type A)", description = "Prevents the client from spoofing the ability to fly.", type = CheckType.BADPACKETS, maxVL = 40)
 public class BadPacketsA extends Check {
     @Setting(name = "vlMax")
     private int vlMax = 3;
 
     private boolean serverSent, clientSent, lastCreative;
     private int vl;
-    public BadPacketsA(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, type, cancelType, maxVL, enabled, executable, cancellable);
+
+    public BadPacketsA() {
+
     }
 
     @Override
@@ -35,7 +38,7 @@ public class BadPacketsA extends Check {
             if (abilities.isAllowedFlight() && !getData().isCreativeMode()) {
                 serverSent = true;
             }
-        } else if(packetType.equalsIgnoreCase(Packet.Client.ABILITIES)) {
+        } else if (packetType.equalsIgnoreCase(Packet.Client.ABILITIES)) {
             WrappedInAbilitiesPacket abilities = new WrappedInAbilitiesPacket(packet, getData().getPlayer());
 
             if (abilities.isAllowedFlight() && !getData().isCreativeMode() && !serverSent) {
@@ -48,24 +51,23 @@ public class BadPacketsA extends Check {
 
             clientSent = true;
 
-            if(!abilities.isAllowedFlight()) {
+            if (!abilities.isAllowedFlight()) {
                 clientSent = serverSent = false;
             }
 
-            if(abilities.isCreativeMode() != lastCreative) {
+            if (abilities.isCreativeMode() != lastCreative) {
                 clientSent = serverSent = false;
             }
 
-            if((lastCreative = abilities.isCreativeMode())) {
+            if ((lastCreative = abilities.isCreativeMode())) {
                 clientSent = serverSent = false;
             }
 
         } else {
-            if(!serverSent && !getData().isCreativeMode() && clientSent) {
+            if (!serverSent && !getData().isCreativeMode() && clientSent) {
                 flag("fake news abilities packet", true, true);
             }
         }
-        return;
     }
 
     @Override

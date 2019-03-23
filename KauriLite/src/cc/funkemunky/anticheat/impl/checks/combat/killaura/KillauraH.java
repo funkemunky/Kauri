@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.combat.killaura;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
@@ -20,10 +21,11 @@ import org.bukkit.event.Event;
         Packet.Client.LEGACY_POSITION,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
+@CheckInfo(name = "Killaura (Type H)", description = "Detects if clients are swinging impossibly.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, executable = false, cancellable = false, maxVL = 15, developer = true)
 public class KillauraH extends Check {
 
-    public KillauraH(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, type, cancelType, maxVL, enabled, executable, cancellable);
+    public KillauraH() {
+
     }
 
     private boolean swing;
@@ -43,9 +45,9 @@ public class KillauraH extends Check {
                     vl = 0;
                 }
             }
-        } else if(packetType.contains("Position") || packetType.contains("Look") || packetType.equals(Packet.Client.FLYING)) {
+        } else if (packetType.contains("Position") || packetType.contains("Look") || packetType.equals(Packet.Client.FLYING)) {
             this.swing = false;
-        } else if(!MiscUtils.shouldReturnArmAnimation(getData())) {
+        } else if (!MiscUtils.shouldReturnArmAnimation(getData())) {
             this.swing = true;
         }
     }

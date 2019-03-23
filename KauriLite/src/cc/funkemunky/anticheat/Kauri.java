@@ -1,10 +1,13 @@
 package cc.funkemunky.anticheat;
 
+import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckManager;
 import cc.funkemunky.anticheat.api.data.DataManager;
 import cc.funkemunky.anticheat.api.data.logging.LoggerManager;
 import cc.funkemunky.anticheat.api.data.stats.StatsManager;
 import cc.funkemunky.anticheat.api.event.TickEvent;
+import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.anticheat.impl.commands.kauri.KauriCommand;
 import cc.funkemunky.anticheat.impl.listeners.FunkeListeners;
 import cc.funkemunky.anticheat.impl.listeners.PacketListeners;
@@ -14,6 +17,7 @@ import cc.funkemunky.api.profiling.BaseProfiler;
 import cc.funkemunky.api.utils.*;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -32,17 +36,21 @@ import java.util.logging.Level;
 public class Kauri extends JavaPlugin {
     @Getter
     private static Kauri instance;
+
     private DataManager dataManager;
     private CheckManager checkManager;
     private StatsManager statsManager;
+
     private int currentTicks;
     private long lastTick, tickElapsed, profileStart;
+
     private ScheduledExecutorService executorService;
+
     private BaseProfiler profiler;
     private LoggerManager loggerManager;
 
-    private String requiredVersionOfAtlas = "1.1.3.5";
-    private List<String> usableVersionsOfAtlas = Arrays.asList("1.1.3.4", "1.1.3.3", "1.1.3.5");
+    private String requiredVersionOfAtlas = "1.1.4";
+    private List<String> usableVersionsOfAtlas = Arrays.asList("1.1.4");
 
     @Override
     public void onEnable() {
@@ -50,18 +58,18 @@ public class Kauri extends JavaPlugin {
         instance = this;
         saveDefaultConfig();
 
-        //if(Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled()) return;
+        if(Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled()) return;
 
-        if(Bukkit.getPluginManager().isPluginEnabled("Atlas") && usableVersionsOfAtlas.contains(Bukkit.getPluginManager().getPlugin("Atlas").getDescription().getVersion())) {
+        if (Bukkit.getPluginManager().isPluginEnabled("Atlas") && usableVersionsOfAtlas.contains(Bukkit.getPluginManager().getPlugin("Atlas").getDescription().getVersion())) {
 
             profiler = new BaseProfiler();
             profileStart = System.currentTimeMillis();
 
             dataManager = new DataManager();
+            checkManager = new CheckManager();
 
             startScanner(false);
 
-            checkManager = new CheckManager();
             dataManager.registerAllPlayers();
 
             //Starting up our utilities, managers, and tasks.
@@ -83,13 +91,12 @@ public class Kauri extends JavaPlugin {
         //Registering all the commands
     }
 
-
     public void onDisable() {
         statsManager.saveStats();
         loggerManager.saveToDatabase();
         EventManager.unregister(new FunkeListeners());
         EventManager.unregister(new PacketListeners());
-        org.bukkit.event.HandlerList.unregisterAll(this);
+        HandlerList.unregisterAll(this);
         dataManager.getDataObjects().clear();
         checkManager.getChecks().clear();
         executorService.shutdownNow();
@@ -136,9 +143,12 @@ public class Kauri extends JavaPlugin {
         reloadConfig();
         getCheckManager().getChecks().clear();
         getDataManager().getDataObjects().clear();
-        startScanner(true);
+        EventManager.unregisterAll(this);
+        HandlerList.unregisterAll(this);
+        startScanner(false);
         checkManager = new CheckManager();
         dataManager = new DataManager();
+        dataManager.registerAllPlayers();
     }
 
     //Credits: Luke.
@@ -148,8 +158,8 @@ public class Kauri extends JavaPlugin {
             try {
                 Class clazz = Class.forName(c);
 
-                return clazz.isAnnotationPresent(Init.class);
-            } catch(Exception e) {
+                return clazz.isAnnotationPresent(Init.class) || clazz.isAnnotationPresent(CheckInfo.class);
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             return false;
@@ -157,10 +167,14 @@ public class Kauri extends JavaPlugin {
             try {
                 Class clazz = Class.forName(c);
 
-                Init annotation = (Init) clazz.getAnnotation(Init.class);
+                if(clazz.isAnnotationPresent(Init.class)) {
+                    Init annotation = (Init) clazz.getAnnotation(Init.class);
 
-                return annotation.priority().getPriority();
-            } catch(Exception e) {
+                    return annotation.priority().getPriority();
+                } else {
+                    return 3;
+                }
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             return 3;
@@ -168,32 +182,33 @@ public class Kauri extends JavaPlugin {
             try {
                 Class clazz = Class.forName(c);
 
+                Object obj = clazz.getSimpleName().equals(mainClass.getSimpleName()) ? plugin : clazz.newInstance();
+
                 if(clazz.isAnnotationPresent(Init.class)) {
-                    Object obj = clazz.getSimpleName().equals(mainClass.getSimpleName()) ? plugin : clazz.newInstance();
                     Init init = (Init) clazz.getAnnotation(Init.class);
 
-                    if(!configOnly) {
+                    if (!configOnly) {
                         if (obj instanceof Listener) {
                             MiscUtils.printToConsole("&eFound " + clazz.getSimpleName() + " Bukkit listener. Registering...");
                             Bukkit.getPluginManager().registerEvents((Listener) obj, plugin);
-                        } else if(obj instanceof cc.funkemunky.api.event.system.Listener) {
+                        } else if (obj instanceof cc.funkemunky.api.event.system.Listener) {
                             MiscUtils.printToConsole("&eFound " + clazz.getSimpleName() + " Atlas listener. Registering...");
                             EventManager.register(plugin, (cc.funkemunky.api.event.system.Listener) obj);
                         }
 
-                        if(init.commands()) {
+                        if (init.commands()) {
                             Atlas.getInstance().getCommandManager().registerCommands(obj);
                         }
 
                     }
                     for (Field field : clazz.getDeclaredFields()) {
                         field.setAccessible(true);
-                        if(field.isAnnotationPresent(ConfigSetting.class)) {
+                        if (field.isAnnotationPresent(ConfigSetting.class)) {
                             String name = field.getAnnotation(ConfigSetting.class).name();
                             String path = field.getAnnotation(ConfigSetting.class).path() + "." + (name.length() > 0 ? name : field.getName());
                             try {
                                 MiscUtils.printToConsole("&eFound " + field.getName() + " ConfigSetting (default=" + field.get(obj) + ").");
-                                if(plugin.getConfig().get(path) == null) {
+                                if (plugin.getConfig().get(path) == null) {
                                     MiscUtils.printToConsole("&eValue not found in configuration! Setting default into config...");
                                     plugin.getConfig().set(path, field.get(obj));
                                     plugin.saveConfig();
@@ -209,9 +224,58 @@ public class Kauri extends JavaPlugin {
                     }
 
                 }
+
+                if(clazz.isAnnotationPresent(CheckInfo.class)) {
+                    Check check = (Check) obj;
+                    CheckInfo info = (CheckInfo) clazz.getAnnotation(CheckInfo.class);
+
+                    check.setEnabled(info.enabled());
+                    check.setExecutable(info.executable());
+                    check.setCancellable(info.cancellable());
+                    check.setDescription(info.description());
+                    check.setMaxVL(info.maxVL());
+                    check.setMaximum(info.maxVersion());
+                    check.setType(info.type());
+                    check.setCancelType(info.cancelType());
+                    check.setName(info.name());
+                    check.setDeveloper(info.developer());
+
+                    Kauri.getInstance().getCheckManager().getChecks().add(check);
+
+                    MiscUtils.printToConsole("&eFound check &a" + check.getName() + "&e! Registering...");
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
+        MiscUtils.printToConsole("&7Applying configuration values...");
+        for (Check check : Kauri.getInstance().getCheckManager().getChecks()) {
+            Arrays.stream(check.getClass().getDeclaredFields()).filter(field -> {
+                field.setAccessible(true);
+
+                return field.isAnnotationPresent(Setting.class);
+            }).forEach(field -> {
+                try {
+                    field.setAccessible(true);
+
+                    String path = "checks." + check.getName() + ".settings." + field.getName();
+                    if (Kauri.getInstance().getConfig().get(path) != null) {
+                        Object val = Kauri.getInstance().getConfig().get(path);
+
+                        if (val instanceof Double && field.get(check) instanceof Float) {
+                            field.set(check, (float) (double) val);
+                        } else {
+                            field.set(check, val);
+                        }
+                    } else {
+                        Kauri.getInstance().getConfig().set("checks." + check.getName() + ".settings." + field.getName(), field.get(check));
+                        Kauri.getInstance().saveConfig();
+                    }
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+        MiscUtils.printToConsole("&aCompleted!");
     }
 }

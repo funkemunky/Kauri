@@ -1,7 +1,8 @@
-package cc.funkemunky.anticheat.impl.checks.movement;
+package cc.funkemunky.anticheat.impl.checks.movement.fly;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.BukkitEvents;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
@@ -12,11 +13,11 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.potion.PotionEffectType;
 
 @BukkitEvents(events = {PlayerMoveEvent.class})
+@cc.funkemunky.api.utils.Init
+@CheckInfo(name = "Fly (Type E)", description = "Checks if a client moves vertically faster than what is possible.", type = CheckType.FLY, cancelType = CancelType.MOTION, executable = false, developer = true)
 public class FlyE extends Check {
-    public FlyE(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, type, cancelType, maxVL, enabled, executable, cancellable);
+    public FlyE() {
 
-        setDeveloper(true);
     }
 
     @Override
@@ -28,14 +29,14 @@ public class FlyE extends Check {
     public void onBukkitEvent(Event event) {
         PlayerMoveEvent e = (PlayerMoveEvent) event;
 
-        if(MiscUtils.cancelForFlight(getData(), 15, false)) return;
+        if (MiscUtils.cancelForFlight(getData(), 15, false)) return;
 
         val deltaY = (float) (e.getTo().getY() - e.getFrom().getY());
         val player = e.getPlayer();
         val totalMaxY = 0.6 + PlayerUtils.getPotionEffectLevel(player, PotionEffectType.JUMP) * 0.12f;
 
-        if(deltaY > totalMaxY) {
-            flag(deltaY + ">-" + totalMaxY, true,true);
+        if (deltaY > totalMaxY) {
+            flag(deltaY + ">-" + totalMaxY, true, true);
         }
     }
 }

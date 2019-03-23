@@ -1,7 +1,8 @@
-package cc.funkemunky.anticheat.impl.checks.movement;
+package cc.funkemunky.anticheat.impl.checks.movement.fly;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
@@ -12,29 +13,31 @@ import lombok.val;
 import org.bukkit.event.Event;
 
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.POSITION, Packet.Client.LEGACY_POSITION, Packet.Client.LEGACY_POSITION_LOOK})
+@cc.funkemunky.api.utils.Init
+@CheckInfo(name = "Fly (Type C)", description = "A different style of acceleration check.", type = CheckType.FLY, cancelType = CancelType.MOTION)
 public class FlyC extends Check {
 
-    public FlyC(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, type, cancelType, maxVL, enabled, executable, cancellable);
+    public FlyC() {
+
     }
 
     private double vl;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(MiscUtils.cancelForFlight(getData(), 12, true)) return;
+        if (MiscUtils.cancelForFlight(getData(), 12, true)) return;
 
         val move = getData().getMovementProcessor();
 
-        if(move.isNearGround()) return;
+        if (move.isNearGround()) return;
 
         val collides = getData().getBoundingBox().grow(1.5f, 1.5f, 1.5f).getCollidingBlocks(getData().getPlayer()).stream().anyMatch(BlockUtils::isSolid);
 
-        if(!MathUtils.approxEquals(0.01, move.getLastClientYAcceleration(), move.getClientYAcceleration())) {
-            if((!collides && move.getAirTicks() > 2) || vl++ > 4) {
+        if (!MathUtils.approxEquals(0.01, move.getLastClientYAcceleration(), move.getClientYAcceleration())) {
+            if ((!collides && move.getAirTicks() > 2) || vl++ > 4) {
                 flag(move.getClientYAcceleration() + ", " + move.getLastClientYAcceleration(), true, true);
             }
-        } else vl-= vl > 0 ? 0.75 : 0;
+        } else vl -= vl > 0 ? 0.75 : 0;
     }
 
     @Override

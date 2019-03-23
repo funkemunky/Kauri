@@ -1,6 +1,5 @@
 package cc.funkemunky.anticheat.impl.commands.kauri.arguments;
 
-import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.CheckSettings;
 import cc.funkemunky.api.commands.FunkeArgument;
 import cc.funkemunky.api.commands.FunkeCommand;
@@ -14,7 +13,7 @@ public class DelayArgument extends FunkeArgument {
 
     @Override
     public void onArgument(CommandSender sender, Command command, String[] args) {
-        if(args.length > 1) {
+        if (args.length > 1) {
             try {
                 long delay = Long.parseLong(args[1]);
 
@@ -22,7 +21,7 @@ public class DelayArgument extends FunkeArgument {
                 Kauri.getInstance().saveConfig();
 
                 sender.sendMessage(getParent().getCommandMessages().getSuccessColor() + "Set the alerts delay to " + getParent().getCommandMessages().getValueColor() + delay + "ms" + getParent().getCommandMessages().getSuccessColor() + ".");
-            } catch(NumberFormatException e) {
+            } catch (NumberFormatException e) {
                 sender.sendMessage(getParent().getCommandMessages().getErrorColor() + "The inputted argument must be in the form of a number.");
             }
         }

@@ -40,11 +40,11 @@ public class CollisionAssessment {
         Block block = BlockUtils.getBlock(location);
 
         if (BlockUtils.isSolid(block) || isEntity) {
-            if (bb.getMinimum().getY() <= (playerBox.getMinimum().getY()) && bb.collidesVertically(playerBox.subtract(0, 0.1f, 0, 0, 0, 0))) {
+            if (bb.getMinimum().getY() <= (playerBox.getMinimum().getY() + 0.3f) && bb.collidesVertically(playerBox.subtract(0, 0.1f, 0, 0, 0, 0))) {
                 onGround = true;
             }
 
-            if(getData().isDebuggingBox() && bb.collides(playerBox) && Kauri.getInstance().getCurrentTicks() % 2 == 0) {
+            if (getData().isDebuggingBox() && bb.collides(playerBox) && Kauri.getInstance().getCurrentTicks() % 2 == 0) {
                 Atlas.getInstance().getThreadPool().submit(() -> MiscUtils.createParticlesForBoundingBox(getData().getPlayer(), bb, WrappedEnumParticle.FLAME, 0.25f));
             }
 
@@ -69,7 +69,7 @@ public class CollisionAssessment {
 
             }
 
-            if(bb.collidesVertically(playerBox.subtract(0, 0.1f,0,0,0,0)) && block.getType().toString().contains("SLIME")) {
+            if (bb.collidesVertically(playerBox.subtract(0, 0.1f, 0, 0, 0, 0)) && block.getType().toString().contains("SLIME")) {
                 onSlime = true;
             }
 
@@ -81,7 +81,7 @@ public class CollisionAssessment {
                 onClimbable = true;
             }
         } else {
-            if (BlockUtils.isLiquid(block) && playerBox.collidesVertically(bb)) {
+            if (BlockUtils.isLiquid(block) && playerBox.grow(0, 0.1f,0).collidesVertically(bb)) {
                 inLiquid = true;
             }
             if (block.getType().toString().contains("WEB") && playerBox.collidesVertically(bb)) {

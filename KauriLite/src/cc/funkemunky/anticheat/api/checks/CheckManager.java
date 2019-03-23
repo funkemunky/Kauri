@@ -1,22 +1,9 @@
 package cc.funkemunky.anticheat.api.checks;
 
-import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
-import cc.funkemunky.anticheat.api.utils.Setting;
-import cc.funkemunky.anticheat.impl.checks.combat.aimassist.AimA;
-import cc.funkemunky.anticheat.impl.checks.combat.autoclicker.AutoclickerA;
-import cc.funkemunky.anticheat.impl.checks.combat.autoclicker.AutoclickerB;
-import cc.funkemunky.anticheat.impl.checks.combat.autoclicker.AutoclickerC;
-import cc.funkemunky.anticheat.impl.checks.combat.autoclicker.AutoclickerD;
-import cc.funkemunky.anticheat.impl.checks.combat.fastbow.Fastbow;
-import cc.funkemunky.anticheat.impl.checks.combat.hitboxes.HitBox;
-import cc.funkemunky.anticheat.impl.checks.combat.killaura.*;
-import cc.funkemunky.anticheat.impl.checks.combat.reach.ReachA;
-import cc.funkemunky.anticheat.impl.checks.combat.reach.ReachB;
-import cc.funkemunky.anticheat.impl.checks.combat.reach.ReachC;
-import cc.funkemunky.anticheat.impl.checks.combat.reach.ReachD;
-import cc.funkemunky.anticheat.impl.checks.movement.*;
-import cc.funkemunky.anticheat.impl.checks.player.*;
+import cc.funkemunky.anticheat.api.utils.BukkitEvents;
+import cc.funkemunky.anticheat.api.utils.Packets;
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -28,85 +15,17 @@ import java.util.concurrent.Executors;
 @Setter
 public class CheckManager {
     private List<Check> checks = new ArrayList<>();
-    private ExecutorService alertsExecutable;
-
     private Set<UUID> bypassingPlayers = new HashSet<>();
+    private ExecutorService alertsExecutable;
 
     public CheckManager() {
         alertsExecutable = Executors.newFixedThreadPool(2);
-        checks = loadChecks();
-    }
-
-    public List<Check> loadChecks() {
-        List<Check> checks = new ArrayList<>();
-        checks.add(new AimA("Aim (Type A)", CheckType.AIM, CancelType.COMBAT, 80, true, false, false));
-        checks.add(new AutoclickerA("Autoclicker (Type A)", CheckType.AUTOCLICKER, CancelType.COMBAT, 50, true, false ,true));
-        checks.add(new AutoclickerB("Autoclicker (Type B)", CheckType.AUTOCLICKER, CancelType.COMBAT, 30, true, true, true));
-        checks.add(new AutoclickerC("Autoclicker (Type C)", CheckType.AUTOCLICKER, CancelType.COMBAT, 40, true, false, true));
-        checks.add(new AutoclickerD("Autoclicker (Type D)", CheckType.AUTOCLICKER, CancelType.COMBAT, 50, true, false, true));
-        checks.add(new KillauraA("Killaura (Type A)", CheckType.KILLAURA, CancelType.COMBAT, 150, true, false, true));
-        checks.add(new KillauraB("Killaura (Type B)", CheckType.KILLAURA, CancelType.COMBAT, 200, true, true, true));
-        checks.add(new KillauraC("Killaura (Type C)", CheckType.KILLAURA, CancelType.COMBAT, 100, true, true, true));
-        checks.add(new KillauraD("Killaura (Type D)", CheckType.KILLAURA, CancelType.COMBAT, 75, true, false, true));
-        checks.add(new KillauraG("Killaura (Type G)", CheckType.KILLAURA, CancelType.COMBAT, 50, true, false, true));
-        //checks.add(new KillauraH("Killaura (Type H)", CheckType.KILLAURA, CancelType.COMBAT, 20, true, true, true));
-        checks.add(new FlyA("Fly (Type A)", CheckType.FLY, CancelType.MOTION, 225, true, true, true));
-        checks.add(new FlyB("Fly (Type B)", CheckType.FLY, CancelType.MOTION, 225, true, false, true));
-        checks.add(new FlyC("Fly (Type C)", CheckType.FLY, CancelType.MOTION, 100, true, true, true));
-        checks.add(new FlyD("Fly (Type D)", CheckType.FLY, CancelType.MOTION, 200, true, false, true));
-        checks.add(new FlyE("Fly (Type E)", CheckType.FLY, CancelType.MOTION, 150, true, false, true));
-        checks.add(new SpeedA("Speed (Type A)", CheckType.SPEED, CancelType.MOTION, 100, true, false, true));
-        checks.add(new SpeedB("Speed (Type B)", CheckType.SPEED, CancelType.MOTION, 125, true, true, true));
-        checks.add(new SpeedC("Speed (Type C)", CheckType.SPEED, CancelType.MOTION, 100, true, false, true));
-        checks.add(new SpeedD("Speed (Type D)", CheckType.SPEED, CancelType.MOTION, 125, true, false, true));
-        checks.add(new GroundSpoof("GroundSpoof", CheckType.MOVEMENT, CancelType.MOTION, 200, true, false, true));
-        checks.add(new ReachA("Reach (Type A)", CheckType.REACH, CancelType.COMBAT, 60, true, true, true));
-        checks.add(new ReachB("Reach (Type B)", CheckType.REACH, CancelType.COMBAT, 60, true, false, true));
-        checks.add(new ReachC("Reach (Type C)", CheckType.REACH, CancelType.MOTION, 50, true, false, true));
-        checks.add(new ReachD("Reach (Type D)", CheckType.REACH, CancelType.COMBAT, 50, true, true, true));
-        checks.add(new Fastbow("Fastbow", CheckType.COMBAT, CancelType.INTERACT, 40, true, true, true));
-        checks.add(new HitBox("HitBox", CheckType.COMBAT, CancelType.COMBAT, 30, true, false, true));
-        checks.add(new BadPacketsA("BadPackets (Type A)", CheckType.BADPACKETS, CancelType.MOTION, 40, true, true, true));
-        checks.add(new BadPacketsC("BadPackets (Type C)", CheckType.BADPACKETS, CancelType.COMBAT, 5, true, true, true));
-        checks.add(new BadPacketsD("BadPackets (Type D)", CheckType.BADPACKETS, CancelType.COMBAT, 50, true, true, true));
-        checks.add(new BadPacketsE("BadPackets (Type E)", CheckType.BADPACKETS, CancelType.HEALTH, 20, true, true, true));
-        checks.add(new BadPacketsF("BadPackets (Type F)", CheckType.BADPACKETS, CancelType.MOTION, 20, true, true, true));
-        checks.add(new BadPacketsG("BadPackets (Type G)", CheckType.BADPACKETS, CancelType.NONE, 150, true, false, true));
-        checks.add(new VelocityA("Velocity (Type A)", CheckType.VELOCITY, CancelType.MOTION,  40, true, true, true));
-        checks.add(new VelocityB("Velocity (Type B)", CheckType.VELOCITY, CancelType.MOTION,  40, true, false, true));
-
-        for (Check check : checks) {
-            Arrays.stream(check.getClass().getDeclaredFields()).filter(field -> {
-                field.setAccessible(true);
-
-                return field.isAnnotationPresent(Setting.class);
-            }).forEach(field -> {
-                try {
-                    field.setAccessible(true);
-
-                    String path = "checks." + check.getName() + ".settings." + field.getName();
-                    if (Kauri.getInstance().getConfig().get(path) != null) {
-                        Object val = Kauri.getInstance().getConfig().get(path);
-
-                        if (val instanceof Double && field.get(check) instanceof Float) {
-                            field.set(check, (float) (double) val);
-                        } else {
-                            field.set(check, val);
-                        }
-                    } else {
-                        Kauri.getInstance().getConfig().set("checks." + check.getName() + ".settings." + field.getName(), field.get(check));
-                        Kauri.getInstance().saveConfig();
-                    }
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            });
-        }
-        return checks;
     }
 
     public void registerCheck(Check check) {
-        checks.add(check);
+        if ((check.getMinimum() == null || ProtocolVersion.getGameVersion().isOrAbove(check.getMinimum())) && (check.getMaximum() == null || ProtocolVersion.getGameVersion().isBelow(check.getMaximum()))) {
+            checks.add(check);
+        }
     }
 
     public boolean isCheck(String name) {
@@ -114,13 +33,33 @@ public class CheckManager {
     }
 
     public void loadChecksIntoData(PlayerData data) {
-        List<Check> checks = loadChecks();
+        List<Check> checkList = new ArrayList<>(checks);
 
-        data.getChecks().clear();
+        checkList.forEach(check -> check.setData(data));
 
-        checks.forEach(check -> check.setData(data));
+        checkList.stream().filter(check -> check.getClass().isAnnotationPresent(Packets.class)).forEach(check -> {
+            Packets packets = check.getClass().getAnnotation(Packets.class);
 
-        data.setChecks(checks);
+            Arrays.stream(packets.packets()).forEach(packet -> {
+                List<Check> checks = data.getPacketChecks().getOrDefault(packet, new ArrayList<>());
+
+                checks.add(check);
+
+                data.getPacketChecks().put(packet, checks);
+            });
+        });
+
+        checkList.stream().filter(check -> check.getClass().isAnnotationPresent(BukkitEvents.class)).forEach(check -> {
+            BukkitEvents events = check.getClass().getAnnotation(BukkitEvents.class);
+
+            Arrays.stream(events.events()).forEach(event -> {
+                List<Check> checks = data.getBukkitChecks().getOrDefault(event, new ArrayList<>());
+
+                checks.add(check);
+
+                data.getBukkitChecks().put(event, checks);
+            });
+        });
     }
 
     public Check getCheck(String name) {
@@ -136,7 +75,7 @@ public class CheckManager {
     }
 
     public void setBypassing(UUID uuid, boolean bypassing) {
-        if(bypassing) {
+        if (bypassing) {
             bypassingPlayers.add(uuid);
         } else {
             bypassingPlayers.remove(uuid);
@@ -146,7 +85,6 @@ public class CheckManager {
     public void setBypassing(UUID uuid) {
         setBypassing(uuid, !isBypassing(uuid));
     }
-
 
     public void removeCheck(String name) {
         Optional<Check> opCheck = checks.stream().filter(check -> check.getName().equalsIgnoreCase(name)).findFirst();

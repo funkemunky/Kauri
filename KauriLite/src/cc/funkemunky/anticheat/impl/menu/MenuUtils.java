@@ -1,6 +1,5 @@
 package cc.funkemunky.anticheat.impl.menu;
 
-import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.menu.Menu;

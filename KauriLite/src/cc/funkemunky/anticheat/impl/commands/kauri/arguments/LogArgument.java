@@ -22,10 +22,10 @@ public class LogArgument extends FunkeArgument {
     public void onArgument(CommandSender sender, Command command, String[] args) {
         Player player = (Player) sender;
 
-        if(args.length >= 2) {
+        if (args.length >= 2) {
             OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
 
-            if(target == null) {
+            if (target == null) {
                 sender.sendMessage(getParent().getCommandMessages().getErrorColor() + "The player \"" + args[0] + "\" could not be found in Mojang's databases.");
                 return;
             }

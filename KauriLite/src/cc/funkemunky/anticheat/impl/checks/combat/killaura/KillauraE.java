@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.combat.killaura;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.TickTimer;
@@ -18,14 +19,15 @@ import java.util.concurrent.atomic.AtomicInteger;
         Packet.Client.LOOK,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
+@CheckInfo(name = "Killaura (Type E)", description = "A heuristic which factors in the rotations to look for any patterns.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT)
 public class KillauraE extends Check {
 
     private final Deque<Float> pitchDeque = new LinkedList<>(), yawDeque = new LinkedList<>();
     private final AtomicInteger level = new AtomicInteger();
     private TickTimer lastAttack = new TickTimer(4);
 
-    public KillauraE(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, type, cancelType, maxVL, enabled, executable, cancellable);
+    public KillauraE() {
+
     }
 
     @Override
@@ -64,7 +66,6 @@ public class KillauraE extends Check {
             pitchDeque.clear();
             level.set(0);
         }
-        return;
     }
 
     @Override

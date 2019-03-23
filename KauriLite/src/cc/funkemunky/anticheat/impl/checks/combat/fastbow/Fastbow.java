@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.combat.fastbow;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.BukkitEvents;
 import cc.funkemunky.anticheat.api.utils.TickTimer;
@@ -13,17 +14,18 @@ import org.bukkit.event.Event;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 
 @BukkitEvents(events = {ProjectileLaunchEvent.class})
+@cc.funkemunky.api.utils.Init
+@CheckInfo(name = "Fastbow", description = "Makes sure the rate of fire is legitimate.", type = CheckType.COMBAT, cancelType = CancelType.INTERACT, maxVL = 20)
 public class Fastbow extends Check {
     private TickTimer lastShoot = new TickTimer(10);
     private Verbose verbose = new Verbose();
-    public Fastbow(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, type, cancelType, maxVL, enabled, executable, cancellable);
+
+    public Fastbow() {
 
     }
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        return;
     }
 
     @Override

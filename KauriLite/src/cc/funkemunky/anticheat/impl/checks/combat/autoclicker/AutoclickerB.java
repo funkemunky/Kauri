@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.combat.autoclicker;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
@@ -22,6 +23,8 @@ import java.util.LinkedList;
         Packet.Client.LEGACY_POSITION,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
+@cc.funkemunky.api.utils.Init
+@CheckInfo(name = "AutoClicker (Type B)", description = "Looks for suspicious consistencies in CPS averages.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 20)
 public class AutoclickerB extends Check {
 
     private final Deque<Double> averageDeque = new LinkedList<>();
@@ -29,13 +32,14 @@ public class AutoclickerB extends Check {
     private final double[] averages = new double[]{0.0, 0.0, 0.0, 0.0};
     private int ticks, vl;
     private long timestamp;
-    public AutoclickerB(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, type, cancelType, maxVL, enabled, executable, cancellable);
+
+    public AutoclickerB() {
+
     }
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(packetType.contains("Position") || packetType.contains("Look") || packetType.equals(Packet.Client.FLYING)) {
+        if (packetType.contains("Position") || packetType.contains("Look") || packetType.equals(Packet.Client.FLYING)) {
             ticks++;
 
             if (ticks == 20 && cps[3] > 4) { // 20 ticks = 1 second
@@ -71,7 +75,7 @@ public class AutoclickerB extends Check {
                 this.pass();
                 ticks = 0;
             }
-        } else if(!MiscUtils.shouldReturnArmAnimation(getData())) {
+        } else if (!MiscUtils.shouldReturnArmAnimation(getData())) {
             cps[3] = cps[3] + 1;
 
             val now = timestamp;

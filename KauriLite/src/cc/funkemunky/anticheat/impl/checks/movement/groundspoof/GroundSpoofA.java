@@ -1,22 +1,26 @@
-package cc.funkemunky.anticheat.impl.checks.movement;
+package cc.funkemunky.anticheat.impl.checks.movement.groundspoof;
 
-import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
+import cc.funkemunky.api.utils.BlockUtils;
 import lombok.val;
+import org.bukkit.block.Block;
 import org.bukkit.event.Event;
 
 @Packets(packets = {Packet.Client.POSITION_LOOK,
         Packet.Client.POSITION,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_POSITION})
-public class GroundSpoof extends Check {
+@cc.funkemunky.api.utils.Init
+@CheckInfo(name = "GroundSpoof (Type A)", description = "Makes sure the ground boolean received from the client is legitimate", maxVL = 200, executable = false, developer = true)
+public class GroundSpoofA extends Check {
     private int vl;
     private long lastTimeStamp;
-    public GroundSpoof(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, type, cancelType, maxVL, enabled, executable, cancellable);
+
+    public GroundSpoofA() {
+
     }
 
     @Override
@@ -26,9 +30,10 @@ public class GroundSpoof extends Check {
                 || move.getTo().toVector().distance(move.getFrom().toVector()) < 0.005 || timeStamp < lastTimeStamp + 5)
             return;
 
+        Block block = BlockUtils.getBlock(getData().getPlayer().getLocation());
         if (!getData().isGeneralCancel() && !move.isBlocksOnTop()) {
-            if(move.isClientOnGround() != move.isServerOnGround()) {
-                if((!move.isNearGround() && getData().getLastServerPos().hasPassed(6) && move.getAirTicks() > 2) || vl++ > 5) {
+            if (move.isClientOnGround() != move.isServerOnGround() && !move.isLagging()) {
+                if ((!move.isNearGround() && getData().getLastServerPos().hasPassed(6) && move.getAirTicks() > 2) || vl++ > 5) {
                     flag(getData().getMovementProcessor().isClientOnGround() + "!=" + getData().getMovementProcessor().isServerOnGround(), true, true);
                 }
             } else {

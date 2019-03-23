@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.combat.killaura;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.TickTimer;
@@ -19,9 +20,11 @@ import org.bukkit.event.Event;
         Packet.Client.POSITION_LOOK,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
+@cc.funkemunky.api.utils.Init
+@CheckInfo(name = "Killaura (Type F)", description = "A simple angle consistency check.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, cancellable = false, executable = false)
 public class KillauraF extends Check {
-    public KillauraF(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, type, cancelType, maxVL, enabled, executable, cancellable);
+    public KillauraF() {
+
     }
 
     private RollingAverage average = new RollingAverage(20);
@@ -31,14 +34,14 @@ public class KillauraF extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(packetType.equals(Packet.Client.USE_ENTITY)) {
+        if (packetType.equals(Packet.Client.USE_ENTITY)) {
             WrappedInUseEntityPacket use = new WrappedInUseEntityPacket(packet, getData().getPlayer());
 
-            if(!(use.getEntity() instanceof LivingEntity)) return;
+            if (!(use.getEntity() instanceof LivingEntity)) return;
 
             target = (LivingEntity) use.getEntity();
             timer.reset();
-        } else if(target != null && timer.hasNotPassed()) {
+        } else if (target != null && timer.hasNotPassed()) {
             val player = getData().getPlayer();
             val offsetArray = MathUtils.getOffsetFromEntity(getData().getPlayer(), target);
 
@@ -46,10 +49,10 @@ public class KillauraF extends Check {
 
             double offset = offsetArray[0], average = this.average.getAverage();
 
-            if (average < 5.0 && (player.isSprinting() || yawDelta > 2.0) && yawDelta > 0.3 && getData().getMovementProcessor().getDeltaXZ() > 0.15 && vl++ > 50) {
+            if (average < 5.0 && (player.isSprinting() || yawDelta > 2.0) && yawDelta > 0.3 && getData().getMovementProcessor().getDeltaXZ() > 0.15 && vl++ > 100) {
                 flag(average + "<-4.0->" + vl, true, true);
             } else {
-                vl-= vl > 0 ? 0.5f : 0;
+                vl -= vl > 0 ? 2f : 0;
             }
 
             debug(average + ", " + offset + ", " + vl);

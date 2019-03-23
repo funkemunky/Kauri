@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.combat.autoclicker;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
@@ -11,6 +12,8 @@ import lombok.val;
 import org.bukkit.event.Event;
 
 @Packets(packets = {Packet.Client.ARM_ANIMATION})
+@cc.funkemunky.api.utils.Init
+@CheckInfo(name = "Autoclicker (Type A)", description = "A unique fast click check that detects jumps in CPS much faster.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT)
 public class AutoclickerA extends Check {
 
     @Setting(name = "maxCPS")
@@ -26,11 +29,12 @@ public class AutoclickerA extends Check {
     private double deduct = 0.25;
 
     private long lastTimeStamp;
-    private int vl;
+    private double vl;
 
-    public AutoclickerA(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, type, cancelType, maxVL, enabled, executable, cancellable);
+    public AutoclickerA() {
+
     }
+
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
@@ -38,7 +42,7 @@ public class AutoclickerA extends Check {
 
         val elapsed = timeStamp - lastTimeStamp;
 
-        if(elapsed < 2) return;
+        if (elapsed < 2) return;
         val cps = 1000D / elapsed;
 
         if (cps > maxCPS && !getData().isLagging()) {

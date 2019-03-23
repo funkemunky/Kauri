@@ -30,7 +30,7 @@ public interface Menu extends Iterable<Button> {
      * When you choose the option you open a new GUI that lists the information,
      * then on close it re-opens the list menu)
      *
-     * @return the {@link Optional< Menu >}
+     * @return the {@link Optional<  Menu  >}
      */
     Optional<Menu> getParent();
 

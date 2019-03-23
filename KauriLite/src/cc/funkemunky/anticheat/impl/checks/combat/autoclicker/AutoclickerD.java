@@ -2,65 +2,85 @@ package cc.funkemunky.anticheat.impl.checks.combat.autoclicker;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
+import cc.funkemunky.api.utils.MathUtils;
+import lombok.val;
 import org.bukkit.event.Event;
 
-@Packets(packets = {
-        Packet.Client.ARM_ANIMATION,
-        Packet.Client.FLYING,
-        Packet.Client.POSITION,
-        Packet.Client.POSITION_LOOK,
-        Packet.Client.LOOK,
-        Packet.Client.LEGACY_POSITION,
-        Packet.Client.LEGACY_POSITION_LOOK,
-        Packet.Client.LEGACY_LOOK})
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+@Packets(packets = {Packet.Client.ARM_ANIMATION})
+@cc.funkemunky.api.utils.Init
+@CheckInfo(name = "Autoclicker (Type D)", description = "A normal click consistency check.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 50, executable = false)
 public class AutoclickerD extends Check {
 
-    private int swingTicks, flyingTicks, lastFlyingTicks, outliner, lastOutliner;
+    private long lastTimeStamp, lastRange;
+    private double vl;
+    private List<Long> times = new CopyOnWriteArrayList<>();
 
-    public AutoclickerD(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, type, cancelType, maxVL, enabled, executable, cancellable);
+    public AutoclickerD() {
+
     }
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(MiscUtils.shouldReturnArmAnimation(getData())) return;
-        if (packetType.equals(Packet.Client.ARM_ANIMATION)) {
-            swingTicks++;
+        val elapsed = timeStamp - lastTimeStamp;
 
-            if (swingTicks == 5) {
-                
-                if (flyingTicks == lastFlyingTicks) {
-                    outliner++;
-                }
+        if (elapsed > 2 && !MiscUtils.shouldReturnArmAnimation(getData())) {
+            if (times.size() >= 20) {
+                val range = getRange(times);
+                val average = getAverageCPS(times);
 
-                if (outliner == lastOutliner) {
-                    outliner = 0;
-                }
+                if (average > 9 && (range < 65 || MathUtils.getDelta(range, lastRange) < 3)) {
+                    if (vl++ > 5)
+                        flag(range + "<-65 || " + range + "≈" + lastRange + " [" + MathUtils.round(average, 2) + " CPS]", true, true);
+                } else vl -= vl > 0 ? 0.5 : 0;
 
-                if (flyingTicks > 22) {
-                    outliner /= 4;
-                }
-
-                if (outliner > 6) {
-                    this.flag("L: " + outliner, false, true);
-                }
-
-                lastFlyingTicks = flyingTicks;
-                lastOutliner = outliner;
-                flyingTicks = 0;
-                swingTicks = 0;
+                debug("VL: " + vl + " RANGE: " + range + " AVERAGE: " + average);
+                lastRange = range;
+                times.clear();
+            } else {
+                times.add(elapsed);
             }
-        } else {
-            flyingTicks++;
         }
+
+        debug(getData().isBreakingBlock() + " , " + getData().getLastBlockPlace().getPassed());
+
+        lastTimeStamp = timeStamp;
     }
 
     @Override
     public void onBukkitEvent(Event event) {
 
+    }
+
+    private long getRange(List<Long> list) {
+        List<Long> use = new ArrayList<>(list);
+        Collections.sort(use);
+
+        return MathUtils.getDelta(use.get(0), use.get(use.size() - 1));
+    }
+
+    private double getAverageCPS(List<Long> list) {
+        List<Double> use = new ArrayList<>();
+
+        list.forEach(value -> use.add(1000D / value));
+
+        double total = 0;
+
+        for (double value : use) {
+            total += value;
+        }
+
+        total /= use.size();
+
+        return total;
     }
 }

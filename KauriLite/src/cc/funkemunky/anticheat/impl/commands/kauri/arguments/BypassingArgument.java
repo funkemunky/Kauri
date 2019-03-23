@@ -1,6 +1,5 @@
 package cc.funkemunky.anticheat.impl.commands.kauri.arguments;
 
-import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.api.commands.FunkeArgument;
 import cc.funkemunky.api.commands.FunkeCommand;
 import org.bukkit.Bukkit;
@@ -18,13 +17,13 @@ public class BypassingArgument extends FunkeArgument {
 
     @Override
     public void onArgument(CommandSender sender, Command command, String[] args) {
-        if(args.length > 0) {
+        if (args.length > 0) {
             OfflinePlayer player = Bukkit.getOfflinePlayer(args[0]);
 
-            if(player != null) {
+            if (player != null) {
                 boolean bypassing = Kauri.getInstance().getCheckManager().isBypassing(player.getUniqueId());
 
-                if(args.length > 1) bypassing = Boolean.parseBoolean(args[1]);
+                if (args.length > 1) bypassing = Boolean.parseBoolean(args[1]);
 
                 Kauri.getInstance().getCheckManager().setBypassing(player.getUniqueId(), bypassing);
             }

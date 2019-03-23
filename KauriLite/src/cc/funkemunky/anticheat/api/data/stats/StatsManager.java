@@ -1,6 +1,5 @@
 package cc.funkemunky.anticheat.api.data.stats;
 
-import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.database.Database;
@@ -54,7 +53,7 @@ public class StatsManager {
     }
 
     public void addFlag(int amount) {
-        flagged+= amount;
+        flagged += amount;
     }
 
     public void addBan() {

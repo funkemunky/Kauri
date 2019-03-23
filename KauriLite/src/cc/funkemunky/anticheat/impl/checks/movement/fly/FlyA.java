@@ -1,7 +1,8 @@
-package cc.funkemunky.anticheat.impl.checks.movement;
+package cc.funkemunky.anticheat.impl.checks.movement.fly;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
@@ -12,14 +13,15 @@ import org.bukkit.event.Event;
 
 
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.POSITION, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION})
+@cc.funkemunky.api.utils.Init
+@CheckInfo(name = "Fly (Type A)", description = "A simple acceleration check for flight.", type = CheckType.FLY, cancelType = CancelType.MOTION, maxVL = 150)
 public class FlyA extends Check {
 
     private int verbose;
     private Verbose verboseLow = new Verbose();
     private long lastTimeStamp;
 
-    public FlyA(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, type, cancelType, maxVL, enabled, executable, cancellable);
+    public FlyA() {
 
     }
 
@@ -32,7 +34,7 @@ public class FlyA extends Check {
            We check if it's less than 1E-4 for some compensation of inconsistencies that happen very often due to netty.
          */
 
-        if (timeStamp - lastTimeStamp > 1) {
+        if (timeStamp - lastTimeStamp > 12) {
             if (move.getAirTicks() > 2
                     && Math.abs(move.getClientYAcceleration()) < 1E-5) {
                 if (verboseLow.flag(4, 800))

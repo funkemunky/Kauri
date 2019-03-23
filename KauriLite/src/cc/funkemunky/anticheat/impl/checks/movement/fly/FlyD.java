@@ -1,7 +1,8 @@
-package cc.funkemunky.anticheat.impl.checks.movement;
+package cc.funkemunky.anticheat.impl.checks.movement.fly;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
@@ -11,9 +12,11 @@ import lombok.val;
 import org.bukkit.event.Event;
 
 @Packets(packets = {Packet.Client.LEGACY_POSITION, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.POSITION_LOOK, Packet.Client.POSITION})
+@cc.funkemunky.api.utils.Init
+@CheckInfo(name = "Fly (Type D)", description = "Makes sure the client is accelerating towards the ground properly.", type = CheckType.FLY, cancelType = CancelType.MOTION, maxVL = 200)
 public class FlyD extends Check {
-    public FlyD(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, type, cancelType, maxVL, enabled, executable, cancellable);
+    public FlyD() {
+
     }
 
     private double lastYChange;
@@ -21,7 +24,7 @@ public class FlyD extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(getData().getLastServerPos().hasNotPassed(1)) return;
+        if (getData().getLastServerPos().hasNotPassed(1)) return;
         val move = getData().getMovementProcessor();
         val from = move.getFrom();
         val to = move.getTo();
@@ -36,7 +39,7 @@ public class FlyD extends Check {
             val offset = Math.abs(yChange - predictedY);
 
             if (!MathUtils.approxEquals(0.00001, yChange, predictedY)) {
-                if(vl++ > 2) {
+                if (vl++ > 2) {
                     this.flag("O -> " + offset, false, true);
                 }
             } else {

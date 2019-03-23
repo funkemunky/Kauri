@@ -1,7 +1,7 @@
-package cc.funkemunky.anticheat.impl.checks.movement;
+package cc.funkemunky.anticheat.impl.checks.movement.speed;
 
-import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Verbose;
@@ -16,13 +16,15 @@ import org.bukkit.potion.PotionEffectType;
         Packet.Client.POSITION,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_POSITION})
+@cc.funkemunky.api.utils.Init
+@CheckInfo(name = "Speed (Type A)", description = "A basic maximum speed check with a verbose threshold.", type = CheckType.SPEED)
 public class SpeedA extends Check {
 
     private Verbose verbose = new Verbose();
     private long lastTimeStamp;
 
-    public SpeedA(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, type, cancelType, maxVL, enabled, executable, cancellable);
+    public SpeedA() {
+
     }
 
     @Override

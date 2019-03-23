@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.combat.killaura;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
@@ -16,6 +17,8 @@ import java.util.LinkedList;
         Packet.Client.LOOK,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
+@cc.funkemunky.api.utils.Init
+@CheckInfo(name = "Killaura (Type D)", description = "Detects over-randomization in killauras.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT)
 public class KillauraD extends Check {
 
     private float lastYaw, lastPitch;
@@ -23,8 +26,8 @@ public class KillauraD extends Check {
             pitchDeque = new LinkedList<>();
     private int vl;
 
-    public KillauraD(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, type, cancelType, maxVL, enabled, executable, cancellable);
+    public KillauraD() {
+
     }
 
     @Override
@@ -34,6 +37,10 @@ public class KillauraD extends Check {
 
         val yawChange = Math.abs(yaw - lastYaw);
         val pitchChange = Math.abs(pitch - lastPitch);
+
+        if (yawChange > 25.f) {
+            return;
+        }
 
         yawDeque.add(yawChange);
         yawDeque.add(pitchChange);
@@ -61,7 +68,6 @@ public class KillauraD extends Check {
         this.lastPitch = pitch;
 
         debug(vl + ": " + yawChange);
-        return;
     }
 
     @Override

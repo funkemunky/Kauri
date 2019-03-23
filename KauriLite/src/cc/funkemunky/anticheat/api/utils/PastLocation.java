@@ -13,15 +13,17 @@ public class PastLocation {
     private List<CustomLocation> previousLocations = new CopyOnWriteArrayList<>();
 
     public CustomLocation getPreviousLocation(long time) {
-        return previousLocations.stream().min(Comparator.comparingLong(loc -> Math.abs(loc.getTimeStamp() - (System.currentTimeMillis() - time)))).orElse(previousLocations.get(previousLocations.size() - 1));
+        return previousLocations.stream().min(Comparator.comparingLong(loc -> Kauri.getInstance().getCurrentTicks() - MiscUtils.millisToTicks(time) - loc.getTicks())).orElse(previousLocations.get(previousLocations.size() - 1));
     }
 
     public List<CustomLocation> getEstimatedLocation(long time, long delta) {
         List<CustomLocation> locs = new ArrayList<>();
 
+        int currentTicks = Kauri.getInstance().getCurrentTicks();
+
         previousLocations.stream()
-                .sorted(Comparator.comparingLong(loc -> Math.abs(loc.getTimeStamp() - (System.currentTimeMillis() - time))))
-                .filter(loc -> Math.abs(loc.getTimeStamp() - (System.currentTimeMillis() - time)) < delta)
+                .sorted(Comparator.comparingLong(loc -> currentTicks - MiscUtils.millisToTicks(time) - loc.getTicks()))
+                .filter(loc -> currentTicks - MiscUtils.millisToTicks(time) - loc.getTicks() < delta)
                 .forEach(locs::add);
         return locs;
     }

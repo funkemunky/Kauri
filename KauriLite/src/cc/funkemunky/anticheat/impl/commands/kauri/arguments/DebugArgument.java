@@ -21,6 +21,8 @@ public class DebugArgument extends FunkeArgument {
         super(parent, name, display, description, permission);
 
         addTabComplete(2, "none");
+        addTabComplete(2, "box");
+        addTabComplete(2, "packets");
         List<String> checks = new ArrayList<>();
         Kauri.getInstance().getCheckManager().getChecks().forEach(check -> checks.add(check.getName().replaceAll(" ", "_")));
 
@@ -42,10 +44,30 @@ public class DebugArgument extends FunkeArgument {
                 if (args[1].equalsIgnoreCase("box")) {
                     data.setDebuggingBox(!data.isDebuggingBox());
                     sender.sendMessage(Color.Gray + "Set box debug to: " + Color.White + data.isDebuggingBox());
-                } else if(args[1].equalsIgnoreCase("none")) {
+                } else if (args[1].equalsIgnoreCase("none")) {
                     data.setDebuggingCheck(null);
+                    data.setDebuggingPackets(false);
                     data.setDebuggingPlayer(null);
                     sender.sendMessage(Color.Red + "Stopped any debug messages from being sent to you.");
+                } else if (args[1].equalsIgnoreCase("packets")) {
+                    if (args.length == 3) {
+                        data.setDebuggingPlayer(player.getUniqueId());
+                        data.setDebuggingPackets(true);
+                        data.setSpecificPacketDebug(args[2]);
+
+                        sender.sendMessage(Color.Green + "You are now debugging your packets.");
+                    } else {
+                        Player target = Bukkit.getPlayer(args[2]);
+
+                        if (target != null) {
+                            data.setDebuggingPlayer(target.getUniqueId());
+                            data.setDebuggingPackets(true);
+                            data.setSpecificPacketDebug(args[3]);
+                            sender.sendMessage(Color.Green + "You are now debugging " + target.getName() + "'s packets.");
+                        } else {
+                            sender.sendMessage(Color.Red + "The player \"" + args[2] + "\" is not online!");
+                        }
+                    }
                 } else {
                     Check check = Kauri.getInstance().getCheckManager().getCheck(args[1].replaceAll("_", " "));
 

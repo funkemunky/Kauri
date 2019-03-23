@@ -19,7 +19,7 @@ public class CheckSettings {
     static boolean broadcastEnabled = false;
 
     @ConfigSetting(path = "executable.broadcast", name = "message")
-    static String broadcastMessage = "&8[&6&lKauri&8] &e%player% &7has been removed for cheating.";
+    static String broadcastMessage = "&8--------------------------------\n&6&lKauri &7has removed &e%player% from the server for cheating.\n&8--------------------------------";
 
     @ConfigSetting(path = "alerts", name = "alertsDelay")
     public static long alertsDelay = 1000;

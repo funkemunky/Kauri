@@ -12,15 +12,15 @@ public class VelocityProcessor {
     private TickTimer lastVelocity = new TickTimer(40);
 
     public void update(WrappedOutVelocityPacket packet) {
-        if(packet.getId() != packet.getPlayer().getEntityId()) return;
+        if(packet.getId() == packet.getPlayer().getEntityId()) {
+            maxVertical = motionY = (float) packet.getY();
+            maxHorizontal = (float) cc.funkemunky.anticheat.api.utils.MiscUtils.hypot(packet.getX(), packet.getZ());
 
-        maxVertical = motionY = (float) packet.getY();
-        maxHorizontal = (float) cc.funkemunky.anticheat.api.utils.MiscUtils.hypot(packet.getX(), packet.getZ());
+            lastVelocity.reset();
 
-        lastVelocity.reset();
-
-        motionX = (float) packet.getX();
-        motionZ = (float) packet.getZ();
+            motionX = (float) packet.getX();
+            motionZ = (float) packet.getZ();
+        }
     }
 
     public void update(WrappedInFlyingPacket packet) {
@@ -30,27 +30,27 @@ public class VelocityProcessor {
 
         var multiplier = 0.91f;
 
-        if(packet.isGround()) multiplier*= 0.68f;
+        if (packet.isGround()) multiplier = 0.68f;
 
         motionX *= multiplier;
         motionZ *= multiplier;
 
-        if(packet.isGround()) {
+        if (packet.isGround()) {
             motionY = 0;
-        } else if(motionY > 0) {
+        } else if (motionY > 0) {
             motionY -= 0.08f;
             motionY *= 0.98f;
         }
 
-        if(motionY < 0.0005) {
+        if (motionY < 0.0005) {
             motionY = 0;
         }
 
-        if(motionX < 0.0005) {
+        if (motionX < 0.0005) {
             motionX = 0;
         }
 
-        if(motionZ < 0.0005) {
+        if (motionZ < 0.0005) {
             motionZ = 0;
         }
         lastMotionX = this.motionX;

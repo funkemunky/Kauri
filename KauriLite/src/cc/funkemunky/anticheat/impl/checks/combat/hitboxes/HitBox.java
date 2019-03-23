@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.combat.hitboxes;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.CustomLocation;
 import cc.funkemunky.anticheat.api.utils.Packets;
@@ -29,8 +30,9 @@ import java.util.List;
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_POSITION,
         Packet.Client.LEGACY_LOOK})
+@cc.funkemunky.api.utils.Init
+@CheckInfo(name = "HitBox", description = "A very accurate hit-box check, using a mixture of ray-tracing and bounding-boxes.", type = CheckType.COMBAT, cancelType = CancelType.COMBAT, maxVL = 50)
 public class HitBox extends Check {
-
     @Setting(name = "pingLeniency")
     private int pingLeniency = 200;
 
@@ -41,14 +43,14 @@ public class HitBox extends Check {
 
     private List<EntityType> type = new ArrayList<>(Arrays.asList(EntityType.PLAYER, EntityType.VILLAGER, EntityType.SKELETON, EntityType.BLAZE, EntityType.ZOMBIE, EntityType.PIG_ZOMBIE, EntityType.CREEPER, EntityType.SNOWMAN));
 
-    public HitBox(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, type, cancelType, maxVL, enabled, executable, cancellable);
+    public HitBox() {
+
     }
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val target = getData().getTarget();
-        if(getData().getLastAttack().hasNotPassed(0) && target != null && type.contains(target.getType()) && target.getWorld().getUID().equals(getData().getPlayer().getWorld().getUID())) {
+        if (getData().getLastAttack().hasNotPassed(0) && target != null && type.contains(target.getType()) && target.getWorld().getUID().equals(getData().getPlayer().getWorld().getUID())) {
             PastLocation location = getData().getEntityPastLocation();
             if (getData().getTransPing() > 400) return;
             List<BoundingBox> boxes = new ArrayList<>();
@@ -83,7 +85,7 @@ public class HitBox extends Check {
     }
 
     private BoundingBox getHitbox(LivingEntity entity, CustomLocation l) {
-        Vector dimensions = MiscUtils.entityDimensions.getOrDefault(entity.getType(), new Vector(0.4, 2,0.4));
-        return new BoundingBox(0, 0, 0, 0, 0, 0).add((float) l.getX(), (float) l.getY(), (float) l.getZ()).grow((float) dimensions.getX(), (float) dimensions.getY(), (float) dimensions.getZ()).grow(.15f, 0.15f, .15f);
+        Vector dimensions = MiscUtils.entityDimensions.getOrDefault(entity.getType(), new Vector(0.4, 2, 0.4));
+        return new BoundingBox(0, 0, 0, 0, 0, 0).add((float) l.getX(), (float) l.getY(), (float) l.getZ()).grow((float) dimensions.getX(), (float) dimensions.getY(), (float) dimensions.getZ()).grow(.25f, 0.15f, .25f);
     }
 }

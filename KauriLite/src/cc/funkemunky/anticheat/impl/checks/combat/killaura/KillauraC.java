@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.combat.killaura;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Verbose;
@@ -15,12 +16,14 @@ import org.bukkit.event.Event;
 import org.bukkit.potion.PotionEffectType;
 
 @Packets(packets = {Packet.Client.USE_ENTITY, Packet.Client.ENTITY_ACTION})
+@cc.funkemunky.api.utils.Init
+@CheckInfo(name = "Killaura (Type C)", description = "Checks for clients sprinting while attacking.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, maxVL = 60)
 public class KillauraC extends Check {
     private Verbose verbose = new Verbose();
     private boolean isSprinting;
 
-    public KillauraC(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, type, cancelType, maxVL, enabled, executable, cancellable);
+    public KillauraC() {
+
     }
 
     @Override
@@ -44,13 +47,12 @@ public class KillauraC extends Check {
             if (use.getEntity() instanceof Player && use.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) { //A player only stops sprinting when hitting a player.
                 double deltaXZ = MathUtils.getHorizontalDistance(getData().getMovementProcessor().getTo().toLocation(use.getPlayer().getWorld()), getData().getMovementProcessor().getFrom().toLocation(use.getPlayer().getWorld()));
                 if (!getData().isGeneralCancel() && (deltaXZ > getBaseSpeed() && isSprinting)) {
-                    if (verbose.flag(10, 850L)) { //We add a verbose or redundancy.
+                    if (verbose.flag(15, 800L)) { //We add a verbose or redundancy.
                         flag(deltaXZ + ">-" + getBaseSpeed(), true, true);
                     }
                 }
             }
         }
-        return;
     }
 
     @Override

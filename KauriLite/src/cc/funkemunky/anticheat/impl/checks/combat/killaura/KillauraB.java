@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.combat.killaura;
 
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
@@ -14,28 +15,28 @@ import org.bukkit.event.Event;
         Packet.Client.LOOK,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
+@cc.funkemunky.api.utils.Init
+@CheckInfo(name = "Killaura (Type B)", description = "Checks for an overall flaw in the rotations of many killauras", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, maxVL = 175)
 public class KillauraB extends Check {
-    public KillauraB(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, type, cancelType, maxVL, enabled, executable, cancellable);
+    public KillauraB() {
+
     }
 
-    private float lastPitchDelta, lastYawDelta;
+    private float lastPitchDelta;
     private double vl;
-    private long lastGCD;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(getData().getLastAttack().hasNotPassed(4)) {
+        if (getData().getLastAttack().hasNotPassed(4)) {
             val to = getData().getMovementProcessor().getTo();
             val from = getData().getMovementProcessor().getFrom();
             val pitchDifference = Math.abs(from.getPitch() - to.getPitch());
-            val yawDifference = Math.abs(from.getYaw() - to.getYaw());
 
             val offset = 16777216L;
             val pitchGCD = MiscUtils.gcd((long) (pitchDifference * offset), (long) (lastPitchDelta * offset));
 
-            if (Math.abs(to.getPitch()) < 88.0f && pitchDifference > 0  && getData().getMovementProcessor().getOptifineTicks() < 10 && pitchGCD < 131072L) {
-                if(vl++ > 100) {
+            if (Math.abs(to.getPitch()) < 88.0f && pitchDifference > 0 && getData().getMovementProcessor().getOptifineTicks() < 10 && pitchGCD < 131072L) {
+                if (vl++ > 100) {
                     flag(String.valueOf(pitchGCD / 2000), true, true);
                 }
             } else {
@@ -45,10 +46,7 @@ public class KillauraB extends Check {
             debug("VL: " + vl + " PITCH: " + pitchGCD + " OPTIFINE: " + getData().isCinematicMode());
 
             lastPitchDelta = pitchDifference;
-            lastYawDelta = yawDifference;
-            lastGCD = pitchGCD;
         }
-        return;
     }
 
     @Override

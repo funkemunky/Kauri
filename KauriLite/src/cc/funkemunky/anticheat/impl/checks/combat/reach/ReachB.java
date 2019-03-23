@@ -1,9 +1,8 @@
 package cc.funkemunky.anticheat.impl.checks.combat.reach;
 
 import cc.funkemunky.anticheat.Kauri;
-import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.utils.DynamicRollingAverage;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
@@ -14,6 +13,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 
 @Packets(packets = {Packet.Client.USE_ENTITY})
+@cc.funkemunky.api.utils.Init
+@CheckInfo(name = "Reach (Type B)", description = "A simple and light, but extremely effective maximum reach calculation. However, slightly experimental.", developer = true, maxVL = 60, executable = false)
 public class ReachB extends Check {
     @Setting(name = "threshold.vl.max")
     static double maxVL = 8.0;
@@ -25,15 +26,15 @@ public class ReachB extends Check {
     private DynamicRollingAverage reachAvg = new DynamicRollingAverage(5);
     private double vl;
 
-    public ReachB(String name, CheckType type, CancelType cancelType, int maxVL, boolean enabled, boolean executable, boolean cancellable) {
-        super(name, type, cancelType, maxVL, enabled, executable, cancellable);
+    public ReachB() {
+
     }
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         WrappedInUseEntityPacket useEvent = new WrappedInUseEntityPacket(packet, getData().getPlayer());
 
-        if(getData().isGeneralCancel()) return;
+        if (getData().isGeneralCancel()) return;
         if (useEvent.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK) && useEvent.getEntity() instanceof Player) {
             val player = getData().getPlayer();
             val entity = (Player) useEvent.getEntity();
