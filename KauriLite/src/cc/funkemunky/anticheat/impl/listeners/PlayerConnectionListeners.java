@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.impl.listeners;
 
+import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import org.bukkit.Achievement;

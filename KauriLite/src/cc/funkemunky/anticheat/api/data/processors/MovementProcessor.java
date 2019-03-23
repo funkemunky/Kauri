@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.api.data.processors;
 
+import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.*;

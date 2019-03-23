@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.api.utils;
 
+import cc.funkemunky.anticheat.Kauri;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;

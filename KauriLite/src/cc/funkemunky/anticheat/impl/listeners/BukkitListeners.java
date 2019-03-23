@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.impl.listeners;
 
+import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.utils.BukkitEvents;

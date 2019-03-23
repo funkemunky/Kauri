@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.impl.listeners;
 
+import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckSettings;
 import cc.funkemunky.anticheat.api.data.PlayerData;

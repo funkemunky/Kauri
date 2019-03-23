@@ -1,5 +1,7 @@
 package cc.funkemunky.anticheat.api.utils;
 
+import cc.funkemunky.anticheat.Kauri;
+
 
 public class TickTimer {
     private int ticks = Kauri.getInstance().getCurrentTicks(), defaultPassed;

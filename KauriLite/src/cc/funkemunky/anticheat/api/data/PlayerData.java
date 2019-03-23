@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.api.data;
 
+import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckSettings;

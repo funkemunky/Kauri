@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.impl.menu;
 
+import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.menu.Menu;
@@ -116,7 +117,7 @@ public class MenuUtils {
                         "&eEnabled&7: &f" + check.isEnabled(),
                         "&eExecutable&7: &f" + check.isExecutable(),
                         "&eCancellable&7: &f" + check.isCancellable(),
-                        "&eType&7: &f" + check.getType().toString(),
+                        "",
                         "&eInstructions&7:",
                         "&8- &fLeft Click &7to toggle check on/off.",
                         "&8- &fShift + Left Click &7to toggle check executable-abilities.",

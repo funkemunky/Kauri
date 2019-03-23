@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.api.data.logging;
 
+import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.database.Database;

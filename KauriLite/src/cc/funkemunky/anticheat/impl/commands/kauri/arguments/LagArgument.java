@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.impl.commands.kauri.arguments;
 
+import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.utils.Pastebin;
 import cc.funkemunky.api.commands.FunkeArgument;

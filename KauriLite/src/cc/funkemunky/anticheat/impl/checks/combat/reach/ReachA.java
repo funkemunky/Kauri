@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.combat.reach;
 
+import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
