@@ -4,21 +4,6 @@ import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.utils.BukkitEvents;
 import cc.funkemunky.anticheat.api.utils.Packets;
-import cc.funkemunky.anticheat.api.utils.Setting;
-import cc.funkemunky.anticheat.impl.checks.combat.aimassist.*;
-import cc.funkemunky.anticheat.impl.checks.combat.autoclicker.*;
-import cc.funkemunky.anticheat.impl.checks.combat.fastbow.Fastbow;
-import cc.funkemunky.anticheat.impl.checks.combat.hitboxes.HitBox;
-import cc.funkemunky.anticheat.impl.checks.combat.killaura.*;
-import cc.funkemunky.anticheat.impl.checks.combat.reach.*;
-import cc.funkemunky.anticheat.impl.checks.movement.*;
-import cc.funkemunky.anticheat.impl.checks.movement.fly.*;
-import cc.funkemunky.anticheat.impl.checks.movement.jesus.JesusA;
-import cc.funkemunky.anticheat.impl.checks.movement.speed.SpeedA;
-import cc.funkemunky.anticheat.impl.checks.movement.speed.SpeedB;
-import cc.funkemunky.anticheat.impl.checks.movement.speed.SpeedC;
-import cc.funkemunky.anticheat.impl.checks.movement.speed.SpeedD;
-import cc.funkemunky.anticheat.impl.checks.player.badpackets.*;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import lombok.Getter;
 import lombok.Setter;
@@ -49,7 +34,17 @@ public class CheckManager {
     }
 
     public void loadChecksIntoData(PlayerData data) {
-        List<Check> checkList = new ArrayList<>(checks);
+        List<Check> checkInit = new ArrayList<>(this.checks);
+
+        List<Check> checkList = new ArrayList<>();
+
+        try {
+            for (Check check : checkInit) {
+                checkList.add((Check) check.getClass().newInstance());
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
 
         checkList.forEach(check -> check.setData(data));
 
