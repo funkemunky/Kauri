@@ -32,14 +32,14 @@ public class MenuUtils {
         boolean isBeginning = page <= 1, isEnd = page >= CheckType.values().length;
         Kauri.getInstance().getCheckManager().getChecks().stream().filter(check -> check.getType().equals(type)).forEach(check -> menu.addItem(checkButton(check, page)));
 
-        if(!isBeginning) {
+        if (!isBeginning) {
             menu.setItem(48, createButton(false, MiscUtils.createItem(Material.SIGN, 1, Color.Gray + "Backward Page: " + Color.White + (page - 1)), (player, infoPair) -> {
                 openCheckEditGUI(player, page - 1);
             }));
         }
 
         menu.setItem(49, createButton(false, MiscUtils.createItem(Material.COMPASS, 1, Color.Red + "Back to Main Menu", "&7&oShift Click"), (player, infoPair) -> {
-            switch(infoPair.getClickType()) {
+            switch (infoPair.getClickType()) {
                 case SHIFT_LEFT:
                 case SHIFT_RIGHT:
                     openMainGUI(player);
@@ -47,13 +47,13 @@ public class MenuUtils {
             }
         }));
 
-        if(!isEnd) {
+        if (!isEnd) {
             menu.setItem(50, createButton(false, MiscUtils.createItem(Material.SIGN, 1, Color.Gray + "Forward Page: " + Color.White + (page + 1)), (player, infoPair) -> {
                 openCheckEditGUI(player, page + 1);
             }));
         }
 
-        if(hasModifiedChecks) {
+        if (hasModifiedChecks) {
             menu.setItem(menu.getMenuDimension().getSize() - 1, saveChangesButton(page));
         }
 
@@ -83,16 +83,16 @@ public class MenuUtils {
         ChestMenu menu = new ChestMenu(Color.Dark_Gray + "Kauri Menu", 3);
 
         menu.setItem(11, createButton(false, MiscUtils.createItem(Material.BOOK_AND_QUILL, 1, Color.Gold + "Edit Check Settings"), ((player2, informationPair) -> {
-            if(informationPair.getClickType().toString().contains("LEFT")) {
+            if (informationPair.getClickType().toString().contains("LEFT")) {
                 openCheckEditGUI(player2, 1);
             }
         })));
 
         menu.setItem(
                 13,
-                createButton(false, MiscUtils.createItem(Material.SIGN, 1, Color.Gold + "Kauri Anticheat", "", "&7You are using &ev" + Kauri.getInstance().getDescription().getVersion() + "&7.", "", "&eBanned&8: &f" + Kauri.getInstance().getStatsManager().getBanned(), "&eFlagged&8: &f" + Kauri.getInstance().getStatsManager().getFlagged() , "", "&7If you have any issues or questions, please", "&fLeft Click &7to get the link to our Support Discord."),
+                createButton(false, MiscUtils.createItem(Material.SIGN, 1, Color.Gold + "Kauri Anticheat", "", "&7You are using &ev" + Kauri.getInstance().getDescription().getVersion() + "&7.", "", "&eBanned&8: &f" + Kauri.getInstance().getStatsManager().getBanned(), "&eFlagged&8: &f" + Kauri.getInstance().getStatsManager().getFlagged(), "", "&7If you have any issues or questions, please", "&fLeft Click &7to get the link to our Support Discord."),
                         ((player, infopair) -> {
-                            if(infopair.getClickType().toString().contains("LEFT")) {
+                            if (infopair.getClickType().toString().contains("LEFT")) {
                                 player.sendMessage(Color.translate("&eOur Support Discord&8: &fhttp://discord.me/Kauri"));
                                 infopair.getMenu().close(player);
                             }
@@ -123,7 +123,7 @@ public class MenuUtils {
                         "&8- &fShift + Left Click &7to toggle check executable-abilities.",
                         "&8- &fRight Click &7to toggle check cancellable-abilities."),
                 ((player2, infoPair) -> {
-                    switch(infoPair.getClickType()) {
+                    switch (infoPair.getClickType()) {
                         case LEFT: {
                             Kauri.getInstance().getConfig().set("checks." + check.getName() + ".enabled", !check.isEnabled());
 
@@ -163,7 +163,7 @@ public class MenuUtils {
                             infoPair.getMenu().buildInventory(false);
                             hasModifiedChecks = true;
                         }
-                            break;
+                        break;
                         case SHIFT_LEFT: {
                             Kauri.getInstance().getConfig().set("checks." + check.getName() + ".executable", !check.isExecutable());
                             check.setExecutable(!check.isExecutable());
@@ -236,7 +236,7 @@ public class MenuUtils {
                                     openCheckEditGUI(player, page + 1);
                                 }));
                             }
-                            
+
                             if (!hasModifiedChecks) {
                                 infoPair.getMenu().setItem(infoPair.getMenu().getMenuDimension().getSize() - 1, saveChangesButton(page));
                             }

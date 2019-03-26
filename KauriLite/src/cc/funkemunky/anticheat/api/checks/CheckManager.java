@@ -1,12 +1,15 @@
 package cc.funkemunky.anticheat.api.checks;
 
+import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.utils.BukkitEvents;
 import cc.funkemunky.anticheat.api.utils.Packets;
+import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -14,6 +17,7 @@ import java.util.concurrent.Executors;
 @Getter
 @Setter
 public class CheckManager {
+    private List<Class<?>> checkClasses = new ArrayList<>();
     private List<Check> checks = new ArrayList<>();
     private Set<UUID> bypassingPlayers = new HashSet<>();
     private ExecutorService alertsExecutable;
@@ -22,9 +26,58 @@ public class CheckManager {
         alertsExecutable = Executors.newFixedThreadPool(2);
     }
 
-    public void registerCheck(Check check) {
-        if ((check.getMinimum() == null || ProtocolVersion.getGameVersion().isOrAbove(check.getMinimum())) && (check.getMaximum() == null || ProtocolVersion.getGameVersion().isBelow(check.getMaximum()))) {
-            checks.add(check);
+    public void registerCheck(Class<?> checkClass, List<Check> checkList) {
+        try {
+            Object obj = checkClass.getConstructors()[0].newInstance();
+            Check check = (Check) obj;
+            CheckInfo info = checkClass.getAnnotation(CheckInfo.class);
+
+            check.setEnabled(info.enabled());
+            check.setExecutable(info.executable());
+            check.setCancellable(info.cancellable());
+            check.setDescription(info.description());
+            check.setMaxVL(info.maxVL());
+            check.setMaximum(info.maxVersion());
+            check.setType(info.type());
+            check.setCancelType(info.cancelType());
+            check.setName(info.name());
+            check.setDeveloper(info.developer());
+
+            checkList.add(check);
+
+            Arrays.stream(check.getClass().getDeclaredFields()).filter(field -> {
+                field.setAccessible(true);
+
+                return field.isAnnotationPresent(Setting.class);
+            }).forEach(field -> {
+                try {
+                    field.setAccessible(true);
+
+                    String path = "checks." + check.getName() + ".settings." + field.getName();
+                    if (Kauri.getInstance().getConfig().get(path) != null) {
+                        Object val = Kauri.getInstance().getConfig().get(path);
+
+                        if (val instanceof Double && field.get(check) instanceof Float) {
+                            field.set(check, (float) (double) val);
+                        } else {
+                            field.set(check, val);
+                        }
+                    } else {
+                        Kauri.getInstance().getConfig().set("checks." + check.getName() + ".settings." + field.getName(), field.get(check));
+                        Kauri.getInstance().saveConfig();
+                    }
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            });
+
+            check.loadFromConfig();
+
+            if ((check.getMinimum() == null || ProtocolVersion.getGameVersion().isOrAbove(check.getMinimum())) && (check.getMaximum() == null || ProtocolVersion.getGameVersion().isBelow(check.getMaximum()))) {
+                checkList.add(check);
+            }
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
         }
     }
 
@@ -33,7 +86,9 @@ public class CheckManager {
     }
 
     public void loadChecksIntoData(PlayerData data) {
-        List<Check> checkList = new ArrayList<>(checks);
+        List<Check> checkList = new ArrayList<>();
+
+        checkClasses.forEach(clazz -> registerCheck(clazz, checkList));
 
         checkList.forEach(check -> check.setData(data));
 

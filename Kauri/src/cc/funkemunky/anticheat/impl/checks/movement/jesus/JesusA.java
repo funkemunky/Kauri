@@ -7,7 +7,6 @@ import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import lombok.val;
 import org.bukkit.event.Event;
 

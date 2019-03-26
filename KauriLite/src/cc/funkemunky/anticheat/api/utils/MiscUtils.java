@@ -50,11 +50,11 @@ public class MiscUtils {
     }
 
     public static CustomLocation findGround(World world, CustomLocation point) {
-        for(int y = point.toVector().getBlockY() ; y > 0 ; y--) {
+        for (int y = point.toVector().getBlockY(); y > 0; y--) {
             CustomLocation loc = new CustomLocation(point.getX(), y, point.getZ());
             Block block = BlockUtils.getBlock(loc.toLocation(world));
 
-            if(block.getType().isBlock() && block.getType().isSolid() && !block.isEmpty()) {
+            if (block.getType().isBlock() && block.getType().isSolid() && !block.isEmpty()) {
                 CustomLocation toReturn = loc.clone();
 
                 toReturn.setY(y + 1);
@@ -109,20 +109,6 @@ public class MiscUtils {
                 || move.isPistonsNear()
                 || move.getTo() != null && move.getTo().toVector().distance(move.getFrom().toVector()) < 0.005
                 || velocity.getLastVelocity().hasNotPassed(velocityTicks);
-    }
-
-    public static float wrapAngleTo180_float(float value) {
-        value = value % 360.0F;
-
-        if (value >= 180.0F) {
-            value -= 360.0F;
-        }
-
-        if (value < -180.0F) {
-            value += 360.0F;
-        }
-
-        return value;
     }
 
     public static Class<?> getClass(String string) {

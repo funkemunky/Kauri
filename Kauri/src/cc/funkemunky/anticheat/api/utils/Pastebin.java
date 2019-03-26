@@ -12,12 +12,10 @@ public class Pastebin {
     static String api_user_key = "15479eb626106167cade921b7d2b7e3c"; //Insert your own api_user_key if you have one.
     static String pasteURL = "http://www.pastebin.com/api/api_post.php";
 
-    public Pastebin()
-    {
+    public Pastebin() {
     }
 
-    static String checkResponse(String response)
-    {
+    static String checkResponse(String response) {
         if (response.substring(0, 15).equals("Bad API request")) {
             return response.substring(17);
         }
@@ -25,8 +23,7 @@ public class Pastebin {
     }
 
     static public String makePaste(String body, String name, Privacy privacy)
-            throws UnsupportedEncodingException
-    {
+            throws UnsupportedEncodingException {
         String content = URLEncoder.encode(body, "UTF-8");
         String title = URLEncoder.encode(name + " report", "UTF-8");
         String data = "api_option=paste&api_user_key=" + Pastebin.api_user_key
@@ -42,8 +39,7 @@ public class Pastebin {
     }
 
     static public String makePaste(String body, String name, Privacy privacy, String expire)
-            throws UnsupportedEncodingException
-    {
+            throws UnsupportedEncodingException {
         String content = URLEncoder.encode(body, "UTF-8");
         String title = URLEncoder.encode(name + " report", "UTF-8");
         String data = "api_option=paste&api_user_key=" + Pastebin.api_user_key
@@ -58,8 +54,7 @@ public class Pastebin {
         return response;
     }
 
-    static String page(String uri, String urlParameters)
-    {
+    static String page(String uri, String urlParameters) {
         URL url;
         HttpURLConnection connection = null;
         try {
@@ -113,6 +108,7 @@ public class Pastebin {
         PUBLIC(0), UNLISTED(1), PRIVATE(2);
 
         private int privacy;
+
         Privacy(int privacy) {
             this.privacy = privacy;
         }

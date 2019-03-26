@@ -36,7 +36,6 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
 
     public Check() {
         alertMessage = CheckSettings.alertMessage;
-        loadFromConfig();
     }
 
     protected void flag(String information, boolean cancel, boolean ban) {
@@ -82,7 +81,7 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
         });
     }
 
-    private void loadFromConfig() {
+    public void loadFromConfig() {
         if (Kauri.getInstance().getConfig().get("checks." + name) != null) {
             maxVL = Kauri.getInstance().getConfig().getInt("checks." + name + ".maxVL");
             enabled = Kauri.getInstance().getConfig().getBoolean("checks." + name + ".enabled");

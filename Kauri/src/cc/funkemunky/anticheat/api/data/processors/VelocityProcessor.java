@@ -12,7 +12,7 @@ public class VelocityProcessor {
     private TickTimer lastVelocity = new TickTimer(40);
 
     public void update(WrappedOutVelocityPacket packet) {
-        if(packet.getId() == packet.getPlayer().getEntityId()) {
+        if (packet.getId() == packet.getPlayer().getEntityId()) {
             maxVertical = motionY = (float) packet.getY();
             maxHorizontal = (float) cc.funkemunky.anticheat.api.utils.MiscUtils.hypot(packet.getX(), packet.getZ());
 

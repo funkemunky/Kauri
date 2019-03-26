@@ -6,11 +6,9 @@ import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.event.system.Listener;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.utils.Color;
-import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.JsonMessage;
 import cc.funkemunky.api.utils.MiscUtils;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
@@ -38,7 +36,6 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
 
     public Check() {
         alertMessage = CheckSettings.alertMessage;
-        loadFromConfig();
     }
 
     protected void flag(String information, boolean cancel, boolean ban) {
@@ -84,7 +81,7 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
         });
     }
 
-    private void loadFromConfig() {
+    public void loadFromConfig() {
         if (Kauri.getInstance().getConfig().get("checks." + name) != null) {
             maxVL = Kauri.getInstance().getConfig().getInt("checks." + name + ".maxVL");
             enabled = Kauri.getInstance().getConfig().getBoolean("checks." + name + ".enabled");

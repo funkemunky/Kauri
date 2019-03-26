@@ -11,14 +11,23 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface CheckInfo {
     String name() default "";
+
     String description() default "Blocks cheats";
+
     CheckType type() default CheckType.MOVEMENT;
+
     CancelType cancelType() default CancelType.MOTION;
+
     int maxVL() default 100;
+
     boolean enabled() default true;
+
     boolean executable() default true;
+
     boolean cancellable() default true;
+
     boolean developer() default false;
+
     ProtocolVersion maxVersion() default ProtocolVersion.V1_13_2;
 
 }

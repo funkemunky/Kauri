@@ -20,10 +20,10 @@ public class GroundSpoofC extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        if(getData().isGeneralCancel() || getData().getLastServerPos().hasNotPassed(1)) return;
+        if (getData().isGeneralCancel() || getData().getLastServerPos().hasNotPassed(1)) return;
 
-        if(move.isServerOnGround() && !move.isClientOnGround() && move.getGroundTicks() > 4) {
-            if(verbose.flag(4, 350L)) {
+        if (move.isServerOnGround() && !move.isClientOnGround() && move.getGroundTicks() > 4) {
+            if (verbose.flag(4, 350L)) {
                 flag("t: " + move.getGroundTicks() + " v: " + verbose.getVerbose(), true, true);
             }
         }

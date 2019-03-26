@@ -1,13 +1,9 @@
 package cc.funkemunky.anticheat.api.utils;
 
-import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
-import cc.funkemunky.anticheat.api.utils.json.JSONException;
-import cc.funkemunky.anticheat.api.utils.json.JSONObject;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.BoundingBox;
-import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.ReflectionsUtil;
 import lombok.val;
 import org.bukkit.Bukkit;
@@ -19,14 +15,8 @@ import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.*;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.reflect.Field;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
 import java.util.*;
 
 public class MiscUtils {
@@ -60,11 +50,11 @@ public class MiscUtils {
     }
 
     public static CustomLocation findGround(World world, CustomLocation point) {
-        for(int y = point.toVector().getBlockY() ; y > 0 ; y--) {
+        for (int y = point.toVector().getBlockY(); y > 0; y--) {
             CustomLocation loc = new CustomLocation(point.getX(), y, point.getZ());
             Block block = BlockUtils.getBlock(loc.toLocation(world));
 
-            if(block.getType().isBlock() && block.getType().isSolid() && !block.isEmpty()) {
+            if (block.getType().isBlock() && block.getType().isSolid() && !block.isEmpty()) {
                 CustomLocation toReturn = loc.clone();
 
                 toReturn.setY(y + 1);
@@ -119,20 +109,6 @@ public class MiscUtils {
                 || move.isPistonsNear()
                 || move.getTo() != null && move.getTo().toVector().distance(move.getFrom().toVector()) < 0.005
                 || velocity.getLastVelocity().hasNotPassed(velocityTicks);
-    }
-
-    public static float wrapAngleTo180_float(float value) {
-        value = value % 360.0F;
-
-        if (value >= 180.0F) {
-            value -= 360.0F;
-        }
-
-        if (value < -180.0F) {
-            value += 360.0F;
-        }
-
-        return value;
     }
 
     public static Class<?> getClass(String string) {

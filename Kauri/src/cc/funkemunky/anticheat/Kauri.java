@@ -1,6 +1,5 @@
 package cc.funkemunky.anticheat;
 
-import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckManager;
 import cc.funkemunky.anticheat.api.data.DataManager;
@@ -8,7 +7,6 @@ import cc.funkemunky.anticheat.api.data.logging.LoggerManager;
 import cc.funkemunky.anticheat.api.data.stats.StatsManager;
 import cc.funkemunky.anticheat.api.event.TickEvent;
 import cc.funkemunky.anticheat.api.pup.AntiPUPManager;
-import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.anticheat.api.utils.VPNUtils;
 import cc.funkemunky.anticheat.impl.commands.kauri.KauriCommand;
 import cc.funkemunky.anticheat.impl.listeners.FunkeListeners;
@@ -63,7 +61,8 @@ public class Kauri extends JavaPlugin {
         instance = this;
         saveDefaultConfig();
 
-        if(Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled()) return;
+        if (Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled())
+            return;
 
         if (Bukkit.getPluginManager().isPluginEnabled("Atlas") && usableVersionsOfAtlas.contains(Bukkit.getPluginManager().getPlugin("Atlas").getDescription().getVersion())) {
 
@@ -176,7 +175,7 @@ public class Kauri extends JavaPlugin {
             try {
                 Class clazz = Class.forName(c);
 
-                if(clazz.isAnnotationPresent(Init.class)) {
+                if (clazz.isAnnotationPresent(Init.class)) {
                     Init annotation = (Init) clazz.getAnnotation(Init.class);
 
                     return annotation.priority().getPriority();
@@ -193,7 +192,7 @@ public class Kauri extends JavaPlugin {
 
                 Object obj = clazz.getSimpleName().equals(mainClass.getSimpleName()) ? plugin : clazz.newInstance();
 
-                if(clazz.isAnnotationPresent(Init.class)) {
+                if (clazz.isAnnotationPresent(Init.class)) {
                     Init init = (Init) clazz.getAnnotation(Init.class);
 
                     if (!configOnly) {
@@ -234,57 +233,16 @@ public class Kauri extends JavaPlugin {
 
                 }
 
-                if(clazz.isAnnotationPresent(CheckInfo.class)) {
-                    Check check = (Check) obj;
-                    CheckInfo info = (CheckInfo) clazz.getAnnotation(CheckInfo.class);
+                if (clazz.isAnnotationPresent(CheckInfo.class)) {
+                    getCheckManager().getCheckClasses().add(clazz);
 
-                    check.setEnabled(info.enabled());
-                    check.setExecutable(info.executable());
-                    check.setCancellable(info.cancellable());
-                    check.setDescription(info.description());
-                    check.setMaxVL(info.maxVL());
-                    check.setMaximum(info.maxVersion());
-                    check.setType(info.type());
-                    check.setCancelType(info.cancelType());
-                    check.setName(info.name());
-                    check.setDeveloper(info.developer());
-
-                    Kauri.getInstance().getCheckManager().getChecks().add(check);
-
-                    MiscUtils.printToConsole("&eFound check &a" + check.getName() + "&e! Registering...");
+                    MiscUtils.printToConsole("&eFound check &a" + ((CheckInfo) clazz.getAnnotation(CheckInfo.class)).name() + "&e! Registering...");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
-        MiscUtils.printToConsole("&7Applying configuration values...");
-        for (Check check : Kauri.getInstance().getCheckManager().getChecks()) {
-            Arrays.stream(check.getClass().getDeclaredFields()).filter(field -> {
-                field.setAccessible(true);
-
-                return field.isAnnotationPresent(Setting.class);
-            }).forEach(field -> {
-                try {
-                    field.setAccessible(true);
-
-                    String path = "checks." + check.getName() + ".settings." + field.getName();
-                    if (Kauri.getInstance().getConfig().get(path) != null) {
-                        Object val = Kauri.getInstance().getConfig().get(path);
-
-                        if (val instanceof Double && field.get(check) instanceof Float) {
-                            field.set(check, (float) (double) val);
-                        } else {
-                            field.set(check, val);
-                        }
-                    } else {
-                        Kauri.getInstance().getConfig().set("checks." + check.getName() + ".settings." + field.getName(), field.get(check));
-                        Kauri.getInstance().saveConfig();
-                    }
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            });
-        }
+        getCheckManager().getCheckClasses().forEach(clazz -> getCheckManager().registerCheck(clazz, getCheckManager().getChecks()));
         MiscUtils.printToConsole("&aCompleted!");
     }
 }

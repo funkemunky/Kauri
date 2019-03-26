@@ -22,7 +22,8 @@ public class PlayerConnectionListeners implements Listener {
             }
         });
 
-        if (ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9)) event.getPlayer().removeAchievement(Achievement.OPEN_INVENTORY);
+        if (ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9))
+            event.getPlayer().removeAchievement(Achievement.OPEN_INVENTORY);
     }
 
     @EventHandler

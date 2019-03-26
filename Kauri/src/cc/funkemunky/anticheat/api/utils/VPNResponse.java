@@ -28,7 +28,7 @@ public class VPNResponse {
         return json;
     }
 
-    public static VPNResponse fromJson(String json)throws JSONException {
+    public static VPNResponse fromJson(String json) throws JSONException {
         JSONObject jsonObject = new JSONObject(json);
 
         return new VPNResponse(jsonObject.getString("ip"), jsonObject.getString("countryName"), jsonObject.getString("countryCode"), jsonObject.getString("state"), jsonObject.getString("city"), jsonObject.getString("isp"), jsonObject.getBoolean("success"), jsonObject.getBoolean("proxy"));

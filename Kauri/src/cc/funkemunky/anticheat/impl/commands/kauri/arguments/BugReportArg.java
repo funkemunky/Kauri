@@ -28,8 +28,8 @@ public class BugReportArg extends FunkeArgument {
 
     @Override
     public void onArgument(CommandSender sender, Command command, String[] args) {
-        if(args.length > 1) {
-            switch(args[1].toLowerCase()) {
+        if (args.length > 1) {
+            switch (args[1].toLowerCase()) {
                 case "config": {
                     sendPastebin(sender, config(Kauri.getInstance()));
                     break;
@@ -52,8 +52,7 @@ public class BugReportArg extends FunkeArgument {
         });
     }
 
-    private StringBuilder config(Plugin plugin)
-    {
+    private StringBuilder config(Plugin plugin) {
         BufferedReader br = null;
         StringBuilder txt = new StringBuilder();
         try {
@@ -77,8 +76,7 @@ public class BugReportArg extends FunkeArgument {
         return txt;
     }
 
-    private StringBuilder latestLog(Plugin plugin)
-    {
+    private StringBuilder latestLog(Plugin plugin) {
         BufferedReader br = null;
         StringBuilder txt = new StringBuilder();
         try {

@@ -81,7 +81,7 @@ public class CollisionAssessment {
                 onClimbable = true;
             }
         } else {
-            if (BlockUtils.isLiquid(block) && playerBox.grow(0, 0.1f,0).collidesVertically(bb)) {
+            if (BlockUtils.isLiquid(block) && playerBox.grow(0, 0.1f, 0).collidesVertically(bb)) {
                 inLiquid = true;
             }
             if (block.getType().toString().contains("WEB") && playerBox.collidesVertically(bb)) {

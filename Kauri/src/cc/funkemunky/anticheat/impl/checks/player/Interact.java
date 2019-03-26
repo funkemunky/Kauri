@@ -1,8 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.player;
 
-import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.BukkitEvents;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.MathUtils;

@@ -1,6 +1,7 @@
 package cc.funkemunky.anticheat.impl.checks.combat.aimassist;
 
-import cc.funkemunky.anticheat.api.checks.*;
+import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Verbose;
