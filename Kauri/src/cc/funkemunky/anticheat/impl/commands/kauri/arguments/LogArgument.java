@@ -47,44 +47,52 @@ public class LogArgument extends FunkeArgument {
                 case "web": {
                     val violations = Kauri.getInstance().getLoggerManager().getViolations(target.getUniqueId());
 
-                    StringBuilder url = new StringBuilder("https://funkemunky.cc/api/kauri?uuid=" + target.getUniqueId().toString().replaceAll("-", "") + "&violations=");
+                    StringBuilder url = new StringBuilder("https://funkemunky.cc/api/kauri?uuid=" + target.getUniqueId().toString().replaceAll("-", "") + (violations.keySet().size() > 0 ? "&violations=" : ""));
 
-                    for (String key : violations.keySet()) {
-                        if(Kauri.getInstance().getCheckManager().isCheck(key)) {
-                            Check check = Kauri.getInstance().getCheckManager().getCheck(key);
-                            int vl = violations.get(key), maxVL = check.getMaxVL();
-                            boolean developer = check.isDeveloper();
+                   if(violations.keySet().size() > 0) {
+                        for (String key : violations.keySet()) {
+                            if(Kauri.getInstance().getCheckManager().isCheck(key)) {
+                                Check check = Kauri.getInstance().getCheckManager().getCheck(key);
+                                int vl = violations.get(key), maxVL = check.getMaxVL();
+                                boolean developer = check.isDeveloper();
 
-                            String toAppend = key + ":" + vl + ":" + maxVL + ":" + developer + ";";
-                            toAppend = toAppend.replaceAll(" ", "%20");
+                                String toAppend = key + ":" + vl + ":" + maxVL + ":" + developer + ";";
+                                toAppend = toAppend.replaceAll(" ", "%20");
 
-                            url.append(toAppend);
+                                url.append(toAppend);
 
+                            }
                         }
-                    }
 
-                    url.deleteCharAt(url.length() - 1);
+                        if(violations.keySet().size() > 0) {
+                            url.deleteCharAt(url.length() - 1);
+                        }
 
-                    String finalURL = "http://funkemunky.cc/api/kauri/cache/%id%";
+                        String finalURL = "http://funkemunky.cc/api/kauri/cache/%id%";
 
-                    try {
-                        URL url2Run = new URL(url.toString());
-                        //%3F
-                        BufferedReader reader = new BufferedReader(new InputStreamReader(url2Run.openConnection().getInputStream(), Charset.forName("UTF-8")));
+                        try {
+                            URL url2Run = new URL(url.toString());
+                            //%3F
+                            BufferedReader reader = new BufferedReader(new InputStreamReader(url2Run.openConnection().getInputStream(), Charset.forName("UTF-8")));
 
-                        finalURL = finalURL.replace("%id%", readAll(reader));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                            finalURL = finalURL.replace("%id%", readAll(reader));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
 
-                    //sender.sendMessage("&aView the log here&7: &f" + finalURL);
-                    System.out.println(finalURL);
+                        sender.sendMessage(Color.translate("&aView the log here&7: &f" + finalURL));
+                    } else {
+                       sender.sendMessage(Color.translate("&cThis player does not have any logs."));
+                   }
                     break;
                 }
                 default: {
+                    sender.sendMessage(getParent().getCommandMessages().getErrorColor() + getParent().getCommandMessages().getInvalidArguments());
                     break;
                 }
             }
+        }else {
+            sender.sendMessage(getParent().getCommandMessages().getErrorColor() + getParent().getCommandMessages().getInvalidArguments());
         }
     }
 

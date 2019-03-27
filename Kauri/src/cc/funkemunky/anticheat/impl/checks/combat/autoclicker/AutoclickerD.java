@@ -21,14 +21,14 @@ import org.bukkit.event.Event;
         Packet.Client.LEGACY_LOOK,
         Packet.Client.ARM_ANIMATION})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Autoclicker (Type D)", description = "Checks for very common autoclicker mistakes.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, executable = false, maxVL = 20)
+@CheckInfo(name = "Autoclicker (Type D)", description = "Checks for very common autoclicker mistakes.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, executable = false, maxVL = 20, developer = true)
 public class AutoclickerD extends Check {
     public AutoclickerD() {
 
     }
 
     private int cps, ticks, vl;
-    private Interval fraction = new Interval(0, 5);
+    private Interval fraction = new Interval(0, 8);
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
@@ -44,7 +44,7 @@ public class AutoclickerD extends Check {
                     val averageCps = fraction.average();
 
                     if (averageCps >= 8.0 && maxCps == minCps) {
-                        if ((vl += 2) >= 6.0) {
+                        if ((vl += 2) > 6.0) {
                             flag("t: " + vl, true, true);
                         }
                     } else {

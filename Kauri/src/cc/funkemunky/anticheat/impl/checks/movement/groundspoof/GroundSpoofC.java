@@ -15,18 +15,20 @@ import org.bukkit.event.Event;
 public class GroundSpoofC extends Check {
 
     private Verbose verbose = new Verbose();
+    private long lastTimeStamp;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        if (getData().isGeneralCancel() || getData().getLastServerPos().hasNotPassed(1)) return;
+        if (getData().isGeneralCancel() || getData().getVelocityProcessor().getLastVelocity().hasNotPassed(5) || getData().getLastServerPos().hasNotPassed(1)) return;
 
-        if (move.isServerOnGround() && !move.isClientOnGround() && move.getGroundTicks() > 4) {
+        if (move.isServerOnGround() && timeStamp > lastTimeStamp + 5 && !move.isClientOnGround() && move.getGroundTicks() > 4) {
             if (verbose.flag(4, 350L)) {
                 flag("t: " + move.getGroundTicks() + " v: " + verbose.getVerbose(), true, true);
             }
         }
+        lastTimeStamp = timeStamp;
     }
 
     @Override

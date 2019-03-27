@@ -117,14 +117,16 @@ public class ReachE extends Check {
 
             for (Vector vec : finalVecs) {
                 double reach = origin.toVector().distance(vec);
-                calculatedReach = calculatedReach == 0 ? reach + .15 : Math.min(reach + .15, calculatedReach);
+                if(reach > 0) {
+                    calculatedReach = calculatedReach == 0 ? reach + .15 : Math.min(reach + .15, calculatedReach);
+                }
 
                 collided++;
             }
 
             if (collided > collisionMin) {
                 if (calculatedReach > maxReach + 0.0001) {
-                    if ((vl += vlAdd) > nonBanMaxVL + (getData().getMovementProcessor().getDeltaXZ() * nonBanMult)) {
+                    if ((vl += (vlAdd + (calculatedReach > maxReach + 0.6f ? 0.45 : 0))) > nonBanMaxVL + (getData().getMovementProcessor().getDeltaXZ() * nonBanMult)) {
                         if (vl > maxVL) {
                             flag(calculatedReach + ">-" + maxReach, false, true);
                         } else {

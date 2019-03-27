@@ -41,11 +41,11 @@ public class VelocityB extends Check {
             val quotient = dxz / kbxz;
 
             if (quotient < 0.6) {
-                if ((vl += 1.1) >= 15.0) {
+                if (vl++ > 18.0) {
                     flag("velocity: " + MathUtils.round(quotient * 100, 1) + "%", true, true);
                 }
             } else {
-                vl = Math.max(0, vl - 0.8);
+                vl = Math.max(0, vl - 1);
             }
 
             debug("QUOTIENT: " + quotient + "/0.6" + " VL: " + vl);

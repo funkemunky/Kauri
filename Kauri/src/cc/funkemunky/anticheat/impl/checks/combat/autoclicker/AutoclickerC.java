@@ -21,11 +21,11 @@ import org.bukkit.event.Event;
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Autoclicker (Type C)", description = "An overall average CPS check.", type = CheckType.AUTOCLICKER, cancelType = CancelType.BREAK, maxVL = 20, executable = false)
+@CheckInfo(name = "Autoclicker (Type C)", description = "An overall average CPS check.", type = CheckType.AUTOCLICKER, cancelType = CancelType.BREAK, maxVL = 20, executable = false, developer = true)
 public class AutoclickerC extends Check {
 
 
-    private final DynamicRollingAverage cpsAverage = new DynamicRollingAverage(5);
+    private final DynamicRollingAverage cpsAverage = new DynamicRollingAverage(10);
     private int cps, ticks;
     private double vl;
 

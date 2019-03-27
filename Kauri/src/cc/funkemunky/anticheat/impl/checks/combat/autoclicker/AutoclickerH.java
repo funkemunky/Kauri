@@ -56,6 +56,8 @@ public class AutoclickerH extends Check {
                     vl = Math.max(vl - 1, 0);
                 }
 
+                debug("AVG: " + average + " LEVEL: " + level.get() + " VL: " + vl);
+
                 delays.clear();
             }
 
