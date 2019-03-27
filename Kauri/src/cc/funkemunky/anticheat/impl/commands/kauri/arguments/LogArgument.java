@@ -26,6 +26,7 @@ public class LogArgument extends FunkeArgument {
 
         addAlias("log");
         addAlias("view");
+        addTabComplete(2, "gui", "web");
     }
 
     @Override

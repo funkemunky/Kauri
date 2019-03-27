@@ -39,12 +39,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @CheckInfo(name = "Reach (Type E)", description = "A ray-tracing check but is less light, however it detects 3.1 reach very accurately.", type = CheckType.REACH, cancelType = CancelType.COMBAT, maxVL = 125)
 public class ReachE extends Check {
 
-    public ReachE() {
-
-    }
-
     @Setting(name = "pingRange")
-    private long pingRange = 175;
+    private long pingRange = 150;
 
     @Setting(name = "theshold.reach")
     private float maxReach = 3.0f;
@@ -71,7 +67,7 @@ public class ReachE extends Check {
     private double belowCollisionSubtract = 0.1;
 
     @Setting(name = "threshold.collisionMin")
-    private int collisionMin = 8;
+    private int collisionMin = 3;
 
     private double vl;
 
@@ -153,6 +149,6 @@ public class ReachE extends Check {
     private BoundingBox getHitbox(LivingEntity entity, CustomLocation l) {
         val dimensions = MiscUtils.entityDimensions.getOrDefault(entity.getType(), new Vector(0.35f, 1.85f, 0.35f));
 
-        return new BoundingBox(l.toVector(), l.toVector()).grow(.25f, .25f, .25f).grow((float) dimensions.getX(), 0, (float) dimensions.getZ()).add(0, 0, 0, 0, (float) dimensions.getY(), 0);
+        return new BoundingBox(l.toVector(), l.toVector()).grow(.15f, .15f, .15f).grow((float) dimensions.getX(), 0, (float) dimensions.getZ()).add(0, 0, 0, 0, (float) dimensions.getY(), 0);
     }
 }

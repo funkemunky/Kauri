@@ -16,12 +16,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Packets(packets = {Packet.Client.ARM_ANIMATION})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Autoclicker (Type H)", description = "Looks for suspicious clicking averages compares to actual clicks.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 50, executable = false)
+@CheckInfo(name = "Autoclicker (Type H)", description = "Looks for suspicious clicking averages compares to actual clicks.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 50, executable = false, developer = true)
 public class AutoclickerH extends Check {
-
-    public AutoclickerH() {
-
-    }
 
     private long lastSwing;
     private final Deque<Long> delays = new LinkedList<>();
@@ -30,37 +26,40 @@ public class AutoclickerH extends Check {
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         if (!MiscUtils.shouldReturnArmAnimation(getData())) {
-            val now = System.currentTimeMillis();
+            val now = timeStamp;
 
             val delay = now - lastSwing;
 
-            if (delay > 160L) return;
+            //Changed this so this check doesn't just stop working when a player has a delay longer than a certain period.
+            if(delay < 160L) {
+                delays.add(delay);
+            }
 
-            delays.add(delay);
-
+            //I removed your leveling system due to it seeming very unnecessary from debugging. Comment your reasoning so I can confirm. - funke
             if (delays.size() == 50) {
-                val level = new AtomicInteger(0);
+                //val level = new AtomicInteger(0);
 
-                delays.stream().filter(range -> range == 0L).forEach(range -> level.getAndIncrement()); //dont judge me
+                //delays.stream().filter(range -> range == 0L).forEach(range -> level.getAndIncrement()); //dont judge me
 
                 val average = delays.stream().mapToLong(Long::longValue).average().orElse(0.0);
-                val averageDelta = Math.abs(delay - average);
+                val averageDelta = Math.abs(delay - average); // Why are you doing this? What is your thought process?
 
-                if (averageDelta <= 10 && level.get() <= 14) {
-                    vl += 4;
-
-                    if (vl > 6) {
-                        this.debug("FLAGGED TYPE H");
+                //Removed level.get() <= 14
+                if (averageDelta <= 10) {
+                    //I cleaned up this area and completely changed the verbose system due to players being able to easily flag this.
+                    // However, unlike autoclickers, players do not flag it consistently every single time. This should do until further testing
+                    // proves this check to be invalid or needing fixing.
+                    if (vl ++ > 6) {
+                        flag("AVG: " + average, true, true);
                     }
                 } else {
-                    vl = Math.max(vl - 1, 0);
+                    vl = 0;
                 }
 
-                debug("AVG: " + average + " LEVEL: " + level.get() + " VL: " + vl);
+                debug("AVG: " + average + " VL: " + vl);
 
                 delays.clear();
             }
-
             this.lastSwing = now;
         }
     }

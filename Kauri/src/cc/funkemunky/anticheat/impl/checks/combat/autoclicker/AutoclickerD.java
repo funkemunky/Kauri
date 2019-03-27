@@ -23,12 +23,9 @@ import org.bukkit.event.Event;
 @cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Autoclicker (Type D)", description = "Checks for very common autoclicker mistakes.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, executable = false, maxVL = 20, developer = true)
 public class AutoclickerD extends Check {
-    public AutoclickerD() {
-
-    }
 
     private int cps, ticks, vl;
-    private Interval fraction = new Interval(0, 8);
+    private Interval fraction = new Interval(0, 5);
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {

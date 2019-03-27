@@ -30,4 +30,6 @@ public @interface CheckInfo {
 
     ProtocolVersion maxVersion() default ProtocolVersion.V1_13_2;
 
+    ProtocolVersion minVersion() default ProtocolVersion.V1_7;
+
 }

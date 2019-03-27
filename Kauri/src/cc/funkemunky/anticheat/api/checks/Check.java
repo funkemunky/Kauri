@@ -82,7 +82,7 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
     }
 
     public void loadFromConfig() {
-        if (Kauri.getInstance().getConfig().get("checks." + name) != null) {
+        if (Kauri.getInstance().getConfig().get("checks." + name) != null && Kauri.getInstance().getConfig().get("checks." + name + ".enabled") != null) {
             maxVL = Kauri.getInstance().getConfig().getInt("checks." + name + ".maxVL");
             enabled = Kauri.getInstance().getConfig().getBoolean("checks." + name + ".enabled");
             executable = Kauri.getInstance().getConfig().getBoolean("checks." + name + ".executable");

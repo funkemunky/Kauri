@@ -188,6 +188,7 @@ public class PacketListeners implements Listener {
                                     dataEntity.setAttacker(packet.getPlayer());
                                 }
                             }
+                            Bukkit.broadcastMessage(data.getLastAttack().getPassed() + "");
                         }
                     }
                     break;

@@ -23,9 +23,6 @@ import java.util.List;
 @cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Reach (Type C)", description = "Uses expanded bounding-boxes to set a maximum hit reach.", type = CheckType.REACH, cancelType = CancelType.COMBAT, developer = true, executable = false)
 public class ReachC extends Check {
-    public ReachC() {
-
-    }
 
     @Setting(name = "boxExpand")
     private float boxExpand = 3.0f;

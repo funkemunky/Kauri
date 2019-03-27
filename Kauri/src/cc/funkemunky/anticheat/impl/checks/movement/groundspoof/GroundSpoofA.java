@@ -19,10 +19,6 @@ public class GroundSpoofA extends Check {
     private int vl;
     private long lastTimeStamp;
 
-    public GroundSpoofA() {
-
-    }
-
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
@@ -30,7 +26,6 @@ public class GroundSpoofA extends Check {
                 || move.getTo().toVector().distance(move.getFrom().toVector()) < 0.005 || timeStamp < lastTimeStamp + 5)
             return;
 
-        Block block = BlockUtils.getBlock(getData().getPlayer().getLocation());
         if (!getData().isGeneralCancel() && !move.isBlocksOnTop()) {
             if (move.isClientOnGround() != move.isServerOnGround() && !move.isLagging()) {
                 if ((!move.isNearGround() && getData().getLastServerPos().hasPassed(6) && move.getAirTicks() > 2) || vl++ > 5) {

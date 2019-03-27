@@ -6,10 +6,11 @@ import org.bukkit.Bukkit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 public class DataManager {
-    private Map<UUID, PlayerData> dataObjects = new HashMap<>();
+    private Map<UUID, PlayerData> dataObjects = new ConcurrentHashMap<>();
 
     public PlayerData getPlayerData(UUID uuid) {
         return dataObjects.getOrDefault(uuid, null);

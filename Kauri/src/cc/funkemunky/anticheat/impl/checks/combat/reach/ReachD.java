@@ -38,11 +38,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Reach (Type D)", description = "Uses a mixture of lighter but less accurate ray-tracing to determine the client's actual reach distance.", type = CheckType.REACH, cancelType = CancelType.COMBAT, maxVL = 30)
 public class ReachD extends Check {
-
-    public ReachD() {
-
-    }
-
     @Setting(name = "pingRange")
     private long pingRange = 150;
 
