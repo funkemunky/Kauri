@@ -95,7 +95,7 @@ public class PacketListeners implements Listener {
 
                         //We use transPing for checking lag since the packet used is little known.
                         //I have not seen anyone create a spoof for it or even talk about the possibility of needing one.
-                        //Large jumps in latency most of the time mean lag.
+                        //Large jumps in latency most of the intervalTime mean lag.
                         data.setLagging(Math.abs(data.getTransPing() - data.getLastTransPing()) > 35);
 
                         if (data.isLagging()) data.getLastLag().reset();
@@ -188,7 +188,6 @@ public class PacketListeners implements Listener {
                                     dataEntity.setAttacker(packet.getPlayer());
                                 }
                             }
-                            Bukkit.broadcastMessage(data.getLastAttack().getPassed() + "");
                         }
                     }
                     break;

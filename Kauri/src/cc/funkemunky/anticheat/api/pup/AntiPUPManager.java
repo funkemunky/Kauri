@@ -29,6 +29,7 @@ public class AntiPUPManager {
         addMethod(new ArmSwing("ArmSwing", PuPType.CRASH, true), list);
         addMethod(new Boxer("Boxer", PuPType.CRASH, true), list);
         addMethod(new YLevel("YLevel", PuPType.CRASH, true), list);
+        addMethod(new MorePackets("MorePackets", PuPType.CRASH, true), list);
         addMethod(new CommandSpam("CommandSpam", PuPType.SPAM, true), list);
         addMethod(new ChatSpam("ChatSpam", PuPType.SPAM, true), list);
         addMethod(new BookEnchant("BookEnchant", PuPType.EXPLOIT, true), list);

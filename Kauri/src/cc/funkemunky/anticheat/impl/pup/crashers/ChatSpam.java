@@ -23,7 +23,7 @@ public class ChatSpam extends AntiPUP {
     private long chatDelay = 500L;
 
     @Setting(name = "noSpamMessage")
-    private String message = "&8[&4!&8] &7You must wait &c%timeLeft% seconds &7 until you can chat.";
+    private String message = "&8[&4!&8] &7You must wait &c%timeLeft% banSeconds &7 until you can chat.";
 
     @Override
     public boolean onPacket(Object packet, String packetType, long timeStamp) {

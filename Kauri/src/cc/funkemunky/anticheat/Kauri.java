@@ -3,6 +3,7 @@ package cc.funkemunky.anticheat;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckManager;
 import cc.funkemunky.anticheat.api.data.DataManager;
+import cc.funkemunky.anticheat.api.data.banwave.BanwaveManager;
 import cc.funkemunky.anticheat.api.data.logging.LoggerManager;
 import cc.funkemunky.anticheat.api.data.stats.StatsManager;
 import cc.funkemunky.anticheat.api.event.TickEvent;
@@ -41,6 +42,8 @@ public class Kauri extends JavaPlugin {
     private CheckManager checkManager;
     private StatsManager statsManager;
     private AntiPUPManager antiPUPManager;
+    private LoggerManager loggerManager;
+    private BanwaveManager banwaveManager;
 
     private int currentTicks;
     private long lastTick, tickElapsed, profileStart;
@@ -48,8 +51,6 @@ public class Kauri extends JavaPlugin {
     private ScheduledExecutorService executorService;
 
     private BaseProfiler profiler;
-    private LoggerManager loggerManager;
-
     private VPNUtils vpnUtils;
 
     private String requiredVersionOfAtlas = "1.1.4";
@@ -61,8 +62,8 @@ public class Kauri extends JavaPlugin {
         instance = this;
         saveDefaultConfig();
 
-        if (Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled())
-            return;
+        /*if (Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled())
+            return;*/
 
         if (Bukkit.getPluginManager().isPluginEnabled("Atlas") && usableVersionsOfAtlas.contains(Bukkit.getPluginManager().getPlugin("Atlas").getDescription().getVersion())) {
 
@@ -82,6 +83,7 @@ public class Kauri extends JavaPlugin {
             statsManager = new StatsManager();
             loggerManager = new LoggerManager();
             loggerManager.loadFromDatabase();
+            banwaveManager = new BanwaveManager();
 
             vpnUtils = new VPNUtils();
 
@@ -90,7 +92,7 @@ public class Kauri extends JavaPlugin {
 
             MiscUtils.printToConsole("&aSuccessfully loaded Kauri and all of its libraries!");
         } else {
-            Bukkit.getLogger().log(Level.SEVERE, "You do not the required Atlas dependency installed! Try restarting the server to see if the downloader will do it properly next time.");
+            Bukkit.getLogger().log(Level.SEVERE, "You do not the required Atlas dependency installed! Try restarting the server to see if the downloader will do it properly next intervalTime.");
         }
 
         executorService = Executors.newSingleThreadScheduledExecutor();
@@ -110,7 +112,7 @@ public class Kauri extends JavaPlugin {
     }
 
     private void runTasks() {
-        //This allows us to use ticks for time comparisons to allow for more parrallel calculations to actual Minecraft
+        //This allows us to use ticks for intervalTime comparisons to allow for more parrallel calculations to actual Minecraft
         //and it also has the added benefit of being lighter than using System.currentTimeMillis.
         new BukkitRunnable() {
             public void run() {

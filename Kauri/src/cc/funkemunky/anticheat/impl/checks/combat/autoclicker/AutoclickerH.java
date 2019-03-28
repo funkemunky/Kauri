@@ -47,7 +47,7 @@ public class AutoclickerH extends Check {
                 //Removed level.get() <= 14
                 if (averageDelta <= 10) {
                     //I cleaned up this area and completely changed the verbose system due to players being able to easily flag this.
-                    // However, unlike autoclickers, players do not flag it consistently every single time. This should do until further testing
+                    // However, unlike autoclickers, players do not flag it consistently every single intervalTime. This should do until further testing
                     // proves this check to be invalid or needing fixing.
                     if (vl ++ > 6) {
                         flag("AVG: " + average, true, true);

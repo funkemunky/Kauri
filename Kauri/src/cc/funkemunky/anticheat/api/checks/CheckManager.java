@@ -43,6 +43,8 @@ public class CheckManager {
             check.setName(info.name());
             check.setDeveloper(info.developer());
             check.setMinimum(info.minVersion());
+            check.setBanWave(info.banWave());
+            check.setBanWaveThreshold(info.banWaveThreshold());
 
             Arrays.stream(check.getClass().getDeclaredFields()).filter(field -> {
                 field.setAccessible(true);
