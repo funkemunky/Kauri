@@ -29,18 +29,20 @@ public class GroundSpoofB extends Check {
     private int ticksInAir = 4;
 
     private Verbose verbose = new Verbose();
+    private long lastTimeStamp;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        if (getData().isGeneralCancel() || getData().getLastServerPos().hasNotPassed(1)) return;
+        if (getData().isGeneralCancel() || getData().getVelocityProcessor().getLastVelocity().hasNotPassed(5) || getData().getLastServerPos().hasNotPassed(1)) return;
 
-        if (move.getDistanceToGround() > distanceFG && move.getAirTicks() > ticksInAir && !move.isServerOnGround() && move.isClientOnGround()) {
+        if (timeStamp > lastTimeStamp + 5 && move.getDistanceToGround() > distanceFG && move.getAirTicks() > ticksInAir && !move.isServerOnGround() && move.isClientOnGround()) {
             if (verbose.flag(vlMax, resetTime)) {
                 flag(move.getDistanceToGround() + ">-" + distanceFG + ";" + move.getAirTicks() + ">-" + ticksInAir, true, true);
             }
         }
+        lastTimeStamp = timeStamp;
     }
 
     @Override

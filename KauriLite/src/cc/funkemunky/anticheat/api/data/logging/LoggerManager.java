@@ -8,6 +8,7 @@ import cc.funkemunky.api.database.DatabaseType;
 import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.Priority;
+import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,13 +18,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Init(priority = Priority.HIGH)
 public class LoggerManager {
-    private Map<UUID, Map<String, Integer>> violations;
+    @Getter
+    private Map<UUID, Map<String, Integer>> violations = new ConcurrentHashMap<>();;
 
     @ConfigSetting(path = "data.logging", name = "type")
     public String type = "FLATFILE";
 
     public LoggerManager() {
-        violations = new ConcurrentHashMap<>();
         Atlas.getInstance().getDatabaseManager().createDatabase("KauriLogs", DatabaseType.valueOf(type));
     }
 

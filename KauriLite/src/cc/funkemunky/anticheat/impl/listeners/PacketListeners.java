@@ -94,7 +94,7 @@ public class PacketListeners implements Listener {
 
                         //We use transPing for checking lag since the packet used is little known.
                         //I have not seen anyone create a spoof for it or even talk about the possibility of needing one.
-                        //Large jumps in latency most of the time mean lag.
+                        //Large jumps in latency most of the intervalTime mean lag.
                         data.setLagging(Math.abs(data.getTransPing() - data.getLastTransPing()) > 35);
 
                         if (data.isLagging()) data.getLastLag().reset();
@@ -199,17 +199,15 @@ public class PacketListeners implements Listener {
     }
 
     private void hopper(Object packet, String packetType, long timeStamp, PlayerData data) {
-        Atlas.getInstance().getSchedular().schedule(() -> {
-            if ((!CheckSettings.bypassEnabled || !data.getPlayer().hasPermission(CheckSettings.bypassPermission)) && !Kauri.getInstance().getCheckManager().isBypassing(data.getUuid())) {
-                Atlas.getInstance().getThreadPool().execute(() ->
-                        data.getPacketChecks().getOrDefault(packetType, new ArrayList<>()).stream().filter(Check::isEnabled).forEach(check ->
-                        {
-                            Kauri.getInstance().getProfiler().start("check:" + check.getName());
-                            check.onPacket(packet, packetType, timeStamp);
-                            Kauri.getInstance().getProfiler().stop("check:" + check.getName());
-                        }));
-            }
-        }, 5, TimeUnit.MILLISECONDS);
+        if ((!CheckSettings.bypassEnabled || !data.getPlayer().hasPermission(CheckSettings.bypassPermission)) && !Kauri.getInstance().getCheckManager().isBypassing(data.getUuid())) {
+            Atlas.getInstance().getThreadPool().execute(() ->
+                    data.getPacketChecks().getOrDefault(packetType, new ArrayList<>()).stream().filter(Check::isEnabled).forEach(check ->
+                    {
+                        Kauri.getInstance().getProfiler().start("check:" + check.getName());
+                        check.onPacket(packet, packetType, timeStamp);
+                        Kauri.getInstance().getProfiler().stop("check:" + check.getName());
+                    }));
+        }
     }
 
     private void debug(String packetType, PlayerData data) {

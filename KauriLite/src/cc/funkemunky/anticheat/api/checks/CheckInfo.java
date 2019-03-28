@@ -28,6 +28,12 @@ public @interface CheckInfo {
 
     boolean developer() default false;
 
+    boolean banWave() default false;
+
+    int banWaveThreshold() default 400;
+
     ProtocolVersion maxVersion() default ProtocolVersion.V1_13_2;
+
+    ProtocolVersion minVersion() default ProtocolVersion.V1_7;
 
 }

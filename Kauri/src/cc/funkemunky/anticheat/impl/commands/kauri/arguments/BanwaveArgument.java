@@ -7,9 +7,11 @@ import cc.funkemunky.api.utils.Color;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
-public class Banwave extends FunkeArgument {
-    public Banwave(FunkeCommand parent, String name, String display, String description) {
-        super(parent, name, display, description);
+public class BanwaveArgument extends FunkeArgument {
+
+
+    public BanwaveArgument(FunkeCommand parent, String name, String display, String description, String... permission) {
+        super(parent, name, display, description, permission);
     }
 
     @Override

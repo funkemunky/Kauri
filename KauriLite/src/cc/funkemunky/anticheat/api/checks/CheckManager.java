@@ -42,8 +42,9 @@ public class CheckManager {
             check.setCancelType(info.cancelType());
             check.setName(info.name());
             check.setDeveloper(info.developer());
-
-            checkList.add(check);
+            check.setMinimum(info.minVersion());
+            check.setBanWave(info.banWave());
+            check.setBanWaveThreshold(info.banWaveThreshold());
 
             Arrays.stream(check.getClass().getDeclaredFields()).filter(field -> {
                 field.setAccessible(true);

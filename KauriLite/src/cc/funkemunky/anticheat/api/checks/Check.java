@@ -24,8 +24,8 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
     private String description;
     private CancelType cancelType;
     private PlayerData data;
-    private int maxVL;
-    private boolean enabled, executable, cancellable, developer;
+    private int maxVL, banWaveThreshold;
+    private boolean enabled, executable, cancellable, developer, isBanWave;
     private Verbose lagVerbose = new Verbose();
     private long lastAlert;
     private List<String> execCommand = new ArrayList<>();
@@ -82,26 +82,35 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
     }
 
     public void loadFromConfig() {
-        if (Kauri.getInstance().getConfig().get("checks." + name) != null) {
-            maxVL = Kauri.getInstance().getConfig().getInt("checks." + name + ".maxVL");
-            enabled = Kauri.getInstance().getConfig().getBoolean("checks." + name + ".enabled");
-            executable = Kauri.getInstance().getConfig().getBoolean("checks." + name + ".executable");
-            cancellable = Kauri.getInstance().getConfig().getBoolean("checks." + name + ".cancellable");
-            Kauri.getInstance().getConfig().getStringList("checks." + name + ".executableCommands").forEach(cmd -> {
+        Map<String, Object> values = new HashMap<>();
+        String path = "checks." + name;
+        values.put(path + ".maxVL", maxVL);
+        values.put(path + ".enabled", enabled);
+        values.put(path + ".executable", executable);
+        values.put(path + ".cancellable", cancellable);
+        values.put(path + ".executableCommands", Collections.singletonList("%global%"));
+        values.put(path + ".banWave.enabled", isBanWave);
+        values.put(path + ".banWave.threshold", banWaveThreshold);
+        
+        values.keySet().stream().filter(key -> Kauri.getInstance().getConfig().get(key) == null).forEach(key -> {
+            Kauri.getInstance().getConfig().set(key, values.get(key));
+            Kauri.getInstance().saveConfig();
+        });
+        
+        if (Kauri.getInstance().getConfig().get("checks." + name) != null && Kauri.getInstance().getConfig().get("checks." + name + ".enabled") != null) {
+            maxVL = Kauri.getInstance().getConfig().getInt(path + ".maxVL");
+            enabled = Kauri.getInstance().getConfig().getBoolean(path + ".enabled");
+            executable = Kauri.getInstance().getConfig().getBoolean(path + ".executable");
+            cancellable = Kauri.getInstance().getConfig().getBoolean(path + ".cancellable");
+            Kauri.getInstance().getConfig().getStringList(path + ".executableCommands").forEach(cmd -> {
                 if (cmd.equals("%global%")) {
                     execCommand.addAll(CheckSettings.executableCommand);
                 } else {
                     execCommand.add(cmd);
                 }
             });
-        } else {
-            Kauri.getInstance().getConfig().set("checks." + name + ".maxVL", maxVL);
-            Kauri.getInstance().getConfig().set("checks." + name + ".enabled", enabled);
-            Kauri.getInstance().getConfig().set("checks." + name + ".executable", executable);
-            Kauri.getInstance().getConfig().set("checks." + name + ".cancellable", cancellable);
-            Kauri.getInstance().getConfig().set("checks." + name + ".executableCommands", Collections.singletonList("%global%"));
-
-            Kauri.getInstance().saveConfig();
+            isBanWave = Kauri.getInstance().getConfig().getBoolean(path + ".banWave.enabled");
+            banWaveThreshold = Kauri.getInstance().getConfig().getInt(path + ".banWave.threshold");
         }
     }
 

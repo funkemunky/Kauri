@@ -1,2 +1,0 @@
-#Iris 1.2 Configuration File
-executableCommand: "kick %player% [IRIS] You have been kicked for failing %check%"

@@ -4,9 +4,7 @@ import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.utils.BlockUtils;
 import lombok.val;
-import org.bukkit.block.Block;
 import org.bukkit.event.Event;
 
 @Packets(packets = {Packet.Client.POSITION_LOOK,
@@ -19,10 +17,6 @@ public class GroundSpoofA extends Check {
     private int vl;
     private long lastTimeStamp;
 
-    public GroundSpoofA() {
-
-    }
-
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
@@ -30,7 +24,6 @@ public class GroundSpoofA extends Check {
                 || move.getTo().toVector().distance(move.getFrom().toVector()) < 0.005 || timeStamp < lastTimeStamp + 5)
             return;
 
-        Block block = BlockUtils.getBlock(getData().getPlayer().getLocation());
         if (!getData().isGeneralCancel() && !move.isBlocksOnTop()) {
             if (move.isClientOnGround() != move.isServerOnGround() && !move.isLagging()) {
                 if ((!move.isNearGround() && getData().getLastServerPos().hasPassed(6) && move.getAirTicks() > 2) || vl++ > 5) {

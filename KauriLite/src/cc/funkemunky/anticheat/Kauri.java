@@ -3,6 +3,7 @@ package cc.funkemunky.anticheat;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckManager;
 import cc.funkemunky.anticheat.api.data.DataManager;
+import cc.funkemunky.anticheat.api.data.banwave.BanwaveManager;
 import cc.funkemunky.anticheat.api.data.logging.LoggerManager;
 import cc.funkemunky.anticheat.api.data.stats.StatsManager;
 import cc.funkemunky.anticheat.api.event.TickEvent;
@@ -38,14 +39,14 @@ public class Kauri extends JavaPlugin {
     private DataManager dataManager;
     private CheckManager checkManager;
     private StatsManager statsManager;
+    private BanwaveManager banwaveManager;
+    private LoggerManager loggerManager;
 
     private int currentTicks;
     private long lastTick, tickElapsed, profileStart;
 
     private ScheduledExecutorService executorService;
-
     private BaseProfiler profiler;
-    private LoggerManager loggerManager;
 
     private String requiredVersionOfAtlas = "1.1.4";
     private List<String> usableVersionsOfAtlas = Arrays.asList("1.1.4");
@@ -76,6 +77,7 @@ public class Kauri extends JavaPlugin {
             statsManager = new StatsManager();
             loggerManager = new LoggerManager();
             loggerManager.loadFromDatabase();
+            banwaveManager = new BanwaveManager();
 
             runTasks();
             registerCommands();

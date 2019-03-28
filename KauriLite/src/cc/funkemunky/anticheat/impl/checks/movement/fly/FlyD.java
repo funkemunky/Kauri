@@ -15,9 +15,6 @@ import org.bukkit.event.Event;
 @cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Fly (Type D)", description = "Makes sure the client is accelerating towards the ground properly.", type = CheckType.FLY, cancelType = CancelType.MOTION, maxVL = 200)
 public class FlyD extends Check {
-    public FlyD() {
-
-    }
 
     private double lastYChange;
     private int vl;
@@ -33,12 +30,12 @@ public class FlyD extends Check {
         val predictedY = (lastYChange - 0.08D) * 0.9800000190734863D;
         this.lastYChange = yChange;
 
-        if (MiscUtils.cancelForFlight(getData(), 10, true)) return;
+        if (MiscUtils.cancelForFlight(getData(), 15, true)) return;
 
         if (!move.isNearGround()) {
             val offset = Math.abs(yChange - predictedY);
 
-            if (!MathUtils.approxEquals(0.00001, yChange, predictedY)) {
+            if (!MathUtils.approxEquals(0.05, yChange, predictedY)) {
                 if (vl++ > 2) {
                     this.flag("O -> " + offset, false, true);
                 }

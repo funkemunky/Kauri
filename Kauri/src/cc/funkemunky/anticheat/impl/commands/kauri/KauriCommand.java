@@ -23,6 +23,6 @@ public class KauriCommand extends FunkeCommand {
         getArguments().add(new BoxWandArgument(this, "boxwand", "boxwand", "receive the magic box wand.", "kauri.boxwand"));
         getArguments().add(new BypassingArgument(this, "bypass", "bypass <player> [boolean]", "set a player to bypass detection without permissions.", "kauri.bypass.command"));
         getArguments().add(new AntiVpnArgument(this, "antivpn", "antivpn <args>", "manage the antivpn."));
-        getArguments().add(new Banwave(this, "banwave", "banwave", "force a ban wave to run."));
+        getArguments().add(new BanwaveArgument(this, "banwave", "banwave", "force a ban wave to run.", "kauri.banwave"));
     }
 }

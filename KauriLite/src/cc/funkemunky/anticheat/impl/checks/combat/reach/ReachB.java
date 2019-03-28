@@ -26,15 +26,11 @@ public class ReachB extends Check {
     private DynamicRollingAverage reachAvg = new DynamicRollingAverage(5);
     private double vl;
 
-    public ReachB() {
-
-    }
-
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         WrappedInUseEntityPacket useEvent = new WrappedInUseEntityPacket(packet, getData().getPlayer());
 
-        if (getData().isGeneralCancel()) return;
+        if (getData().isGeneralCancel() || getData().getPing() > 200 || getData().isLagging()) return;
         if (useEvent.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK) && useEvent.getEntity() instanceof Player) {
             val player = getData().getPlayer();
             val entity = (Player) useEvent.getEntity();
