@@ -17,7 +17,7 @@ public class PlayerConnectionListeners implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Atlas.getInstance().getThreadPool().execute(() -> {
             Kauri.getInstance().getDataManager().addData(event.getPlayer().getUniqueId());
-            if (Kauri.getInstance().getStatsManager().isPlayerBanned(event.getPlayer().getUniqueId())) {
+            if (Kauri.getInstance().getLoggerManager().isBanned(event.getPlayer().getUniqueId())) {
                 Kauri.getInstance().getLoggerManager().removeBan(event.getPlayer().getUniqueId());
             }
         });
