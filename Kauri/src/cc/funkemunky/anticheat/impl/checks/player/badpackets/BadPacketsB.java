@@ -27,7 +27,7 @@ public class BadPacketsB extends Check {
         if (getData().getActionProcessor().isOpenInventory()) {
             val move = getData().getMovementProcessor();
             if (!packetType.contains("Position") || (!move.isInLiquid() && move.isServerOnGround() && !move.isOnClimbable())) {
-                if (vl++ > vlThreshold) {
+                if (getData().getMovementProcessor().getDeltaXZ() > 0.1 && vl++ > vlThreshold) {
                     flag(vl + ">-" + vlThreshold, true, true);
                 }
             } else vl = 0;

@@ -20,17 +20,20 @@ public class ConsoleClient extends AntiPUP {
     }
 
     private long lastFlying;
+    private int vl = 0;
 
     @Override
     public boolean onPacket(Object packet, String packetType, long timeStamp) {
         if (packetType.equalsIgnoreCase(Packet.Client.KEEP_ALIVE)) {
-            if (timeStamp - lastFlying > 8000L && getData().getLastLogin().hasPassed(10)) {
-                new BukkitRunnable() {
-                    public void run() {
-                        getData().getPlayer().kickPlayer(Color.translate(message));
-                    }
-                }.runTask(Kauri.getInstance());
-            }
+            if (timeStamp - lastFlying > 8000L && !getData().getPlayer().isDead() && getData().getLastLogin().hasPassed(10)) {
+                if(vl++ > 2) {
+                    new BukkitRunnable() {
+                        public void run() {
+                            getData().getPlayer().kickPlayer(Color.translate(message));
+                        }
+                    }.runTask(Kauri.getInstance());
+                }
+            } else vl = 0;
         } else lastFlying = timeStamp;
         return false;
     }

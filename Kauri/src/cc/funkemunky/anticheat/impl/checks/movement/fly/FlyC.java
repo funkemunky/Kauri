@@ -34,7 +34,7 @@ public class FlyC extends Check {
         val collides = getData().getBoundingBox().grow(1.5f, 1.5f, 1.5f).getCollidingBlocks(getData().getPlayer()).stream().anyMatch(BlockUtils::isSolid);
 
         if (!MathUtils.approxEquals(0.01, move.getLastClientYAcceleration(), move.getClientYAcceleration())) {
-            if ((!collides && move.getAirTicks() > 2) || vl++ > 4) {
+            if (vl++ > 4) {
                 flag(move.getClientYAcceleration() + ", " + move.getLastClientYAcceleration(), true, true);
             }
         } else vl -= vl > 0 ? 0.75 : 0;

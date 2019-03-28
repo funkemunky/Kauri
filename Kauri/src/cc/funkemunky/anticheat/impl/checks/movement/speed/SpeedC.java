@@ -41,7 +41,7 @@ public class SpeedC extends Check {
             val delta = deltaXZ - predicted;
 
 
-            if (!onGround && !lastLastOnGround && !lastOnGround) {
+            if (!onGround && !lastLastOnGround && !lastOnGround && getData().getVelocityProcessor().getLastVelocity().hasPassed(5)) {
                 if (delta > 0.028) {
                     if (delta > 0.2f && vl++ > 3) {
                         flag(delta + "", true, true);

@@ -45,7 +45,7 @@ public class SpeedA extends Check {
 
 
         if (move.getAirTicks() > 0) {
-            baseSpeed = 0.374 * Math.pow(0.988, Math.min(16, move.getAirTicks()));
+            baseSpeed = 0.377 * Math.pow(0.988, Math.min(16, move.getAirTicks()));
         } else {
             baseSpeed = 0.341 - (0.0052 * Math.min(9, move.getGroundTicks()));
         }

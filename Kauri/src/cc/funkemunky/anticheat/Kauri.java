@@ -152,10 +152,7 @@ public class Kauri extends JavaPlugin {
         reloadConfig();
         getCheckManager().getChecks().clear();
         getDataManager().getDataObjects().clear();
-        EventManager.unregisterAll(this);
-        HandlerList.unregisterAll(this);
         startScanner(false);
-        checkManager = new CheckManager();
         antiPUPManager = new AntiPUPManager();
         dataManager = new DataManager();
         dataManager.registerAllPlayers();
