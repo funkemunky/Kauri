@@ -40,7 +40,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class ReachE extends Check {
 
     @Setting(name = "pingRange")
-    private long pingRange = 150;
+    private long pingRange = 50;
 
     @Setting(name = "theshold.reach")
     private float maxReach = 3.0f;
@@ -61,13 +61,13 @@ public class ReachE extends Check {
     private double armSubtract = 0.01;
 
     @Setting(name = "threshold.vl.subtract.belowThreshold")
-    private double belowTSubtract = 0.35;
+    private double belowTSubtract = 0.2;
 
     @Setting(name = "threshold.vl.subtract.belowCollisionMin")
     private double belowCollisionSubtract = 0.1;
 
     @Setting(name = "threshold.collisionMin")
-    private int collisionMin = 3;
+    private int collisionMin = 2;
 
     private double vl;
 
