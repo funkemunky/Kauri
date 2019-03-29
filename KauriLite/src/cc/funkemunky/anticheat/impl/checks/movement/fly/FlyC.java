@@ -7,37 +7,44 @@ import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
 import org.bukkit.event.Event;
 
-@Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.POSITION, Packet.Client.LEGACY_POSITION, Packet.Client.LEGACY_POSITION_LOOK})
+@Packets(packets = {Packet.Client.LEGACY_POSITION, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.POSITION_LOOK, Packet.Client.POSITION})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Fly (Type C)", description = "A different style of acceleration check.", type = CheckType.FLY, cancelType = CancelType.MOTION)
+@CheckInfo(name = "Fly (Type C)", description = "Makes sure the client is accelerating towards the ground properly.", type = CheckType.FLY, cancelType = CancelType.MOTION, maxVL = 200)
 public class FlyC extends Check {
 
-    public FlyC() {
-
-    }
-
-    private double vl;
+    private double lastYChange;
+    private int vl;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if (MiscUtils.cancelForFlight(getData(), 12, true)) return;
-
+        if (getData().getLastServerPos().hasNotPassed(1)) return;
         val move = getData().getMovementProcessor();
+        val from = move.getFrom();
+        val to = move.getTo();
 
-        if (move.isNearGround()) return;
+        val yChange = to.getY() - from.getY();
+        val predictedY = (lastYChange - 0.08D) * 0.9800000190734863D;
+        this.lastYChange = yChange;
 
-        val collides = getData().getBoundingBox().grow(1.5f, 1.5f, 1.5f).getCollidingBlocks(getData().getPlayer()).stream().anyMatch(BlockUtils::isSolid);
+        if (MiscUtils.cancelForFlight(getData(), 15, true)) return;
 
-        if (!MathUtils.approxEquals(0.01, move.getLastClientYAcceleration(), move.getClientYAcceleration())) {
-            if ((!collides && move.getAirTicks() > 2) || vl++ > 4) {
-                flag(move.getClientYAcceleration() + ", " + move.getLastClientYAcceleration(), true, true);
+        if (!move.isNearGround()) {
+            val offset = Math.abs(yChange - predictedY);
+
+            if (!MathUtils.approxEquals(0.05, yChange, predictedY)) {
+                if (vl++ > 2) {
+                    this.flag("O -> " + offset, false, true);
+                }
+            } else {
+                vl = Math.max(vl - 1, 0);
             }
-        } else vl -= vl > 0 ? 0.75 : 0;
+
+            debug("VL: " + vl + "DIF: " + Math.abs(yChange - predictedY));
+        }
     }
 
     @Override

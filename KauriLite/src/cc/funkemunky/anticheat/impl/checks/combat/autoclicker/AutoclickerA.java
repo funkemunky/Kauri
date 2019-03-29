@@ -31,10 +31,6 @@ public class AutoclickerA extends Check {
     private long lastTimeStamp;
     private double vl;
 
-    public AutoclickerA() {
-
-    }
-
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
@@ -45,7 +41,7 @@ public class AutoclickerA extends Check {
         if (elapsed < 2) return;
         val cps = 1000D / elapsed;
 
-        if (cps > maxCPS && !getData().isLagging()) {
+        if (cps > maxCPS && !getData().getMovementProcessor().isLagging()) {
             if (vl++ > verboseThreshold) {
                 flag(cps + ">-" + maxCPS, false, cps > banCPS);
             }

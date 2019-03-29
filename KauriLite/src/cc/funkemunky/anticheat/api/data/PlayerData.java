@@ -34,15 +34,15 @@ public class PlayerData {
     private UUID uuid, debuggingPlayer;
     private Check debuggingCheck;
     private String specificPacketDebug = "";
-    private boolean debuggingBox, debuggingPackets, banned = false;
+    private boolean debuggingBox, debuggingPackets, banned = false, developerAlerts,
+            ableToFly, creativeMode, invulnerable, flying, generalCancel, breakingBlock,
+            cinematicMode, lagging, alertsEnabled, inventoryOpen;
     private Player player;
 
     private Map<String, List<Check>> packetChecks = new HashMap<>();
     private Map<Class, List<Check>> bukkitChecks = new HashMap<>();
 
     private CancelType cancelType = CancelType.NONE;
-    private boolean ableToFly, creativeMode, invulnerable, flying, generalCancel, breakingBlock,
-            cinematicMode, lagging, alertsEnabled;
     private Vector lastVelocityVector;
     private BoundingBox boundingBox;
     private TickTimer lastMovementCancel = new TickTimer(4),
@@ -58,7 +58,6 @@ public class PlayerData {
     private MCSmooth yawSmooth = new MCSmooth(), pitchSmooth = new MCSmooth();
     private CustomLocation entityFrom, entityTo;
     private PastLocation entityPastLocation = new PastLocation();
-    private boolean inventoryOpen;
 
     /* Processors */
     private MovementProcessor movementProcessor;

@@ -16,7 +16,6 @@ import cc.funkemunky.api.profiling.BaseProfiler;
 import cc.funkemunky.api.utils.*;
 import lombok.Getter;
 import org.bukkit.Bukkit;
-import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -39,13 +38,14 @@ public class Kauri extends JavaPlugin {
     private DataManager dataManager;
     private CheckManager checkManager;
     private StatsManager statsManager;
-    private BanwaveManager banwaveManager;
     private LoggerManager loggerManager;
+    private BanwaveManager banwaveManager;
 
     private int currentTicks;
     private long lastTick, tickElapsed, profileStart;
 
-    private ScheduledExecutorService executorService;
+    private ScheduledExecutorService executorService, checkExecutor;
+
     private BaseProfiler profiler;
 
     private String requiredVersionOfAtlas = "1.1.4";
@@ -57,8 +57,8 @@ public class Kauri extends JavaPlugin {
         instance = this;
         saveDefaultConfig();
 
-        if (Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled())
-            return;
+        /*if (Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled())
+            return;*/
 
         if (Bukkit.getPluginManager().isPluginEnabled("Atlas") && usableVersionsOfAtlas.contains(Bukkit.getPluginManager().getPlugin("Atlas").getDescription().getVersion())) {
 
@@ -84,10 +84,11 @@ public class Kauri extends JavaPlugin {
 
             MiscUtils.printToConsole("&aSuccessfully loaded Kauri and all of its libraries!");
         } else {
-            Bukkit.getLogger().log(Level.SEVERE, "You do not the required Atlas dependency installed! Try restarting the server to see if the downloader will do it properly next time.");
+            Bukkit.getLogger().log(Level.SEVERE, "You do not the required Atlas dependency installed! Try restarting the server to see if the downloader will do it properly next intervalTime.");
         }
 
         executorService = Executors.newSingleThreadScheduledExecutor();
+        checkExecutor = Executors.newScheduledThreadPool(2);
 
         //Registering all the commands
     }
@@ -97,14 +98,14 @@ public class Kauri extends JavaPlugin {
         loggerManager.saveToDatabase();
         EventManager.unregister(new FunkeListeners());
         EventManager.unregister(new PacketListeners());
-        HandlerList.unregisterAll(this);
+        org.bukkit.event.HandlerList.unregisterAll(this);
         dataManager.getDataObjects().clear();
         checkManager.getChecks().clear();
         executorService.shutdownNow();
     }
 
     private void runTasks() {
-        //This allows us to use ticks for time comparisons to allow for more parrallel calculations to actual Minecraft
+        //This allows us to use ticks for intervalTime comparisons to allow for more parrallel calculations to actual Minecraft
         //and it also has the added benefit of being lighter than using System.currentTimeMillis.
         new BukkitRunnable() {
             public void run() {
@@ -144,10 +145,7 @@ public class Kauri extends JavaPlugin {
         reloadConfig();
         getCheckManager().getChecks().clear();
         getDataManager().getDataObjects().clear();
-        EventManager.unregisterAll(this);
-        HandlerList.unregisterAll(this);
         startScanner(false);
-        checkManager = new CheckManager();
         dataManager = new DataManager();
         dataManager.registerAllPlayers();
     }

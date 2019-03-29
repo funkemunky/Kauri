@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.movement.velocity;
 
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
+import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.MathUtils;
@@ -11,11 +12,8 @@ import org.bukkit.event.Event;
 
 @Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Velocity (Type B)", description = "Checks for horizontal velocity modifications.", maxVL = 80, executable = false)
+@CheckInfo(name = "Velocity (Type B)", description = "Checks for horizontal velocity modifications.", type = CheckType.VELOCITY, maxVL = 80, executable = false)
 public class VelocityB extends Check {
-    public VelocityB() {
-
-    }
 
     private double vl;
 
@@ -41,11 +39,11 @@ public class VelocityB extends Check {
             val quotient = dxz / kbxz;
 
             if (quotient < 0.6) {
-                if ((vl += 1.1) >= 15.0) {
+                if (vl++ > 18.0) {
                     flag("velocity: " + MathUtils.round(quotient * 100, 1) + "%", true, true);
                 }
             } else {
-                vl = Math.max(0, vl - 0.8);
+                vl = Math.max(0, vl - 1);
             }
 
             debug("QUOTIENT: " + quotient + "/0.6" + " VL: " + vl);

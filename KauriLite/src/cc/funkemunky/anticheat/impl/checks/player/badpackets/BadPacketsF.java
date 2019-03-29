@@ -20,7 +20,7 @@ import org.bukkit.event.Event;
 @CheckInfo(name = "BadPackets (Type F)", description = "Checks frequency of incoming packets. More reliable, but less detection.", type = CheckType.BADPACKETS, maxVL = 40)
 public class BadPacketsF extends Check {
 
-    @Setting(name = "threshold.time")
+    @Setting(name = "threshold.intervalTime")
     private long threshold = 960L;
 
     @Setting(name = "threshold.vl.max")

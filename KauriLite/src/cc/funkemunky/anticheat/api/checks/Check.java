@@ -51,9 +51,9 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
                     new BukkitRunnable() {
                         public void run() {
                             getData().setBanned(false);
+                            execCommand.forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replaceAll("%player%", getData().getPlayer().getName()).replaceAll("%check%", getName())));
                             getData().getPacketChecks().values().forEach(checkList -> checkList.forEach(check -> check.vl = 0));
                             getData().getBukkitChecks().values().forEach(checkList -> checkList.forEach(check -> check.vl = 0));
-                            execCommand.forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replaceAll("%player%", getData().getPlayer().getName()).replaceAll("%check%", getName())));
                         }
                     }.runTaskLater(Kauri.getInstance(), 10);
                     if (CheckSettings.broadcastEnabled)
@@ -67,16 +67,18 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
 
                 JsonMessage message = new JsonMessage();
                 message.addText(Color.translate(alertMessage.replaceAll("%check%", (developer ? Color.Red + Color.Italics : "") + getName()).replaceAll("%player%", data.getPlayer().getName()).replaceAll("%vl%", String.valueOf(vl)).replaceAll("%info%", information))).addHoverText((!ban || developer ? Color.Red + "This alert does not count towards their ban-violations." + "\n" : "") + Color.Gray + information);
-                if (System.currentTimeMillis() - lastAlert > CheckSettings.alertsDelay) {
-                    Kauri.getInstance().getDataManager().getDataObjects().values().stream().filter(PlayerData::isAlertsEnabled).forEach(data -> message.sendToPlayer(data.getPlayer()));
-                    lastAlert = System.currentTimeMillis();
+
+                if((!data.getMovementProcessor().isLagging() && ban) || CheckSettings.showExperimentalAlerts) {
+                    if (System.currentTimeMillis() - lastAlert > CheckSettings.alertsDelay) {
+                        Kauri.getInstance().getDataManager().getDataObjects().values().stream().filter(PlayerData::isAlertsEnabled).forEach(data -> message.sendToPlayer(data.getPlayer()));
+                        lastAlert = System.currentTimeMillis();
+                    }
+                    if (CheckSettings.printToConsole) {
+                        MiscUtils.printToConsole(alertMessage.replaceAll("%check%", (developer ? Color.Red + Color.Italics : "") + getName()).replaceAll("%player%", data.getPlayer().getName()).replaceAll("%vl%", String.valueOf(vl)));
+                    }
                 }
 
                 if (CheckSettings.testMode && !data.isAlertsEnabled()) message.sendToPlayer(data.getPlayer());
-
-                if (CheckSettings.printToConsole) {
-                    MiscUtils.printToConsole(alertMessage.replaceAll("%check%", (developer ? Color.Red + Color.Italics : "") + getName()).replaceAll("%player%", data.getPlayer().getName()).replaceAll("%vl%", String.valueOf(vl)));
-                }
             }
         });
     }
@@ -97,7 +99,7 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
             Kauri.getInstance().saveConfig();
         });
         
-        if (Kauri.getInstance().getConfig().get("checks." + name) != null && Kauri.getInstance().getConfig().get("checks." + name + ".enabled") != null) {
+        if (Kauri.getInstance().getConfig().get("checks." + name) != null) {
             maxVL = Kauri.getInstance().getConfig().getInt(path + ".maxVL");
             enabled = Kauri.getInstance().getConfig().getBoolean(path + ".enabled");
             executable = Kauri.getInstance().getConfig().getBoolean(path + ".executable");

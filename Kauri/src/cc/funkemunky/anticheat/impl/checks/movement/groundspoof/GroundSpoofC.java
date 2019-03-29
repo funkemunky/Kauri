@@ -21,7 +21,9 @@ public class GroundSpoofC extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        if (getData().isGeneralCancel() || getData().getVelocityProcessor().getLastVelocity().hasNotPassed(5) || getData().getLastServerPos().hasNotPassed(1)) return;
+        if (getData().isGeneralCancel()
+                || getData().getVelocityProcessor().getLastVelocity().hasNotPassed(5)
+                || getData().getLastServerPos().hasNotPassed(1) || move.isOnClimbable()) return;
 
         if (move.isServerOnGround() && timeStamp > lastTimeStamp + 5 && !move.isClientOnGround() && move.getGroundTicks() > 4) {
             if (verbose.flag(4, 350L)) {

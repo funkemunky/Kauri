@@ -13,9 +13,6 @@ import org.bukkit.event.Event;
 @cc.funkemunky.api.utils.Init
 @CheckInfo(name = "BadPackets (Type C)", description = "Checks for impossible pitch rotation.", type = CheckType.BADPACKETS, maxVL = 2)
 public class BadPacketsC extends Check {
-    public BadPacketsC() {
-
-    }
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {

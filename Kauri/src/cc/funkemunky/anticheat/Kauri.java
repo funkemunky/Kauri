@@ -48,7 +48,7 @@ public class Kauri extends JavaPlugin {
     private int currentTicks;
     private long lastTick, tickElapsed, profileStart;
 
-    private ScheduledExecutorService executorService;
+    private ScheduledExecutorService executorService, checkExecutor;
 
     private BaseProfiler profiler;
     private VPNUtils vpnUtils;
@@ -96,6 +96,7 @@ public class Kauri extends JavaPlugin {
         }
 
         executorService = Executors.newSingleThreadScheduledExecutor();
+        checkExecutor = Executors.newScheduledThreadPool(2);
 
         //Registering all the commands
     }

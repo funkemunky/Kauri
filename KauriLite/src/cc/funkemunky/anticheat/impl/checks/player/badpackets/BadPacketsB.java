@@ -13,9 +13,6 @@ import org.bukkit.event.Event;
 @cc.funkemunky.api.utils.Init
 @CheckInfo(name = "BadPackets (Type B)", description = "Looks for any invalid movements while a player has an inventory window open.", type = CheckType.BADPACKETS, maxVL = 80, executable = false, developer = true)
 public class BadPacketsB extends Check {
-    public BadPacketsB() {
-
-    }
 
     @Setting(name = "threshold.vl.max")
     private int vlThreshold = 10;
@@ -27,7 +24,7 @@ public class BadPacketsB extends Check {
         if (getData().getActionProcessor().isOpenInventory()) {
             val move = getData().getMovementProcessor();
             if (!packetType.contains("Position") || (!move.isInLiquid() && move.isServerOnGround() && !move.isOnClimbable())) {
-                if (vl++ > vlThreshold) {
+                if (getData().getMovementProcessor().getDeltaXZ() > 0.1 && vl++ > vlThreshold) {
                     flag(vl + ">-" + vlThreshold, true, true);
                 }
             } else vl = 0;

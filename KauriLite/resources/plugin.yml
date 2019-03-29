@@ -1,7 +1,7 @@
 name: KauriLite
 main: cc.funkemunky.anticheat.Kauri
 desciption: A new evolution in detection.
-version: b14
+version: b15
 depend: [Atlas]
 authors: [funkemunky, Elevated]
 commands:

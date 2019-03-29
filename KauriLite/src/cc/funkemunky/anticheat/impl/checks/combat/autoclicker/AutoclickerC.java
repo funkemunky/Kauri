@@ -29,10 +29,6 @@ public class AutoclickerC extends Check {
     private int cps, ticks;
     private double vl;
 
-    public AutoclickerC() {
-
-    }
-
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         if (packetType.contains("Position") || packetType.contains("Look") || packetType.equals(Packet.Client.FLYING)) {

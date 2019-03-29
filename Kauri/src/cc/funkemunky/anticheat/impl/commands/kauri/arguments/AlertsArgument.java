@@ -15,6 +15,9 @@ public class AlertsArgument extends FunkeArgument {
 
         addAlias("toggleAlerts");
         addAlias("ta");
+        addAlias("talerts");
+
+        addTabComplete(2, "dev");
 
         setPlayerOnly(true);
     }
@@ -27,7 +30,13 @@ public class AlertsArgument extends FunkeArgument {
             sender.sendMessage(getParent().getCommandMessages().getErrorColor() + "There was an error trying to find your data object.");
             return;
         }
+
         data.setAlertsEnabled(!data.isAlertsEnabled());
-        sender.sendMessage(Color.translate("&7Toggled your alerts &f" + (data.isAlertsEnabled() ? "on" : "off") + "&7."));
+        if(args.length > 1 && args[1].equalsIgnoreCase("dev")) {
+            data.setDeveloperAlerts(data.isAlertsEnabled());
+            sender.sendMessage(Color.translate("&7Toggled your alerts with developer mode &f" + (data.isAlertsEnabled() ? "on" : "off") + "&7."));
+        } else {
+            sender.sendMessage(Color.translate("&7Toggled your alerts &f" + (data.isAlertsEnabled() ? "on" : "off") + "&7."));
+        }
     }
 }

@@ -17,9 +17,6 @@ import org.bukkit.potion.PotionEffectType;
 @cc.funkemunky.api.utils.Init
 @CheckInfo(name = "FastLadder", description = "Looks for any suspicious vertical speed values while climbing.", type = CheckType.MOVEMENT, cancelType = CancelType.MOTION)
 public class FastLadder extends Check {
-    public FastLadder() {
-
-    }
 
     @Setting(name = "threshold.verboseMaxSpeed")
     private float verboseMaxSpeed = 0.118f;

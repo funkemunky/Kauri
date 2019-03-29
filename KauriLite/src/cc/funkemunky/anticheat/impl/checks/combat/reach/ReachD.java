@@ -40,7 +40,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class ReachD extends Check {
 
     @Setting(name = "pingRange")
-    private long pingRange = 150;
+    private long pingRange = 100;
 
     @Setting(name = "threshold.reach")
     private float maxReach = 3.0f;

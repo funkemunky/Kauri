@@ -38,4 +38,7 @@ public class CheckSettings {
 
     @ConfigSetting(path = "bypass", name = "permission")
     public static String bypassPermission = "kauri.bypass";
+
+    @ConfigSetting(path = "alerts", name = "showExperimentalAlerts")
+    public static boolean showExperimentalAlerts = false;
 }

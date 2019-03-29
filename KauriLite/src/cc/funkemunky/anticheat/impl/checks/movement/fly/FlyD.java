@@ -4,51 +4,36 @@ import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.utils.BukkitEvents;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
-import cc.funkemunky.anticheat.api.utils.Packets;
-import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.PlayerUtils;
 import lombok.val;
 import org.bukkit.event.Event;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.potion.PotionEffectType;
 
-@Packets(packets = {Packet.Client.LEGACY_POSITION, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.POSITION_LOOK, Packet.Client.POSITION})
+@BukkitEvents(events = {PlayerMoveEvent.class})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Fly (Type D)", description = "Makes sure the client is accelerating towards the ground properly.", type = CheckType.FLY, cancelType = CancelType.MOTION, maxVL = 200)
+@CheckInfo(name = "Fly (Type D)", description = "Checks if a client moves vertically faster than what is possible.", type = CheckType.FLY, cancelType = CancelType.MOTION, executable = false, developer = true)
 public class FlyD extends Check {
-
-    private double lastYChange;
-    private int vl;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if (getData().getLastServerPos().hasNotPassed(1)) return;
-        val move = getData().getMovementProcessor();
-        val from = move.getFrom();
-        val to = move.getTo();
 
-        val yChange = to.getY() - from.getY();
-        val predictedY = (lastYChange - 0.08D) * 0.9800000190734863D;
-        this.lastYChange = yChange;
-
-        if (MiscUtils.cancelForFlight(getData(), 15, true)) return;
-
-        if (!move.isNearGround()) {
-            val offset = Math.abs(yChange - predictedY);
-
-            if (!MathUtils.approxEquals(0.05, yChange, predictedY)) {
-                if (vl++ > 2) {
-                    this.flag("O -> " + offset, false, true);
-                }
-            } else {
-                vl = Math.max(vl - 1, 0);
-            }
-
-            debug("VL: " + vl + "DIF: " + Math.abs(yChange - predictedY));
-        }
     }
 
     @Override
     public void onBukkitEvent(Event event) {
+        PlayerMoveEvent e = (PlayerMoveEvent) event;
 
+        if (MiscUtils.cancelForFlight(getData(), 15, false)) return;
+
+        val deltaY = (float) (e.getTo().getY() - e.getFrom().getY());
+        val player = e.getPlayer();
+        val totalMaxY = 0.6 + PlayerUtils.getPotionEffectLevel(player, PotionEffectType.JUMP) * 0.12f;
+
+        if (deltaY > totalMaxY) {
+            flag(deltaY + ">-" + totalMaxY, true, true);
+        }
     }
 }
