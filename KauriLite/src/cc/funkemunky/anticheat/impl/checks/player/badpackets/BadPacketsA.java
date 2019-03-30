@@ -20,15 +20,8 @@ import org.bukkit.event.Event;
 @cc.funkemunky.api.utils.Init
 @CheckInfo(name = "BadPackets (Type A)", description = "Prevents the client from spoofing the ability to fly.", type = CheckType.BADPACKETS, maxVL = 40)
 public class BadPacketsA extends Check {
-    @Setting(name = "vlMax")
-    private int vlMax = 3;
 
-    private boolean serverSent, clientSent, lastCreative;
-    private int vl;
-
-    public BadPacketsA() {
-
-    }
+    private boolean serverSent, lastAllowedFlight;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
@@ -41,32 +34,14 @@ public class BadPacketsA extends Check {
         } else if (packetType.equalsIgnoreCase(Packet.Client.ABILITIES)) {
             WrappedInAbilitiesPacket abilities = new WrappedInAbilitiesPacket(packet, getData().getPlayer());
 
-            if (abilities.isAllowedFlight() && !getData().isCreativeMode() && !serverSent) {
-                if (vl++ > vlMax) {
-                    flag("fake news abilities packet", true, true);
-                }
-            } else {
-                vl -= vl > 0 ? 1 : 0;
-            }
-
-            clientSent = true;
-
-            if (!abilities.isAllowedFlight()) {
-                clientSent = serverSent = false;
-            }
-
-            if (abilities.isCreativeMode() != lastCreative) {
-                clientSent = serverSent = false;
-            }
-
-            if ((lastCreative = abilities.isCreativeMode())) {
-                clientSent = serverSent = false;
-            }
-
-        } else {
-            if (!serverSent && !getData().isCreativeMode() && clientSent) {
+            if (abilities.isAllowedFlight() != lastAllowedFlight && abilities.isAllowedFlight() && !getData().isCreativeMode() && !serverSent) {
                 flag("fake news abilities packet", true, true);
+                getData().getPlayer().setAllowFlight(false);
             }
+
+            lastAllowedFlight = abilities.isAllowedFlight();
+            serverSent = false;
+
         }
     }
 

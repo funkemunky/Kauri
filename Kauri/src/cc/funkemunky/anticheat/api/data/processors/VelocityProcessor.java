@@ -1,10 +1,12 @@
 package cc.funkemunky.anticheat.api.data.processors;
 
+import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.TickTimer;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import lombok.Getter;
 import lombok.var;
+import org.bukkit.Bukkit;
 
 @Getter
 public class VelocityProcessor {
@@ -12,15 +14,13 @@ public class VelocityProcessor {
     private TickTimer lastVelocity = new TickTimer(40);
 
     public void update(WrappedOutVelocityPacket packet) {
-        if (packet.getId() == packet.getPlayer().getEntityId()) {
-            maxVertical = motionY = (float) packet.getY();
-            maxHorizontal = (float) cc.funkemunky.anticheat.api.utils.MiscUtils.hypot(packet.getX(), packet.getZ());
+        maxVertical = motionY = (float) packet.getY();
+        maxHorizontal = (float) cc.funkemunky.anticheat.api.utils.MiscUtils.hypot(packet.getX(), packet.getZ());
 
-            lastVelocity.reset();
+        if(packet.getId() == packet.getPlayer().getEntityId()) lastVelocity.reset();
 
-            motionX = (float) packet.getX();
-            motionZ = (float) packet.getZ();
-        }
+        motionX = (float) packet.getX();
+        motionZ = (float) packet.getZ();
     }
 
     public void update(WrappedInFlyingPacket packet) {
@@ -59,5 +59,9 @@ public class VelocityProcessor {
         this.motionX = motionX;
         this.motionY = motionY;
         this.motionZ = motionZ;
+    }
+
+    public boolean isTakingVelocity() {
+        return motionY > 0 || MiscUtils.hypot(motionX, motionZ) > 1E-4;
     }
 }

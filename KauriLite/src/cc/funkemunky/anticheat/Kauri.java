@@ -13,14 +13,19 @@ import cc.funkemunky.anticheat.impl.listeners.PacketListeners;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.event.system.EventManager;
 import cc.funkemunky.api.profiling.BaseProfiler;
+import cc.funkemunky.api.updater.UpdaterUtils;
 import cc.funkemunky.api.utils.*;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.io.*;
 import java.lang.reflect.Field;
 import java.math.RoundingMode;
 import java.util.Arrays;
@@ -49,7 +54,10 @@ public class Kauri extends JavaPlugin {
     private BaseProfiler profiler;
 
     private String requiredVersionOfAtlas = "1.1.4";
-    private List<String> usableVersionsOfAtlas = Arrays.asList("1.1.4");
+    private List<String> usableVersionsOfAtlas = Arrays.asList("1.1.4", "1.1.4.1");
+
+    private FileConfiguration config;
+    private File configFile;
 
     @Override
     public void onEnable() {
@@ -143,13 +151,56 @@ public class Kauri extends JavaPlugin {
 
     public void reloadKauri() {
         reloadConfig();
-        getCheckManager().getChecks().clear();
-        getDataManager().getDataObjects().clear();
-        startScanner(false);
+        checkManager = new CheckManager();
         dataManager = new DataManager();
+        HandlerList.unregisterAll(this);
+        EventManager.unregisterAll(this);
+        startScanner(false);
         dataManager.registerAllPlayers();
     }
 
+    public void reloadConfig() {
+        if (configFile == null) {
+            configFile = new File(UpdaterUtils.getPluginDirectory(), "config.yml");
+        }
+        config = YamlConfiguration.loadConfiguration(configFile);
+
+        // Look for defaults in the jar
+        try {
+            Reader defConfigStream = new InputStreamReader(this.getResource("config.yml"), "UTF8");
+            YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(defConfigStream);
+            config.setDefaults(defConfig);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public FileConfiguration getConfig() {
+        if (config == null) {
+            reloadConfig();
+        }
+        return config;
+    }
+
+    public void saveConfig() {
+        if (config == null || configFile == null) {
+            return;
+        }
+        try {
+            getConfig().save(configFile);
+        } catch (IOException ex) {
+            getLogger().log(Level.SEVERE, "Could not save config to " + configFile, ex);
+        }
+    }
+
+    public void saveDefaultConfig() {
+        if (configFile == null) {
+            configFile = new File(getDataFolder(), "config.yml");
+        }
+        if (!configFile.exists()) {
+            this.saveResource("config.yml", false);
+        }
+    }
     //Credits: Luke.
 
     private void initializeScanner(Class<?> mainClass, Plugin plugin, boolean configOnly) {

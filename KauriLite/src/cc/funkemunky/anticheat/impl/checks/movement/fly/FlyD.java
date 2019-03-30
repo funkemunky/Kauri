@@ -26,7 +26,7 @@ public class FlyD extends Check {
     public void onBukkitEvent(Event event) {
         PlayerMoveEvent e = (PlayerMoveEvent) event;
 
-        if (MiscUtils.cancelForFlight(getData(), 15, false)) return;
+        if (MiscUtils.cancelForFlight(getData(), 5, false)) return;
 
         val deltaY = (float) (e.getTo().getY() - e.getFrom().getY());
         val player = e.getPlayer();
@@ -35,5 +35,7 @@ public class FlyD extends Check {
         if (deltaY > totalMaxY) {
             flag(deltaY + ">-" + totalMaxY, true, true);
         }
+
+        debug("Y: " + deltaY);
     }
 }

@@ -94,6 +94,7 @@ public class MiscUtils {
                 || move.getLastVehicle().hasNotPassed(5)
                 || move.getLiquidTicks() > 0
                 || move.getWebTicks() > 0
+                || velocity.isTakingVelocity()
                 || move.getLastFlightToggle().hasNotPassed(10)
                 || (move.isLagging() && data.isLagging())
                 || !Atlas.getInstance().getBlockBoxManager().getBlockBox().isChunkLoaded(data.getPlayer().getLocation())

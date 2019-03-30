@@ -58,9 +58,7 @@ public class PacketListeners implements Listener {
                 case Packet.Server.ENTITY_VELOCITY: {
                     WrappedOutVelocityPacket packet = new WrappedOutVelocityPacket(event.getPacket(), event.getPlayer());
 
-                    if ((Math.abs(packet.getX()) > 0.1 || Math.abs(packet.getZ()) > 0.1) && Math.abs(packet.getY()) > 0.1) {
-                        data.getVelocityProcessor().update(packet);
-                    }
+                    data.getVelocityProcessor().update(packet);
                     break;
                 }
             }
@@ -202,13 +200,13 @@ public class PacketListeners implements Listener {
 
     private void hopper(Object packet, String packetType, long timeStamp, PlayerData data) {
         if ((!CheckSettings.bypassEnabled || !data.getPlayer().hasPermission(CheckSettings.bypassPermission)) && !Kauri.getInstance().getCheckManager().isBypassing(data.getUuid())) {
-            Kauri.getInstance().getCheckExecutor().schedule(() ->
+            Kauri.getInstance().getCheckExecutor().execute(() ->
                     data.getPacketChecks().getOrDefault(packetType, new ArrayList<>()).stream().filter(Check::isEnabled).forEach(check ->
                     {
                         Kauri.getInstance().getProfiler().start("check:" + check.getName());
                         check.onPacket(packet, packetType, timeStamp);
                         Kauri.getInstance().getProfiler().stop("check:" + check.getName());
-                    }), 5, TimeUnit.MILLISECONDS);
+                    }));
         }
     }
 
