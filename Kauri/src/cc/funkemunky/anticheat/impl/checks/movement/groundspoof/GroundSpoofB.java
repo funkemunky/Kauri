@@ -36,6 +36,7 @@ public class GroundSpoofB extends Check {
         val move = getData().getMovementProcessor();
 
         if (getData().isGeneralCancel()
+                || move.isInsideBlock()
                 || getData().getVelocityProcessor().getLastVelocity().hasNotPassed(5)
                 || getData().getLastServerPos().hasNotPassed(1)
                 || move.isOnClimbable()) return;

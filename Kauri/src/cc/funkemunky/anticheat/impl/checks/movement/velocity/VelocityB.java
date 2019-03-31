@@ -49,7 +49,7 @@ public class VelocityB extends Check {
             debug("QUOTIENT: " + quotient + "/0.6" + " VL: " + vl);
         }
 
-        //debug("KBXZ: " + kbxz + " COLLIDE:" + noneCollide + " DXZ: " + dxz + " DY: " + dy + " KBY: " + getData().getVelocityProcessor().getMotionY());
+        //=debug("KBXZ: " + kbxz + " COLLIDE:" + noneCollide + " DXZ: " + dxz + " DY: " + dy + " KBY: " + getData().getVelocityProcessor().getMotionY());
     }
 
     @Override

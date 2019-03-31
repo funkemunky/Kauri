@@ -23,7 +23,7 @@ public class GroundSpoofC extends Check {
         val move = getData().getMovementProcessor();
 
         if (getData().isGeneralCancel()
-                || !BlockUtils.isSolid(BlockUtils.getBlock(getData().getPlayer().getLocation()))
+                || move.isInsideBlock()
                 || getData().getVelocityProcessor().getLastVelocity().hasNotPassed(5)
                 || getData().getLastServerPos().hasNotPassed(1)
                 || move.isOnClimbable()
