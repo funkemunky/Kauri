@@ -27,7 +27,7 @@ public class GroundSpoofA extends Check {
             return;
 
         if (!getData().isGeneralCancel() && !move.isInsideBlock() && !move.isBlocksOnTop()) {
-            if (move.isClientOnGround() != move.isServerOnGround() && !move.isLagging() && move.getClimbTicks() == 0 && move.getWebTicks() == 0) {
+            if (move.isClientOnGround() != move.isServerOnGround() && !move.isLagging() && move.getLiquidTicks() == 0 && move.getClimbTicks() == 0 && move.getWebTicks() == 0) {
                 if (vl++ > 3) {
                     flag(getData().getMovementProcessor().isClientOnGround() + "!=" + getData().getMovementProcessor().isServerOnGround(), true, true);
                 }

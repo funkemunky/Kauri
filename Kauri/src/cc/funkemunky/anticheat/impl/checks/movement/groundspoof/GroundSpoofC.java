@@ -27,6 +27,7 @@ public class GroundSpoofC extends Check {
                 || getData().getVelocityProcessor().getLastVelocity().hasNotPassed(5)
                 || getData().getLastServerPos().hasNotPassed(1)
                 || move.isOnClimbable()
+                || move.getLiquidTicks() > 0
                 || move.getWebTicks() > 0
                 || move.getClimbTicks() > 0) return;
 

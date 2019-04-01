@@ -39,6 +39,8 @@ public class GroundSpoofB extends Check {
                 || move.isInsideBlock()
                 || getData().getVelocityProcessor().getLastVelocity().hasNotPassed(5)
                 || getData().getLastServerPos().hasNotPassed(1)
+                || move.getLiquidTicks() > 0
+                || move.getWebTicks() > 0
                 || move.isOnClimbable()) return;
 
         if (timeStamp > lastTimeStamp + 5 && move.getDistanceToGround() > distanceFG && move.getAirTicks() > ticksInAir && !move.isServerOnGround() && move.isClientOnGround()) {
