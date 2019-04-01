@@ -23,7 +23,7 @@ public class StepA extends Check {
         val move = getData().getMovementProcessor();
 
         debug(move.isServerOnGround() + "");
-        if (getData().isGeneralCancel()) return;
+        if (getData().isGeneralCancel() && move.getHalfBlockTicks() == 0) return;
 
         if (move.isCollidesHorizontally()) {
             debug("TOTAL: " + (yTotal += move.getDeltaY()));

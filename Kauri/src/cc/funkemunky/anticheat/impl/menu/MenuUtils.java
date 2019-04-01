@@ -16,7 +16,8 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
-public class MenuUtils {
+public class
+MenuUtils {
     public static boolean hasModifiedChecks = false;
 
     private static Button createButton(boolean moveable, ItemStack stack, ClickAction action) {
