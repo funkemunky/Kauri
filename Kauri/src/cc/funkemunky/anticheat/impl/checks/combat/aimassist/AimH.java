@@ -4,15 +4,17 @@ import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
-import cc.funkemunky.anticheat.api.utils.BukkitEvents;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import lombok.val;
 import org.bukkit.event.Event;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.util.Vector;
 
-@BukkitEvents(events = {PlayerMoveEvent.class})
+@Packets(packets = {
+        Packet.Client.LOOK,
+        Packet.Client.POSITION_LOOK,
+        Packet.Client.LEGACY_POSITION_LOOK,
+        Packet.Client.LEGACY_LOOK,})
 @cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Aim (Type H)", description = "Looks for a common angle mistake in clients. By Itz_Lucky.", type = CheckType.AIM, cancelType = CancelType.MOTION, maxVL = 10)
 public class AimH extends Check {
@@ -23,26 +25,22 @@ public class AimH extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
+        val move = getData().getMovementProcessor();
 
-    }
+        if (getData().getLastServerPos().hasNotPassed(2) && getData().getLastLogin().hasNotPassed(20)) return;
 
-    @Override
-    public void onBukkitEvent(Event event) {
-        PlayerMoveEvent e = (PlayerMoveEvent) event;
+        Vector vector = new Vector(move.getTo().getX() - move.getFrom().getX(), 0, move.getTo().getZ() - move.getFrom().getZ());
+        double angleMove = vector.distanceSquared((new Vector(move.getTo().getYaw() - move.getFrom().getYaw(), 0, move.getTo().getYaw() - move.getFrom().getYaw())));
 
-        if(e.getTo().getYaw() == e.getFrom().getYaw() || e.getTo().getPitch() == e.getFrom().getPitch()) return;
-
-        if (getData().getLastServerPos().hasNotPassed(0) && getData().getLastLogin().hasNotPassed(20)) return;
-
-        double deltaX = e.getTo().getX() - e.getFrom().getX(), deltaZ = e.getTo().getZ() - e.getFrom().getZ(), yawDelta = e.getTo().getYaw() - e.getFrom().getYaw();
-
-        Vector vector = new Vector(deltaX, 0, deltaZ);
-        double angleMove = vector.distanceSquared((new Vector(yawDelta, 0, yawDelta)));
-
-        if (angleMove > 100000 && deltaX > 0.2f && deltaZ < 1) {
+        if (angleMove > 100000 && move.getDeltaXZ() > 0.2f && move.getDeltaXZ() < 1) {
             flag("angle: " + angleMove, true, true);
         }
 
         debug("angle: " + angleMove);
+    }
+
+    @Override
+    public void onBukkitEvent(Event event) {
+
     }
 }

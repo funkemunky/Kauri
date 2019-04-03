@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.lang.reflect.InvocationTargetException;
+import java.text.Collator;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -18,7 +19,7 @@ import java.util.concurrent.Executors;
 @Setter
 public class CheckManager {
     private List<Class<?>> checkClasses = new ArrayList<>();
-    private List<Check> checks = new ArrayList<>();
+    private Collection<Check> checks = new TreeSet<Check>(Comparator.comparing(Check::getName, Collator.getInstance()));
     private Set<UUID> bypassingPlayers = new HashSet<>();
     private ExecutorService alertsExecutable;
 
@@ -26,7 +27,7 @@ public class CheckManager {
         alertsExecutable = Executors.newFixedThreadPool(2);
     }
 
-    public void registerCheck(Class<?> checkClass, List<Check> checkList) {
+    public void registerCheck(Class<?> checkClass, Collection<Check> checkList) {
         try {
             Object obj = checkClass.getConstructors()[0].newInstance();
             Check check = (Check) obj;

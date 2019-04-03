@@ -68,13 +68,14 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
                 JsonMessage message = new JsonMessage();
                 message.addText(Color.translate(alertMessage.replaceAll("%check%", (developer ? Color.Red + Color.Italics : "") + getName()).replaceAll("%player%", data.getPlayer().getName()).replaceAll("%vl%", String.valueOf(vl)).replaceAll("%info%", information))).addHoverText((!ban || developer ? Color.Red + "This alert does not count towards their ban-violations." + "\n" : "") + Color.Gray + information);
 
-                if((!data.getMovementProcessor().isLagging() && ban) || CheckSettings.showExperimentalAlerts) {
-                    if (System.currentTimeMillis() - lastAlert > CheckSettings.alertsDelay) {
-                        Kauri.getInstance().getDataManager().getDataObjects().values().stream().filter(PlayerData::isAlertsEnabled).forEach(data -> message.sendToPlayer(data.getPlayer()));
+                if((!data.getMovementProcessor().isLagging() && ban)) {
+                    if(System.currentTimeMillis() - lastAlert > CheckSettings.alertsDelay) {
+                        Kauri.getInstance().getDataManager().getDataObjects().values().stream().filter(data -> (data.isDeveloperAlerts() || data.isAlertsEnabled()) && (!developer || CheckSettings.showExperimentalAlerts || data.isDeveloperAlerts())).forEach(data -> message.sendToPlayer(data.getPlayer()));
                         lastAlert = System.currentTimeMillis();
-                    }
-                    if (CheckSettings.printToConsole) {
-                        MiscUtils.printToConsole(alertMessage.replaceAll("%check%", (developer ? Color.Red + Color.Italics : "") + getName()).replaceAll("%player%", data.getPlayer().getName()).replaceAll("%vl%", String.valueOf(vl)));
+
+                        if (CheckSettings.printToConsole) {
+                            MiscUtils.printToConsole(alertMessage.replaceAll("%check%", (developer ? Color.Red + Color.Italics : "") + getName()).replaceAll("%player%", data.getPlayer().getName()).replaceAll("%vl%", String.valueOf(vl)));
+                        }
                     }
                 }
 

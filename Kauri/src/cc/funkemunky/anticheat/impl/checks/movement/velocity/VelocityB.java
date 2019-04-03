@@ -28,7 +28,7 @@ public class VelocityB extends Check {
 
         val kbxz = cc.funkemunky.anticheat.api.utils.MiscUtils.hypot(getData().getVelocityProcessor().getMotionX(), getData().getVelocityProcessor().getMotionZ());
 
-        val noneCollide = getData().getBoundingBox().grow(1.5f, 0, 1.5f).getCollidingBlockBoxes(player).size() == 0;
+        val noneCollide = getData().getBoundingBox().grow(1.5f, 0, 1.5f).getCollidingBlocks(player).size() == 0;
         //the only accurate way to check horizontal kb is to check it in the air, if the player is on ground it won't work
         //people might say this is from agc or whatever but its from gcheat, just like entire agc is (no joke)
         if (getData().getMovementProcessor().getBlockAboveTicks() == 0

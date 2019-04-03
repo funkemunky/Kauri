@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat;
 
+import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckManager;
 import cc.funkemunky.anticheat.api.data.DataManager;
@@ -30,6 +31,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.math.RoundingMode;
+import java.text.Collator;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;

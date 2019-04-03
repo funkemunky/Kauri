@@ -37,7 +37,7 @@ public class VelocityC extends Check {
             val move = getData().getMovementProcessor();
             val velocity = getData().getVelocityProcessor();
 
-            val noneCollide = getData().getBoundingBox().grow(1.5f, -0.2f, 1.5f).getCollidingBlocks(player).stream().filter(block -> BlockUtils.isSolid(block)).count() == 0;
+            val noneCollide = getData().getBoundingBox().grow(1.5f, 0, 1.5f).getCollidingBlocks(player).stream().noneMatch(block -> !block.isEmpty());
 
             if (this.velocity > 0 && !move.isBlocksOnTop() && noneCollide) {
                 val velocityXZ = this.velocity;
@@ -54,7 +54,7 @@ public class VelocityC extends Check {
                 }
                 getAIMoveSpeed += (player.getWalkSpeed() - 0.2) * 5 * 0.45;
 
-                max /= (getAIMoveSpeed / 0.06) + (getData().getLastAttack().hasNotPassed(4) ? 0.1 : 0);
+                max /= (getAIMoveSpeed / 0.075) + (getData().getLastAttack().hasNotPassed(4) ? 0.005 : 0);
 
                 if (ratio < max) {
                     if(vl++ > 3) {

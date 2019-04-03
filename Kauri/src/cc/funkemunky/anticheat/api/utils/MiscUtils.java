@@ -4,6 +4,7 @@ import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.BoundingBox;
+import cc.funkemunky.api.utils.PlayerUtils;
 import cc.funkemunky.api.utils.ReflectionsUtil;
 import lombok.val;
 import org.bukkit.Bukkit;
@@ -14,6 +15,7 @@ import org.bukkit.command.PluginCommand;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.*;
+import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -37,6 +39,10 @@ public class MiscUtils {
         BoundingBox highestBox = boxes.stream().min(Comparator.comparingDouble(box -> 500 - box.minY)).orElse(new BoundingBox(data.getMovementProcessor().getTo().toVector(), data.getMovementProcessor().getTo().toVector()));
 
         return data.getBoundingBox().minY - highestBox.maxY;
+    }
+
+    public static float getBaseSpeed(PlayerData data) {
+        return 0.25f + (PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.SPEED) * 0.062f) + ((data.getPlayer().getWalkSpeed() - 0.2f) * 1.6f);
     }
 
     public static double hypot(double... value) {

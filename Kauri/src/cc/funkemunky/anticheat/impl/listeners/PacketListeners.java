@@ -204,7 +204,7 @@ public class PacketListeners implements Listener {
                         Kauri.getInstance().getProfiler().start("check:" + check.getName());
                         check.onPacket(packet, packetType, timeStamp);
                         Kauri.getInstance().getProfiler().stop("check:" + check.getName());
-                    }), 2, TimeUnit.MILLISECONDS);
+                    }), 4, TimeUnit.MILLISECONDS);
         }
     }
 

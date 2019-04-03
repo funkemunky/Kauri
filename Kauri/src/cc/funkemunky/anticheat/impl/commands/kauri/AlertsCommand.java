@@ -24,8 +24,8 @@ public class AlertsCommand {
 
         data.setAlertsEnabled(!data.isAlertsEnabled());
         if(args.length > 0 && args[0].equalsIgnoreCase("dev")) {
-            data.setDeveloperAlerts(data.isAlertsEnabled());
-            player.sendMessage(Color.translate("&7Toggled your alerts with developer mode &f" + (data.isAlertsEnabled() ? "on" : "off") + "&7."));
+            data.setDeveloperAlerts(!data.isDeveloperAlerts());
+            player.sendMessage(Color.translate("&7Toggled your developer alerts &f" + (data.isDeveloperAlerts() ? "on" : "off") + "&7."));
         } else {
             player.sendMessage(Color.translate("&7Toggled your alerts &f" + (data.isAlertsEnabled() ? "on" : "off") + "&7."));
         }

@@ -71,7 +71,7 @@ public class MovementProcessor {
                 inWeb = assessment.isInWeb();
                 onClimbable = assessment.isOnClimbable();
                 fullyInAir = assessment.isFullyInAir();
-                onSoulSand = assessment.getMaterialsCollided().contains(Material.SOUL_SAND);
+                onSoulSand = assessment.isOnSoulSand();
                 halfBlocksAround = assessment.getMaterialsCollided().stream().anyMatch(material -> material.toString().contains("STAIR") || material.toString().contains("STEP") || material.toString().contains("SLAB") || material.toString().contains("SNOW") || material.toString().contains("CAKE") || material.toString().contains("BED") || material.toString().contains("SKULL"));
 
                 isNearGround = isNearGround(data, 1.5f);
