@@ -42,7 +42,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class ReachE extends Check {
 
     @Setting(name = "pingRange")
-    private long pingRange = 50;
+    private long pingRange = 80;
 
     @Setting(name = "theshold.reach")
     private float maxReach = 3.0f;
@@ -115,9 +115,9 @@ public class ReachE extends Check {
 
             for (Vector vec : finalVecs) {
                 double reach = origin.toVector().distance(vec);
-                if(reach > 0) {
-                    calculatedReach = calculatedReach == 0 ? reach + .25 : Math.min(reach + .25, calculatedReach);
-                }
+                if(reach <= 0K) continue;
+
+                calculatedReach = calculatedReach == 0 ? reach + .25 : Math.min(reach + .25, calculatedReach);
 
                 collided++;
             }

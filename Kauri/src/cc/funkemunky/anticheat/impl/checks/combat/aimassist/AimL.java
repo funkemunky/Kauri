@@ -14,7 +14,7 @@ import lombok.val;
 import org.bukkit.event.Event;
 
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LOOK, Packet.Client.LEGACY_LOOK, Packet.Client.LEGACY_POSITION_LOOK})
-@Init
+//@Init
 @CheckInfo(name = "Aim (Type L)", description = "Checks for low common denominators in other rotations - FlyCode.", type = CheckType.AIM, cancelType = CancelType.MOTION, developer = true, executable = false)
 public class AimL extends Check {
 
