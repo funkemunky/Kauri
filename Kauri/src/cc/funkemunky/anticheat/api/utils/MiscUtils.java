@@ -71,6 +71,10 @@ public class MiscUtils {
         return point;
     }
 
+    public static boolean canDoCombat(boolean setting, PlayerData data) {
+        return (!setting || data.getLastAttack().hasNotPassed(6));
+    }
+
     public static List<Block> getBlocks(BoundingBox box, World world) {
         List<Block> block = new ArrayList<>();
 

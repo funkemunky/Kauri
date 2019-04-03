@@ -15,8 +15,8 @@ import org.bukkit.event.Event;
 
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LOOK, Packet.Client.LEGACY_LOOK, Packet.Client.LEGACY_POSITION_LOOK})
 @Init
-@CheckInfo(name = "Aim (Type J)", description = "Checks for low common denominators - FlyCode.", type = CheckType.AIM, cancelType = CancelType.MOTION)
-public class AimJ extends Check {
+@CheckInfo(name = "Aim (Type L)", description = "Checks for low common denominators in other rotations - FlyCode.", type = CheckType.AIM, cancelType = CancelType.MOTION, developer = true, executable = false)
+public class AimL extends Check {
 
     private Verbose verbose = new Verbose();
 
@@ -27,16 +27,18 @@ public class AimJ extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         if(!MiscUtils.canDoCombat(combatOnly, getData())) return;
 
-        val offset = 16777216L;
-        val pitchGCD = MiscUtils.gcd((long) ((getData().getMovementProcessor().getPitchDelta()) * offset), (long) ((getData().getMovementProcessor().getLastPitchDelta()) * offset));
+        val yawDifference = getData().getMovementProcessor().getYawDelta();
 
-        if(String.valueOf(pitchGCD).length() <= 5 && !getData().isCinematicMode()) {
-            if(verbose.flag(60, 250L)) {
-                flag("t: " + verbose.getVerbose() + " l: " + String.valueOf(pitchGCD).length(), true, true);
+        val offset = 16777216L;
+        val yawGCD = MiscUtils.gcd((long) ((yawDifference) * offset), (long) ((getData().getMovementProcessor().getLastYawDelta()) * offset));
+
+        if(String.valueOf(yawGCD).length() <= 5 && yawDifference > 0 && !getData().isCinematicMode()) {
+            if(verbose.flag(100, 200L)) {
+                flag("t: " + verbose.getVerbose() + " l: " + String.valueOf(yawGCD).length(), true, true);
             }
         } else verbose.deduct();
 
-        debug(verbose.getVerbose() + ", " + String.valueOf(pitchGCD).length() + ", " + getData().isCinematicMode());
+        debug(verbose.getVerbose() + ", " + String.valueOf(yawGCD).length() + ", " + getData().isCinematicMode());
     }
 
     @Override

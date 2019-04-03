@@ -4,6 +4,7 @@ import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
@@ -16,17 +17,16 @@ import org.bukkit.event.Event;
 @CheckInfo(name = "Aim (Type C)", description = "Makes sure the aim acceleration is legitimate.", type = CheckType.AIM, cancelType = CancelType.MOTION, maxVL = 80)
 public class AimC extends Check {
 
-    public AimC() {
-
-    }
-
     private int vl;
 
     @Setting(name = "threshold.vl.max")
     private int vlMax = 9;
 
     @Setting(name = "threshold.vl.subtract")
-    public int subtract = 2;
+    private int subtract = 2;
+
+    @Setting(name = "combatOnly")
+    private boolean combatOnly = true;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
@@ -34,6 +34,9 @@ public class AimC extends Check {
         val yawDelta = move.getYawDelta();
         val yawAccel = MathUtils.getDelta(move.getYawDelta(), move.getLastYawDelta());
         val pitchAccel = MathUtils.getDelta(move.getPitchDelta(), move.getLastPitchDelta());
+
+        if(!MiscUtils.canDoCombat(combatOnly, getData())) return;
+
 
         if (yawAccel == 0 && pitchAccel == 0 && getData().getPlayer().getVehicle() == null && Math.abs(move.getTo().getPitch()) < 80 && yawDelta > 0.1) {
             if (vl++ > vlMax) {

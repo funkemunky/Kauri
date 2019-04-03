@@ -23,21 +23,17 @@ public class AimB extends Check {
 
     }
 
-    private float lastPitchDelta, lastYawDelta;
     private Verbose verbose = new Verbose();
     private long lastGCD;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        val to = getData().getMovementProcessor().getTo();
-        val from = getData().getMovementProcessor().getFrom();
-        val pitchDifference = Math.abs(from.getPitch() - to.getPitch());
-        val yawDifference = Math.abs(from.getYaw() - to.getYaw());
-
+        val pitchDifference = getData().getMovementProcessor().getPitchDelta();
+        val lastPitchDifference = getData().getMovementProcessor().getLastPitchDelta();
         val offset = 16777216L;
-        val pitchGCD = MiscUtils.gcd((long) (pitchDifference * offset), (long) (lastPitchDelta * offset));
+        val pitchGCD = MiscUtils.gcd((long) (pitchDifference * offset), (long) (lastPitchDifference * offset));
 
-        if (Math.abs(to.getPitch()) < 88.0f && pitchDifference > 0 && getData().getMovementProcessor().getOptifineTicks() < 10 && (pitchGCD < 131072L || pitchGCD == lastGCD)) {
+        if (Math.abs(getData().getMovementProcessor().getTo().getPitch()) < 88.0f && pitchDifference > 0 && getData().getMovementProcessor().getOptifineTicks() < 10 && (pitchGCD < 131072L || pitchGCD == lastGCD)) {
             if (verbose.flag(150, 5000L)) {
                 flag(String.valueOf(pitchGCD / 2000), true, true);
             }
@@ -45,8 +41,6 @@ public class AimB extends Check {
 
         debug("VL: " + verbose.getVerbose() + " PITCH: " + pitchGCD + " OPTIFINE: " + getData().isCinematicMode());
 
-        lastPitchDelta = pitchDifference;
-        lastYawDelta = yawDifference;
         lastGCD = pitchGCD;
     }
 

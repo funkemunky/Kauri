@@ -4,6 +4,7 @@ import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
+import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.Color;
@@ -30,12 +31,17 @@ public class AimF extends Check {
     private double lastRange;
     private Verbose verbose = new Verbose();
 
+    @Setting(name = "combatOnly")
+    private boolean combatOnly = true;
+
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
         val offset = 16777216L;
         val gcd = MiscUtils.gcd((long) (move.getYawDelta() * offset), (long) (move.getLastYawDelta() * offset));
+
+        if(!MiscUtils.canDoCombat(combatOnly, getData())) return;
 
         if (Math.abs(move.getTo().getPitch()) < 86.0f && move.getYawDelta() > 0.2 && gcd > 121072L) {
             if (gcdValues.size() >= 5) {

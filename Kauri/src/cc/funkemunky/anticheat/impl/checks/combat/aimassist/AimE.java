@@ -4,6 +4,7 @@ import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
@@ -36,6 +37,9 @@ public class AimE extends Check {
     @Setting(name = "threshold.minYawDelta")
     private double minYawDelta = 0.6;
 
+    @Setting(name = "combatOnly")
+    private boolean combatOnly = true;
+
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
@@ -43,6 +47,9 @@ public class AimE extends Check {
         val pitchDelta = move.getPitchDelta();
         val yawAccel = MathUtils.getDelta(yawDelta, move.getLastYawDelta());
         val pitchAccel = MathUtils.getDelta(pitchDelta, move.getLastPitchDelta());
+
+        if(!MiscUtils.canDoCombat(combatOnly, getData())) return;
+
 
         if (yawDelta > minYawDelta && getData().getPlayer().getVehicle() == null && Math.abs(move.getTo().getPitch()) < 80 && (pitchAccel < pitchAccelMax || yawAccel < yawAccelMax)) {
             if (vl++ > vlMax) {

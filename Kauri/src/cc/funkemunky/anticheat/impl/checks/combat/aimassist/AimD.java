@@ -4,6 +4,7 @@ import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
@@ -31,11 +32,18 @@ public class AimD extends Check {
     @Setting(name = "threshold.verbose.subtract")
     private int subtract = 4;
 
+    @Setting(name = "combatOnly")
+    private boolean combatOnly = true;
+
+
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
         val yawDelta = move.getYawDelta();
         val pitchAcceleration = MathUtils.getDelta(move.getPitchDelta(), move.getLastPitchDelta());
+
+        if(!MiscUtils.canDoCombat(combatOnly, getData())) return;
+
 
         if (pitchAcceleration == 0 && getData().getPlayer().getVehicle() == null && Math.abs(move.getTo().getPitch()) < 80 && yawDelta > minYawDelta) {
             if (vl++ > vlMax) {
