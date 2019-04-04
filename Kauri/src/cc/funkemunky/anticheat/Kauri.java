@@ -59,11 +59,8 @@ public class Kauri extends JavaPlugin {
     private BaseProfiler profiler;
     private VPNUtils vpnUtils;
 
-    private String requiredVersionOfAtlas = "1.1.4";
+    private String requiredVersionOfAtlas = "1.1.4.1";
     private List<String> usableVersionsOfAtlas = Arrays.asList("1.1.4", "1.1.4.1");
-
-    private FileConfiguration config;
-    private File configFile;
 
     @Override
     public void onEnable() {
@@ -74,35 +71,28 @@ public class Kauri extends JavaPlugin {
         /*if (Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled())
             return;*/
 
-        if (Bukkit.getPluginManager().isPluginEnabled("Atlas") && usableVersionsOfAtlas.contains(Bukkit.getPluginManager().getPlugin("Atlas").getDescription().getVersion())) {
+        profiler = new BaseProfiler();
+        profileStart = System.currentTimeMillis();
 
-            profiler = new BaseProfiler();
-            profileStart = System.currentTimeMillis();
+        dataManager = new DataManager();
+        checkManager = new CheckManager();
 
-            dataManager = new DataManager();
-            checkManager = new CheckManager();
+        startScanner(false);
 
-            startScanner(false);
+        antiPUPManager = new AntiPUPManager();
+        dataManager.registerAllPlayers();
 
-            antiPUPManager = new AntiPUPManager();
-            dataManager.registerAllPlayers();
+        //Starting up our utilities, managers, and tasks.
 
-            //Starting up our utilities, managers, and tasks.
+        statsManager = new StatsManager();
+        loggerManager = new LoggerManager();
+        loggerManager.loadFromDatabase();
+        banwaveManager = new BanwaveManager();
 
-            statsManager = new StatsManager();
-            loggerManager = new LoggerManager();
-            loggerManager.loadFromDatabase();
-            banwaveManager = new BanwaveManager();
+        vpnUtils = new VPNUtils();
 
-            vpnUtils = new VPNUtils();
-
-            runTasks();
-            registerCommands();
-
-            MiscUtils.printToConsole("&aSuccessfully loaded Kauri and all of its libraries!");
-        } else {
-            Bukkit.getLogger().log(Level.SEVERE, "You do not the required Atlas dependency installed! Try restarting the server to see if the downloader will do it properly next intervalTime.");
-        }
+        runTasks();
+        registerCommands();
 
         executorService = Executors.newSingleThreadScheduledExecutor();
         checkExecutor = Executors.newScheduledThreadPool(2);
@@ -169,49 +159,6 @@ public class Kauri extends JavaPlugin {
         dataManager.registerAllPlayers();
     }
 
-    public void reloadConfig() {
-        if (configFile == null) {
-            configFile = new File(UpdaterUtils.getPluginDirectory(), "config.yml");
-        }
-        config = YamlConfiguration.loadConfiguration(configFile);
-
-        // Look for defaults in the jar
-        try {
-            Reader defConfigStream = new InputStreamReader(this.getResource("config.yml"), "UTF8");
-            YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(defConfigStream);
-            config.setDefaults(defConfig);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public FileConfiguration getConfig() {
-        if (config == null) {
-            reloadConfig();
-        }
-        return config;
-    }
-
-    public void saveConfig() {
-        if (config == null || configFile == null) {
-            return;
-        }
-        try {
-            getConfig().save(configFile);
-        } catch (IOException ex) {
-            getLogger().log(Level.SEVERE, "Could not save config to " + configFile, ex);
-        }
-    }
-
-    public void saveDefaultConfig() {
-        if (configFile == null) {
-            configFile = new File(getDataFolder(), "config.yml");
-        }
-        if (!configFile.exists()) {
-            this.saveResource("config.yml", false);
-        }
-    }
-    //Credits: Luke.
 
     private void initializeScanner(Class<?> mainClass, Plugin plugin, boolean configOnly) {
         ClassScanner.scanFile(null, mainClass).stream().filter(c -> {
