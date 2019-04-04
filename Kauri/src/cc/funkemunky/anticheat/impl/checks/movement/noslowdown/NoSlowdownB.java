@@ -13,7 +13,7 @@ import lombok.val;
 import org.bukkit.event.Event;
 
 @Init
-//@CheckInfo(name = "NoSlowdown (Type B)", description = "Looks for players not slowing down on soul sand.", executable = false, developer = true)
+@CheckInfo(name = "NoSlowdown (Type B)", description = "Looks for players not slowing down on soul sand.", executable = false, developer = true)
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.POSITION, Packet.Client.LEGACY_POSITION, Packet.Client.LEGACY_POSITION_LOOK})
 public class NoSlowdownB extends Check {
 

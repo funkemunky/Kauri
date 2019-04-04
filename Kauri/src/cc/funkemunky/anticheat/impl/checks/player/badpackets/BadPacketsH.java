@@ -11,7 +11,7 @@ import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.Init;
 import org.bukkit.event.Event;
 
-@CheckInfo(name = "BadPackets (Type H)", description = "Looks for a mistake commonly found in autoblock modules on cheat clients.", type = CheckType.KILLAURA, cancelType = CancelType.INTERACT)
+@CheckInfo(name = "BadPackets (Type H)", description = "Looks for a mistake commonly found in autoblock modules on cheat clients.", type = CheckType.BADPACKETS, cancelType = CancelType.INTERACT)
 @Init
 @Packets(packets = {Packet.Client.USE_ENTITY, Packet.Client.BLOCK_DIG})
 public class BadPacketsH extends Check {
@@ -20,7 +20,7 @@ public class BadPacketsH extends Check {
     private int maxVL = 14;
 
     @Setting(name = "threshold.vl.reset")
-    private long resetTime = 300L;
+    private long resetTime = 600L;
 
     @Setting(name = "threshold.vl.deduct")
     private int deduct = 1;
@@ -31,12 +31,12 @@ public class BadPacketsH extends Check {
     //TODO block place and block dig difference.
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(packetType.contains("USE")) {
+        if(packetType.equalsIgnoreCase(Packet.Client.USE_ENTITY)) {
             if(timeStamp - useEntity < 5 || getData().isLagging()) return;
             long delta = (timeStamp - blockDig);
 
             if(delta == 0) {
-                if(verbose.flag(maxVL, resetTime)) {
+                if(verbose.flag(maxVL, resetTime, 2)) {
                     flag(delta + "ms", true, true);
                 }
             } else verbose.deduct(deduct);

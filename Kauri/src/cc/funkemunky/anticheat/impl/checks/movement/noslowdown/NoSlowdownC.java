@@ -11,7 +11,7 @@ import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
 import org.bukkit.event.Event;
 
-//@Init
+@Init
 @CheckInfo(name = "NoSlowdown (Type C)", description = "Ensures the player is not moving too fast in webs.", executable = false, developer = true)
 @Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION})
 public class NoSlowdownC extends Check {

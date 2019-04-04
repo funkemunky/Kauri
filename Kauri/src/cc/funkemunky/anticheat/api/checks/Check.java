@@ -68,9 +68,9 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
                 JsonMessage message = new JsonMessage();
                 message.addText(Color.translate(alertMessage.replaceAll("%check%", (developer ? Color.Red + Color.Italics : "") + getName()).replaceAll("%player%", data.getPlayer().getName()).replaceAll("%vl%", String.valueOf(vl)).replaceAll("%info%", information))).addHoverText((!ban || developer ? Color.Red + "This alert does not count towards their ban-violations." + "\n" : "") + Color.Gray + information);
 
-                if((!data.getMovementProcessor().isLagging() && ban)) {
+                if((!data.getMovementProcessor().isLagging())) {
                     if(System.currentTimeMillis() - lastAlert > CheckSettings.alertsDelay) {
-                        Kauri.getInstance().getDataManager().getDataObjects().values().stream().filter(data -> (data.isDeveloperAlerts() || data.isAlertsEnabled()) && (!developer || CheckSettings.showExperimentalAlerts || data.isDeveloperAlerts())).forEach(data -> message.sendToPlayer(data.getPlayer()));
+                        Kauri.getInstance().getDataManager().getDataObjects().values().stream().filter(data -> (data.isDeveloperAlerts() || data.isAlertsEnabled()) && ((!developer && ban) || CheckSettings.showExperimentalAlerts || data.isDeveloperAlerts())).forEach(data -> message.sendToPlayer(data.getPlayer()));
                         lastAlert = System.currentTimeMillis();
 
                         if (CheckSettings.printToConsole) {

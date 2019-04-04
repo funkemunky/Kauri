@@ -31,6 +31,9 @@ public class VPNUtils {
 
             JSONObject object = JsonReader.readJsonFromUrl(url);
 
+            if(!object.has("ip")) {
+                return null;
+            }
             return VPNResponse.fromJson(object.toString());
         } catch (IOException | JSONException e) {
             e.printStackTrace();

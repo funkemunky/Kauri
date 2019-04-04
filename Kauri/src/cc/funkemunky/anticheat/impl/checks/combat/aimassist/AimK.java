@@ -12,7 +12,7 @@ import lombok.val;
 import org.bukkit.event.Event;
 
 @CheckInfo(name = "Aim (Type K)", description = "Looks for rounded rotational values", type = CheckType.AIM, cancelType = CancelType.MOTION, developer = true, executable = false)
-//@Init
+@Init
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LOOK, Packet.Client.LEGACY_LOOK, Packet.Client.LEGACY_POSITION_LOOK})
 public class AimK extends Check {
 

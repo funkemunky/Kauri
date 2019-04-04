@@ -1,55 +1,44 @@
 package cc.funkemunky.anticheat.impl.checks.combat.aimassist;
 
+import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
+import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
+import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
+import cc.funkemunky.api.utils.Init;
 import lombok.val;
 import org.bukkit.event.Event;
 
-import java.util.Deque;
-import java.util.LinkedList;
-
-@Packets(packets = {
-        Packet.Client.LOOK,
-        Packet.Client.POSITION_LOOK,
-        Packet.Client.LEGACY_POSITION_LOOK,
-        Packet.Client.LEGACY_LOOK,})
+@Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LOOK, Packet.Client.LEGACY_LOOK, Packet.Client.LEGACY_POSITION_LOOK})
+@Init
+@CheckInfo(name = "Aim (Type I)", description = "Checks for low common denominators in other rotations - FlyCode.", type = CheckType.AIM, cancelType = CancelType.MOTION, developer = true, executable = false)
 public class AimI extends Check {
 
-    private final Deque<Float> pitchDeque = new LinkedList<>();
-    private int vl;
+    private Verbose verbose = new Verbose();
 
     @Setting(name = "combatOnly")
     private boolean combatOnly = true;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        val from = this.getData().getMovementProcessor().getFrom();
-        val to = this.getData().getMovementProcessor().getTo();
-
         if(!MiscUtils.canDoCombat(combatOnly, getData())) return;
 
-        val yawChange = Math.abs(from.getYaw() - to.getYaw());
-        val pitchChange = Math.abs(from.getPitch() - to.getPitch());
+        val yawDifference = getData().getMovementProcessor().getYawDelta();
 
-        pitchDeque.add(pitchChange);
+        val offset = 16777216L;
+        val yawGCD = MiscUtils.gcd((long) ((yawDifference) * offset), (long) ((getData().getMovementProcessor().getLastYawDelta()) * offset));
 
-        val pitchAverage = pitchDeque.stream().mapToDouble(Float::doubleValue).average().orElse(0.0F);
-        val pitchRatio = pitchAverage / pitchChange;
-
-        if (pitchRatio > 100.F && yawChange > 2.f) {
-            if (++vl > 2) {
-                this.flag("P: " + pitchRatio, false, false);
+        if(String.valueOf(yawGCD).length() <= 5 && yawDifference > 0 && !getData().isCinematicMode()) {
+            if(verbose.flag(100, 200L)) {
+                flag("t: " + verbose.getVerbose() + " l: " + String.valueOf(yawGCD).length(), true, true);
             }
-        } else {
-            vl = 0;
-        }
+        } else verbose.deduct();
 
-        if (pitchDeque.size() == 20) {
-            pitchDeque.clear();
-        }
+        debug(verbose.getVerbose() + ", " + String.valueOf(yawGCD).length() + ", " + getData().isCinematicMode());
     }
 
     @Override

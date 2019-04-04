@@ -42,7 +42,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class ReachE extends Check {
 
     @Setting(name = "pingRange")
-    private long pingRange = 80;
+    private long pingRange = 150;
 
     @Setting(name = "theshold.reach")
     private float maxReach = 3.0f;
@@ -92,7 +92,7 @@ public class ReachE extends Check {
 
             RayTrace trace = new RayTrace(origin.toVector(), origin.getDirection());
 
-            List<Vector> vecs = trace.traverse(target.getEyeLocation().distance(origin), 0.1);
+            List<Vector> vecs = trace.traverse(target.getEyeLocation().distance(origin), 0.05f);
 
             List<BoundingBox> entityBoxes = new CopyOnWriteArrayList<>();
 
@@ -101,7 +101,7 @@ public class ReachE extends Check {
                         .forEach(loc -> entityBoxes.add(getHitbox(target, loc)));
             } else {
                 entityData.getMovementProcessor().getPastLocation()
-                        .getEstimatedLocation(getData().getTransPing(), pingRange + MathUtils.getDelta(getData().getTransPing(), getData().getLastTransPing()))
+                        .getEstimatedLocation(getData().getTransPing(), getData().isLagging() ? pingRange + MathUtils.getDelta(getData().getTransPing(), getData().getLastTransPing()) : 50)
                         .forEach(loc -> entityBoxes.add(getHitbox(target, loc)));
             }
 
@@ -115,30 +115,31 @@ public class ReachE extends Check {
 
             for (Vector vec : finalVecs) {
                 double reach = origin.toVector().distance(vec);
-                if(reach <= 0K) continue;
+                if(reach <= 1) continue;
 
-                calculatedReach = calculatedReach == 0 ? reach + .25 : Math.min(reach + .25, calculatedReach);
+                calculatedReach = calculatedReach == 0 ? reach + 0.1f : Math.min(reach + 0.1f, calculatedReach);
 
                 collided++;
             }
 
-            if (collided > collisionMin) {
-                if (calculatedReach > maxReach + 0.0001) {
-                    if ((vl += (vlAdd + (calculatedReach > maxReach + 0.6f ? 0.45 : 0))) > nonBanMaxVL + (getData().getMovementProcessor().getDeltaXZ() * nonBanMult)) {
-                        if (vl > maxVL) {
-                            flag(calculatedReach + ">-" + maxReach, false, true);
-                        } else {
-                            flag(calculatedReach + ">-" + maxReach, false, false);
-                        }
-                    }
+           if(collided > 0) {
+               if (calculatedReach > maxReach + 0.0001) {
+                   if ((vl += (vlAdd + (calculatedReach > 3.2 ? 1 : 0))) > nonBanMaxVL) {
+                       if (vl > maxVL) {
+                           flag(calculatedReach + ">-" + maxReach, false, true);
+                       } else {
+                           flag(calculatedReach + ">-" + maxReach, false, false);
+                       }
+                   }
 
-                    debug(Color.Green + "REACH: " + calculatedReach);
-                } else {
-                    vl -= vl > 0 ? belowTSubtract : 0;
-                }
-            } else {
-                vl -= vl > 0 ? belowCollisionSubtract : 0;
-            }
+                   flag(calculatedReach + ">-" + maxReach + " (DEVELOPERS ONLY)", false, false);
+
+                   debug(Color.Green + "REACH: " + calculatedReach);
+               } else {
+                   vl -= vl > 0 ? belowTSubtract : 0;
+               }
+           }
+
             debug("VL: " + vl + "/" + maxVL + " REACH: " + calculatedReach + " COLLIDED: " + collided + " MAX: " + maxReach + " RANGE: " + pingRange);
         }
     }
@@ -151,6 +152,6 @@ public class ReachE extends Check {
     private BoundingBox getHitbox(LivingEntity entity, CustomLocation l) {
         val dimensions = MiscUtils.entityDimensions.getOrDefault(entity.getType(), new Vector(0.35f, 1.85f, 0.35f));
 
-        return new BoundingBox(l.toVector(), l.toVector()).grow(.25f, .25f, .25f).grow((float) dimensions.getX(), 0, (float) dimensions.getZ()).add(0, 0, 0, 0, (float) dimensions.getY(), 0);
+        return new BoundingBox(l.toVector(), l.toVector()).grow(0.1f, 0.1f, 0.1f).grow((float) dimensions.getX(), 0, (float) dimensions.getZ()).add(0, 0, 0, 0, (float) dimensions.getY(), 0);
     }
 }

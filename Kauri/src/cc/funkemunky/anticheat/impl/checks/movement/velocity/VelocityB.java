@@ -3,6 +3,7 @@ package cc.funkemunky.anticheat.impl.checks.movement.velocity;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.MathUtils;
@@ -28,7 +29,7 @@ public class VelocityB extends Check {
 
         val kbxz = cc.funkemunky.anticheat.api.utils.MiscUtils.hypot(getData().getVelocityProcessor().getMotionX(), getData().getVelocityProcessor().getMotionZ());
 
-        val noneCollide = getData().getBoundingBox().grow(1.5f, 0, 1.5f).getCollidingBlocks(player).size() == 0;
+        val noneCollide = getData().getBoundingBox().grow(1.5f, 0, 1.5f).getCollidingBlocks(player).stream().noneMatch(block -> !block.isEmpty());
         //the only accurate way to check horizontal kb is to check it in the air, if the player is on ground it won't work
         //people might say this is from agc or whatever but its from gcheat, just like entire agc is (no joke)
         if (getData().getMovementProcessor().getBlockAboveTicks() == 0
@@ -38,7 +39,9 @@ public class VelocityB extends Check {
 
             val quotient = dxz / kbxz;
 
-            if (quotient < 0.6) {
+            long pingTicks = MiscUtils.millisToTicks(getData().getTransPing());
+
+            if (quotient < 0.6 - (pingTicks * 0.05)) {
                 if (vl++ > 18.0) {
                     flag("velocity: " + MathUtils.round(quotient * 100, 1) + "%", true, true);
                 }

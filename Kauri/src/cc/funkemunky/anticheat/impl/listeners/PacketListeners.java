@@ -83,7 +83,7 @@ public class PacketListeners implements Listener {
 
         if (data != null) {
             switch (event.getType()) {
-                //I use transaction packets for checking transPing rather than keepAlives since there really isn't anyone who would spoof the times of these.
+                //AimI use transaction packets for checking transPing rather than keepAlives since there really isn't anyone who would spoof the times of these.
                 case Packet.Client.TRANSACTION: {
                     WrappedInTransactionPacket packet = new WrappedInTransactionPacket(event.getPacket(), player);
 
@@ -92,7 +92,7 @@ public class PacketListeners implements Listener {
                         data.setTransPing(event.getTimeStamp() - data.getLastTransaction());
 
                         //We use transPing for checking lag since the packet used is little known.
-                        //I have not seen anyone create a spoof for it or even talk about the possibility of needing one.
+                        //AimI have not seen anyone create a spoof for it or even talk about the possibility of needing one.
                         //Large jumps in latency most of the intervalTime mean lag.
                         data.setLagging(Math.abs(data.getTransPing() - data.getLastTransPing()) > 35);
 

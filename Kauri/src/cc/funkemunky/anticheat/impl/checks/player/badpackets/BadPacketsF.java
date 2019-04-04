@@ -29,10 +29,6 @@ public class BadPacketsF extends Check {
     private int ticks, vl;
     private long lastReset, lastTimeStamp;
 
-    public BadPacketsF() {
-
-    }
-
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         if (!getData().isLagging() && timeStamp > lastTimeStamp + 5 && getData().getLastServerPos().hasPassed(2) && getData().getLastLogin().hasPassed(40)) {

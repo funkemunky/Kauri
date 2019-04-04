@@ -24,7 +24,7 @@ public class Verbose {
             lastFlag.reset();
             return (verbose++) > amount;
         }
-        verbose = 0;
+        verbose = 1;
         lastFlag.reset();
         return false;
     }

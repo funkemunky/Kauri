@@ -35,7 +35,7 @@ public class AutoclickerH extends Check {
                 delays.add(delay);
             }
 
-            //I removed your leveling system due to it seeming very unnecessary from debugging. Comment your reasoning so I can confirm. - funke
+            //AimI removed your leveling system due to it seeming very unnecessary from debugging. Comment your reasoning so AimI can confirm. - funke
             if (delays.size() == 50) {
                 //val level = new AtomicInteger(0);
 
@@ -46,7 +46,7 @@ public class AutoclickerH extends Check {
 
                 //Removed level.get() <= 14
                 if (averageDelta <= 10) {
-                    //I cleaned up this area and completely changed the verbose system due to players being able to easily flag this.
+                    //AimI cleaned up this area and completely changed the verbose system due to players being able to easily flag this.
                     // However, unlike autoclickers, players do not flag it consistently every single intervalTime. This should do until further testing
                     // proves this check to be invalid or needing fixing.
                     if (vl ++ > 6) {

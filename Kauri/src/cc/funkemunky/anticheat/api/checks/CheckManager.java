@@ -19,7 +19,7 @@ import java.util.concurrent.Executors;
 @Setter
 public class CheckManager {
     private List<Class<?>> checkClasses = new ArrayList<>();
-    private Collection<Check> checks = new TreeSet<Check>(Comparator.comparing(Check::getName, Collator.getInstance()));
+    private Collection<Check> checks = new TreeSet<>(Comparator.comparing(Check::getName, Collator.getInstance()));
     private Set<UUID> bypassingPlayers = new HashSet<>();
     private ExecutorService alertsExecutable;
 

@@ -31,6 +31,9 @@ MenuUtils {
         boolean isBeginning = page <= 1, isEnd = page >= CheckType.values().length;
         Kauri.getInstance().getCheckManager().getChecks().stream().filter(check -> check.getType().equals(type)).forEach(check -> menu.addItem(checkButton(check, page)));
 
+        menu.setItem(47, createButton(false, MiscUtils.createItem(Material.REDSTONE, 1, Color.Green + "All Checks", "", "&fLeft Click &7to toggle all checks.", "&fLeft Click + Shift &7to toggle all executable abilities in checks.", "&fRight Click &7to toggle all cancelling abilities in checks."), ((player, infoPair) -> {
+
+        })));
         if (!isBeginning) {
             menu.setItem(48, createButton(false, MiscUtils.createItem(Material.SIGN, 1, Color.Gray + "Backward Page: " + Color.White + (page - 1)), (player, infoPair) -> {
                 openCheckEditGUI(player, page - 1);
