@@ -9,6 +9,7 @@ import cc.funkemunky.anticheat.api.data.logging.LoggerManager;
 import cc.funkemunky.anticheat.api.data.stats.StatsManager;
 import cc.funkemunky.anticheat.api.event.TickEvent;
 import cc.funkemunky.anticheat.api.pup.AntiPUPManager;
+import cc.funkemunky.anticheat.api.utils.Message;
 import cc.funkemunky.anticheat.api.utils.VPNUtils;
 import cc.funkemunky.anticheat.impl.commands.kauri.KauriCommand;
 import cc.funkemunky.anticheat.impl.listeners.FunkeListeners;
@@ -31,7 +32,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.math.RoundingMode;
-import java.text.Collator;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -62,12 +62,15 @@ public class Kauri extends JavaPlugin {
     private String requiredVersionOfAtlas = "1.1.4.1";
     private List<String> usableVersionsOfAtlas = Arrays.asList("1.1.4", "1.1.4.1");
 
+    private FileConfiguration messages;
+    private File messagesFile;
+
     @Override
     public void onEnable() {
         //This allows us to access this class's contents from others places.
         instance = this;
         saveDefaultConfig();
-
+        saveDefaultMessages();
         /*if (Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled())
             return;*/
 
@@ -150,6 +153,7 @@ public class Kauri extends JavaPlugin {
 
     public void reloadKauri() {
         reloadConfig();
+        reloadMessages();
         checkManager = new CheckManager();
         dataManager = new DataManager();
         HandlerList.unregisterAll(this);
@@ -159,6 +163,49 @@ public class Kauri extends JavaPlugin {
         dataManager.registerAllPlayers();
     }
 
+    public void reloadMessages() {
+        if (messagesFile == null) {
+            messagesFile = new File(UpdaterUtils.getPluginDirectory(), "messages.yml");
+        }
+        messages = YamlConfiguration.loadConfiguration(messagesFile);
+
+        // Look for defaults in the jar
+        try {
+            Reader defConfigStream = new InputStreamReader(this.getResource("messages.yml"), "UTF8");
+            YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(defConfigStream);
+            messages.setDefaults(defConfig);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public FileConfiguration getMessages() {
+        if (messages == null) {
+            reloadMessages();
+        }
+        return messages;
+    }
+
+    public void saveMessages() {
+        if (messages == null || messagesFile == null) {
+            return;
+        }
+        try {
+            getMessages().save(messagesFile);
+        } catch (IOException ex) {
+            getLogger().log(Level.SEVERE, "Could not save messages file to " + messagesFile, ex);
+        }
+    }
+
+    public void saveDefaultMessages() {
+        if (messagesFile == null) {
+            messagesFile = new File(getDataFolder(), "messages.yml");
+        }
+        if (!messagesFile.exists()) {
+            this.saveResource("messages.yml", false);
+        }
+    }
+    //Credits: Luke.
 
     private void initializeScanner(Class<?> mainClass, Plugin plugin, boolean configOnly) {
         ClassScanner.scanFile(null, mainClass).stream().filter(c -> {
@@ -226,6 +273,19 @@ public class Kauri extends JavaPlugin {
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();
+                            }
+                        }
+                        if(field.isAnnotationPresent(Message.class)) {
+                            Message msg = field.getAnnotation(Message.class);
+
+                            MiscUtils.printToConsole("&eFound " + field.getName() + " Message (default=" + field.get(obj) + ").");
+                            if(getMessages().get(msg.name()) != null) {
+                                MiscUtils.printToConsole("&eValue not found in message configuration! Setting default into messages.yml...");
+                                field.set(obj, getMessages().getString(msg.name()));
+                            } else {
+                                getMessages().set(msg.name(), field.get(obj));
+                                saveMessages();
+                                MiscUtils.printToConsole("&eValue found in message configuration! Set value to &a" + plugin.getConfig().get(msg.name()));
                             }
                         }
                     }

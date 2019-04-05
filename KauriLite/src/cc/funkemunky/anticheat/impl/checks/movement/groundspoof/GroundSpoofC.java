@@ -5,7 +5,6 @@ import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.Init;
 import lombok.val;
 import org.bukkit.event.Event;
@@ -23,10 +22,11 @@ public class GroundSpoofC extends Check {
         val move = getData().getMovementProcessor();
 
         if (getData().isGeneralCancel()
-                || !BlockUtils.isSolid(BlockUtils.getBlock(getData().getPlayer().getLocation()))
+                || move.isInsideBlock()
                 || getData().getVelocityProcessor().getLastVelocity().hasNotPassed(5)
                 || getData().getLastServerPos().hasNotPassed(1)
                 || move.isOnClimbable()
+                || move.getLiquidTicks() > 0
                 || move.getWebTicks() > 0
                 || move.getClimbTicks() > 0) return;
 

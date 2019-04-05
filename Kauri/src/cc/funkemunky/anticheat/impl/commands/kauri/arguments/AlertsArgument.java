@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.commands.kauri.arguments;
 
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
+import cc.funkemunky.anticheat.api.utils.Messages;
 import cc.funkemunky.api.commands.FunkeArgument;
 import cc.funkemunky.api.commands.FunkeCommand;
 import cc.funkemunky.api.utils.Color;
@@ -27,16 +28,16 @@ public class AlertsArgument extends FunkeArgument {
         PlayerData data = Kauri.getInstance().getDataManager().getPlayerData(((Player) sender).getUniqueId());
 
         if (data == null) {
-            sender.sendMessage(getParent().getCommandMessages().getErrorColor() + "There was an error trying to find your data object.");
+            sender.sendMessage(Color.translate(Messages.errorData));
             return;
         }
 
         data.setAlertsEnabled(!data.isAlertsEnabled());
         if(args.length > 1 && args[1].equalsIgnoreCase("dev")) {
             data.setDeveloperAlerts(data.isAlertsEnabled());
-            sender.sendMessage(Color.translate("&7Toggled your alerts with developer mode &f" + (data.isAlertsEnabled() ? "on" : "off") + "&7."));
+            sender.sendMessage(Color.translate(Messages.toggledDevAlerts.replace("%enabled%", (data.isDeveloperAlerts() ? "on" : "off"))));
         } else {
-            sender.sendMessage(Color.translate("&7Toggled your alerts &f" + (data.isAlertsEnabled() ? "on" : "off") + "&7."));
+            sender.sendMessage(Color.translate(Messages.toggledAlerts.replace("%enabled%", (data.isAlertsEnabled() ? "on" : "off"))));
         }
     }
 }
