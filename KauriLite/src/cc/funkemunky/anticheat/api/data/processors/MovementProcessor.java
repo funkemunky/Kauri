@@ -223,6 +223,4 @@ public class MovementProcessor {
         Kauri.getInstance().getProfiler().stop("MovementProcessor:isOnGround");
         return onGround;
     }
-
-
 }

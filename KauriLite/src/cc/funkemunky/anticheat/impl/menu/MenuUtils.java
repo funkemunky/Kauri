@@ -251,9 +251,11 @@ public class MenuUtils {
     private static Button saveChangesButton(int page) {
         return createButton(false, MiscUtils.createItem(Material.BOOK_AND_QUILL, 1, Color.Red + "Save Changes"), ((player2, infoPair) -> {
             hasModifiedChecks = false;
+            Kauri.getInstance().saveConfig();
             Kauri.getInstance().reloadKauri();
             openCheckEditGUI(player2, page);
         }));
     }
+
 
 }

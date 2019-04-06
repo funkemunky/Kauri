@@ -11,7 +11,7 @@ import lombok.val;
 import org.bukkit.event.Event;
 
 @Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION})
-@cc.funkemunky.api.utils.Init
+//@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Jesus (Type A)", description = "Looks for consistency in y movement in water.", type = CheckType.JESUS, cancelType = CancelType.MOTION, maxVL = 50)
 public class JesusA extends Check {
 

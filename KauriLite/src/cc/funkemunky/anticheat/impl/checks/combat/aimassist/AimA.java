@@ -6,6 +6,7 @@ import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
+import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
@@ -20,20 +21,19 @@ import org.bukkit.event.Event;
 @CheckInfo(name = "Aim (Type A)", type = CheckType.AIM, cancelType = CancelType.MOTION, description = "Checks for the consistency in aim overall", executable = false, maxVL = 80)
 public class AimA extends Check {
 
-    private float lastYaw, lastPitch, lastWrapped, lastChange;
+    private float lastWrapped, lastChange;
     private int vl;
 
-    public AimA() {
-
-    }
+    @Setting(name = "combatOnly")
+    private boolean combatOnly = true;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        val yaw = this.getData().getPlayer().getLocation().getYaw();
-        val pitch = this.getData().getPlayer().getLocation().getPitch();
 
-        val yawChange = Math.abs(yaw - lastYaw);
-        val pitchChange = Math.abs(pitch - lastPitch);
+        if(!MiscUtils.canDoCombat(combatOnly, getData())) return;
+
+        val yawChange = getData().getMovementProcessor().getYawDelta();
+        val pitchChange = getData().getMovementProcessor().getPitchDelta();
 
         val wrappedCombined = MathUtils.yawTo180F(yawChange + pitchChange);
 
@@ -49,8 +49,6 @@ public class AimA extends Check {
 
         debug(vl + ": " + wrappedCombined + ", " + wrappedChange + ", " + lastChange + ", " + getData().getMovementProcessor().getOptifineTicks());
 
-        lastPitch = pitch;
-        lastYaw = yaw;
         lastWrapped = wrappedCombined;
         lastChange = wrappedChange;
     }

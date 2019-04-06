@@ -16,7 +16,7 @@ import org.bukkit.potion.PotionEffectType;
 
 @Packets(packets = {Packet.Server.ENTITY_VELOCITY, Packet.Client.POSITION_LOOK, Packet.Client.POSITION, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION})
 @CheckInfo(name = "Velocity (Type C)", description = "Predicts the minimum horizontal movement someone should move when velocity is taken.", type = CheckType.VELOCITY, cancelType = CancelType.MOTION, developer = true, executable = false)
-@Init
+//@Init
 public class VelocityC extends Check {
 
     private double vl;

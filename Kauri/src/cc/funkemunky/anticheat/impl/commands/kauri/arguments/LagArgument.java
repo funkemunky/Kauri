@@ -38,7 +38,7 @@ public class LagArgument extends FunkeArgument {
             sender.sendMessage(MiscUtils.line(Color.Dark_Gray));
             sender.sendMessage(MiscUtils.line(Color.Dark_Gray));
             sender.sendMessage(Color.translate("&6&lServer Info"));
-            sender.sendMessage(Color.translate("&8» &eTPS&7: &f" + Kauri.getInstance().getTPS()));
+            sender.sendMessage(Color.translate("&8» &eTPS&7: &f" + MathUtils.round(Kauri.getInstance().getTps(), 2)));
             sender.sendMessage(Color.translate("&8» &eMS&7: &f" + Kauri.getInstance().getTickElapsed()));
 
             val freeMem = MathUtils.round(Runtime.getRuntime().freeMemory() / (1024D * 1024D * 1024D), 2);
@@ -99,7 +99,7 @@ public class LagArgument extends FunkeArgument {
                 case "server":
                     sender.sendMessage(MiscUtils.line(Color.Dark_Gray));
                     sender.sendMessage(Color.translate("&6&lServer Info"));
-                    sender.sendMessage(Color.translate("&8» &eTPS&7: &f" + Kauri.getInstance().getTPS()));
+                    sender.sendMessage(Color.translate("&8» &eTPS&7: &f" + MathUtils.round(Kauri.getInstance().getTps(), 2)));
                     sender.sendMessage(Color.translate("&8» &eMS&7: &f" + Kauri.getInstance().getTickElapsed()));
 
                     val freeMem = MathUtils.round(Runtime.getRuntime().freeMemory() / (1024D * 1024D * 1024D), 2);

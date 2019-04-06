@@ -53,47 +53,40 @@ public class Kauri extends JavaPlugin {
 
     private BaseProfiler profiler;
 
-    private String requiredVersionOfAtlas = "1.1.4";
+    private String requiredVersionOfAtlas = "1.1.4.1";
     private List<String> usableVersionsOfAtlas = Arrays.asList("1.1.4", "1.1.4.1");
 
-    private FileConfiguration config;
-    private File configFile;
+    private FileConfiguration messages;
+    private File messagesFile;
 
     @Override
     public void onEnable() {
         //This allows us to access this class's contents from others places.
         instance = this;
         saveDefaultConfig();
-
+        saveDefaultMessages();
         /*if (Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled())
             return;*/
 
-        if (Bukkit.getPluginManager().isPluginEnabled("Atlas") && usableVersionsOfAtlas.contains(Bukkit.getPluginManager().getPlugin("Atlas").getDescription().getVersion())) {
+        profiler = new BaseProfiler();
+        profileStart = System.currentTimeMillis();
 
-            profiler = new BaseProfiler();
-            profileStart = System.currentTimeMillis();
+        dataManager = new DataManager();
+        checkManager = new CheckManager();
 
-            dataManager = new DataManager();
-            checkManager = new CheckManager();
+        startScanner(false);
 
-            startScanner(false);
+        dataManager.registerAllPlayers();
 
-            dataManager.registerAllPlayers();
+        //Starting up our utilities, managers, and tasks.
 
-            //Starting up our utilities, managers, and tasks.
+        statsManager = new StatsManager();
+        loggerManager = new LoggerManager();
+        loggerManager.loadFromDatabase();
+        banwaveManager = new BanwaveManager();
 
-            statsManager = new StatsManager();
-            loggerManager = new LoggerManager();
-            loggerManager.loadFromDatabase();
-            banwaveManager = new BanwaveManager();
-
-            runTasks();
-            registerCommands();
-
-            MiscUtils.printToConsole("&aSuccessfully loaded Kauri and all of its libraries!");
-        } else {
-            Bukkit.getLogger().log(Level.SEVERE, "You do not the required Atlas dependency installed! Try restarting the server to see if the downloader will do it properly next intervalTime.");
-        }
+        runTasks();
+        registerCommands();
 
         executorService = Executors.newSingleThreadScheduledExecutor();
         checkExecutor = Executors.newScheduledThreadPool(2);
@@ -151,6 +144,7 @@ public class Kauri extends JavaPlugin {
 
     public void reloadKauri() {
         reloadConfig();
+        reloadMessages();
         checkManager = new CheckManager();
         dataManager = new DataManager();
         HandlerList.unregisterAll(this);
@@ -159,46 +153,46 @@ public class Kauri extends JavaPlugin {
         dataManager.registerAllPlayers();
     }
 
-    public void reloadConfig() {
-        if (configFile == null) {
-            configFile = new File(UpdaterUtils.getPluginDirectory(), "config.yml");
+    public void reloadMessages() {
+        if (messagesFile == null) {
+            messagesFile = new File(UpdaterUtils.getPluginDirectory(), "messages.yml");
         }
-        config = YamlConfiguration.loadConfiguration(configFile);
+        messages = YamlConfiguration.loadConfiguration(messagesFile);
 
         // Look for defaults in the jar
         try {
-            Reader defConfigStream = new InputStreamReader(this.getResource("config.yml"), "UTF8");
+            Reader defConfigStream = new InputStreamReader(this.getResource("messages.yml"), "UTF8");
             YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(defConfigStream);
-            config.setDefaults(defConfig);
+            messages.setDefaults(defConfig);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
     }
 
-    public FileConfiguration getConfig() {
-        if (config == null) {
-            reloadConfig();
+    public FileConfiguration getMessages() {
+        if (messages == null) {
+            reloadMessages();
         }
-        return config;
+        return messages;
     }
 
-    public void saveConfig() {
-        if (config == null || configFile == null) {
+    public void saveMessages() {
+        if (messages == null || messagesFile == null) {
             return;
         }
         try {
-            getConfig().save(configFile);
+            getMessages().save(messagesFile);
         } catch (IOException ex) {
-            getLogger().log(Level.SEVERE, "Could not save config to " + configFile, ex);
+            getLogger().log(Level.SEVERE, "Could not save messages file to " + messagesFile, ex);
         }
     }
 
-    public void saveDefaultConfig() {
-        if (configFile == null) {
-            configFile = new File(getDataFolder(), "config.yml");
+    public void saveDefaultMessages() {
+        if (messagesFile == null) {
+            messagesFile = new File(getDataFolder(), "messages.yml");
         }
-        if (!configFile.exists()) {
-            this.saveResource("config.yml", false);
+        if (!messagesFile.exists()) {
+            this.saveResource("messages.yml", false);
         }
     }
     //Credits: Luke.
@@ -271,6 +265,19 @@ public class Kauri extends JavaPlugin {
                                 e.printStackTrace();
                             }
                         }
+                        /*if(field.isAnnotationPresent(Message.class)) {
+                            Message msg = field.getAnnotation(Message.class);
+
+                            MiscUtils.printToConsole("&eFound " + field.getName() + " Message (default=" + field.get(obj) + ").");
+                            if(getMessages().get(msg.name()) != null) {
+                                MiscUtils.printToConsole("&eValue not found in message configuration! Setting default into messages.yml...");
+                                field.set(obj, getMessages().getString(msg.name()));
+                            } else {
+                                getMessages().set(msg.name(), field.get(obj));
+                                saveMessages();
+                                MiscUtils.printToConsole("&eValue found in message configuration! Set value to &a" + plugin.getConfig().get(msg.name()));
+                            }
+                        }*/
                     }
 
                 }

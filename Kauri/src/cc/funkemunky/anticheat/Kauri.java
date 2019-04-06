@@ -53,6 +53,7 @@ public class Kauri extends JavaPlugin {
 
     private int currentTicks;
     private long lastTick, tickElapsed, profileStart;
+    private double tps;
 
     private ScheduledExecutorService executorService, checkExecutor;
 
@@ -133,6 +134,23 @@ public class Kauri extends JavaPlugin {
                 lastTick = timeStamp;
             }
         }.runTaskTimer(Kauri.getInstance(), 0L, 1L);
+
+        new BukkitRunnable() {
+            long sec;
+            long currentSec;
+            int ticks;
+
+            public void run() {
+                this.sec = (System.currentTimeMillis() / 1000L);
+                if (this.currentSec == this.sec) {
+                    this.ticks += 1;
+                } else {
+                    this.currentSec = this.sec;
+                    Kauri.this.tps = (Kauri.this.tps == 0.0D ? this.ticks : (Kauri.this.tps + this.ticks) / 2.0D);
+                    this.ticks = 0;
+                }
+            }
+        }.runTaskTimer(this, 1L, 1L);
     }
 
     public void startScanner(boolean configOnly) {
@@ -143,7 +161,7 @@ public class Kauri extends JavaPlugin {
         Atlas.getInstance().getFunkeCommandManager().addCommand(new KauriCommand());
     }
 
-    public double getTPS() {
+    public double getTPSMS() {
         return 1000D / tickElapsed;
     }
 
@@ -275,7 +293,7 @@ public class Kauri extends JavaPlugin {
                                 e.printStackTrace();
                             }
                         }
-                        if(field.isAnnotationPresent(Message.class)) {
+                        /*if(field.isAnnotationPresent(Message.class)) {
                             Message msg = field.getAnnotation(Message.class);
 
                             MiscUtils.printToConsole("&eFound " + field.getName() + " Message (default=" + field.get(obj) + ").");
@@ -287,7 +305,7 @@ public class Kauri extends JavaPlugin {
                                 saveMessages();
                                 MiscUtils.printToConsole("&eValue found in message configuration! Set value to &a" + plugin.getConfig().get(msg.name()));
                             }
-                        }
+                        }*/
                     }
 
                 }

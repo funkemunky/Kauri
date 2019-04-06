@@ -21,7 +21,7 @@ import org.bukkit.event.Event;
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Killaura (Type A)", description = "Checks the time between certain packets and attacks.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, maxVL = 150)
+@CheckInfo(name = "Killaura (Type A)", description = "Checks the intervalTime between certain packets and attacks.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, maxVL = 150)
 public class KillauraA extends Check {
 
     private long lastFlying = 0;
@@ -39,7 +39,7 @@ public class KillauraA extends Check {
 
             if (!use.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) return;
 
-            /*Checks the time difference between a flying packet and a use packet. If legit, it should normally be around 50ms.
+            /*Checks the intervalTime difference between a flying packet and a use packet. If legit, it should normally be around 50ms.
             KillauraA modules tend to be made using a motion event, and client developers usually forget to make sure that the motion
             and the attack packets are being sent in separate ticks */
             long elapsed = MathUtils.elapsed(lastFlying);

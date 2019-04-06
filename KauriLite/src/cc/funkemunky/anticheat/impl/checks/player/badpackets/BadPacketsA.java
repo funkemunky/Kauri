@@ -4,7 +4,6 @@ import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
-import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInAbilitiesPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutAbilitiesPacket;
@@ -20,7 +19,6 @@ import org.bukkit.event.Event;
 @cc.funkemunky.api.utils.Init
 @CheckInfo(name = "BadPackets (Type A)", description = "Prevents the client from spoofing the ability to fly.", type = CheckType.BADPACKETS, maxVL = 40)
 public class BadPacketsA extends Check {
-
     private boolean serverSent, lastAllowedFlight;
 
     @Override
@@ -40,8 +38,8 @@ public class BadPacketsA extends Check {
             }
 
             lastAllowedFlight = abilities.isAllowedFlight();
-            serverSent = false;
 
+            serverSent = false;
         }
     }
 

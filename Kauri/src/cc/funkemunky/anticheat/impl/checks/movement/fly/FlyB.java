@@ -28,10 +28,9 @@ public class FlyB extends Check {
         if (MiscUtils.cancelForFlight(getData(), 12, true)) return;
 
         val move = getData().getMovementProcessor();
-
-        if (move.isNearGround()) return;
-
         val collides = getData().getBoundingBox().grow(1.5f, 1.5f, 1.5f).getCollidingBlocks(getData().getPlayer()).stream().anyMatch(BlockUtils::isSolid);
+
+        if(collides) return;
 
         if (!MathUtils.approxEquals(0.01, move.getLastClientYAcceleration(), move.getClientYAcceleration())) {
             if (vl++ > 4) {
