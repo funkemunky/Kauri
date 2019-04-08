@@ -8,6 +8,8 @@ import cc.funkemunky.anticheat.api.utils.menu.button.Button;
 import cc.funkemunky.anticheat.api.utils.menu.button.ClickAction;
 import cc.funkemunky.anticheat.api.utils.menu.type.impl.ChestMenu;
 import cc.funkemunky.api.utils.Color;
+import cc.funkemunky.api.utils.ConfigSetting;
+import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MiscUtils;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -15,10 +17,22 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
+@Init
 public class
 MenuUtils {
     public static boolean hasModifiedChecks = false;
+
+    @ConfigSetting(path = "data.gui", name = "enabled")
+    private static boolean enabled;
+
+    @ConfigSetting(path = "data.gui", name = "executable")
+    private static boolean executable;
+
+    @ConfigSetting(path = "data.gui", name = "cancellable")
+    private static boolean cancellable;
 
     private static Button createButton(boolean moveable, ItemStack stack, ClickAction action) {
         return new Button(moveable, stack, action);
@@ -31,9 +45,7 @@ MenuUtils {
         boolean isBeginning = page <= 1, isEnd = page >= CheckType.values().length;
         Kauri.getInstance().getCheckManager().getChecks().stream().filter(check -> check.getType().equals(type)).forEach(check -> menu.addItem(checkButton(check, page)));
 
-        menu.setItem(47, createButton(false, MiscUtils.createItem(Material.REDSTONE, 1, Color.Green + "All Checks", "", "&fLeft Click &7to toggle all checks.", "&fLeft Click + Shift &7to toggle all executable abilities in checks.", "&fRight Click &7to toggle all cancelling abilities in checks."), ((player, infoPair) -> {
-
-        })));
+        menu.setItem(47, getModifyAllButton());
         if (!isBeginning) {
             menu.setItem(48, createButton(false, MiscUtils.createItem(Material.SIGN, 1, Color.Gray + "Backward Page: " + Color.White + (page - 1)), (player, infoPair) -> {
                 openCheckEditGUI(player, page - 1);
@@ -55,6 +67,8 @@ MenuUtils {
             }));
         }
 
+        menu.setItem(51, getModifyAllButton());
+
         if (hasModifiedChecks) {
             menu.setItem(menu.getMenuDimension().getSize() - 1, saveChangesButton(page));
         }
@@ -63,13 +77,37 @@ MenuUtils {
     }
 
     public static void openLogGUI(Player toOpen, OfflinePlayer target) {
+        openLogGUI(toOpen, target, 1);
+    }
+
+    public static void openLogGUI(Player toOpen, OfflinePlayer target, int page) {
         ChestMenu menu = new ChestMenu(Color.Dark_Gray + target.getName() + "'s Logs", 6);
 
         Map<String, Integer> logs = Kauri.getInstance().getLoggerManager().getViolations(target.getUniqueId());
+
         String banReason = Kauri.getInstance().getLoggerManager().getBanReason(target.getUniqueId());
-        logs.keySet().forEach(key -> {
+
+        int pageMax = Math.min(logs.size(), page * 36);
+
+        List<String> keys = new ArrayList<>(logs.keySet());
+
+        for (int i = (page - 1) * 36; i < pageMax; i++) {
+            String key = keys.get(i);
+
             menu.addItem(createButton(false, MiscUtils.createItem(key.equalsIgnoreCase(banReason) ? Material.ENCHANTED_BOOK : Material.BOOK, 1, Color.Blue + key, "", "&eViolations&8: &f" + logs.get(key)), null));
-        });
+        }
+
+        if(page > 1) {
+            menu.setItem(48, createButton(false, MiscUtils.createItem(Material.SIGN, 1, Color.Gray + "Backward Page: " + Color.White + (page - 1)), (player, infoPair) -> {
+                openLogGUI(player, target, page - 1);
+            }));
+        }
+
+        if(logs.size() > pageMax) {
+            menu.setItem(50, createButton(false, MiscUtils.createItem(Material.SIGN, 1, Color.Gray + "Forward Page: " + Color.White + (page + 1)), (player, infoPair) -> {
+                openLogGUI(player, target, page + 1);
+            }));
+        }
 
         menu.setItem(49, createButton(false, MiscUtils.createItem(Material.REDSTONE, 1, Color.Red + "Clear Logs"),
                 ((player, infoPair) -> {
@@ -288,4 +326,51 @@ MenuUtils {
         }));
     }
 
+    private static Button getModifyAllButton() {
+        return createButton(false, MiscUtils.createItem(Material.REDSTONE, 1, Color.Green + "All Checks", "", "&fLeft Click &7to toggle all checks.", "&fMiddle &7to toggle all executable abilities in checks.", "&fRight Click &7to toggle all cancelling abilities in checks."), ((player, infoPair) -> {
+            switch(infoPair.getClickType()) {
+                case LEFT:
+                    Kauri.getInstance().getCheckManager().getChecks().forEach(check -> {
+                        Kauri.getInstance().getConfig().set("checks." + check.getName() + ".enabled", enabled);
+                    });
+
+                    hasModifiedChecks = true;
+                    updateData(UpdateDataType.ENABLED);
+                    break;
+                case MIDDLE:
+                    Kauri.getInstance().getCheckManager().getChecks().forEach(check -> {
+                        Kauri.getInstance().getConfig().set("checks." + check.getName() + ".executable", executable);
+                    });
+
+                    hasModifiedChecks = true;
+                    updateData(UpdateDataType.EXECUTABLE);
+                    break;
+                case RIGHT:
+                    Kauri.getInstance().getCheckManager().getChecks().forEach(check -> {
+                        Kauri.getInstance().getConfig().set("checks." + check.getName() + ".cancellable", cancellable);
+                    });
+
+                    hasModifiedChecks = true;
+                    updateData(UpdateDataType.CANCELLABLE);
+                    break;
+            }
+        }));
+    }
+
+    private static void updateData(UpdateDataType type) {
+        switch(type) {
+            case ENABLED:
+                enabled = !enabled;
+                Kauri.getInstance().getConfig().set("data.gui.enabled", enabled);
+                break;
+            case EXECUTABLE:
+                executable = !executable;
+                Kauri.getInstance().getConfig().set("data.gui.executable", executable);
+                break;
+            case CANCELLABLE:
+                cancellable = !cancellable;
+                Kauri.getInstance().getConfig().set("data.gui.cancellable", cancellable);
+                break;
+        }
+    }
 }

@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.impl.commands.kauri.arguments;
 
+import cc.funkemunky.anticheat.api.utils.Message;
 import cc.funkemunky.api.commands.FunkeArgument;
 import cc.funkemunky.api.commands.FunkeCommand;
 import cc.funkemunky.api.utils.Color;
@@ -10,6 +11,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class BoxWandArgument extends FunkeArgument {
+
+    @Message(name = "command.boxwand.received")
+    private String received = "&aGave you the magic box wand. Use it wisely.";
     public BoxWandArgument(FunkeCommand parent, String name, String display, String description, String... permission) {
         super(parent, name, display, description, permission);
 
@@ -21,6 +25,6 @@ public class BoxWandArgument extends FunkeArgument {
         Player player = (Player) sender;
 
         player.getInventory().addItem(MiscUtils.createItem(Material.BLAZE_ROD, 1, Color.Gold + "Magic Box Wand"));
-        sender.sendMessage(Color.Green + "Gave you the magic box wand. Use it wisely.");
+        sender.sendMessage(Color.translate(received));
     }
 }

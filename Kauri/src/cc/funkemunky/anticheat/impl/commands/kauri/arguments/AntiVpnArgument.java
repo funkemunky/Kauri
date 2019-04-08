@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.commands.kauri.arguments;
 
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.utils.ItemBuilder;
+import cc.funkemunky.anticheat.api.utils.Messages;
 import cc.funkemunky.anticheat.api.utils.VPNResponse;
 import cc.funkemunky.anticheat.api.utils.menu.button.Button;
 import cc.funkemunky.anticheat.api.utils.menu.type.impl.ChestMenu;
@@ -45,7 +46,7 @@ public class AntiVpnArgument extends FunkeArgument {
             Player player = Bukkit.getPlayer(args[2]);
 
             if (player == null || !player.isOnline()) {
-                sender.sendMessage(Color.Red + "The player \"" + args[2] + "\" is not online!");
+                sender.sendMessage(Color.translate(Messages.errorPlayerOffline));
                 return;
             }
 
