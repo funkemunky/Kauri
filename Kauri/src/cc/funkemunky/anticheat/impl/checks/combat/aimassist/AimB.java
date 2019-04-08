@@ -19,9 +19,6 @@ import org.bukkit.event.Event;
 @cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Aim (Type B)", description = "Checks for common denominators in the pitch.", maxVL = 50, cancelType = CancelType.MOTION, type = CheckType.AIM)
 public class AimB extends Check {
-    public AimB() {
-
-    }
 
     private Verbose verbose = new Verbose();
     private long lastGCD;

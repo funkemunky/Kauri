@@ -71,7 +71,15 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
 
                     if((!data.getMovementProcessor().isLagging())) {
                         if(System.currentTimeMillis() - lastAlert > CheckSettings.alertsDelay) {
-                            Kauri.getInstance().getDataManager().getDataObjects().values().stream().filter(data -> (data.isDeveloperAlerts() || data.isAlertsEnabled()) && ((!developer && ban) || CheckSettings.showExperimentalAlerts || data.isDeveloperAlerts())).forEach(data -> message.sendToPlayer(data.getPlayer()));
+                            Kauri.getInstance().getDataManager().getDataObjects().keySet().stream().filter(key -> {
+                                PlayerData data = Kauri.getInstance().getDataManager().getDataObjects().get(key);
+
+                                return (data.isDeveloperAlerts() || data.isAlertsEnabled()) && ((!developer && ban) || CheckSettings.showExperimentalAlerts || data.isDeveloperAlerts());
+                            }).forEach(key -> {
+                                PlayerData data = Kauri.getInstance().getDataManager().getDataObjects().get(key);
+
+                                message.sendToPlayer(data.getPlayer());
+                            });
                             lastAlert = System.currentTimeMillis();
 
                             if (CheckSettings.printToConsole) {

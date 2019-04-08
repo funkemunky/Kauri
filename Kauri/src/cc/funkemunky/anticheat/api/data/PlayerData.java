@@ -76,7 +76,7 @@ public class PlayerData {
         if (CheckSettings.enableOnJoin && player.hasPermission("kauri.alerts")) alertsEnabled = true;
 
         actionProcessor = new ActionProcessor();
-        velocityProcessor = new VelocityProcessor();
+        velocityProcessor = new VelocityProcessor(this);
         movementProcessor = new MovementProcessor();
 
         Kauri.getInstance().getCheckManager().loadChecksIntoData(this);

@@ -22,38 +22,38 @@ public class VelocityB extends Check {
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         Player player = getData().getPlayer();
-        if (getData().getVelocityProcessor().getLastVelocity().hasPassed(2)) return;
+        if(getData().getVelocityProcessor().getLastVelocity().hasPassed(2)) return;
 
         val dy = getData().getMovementProcessor().getTo().getY() - getData().getMovementProcessor().getFrom().getY();
-        val dxz = cc.funkemunky.anticheat.api.utils.MiscUtils.hypot(getData().getMovementProcessor().getTo().getX() - getData().getMovementProcessor().getFrom().getX(),
+        val dxz = Math.hypot(getData().getMovementProcessor().getTo().getX() - getData().getMovementProcessor().getFrom().getX(),
                 getData().getMovementProcessor().getTo().getZ() - getData().getMovementProcessor().getFrom().getZ());
 
-        val kbxz = cc.funkemunky.anticheat.api.utils.MiscUtils.hypot(getData().getVelocityProcessor().getMotionX(), getData().getVelocityProcessor().getMotionZ());
+        val kbxz = Math.hypot(getData().getVelocityProcessor().getMotionX(), getData().getVelocityProcessor().getMotionZ());
 
-        val noneCollide = getData().getBoundingBox().grow(1.5f, 0, 1.5f).getCollidingBlocks(player).stream().allMatch(Block::isEmpty);
         //the only accurate way to check horizontal kb is to check it in the air, if the player is on ground it won't work
         //people might say this is from agc or whatever but its from gcheat, just like entire agc is (no joke)
         if (getData().getMovementProcessor().getBlockAboveTicks() == 0
                 && getData().getMovementProcessor().getLiquidTicks() == 0
                 && getData().getMovementProcessor().getWebTicks() == 0
-                && noneCollide) {
+                && kbxz > 0.15
+                && !getData().getMovementProcessor().isBlocksNear()) {
 
             val quotient = dxz / kbxz;
 
-            long pingTicks = MiscUtils.millisToTicks(getData().getTransPing());
+            val threshold = getData().getLastAttack().hasPassed(10) ? 0.6 : 0.5f;
 
-            if (quotient < 0.6 - (pingTicks * 0.05)) {
-                if (vl++ > 18.0) {
+            if (quotient < threshold) {
+                if ((vl += 1.1) >= 8.0) {
                     flag("velocity: " + MathUtils.round(quotient * 100, 1) + "%", true, true);
                 }
             } else {
-                vl = Math.max(0, vl - 1);
+                vl = Math.max(0, vl - 0.8);
             }
 
-            debug("QUOTIENT: " + quotient + "/0.6" + " VL: " + vl);
+            debug("QUOTIENT: " + quotient + "/" + threshold + " VL: " + vl);
         }
 
-        //=debug("KBXZ: " + kbxz + " COLLIDE:" + noneCollide + " DXZ: " + dxz + " DY: " + dy + " KBY: " + getData().getVelocityProcessor().getMotionY());
+        //debug("KBXZ: " + kbxz + " COLLIDE:" + noneCollide + " DXZ: " + dxz + " DY: " + dy + " KBY: " + getData().getVelocityProcessor().getMotionY());
     }
 
     @Override

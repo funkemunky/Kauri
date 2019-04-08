@@ -41,6 +41,8 @@ public class PacketListeners implements Listener {
             switch (event.getType()) {
                 case Packet.Server.POSITION: {
                     data.getLastServerPos().reset();
+                    data.getVelocityProcessor().velocityX = data.getVelocityProcessor().velocityY = data.getVelocityProcessor().velocityZ = 0;
+                    data.getVelocityProcessor().setAttackedSinceVelocity(false);
                     break;
                 }
                 case Packet.Server.KEEP_ALIVE:
@@ -186,6 +188,7 @@ public class PacketListeners implements Listener {
                             }
                         }
                     }
+                    data.getVelocityProcessor().update(packet);
                     break;
                 }
             }
