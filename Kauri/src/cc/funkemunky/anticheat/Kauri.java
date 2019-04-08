@@ -273,40 +273,44 @@ public class Kauri extends JavaPlugin {
                         }
 
                     }
-                    for (Field field : clazz.getDeclaredFields()) {
-                        field.setAccessible(true);
-                        if (field.isAnnotationPresent(ConfigSetting.class)) {
-                            String name = field.getAnnotation(ConfigSetting.class).name();
-                            String path = field.getAnnotation(ConfigSetting.class).path() + "." + (name.length() > 0 ? name : field.getName());
-                            try {
-                                MiscUtils.printToConsole("&eFound " + field.getName() + " ConfigSetting (default=" + field.get(obj) + ").");
-                                if (plugin.getConfig().get(path) == null) {
-                                    MiscUtils.printToConsole("&eValue not found in configuration! Setting default into config...");
-                                    plugin.getConfig().set(path, field.get(obj));
-                                    plugin.saveConfig();
-                                } else {
-                                    field.set(obj, plugin.getConfig().get(path));
 
-                                    MiscUtils.printToConsole("&eValue found in configuration! Set value to &a" + plugin.getConfig().get(path));
+                    Arrays.stream(clazz.getDeclaredFields()).filter(field -> field.getAnnotations().length > 0).forEach(field -> {
+                        try {
+                            field.setAccessible(true);
+                            if (field.isAnnotationPresent(ConfigSetting.class)) {
+                                String name = field.getAnnotation(ConfigSetting.class).name();
+                                String path = field.getAnnotation(ConfigSetting.class).path() + "." + (name.length() > 0 ? name : field.getName());
+                                try {
+                                    MiscUtils.printToConsole("&eFound " + field.getName() + " ConfigSetting (default=" + field.get(obj) + ").");
+                                    if (plugin.getConfig().get(path) == null) {
+                                        MiscUtils.printToConsole("&eValue not found in configuration! Setting default into config...");
+                                        plugin.getConfig().set(path, field.get(obj));
+                                        plugin.saveConfig();
+                                    } else {
+                                        field.set(obj, plugin.getConfig().get(path));
+
+                                        MiscUtils.printToConsole("&eValue found in configuration! Set value to &a" + plugin.getConfig().get(path));
+                                    }
+                                } catch (IllegalAccessException e) {
+                                    e.printStackTrace();
                                 }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        /*if(field.isAnnotationPresent(Message.class)) {
-                            Message msg = field.getAnnotation(Message.class);
+                            } else if(field.isAnnotationPresent(Message.class)) {
+                                Message msg = field.getAnnotation(Message.class);
 
-                            MiscUtils.printToConsole("&eFound " + field.getName() + " Message (default=" + field.get(obj) + ").");
-                            if(getMessages().get(msg.name()) != null) {
-                                MiscUtils.printToConsole("&eValue not found in message configuration! Setting default into messages.yml...");
-                                field.set(obj, getMessages().getString(msg.name()));
-                            } else {
-                                getMessages().set(msg.name(), field.get(obj));
-                                saveMessages();
-                                MiscUtils.printToConsole("&eValue found in message configuration! Set value to &a" + plugin.getConfig().get(msg.name()));
+                                MiscUtils.printToConsole("&eFound " + field.getName() + " Message (default=" + field.get(obj) + ").");
+                                if(getMessages().get(msg.name()) != null) {
+                                    MiscUtils.printToConsole("&eValue not found in message configuration! Setting default into messages.yml...");
+                                    field.set(obj, getMessages().getString(msg.name()));
+                                } else {
+                                    getMessages().set(msg.name(), field.get(obj));
+                                    saveMessages();
+                                    MiscUtils.printToConsole("&eValue found in message configuration! Set value to &a" + plugin.getConfig().get(msg.name()));
+                                }
                             }
-                        }*/
-                    }
+                        } catch(IllegalAccessException e) {
+                            e.printStackTrace();
+                        }
+                    });
 
                 }
 
