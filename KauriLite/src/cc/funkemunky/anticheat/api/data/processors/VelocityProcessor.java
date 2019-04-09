@@ -1,23 +1,41 @@
 package cc.funkemunky.anticheat.api.data.processors;
 
+import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
+import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.anticheat.api.utils.TickTimer;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.var;
 import org.bukkit.Bukkit;
 
 @Getter
+@Setter
 public class VelocityProcessor {
     private float maxVertical, maxHorizontal, motionX, motionY, motionZ, lastMotionX, lastMotionY, lastMotionZ;
+    public double velocityX, velocityY, velocityZ;
+    private PlayerData data;
+    private boolean attackedSinceVelocity;
     private TickTimer lastVelocity = new TickTimer(40);
+
+    public VelocityProcessor(PlayerData data) {
+        this.data = data;
+    }
 
     public void update(WrappedOutVelocityPacket packet) {
         maxVertical = motionY = (float) packet.getY();
         maxHorizontal = (float) cc.funkemunky.anticheat.api.utils.MiscUtils.hypot(packet.getX(), packet.getZ());
 
         if(packet.getId() == packet.getPlayer().getEntityId()) lastVelocity.reset();
+
+        if(data.getMovementProcessor().isClientOnGround() && data.getMovementProcessor().getFrom().getY() % 1 == 0) {
+            velocityX = packet.getX();
+            velocityY = packet.getY();
+            velocityZ = packet.getZ();
+        }
 
         motionX = (float) packet.getX();
         motionZ = (float) packet.getZ();
@@ -59,6 +77,15 @@ public class VelocityProcessor {
         this.motionX = motionX;
         this.motionY = motionY;
         this.motionZ = motionZ;
+    }
+
+    public void update(WrappedInUseEntityPacket packet) {
+        if(!attackedSinceVelocity) {
+            velocityX *= 0.6;
+            velocityY *= 0.6;
+            velocityZ *= 0.6;
+            attackedSinceVelocity = true;
+        }
     }
 
     public boolean isTakingVelocity() {

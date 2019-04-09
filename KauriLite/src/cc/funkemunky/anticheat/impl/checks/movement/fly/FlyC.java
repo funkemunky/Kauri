@@ -32,7 +32,7 @@ public class FlyC extends Check {
 
         if (MiscUtils.cancelForFlight(getData(), 15, true)) return;
 
-        if (!move.isNearGround()) {
+        if (!move.isBlocksAround()) {
             val offset = Math.abs(yChange - predictedY);
 
             if (!MathUtils.approxEquals(0.05, yChange, predictedY)) {

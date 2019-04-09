@@ -7,6 +7,7 @@ import cc.funkemunky.anticheat.api.utils.*;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.*;
+import cc.funkemunky.api.utils.MathUtils;
 import lombok.Getter;
 import lombok.val;
 import org.bukkit.Material;

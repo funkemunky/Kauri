@@ -45,7 +45,7 @@ MenuUtils {
         boolean isBeginning = page <= 1, isEnd = page >= CheckType.values().length;
         Kauri.getInstance().getCheckManager().getChecks().stream().filter(check -> check.getType().equals(type)).forEach(check -> menu.addItem(checkButton(check, page)));
 
-        menu.setItem(47, getModifyAllButton());
+        menu.setItem(45, getModifyAllButton(page));
         if (!isBeginning) {
             menu.setItem(48, createButton(false, MiscUtils.createItem(Material.SIGN, 1, Color.Gray + "Backward Page: " + Color.White + (page - 1)), (player, infoPair) -> {
                 openCheckEditGUI(player, page - 1);
@@ -67,7 +67,7 @@ MenuUtils {
             }));
         }
 
-        menu.setItem(51, getModifyAllButton());
+        menu.setItem(53, getModifyAllButton(page));
 
         if (hasModifiedChecks) {
             menu.setItem(menu.getMenuDimension().getSize() - 1, saveChangesButton(page));
@@ -326,7 +326,7 @@ MenuUtils {
         }));
     }
 
-    private static Button getModifyAllButton() {
+    private static Button getModifyAllButton(int page) {
         return createButton(false, MiscUtils.createItem(Material.REDSTONE, 1, Color.Green + "All Checks", "", "&fLeft Click &7to toggle all checks.", "&fMiddle &7to toggle all executable abilities in checks.", "&fRight Click &7to toggle all cancelling abilities in checks."), ((player, infoPair) -> {
             switch(infoPair.getClickType()) {
                 case LEFT:
@@ -335,6 +335,7 @@ MenuUtils {
                     });
 
                     hasModifiedChecks = true;
+                    openCheckEditGUI(player, page);
                     updateData(UpdateDataType.ENABLED);
                     break;
                 case MIDDLE:
@@ -343,6 +344,7 @@ MenuUtils {
                     });
 
                     hasModifiedChecks = true;
+                    openCheckEditGUI(player, page);
                     updateData(UpdateDataType.EXECUTABLE);
                     break;
                 case RIGHT:
@@ -351,6 +353,7 @@ MenuUtils {
                     });
 
                     hasModifiedChecks = true;
+                    openCheckEditGUI(player, page);
                     updateData(UpdateDataType.CANCELLABLE);
                     break;
             }

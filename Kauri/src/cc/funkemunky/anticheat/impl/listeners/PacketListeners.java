@@ -24,6 +24,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.EventListenerProxy;
 import java.util.concurrent.TimeUnit;
 
 @cc.funkemunky.api.utils.Init
@@ -73,7 +74,7 @@ public class PacketListeners implements Listener {
         Kauri.getInstance().getProfiler().stop("event:PacketSendEvent");
     }
 
-    @EventMethod
+    @EventMethod(priority = EnumPriority.LOW)
     public void onEvent(PacketReceiveEvent event) {
         if (event.getPlayer() == null || !Kauri.getInstance().getDataManager().getDataObjects().containsKey(event.getPlayer().getUniqueId()))
             return;
@@ -201,13 +202,12 @@ public class PacketListeners implements Listener {
 
     private void hopper(Object packet, String packetType, long timeStamp, PlayerData data) {
         if ((!CheckSettings.bypassEnabled || !data.getPlayer().hasPermission(CheckSettings.bypassPermission)) && !Kauri.getInstance().getCheckManager().isBypassing(data.getUuid())) {
-            Kauri.getInstance().getCheckExecutor().schedule(() ->
-                    data.getPacketChecks().getOrDefault(packetType, new ArrayList<>()).stream().filter(Check::isEnabled).forEach(check ->
-                    {
-                        Kauri.getInstance().getProfiler().start("check:" + check.getName());
-                        check.onPacket(packet, packetType, timeStamp);
-                        Kauri.getInstance().getProfiler().stop("check:" + check.getName());
-                    }), 10, TimeUnit.MILLISECONDS);
+            data.getPacketChecks().getOrDefault(packetType, new ArrayList<>()).stream().filter(Check::isEnabled).forEach(check ->
+            {
+                Kauri.getInstance().getProfiler().start("check:" + check.getName());
+                check.onPacket(packet, packetType, timeStamp);
+                Kauri.getInstance().getProfiler().stop("check:" + check.getName());
+            });
         }
     }
 

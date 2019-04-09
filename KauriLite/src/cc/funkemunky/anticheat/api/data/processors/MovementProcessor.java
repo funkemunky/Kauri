@@ -19,8 +19,8 @@ import java.util.List;
 @Getter
 public class MovementProcessor {
     private boolean lastFlight, flight, isLagging, clientOnGround, serverOnGround, fullyInAir, inAir, hasJumped, inLiquid, blocksOnTop, pistonsNear, onHalfBlock,
-            onClimbable, onIce, collidesHorizontally, inWeb, onSlimeBefore, onSoulSand, isRiptiding, halfBlocksAround, isNearGround, isInsideBlock;
-    private int airTicks, groundTicks, iceTicks, climbTicks, halfBlockTicks, soulSandTicks, blockAboveTicks, optifineTicks, liquidTicks, webTicks;
+            onClimbable, onIce, collidesHorizontally, inWeb, onSlimeBefore, onSoulSand, isRiptiding, halfBlocksAround, isNearGround, isInsideBlock, blocksNear, blocksAround;
+    private int airTicks, groundTicks, iceTicks, climbTicks, halfBlockTicks, soulSandTicks, blockAboveTicks, optifineTicks, liquidTicks, webTicks, yawZeroTicks, pitchZeroTicks;
     private float deltaY, yawDelta, pitchDelta, lastYawDelta, lastPitchDelta, lastDeltaY, deltaXZ, distanceToGround, serverYVelocity, lastServerYVelocity, serverYAcceleration, clientYAcceleration, lastClientYAcceleration, lastServerYAcceleration, jumpVelocity, cinematicYawDelta, cinematicPitchDelta, lastCinematicPitchDelta, lastCinematicYawDelta;
     private CustomLocation from, to;
     private PastLocation pastLocation = new PastLocation();
@@ -72,6 +72,8 @@ public class MovementProcessor {
                 onClimbable = assessment.isOnClimbable();
                 fullyInAir = assessment.isFullyInAir();
                 onSoulSand = assessment.isOnSoulSand();
+                blocksAround = assessment.isBlocksAround();
+                blocksNear = assessment.isBlocksNear();
                 halfBlocksAround = assessment.getMaterialsCollided().stream().anyMatch(material -> material.toString().contains("STAIR") || material.toString().contains("STEP") || material.toString().contains("SLAB") || material.toString().contains("SNOW") || material.toString().contains("CAKE") || material.toString().contains("BED") || material.toString().contains("SKULL"));
 
                 isNearGround = isNearGround(data, 1.5f);
@@ -181,11 +183,19 @@ public class MovementProcessor {
             if (data.isCinematicMode()) {
                 optifineTicks += optifineTicks < 60 ? 1 : 0;
             } else if (optifineTicks > 0) {
-                optifineTicks--;
+                optifineTicks-= 3;
             }
             lastCinematicYawDelta = cinematicYawDelta;
             lastCinematicPitchDelta = cinematicPitchDelta;
         }
+
+        if(to.getYaw() == from.getYaw()) {
+            yawZeroTicks = Math.min(20, yawZeroTicks + 1);
+        } else yawZeroTicks-= yawZeroTicks > 0 ? 1 : 0;
+
+        if(to.getPitch() == from.getPitch()) {
+            pitchZeroTicks = Math.min(20, pitchZeroTicks + 1);
+        } else pitchZeroTicks-= pitchZeroTicks > 0 ? 1 : 0;
 
         pastLocation.addLocation(new CustomLocation(to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch()));
         data.setGeneralCancel(data.getLastServerPos().hasNotPassed(1) || (data.isLagging() && isLagging) || getLastFlightToggle().hasNotPassed(8) || !chunkLoaded || packet.getPlayer().getAllowFlight() || packet.getPlayer().getActivePotionEffects().stream().anyMatch(effect -> effect.getType().getName().toLowerCase().contains("levi")) || packet.getPlayer().getGameMode().toString().contains("CREATIVE") || packet.getPlayer().getGameMode().toString().contains("SPEC") || lastVehicle.hasNotPassed() || getLastRiptide().hasNotPassed(10) || data.getLastLogin().hasNotPassed(50) || data.getVelocityProcessor().getLastVelocity().hasNotPassed(40));
@@ -223,4 +233,6 @@ public class MovementProcessor {
         Kauri.getInstance().getProfiler().stop("MovementProcessor:isOnGround");
         return onGround;
     }
+
+
 }

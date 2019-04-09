@@ -42,7 +42,7 @@ public class AutoclickerD extends Check {
                 debug("VL: " + vl + " RANGE: " + range + " AVERAGE: " + average);
                 lastRange = range;
                 times.clear();
-            } else {
+            } else if(elapsed > 54) {
                 times.add(elapsed);
             }
         }

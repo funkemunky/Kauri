@@ -41,6 +41,8 @@ public class PacketListeners implements Listener {
             switch (event.getType()) {
                 case Packet.Server.POSITION: {
                     data.getLastServerPos().reset();
+                    data.getVelocityProcessor().velocityX = data.getVelocityProcessor().velocityY = data.getVelocityProcessor().velocityZ = 0;
+                    data.getVelocityProcessor().setAttackedSinceVelocity(false);
                     break;
                 }
                 case Packet.Server.KEEP_ALIVE:
@@ -58,9 +60,7 @@ public class PacketListeners implements Listener {
                 case Packet.Server.ENTITY_VELOCITY: {
                     WrappedOutVelocityPacket packet = new WrappedOutVelocityPacket(event.getPacket(), event.getPlayer());
 
-                    if ((Math.abs(packet.getX()) > 0.1 || Math.abs(packet.getZ()) > 0.1) && Math.abs(packet.getY()) > 0.1) {
-                        data.getVelocityProcessor().update(packet);
-                    }
+                    data.getVelocityProcessor().update(packet);
                     break;
                 }
             }
@@ -84,7 +84,7 @@ public class PacketListeners implements Listener {
 
         if (data != null) {
             switch (event.getType()) {
-                //I use transaction packets for checking transPing rather than keepAlives since there really isn't anyone who would spoof the times of these.
+                //AimI use transaction packets for checking transPing rather than keepAlives since there really isn't anyone who would spoof the times of these.
                 case Packet.Client.TRANSACTION: {
                     WrappedInTransactionPacket packet = new WrappedInTransactionPacket(event.getPacket(), player);
 
@@ -93,7 +93,7 @@ public class PacketListeners implements Listener {
                         data.setTransPing(event.getTimeStamp() - data.getLastTransaction());
 
                         //We use transPing for checking lag since the packet used is little known.
-                        //I have not seen anyone create a spoof for it or even talk about the possibility of needing one.
+                        //AimI have not seen anyone create a spoof for it or even talk about the possibility of needing one.
                         //Large jumps in latency most of the intervalTime mean lag.
                         data.setLagging(Math.abs(data.getTransPing() - data.getLastTransPing()) > 35);
 
@@ -138,10 +138,8 @@ public class PacketListeners implements Listener {
                 case Packet.Client.LEGACY_LOOK: {
                     WrappedInFlyingPacket packet = new WrappedInFlyingPacket(event.getPacket(), player);
 
-                    Atlas.getInstance().getThreadPool().execute(() -> {
-                        data.getMovementProcessor().update(data, packet);
-                        data.getVelocityProcessor().update(packet);
-                    });
+                    data.getMovementProcessor().update(data, packet);
+                    data.getVelocityProcessor().update(packet);
                     if (data.getMovementProcessor().getTo() == null) return;
                     break;
                 }
@@ -189,6 +187,7 @@ public class PacketListeners implements Listener {
                             }
                         }
                     }
+                    data.getVelocityProcessor().update(packet);
                     break;
                 }
             }

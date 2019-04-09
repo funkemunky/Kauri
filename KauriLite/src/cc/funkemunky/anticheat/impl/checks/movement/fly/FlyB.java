@@ -7,7 +7,6 @@ import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
 import org.bukkit.event.Event;
@@ -29,9 +28,7 @@ public class FlyB extends Check {
 
         val move = getData().getMovementProcessor();
 
-        if (move.isNearGround()) return;
-
-        val collides = getData().getBoundingBox().grow(1.5f, 1.5f, 1.5f).getCollidingBlocks(getData().getPlayer()).stream().anyMatch(BlockUtils::isSolid);
+        if(move.isBlocksAround()) return;
 
         if (!MathUtils.approxEquals(0.01, move.getLastClientYAcceleration(), move.getClientYAcceleration())) {
             if (vl++ > 4) {
