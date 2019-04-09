@@ -1,11 +1,11 @@
 package cc.funkemunky.anticheat.api.event;
 
-import cc.funkemunky.api.event.system.Event;
+import cc.funkemunky.api.events.AtlasEvent;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class TickEvent extends Event {
+public class TickEvent extends AtlasEvent {
     private int currentTick;
 }

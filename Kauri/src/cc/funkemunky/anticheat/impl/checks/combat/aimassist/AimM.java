@@ -14,7 +14,7 @@ import lombok.val;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 
-@CheckInfo(name = "Aim (Type M)", description = "test", type = CheckType.AIM, cancellable = false, executable = false)
+@CheckInfo(name = "Aim (Type M)", description = "test", type = CheckType.AIM, cancellable = false, executable = false, developer = true)
 @Init
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LOOK, Packet.Client.LEGACY_LOOK})
 public class AimM extends Check {

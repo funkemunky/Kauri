@@ -5,11 +5,14 @@ import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckSettings;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.api.Atlas;
-import cc.funkemunky.api.event.custom.PacketReceiveEvent;
-import cc.funkemunky.api.event.custom.PacketSendEvent;
 import cc.funkemunky.api.event.system.EnumPriority;
 import cc.funkemunky.api.event.system.EventMethod;
 import cc.funkemunky.api.event.system.Listener;
+import cc.funkemunky.api.events.AtlasListener;
+import cc.funkemunky.api.events.Listen;
+import cc.funkemunky.api.events.ListenerPriority;
+import cc.funkemunky.api.events.impl.PacketReceiveEvent;
+import cc.funkemunky.api.events.impl.PacketSendEvent;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.*;
@@ -17,6 +20,7 @@ import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.Color;
+import cc.funkemunky.api.utils.Init;
 import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -27,10 +31,10 @@ import java.util.ArrayList;
 import java.util.EventListenerProxy;
 import java.util.concurrent.TimeUnit;
 
-@cc.funkemunky.api.utils.Init
-public class PacketListeners implements Listener {
+@Init
+public class PacketListeners implements AtlasListener {
 
-    @EventMethod(priority = EnumPriority.HIGHEST)
+    @Listen(priority = ListenerPriority.HIGHEST)
     public void onEvent(PacketSendEvent event) {
         if (event.getPlayer() == null || !event.getPlayer().isOnline() || !Kauri.getInstance().getDataManager().getDataObjects().containsKey(event.getPlayer().getUniqueId()))
             return;
@@ -44,6 +48,7 @@ public class PacketListeners implements Listener {
                     data.getLastServerPos().reset();
                     data.getVelocityProcessor().velocityX = data.getVelocityProcessor().velocityY = data.getVelocityProcessor().velocityZ = 0;
                     data.getVelocityProcessor().setAttackedSinceVelocity(false);
+                    //Bukkit.broadcastMessage("I did position bro. (" + Kauri.getInstance().getCurrentTicks() + ")");
                     break;
                 }
                 case Packet.Server.KEEP_ALIVE:
@@ -74,7 +79,7 @@ public class PacketListeners implements Listener {
         Kauri.getInstance().getProfiler().stop("event:PacketSendEvent");
     }
 
-    @EventMethod(priority = EnumPriority.LOW)
+    @Listen(priority = ListenerPriority.LOW)
     public void onEvent(PacketReceiveEvent event) {
         if (event.getPlayer() == null || !Kauri.getInstance().getDataManager().getDataObjects().containsKey(event.getPlayer().getUniqueId()))
             return;

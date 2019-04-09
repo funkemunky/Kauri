@@ -25,7 +25,7 @@ public class AimO extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(getData().getLastAttack().hasPassed(3)) {
+        if(getData().getLastAttack().hasPassed(5)) {
             if(getData().getLastAttack().hasPassed(10)) {
                 ticks = 0;
             }
@@ -46,14 +46,14 @@ public class AimO extends Check {
                    flag("ticks: " + ticks + " vl: " + vl, true, true);
                }
                lastFlag.reset();
-           } else if(ticks < 15 && lastFlag.hasPassed()) {
-               vl-= vl > 0 ? 0.5 : 0;
+           } else if(ticks < 12 && lastFlag.hasPassed()) {
+               vl-= vl > 0 ? 2 : 0;
                lastFlag.reset();
-           } else if(lastFlag.hasPassed(2)){
-               vl-= vl > 0 ? 0.2 : 0;
+           } else if(ticks > 0 && lastFlag.hasPassed(2)){
+               vl-= vl > 0 ? 1 : 0;
                lastFlag.reset();
            } else {
-               vl-= vl > 0 ? 0.1 : 0;
+               vl-= vl > 0 ? 0.25 : 0;
            }
 
             debug(Color.Green + "VL: " + vl);

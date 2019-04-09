@@ -42,7 +42,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class ReachE extends Check {
 
     @Setting(name = "pingRange")
-    private long pingRange = 150;
+    private long pingRange = 50;
 
     @Setting(name = "theshold.reach")
     private float maxReach = 3.0f;
@@ -60,10 +60,10 @@ public class ReachE extends Check {
     private double vlAdd = 1;
 
     @Setting(name = "threshold.vl.subtract.arm")
-    private double armSubtract = 0.01;
+    private double armSubtract = 0.005;
 
     @Setting(name = "threshold.vl.subtract.belowThreshold")
-    private double belowTSubtract = 0.2;
+    private double belowTSubtract = 0.1;
 
     @Setting(name = "threshold.vl.subtract.belowCollisionMin")
     private double belowCollisionSubtract = 0.1;
@@ -92,12 +92,12 @@ public class ReachE extends Check {
 
             RayTrace trace = new RayTrace(origin.toVector(), origin.getDirection());
 
-            List<Vector> vecs = trace.traverse(target.getEyeLocation().distance(origin), 0.05f);
+            List<Vector> vecs = trace.traverse(target.getEyeLocation().distance(origin), 0.01f);
 
             List<BoundingBox> entityBoxes = new CopyOnWriteArrayList<>();
 
             if (entityData == null) {
-                getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), pingRange + MathUtils.getDelta(getData().getTransPing(), getData().getLastTransPing()))
+                getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), Math.max(0, pingRange + (getData().getMovementProcessor().getDeltaXZ() < 0.23 ? -50 : 0)) + MathUtils.getDelta(getData().getTransPing(), getData().getLastTransPing()))
                         .forEach(loc -> entityBoxes.add(getHitbox(target, loc)));
             } else {
                 entityData.getMovementProcessor().getPastLocation()
@@ -115,7 +115,7 @@ public class ReachE extends Check {
 
             for (Vector vec : finalVecs) {
                 double reach = origin.toVector().distance(vec);
-                if(reach <= 1) continue;
+                if(reach <= 0.5) continue;
 
                 calculatedReach = calculatedReach == 0 ? reach : Math.min(reach, calculatedReach);
 
@@ -123,7 +123,7 @@ public class ReachE extends Check {
             }
 
            if(collided > 0) {
-               if (calculatedReach > maxReach + 0.0001) {
+               if (calculatedReach > maxReach + 0.051) {
                    if ((vl += (vlAdd + (calculatedReach > 3.2 ? 1 : 0))) > nonBanMaxVL) {
                        if (vl > maxVL) {
                            flag(calculatedReach + ">-" + maxReach, false, true);
@@ -152,6 +152,6 @@ public class ReachE extends Check {
     private BoundingBox getHitbox(LivingEntity entity, CustomLocation l) {
         val dimensions = MiscUtils.entityDimensions.getOrDefault(entity.getType(), new Vector(0.35f, 1.85f, 0.35f));
 
-        return new BoundingBox(l.toVector(), l.toVector()).grow(0.15f, 0.15f, 0.15f).grow((float) dimensions.getX(), 0, (float) dimensions.getZ()).add(0, 0, 0, 0, (float) dimensions.getY(), 0);
+        return new BoundingBox(l.toVector(), l.toVector()).grow(0.1f, 0.1f, 0.1f).grow((float) dimensions.getX(), 0, (float) dimensions.getZ()).add(0, 0, 0, 0, (float) dimensions.getY(), 0);
     }
 }
