@@ -20,7 +20,7 @@ public class GroundSpoofA extends Check {
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
-        if (getData().getLastServerPos().hasNotPassed(2)
+        if (move.isServerPos()
                 || move.getTo().toVector().distance(move.getFrom().toVector()) < 0.005 || timeStamp < lastTimeStamp + 5)
             return;
 

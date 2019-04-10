@@ -56,6 +56,8 @@ public class AutoclickerF extends Check {
                 lastOutliner = outliner;
                 flyingTicks = 0;
                 swingTicks = 0;
+
+                debug("OUT: " + outliner);
             }
         } else {
             flyingTicks++;

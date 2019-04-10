@@ -23,7 +23,7 @@ public class AlertsCommand {
             return;
         }
 
-        if(args.length > 0 && args[0].equalsIgnoreCase("dev")) {
+        if (args.length > 0 && args[0].equalsIgnoreCase("dev")) {
             data.setDeveloperAlerts(!data.isDeveloperAlerts());
             player.sendMessage(Color.translate(Messages.toggledDevAlerts.replace("%enabled%", (data.isDeveloperAlerts() ? "on" : "off"))));
         } else {

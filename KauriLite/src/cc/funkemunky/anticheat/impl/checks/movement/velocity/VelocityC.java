@@ -40,7 +40,7 @@ public class VelocityC extends Check {
             }
             debug(Color.Green + "RATIO: " + ratio + "/" + threshold + " VL" + vl);
         }
-        if(vel.getLastVelocity().hasNotPassed(10)) {
+        if (vel.getLastVelocity().hasNotPassed(10)) {
             //debug("VEL: " + velocityH + " IB: " + move.isInsideBlock() + ", " + collides + ", " + move.isClientOnGround() + ", " + MathUtils.round(offsetY, 4) + ", " + move.isBlocksOnTop());
         }
     }

@@ -40,7 +40,7 @@ public class AntiVPN extends AntiPUP {
         Atlas.getInstance().getThreadPool().execute(() -> {
             VPNResponse response = Kauri.getInstance().getVpnUtils().getResponse(event.getPlayer());
 
-            if(response == null) return;
+            if (response == null) return;
 
             if (response.isProxy()) {
                 new BukkitRunnable() {

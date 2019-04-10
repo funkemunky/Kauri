@@ -9,47 +9,46 @@ import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
+import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
+import org.apache.commons.lang.time.DurationFormatUtils;
 import org.bukkit.event.Event;
 
 import java.util.Deque;
 import java.util.LinkedList;
 
-@CheckInfo(name = "Autoclicker (Type I)", description = "Something.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, developer = true)
-//@Init
+@CheckInfo(name = "Autoclicker (Type I)", description = "Something.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT)
+@Init
 @Packets(packets = {Packet.Client.ARM_ANIMATION})
 public class AutoclickerI extends Check {
 
-    private long lastTimeStamp, lastMS, ms;
+    private long lastTimeStamp, elapsed, ms;
 
-    private final Deque<Long> averageDeque = new LinkedList<>();
+    private int vl, ticks;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        val offset = 16777216L;
 
-        lastMS = ms;
         ms = timeStamp - lastTimeStamp;
 
-        double cps = 1000D/ ms, lastCPS = 1000D / lastMS;
+        double cps = 1000D / ms;
 
-        val gcd = MiscUtils.gcd((long) (cps * offset), (long) (lastCPS * offset));
-
-        averageDeque.add(gcd);
-
-        if (averageDeque.size() == 20) {
-            val distinct = averageDeque.stream().distinct().count();
-            val duplicates = averageDeque.size() - distinct;
-
-            if(duplicates > 0) {
-
-            }
-
-            debug(Color.Green + "DIS: " + distinct + " DUP: " + duplicates);
-            averageDeque.clear();
+        if(cps < 7 || cps > 19) {
+            lastTimeStamp = timeStamp;
+            return;
         }
 
-        debug("GCD: " + gcd + " CPS: " + cps);
+        if(ticks++ > 60) {
+            long time = MathUtils.elapsed(elapsed);
+
+            if(time < 7800) {
+                flag("time: " + time +"ms", true, true);
+            }
+            debug("MS: " + time + " DUR: " + DurationFormatUtils.formatDurationWords(time, true, true));
+            ticks = 0;
+            elapsed = timeStamp;
+        }
+        debug("CPS: " + cps);
 
         lastTimeStamp = timeStamp;
     }

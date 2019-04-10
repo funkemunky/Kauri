@@ -25,15 +25,15 @@ public class AimI extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(!MiscUtils.canDoCombat(combatOnly, getData())) return;
+        if (!MiscUtils.canDoCombat(combatOnly, getData())) return;
 
         val yawDifference = getData().getMovementProcessor().getYawDelta();
 
         val offset = 16777216L;
         val yawGCD = MiscUtils.gcd((long) ((yawDifference) * offset), (long) ((getData().getMovementProcessor().getLastYawDelta()) * offset));
 
-        if(String.valueOf(yawGCD).length() <= 5 && yawDifference > 0 && !getData().isCinematicMode()) {
-            if(verbose.flag(100, 200L)) {
+        if (String.valueOf(yawGCD).length() <= 5 && yawDifference > 0 && !getData().isCinematicMode()) {
+            if (verbose.flag(100, 200L)) {
                 flag("t: " + verbose.getVerbose() + " l: " + String.valueOf(yawGCD).length(), true, true);
             }
         } else verbose.deduct();

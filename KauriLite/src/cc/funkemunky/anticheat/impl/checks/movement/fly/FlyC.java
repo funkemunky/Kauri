@@ -21,7 +21,6 @@ public class FlyC extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if (getData().getLastServerPos().hasNotPassed(1)) return;
         val move = getData().getMovementProcessor();
         val from = move.getFrom();
         val to = move.getTo();

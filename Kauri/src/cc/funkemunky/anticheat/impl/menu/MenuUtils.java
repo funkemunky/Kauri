@@ -8,7 +8,6 @@ import cc.funkemunky.anticheat.api.utils.menu.button.Button;
 import cc.funkemunky.anticheat.api.utils.menu.button.ClickAction;
 import cc.funkemunky.anticheat.api.utils.menu.type.impl.ChestMenu;
 import cc.funkemunky.api.utils.Color;
-import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MiscUtils;
 import org.bukkit.Material;
@@ -17,8 +16,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 @Init
 public class
@@ -100,13 +97,13 @@ MenuUtils {
             menu.addItem(createButton(false, MiscUtils.createItem(key.equalsIgnoreCase(banReason) ? Material.ENCHANTED_BOOK : Material.BOOK, 1, Color.Blue + key, "", "&eViolations&8: &f" + logs.get(key)), null));
         }
 
-        if(page > 1) {
+        if (page > 1) {
             menu.setItem(48, createButton(false, MiscUtils.createItem(Material.SIGN, 1, Color.Gray + "Backward Page: " + Color.White + (page - 1)), (player, infoPair) -> {
                 openLogGUI(player, target, page - 1);
             }));
         }
 
-        if(logs.size() > pageMax) {
+        if (logs.size() > pageMax) {
             menu.setItem(50, createButton(false, MiscUtils.createItem(Material.SIGN, 1, Color.Gray + "Forward Page: " + Color.White + (page + 1)), (player, infoPair) -> {
                 openLogGUI(player, target, page + 1);
             }));
@@ -331,7 +328,7 @@ MenuUtils {
 
     private static Button getModifyAllButton(int page) {
         return createButton(false, MiscUtils.createItem(Material.REDSTONE, 1, Color.Green + "All Checks", "", "&fLeft Click &7to toggle all checks.", "&fMiddle &7to toggle all executable abilities in checks.", "&fRight Click &7to toggle all cancelling abilities in checks."), ((player, infoPair) -> {
-            switch(infoPair.getClickType()) {
+            switch (infoPair.getClickType()) {
                 case LEFT:
                     Kauri.getInstance().getCheckManager().getChecks().forEach(check -> {
                         Kauri.getInstance().getConfig().set("checks." + check.getName() + ".enabled", enabled);

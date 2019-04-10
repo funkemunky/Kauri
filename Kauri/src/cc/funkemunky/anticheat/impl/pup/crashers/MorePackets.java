@@ -31,9 +31,10 @@ public class MorePackets extends AntiPUP {
     @Override
     public boolean onPacket(Object packet, String packetType, long timeStamp) {
 
-        if(timeStamp < lastTimeStamp + 30) {
-            if(vl++ > maxVL) {
-                if(kick) Bukkit.getScheduler().scheduleSyncDelayedTask(Kauri.getInstance(), () -> getData().getPlayer().kickPlayer(Color.translate(kickMessage)));
+        if (timeStamp < lastTimeStamp + 30) {
+            if (vl++ > maxVL) {
+                if (kick)
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(Kauri.getInstance(), () -> getData().getPlayer().kickPlayer(Color.translate(kickMessage)));
                 lastTimeStamp = timeStamp;
                 return true;
             }

@@ -18,6 +18,7 @@ public class ReloadArgument extends FunkeArgument {
 
     @Message(name = "command.reload.completed")
     private String completed = "&aCompleted!";
+
     @Override
     public void onArgument(CommandSender commandSender, Command command, String[] strings) {
         commandSender.sendMessage(Color.translate(started));

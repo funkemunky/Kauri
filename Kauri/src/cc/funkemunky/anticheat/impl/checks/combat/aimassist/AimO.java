@@ -4,7 +4,9 @@ import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
-import cc.funkemunky.anticheat.api.utils.*;
+import cc.funkemunky.anticheat.api.utils.MiscUtils;
+import cc.funkemunky.anticheat.api.utils.Packets;
+import cc.funkemunky.anticheat.api.utils.TickTimer;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.Color;
 import lombok.val;
@@ -25,8 +27,8 @@ public class AimO extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(getData().getLastAttack().hasPassed(5)) {
-            if(getData().getLastAttack().hasPassed(10)) {
+        if (getData().getLastAttack().hasPassed(5)) {
+            if (getData().getLastAttack().hasPassed(10)) {
                 ticks = 0;
             }
             return;
@@ -36,29 +38,31 @@ public class AimO extends Check {
         val one = (long) (move.getYawDelta() * offset);
         val two = (long) (move.getLastYawDelta() * offset);
         val gcd = MiscUtils.gcd(one, two);
-        val div = (gcd  / (double) offset);
+        val div = (gcd / (double) offset);
 
-        if(move.getYawDelta() / div % 1 == 0 && move.getLastYawDelta() / div % 1 == 0 || ticks > 30) {
-           debug(Color.Green + "Ticks: " + ticks);
+        if(move.getYawDelta() < 0.25) return;
 
-           if(ticks > 20) {
-               if(vl++ > 7) {
-                   flag("ticks: " + ticks + " vl: " + vl, true, true);
-               }
-               lastFlag.reset();
-           } else if(ticks < 12 && lastFlag.hasPassed()) {
-               vl-= vl > 0 ? 2 : 0;
-               lastFlag.reset();
-           } else if(ticks > 0 && lastFlag.hasPassed(2)){
-               vl-= vl > 0 ? 1 : 0;
-               lastFlag.reset();
-           } else {
-               vl-= vl > 0 ? 0.25 : 0;
-           }
+        if (move.getYawDelta() / div % 1 == 0 && move.getLastYawDelta() / div % 1 == 0 || ticks > 30) {
+            debug(Color.Green + "Ticks: " + ticks);
+
+            if (ticks > 18) {
+                if (vl++ > 7) {
+                    flag("ticks: " + ticks + " vl: " + vl, true, true);
+                }
+                lastFlag.reset();
+            } else if (ticks < 12 && lastFlag.hasPassed()) {
+                vl -= vl > 0 ? 1 : 0;
+                lastFlag.reset();
+            } else if (ticks > 0 && lastFlag.hasPassed(2)) {
+                vl -= vl > 0 ? 0.5 : 0;
+                lastFlag.reset();
+            } else {
+                vl -= vl > 0 ? 0.25 : 0;
+            }
 
             debug(Color.Green + "VL: " + vl);
 
-           ticks = 0;
+            ticks = 0;
         } else ticks++;
 
         //debug(0.1 - (move.getYawDelta() / div) % 0.1 + "");

@@ -2,7 +2,6 @@ package cc.funkemunky.anticheat.impl.commands.kauri.arguments;
 
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.utils.Message;
 import cc.funkemunky.anticheat.api.utils.Messages;
 import cc.funkemunky.anticheat.impl.menu.MenuUtils;
@@ -16,10 +15,11 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.io.*;
-import java.net.MalformedURLException;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.nio.charset.Charset;
 
 public class LogArgument extends FunkeArgument {
@@ -51,14 +51,14 @@ public class LogArgument extends FunkeArgument {
             }
 
             MenuUtils.openLogGUI(player, target);
-        } else if(args.length > 2) {
+        } else if (args.length > 2) {
             OfflinePlayer target = Bukkit.getOfflinePlayer(args[2]);
 
             if (target == null) {
                 sender.sendMessage(Color.translate(Messages.playerDoesntExist));
                 return;
             }
-            switch(args[1].toLowerCase()) {
+            switch (args[1].toLowerCase()) {
                 case "gui": {
                     Player player = (Player) sender;
 
@@ -70,9 +70,9 @@ public class LogArgument extends FunkeArgument {
 
                     StringBuilder url = new StringBuilder("https://funkemunky.cc/api/kauri?uuid=" + target.getUniqueId().toString().replaceAll("-", "") + (violations.keySet().size() > 0 ? "&violations=" : ""));
 
-                    if(violations.keySet().size() > 0) {
+                    if (violations.keySet().size() > 0) {
                         for (String key : violations.keySet()) {
-                            if(Kauri.getInstance().getCheckManager().isCheck(key)) {
+                            if (Kauri.getInstance().getCheckManager().isCheck(key)) {
                                 Check check = Kauri.getInstance().getCheckManager().getCheck(key);
                                 int vl = violations.get(key), maxVL = check.getMaxVL();
                                 boolean developer = check.isDeveloper();
@@ -85,7 +85,7 @@ public class LogArgument extends FunkeArgument {
                             }
                         }
 
-                        if(violations.keySet().size() > 0) {
+                        if (violations.keySet().size() > 0) {
                             url.deleteCharAt(url.length() - 1);
                         }
 

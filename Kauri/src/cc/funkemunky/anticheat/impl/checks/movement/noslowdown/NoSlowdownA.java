@@ -6,7 +6,6 @@ import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
@@ -26,11 +25,11 @@ public class NoSlowdownA extends Check {
         val action = getData().getActionProcessor();
         val baseSpeed = MiscUtils.getBaseSpeed(getData()) - 0.02f;
 
-        if(timeStamp - lastTimeStamp < 5 || getData().isGeneralCancel()) return;
+        if (timeStamp - lastTimeStamp < 5 || getData().isGeneralCancel()) return;
 
-        if(action.isUsingItem() && move.getDeltaXZ() > baseSpeed) {
-            if(verbose.flag(20, 500L)) {
-                flag(MathUtils.round(move.getDeltaXZ(), 3) + ">- " + baseSpeed, true,false);
+        if (action.isUsingItem() && move.getDeltaXZ() > baseSpeed) {
+            if (verbose.flag(20, 500L)) {
+                flag(MathUtils.round(move.getDeltaXZ(), 3) + ">- " + baseSpeed, true, false);
             }
             debug(verbose.getVerbose() + ": " + move.getDeltaXZ() + ">-" + baseSpeed);
         } else verbose.deduct();

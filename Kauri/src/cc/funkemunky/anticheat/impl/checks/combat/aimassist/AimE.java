@@ -48,7 +48,7 @@ public class AimE extends Check {
         val yawAccel = MathUtils.getDelta(yawDelta, move.getLastYawDelta());
         val pitchAccel = MathUtils.getDelta(pitchDelta, move.getLastPitchDelta());
 
-        if(!MiscUtils.canDoCombat(combatOnly, getData())) return;
+        if (!MiscUtils.canDoCombat(combatOnly, getData())) return;
 
 
         if (yawDelta > minYawDelta && getData().getPlayer().getVehicle() == null && Math.abs(move.getTo().getPitch()) < 80 && (pitchAccel < pitchAccelMax || yawAccel < yawAccelMax)) {

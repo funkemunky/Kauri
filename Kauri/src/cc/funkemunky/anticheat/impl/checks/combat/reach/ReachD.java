@@ -10,8 +10,6 @@ import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedPacketPlayOutWorldParticle;
-import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumParticle;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MathUtils;
@@ -109,26 +107,26 @@ public class ReachD extends Check {
 
             for (Vector vec : finalVecs) {
                 double reach = origin.toVector().distance(vec);
-                if(reach <= 2.1) continue;
+                if (reach <= 2.1) continue;
 
                 calculatedReach = calculatedReach == 0 ? reach : Math.min(reach, calculatedReach);
 
                 collided++;
             }
 
-           if(collided > collisionMin) {
-               if (calculatedReach > maxReach + 0.051) {
-                   if ((vl += (vlAdd + (calculatedReach > 3.2 ? 1 : 0))) > maxVL) {
-                       flag(calculatedReach + ">-" + maxReach, false, true);
-                   }
+            if (collided > collisionMin) {
+                if (calculatedReach > maxReach + 0.051) {
+                    if ((vl += (vlAdd + (calculatedReach > 3.2 ? 1 : 0))) > maxVL) {
+                        flag(calculatedReach + ">-" + maxReach, false, true);
+                    }
 
-                   flag(calculatedReach + ">-" + maxReach, false, false);
+                    flag(calculatedReach + ">-" + maxReach, false, false);
 
-                   debug(Color.Green + "REACH: " + calculatedReach);
-               } else {
-                   vl -= vl > 0 ? belowTSubtract : 0;
-               }
-           }
+                    debug(Color.Green + "REACH: " + calculatedReach);
+                } else {
+                    vl -= vl > 0 ? belowTSubtract : 0;
+                }
+            }
 
             debug("VL: " + vl + "/" + maxVL + " REACH: " + calculatedReach + " COLLIDED: " + collided + " MAX: " + maxReach + " RANGE: " + pingRange);
         }

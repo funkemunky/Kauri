@@ -88,4 +88,8 @@ public class PlayerData {
             }
         }, 50L, 50L, TimeUnit.MILLISECONDS);
     }
+
+    public boolean isServerPos() {
+        return System.currentTimeMillis() - lastServerPosStamp < 100;
+    }
 }

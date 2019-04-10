@@ -26,7 +26,7 @@ public class BanwaveManager {
         service = Executors.newSingleThreadExecutor();
 
         executor.scheduleAtFixedRate(() -> {
-            if(BanwaveConfig.getInstance().enabled) {
+            if (BanwaveConfig.getInstance().enabled) {
                 runJudgementDay();
             }
         }, BanwaveConfig.getInstance().intervalTime, BanwaveConfig.getInstance().intervalTime, TimeUnit.valueOf(BanwaveConfig.getInstance().intervalUnit.toUpperCase()));
@@ -40,12 +40,12 @@ public class BanwaveManager {
             val judged = judgeCheaters();
             log("&7Found a total of &e" + judged.size() + " cheaters&7.");
 
-            if(!BanwaveConfig.getInstance().banInstantly) {
+            if (!BanwaveConfig.getInstance().banInstantly) {
                 AtomicInteger integer = new AtomicInteger(0);
 
                 new BukkitRunnable() {
                     public void run() {
-                        if(integer.get() < judged.size()) {
+                        if (integer.get() < judged.size()) {
                             banCheater(judged.get(integer.get()));
                             integer.getAndIncrement();
                         } else {
@@ -102,7 +102,7 @@ public class BanwaveManager {
 
     private void log(String message) {
         MiscUtils.printToConsole(message);
-        if(BanwaveConfig.getInstance().msgAdmins) {
+        if (BanwaveConfig.getInstance().msgAdmins) {
             Kauri.getInstance().getDataManager().getDataObjects().keySet().stream()
                     .filter(key -> Kauri.getInstance().getDataManager().getDataObjects().get(key).isAlertsEnabled())
                     .forEach(key -> {
@@ -114,6 +114,6 @@ public class BanwaveManager {
     }
 
     private void broadcast(String message) {
-        if(BanwaveConfig.getInstance().broadcast) Bukkit.broadcastMessage(Color.translate(message));
+        if (BanwaveConfig.getInstance().broadcast) Bukkit.broadcastMessage(Color.translate(message));
     }
 }

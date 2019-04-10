@@ -22,8 +22,8 @@ public class CriticalsA extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        if(getData().getLastAttack().hasNotPassed(0)) {
-            if(move.isServerOnGround()
+        if (getData().getLastAttack().hasNotPassed(0)) {
+            if (move.isServerOnGround()
                     && move.getDeltaY() != 0
                     && Math.abs(move.getDeltaY()) < 0.1
                     && move.getHalfBlockTicks() == 0

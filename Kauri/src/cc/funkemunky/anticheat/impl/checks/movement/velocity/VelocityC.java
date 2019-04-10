@@ -7,12 +7,9 @@ import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
-import cc.funkemunky.api.utils.*;
+import cc.funkemunky.api.utils.Color;
 import lombok.val;
-import lombok.var;
 import org.bukkit.event.Event;
-import org.bukkit.potion.PotionEffectType;
 
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.POSITION, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION})
 @CheckInfo(name = "Velocity (Type C)", description = "Predicts the minimum horizontal movement someone should move when velocity is taken.", type = CheckType.VELOCITY, cancelType = CancelType.MOTION, developer = true, executable = false)
@@ -43,7 +40,7 @@ public class VelocityC extends Check {
             }
             debug(Color.Green + "RATIO: " + ratio + "/" + threshold + " VL" + vl);
         }
-        if(vel.getLastVelocity().hasNotPassed(10)) {
+        if (vel.getLastVelocity().hasNotPassed(10)) {
             //debug("VEL: " + velocityH + " IB: " + move.isInsideBlock() + ", " + collides + ", " + move.isClientOnGround() + ", " + MathUtils.round(offsetY, 4) + ", " + move.isBlocksOnTop());
         }
     }

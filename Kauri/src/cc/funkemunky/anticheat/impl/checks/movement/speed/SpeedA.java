@@ -30,7 +30,7 @@ public class SpeedA extends Check {
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         //The client will always send a position packet when teleported or dictated to move by the server, so we need to account for that to prevent false-positives.
-        if (getData().getLastServerPos().hasNotPassed(1) || getData().isGeneralCancel()) {
+        if (getData().isGeneralCancel()) {
             return;
         }
         val move = getData().getMovementProcessor();

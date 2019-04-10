@@ -41,9 +41,9 @@ public class PacketListeners implements AtlasListener {
             switch (event.getType()) {
                 case Packet.Server.POSITION: {
                     data.getLastServerPos().reset();
+                    data.setLastServerPosStamp(event.getTimeStamp());
                     data.getVelocityProcessor().velocityX = data.getVelocityProcessor().velocityY = data.getVelocityProcessor().velocityZ = 0;
                     data.getVelocityProcessor().setAttackedSinceVelocity(false);
-                    //Bukkit.broadcastMessage("I did position bro. (" + Kauri.getInstance().getCurrentTicks() + ")");
                     break;
                 }
                 case Packet.Server.KEEP_ALIVE:
@@ -72,6 +72,7 @@ public class PacketListeners implements AtlasListener {
         }
         Kauri.getInstance().getProfiler().stop("event:PacketSendEvent");
     }
+
 
     @Listen(priority = ListenerPriority.LOW)
     public void onEvent(PacketReceiveEvent event) {

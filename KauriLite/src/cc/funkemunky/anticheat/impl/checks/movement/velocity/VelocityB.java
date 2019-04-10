@@ -20,7 +20,7 @@ public class VelocityB extends Check {
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         Player player = getData().getPlayer();
-        if(getData().getVelocityProcessor().getLastVelocity().hasPassed(2)) return;
+        if (getData().getVelocityProcessor().getLastVelocity().hasPassed(2)) return;
 
         val dy = getData().getMovementProcessor().getTo().getY() - getData().getMovementProcessor().getFrom().getY();
         val dxz = Math.hypot(getData().getMovementProcessor().getTo().getX() - getData().getMovementProcessor().getFrom().getX(),

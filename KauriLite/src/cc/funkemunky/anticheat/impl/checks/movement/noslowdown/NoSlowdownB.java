@@ -23,10 +23,10 @@ public class NoSlowdownB extends Check {
         val move = getData().getMovementProcessor();
         val baseSpeed = MiscUtils.getBaseSpeed(getData()) - 0.04;
 
-        if(getData().isGeneralCancel()) return;
+        if (getData().isGeneralCancel()) return;
 
-        if(move.isOnSoulSand() && move.isServerOnGround() && move.getDeltaXZ() > baseSpeed) {
-            if(verbose.flag(6, 400L)) {
+        if (move.isOnSoulSand() && move.isServerOnGround() && move.getDeltaXZ() > baseSpeed) {
+            if (verbose.flag(6, 400L)) {
                 flag(MathUtils.round(move.getDeltaXZ(), 3) + ">-" + baseSpeed, true, false);
             }
         } else verbose.deduct();

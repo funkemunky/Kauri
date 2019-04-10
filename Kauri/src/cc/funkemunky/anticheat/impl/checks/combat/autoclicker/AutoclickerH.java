@@ -12,7 +12,6 @@ import org.bukkit.event.Event;
 
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Packets(packets = {Packet.Client.ARM_ANIMATION})
 @cc.funkemunky.api.utils.Init
@@ -31,7 +30,7 @@ public class AutoclickerH extends Check {
             val delay = now - lastSwing;
 
             //Changed this so this check doesn't just stop working when a player has a delay longer than a certain period.
-            if(delay < 160L) {
+            if (delay < 160L) {
                 delays.add(delay);
             }
 
@@ -49,14 +48,14 @@ public class AutoclickerH extends Check {
                     //AimI cleaned up this area and completely changed the verbose system due to players being able to easily flag this.
                     // However, unlike autoclickers, players do not flag it consistently every single intervalTime. This should do until further testing
                     // proves this check to be invalid or needing fixing.
-                    if (vl ++ > 6) {
+                    if (vl++ > 6) {
                         flag("AVG: " + average, true, true);
                     }
                 } else {
                     vl = 0;
                 }
 
-                debug("AVG: " + average + " VL: " + vl);
+                debug("VL: " + vl + "DELTA: " + averageDelta  + "AVG: " + average + " VL: " + vl);
 
                 delays.clear();
             }

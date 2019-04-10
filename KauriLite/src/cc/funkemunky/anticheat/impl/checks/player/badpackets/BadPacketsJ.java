@@ -21,7 +21,7 @@ public class BadPacketsJ extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         long delta = timeStamp - lastTimeStamp;
 
-        if(getData().getLastServerPos().hasNotPassed(0) || getData().getLastLogin().hasNotPassed(20)) return;
+        if(getData().getMovementProcessor().isServerPos() || getData().getLastLogin().hasNotPassed(20)) return;
 
         if(delta > 60) {
             lastOverAmount = timeStamp;

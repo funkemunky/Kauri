@@ -28,7 +28,7 @@ public class FlyB extends Check {
 
         val move = getData().getMovementProcessor();
 
-        if(move.isBlocksAround()) return;
+        if (move.isBlocksAround()) return;
 
         if (!MathUtils.approxEquals(0.01, move.getLastClientYAcceleration(), move.getClientYAcceleration())) {
             if (vl++ > 4) {

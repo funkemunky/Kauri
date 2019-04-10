@@ -5,9 +5,6 @@ import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckSettings;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.api.Atlas;
-import cc.funkemunky.api.event.system.EnumPriority;
-import cc.funkemunky.api.event.system.EventMethod;
-import cc.funkemunky.api.event.system.Listener;
 import cc.funkemunky.api.events.AtlasListener;
 import cc.funkemunky.api.events.Listen;
 import cc.funkemunky.api.events.ListenerPriority;
@@ -28,8 +25,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.EventListenerProxy;
-import java.util.concurrent.TimeUnit;
 
 @Init
 public class PacketListeners implements AtlasListener {
@@ -46,9 +41,9 @@ public class PacketListeners implements AtlasListener {
             switch (event.getType()) {
                 case Packet.Server.POSITION: {
                     data.getLastServerPos().reset();
+                    data.setLastServerPosStamp(event.getTimeStamp());
                     data.getVelocityProcessor().velocityX = data.getVelocityProcessor().velocityY = data.getVelocityProcessor().velocityZ = 0;
                     data.getVelocityProcessor().setAttackedSinceVelocity(false);
-                    //Bukkit.broadcastMessage("I did position bro. (" + Kauri.getInstance().getCurrentTicks() + ")");
                     break;
                 }
                 case Packet.Server.KEEP_ALIVE:

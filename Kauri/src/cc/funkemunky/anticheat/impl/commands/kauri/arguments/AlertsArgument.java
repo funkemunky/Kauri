@@ -2,7 +2,6 @@ package cc.funkemunky.anticheat.impl.commands.kauri.arguments;
 
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
-import cc.funkemunky.anticheat.api.utils.Message;
 import cc.funkemunky.anticheat.api.utils.Messages;
 import cc.funkemunky.api.commands.FunkeArgument;
 import cc.funkemunky.api.commands.FunkeCommand;
@@ -33,7 +32,7 @@ public class AlertsArgument extends FunkeArgument {
             return;
         }
 
-        if(args.length > 1 && args[1].equalsIgnoreCase("dev")) {
+        if (args.length > 1 && args[1].equalsIgnoreCase("dev")) {
             data.setDeveloperAlerts(data.isAlertsEnabled());
             sender.sendMessage(Color.translate(Messages.toggledDevAlerts.replace("%enabled%", (data.isDeveloperAlerts() ? "on" : "off"))));
         } else {

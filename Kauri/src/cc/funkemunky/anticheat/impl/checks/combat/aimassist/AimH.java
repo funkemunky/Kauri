@@ -37,7 +37,7 @@ public class AimH extends Check {
         val from = this.getData().getMovementProcessor().getFrom();
         val to = this.getData().getMovementProcessor().getTo();
 
-        if(!MiscUtils.canDoCombat(combatOnly, getData())) return;
+        if (!MiscUtils.canDoCombat(combatOnly, getData())) return;
 
         val yawChange = Math.abs(from.getYaw() - to.getYaw());
         val pitchChange = Math.abs(from.getPitch() - to.getPitch());

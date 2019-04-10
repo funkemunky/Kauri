@@ -35,7 +35,7 @@ public class AimC extends Check {
         val yawAccel = MathUtils.getDelta(move.getYawDelta(), move.getLastYawDelta());
         val pitchAccel = MathUtils.getDelta(move.getPitchDelta(), move.getLastPitchDelta());
 
-        if(!MiscUtils.canDoCombat(combatOnly, getData())) return;
+        if (!MiscUtils.canDoCombat(combatOnly, getData())) return;
 
 
         if (yawAccel == 0 && pitchAccel == 0 && getData().getPlayer().getVehicle() == null && Math.abs(move.getTo().getPitch()) < 80 && yawDelta > 0.1) {

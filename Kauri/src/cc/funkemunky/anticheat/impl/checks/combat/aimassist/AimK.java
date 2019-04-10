@@ -22,10 +22,10 @@ public class AimK extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        if(getData().getLastServerPos().hasNotPassed(1)) return;
+        if (!move.isServerPos()) return;
 
-        if(move.getYawDelta() > 0.1 && move.getYawDelta() % 0.5 == 0 || move.getTo().getYaw() % 1 == 0) {
-            if(verbose.flag(6, 600L)) {
+        if (move.getYawDelta() > 0.1 && move.getYawDelta() % 0.5 == 0 || move.getTo().getYaw() % 1 == 0) {
+            if (verbose.flag(6, 600L)) {
                 flag("YD: " + move.getYawDelta() + " YAW: " + move.getTo().getYaw(), true, true);
             }
         }

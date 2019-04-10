@@ -30,7 +30,7 @@ public class AimA extends Check {
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
 
-        if(!MiscUtils.canDoCombat(combatOnly, getData())) return;
+        if (!MiscUtils.canDoCombat(combatOnly, getData())) return;
 
         val yawChange = getData().getMovementProcessor().getYawDelta();
         val pitchChange = getData().getMovementProcessor().getPitchDelta();

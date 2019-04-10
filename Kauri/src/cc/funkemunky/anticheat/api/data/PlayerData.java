@@ -14,6 +14,7 @@ import cc.funkemunky.anticheat.api.utils.PastLocation;
 import cc.funkemunky.anticheat.api.utils.TickTimer;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.utils.BoundingBox;
+import cc.funkemunky.api.utils.MathUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -90,5 +91,9 @@ public class PlayerData {
                 entityPastLocation.addLocation(entityTo);
             }
         }, 50L, 50L, TimeUnit.MILLISECONDS);
+    }
+
+    public boolean isServerPos() {
+        return System.currentTimeMillis() - lastServerPosStamp < 100;
     }
 }

@@ -15,9 +15,6 @@ import org.bukkit.event.Event;
 @cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Speed (Type C)", description = "Checks the in-air horizontal deceleration of the client. More accurate.", type = CheckType.SPEED)
 public class SpeedC extends Check {
-    public SpeedC() {
-
-    }
 
     private float lastMotion;
     private long lastTimeStamp;

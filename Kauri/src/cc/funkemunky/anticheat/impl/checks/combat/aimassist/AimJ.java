@@ -25,13 +25,13 @@ public class AimJ extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(!MiscUtils.canDoCombat(combatOnly, getData())) return;
+        if (!MiscUtils.canDoCombat(combatOnly, getData())) return;
 
         val offset = 16777216L;
         val pitchGCD = MiscUtils.gcd((long) ((getData().getMovementProcessor().getPitchDelta()) * offset), (long) ((getData().getMovementProcessor().getLastPitchDelta()) * offset));
 
-        if(String.valueOf(pitchGCD).length() <= 5 && !getData().isCinematicMode()) {
-            if(verbose.flag(60, 250L)) {
+        if (String.valueOf(pitchGCD).length() <= 5 && !getData().isCinematicMode()) {
+            if (verbose.flag(60, 250L)) {
                 flag("t: " + verbose.getVerbose() + " l: " + String.valueOf(pitchGCD).length(), true, true);
             }
         } else verbose.deduct();

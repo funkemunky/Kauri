@@ -28,7 +28,8 @@ public class ReachA extends Check {
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         /* A very simple maximum-reach distance check for a player in combat */
-        if(getData().getPlayer().getAllowFlight() || getData().getPlayer().getGameMode().toString().contains("CREATIVE")) return;
+        if (getData().getPlayer().getAllowFlight() || getData().getPlayer().getGameMode().toString().contains("CREATIVE"))
+            return;
         WrappedInUseEntityPacket use = new WrappedInUseEntityPacket(packet, getData().getPlayer());
 
         Player player = getData().getPlayer();

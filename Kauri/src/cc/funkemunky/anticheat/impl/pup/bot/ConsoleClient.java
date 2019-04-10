@@ -26,7 +26,7 @@ public class ConsoleClient extends AntiPUP {
     public boolean onPacket(Object packet, String packetType, long timeStamp) {
         if (packetType.equalsIgnoreCase(Packet.Client.KEEP_ALIVE)) {
             if (timeStamp - lastFlying > 8000L && !getData().getPlayer().isDead() && getData().getLastLogin().hasPassed(10)) {
-                if(vl++ > 2) {
+                if (vl++ > 2) {
                     new BukkitRunnable() {
                         public void run() {
                             getData().getPlayer().kickPlayer(Color.translate(message));

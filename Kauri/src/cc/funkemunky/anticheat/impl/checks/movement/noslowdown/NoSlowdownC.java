@@ -25,7 +25,7 @@ public class NoSlowdownC extends Check {
         val accelerationMax = 0.05f;
         val accel = Math.abs(move.getClientYAcceleration());
 
-        if(move.isInWeb() && move.getWebTicks() > 4) {
+        if (move.isInWeb() && move.getWebTicks() > 4) {
             if (accel > accelerationMax) {
                 if (verbose.flag(4, 500L)) {
                     flag(MathUtils.round(accel, 4) + ">-" + accelerationMax, true, true);

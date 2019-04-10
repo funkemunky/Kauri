@@ -6,7 +6,6 @@ import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.utils.Init;
 import org.bukkit.event.Event;
 
 @CheckInfo(name = "BadPackets (Type J)", description = "finds your french baget.", type = CheckType.BADPACKETS, executable = false, developer = true)
@@ -22,19 +21,19 @@ public class BadPacketsJ extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         long delta = timeStamp - lastTimeStamp;
 
-        if(getData().getLastServerPos().hasNotPassed(0) || getData().getLastLogin().hasNotPassed(20)) return;
+        if (getData().getMovementProcessor().isServerPos() || getData().getLastLogin().hasNotPassed(20)) return;
 
-        if(delta > 60) {
+        if (delta > 60) {
             lastOverAmount = timeStamp;
             overAmountTicks = delta / 50;
-        } else if(delta < 5) {
-            if(ticks++ > overAmountTicks + 1) {
-                if(verbose.flag(4, 2000L)) {
+        } else if (delta < 5) {
+            if (ticks++ > overAmountTicks + 1) {
+                if (verbose.flag(4, 2000L)) {
                     flag("fake lag", true, true);
                 }
             }
         } else {
-            if(verbose.getVerbose() < 1) {
+            if (verbose.getVerbose() < 1) {
                 ticks = 0;
             }
             verbose.deduct();

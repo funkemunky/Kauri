@@ -1,6 +1,5 @@
 package cc.funkemunky.anticheat;
 
-import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckManager;
 import cc.funkemunky.anticheat.api.data.DataManager;
@@ -19,8 +18,6 @@ import cc.funkemunky.api.profiling.BaseProfiler;
 import cc.funkemunky.api.updater.UpdaterUtils;
 import cc.funkemunky.api.utils.*;
 import lombok.Getter;
-import org.bukkit.Bukkit;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.HandlerList;
@@ -30,7 +27,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.*;
-import java.lang.reflect.Field;
 import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -114,6 +110,7 @@ public class Kauri extends JavaPlugin {
         dataManager.getDataObjects().clear();
         checkManager.getChecks().clear();
         executorService.shutdownNow();
+        checkExecutor.shutdownNow();
     }
 
     private void runTasks() {
@@ -256,7 +253,7 @@ public class Kauri extends JavaPlugin {
             try {
                 Class clazz = Class.forName(c);
 
-                Object obj = clazz.getSimpleName().equals(mainClass.getSimpleName()) ? plugin : clazz.newInstance();
+                Object obj = clazz.equals(this.getClass()) ? this : clazz.newInstance();
 
                 if (clazz.isAnnotationPresent(Init.class)) {
                     Init init = (Init) clazz.getAnnotation(Init.class);
@@ -264,10 +261,10 @@ public class Kauri extends JavaPlugin {
                     if (obj instanceof Listener) {
                         MiscUtils.printToConsole("&eFound " + clazz.getSimpleName() + " Bukkit listener. Registering...");
                         plugin.getServer().getPluginManager().registerEvents((Listener) obj, plugin);
-                    } else if(obj instanceof cc.funkemunky.api.event.system.Listener) {
+                    } else if (obj instanceof cc.funkemunky.api.event.system.Listener) {
                         MiscUtils.printToConsole("&eFound " + clazz.getSimpleName() + "(deprecated) Atlas listener. Registering...");
                         cc.funkemunky.api.event.system.EventManager.register(plugin, (cc.funkemunky.api.event.system.Listener) obj);
-                    } else if(obj instanceof AtlasListener) {
+                    } else if (obj instanceof AtlasListener) {
                         MiscUtils.printToConsole("&eFound " + clazz.getSimpleName() + "Atlas listener. Registering...");
                         Atlas.getInstance().getEventManager().registerListeners((AtlasListener) obj, plugin);
                     }
@@ -297,11 +294,11 @@ public class Kauri extends JavaPlugin {
                                 } catch (IllegalAccessException e) {
                                     e.printStackTrace();
                                 }
-                            } else if(field.isAnnotationPresent(Message.class)) {
+                            } else if (field.isAnnotationPresent(Message.class)) {
                                 Message msg = field.getAnnotation(Message.class);
 
                                 MiscUtils.printToConsole("&eFound " + field.getName() + " Message (default=" + field.get(obj) + ").");
-                                if(getMessages().get(msg.name()) != null) {
+                                if (getMessages().get(msg.name()) != null) {
                                     MiscUtils.printToConsole("&eValue not found in message configuration! Setting default into messages.yml...");
                                     field.set(obj, getMessages().getString(msg.name()));
                                 } else {
@@ -310,7 +307,7 @@ public class Kauri extends JavaPlugin {
                                     MiscUtils.printToConsole("&eValue found in message configuration! Set value to &a" + plugin.getConfig().get(msg.name()));
                                 }
                             }
-                        } catch(IllegalAccessException e) {
+                        } catch (IllegalAccessException e) {
                             e.printStackTrace();
                         }
                     });

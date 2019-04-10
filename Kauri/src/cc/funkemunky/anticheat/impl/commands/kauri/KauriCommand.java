@@ -7,7 +7,6 @@ import cc.funkemunky.api.commands.FunkeCommand;
 import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.MiscUtils;
 
-import java.io.IOException;
 import java.util.Arrays;
 
 public class KauriCommand extends FunkeCommand {
@@ -34,12 +33,12 @@ public class KauriCommand extends FunkeCommand {
         getArguments().forEach(argument -> {
             Arrays.stream(argument.getClass().getDeclaredFields()).filter(field -> field.getAnnotations().length > 0).forEach(field -> {
                 field.setAccessible(true);
-                if(field.isAnnotationPresent(Message.class)) {
+                if (field.isAnnotationPresent(Message.class)) {
                     try {
                         Message msg = field.getAnnotation(Message.class);
 
                         MiscUtils.printToConsole("&eFound " + field.getName() + " Message (default=" + field.get(argument) + ").");
-                        if(Kauri.getInstance().getMessages().get(msg.name()) != null) {
+                        if (Kauri.getInstance().getMessages().get(msg.name()) != null) {
                             MiscUtils.printToConsole("&eValue not found in message configuration! Setting default into messages.yml...");
                             field.set(argument, Kauri.getInstance().getMessages().getString(msg.name()));
                         } else {
@@ -47,10 +46,10 @@ public class KauriCommand extends FunkeCommand {
                             Kauri.getInstance().saveMessages();
                             MiscUtils.printToConsole("&eValue found in message configuration! Set value to &a" + Kauri.getInstance().getConfig().get(msg.name()));
                         }
-                    } catch(IllegalAccessException e) {
+                    } catch (IllegalAccessException e) {
                         e.printStackTrace();
                     }
-                } else if(field.isAnnotationPresent(ConfigSetting.class)) {
+                } else if (field.isAnnotationPresent(ConfigSetting.class)) {
                     ConfigSetting annotation = field.getAnnotation(ConfigSetting.class);
                     String name = annotation.name();
                     String path = annotation.path() + "." + (name.length() > 0 ? name : field.getName());

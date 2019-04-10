@@ -42,7 +42,7 @@ public class AimD extends Check {
         val yawDelta = move.getYawDelta();
         val pitchAcceleration = MathUtils.getDelta(move.getPitchDelta(), move.getLastPitchDelta());
 
-        if(!MiscUtils.canDoCombat(combatOnly, getData())) return;
+        if (!MiscUtils.canDoCombat(combatOnly, getData())) return;
 
 
         if (pitchAcceleration == 0 && getData().getPlayer().getVehicle() == null && Math.abs(move.getTo().getPitch()) < 80 && yawDelta > minYawDelta) {

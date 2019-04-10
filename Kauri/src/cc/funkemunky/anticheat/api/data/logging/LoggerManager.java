@@ -19,7 +19,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @Init(priority = Priority.HIGH)
 public class LoggerManager {
     @Getter
-    private Map<UUID, Map<String, Integer>> violations = new ConcurrentHashMap<>();;
+    private Map<UUID, Map<String, Integer>> violations = new ConcurrentHashMap<>();
+    ;
 
     @ConfigSetting(path = "data.logging", name = "type")
     public String type = "FLATFILE";
