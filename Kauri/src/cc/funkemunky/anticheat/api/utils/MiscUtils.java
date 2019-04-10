@@ -90,19 +90,6 @@ public class MiscUtils {
         return (previous <= 16384L) ? current : gcd(previous, current % previous);
     }
 
-
-    public static long lcm(long a, long b)
-    {
-        return a * (b / gcd(a, b));
-    }
-
-    public static long lcm(long... input)
-    {
-        long result = input[0];
-        for(int i = 1; i < input.length; i++) result = lcm(result, input[i]);
-        return result;
-    }
-
     public static boolean cancelForFlight(PlayerData data) {
         return cancelForFlight(data, 40, true);
     }
@@ -272,21 +259,6 @@ public class MiscUtils {
         } catch (UnknownDependencyException | InvalidPluginException | InvalidDescriptionException e3) {
             e3.printStackTrace();
         }
-    }
-
-    public static Location findGroundLocation(Player player) {
-        for (int y = player.getLocation().getBlockY(); y > 0; y--) {
-            Location location = new Location(player.getWorld(), player.getLocation().getBlockX(), y, player.getLocation().getBlockZ());
-
-            Block block = BlockUtils.getBlock(location);
-
-            if (BlockUtils.isSolid(block)) {
-                Location toReturn = location.clone();
-                toReturn.setY(ReflectionsUtil.getBlockBoundingBox(block).maxY);
-                return location;
-            }
-        }
-        return player.getLocation();
     }
 
     private static Plugin getPlugin(final String p) {

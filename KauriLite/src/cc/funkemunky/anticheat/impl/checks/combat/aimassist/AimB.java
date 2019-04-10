@@ -4,35 +4,45 @@ import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
+import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
+import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
 import org.bukkit.event.Event;
-import org.bukkit.util.Vector;
 
-@Packets(packets = {
-        Packet.Client.LOOK,
-        Packet.Client.POSITION_LOOK,
-        Packet.Client.LEGACY_POSITION_LOOK,
-        Packet.Client.LEGACY_LOOK,})
+@Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LOOK, Packet.Client.LEGACY_LOOK, Packet.Client.LEGACY_POSITION_LOOK})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Aim (Type B)", type = CheckType.AIM, cancelType = CancelType.MOTION, maxVL = 10)
+@CheckInfo(name = "Aim (Type B)", description = "Makes sure the aim acceleration is legitimate.", type = CheckType.AIM, cancelType = CancelType.MOTION, maxVL = 80)
 public class AimB extends Check {
+
+    private int vl;
+
+    @Setting(name = "threshold.vl.max")
+    private int vlMax = 9;
+
+    @Setting(name = "threshold.vl.subtract")
+    private int subtract = 2;
+
+    @Setting(name = "combatOnly")
+    private boolean combatOnly = true;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
+        val yawDelta = move.getYawDelta();
+        val yawAccel = MathUtils.getDelta(move.getYawDelta(), move.getLastYawDelta());
+        val pitchAccel = MathUtils.getDelta(move.getPitchDelta(), move.getLastPitchDelta());
 
-        if (getData().getLastServerPos().hasNotPassed(2) || getData().getLastLogin().hasNotPassed(20)) return;
+        if(!MiscUtils.canDoCombat(combatOnly, getData())) return;
 
-        Vector vector = new Vector(move.getTo().getX() - move.getFrom().getX(), 0, move.getTo().getZ() - move.getFrom().getZ());
-        double angleMove = vector.distanceSquared((new Vector(move.getTo().getYaw() - move.getFrom().getYaw(), 0, move.getTo().getYaw() - move.getFrom().getYaw())));
 
-        if (angleMove > 100000 && move.getDeltaXZ() > 0.2f && move.getDeltaXZ() < 1) {
-            flag("angle: " + angleMove, true, true);
-        }
-
-        debug("angle: " + angleMove);
+        if (yawAccel == 0 && pitchAccel == 0 && getData().getPlayer().getVehicle() == null && Math.abs(move.getTo().getPitch()) < 80 && yawDelta > 0.1) {
+            if (vl++ > vlMax) {
+                flag("p+y acceleration = 0; vl=" + vl, true, true);
+            }
+        } else vl -= vl > 0 ? subtract : 0;
     }
 
     @Override

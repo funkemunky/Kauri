@@ -4,64 +4,66 @@ import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
-import cc.funkemunky.anticheat.api.utils.DynamicRollingAverage;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockDigPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import lombok.val;
 import org.bukkit.event.Event;
 
 @Packets(packets = {
-        Packet.Client.ARM_ANIMATION,
         Packet.Client.FLYING,
         Packet.Client.POSITION,
         Packet.Client.POSITION_LOOK,
         Packet.Client.LOOK,
         Packet.Client.LEGACY_POSITION,
         Packet.Client.LEGACY_POSITION_LOOK,
-        Packet.Client.LEGACY_LOOK})
+        Packet.Client.LEGACY_LOOK,
+        Packet.Client.ARM_ANIMATION,
+        Packet.Client.BLOCK_DIG})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Autoclicker (Type C)", description = "An overall average CPS check.", type = CheckType.AUTOCLICKER, cancelType = CancelType.BREAK, maxVL = 20, executable = false)
+@CheckInfo(name = "Autoclicker (Type C)", description = "An unreasonable amount of CPS while breaking a block.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 20)
 public class AutoclickerC extends Check {
 
+    public AutoclickerC() {
 
-    private final DynamicRollingAverage cpsAverage = new DynamicRollingAverage(5);
-    private int cps, ticks;
-    private double vl;
+    }
+
+    private boolean sent;
+    private int vl;
+    private long lastArm, lastRange;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if (packetType.contains("Position") || packetType.contains("Look") || packetType.equals(Packet.Client.FLYING)) {
-            if (++ticks == 20) {
-                if (cps > 0) {
-                    cpsAverage.add(cps);
+        if (MiscUtils.shouldReturnArmAnimation(getData())) return;
+        if (packet instanceof WrappedInBlockDigPacket) {
+            val digPacket = (WrappedInBlockDigPacket) packet;
 
-                    val average = cpsAverage.getAverage();
+            val digType = digPacket.getAction();
 
-                    if (average >= 9.0) {
-                        if (Math.round(average) == average || Math.round(average) == average - 0.5) {
-                            if (++vl > 8) {
-                                flag(average + " -> " + (double) Math.round(average) + " -> " + "0.0", false, true);
-                            }
-                        } else {
-                            vl -= vl > 0 ? 1 : 0;
-                        }
-                    } else {
-                        vl -= vl > 0 ? 0.05 : 0;
-                    }
-
-                    if (cpsAverage.isReachedSize()) {
-                        cpsAverage.clearValues();
-                    }
+            switch (digType) {
+                case START_DESTROY_BLOCK: {
+                    sent = true;
+                    break;
                 }
-
-                cps = 0;
-                ticks = 0;
-
-                debug("AV: " + cpsAverage.getAverage() + " VL: " + vl);
+                case ABORT_DESTROY_BLOCK: {
+                    if (sent && lastRange > 10L) {
+                        if (++vl >= 10) {
+                            this.flag("V: " + vl, false, true);
+                        }
+                    }
+                    break;
+                }
             }
-        } else if (!MiscUtils.shouldReturnArmAnimation(getData())) {
-            cps++;
+        } else if (Packet.isPositionLook(packetType) || Packet.isPosition(packetType) || Packet.isLook(packetType) || packet instanceof WrappedInFlyingPacket) {
+            sent = false;
+        } else if (packetType.equals(Packet.Client.ARM_ANIMATION)) {
+            val now = System.currentTimeMillis();
+            val delay = now - this.lastArm;
+
+            this.lastArm = now;
+            this.lastRange = delay;
         }
     }
 

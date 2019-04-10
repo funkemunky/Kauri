@@ -164,7 +164,7 @@ public class LagArgument extends FunkeArgument {
         sender.sendMessage(MiscUtils.line(lineColor));
         sender.sendMessage(Color.translate(serverInfo));
         sender.sendMessage(Color.translate(tps.replace("%tps%", String.valueOf(MathUtils.round(Kauri.getInstance().getTps(), 2)))));
-        sender.sendMessage(Color.translate(tps.replace("%ms%", String.valueOf(Kauri.getInstance().getTickElapsed()))));
+        sender.sendMessage(Color.translate(tickTime.replace("%ms%", String.valueOf(Kauri.getInstance().getTickElapsed()))));
 
         val freeMem = MathUtils.round(Runtime.getRuntime().freeMemory() / (1024D * 1024D * 1024D), 2);
         val totalMem = MathUtils.round(Runtime.getRuntime().totalMemory() / (1024D * 1024D * 1024D), 2);

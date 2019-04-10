@@ -9,15 +9,13 @@ import cc.funkemunky.anticheat.api.data.stats.StatsManager;
 import cc.funkemunky.anticheat.api.event.TickEvent;
 import cc.funkemunky.anticheat.api.utils.Message;
 import cc.funkemunky.anticheat.impl.commands.kauri.KauriCommand;
-import cc.funkemunky.anticheat.impl.listeners.FunkeListeners;
-import cc.funkemunky.anticheat.impl.listeners.PacketListeners;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.event.system.EventManager;
+import cc.funkemunky.api.events.AtlasListener;
 import cc.funkemunky.api.profiling.BaseProfiler;
 import cc.funkemunky.api.updater.UpdaterUtils;
 import cc.funkemunky.api.utils.*;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.HandlerList;
@@ -27,7 +25,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.*;
-import java.lang.reflect.Field;
 import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -55,8 +52,8 @@ public class Kauri extends JavaPlugin {
 
     private BaseProfiler profiler;
 
-    private String requiredVersionOfAtlas = "1.1.4.1";
-    private List<String> usableVersionsOfAtlas = Arrays.asList("1.1.4", "1.1.4.1");
+    private String requiredVersionOfAtlas = "1.2";
+    private List<String> usableVersionsOfAtlas = Arrays.asList("1.1.4", "1.1.4.1", "1.2");
 
     private FileConfiguration messages;
     private File messagesFile;
@@ -99,9 +96,10 @@ public class Kauri extends JavaPlugin {
     public void onDisable() {
         statsManager.saveStats();
         loggerManager.saveToDatabase();
-        EventManager.unregister(new FunkeListeners());
-        EventManager.unregister(new PacketListeners());
+        Atlas.getInstance().getEventManager().unregisterAll(this);
+        EventManager.unregisterAll(this);
         org.bukkit.event.HandlerList.unregisterAll(this);
+        Atlas.getInstance().getFunkeCommandManager().removeCommand("Kauri");
         dataManager.getDataObjects().clear();
         checkManager.getChecks().clear();
         executorService.shutdownNow();
@@ -114,7 +112,7 @@ public class Kauri extends JavaPlugin {
             public void run() {
                 TickEvent tickEvent = new TickEvent(currentTicks++);
 
-                EventManager.callEvent(tickEvent);
+                Atlas.getInstance().getEventManager().callEvent(tickEvent);
             }
         }.runTaskTimerAsynchronously(this, 1L, 1L);
 
@@ -168,6 +166,7 @@ public class Kauri extends JavaPlugin {
         dataManager = new DataManager();
         HandlerList.unregisterAll(this);
         EventManager.unregisterAll(this);
+        Atlas.getInstance().getEventManager().unregisterAll(this);
         startScanner(false);
         dataManager.registerAllPlayers();
     }
@@ -250,20 +249,21 @@ public class Kauri extends JavaPlugin {
                 if (clazz.isAnnotationPresent(Init.class)) {
                     Init init = (Init) clazz.getAnnotation(Init.class);
 
-                    if (!configOnly) {
-                        if (obj instanceof Listener) {
-                            MiscUtils.printToConsole("&eFound " + clazz.getSimpleName() + " Bukkit listener. Registering...");
-                            Bukkit.getPluginManager().registerEvents((Listener) obj, plugin);
-                        } else if (obj instanceof cc.funkemunky.api.event.system.Listener) {
-                            MiscUtils.printToConsole("&eFound " + clazz.getSimpleName() + " Atlas listener. Registering...");
-                            EventManager.register(plugin, (cc.funkemunky.api.event.system.Listener) obj);
-                        }
-
-                        if (init.commands()) {
-                            Atlas.getInstance().getCommandManager().registerCommands(obj);
-                        }
-
+                    if (obj instanceof Listener) {
+                        MiscUtils.printToConsole("&eFound " + clazz.getSimpleName() + " Bukkit listener. Registering...");
+                        plugin.getServer().getPluginManager().registerEvents((Listener) obj, plugin);
+                    } else if(obj instanceof cc.funkemunky.api.event.system.Listener) {
+                        MiscUtils.printToConsole("&eFound " + clazz.getSimpleName() + "(deprecated) Atlas listener. Registering...");
+                        cc.funkemunky.api.event.system.EventManager.register(plugin, (cc.funkemunky.api.event.system.Listener) obj);
+                    } else if(obj instanceof AtlasListener) {
+                        MiscUtils.printToConsole("&eFound " + clazz.getSimpleName() + "Atlas listener. Registering...");
+                        Atlas.getInstance().getEventManager().registerListeners((AtlasListener) obj, plugin);
                     }
+
+                    if (init.commands()) {
+                        Atlas.getInstance().getCommandManager().registerCommands(obj);
+                    }
+
 
                     Arrays.stream(clazz.getDeclaredFields()).filter(field -> field.getAnnotations().length > 0).forEach(field -> {
                         try {

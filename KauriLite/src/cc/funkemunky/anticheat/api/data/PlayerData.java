@@ -7,7 +7,6 @@ import cc.funkemunky.anticheat.api.checks.CheckSettings;
 import cc.funkemunky.anticheat.api.data.processors.ActionProcessor;
 import cc.funkemunky.anticheat.api.data.processors.MovementProcessor;
 import cc.funkemunky.anticheat.api.data.processors.VelocityProcessor;
-import cc.funkemunky.anticheat.api.pup.AntiPUP;
 import cc.funkemunky.anticheat.api.utils.CustomLocation;
 import cc.funkemunky.anticheat.api.utils.MCSmooth;
 import cc.funkemunky.anticheat.api.utils.PastLocation;
@@ -42,7 +41,6 @@ public class PlayerData {
 
     private Map<String, List<Check>> packetChecks = new HashMap<>();
     private Map<Class, List<Check>> bukkitChecks = new HashMap<>();
-    private Map<String, List<AntiPUP>> antiPupMethods = new HashMap<>();
 
     private CancelType cancelType = CancelType.NONE;
     private Vector lastVelocityVector;
@@ -80,6 +78,7 @@ public class PlayerData {
         movementProcessor = new MovementProcessor();
 
         Kauri.getInstance().getCheckManager().loadChecksIntoData(this);
+
 
         Atlas.getInstance().getSchedular().scheduleAtFixedRate(() -> {
             if (target != null && !target.isDead()) {

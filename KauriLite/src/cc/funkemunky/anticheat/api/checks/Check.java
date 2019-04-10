@@ -52,13 +52,13 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
                         new BukkitRunnable() {
                             public void run() {
                                 getData().setBanned(false);
-                                execCommand.forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replaceAll("%player%", getData().getPlayer().getName()).replaceAll("%check%", getName())));
+                                execCommand.forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replace("%player%", getData().getPlayer().getName()).replace("%check%", getName())));
                                 getData().getPacketChecks().values().forEach(checkList -> checkList.forEach(check -> check.vl = 0));
                                 getData().getBukkitChecks().values().forEach(checkList -> checkList.forEach(check -> check.vl = 0));
                             }
                         }.runTaskLater(Kauri.getInstance(), 10);
                         if (CheckSettings.broadcastEnabled)
-                            Bukkit.broadcastMessage(Color.translate(CheckSettings.broadcastMessage.replaceAll("%player%", getData().getPlayer().getName())));
+                            Bukkit.broadcastMessage(Color.translate(CheckSettings.broadcastMessage.replace("%player%", getData().getPlayer().getName())));
                         Kauri.getInstance().getLoggerManager().addBan(data.getUuid(), this);
                     }
 
@@ -67,23 +67,26 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
                     if (cancel && cancellable) data.setCancelType(cancelType);
 
                     JsonMessage message = new JsonMessage();
-                    message.addText(Color.translate(alertMessage.replaceAll("%check%", (developer ? Color.Red + Color.Italics : "") + getName()).replaceAll("%player%", data.getPlayer().getName()).replaceAll("%vl%", String.valueOf(vl)).replaceAll("%info%", information))).addHoverText((!ban || developer ? Color.Red + "This alert does not count towards their ban-violations." + "\n" : "") + Color.Gray + information);
 
                     if((!data.getMovementProcessor().isLagging())) {
                         if(System.currentTimeMillis() - lastAlert > CheckSettings.alertsDelay) {
-                            Kauri.getInstance().getDataManager().getDataObjects().keySet().stream().filter(key -> {
-                                PlayerData data = Kauri.getInstance().getDataManager().getDataObjects().get(key);
+                            if(ban && !developer) {
+                                message.addText(Color.translate(alertMessage.replace("%prefix%", CheckSettings.alertPrefix).replace("%check%", getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", String.valueOf(vl)).replace("%info%", information))).addHoverText(Color.Gray + information);
+                                Kauri.getInstance().getDataManager().getDataObjects().keySet().stream().filter(key -> Kauri.getInstance().getDataManager().getDataObjects().get(key).isAlertsEnabled())
+                                        .forEach(key -> message.sendToPlayer(Kauri.getInstance().getDataManager().getDataObjects().get(key).getPlayer()));
+                                lastAlert = System.currentTimeMillis();
 
-                                return (data.isDeveloperAlerts() || data.isAlertsEnabled()) && ((!developer && ban) || CheckSettings.showExperimentalAlerts || data.isDeveloperAlerts());
-                            }).forEach(key -> {
-                                PlayerData data = Kauri.getInstance().getDataManager().getDataObjects().get(key);
+                                if (CheckSettings.printToConsole) {
+                                    MiscUtils.printToConsole(alertMessage.replace("%check%", (developer ? Color.Red + Color.Italics : "") + getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", String.valueOf(vl)));
+                                }
+                            } else {
+                                message.addText(Color.translate(alertMessage.replace("%prefix%", CheckSettings.devAlertPrefix).replace("%check%", (developer ? Color.Red + Color.Italics : "") + getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", "N/A").replaceAll("%info%", information))).addHoverText(Color.Gray + information);
 
-                                message.sendToPlayer(data.getPlayer());
-                            });
-                            lastAlert = System.currentTimeMillis();
+                                Kauri.getInstance().getDataManager().getDataObjects().keySet().stream().filter(key -> {
+                                    PlayerData data = Kauri.getInstance().getDataManager().getDataObjects().get(key);
 
-                            if (CheckSettings.printToConsole) {
-                                MiscUtils.printToConsole(alertMessage.replaceAll("%check%", (developer ? Color.Red + Color.Italics : "") + getName()).replaceAll("%player%", data.getPlayer().getName()).replaceAll("%vl%", String.valueOf(vl)));
+                                    return data.isAlertsEnabled() && data.isDeveloperAlerts();
+                                }).forEach(key -> message.sendToPlayer(Kauri.getInstance().getDataManager().getDataObjects().get(key).getPlayer()));
                             }
                         }
                     }

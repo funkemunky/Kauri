@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.movement.speed;
 
+import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
@@ -7,6 +8,7 @@ import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.BlockUtils;
+import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.ReflectionsUtil;
 import lombok.val;
 import org.bukkit.block.Block;
@@ -14,7 +16,7 @@ import org.bukkit.event.Event;
 
 
 @Packets(packets = {Packet.Client.LEGACY_POSITION, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.POSITION, Packet.Client.POSITION_LOOK})
-@cc.funkemunky.api.utils.Init
+@Init
 @CheckInfo(name = "Speed (Type D)", description = "Checks the in-air and on-ground deceleration of the client. Less accurate.", type = CheckType.SPEED, maxVL = 125, executable = false, developer = true)
 public class SpeedD extends Check {
     public SpeedD() {
@@ -40,13 +42,13 @@ public class SpeedD extends Check {
 
         val max = move.isServerOnGround() || move.getAirTicks() < 3 ? 0.24 : 0.03;
 
-        if (getData().getLastBlockPlace().hasPassed(8) && getData().getVelocityProcessor().getLastVelocity().hasPassed(6) && getData().getLastServerPos().hasPassed(1) && !getData().isGeneralCancel() && timeStamp > lastTimeStamp + 5 && delta > max) {
+        if (getData().getLastBlockPlace().hasPassed(8) && !move.isBlocksOnTop() && getData().getVelocityProcessor().getLastVelocity().hasPassed(6) && getData().getLastServerPos().hasPassed(1) && !getData().isGeneralCancel() && timeStamp > lastTimeStamp + 5 && delta > max) {
             if ((delta > max + 0.4) || verbose.flag(3, 400L)) {
                 flag(delta + ">-" + max + ";" + move.isServerOnGround(), true, true);
             }
         }
 
-        debug("DIFFERENCE: " + delta + " GROUND: " + move.isServerOnGround());
+        debug("DIFFERENCE: " + delta + " GROUND: " + move.isServerOnGround() + " TICKS: " + Kauri.getInstance().getCurrentTicks());
 
         lastMotion = deltaXZ;
         lastTimeStamp = timeStamp;

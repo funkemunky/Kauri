@@ -60,8 +60,8 @@ public class Kauri extends JavaPlugin {
     private BaseProfiler profiler;
     private VPNUtils vpnUtils;
 
-    private String requiredVersionOfAtlas = "1.1.4.1";
-    private List<String> usableVersionsOfAtlas = Arrays.asList("1.1.4", "1.1.4.1");
+    private String requiredVersionOfAtlas = "1.2";
+    private List<String> usableVersionsOfAtlas = Arrays.asList("1.1.4", "1.1.4.1", "1.2", "1.2-PRE-b3");
 
     private FileConfiguration messages;
     private File messagesFile;

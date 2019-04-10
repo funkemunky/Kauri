@@ -36,11 +36,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Reach (Type D)", description = "Uses a mixture of lighter but less accurate ray-tracing to determine the client's actual reach distance.", type = CheckType.REACH, cancelType = CancelType.COMBAT, maxVL = 30)
+@CheckInfo(name = "Reach (Type C)", description = "Uses a mixture of lighter but less accurate ray-tracing to determine the client's actual reach distance.", type = CheckType.REACH, cancelType = CancelType.COMBAT, maxVL = 30)
 public class ReachC extends Check {
-
     @Setting(name = "pingRange")
-    private long pingRange = 100;
+    private long pingRange = 150;
 
     @Setting(name = "threshold.reach")
     private float maxReach = 3.0f;

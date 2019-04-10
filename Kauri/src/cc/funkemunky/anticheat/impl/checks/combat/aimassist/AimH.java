@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.checks.combat.aimassist;
 
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
+import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
@@ -19,7 +20,7 @@ import java.util.LinkedList;
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK,})
 @Init
-@CheckInfo(name = "Aim (Type H)", description = "Looks for something pitch something ask elevated")
+@CheckInfo(name = "Aim (Type H)", description = "Looks for a common ratio of pitch movement in AimBots.", type = CheckType.AIM, executable = false, developer = true)
 public class AimH extends Check {
 
     private final Deque<Float> pitchDeque = new LinkedList<>();
@@ -27,6 +28,9 @@ public class AimH extends Check {
 
     @Setting(name = "combatOnly")
     private boolean combatOnly = true;
+
+    @Setting(name = "threshold.vl.max")
+    private int vlMax = 2;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
@@ -44,8 +48,8 @@ public class AimH extends Check {
         val pitchRatio = pitchAverage / pitchChange;
 
         if (pitchRatio > 100.F && yawChange > 2.f) {
-            if (++vl > 2) {
-                this.flag("P: " + pitchRatio, false, false);
+            if (++vl > vlMax) {
+                this.flag("P: " + pitchRatio, true, true);
             }
         } else {
             vl = 0;

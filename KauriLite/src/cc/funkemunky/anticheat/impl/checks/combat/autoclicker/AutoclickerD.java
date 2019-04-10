@@ -25,6 +25,10 @@ public class AutoclickerD extends Check {
     private double vl;
     private List<Long> times = new CopyOnWriteArrayList<>();
 
+    public AutoclickerD() {
+
+    }
+
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val elapsed = timeStamp - lastTimeStamp;
@@ -42,7 +46,7 @@ public class AutoclickerD extends Check {
                 debug("VL: " + vl + " RANGE: " + range + " AVERAGE: " + average);
                 lastRange = range;
                 times.clear();
-            } else if(elapsed > 54) {
+            } else {
                 times.add(elapsed);
             }
         }

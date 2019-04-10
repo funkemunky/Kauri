@@ -6,7 +6,6 @@ import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.utils.Init;
 import org.bukkit.event.Event;
 
 @CheckInfo(name = "BadPackets (Type J)", description = "finds your french baget.", type = CheckType.BADPACKETS, executable = false, developer = true)

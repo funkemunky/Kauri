@@ -12,8 +12,14 @@ public class CheckSettings {
     @ConfigSetting(name = "executableCommand")
     static List<String> executableCommand = Collections.singletonList("ban %player% [Kauri] Unfair Advantage");
 
+    @ConfigSetting(path = "alerts", name = "prefix")
+    static String alertPrefix = "&8[&6&lKauri&8]";
+
+    @ConfigSetting(path = "alerts", name = "devPrefix")
+    static String devAlertPrefix = "&8[&c&lDEV&8]";
+
     @ConfigSetting(path = "alerts", name = "alertMessage")
-    static String alertMessage = "&8[&6&lKauri&8] &f%player% &7failed &f%check% &c(x%vl%)";
+    static String alertMessage = "%prefix% &f%player% &7failed &f%check% &c(x%vl%)";
 
     @ConfigSetting(path = "executable.broadcast", name = "enabled")
     static boolean broadcastEnabled = false;

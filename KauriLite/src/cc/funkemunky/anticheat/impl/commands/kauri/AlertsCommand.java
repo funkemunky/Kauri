@@ -23,11 +23,11 @@ public class AlertsCommand {
             return;
         }
 
-        data.setAlertsEnabled(!data.isAlertsEnabled());
         if(args.length > 0 && args[0].equalsIgnoreCase("dev")) {
             data.setDeveloperAlerts(!data.isDeveloperAlerts());
             player.sendMessage(Color.translate(Messages.toggledDevAlerts.replace("%enabled%", (data.isDeveloperAlerts() ? "on" : "off"))));
         } else {
+            data.setAlertsEnabled(!data.isAlertsEnabled());
             player.sendMessage(Color.translate(Messages.toggledAlerts.replace("%enabled%", (data.isAlertsEnabled() ? "on" : "off"))));
         }
     }

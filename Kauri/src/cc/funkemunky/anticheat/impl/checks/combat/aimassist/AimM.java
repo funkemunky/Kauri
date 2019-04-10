@@ -6,6 +6,7 @@ import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
+import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.Init;
@@ -14,7 +15,7 @@ import lombok.val;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 
-@CheckInfo(name = "Aim (Type M)", description = "test", type = CheckType.AIM, cancellable = false, executable = false, developer = true)
+@CheckInfo(name = "Aim (Type M)", description = "A heuristic that looks for common patterns by advanced AimAssists (not stable) - FlyCode", type = CheckType.AIM, cancellable = false, executable = false, developer = true)
 @Init
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LOOK, Packet.Client.LEGACY_LOOK})
 public class AimM extends Check {
@@ -25,6 +26,9 @@ public class AimM extends Check {
     private float lastPitch, lastYaw;
     
     private Verbose verbose = new Verbose();
+
+    @Setting(name = "thershold.count")
+    private int countMax = 10;
     
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
@@ -71,7 +75,7 @@ public class AimM extends Check {
                     if (move.getDeltaXZ() < 0.20) {
                         if (count > 0) count--;
                     }
-                    if (count >= 10 && verbose.flag(4, 999L)) {
+                    if (count > countMax && verbose.flag(4, 999L)) {
                         flag("test", true, true);
                     }
                     lastGcd = gcd;

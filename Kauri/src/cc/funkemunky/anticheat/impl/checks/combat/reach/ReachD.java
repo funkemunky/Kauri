@@ -10,6 +10,8 @@ import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedPacketPlayOutWorldParticle;
+import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumParticle;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MathUtils;
@@ -36,16 +38,32 @@ import java.util.concurrent.CopyOnWriteArrayList;
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Reach (Type D)", description = "Uses a mixture of lighter but less accurate ray-tracing to determine the client's actual reach distance.", type = CheckType.REACH, cancelType = CancelType.COMBAT, maxVL = 30)
+@CheckInfo(name = "Reach (Type D)", description = "A ray-tracing check but is less light, however it detects 3.1 reach very accurately.", type = CheckType.REACH, cancelType = CancelType.COMBAT, maxVL = 125)
 public class ReachD extends Check {
-    @Setting(name = "pingRange")
-    private long pingRange = 150;
 
-    @Setting(name = "threshold.reach")
+    @Setting(name = "pingRange")
+    private long pingRange = 50;
+
+    @Setting(name = "theshold.reach")
     private float maxReach = 3.0f;
 
     @Setting(name = "threshold.vl.max")
     private int maxVL = 5;
+
+    @Setting(name = "threshold.vl.add")
+    private double vlAdd = 1;
+
+    @Setting(name = "threshold.vl.subtract.arm")
+    private double armSubtract = 0.005;
+
+    @Setting(name = "threshold.vl.subtract.belowThreshold")
+    private double belowTSubtract = 0.1;
+
+    @Setting(name = "threshold.collisionMin")
+    private int collisionMin = 12;
+
+    @Setting(name = "accuracy")
+    private float accuracy = 0.025f;
 
     private double vl;
 
@@ -53,7 +71,7 @@ public class ReachD extends Check {
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         if (packetType.equals(Packet.Client.ARM_ANIMATION)) {
-            vl -= vl > 0 ? 0.005 : 0;
+            vl -= vl > 0 ? armSubtract : 0;
         } else if (getData().getTarget() != null && getData().getTarget().getWorld().getUID().equals(getData().getPlayer().getWorld().getUID()) && getData().getLastAttack().hasNotPassed(0) && getData().getPlayer().getGameMode().equals(GameMode.SURVIVAL)) {
             val target = getData().getTarget();
             val entityData = Kauri.getInstance().getDataManager().getPlayerData(target.getUniqueId());
@@ -68,16 +86,16 @@ public class ReachD extends Check {
 
             RayTrace trace = new RayTrace(origin.toVector(), origin.getDirection());
 
-            List<Vector> vecs = trace.traverse(target.getEyeLocation().distance(origin), 0.05);
+            List<Vector> vecs = trace.traverse(2, target.getEyeLocation().distance(origin), accuracy);
 
             List<BoundingBox> entityBoxes = new CopyOnWriteArrayList<>();
 
             if (entityData == null) {
-                getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), pingRange + MathUtils.getDelta(getData().getTransPing(), getData().getLastTransPing()))
+                getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), Math.max(0, pingRange + (getData().getMovementProcessor().getDeltaXZ() < 0.23 ? -50 : 0)) + MathUtils.getDelta(getData().getTransPing(), getData().getLastTransPing()))
                         .forEach(loc -> entityBoxes.add(getHitbox(target, loc)));
             } else {
                 entityData.getMovementProcessor().getPastLocation()
-                        .getEstimatedLocation(getData().getTransPing(), pingRange + MathUtils.getDelta(getData().getTransPing(), getData().getLastTransPing()))
+                        .getEstimatedLocation(getData().getTransPing(), getData().isLagging() ? pingRange + MathUtils.getDelta(getData().getTransPing(), getData().getLastTransPing()) : 50)
                         .forEach(loc -> entityBoxes.add(getHitbox(target, loc)));
             }
 
@@ -91,23 +109,27 @@ public class ReachD extends Check {
 
             for (Vector vec : finalVecs) {
                 double reach = origin.toVector().distance(vec);
-                calculatedReach = calculatedReach == 0 ? reach + .12 : Math.min(reach + .12, calculatedReach);
+                if(reach <= 2.1) continue;
+
+                calculatedReach = calculatedReach == 0 ? reach : Math.min(reach, calculatedReach);
 
                 collided++;
             }
 
-            if (collided > 7) {
-                if (calculatedReach > maxReach + 0.2) {
-                    if (vl++ > maxVL) {
-                        flag(calculatedReach + ">-" + maxReach, false, true);
-                    }
-                    debug(Color.Green + "REACH: " + calculatedReach);
-                } else {
-                    vl -= vl > 0 ? 0.25 : 0;
-                }
-            } else {
-                vl -= vl > 0 ? 0.1f : 0;
-            }
+           if(collided > collisionMin) {
+               if (calculatedReach > maxReach + 0.051) {
+                   if ((vl += (vlAdd + (calculatedReach > 3.2 ? 1 : 0))) > maxVL) {
+                       flag(calculatedReach + ">-" + maxReach, false, true);
+                   }
+
+                   flag(calculatedReach + ">-" + maxReach, false, false);
+
+                   debug(Color.Green + "REACH: " + calculatedReach);
+               } else {
+                   vl -= vl > 0 ? belowTSubtract : 0;
+               }
+           }
+
             debug("VL: " + vl + "/" + maxVL + " REACH: " + calculatedReach + " COLLIDED: " + collided + " MAX: " + maxReach + " RANGE: " + pingRange);
         }
     }
@@ -120,6 +142,6 @@ public class ReachD extends Check {
     private BoundingBox getHitbox(LivingEntity entity, CustomLocation l) {
         val dimensions = MiscUtils.entityDimensions.getOrDefault(entity.getType(), new Vector(0.35f, 1.85f, 0.35f));
 
-        return new BoundingBox(l.toVector(), l.toVector()).grow(.25f, .25f, .25f).grow((float) dimensions.getX(), 0, (float) dimensions.getZ()).add(0, 0, 0, 0, (float) dimensions.getY(), 0);
+        return new BoundingBox(l.toVector(), l.toVector()).grow((float) dimensions.getX(), 0, (float) dimensions.getZ()).add(0, 0, 0, 0, (float) dimensions.getY(), 0);
     }
 }

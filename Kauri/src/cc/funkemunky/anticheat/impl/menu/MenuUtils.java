@@ -25,13 +25,16 @@ public class
 MenuUtils {
     public static boolean hasModifiedChecks = false;
 
-    @ConfigSetting(path = "data.gui", name = "enabled")
+    /* Removed these because I was annoyed about it working properly. It didn't feel right and natural. Without it saving
+       the state it should be much more natural and intuitive. -funkemunky
+     */
+    //@ConfigSetting(path = "data.gui", name = "enabled")
     private static boolean enabled;
 
-    @ConfigSetting(path = "data.gui", name = "executable")
+    //@ConfigSetting(path = "data.gui", name = "executable")
     private static boolean executable;
 
-    @ConfigSetting(path = "data.gui", name = "cancellable")
+    //@ConfigSetting(path = "data.gui", name = "cancellable")
     private static boolean cancellable;
 
     private static Button createButton(boolean moveable, ItemStack stack, ClickAction action) {
@@ -336,7 +339,7 @@ MenuUtils {
 
                     hasModifiedChecks = true;
                     openCheckEditGUI(player, page);
-                    updateData(UpdateDataType.ENABLED);
+                    //updateData(UpdateDataType.ENABLED);
                     break;
                 case MIDDLE:
                     Kauri.getInstance().getCheckManager().getChecks().forEach(check -> {
@@ -345,7 +348,7 @@ MenuUtils {
 
                     hasModifiedChecks = true;
                     openCheckEditGUI(player, page);
-                    updateData(UpdateDataType.EXECUTABLE);
+                    //updateData(UpdateDataType.EXECUTABLE);
                     break;
                 case RIGHT:
                     Kauri.getInstance().getCheckManager().getChecks().forEach(check -> {
@@ -354,13 +357,13 @@ MenuUtils {
 
                     hasModifiedChecks = true;
                     openCheckEditGUI(player, page);
-                    updateData(UpdateDataType.CANCELLABLE);
+                    //updateData(UpdateDataType.CANCELLABLE);
                     break;
             }
         }));
     }
 
-    private static void updateData(UpdateDataType type) {
+    /*private static void updateData(UpdateDataType type) {
         switch(type) {
             case ENABLED:
                 enabled = !enabled;
@@ -375,5 +378,5 @@ MenuUtils {
                 Kauri.getInstance().getConfig().set("data.gui.cancellable", cancellable);
                 break;
         }
-    }
+    }*/
 }
