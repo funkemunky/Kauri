@@ -40,18 +40,7 @@ public class LogArgument extends FunkeArgument {
 
     @Override
     public void onArgument(CommandSender sender, Command command, String[] args) {
-        if (args.length > 1) {
-            Player player = (Player) sender;
-
-            OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
-
-            if (target == null) {
-                sender.sendMessage(Color.translate(Messages.playerDoesntExist));
-                return;
-            }
-
-            MenuUtils.openLogGUI(player, target);
-        } else if (args.length > 2) {
+        if (args.length > 2) {
             OfflinePlayer target = Bukkit.getOfflinePlayer(args[2]);
 
             if (target == null) {
@@ -60,9 +49,11 @@ public class LogArgument extends FunkeArgument {
             }
             switch (args[1].toLowerCase()) {
                 case "gui": {
-                    Player player = (Player) sender;
+                    if(sender instanceof Player) {
+                        Player player = (Player) sender;
 
-                    MenuUtils.openLogGUI(player, target);
+                        MenuUtils.openLogGUI(player, target);
+                    }
                     break;
                 }
                 case "web": {
@@ -112,6 +103,17 @@ public class LogArgument extends FunkeArgument {
                     break;
                 }
             }
+        } else if (args.length > 1) {
+            Player player = (Player) sender;
+
+            OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
+
+            if (target == null) {
+                sender.sendMessage(Color.translate(Messages.playerDoesntExist));
+                return;
+            }
+
+            MenuUtils.openLogGUI(player, target);
         } else {
             sender.sendMessage(Color.translate(Messages.invalidArguments));
         }
