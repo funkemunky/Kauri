@@ -33,11 +33,11 @@ public class AlertsArgument extends FunkeArgument {
             return;
         }
 
-        data.setAlertsEnabled(!data.isAlertsEnabled());
         if(args.length > 1 && args[1].equalsIgnoreCase("dev")) {
             data.setDeveloperAlerts(data.isAlertsEnabled());
             sender.sendMessage(Color.translate(Messages.toggledDevAlerts.replace("%enabled%", (data.isDeveloperAlerts() ? "on" : "off"))));
         } else {
+            data.setAlertsEnabled(!data.isAlertsEnabled());
             sender.sendMessage(Color.translate(Messages.toggledAlerts.replace("%enabled%", (data.isAlertsEnabled() ? "on" : "off"))));
         }
     }

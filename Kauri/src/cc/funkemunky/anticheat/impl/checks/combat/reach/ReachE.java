@@ -50,12 +50,6 @@ public class ReachE extends Check {
     @Setting(name = "threshold.vl.max")
     private int maxVL = 5;
 
-    @Setting(name = "threshold.vl.nonBanMax")
-    private double nonBanMaxVL = 2.0;
-
-    @Setting(name = "threshold.vl.nonBanMult")
-    private double nonBanMult = 5.0;
-
     @Setting(name = "threshold.vl.add")
     private double vlAdd = 1;
 
@@ -65,11 +59,11 @@ public class ReachE extends Check {
     @Setting(name = "threshold.vl.subtract.belowThreshold")
     private double belowTSubtract = 0.1;
 
-    @Setting(name = "threshold.vl.subtract.belowCollisionMin")
-    private double belowCollisionSubtract = 0.1;
-
     @Setting(name = "threshold.collisionMin")
-    private int collisionMin = 2;
+    private int collisionMin = 12;
+
+    @Setting(name = "accuracy")
+    private float accuracy = 0.025f;
 
     private double vl;
 
@@ -92,7 +86,7 @@ public class ReachE extends Check {
 
             RayTrace trace = new RayTrace(origin.toVector(), origin.getDirection());
 
-            List<Vector> vecs = trace.traverse(target.getEyeLocation().distance(origin), 0.01f);
+            List<Vector> vecs = trace.traverse(2, target.getEyeLocation().distance(origin), accuracy);
 
             List<BoundingBox> entityBoxes = new CopyOnWriteArrayList<>();
 
@@ -115,24 +109,20 @@ public class ReachE extends Check {
 
             for (Vector vec : finalVecs) {
                 double reach = origin.toVector().distance(vec);
-                if(reach <= 0.5) continue;
+                if(reach <= 2.1) continue;
 
                 calculatedReach = calculatedReach == 0 ? reach : Math.min(reach, calculatedReach);
 
                 collided++;
             }
 
-           if(collided > 0) {
+           if(collided > collisionMin) {
                if (calculatedReach > maxReach + 0.051) {
-                   if ((vl += (vlAdd + (calculatedReach > 3.2 ? 1 : 0))) > nonBanMaxVL) {
-                       if (vl > maxVL) {
-                           flag(calculatedReach + ">-" + maxReach, false, true);
-                       } else {
-                           flag(calculatedReach + ">-" + maxReach, false, false);
-                       }
+                   if ((vl += (vlAdd + (calculatedReach > 3.2 ? 1 : 0))) > maxVL) {
+                       flag(calculatedReach + ">-" + maxReach, false, true);
                    }
 
-                   flag(calculatedReach + ">-" + maxReach + " (DEVELOPERS ONLY)", false, false);
+                   flag(calculatedReach + ">-" + maxReach, false, false);
 
                    debug(Color.Green + "REACH: " + calculatedReach);
                } else {
@@ -152,6 +142,6 @@ public class ReachE extends Check {
     private BoundingBox getHitbox(LivingEntity entity, CustomLocation l) {
         val dimensions = MiscUtils.entityDimensions.getOrDefault(entity.getType(), new Vector(0.35f, 1.85f, 0.35f));
 
-        return new BoundingBox(l.toVector(), l.toVector()).grow(0.1f, 0.1f, 0.1f).grow((float) dimensions.getX(), 0, (float) dimensions.getZ()).add(0, 0, 0, 0, (float) dimensions.getY(), 0);
+        return new BoundingBox(l.toVector(), l.toVector()).grow((float) dimensions.getX(), 0, (float) dimensions.getZ()).add(0, 0, 0, 0, (float) dimensions.getY(), 0);
     }
 }

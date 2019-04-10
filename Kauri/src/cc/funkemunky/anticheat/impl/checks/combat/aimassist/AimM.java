@@ -71,7 +71,7 @@ public class AimM extends Check {
                     if (move.getDeltaXZ() < 0.20) {
                         if (count > 0) count--;
                     }
-                    if (count >= 10 && verbose.flag(1, 999L)) {
+                    if (count >= 10 && verbose.flag(4, 999L)) {
                         flag("test", true, true);
                     }
                     lastGcd = gcd;
