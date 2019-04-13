@@ -11,7 +11,7 @@ import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
 import org.bukkit.event.Event;
 
-@CheckInfo(name = "Fly (Type E)", description = "Detects flys.", type = CheckType.FLY, developer = true, executable = false)
+@CheckInfo(name = "Fly (Type E)", description = "Detects flys.", type = CheckType.FLY, executable = false)
 @Init
 @Packets(packets = {Packet.Client.LEGACY_POSITION, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.POSITION_LOOK, Packet.Client.POSITION})
 public class FlyE extends Check {
