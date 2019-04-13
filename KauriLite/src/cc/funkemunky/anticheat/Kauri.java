@@ -53,7 +53,7 @@ public class Kauri extends JavaPlugin {
     private BaseProfiler profiler;
 
     private String requiredVersionOfAtlas = "1.2";
-    private List<String> usableVersionsOfAtlas = Arrays.asList("1.1.4", "1.1.4.1", "1.2", "1.2-PRE-b3");
+    private List<String> usableVersionsOfAtlas = Arrays.asList("1.1.4", "1.1.4.1", "1.2", "1.2-PRE-b4", "1.2-PRE-b5", "1.2-PRE-b6");
 
     private FileConfiguration messages;
     private File messagesFile;
@@ -245,7 +245,7 @@ public class Kauri extends JavaPlugin {
             try {
                 Class clazz = Class.forName(c);
 
-                Object obj = clazz.getSimpleName().equals(mainClass.getSimpleName()) ? plugin : clazz.newInstance();
+                Object obj = clazz.equals(this.getClass()) ? this : clazz.newInstance();
 
                 if (clazz.isAnnotationPresent(Init.class)) {
                     Init init = (Init) clazz.getAnnotation(Init.class);

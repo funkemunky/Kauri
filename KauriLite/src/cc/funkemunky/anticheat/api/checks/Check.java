@@ -39,7 +39,7 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
     }
 
     protected void flag(String information, boolean cancel, boolean ban) {
-        if(Kauri.getInstance().getTps() > CheckSettings.tpsThreshold) {
+        if (Kauri.getInstance().getTps() > CheckSettings.tpsThreshold) {
             Kauri.getInstance().getCheckManager().getAlertsExecutable().execute(() -> {
                 if (data.getLastLag().hasPassed() || lagVerbose.flag(4, 500L)) {
                     if (ban && !data.getMovementProcessor().isLagging()) {
@@ -68,9 +68,9 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
 
                     JsonMessage message = new JsonMessage();
 
-                    if((!data.getMovementProcessor().isLagging())) {
-                        if(System.currentTimeMillis() - lastAlert > CheckSettings.alertsDelay) {
-                            if(ban && !developer) {
+                    if ((!data.getMovementProcessor().isLagging())) {
+                        if (System.currentTimeMillis() - lastAlert > CheckSettings.alertsDelay) {
+                            if (ban && !developer) {
                                 message.addText(Color.translate(alertMessage.replace("%prefix%", CheckSettings.alertPrefix).replace("%check%", getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", String.valueOf(vl)).replace("%info%", information))).addHoverText(Color.Gray + information);
                                 Kauri.getInstance().getDataManager().getDataObjects().keySet().stream().filter(key -> Kauri.getInstance().getDataManager().getDataObjects().get(key).isAlertsEnabled())
                                         .forEach(key -> message.sendToPlayer(Kauri.getInstance().getDataManager().getDataObjects().get(key).getPlayer()));
@@ -107,12 +107,12 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
         values.put(path + ".executableCommands", Collections.singletonList("%global%"));
         values.put(path + ".banWave.enabled", isBanWave);
         values.put(path + ".banWave.threshold", banWaveThreshold);
-        
+
         values.keySet().stream().filter(key -> Kauri.getInstance().getConfig().get(key) == null).forEach(key -> {
             Kauri.getInstance().getConfig().set(key, values.get(key));
             Kauri.getInstance().saveConfig();
         });
-        
+
         if (Kauri.getInstance().getConfig().get("checks." + name) != null) {
             maxVL = Kauri.getInstance().getConfig().getInt(path + ".maxVL");
             enabled = Kauri.getInstance().getConfig().getBoolean(path + ".enabled");

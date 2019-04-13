@@ -19,9 +19,6 @@ import org.bukkit.event.Event;
 @Init
 @CheckInfo(name = "Speed (Type D)", description = "Checks the in-air and on-ground deceleration of the client. Less accurate.", type = CheckType.SPEED, maxVL = 125, executable = false, developer = true)
 public class SpeedD extends Check {
-    public SpeedD() {
-
-    }
 
     private float lastMotion;
     private long lastTimeStamp;
