@@ -25,10 +25,6 @@ public class AutoclickerG extends Check {
     private double vl;
     private List<Long> times = new CopyOnWriteArrayList<>();
 
-    public AutoclickerG() {
-
-    }
-
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val elapsed = timeStamp - lastTimeStamp;

@@ -28,13 +28,13 @@ public class BypassingArgument extends FunkeArgument {
 
     @Override
     public void onArgument(CommandSender sender, Command command, String[] args) {
-        if (args.length > 0) {
-            OfflinePlayer player = Bukkit.getOfflinePlayer(args[0]);
+        if (args.length > 1) {
+            OfflinePlayer player = Bukkit.getOfflinePlayer(args[1]);
 
             if (player != null) {
                 boolean bypassing = !Kauri.getInstance().getCheckManager().isBypassing(player.getUniqueId());
 
-                if (args.length > 1) bypassing = Boolean.parseBoolean(args[1]);
+                if (args.length > 2) bypassing = Boolean.parseBoolean(args[2]);
 
                 Kauri.getInstance().getCheckManager().setBypassing(player.getUniqueId(), bypassing);
 

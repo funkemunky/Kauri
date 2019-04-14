@@ -73,7 +73,6 @@ public class PacketListeners implements AtlasListener {
         Kauri.getInstance().getProfiler().stop("event:PacketSendEvent");
     }
 
-
     @Listen(priority = ListenerPriority.LOW)
     public void onEvent(PacketReceiveEvent event) {
         if (event.getPlayer() == null || !Kauri.getInstance().getDataManager().getDataObjects().containsKey(event.getPlayer().getUniqueId()))

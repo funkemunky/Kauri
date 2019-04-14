@@ -73,19 +73,19 @@ public class CollisionAssessment {
                 onSlime = true;
             }
 
-            if(block.getType().toString().contains("SOUL") && bb.intersectsWithBox(getData().getBoundingBox().subtract(0, 0.01f,0,0,1.4f,0).shrink(0.2f,0,0.2f))) {
+            if (block.getType().toString().contains("SOUL") && bb.intersectsWithBox(getData().getBoundingBox().subtract(0, 0.01f, 0, 0, 1.4f, 0).shrink(0.2f, 0, 0.2f))) {
                 onSoulSand = true;
             }
 
-            if (BlockUtils.isClimbableBlock(block) && bb.intersectsWithBox(data.getBoundingBox().grow(0.1f,0.1f,0.1f))) {
+            if (BlockUtils.isClimbableBlock(block) && bb.intersectsWithBox(data.getBoundingBox().grow(0.1f, 0.1f, 0.1f))) {
                 onClimbable = true;
             }
 
-            if(!isEntity) {
-                if(bb.intersectsWithBox(data.getBoundingBox().grow(1.0f, 0, 1.0f).shrink(0, 0.01f, 0))) {
+            if (!isEntity) {
+                if (bb.intersectsWithBox(data.getBoundingBox().grow(1.0f, 0, 1.0f).shrink(0, 0.01f, 0))) {
                     blocksNear = true;
                 }
-                if(bb.intersectsWithBox(data.getBoundingBox().grow(1.5f, 1.5f, 1.5f))) {
+                if (bb.intersectsWithBox(data.getBoundingBox().grow(1.5f, 1.5f, 1.5f))) {
                     blocksAround = true;
                 }
             }
