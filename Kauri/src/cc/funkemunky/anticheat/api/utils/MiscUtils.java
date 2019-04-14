@@ -106,7 +106,7 @@ public class MiscUtils {
                 || !Atlas.getInstance().getBlockBoxManager().getBlockBox().isChunkLoaded(data.getPlayer().getLocation())
                 || data.getLastLogin().hasNotPassed(50)
                 || move.getClimbTicks() > 0
-                || data.getLastBlockPlace().hasNotPassed(10)
+                || data.getLastBlockPlace().hasNotPassed(15)
                 || player.getActivePotionEffects().stream().anyMatch(effect -> effect.toString().toLowerCase().contains("levi"))
                 || (move.isServerOnGround() && move.isOnHalfBlock())
                 || (move.isServerOnGround() && groundCheck)

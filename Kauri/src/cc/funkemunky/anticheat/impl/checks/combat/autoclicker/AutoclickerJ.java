@@ -8,66 +8,55 @@ import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.Init;
+import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
 import org.bukkit.event.Event;
 
-import java.util.Collection;
-import java.util.Deque;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 @Init
+@CheckInfo(name = "Autoclicker (Type J)", description = "Looks for autoclickers with repeating time differences.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT)
 @Packets(packets = {Packet.Client.ARM_ANIMATION})
-@CheckInfo(name = "Autoclicker (Type J)", description = "test", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, developer = true)
 public class AutoclickerJ extends Check {
 
-    private Deque<Double> list = new LinkedList<>();
+    private List<Double> list = new ArrayList<>();
     private long lastTimeStamp;
+    private double lastRange;
+    private int vl;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(!MiscUtils.shouldReturnArmAnimation(getData())) {
-            val delta = timeStamp - lastTimeStamp;
-            val cps = 1000D / delta;
+        if(MiscUtils.shouldReturnArmAnimation(getData())) return;
 
+        double cps = 1000D / (timeStamp - lastTimeStamp);
 
-            if(list.size() >= 80) {
-                val stddev = getStd(list);
+        if(list.size() >= 40) {
+            list.sort(Comparator.reverseOrder());
 
-                debug("STD: " + stddev);
+            val range = list.get(0) - list.get(list.size() - 1);
+            val delta = MathUtils.getDelta(range, lastRange);
 
-                list.clear();
-            } else if(cps < 20 && cps > 0) {
-                list.add(cps);
-            }
+            if(delta < 0.5) {
+                if(vl++ > 5) {
+                    flag(delta + "<-0.1", true, true);
+                }
+            } else vl-= vl > 0 ? 2 : 0;
 
-            lastTimeStamp = timeStamp;
+            debug("range=" + range + " delta=" + delta + " vl=" + vl);
+            lastRange = range;
+            list.clear();
+        } else if(cps > 0 && cps < 20) {
+            list.add(cps);
         }
+
+        lastTimeStamp = timeStamp;
     }
 
     @Override
     public void onBukkitEvent(Event event) {
 
-    }
-
-    private double getMean(Collection<Double> list) {
-        double total = 0;
-
-        for (Double val : list) {
-            total+= val;
-        }
-
-        return total / list.size();
-    }
-
-    private double getStd(Collection<Double> list) {
-        double mean = getMean(list);
-
-        double total = 0;
-
-        for (Double val : list) {
-            total+= Math.pow(val - mean, 2);
-        }
-
-        return Math.sqrt(total / list.size());
     }
 }

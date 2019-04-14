@@ -40,14 +40,14 @@ public class AutoclickerC extends Check {
 
                     if (average >= 9.0) {
                         if (Math.round(average) == average || Math.round(average) == average - 0.5) {
-                            if (++vl > 8) {
+                            if (++vl > 10) {
                                 flag(average + " -> " + (double) Math.round(average) + " -> " + "0.0", false, true);
                             }
                         } else {
                             vl -= vl > 0 ? 1 : 0;
                         }
                     } else {
-                        vl -= vl > 0 ? 0.05 : 0;
+                        vl -= vl > 0 ? 0.25 : 0;
                     }
 
                     if (cpsAverage.isReachedSize()) {

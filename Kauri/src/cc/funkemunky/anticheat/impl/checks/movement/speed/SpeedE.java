@@ -14,7 +14,7 @@ import lombok.var;
 import org.bukkit.event.Event;
 
 @Init
-@CheckInfo(name = "Speed (Type E)", description = "Speed check", type = CheckType.SPEED, executable = false)
+@CheckInfo(name = "Speed (Type E)", description = "Totally not skidded off Lancer.", type = CheckType.SPEED, executable = false)
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.POSITION, Packet.Client.LEGACY_POSITION, Packet.Client.LEGACY_POSITION_LOOK})
 public class SpeedE extends Check {
 
@@ -23,7 +23,7 @@ public class SpeedE extends Check {
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val player = getData().getPlayer();
-        if (player.getAllowFlight() || player.isInsideVehicle()) {
+        if (player.getAllowFlight() || player.isInsideVehicle() || getData().getLastServerPos().hasNotPassed(0)) {
             return;
         }
 

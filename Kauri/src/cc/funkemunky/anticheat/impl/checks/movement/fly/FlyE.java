@@ -5,6 +5,7 @@ import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
+import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MathUtils;
@@ -16,13 +17,15 @@ import org.bukkit.event.Event;
 @Packets(packets = {Packet.Client.LEGACY_POSITION, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.POSITION_LOOK, Packet.Client.POSITION})
 public class FlyE extends Check {
 
+    private Verbose verbose = new Verbose();
+
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
         if (MiscUtils.cancelForFlight(getData(), 15, false)) return;
 
-        if (move.getAirTicks() > 5 && !move.isClientOnGround() && !MathUtils.approxEquals(0.2, move.getServerYVelocity(), move.getDeltaY())) {
+        if (move.getAirTicks() > 1 && !move.isServerOnGround() && !MathUtils.approxEquals(0.1, move.getClientYAcceleration(), move.getServerYAcceleration()) && !MathUtils.approxEquals(0.2, move.getServerYVelocity(), move.getDeltaY())) {
             flag(move.getDeltaY() + ">-" + move.getServerYVelocity(), true, true);
         }
     }

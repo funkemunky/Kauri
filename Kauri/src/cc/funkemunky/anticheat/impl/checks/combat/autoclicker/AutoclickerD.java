@@ -21,7 +21,7 @@ import org.bukkit.event.Event;
         Packet.Client.LEGACY_LOOK,
         Packet.Client.ARM_ANIMATION})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Autoclicker (Type D)", description = "Checks for very common autoclicker mistakes.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, executable = false, maxVL = 20, developer = true)
+@CheckInfo(name = "Autoclicker (Type D)", description = "Checks for very common autoclicker mistakes.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, executable = false, maxVL = 20)
 public class AutoclickerD extends Check {
 
     private int cps, ticks, vl;
@@ -41,7 +41,7 @@ public class AutoclickerD extends Check {
                     val averageCps = fraction.average();
 
                     if (averageCps >= 8.0 && maxCps == minCps) {
-                        if ((vl += 2) > 6.0) {
+                        if ((vl += 2) > 8.0) {
                             flag("t: " + vl, true, true);
                         }
                     } else {

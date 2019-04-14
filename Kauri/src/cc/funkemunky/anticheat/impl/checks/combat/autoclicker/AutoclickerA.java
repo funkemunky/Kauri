@@ -8,6 +8,7 @@ import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
+import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
 import org.bukkit.event.Event;
 
@@ -28,28 +29,23 @@ public class AutoclickerA extends Check {
     @Setting(name = "verboseDeduct")
     private double deduct = 0.25;
 
+    private int ticks;
     private long lastTimeStamp;
     private double vl;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
+        if(MiscUtils.shouldReturnArmAnimation(getData())) return;
 
-        val elapsed = timeStamp - lastTimeStamp;
-
-        if (elapsed < 2) return;
-        val cps = 1000D / elapsed;
-
-        if (cps > maxCPS && !getData().isLagging() && !MiscUtils.shouldReturnArmAnimation(getData())) {
-            if (vl++ > verboseThreshold) {
-                flag(cps + ">-" + maxCPS, false, cps > banCPS);
+        if(timeStamp - lastTimeStamp > 1000L) {
+            if(ticks > banCPS) {
+                flag("cps: " + ticks, true, true);
+            } else
+            if(ticks > maxCPS) {
+                flag("cps: " + ticks, true, false);
             }
-        } else {
-            vl -= vl > 0 ? deduct : 0;
-        }
-
-        debug("VL: " + vl + " CPS: " + cps);
-
-        lastTimeStamp = timeStamp;
+            ticks = 0;
+        } else ticks++;
     }
 
     @Override
