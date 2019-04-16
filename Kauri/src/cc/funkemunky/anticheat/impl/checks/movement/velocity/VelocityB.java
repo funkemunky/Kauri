@@ -30,37 +30,40 @@ public class VelocityB extends Check {
             }
         } else if(velocityX != 0 && velocityZ != 0) {
             val dy = getData().getMovementProcessor().getTo().getY() - getData().getMovementProcessor().getFrom().getY();
-            val dxz = Math.hypot(getData().getMovementProcessor().getTo().getX() - getData().getMovementProcessor().getFrom().getX(),
-                    getData().getMovementProcessor().getTo().getZ() - getData().getMovementProcessor().getFrom().getZ());
 
-            val kbxz = Math.hypot(velocityX, velocityZ);
+            if(dy < 0.419 && dy > 0.1) {
+                val dxz = Math.hypot(getData().getMovementProcessor().getTo().getX() - getData().getMovementProcessor().getFrom().getX(),
+                        getData().getMovementProcessor().getTo().getZ() - getData().getMovementProcessor().getFrom().getZ());
 
-            //the only accurate way to check horizontal kb is to check it in the air, if the player is on ground it won't work
-            //people might say this is from agc or whatever but its from gcheat, just like entire agc is (no joke)
-            val aimove = Atlas.getInstance().getBlockBoxManager().getBlockBox().getAiSpeed(getData().getPlayer()) * 2.9;
-            if (getData().getMovementProcessor().getBlockAboveTicks() == 0
-                    && getData().getMovementProcessor().getLiquidTicks() == 0
-                    && getData().getMovementProcessor().getWebTicks() == 0
-                    && kbxz > 0.15
-                    && !getData().getMovementProcessor().isBlocksNear()) {
+                val kbxz = Math.hypot(velocityX, velocityZ);
 
-                val quotient = dxz / kbxz;
+                //the only accurate way to check horizontal kb is to check it in the air, if the player is on ground it won't work
+                //people might say this is from agc or whatever but its from gcheat, just like entire agc is (no joke)
+                val aimove = Atlas.getInstance().getBlockBoxManager().getBlockBox().getAiSpeed(getData().getPlayer()) * 2.9;
+                if (getData().getMovementProcessor().getBlockAboveTicks() == 0
+                        && getData().getMovementProcessor().getLiquidTicks() == 0
+                        && getData().getMovementProcessor().getWebTicks() == 0
+                        && kbxz > 0.15
+                        && !getData().getMovementProcessor().isBlocksNear()) {
 
-                val threshold = 1 - aimove;
+                    val quotient = dxz / kbxz;
 
-                if (quotient < threshold) {
-                    if ((vl += 1.1) >= 14.0) {
-                        flag("velocity: " + MathUtils.round(quotient * 100, 1) + "%", true, true);
+                    val threshold = 0.75;
+
+                    if (quotient < threshold) {
+                        if (vl++ >= 14.0) {
+                            flag("velocity: " + MathUtils.round(quotient * 100, 1) + "%", true, true);
+                        }
+                    } else {
+                        vl = Math.max(0, vl - 1.5);
                     }
-                } else {
-                    vl = Math.max(0, vl - 0.8);
+
+                    debug("QUOTIENT: " + quotient + "/" + threshold + " VL: " + vl);
                 }
 
-                debug("QUOTIENT: " + quotient + "/" + threshold + " VL: " + vl);
+                velocityX = velocityZ = 0;
+                //debug("KBXZ: " + kbxz + " DXZ: " + dxz + " AI: " + aimove);
             }
-
-            velocityX = velocityZ = 0;
-            debug("KBXZ: " + kbxz + " DXZ: " + dxz + " AI: " + aimove);
         }
     }
 

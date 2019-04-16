@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 @Init
 @Packets(packets = {Packet.Client.ARM_ANIMATION})
-@CheckInfo(name = "Autoclicker (Type I)", description = "test", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, developer = true)
+@CheckInfo(name = "Autoclicker (Type I)", description = "test", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT)
 public class AutoclickerI extends Check {
 
     private List<Double> list = new ArrayList<>();

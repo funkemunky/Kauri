@@ -156,7 +156,7 @@ public class Kauri extends JavaPlugin {
     }
 
     private void registerCommands() {
-        Atlas.getInstance().getFunkeCommandManager().addCommand(new KauriCommand());
+        Atlas.getInstance().getFunkeCommandManager().addCommand(this, new KauriCommand());
     }
 
     public double getTPSMS() {
@@ -270,7 +270,7 @@ public class Kauri extends JavaPlugin {
                     }
 
                     if (init.commands()) {
-                        Atlas.getInstance().getCommandManager().registerCommands(obj);
+                        Atlas.getInstance().getCommandManager().registerCommands(plugin, obj);
                     }
 
 
