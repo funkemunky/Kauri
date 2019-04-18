@@ -9,10 +9,12 @@ import cc.funkemunky.anticheat.api.data.stats.StatsManager;
 import cc.funkemunky.anticheat.api.event.TickEvent;
 import cc.funkemunky.anticheat.api.utils.Message;
 import cc.funkemunky.anticheat.impl.commands.kauri.KauriCommand;
+import cc.funkemunky.anticheat.impl.listeners.LegacyListeners;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.event.system.EventManager;
 import cc.funkemunky.api.events.AtlasListener;
 import cc.funkemunky.api.profiling.BaseProfiler;
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.updater.UpdaterUtils;
 import cc.funkemunky.api.utils.*;
 import lombok.Getter;
@@ -53,7 +55,7 @@ public class Kauri extends JavaPlugin {
     private BaseProfiler profiler;
 
     private String requiredVersionOfAtlas = "1.2";
-    private List<String> usableVersionsOfAtlas = Arrays.asList("1.1.4", "1.1.4.1", "1.2", "1.2-PRE-b4", "1.2-PRE-b5", "1.2-PRE-b6");
+    private List<String> usableVersionsOfAtlas = Arrays.asList("1.2", "1.2-PRE-b8");
 
     private FileConfiguration messages;
     private File messagesFile;
@@ -86,6 +88,7 @@ public class Kauri extends JavaPlugin {
 
         runTasks();
         registerCommands();
+        registerListeners();
 
         executorService = Executors.newSingleThreadScheduledExecutor();
         checkExecutor = Executors.newScheduledThreadPool(2);
@@ -149,7 +152,7 @@ public class Kauri extends JavaPlugin {
     }
 
     private void registerCommands() {
-        Atlas.getInstance().getFunkeCommandManager().addCommand(new KauriCommand());
+        Atlas.getInstance().getFunkeCommandManager().addCommand(this, new KauriCommand());
     }
 
     public double getTPSMS() {
@@ -170,6 +173,12 @@ public class Kauri extends JavaPlugin {
         Atlas.getInstance().getEventManager().unregisterAll(this);
         startScanner(false);
         dataManager.registerAllPlayers();
+    }
+
+    private void registerListeners() {
+        if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_12)) {
+            getServer().getPluginManager().registerEvents(new LegacyListeners(), this);
+        }
     }
 
     public void reloadMessages() {
@@ -262,7 +271,7 @@ public class Kauri extends JavaPlugin {
                     }
 
                     if (init.commands()) {
-                        Atlas.getInstance().getCommandManager().registerCommands(obj);
+                        Atlas.getInstance().getCommandManager().registerCommands(plugin, obj);
                     }
 
 

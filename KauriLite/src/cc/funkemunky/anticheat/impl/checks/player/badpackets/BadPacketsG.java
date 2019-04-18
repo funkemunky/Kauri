@@ -7,9 +7,9 @@ import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.anticheat.api.utils.StatisticalAnalysis;
-import cc.funkemunky.anticheat.api.utils.TickTimer;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.TickTimer;
 import lombok.val;
 import org.bukkit.event.Event;
 
@@ -24,10 +24,6 @@ import org.bukkit.event.Event;
 @cc.funkemunky.api.utils.Init
 @CheckInfo(name = "BadPackets (Type G)", description = "Checks frequency of incoming packets. More detection, but less reliable.", type = CheckType.BADPACKETS, maxVL = 200, executable = false, developer = true)
 public class BadPacketsG extends Check {
-
-    public BadPacketsG() {
-
-    }
 
     @Setting(name = "usingPaperSpigot")
     public boolean usingPaper = false;
@@ -47,7 +43,7 @@ public class BadPacketsG extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val data = this.getData();
 
-        if (data.getLastLogin().hasNotPassed(15) || getData().getMovementProcessor().isServerPos()) {
+        if (data.getLastLogin().hasNotPassed(15) || data.getMovementProcessor().isServerPos()) {
             return;
         }
 

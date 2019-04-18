@@ -2,11 +2,12 @@ package cc.funkemunky.anticheat.api.data.processors;
 
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
+import cc.funkemunky.anticheat.api.utils.CollisionAssessment;
+import cc.funkemunky.anticheat.api.utils.CustomLocation;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
-import cc.funkemunky.anticheat.api.utils.*;
+import cc.funkemunky.anticheat.api.utils.PastLocation;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.*;
 import lombok.Getter;
 import lombok.val;

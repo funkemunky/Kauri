@@ -8,8 +8,6 @@ import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.utils.MathUtils;
-import lombok.val;
 import org.bukkit.event.Event;
 
 @Packets(packets = {Packet.Client.ARM_ANIMATION})

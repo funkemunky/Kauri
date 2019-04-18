@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.api.utils;
 
+import cc.funkemunky.api.utils.TickTimer;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -21,10 +21,6 @@ public class FlyA extends Check {
     private Verbose verboseLow = new Verbose();
     private long lastTimeStamp;
 
-    public FlyA() {
-
-    }
-
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         if (MiscUtils.cancelForFlight(getData())) return;

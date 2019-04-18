@@ -2,7 +2,6 @@ package cc.funkemunky.anticheat.api.checks;
 
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
-import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.event.system.Listener;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.utils.Color;

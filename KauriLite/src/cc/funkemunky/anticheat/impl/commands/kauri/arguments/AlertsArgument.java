@@ -32,7 +32,7 @@ public class AlertsArgument extends FunkeArgument {
             return;
         }
 
-        if(args.length > 1 && args[1].equalsIgnoreCase("dev")) {
+        if (args.length > 1 && args[1].equalsIgnoreCase("dev")) {
             data.setDeveloperAlerts(data.isAlertsEnabled());
             sender.sendMessage(Color.translate(Messages.toggledDevAlerts.replace("%enabled%", (data.isDeveloperAlerts() ? "on" : "off"))));
         } else {

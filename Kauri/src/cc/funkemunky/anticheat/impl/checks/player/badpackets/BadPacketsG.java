@@ -7,9 +7,9 @@ import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.anticheat.api.utils.StatisticalAnalysis;
-import cc.funkemunky.anticheat.api.utils.TickTimer;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.TickTimer;
 import lombok.val;
 import org.bukkit.event.Event;
 

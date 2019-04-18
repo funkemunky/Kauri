@@ -5,9 +5,9 @@ import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
-import cc.funkemunky.anticheat.api.utils.TickTimer;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.TickTimer;
 import lombok.val;
 import org.bukkit.event.Event;
 
@@ -23,9 +23,6 @@ import org.bukkit.event.Event;
 @cc.funkemunky.api.utils.Init
 @CheckInfo(name = "BadPackets (Type D)", description = "Compares the rate of interact packets to a certain frequency.", type = CheckType.BADPACKETS, cancelType = CancelType.INTERACT, maxVL = 50)
 public class BadPacketsD extends Check {
-    public BadPacketsD() {
-
-    }
 
     private long lastFlying;
     private TickTimer lastLag = new TickTimer(4);
