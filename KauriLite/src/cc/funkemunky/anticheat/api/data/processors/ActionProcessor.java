@@ -1,10 +1,10 @@
 package cc.funkemunky.anticheat.api.data.processors;
 
 import cc.funkemunky.anticheat.api.data.PlayerData;
-import cc.funkemunky.anticheat.api.utils.TickTimer;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInCloseWindowPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInEntityActionPacket;
+import cc.funkemunky.api.utils.TickTimer;
 import lombok.Getter;
 import lombok.Setter;
 

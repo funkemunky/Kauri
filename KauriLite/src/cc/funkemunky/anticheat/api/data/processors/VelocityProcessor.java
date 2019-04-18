@@ -2,10 +2,10 @@ package cc.funkemunky.anticheat.api.data.processors;
 
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
-import cc.funkemunky.anticheat.api.utils.TickTimer;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
+import cc.funkemunky.api.utils.TickTimer;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.var;
@@ -27,9 +27,9 @@ public class VelocityProcessor {
         maxVertical = motionY = (float) packet.getY();
         maxHorizontal = (float) cc.funkemunky.anticheat.api.utils.MiscUtils.hypot(packet.getX(), packet.getZ());
 
-        if(packet.getId() == packet.getPlayer().getEntityId()) lastVelocity.reset();
+        if (packet.getId() == packet.getPlayer().getEntityId()) lastVelocity.reset();
 
-        if(data.getMovementProcessor().isClientOnGround() && data.getMovementProcessor().getFrom().getY() % 1 == 0) {
+        if (data.getMovementProcessor().isClientOnGround() && data.getMovementProcessor().getFrom().getY() % 1 == 0) {
             velocityX = packet.getX();
             velocityY = packet.getY();
             velocityZ = packet.getZ();
@@ -78,7 +78,7 @@ public class VelocityProcessor {
     }
 
     public void update(WrappedInUseEntityPacket packet) {
-        if(!attackedSinceVelocity) {
+        if (!attackedSinceVelocity) {
             velocityX *= 0.6;
             velocityY *= 0.6;
             velocityZ *= 0.6;

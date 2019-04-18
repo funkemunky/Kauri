@@ -31,12 +31,12 @@ public class BadPacketsH extends Check {
     //TODO block place and block dig difference.
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(packetType.equalsIgnoreCase(Packet.Client.USE_ENTITY)) {
-            if(timeStamp - useEntity < 5 || getData().isLagging()) return;
+        if (packetType.equalsIgnoreCase(Packet.Client.USE_ENTITY)) {
+            if (timeStamp - useEntity < 5 || getData().isLagging()) return;
             long delta = (timeStamp - blockDig);
 
-            if(delta == 0) {
-                if(verbose.flag(maxVL, resetTime, 2)) {
+            if (delta == 0) {
+                if (verbose.flag(maxVL, resetTime, 2)) {
                     flag(delta + "ms", true, true);
                 }
             } else verbose.deduct(deduct);

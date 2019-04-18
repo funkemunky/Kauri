@@ -11,10 +11,12 @@ import cc.funkemunky.anticheat.api.pup.AntiPUPManager;
 import cc.funkemunky.anticheat.api.utils.Message;
 import cc.funkemunky.anticheat.api.utils.VPNUtils;
 import cc.funkemunky.anticheat.impl.commands.kauri.KauriCommand;
+import cc.funkemunky.anticheat.impl.listeners.LegacyListeners;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.event.system.EventManager;
 import cc.funkemunky.api.events.AtlasListener;
 import cc.funkemunky.api.profiling.BaseProfiler;
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.updater.UpdaterUtils;
 import cc.funkemunky.api.utils.*;
 import lombok.Getter;
@@ -57,7 +59,7 @@ public class Kauri extends JavaPlugin {
     private VPNUtils vpnUtils;
 
     private String requiredVersionOfAtlas = "1.2";
-    private List<String> usableVersionsOfAtlas = Arrays.asList("1.1.4", "1.1.4.1", "1.2", "1.2-PRE-b3");
+    private List<String> usableVersionsOfAtlas = Arrays.asList("1.2", "1.2-PRE-b8");
 
     private FileConfiguration messages;
     private File messagesFile;
@@ -93,6 +95,7 @@ public class Kauri extends JavaPlugin {
 
         runTasks();
         registerCommands();
+        registerListeners();
 
         executorService = Executors.newSingleThreadScheduledExecutor();
         checkExecutor = Executors.newScheduledThreadPool(2);
@@ -178,6 +181,12 @@ public class Kauri extends JavaPlugin {
         startScanner(false);
         antiPUPManager = new AntiPUPManager();
         dataManager.registerAllPlayers();
+    }
+
+    private void registerListeners() {
+        if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_12)) {
+            getServer().getPluginManager().registerEvents(new LegacyListeners(), this);
+        }
     }
 
     public void reloadMessages() {

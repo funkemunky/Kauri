@@ -45,6 +45,7 @@ public class KillauraH extends Check {
                     vl = 0;
                 }
             }
+
         } else if (packetType.contains("Position") || packetType.contains("Look") || packetType.equals(Packet.Client.FLYING)) {
             this.swing = false;
         } else if (!MiscUtils.shouldReturnArmAnimation(getData())) {

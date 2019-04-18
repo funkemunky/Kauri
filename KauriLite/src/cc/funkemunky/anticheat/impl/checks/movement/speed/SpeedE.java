@@ -14,7 +14,7 @@ import lombok.var;
 import org.bukkit.event.Event;
 
 @Init
-@CheckInfo(name = "Speed (Type E)", description = "Speed check", type = CheckType.SPEED, developer = true)
+@CheckInfo(name = "Speed (Type E)", description = "Totally not skidded off Lancer.", type = CheckType.SPEED, executable = false)
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.POSITION, Packet.Client.LEGACY_POSITION, Packet.Client.LEGACY_POSITION_LOOK})
 public class SpeedE extends Check {
 
@@ -23,7 +23,7 @@ public class SpeedE extends Check {
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val player = getData().getPlayer();
-        if (player.getAllowFlight() || player.isInsideVehicle()) {
+        if (player.getAllowFlight() || player.isInsideVehicle() || getData().getLastServerPos().hasNotPassed(0)) {
             return;
         }
 
@@ -87,7 +87,7 @@ public class SpeedE extends Check {
 
         if (speed > 0.24 && speedChange - moveSpeed > 0.001) {
             //To help prevent falses from things such as underblock/random running + jumping. Only falses once and it's rare and hard to get it to
-            if ((threshold += 10) > 15) {
+            if (Math.min(30, threshold += 3) > 15) {
                 flag(speedChange - moveSpeed + ">-0.01", true, true);
             }
         } else {
