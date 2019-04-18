@@ -24,11 +24,6 @@ public class KillauraE extends Check {
 
     private final Deque<Float> pitchDeque = new LinkedList<>(), yawDeque = new LinkedList<>();
     private final AtomicInteger level = new AtomicInteger();
-    private TickTimer lastAttack = new TickTimer(4);
-
-    public KillauraE() {
-
-    }
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {

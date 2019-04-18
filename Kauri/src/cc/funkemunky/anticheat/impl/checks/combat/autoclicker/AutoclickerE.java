@@ -26,10 +26,6 @@ import org.bukkit.event.Event;
 @CheckInfo(name = "Autoclicker (Type E)", description = "An unreasonable amount of CPS while breaking a block.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 20)
 public class AutoclickerE extends Check {
 
-    public AutoclickerE() {
-
-    }
-
     private boolean sent;
     private int vl;
     private long lastArm, lastRange;

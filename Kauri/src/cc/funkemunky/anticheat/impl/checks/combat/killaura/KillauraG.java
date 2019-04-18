@@ -6,85 +6,55 @@ import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
+import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
-import cc.funkemunky.api.utils.BlockUtils;
-import cc.funkemunky.api.utils.BoundingBox;
-import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.MiscUtils;
+import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.math.RayTrace;
 import lombok.val;
 import lombok.var;
+import one.util.streamex.StreamEx;
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
 import org.bukkit.util.Vector;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
-@Packets(packets = {Packet.Client.USE_ENTITY})
-//@Init
+@Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LOOK, Packet.Client.LEGACY_LOOK, Packet.Client.LEGACY_POSITION_LOOK})
+@Init
 @CheckInfo(name = "Killaura (Type G)", description = "Raytraces to check if there are blocks obstructing the path of attack.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, executable = false)
 public class KillauraG extends Check {
 
-    @Setting(name = "threshold.collision")
-    private int threshold = 2;
-
-    @Setting(name = "multipliers.blockBoxShrink")
-    private double shrinkMult = 0.1;
-
+    //TODO Test for false positives.
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        WrappedInUseEntityPacket use = new WrappedInUseEntityPacket(packet, getData().getPlayer());
-
-        if (!use.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) return;
-
-        if (use.getEntity() instanceof LivingEntity) {
-
-            val origin = getData().getPlayer().getLocation().add(0, 1.53, 0);
-            val entity = (LivingEntity) use.getEntity();
-
-            val pitchOffset = MathUtils.getOffsetFromLocation(getData().getPlayer().getLocation(), entity.getLocation())[1];
-
-            val distance = origin.distance(((LivingEntity) use.getEntity()).getEyeLocation()) / 1.6 - 0.2;
-
-            if (pitchOffset > 35 || distance < 1 || !getData().getMovementProcessor().isServerOnGround()) return;
-
+        if(getData().getTarget() != null && getData().getLastAttack().hasNotPassed(0)) {
+            val move = getData().getMovementProcessor();
+            val origin = move.getTo().toLocation(getData().getPlayer().getWorld()).add(0, 1.54, 0);
+            val target = getData().getTarget();
+            val distance = move.getTo().toVector().setY(0).distance(target.getLocation().toVector().setY(0));
 
             RayTrace trace = new RayTrace(origin.toVector(), origin.getDirection());
+            val targetBox = MiscUtils.getEntityBoundingBox(target).grow(0.5f, 0.5f, 0.5f);
 
-            //TODO Test with 0.25 and see if it has false positives. If so, put it back to 0.2.
-            List<Vector> vectors = trace.traverse(distance, 0.25);
+            val count = StreamEx.of(trace.traverse(distance, 0.5)).sorted(Comparator.comparing(vec -> vec.distance(origin.toVector()))).takeWhile(vec -> !targetBox.collides(vec) && vec.distance(origin.toVector()) < origin.distance(target.getEyeLocation())).filter(vec -> {
+                val boxList = Atlas.getInstance().getBlockBoxManager().getBlockBox().getSpecificBox(vec.toLocation(target.getWorld()));
 
-            //vectors.forEach(position -> origin.getWorld().playEffect(position.toLocation(origin.getWorld()), ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_13) ? Effect.SMOKE : Effect.valueOf("COLOURED_DUST"), 0));
+                return boxList.size() > 0 && boxList.stream().anyMatch(box -> box.intersectsWithBox(vec));
+            }).count();
 
-            var amount = 0;
-
-            val boxToCheck = new BoundingBox(getData().getPlayer().getEyeLocation().toVector(), use.getEntity().getLocation().toVector()).grow(1, 1, 1);
-
-            val collidingBlocks = boxToCheck.getCollidingBlockBoxes(getData().getPlayer());
-
-            val entityBox = MiscUtils.getEntityBoundingBox((LivingEntity) use.getEntity()).grow(0.35f, 0.35f, 0.35f);
-            for (Vector vec : vectors) {
-                if (entityBox.intersectsWithBox(vec)) {
-                    break;
-                }
-
-                Block block = BlockUtils.getBlock(vec.toLocation(origin.getWorld()));
-                if (!block.getType().isSolid() || BlockUtils.isClimbableBlock(block)) continue;
-
-                float shrink = (float) shrinkMult;
-
-                if (collidingBlocks.stream().anyMatch(box -> box.shrink(shrink, shrink, shrink).intersectsWithBox(vec))) {
-                    amount++;
-                }
+            if(count > 0) {
+                flag("colliding=" + count, true, true);
             }
-
-            if (amount > threshold) {
-                flag(amount + ">-" + threshold, true, true);
-            }
-
-            debug("COLLIDED: " + amount + " AMOUNT: " + vectors.size() + " DISTANCE: " + MathUtils.round(distance, 4));
         }
     }
 

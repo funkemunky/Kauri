@@ -17,10 +17,6 @@ import org.bukkit.event.Event;
 @CheckInfo(name = "Aim (Type D)", description = "Checks for impossible pitch acceleration.", type = CheckType.AIM, cancelType = CancelType.MOTION, maxVL = 50)
 public class AimD extends Check {
 
-    public AimD() {
-
-    }
-
     private int vl;
 
     @Setting(name = "threshold.minYawDelta")

@@ -12,9 +12,6 @@ import org.bukkit.event.Event;
 @cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Step (Type A)", description = "Checks for illegitimate collisions.", type = CheckType.STEP, maxVL = 50, executable = false)
 public class StepA extends Check {
-    public StepA() {
-
-    }
 
     private float yTotal;
 

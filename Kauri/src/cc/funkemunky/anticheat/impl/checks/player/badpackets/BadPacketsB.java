@@ -13,9 +13,6 @@ import org.bukkit.event.Event;
 @cc.funkemunky.api.utils.Init
 @CheckInfo(name = "BadPackets (Type B)", description = "Looks for any invalid movements while a player has an inventory window open.", type = CheckType.BADPACKETS, maxVL = 80, executable = false, developer = true)
 public class BadPacketsB extends Check {
-    public BadPacketsB() {
-
-    }
 
     @Setting(name = "threshold.vl.max")
     private int vlThreshold = 10;

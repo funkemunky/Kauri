@@ -40,7 +40,7 @@ public class SpeedC extends Check {
 
         val max = move.isServerOnGround() || move.getAirTicks() < 3 ? 0.24 : 0.03;
 
-        if (getData().getLastBlockPlace().hasPassed(8) && !move.isBlocksOnTop() && getData().getVelocityProcessor().getLastVelocity().hasPassed(6) && !move.isServerPos() && !getData().isGeneralCancel() && timeStamp > lastTimeStamp + 5 && delta > max) {
+        if (getData().getLastBlockPlace().hasPassed(8) && (move.getAirTicks() > 2 || move.getGroundTicks() > 1) && !move.isBlocksOnTop() && getData().getVelocityProcessor().getLastVelocity().hasPassed(6) && !move.isServerPos() && !getData().isGeneralCancel() && timeStamp > lastTimeStamp + 5 && delta > max) {
             if (delta > (MiscUtils.getBaseSpeed(getData()) + 0.7) || verbose.flag(5, 1000L)) {
                 flag(delta + ">-" + max + ";" + move.isServerOnGround(), true, true);
             }

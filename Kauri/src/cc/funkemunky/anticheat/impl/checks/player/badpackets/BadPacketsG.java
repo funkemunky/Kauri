@@ -25,10 +25,6 @@ import org.bukkit.event.Event;
 @CheckInfo(name = "BadPackets (Type G)", description = "Checks frequency of incoming packets. More detection, but less reliable.", type = CheckType.BADPACKETS, maxVL = 200, executable = false, developer = true)
 public class BadPacketsG extends Check {
 
-    public BadPacketsG() {
-
-    }
-
     @Setting(name = "usingPaperSpigot")
     public boolean usingPaper = false;
 

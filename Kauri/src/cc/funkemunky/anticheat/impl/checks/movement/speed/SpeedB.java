@@ -31,11 +31,6 @@ public class SpeedB extends Check {
 
     private final Deque<Double> offsetDeque = new LinkedList<>();
 
-    public SpeedB() {
-
-    }
-
-
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val player = getData().getPlayer();

@@ -30,7 +30,11 @@ public class AimB extends Check {
         val offset = 16777216L;
         val pitchGCD = MiscUtils.gcd((long) (pitchDifference * offset), (long) (lastPitchDifference * offset));
 
-        if (Math.abs(getData().getMovementProcessor().getTo().getPitch()) < 88.0f && pitchDifference > 0 && getData().getMovementProcessor().getOptifineTicks() < 10 && (pitchGCD < 131072L || pitchGCD == lastGCD)) {
+        if (Math.abs(getData().getMovementProcessor().getTo().getPitch()) < 88.0f
+                && getData().getMovementProcessor().getYawDelta() > 0.3
+                && pitchDifference > 0
+                && getData().getMovementProcessor().getOptifineTicks() < 10
+                && (pitchGCD < 131072L || pitchGCD == lastGCD)) {
             if (verbose.flag(150, 5000L)) {
                 flag(String.valueOf(pitchGCD / 2000), true, true);
             }

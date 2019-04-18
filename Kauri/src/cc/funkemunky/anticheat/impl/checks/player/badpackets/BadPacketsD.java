@@ -23,9 +23,6 @@ import org.bukkit.event.Event;
 @cc.funkemunky.api.utils.Init
 @CheckInfo(name = "BadPackets (Type D)", description = "Compares the rate of interact packets to a certain frequency.", type = CheckType.BADPACKETS, cancelType = CancelType.INTERACT, maxVL = 50)
 public class BadPacketsD extends Check {
-    public BadPacketsD() {
-
-    }
 
     private long lastFlying;
     private TickTimer lastLag = new TickTimer(4);

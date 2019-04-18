@@ -28,11 +28,11 @@ public class KillauraC extends Check {
         if (use.getEntity() instanceof Player && use.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) { //A player only stops sprinting when hitting a player.
             val baseSpeed = MiscUtils.getBaseSpeed(getData());
             double deltaXZ = MathUtils.getHorizontalDistance(getData().getMovementProcessor().getTo().toLocation(use.getPlayer().getWorld()), getData().getMovementProcessor().getFrom().toLocation(use.getPlayer().getWorld()));
-            if (!getData().isGeneralCancel() && (deltaXZ > baseSpeed && getData().getActionProcessor().isSprinting())) {
+            if (!getData().isGeneralCancel() && (deltaXZ > baseSpeed && use.getPlayer().isSprinting() && getData().getActionProcessor().isSprinting())) {
                 if (verbose.flag(15, 800L)) { //We add a verbose or redundancy.
                     flag(deltaXZ + ">-" + baseSpeed, true, true);
                 }
-            }
+            } else verbose.deduct();
         }
     }
 

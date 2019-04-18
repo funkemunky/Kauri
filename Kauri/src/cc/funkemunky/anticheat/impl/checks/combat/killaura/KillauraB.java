@@ -18,9 +18,6 @@ import org.bukkit.event.Event;
 @cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Killaura (Type B)", description = "Checks for an overall flaw in the rotations of many killauras", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, maxVL = 175)
 public class KillauraB extends Check {
-    public KillauraB() {
-
-    }
 
     private float lastPitchDelta;
     private double vl;

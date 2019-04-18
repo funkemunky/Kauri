@@ -25,10 +25,6 @@ import org.bukkit.event.Event;
 @CheckInfo(name = "Killaura (Type H)", description = "Detects if clients are swinging impossibly.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, executable = false, cancellable = false, maxVL = 15, developer = true)
 public class KillauraH extends Check {
 
-    public KillauraH() {
-
-    }
-
     private boolean swing;
     private int vl;
 

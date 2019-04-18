@@ -21,10 +21,6 @@ import org.bukkit.util.Vector;
 public class ReachA extends Check {
     private Verbose verbose = new Verbose();
 
-    public ReachA() {
-
-    }
-
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         /* A very simple maximum-reach distance check for a player in combat */

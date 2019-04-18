@@ -43,10 +43,6 @@ public class HitBox extends Check {
 
     private List<EntityType> type = new ArrayList<>(Arrays.asList(EntityType.PLAYER, EntityType.VILLAGER, EntityType.SKELETON, EntityType.BLAZE, EntityType.ZOMBIE, EntityType.PIG_ZOMBIE, EntityType.CREEPER, EntityType.SNOWMAN));
 
-    public HitBox() {
-
-    }
-
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val target = getData().getTarget();

@@ -29,10 +29,6 @@ public class VelocityA extends Check {
     private float lastVelocity;
     private int vl;
 
-    public VelocityA() {
-
-    }
-
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         if (packetType.equals(Packet.Server.ENTITY_VELOCITY)) {

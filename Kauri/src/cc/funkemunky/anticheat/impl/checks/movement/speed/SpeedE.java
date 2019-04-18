@@ -24,6 +24,7 @@ public class SpeedE extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val player = getData().getPlayer();
         if (player.getAllowFlight() || player.isInsideVehicle() || getData().getLastServerPos().hasNotPassed(0)) {
+            threshold = 0;
             return;
         }
 

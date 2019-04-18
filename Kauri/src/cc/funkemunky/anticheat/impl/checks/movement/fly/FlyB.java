@@ -16,10 +16,6 @@ import org.bukkit.event.Event;
 @CheckInfo(name = "Fly (Type B)", description = "A different style of acceleration check.", type = CheckType.FLY, cancelType = CancelType.MOTION)
 public class FlyB extends Check {
 
-    public FlyB() {
-
-    }
-
     private double vl;
 
     @Override

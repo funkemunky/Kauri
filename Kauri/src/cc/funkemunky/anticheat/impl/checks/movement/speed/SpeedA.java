@@ -23,10 +23,6 @@ public class SpeedA extends Check {
     private Verbose verbose = new Verbose();
     private long lastTimeStamp;
 
-    public SpeedA() {
-
-    }
-
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         //The client will always send a position packet when teleported or dictated to move by the server, so we need to account for that to prevent false-positives.

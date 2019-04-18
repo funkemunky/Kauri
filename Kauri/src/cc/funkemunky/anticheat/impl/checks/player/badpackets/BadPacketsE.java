@@ -17,10 +17,6 @@ public class BadPacketsE extends Check {
 
     private Verbose verbose = new Verbose();
 
-    public BadPacketsE() {
-
-    }
-
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
     }

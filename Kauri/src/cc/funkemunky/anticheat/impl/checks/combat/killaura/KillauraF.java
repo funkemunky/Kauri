@@ -23,9 +23,6 @@ import org.bukkit.event.Event;
 @cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Killaura (Type F)", description = "A simple angle consistency check.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, cancellable = false, executable = false)
 public class KillauraF extends Check {
-    public KillauraF() {
-
-    }
 
     private RollingAverage average = new RollingAverage(20);
     private LivingEntity target;

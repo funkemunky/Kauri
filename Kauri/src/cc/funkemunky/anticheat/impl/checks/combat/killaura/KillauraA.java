@@ -28,10 +28,6 @@ public class KillauraA extends Check {
     private int verbose;
     private TickTimer lastLag = new TickTimer(4);
 
-    public KillauraA() {
-
-    }
-
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         if (packetType.equals(Packet.Client.USE_ENTITY)) {

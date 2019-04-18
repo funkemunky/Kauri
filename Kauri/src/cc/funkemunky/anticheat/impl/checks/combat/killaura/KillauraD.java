@@ -26,10 +26,6 @@ public class KillauraD extends Check {
             pitchDeque = new LinkedList<>();
     private int vl;
 
-    public KillauraD() {
-
-    }
-
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val yaw = this.getData().getPlayer().getLocation().getYaw();
