@@ -18,52 +18,37 @@ public class VelocityB extends Check {
 
     private double vl, velocityX, velocityZ;
 
-    @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(packetType.equals(Packet.Server.ENTITY_VELOCITY)) {
-            WrappedOutVelocityPacket velocity = new WrappedOutVelocityPacket(packet, getData().getPlayer());
-
-            if(velocity.getId() == getData().getPlayer().getEntityId() && getData().getMovementProcessor().isClientOnGround()) {
-                velocityX = velocity.getX();
-                velocityZ = velocity.getZ();
+        if(packetType.equalsIgnoreCase(Packet.Server.ENTITY_VELOCITY)) {
+            WrappedOutVelocityPacket dy = new WrappedOutVelocityPacket(packet, this.getData().getPlayer());
+            if(dy.getId() == this.getData().getPlayer().getEntityId() && this.getData().getMovementProcessor().getFrom().getY() % 1.0D == 0.0D && this.getData().getMovementProcessor().isClientOnGround()) {
+                this.velocityX = dy.getX();
+                this.velocityZ = dy.getZ();
             }
-        } else if(velocityX != 0 && velocityZ != 0) {
-            val dy = getData().getMovementProcessor().getTo().getY() - getData().getMovementProcessor().getFrom().getY();
-
-            if(dy < 0.419 && dy > 0.1) {
-                val dxz = Math.hypot(getData().getMovementProcessor().getTo().getX() - getData().getMovementProcessor().getFrom().getX(),
-                        getData().getMovementProcessor().getTo().getZ() - getData().getMovementProcessor().getFrom().getZ());
-
-                val kbxz = Math.hypot(velocityX, velocityZ);
-
-                //the only accurate way to check horizontal kb is to check it in the air, if the player is on ground it won't work
-                //people might say this is from agc or whatever but its from gcheat, just like entire agc is (no joke)
-                val aimove = Atlas.getInstance().getBlockBoxManager().getBlockBox().getAiSpeed(getData().getPlayer()) * 2.9;
-                if (getData().getMovementProcessor().getBlockAboveTicks() == 0
-                        && getData().getMovementProcessor().getLiquidTicks() == 0
-                        && getData().getMovementProcessor().getWebTicks() == 0
-                        && kbxz > 0.15
-                        && !getData().getMovementProcessor().isBlocksNear()) {
-
-                    val quotient = dxz / kbxz;
-
-                    val threshold = 0.75;
-
-                    if (quotient < threshold) {
-                        if (vl++ >= 14.0) {
-                            flag("velocity: " + MathUtils.round(quotient * 100, 1) + "%", true, true);
+        } else if(this.velocityX != 0.0D && this.velocityZ != 0.0D) {
+            double dy = this.getData().getMovementProcessor().getTo().getY() - this.getData().getMovementProcessor().getFrom().getY();
+            if(dy < 0.419D && dy > 0.1D) {
+                double dxz = Math.hypot(this.getData().getMovementProcessor().getTo().getX() - this.getData().getMovementProcessor().getFrom().getX(), this.getData().getMovementProcessor().getTo().getZ() - this.getData().getMovementProcessor().getFrom().getZ());
+                double kbxz = Math.hypot(this.velocityX, this.velocityZ);
+                float aimove = Atlas.getInstance().getBlockBoxManager().getBlockBox().getAiSpeed(this.getData().getPlayer());
+                if(this.getData().getMovementProcessor().getBlockAboveTicks() == 0 && this.getData().getMovementProcessor().getLiquidTicks() == 0 && this.getData().getMovementProcessor().getWebTicks() == 0 && kbxz > 0.15D && !this.getData().getMovementProcessor().isBlocksNear()) {
+                    double quotient = dxz / kbxz;
+                    double threshold = 0.9721D - ((double)aimove + (this.getData().getLastAttack().hasNotPassed(0)?-0.05D:0.0D));
+                    if(quotient < threshold) {
+                        if(this.vl++ >= 14.0D) {
+                            this.flag("velocity: " + MathUtils.round(quotient * 100.0D, 1) + "%", true, true);
                         }
                     } else {
-                        vl = Math.max(0, vl - 1.5);
+                        this.vl = Math.max(0.0D, this.vl - 0.75D);
                     }
 
-                    debug("QUOTIENT: " + quotient + "/" + threshold + " VL: " + vl);
+                    this.debug("QUOTIENT: " + quotient + "/" + threshold + " VL: " + this.vl + " y=" + dy + " ai=" + aimove);
                 }
 
-                velocityX = velocityZ = 0;
-                //debug("KBXZ: " + kbxz + " DXZ: " + dxz + " AI: " + aimove);
+                this.velocityX = this.velocityZ = 0.0D;
             }
         }
+
     }
 
     @Override

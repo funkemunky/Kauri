@@ -25,6 +25,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 @Init
 public class PacketListeners implements AtlasListener {
@@ -202,12 +203,14 @@ public class PacketListeners implements AtlasListener {
 
     private void hopper(Object packet, String packetType, long timeStamp, PlayerData data) {
         if ((!CheckSettings.bypassEnabled || !data.getPlayer().hasPermission(CheckSettings.bypassPermission)) && !Kauri.getInstance().getCheckManager().isBypassing(data.getUuid())) {
-            data.getPacketChecks().getOrDefault(packetType, new ArrayList<>()).stream().filter(Check::isEnabled).forEach(check ->
-            {
-                Kauri.getInstance().getProfiler().start("check:" + check.getName());
-                check.onPacket(packet, packetType, timeStamp);
-                Kauri.getInstance().getProfiler().stop("check:" + check.getName());
-            });
+            Kauri.getInstance().getCheckExecutor().schedule(() -> {
+                data.getPacketChecks().getOrDefault(packetType, new ArrayList<>()).stream().filter(Check::isEnabled).forEach(check ->
+                {
+                    Kauri.getInstance().getProfiler().start("check:" + check.getName());
+                    check.onPacket(packet, packetType, timeStamp);
+                    Kauri.getInstance().getProfiler().stop("check:" + check.getName());
+                });
+            }, 20L, TimeUnit.MILLISECONDS);
         }
     }
 

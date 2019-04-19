@@ -28,28 +28,29 @@ public class ReachE extends Check {
         val target = getData().getTarget();
 
         if(target != null && getData().getLastAttack().hasNotPassed(1)) {
-            val location = getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), 100L);
+            long range = 50L + Math.abs(this.getData().getTransPing() - this.getData().getLastTransPing());
+            val location = getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), range);
             val to = getData().getMovementProcessor().getTo().toLocation(target.getWorld()).clone().add(0, 1.54f, 0);
-            val player = getData().getPlayer();
-
-            RayTrace trace = new RayTrace(to.toVector(), to.getDirection());
+            val trace = new RayTrace(to.toVector(), to.getDirection());
 
             val traverse = trace.traverse(target.getLocation().distance(to) + 0.4, 0.05);
-            val dimensions = MiscUtils.entityDimensions.getOrDefault(target.getType(), new Vector(0.3, 1.8, 0.3));
+            float distance = (float)traverse.stream().filter((vec) -> {
+                return location.stream().anyMatch((loc) -> {
+                    return this.getHitbox(target, loc).intersectsWithBox(vec);
+                });
+            }).mapToDouble((vec) -> vec.distance(to.toVector()) + 0.05f).min().orElse(0.0D);
 
-            val distance = (float) traverse.stream().filter(vec -> location.stream().anyMatch(loc -> {
-                return getHitbox(target, loc).intersectsWithBox(vec);
-            })).mapToDouble(vec -> vec.distance(to.toVector()) + 0.1f).min().orElse(0);
+            if(distance <= 0.2) {
+                return;
+            }
 
-            if(distance <= 0.2) return;
-
-            if(distance > 3) {
-                if(vl++ > 6) {
-                    flag("reach=" + distance, true, true);
+            if(distance > 3.0F) {
+                if(vl++ > 6.0F) {
+                    this.flag("reach=" + distance, true, true);
                 }
-            } else vl-= vl > 0 ? 0.1 : 0;
+            } else vl-= vl > 0 ? 0.25 : 0;
 
-            debug("DISTANCE: " + distance + " VL: " + vl);
+            this.debug("distance=" + distance + " vl=" + this.vl + " range=" + range);
         }
     }
 
@@ -59,8 +60,7 @@ public class ReachE extends Check {
     }
 
     private BoundingBox getHitbox(LivingEntity entity, CustomLocation l) {
-        val dimensions = MiscUtils.entityDimensions.getOrDefault(entity.getType(), new Vector(0.35f, 1.85f, 0.35f));
-
-        return new BoundingBox(l.toVector(), l.toVector()).grow(0.1f, 0.1f, 0.1f).grow((float) dimensions.getX(), 0, (float) dimensions.getZ()).add(0, 0, 0, 0, (float) dimensions.getY(), 0);
+        Vector dimensions = (Vector)MiscUtils.entityDimensions.getOrDefault(entity.getType(), new Vector(0.35F, 1.85F, 0.35F));
+        return (new BoundingBox(l.toVector(), l.toVector())).grow(0.15F, 0.15F, 0.15F).grow((float)dimensions.getX(), 0.0F, (float)dimensions.getZ()).add(0.0F, 0.0F, 0.0F, 0.0F, (float)dimensions.getY(), 0.0F);
     }
 }
