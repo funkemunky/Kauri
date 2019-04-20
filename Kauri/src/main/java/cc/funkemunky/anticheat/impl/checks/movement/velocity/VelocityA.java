@@ -34,7 +34,7 @@ public class VelocityA extends Check {
         if (packetType.equals(Packet.Server.ENTITY_VELOCITY)) {
             WrappedOutVelocityPacket velocity = new WrappedOutVelocityPacket(packet, getData().getPlayer());
 
-            if (velocity.getId() == velocity.getPlayer().getEntityId()) {
+            if (velocity.getId() == velocity.getPlayer().getEntityId() && getData().getMovementProcessor().getFrom().getY() % 1 == 0 && getData().getMovementProcessor().isClientOnGround()) {
                 lastVelocity = (float) velocity.getY();
             }
         }

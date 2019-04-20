@@ -58,11 +58,6 @@ public class SpeedE extends Check {
         if (onGround) {
             moveSpeed = Atlas.getInstance().getBlockBoxManager().getBlockBox().getMovementFactor(player) * f6;
 
-            //fixes a speed bug
-            if (getData().getActionProcessor().isSprinting() && moveSpeed < 0.129) {
-                moveSpeed *= 1.3;
-            }
-
             //fixes momentum when you land
             if (dy > 0.0001) {
                 moveSpeed += 0.2;
