@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="KauriDownloader:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/KauriDownloader_jar</output-path>
+    <root id="archive" name="KauriDownloader.jar">
+      <element id="module-output" name="KauriDownloader" />
+    </root>
+  </artifact>
+</component>

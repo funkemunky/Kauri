@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="lombok">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../Kauri/depends/lombok.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../Kauri/depends/spigot-1.8.8-R0.1-SNAPSHOT-latest.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../Kauri/depends/spigot-1.8.8-R0.1-SNAPSHOT-latest.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Kauri:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Kauri_jar</output-path>
+    <root id="archive" name="Kauri.jar">
+      <element id="module-output" name="Kauri" />
+    </root>
+  </artifact>
+</component>
