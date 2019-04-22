@@ -21,7 +21,7 @@ public class VelocityB extends Check {
 
     public void onPacket(Object packet, String packetType, long timeStamp) {
         if(packetType.equalsIgnoreCase(Packet.Server.ENTITY_VELOCITY)) {
-            WrappedOutVelocityPacket dy = new WrappedOutVelocityPacket(packet, this.getData().getPlayer());
+            WrappedOutVelocityPacket id = new WrappedOutVelocityPacket(packet, this.getData().getPlayer());
             if(dy.getId() == this.getData().getPlayer().getEntityId() && this.getData().getMovementProcessor().getFrom().getY() % 1.0D == 0.0D && this.getData().getMovementProcessor().isClientOnGround()) {
                 this.velocityX = dy.getX();
                 this.velocityZ = dy.getZ();

@@ -88,21 +88,20 @@ public class LagArgument extends FunkeArgument {
                 case "profile": {
                     List<String> body = new ArrayList<>();
                     body.add(MiscUtils.lineNoStrike());
-                    float totalPCT = 0;
-                    long totalTime = MathUtils.elapsed(Kauri.getInstance().getProfileStart());
-                    for (String string : Kauri.getInstance().getProfiler().total.keySet()) {
-                        body.add(string);
-                        double stringTotal = TimeUnit.NANOSECONDS.toMillis(Kauri.getInstance().getProfiler().total.get(string));
-                        int calls = Kauri.getInstance().getProfiler().calls.get(string);
-                        double pct = stringTotal / totalTime;
-                        body.add("Latency: " + stringTotal / calls + "ms");
-                        body.add("Calls: " + calls);
-                        body.add("STD: " + Kauri.getInstance().getProfiler().stddev.get(string));
-                        body.add("PCT: " + MathUtils.round(pct, 8));
-                        totalPCT += (pct);
+                    val results = Kauri.getInstance().getProfiler().results();
+
+                    double totalPCT = 0;
+                    double totalMS = 0;
+
+                    for (String key : results.keySet()) {
+                        body.add(key + ":");
+                        double ms = results.get(key);
+                        body.add("PCT: "  + MathUtils.round(totalPCT+=ms / 50, 4));
+                        body.add("MS: " + (totalMS+= ms));
                     }
+
                     body.add("Total PCT: " + MathUtils.round(totalPCT, 4) + "%");
-                    body.add("Total Time: " + totalTime + "ms");
+                    body.add("Total Time: " + totalMS + "ms");
                     body.add("Total Calls: " + Kauri.getInstance().getProfiler().totalCalls);
                     body.add(MiscUtils.lineNoStrike());
 
