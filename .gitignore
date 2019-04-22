@@ -26,5 +26,4 @@ hs_err_pid*
 # Kauri Project Files
 */.idea/*.*
 */out/*.*
-*.xml
 Kauri/.idea/misc.xml
