@@ -24,10 +24,6 @@ public class AutoclickerF extends Check {
 
     private int swingTicks, flyingTicks, lastFlyingTicks, outliner, lastOutliner;
 
-    public AutoclickerF() {
-
-    }
-
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         if (MiscUtils.shouldReturnArmAnimation(getData())) return;

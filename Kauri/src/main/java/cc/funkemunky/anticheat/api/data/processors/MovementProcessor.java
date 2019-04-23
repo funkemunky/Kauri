@@ -144,13 +144,7 @@ public class MovementProcessor {
             //The MiscUtils#getDistanceToGround method is kind of heavy, so we only run it 4 times a second instead of 20.
             //We compensate for the loss of data by using the yDelta of the player to guess the distance.
             //This method should and won't be used for anything sensitive requiring precise data.
-            //This is just used for preventing any false positives.
-
-            if (Kauri.getInstance().getCurrentTicks() % 4 == 0 && chunkLoaded) {
-                distanceToGround = MiscUtils.getDistanceToGround(data, 40);
-            } else {
-                distanceToGround += deltaY;
-            }
+            //This is just used for preventing any false positives
 
             lastTimeStamp = timeStamp;
 

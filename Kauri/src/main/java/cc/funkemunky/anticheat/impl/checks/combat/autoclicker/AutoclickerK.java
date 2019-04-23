@@ -24,7 +24,10 @@ public class AutoclickerK extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(MiscUtils.shouldReturnArmAnimation(getData())) return;
+        if(MiscUtils.shouldReturnArmAnimation(getData())) {
+            debug("brekaing block");
+            return;
+        }
 
         long ms = timeStamp - lastTimeStamp;
 

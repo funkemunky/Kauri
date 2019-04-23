@@ -21,10 +21,10 @@ public class VelocityB extends Check {
 
     public void onPacket(Object packet, String packetType, long timeStamp) {
         if(packetType.equalsIgnoreCase(Packet.Server.ENTITY_VELOCITY)) {
-            WrappedOutVelocityPacket id = new WrappedOutVelocityPacket(packet, this.getData().getPlayer());
-            if(dy.getId() == this.getData().getPlayer().getEntityId() && this.getData().getMovementProcessor().getFrom().getY() % 1.0D == 0.0D && this.getData().getMovementProcessor().isClientOnGround()) {
-                this.velocityX = dy.getX();
-                this.velocityZ = dy.getZ();
+            WrappedOutVelocityPacket vel = new WrappedOutVelocityPacket(packet, this.getData().getPlayer());
+            if(vel.getId() == this.getData().getPlayer().getEntityId() && this.getData().getMovementProcessor().getFrom().getY() % 1.0D == 0.0D && this.getData().getMovementProcessor().isClientOnGround()) {
+                this.velocityX = vel.getX();
+                this.velocityZ = vel.getZ();
             }
         } else if(this.velocityX != 0.0D && this.velocityZ != 0.0D) {
             double dy = this.getData().getMovementProcessor().getTo().getY() - this.getData().getMovementProcessor().getFrom().getY();
@@ -32,9 +32,9 @@ public class VelocityB extends Check {
                 double dx = this.getData().getMovementProcessor().getTo().getX() - this.getData().getMovementProcessor().getFrom().getX(), dz = this.getData().getMovementProcessor().getTo().getZ() - this.getData().getMovementProcessor().getFrom().getZ();
                 Vector kb = new Vector(this.velocityX, 0, this.velocityZ), dxz = new Vector(dx, 0, dz);
                 float aimove = Atlas.getInstance().getBlockBoxManager().getBlockBox().getAiSpeed(this.getData().getPlayer());
-                if(this.getData().getMovementProcessor().getBlockAboveTicks() == 0 && this.getData().getMovementProcessor().getLiquidTicks() == 0 && this.getData().getMovementProcessor().getWebTicks() == 0 && kb.length() > 0.15 && !this.getData().getMovementProcessor().isBlocksNear()) {
+                if(this.getData().getMovementProcessor().getBlockAboveTicks() == 0 && this.getData().getMovementProcessor().getLiquidTicks() == 0 && this.getData().getMovementProcessor().getWebTicks() == 0 && kb.length() > 0.4 && !this.getData().getMovementProcessor().isBlocksNear()) {
                     double quotient = 1 - kb.distance(dxz);
-                    double threshold = 1 - ((double)aimove + (this.getData().getLastAttack().hasNotPassed(0)?-0.05D:0.0D));
+                    double threshold = 1 - ((double)aimove + (this.getData().getLastAttack().hasNotPassed(1)?+0.002D:0.0D));
                     if(quotient < threshold) {
                         if(this.vl++ >= 14.0D) {
                             this.flag("velocity: " + MathUtils.round(quotient * 100.0D, 1) + "%", true, true);
@@ -43,7 +43,7 @@ public class VelocityB extends Check {
                         this.vl = Math.max(0.0D, this.vl - 0.75D);
                     }
 
-                    this.debug("QUOTIENT: " + quotient + "/" + threshold + " VL: " + this.vl + " y=" + dy + " ai=" + aimove);
+                    this.debug("QUOTIENT: " + quotient + "/" + threshold + " VL: " + this.vl + " y=" + dy + " ai=" + aimove + " kbz=" + kb.length());
                 }
 
                 this.velocityX = this.velocityZ = 0.0D;

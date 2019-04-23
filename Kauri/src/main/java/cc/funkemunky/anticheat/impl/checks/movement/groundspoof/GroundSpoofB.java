@@ -43,9 +43,9 @@ public class GroundSpoofB extends Check {
                 || move.getWebTicks() > 0
                 || move.isOnClimbable()) return;
 
-        if (timeStamp > lastTimeStamp + 5 && move.getDistanceToGround() > distanceFG && move.getAirTicks() > ticksInAir && !move.isServerOnGround() && move.isClientOnGround()) {
+        if (timeStamp > lastTimeStamp + 5 && move.getAirTicks() > ticksInAir && !move.isServerOnGround() && move.isClientOnGround()) {
             if (verbose.flag(vlMax, resetTime)) {
-                flag(move.getDistanceToGround() + ">-" + distanceFG + ";" + move.getAirTicks() + ">-" + ticksInAir, true, true);
+                flag( move.getAirTicks() + ">-" + ticksInAir, true, true);
             }
         }
         lastTimeStamp = timeStamp;

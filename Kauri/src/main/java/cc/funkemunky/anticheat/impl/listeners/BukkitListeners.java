@@ -142,9 +142,14 @@ public class BukkitListeners implements Listener {
     private void callChecks(PlayerData data, Event event) {
         if ((!CheckSettings.bypassEnabled || !data.getPlayer().hasPermission(CheckSettings.bypassPermission)) && !Kauri.getInstance().getCheckManager().isBypassing(data.getUuid())) {
             Kauri.getInstance().getCheckExecutor().execute(() -> {
+
                 data.getBukkitChecks().getOrDefault(event.getClass(), new ArrayList<>()).stream()
                         .filter(check -> check.isEnabled() && check.getClass().isAnnotationPresent(BukkitEvents.class) && Arrays.asList(check.getClass().getAnnotation(BukkitEvents.class).events()).contains(event.getClass()))
-                        .forEach(check -> check.onBukkitEvent(event));
+                        .forEach(check -> {
+                            Kauri.getInstance().getProfiler().start("check:" + check.getName() + "#" + event.getEventName());
+                            check.onBukkitEvent(event);
+                            Kauri.getInstance().getProfiler().stop("check:" + check.getName() + "#" + event.getEventName());
+                        });
             });
         }
     }

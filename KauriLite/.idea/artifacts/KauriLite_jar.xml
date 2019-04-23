@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="KauriLite:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/KauriLite_jar</output-path>
+    <root id="archive" name="Kauri.jar">
+      <element id="module-output" name="KauriLite" />
+    </root>
+  </artifact>
+</component>

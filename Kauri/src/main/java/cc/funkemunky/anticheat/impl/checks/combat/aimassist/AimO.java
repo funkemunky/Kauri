@@ -45,7 +45,7 @@ public class AimO extends Check {
         if (move.getYawDelta() / div % 1 == 0 && move.getLastYawDelta() / div % 1 == 0 || ticks > 30) {
             debug(Color.Green + "Ticks: " + ticks);
 
-            if (ticks > 18) {
+            if (ticks > 30) {
                 if (vl++ > 7) {
                     flag("ticks: " + ticks + " vl: " + vl, true, true);
                 }

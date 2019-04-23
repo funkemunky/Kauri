@@ -66,7 +66,7 @@ public class SpeedA extends Check {
         }
         lastTimeStamp = timeStamp;
 
-        debug(verbose.getVerbose() + ": " + motionXZ + ", " + baseSpeed + ", " + move.getDistanceToGround() + ", " + move.getAirTicks() + ", " + move.getGroundTicks() + ", " + getData().getPlayer().getWalkSpeed());
+        debug(verbose.getVerbose() + ": " + motionXZ + ", " + baseSpeed + ", " + move.getAirTicks() + ", " + move.getGroundTicks() + ", " + getData().getPlayer().getWalkSpeed());
     }
 
     @Override

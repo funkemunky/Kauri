@@ -7,6 +7,7 @@ import cc.funkemunky.anticheat.api.utils.Messages;
 import cc.funkemunky.anticheat.api.utils.Pastebin;
 import cc.funkemunky.api.commands.FunkeArgument;
 import cc.funkemunky.api.commands.FunkeCommand;
+import cc.funkemunky.api.profiling.ResultsType;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.MiscUtils;
@@ -88,16 +89,17 @@ public class LagArgument extends FunkeArgument {
                 case "profile": {
                     List<String> body = new ArrayList<>();
                     body.add(MiscUtils.lineNoStrike());
-                    val results = Kauri.getInstance().getProfiler().results();
+                    val results = Kauri.getInstance().getProfiler().results(ResultsType.TOTAL);
 
                     double totalPCT = 0;
                     double totalMS = 0;
 
                     for (String key : results.keySet()) {
                         body.add(key + ":");
-                        double ms = results.get(key);
-                        body.add("PCT: "  + MathUtils.round(totalPCT+=ms / 50, 4));
-                        body.add("MS: " + (totalMS+= ms));
+                        double ms = results.get(key) / Kauri.getInstance().getProfiler().calls.get(key);
+                        totalPCT+=ms;
+                        body.add("PCT: "  + MathUtils.round(ms / 50 * 100, 4));
+                        body.add("MS: " + ms + "ms");
                     }
 
                     body.add("Total PCT: " + MathUtils.round(totalPCT, 4) + "%");

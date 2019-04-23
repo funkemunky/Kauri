@@ -53,7 +53,8 @@ public class PlayerData {
             lastLogin = new TickTimer(60),
             lastBlockPlace = new TickTimer(30),
             lastFlag = new TickTimer(40),
-            lastAttack = new TickTimer(4);
+            lastAttack = new TickTimer(4),
+            lastBlockBreak;
     private float walkSpeed, flySpeed;
     private LivingEntity target, attacker;
     private long transPing, lastTransaction, lastTransPing, ping, lastPing, lastKeepAlive, lastServerPosStamp;

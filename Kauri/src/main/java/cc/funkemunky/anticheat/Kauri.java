@@ -174,6 +174,7 @@ public class Kauri extends JavaPlugin {
         checkManager = new CheckManager();
         dataManager = new DataManager();
         HandlerList.unregisterAll(this);
+        profiler.reset();
         EventManager.unregisterAll(this);
         Atlas.getInstance().getEventManager().unregisterAll(this);
         startScanner(false);
