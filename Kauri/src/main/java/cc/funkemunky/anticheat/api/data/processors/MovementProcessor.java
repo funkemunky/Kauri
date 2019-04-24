@@ -22,7 +22,7 @@ public class MovementProcessor {
     private boolean lastFlight, flight, isLagging, clientOnGround, serverOnGround, fullyInAir, inAir, hasJumped, inLiquid, blocksOnTop, pistonsNear, onHalfBlock,
             onClimbable, isServerPos, onIce, collidesHorizontally, inWeb, onSlimeBefore, onSoulSand, isRiptiding, halfBlocksAround, isNearGround, isInsideBlock, blocksNear, blocksAround;
     private int airTicks, groundTicks, iceTicks, climbTicks, halfBlockTicks, soulSandTicks, blockAboveTicks, optifineTicks, liquidTicks, webTicks, yawZeroTicks, pitchZeroTicks;
-    private float deltaY, yawDelta, pitchDelta, lastYawDelta, lastPitchDelta, lastDeltaY, deltaXZ, distanceToGround, serverYVelocity, lastServerYVelocity, serverYAcceleration, clientYAcceleration, lastClientYAcceleration, lastServerYAcceleration, jumpVelocity, cinematicYawDelta, cinematicPitchDelta, lastCinematicPitchDelta, lastCinematicYawDelta;
+    private float deltaY, lastDeltaXZ, yawDelta, pitchDelta, lastYawDelta, lastPitchDelta, lastDeltaY, deltaXZ, distanceToGround, serverYVelocity, lastServerYVelocity, serverYAcceleration, clientYAcceleration, lastClientYAcceleration, lastServerYAcceleration, jumpVelocity, cinematicYawDelta, cinematicPitchDelta, lastCinematicPitchDelta, lastCinematicYawDelta;
     private CustomLocation from, to;
     private PastLocation pastLocation = new PastLocation();
     private TickTimer lastRiptide = new TickTimer(6), lastVehicle = new TickTimer(4), lastFlightToggle = new TickTimer(10);
@@ -47,7 +47,8 @@ public class MovementProcessor {
             to.setX(packet.getX());
             to.setY(packet.getY());
             to.setZ(packet.getZ());
-            data.setBoundingBox(ReflectionsUtil.toBoundingBox(ReflectionsUtil.getBoundingBox(packet.getPlayer())));
+
+            data.setBoundingBox(new BoundingBox(to.toVector(), to.toVector()).grow(0.3f, 0, 0.3f).add(0,0,0,0,1.84f,0));
 
             if (chunkLoaded) {
                 //Here we get the colliding boundingboxes surrounding the player.
@@ -95,6 +96,7 @@ public class MovementProcessor {
 
             lastDeltaY = deltaY;
             deltaY = (float) (to.getY() - from.getY());
+            lastDeltaXZ = deltaXZ;
             deltaXZ = (float) (cc.funkemunky.anticheat.api.utils.MiscUtils.hypot(to.getX() - from.getX(), to.getZ() - from.getZ()));
             lastClientYAcceleration = clientYAcceleration;
             clientYAcceleration = deltaY - lastDeltaY;
@@ -197,7 +199,7 @@ public class MovementProcessor {
         } else pitchZeroTicks -= pitchZeroTicks > 0 ? 1 : 0;
 
         pastLocation.addLocation(new CustomLocation(to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch()));
-        data.setGeneralCancel(isServerPos || (data.isLagging() && isLagging) || getLastFlightToggle().hasNotPassed(8) || !chunkLoaded || packet.getPlayer().getAllowFlight() || packet.getPlayer().getActivePotionEffects().stream().anyMatch(effect -> effect.getType().getName().toLowerCase().contains("levi")) || packet.getPlayer().getGameMode().toString().contains("CREATIVE") || packet.getPlayer().getGameMode().toString().contains("SPEC") || lastVehicle.hasNotPassed() || getLastRiptide().hasNotPassed(10) || data.getLastLogin().hasNotPassed(50) || data.getVelocityProcessor().getLastVelocity().hasNotPassed(40));
+        data.setGeneralCancel(isServerPos || (data.isLagging() && isLagging) || getLastFlightToggle().hasNotPassed(8) || !chunkLoaded || packet.getPlayer().getAllowFlight() || packet.getPlayer().getActivePotionEffects().stream().anyMatch(effect -> effect.getType().getName().toLowerCase().contains("levi")) || packet.getPlayer().getGameMode().toString().contains("CREATIVE") || packet.getPlayer().getGameMode().toString().contains("SPEC") || lastVehicle.hasNotPassed() || getLastRiptide().hasNotPassed(10) || data.getLastLogin().hasNotPassed(50) || data.getVelocityProcessor().getLastVelocity().hasNotPassed(25));
         Kauri.getInstance().getProfiler().stop("MovementProcessor:update");
     }
 

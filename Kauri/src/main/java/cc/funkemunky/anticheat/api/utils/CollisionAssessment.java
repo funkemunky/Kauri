@@ -40,7 +40,7 @@ public class CollisionAssessment {
         Block block = BlockUtils.getBlock(location);
 
         if (BlockUtils.isSolid(block) || isEntity) {
-            if (bb.getMinimum().getY() <= (playerBox.getMinimum().getY() + 0.3f) && bb.collidesVertically(playerBox.subtract(0, 0.1f, 0, 0, 0, 0))) {
+            if (bb.collidesVertically(playerBox.subtract(0, 0.1f, 0, 0, 1.4f, 0))) {
                 onGround = true;
             }
 
@@ -48,7 +48,7 @@ public class CollisionAssessment {
                 Atlas.getInstance().getThreadPool().submit(() -> MiscUtils.createParticlesForBoundingBox(getData().getPlayer(), bb, WrappedEnumParticle.FLAME, 0.25f));
             }
 
-            if ((bb.getMaximum().getY()) >= playerBox.getMaximum().getY() && bb.collidesVertically(playerBox.add(0, 0, 0, 0, 0.35f, 0))) {
+            if (bb.collidesVertically(playerBox.add(0, 1.45f, 0, 0, 0.35f, 0))) {
                 blocksOnTop = true;
             }
 
