@@ -65,7 +65,6 @@ cc\funkemunky\anticheat\impl\pup\vpn\AntiVPN$1.class
 cc\funkemunky\anticheat\api\utils\json\HTTPTokener.class
 cc\funkemunky\anticheat\impl\listeners\BukkitListeners.class
 cc\funkemunky\anticheat\api\utils\Verbose.class
-cc\funkemunky\anticheat\impl\checks\movement\groundspoof\GroundSpoofC.class
 cc\funkemunky\anticheat\impl\commands\kauri\arguments\UpdateConfigArgument.class
 cc\funkemunky\anticheat\api\checks\CheckInfo.class
 cc\funkemunky\anticheat\api\utils\menu\button\ClickAction.class
@@ -76,7 +75,6 @@ cc\funkemunky\anticheat\api\utils\Setting.class
 cc\funkemunky\anticheat\impl\pup\vpn\AntiVPN$2.class
 cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimL.class
 cc\funkemunky\anticheat\api\utils\json\JSONString.class
-cc\funkemunky\anticheat\impl\checks\movement\groundspoof\GroundSpoofB.class
 cc\funkemunky\anticheat\api\utils\MiscUtils.class
 cc\funkemunky\anticheat\api\utils\json\JSONObject$Null.class
 cc\funkemunky\anticheat\impl\commands\kauri\arguments\ReloadArgument.class

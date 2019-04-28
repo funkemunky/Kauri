@@ -41,7 +41,6 @@ C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\antichea
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\api\data\processors\MovementProcessor.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimA.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\api\data\DataManager.java
-C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\impl\checks\movement\groundspoof\GroundSpoofB.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\impl\commands\kauri\arguments\DelayArgument.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\api\utils\json\XMLTokener.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\api\utils\json\HTTP.java
@@ -158,7 +157,6 @@ C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\antichea
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\api\data\PlayerData.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\impl\checks\movement\motion\MotionA.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\impl\pup\bot\ConsoleClient.java
-C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\impl\checks\movement\groundspoof\GroundSpoofC.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\impl\listeners\BukkitListeners.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\impl\checks\combat\killaura\KillauraE.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\api\utils\MathUtils.java

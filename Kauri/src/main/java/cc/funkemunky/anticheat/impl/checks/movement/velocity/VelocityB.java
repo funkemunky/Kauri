@@ -8,6 +8,7 @@ import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.math.RollingAverageDouble;
 import lombok.val;
 import org.bukkit.event.Event;
 import org.bukkit.util.Vector;
@@ -20,33 +21,37 @@ public class VelocityB extends Check {
     private double vl, velocityX, velocityZ;
 
     public void onPacket(Object packet, String packetType, long timeStamp) {
+        val move = getData().getMovementProcessor();
         if(packetType.equalsIgnoreCase(Packet.Server.ENTITY_VELOCITY)) {
-            WrappedOutVelocityPacket vel = new WrappedOutVelocityPacket(packet, this.getData().getPlayer());
-            if(vel.getId() == this.getData().getPlayer().getEntityId() && this.getData().getMovementProcessor().getFrom().getY() % 1.0D == 0.0D && this.getData().getMovementProcessor().isClientOnGround()) {
-                this.velocityX = vel.getX();
-                this.velocityZ = vel.getZ();
+            WrappedOutVelocityPacket vel = new WrappedOutVelocityPacket(packet, getData().getPlayer());
+            if(vel.getId() == getData().getPlayer().getEntityId() && move.getFrom().getY() % 1.0D == 0.0D && move.isClientOnGround()) {
+                velocityX = vel.getX();
+                velocityZ = vel.getZ();
             }
-        } else if(this.velocityX != 0.0D && this.velocityZ != 0.0D) {
-            double dy = this.getData().getMovementProcessor().getTo().getY() - this.getData().getMovementProcessor().getFrom().getY();
-            if(dy < 0.419D && dy > 0.1D) {
-                double dx = this.getData().getMovementProcessor().getTo().getX() - this.getData().getMovementProcessor().getFrom().getX(), dz = this.getData().getMovementProcessor().getTo().getZ() - this.getData().getMovementProcessor().getFrom().getZ();
-                Vector kb = new Vector(this.velocityX, 0, this.velocityZ), dxz = new Vector(dx, 0, dz);
-                float aimove = Atlas.getInstance().getBlockBoxManager().getBlockBox().getAiSpeed(this.getData().getPlayer());
-                if(this.getData().getMovementProcessor().getBlockAboveTicks() == 0 && this.getData().getMovementProcessor().getLiquidTicks() == 0 && this.getData().getMovementProcessor().getWebTicks() == 0 && kb.length() > 0.4 && !this.getData().getMovementProcessor().isBlocksNear()) {
-                    double quotient = 1 - kb.distance(dxz);
-                    double threshold = 1 - ((double)aimove + (this.getData().getLastAttack().hasNotPassed(1)?+0.002D:0.0D));
+        } else if(velocityX != 0.0D && velocityZ != 0.0D) {
+            val dy = move.getTo().getY() - move.getFrom().getY();
+            if(dy > 0) {
+                double dx = move.getTo().getX() - move.getFrom().getX(), dz = move.getTo().getZ() - move.getFrom().getZ();
+                Vector kb = new Vector(velocityX, 0, velocityZ), d = new Vector(dx, 0, dz);
+                float aimove = Atlas.getInstance().getBlockBoxManager().getBlockBox().getAiSpeed(getData().getPlayer());
+                if(move.getBlockAboveTicks() == 0 && move.getLiquidTicks() == 0 && move.getWebTicks() == 0 && !move.isBlocksNear()) {
+                    double kbxz = kb.length(), dxz = d.length();
+
+                    val quotient = dxz / kbxz;
+                    val directionDelta = 1.85 - kb.distance(move.getTo().toLocation(getData().getPlayer().getWorld()).getDirection());
+                    val threshold = (1 - aimove * 1.1f) / (getData().getLastAttack().hasNotPassed(0) ? 1.95 : 1) + (directionDelta / 7.25);
                     if(quotient < threshold) {
-                        if(this.vl++ >= 14.0D) {
-                            this.flag("velocity: " + MathUtils.round(quotient * 100.0D, 1) + "%", true, true);
+                        if(vl++ >= 14.0D) {
+                            flag("velocity: " + MathUtils.round(quotient * 100.0D, 1) + "%", true, true);
                         }
                     } else {
-                        this.vl = Math.max(0.0D, this.vl - 0.75D);
+                        vl = Math.max(0.0D, vl - 0.35D);
                     }
 
-                    this.debug("QUOTIENT: " + quotient + "/" + threshold + " VL: " + this.vl + " y=" + dy + " ai=" + aimove + " kbz=" + kb.length());
+                    debug("QUOTIENT: " + quotient + "/" + threshold + " VL: " + vl + " dy=" + dy + "  delta=" + directionDelta);
                 }
 
-                this.velocityX = this.velocityZ = 0.0D;
+                velocityX = velocityZ = 0.0D;
             }
         }
 

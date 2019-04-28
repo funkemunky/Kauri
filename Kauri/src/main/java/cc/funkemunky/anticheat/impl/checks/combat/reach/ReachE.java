@@ -8,6 +8,7 @@ import cc.funkemunky.anticheat.api.utils.CustomLocation;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.BoundingBox;
+import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.math.RayTrace;
@@ -28,7 +29,7 @@ public class ReachE extends Check {
         val target = getData().getTarget();
 
         if(target != null && getData().getLastAttack().hasNotPassed(1) && getData().getTransPing() < 450) {
-            long range = 50L + Math.abs(this.getData().getTransPing() - this.getData().getLastTransPing());
+            long range = (getData().getMovementProcessor().getYawDelta() > 1 ? 150 : 100) + Math.abs(this.getData().getTransPing() - this.getData().getLastTransPing());
             val location = getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), range);
             val to = getData().getMovementProcessor().getTo().toLocation(target.getWorld()).clone().add(0, 1.54f, 0);
             val trace = new RayTrace(to.toVector(), to.getDirection());
@@ -43,11 +44,10 @@ public class ReachE extends Check {
             }
 
             val traverse = trace.traverse(Math.min(calcDistance, 2), calcDistance, 0.05);
-            float distance = (float)traverse.stream().filter((vec) -> {
-                return location.stream().anyMatch((loc) -> {
-                    return this.getHitbox(target, loc).intersectsWithBox(vec);
-                });
-            }).mapToDouble((vec) -> vec.distance(to.toVector()) + 0.05f).min().orElse(0.0D);
+            float distance = (float)traverse.stream()
+                    .filter((vec) -> location.stream().anyMatch((loc) -> this.getHitbox(target, loc).intersectsWithBox(vec)))
+                    .mapToDouble((vec) -> vec.distance(to.toVector()))
+                    .min().orElse(0.0D);
 
             if(distance <= 0.2) {
                 return;
@@ -57,9 +57,9 @@ public class ReachE extends Check {
                 if(vl++ > 6.0F) {
                     this.flag("reach=" + distance, true, true);
                 }
-            } else vl-= vl > 0 ? 0.25 : 0;
+            } else vl-= vl > 0 ? 0.1 : 0;
 
-            this.debug("distance=" + distance + " vl=" + this.vl + " range=" + range);
+            this.debug((distance > 3 ? Color.Green : "") + "distance=" + distance + " vl=" + this.vl + " range=" + range);
         }
     }
 
@@ -69,7 +69,7 @@ public class ReachE extends Check {
     }
 
     private BoundingBox getHitbox(LivingEntity entity, CustomLocation l) {
-        Vector dimensions = (Vector)MiscUtils.entityDimensions.getOrDefault(entity.getType(), new Vector(0.35F, 1.85F, 0.35F));
-        return (new BoundingBox(l.toVector(), l.toVector())).grow(0.15F, 0.15F, 0.15F).grow((float)dimensions.getX(), 0.0F, (float)dimensions.getZ()).add(0.0F, 0.0F, 0.0F, 0.0F, (float)dimensions.getY(), 0.0F);
+        Vector dimensions = MiscUtils.entityDimensions.getOrDefault(entity.getType(), new Vector(0.35F, 1.85F, 0.35F));
+        return (new BoundingBox(l.toVector(), l.toVector())).grow(0.1F, 0.1F, 0.1F).grow((float)dimensions.getX(), 0.0F, (float)dimensions.getZ()).add(0.0F, 0.0F, 0.0F, 0.0F, (float)dimensions.getY(), 0.0F);
     }
 }
