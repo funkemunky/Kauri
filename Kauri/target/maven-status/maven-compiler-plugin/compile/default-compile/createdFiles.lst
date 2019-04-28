@@ -40,6 +40,7 @@ cc\funkemunky\anticheat\impl\checks\player\badpackets\BadPacketsF.class
 cc\funkemunky\anticheat\impl\checks\combat\criticals\CriticalsA.class
 cc\funkemunky\anticheat\api\utils\Packets.class
 cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimO.class
+cc\funkemunky\anticheat\impl\commands\kauri\arguments\VelocityCommand.class
 cc\funkemunky\anticheat\api\utils\menu\util\ArrayIterator.class
 cc\funkemunky\anticheat\Kauri.class
 cc\funkemunky\anticheat\api\pup\AntiPUP.class

@@ -18,7 +18,7 @@ import org.bukkit.event.Event;
 import org.bukkit.util.Vector;
 
 @CheckInfo(name = "Reach (Type E)", description = "A very accurate and fast 3.1 reach check.", type = CheckType.REACH, cancelType = CancelType.COMBAT, maxVL = 40)
-@Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION})
+@Packets(packets = {Packet.Client.LOOK, Packet.Client.POSITION, Packet.Client.POSITION_LOOK, Packet.Client.FLYING, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION, Packet.Client.LEGACY_LOOK})
 @Init
 public class ReachE extends Check {
 
@@ -27,11 +27,12 @@ public class ReachE extends Check {
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val target = getData().getTarget();
+        val move = getData().getMovementProcessor();
 
         if(target != null && getData().getLastAttack().hasNotPassed(1) && getData().getTransPing() < 450) {
-            long range = (getData().getMovementProcessor().getYawDelta() > 1 ? 150 : 100) + Math.abs(this.getData().getTransPing() - this.getData().getLastTransPing());
+            long range = (move.getYawDelta() > 4 ? 150 : move.getYawDelta() > 2 ? 100 : 50) + Math.abs(getData().getTransPing() - getData().getLastTransPing());
             val location = getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), range);
-            val to = getData().getMovementProcessor().getTo().toLocation(target.getWorld()).clone().add(0, 1.54f, 0);
+            val to = move.getTo().toLocation(target.getWorld()).clone().add(0, (getData().getPlayer().isSneaking() ? 1.54f : 1.62f), 0);
             val trace = new RayTrace(to.toVector(), to.getDirection());
 
             val calcDistance = target.getLocation().distance(to);
@@ -41,11 +42,14 @@ public class ReachE extends Check {
                     flag(calcDistance + ">-20", true, true);
                 }
                 return;
+            } else if(calcDistance < 1) {
+                vl-= vl > 0 ? 0.1 : 0;
+                return;
             }
 
             val traverse = trace.traverse(Math.min(calcDistance, 2), calcDistance, 0.05);
             float distance = (float)traverse.stream()
-                    .filter((vec) -> location.stream().anyMatch((loc) -> this.getHitbox(target, loc).intersectsWithBox(vec)))
+                    .filter((vec) -> location.stream().anyMatch((loc) -> getHitbox(target, loc).intersectsWithBox(vec)))
                     .mapToDouble((vec) -> vec.distance(to.toVector()))
                     .min().orElse(0.0D);
 
@@ -55,11 +59,11 @@ public class ReachE extends Check {
 
             if(distance > 3.0F) {
                 if(vl++ > 6.0F) {
-                    this.flag("reach=" + distance, true, true);
+                    flag("reach=" + distance, true, true);
                 }
             } else vl-= vl > 0 ? 0.1 : 0;
 
-            this.debug((distance > 3 ? Color.Green : "") + "distance=" + distance + " vl=" + this.vl + " range=" + range);
+            debug((distance > 3 ? Color.Green : "") + "distance=" + distance + " vl=" + vl + " range=" + range);
         }
     }
 

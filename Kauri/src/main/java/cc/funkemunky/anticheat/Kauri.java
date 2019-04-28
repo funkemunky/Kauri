@@ -109,6 +109,7 @@ public class Kauri extends JavaPlugin {
         org.bukkit.event.HandlerList.unregisterAll(this);
         dataManager.getDataObjects().clear();
         checkManager.getChecks().clear();
+        Atlas.getInstance().getCommandManager().unregisterCommands(this);
         checkManager.getAlertsExecutable().shutdownNow();
         executorService.shutdownNow();
         checkExecutor.shutdownNow();
