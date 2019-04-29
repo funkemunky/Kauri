@@ -29,7 +29,7 @@ public class MotionA extends Check {
 
             val diff = direction.distance(moveVector);
 
-            if(diff > 1) {
+            if(diff > 1.08) {
                 if(vl++ > 3) {
                     flag(diff + ">-1", true, true);
                 }

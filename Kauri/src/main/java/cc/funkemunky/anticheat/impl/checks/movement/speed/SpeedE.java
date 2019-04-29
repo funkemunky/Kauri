@@ -8,14 +8,13 @@ import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.Init;
-import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.ReflectionsUtil;
 import lombok.val;
 import lombok.var;
 import org.bukkit.event.Event;
 
 @Init
-@CheckInfo(name = "Speed (Type E)", description = "Totally not skidded off Lancer.", type = CheckType.SPEED, executable = false)
+@CheckInfo(name = "Speed (Type E)", description = "Speed check", type = CheckType.SPEED, developer = true)
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.POSITION, Packet.Client.LEGACY_POSITION, Packet.Client.LEGACY_POSITION_LOOK})
 public class SpeedE extends Check {
 
@@ -24,8 +23,7 @@ public class SpeedE extends Check {
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val player = getData().getPlayer();
-        if (player.getAllowFlight() || player.isInsideVehicle() || getData().getLastServerPos().hasNotPassed(0)) {
-            threshold = 0;
+        if (player.getAllowFlight() || player.isInsideVehicle()) {
             return;
         }
 
@@ -58,6 +56,11 @@ public class SpeedE extends Check {
         if (onGround) {
             moveSpeed = Atlas.getInstance().getBlockBoxManager().getBlockBox().getMovementFactor(player) * f6;
 
+            //fixes a speed bug
+            if (getData().getActionProcessor().isSprinting() && moveSpeed < 0.129) {
+                moveSpeed *= 1.3;
+            }
+
             //fixes momentum when you land
             if (dy > 0.0001) {
                 moveSpeed += 0.2;
@@ -78,20 +81,18 @@ public class SpeedE extends Check {
         val previousSpeed = this.lastSpeed;
         val speed = Math.sqrt(dx * dx + dz * dz);
 
-        val speedChange = (speed - previousSpeed) / moveSpeed;
+        val speedChange = speed - previousSpeed;
 
         moveSpeed += Math.sqrt(getData().getVelocityProcessor().getMaxHorizontal());
 
-        if (speed > 0.24 && MathUtils.getDelta(speedChange, 0.9796) > (move.isBlocksOnTop() ? 3.6 : 0.1) && getData().getVelocityProcessor().getLastVelocity().hasPassed(15)) {
+        if (speed > 0.24 && speedChange - moveSpeed > (move.isBlocksOnTop() ? 0.1 : 0.001)) {
             //To help prevent falses from things such as underblock/random running + jumping. Only falses once and it's rare and hard to get it to
-            if ((threshold = Math.min(50, threshold + 2)) > 40) {
-                flag(speedChange + ">-0.1", true, true);
+            if ((threshold = Math.min(55, threshold + 2)) > 40) {
+                flag(speedChange - moveSpeed + ">-0.001", true, true);
             }
         } else {
             threshold = Math.max(threshold - 1, 0);
         }
-
-        debug("change=" + speedChange + " vl=" + threshold);
 
         //@See net.minecraft.server.v1_8_R3.EntityLiving#L1285
         this.lastSpeed = speed * f5;
