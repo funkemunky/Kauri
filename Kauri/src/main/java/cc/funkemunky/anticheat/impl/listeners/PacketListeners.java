@@ -4,6 +4,7 @@ import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckSettings;
 import cc.funkemunky.anticheat.api.data.PlayerData;
+import cc.funkemunky.anticheat.api.utils.CustomLocation;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.events.AtlasListener;
 import cc.funkemunky.api.events.Listen;
@@ -13,6 +14,7 @@ import cc.funkemunky.api.events.impl.PacketSendEvent;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.*;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutPositionPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.BlockUtils;
@@ -41,7 +43,11 @@ public class PacketListeners implements AtlasListener {
         if (data != null) {
             switch (event.getType()) {
                 case Packet.Server.POSITION: {
+                    WrappedOutPositionPacket position = new WrappedOutPositionPacket(event.getPacket(), event.getPlayer());
+
+                    data.setPositionLoc(new CustomLocation(position.getX(), position.getY(), position.getZ(), position.getYaw(), position.getPitch()));
                     data.getLastServerPos().reset();
+                    data.setPosition(true);
                     data.setLastServerPosStamp(event.getTimeStamp());
                     data.getVelocityProcessor().velocityX = data.getVelocityProcessor().velocityY = data.getVelocityProcessor().velocityZ = 0;
                     data.getVelocityProcessor().setAttackedSinceVelocity(false);

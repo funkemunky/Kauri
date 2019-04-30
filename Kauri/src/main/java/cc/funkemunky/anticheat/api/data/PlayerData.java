@@ -37,7 +37,7 @@ public class PlayerData {
     private String specificPacketDebug = "";
     private boolean debuggingBox, debuggingPackets, banned = false, developerAlerts,
             ableToFly, creativeMode, invulnerable, flying, generalCancel, breakingBlock,
-            cinematicMode, lagging, alertsEnabled, inventoryOpen;
+            cinematicMode, lagging, alertsEnabled, inventoryOpen, isPosition;
     private Player player;
 
     private Map<String, List<Check>> packetChecks = new HashMap<>();
@@ -59,7 +59,7 @@ public class PlayerData {
     private LivingEntity target, attacker;
     private long transPing, lastTransaction, lastTransPing, ping, lastPing, lastKeepAlive, lastServerPosStamp;
     private MCSmooth yawSmooth = new MCSmooth(), pitchSmooth = new MCSmooth();
-    private CustomLocation entityFrom, entityTo;
+    private CustomLocation entityFrom, entityTo, positionLoc;
     private PastLocation entityPastLocation = new PastLocation();
 
     /* Processors */
