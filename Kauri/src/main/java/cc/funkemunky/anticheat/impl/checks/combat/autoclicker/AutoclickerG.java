@@ -34,7 +34,7 @@ public class AutoclickerG extends Check {
                 val range = getRange(times);
                 val average = getAverageCPS(times);
 
-                if (average > 9 && (range < 65 || MathUtils.getDelta(range, lastRange) < 3)) {
+                if (average > 110 && (range < 65 || MathUtils.getDelta(range, lastRange) < 3)) {
                     if (vl++ > 5)
                         flag(range + "<-65 || " + range + "≈" + lastRange + " [" + MathUtils.round(average, 2) + " CPS]", true, true);
                 } else vl -= vl > 0 ? 0.5 : 0;

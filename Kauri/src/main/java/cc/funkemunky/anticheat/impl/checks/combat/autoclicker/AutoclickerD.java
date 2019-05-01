@@ -40,7 +40,7 @@ public class AutoclickerD extends Check {
 
                     val averageCps = fraction.average();
 
-                    if (averageCps >= 8.0 && maxCps == minCps) {
+                    if (averageCps >= 8.0 && averageCps < 17 && maxCps == minCps) {
                         if ((vl += 2) > 8.0) {
                             flag("t: " + vl, true, true);
                         }
