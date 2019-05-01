@@ -18,7 +18,7 @@ import org.bukkit.event.Event;
         Packet.Client.LEGACY_POSITION,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
-@cc.funkemunky.api.utils.Init
+//@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Autoclicker (Type F)", description = "Compares the CPS of an autoclicker a certain frequency.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 8)
 public class AutoclickerF extends Check {
 
