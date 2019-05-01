@@ -28,6 +28,7 @@ public class MovementProcessor {
     private TickTimer lastRiptide = new TickTimer(6), lastVehicle = new TickTimer(4), lastFlightToggle = new TickTimer(10);
     private List<BoundingBox> boxes = new ArrayList<>();
     private long lastTimeStamp, lookTicks;
+    private static boolean doReset;
 
     public void update(PlayerData data, WrappedInFlyingPacket packet) {
         val player = packet.getPlayer();
@@ -94,6 +95,8 @@ public class MovementProcessor {
 
             isLagging = MathUtils.getDelta(timeStamp, lastTimeStamp) < 5;
 
+
+
             lastDeltaY = deltaY;
             deltaY = (float) (to.getY() - from.getY());
             lastDeltaXZ = deltaXZ;
@@ -125,6 +128,14 @@ public class MovementProcessor {
                 hasJumped = true;
             }
 
+            if(doReset) data.setPosition(doReset = false);
+
+            if(to.toVector().distance(data.getPositionLoc().toVector()) < 1E-4) {
+                doReset = true;
+            } else if(data.isPosition()) {
+                data.getLastServerPos().reset();
+            }
+            
             lastServerYVelocity = serverYVelocity;
 
             if (hasJumped) {
