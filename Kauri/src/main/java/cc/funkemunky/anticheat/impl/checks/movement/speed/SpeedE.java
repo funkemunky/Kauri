@@ -14,7 +14,7 @@ import lombok.var;
 import org.bukkit.event.Event;
 
 @Init
-@CheckInfo(name = "Speed (Type E)", description = "Speed check", type = CheckType.SPEED, developer = true)
+@CheckInfo(name = "Speed (Type E)", description = "Speed check", type = CheckType.SPEED)
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.POSITION, Packet.Client.LEGACY_POSITION, Packet.Client.LEGACY_POSITION_LOOK})
 public class SpeedE extends Check {
 
@@ -23,7 +23,7 @@ public class SpeedE extends Check {
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val player = getData().getPlayer();
-        if (player.getAllowFlight() || player.isInsideVehicle()) {
+        if (getData().isGeneralCancel()) {
             return;
         }
 
@@ -46,7 +46,7 @@ public class SpeedE extends Check {
 
         if (onGround) {
             //@See net.minecraft.server.v1_8_R3.EntityLiving#L1240
-            f5 = ReflectionsUtil.getFriction(BlockUtils.getBlock(move.getTo().toLocation(player.getWorld()).clone().subtract(0, 1, 0))) * 0.91F;
+            f5 *= ReflectionsUtil.getFriction(BlockUtils.getBlock(move.getTo().toLocation(player.getWorld()).clone().subtract(0, 0.5f, 0)));
         }
 
         //@See net.minecraft.server.v1_8_R3.EntityLiving#L1243
@@ -54,11 +54,11 @@ public class SpeedE extends Check {
 
         //@See net.minecraft.server.v1_8_R3.EntityLiving#L1244
         if (onGround) {
-            moveSpeed = Atlas.getInstance().getBlockBoxManager().getBlockBox().getMovementFactor(player) * f6;
+            moveSpeed = Atlas.getInstance().getBlockBoxManager().getBlockBox().getAiSpeed(player) * f6;
 
             //fixes a speed bug
             if (getData().getActionProcessor().isSprinting() && moveSpeed < 0.129) {
-                moveSpeed *= 1.3;
+               // moveSpeed *= 1.3;
             }
 
             //fixes momentum when you land
@@ -83,16 +83,19 @@ public class SpeedE extends Check {
 
         val speedChange = speed - previousSpeed;
 
-        moveSpeed += Math.sqrt(getData().getVelocityProcessor().getMaxHorizontal());
 
-        if (speed > 0.24 && speedChange - moveSpeed > (move.isBlocksOnTop() ? 0.1 : 0.001)) {
+        val delta = speedChange - moveSpeed;
+
+        if (speed > 0.24 && delta > (move.isBlocksOnTop() ? 0.005 : 0.001) && getData().getVelocityProcessor().getLastVelocity().hasPassed(35)) {
             //To help prevent falses from things such as underblock/random running + jumping. Only falses once and it's rare and hard to get it to
-            if ((threshold = Math.min(55, threshold + 2)) > 40) {
+            if ((threshold = Math.min(55, threshold + 4)) > 40) {
                 flag(speedChange - moveSpeed + ">-0.001", true, true);
             }
         } else {
             threshold = Math.max(threshold - 1, 0);
         }
+
+        debug("delta=" + delta + " vl=" + threshold);
 
         //@See net.minecraft.server.v1_8_R3.EntityLiving#L1285
         this.lastSpeed = speed * f5;
