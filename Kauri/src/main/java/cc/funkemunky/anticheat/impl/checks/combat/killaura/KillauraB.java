@@ -7,43 +7,46 @@ import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
+import cc.funkemunky.api.utils.Init;
 import lombok.val;
 import org.bukkit.event.Event;
 
 @Packets(packets = {
+        Packet.Client.USE_ENTITY,
+        Packet.Client.ARM_ANIMATION,
+        Packet.Client.FLYING,
+        Packet.Client.POSITION,
         Packet.Client.POSITION_LOOK,
         Packet.Client.LOOK,
+        Packet.Client.LEGACY_POSITION,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
-@cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Killaura (Type B)", description = "Checks for an overall flaw in the rotations of many killauras", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, maxVL = 175)
+@CheckInfo(name = "Killaura (Type B)", description = "Detects if clients are swinging impossibly.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, executable = false, cancellable = false, maxVL = 15, developer = true)
+@Init
 public class KillauraB extends Check {
 
-    private float lastPitchDelta;
-    private double vl;
+    private boolean swing;
+    private int vl;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if (getData().getLastAttack().hasNotPassed(4)) {
-            val to = getData().getMovementProcessor().getTo();
-            val from = getData().getMovementProcessor().getFrom();
-            val pitchDifference = Math.abs(from.getPitch() - to.getPitch());
+        if (packetType.equals(Packet.Client.USE_ENTITY)) {
+            val useEntity = new WrappedInUseEntityPacket(packet, getData().getPlayer());
 
-            val offset = 16777216L;
-            val pitchGCD = MiscUtils.gcd((long) (pitchDifference * offset), (long) (lastPitchDelta * offset));
-
-            if (Math.abs(to.getPitch()) < 88.0f && pitchDifference > 0 && getData().getMovementProcessor().getOptifineTicks() < 10 && pitchGCD < 131072L) {
-                if (vl++ > 100) {
-                    flag(String.valueOf(pitchGCD / 2000), true, true);
+            if (useEntity.getAction() == WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK) {
+                if (!swing) {
+                    if (++vl >= 4) {
+                        this.flag("FALSE", false, true);
+                    }
+                } else {
+                    vl = 0;
                 }
-            } else {
-                vl -= vl > 0 ? 2 : 0;
+                debug("vl=" + vl + " swing=" + swing);
             }
 
-            debug("VL: " + vl + " PITCH: " + pitchGCD + " OPTIFINE: " + getData().isCinematicMode());
-
-            lastPitchDelta = pitchDifference;
-        }
+        } else
+            swing = packetType.equalsIgnoreCase(Packet.Client.ARM_ANIMATION) && !MiscUtils.shouldReturnArmAnimation(getData());
     }
 
     @Override

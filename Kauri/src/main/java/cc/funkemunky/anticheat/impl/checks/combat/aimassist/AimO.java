@@ -18,7 +18,7 @@ import org.bukkit.event.Event;
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Aim (Type O)", description = "A heuristic which looks for one thing all aimbots have in common.", maxVL = 50, cancelType = CancelType.MOTION, type = CheckType.AIM)
+@CheckInfo(name = "Aim (Type O)", description = "A heuristic which looks for one thing all aimbots have in common.", maxVL = 50, cancelType = CancelType.MOTION, type = CheckType.AIM, developer = true)
 public class AimO extends Check {
 
     private int ticks = 0;

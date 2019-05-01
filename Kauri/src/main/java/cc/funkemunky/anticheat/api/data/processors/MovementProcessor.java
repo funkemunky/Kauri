@@ -11,6 +11,7 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.*;
 import lombok.Getter;
 import lombok.val;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.potion.PotionEffectType;
 
@@ -95,27 +96,19 @@ public class MovementProcessor {
 
             isLagging = MathUtils.getDelta(timeStamp, lastTimeStamp) < 5;
 
+            if(data.getTeleportLocations().stream().anyMatch(vec -> vec.distance(to.toVector()) == 0)) {
+                data.getLastServerPos().reset();
+                data.getTeleportLocations().clear();
+                from = to;
+            }
 
 
             lastDeltaY = deltaY;
-            deltaY = (float) (to.getY() - from.getY());
             lastDeltaXZ = deltaXZ;
+            deltaY = (float) (to.getY() - from.getY());
             deltaXZ = (float) (cc.funkemunky.anticheat.api.utils.MiscUtils.hypot(to.getX() - from.getX(), to.getZ() - from.getZ()));
             lastClientYAcceleration = clientYAcceleration;
             clientYAcceleration = deltaY - lastDeltaY;
-
-            lastFlight = flight;
-            flight = player.getAllowFlight();
-            if (flight != lastFlight) {
-                getLastFlightToggle().reset();
-            }
-
-            isServerPos = data.isServerPos();
-
-            isInsideBlock = BlockUtils.isSolid(BlockUtils.getBlock(to.toLocation(data.getPlayer().getWorld()))) || BlockUtils.isSolid(BlockUtils.getBlock(to.toLocation(data.getPlayer().getWorld()).clone().add(0, 1, 0)));
-
-            if (isRiptiding = Atlas.getInstance().getBlockBoxManager().getBlockBox().isRiptiding(packet.getPlayer()))
-                lastRiptide.reset();
 
             //Hear we use the client's ground packet being sent since whatever motion the client says it has
             //will line up with this since ground is sent along with positional packets (flying, poslook, pos, look)
@@ -128,13 +121,16 @@ public class MovementProcessor {
                 hasJumped = true;
             }
 
-            if(doReset) data.setPosition(doReset = false);
-
-            if(to.toVector().distance(data.getPositionLoc().toVector()) < 1E-4) {
-                doReset = true;
-            } else if(data.isPosition()) {
-                data.getLastServerPos().reset();
+            lastFlight = flight;
+            flight = player.getAllowFlight();
+            if (flight != lastFlight) {
+                getLastFlightToggle().reset();
             }
+
+            isInsideBlock = BlockUtils.isSolid(BlockUtils.getBlock(to.toLocation(data.getPlayer().getWorld()))) || BlockUtils.isSolid(BlockUtils.getBlock(to.toLocation(data.getPlayer().getWorld()).clone().add(0, 1, 0)));
+
+            if (isRiptiding = Atlas.getInstance().getBlockBoxManager().getBlockBox().isRiptiding(packet.getPlayer()))
+                lastRiptide.reset();
             
             lastServerYVelocity = serverYVelocity;
 

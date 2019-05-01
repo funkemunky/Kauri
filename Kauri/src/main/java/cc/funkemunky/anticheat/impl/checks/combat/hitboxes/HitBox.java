@@ -48,7 +48,7 @@ public class HitBox extends Check {
         val target = getData().getTarget();
         if (getData().getLastAttack().hasNotPassed(0) && target != null && type.contains(target.getType()) && target.getWorld().getUID().equals(getData().getPlayer().getWorld().getUID())) {
             PastLocation location = getData().getEntityPastLocation();
-            if (getData().getTransPing() > 400) return;
+            if (getData().getTransPing() > 400 || getData().getMovementProcessor().getYawDelta() > 9) return;
             List<BoundingBox> boxes = new ArrayList<>();
 
             val locs = location.getEstimatedLocation(getData().getTransPing(), Math.abs(getData().getTransPing() - getData().getLastTransPing()) + pingLeniency);

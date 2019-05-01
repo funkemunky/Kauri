@@ -31,7 +31,7 @@ import java.util.stream.StreamSupport;
 
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LOOK, Packet.Client.LEGACY_LOOK, Packet.Client.LEGACY_POSITION_LOOK})
 @Init
-@CheckInfo(name = "Killaura (Type G)", description = "Raytraces to check if there are blocks obstructing the path of attack.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, executable = false)
+@CheckInfo(name = "Killaura (Type G)", description = "Raytraces to check if there are blocks obstructing the path of attack.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, executable = false, developer = true)
 public class KillauraG extends Check {
 
     //TODO Test for false positives.
@@ -46,7 +46,7 @@ public class KillauraG extends Check {
             RayTrace trace = new RayTrace(origin.toVector(), origin.getDirection());
             val targetBox = MiscUtils.getEntityBoundingBox(target).grow(0.5f, 0.5f, 0.5f);
 
-            val count = StreamEx.of(trace.traverse(distance, 0.25)).sorted(Comparator.comparing(vec -> vec.distance(origin.toVector()))).takeWhile(vec -> !targetBox.collides(vec) && vec.distance(origin.toVector()) < origin.distance(target.getEyeLocation())).filter(vec -> {
+            val count = StreamEx.of(trace.traverse(distance / 1.5f, 0.25)).sorted(Comparator.comparing(vec -> vec.distance(origin.toVector()))).takeWhile(vec -> !targetBox.collides(vec) && vec.distance(origin.toVector()) < origin.distance(target.getEyeLocation())).filter(vec -> {
                 val boxList = Atlas.getInstance().getBlockBoxManager().getBlockBox().getSpecificBox(vec.toLocation(target.getWorld()));
 
                 return boxList.size() > 0 && boxList.stream().anyMatch(box -> box.intersectsWithBox(vec));

@@ -20,29 +20,30 @@ import org.bukkit.event.Event;
 @CheckInfo(name = "Aim (Type B)", description = "Checks for common denominators in the pitch.", maxVL = 50, cancelType = CancelType.MOTION, type = CheckType.AIM)
 public class AimB extends Check {
 
-    private Verbose verbose = new Verbose();
-    private long lastGCD;
+    private double vl;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        val pitchDifference = getData().getMovementProcessor().getPitchDelta();
-        val lastPitchDifference = getData().getMovementProcessor().getLastPitchDelta();
-        val offset = 16777216L;
-        val pitchGCD = MiscUtils.gcd((long) (pitchDifference * offset), (long) (lastPitchDifference * offset));
+        if (getData().getLastAttack().hasNotPassed(4)) {
+            val move = getData().getMovementProcessor();
 
-        if (Math.abs(getData().getMovementProcessor().getTo().getPitch()) < 88.0f
-                && getData().getMovementProcessor().getYawDelta() > 0.3
-                && pitchDifference > 0
-                && getData().getMovementProcessor().getOptifineTicks() < 10
-                && (pitchGCD < 131072L || pitchGCD == lastGCD)) {
-            if (verbose.flag(150, 5000L)) {
-                flag(String.valueOf(pitchGCD / 2000), true, true);
+            val offset = 16777216L;
+            val pitchGCD = MiscUtils.gcd((long) (move.getPitchDelta() * offset), (long) (move.getLastPitchDelta() * offset));
+
+            if (Math.abs(move.getTo().getPitch()) < 88.0f
+                    && move.getPitchDelta() > 0
+                    && move.getYawDelta() < 10
+                    && move.getOptifineTicks() < 10
+                    && pitchGCD < 131072L) {
+                if (vl++ > 100) {
+                    flag(String.valueOf(pitchGCD / 2000), true, true);
+                }
+            } else {
+                vl -= vl > 0 ? 2 : 0;
             }
-        } else verbose.deduct(2);
 
-        debug("VL: " + verbose.getVerbose() + " PITCH: " + pitchGCD + " OPTIFINE: " + getData().isCinematicMode());
-
-        lastGCD = pitchGCD;
+            debug("VL: " + vl + " PITCH: " + pitchGCD + " OPTIFINE: " + getData().isCinematicMode());
+        }
     }
 
     @Override

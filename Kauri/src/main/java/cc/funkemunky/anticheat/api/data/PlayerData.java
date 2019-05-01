@@ -9,6 +9,7 @@ import cc.funkemunky.anticheat.api.data.processors.MovementProcessor;
 import cc.funkemunky.anticheat.api.data.processors.VelocityProcessor;
 import cc.funkemunky.anticheat.api.pup.AntiPUP;
 import cc.funkemunky.anticheat.api.utils.CustomLocation;
+import cc.funkemunky.anticheat.api.utils.EvictingList;
 import cc.funkemunky.anticheat.api.utils.MCSmooth;
 import cc.funkemunky.anticheat.api.utils.PastLocation;
 import cc.funkemunky.api.Atlas;
@@ -22,10 +23,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Getter
@@ -55,6 +53,7 @@ public class PlayerData {
             lastFlag = new TickTimer(40),
             lastAttack = new TickTimer(4),
             lastBlockBreak;
+    private List<Vector> teleportLocations = new EvictingList<>(5);
     private float walkSpeed, flySpeed;
     private LivingEntity target, attacker;
     private long transPing, lastTransaction, lastTransPing, ping, lastPing, lastKeepAlive, lastServerPosStamp;

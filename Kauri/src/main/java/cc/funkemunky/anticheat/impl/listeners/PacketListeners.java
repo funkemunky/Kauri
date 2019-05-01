@@ -25,6 +25,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
@@ -45,10 +46,7 @@ public class PacketListeners implements AtlasListener {
                 case Packet.Server.POSITION: {
                     WrappedOutPositionPacket position = new WrappedOutPositionPacket(event.getPacket(), event.getPlayer());
 
-                    data.setPositionLoc(new CustomLocation(position.getX(), position.getY(), position.getZ(), position.getYaw(), position.getPitch()));
-                    data.getLastServerPos().reset();
-                    data.setPosition(true);
-                    data.setLastServerPosStamp(event.getTimeStamp());
+                    data.getTeleportLocations().add(new Vector(position.getX(), position.getY(), position.getZ()));
                     data.getVelocityProcessor().velocityX = data.getVelocityProcessor().velocityY = data.getVelocityProcessor().velocityZ = 0;
                     data.getVelocityProcessor().setAttackedSinceVelocity(false);
                     break;

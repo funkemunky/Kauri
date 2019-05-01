@@ -26,13 +26,13 @@ public class FlyD extends Check {
     public void onBukkitEvent(Event event) {
         PlayerMoveEvent e = (PlayerMoveEvent) event;
 
-        if (MiscUtils.cancelForFlight(getData(), 6, true) || getData().getMovementProcessor().isServerPos()) return;
+        if (MiscUtils.cancelForFlight(getData(), 40, true) || getData().getLastServerPos().hasNotPassed(0)) return;
 
         val deltaY = (float) (e.getTo().getY() - e.getFrom().getY());
         val player = e.getPlayer();
         val totalMaxY = 0.6 + getData().getVelocityProcessor().getMotionY() + (getData().getVelocityProcessor().getLastVelocity().hasNotPassed(30) ? getData().getVelocityProcessor().getMaxVertical() : 0) + PlayerUtils.getPotionEffectLevel(player, PotionEffectType.JUMP) * 0.12f;
 
-        if (deltaY > totalMaxY && getData().getVelocityProcessor().getLastVelocity().hasPassed(20)) {
+        if (deltaY > totalMaxY) {
             flag(deltaY + ">-" + totalMaxY, true, true);
         }
 
