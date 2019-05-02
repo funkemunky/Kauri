@@ -53,6 +53,7 @@ public class VelocityB extends Check {
         } else if(velocityX != 0.0D && velocityZ != 0.0D) {
             val dy = move.getTo().getY() - move.getFrom().getY();
             if(dy > 0) {
+                val action = getData().getActionProcessor();
                 double dx = move.getTo().getX() - move.getFrom().getX(), dz = move.getTo().getZ() - move.getFrom().getZ();
                 Vector kb = new Vector(velocityX, 0, velocityZ), d = new Vector(dx, 0, dz);
                 float aimove = Atlas.getInstance().getBlockBoxManager().getBlockBox().getAiSpeed(getData().getPlayer());
@@ -73,10 +74,7 @@ public class VelocityB extends Check {
                     debug("QUOTIENT: " + quotient + "/" + threshold + " VL: " + vl + " dy=" + dy + "  delta=" + directionDelta + " dxz=" + dxz + " kbxz=" + kbxz);
                 }
 
-                if(ticks++ > maxTicks) {
-                    velocityX = velocityZ = 0.0D;
-                    ticks = 0;
-                }
+                velocityX = velocityZ = 0.0D;
             }
         }
 

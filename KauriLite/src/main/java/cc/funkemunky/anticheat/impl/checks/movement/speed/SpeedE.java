@@ -20,6 +20,7 @@ public class SpeedE extends Check {
 
     private int threshold;
     private double lastSpeed;
+
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val player = getData().getPlayer();
@@ -57,8 +58,8 @@ public class SpeedE extends Check {
             moveSpeed = Atlas.getInstance().getBlockBoxManager().getBlockBox().getAiSpeed(player) * f6;
 
             //fixes a speed bug
-            if (getData().getActionProcessor().isSprinting() && moveSpeed < 0.129) {
-               // moveSpeed *= 1.3;
+            if (getData().getPlayer().isSprinting() && moveSpeed < 0.129) {
+                moveSpeed *= 1.3;
             }
 
             //fixes momentum when you land
@@ -86,9 +87,9 @@ public class SpeedE extends Check {
 
         val delta = speedChange - moveSpeed;
 
-        if (speed > 0.24 && delta > (move.isBlocksOnTop() ? 0.005 : 0.001) && getData().getVelocityProcessor().getLastVelocity().hasPassed(35)) {
+        if (speed > 0.24 && delta > (move.isBlocksOnTop() ? 0.024 : 0.001) && getData().getVelocityProcessor().getLastVelocity().hasPassed(35)) {
             //To help prevent falses from things such as underblock/random running + jumping. Only falses once and it's rare and hard to get it to
-            if ((threshold = Math.min(55, threshold + 4)) > 40) {
+            if ((threshold = Math.min(55, threshold + 2)) > 40) {
                 flag(speedChange - moveSpeed + ">-0.001", true, true);
             }
         } else {

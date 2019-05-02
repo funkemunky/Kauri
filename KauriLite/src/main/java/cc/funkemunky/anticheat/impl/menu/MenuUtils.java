@@ -131,7 +131,7 @@ MenuUtils {
 
         menu.setItem(
                 13,
-                createButton(false, MiscUtils.createItem(Material.SIGN, 1, Color.Gold + "Kauri Anticheat", "", "&7You are using &ev" + Kauri.getInstance().getDescription().getVersion() + "&7.", "", "&eBanned&8: &f" + Kauri.getInstance().getStatsManager().getBanned(), "&eFlagged&8: &f" + Kauri.getInstance().getStatsManager().getFlagged(), "", "&7If you have any issues or questions, please", "&fLeft Click &7to get the link to our Support Discord."),
+                createButton(false, MiscUtils.createItem(Material.SIGN, 1, Color.Gold + "Kauri Lite", "", "&7You are using Kauri Lite &e" + Kauri.getInstance().getDescription().getVersion() + "&7.", "", "&eBanned&8: &f" + Kauri.getInstance().getStatsManager().getBanned(), "&eFlagged&8: &f" + Kauri.getInstance().getStatsManager().getFlagged(), "", "&7If you have any issues or questions, please", "&fLeft Click &7to get the link to our Support Discord."),
                         ((player, infopair) -> {
                             if (infopair.getClickType().toString().contains("LEFT")) {
                                 player.sendMessage(Color.translate("&eOur Support Discord&8: &fhttp://discord.me/Kauri"));

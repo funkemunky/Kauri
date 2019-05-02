@@ -74,10 +74,7 @@ public class VelocityB extends Check {
                     debug("QUOTIENT: " + quotient + "/" + threshold + " VL: " + vl + " dy=" + dy + "  delta=" + directionDelta + " dxz=" + dxz + " kbxz=" + kbxz);
                 }
 
-                if(ticks++ > maxTicks) {
-                    velocityX = velocityZ = 0.0D;
-                    ticks = 0;
-                }
+                velocityX = velocityZ = 0.0D;
             }
         }
 

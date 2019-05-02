@@ -113,7 +113,7 @@ public class SpeedB extends Check {
         total += (getData().getPlayer().getWalkSpeed() - 0.2) * 1.65;
         total += (getData().getLastBlockPlace().hasNotPassed(7)) ? 0.1 : 0;
         total += move.isOnSlimeBefore() ? 0.1 : 0;
-        total += move.getBlockAboveTicks() > 0 ? move.getIceTicks() > 0 ? 0.4 : 0.2 : 0;
+        total += move.getBlockAboveTicks() > 0 ? move.getIceTicks() > 0 ? 0.5 : 0.25 : 0;
         total += move.getHalfBlockTicks() > 0 ? 0.12 : 0;
         total += Math.max(0, MiscUtils.hypot(velocity.getMotionX(), velocity.getMotionZ()) - total);
         return total;
