@@ -97,12 +97,12 @@ public class LagArgument extends FunkeArgument {
                     for (String key : results.keySet()) {
                         body.add(key + ":");
                         double ms = results.get(key) / Kauri.getInstance().getProfiler().calls.get(key);
-                        totalPCT+=ms;
+                        totalMS+=ms;
                         body.add("PCT: "  + MathUtils.round(ms / 50 * 100, 4));
                         body.add("MS: " + ms + "ms");
                     }
 
-                    body.add("Total PCT: " + MathUtils.round(totalPCT, 4) + "%");
+                    body.add("Total PCT: " +  MathUtils.round(totalMS / 50 * 100, 4) + "%");
                     body.add("Total Time: " + totalMS + "ms");
                     body.add("Total Calls: " + Kauri.getInstance().getProfiler().totalCalls);
                     body.add(MiscUtils.lineNoStrike());
