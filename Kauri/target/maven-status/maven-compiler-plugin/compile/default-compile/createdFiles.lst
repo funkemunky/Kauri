@@ -180,7 +180,6 @@ cc\funkemunky\anticheat\impl\checks\player\badpackets\BadPacketsI.class
 cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimF.class
 cc\funkemunky\anticheat\impl\commands\kauri\arguments\AntiVpnArgument.class
 cc\funkemunky\anticheat\api\utils\json\XMLTokener.class
-cc\funkemunky\anticheat\impl\checks\movement\speed\SpeedE.class
 cc\funkemunky\anticheat\impl\checks\movement\velocity\VelocityA.class
 cc\funkemunky\anticheat\impl\pup\crashers\ArmSwing.class
 cc\funkemunky\anticheat\impl\checks\combat\killaura\KillauraC.class

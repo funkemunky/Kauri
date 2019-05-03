@@ -29,7 +29,7 @@ public class ReachE extends Check {
         val target = getData().getTarget();
         val move = getData().getMovementProcessor();
 
-        if(target != null && getData().getLastAttack().hasNotPassed(1) && getData().getTransPing() < 450) {
+        if(target != null && getData().getLastAttack().hasNotPassed(0) && getData().getTransPing() < 450) {
             long range = (move.getYawDelta() > 4 ? 150 : move.getYawDelta() > 2 ? 100 : 50) + Math.abs(getData().getTransPing() - getData().getLastTransPing());
             val location = getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), range);
             val to = move.getTo().toLocation(target.getWorld()).clone().add(0, (getData().getPlayer().isSneaking() ? 1.54f : 1.62f), 0);
@@ -58,10 +58,10 @@ public class ReachE extends Check {
             }
 
             if(distance > 3.0F) {
-                if(vl++ > 6.0F) {
+                if(vl++ > 7.0F) {
                     flag("reach=" + distance, true, true);
                 }
-            } else vl-= vl > 0 ? 0.1 : 0;
+            } else vl-= vl > 0 ? 0.2 : 0;
 
             debug((distance > 3 ? Color.Green : "") + "distance=" + distance + " vl=" + vl + " range=" + range);
         }

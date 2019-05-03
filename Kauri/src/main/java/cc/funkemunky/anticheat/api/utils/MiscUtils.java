@@ -97,7 +97,7 @@ public class MiscUtils {
         val velocity = data.getVelocityProcessor();
 
         return player.getAllowFlight()
-                || move.isServerPos()
+                || data.getLastServerPos().hasNotPassed(0)
                 || move.getLastVehicle().hasNotPassed(5)
                 || move.getLiquidTicks() > 0
                 || move.getWebTicks() > 0
