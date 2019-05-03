@@ -21,7 +21,7 @@ import java.util.List;
 @Getter
 public class MovementProcessor {
     private boolean lastFlight, flight, isLagging, clientOnGround, serverOnGround, fullyInAir, inAir, hasJumped, inLiquid, blocksOnTop, pistonsNear, onHalfBlock,
-            onClimbable, isServerPos, onIce, collidesHorizontally, inWeb, onSlimeBefore, onSoulSand, isRiptiding, halfBlocksAround, isNearGround, isInsideBlock, blocksNear, blocksAround;
+            onClimbable, onIce, collidesHorizontally, inWeb, onSlimeBefore, onSoulSand, isRiptiding, halfBlocksAround, isNearGround, isInsideBlock, blocksNear, blocksAround;
     private int airTicks, groundTicks, iceTicks, climbTicks, halfBlockTicks, soulSandTicks, blockAboveTicks, optifineTicks, liquidTicks, webTicks, yawZeroTicks, pitchZeroTicks;
     private float deltaY, lastDeltaXZ, yawDelta, pitchDelta, lastYawDelta, lastPitchDelta, lastDeltaY, deltaXZ, distanceToGround, serverYVelocity, lastServerYVelocity, serverYAcceleration, clientYAcceleration, lastClientYAcceleration, lastServerYAcceleration, jumpVelocity, cinematicYawDelta, cinematicPitchDelta, lastCinematicPitchDelta, lastCinematicYawDelta;
     private CustomLocation from, to;

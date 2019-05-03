@@ -13,6 +13,7 @@ import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.math.RayTrace;
 import lombok.val;
+import org.bukkit.GameMode;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
 import org.bukkit.util.Vector;
@@ -29,7 +30,7 @@ public class ReachE extends Check {
         val target = getData().getTarget();
         val move = getData().getMovementProcessor();
 
-        if(target != null && getData().getLastAttack().hasNotPassed(0) && getData().getTransPing() < 450) {
+        if(target != null && !getData().getPlayer().getGameMode().equals(GameMode.CREATIVE) && getData().getLastAttack().hasNotPassed(0) && getData().getTransPing() < 450) {
             long range = (move.getYawDelta() > 4 ? 150 : move.getYawDelta() > 2 ? 100 : 50) + Math.abs(getData().getTransPing() - getData().getLastTransPing());
             val location = getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), range);
             val to = move.getTo().toLocation(target.getWorld()).clone().add(0, (getData().getPlayer().isSneaking() ? 1.54f : 1.62f), 0);

@@ -32,7 +32,7 @@ public class GroundSpoof extends Check {
             return;
 
         if(move.isServerOnGround() != move.isClientOnGround()) {
-            if(verbose.flag(4, 400L)) {
+            if(verbose.flag(7, 400L)) {
                 flag("client=" + move.isClientOnGround() + " server=" + move.isServerOnGround(), true, true);
             }
         } else verbose.deduct();

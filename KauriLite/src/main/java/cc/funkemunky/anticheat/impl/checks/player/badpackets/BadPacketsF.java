@@ -31,7 +31,7 @@ public class BadPacketsF extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if (!getData().isLagging() && timeStamp > lastTimeStamp + 5 && !getData().getMovementProcessor().isServerPos() && getData().getLastLogin().hasPassed(40)) {
+        if (!getData().isLagging() && timeStamp > lastTimeStamp + 5 && getData().getLastServerPos().hasNotPassed(0) && getData().getLastLogin().hasPassed(40)) {
             if (ticks++ >= 20) {
                 val elapsed = timeStamp - lastReset;
                 if (elapsed < threshold) {

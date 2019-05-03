@@ -33,7 +33,7 @@ public class BadPacketsL extends Check {
         val deltaFD = MathUtils.getDelta(fallDistance, lastFallDistance);
 
         if(MathUtils.getDelta(deltaFD, Math.abs(getData().getMovementProcessor().getDeltaY())) > 0.5) {
-            if(verbose.flag(4, 500L)) {
+            if(verbose.flag(6, 500L)) {
                 flag(deltaFD + "<-" + getData().getMovementProcessor().getDeltaXZ(), true, true);
             }
         }
