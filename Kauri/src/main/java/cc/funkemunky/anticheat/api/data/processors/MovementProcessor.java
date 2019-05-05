@@ -35,7 +35,6 @@ public class MovementProcessor {
         val player = packet.getPlayer();
         val timeStamp = System.currentTimeMillis();
         boolean chunkLoaded = Atlas.getInstance().getBlockBoxManager().getBlockBox().isChunkLoaded(player.getLocation());
-        Kauri.getInstance().getProfiler().start("MovementProcessor:update");
         if (from == null || to == null) {
             from = new CustomLocation(0, 0, 0, 0, 0);
             to = new CustomLocation(0, 0, 0, 0, 0);
@@ -207,38 +206,31 @@ public class MovementProcessor {
 
         pastLocation.addLocation(new CustomLocation(to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch()));
         data.setGeneralCancel(data.getLastServerPos().hasNotPassed(0) || (data.isLagging() && isLagging) || getLastFlightToggle().hasNotPassed(8) || !chunkLoaded || packet.getPlayer().getAllowFlight() || packet.getPlayer().getActivePotionEffects().stream().anyMatch(effect -> effect.getType().getName().toLowerCase().contains("levi")) || packet.getPlayer().getGameMode().toString().contains("CREATIVE") || packet.getPlayer().getGameMode().toString().contains("SPEC") || lastVehicle.hasNotPassed() || getLastRiptide().hasNotPassed(10) || data.getLastLogin().hasNotPassed(50) || data.getVelocityProcessor().getLastVelocity().hasNotPassed(25));
-        Kauri.getInstance().getProfiler().stop("MovementProcessor:update");
     }
 
     public boolean isNearGround(PlayerData data, float amount) {
-        Kauri.getInstance().getProfiler().start("MovementProcessor:isNearGround");
         BoundingBox box = data.getBoundingBox().grow(amount, amount, amount).subtract(0, 0, 0, 0, 1.6f, 0);
 
         boolean near = boxes.stream()
                 .anyMatch(box2 -> box.collides(box2) && !BlockUtils.isSolid(BlockUtils.getBlock(box2.getMinimum().toLocation(data.getPlayer().getWorld()).clone().add(0, 1, 0)))
                         && box2.collidesVertically(box));
-        Kauri.getInstance().getProfiler().start("MovementProcessor:isNearGround");
         return near;
     }
 
     public boolean isOnGround(PlayerData data, float amount) {
-        Kauri.getInstance().getProfiler().start("MovementProcessor:isOnGround");
         BoundingBox box = data.getBoundingBox().grow(0.25f, 0, 0.25f).subtract(0, amount, 0, 0, 1.6f, 0);
 
         boolean near = boxes.stream()
                 .anyMatch(box2 -> data.getBoundingBox().grow(1E-6f, 0.5f, 1E-6f).intersectsWithBox(box2) && box.collides(box2) && getTo().getY() + 0.1f >= box2.getMaximum().getY() && !BlockUtils.isSolid(BlockUtils.getBlock(box2.getMinimum().toLocation(data.getPlayer().getWorld()).clone().add(0, 1, 0)))
                         && box2.collidesVertically(box));
-        Kauri.getInstance().getProfiler().stop("MovementProcessor:isOnGround");
         return near;
     }
 
     public boolean isOnGround(BoundingBox inputBox, PlayerData data, float amount) {
-        Kauri.getInstance().getProfiler().start("MovementProcessor:isOnGround");
 
         BoundingBox box = inputBox.subtract(0, amount, 0, 0, 0, 0);
 
         boolean onGround = box.getCollidingBlockBoxes(data.getPlayer()).stream().anyMatch(box::collidesVertically);
-        Kauri.getInstance().getProfiler().stop("MovementProcessor:isOnGround");
         return onGround;
     }
 
