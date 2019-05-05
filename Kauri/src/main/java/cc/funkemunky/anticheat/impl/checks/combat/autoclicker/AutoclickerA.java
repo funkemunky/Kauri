@@ -37,6 +37,9 @@ public class AutoclickerA extends Check {
 
         if(timeStamp - lastTimeStamp > 1000L) {
             if(ticks > banCPS) {
+                if(vl++ > 2) {
+                    banUser();
+                }
                 flag("cps: " + ticks, true, true);
             } else
             if(ticks > maxCPS) {

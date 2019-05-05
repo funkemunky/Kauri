@@ -42,11 +42,9 @@ public class SpeedC extends Check {
 
         val max = (move.isServerOnGround() || move.getAirTicks() < 3 ? 0.24 + PlayerUtils.getPotionEffectLevel(getData().getPlayer(), PotionEffectType.SPEED) * 0.025 : 0.03);
 
-        if (getData().getLastBlockPlace().hasPassed(8) && (move.getAirTicks() > 2 || move.getGroundTicks() > 1) && !move.isBlocksOnTop() && getData().getVelocityProcessor().getLastVelocity().hasPassed(6) && getData().getLastServerPos().hasNotPassed(0) && !getData().isGeneralCancel() && timeStamp > lastTimeStamp + 5 && delta > max) {
-            if (delta > (MiscUtils.getBaseSpeed(getData()) + 0.7) || verbose.flag(9, 500L)) {
-                flag(delta + ">-" + max + ";" + move.isServerOnGround(), true, true);
-            }
-        } else verbose.deduct(2);
+        if (getData().getLastBlockPlace().hasPassed(8) && move.getAirTicks() > 2 && !move.isBlocksOnTop() && getData().getVelocityProcessor().getLastVelocity().hasPassed(6) && getData().getLastServerPos().hasNotPassed(0) && !getData().isGeneralCancel() && timeStamp > lastTimeStamp + 5 && delta > max) {
+            flag(delta + ">-" + max + ";" + move.isServerOnGround(), true, true);
+        }
 
         debug("DIFFERENCE: " + delta + " GROUND: " + move.isServerOnGround() + " TICKS: " + Kauri.getInstance().getCurrentTicks());
 

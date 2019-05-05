@@ -1,70 +1,75 @@
 package cc.funkemunky.anticheat.impl.checks.combat.reach;
 
-import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.CustomLocation;
 import cc.funkemunky.anticheat.api.utils.Packets;
-import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.utils.BoundingBox;
+import cc.funkemunky.api.utils.Color;
+import cc.funkemunky.api.utils.Init;
+import cc.funkemunky.api.utils.MiscUtils;
+import cc.funkemunky.api.utils.math.RayTrace;
 import lombok.val;
-import org.bukkit.GameMode;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
+import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.List;
-
-@Packets(packets = {Packet.Client.USE_ENTITY})
-@cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Reach (Type B)", description = "Uses expanded bounding-boxes to set a maximum hit reach.", type = CheckType.REACH, cancelType = CancelType.COMBAT, developer = true, executable = false)
+@CheckInfo(name = "Reach (Type B)", description = "A very accurate and fast 3.1 reach check.", type = CheckType.REACH, cancelType = CancelType.COMBAT, maxVL = 40)
+@Packets(packets = {Packet.Client.ARM_ANIMATION, Packet.Client.LOOK, Packet.Client.POSITION, Packet.Client.POSITION_LOOK, Packet.Client.FLYING, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION, Packet.Client.LEGACY_LOOK})
+@Init
 public class ReachB extends Check {
 
-    @Setting(name = "boxExpand")
-    private float boxExpand = 3.0f;
-
-    @Setting(name = "range")
-    private long range = 200;
-
-    @Setting(name = "vlMax")
-    private double vlMax = 5;
-
-    private double vl;
+    private float vl = 0;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        WrappedInUseEntityPacket use = new WrappedInUseEntityPacket(packet, getData().getPlayer());
+        if(packetType.equals(Packet.Client.ARM_ANIMATION)) {
+            vl-= vl > 0 ? 0.02 : 0;
+        } else {
+            val target = getData().getTarget();
+            val move = getData().getMovementProcessor();
 
-        if (getData().isGeneralCancel()) return;
-        if (use.getEntity() instanceof Player && use.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK) && use.getPlayer().getGameMode().equals(GameMode.SURVIVAL)) {
-            val entityData = Kauri.getInstance().getDataManager().getPlayerData(use.getEntity().getUniqueId());
+            if(target != null && getData().getLastAttack().hasNotPassed(0) && getData().getTransPing() < 450) {
+                long range = (move.getYawDelta() > 4 ? 150 : move.getYawDelta() > 2.5 ? 100 : 50) + Math.abs(getData().getTransPing() - getData().getLastTransPing());
+                val location = getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), range);
+                val to = move.getTo().toLocation(target.getWorld()).clone().add(0, (getData().getPlayer().isSneaking() ? 1.54f : 1.62f), 0);
+                val trace = new RayTrace(to.toVector(), to.getDirection());
 
-            if (entityData == null) return;
-            List<CustomLocation> locations = entityData.getMovementProcessor().getPastLocation().getEstimatedLocation(getData().getTransPing(), range + Math.abs(getData().getLastTransPing() - getData().getTransPing()));
+                val calcDistance = target.getLocation().distance(to);
 
-            List<BoundingBox> boxes = new ArrayList<>();
-
-            BoundingBox playerBox = new BoundingBox(getData().getMovementProcessor().getTo().clone().toLocation(use.getPlayer().getWorld())
-                    .add(0, 1.53, 0).toVector(), getData().getMovementProcessor().getTo().clone().toLocation(use.getPlayer().getWorld()).add(0, 1.53, 0).toVector())
-                    .grow(boxExpand, boxExpand, boxExpand);
-
-            locations.forEach(loc -> boxes.add(getHitbox(loc)));
-
-            val count = boxes.stream().filter(box -> box.collides(playerBox)).count();
-            if (count == 0 && !getData().isLagging()) {
-                if (vl++ > vlMax) {
-                    flag("reach is greater than " + boxExpand, false, true);
+                if(calcDistance > 15) {
+                    if(vl++ > 2) {
+                        flag(calcDistance + ">-20", true, true);
+                    }
+                    return;
+                } else if(calcDistance < 1) {
+                    vl-= vl > 0 ? 0.1 : 0;
+                    return;
                 }
-                debug("VL: " + vl + "REACH: " + boxExpand + " RANGE: " + 200);
-            } else {
-                vl -= vl > 0 ? 0.5f : 0;
-            }
 
-            debug("COUNT: " + count + " VL: " + vl + "/" + vlMax);
+                val traverse = trace.traverse(Math.min(calcDistance, 2), calcDistance, 0.05);
+                float distance = (float)traverse.stream()
+                        .filter((vec) -> location.stream().anyMatch((loc) -> getHitbox(target, loc).intersectsWithBox(vec)))
+                        .mapToDouble((vec) -> vec.distance(to.toVector()))
+                        .min().orElse(0.0D);
+
+                if(distance <= 2) {
+                    return;
+                }
+
+                if(distance > 3.0F) {
+                    if(vl++ > 12) {
+                        banUser();
+                    } else if(vl > 7.0F) {
+                        flag("reach=" + distance, true, true);
+                    }
+                } else vl-= vl > 0 ? 0.05 : 0;
+
+                debug((distance > 3 ? Color.Green : "") + "distance=" + distance + " vl=" + vl + " range=" + range);
+            }
         }
     }
 
@@ -73,8 +78,8 @@ public class ReachB extends Check {
 
     }
 
-    private BoundingBox getHitbox(CustomLocation l) {
-        return new BoundingBox(0, 0, 0, 0, 0, 0).add((float) l.getX(), (float) l.getY(), (float) l.getZ()).grow(.4f, 0, .4f)
-                .add(0, 0, 0, 0, 1.85f, 0);
+    private BoundingBox getHitbox(LivingEntity entity, CustomLocation l) {
+        Vector dimensions = MiscUtils.entityDimensions.getOrDefault(entity.getType(), new Vector(0.35F, 1.85F, 0.35F));
+        return (new BoundingBox(l.toVector(), l.toVector())).grow(0.1F, 0.1F, 0.1F).grow((float)dimensions.getX(), 0.0F, (float)dimensions.getZ()).add(0.0F, 0.0F, 0.0F, 0.0F, (float)dimensions.getY(), 0.0F);
     }
 }

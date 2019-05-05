@@ -51,6 +51,9 @@ public class ReachA extends Check {
             if (delta > threshold) {
                 if (verbose.flag(14, 2000L)) { //We add a verbose threshold to prevent any false positives caused by errors in calculation or mishaps with packets.
                     flag(delta + ">-" + threshold, true, true);
+                    if(!getData().getLastServerPos().hasPassed(10) && !getData().isLagging()) {
+                        banUser();
+                    }
                 }
             } else {
                 verbose.deduct(2);

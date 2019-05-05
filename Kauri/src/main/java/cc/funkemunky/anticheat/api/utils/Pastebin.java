@@ -54,7 +54,7 @@ public class Pastebin {
         return response;
     }
 
-    static String page(String uri, String urlParameters) {
+    public static String page(String uri, String urlParameters) {
         URL url;
         HttpURLConnection connection = null;
         try {

@@ -29,7 +29,7 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
     private List<String> execCommand = new ArrayList<>();
     private Map<String, Object> settings = new HashMap<>();
     private String alertMessage = "";
-    private int vl;
+    private int vl = 0;
     private ProtocolVersion minimum, maximum;
 
     public Check() {
@@ -45,18 +45,7 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
                 Kauri.getInstance().getLoggerManager().addViolation(data.getUuid(), this);
                 Kauri.getInstance().getStatsManager().addFlag();
                 if (vl > maxVL && executable && ban && !developer && !getData().isBanned()) {
-                    getData().setBanned(true);
-                    new BukkitRunnable() {
-                        public void run() {
-                            getData().setBanned(false);
-                            execCommand.forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replace("%player%", getData().getPlayer().getName()).replace("%check%", getName())));
-                            getData().getPacketChecks().values().forEach(checkList -> checkList.forEach(check -> check.vl = 0));
-                            getData().getBukkitChecks().values().forEach(checkList -> checkList.forEach(check -> check.vl = 0));
-                        }
-                    }.runTaskLater(Kauri.getInstance(), 10);
-                    if (CheckSettings.broadcastEnabled)
-                        Bukkit.broadcastMessage(Color.translate(CheckSettings.broadcastMessage.replace("%player%", getData().getPlayer().getName())));
-                    Kauri.getInstance().getLoggerManager().addBan(data.getUuid(), this);
+                    banUser();
                 }
 
                 data.getLastFlag().reset();
@@ -67,7 +56,7 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
 
                 if ((!data.getMovementProcessor().isLagging())) {
                     if (System.currentTimeMillis() - lastAlert > CheckSettings.alertsDelay) {
-                        if (ban && !developer) {
+                        if (!developer) {
                             message.addText(Color.translate(alertMessage.replace("%prefix%", CheckSettings.alertPrefix).replace("%check%", getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", String.valueOf(vl)).replace("%info%", information))).addHoverText(Color.Gray + information);
                             Kauri.getInstance().getDataManager().getDataObjects().keySet().stream().filter(key -> Kauri.getInstance().getDataManager().getDataObjects().get(key).isAlertsEnabled())
                                     .forEach(key -> message.sendToPlayer(Kauri.getInstance().getDataManager().getDataObjects().get(key).getPlayer()));
@@ -77,7 +66,7 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
                                 MiscUtils.printToConsole(alertMessage.replace("%check%", (developer ? Color.Red + Color.Italics : "") + getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", String.valueOf(vl)));
                             }
                         } else {
-                            message.addText(Color.translate(alertMessage.replace("%prefix%", CheckSettings.devAlertPrefix).replace("%check%", (developer ? Color.Red + Color.Italics : "") + getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", "N/A").replaceAll("%info%", information))).addHoverText(Color.Gray + information);
+                            message.addText(Color.translate(alertMessage.replace("%prefix%", CheckSettings.devAlertPrefix).replace("%check%", Color.Red + Color.Italics + getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", "N/A").replaceAll("%info%", information))).addHoverText(Color.Gray + information);
 
                             Kauri.getInstance().getDataManager().getDataObjects().keySet().stream().filter(key -> {
                                 PlayerData data = Kauri.getInstance().getDataManager().getDataObjects().get(key);
@@ -91,6 +80,22 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
                 if (CheckSettings.testMode && !data.isAlertsEnabled()) message.sendToPlayer(data.getPlayer());
             });
         }
+    }
+
+    public void banUser() {
+        if(getData().isBanned()) return;
+        getData().setBanned(true);
+        new BukkitRunnable() {
+            public void run() {
+                getData().setBanned(false);
+                execCommand.forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replace("%player%", getData().getPlayer().getName()).replace("%check%", getName())));
+                getData().getPacketChecks().values().forEach(checkList -> checkList.forEach(check -> check.vl = 0));
+                getData().getBukkitChecks().values().forEach(checkList -> checkList.forEach(check -> check.vl = 0));
+            }
+        }.runTaskLater(Kauri.getInstance(), 10);
+        if (CheckSettings.broadcastEnabled)
+            Bukkit.broadcastMessage(Color.translate(CheckSettings.broadcastMessage.replace("%player%", getData().getPlayer().getName())));
+        Kauri.getInstance().getLoggerManager().addBan(data.getUuid(), this);
     }
 
     public void loadFromConfig() {

@@ -33,8 +33,9 @@ public class FlyA extends Check {
         if (timeStamp - lastTimeStamp > 12) {
             if (move.getAirTicks() > 2
                     && Math.abs(move.getClientYAcceleration()) < 1E-5) {
-                if (verboseLow.flag(4, 800))
+                if (verboseLow.flag(9, 800)) {
                     flag("t: low; " + move.getDeltaY() + "≈" + move.getLastDeltaY(), true, true);
+                }
             }
 
             /* This is to check for large amounts of instant acceleration to counter any fly which tries bypass in this manner  */
@@ -42,8 +43,7 @@ public class FlyA extends Check {
                     && !move.isBlocksOnTop()) {
                 //We have to add a verbose since this check isn't 100% accurate and therefore can have issues.
                 //However, we can instantly flag if they are already in the air since a large delta between velocities is impossible.
-                if (verbose++ > 3)
-                    flag("t: high; " + move.getDeltaY() + ">-" + move.getLastDeltaY(), true, false);
+                if (verbose++ > 3) flag("t: high; " + move.getDeltaY() + ">-" + move.getLastDeltaY(), true, true);
             } else verbose = 0;
             debug(move.isServerOnGround() + ", " + move.isBlocksOnTop() + ", " + Math.abs(move.getServerYAcceleration()) + ", " + move.getServerYVelocity() + ", " + move.getDeltaY() + ", " + move.getDistanceToGround());
         }

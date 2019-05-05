@@ -31,7 +31,7 @@ import java.util.List;
         Packet.Client.LEGACY_POSITION,
         Packet.Client.LEGACY_LOOK})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "HitBox", description = "A very accurate hit-box check, using a mixture of ray-tracing and bounding-boxes.", type = CheckType.COMBAT, cancelType = CancelType.COMBAT, maxVL = 50)
+@CheckInfo(name = "HitBox", description = "A very accurate hit-box check, using a mixture of ray-tracing and bounding-boxes.", type = CheckType.COMBAT, cancelType = CancelType.COMBAT, maxVL = 20)
 public class HitBox extends Check {
     @Setting(name = "pingLeniency")
     private int pingLeniency = 200;
@@ -64,7 +64,9 @@ public class HitBox extends Check {
             int collided = (int) boxes.stream()
                     .filter(box -> trace.intersects(box, box.getMinimum().distance(eyeLoc.toVector()) + 1.0, 0.2)).count();
             if (collided == 0 && !getData().isLagging()) {
-                if (vl++ > maxVL) {
+                if(vl++ > maxVL * 1.5) {
+                    banUser();
+                } else if (vl > maxVL) {
                     flag(collided + "=0", true, true);
                 }
             } else {
