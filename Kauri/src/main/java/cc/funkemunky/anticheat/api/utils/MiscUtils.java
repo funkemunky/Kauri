@@ -102,7 +102,7 @@ public class MiscUtils {
                 || move.getLiquidTicks() > 0
                 || move.getWebTicks() > 0
                 || velocity.isTakingVelocity()
-                || (move.isLagging() && data.isLagging())
+                || data.isLagging()
                 || !Atlas.getInstance().getBlockBoxManager().getBlockBox().isChunkLoaded(data.getPlayer().getLocation())
                 || data.getLastLogin().hasNotPassed(50)
                 || move.getClimbTicks() > 0

@@ -45,8 +45,7 @@ public class KillauraB extends Check {
                 debug("vl=" + vl + " swing=" + swing);
             }
 
-        } else
-            swing = packetType.equalsIgnoreCase(Packet.Client.ARM_ANIMATION) && !MiscUtils.shouldReturnArmAnimation(getData());
+        } else swing = packetType.equalsIgnoreCase(Packet.Client.ARM_ANIMATION) && !MiscUtils.shouldReturnArmAnimation(getData());
     }
 
     @Override

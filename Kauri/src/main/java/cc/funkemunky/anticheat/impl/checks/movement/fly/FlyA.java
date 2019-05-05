@@ -19,7 +19,6 @@ public class FlyA extends Check {
 
     private int verbose;
     private Verbose verboseLow = new Verbose();
-    private long lastTimeStamp;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
@@ -30,7 +29,7 @@ public class FlyA extends Check {
            We check if it's less than 1E-4 for some compensation of inconsistencies that happen very often due to netty.
          */
 
-        if (timeStamp - lastTimeStamp > 12) {
+        if (!getData().isLagging()) {
             if (move.getAirTicks() > 2
                     && Math.abs(move.getClientYAcceleration()) < 1E-5) {
                 if (verboseLow.flag(9, 800)) {
@@ -47,7 +46,6 @@ public class FlyA extends Check {
             } else verbose = 0;
             debug(move.isServerOnGround() + ", " + move.isBlocksOnTop() + ", " + Math.abs(move.getServerYAcceleration()) + ", " + move.getServerYVelocity() + ", " + move.getDeltaY() + ", " + move.getDistanceToGround());
         }
-        lastTimeStamp = timeStamp;
     }
 
     @Override

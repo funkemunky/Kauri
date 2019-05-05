@@ -24,10 +24,7 @@ public class AutoclickerK extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(MiscUtils.shouldReturnArmAnimation(getData())) {
-            debug("breaking block");
-            return;
-        }
+        if(MiscUtils.shouldReturnArmAnimation(getData())) return;
 
         long ms = timeStamp - lastTimeStamp;
 
@@ -42,7 +39,7 @@ public class AutoclickerK extends Check {
                 } else if(vl > 4) {
                     flag("delta=" + avgDelta + " std=" + std, true, true);
                 }
-            } else vl-= vl > 0 ? 1 : 0;
+            } else vl-= vl > 0 ? .75 : 0;
 
             debug("avg=" + average + " std=" + std);
             list.clear();

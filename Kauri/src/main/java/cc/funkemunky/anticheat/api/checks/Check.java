@@ -54,26 +54,24 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
 
                 JsonMessage message = new JsonMessage();
 
-                if ((!data.getMovementProcessor().isLagging())) {
-                    if (System.currentTimeMillis() - lastAlert > CheckSettings.alertsDelay) {
-                        if (!developer) {
-                            message.addText(Color.translate(alertMessage.replace("%prefix%", CheckSettings.alertPrefix).replace("%check%", getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", String.valueOf(vl)).replace("%info%", information))).addHoverText(Color.Gray + information);
-                            Kauri.getInstance().getDataManager().getDataObjects().keySet().stream().filter(key -> Kauri.getInstance().getDataManager().getDataObjects().get(key).isAlertsEnabled())
-                                    .forEach(key -> message.sendToPlayer(Kauri.getInstance().getDataManager().getDataObjects().get(key).getPlayer()));
-                            lastAlert = System.currentTimeMillis();
+                if (System.currentTimeMillis() - lastAlert > CheckSettings.alertsDelay) {
+                    if (!developer) {
+                        message.addText(Color.translate(alertMessage.replace("%prefix%", CheckSettings.alertPrefix).replace("%check%", getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", String.valueOf(vl)).replace("%info%", information))).addHoverText(Color.Gray + information);
+                        Kauri.getInstance().getDataManager().getDataObjects().keySet().stream().filter(key -> Kauri.getInstance().getDataManager().getDataObjects().get(key).isAlertsEnabled())
+                                .forEach(key -> message.sendToPlayer(Kauri.getInstance().getDataManager().getDataObjects().get(key).getPlayer()));
+                        lastAlert = System.currentTimeMillis();
 
-                            if (CheckSettings.printToConsole) {
-                                MiscUtils.printToConsole(alertMessage.replace("%check%", (developer ? Color.Red + Color.Italics : "") + getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", String.valueOf(vl)));
-                            }
-                        } else {
-                            message.addText(Color.translate(alertMessage.replace("%prefix%", CheckSettings.devAlertPrefix).replace("%check%", Color.Red + Color.Italics + getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", "N/A").replaceAll("%info%", information))).addHoverText(Color.Gray + information);
-
-                            Kauri.getInstance().getDataManager().getDataObjects().keySet().stream().filter(key -> {
-                                PlayerData data = Kauri.getInstance().getDataManager().getDataObjects().get(key);
-
-                                return data.isAlertsEnabled() && data.isDeveloperAlerts();
-                            }).forEach(key -> message.sendToPlayer(Kauri.getInstance().getDataManager().getDataObjects().get(key).getPlayer()));
+                        if (CheckSettings.printToConsole) {
+                            MiscUtils.printToConsole(alertMessage.replace("%check%", (developer ? Color.Red + Color.Italics : "") + getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", String.valueOf(vl)));
                         }
+                    } else {
+                        message.addText(Color.translate(alertMessage.replace("%prefix%", CheckSettings.devAlertPrefix).replace("%check%", Color.Red + Color.Italics + getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", "N/A").replaceAll("%info%", information))).addHoverText(Color.Gray + information);
+
+                        Kauri.getInstance().getDataManager().getDataObjects().keySet().stream().filter(key -> {
+                            PlayerData data = Kauri.getInstance().getDataManager().getDataObjects().get(key);
+
+                            return data.isAlertsEnabled() && data.isDeveloperAlerts();
+                        }).forEach(key -> message.sendToPlayer(Kauri.getInstance().getDataManager().getDataObjects().get(key).getPlayer()));
                     }
                 }
 

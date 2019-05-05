@@ -21,7 +21,6 @@ import org.bukkit.potion.PotionEffectType;
 public class SpeedA extends Check {
 
     private Verbose verbose = new Verbose();
-    private long lastTimeStamp;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
@@ -54,17 +53,13 @@ public class SpeedA extends Check {
         baseSpeed += (getData().getPlayer().getWalkSpeed() - 0.2) * 1.8f;
         baseSpeed += move.isOnSlimeBefore() ? 0.1 : 0;
 
-        if (timeStamp - lastTimeStamp > 1) {
-            if (motionXZ > baseSpeed && !getData().getVelocityProcessor().getLastVelocity().hasNotPassed(40)) {
-                if (verbose.flag(getData().isLagging() ? 45 : 35, 1000L, motionXZ - baseSpeed > 0.5f ? 5 : 2)) {
-                    flag(MathUtils.round(motionXZ, 4) + ">-" + MathUtils.round(baseSpeed, 4), true, true);
-                }
-            } else {
-                verbose.deduct();
+        if (motionXZ > baseSpeed && !getData().getVelocityProcessor().getLastVelocity().hasNotPassed(40)) {
+            if (verbose.flag(getData().isLagging() ? 45 : 35, 1000L, motionXZ - baseSpeed > 0.5f ? 5 : 2)) {
+                flag(MathUtils.round(motionXZ, 4) + ">-" + MathUtils.round(baseSpeed, 4), true, true);
             }
-
+        } else {
+            verbose.deduct();
         }
-        lastTimeStamp = timeStamp;
 
         debug(verbose.getVerbose() + ": " + motionXZ + ", " + baseSpeed + ", " + move.getAirTicks() + ", " + move.getGroundTicks() + ", " + getData().getPlayer().getWalkSpeed());
     }

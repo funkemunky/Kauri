@@ -27,11 +27,11 @@ public class BadPacketsF extends Check {
     private int maxVL = 4;
 
     private int ticks, vl;
-    private long lastReset, lastTimeStamp;
+    private long lastReset;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if (!getData().isLagging() && timeStamp > lastTimeStamp + 5 && getData().getLastServerPos().hasNotPassed(0) && getData().getLastLogin().hasPassed(40)) {
+        if (!getData().isLagging() && getData().getLastServerPos().hasNotPassed(0) && getData().getLastLogin().hasPassed(40)) {
             if (ticks++ >= 20) {
                 val elapsed = timeStamp - lastReset;
                 if (elapsed < threshold) {
@@ -45,7 +45,6 @@ public class BadPacketsF extends Check {
                 lastReset = timeStamp;
             }
         }
-        lastTimeStamp = timeStamp;
     }
 
     @Override
