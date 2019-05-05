@@ -16,14 +16,14 @@ import org.bukkit.util.Vector;
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK,})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Aim (Type G)", description = "Looks for a common angle mistake in clients. By Itz_Lucky.", type = CheckType.AIM, cancelType = CancelType.MOTION, maxVL = 10)
+@CheckInfo(name = "Aim (Type E)", description = "Looks for a common angle mistake in clients. By Itz_Lucky.", type = CheckType.AIM, cancelType = CancelType.MOTION, maxVL = 10)
 public class AimE extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        if (move.isServerPos() || move.getLookTicks() < 5 || getData().getLastLogin().hasNotPassed(20)) return;
+        if (getData().getLastServerPos().hasNotPassed(0) || move.getLookTicks() < 5 || getData().getLastLogin().hasNotPassed(20)) return;
 
         Vector vector = new Vector(move.getTo().getX() - move.getFrom().getX(), 0, move.getTo().getZ() - move.getFrom().getZ());
         double angleMove = vector.distanceSquared((new Vector(move.getTo().getYaw() - move.getFrom().getYaw(), 0, move.getTo().getYaw() - move.getFrom().getYaw())));
