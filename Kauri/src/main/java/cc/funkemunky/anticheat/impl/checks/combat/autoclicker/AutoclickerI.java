@@ -46,6 +46,8 @@ public class AutoclickerI extends Check {
 
                 if(pct < 75 && stdDelta < 0.5) {
                     if(vl++ > 6) {
+                        banUser();
+                    } else if(vl > 3) {
                         flag("pct=" + pct + "%, std=" + stdDelta, true, true);
                     }
                 } else vl -= vl > 0 ? 0.5 : 0;

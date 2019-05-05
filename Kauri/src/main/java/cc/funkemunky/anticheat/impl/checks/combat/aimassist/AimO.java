@@ -18,7 +18,7 @@ import org.bukkit.event.Event;
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Aim (Type O)", description = "A heuristic which looks for one thing all aimbots have in common.", maxVL = 50, cancelType = CancelType.MOTION, type = CheckType.AIM, developer = true)
+@CheckInfo(name = "Aim (Type O)", description = "A heuristic which looks for one thing all aimbots have in common.", maxVL = 50, cancelType = CancelType.MOTION, type = CheckType.AIM)
 public class AimO extends Check {
 
     private int ticks = 0;
@@ -46,8 +46,10 @@ public class AimO extends Check {
             debug(Color.Green + "Ticks: " + ticks);
 
             if (ticks > 30) {
-                if (vl++ > 7) {
-                    flag("ticks: " + ticks + " vl: " + vl, true, true);
+                if(vl++ > 12) {
+                    banUser();
+                } else if (vl > 7) {
+                    flag("ticks: " + ticks + " vl: " + vl, true, false);
                 }
                 lastFlag.reset();
             } else if (ticks < 12 && lastFlag.hasPassed()) {

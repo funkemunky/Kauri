@@ -4,7 +4,6 @@ import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
-import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
@@ -14,67 +13,40 @@ import org.bukkit.event.Event;
 import org.bukkit.util.Vector;
 
 @Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION, Packet.Server.ENTITY_VELOCITY})
-//@cc.funkemunky.api.utils.Init
+@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Velocity (Type B)", description = "Checks for horizontal velocity modifications.", type = CheckType.VELOCITY, maxVL = 80, executable = false)
 public class VelocityB extends Check {
 
     private double vl, velocityX, velocityZ;
-    private int ticks;
-
-    @Setting(name = "threshold.vl.max")
-    private double vlMax = 14D;
-
-    @Setting(name = "threshold.vl.add")
-    private double add = 1D;
-
-    @Setting(name = "threshold.vl.subtract")
-    private double subtract = 0.55D;
-
-    @Setting(name = "multipliers.airMove")
-    private float airMove = 1.08f;
-
-    @Setting(name = "multipliers.attack")
-    private float attackMult = 1.96f;
-
-    @Setting(name = "multipliers.direction")
-    private float directionMult = 7.35f;
-
-    @Setting(name = "velocityTicks")
-    private int maxTicks = 1;
 
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        val move = getData().getMovementProcessor();
         if(packetType.equalsIgnoreCase(Packet.Server.ENTITY_VELOCITY)) {
-            WrappedOutVelocityPacket vel = new WrappedOutVelocityPacket(packet, getData().getPlayer());
-            if(vel.getId() == getData().getPlayer().getEntityId() && move.getFrom().getY() % 1.0D == 0.0D && move.isClientOnGround()) {
-                velocityX = vel.getX();
-                velocityZ = vel.getZ();
+            WrappedOutVelocityPacket dy = new WrappedOutVelocityPacket(packet, this.getData().getPlayer());
+            if(dy.getId() == this.getData().getPlayer().getEntityId() && this.getData().getMovementProcessor().getFrom().getY() % 1.0D == 0.0D && this.getData().getMovementProcessor().isClientOnGround()) {
+                this.velocityX = dy.getX();
+                this.velocityZ = dy.getZ();
             }
-        } else if(velocityX != 0.0D && velocityZ != 0.0D) {
-            val dy = move.getTo().getY() - move.getFrom().getY();
-            if(dy > 0) {
-                val action = getData().getActionProcessor();
-                double dx = move.getTo().getX() - move.getFrom().getX(), dz = move.getTo().getZ() - move.getFrom().getZ();
-                Vector kb = new Vector(velocityX, 0, velocityZ), d = new Vector(dx, 0, dz);
-                float aimove = Atlas.getInstance().getBlockBoxManager().getBlockBox().getAiSpeed(getData().getPlayer());
-                if(move.getBlockAboveTicks() == 0 && move.getLiquidTicks() == 0 && move.getWebTicks() == 0 && !move.isBlocksNear()) {
-                    double kbxz = kb.length() / (ticks > 0 ? 1.8 : 1) - (0.026f * ticks), dxz = d.length();
-
-                    val quotient = dxz / kbxz;
-                    val directionDelta = 1.85 - kb.distance(move.getTo().toLocation(getData().getPlayer().getWorld()).getDirection());
-                    val threshold = (1 - aimove * airMove) / (getData().getLastAttack().hasNotPassed(0) ? attackMult : 1) + (directionDelta / directionMult);
+        } else if(this.velocityX != 0.0D && this.velocityZ != 0.0D) {
+            double dy = this.getData().getMovementProcessor().getTo().getY() - this.getData().getMovementProcessor().getFrom().getY();
+            if(dy < 0.419D && dy > 0.1D) {
+                double dx = this.getData().getMovementProcessor().getTo().getX() - this.getData().getMovementProcessor().getFrom().getX(), dz = this.getData().getMovementProcessor().getTo().getZ() - this.getData().getMovementProcessor().getFrom().getZ();
+                Vector kb = new Vector(this.velocityX, 0, this.velocityZ), dxz = new Vector(dx, 0, dz);
+                float aimove = Atlas.getInstance().getBlockBoxManager().getBlockBox().getAiSpeed(this.getData().getPlayer()) * 1.35f;
+                if(this.getData().getMovementProcessor().getBlockAboveTicks() == 0 && this.getData().getMovementProcessor().getLiquidTicks() == 0 && this.getData().getMovementProcessor().getWebTicks() == 0 && kb.length() > 0.15 && !this.getData().getMovementProcessor().isBlocksNear()) {
+                    double quotient = 1 - kb.distance(dxz);
+                    double threshold = (1 - aimove / (this.getData().getLastAttack().hasNotPassed(0) ? 2 : 1));
                     if(quotient < threshold) {
-                        if((vl+= add) > vlMax) {
-                            flag("velocity: " + MathUtils.round(quotient * 100.0D, 1) + "%", true, true);
+                        if(this.vl++ >= 14.0D) {
+                            this.flag("velocity: " + MathUtils.round(quotient * 100.0D, 1) + "%", true, true);
                         }
                     } else {
-                        vl = Math.max(0.0D, vl - subtract);
+                        this.vl = Math.max(0.0D, this.vl - 0.75D);
                     }
 
-                    debug("QUOTIENT: " + quotient + "/" + threshold + " VL: " + vl + " dy=" + dy + "  delta=" + directionDelta + " dxz=" + dxz + " kbxz=" + kbxz);
+                    this.debug("QUOTIENT: " + quotient + "/" + threshold + " VL: " + this.vl + " y=" + dy + " ai=" + aimove);
                 }
 
-                velocityX = velocityZ = 0.0D;
+                this.velocityX = this.velocityZ = 0.0D;
             }
         }
 

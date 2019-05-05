@@ -36,11 +36,13 @@ public class AutoclickerK extends Check {
             double std = Math.sqrt(list.stream().mapToDouble(val -> Math.pow(val - average, 2)).average().orElse(0));
             double avgDelta = Math.abs(std - lastStd);
 
-            if(avgDelta < 5 && average > 50 && std < 70) {
-                if(vl++ > 2) {
+            if(avgDelta < 5 && average > 50 && average < 120 && std < 70) {
+                if(vl++ > 7) {
+                    banUser();
+                } else if(vl > 4) {
                     flag("delta=" + avgDelta + " std=" + std, true, true);
                 }
-            } else vl-= vl > 0 ? 0.5 : 0;
+            } else vl-= vl > 0 ? 1 : 0;
 
             debug("avg=" + average + " std=" + std);
             list.clear();

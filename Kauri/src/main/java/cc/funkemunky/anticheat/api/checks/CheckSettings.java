@@ -50,4 +50,10 @@ public class CheckSettings {
 
     @ConfigSetting(path = "alerts", name = "tpsThreshold")
     public static double tpsThreshold = 14.0;
+
+    @ConfigSetting(path = "antivpn.license", name = "code")
+    public static String license = "";
+
+    @ConfigSetting(path = "antivpn.license", name = "override")
+    public static boolean override = false;
 }

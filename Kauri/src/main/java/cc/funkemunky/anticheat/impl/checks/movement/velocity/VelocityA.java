@@ -22,10 +22,6 @@ import org.bukkit.event.Event;
 @CheckInfo(name = "Velocity (Type A)", description = "Detects any vertical velocity modification below 100%.", type = CheckType.VELOCITY, maxVL = 40)
 public class VelocityA extends Check {
 
-
-    @Setting(name = "thresoldVL")
-    private int maxVL = 7;
-
     private float lastVelocity;
     private int vl;
 
@@ -43,7 +39,9 @@ public class VelocityA extends Check {
             val percentage = MathUtils.round(ratio * 100D, 1);
 
             if (ratio < 1 && !getData().getMovementProcessor().isBlocksOnTop() && !getData().isAbleToFly()) {
-                if (vl++ > maxVL) {
+                if(vl++ > 4) {
+                    banUser();
+                } else {
                     flag("velocity: " + percentage + "%", true, true);
                 }
             } else {
