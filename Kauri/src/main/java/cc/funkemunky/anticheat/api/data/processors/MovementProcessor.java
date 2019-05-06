@@ -92,7 +92,7 @@ public class MovementProcessor {
             }
             jumpVelocity = 0.42f + (PlayerUtils.getPotionEffectLevel(packet.getPlayer(), PotionEffectType.JUMP) * 0.1f);
 
-            if(data.getTeleportLocations().stream().anyMatch(vec -> vec.distance(to.toVector()) == 0)) {
+            if(data.getTeleportLocations().stream().anyMatch(vec -> vec.distance(to.toVector()) < 0.45)) {
                 data.getLastServerPos().reset();
                 data.getTeleportLocations().clear();
                 from = to;
