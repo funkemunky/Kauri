@@ -14,6 +14,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.FutureTask;
 
 public class AntiVPN extends AntiPUP {
 
@@ -37,24 +38,31 @@ public class AntiVPN extends AntiPUP {
 
     @EventHandler(priority = EventPriority.LOW)
     public void onPlayerJoin(PlayerJoinEvent event) {
-        Atlas.getInstance().getThreadPool().execute(() -> {
-            VPNResponse response = Kauri.getInstance().getVpnUtils().getResponse(event.getPlayer());
+        long timestamp = System.currentTimeMillis();
+        if(timestamp - Kauri.getInstance().lastLogin > 150L) {
+            FutureTask<Boolean> task = new FutureTask<Boolean>(() -> {
+                VPNResponse response = Kauri.getInstance().getVpnUtils().getResponse(event.getPlayer());
 
-            if (response == null) return;
+                if (response == null) return false;
 
-            if (response.isProxy()) {
-                new BukkitRunnable() {
-                    public void run() {
-                        event.getPlayer().kickPlayer(Color.translate(usingProxy));
-                    }
-                }.runTask(Kauri.getInstance());
-            } else if (blockCountries.contains(response.getCountryCode())) {
-                new BukkitRunnable() {
-                    public void run() {
-                        event.getPlayer().kickPlayer(Color.translate(blockedCountry.replaceAll("%countryName%", response.getCountryName())));
-                    }
-                }.runTask(Kauri.getInstance());
-            }
-        });
+                if (response.isProxy()) {
+                    new BukkitRunnable() {
+                        public void run() {
+                            event.getPlayer().kickPlayer(Color.translate(usingProxy));
+                        }
+                    }.runTask(Kauri.getInstance());
+                } else if (blockCountries.contains(response.getCountryCode())) {
+                    new BukkitRunnable() {
+                        public void run() {
+                            event.getPlayer().kickPlayer(Color.translate(blockedCountry.replaceAll("%countryName%", response.getCountryName())));
+                        }
+                    }.runTask(Kauri.getInstance());
+                }
+                return true;
+            });
+
+            Atlas.getInstance().getThreadPool().submit(task);
+        }
+        Kauri.getInstance().lastLogin = timestamp;
     }
 }

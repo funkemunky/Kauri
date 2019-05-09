@@ -28,7 +28,7 @@ public class MovementProcessor {
     private PastLocation pastLocation = new PastLocation();
     private TickTimer lastRiptide = new TickTimer(6), lastVehicle = new TickTimer(4), lastFlightToggle = new TickTimer(10);
     private List<BoundingBox> boxes = new ArrayList<>();
-    private long lastTimeStamp, lookTicks;
+    private long lastTimeStamp, lookTicks, lagTicks;
 
     public void update(PlayerData data, WrappedInFlyingPacket packet) {
         val player = packet.getPlayer();
@@ -92,9 +92,11 @@ public class MovementProcessor {
             }
             jumpVelocity = 0.42f + (PlayerUtils.getPotionEffectLevel(packet.getPlayer(), PotionEffectType.JUMP) * 0.1f);
 
-            if(data.getTeleportLocations().stream().anyMatch(vec -> vec.distance(to.toVector()) < 0.45)) {
+            val vecStream = data.getTeleportLocations().stream().filter(vec -> vec.distance(to.toVector()) < 0.45).findFirst().orElse(null);
+
+            if(vecStream != null) {
                 data.getLastServerPos().reset();
-                data.getTeleportLocations().clear();
+                data.getTeleportLocations().remove(vecStream);
                 from = to;
             }
 
@@ -123,6 +125,14 @@ public class MovementProcessor {
                 getLastFlightToggle().reset();
             }
 
+
+            if(timeStamp - lastTimeStamp > 100) {
+                lagTicks = (timeStamp - lastTimeStamp - 50) / 50;
+            } else lagTicks-= lagTicks > 0 ? 1 : 0;
+
+            if(lagTicks > 0) {
+                data.getLastLag().reset();
+            }
             isInsideBlock = BlockUtils.isSolid(BlockUtils.getBlock(to.toLocation(data.getPlayer().getWorld()))) || BlockUtils.isSolid(BlockUtils.getBlock(to.toLocation(data.getPlayer().getWorld()).clone().add(0, 1, 0)));
 
             if (isRiptiding = Atlas.getInstance().getBlockBoxManager().getBlockBox().isRiptiding(packet.getPlayer()))

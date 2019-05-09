@@ -5,6 +5,7 @@ import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.anticheat.impl.pup.bot.ConsoleClient;
+import cc.funkemunky.anticheat.impl.pup.bot.WorldLoader;
 import cc.funkemunky.anticheat.impl.pup.crashers.*;
 import cc.funkemunky.anticheat.impl.pup.exploits.BookEnchant;
 import cc.funkemunky.anticheat.impl.pup.vpn.AntiVPN;
@@ -33,6 +34,7 @@ public class AntiPUPManager {
         addMethod(new CommandSpam("CommandSpam", PuPType.SPAM, true), list);
         addMethod(new ChatSpam("ChatSpam", PuPType.SPAM, true), list);
         addMethod(new BookEnchant("BookEnchant", PuPType.EXPLOIT, true), list);
+        addMethod(new WorldLoader("WorldLoader", PuPType.BOT, true), list);
 
 
         for (AntiPUP pup : list) {

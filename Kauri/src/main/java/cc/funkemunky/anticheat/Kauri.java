@@ -30,10 +30,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.*;
 import java.math.RoundingMode;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Level;
 
@@ -53,7 +53,7 @@ public class Kauri extends JavaPlugin {
     private long lastTick, tickElapsed, profileStart;
     private double tps;
 
-    private ScheduledExecutorService executorService, checkExecutor;
+    private ScheduledExecutorService executorService, checkExecutor, vpnSchedular = Executors.newSingleThreadScheduledExecutor();
 
     private BaseProfiler profiler;
     private VPNUtils vpnUtils;
@@ -63,6 +63,8 @@ public class Kauri extends JavaPlugin {
 
     private FileConfiguration messages;
     private File messagesFile;
+    public ExecutorService dedicatedVPN = Executors.newSingleThreadExecutor();
+    public long lastLogin;
 
     @Override
     public void onEnable() {
@@ -134,6 +136,8 @@ public class Kauri extends JavaPlugin {
                 lastTick = timeStamp;
             }
         }.runTaskTimer(Kauri.getInstance(), 0L, 1L);
+
+
 
         new BukkitRunnable() {
             long sec;

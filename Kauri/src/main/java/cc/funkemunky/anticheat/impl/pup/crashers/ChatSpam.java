@@ -23,7 +23,7 @@ public class ChatSpam extends AntiPUP {
     private long chatDelay = 500L;
 
     @Setting(name = "noSpamMessage")
-    private String message = "&8[&4!&8] &7You must wait &c%timeLeft% banSeconds &7 until you can chat.";
+    private String message = "&8[&4!&8] &7You must wait &c%timeLeft% seconds &7 until you can chat.";
 
     @Override
     public boolean onPacket(Object packet, String packetType, long timeStamp) {
@@ -32,20 +32,22 @@ public class ChatSpam extends AntiPUP {
 
     @EventHandler
     public void onEvent(AsyncPlayerChatEvent event) {
-        String message = event.getMessage();
+        if(event.getPlayer().getUniqueId().equals(getData().getUuid())) {
+            String message = event.getMessage();
 
-        if (!message.startsWith("/")) {
-            long timeStamp = System.currentTimeMillis();
-            long delta = timeStamp - lastMessage;
-            if (delta < chatDelay) {
-                if (vl++ > spamMax) {
-                    double seconds = MathUtils.round(delta / 1000D, 1);
+            if (!message.startsWith("/")) {
+                long timeStamp = System.currentTimeMillis();
+                long delta = timeStamp - lastMessage;
+                if (delta < chatDelay) {
+                    if (vl++ > spamMax) {
+                        double seconds = MathUtils.round(delta / 1000D, 1);
 
-                    event.getPlayer().sendMessage(Color.translate(this.message.replaceAll("%timeLeft%", seconds + "")));
-                    event.setCancelled(true);
-                }
-            } else vl -= vl > 0 ? 1 : 0;
-            lastMessage = timeStamp;
+                        event.getPlayer().sendMessage(Color.translate(this.message.replaceAll("%timeLeft%", seconds + "")));
+                        event.setCancelled(true);
+                    }
+                } else vl -= vl > 0 ? 1 : 0;
+                lastMessage = timeStamp;
+            }
         }
     }
 }

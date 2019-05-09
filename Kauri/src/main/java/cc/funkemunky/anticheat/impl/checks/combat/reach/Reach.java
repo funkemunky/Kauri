@@ -13,19 +13,21 @@ import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.math.RayTrace;
 import lombok.val;
+import org.bukkit.GameMode;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
 import org.bukkit.util.Vector;
 
-@CheckInfo(name = "Reach (Type B)", description = "A very accurate and fast 3.1 reach check.", type = CheckType.REACH, cancelType = CancelType.COMBAT, maxVL = 40)
+@CheckInfo(name = "Reach", description = "A very accurate and fast 3.1 reach check.", type = CheckType.REACH, cancelType = CancelType.COMBAT, maxVL = 40)
 @Packets(packets = {Packet.Client.ARM_ANIMATION, Packet.Client.LOOK, Packet.Client.POSITION, Packet.Client.POSITION_LOOK, Packet.Client.FLYING, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION, Packet.Client.LEGACY_LOOK})
 @Init
-public class ReachB extends Check {
+public class Reach extends Check {
 
     private float vl = 0;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
+        if(getData().getPlayer().getGameMode().equals(GameMode.CREATIVE)) return;
         if(packetType.equals(Packet.Client.ARM_ANIMATION)) {
             vl-= vl > 0 ? 0.02 : 0;
         } else {
@@ -33,7 +35,7 @@ public class ReachB extends Check {
             val move = getData().getMovementProcessor();
 
             if(target != null && getData().getLastAttack().hasNotPassed(0) && getData().getTransPing() < 450) {
-                long range = (move.getYawDelta() > 4 ? 150 : move.getYawDelta() > 2.5 ? 100 : 50) + Math.abs(getData().getTransPing() - getData().getLastTransPing());
+                long range = (move.getYawDelta() > 4 ? 150 : 100) + Math.abs(getData().getTransPing() - getData().getLastTransPing()) * 3;
                 val location = getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), range);
                 val to = move.getTo().toLocation(target.getWorld()).clone().add(0, (getData().getPlayer().isSneaking() ? 1.54f : 1.62f), 0);
                 val trace = new RayTrace(to.toVector(), to.getDirection());
@@ -50,7 +52,7 @@ public class ReachB extends Check {
                     return;
                 }
 
-                val traverse = trace.traverse(Math.min(calcDistance, 2), calcDistance, 0.05);
+                val traverse = trace.traverse(Math.min(calcDistance, 2), calcDistance, 0.1);
                 float distance = (float)traverse.stream()
                         .filter((vec) -> location.stream().anyMatch((loc) -> getHitbox(target, loc).intersectsWithBox(vec)))
                         .mapToDouble((vec) -> vec.distance(to.toVector()))
@@ -60,7 +62,7 @@ public class ReachB extends Check {
                     return;
                 }
 
-                if(distance > 3.0F) {
+                if(distance > 3.0F && getData().getMovementProcessor().getLagTicks() == 0) {
                     if(vl++ > 12) {
                         banUser();
                     } else if(vl > 7.0F) {
