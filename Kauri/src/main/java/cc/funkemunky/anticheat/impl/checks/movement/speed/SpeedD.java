@@ -17,7 +17,7 @@ import org.bukkit.event.Event;
 
 @Packets(packets = {Packet.Client.LEGACY_POSITION, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.POSITION, Packet.Client.POSITION_LOOK})
 @Init
-@CheckInfo(name = "Speed (Type D)", description = "Checks the in-air and on-ground deceleration of the client. Less accurate.", type = CheckType.SPEED, maxVL = 125, executable = false, developer = true)
+@CheckInfo(name = "Speed (Type D)", description = "Checks the in-air and on-ground deceleration of the client. Less accurate.", type = CheckType.SPEED, maxVL = 125, executable = false)
 public class SpeedD extends Check {
 
     private float lastMotion;

@@ -23,33 +23,23 @@ import org.bukkit.potion.PotionEffectType;
 @CheckInfo(name = "Speed (Type C)", description = "Checks the in-air and on-ground deceleration of the client. More accurate.", type = CheckType.SPEED, maxVL = 125)
 public class SpeedC extends Check {
 
-    private float lastMotion;
-    private long lastTimeStamp;
-    private Verbose verbose = new Verbose();
+    private boolean lastGround, lastLastGround;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
-        val to = move.getTo();
-        val from = move.getFrom();
-        Block below = BlockUtils.getBlock(to.clone().toLocation(getData().getPlayer().getWorld()).subtract(0, 1, 0));
 
-        val deltaXZ = (float) cc.funkemunky.anticheat.api.utils.MiscUtils.hypot(to.getX() - from.getX(), to.getZ() - from.getZ());
-        val friction = !move.isServerOnGround() || !below.getType().isSolid() ? 0.68f : ReflectionsUtil.getFriction(below);
-        val resistance = move.isServerOnGround() ? friction * 0.91f : 0.91f;
-        val predicted = lastMotion * resistance;
-        val delta = deltaXZ - predicted;
+        val ground = move.isServerOnGround();
+        val sprinting = getData().getActionProcessor().isSprinting();
+        val accel = move.getDeltaXZ() - move.getLastDeltaXZ();
+        val delta = accel -  (sprinting ? 0.026f : 0.02f);
 
-        val max = (move.isServerOnGround() || move.getAirTicks() < 3 ? 0.24 + PlayerUtils.getPotionEffectLevel(getData().getPlayer(), PotionEffectType.SPEED) * 0.025 : 0.03);
-
-        if (getData().getLastBlockPlace().hasPassed(8) && move.getAirTicks() > 2 && !move.isBlocksOnTop() && getData().getVelocityProcessor().getLastVelocity().hasPassed(6) && getData().getLastServerPos().hasNotPassed(0) && !getData().isGeneralCancel() && timeStamp > lastTimeStamp + 5 && delta > max) {
-            flag(delta + ">-" + max + ";" + move.isServerOnGround(), true, true);
+        if(delta > 1E-6 && !lastGround & !lastLastGround) {
+            flag("accel=" + accel + " delta=" + delta, true, true);
         }
 
-        debug("DIFFERENCE: " + delta + " GROUND: " + move.isServerOnGround() + " TICKS: " + Kauri.getInstance().getCurrentTicks());
-
-        lastMotion = deltaXZ;
-        lastTimeStamp = timeStamp;
+        lastLastGround = lastGround;
+        lastGround = ground;
     }
 
     @Override
