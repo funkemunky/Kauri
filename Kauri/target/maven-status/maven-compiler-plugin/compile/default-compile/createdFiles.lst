@@ -189,4 +189,5 @@ cc\funkemunky\anticheat\impl\pup\bot\ConsoleClient$1.class
 cc\funkemunky\anticheat\api\utils\menu\MenuListener.class
 cc\funkemunky\anticheat\impl\checks\combat\autoclicker\AutoclickerB.class
 cc\funkemunky\anticheat\api\utils\json\CookieList.class
+cc\funkemunky\anticheat\impl\checks\behavioral\InventoryClick.class
 cc\funkemunky\anticheat\impl\listeners\PacketListeners.class

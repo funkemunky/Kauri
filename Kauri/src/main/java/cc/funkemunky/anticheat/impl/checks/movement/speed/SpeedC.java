@@ -34,7 +34,7 @@ public class SpeedC extends Check {
         val accel = move.getDeltaXZ() - move.getLastDeltaXZ();
         val delta = accel -  (sprinting ? 0.026f : 0.02f);
 
-        if(delta > 1E-6 && !lastGround & !lastLastGround) {
+        if(delta > 1E-6 && !lastGround & !lastLastGround && !getData().isGeneralCancel() && getData().getVelocityProcessor().getLastVelocity().hasPassed(10)) {
             flag("accel=" + accel + " delta=" + delta, true, true);
         }
 
