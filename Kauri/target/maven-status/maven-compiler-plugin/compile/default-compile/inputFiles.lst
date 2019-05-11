@@ -4,6 +4,7 @@ C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\antichea
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\impl\checks\player\badpackets\BadPacketsF.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\impl\checks\movement\speed\SpeedF.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimJ.java
+C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\impl\checks\combat\autoclicker\DoubleClick.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\api\utils\json\CDL.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\impl\checks\movement\speed\SpeedE.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\impl\checks\player\badpackets\BadPacketsG.java
@@ -35,6 +36,7 @@ C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\antichea
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\api\data\stats\StatsManager.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\impl\commands\kauri\arguments\UpdateConfigArgument.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\impl\checks\movement\noslowdown\NoSlowdownC.java
+C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\impl\pup\bot\WorldLoader.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\api\utils\MiscUtils.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\impl\menu\MenuUtils.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\api\data\banwave\BanwaveManager.java
@@ -74,6 +76,7 @@ C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\antichea
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\impl\listeners\PacketListeners.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\api\utils\ItemBuilder.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\impl\menu\InputHandler.java
+C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\impl\checks\behavioral\InventoryClick.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\impl\pup\crashers\YLevel.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\impl\commands\kauri\arguments\DebugArgument.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\dev\KauriAPI.java

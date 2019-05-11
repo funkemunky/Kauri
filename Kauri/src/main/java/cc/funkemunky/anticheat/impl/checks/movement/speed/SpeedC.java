@@ -32,9 +32,14 @@ public class SpeedC extends Check {
         val ground = move.isServerOnGround();
         val sprinting = getData().getActionProcessor().isSprinting();
         val accel = move.getDeltaXZ() - move.getLastDeltaXZ();
-        val delta = accel -  (sprinting ? 0.026f : 0.02f);
+        val delta = accel - (sprinting ? 0.026f : 0.02f);
 
-        if(delta > 1E-6 && !lastGround & !lastLastGround && !getData().isGeneralCancel() && getData().getVelocityProcessor().getLastVelocity().hasPassed(10)) {
+        if(delta > 1E-6
+                && !lastGround
+                && !lastLastGround
+                && !getData().isGeneralCancel()
+                && !move.isOnHalfBlock()
+                && getData().getVelocityProcessor().getLastVelocity().hasPassed(10)) {
             flag("accel=" + accel + " delta=" + delta, true, true);
         }
 

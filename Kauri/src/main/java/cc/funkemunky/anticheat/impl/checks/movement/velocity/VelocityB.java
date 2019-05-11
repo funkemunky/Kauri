@@ -8,6 +8,7 @@ import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.MathUtils;
+import lombok.val;
 import org.bukkit.event.Event;
 import org.bukkit.util.Vector;
 
@@ -17,6 +18,7 @@ import org.bukkit.util.Vector;
 public class VelocityB extends Check {
 
     private double vl, velocityX, velocityZ;
+    private int ticks;
 
     public void onPacket(Object packet, String packetType, long timeStamp) {
         if(packetType.equalsIgnoreCase(Packet.Server.ENTITY_VELOCITY)) {
@@ -26,26 +28,29 @@ public class VelocityB extends Check {
                 velocityZ = dy.getZ();
             }
         } else if(velocityX != 0.0D && velocityZ != 0.0D) {
-            double dy = getData().getMovementProcessor().getTo().getY() - getData().getMovementProcessor().getFrom().getY();
-            if(dy < 0.419D && dy > 0.1D) {
-                double dx = getData().getMovementProcessor().getTo().getX() - getData().getMovementProcessor().getFrom().getX(), dz = getData().getMovementProcessor().getTo().getZ() - getData().getMovementProcessor().getFrom().getZ();
-                Vector kb = new Vector(velocityX, 0, velocityZ), dxz = new Vector(dx, 0, dz);
-                float aimove = Atlas.getInstance().getBlockBoxManager().getBlockBox().getAiSpeed(getData().getPlayer()) * 1.35f;
-                if(getData().getMovementProcessor().getBlockAboveTicks() == 0 && getData().getMovementProcessor().getLiquidTicks() == 0 && getData().getMovementProcessor().getWebTicks() == 0 && kb.length() > 0.15 && !getData().getMovementProcessor().isBlocksNear()) {
-                    double quotient = 1 - kb.distance(dxz);
-                    double threshold = (1 - aimove / (getData().getLastAttack().hasNotPassed(0) ? 2 : 1));
+            val move = getData().getMovementProcessor();
+            double dy = move.getTo().getY() - move.getFrom().getY();
+            if(dy > 0D) {
+                float aimove = Atlas.getInstance().getBlockBoxManager().getBlockBox().getAiSpeed(getData().getPlayer()) * 1.175f;
+                double velocityXZ = MathUtils.hypot(velocityX, velocityZ) / (ticks > 0 ? 1.96 : 1) - (ticks * 0.026f);
+                if(move.getBlockAboveTicks() == 0 && move.getLiquidTicks() == 0 && move.getWebTicks() == 0 && velocityXZ > 0.15 && !move.isBlocksNear()) {
+                    double quotient =  move.getDeltaXZ() / velocityXZ;
+                    double threshold = (1 - aimove) / (getData().getLastAttack().hasNotPassed(1) ? 2 + (ticks * 0.03) : 1 + (ticks * 0.026));
                     if(quotient < threshold) {
                         if(vl++ >= 14.0D) {
                             flag("velocity: " + MathUtils.round(quotient * 100.0D, 1) + "%", true, true);
                         }
                     } else {
-                        vl = Math.max(0.0D, vl - 0.75D);
+                        vl -= vl > 0 ? 0.6 : 0;
                     }
 
-                    debug("QUOTIENT: " + quotient + "/" + threshold + " VL: " + vl + " y=" + dy + " ai=" + aimove);
+                    debug("q=" + quotient + "/" + threshold + " vl=" + vl + " vel=" + velocityXZ + " dxz=" + move.getDeltaXZ());
                 }
 
-                velocityX = velocityZ = 0.0D;
+                if(ticks++ == 3 || move.isServerOnGround()) {
+                    velocityX = velocityZ = 0.0D;
+                    ticks = 0;
+                }
             }
         }
 

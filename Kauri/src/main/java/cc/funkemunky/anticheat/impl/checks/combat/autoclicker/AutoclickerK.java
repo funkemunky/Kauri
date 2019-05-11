@@ -20,7 +20,7 @@ public class AutoclickerK extends Check {
 
     private long lastTimeStamp;
     private List<Long> list = new ArrayList<>();
-    private double lastStd, vl;
+    private double lastStd, lastAverage, vl;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
@@ -31,19 +31,22 @@ public class AutoclickerK extends Check {
         if(list.size() >= 20) {
             double average = list.stream().mapToLong(val -> val).average().orElse(0);
             double std = Math.sqrt(list.stream().mapToDouble(val -> Math.pow(val - average, 2)).average().orElse(0));
-            double avgDelta = Math.abs(std - lastStd);
+            double stdDelta = Math.abs(std - lastStd), avgDelta = Math.abs(average - lastAverage);
 
-            if(avgDelta < 5 && average > 50 && average < 120 && std < 70) {
-                if(vl++ > 7) {
-                    banUser();
-                } else if(vl > 4) {
-                    flag("delta=" + avgDelta + " std=" + std, true, true);
+            if(stdDelta < 5 && average > 50 && average < 120) {
+                if(avgDelta > 5) {
+                    if(vl++ > 4) {
+                        banUser();
+                    } else if(vl > 2) {
+                        flag("stddelta=" + stdDelta + " avgdelta=" + avgDelta + " std=" + std, true, true);
+                    }
                 }
-            } else vl-= vl > 0 ? .75 : 0;
+            } else vl-= vl > 0 ? .5 : 0;
 
-            debug("avg=" + average + " std=" + std);
+            debug("avg=" + average + " std=" + std + "vl=" + vl);
             list.clear();
             lastStd = std;
+            lastAverage = average;
         } else if(ms > 0 && ms < 400) {
             list.add(ms);
         }

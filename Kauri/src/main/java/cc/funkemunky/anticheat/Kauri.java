@@ -177,6 +177,7 @@ public class Kauri extends JavaPlugin {
         reloadConfig();
         reloadMessages();
         checkManager = new CheckManager();
+        dataManager.getDataObjects().clear();
         dataManager = new DataManager();
         HandlerList.unregisterAll(this);
         profiler.reset();
