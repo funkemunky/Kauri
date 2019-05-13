@@ -35,7 +35,7 @@ public class AutoclickerK extends Check {
 
             if(stdDelta < 5 && average > 50 && average < 120) {
                 if(avgDelta > 5) {
-                    if(vl++ > 4) {
+                    if(vl++ > 5) {
                         banUser();
                     } else if(vl > 2) {
                         flag("stddelta=" + stdDelta + " avgdelta=" + avgDelta + " std=" + std, true, true);

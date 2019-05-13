@@ -133,7 +133,9 @@ public class MovementProcessor {
             if(lagTicks > 0) {
                 data.getLastLag().reset();
             }
-            isInsideBlock = BlockUtils.isSolid(BlockUtils.getBlock(to.toLocation(data.getPlayer().getWorld()))) || BlockUtils.isSolid(BlockUtils.getBlock(to.toLocation(data.getPlayer().getWorld()).clone().add(0, 1, 0)));
+            val block = BlockUtils.getBlock(to.toLocation(data.getPlayer().getWorld()));
+            val blockAbove = BlockUtils.getBlock(to.toLocation(data.getPlayer().getWorld()).clone().add(0, 1, 0));
+            isInsideBlock = block == null || blockAbove == null || BlockUtils.isSolid(block) || BlockUtils.isSolid(blockAbove);
 
             if (isRiptiding = Atlas.getInstance().getBlockBoxManager().getBlockBox().isRiptiding(packet.getPlayer()))
                 lastRiptide.reset();

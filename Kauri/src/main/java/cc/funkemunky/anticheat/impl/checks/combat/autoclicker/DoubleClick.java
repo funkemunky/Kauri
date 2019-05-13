@@ -20,7 +20,7 @@ import org.bukkit.event.Event;
         Packet.Client.LEGACY_POSITION,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
-@Init
+//@Init
 public class DoubleClick extends Check {
 
     private long lastFlying, lastArm;

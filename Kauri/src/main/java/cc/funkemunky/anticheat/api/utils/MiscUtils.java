@@ -17,6 +17,7 @@ import org.bukkit.potion.PotionEffectType;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class MiscUtils {
 
@@ -57,7 +58,7 @@ public class MiscUtils {
             CustomLocation loc = new CustomLocation(point.getX(), y, point.getZ());
             Block block = BlockUtils.getBlock(loc.toLocation(world));
 
-            if (block.getType().isBlock() && block.getType().isSolid() && !block.isEmpty()) {
+            if (block != null && block.getType().isBlock() && block.getType().isSolid() && !block.isEmpty()) {
                 CustomLocation toReturn = loc.clone();
 
                 toReturn.setY(y + 1);
@@ -73,10 +74,7 @@ public class MiscUtils {
     }
 
     public static List<Block> getBlocks(BoundingBox box, World world) {
-        List<Block> block = new ArrayList<>();
-
-        Atlas.getInstance().getBlockBoxManager().getBlockBox().getCollidingBoxes(world, box).forEach(box2 -> BlockUtils.getBlock(box2.getMinimum().toLocation(world)));
-        return block;
+        return Atlas.getInstance().getBlockBoxManager().getBlockBox().getCollidingBoxes(world, box).stream().map(box2 -> BlockUtils.getBlock(box2.getMinimum().toLocation(world))).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     public static long gcd(long current, long previous) {
@@ -97,7 +95,7 @@ public class MiscUtils {
         val velocity = data.getVelocityProcessor();
 
         return player.getAllowFlight()
-                || data.getLastServerPos().hasNotPassed(0)
+                || data.getLastServerPos().hasNotPassed(1)
                 || move.getLastVehicle().hasNotPassed(5)
                 || move.getLiquidTicks() > 0
                 || move.getWebTicks() > 0

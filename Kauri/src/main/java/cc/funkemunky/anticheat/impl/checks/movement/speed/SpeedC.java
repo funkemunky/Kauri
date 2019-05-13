@@ -19,7 +19,7 @@ import org.bukkit.potion.PotionEffectType;
 
 
 @Packets(packets = {Packet.Client.LEGACY_POSITION, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.POSITION, Packet.Client.POSITION_LOOK})
-@Init
+//@Init
 @CheckInfo(name = "Speed (Type C)", description = "Checks the in-air and on-ground deceleration of the client. More accurate.", type = CheckType.SPEED, maxVL = 125)
 public class SpeedC extends Check {
 

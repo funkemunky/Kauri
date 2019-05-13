@@ -10,7 +10,7 @@ import cc.funkemunky.api.utils.Init;
 import lombok.val;
 import org.bukkit.event.Event;
 
-@CheckInfo(name = "Criticals", type = CheckType.COMBAT, cancelType = CancelType.COMBAT, maxVL = 50)
+@CheckInfo(name = "Criticals", type = CheckType.COMBAT, cancelType = CancelType.COMBAT, maxVL = 50, developer = true)
 @Init
 @Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION})
 public class Criticals extends Check {

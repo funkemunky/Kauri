@@ -39,7 +39,9 @@ public class CollisionAssessment {
         Location location = bb.getMinimum().toLocation(world);
         Block block = BlockUtils.getBlock(location);
 
-        if (BlockUtils.isSolid(block) || isEntity) {
+        if(block == null && !isEntity) return;
+
+        if (isEntity || BlockUtils.isSolid(block)) {
             if (bb.collidesVertically(playerBox.subtract(0, 0.1f, 0, 0, 1.4f, 0))) {
                 onGround = true;
             }

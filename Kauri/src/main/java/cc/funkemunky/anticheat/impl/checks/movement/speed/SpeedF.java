@@ -11,7 +11,7 @@ import lombok.val;
 import org.bukkit.event.Event;
 
 @CheckInfo(name = "Speed (Type F)", description = "Speed check", type = CheckType.SPEED, maxVL = 10)
-@Init
+//@Init
 @Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION})
 public class SpeedF extends Check {
 

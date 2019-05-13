@@ -81,19 +81,20 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
     }
 
     public void banUser() {
-        if(getData().isBanned()) return;
-        getData().setBanned(true);
-        new BukkitRunnable() {
-            public void run() {
-                getData().setBanned(false);
-                execCommand.forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replace("%player%", getData().getPlayer().getName()).replace("%check%", getName())));
-                getData().getPacketChecks().values().forEach(checkList -> checkList.forEach(check -> check.vl = 0));
-                getData().getBukkitChecks().values().forEach(checkList -> checkList.forEach(check -> check.vl = 0));
-            }
-        }.runTaskLater(Kauri.getInstance(), 10);
-        if (CheckSettings.broadcastEnabled)
-            Bukkit.broadcastMessage(Color.translate(CheckSettings.broadcastMessage.replace("%player%", getData().getPlayer().getName())));
-        Kauri.getInstance().getLoggerManager().addBan(data.getUuid(), this);
+        if(executable && !getData().isBanned() && !getData().isLagging() && Kauri.getInstance().getTps() > CheckSettings.tpsThreshold) {
+            getData().setBanned(true);
+            new BukkitRunnable() {
+                public void run() {
+                    getData().setBanned(false);
+                    execCommand.forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replace("%player%", getData().getPlayer().getName()).replace("%check%", getName())));
+                    getData().getPacketChecks().values().forEach(checkList -> checkList.forEach(check -> check.vl = 0));
+                    getData().getBukkitChecks().values().forEach(checkList -> checkList.forEach(check -> check.vl = 0));
+                }
+            }.runTaskLater(Kauri.getInstance(), 10);
+            if (CheckSettings.broadcastEnabled)
+                Bukkit.broadcastMessage(Color.translate(CheckSettings.broadcastMessage.replace("%player%", getData().getPlayer().getName())));
+            Kauri.getInstance().getLoggerManager().addBan(data.getUuid(), this);
+        }
     }
 
     public void loadFromConfig() {

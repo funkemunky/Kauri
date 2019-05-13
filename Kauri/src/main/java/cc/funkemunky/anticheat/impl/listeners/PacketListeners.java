@@ -170,7 +170,8 @@ public class PacketListeners implements AtlasListener {
                     if (packet.getItemStack() != null && packet.getPosition() != null && packet.getPosition().getX() != -1 && packet.getPosition().getY() != -1 && packet.getPosition().getZ() != -1) {
                         Location location = new Location(packet.getPlayer().getWorld(), packet.getPosition().getX(), packet.getPosition().getY(), packet.getPosition().getZ());
 
-                        if (location.distance(packet.getPlayer().getLocation()) < 15 && BlockUtils.getBlock(location).getType().isSolid() && packet.getItemStack().getType().isSolid()) {
+                        val block = BlockUtils.getBlock(location);
+                        if (location.distance(packet.getPlayer().getLocation()) < 15 && block != null && block.getType().isSolid() && packet.getItemStack().getType().isSolid()) {
                             data.getLastBlockPlace().reset();
                         }
                     }
