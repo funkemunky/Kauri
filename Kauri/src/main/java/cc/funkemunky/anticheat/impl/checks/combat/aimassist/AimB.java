@@ -1,9 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.combat.aimassist;
 
-import cc.funkemunky.anticheat.api.checks.CancelType;
-import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckInfo;
-import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Verbose;
@@ -17,7 +14,7 @@ import org.bukkit.event.Event;
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Aim (Type B)", description = "Checks for common denominators in the pitch.", maxVL = 25, cancelType = CancelType.MOTION, type = CheckType.AIM)
+@CheckInfo(name = "Aim (Type B)", description = "Checks for common denominators in the pitch.", cancelType = CancelType.MOTION, type = CheckType.AIM)
 public class AimB extends Check {
 
     private double vl;
@@ -35,8 +32,12 @@ public class AimB extends Check {
                     && move.getYawDelta() < 10
                     && move.getOptifineTicks() < 10
                     && pitchGCD < 131072L) {
-                if (vl++ > 100) {
-                    flag(String.valueOf(pitchGCD / 2000), true, true);
+                if(vl++ > 80) {
+                    flag(String.valueOf(pitchGCD / 2000), true, true, AlertTier.CERTAIN);
+                } else if (vl > 55) {
+                    flag(String.valueOf(pitchGCD / 2000), true, true, AlertTier.HIGH);
+                } else if(vl > 30) {
+                    flag(String.valueOf(pitchGCD / 2000), true, false, AlertTier.LIKELY);
                 }
             } else {
                 vl -= vl > 0 ? 2 : 0;

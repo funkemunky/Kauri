@@ -35,7 +35,7 @@ public class Reach extends Check {
             val move = getData().getMovementProcessor();
             val velocity = getData().getVelocityProcessor();
 
-            if(target != null && getData().getLastLogin().hasPassed(5) && getData().getLastServerPos().hasPassed(0) && getData().getLastAttack().hasNotPassed(0) && getData().getTransPing() < 450) {
+            if(target != null && getData().getLastLogin().hasPassed(5) && !getData().isServerPos() && getData().getLastAttack().hasNotPassed(0) && getData().getTransPing() < 450) {
                 long range = (move.getYawDelta() > 4.5 ? 150 : move.getYawDelta() > 2.5 || velocity.getLastVelocity().hasNotPassed(8)  ? 100 : 50) + Math.abs(getData().getTransPing() - getData().getLastTransPing()) * 3;
                 val location = getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), range);
                 val to = move.getTo().toLocation(target.getWorld()).clone().add(0, (getData().getPlayer().isSneaking() ? 1.54f : 1.62f), 0);

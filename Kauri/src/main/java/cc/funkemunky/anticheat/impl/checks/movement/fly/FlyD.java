@@ -26,7 +26,7 @@ public class FlyD extends Check {
     public void onBukkitEvent(Event event) {
         PlayerMoveEvent e = (PlayerMoveEvent) event;
 
-        if (MiscUtils.cancelForFlight(getData(), 40, true) || getData().getLastServerPos().hasNotPassed(0)) return;
+        if (MiscUtils.cancelForFlight(getData(), 40, true) || getData().isServerPos()) return;
 
         val deltaY = (float) (e.getTo().getY() - e.getFrom().getY());
         val player = e.getPlayer();

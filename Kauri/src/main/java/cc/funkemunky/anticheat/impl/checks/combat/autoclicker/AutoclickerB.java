@@ -1,9 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.combat.autoclicker;
 
-import cc.funkemunky.anticheat.api.checks.CancelType;
-import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckInfo;
-import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
@@ -33,10 +30,6 @@ public class AutoclickerB extends Check {
     private int ticks, vl;
     private long timestamp;
 
-    public AutoclickerB() {
-
-    }
-
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         if (packetType.contains("Position") || packetType.contains("Look") || packetType.equals(Packet.Client.FLYING)) {
@@ -63,7 +56,7 @@ public class AutoclickerB extends Check {
                         vl += duplicates;
 
                         if (vl > 3) {
-                            this.flag("D: " + duplicates, false, false);
+                            this.flag("D: " + duplicates, false, false, AlertTier.HIGH);
                         }
                     } else {
                         vl -= vl > 0 ? 1 : 0;

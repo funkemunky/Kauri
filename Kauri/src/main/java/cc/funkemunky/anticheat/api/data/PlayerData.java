@@ -1,6 +1,7 @@
 package cc.funkemunky.anticheat.api.data;
 
 import cc.funkemunky.anticheat.Kauri;
+import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckSettings;
@@ -32,6 +33,7 @@ public class PlayerData {
     public Location setbackLocation;
     private UUID uuid, debuggingPlayer;
     private Check debuggingCheck;
+    private AlertTier alertTier;
     private String specificPacketDebug = "";
     private boolean debuggingBox, debuggingPackets, banned = false, developerAlerts,
             ableToFly, creativeMode, invulnerable, flying, generalCancel, breakingBlock,
@@ -46,7 +48,6 @@ public class PlayerData {
     private Vector lastVelocityVector;
     private BoundingBox boundingBox;
     private TickTimer lastMovementCancel = new TickTimer(4),
-            lastServerPos = new TickTimer(8),
             lastLag = new TickTimer(20),
             lastLogin = new TickTimer(60),
             lastBlockPlace = new TickTimer(30),
@@ -81,7 +82,6 @@ public class PlayerData {
 
         Kauri.getInstance().getCheckManager().loadChecksIntoData(this);
         Kauri.getInstance().getAntiPUPManager().loadMethodsIntoData(this);
-
 
         Atlas.getInstance().getSchedular().scheduleAtFixedRate(() -> {
             if (target != null && !target.isDead()) {

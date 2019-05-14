@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.combat.aimassist;
 
+import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
@@ -20,7 +21,7 @@ import java.util.LinkedList;
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK,})
 @Init
-@CheckInfo(name = "Aim (Type H)", description = "Looks for a common ratio of pitch movement in AimBots.", type = CheckType.AIM, executable = false, developer = true)
+@CheckInfo(name = "Aim (Type H)", description = "Looks for a common ratio of pitch movement in AimBots.", type = CheckType.AIM, executable = false)
 public class AimH extends Check {
 
     private final Deque<Float> pitchDeque = new LinkedList<>();
@@ -49,7 +50,7 @@ public class AimH extends Check {
 
         if (pitchRatio > 100.F && yawChange > 2.f) {
             if (++vl > vlMax) {
-                this.flag("P: " + pitchRatio, true, true);
+                this.flag("P: " + pitchRatio, true, true, AlertTier.POSSIBLE);
             }
         } else {
             vl = 0;

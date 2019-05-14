@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.combat.aimassist;
 
+import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
@@ -12,7 +13,7 @@ import cc.funkemunky.api.utils.Init;
 import lombok.val;
 import org.bukkit.event.Event;
 
-@CheckInfo(name = "Aim (Type M)", description = "A heuristic that looks for common patterns by advanced AimAssists (not stable) - FlyCode", type = CheckType.AIM, cancellable = false, executable = false, developer = true)
+@CheckInfo(name = "Aim (Type M)", description = "A heuristic that looks for common patterns by advanced AimAssists (not stable) - FlyCode", type = CheckType.AIM, cancellable = false, executable = false)
 @Init
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LOOK, Packet.Client.LEGACY_LOOK})
 public class AimM extends Check {
@@ -73,7 +74,7 @@ public class AimM extends Check {
                         if (count > 0) count--;
                     }
                     if (count > countMax && verbose.flag(4, 999L)) {
-                        flag("test", true, true);
+                        flag("test", true, true, AlertTier.POSSIBLE);
                     }
                     lastGcd = gcd;
                 }

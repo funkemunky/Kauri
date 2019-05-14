@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.combat.aimassist;
 
+import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
@@ -71,7 +72,7 @@ public class AimL extends Check {
                 lastSet = System.currentTimeMillis();
             }
             if (data.size() == safe && bad < 1 && safe > 32 && getData().getPlayer().getLocation().distance(getData().getTarget().getLocation()) > 1.00 && verbose.flag(10, 450L)) {
-                flag("test", true, true);
+                flag("test", true, true, AlertTier.LIKELY);
             }
             float weight = (float) MathUtils.round(Math.abs(MathUtils.yawTo180F(e.getFrom().getYaw() - e.getTo().getYaw())), 3);
             if (!data.containsKey(weight)) {

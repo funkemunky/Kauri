@@ -24,7 +24,7 @@ public class BadPacketsL extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(getData().getLastServerPos().hasNotPassed(0) || getData().isGeneralCancel()) {
+        if(getData().isGeneralCancel()) {
             lastFallDistance = 0;
             return;
         }
@@ -36,7 +36,7 @@ public class BadPacketsL extends Check {
             if(verbose.flag(6, 500L)) {
                 flag(deltaFD + "<-" + getData().getMovementProcessor().getDeltaXZ(), true, true);
             }
-        }
+        } else verbose.deduct();
         lastFallDistance = fallDistance;
         debug(getData().getPlayer().getFallDistance() + "");
     }

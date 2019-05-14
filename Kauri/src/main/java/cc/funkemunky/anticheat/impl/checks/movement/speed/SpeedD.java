@@ -38,7 +38,7 @@ public class SpeedD extends Check {
 
         val max = move.isServerOnGround() || move.getAirTicks() < 3 ? 0.24 : 0.03;
 
-        if (getData().getLastBlockPlace().hasPassed(8) && !move.isBlocksOnTop() && getData().getVelocityProcessor().getLastVelocity().hasPassed(6) && getData().getLastServerPos().hasNotPassed(0) && !getData().isGeneralCancel() && timeStamp > lastTimeStamp + 5 && delta > max) {
+        if (getData().getLastBlockPlace().hasPassed(8) && !move.isBlocksOnTop() && getData().getVelocityProcessor().getLastVelocity().hasPassed(6) && !getData().isGeneralCancel() && timeStamp > lastTimeStamp + 5 && delta > max) {
             if ((delta > max + 0.4) || verbose.flag(3, 400L)) {
                 flag(delta + ">-" + max + ";" + move.isServerOnGround(), true, true);
             }

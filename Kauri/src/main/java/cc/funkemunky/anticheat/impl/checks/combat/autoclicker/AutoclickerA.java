@@ -1,9 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.combat.autoclicker;
 
-import cc.funkemunky.anticheat.api.checks.CancelType;
-import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckInfo;
-import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
@@ -38,12 +35,10 @@ public class AutoclickerA extends Check {
         if(timeStamp - lastTimeStamp > 1000L) {
             if(ticks > banCPS) {
                 if(vl++ > 2) {
-                    banUser();
-                }
-                flag("cps: " + ticks, true, true);
-            } else
-            if(ticks > maxCPS) {
-                flag("cps: " + ticks, true, false);
+                    flag("cps: " + ticks, true, true, AlertTier.CERTAIN);
+                } else flag("cps: " + ticks, true, true, AlertTier.HIGH);
+            } else if(ticks > maxCPS) {
+                flag("cps: " + ticks, true, true, AlertTier.LIKELY);
             }
             ticks = 0;
         } else ticks++;

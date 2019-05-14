@@ -57,7 +57,7 @@ public class SpeedB extends Check {
 
         val streak = new AtomicInteger();
 
-        if (player.getAllowFlight() || getData().getLastServerPos().hasNotPassed(0) || getData().getVelocityProcessor().getLastVelocity().hasNotPassed(20) || player.getVehicle() != null || getData().getMovementProcessor().isRiptiding() || PlayerUtils.isGliding(player)) {
+        if (getData().isGeneralCancel() || getData().getVelocityProcessor().getLastVelocity().hasNotPassed(20)) {
             return;
         }
 

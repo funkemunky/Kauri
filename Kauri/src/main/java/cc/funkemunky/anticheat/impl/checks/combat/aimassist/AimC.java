@@ -1,9 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.combat.aimassist;
 
-import cc.funkemunky.anticheat.api.checks.CancelType;
-import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckInfo;
-import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
@@ -40,7 +37,7 @@ public class AimC extends Check {
 
         if (yawAccel == 0 && pitchAccel == 0 && getData().getPlayer().getVehicle() == null && Math.abs(move.getTo().getPitch()) < 80 && yawDelta > 0.1) {
             if (vl++ > vlMax) {
-                flag("p+y acceleration = 0; vl=" + vl, true, true);
+                flag("p+y acceleration = 0; vl=" + vl, true, true, AlertTier.LIKELY);
             }
         } else vl -= vl > 0 ? subtract : 0;
     }

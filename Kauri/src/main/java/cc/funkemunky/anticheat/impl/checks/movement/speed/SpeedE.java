@@ -19,7 +19,7 @@ public class SpeedE extends Check {
     private float vl = 0;
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(getData().getLastServerPos().hasNotPassed(0) || getData().isGeneralCancel()) return;
+        if(getData().isGeneralCancel()) return;
         val move = getData().getMovementProcessor();
         float threshold = MiscUtils.getBaseSpeed(getData()) + (move.isServerOnGround() ? 0.07f : 0.09f);
 

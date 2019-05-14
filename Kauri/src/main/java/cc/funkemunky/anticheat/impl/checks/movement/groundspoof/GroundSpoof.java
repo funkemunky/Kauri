@@ -23,7 +23,6 @@ public class GroundSpoof extends Check {
         val move = getData().getMovementProcessor();
 
         if(getData().isGeneralCancel()
-                || getData().getLastServerPos().hasNotPassed(1)
                 || move.getLiquidTicks() > 0
                 || move.getClimbTicks() > 0
                 || move.getWebTicks() > 0

@@ -7,13 +7,16 @@ import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.JsonMessage;
 import cc.funkemunky.api.utils.MiscUtils;
+import cc.funkemunky.api.utils.TickTimer;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -25,7 +28,7 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
     private PlayerData data;
     private int maxVL, banWaveThreshold;
     private boolean enabled, executable, cancellable, developer, isBanWave;
-    private long lastAlert;
+    private TickTimer lastAlert = new TickTimer(0);
     private List<String> execCommand = new ArrayList<>();
     private Map<String, Object> settings = new HashMap<>();
     private String alertMessage = "";
@@ -36,52 +39,52 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
         alertMessage = CheckSettings.alertMessage;
     }
 
-    protected void flag(String information, boolean cancel, boolean ban) {
-        if (Kauri.getInstance().getTps() > CheckSettings.tpsThreshold) {
-            Kauri.getInstance().getCheckManager().getAlertsExecutable().execute(() -> {
-                if (ban && !data.isLagging()) {
-                    vl++;
-                }
-                Kauri.getInstance().getLoggerManager().addViolation(data.getUuid(), this);
-                Kauri.getInstance().getStatsManager().addFlag();
-                if (vl > maxVL && executable && ban && !developer && !getData().isBanned()) {
-                    banUser();
-                }
+    protected void flag(String information, boolean cancel, boolean ban, AlertTier alertTier) {
+        Kauri.getInstance().getCheckManager().getAlertsExecutable().execute(() -> {
+            data.getLastFlag().reset();
 
-                data.getLastFlag().reset();
+            JsonMessage message = new JsonMessage();
 
-                if (cancel && cancellable) data.setCancelType(cancelType);
-
-                JsonMessage message = new JsonMessage();
-
-                if (System.currentTimeMillis() - lastAlert > CheckSettings.alertsDelay) {
-                    if (!developer) {
-                        message.addText(Color.translate(alertMessage.replace("%prefix%", CheckSettings.alertPrefix).replace("%check%", getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", String.valueOf(vl)).replace("%info%", information))).addHoverText(Color.Gray + information);
-                        Kauri.getInstance().getDataManager().getDataObjects().keySet().stream().filter(key -> Kauri.getInstance().getDataManager().getDataObjects().get(key).isAlertsEnabled())
-                                .forEach(key -> message.sendToPlayer(Kauri.getInstance().getDataManager().getDataObjects().get(key).getPlayer()));
-                        lastAlert = System.currentTimeMillis();
-
-                        if (CheckSettings.printToConsole) {
-                            MiscUtils.printToConsole(alertMessage.replace("%check%", (developer ? Color.Red + Color.Italics : "") + getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", String.valueOf(vl)));
-                        }
-                    } else {
-                        message.addText(Color.translate(alertMessage.replace("%prefix%", CheckSettings.devAlertPrefix).replace("%check%", Color.Red + Color.Italics + getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", "N/A").replaceAll("%info%", information))).addHoverText(Color.Gray + information);
-
-                        Kauri.getInstance().getDataManager().getDataObjects().keySet().stream().filter(key -> {
-                            PlayerData data = Kauri.getInstance().getDataManager().getDataObjects().get(key);
-
-                            return data.isAlertsEnabled() && data.isDeveloperAlerts();
-                        }).forEach(key -> message.sendToPlayer(Kauri.getInstance().getDataManager().getDataObjects().get(key).getPlayer()));
+            if (lastAlert.hasPassed(cc.funkemunky.anticheat.api.utils.MiscUtils.millisToTicks(CheckSettings.alertsDelay))) {
+                val dataToAlert = Kauri.getInstance().getDataManager().getDataObjects().keySet().stream().map(key -> Kauri.getInstance().getDataManager().getDataObjects().get(key)).filter(PlayerData::isAlertsEnabled).collect(Collectors.toList());
+                if (!developer && Kauri.getInstance().getTps() > CheckSettings.tpsThreshold) {
+                    if (cancel && cancellable) data.setCancelType(cancelType);
+                    if (ban && !data.isLagging()) {
+                        vl++;
+                        Kauri.getInstance().getStatsManager().addFlag();
                     }
-                }
+                    Kauri.getInstance().getLoggerManager().addViolation(data.getUuid(), this);
+                    if (tierEquals(alertTier, AlertTier.CERTAIN) || (vl > maxVL && executable && ban && !developer && !getData().isBanned())) {
+                        banUser();
+                    }
+                    message.addText(Color.translate(alertMessage.replace("%prefix%", CheckSettings.alertPrefix).replace("%check%", getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", String.valueOf(vl)).replace("%info%", information))).addHoverText(Color.Gray + information);
 
-                if (CheckSettings.testMode && !data.isAlertsEnabled()) message.sendToPlayer(data.getPlayer());
-            });
-        }
+                    dataToAlert.stream().filter(data -> priorityGreater(alertTier, data.getAlertTier())).forEach(data -> message.sendToPlayer(data.getPlayer()));
+                    if (CheckSettings.printToConsole) {
+                        MiscUtils.printToConsole(alertMessage.replace("%check%", (developer ? Color.Red + Color.Italics : "") + getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", String.valueOf(vl)));
+                    }
+                } else {
+                    message.addText(Color.translate(alertMessage.replace("%prefix%", CheckSettings.devAlertPrefix).replace("%check%", Color.Red + Color.Italics + getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", "N/A").replace("%info%", information))).addHoverText(Color.Gray + information);
+
+                    dataToAlert.stream().filter(PlayerData::isDeveloperAlerts).forEach(data -> message.sendToPlayer(data.getPlayer()));
+                }
+                lastAlert.reset();
+            }
+
+            if (CheckSettings.testMode && !data.isAlertsEnabled()) message.sendToPlayer(data.getPlayer());
+        });
     }
 
-    public void banUser() {
-        if(executable && !getData().isBanned() && !getData().isLagging() && Kauri.getInstance().getTps() > CheckSettings.tpsThreshold) {
+    private boolean tierEquals(AlertTier base, AlertTier... toCheck) {
+        return Arrays.stream(toCheck).allMatch(base::equals);
+    }
+
+    private boolean priorityGreater(AlertTier base, AlertTier... toCheck) {
+        return Arrays.stream(toCheck).allMatch(check -> check.getPriority() >= base.getPriority());
+    }
+
+    private void banUser() {
+        if(!getData().isBanned()) {
             getData().setBanned(true);
             new BukkitRunnable() {
                 public void run() {

@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.combat.aimassist;
 
+import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
@@ -24,7 +25,7 @@ import java.util.List;
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
 @Init
-@CheckInfo(name = "Aim (Type F)", description = "Finds any suspiciously consistent variables.", type = CheckType.AIM, developer = true, executable = false)
+@CheckInfo(name = "Aim (Type F)", description = "Finds any suspiciously consistent variables.", type = CheckType.AIM, executable = false)
 public class AimF extends Check {
 
     private List<Double> gcdValues = new ArrayList<>();
@@ -51,7 +52,7 @@ public class AimF extends Check {
                 double delta = MathUtils.getDelta(lastRange, range);
 
                 if ((delta < 5 || range < 0.1) && verbose.flag(1, 1750L)) {
-                    flag("delta: " + delta + " range: " + range, true, true);
+                    flag("delta: " + delta + " range: " + range, true, true, AlertTier.POSSIBLE);
                 }
                 debug(Color.Green + "Range: " + range);
                 lastRange = range;

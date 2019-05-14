@@ -26,6 +26,9 @@ public class Messages {
     @Message(name = "command.alerts.toggledAlerts")
     public static String toggledAlerts = "&7Toggled your alerts &f%enabled%&7.";
 
+    @Message(name = "command.alerts.setTier")
+    public static String setTierAlerts = "&7Your alerts tier is set to &f%tier%&7.";
+
     @Message(name = "command.alerts.toggledDevAlerts")
     public static String toggledDevAlerts = "&7Toggled your developer alerts &f%enabled%&7.";
 }

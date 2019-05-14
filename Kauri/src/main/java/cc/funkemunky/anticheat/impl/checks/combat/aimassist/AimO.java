@@ -1,9 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.combat.aimassist;
 
-import cc.funkemunky.anticheat.api.checks.CancelType;
-import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckInfo;
-import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
@@ -47,9 +44,11 @@ public class AimO extends Check {
 
             if (ticks > 30) {
                 if(vl++ > 12) {
-                    banUser();
+                    flag("ticks: " + ticks + " vl: " + vl, true, true, AlertTier.CERTAIN);
                 } else if (vl > 7) {
-                    flag("ticks: " + ticks + " vl: " + vl, true, false);
+                    flag("ticks: " + ticks + " vl: " + vl, true, true, AlertTier.HIGH);
+                } else if(vl > 5) {
+                    flag("ticks: " + ticks + " vl: " + vl, true, false, AlertTier.POSSIBLE);
                 }
                 lastFlag.reset();
             } else if (ticks < 12 && lastFlag.hasPassed()) {
