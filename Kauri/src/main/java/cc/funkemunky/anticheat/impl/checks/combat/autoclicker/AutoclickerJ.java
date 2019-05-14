@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-@Init
+//@Init
 @CheckInfo(name = "Autoclicker (Type J)", description = "Looks for autoclickers with repeating time differences.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT)
 @Packets(packets = {Packet.Client.ARM_ANIMATION})
 public class AutoclickerJ extends Check {

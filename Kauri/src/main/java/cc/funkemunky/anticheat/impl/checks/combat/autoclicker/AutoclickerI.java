@@ -19,7 +19,7 @@ import java.util.List;
 
 @Init
 @Packets(packets = {Packet.Client.ARM_ANIMATION})
-@CheckInfo(name = "Autoclicker (Type I)", description = "test", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT)
+@CheckInfo(name = "Autoclicker (Type I)", description = "test", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, executable = false)
 public class AutoclickerI extends Check {
 
     private List<Double> list = new ArrayList<>();

@@ -29,11 +29,9 @@ public class SpeedD extends Check {
         val move = getData().getMovementProcessor();
         val to = move.getTo();
         val from = move.getFrom();
-        Block below = BlockUtils.getBlock(to.clone().toLocation(getData().getPlayer().getWorld()).subtract(0, 1, 0));
-
 
         val deltaXZ = (float) cc.funkemunky.anticheat.api.utils.MiscUtils.hypot(to.getX() - from.getX(), to.getZ() - from.getZ());
-        val friction = !move.isServerOnGround() || below == null || !below.getType().isSolid() ? 0.68f : ReflectionsUtil.getFriction(below);
+        val friction = 0.68f;
         val resistance = move.isServerOnGround() ? friction * 0.91f : 0.91f;
         val predicted = lastMotion * resistance;
         val delta = deltaXZ - predicted;

@@ -10,8 +10,8 @@ import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
 import org.bukkit.event.Event;
 
-@CheckInfo(name = "Speed (Type F)", description = "Speed check", type = CheckType.SPEED, maxVL = 10)
-//@Init
+@CheckInfo(name = "Speed (Type F)", description = "Speed check", type = CheckType.SPEED, maxVL = 40, developer = true)
+@Init
 @Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION})
 public class SpeedF extends Check {
 
@@ -23,7 +23,7 @@ public class SpeedF extends Check {
 
         val delta = MathUtils.getDelta(move.getDeltaXZ(), move.getLastDeltaXZ());
 
-        if(delta > 0.4 * (getData().getMovementProcessor().getAirTicks() > 0 && getData().getMovementProcessor().getAirTicks() < 2 ? 2.5 : 1)) {
+        if(delta > 0.7 * (getData().getMovementProcessor().getAirTicks() > 0 && getData().getMovementProcessor().getAirTicks() < 2 ? 2.5 : 1)) {
             flag("delta=" + delta, true, true);
         }
     }

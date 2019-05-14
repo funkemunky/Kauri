@@ -21,7 +21,7 @@ public class SpeedE extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         if(getData().getLastServerPos().hasNotPassed(0) || getData().isGeneralCancel()) return;
         val move = getData().getMovementProcessor();
-        float threshold = MiscUtils.getBaseSpeed(getData()) + (move.isServerOnGround() ? 0.064f : 0.085f);
+        float threshold = MiscUtils.getBaseSpeed(getData()) + (move.isServerOnGround() ? 0.07f : 0.09f);
 
         threshold+= move.getHalfBlockTicks() > 0 ? 0.08 : 0;
         threshold+= move.isOnSlimeBefore() ? 0.025 : 0;
