@@ -1,9 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.combat.autoclicker;
 
-import cc.funkemunky.anticheat.api.checks.CancelType;
-import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckInfo;
-import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.Interval;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
@@ -41,8 +38,10 @@ public class AutoclickerD extends Check {
                     val averageCps = fraction.average();
 
                     if (averageCps >= 8.0 && averageCps < 17 && maxCps == minCps && getData().getMovementProcessor().getLagTicks() == 0) {
-                        if ((vl += 2) > 8.0) {
-                            flag("t: " + vl, true, true);
+                        if ((vl += 2) > 12.0) {
+                            flag("t: " + vl, true, true, AlertTier.LIKELY);
+                        } else if(vl > 7) {
+                            flag("t: " + vl, true, false, AlertTier.POSSIBLE);
                         }
                     } else {
                         vl = Math.max(vl - 1, 0);

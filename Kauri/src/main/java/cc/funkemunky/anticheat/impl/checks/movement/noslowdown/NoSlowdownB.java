@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.movement.noslowdown;
 
+import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
@@ -27,7 +28,7 @@ public class NoSlowdownB extends Check {
 
         if (move.isOnSoulSand() && move.isServerOnGround() && move.getDeltaXZ() > baseSpeed) {
             if (verbose.flag(6, 400L)) {
-                flag(MathUtils.round(move.getDeltaXZ(), 3) + ">-" + baseSpeed, true, false);
+                flag(MathUtils.round(move.getDeltaXZ(), 3) + ">-" + baseSpeed, true, false, AlertTier.HIGH);
             }
         } else verbose.deduct();
     }

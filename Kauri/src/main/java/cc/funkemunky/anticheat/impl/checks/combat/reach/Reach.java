@@ -1,9 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.combat.reach;
 
-import cc.funkemunky.anticheat.api.checks.CancelType;
-import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckInfo;
-import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.CustomLocation;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
@@ -45,7 +42,7 @@ public class Reach extends Check {
 
                 if(calcDistance > 15) {
                     if(vl++ > 4) {
-                        flag(calcDistance + ">-20", true, true);
+                        flag(calcDistance + ">-20", true, true, AlertTier.HIGH);
                     }
                     return;
                 } else if(calcDistance < 1) {
@@ -65,9 +62,9 @@ public class Reach extends Check {
 
                 if(distance > 3.0F && getData().getMovementProcessor().getLagTicks() == 0) {
                     if(vl++ > 12) {
-                        banUser();
+                        flag("reach=" + distance, true, true, AlertTier.CERTAIN);
                     } else if(vl > 7.0F) {
-                        flag("reach=" + distance, true, true);
+                        flag("reach=" + distance, true, true, distance > 3.1 ? AlertTier.HIGH : AlertTier.LIKELY);
                     }
                 } else vl-= vl > 0 ? 0.05 : 0;
 

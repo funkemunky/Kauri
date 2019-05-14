@@ -1,9 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.movement.fly;
 
-import cc.funkemunky.anticheat.api.checks.CancelType;
-import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckInfo;
-import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
@@ -28,7 +25,7 @@ public class FlyB extends Check {
 
         if (!MathUtils.approxEquals(0.01, move.getLastClientYAcceleration(), move.getClientYAcceleration())) {
             if (vl++ > 4) {
-                flag(move.getClientYAcceleration() + ", " + move.getLastClientYAcceleration(), true, true);
+                flag(move.getClientYAcceleration() + ", " + move.getLastClientYAcceleration(), true, true, AlertTier.HIGH);
             }
         } else vl -= vl > 0 ? 0.75 : 0;
     }

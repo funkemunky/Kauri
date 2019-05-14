@@ -1,9 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.movement.fly;
 
-import cc.funkemunky.anticheat.api.checks.CancelType;
-import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckInfo;
-import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Verbose;
@@ -14,7 +11,7 @@ import org.bukkit.event.Event;
 
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.POSITION, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Fly (Type A)", description = "A simple acceleration check for flight.", type = CheckType.FLY, cancelType = CancelType.MOTION, maxVL = 150)
+@CheckInfo(name = "Fly (Type A)", description = "A simple acceleration check for flight.", type = CheckType.FLY, cancelType = CancelType.MOTION, maxVL = 40)
 public class FlyA extends Check {
 
     private int verbose;
@@ -33,7 +30,7 @@ public class FlyA extends Check {
             if (move.getAirTicks() > 2
                     && Math.abs(move.getClientYAcceleration()) < 1E-5) {
                 if (verboseLow.flag(9, 800)) {
-                    flag("t: low; " + move.getDeltaY() + "≈" + move.getLastDeltaY(), true, true);
+                    flag("t: low; " + move.getDeltaY() + "≈" + move.getLastDeltaY(), true, true, AlertTier.HIGH);
                 }
             }
 
@@ -42,7 +39,7 @@ public class FlyA extends Check {
                     && !move.isBlocksOnTop()) {
                 //We have to add a verbose since this check isn't 100% accurate and therefore can have issues.
                 //However, we can instantly flag if they are already in the air since a large delta between velocities is impossible.
-                if (verbose++ > 3) flag("t: high; " + move.getDeltaY() + ">-" + move.getLastDeltaY(), true, true);
+                if (verbose++ > 3) flag("t: high; " + move.getDeltaY() + ">-" + move.getLastDeltaY(), true, true, AlertTier.HIGH);
             } else verbose = 0;
             debug(move.isServerOnGround() + ", " + move.isBlocksOnTop() + ", " + Math.abs(move.getServerYAcceleration()) + ", " + move.getServerYVelocity() + ", " + move.getDeltaY() + ", " + move.getDistanceToGround());
         }

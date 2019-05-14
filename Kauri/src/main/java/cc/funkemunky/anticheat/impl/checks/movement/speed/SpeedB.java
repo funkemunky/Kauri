@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.movement.speed;
 
+import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
@@ -81,7 +82,7 @@ public class SpeedB extends Check {
 
             if (streak.get() >= maxStreak) {
                 if (vl++ > 2) {
-                    flag("" + (double) (streak.get() * 100) / maxStreak + "%", true, true);
+                    flag("" + (double) (streak.get() * 100) / maxStreak + "%", true, true, AlertTier.HIGH);
                 }
             } else if (streak.get() == 0) {
                 vl = 0;

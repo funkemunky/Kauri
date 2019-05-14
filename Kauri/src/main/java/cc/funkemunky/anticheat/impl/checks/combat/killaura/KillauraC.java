@@ -1,9 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.combat.killaura;
 
-import cc.funkemunky.anticheat.api.checks.CancelType;
-import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckInfo;
-import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Verbose;
@@ -30,7 +27,7 @@ public class KillauraC extends Check {
             double deltaXZ = MathUtils.getHorizontalDistance(getData().getMovementProcessor().getTo().toLocation(use.getPlayer().getWorld()), getData().getMovementProcessor().getFrom().toLocation(use.getPlayer().getWorld()));
             if (!getData().isGeneralCancel() && (deltaXZ > baseSpeed && use.getPlayer().isSprinting() && getData().getActionProcessor().isSprinting())) {
                 if (verbose.flag(15, 800L)) { //We add a verbose or redundancy.
-                    flag(deltaXZ + ">-" + baseSpeed, true, true);
+                    flag(deltaXZ + ">-" + baseSpeed, true, true, AlertTier.LIKELY);
                 }
             } else verbose.deduct();
         }

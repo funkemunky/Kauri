@@ -1,9 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.combat.autoclicker;
 
-import cc.funkemunky.anticheat.api.checks.CancelType;
-import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckInfo;
-import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
@@ -36,9 +33,9 @@ public class AutoclickerK extends Check {
             if(stdDelta < 5 && average > 50 && average < 120) {
                 if(avgDelta > 5) {
                     if(vl++ > 5) {
-                        banUser();
+                        flag("avg=" + average + " std=" + std + "% delta=" + stdDelta, true, true, AlertTier.CERTAIN);
                     } else if(vl > 2) {
-                        flag("stddelta=" + stdDelta + " avgdelta=" + avgDelta + " std=" + std, true, true);
+                        flag("avg=" + average + " std=" + std + "% delta=" + stdDelta, true, true, AlertTier.HIGH);
                     }
                 }
             } else vl-= vl > 0 ? .5 : 0;

@@ -1,9 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.movement.groundspoof;
 
-import cc.funkemunky.anticheat.api.checks.CancelType;
-import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckInfo;
-import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
@@ -32,7 +29,7 @@ public class GroundSpoof extends Check {
 
         if(move.isServerOnGround() != move.isClientOnGround()) {
             if(verbose.flag(7, 400L)) {
-                flag("client=" + move.isClientOnGround() + " server=" + move.isServerOnGround(), true, true);
+                flag("client=" + move.isClientOnGround() + " server=" + move.isServerOnGround(), true, true, verbose.getVerbose() > 13 ? AlertTier.HIGH : AlertTier.LIKELY);
             }
         } else verbose.deduct();
         debug("client=" + move.isClientOnGround() + " server=" + move.isServerOnGround() + " vl=" + verbose.getVerbose() + " dy=" + move.getDeltaY() + " y=" + move.getTo().getY());

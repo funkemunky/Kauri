@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.movement.motion;
 
+import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
@@ -31,7 +32,7 @@ public class MotionA extends Check {
 
             if(diff > 1.05) {
                 if(vl++ > 15) {
-                    flag(diff + ">-1", true, true);
+                    flag(diff + ">-1", true, true, AlertTier.LIKELY);
                 }
             } else vl-= vl > 0 ? 3 : 0;
 

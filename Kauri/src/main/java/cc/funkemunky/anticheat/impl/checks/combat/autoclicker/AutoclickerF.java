@@ -1,9 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.combat.autoclicker;
 
-import cc.funkemunky.anticheat.api.checks.CancelType;
-import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckInfo;
-import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
@@ -19,45 +16,29 @@ import org.bukkit.event.Event;
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
 //@cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Autoclicker (Type F)", description = "Compares the CPS of an autoclicker a certain frequency.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 8)
+@CheckInfo(name = "Autoclicker (Type F)", description = "Looks to see if the CPS is rounded consistently, something only autoclickers could do.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 50)
 public class AutoclickerF extends Check {
 
-    private int swingTicks, flyingTicks, lastFlyingTicks, outliner, lastOutliner;
+    private long lastTimeStamp;
+    private double vl;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if (MiscUtils.shouldReturnArmAnimation(getData())) return;
-        if (packetType.equals(Packet.Client.ARM_ANIMATION)) {
-            swingTicks++;
+        long delta = timeStamp - lastTimeStamp;
+        if(!MiscUtils.shouldReturnArmAnimation(getData()) && delta > 0 && delta < 200) {
+            double cps = 1000D / (timeStamp - lastTimeStamp);
 
-            if (swingTicks == 5) {
-
-                if (flyingTicks == lastFlyingTicks) {
-                    outliner++;
+            if(cps % 0.5 == 0 || cps % 1 == 0) {
+                if(vl++ > 6) {
+                    flag("vl=" + vl + " cps=" + cps, false, true, AlertTier.LIKELY);
                 }
+            } else vl-= vl > 0 ? 0.25 : 0;
 
-                if (outliner == lastOutliner) {
-                    outliner = 0;
-                }
-
-                if (flyingTicks > 22) {
-                    outliner /= 4;
-                }
-
-                if (outliner > 6) {
-                    this.flag("L: " + outliner, false, true);
-                }
-
-                lastFlyingTicks = flyingTicks;
-                lastOutliner = outliner;
-                flyingTicks = 0;
-                swingTicks = 0;
-
-                debug("OUT: " + outliner);
-            }
-        } else {
-            flyingTicks++;
+            debug("cps=" + cps + " vl=" + vl);
         }
+
+        lastTimeStamp = timeStamp;
+
     }
 
     @Override

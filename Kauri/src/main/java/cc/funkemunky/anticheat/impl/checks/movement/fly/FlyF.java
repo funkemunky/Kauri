@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.movement.fly;
 
+import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
@@ -26,7 +27,7 @@ public class FlyF extends Check {
 
         if(accel < 0.065 && move.getAirTicks() > 3) {
             if(vl++ > 3) {
-                flag("accel=" + accel, true, true);
+                flag("accel=" + accel, true, true, AlertTier.LIKELY);
             }
         } else vl-= vl > 0 ? 1 : 0;
 

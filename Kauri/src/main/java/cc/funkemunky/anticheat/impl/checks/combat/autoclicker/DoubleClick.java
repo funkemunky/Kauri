@@ -1,9 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.combat.autoclicker;
 
-import cc.funkemunky.anticheat.api.checks.CancelType;
-import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckInfo;
-import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.Init;
@@ -31,10 +28,13 @@ public class DoubleClick extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         if(packetType.equals(Packet.Client.ARM_ANIMATION)) {
             if(timeStamp - lastArm == 0 && lastLag.hasPassed()) {
-                if(vl++ > 4) {
-                    flag("vl=" + vl, true, true);
+                if(vl++ > 10) {
+                    flag("vl=" + vl, true, true, AlertTier.HIGH);
+                } else if(vl > 4) {
+                    flag("vl=" + vl, true, true, AlertTier.LIKELY);
+                } else {
+                    flag("vl=" + vl, true, false, AlertTier.POSSIBLE);
                 }
-                debug("DOUBLE CLICKED");
             } else vl-= vl > 0 ? 1 : 0;
             lastArm = timeStamp;
         } else {

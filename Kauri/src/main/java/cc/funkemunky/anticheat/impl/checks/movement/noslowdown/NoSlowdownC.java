@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.movement.noslowdown;
 
+import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
@@ -28,13 +29,13 @@ public class NoSlowdownC extends Check {
         if (move.isInWeb() && move.getWebTicks() > 4) {
             if (accel > accelerationMax) {
                 if (verbose.flag(4, 500L)) {
-                    flag(MathUtils.round(accel, 4) + ">-" + accelerationMax, true, true);
+                    flag(MathUtils.round(accel, 4) + ">-" + accelerationMax, true, true, AlertTier.HIGH);
                 }
             } else verbose.deduct();
 
             if (move.getDeltaXZ() > baseSpeed) {
                 if (verbose2.flag(6, 500L)) {
-                    flag(MathUtils.round(move.getDeltaXZ(), 4) + ">-" + baseSpeed, true, true);
+                    flag(MathUtils.round(move.getDeltaXZ(), 4) + ">-" + baseSpeed, true, true, AlertTier.HIGH);
                 }
             } else verbose2.deduct();
 

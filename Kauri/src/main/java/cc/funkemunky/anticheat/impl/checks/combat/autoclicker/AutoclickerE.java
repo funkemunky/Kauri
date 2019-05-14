@@ -1,9 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.combat.autoclicker;
 
-import cc.funkemunky.anticheat.api.checks.CancelType;
-import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckInfo;
-import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
@@ -46,7 +43,7 @@ public class AutoclickerE extends Check {
                 case ABORT_DESTROY_BLOCK: {
                     if (sent && lastRange > 10L) {
                         if (++vl >= 10) {
-                            this.flag("V: " + vl, false, true);
+                            this.flag("V: " + vl, false, true, AlertTier.HIGH);
                         }
                     }
                     break;

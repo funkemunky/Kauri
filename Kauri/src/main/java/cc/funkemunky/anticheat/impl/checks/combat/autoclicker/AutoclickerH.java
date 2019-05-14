@@ -1,9 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.combat.autoclicker;
 
-import cc.funkemunky.anticheat.api.checks.CancelType;
-import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckInfo;
-import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
@@ -49,7 +46,7 @@ public class AutoclickerH extends Check {
                     // However, unlike autoclickers, players do not flag it consistently every single intervalTime. This should do until further testing
                     // proves this check to be invalid or needing fixing.
                     if (vl++ > 6) {
-                        flag("AVG: " + average, true, true);
+                        flag("AVG: " + average, true, true, AlertTier.LIKELY);
                     }
                 } else {
                     vl = 0;

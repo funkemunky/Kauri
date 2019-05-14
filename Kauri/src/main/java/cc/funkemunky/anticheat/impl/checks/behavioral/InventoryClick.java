@@ -1,9 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.behavioral;
 
-import cc.funkemunky.anticheat.api.checks.CancelType;
-import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckInfo;
-import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
@@ -50,7 +47,7 @@ public class InventoryClick extends Check {
 
                     if(delta < 1) {
                         if(vl++ > 5) {
-                            flag("arm=" + MathUtils.round(armAverage, 2) + " inv=" + MathUtils.round(invAverage, 2), true, true);
+                            flag("arm=" + MathUtils.round(armAverage, 2) + " inv=" + MathUtils.round(invAverage, 2), true, true, vl > 30 ? AlertTier.LIKELY : vl > 10 ? AlertTier.POSSIBLE : AlertTier.LOW);
                         }
                     } else vl = 0;
 

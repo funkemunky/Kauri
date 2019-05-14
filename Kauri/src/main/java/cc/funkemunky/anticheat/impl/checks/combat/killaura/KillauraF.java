@@ -1,9 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.combat.killaura;
 
-import cc.funkemunky.anticheat.api.checks.CancelType;
-import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckInfo;
-import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
@@ -47,7 +44,7 @@ public class KillauraF extends Check {
             double offset = offsetArray[0], average = this.average.getAverage();
 
             if (average < 5.0 && (player.isSprinting() || yawDelta > 2.0) && yawDelta > 0.3 && getData().getMovementProcessor().getDeltaXZ() > 0.15 && vl++ > 100) {
-                flag(average + "<-4.0->" + vl, true, true);
+                flag(average + "<-4.0->" + vl, true, true, AlertTier.POSSIBLE);
             } else {
                 vl -= vl > 0 ? 2f : 0;
             }

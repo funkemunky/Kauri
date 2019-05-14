@@ -1,11 +1,9 @@
 package cc.funkemunky.anticheat.impl.checks.combat.killaura;
 
-import cc.funkemunky.anticheat.api.checks.CancelType;
-import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckInfo;
-import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
+import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.TickTimer;
 import lombok.val;
 import org.bukkit.event.Event;
@@ -20,10 +18,12 @@ import java.util.concurrent.atomic.AtomicInteger;
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
 @CheckInfo(name = "Killaura (Type E)", description = "A heuristic which factors in the rotations to look for any patterns.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT)
+@Init
 public class KillauraE extends Check {
 
     private final Deque<Float> pitchDeque = new LinkedList<>(), yawDeque = new LinkedList<>();
     private final AtomicInteger level = new AtomicInteger();
+    private int vl;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
@@ -54,7 +54,9 @@ public class KillauraE extends Check {
             val yawAverage = yawDeque.stream().mapToDouble(Float::floatValue).average().orElse(0.0);
 
             if ((pitchAverage >= 10.0F && yawAverage >= 5.6) && level.get() >= 3 && level.get() < 6) {
-                this.flag(pitchAverage + " -> " + yawAverage + " -> 0.0", false, false);
+                if(vl++ > 1) {
+                    flag(pitchAverage + " -> " + yawAverage + " -> 0.0", false, false, AlertTier.HIGH);
+                } else flag(pitchAverage + " -> " + yawAverage + " -> 0.0", false, false, AlertTier.POSSIBLE);
             }
 
             yawDeque.clear();

@@ -1,9 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.combat.hitboxes;
 
-import cc.funkemunky.anticheat.api.checks.CancelType;
-import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckInfo;
-import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.CustomLocation;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.PastLocation;
@@ -65,9 +62,9 @@ public class HitBox extends Check {
                     .filter(box -> trace.intersects(box, box.getMinimum().distance(eyeLoc.toVector()) + 1.0, 0.2)).count();
             if (collided == 0 && !getData().isLagging()) {
                 if(vl++ > maxVL * 1.5) {
-                    banUser();
+                    flag(collided + "=" + 0, true, true, !getData().isLagging() ? AlertTier.CERTAIN : AlertTier.HIGH);
                 } else if (vl > maxVL) {
-                    flag(collided + "=0", true, true);
+                    flag(collided + "=0", true, true, !getData().isLagging() ? AlertTier.HIGH : AlertTier.LIKELY);
                 }
             } else {
                 vl -= vl > 0 ? 1 : 0;

@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.movement.noslowdown;
 
+import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
@@ -12,7 +13,7 @@ import lombok.val;
 import org.bukkit.event.Event;
 
 @Init
-@CheckInfo(name = "NoSlowdown (Type A)", description = "Looks for players using items but not slowing down. (Players can do this with a glitch, so do not ban).", executable = false, developer = true)
+@CheckInfo(name = "NoSlowdown (Type A)", description = "Looks for players using items but not slowing down. (Players can do this with a glitch, so do not ban).", executable = false)
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.POSITION, Packet.Client.LEGACY_POSITION, Packet.Client.LEGACY_POSITION_LOOK})
 public class NoSlowdownA extends Check {
 
@@ -29,7 +30,7 @@ public class NoSlowdownA extends Check {
 
         if (action.isUsingItem() && move.getDeltaXZ() > baseSpeed) {
             if (verbose.flag(20, 500L)) {
-                flag(MathUtils.round(move.getDeltaXZ(), 3) + ">- " + baseSpeed, true, false);
+                flag(MathUtils.round(move.getDeltaXZ(), 3) + ">- " + baseSpeed, true, false, AlertTier.POSSIBLE);
             }
             debug(verbose.getVerbose() + ": " + move.getDeltaXZ() + ">-" + baseSpeed);
         } else verbose.deduct();

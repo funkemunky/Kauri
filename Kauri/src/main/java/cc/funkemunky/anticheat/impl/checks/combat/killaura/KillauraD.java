@@ -1,9 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.combat.killaura;
 
-import cc.funkemunky.anticheat.api.checks.CancelType;
-import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckInfo;
-import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import lombok.val;
@@ -50,7 +47,7 @@ public class KillauraD extends Check {
 
             if (yawDups == 0 && pitchDups == 0) {
                 if (++vl > 3) {
-                    flag("P|Y: 0", true, false);
+                    flag("P|Y: 0", true, false, vl > 5 ? AlertTier.HIGH : AlertTier.LIKELY);
                 }
             } else {
                 vl = 0;

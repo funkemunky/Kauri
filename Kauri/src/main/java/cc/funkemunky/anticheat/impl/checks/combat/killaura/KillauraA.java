@@ -1,9 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.combat.killaura;
 
-import cc.funkemunky.anticheat.api.checks.CancelType;
-import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckInfo;
-import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
@@ -41,7 +38,7 @@ public class KillauraA extends Check {
             long elapsed = MathUtils.elapsed(lastFlying);
             if (elapsed < 35) {
                 if (lastLag.hasPassed() && verbose++ > 12) {
-                    flag("t: post; " + elapsed + "<-10", true, true);
+                    flag("t: post; " + elapsed + "<-10", true, true, verbose > 20 ? AlertTier.CERTAIN : AlertTier.HIGH);
                 }
             } else {
                 verbose = 0;

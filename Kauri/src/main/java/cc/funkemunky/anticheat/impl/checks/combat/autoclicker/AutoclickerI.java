@@ -1,9 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.combat.autoclicker;
 
-import cc.funkemunky.anticheat.api.checks.CancelType;
-import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckInfo;
-import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
@@ -45,10 +42,12 @@ public class AutoclickerI extends Check {
                 val stdDelta = MathUtils.getDelta(stddev, lastStd);
 
                 if(pct < 75 && stdDelta < 0.5) {
-                    if(vl++ > 6) {
-                        banUser();
+                    if(vl++ > 10) {
+                        flag("pct=" + pct + "%, std=" + stdDelta, true, true, AlertTier.CERTAIN);
+                    } else if(vl > 6) {
+                        flag("pct=" + pct + "%, std=" + stdDelta, true, true, AlertTier.HIGH);
                     } else if(vl > 3) {
-                        flag("pct=" + pct + "%, std=" + stdDelta, true, true);
+                        flag("pct=" + pct + "%, std=" + stdDelta, true, true, AlertTier.LIKELY);
                     }
                 } else vl -= vl > 0 ? 0.5 : 0;
 

@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.movement.fly;
 
+import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
@@ -27,7 +28,7 @@ public class FlyE extends Check {
 
         if (move.getAirTicks() > 1 && !move.isClientOnGround() && !move.isServerOnGround() && !MathUtils.approxEquals(0.1, move.getClientYAcceleration(), move.getServerYAcceleration()) && !MathUtils.approxEquals(0.2, move.getServerYVelocity(), move.getDeltaY())) {
             if(verbose.flag(2, 1000L)) {
-                flag(move.getDeltaY() + ">-" + move.getServerYVelocity(), true, true);
+                flag(move.getDeltaY() + ">-" + move.getServerYVelocity(), true, true, AlertTier.HIGH);
             }
         }
     }

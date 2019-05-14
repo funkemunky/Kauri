@@ -1,9 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.combat.fastbow;
 
-import cc.funkemunky.anticheat.api.checks.CancelType;
-import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckInfo;
-import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.BukkitEvents;
 import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.utils.MathUtils;
@@ -34,7 +31,7 @@ public class Fastbow extends Check {
 
         if (arrow.getVelocity().length() > .14 && lastShoot.hasNotPassed(6)) {
             if (verbose.flagB(5, 1)) {
-                flag("t: " + lastShoot.getPassed() + "; v: " + MathUtils.round(arrow.getVelocity().length(), 5), false, true);
+                flag("t: " + lastShoot.getPassed() + "; v: " + MathUtils.round(arrow.getVelocity().length(), 5), true, true, verbose.getVerbose() > 7 ? AlertTier.CERTAIN : AlertTier.HIGH);
             }
         } else {
             verbose.deduct();

@@ -1,9 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.movement.fastladder;
 
-import cc.funkemunky.anticheat.api.checks.CancelType;
-import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckInfo;
-import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.BukkitEvents;
 import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.utils.Color;
@@ -40,7 +37,7 @@ public class FastLadder extends Check {
         if (getData().getMovementProcessor().isOnClimbable()) {
             if (deltaY > verboseMaxSpeed) {
                 if (vl++ > 7) {
-                    flag(deltaY + ">-" + verboseMaxSpeed, true, true);
+                    flag(deltaY + ">-" + verboseMaxSpeed, true, true, AlertTier.HIGH);
                 }
             } else {
                 vl -= vl > 0 ? 1 : 0;
@@ -49,7 +46,7 @@ public class FastLadder extends Check {
             val maxThreshold = maxSpeed + PlayerUtils.getPotionEffectLevel(e.getPlayer(), PotionEffectType.JUMP) * 0.1;
 
             if (deltaY > maxThreshold) {
-                flag(deltaY + ">-" + maxThreshold, true, true);
+                flag(deltaY + ">-" + maxThreshold, true, true, AlertTier.LIKELY);
             }
 
             debug(vl + ": " + deltaY);

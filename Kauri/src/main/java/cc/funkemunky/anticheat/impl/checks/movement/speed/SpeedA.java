@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.movement.speed;
 
+import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
@@ -55,7 +56,7 @@ public class SpeedA extends Check {
 
         if (motionXZ > baseSpeed && !getData().getVelocityProcessor().getLastVelocity().hasNotPassed(40)) {
             if (verbose.flag(getData().isLagging() ? 45 : 35, 1000L, motionXZ - baseSpeed > 0.5f ? 5 : 2)) {
-                flag(MathUtils.round(motionXZ, 4) + ">-" + MathUtils.round(baseSpeed, 4), true, true);
+                flag(MathUtils.round(motionXZ, 4) + ">-" + MathUtils.round(baseSpeed, 4), true, true, verbose.getVerbose() > 70 ? AlertTier.CERTAIN : AlertTier.HIGH);
             }
         } else {
             verbose.deduct();
