@@ -31,4 +31,19 @@ public class Messages {
 
     @Message(name = "command.alerts.toggledDevAlerts")
     public static String toggledDevAlerts = "&7Toggled your developer alerts &f%enabled%&7.";
+
+    @Message(name = "field.alertTiers.certain")
+    public static String alertTierCertain = "Certain";
+
+    @Message(name = "field.alertTiers.high")
+    public static String alertTierHigh = "High";
+
+    @Message(name = "field.alertTiers.likely")
+    public static String alertTierLikely = "Likely";
+
+    @Message(name = "field.alertTiers.possible")
+    public static String alertTierPossible = "Possible";
+
+    @Message(name = "field.alertTiers.low")
+    public static String alertTierLow = "Low";
 }
