@@ -47,7 +47,7 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
 
             long timeStamp = System.currentTimeMillis();
             if (timeStamp - lastAlert > CheckSettings.alertsDelay) {
-                val dataToAlert = Kauri.getInstance().getDataManager().getDataObjects().keySet().stream().map(key -> Kauri.getInstance().getDataManager().getDataObjects().get(key)).filter(PlayerData::isAlertsEnabled).collect(Collectors.toList());
+                val dataToAlert = Kauri.getInstance().getDataManager().getDataObjects().keySet().stream().map(key -> Kauri.getInstance().getDataManager().getDataObjects().get(key)).filter(data -> data.getAlertTier() != null && data.getPlayer().hasPermission("kauri.alerts")).collect(Collectors.toList());
                 if (!developer && Kauri.getInstance().getTps() > CheckSettings.tpsThreshold) {
                     if (cancel && cancellable) data.setCancelType(cancelType);
                     if (ban && !data.isLagging()) {
@@ -55,14 +55,14 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
                         Kauri.getInstance().getStatsManager().addFlag();
                     }
                     Kauri.getInstance().getLoggerManager().addViolation(data.getUuid(), this);
-                    if (tierEquals(alertTier, AlertTier.CERTAIN) || (vl > maxVL && executable && ban && !developer && !getData().isBanned())) {
+                    if (alertTier.equals(AlertTier.CERTAIN) || (vl > maxVL && executable && ban && !developer && !getData().isBanned())) {
                         banUser();
                     }
                     message.addText(Color.translate(alertMessage.replace("%prefix%", CheckSettings.alertPrefix).replace("%check%", getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", String.valueOf(vl)).replace("%info%", information).replace("%chance%", alertTier.getName()))).addHoverText(Color.Gray + information);
 
-                    dataToAlert.stream().filter(data -> priorityGreater(alertTier, data.getAlertTier())).forEach(data -> message.sendToPlayer(data.getPlayer()));
+                    dataToAlert.stream().filter(data2 -> data2.getAlertTier().getPriority() <= alertTier.getPriority()).forEach(data2 -> message.sendToPlayer(data2.getPlayer()));
                     if (CheckSettings.printToConsole) {
-                        MiscUtils.printToConsole(alertMessage.replace("%check%", (developer ? Color.Red + Color.Italics : "") + getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", String.valueOf(vl)));
+                        MiscUtils.printToConsole(alertMessage.replace("%check%", (developer ? Color.Red + Color.Italics : "") + getName()).replace("%prefix%", CheckSettings.alertPrefix).replace("%check%", getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", String.valueOf(vl)).replace("%info%", information).replace("%chance%", alertTier.getName()));
                     }
                 } else {
                     message.addText(Color.translate(alertMessage.replace("%prefix%", CheckSettings.devAlertPrefix).replace("%check%", Color.Red + Color.Italics + getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", "N/A").replace("%chance%", alertTier.getName()).replace("%info%", information))).addHoverText(Color.Gray + information);
@@ -75,15 +75,6 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
             if (CheckSettings.testMode && !data.isAlertsEnabled()) message.sendToPlayer(data.getPlayer());
         });
     }
-
-    private boolean tierEquals(AlertTier base, AlertTier... toCheck) {
-        return Arrays.stream(toCheck).allMatch(base::equals);
-    }
-
-    private boolean priorityGreater(AlertTier base, AlertTier... toCheck) {
-        return Arrays.stream(toCheck).allMatch(check -> check.getPriority() >= base.getPriority());
-    }
-
     private void banUser() {
         if(!getData().isBanned()) {
             getData().setBanned(true);

@@ -4,6 +4,7 @@ import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.utils.Messages;
+import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.commands.ancmd.Command;
 import cc.funkemunky.api.commands.ancmd.CommandAdapter;
 import cc.funkemunky.api.utils.Color;
@@ -29,16 +30,14 @@ public class AlertsCommand {
         if(args.length > 0) {
             if (args[0].equalsIgnoreCase("dev")) {
                 data.setDeveloperAlerts(!data.isDeveloperAlerts());
-                data.setAlertsEnabled(true);
                 player.sendMessage(Color.translate(Messages.toggledDevAlerts.replace("%enabled%", (data.isDeveloperAlerts() ? "on" : "off"))));
             } else if(Arrays.stream(AlertTier.values()).anyMatch(tier -> tier.getName().equalsIgnoreCase(args[0]))) {
                 AlertTier tier = AlertTier.valueOf(args[0]);
                 data.setAlertTier(tier);
-                data.setAlertsEnabled(true);
                 player.sendMessage(Color.translate(Messages.setTierAlerts.replace("%tier%", tier.getName())));
             } else if(args[0].equalsIgnoreCase("off")) {
-                data.setAlertsEnabled(false);
                 player.sendMessage(Color.translate(Messages.toggledAlerts.replace("%enabled%", "off")));
+                data.setAlertTier(null);
             } else {
                 player.sendMessage(Color.translate(Messages.invalidArguments));
                 player.sendMessage(Color.translate("&7Options: &f&odev&7, &f&olow&7, &f&olikely77, &f&ohigh&7, &f&ooff"));

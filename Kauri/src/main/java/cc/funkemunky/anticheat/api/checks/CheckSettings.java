@@ -19,7 +19,7 @@ public class CheckSettings {
     static String devAlertPrefix = "&8[&c&lDEV&8]";
 
     @ConfigSetting(path = "alerts", name = "alertMessage")
-    static String alertMessage = "%prefix% &f%player% &7failed &f%check% &8(&7vl=&f%vl&7, &7chance=&f%chance%&8)";
+    static String alertMessage = "%prefix% &f%player% &7failed &f%check% &8(&7vl=&f%vl%&7, &7chance=&f%chance%&8)";
 
     @ConfigSetting(path = "executable.broadcast", name = "enabled")
     static boolean broadcastEnabled = false;
@@ -47,6 +47,9 @@ public class CheckSettings {
 
     @ConfigSetting(path = "alerts", name = "showExperimentalAlerts")
     public static boolean showExperimentalAlerts = false;
+
+    @ConfigSetting(path = "alerts", name = "defaultMode")
+    public static AlertTier defaultAlertMode = AlertTier.HIGH;
 
     @ConfigSetting(path = "alerts", name = "tpsThreshold")
     public static double tpsThreshold = 14.0;

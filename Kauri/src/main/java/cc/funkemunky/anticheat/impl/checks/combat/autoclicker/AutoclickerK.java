@@ -17,7 +17,7 @@ public class AutoclickerK extends Check {
 
     private long lastTimeStamp;
     private List<Long> list = new ArrayList<>();
-    private double lastStd, lastAverage, vl;
+    private double lastStd, lastAverage, vl, vl2;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
@@ -37,8 +37,13 @@ public class AutoclickerK extends Check {
                     } else if(vl > 2) {
                         flag("avg=" + average + " std=" + std + "% delta=" + stdDelta, true, true, AlertTier.HIGH);
                     }
+                } else if(vl2++ > 2) {
+                    flag("avg=" + average + " std=" + std + "% delta=" + stdDelta, true, false, AlertTier.POSSIBLE);
                 }
-            } else vl-= vl > 0 ? .5 : 0;
+            } else {
+                vl-= vl > 0 ? .5 : 0;
+                vl2-= vl2 > 0 ? .5 : 0;
+            }
 
             debug("avg=" + average + " std=" + std + "vl=" + vl);
             list.clear();
