@@ -27,8 +27,8 @@ public class FlyE extends Check {
         if (MiscUtils.cancelForFlight(getData(), 15, false)) return;
 
         if (move.getAirTicks() > 1 && !move.isClientOnGround() && !move.isServerOnGround() && !MathUtils.approxEquals(0.1, move.getClientYAcceleration(), move.getServerYAcceleration()) && !MathUtils.approxEquals(0.2, move.getServerYVelocity(), move.getDeltaY())) {
-            if(verbose.flag(2, 1000L)) {
-                flag(move.getDeltaY() + ">-" + move.getServerYVelocity(), true, true, AlertTier.HIGH);
+            if(verbose.flag(4, 1000L)) {
+                flag(move.getDeltaY() + ">-" + move.getServerYVelocity(), true, true, AlertTier.LIKELY);
             }
         }
     }

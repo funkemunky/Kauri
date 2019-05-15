@@ -50,11 +50,13 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
                 val dataToAlert = Kauri.getInstance().getDataManager().getDataObjects().keySet().stream().map(key -> Kauri.getInstance().getDataManager().getDataObjects().get(key)).filter(data -> data.getAlertTier() != null && data.getPlayer().hasPermission("kauri.alerts")).collect(Collectors.toList());
                 if (!developer && Kauri.getInstance().getTps() > CheckSettings.tpsThreshold) {
                     if (cancel && cancellable) data.setCancelType(cancelType);
-                    if (ban && !data.isLagging()) {
-                        vl++;
-                        Kauri.getInstance().getStatsManager().addFlag();
+                    if (ban) {
+                        if(!data.isLagging()) {
+                            vl++;
+                            Kauri.getInstance().getStatsManager().addFlag();
+                        }
+                        Kauri.getInstance().getLoggerManager().addViolation(data.getUuid(), this);
                     }
-                    Kauri.getInstance().getLoggerManager().addViolation(data.getUuid(), this);
                     if (alertTier.equals(AlertTier.CERTAIN) || (vl > maxVL && executable && ban && !developer && !getData().isBanned())) {
                         banUser();
                     }

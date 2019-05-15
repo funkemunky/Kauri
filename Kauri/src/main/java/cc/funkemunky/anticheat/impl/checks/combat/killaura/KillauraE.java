@@ -57,7 +57,7 @@ public class KillauraE extends Check {
                 if(vl++ > 1) {
                     flag(pitchAverage + " -> " + yawAverage + " -> 0.0", false, false, AlertTier.HIGH);
                 } else flag(pitchAverage + " -> " + yawAverage + " -> 0.0", false, false, AlertTier.POSSIBLE);
-            }
+            } else vl-= vl > 0 ? 1 : 0;
 
             yawDeque.clear();
             pitchDeque.clear();

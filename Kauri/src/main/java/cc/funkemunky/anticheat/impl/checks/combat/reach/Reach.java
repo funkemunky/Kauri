@@ -50,7 +50,7 @@ public class Reach extends Check {
                     return;
                 }
 
-                val traverse = trace.traverse(Math.min(calcDistance, 2), calcDistance, 0.1);
+                val traverse = trace.traverse(calcDistance * 1.5, 0.1);
                 float distance = (float)traverse.stream()
                         .filter((vec) -> location.stream().anyMatch((loc) -> getHitbox(target, loc).intersectsWithBox(vec)))
                         .mapToDouble((vec) -> vec.distance(to.toVector()))
