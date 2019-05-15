@@ -33,7 +33,7 @@ public class PlayerData {
     public Location setbackLocation;
     private UUID uuid, debuggingPlayer;
     private Check debuggingCheck;
-    private AlertTier alertTier = CheckSettings.defaultAlertMode;
+    private AlertTier alertTier = AlertTier.HIGH;
     private String specificPacketDebug = "";
     private boolean debuggingBox, debuggingPackets, banned = false, developerAlerts,
             ableToFly, creativeMode, invulnerable, flying, generalCancel, breakingBlock,
