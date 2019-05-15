@@ -48,8 +48,8 @@ public class CheckSettings {
     @ConfigSetting(path = "alerts", name = "showExperimentalAlerts")
     public static boolean showExperimentalAlerts = false;
 
-    @ConfigSetting(path = "alerts", name = "defaultMode")
-    public static AlertTier defaultAlertMode = AlertTier.HIGH;
+    /*@ConfigSetting(path = "alerts", name = "defaultMode")
+    public static AlertTier defaultAlertMode = AlertTier.HIGH;*/
 
     @ConfigSetting(path = "alerts", name = "tpsThreshold")
     public static double tpsThreshold = 14.0;
