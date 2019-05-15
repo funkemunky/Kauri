@@ -1,9 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.player.badpackets;
 
-import cc.funkemunky.anticheat.api.checks.CancelType;
-import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckInfo;
-import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.MathUtils;
@@ -34,7 +31,7 @@ public class BadPacketsD extends Check {
             val elapsed = timeStamp - lastFlying;
             if (elapsed < 10) {
                 if (lastLag.hasPassed() && vl++ > 5) {
-                    flag(elapsed + "<-10", true, true);
+                    flag(elapsed + "<-10", true, true, AlertTier.HIGH);
                 }
             } else {
                 vl -= vl > 0 ? 1 : 0;

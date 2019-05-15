@@ -7,6 +7,7 @@ import cc.funkemunky.anticheat.api.utils.Messages;
 import cc.funkemunky.api.commands.FunkeArgument;
 import cc.funkemunky.api.commands.FunkeCommand;
 import cc.funkemunky.api.utils.Color;
+import lombok.val;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -23,7 +24,15 @@ public class AlertsArgument extends FunkeArgument {
         addAlias("talerts");
 
         addTabComplete(2, "dev", "off");
-        addTabComplete(2, Arrays.stream(AlertTier.values()).filter(tier -> tier.getPriority() < 4).map(AlertTier::getName).collect(Collectors.toList()).toArray(new String[AlertTier.values().length]));
+        val alert = Arrays.stream(AlertTier.values()).filter(tier -> tier.getPriority() < 4).map(AlertTier::getName).collect(Collectors.toList());
+
+        String[] alerts = new String[alert.size()];
+
+        for (int i = 0; i < alerts.length; i++) {
+            alerts[i] = alert.get(i);
+        }
+
+        addTabComplete(2, alerts);
 
         setPlayerOnly(true);
     }
@@ -45,7 +54,7 @@ public class AlertsArgument extends FunkeArgument {
                 data.setAlertsEnabled(true);
                 player.sendMessage(Color.translate(Messages.toggledDevAlerts.replace("%enabled%", (data.isDeveloperAlerts() ? "on" : "off"))));
             } else if(Arrays.stream(AlertTier.values()).anyMatch(tier -> tier.getName().equalsIgnoreCase(args[1]))) {
-                AlertTier tier = AlertTier.valueOf(args[1]);
+                AlertTier tier = AlertTier.valueOf(args[1].toUpperCase());
                 data.setAlertTier(tier);
                 data.setAlertsEnabled(true);
                 player.sendMessage(Color.translate(Messages.setTierAlerts.replace("%tier%", tier.getName())));

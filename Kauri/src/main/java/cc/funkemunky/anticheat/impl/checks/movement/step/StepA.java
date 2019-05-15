@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.movement.step;
 
+import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
@@ -25,7 +26,7 @@ public class StepA extends Check {
         if (move.isCollidesHorizontally()) {
             debug("TOTAL: " + (yTotal += move.getDeltaY()));
         } else if (yTotal % 1.0 == 0 && yTotal > 0) {
-            flag("total:" + yTotal, true, true);
+            flag("total:" + yTotal, true, true, AlertTier.LIKELY);
             yTotal = 0;
         }
     }

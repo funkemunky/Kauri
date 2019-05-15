@@ -1,6 +1,7 @@
 package cc.funkemunky.anticheat.impl.checks.movement.speed;
 
 import cc.funkemunky.anticheat.Kauri;
+import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
@@ -12,6 +13,7 @@ import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.PlayerUtils;
 import cc.funkemunky.api.utils.ReflectionsUtil;
+import javafx.scene.control.Alert;
 import lombok.val;
 import org.bukkit.block.Block;
 import org.bukkit.event.Event;
@@ -40,7 +42,7 @@ public class SpeedC extends Check {
                 && !getData().isGeneralCancel()
                 && !move.isOnHalfBlock()
                 && getData().getVelocityProcessor().getLastVelocity().hasPassed(10)) {
-            flag("accel=" + accel + " delta=" + delta, true, true);
+            flag("accel=" + accel + " delta=" + delta, true, true, AlertTier.HIGH);
         }
 
         lastLastGround = lastGround;

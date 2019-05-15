@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.player.badpackets;
 
+import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
@@ -34,7 +35,7 @@ public class BadPacketsL extends Check {
 
         if(MathUtils.getDelta(deltaFD, Math.abs(getData().getMovementProcessor().getDeltaY())) > 0.5) {
             if(verbose.flag(6, 500L)) {
-                flag(deltaFD + "<-" + getData().getMovementProcessor().getDeltaXZ(), true, true);
+                flag(deltaFD + "<-" + getData().getMovementProcessor().getDeltaXZ(), true, true, verbose.getVerbose() > 10 ? AlertTier.LIKELY : AlertTier.POSSIBLE);
             }
         } else verbose.deduct();
         lastFallDistance = fallDistance;

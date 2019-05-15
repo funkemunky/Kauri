@@ -28,7 +28,7 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
     private PlayerData data;
     private int maxVL, banWaveThreshold;
     private boolean enabled, executable, cancellable, developer, isBanWave;
-    private TickTimer lastAlert = new TickTimer(0);
+    private long lastAlert;
     private List<String> execCommand = new ArrayList<>();
     private Map<String, Object> settings = new HashMap<>();
     private String alertMessage = "";
@@ -45,7 +45,8 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
 
             JsonMessage message = new JsonMessage();
 
-            if (lastAlert.hasPassed(cc.funkemunky.anticheat.api.utils.MiscUtils.millisToTicks(CheckSettings.alertsDelay))) {
+            long timeStamp = System.currentTimeMillis();
+            if (timeStamp - lastAlert > CheckSettings.alertsDelay) {
                 val dataToAlert = Kauri.getInstance().getDataManager().getDataObjects().keySet().stream().map(key -> Kauri.getInstance().getDataManager().getDataObjects().get(key)).filter(PlayerData::isAlertsEnabled).collect(Collectors.toList());
                 if (!developer && Kauri.getInstance().getTps() > CheckSettings.tpsThreshold) {
                     if (cancel && cancellable) data.setCancelType(cancelType);
@@ -57,18 +58,18 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
                     if (tierEquals(alertTier, AlertTier.CERTAIN) || (vl > maxVL && executable && ban && !developer && !getData().isBanned())) {
                         banUser();
                     }
-                    message.addText(Color.translate(alertMessage.replace("%prefix%", CheckSettings.alertPrefix).replace("%check%", getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", String.valueOf(vl)).replace("%info%", information))).addHoverText(Color.Gray + information);
+                    message.addText(Color.translate(alertMessage.replace("%prefix%", CheckSettings.alertPrefix).replace("%check%", getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", String.valueOf(vl)).replace("%info%", information).replace("%chance%", alertTier.getName()))).addHoverText(Color.Gray + information);
 
                     dataToAlert.stream().filter(data -> priorityGreater(alertTier, data.getAlertTier())).forEach(data -> message.sendToPlayer(data.getPlayer()));
                     if (CheckSettings.printToConsole) {
                         MiscUtils.printToConsole(alertMessage.replace("%check%", (developer ? Color.Red + Color.Italics : "") + getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", String.valueOf(vl)));
                     }
                 } else {
-                    message.addText(Color.translate(alertMessage.replace("%prefix%", CheckSettings.devAlertPrefix).replace("%check%", Color.Red + Color.Italics + getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", "N/A").replace("%info%", information))).addHoverText(Color.Gray + information);
+                    message.addText(Color.translate(alertMessage.replace("%prefix%", CheckSettings.devAlertPrefix).replace("%check%", Color.Red + Color.Italics + getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", "N/A").replace("%chance%", alertTier.getName()).replace("%info%", information))).addHoverText(Color.Gray + information);
 
                     dataToAlert.stream().filter(PlayerData::isDeveloperAlerts).forEach(data -> message.sendToPlayer(data.getPlayer()));
                 }
-                lastAlert.reset();
+                lastAlert = timeStamp;
             }
 
             if (CheckSettings.testMode && !data.isAlertsEnabled()) message.sendToPlayer(data.getPlayer());

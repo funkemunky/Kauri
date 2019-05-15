@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.movement.velocity;
 
+import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
@@ -38,7 +39,7 @@ public class VelocityB extends Check {
                     double threshold = (1 - aimove) / (getData().getLastAttack().hasNotPassed(1) ? 2 + (ticks * 0.03) : 1 + (ticks * 0.026));
                     if(quotient < threshold) {
                         if(vl++ >= 14.0D) {
-                            flag("velocity: " + MathUtils.round(quotient * 100.0D, 1) + "%", true, true);
+                            flag("velocity: " + MathUtils.round(quotient * 100.0D, 1) + "%", true, true, AlertTier.LIKELY);
                         }
                     } else {
                         vl -= vl > 0 ? 0.6 : 0;

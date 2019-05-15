@@ -1,6 +1,7 @@
 package cc.funkemunky.anticheat.impl.checks.movement.speed;
 
 import cc.funkemunky.anticheat.Kauri;
+import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
@@ -40,7 +41,7 @@ public class SpeedD extends Check {
 
         if (getData().getLastBlockPlace().hasPassed(8) && !move.isBlocksOnTop() && getData().getVelocityProcessor().getLastVelocity().hasPassed(6) && !getData().isGeneralCancel() && timeStamp > lastTimeStamp + 5 && delta > max) {
             if ((delta > max + 0.4) || verbose.flag(3, 400L)) {
-                flag(delta + ">-" + max + ";" + move.isServerOnGround(), true, true);
+                flag(delta + ">-" + max + ";" + move.isServerOnGround(), true, true, AlertTier.LIKELY);
             }
         }
 

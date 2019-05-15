@@ -1,9 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.player.badpackets;
 
-import cc.funkemunky.anticheat.api.checks.CancelType;
-import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckInfo;
-import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.anticheat.api.utils.Verbose;
@@ -37,7 +34,7 @@ public class BadPacketsI extends Check {
 
             if (delta == 0) {
                 if (verbose.flag(maxVL, resetTime, 2)) {
-                    flag(delta + "ms", true, true);
+                    flag(delta + "ms", true, true, AlertTier.HIGH);
                 }
             } else verbose.deduct(deduct);
             debug("USE: [" + (timeStamp - blockPlace) + "ms]");

@@ -1,9 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.movement.speed;
 
-import cc.funkemunky.anticheat.api.checks.CancelType;
-import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckInfo;
-import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
@@ -30,7 +27,7 @@ public class SpeedE extends Check {
 
         if(move.getDeltaXZ() > threshold) {
             if(Math.min(vl+= 2, 40) > 30) {
-                flag("speed=" + move.getDeltaXZ(), true, true);
+                flag("speed=" + move.getDeltaXZ(), true, true, AlertTier.HIGH);
             }
         } else vl-= vl > 0 ? 1 : 0;
 

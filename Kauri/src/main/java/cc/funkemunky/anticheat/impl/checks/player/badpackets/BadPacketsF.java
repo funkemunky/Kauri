@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.player.badpackets;
 
+import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
@@ -36,7 +37,7 @@ public class BadPacketsF extends Check {
                 val elapsed = timeStamp - lastReset;
                 if (elapsed < threshold) {
                     if (vl++ > maxVL) {
-                        flag(elapsed + "-<" + threshold, true, true);
+                        flag(elapsed + "-<" + threshold, true, true, AlertTier.HIGH);
                     }
                 } else {
                     vl -= vl > 0 ? 1 : 0;

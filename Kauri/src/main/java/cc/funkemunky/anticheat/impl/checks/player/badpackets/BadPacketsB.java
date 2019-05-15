@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.player.badpackets;
 
+import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
@@ -25,7 +26,7 @@ public class BadPacketsB extends Check {
             val move = getData().getMovementProcessor();
             if (!packetType.contains("Position") || (!move.isInLiquid() && move.isServerOnGround() && !move.isOnClimbable())) {
                 if (getData().getMovementProcessor().getDeltaXZ() > 0.1 && vl++ > vlThreshold) {
-                    flag(vl + ">-" + vlThreshold, true, true);
+                    flag(vl + ">-" + vlThreshold, true, true, AlertTier.POSSIBLE);
                 }
             } else vl = 0;
         }

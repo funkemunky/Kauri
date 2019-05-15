@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.player.badpackets;
 
+import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
@@ -33,7 +34,7 @@ public class BadPacketsA extends Check {
             WrappedInAbilitiesPacket abilities = new WrappedInAbilitiesPacket(packet, getData().getPlayer());
 
             if (abilities.isAllowedFlight() != lastAllowedFlight && abilities.isAllowedFlight() && !getData().isCreativeMode() && !serverSent) {
-                flag("fake news abilities packet", true, true);
+                flag("fake news abilities packet", true, true, AlertTier.HIGH);
                 getData().getPlayer().setAllowFlight(false);
             }
 

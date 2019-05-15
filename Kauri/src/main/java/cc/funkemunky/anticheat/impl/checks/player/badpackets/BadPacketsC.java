@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.player.badpackets;
 
+import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
@@ -21,7 +22,7 @@ public class BadPacketsC extends Check {
         val pitch = Math.abs(flying.getPitch());
 
         if (pitch > 90) {
-            flag(pitch + ">-90", true, true);
+            flag(pitch + ">-90", true, true, AlertTier.CERTAIN);
         }
     }
 

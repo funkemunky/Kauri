@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.movement.velocity;
 
+import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
@@ -30,7 +31,7 @@ public class VelocityA extends Check {
         if (packetType.equals(Packet.Server.ENTITY_VELOCITY)) {
             WrappedOutVelocityPacket velocity = new WrappedOutVelocityPacket(packet, getData().getPlayer());
 
-            if (velocity.getId() == velocity.getPlayer().getEntityId() && getData().getMovementProcessor().getFrom().getY() % 1 == 0 && getData().getMovementProcessor().isClientOnGround()) {
+            if (velocity.getId() == velocity.getPlayer().getEntityId()&& getData().getMovementProcessor().getFrom().getY() % 1 == 0 && getData().getMovementProcessor().isClientOnGround()) {
                 lastVelocity = (float) velocity.getY();
             }
         }
@@ -40,9 +41,11 @@ public class VelocityA extends Check {
 
             if (ratio < 1 && !getData().getMovementProcessor().isBlocksOnTop() && !getData().isAbleToFly()) {
                 if(vl++ > 4) {
-                    banUser();
-                } else {
-                    flag("velocity: " + percentage + "%", true, true);
+                    flag("velocity: " + percentage + "%", true, true, AlertTier.CERTAIN);
+                } else if(vl > 1) {
+                    flag("velocity: " + percentage + "%", true, true, AlertTier.HIGH);
+                }  else {
+                    flag("velocity: " + percentage + "%", true, true, AlertTier.POSSIBLE);
                 }
             } else {
                 vl -= vl > 0 ? 1 : 0;

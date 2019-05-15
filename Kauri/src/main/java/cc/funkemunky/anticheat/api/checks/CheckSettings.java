@@ -19,7 +19,7 @@ public class CheckSettings {
     static String devAlertPrefix = "&8[&c&lDEV&8]";
 
     @ConfigSetting(path = "alerts", name = "alertMessage")
-    static String alertMessage = "%prefix% &f%player% &7failed &f%check% &c(x%vl%)";
+    static String alertMessage = "%prefix% &f%player% &7failed &f%check% &8(&7vl=&f%vl&7, &7chance=&f%chance%&8)";
 
     @ConfigSetting(path = "executable.broadcast", name = "enabled")
     static boolean broadcastEnabled = false;

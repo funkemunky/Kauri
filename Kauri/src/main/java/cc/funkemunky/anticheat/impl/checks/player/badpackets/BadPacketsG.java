@@ -1,6 +1,7 @@
 package cc.funkemunky.anticheat.impl.checks.player.badpackets;
 
 import cc.funkemunky.anticheat.Kauri;
+import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
@@ -60,7 +61,7 @@ public class BadPacketsG extends Check {
 
         if (!MathUtils.approxEquals(deltaBalance, max, stdDev) && stdDev < max && getData().getLastLag().hasNotPassed(10)) {
             if (lastLag.hasPassed() && vl++ > maxVL) {
-                this.flag("S: " + stdDev, false, true);
+                this.flag("S: " + stdDev, false, true, vl > 60 ? AlertTier.HIGH : AlertTier.LIKELY);
             }
         } else vl -= vl > 0 ? 3 : 0;
 

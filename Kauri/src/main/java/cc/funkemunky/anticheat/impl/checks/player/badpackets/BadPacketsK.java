@@ -1,9 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.player.badpackets;
 
-import cc.funkemunky.anticheat.api.checks.CancelType;
-import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckInfo;
-import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockDigPacket;
@@ -27,7 +24,7 @@ public class BadPacketsK extends Check {
                 long delta = timeStamp - lastBlockPlace;
 
                 if(delta == 0) {
-                    flag("delta=0", true, true);
+                    flag("delta=0", true, true, AlertTier.HIGH);
                 }
 
                 debug("delta=" + delta);

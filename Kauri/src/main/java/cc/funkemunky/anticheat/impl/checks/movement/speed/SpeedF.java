@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.movement.speed;
 
+import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
@@ -24,7 +25,7 @@ public class SpeedF extends Check {
         val delta = MathUtils.getDelta(move.getDeltaXZ(), move.getLastDeltaXZ());
 
         if(delta > 0.7 * (getData().getMovementProcessor().getAirTicks() > 0 && getData().getMovementProcessor().getAirTicks() < 2 ? 2.5 : 1)) {
-            flag("delta=" + delta, true, true);
+            flag("delta=" + delta, true, true, AlertTier.LIKELY);
         }
     }
 
