@@ -54,7 +54,7 @@ public class KillauraE extends Check {
             val yawAverage = yawDeque.stream().mapToDouble(Float::floatValue).average().orElse(0.0);
 
             if ((pitchAverage >= 10.0F && yawAverage >= 5.6) && level.get() >= 3 && level.get() < 6) {
-                if(vl++ > 1) {
+                if(vl++ > 2) {
                     flag(pitchAverage + " -> " + yawAverage + " -> 0.0", false, false, AlertTier.HIGH);
                 } else flag(pitchAverage + " -> " + yawAverage + " -> 0.0", false, false, AlertTier.POSSIBLE);
             } else vl-= vl > 0 ? 1 : 0;
