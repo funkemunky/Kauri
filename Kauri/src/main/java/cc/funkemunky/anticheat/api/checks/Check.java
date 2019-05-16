@@ -80,6 +80,8 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
     private void banUser() {
         if(!getData().isBanned()) {
             getData().setBanned(true);
+            Kauri.getInstance().getStatsManager().addBan();
+            Kauri.getInstance().getLoggerManager().addBan(getData().getUuid(), this);
             new BukkitRunnable() {
                 public void run() {
                     getData().setBanned(false);

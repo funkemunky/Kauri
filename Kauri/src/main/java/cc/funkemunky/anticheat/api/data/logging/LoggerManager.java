@@ -9,18 +9,18 @@ import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.Priority;
 import lombok.Getter;
+import lombok.val;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Init(priority = Priority.HIGH)
 public class LoggerManager {
     @Getter
-    private Map<UUID, Map<String, Integer>> violations = new ConcurrentHashMap<>();
-    ;
+    private Map<UUID, Violation> violations = new ConcurrentHashMap<>();
+
+    @Getter
+    private Set<UUID> recentViolators = new LinkedHashSet<>();
 
     @ConfigSetting(path = "data.logging", name = "type")
     public String type = "FLATFILE";
@@ -40,10 +40,11 @@ public class LoggerManager {
             if (!toFormat[1].equals("banned")) {
                 UUID uuid = UUID.fromString(toFormat[0]);
 
-                Map<String, Integer> vls = violations.getOrDefault(uuid, new HashMap<>());
-
                 int vl = (int) database.getDatabaseValues().get(key);
-                vls.put(toFormat[1], vl);
+
+                Violation vls = violations.getOrDefault(uuid, new Violation());
+
+                vls.addViolation(toFormat[1], vl);
 
                 violations.put(uuid, vls);
             }
@@ -54,10 +55,10 @@ public class LoggerManager {
         Database database = Atlas.getInstance().getDatabaseManager().getDatabase("KauriLogs");
 
         violations.keySet().forEach(key -> {
-            Map<String, Integer> vls = violations.get(key);
+            val vls = violations.get(key);
 
-            vls.keySet().forEach(check -> {
-                int vl = vls.get(check);
+            vls.getViolations().keySet().forEach(check -> {
+                int vl = vls.getViolations().get(check);
 
                 database.inputField(key.toString() + ";" + check, vl);
             });
@@ -103,17 +104,17 @@ public class LoggerManager {
 
     public int addAndGetViolation(UUID uuid, Check check, int amount) {
         if (!violations.containsKey(uuid)) {
-            violations.put(uuid, new HashMap<>());
+            violations.put(uuid, new Violation());
         }
 
-        Map<String, Integer> vls = violations.get(uuid);
+        Violation vls = violations.get(uuid);
 
-        int vio;
-        vls.put(check.getName(), (vio = (vls.getOrDefault(check.getName(), 0) + amount)));
-
+        vls.addViolation(check.getName(), amount);
         violations.put(uuid, vls);
 
-        return vio;
+        recentViolators.add(uuid);
+
+        return vls.getViolation(check.getName());
     }
 
     public void clearLogs(UUID uuid) {
@@ -125,7 +126,7 @@ public class LoggerManager {
     }
 
     public Map<String, Integer> getViolations(UUID uuid) {
-        return violations.getOrDefault(uuid, new HashMap<>());
+        return violations.getOrDefault(uuid, new Violation()).getViolations();
     }
 
     public int getViolations(Check check, UUID uuid) {
