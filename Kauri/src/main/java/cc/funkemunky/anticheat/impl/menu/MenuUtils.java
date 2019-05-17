@@ -150,8 +150,6 @@ MenuUtils {
 
     public static void openRecentViolators(Player toOpen) {
         ChestMenu menu = new ChestMenu(Color.Dark_Gray + "Recent Violators", 5);
-
-        menu
     }
 
     private static Button checkButton(Check check, int page) {

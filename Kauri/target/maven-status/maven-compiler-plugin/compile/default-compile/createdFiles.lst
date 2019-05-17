@@ -47,6 +47,7 @@ cc\funkemunky\anticheat\api\data\processors\VelocityProcessor.class
 cc\funkemunky\anticheat\impl\checks\movement\fastladder\FastLadder.class
 cc\funkemunky\anticheat\impl\menu\InputHandler.class
 cc\funkemunky\anticheat\api\utils\menu\button\Button.class
+cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimN.class
 cc\funkemunky\anticheat\impl\checks\combat\autoclicker\AutoclickerG.class
 cc\funkemunky\anticheat\impl\listeners\FunkeListeners.class
 cc\funkemunky\anticheat\impl\pup\bot\ConsoleClient.class
@@ -156,6 +157,7 @@ cc\funkemunky\anticheat\impl\checks\movement\speed\SpeedD.class
 cc\funkemunky\anticheat\impl\menu\UpdateDataType.class
 cc\funkemunky\anticheat\impl\checks\combat\autoclicker\AutoclickerA.class
 cc\funkemunky\anticheat\api\utils\json\JSONWriter.class
+cc\funkemunky\anticheat\api\data\logging\Violation.class
 cc\funkemunky\anticheat\Kauri$1.class
 cc\funkemunky\anticheat\impl\checks\player\badpackets\BadPacketsI.class
 cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimF.class

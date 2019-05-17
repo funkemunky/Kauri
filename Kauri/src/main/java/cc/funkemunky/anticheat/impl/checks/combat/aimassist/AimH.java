@@ -50,7 +50,7 @@ public class AimH extends Check {
 
         if (pitchRatio > 100.F && yawChange > 2.f) {
             if (++vl > vlMax) {
-                this.flag("P: " + pitchRatio, true, true, AlertTier.POSSIBLE);
+                this.flag("P: " + pitchRatio, true, true, AlertTier.LIKELY);
             }
         } else {
             vl = 0;
