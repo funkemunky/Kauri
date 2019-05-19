@@ -15,7 +15,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
 import org.bukkit.util.Vector;
 
-@CheckInfo(name = "Reach", description = "A very accurate and fast 3.1 reach check.", type = CheckType.REACH, cancelType = CancelType.COMBAT, maxVL = 40)
+@CheckInfo(name = "Reach (Type A)", description = "A very accurate and fast 3.1 reach check.", type = CheckType.REACH, cancelType = CancelType.COMBAT, maxVL = 40)
 @Packets(packets = {Packet.Client.ARM_ANIMATION, Packet.Client.LOOK, Packet.Client.POSITION, Packet.Client.POSITION_LOOK, Packet.Client.FLYING, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION, Packet.Client.LEGACY_LOOK})
 @Init
 public class Reach extends Check {
@@ -26,14 +26,14 @@ public class Reach extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         if(getData().getPlayer().getGameMode().equals(GameMode.CREATIVE)) return;
         if(packetType.equals(Packet.Client.ARM_ANIMATION)) {
-            vl-= vl > 0 ? 0.02 : 0;
+            vl-= vl > 0 ? 0.01 : 0;
         } else {
             val target = getData().getTarget();
             val move = getData().getMovementProcessor();
             val velocity = getData().getVelocityProcessor();
 
             if(target != null && getData().getLastLogin().hasPassed(5) && !getData().isServerPos() && getData().getLastAttack().hasNotPassed(0) && getData().getTransPing() < 450) {
-                long range = (move.getYawDelta() > 4.5 ? 150 : move.getYawDelta() > 2.5 || velocity.getLastVelocity().hasNotPassed(8)  ? 100 : 50) + Math.abs(getData().getTransPing() - getData().getLastTransPing()) * 3;
+                long range = (move.getYawDelta() > 6 ? 150 : move.getYawDelta() > 4 ? 100 : 50) + Math.abs(getData().getTransPing() - getData().getLastTransPing()) * 3;
                 val location = getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), range);
                 val to = move.getTo().toLocation(target.getWorld()).clone().add(0, (getData().getPlayer().isSneaking() ? 1.54f : 1.62f), 0);
                 val trace = new RayTrace(to.toVector(), to.getDirection());
@@ -64,7 +64,11 @@ public class Reach extends Check {
                     if(vl++ > 12) {
                         flag("reach=" + distance, true, true, AlertTier.CERTAIN);
                     } else if(vl > 7.0F) {
-                        flag("reach=" + distance, true, true, distance > 3.1 ? AlertTier.HIGH : AlertTier.LIKELY);
+                        flag("reach=" + distance, true, true, AlertTier.HIGH);
+                    } else if(vl > 3) {
+                        flag("reach=" + distance, true, false, distance > 3.2 && vl > 5 ? AlertTier.LIKELY : AlertTier.POSSIBLE);
+                    } else {
+                        flag("reach=" + distance, true, false, AlertTier.LOW);
                     }
                 } else vl-= vl > 0 ? 0.05 : 0;
 

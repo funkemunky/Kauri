@@ -3,8 +3,12 @@ package cc.funkemunky.anticheat.api.utils;
 import cc.funkemunky.anticheat.api.checks.CheckSettings;
 import cc.funkemunky.anticheat.api.utils.json.JSONException;
 import cc.funkemunky.anticheat.api.utils.json.JSONObject;
+import cc.funkemunky.api.Atlas;
+import cc.funkemunky.api.database.Database;
+import cc.funkemunky.api.database.flatfile.FlatfileDatabase;
 import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.Init;
+import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -16,8 +20,35 @@ public class VPNUtils {
         return getResponse(player.getAddress().getAddress().getHostAddress());
     }
 
+    public void cacheReponse(VPNResponse reponse) {
+        Database database = Atlas.getInstance().getDatabaseManager().getDatabase("VPN-Cache");
+
+        try {
+            database.inputField(reponse.getIp(), reponse.toJson().toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public VPNResponse getIfCached(String ipAddress) {
+        Database database = Atlas.getInstance().getDatabaseManager().getDatabase("VPN-Cache");
+
+        if(database.getDatabaseValues().containsKey(ipAddress)) {
+            try {
+                return VPNResponse.fromJson((String) database.getField(ipAddress));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
     public VPNResponse getResponse(String ipAddress) {
         try {
+
+            val response = getIfCached(ipAddress);
+
+            if(response != null) return response;
 
             String license = !CheckSettings.override ? (Bukkit.getPluginManager().isPluginEnabled("KauriLoader") ? Bukkit.getPluginManager().getPlugin("KauriLoader").getConfig().getString("license") : "none") : CheckSettings.license;
 
@@ -28,7 +59,12 @@ public class VPNUtils {
             if (!object.has("ip")) {
                 return null;
             }
-            return VPNResponse.fromJson(object.toString());
+
+            val toCacheAndReturn = VPNResponse.fromJson(object.toString());
+
+            cacheReponse(toCacheAndReturn);
+
+            return toCacheAndReturn;
         } catch (IOException | JSONException e) {
             e.printStackTrace();
         }

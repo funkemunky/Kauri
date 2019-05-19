@@ -9,17 +9,24 @@ import cc.funkemunky.anticheat.impl.pup.bot.WorldLoader;
 import cc.funkemunky.anticheat.impl.pup.crashers.*;
 import cc.funkemunky.anticheat.impl.pup.exploits.BookEnchant;
 import cc.funkemunky.anticheat.impl.pup.vpn.AntiVPN;
+import cc.funkemunky.api.Atlas;
+import cc.funkemunky.api.database.DatabaseType;
+import cc.funkemunky.api.database.flatfile.FlatfileDatabase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class AntiPUPManager {
     private List<AntiPUP> antibot;
+    public ExecutorService pupThread = Executors.newFixedThreadPool(2);
 
     public AntiPUPManager() {
         antibot = registerMethods();
+        Atlas.getInstance().getDatabaseManager().createDatabase("VPN-Cache", DatabaseType.FLATFILE);
     }
 
     public List<AntiPUP> registerMethods() {

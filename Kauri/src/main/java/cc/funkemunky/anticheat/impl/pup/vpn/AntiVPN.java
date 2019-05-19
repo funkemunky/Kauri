@@ -7,9 +7,13 @@ import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.anticheat.api.utils.VPNResponse;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.utils.Color;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerPreLoginEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
@@ -37,32 +41,23 @@ public class AntiVPN extends AntiPUP {
     }
 
     @EventHandler(priority = EventPriority.LOW)
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        long timestamp = System.currentTimeMillis();
-        if(timestamp - Kauri.getInstance().lastLogin > 150L) {
-            FutureTask<Boolean> task = new FutureTask<Boolean>(() -> {
-                VPNResponse response = Kauri.getInstance().getVpnUtils().getResponse(event.getPlayer());
+    public void onPlayerJoin(PlayerLoginEvent event) {
+        Kauri.getInstance().getAntiPUPManager().pupThread.execute(() -> {
+            Kauri.getInstance().getProfiler().start("pup:AntiVpn:AsyncPlayerPreLoginEvent");
+            long timestamp = System.currentTimeMillis();
+            if(timestamp - Kauri.getInstance().lastLogin > 150L) {
+                VPNResponse response = Kauri.getInstance().getVpnUtils().getResponse(event.getAddress().getHostAddress());
 
-                if (response == null) return false;
+                if (response == null) return;
 
                 if (response.isProxy()) {
-                    new BukkitRunnable() {
-                        public void run() {
-                            event.getPlayer().kickPlayer(Color.translate(usingProxy));
-                        }
-                    }.runTask(Kauri.getInstance());
+                    Bukkit.getScheduler().runTask(Kauri.getInstance(), () -> event.getPlayer().kickPlayer(Color.translate(usingProxy)));
                 } else if (blockCountries.contains(response.getCountryCode())) {
-                    new BukkitRunnable() {
-                        public void run() {
-                            event.getPlayer().kickPlayer(Color.translate(blockedCountry.replaceAll("%countryName%", response.getCountryName())));
-                        }
-                    }.runTask(Kauri.getInstance());
+                    Bukkit.getScheduler().runTask(Kauri.getInstance(), () -> event.getPlayer().kickPlayer(Color.translate(blockedCountry.replaceAll("%countryName%", response.getCountryName()))));
                 }
-                return true;
-            });
-
-            Atlas.getInstance().getThreadPool().submit(task);
-        }
-        Kauri.getInstance().lastLogin = timestamp;
+            }
+            Kauri.getInstance().lastLogin = timestamp;
+            Kauri.getInstance().getProfiler().stop("pup:AntiVpn:AsyncPlayerPreLoginEvent");
+        });
     }
 }

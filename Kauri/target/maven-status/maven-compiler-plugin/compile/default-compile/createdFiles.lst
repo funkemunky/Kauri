@@ -14,6 +14,7 @@ cc\funkemunky\anticheat\impl\checks\player\badpackets\BadPacketsG.class
 cc\funkemunky\anticheat\impl\checks\movement\fly\FlyD.class
 cc\funkemunky\anticheat\impl\commands\kauri\arguments\BypassingArgument.class
 cc\funkemunky\anticheat\impl\listeners\PacketListeners$1.class
+cc\funkemunky\anticheat\impl\checks\combat\reach\ReachB.class
 cc\funkemunky\anticheat\impl\commands\kauri\arguments\DelayArgument.class
 cc\funkemunky\anticheat\api\utils\MathUtils.class
 cc\funkemunky\anticheat\impl\checks\movement\velocity\VelocityB.class
@@ -56,7 +57,6 @@ cc\funkemunky\dev\ToggleType.class
 cc\funkemunky\anticheat\impl\pup\crashers\CommandSpam.class
 cc\funkemunky\anticheat\impl\checks\movement\noslowdown\NoSlowdownC.class
 cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimK.class
-cc\funkemunky\anticheat\impl\pup\vpn\AntiVPN$1.class
 cc\funkemunky\anticheat\api\utils\json\HTTPTokener.class
 cc\funkemunky\anticheat\impl\listeners\BukkitListeners.class
 cc\funkemunky\anticheat\api\utils\Verbose.class
@@ -66,7 +66,6 @@ cc\funkemunky\anticheat\impl\menu\MenuUtils.class
 cc\funkemunky\anticheat\api\utils\Interval.class
 cc\funkemunky\anticheat\api\utils\DynamicRollingAverage.class
 cc\funkemunky\anticheat\api\utils\Setting.class
-cc\funkemunky\anticheat\impl\pup\vpn\AntiVPN$2.class
 cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimL.class
 cc\funkemunky\anticheat\api\utils\json\JSONString.class
 cc\funkemunky\anticheat\api\utils\MiscUtils.class

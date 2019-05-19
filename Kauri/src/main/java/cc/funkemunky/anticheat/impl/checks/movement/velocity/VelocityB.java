@@ -36,13 +36,13 @@ public class VelocityB extends Check {
                 double velocityXZ = MathUtils.hypot(velocityX, velocityZ) / (ticks > 0 ? 1.96 : 1) - (ticks * 0.026f);
                 if(move.getBlockAboveTicks() == 0 && move.getLiquidTicks() == 0 && move.getWebTicks() == 0 && velocityXZ > 0.15 && !move.isBlocksNear()) {
                     double quotient =  move.getDeltaXZ() / velocityXZ;
-                    double threshold = (1 - aimove) / (getData().getLastAttack().hasNotPassed(1) ? 2 + (ticks * 0.03) : 1 + (ticks * 0.026));
+                    double threshold = (1 - aimove) / (getData().getLastAttack().hasNotPassed(1) ? 1.95 + (ticks * 0.025) : 1 + (ticks * 0.026));
                     if(quotient < threshold) {
                         if(vl++ >= 14.0D) {
                             flag("velocity: " + MathUtils.round(quotient * 100.0D, 1) + "%", true, true, AlertTier.LIKELY);
                         }
                     } else {
-                        vl -= vl > 0 ? 0.6 : 0;
+                        vl -= vl > 0 ? 1.2 / (ticks < 1 ? 4 : 1) : 0;
                     }
 
                     debug("q=" + quotient + "/" + threshold + " vl=" + vl + " vel=" + velocityXZ + " dxz=" + move.getDeltaXZ());
