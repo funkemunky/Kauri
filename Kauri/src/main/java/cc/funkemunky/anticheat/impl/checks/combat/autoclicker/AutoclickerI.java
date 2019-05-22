@@ -37,11 +37,12 @@ public class AutoclickerI extends Check {
 
                 list.sort(Comparator.reverseOrder());
 
+                val average = list.stream().mapToDouble(val -> val).average().getAsDouble();
                 val range = Math.abs(list.get(0) - list.get(list.size() - 1));
                 val pct = MathUtils.round(count / (double) list.size() * 100, 3);
                 val stdDelta = MathUtils.getDelta(stddev, lastStd);
 
-                if(pct < 75 && stdDelta < 0.5) {
+                if(range < 1 && stdDelta < 0.5) {
                     if(vl++ > 10) {
                         flag("pct=" + pct + "%, std=" + stdDelta, true, true, AlertTier.CERTAIN);
                     } else if(vl > 6) {

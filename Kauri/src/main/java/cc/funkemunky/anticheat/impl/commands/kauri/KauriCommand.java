@@ -28,8 +28,9 @@ public class KauriCommand extends FunkeCommand {
         getArguments().add(new UpdateConfigArgument(this, "updateconfig", "updateConfig <config/messages> [args]", "update certain or all parts of a config", "kauri.updateConfig"));
         getArguments().add(new BoxWandArgument(this, "boxwand", "boxwand", "receive the magic box wand.", "kauri.boxwand"));
         getArguments().add(new BypassingArgument(this, "bypass", "bypass <player> [boolean]", "set a player to bypass detection without permissions.", "kauri.bypass.command"));
-        getArguments().add(new AntiVpnArgument(this, "antivpn", "antivpn <args>", "manage the antivpn."));
+        getArguments().add(new AntiVpnArgument(this, "antivpn", "antivpn <args>", "manage the antivpn.", "kauri.antivpn"));
         getArguments().add(new BanwaveArgument(this, "banwave", "banwave", "force a ban wave to run.", "kauri.banwave"));
+        getArguments().add(new VelocityArgument(this, "velocity", "velocity <xz> <y>", "apply velocity.", "kauri.velocity"));
 
         getArguments().forEach(argument -> {
             Arrays.stream(argument.getClass().getDeclaredFields()).filter(field -> field.getAnnotations().length > 0).forEach(field -> {

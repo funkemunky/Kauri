@@ -70,7 +70,7 @@ public class Reach extends Check {
                     } else {
                         flag("reach=" + distance, true, false, AlertTier.LOW);
                     }
-                } else vl-= vl > 0 ? 0.05 : 0;
+                } else vl-= vl > 0 ? 0.1 : 0;
 
                 debug((distance > 3 ? Color.Green : "") + "distance=" + distance + " vl=" + vl + " range=" + range);
             }

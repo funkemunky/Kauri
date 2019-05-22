@@ -98,6 +98,7 @@ cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimA.class
 cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimM.class
 cc\funkemunky\anticheat\impl\commands\kauri\AlertsCommand.class
 cc\funkemunky\anticheat\impl\checks\combat\autoclicker\AutoclickerC.class
+cc\funkemunky\anticheat\impl\commands\kauri\arguments\VelocityArgument.class
 cc\funkemunky\anticheat\Kauri$2.class
 cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimG.class
 cc\funkemunky\anticheat\impl\checks\movement\noslowdown\NoSlowdownB.class
@@ -134,6 +135,7 @@ cc\funkemunky\anticheat\Kauri$3.class
 cc\funkemunky\anticheat\api\utils\Message.class
 cc\funkemunky\anticheat\impl\checks\movement\speed\SpeedF.class
 cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimC.class
+cc\funkemunky\anticheat\impl\checks\movement\motion\MotionB.class
 cc\funkemunky\anticheat\api\data\processors\ActionProcessor.class
 cc\funkemunky\anticheat\impl\checks\combat\autoclicker\DoubleClick.class
 cc\funkemunky\anticheat\impl\checks\combat\autoclicker\AutoclickerD.class

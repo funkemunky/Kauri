@@ -145,14 +145,23 @@ public class MovementProcessor {
             if (hasJumped) {
                 serverYVelocity = Math.min(deltaY, 0.42f);
             } else if (inAir) {
-                serverYVelocity -= 0.08f;
-                serverYVelocity *= 0.98f;
+                float newY = (serverYVelocity - 0.08f) * 0.98f;
+
+                serverYVelocity = Math.min(getDistanceToNearestBlock(data), newY);
             } else {
                 serverYVelocity = 0;
             }
 
+            if(data.getVelocityProcessor().getLastVelocity().hasNotPassed(1)) {
+                serverYVelocity = data.getVelocityProcessor().getMotionY();
+            }
+
             if (getLastFlightToggle().hasNotPassed(3)) {
                 serverYVelocity = deltaY;
+            }
+
+            if(Math.abs(serverYVelocity) < 0.005) {
+                serverYVelocity = 0;
             }
 
             lastServerYAcceleration = serverYAcceleration;
@@ -215,6 +224,14 @@ public class MovementProcessor {
 
         pastLocation.addLocation(new CustomLocation(to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch()));
         data.setGeneralCancel(data.isServerPos() || data.isLagging() || getLastFlightToggle().hasNotPassed(8) || !chunkLoaded || packet.getPlayer().getAllowFlight() || packet.getPlayer().getActivePotionEffects().stream().anyMatch(effect -> effect.getType().getName().toLowerCase().contains("levi")) || packet.getPlayer().getGameMode().toString().contains("CREATIVE") || packet.getPlayer().getGameMode().toString().contains("SPEC") || lastVehicle.hasNotPassed() || getLastRiptide().hasNotPassed(10) || data.getLastLogin().hasNotPassed(50) || data.getVelocityProcessor().getLastVelocity().hasNotPassed(25));
+    }
+
+    private float getDistanceToNearestBlock(PlayerData data) {
+        BoundingBox box = data.getBoundingBox().subtract(0, Math.min(2, Math.abs(serverYVelocity)), 0,0,0,0);
+
+        val colliding = box.getCollidingBlockBoxes(data.getPlayer());
+
+        return (float) colliding.stream().mapToDouble(cBox -> MathUtils.getDelta(to.getY(), cBox.maxY)).min().orElse(100);
     }
 
     public boolean isNearGround(PlayerData data, float amount) {

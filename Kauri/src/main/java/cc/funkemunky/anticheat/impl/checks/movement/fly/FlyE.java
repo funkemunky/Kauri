@@ -24,13 +24,9 @@ public class FlyE extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        if (MiscUtils.cancelForFlight(getData(), 15, false)) return;
+        if (MiscUtils.cancelForFlight(getData(), -1, false)) return;
 
-        if (move.getAirTicks() > 1 && !move.isClientOnGround() && !move.isServerOnGround() && !MathUtils.approxEquals(0.1, move.getClientYAcceleration(), move.getServerYAcceleration()) && !MathUtils.approxEquals(0.2, move.getServerYVelocity(), move.getDeltaY())) {
-            if(verbose.flag(4, 1000L)) {
-                flag(move.getDeltaY() + ">-" + move.getServerYVelocity(), true, true, AlertTier.LIKELY);
-            }
-        }
+        debug(move.getDeltaY() + ", " + move.getServerYVelocity());
     }
 
     @Override
