@@ -46,20 +46,20 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
             JsonMessage message = new JsonMessage();
 
             long timeStamp = System.currentTimeMillis();
+            if (cancel && cancellable) data.setCancelType(cancelType);
+            if (ban) {
+                if(!data.isLagging()) {
+                    vl++;
+                    Kauri.getInstance().getStatsManager().addFlag();
+                }
+                Kauri.getInstance().getLoggerManager().addViolation(data.getUuid(), this);
+            }
+            if (alertTier.equals(AlertTier.CERTAIN) || (vl > maxVL && executable && ban && !developer && !getData().isBanned())) {
+                banUser();
+            }
             if (timeStamp - lastAlert > CheckSettings.alertsDelay) {
                 val dataToAlert = Kauri.getInstance().getDataManager().getDataObjects().keySet().stream().map(key -> Kauri.getInstance().getDataManager().getDataObjects().get(key)).filter(data -> data.getAlertTier() != null && data.getPlayer().hasPermission("kauri.alerts")).collect(Collectors.toList());
                 if (!developer && Kauri.getInstance().getTps() > CheckSettings.tpsThreshold) {
-                    if (cancel && cancellable) data.setCancelType(cancelType);
-                    if (ban) {
-                        if(!data.isLagging()) {
-                            vl++;
-                            Kauri.getInstance().getStatsManager().addFlag();
-                        }
-                        Kauri.getInstance().getLoggerManager().addViolation(data.getUuid(), this);
-                    }
-                    if (alertTier.equals(AlertTier.CERTAIN) || (vl > maxVL && executable && ban && !developer && !getData().isBanned())) {
-                        banUser();
-                    }
                     message.addText(Color.translate(alertMessage.replace("%prefix%", CheckSettings.alertPrefix).replace("%check%", getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", String.valueOf(vl)).replace("%info%", information).replace("%chance%", alertTier.getName()))).addHoverText(Color.Gray + information);
 
                     dataToAlert.stream().filter(data2 -> data2.getAlertTier().getPriority() <= alertTier.getPriority()).forEach(data2 -> message.sendToPlayer(data2.getPlayer()));

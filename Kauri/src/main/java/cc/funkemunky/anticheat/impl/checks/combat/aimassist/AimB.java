@@ -32,9 +32,9 @@ public class AimB extends Check {
                     && move.getYawDelta() < 10
                     && move.getOptifineTicks() < 10
                     && pitchGCD < 131072L) {
-                if(vl++ > 80) {
+                if(vl++ > 60) {
                     flag(String.valueOf(pitchGCD / 2000), true, true, AlertTier.CERTAIN);
-                } else if (vl > 55) {
+                } else if (vl > 40) {
                     flag(String.valueOf(pitchGCD / 2000), true, true, AlertTier.HIGH);
                 } else if(vl > 30) {
                     flag(String.valueOf(pitchGCD / 2000), true, false, AlertTier.LIKELY);
