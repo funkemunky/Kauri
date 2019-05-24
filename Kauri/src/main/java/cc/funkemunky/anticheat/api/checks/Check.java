@@ -84,7 +84,6 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
             Kauri.getInstance().getLoggerManager().addBan(getData().getUuid(), this);
             new BukkitRunnable() {
                 public void run() {
-                    getData().setBanned(false);
                     execCommand.forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replace("%player%", getData().getPlayer().getName()).replace("%check%", getName())));
                     getData().getPacketChecks().values().forEach(checkList -> checkList.forEach(check -> check.vl = 0));
                     getData().getBukkitChecks().values().forEach(checkList -> checkList.forEach(check -> check.vl = 0));

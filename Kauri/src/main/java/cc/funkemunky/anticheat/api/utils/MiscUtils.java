@@ -107,6 +107,7 @@ public class MiscUtils {
                 || (move.isServerOnGround() && move.isOnHalfBlock())
                 || (move.isServerOnGround() && groundCheck)
                 || move.isRiptiding()
+                || move.isBlocksOnTop()
                 || move.isOnSlimeBefore()
                 || move.getLastRiptide().hasNotPassed(8)
                 || move.isPistonsNear()

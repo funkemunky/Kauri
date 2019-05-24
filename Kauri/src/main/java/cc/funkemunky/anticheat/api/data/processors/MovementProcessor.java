@@ -145,9 +145,15 @@ public class MovementProcessor {
             if (hasJumped) {
                 serverYVelocity = Math.min(deltaY, 0.42f);
             } else if (inAir) {
-                float newY = (serverYVelocity - 0.08f) * 0.98f;
+                serverYVelocity = (serverYVelocity - 0.08f) * 0.98f;
 
-                serverYVelocity = Math.min(getDistanceToNearestBlock(data), newY);
+                if(Math.abs(serverYVelocity) < 0.005) {
+                    serverYVelocity = 0;
+                }
+
+                if(deltaXZ == 0 & serverYVelocity == 0) {
+                    serverYVelocity = (serverYVelocity - 0.08f) * 0.98f;
+                }
             } else {
                 serverYVelocity = 0;
             }
@@ -158,10 +164,6 @@ public class MovementProcessor {
 
             if (getLastFlightToggle().hasNotPassed(3)) {
                 serverYVelocity = deltaY;
-            }
-
-            if(Math.abs(serverYVelocity) < 0.005) {
-                serverYVelocity = 0;
             }
 
             lastServerYAcceleration = serverYAcceleration;

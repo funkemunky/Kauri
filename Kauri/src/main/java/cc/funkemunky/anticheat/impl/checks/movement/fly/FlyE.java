@@ -25,10 +25,10 @@ public class FlyE extends Check {
 
         val delta = MathUtils.getDelta(move.getDeltaY(), move.getServerYVelocity());
 
-        val max = 0.02 + (getData().getVelocityProcessor().getLastVelocity().hasNotPassed(20) ? Math.max(getData().getVelocityProcessor().getMaxVertical(), 0.3) : 0);
+        val max = 0.02 + (getData().getVelocityProcessor().getLastVelocity().hasNotPassed(20) ? 0.8 + Math.max(0, getData().getVelocityProcessor().getMotionY()) : 0);
 
-        if(delta > max) {
-            if(delta > 1 + max || verbose.flag(5, 500L)) {
+        if(delta > max && !move.isInsideBlock()) {
+            if(delta > 1.4 + max || verbose.flag(5, 500L)) {
                 flag(move.getDeltaY() + ">-" + move.getServerYVelocity(), true, true, AlertTier.LIKELY);
             }
         }
