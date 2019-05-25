@@ -255,6 +255,18 @@ public class MiscUtils {
         }
     }
 
+    public static float getFrictionFactor(PlayerData data) {
+        val move = data.getMovementProcessor();
+
+        if(move.isOnIce()) {
+            return 0.98f;
+        } else if(move.isOnSlime()) {
+            return 0.8f;
+        } else {
+            return 0.6f;
+        }
+    }
+
     private static Plugin getPlugin(final String p) {
         for (final Plugin pl : Atlas.getInstance().getServer().getPluginManager().getPlugins()) {
             if (pl.getDescription().getName().equalsIgnoreCase(p)) {
