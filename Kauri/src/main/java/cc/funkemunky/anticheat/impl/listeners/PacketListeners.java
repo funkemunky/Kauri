@@ -201,7 +201,7 @@ public class PacketListeners implements AtlasListener {
                 }
             }
             debug(event.getType(), data);
-            hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
+            hopper(event.getPacket(), event.getType().replace(Packet.Client.LEGACY_LOOK, Packet.Client.LOOK).replace(Packet.Client.LEGACY_POSITION, Packet.Client.POSITION).replace(Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.POSITION_LOOK), event.getTimeStamp(), data);
             if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
         }
         Kauri.getInstance().getProfiler().stop("event:PacketReceiveEvent");

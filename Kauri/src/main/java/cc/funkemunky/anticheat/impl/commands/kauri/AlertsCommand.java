@@ -16,7 +16,8 @@ import java.util.Arrays;
 @Init(commands = true)
 public class AlertsCommand {
 
-    @Command(name = "alerts", description = "Toggle the alerts for Kauri.", tabCompletions = {"alerts.dev", "alerts.off", "alerts.low", "alerts.likely", "alerts.possible", "alerts.high"}, aliases = {"togglealerts", "talerts", "ta"}, permission = {"kauri.alerts", "kauri.staff"}, playerOnly = true)
+    //tabCompletions = {"alerts.dev", "alerts.off", "alerts.low", "alerts.likely", "alerts.possible", "alerts.high"}
+    @Command(name = "alerts", description = "Toggle the alerts for Kauri.", aliases = {"togglealerts", "talerts", "ta"}, permission = {"kauri.alerts", "kauri.staff"}, playerOnly = true)
     public void onAlerts(CommandAdapter command) {
         Player player = command.getPlayer();
         PlayerData data = Kauri.getInstance().getDataManager().getPlayerData(player.getUniqueId());
