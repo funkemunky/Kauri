@@ -30,7 +30,7 @@ public class AutoclickerK extends Check {
             double std = Math.sqrt(list.stream().mapToDouble(val -> Math.pow(val - average, 2)).average().orElse(0));
             double stdDelta = Math.abs(std - lastStd), avgDelta = Math.abs(average - lastAverage);
 
-            if(stdDelta < 5 && average > 50 && average < 120) {
+            if(stdDelta < 5 && average > 65 && average < 120) {
                 if(avgDelta > 5) {
                     if(vl++ > 5) {
                         flag("avg=" + average + " std=" + std + "% delta=" + stdDelta, true, true, AlertTier.CERTAIN);

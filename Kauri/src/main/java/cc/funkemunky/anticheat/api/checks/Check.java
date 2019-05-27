@@ -96,7 +96,7 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
     }
 
     public void loadFromConfig() {
-        Map<String, Object> values = new HashMap<>();
+        LinkedHashMap<String, Object> values = new LinkedHashMap<>();
         String path = "checks." + name;
         values.put(path + ".maxVL", maxVL);
         values.put(path + ".enabled", enabled);

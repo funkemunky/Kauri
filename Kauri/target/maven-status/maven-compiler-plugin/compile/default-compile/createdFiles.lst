@@ -25,12 +25,10 @@ cc\funkemunky\anticheat\api\utils\menu\Menu$CloseHandler.class
 cc\funkemunky\anticheat\api\utils\URLUtils.class
 cc\funkemunky\anticheat\impl\checks\combat\autoclicker\AutoclickerE.class
 cc\funkemunky\anticheat\impl\commands\kauri\arguments\LogArgument.class
-cc\funkemunky\anticheat\impl\checks\player\badpackets\BadPacketsL.class
 cc\funkemunky\dev\exceptions\CheckDoesNotExistException.class
 cc\funkemunky\anticheat\api\utils\ItemBuilder.class
 cc\funkemunky\anticheat\api\utils\json\JSONObject.class
 cc\funkemunky\anticheat\api\checks\Check.class
-cc\funkemunky\anticheat\impl\checks\movement\groundspoof\GroundSpoof.class
 cc\funkemunky\anticheat\impl\checks\combat\autoclicker\AutoclickerK.class
 cc\funkemunky\anticheat\api\data\banwave\BanwaveConfig.class
 cc\funkemunky\anticheat\impl\checks\movement\fly\FlyE.class
@@ -74,6 +72,7 @@ cc\funkemunky\anticheat\api\utils\DynamicRollingAverage.class
 cc\funkemunky\anticheat\api\utils\Setting.class
 cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimL.class
 cc\funkemunky\anticheat\api\utils\json\JSONString.class
+cc\funkemunky\anticheat\impl\checks\movement\groundspoof\GroundSpoofB.class
 cc\funkemunky\anticheat\api\utils\MiscUtils.class
 cc\funkemunky\anticheat\api\utils\json\JSONObject$Null.class
 cc\funkemunky\dev\KauriAPI.class
@@ -103,6 +102,7 @@ cc\funkemunky\anticheat\impl\checks\combat\hitboxes\HitBox.class
 cc\funkemunky\anticheat\api\data\PlayerData.class
 cc\funkemunky\anticheat\api\utils\CollisionAssessment.class
 cc\funkemunky\anticheat\api\utils\json\XML.class
+cc\funkemunky\anticheat\impl\checks\movement\groundspoof\GroundSpoofA.class
 cc\funkemunky\anticheat\impl\checks\player\badpackets\BadPacketsD.class
 cc\funkemunky\anticheat\impl\pup\crashers\ChatSpam.class
 cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimA.class
@@ -113,6 +113,7 @@ cc\funkemunky\anticheat\impl\commands\kauri\arguments\VelocityArgument.class
 cc\funkemunky\anticheat\Kauri$2.class
 cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimG.class
 cc\funkemunky\anticheat\impl\checks\movement\noslowdown\NoSlowdownB.class
+cc\funkemunky\anticheat\impl\checks\movement\speed\SpeedG.class
 cc\funkemunky\anticheat\impl\checks\movement\fly\FlyG.class
 cc\funkemunky\anticheat\impl\checks\combat\criticals\Criticals.class
 cc\funkemunky\anticheat\impl\checks\movement\fly\FlyF.class

@@ -1,4 +1,4 @@
-package cc.funkemunky.anticheat.impl.checks.player.badpackets;
+package cc.funkemunky.anticheat.impl.checks.movement.groundspoof;
 
 import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.Check;
@@ -15,10 +15,10 @@ import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
 import org.bukkit.event.Event;
 
-@CheckInfo(name = "BadPackets (Type L)", description = "Shit", type = CheckType.BADPACKETS)
+@CheckInfo(name = "BadPackets (Type L)", description = "Ensures the fall distance is what it should be.", type = CheckType.MOVEMENT)
 @Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION})
 @Init
-public class BadPacketsL extends Check {
+public class GroundSpoofB extends Check {
 
     private float lastFallDistance = 0;
     private Verbose verbose = new Verbose();
