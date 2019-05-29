@@ -26,16 +26,15 @@ public class Reach extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         if(getData().getPlayer().getGameMode().equals(GameMode.CREATIVE)) return;
         if(packetType.equals(Packet.Client.ARM_ANIMATION)) {
-            vl-= vl > 0 ? 0.01 : 0;
+            vl-= vl > 0 ? 0.025 : 0;
         } else {
             val target = getData().getTarget();
             val move = getData().getMovementProcessor();
-            val velocity = getData().getVelocityProcessor();
 
             if(target != null && getData().getLastLogin().hasPassed(5) && !getData().isServerPos() && getData().getLastAttack().hasNotPassed(0) && getData().getTransPing() < 450) {
-                long range = (move.getYawDelta() > 6 ? 150 : move.getYawDelta() > 4 ? 100 : 50) + Math.abs(getData().getTransPing() - getData().getLastTransPing()) * 3;
+                long range = (move.getYawDelta() > 4 ? 150 : 100) + Math.abs(getData().getTransPing() - getData().getLastTransPing()) * 3;
                 val location = getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), range);
-                val to = move.getTo().toLocation(target.getWorld()).clone().add(0, (getData().getPlayer().isSneaking() ? 1.54f : 1.62f), 0);
+                val to = getData().getPlayer().getEyeLocation();
                 val trace = new RayTrace(to.toVector(), to.getDirection());
 
                 val calcDistance = target.getLocation().distance(to);
@@ -50,7 +49,7 @@ public class Reach extends Check {
                     return;
                 }
 
-                val traverse = trace.traverse(calcDistance * 1.5, 0.1);
+                val traverse = trace.traverse(calcDistance * 1.25, 0.1);
                 float distance = (float)traverse.stream()
                         .filter((vec) -> location.stream().anyMatch((loc) -> getHitbox(target, loc).intersectsWithBox(vec)))
                         .mapToDouble((vec) -> vec.distance(to.toVector()))
@@ -84,6 +83,6 @@ public class Reach extends Check {
 
     private BoundingBox getHitbox(LivingEntity entity, CustomLocation l) {
         Vector dimensions = MiscUtils.entityDimensions.getOrDefault(entity.getType(), new Vector(0.35F, 1.85F, 0.35F));
-        return (new BoundingBox(l.toVector(), l.toVector())).grow(0.1F, 0.1F, 0.1F).grow((float)dimensions.getX(), 0.0F, (float)dimensions.getZ()).add(0.0F, 0.0F, 0.0F, 0.0F, (float)dimensions.getY(), 0.0F);
+        return (new BoundingBox(l.toVector(), l.toVector())).grow(0.15F, 0.15F, 0.15F).grow((float)dimensions.getX(), 0.0F, (float)dimensions.getZ()).add(0.0F, 0.0F, 0.0F, 0.0F, (float)dimensions.getY(), 0.0F);
     }
 }

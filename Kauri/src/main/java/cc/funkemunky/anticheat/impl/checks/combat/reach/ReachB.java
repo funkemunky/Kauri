@@ -54,6 +54,6 @@ public class ReachB extends Check {
 
     private BoundingBox getHitbox(LivingEntity entity, CustomLocation l) {
         Vector dimensions = MiscUtils.entityDimensions.getOrDefault(entity.getType(), new Vector(0.35F, 1.85F, 0.35F));
-        return (new BoundingBox(l.toVector(), l.toVector())).grow(0.1F, 0.1F, 0.1F).grow((float)dimensions.getX(), 0.0F, (float)dimensions.getZ()).add(0.0F, 0.0F, 0.0F, 0.0F, (float)dimensions.getY(), 0.0F);
+        return (new BoundingBox(l.toVector(), l.toVector())).grow(0.15F, 0.15F, 0.15F).grow((float)dimensions.getX(), 0.0F, (float)dimensions.getZ()).add(0.0F, 0.0F, 0.0F, 0.0F, (float)dimensions.getY(), 0.0F);
     }
 }
