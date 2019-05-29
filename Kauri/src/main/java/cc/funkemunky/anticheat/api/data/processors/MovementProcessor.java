@@ -21,7 +21,7 @@ import java.util.List;
 @Getter
 public class MovementProcessor {
     private boolean lastFlight, flight, isLagging, clientOnGround, serverOnGround, fullyInAir, inAir, hasJumped, inLiquid, blocksOnTop, pistonsNear, onHalfBlock,
-            onClimbable, onIce, collidesHorizontally, inWeb, onSlime, onSlimeBefore, onSoulSand, isRiptiding, halfBlocksAround, isNearGround, isInsideBlock, blocksNear, blocksAround;
+            onClimbable, onIce, collidesHorizontally, tookVelocity, inWeb, onSlime, onSlimeBefore, onSoulSand, isRiptiding, halfBlocksAround, isNearGround, isInsideBlock, blocksNear, blocksAround;
     private int airTicks, groundTicks, iceTicks, climbTicks, halfBlockTicks, soulSandTicks, blockAboveTicks, optifineTicks, liquidTicks, webTicks, yawZeroTicks, pitchZeroTicks;
     private float deltaY, lastDeltaXZ, yawDelta, pitchDelta, lastYawDelta, lastPitchDelta, lastDeltaY, deltaXZ, distanceToGround, serverYVelocity, lastServerYVelocity, serverYAcceleration, clientYAcceleration, lastClientYAcceleration, lastServerYAcceleration, jumpVelocity, cinematicYawDelta, cinematicPitchDelta, lastCinematicPitchDelta, lastCinematicYawDelta;
     private CustomLocation from, to;
@@ -91,6 +91,7 @@ public class MovementProcessor {
                     groundTicks = 0;
                 }
             }
+            tookVelocity = System.currentTimeMillis() - data.getVelocityProcessor().getLastVelocityTimestamp() < 100L;
             jumpVelocity = 0.42f + (PlayerUtils.getPotionEffectLevel(packet.getPlayer(), PotionEffectType.JUMP) * 0.1f);
 
             val vecStream = data.getTeleportLocations().stream().filter(vec -> vec.distance(to.toVector()) < 0.45).findFirst().orElse(null);
@@ -177,6 +178,8 @@ public class MovementProcessor {
 
             lastTimeStamp = timeStamp;
 
+            if(data.isLoggedIn() && data.getLastLogin().hasPassed(2)) data.setLoggedIn(false);
+
 
             iceTicks = onIce ? Math.min(40, iceTicks + 1) : Math.max(0, iceTicks - 1);
             climbTicks = onClimbable ? Math.min(40, climbTicks + 1) : Math.max(0, climbTicks - 1);
@@ -185,8 +188,9 @@ public class MovementProcessor {
             liquidTicks = inLiquid ? Math.min(50, liquidTicks + 1) : Math.max(0, liquidTicks - 1);
             soulSandTicks = onSoulSand ? Math.min(40, soulSandTicks + 1) : Math.max(0, soulSandTicks - 1);
             webTicks = inWeb ? Math.min(30, webTicks + 1) : Math.max(webTicks, webTicks - 1);
+        } else if(!packet.isLook() && data.isLoggedIn()) {
+            data.getLastLogin().reset();
         }
-
         if (player.getVehicle() != null || PlayerUtils.isGliding(player)) lastVehicle.reset();
 
         if (packet.isLook()) {
@@ -199,7 +203,7 @@ public class MovementProcessor {
             lastPitchDelta = pitchDelta;
             float yawDelta = this.yawDelta = MathUtils.getDelta(to.getYaw(), from.getYaw()), pitchDelta = this.pitchDelta = MathUtils.getDelta(to.getPitch(), from.getPitch());
             float smooth = data.getYawSmooth().smooth(yawDelta, MiscUtils.convertToMouseDelta(yawDelta)), smooth2 = data.getPitchSmooth().smooth(pitchDelta, MiscUtils.convertToMouseDelta(pitchDelta));
-
+            if(data.isLoggedIn()) data.setLoggedIn(false);
             val smoothDelta = MathUtils.getDelta(yawDelta, smooth);
             val smoothDelta2 = MathUtils.getDelta(pitchDelta, smooth2);
 

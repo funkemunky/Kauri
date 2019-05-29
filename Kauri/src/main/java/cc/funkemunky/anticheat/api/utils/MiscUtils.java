@@ -99,6 +99,7 @@ public class MiscUtils {
                 || move.getLastVehicle().hasNotPassed(5)
                 || move.getLiquidTicks() > 0
                 || move.getWebTicks() > 0
+                || move.isTookVelocity()
                 || !Atlas.getInstance().getBlockBoxManager().getBlockBox().isChunkLoaded(data.getPlayer().getLocation())
                 || data.getLastLogin().hasNotPassed(50)
                 || move.getClimbTicks() > 0

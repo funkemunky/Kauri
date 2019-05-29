@@ -37,7 +37,7 @@ public class PlayerData {
     private String specificPacketDebug = "";
     private boolean debuggingBox, debuggingPackets, banned = false, developerAlerts,
             ableToFly, creativeMode, invulnerable, flying, generalCancel, breakingBlock,
-            cinematicMode, lagging, alertsEnabled, inventoryOpen, isPosition;
+            cinematicMode, lagging, alertsEnabled, inventoryOpen, isPosition, loggedIn;
     private Player player;
 
     private Map<String, List<Check>> packetChecks = new HashMap<>();
@@ -73,6 +73,7 @@ public class PlayerData {
         this.uuid = uuid;
         this.player = Bukkit.getPlayer(uuid);
         lastLogin.reset();
+        loggedIn = true;
 
         if (CheckSettings.enableOnJoin && player.hasPermission("kauri.alerts")) alertsEnabled = true;
 

@@ -16,6 +16,7 @@ public class VelocityProcessor {
     private float maxVertical, maxHorizontal, motionX, motionY, motionZ, lastMotionX, lastMotionY, lastMotionZ;
     public double velocityX, velocityY, velocityZ;
     private PlayerData data;
+    private long lastVelocityTimestamp;
     private boolean attackedSinceVelocity;
     private TickTimer lastVelocity = new TickTimer(40);
 
@@ -27,7 +28,10 @@ public class VelocityProcessor {
         maxVertical = motionY = (float) packet.getY();
         maxHorizontal = (float) cc.funkemunky.anticheat.api.utils.MiscUtils.hypot(packet.getX(), packet.getZ());
 
-        if (packet.getId() == packet.getPlayer().getEntityId()) lastVelocity.reset();
+        if (packet.getId() == packet.getPlayer().getEntityId()) {
+            lastVelocity.reset();
+            lastVelocityTimestamp = System.currentTimeMillis();
+        }
 
         if (data.getMovementProcessor().isClientOnGround() && data.getMovementProcessor().getFrom().getY() % 1 == 0) {
             velocityX = packet.getX();
