@@ -8,10 +8,10 @@ import cc.funkemunky.api.utils.Init;
 import lombok.val;
 import org.bukkit.event.Event;
 
-@CheckInfo(name = "GroundSpoof", type = CheckType.MOVEMENT, cancelType = CancelType.MOTION)
+@CheckInfo(name = "GroundSpoofA (Type A)", type = CheckType.MOVEMENT, cancelType = CancelType.MOTION)
 @Init
 @Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION})
-public class GroundSpoof extends Check {
+public class GroundSpoofA extends Check {
 
     private Verbose verbose = new Verbose();
 
