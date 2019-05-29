@@ -33,7 +33,7 @@ public class KillauraB extends Check {
 
             if (useEntity.getAction() == WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK) {
                 if (!swing) {
-                    if (++vl >= 4) {
+                    if (++vl > 6) {
                         this.flag("FALSE", false, true, AlertTier.HIGH);
                     }
                 } else {
