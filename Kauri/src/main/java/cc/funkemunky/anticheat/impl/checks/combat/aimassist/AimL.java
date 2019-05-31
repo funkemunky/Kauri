@@ -1,95 +1,72 @@
 package cc.funkemunky.anticheat.impl.checks.combat.aimassist;
 
-import cc.funkemunky.anticheat.api.checks.AlertTier;
-import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckInfo;
-import cc.funkemunky.anticheat.api.checks.CheckType;
-import cc.funkemunky.anticheat.api.utils.BukkitEvents;
-import cc.funkemunky.anticheat.api.utils.MCSmooth;
+import cc.funkemunky.anticheat.api.checks.*;
+import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
-import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.utils.Init;
-import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.Color;
+import cc.funkemunky.api.utils.TickTimer;
+import lombok.val;
 import org.bukkit.event.Event;
-import org.bukkit.event.player.PlayerMoveEvent;
 
-import java.util.HashMap;
-import java.util.Map;
-
-@CheckInfo(name = "Aim (Type L)", description = "Checks for impossible packet rates sent by anything that aims.", type = CheckType.AIM, cancellable = false, maxVL = 20)
-@Init
-@BukkitEvents(events = {PlayerMoveEvent.class})
-@Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LOOK, Packet.Client.LEGACY_LOOK, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.POSITION, Packet.Client.LEGACY_POSITION})
+@Packets(packets = {
+        Packet.Client.POSITION_LOOK,
+        Packet.Client.LOOK,
+        Packet.Client.LEGACY_POSITION_LOOK,
+        Packet.Client.LEGACY_LOOK})
+@cc.funkemunky.api.utils.Init
+@CheckInfo(name = "Aim (Type O)", description = "A heuristic which looks for one thing all aimbots have in common.", maxVL = 50, cancelType = CancelType.MOTION, type = CheckType.AIM)
 public class AimL extends Check {
 
-    private MCSmooth smoothUtil = new MCSmooth();
-    private float lastSmooth;
-    private boolean set;
-
-    private Verbose verbose = new Verbose();
-
-    private int safe, bad;
-
-    private long lastTimeStamp, lastSet, last;
-
-    private Map<Float, Integer> data = new HashMap<>();
+    private int ticks = 0;
+    private double vl;
+    private TickTimer lastFlag = new TickTimer(5);
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-
-        switch (packetType) {
-            case Packet.Client.POSITION:
-            case Packet.Client.LEGACY_POSITION:
-                lastTimeStamp = timeStamp;
-                break;
-            case Packet.Client.LOOK:
-            case Packet.Client.LEGACY_LOOK:
-                lastTimeStamp = timeStamp;
-                reset();
-                break;
+        if (getData().getLastAttack().hasPassed(10)) {
+            if(getData().getLastAttack().hasPassed(20)) ticks = 0;
+            return;
         }
+        val move = getData().getMovementProcessor();
+        val offset = 16777216L;
+        val one = (long) (move.getYawDelta() * offset);
+        val two = (long) (move.getLastYawDelta() * offset);
+        val gcd = MiscUtils.gcd(one, two);
+        val div = (gcd / (double) offset);
+
+        if(move.getYawDelta() < 0.25) return;
+
+        if (move.getYawDelta() / div % 1 == 0 && move.getLastYawDelta() / div % 1 == 0 || ticks > 30) {
+            debug(Color.Green + "Ticks: " + ticks);
+
+            if (ticks > 30) {
+                if(vl++ > 12) {
+                    flag("ticks: " + ticks + " vl: " + vl, true, true, AlertTier.HIGH);
+                } else if (vl > 7) {
+                    flag("ticks: " + ticks + " vl: " + vl, true, true, AlertTier.LIKELY);
+                } else if(vl > 5) {
+                    flag("ticks: " + ticks + " vl: " + vl, true, false, AlertTier.POSSIBLE);
+                }
+                lastFlag.reset();
+            } else vl-= vl > 0 ? 1 : 0;
+
+            debug(Color.Green + "VL: " + vl);
+
+            ticks = 0;
+        } else ticks++;
+
+        //debug(0.1 - (move.getYawDelta() / div) % 0.1 + "");
+
+        //debug("GCD: " + gcd + " div: " + div + " 1: " + (move.getYawDelta() / div));
+        //debug("1: " + (move.getYawDelta() / div) + " 2: " + (move.getLastYawDelta() / div));
+        //debug("1: " + (move.getYawDelta() / move.getLastYawDelta() / div));
+        //debug("LCM: " + lcm);
+        //debug("1: " + (one / (double) lcm) + " 2: " + (two / (double) lcm));
     }
 
     @Override
     public void onBukkitEvent(Event event) {
-        PlayerMoveEvent e = (PlayerMoveEvent) event;
 
-        /*if ((System.currentTimeMillis() - user.lastFullblockMoved) > 400L) {
-            last = System.currentTimeMillis();
-        }*/
-        long timeStamp = System.currentTimeMillis();
-        if (set && timeStamp - lastSet > 2000L) {
-            reset();
-        }
-        if (getData().getLastAttack().hasNotPassed(10) && timeStamp - last >= 3000L) {
-            if (set) {
-                if (timeStamp - lastSet > 2000L) {
-                    reset();
-                }
-            } else {
-                set = true;
-                lastSet = System.currentTimeMillis();
-            }
-            if (data.size() == safe && bad < 1 && safe > 32 && getData().getPlayer().getLocation().distance(getData().getTarget().getLocation()) > 1.00 && verbose.flag(10, 450L)) {
-                flag("test", true, true, AlertTier.LIKELY);
-            }
-            float weight = (float) MathUtils.round(Math.abs(MathUtils.yawTo180F(e.getFrom().getYaw() - e.getTo().getYaw())), 3);
-            if (!data.containsKey(weight)) {
-                data.put(weight, 1);
-                safe++;
-            } else {
-                bad++;
-            }
-        }
-
-        debug(verbose.getVerbose() + " vl");
-    }
-
-    private void reset() {
-        set = false;
-        bad = safe = 0;
-        data.clear();
-        verbose.setVerbose(0);
     }
 }

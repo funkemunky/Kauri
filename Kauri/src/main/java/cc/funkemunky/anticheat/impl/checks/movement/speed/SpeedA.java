@@ -4,69 +4,119 @@ import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
-import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.PlayerUtils;
 import lombok.val;
+import lombok.var;
+import org.bukkit.Location;
 import org.bukkit.event.Event;
 import org.bukkit.potion.PotionEffectType;
 
-@Packets(packets = {Packet.Client.POSITION_LOOK,
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicInteger;
+
+@Packets(packets = {
+        Packet.Client.POSITION_LOOK,
         Packet.Client.POSITION,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_POSITION})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Speed (Type A)", description = "A basic maximum speed check with a verbose threshold.", type = CheckType.SPEED)
+@CheckInfo(name = "Speed (Type A)", description = "A simple but effective speed check.", type = CheckType.SPEED, maxVL = 60)
 public class SpeedA extends Check {
+    private double lastX, lastY, lastZ;
+    private int vl;
 
-    private Verbose verbose = new Verbose();
+    private final Deque<Double> offsetDeque = new LinkedList<>();
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        //The client will always send a position packet when teleported or dictated to move by the server, so we need to account for that to prevent false-positives.
-        if (getData().isGeneralCancel()) {
+        val player = getData().getPlayer();
+
+        val from = getData().getMovementProcessor().getFrom();
+        val to = getData().getMovementProcessor().getTo();
+
+        val fromVec = from.toVector();
+        val toVec = to.toVector();
+
+        val velocity = getData().getVelocityProcessor();
+
+        val motionX = to.getX() - from.getX();
+        val motionY = to.getY() - from.getY();
+        val motionZ = to.getZ() - from.getZ();
+
+        val lastMotLoc = new Location(player.getWorld(), lastX, lastY, lastZ).toVector();
+        val currMotLoc = new Location(player.getWorld(), motionX, motionY, motionZ).toVector();
+
+        val locOffset = MathUtils.offset(fromVec, toVec);
+        val motOffset = MathUtils.offset(lastMotLoc, currMotLoc);
+
+        val offsetChange = Math.abs(locOffset - motOffset);
+
+        val streak = new AtomicInteger();
+
+        if (getData().isGeneralCancel() || getData().getVelocityProcessor().getLastVelocity().hasNotPassed(20)) {
             return;
         }
-        val move = getData().getMovementProcessor();
-        val to = move.getTo();
-        val from = move.getFrom();
 
-        /* We we do just a basic calculation of the maximum allowed movement of a player */
-        float motionXZ = (float) cc.funkemunky.anticheat.api.utils.MiscUtils.hypot(to.getX() - from.getX(), to.getZ() - from.getZ());
+        offsetDeque.add(offsetChange);
 
-        /* We we do just a basic calculation of the maximum allowed movement of a player */
-        double baseSpeed;
+        if (offsetDeque.size() == 5) {
+            val account = account();
+            val maxOffset = 0.33f + account();
 
+            offsetDeque.forEach(offset -> {
+                if (offset > maxOffset) {
+                    streak.incrementAndGet();
+                }
+            });
 
-        if (move.getAirTicks() > 0) {
-            baseSpeed = 0.381 * Math.pow(0.989, Math.min(16, move.getAirTicks()));
-        } else {
-            baseSpeed = 0.341 - (0.0043 * Math.min(10, move.getGroundTicks()));
-        }
+            var maxStreak = 2;
 
-        baseSpeed += PlayerUtils.getPotionEffectLevel(getData().getPlayer(), PotionEffectType.SPEED) * (move.isServerOnGround() ? 0.058f : 0.052f);
-        baseSpeed *= move.getHalfBlockTicks() > 0 ? 2.5 : 1;
-        baseSpeed *= move.getBlockAboveTicks() > 0 ? 3.4 : 1;
-        baseSpeed *= move.getIceTicks() > 0 && (move.getDeltaY() > 0.001 || move.getGroundTicks() < 6) ? 2.5f : 1.0;
-        baseSpeed += getData().getLastBlockPlace().hasNotPassed(15) ? 0.1 : 0;
-        baseSpeed += (getData().getPlayer().getWalkSpeed() - 0.2) * 1.8f;
-        baseSpeed += move.isOnSlimeBefore() ? 0.1 : 0;
-
-        if (motionXZ > baseSpeed && !getData().getVelocityProcessor().getLastVelocity().hasNotPassed(40)) {
-            if (verbose.flag(getData().isLagging() ? 45 : 35, 1000L, motionXZ - baseSpeed > 0.5f ? 5 : 2)) {
-                flag(MathUtils.round(motionXZ, 4) + ">-" + MathUtils.round(baseSpeed, 4), true, true, verbose.getVerbose() > 70 ? AlertTier.CERTAIN : AlertTier.HIGH);
+            if (player.hasPotionEffect(PotionEffectType.SPEED)) {
+                maxStreak++;
             }
-        } else {
-            verbose.deduct();
+
+            if (streak.get() >= maxStreak) {
+                if (vl++ > 2) {
+                    flag("" + (double) (streak.get() * 100) / maxStreak + "%", true, true, AlertTier.HIGH);
+                }
+            } else if (streak.get() == 0) {
+                vl = 0;
+            }
+
+            debug(vl + ": " + streak.get() + ", " + maxStreak + "," + MiscUtils.hypot(velocity.getMotionX(), velocity.getMotionZ()) + ", " + account);
+
+            offsetDeque.clear();
         }
 
-        debug(verbose.getVerbose() + ": " + motionXZ + ", " + baseSpeed + ", " + move.getAirTicks() + ", " + move.getGroundTicks() + ", " + getData().getPlayer().getWalkSpeed());
+        lastX = motionX;
+        lastY = motionY;
+        lastZ = motionZ;
     }
 
     @Override
     public void onBukkitEvent(Event event) {
 
+    }
+
+    private float account() {
+        float total = 0;
+
+        val move = getData().getMovementProcessor();
+        val velocity = getData().getVelocityProcessor();
+
+        total += PlayerUtils.getPotionEffectLevel(getData().getPlayer(), PotionEffectType.SPEED) * (move.isServerOnGround() ? 0.057f : 0.044f);
+        total += move.getIceTicks() > 0 && (move.getDeltaY() > 0.001 || move.getGroundTicks() < 6) ? 0.23 : 0;
+        total += (getData().getPlayer().getWalkSpeed() - 0.2) * 1.65;
+        total += (getData().getLastBlockPlace().hasNotPassed(7)) ? 0.1 : 0;
+        total += move.isOnSlimeBefore() ? 0.1 : 0;
+        total += move.getBlockAboveTicks() > 0 ? move.getIceTicks() > 0 ? 0.5 : 0.25 : 0;
+        total += move.getHalfBlockTicks() > 0 ? 0.12 : 0;
+        total += Math.max(0, MiscUtils.hypot(velocity.getMotionX(), velocity.getMotionZ()) - total);
+        return total;
     }
 }

@@ -4,60 +4,55 @@ import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import lombok.val;
+import cc.funkemunky.api.utils.Init;
 import org.bukkit.event.Event;
 
-import java.util.Deque;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
 
+@CheckInfo(name = "Autoclicker (Type K)", description = "test", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT)
+@Init
 @Packets(packets = {Packet.Client.ARM_ANIMATION})
-@cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Autoclicker (Type H)", description = "Looks for suspicious clicking averages compares to actual clicks.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 50, executable = false, developer = true)
 public class AutoclickerH extends Check {
 
-    private long lastSwing;
-    private final Deque<Long> delays = new LinkedList<>();
-    private int vl;
+    private long lastTimeStamp;
+    private List<Long> list = new ArrayList<>();
+    private double lastStd, lastAverage, vl, vl2;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if (!MiscUtils.shouldReturnArmAnimation(getData())) {
-            val now = timeStamp;
+        if(MiscUtils.shouldReturnArmAnimation(getData())) return;
 
-            val delay = now - lastSwing;
+        long ms = timeStamp - lastTimeStamp;
 
-            //Changed this so this check doesn't just stop working when a player has a delay longer than a certain period.
-            if (delay < 160L) {
-                delays.add(delay);
-            }
+        if(list.size() >= 20) {
+            double average = list.stream().mapToLong(val -> val).average().orElse(0);
+            double std = Math.sqrt(list.stream().mapToDouble(val -> Math.pow(val - average, 2)).average().orElse(0));
+            double stdDelta = Math.abs(std - lastStd), avgDelta = Math.abs(average - lastAverage);
 
-            //AimI removed your leveling system due to it seeming very unnecessary from debugging. Comment your reasoning so AimI can confirm. - funke
-            if (delays.size() == 50) {
-                //val level = new AtomicInteger(0);
-
-                //delays.stream().filter(range -> range == 0L).forEach(range -> level.getAndIncrement()); //dont judge me
-
-                val average = delays.stream().mapToLong(Long::longValue).average().orElse(0.0);
-                val averageDelta = Math.abs(delay - average); // Why are you doing this? What is your thought process?
-
-                //Removed level.get() <= 14
-                if (averageDelta <= 10) {
-                    //AimI cleaned up this area and completely changed the verbose system due to players being able to easily flag this.
-                    // However, unlike autoclickers, players do not flag it consistently every single intervalTime. This should do until further testing
-                    // proves this check to be invalid or needing fixing.
-                    if (vl++ > 6) {
-                        flag("AVG: " + average, true, true, AlertTier.LIKELY);
+            if(stdDelta < 5 && average > 65 && average < 120) {
+                if(avgDelta > 5) {
+                    if(vl++ > 5) {
+                        flag("avg=" + average + " std=" + std + "% delta=" + stdDelta, true, true, AlertTier.CERTAIN);
+                    } else if(vl > 2) {
+                        flag("avg=" + average + " std=" + std + "% delta=" + stdDelta, true, true, AlertTier.HIGH);
                     }
-                } else {
-                    vl = 0;
+                } else if(vl2++ > 2) {
+                    flag("avg=" + average + " std=" + std + "% delta=" + stdDelta, true, false, AlertTier.POSSIBLE);
                 }
-
-                debug("VL: " + vl + "DELTA: " + averageDelta  + "AVG: " + average + " VL: " + vl);
-
-                delays.clear();
+            } else {
+                vl-= vl > 0 ? .5 : 0;
+                vl2-= vl2 > 0 ? .5 : 0;
             }
-            this.lastSwing = now;
+
+            debug("avg=" + average + " std=" + std + "vl=" + vl);
+            list.clear();
+            lastStd = std;
+            lastAverage = average;
+        } else if(ms > 0 && ms < 400) {
+            list.add(ms);
         }
+        lastTimeStamp = timeStamp;
     }
 
     @Override

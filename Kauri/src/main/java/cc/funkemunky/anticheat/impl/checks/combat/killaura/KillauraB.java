@@ -3,46 +3,34 @@ package cc.funkemunky.anticheat.impl.checks.combat.killaura;
 import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
+import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
-import cc.funkemunky.api.utils.Init;
+import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 
-@Packets(packets = {
-        Packet.Client.USE_ENTITY,
-        Packet.Client.ARM_ANIMATION,
-        Packet.Client.FLYING,
-        Packet.Client.POSITION,
-        Packet.Client.POSITION_LOOK,
-        Packet.Client.LOOK,
-        Packet.Client.LEGACY_POSITION,
-        Packet.Client.LEGACY_POSITION_LOOK,
-        Packet.Client.LEGACY_LOOK})
-@CheckInfo(name = "Killaura (Type B)", description = "Detects if clients are swinging impossibly.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, executable = false, cancellable = false, maxVL = 15, developer = true)
-@Init
+@Packets(packets = {Packet.Client.USE_ENTITY})
+@cc.funkemunky.api.utils.Init
+@CheckInfo(name = "Killaura (Type C)", description = "Checks for clients sprinting while attacking.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, maxVL = 60)
 public class KillauraB extends Check {
 
-    private boolean swing;
-    private int vl;
+    private Verbose verbose = new Verbose();
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if (packetType.equals(Packet.Client.USE_ENTITY)) {
-            val useEntity = new WrappedInUseEntityPacket(packet, getData().getPlayer());
+        WrappedInUseEntityPacket use = new WrappedInUseEntityPacket(packet, getData().getPlayer());
 
-            if (useEntity.getAction() == WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK) {
-                if (!swing) {
-                    if (++vl > 6) {
-                        this.flag("FALSE", false, true, AlertTier.HIGH);
-                    }
-                } else {
-                    vl = 0;
+        if (use.getEntity() instanceof Player && use.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) { //A player only stops sprinting when hitting a player.
+            val baseSpeed = MiscUtils.getBaseSpeed(getData());
+            double deltaXZ = MathUtils.getHorizontalDistance(getData().getMovementProcessor().getTo().toLocation(use.getPlayer().getWorld()), getData().getMovementProcessor().getFrom().toLocation(use.getPlayer().getWorld()));
+            if (!getData().isGeneralCancel() && (deltaXZ > baseSpeed && use.getPlayer().isSprinting() && getData().getActionProcessor().isSprinting())) {
+                if (verbose.flag(15, 800L)) { //We add a verbose or redundancy.
+                    flag(deltaXZ + ">-" + baseSpeed, true, true, AlertTier.LIKELY);
                 }
-                debug("vl=" + vl + " swing=" + swing);
-            }
-
-        } else swing = packetType.equalsIgnoreCase(Packet.Client.ARM_ANIMATION) && !MiscUtils.shouldReturnArmAnimation(getData());
+            } else verbose.deduct();
+        }
     }
 
     @Override

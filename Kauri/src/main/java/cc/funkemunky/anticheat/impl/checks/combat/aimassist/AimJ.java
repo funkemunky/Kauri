@@ -16,7 +16,7 @@ import org.bukkit.event.Event;
 @CheckInfo(name = "Aim (Type M)", description = "A heuristic that looks for common patterns by advanced AimAssists (not stable) - FlyCode", type = CheckType.AIM, cancellable = false, executable = false)
 @Init
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LOOK, Packet.Client.LEGACY_LOOK})
-public class AimM extends Check {
+public class AimJ extends Check {
 
     private int count;
     private long lastGcd, ace;

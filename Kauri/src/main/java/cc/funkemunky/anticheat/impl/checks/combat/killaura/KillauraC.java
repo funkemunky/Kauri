@@ -1,40 +1,69 @@
 package cc.funkemunky.anticheat.impl.checks.combat.killaura;
 
 import cc.funkemunky.anticheat.api.checks.*;
-import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
-import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
-import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 
-@Packets(packets = {Packet.Client.USE_ENTITY})
+import java.util.Deque;
+import java.util.LinkedList;
+
+@Packets(packets = {
+        Packet.Client.POSITION_LOOK,
+        Packet.Client.LOOK,
+        Packet.Client.LEGACY_POSITION_LOOK,
+        Packet.Client.LEGACY_LOOK})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Killaura (Type C)", description = "Checks for clients sprinting while attacking.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, maxVL = 60)
+@CheckInfo(name = "Killaura (Type D)", description = "Detects over-randomization in killauras.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT)
 public class KillauraC extends Check {
 
-    private Verbose verbose = new Verbose();
+    private float lastYaw, lastPitch;
+    private Deque<Float> yawDeque = new LinkedList<>(),
+            pitchDeque = new LinkedList<>();
+    private int vl;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        WrappedInUseEntityPacket use = new WrappedInUseEntityPacket(packet, getData().getPlayer());
+        val yaw = this.getData().getPlayer().getLocation().getYaw();
+        val pitch = this.getData().getPlayer().getLocation().getPitch();
 
-        if (use.getEntity() instanceof Player && use.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) { //A player only stops sprinting when hitting a player.
-            val baseSpeed = MiscUtils.getBaseSpeed(getData());
-            double deltaXZ = MathUtils.getHorizontalDistance(getData().getMovementProcessor().getTo().toLocation(use.getPlayer().getWorld()), getData().getMovementProcessor().getFrom().toLocation(use.getPlayer().getWorld()));
-            if (!getData().isGeneralCancel() && (deltaXZ > baseSpeed && use.getPlayer().isSprinting() && getData().getActionProcessor().isSprinting())) {
-                if (verbose.flag(15, 800L)) { //We add a verbose or redundancy.
-                    flag(deltaXZ + ">-" + baseSpeed, true, true, AlertTier.LIKELY);
-                }
-            } else verbose.deduct();
+        val yawChange = Math.abs(yaw - lastYaw);
+        val pitchChange = Math.abs(pitch - lastPitch);
+
+        if (yawChange > 25.f) {
+            return;
         }
+
+        yawDeque.add(yawChange);
+        yawDeque.add(pitchChange);
+
+        if (yawDeque.size() == 20 && pitchDeque.size() == 20) {
+            val yawDistinct = yawDeque.stream().distinct().count();
+            val pitchDistinct = pitchDeque.stream().distinct().count();
+
+            val yawDups = yawDeque.size() - yawDistinct;
+            val pitchDups = pitchDeque.size() - pitchDistinct;
+
+            if (yawDups == 0 && pitchDups == 0) {
+                if (++vl > 3) {
+                    flag("P|Y: 0", true, false, vl > 5 ? AlertTier.HIGH : AlertTier.LIKELY);
+                }
+            } else {
+                vl = 0;
+            }
+
+            yawDeque.clear();
+            pitchDeque.clear();
+        }
+
+        this.lastYaw = yaw;
+        this.lastPitch = pitch;
+
+        debug(vl + ": " + yawChange);
     }
 
     @Override
     public void onBukkitEvent(Event event) {
-
     }
 }

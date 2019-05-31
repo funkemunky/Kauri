@@ -34,7 +34,7 @@ public class Reach extends Check {
             if(target != null && getData().getLastLogin().hasPassed(5) && !getData().isServerPos() && getData().getLastAttack().hasNotPassed(0) && getData().getTransPing() < 450) {
                 long range = (move.getYawDelta() > 4 ? 150 : 100) + Math.abs(getData().getTransPing() - getData().getLastTransPing()) * 3;
                 val location = getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), range);
-                val to = getData().getPlayer().getEyeLocation();
+                val to = move.getTo().toLocation(getData().getPlayer().getWorld()).add(0, getData().getActionProcessor().isSneaking() ? 1.53f : 1.64f, 0);
                 val trace = new RayTrace(to.toVector(), to.getDirection());
 
                 val calcDistance = target.getLocation().distance(to);

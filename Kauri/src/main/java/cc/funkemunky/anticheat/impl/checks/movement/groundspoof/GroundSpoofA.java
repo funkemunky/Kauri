@@ -28,7 +28,7 @@ public class GroundSpoofA extends Check {
             return;
 
         if(move.isServerOnGround() != move.isClientOnGround()) {
-            if(verbose.flag(7, 400L)) {
+            if(verbose.flag(14, 400L)) {
                 flag("client=" + move.isClientOnGround() + " server=" + move.isServerOnGround(), true, true, verbose.getVerbose() > 13 ? AlertTier.HIGH : AlertTier.LIKELY);
             }
         } else verbose.deduct();

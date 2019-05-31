@@ -1,40 +1,64 @@
 package cc.funkemunky.anticheat.impl.checks.combat.aimassist;
 
-import cc.funkemunky.anticheat.api.checks.*;
+import cc.funkemunky.anticheat.api.checks.AlertTier;
+import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
+import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
-import cc.funkemunky.anticheat.api.utils.Verbose;
+import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
+import cc.funkemunky.api.utils.Init;
 import lombok.val;
 import org.bukkit.event.Event;
-import org.bukkit.util.Vector;
+
+import java.util.Deque;
+import java.util.LinkedList;
 
 @Packets(packets = {
         Packet.Client.LOOK,
         Packet.Client.POSITION_LOOK,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK,})
-@cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Aim (Type G)", description = "Looks for a common angle mistake in clients. By Itz_Lucky.", type = CheckType.AIM, cancelType = CancelType.MOTION, maxVL = 50)
+@Init
+@CheckInfo(name = "Aim (Type H)", description = "Looks for a common ratio of pitch movement in AimBots.", type = CheckType.AIM, executable = false)
 public class AimG extends Check {
 
-    private Verbose verbose = new Verbose();
+    private final Deque<Float> pitchDeque = new LinkedList<>();
+    private int vl;
+
+    @Setting(name = "combatOnly")
+    private boolean combatOnly = true;
+
+    @Setting(name = "threshold.vl.max")
+    private int vlMax = 2;
+
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        val move = getData().getMovementProcessor();
+        val from = this.getData().getMovementProcessor().getFrom();
+        val to = this.getData().getMovementProcessor().getTo();
 
-        if (getData().isServerPos() || move.getLookTicks() < 5 || getData().getLastLogin().hasNotPassed(20)) return;
+        if (!MiscUtils.canDoCombat(combatOnly, getData())) return;
 
-        Vector vector = new Vector(move.getTo().getX() - move.getFrom().getX(), 0, move.getTo().getZ() - move.getFrom().getZ());
-        double angleMove = vector.distanceSquared((new Vector(move.getTo().getYaw() - move.getFrom().getYaw(), 0, move.getTo().getYaw() - move.getFrom().getYaw())));
+        val yawChange = Math.abs(from.getYaw() - to.getYaw());
+        val pitchChange = Math.abs(from.getPitch() - to.getPitch());
 
-        if (angleMove > 100000 && move.getDeltaXZ() > 0.2f && move.getDeltaXZ() < 1) {
-            if(verbose.flag(3, 1000L)) {
-                flag("angle: " + angleMove, true, true, AlertTier.CERTAIN);
+        pitchDeque.add(pitchChange);
+
+        val pitchAverage = pitchDeque.stream().mapToDouble(Float::doubleValue).average().orElse(0.0F);
+        val pitchRatio = pitchAverage / pitchChange;
+
+        if (pitchRatio > 100.F && yawChange > 2.f) {
+            if (++vl > vlMax) {
+                this.flag("P: " + pitchRatio, true, true, AlertTier.LIKELY);
             }
-            flag("angle: " + angleMove, true, true, AlertTier.LIKELY);
+        } else {
+            vl = 0;
         }
 
-        debug("angle: " + angleMove);
+        if (pitchDeque.size() == 20) {
+            pitchDeque.clear();
+        }
     }
 
     @Override

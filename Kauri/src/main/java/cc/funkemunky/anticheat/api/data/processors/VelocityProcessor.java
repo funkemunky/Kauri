@@ -36,6 +36,8 @@ public class VelocityProcessor {
         if (data.getMovementProcessor().isClientOnGround() && data.getMovementProcessor().getFrom().getY() % 1 == 0) {
             velocityX = packet.getX();
             velocityY = packet.getY();
+
+            data.getMovementProcessor().setServerYVelocity(data.getMovementProcessor().getServerYVelocity() + (float) velocityY);
             velocityZ = packet.getZ();
         }
 

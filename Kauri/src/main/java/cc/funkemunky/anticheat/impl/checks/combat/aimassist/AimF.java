@@ -1,70 +1,41 @@
 package cc.funkemunky.anticheat.impl.checks.combat.aimassist;
 
-import cc.funkemunky.anticheat.api.checks.AlertTier;
-import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckInfo;
-import cc.funkemunky.anticheat.api.checks.CheckType;
-import cc.funkemunky.anticheat.api.utils.MiscUtils;
+import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.Packets;
-import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.utils.Color;
-import cc.funkemunky.api.utils.Init;
-import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
 import org.bukkit.event.Event;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import org.bukkit.util.Vector;
 
 @Packets(packets = {
-        Packet.Client.POSITION_LOOK,
         Packet.Client.LOOK,
+        Packet.Client.POSITION_LOOK,
         Packet.Client.LEGACY_POSITION_LOOK,
-        Packet.Client.LEGACY_LOOK})
-@Init
-@CheckInfo(name = "Aim (Type F)", description = "Finds any suspiciously consistent variables.", type = CheckType.AIM, executable = false)
+        Packet.Client.LEGACY_LOOK,})
+@cc.funkemunky.api.utils.Init
+@CheckInfo(name = "Aim (Type G)", description = "Looks for a common angle mistake in clients. By Itz_Lucky.", type = CheckType.AIM, cancelType = CancelType.MOTION, maxVL = 50)
 public class AimF extends Check {
 
-    private List<Double> gcdValues = new ArrayList<>();
-    private double lastRange;
     private Verbose verbose = new Verbose();
-
-    @Setting(name = "combatOnly")
-    private boolean combatOnly = true;
-
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        val offset = 16777216L;
-        val gcd = MiscUtils.gcd((long) (move.getYawDelta() * offset), (long) (move.getLastYawDelta() * offset));
+        if (getData().isServerPos() || move.getLookTicks() < 5 || getData().getLastLogin().hasNotPassed(20)) return;
 
-        if (!MiscUtils.canDoCombat(combatOnly, getData())) return;
+        Vector vector = new Vector(move.getTo().getX() - move.getFrom().getX(), 0, move.getTo().getZ() - move.getFrom().getZ());
+        double angleMove = vector.distanceSquared((new Vector(move.getTo().getYaw() - move.getFrom().getYaw(), 0, move.getTo().getYaw() - move.getFrom().getYaw())));
 
-        if (Math.abs(move.getTo().getPitch()) < 86.0f && move.getYawDelta() > 0.2 && gcd > 121072L) {
-            if (gcdValues.size() >= 5) {
-                gcdValues.sort(Comparator.naturalOrder());
-                double range = gcdValues.get(gcdValues.size() - 1) - gcdValues.get(0);
-
-                double delta = MathUtils.getDelta(lastRange, range);
-
-                if ((delta < 5 || range < 0.1) && verbose.flag(1, 1750L)) {
-                    flag("delta: " + delta + " range: " + range, true, true, AlertTier.POSSIBLE);
-                }
-                debug(Color.Green + "Range: " + range);
-                lastRange = range;
-                gcdValues.clear();
-            } else {
-                gcdValues.add(gcd / 10000D);
+        if (angleMove > 100000 && move.getDeltaXZ() > 0.2f && move.getDeltaXZ() < 1) {
+            if(verbose.flag(3, 1000L)) {
+                flag("angle: " + angleMove, true, true, AlertTier.CERTAIN);
             }
+            flag("angle: " + angleMove, true, true, AlertTier.LIKELY);
         }
 
-        debug("YAW: " + gcd + " OPTIFINE: " + getData().isCinematicMode());
+        debug("angle: " + angleMove);
     }
-
 
     @Override
     public void onBukkitEvent(Event event) {

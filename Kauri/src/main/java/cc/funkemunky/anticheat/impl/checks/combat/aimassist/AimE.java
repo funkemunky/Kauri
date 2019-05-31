@@ -1,35 +1,36 @@
 package cc.funkemunky.anticheat.impl.checks.combat.aimassist;
 
-import cc.funkemunky.anticheat.api.checks.*;
+import cc.funkemunky.anticheat.api.checks.AlertTier;
+import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
+import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
+import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
+import cc.funkemunky.api.utils.Color;
+import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
 import org.bukkit.event.Event;
 
-@Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LOOK, Packet.Client.LEGACY_LOOK, Packet.Client.LEGACY_POSITION_LOOK})
-@cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Aim (Type E)", description = "Looks for suspicious yaw and pitch movements. Not recommended for banning.", type = CheckType.AIM, cancelType = CancelType.MOTION, maxVL = 200, executable = false, cancellable = false)
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
+@Packets(packets = {
+        Packet.Client.POSITION_LOOK,
+        Packet.Client.LOOK,
+        Packet.Client.LEGACY_POSITION_LOOK,
+        Packet.Client.LEGACY_LOOK})
+@Init
+@CheckInfo(name = "Aim (Type F)", description = "Finds any suspiciously consistent variables.", type = CheckType.AIM, executable = false)
 public class AimE extends Check {
 
-    private int vl;
-
-    @Setting(name = "threshold.verbose.max")
-    private int vlMax = 40;
-
-    @Setting(name = "threshold.verbose.subtract")
-    private int vlSub = 2;
-
-    @Setting(name = "threshold.yawAccel")
-    private double yawAccelMax = 1E-5;
-
-    @Setting(name = "threshold.pitchAccel")
-    private double pitchAccelMax = 1E-7;
-
-    @Setting(name = "threshold.minYawDelta")
-    private double minYawDelta = 0.6;
+    private List<Double> gcdValues = new ArrayList<>();
+    private double lastRange;
+    private Verbose verbose = new Verbose();
 
     @Setting(name = "combatOnly")
     private boolean combatOnly = true;
@@ -37,22 +38,33 @@ public class AimE extends Check {
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
-        val yawDelta = move.getYawDelta();
-        val pitchDelta = move.getPitchDelta();
-        val yawAccel = MathUtils.getDelta(yawDelta, move.getLastYawDelta());
-        val pitchAccel = MathUtils.getDelta(pitchDelta, move.getLastPitchDelta());
+
+        val offset = 16777216L;
+        val gcd = MiscUtils.gcd((long) (move.getYawDelta() * offset), (long) (move.getLastYawDelta() * offset));
 
         if (!MiscUtils.canDoCombat(combatOnly, getData())) return;
 
+        if (Math.abs(move.getTo().getPitch()) < 86.0f && move.getYawDelta() > 0.2 && gcd > 121072L) {
+            if (gcdValues.size() >= 5) {
+                gcdValues.sort(Comparator.naturalOrder());
+                double range = gcdValues.get(gcdValues.size() - 1) - gcdValues.get(0);
 
-        if (yawDelta > minYawDelta && getData().getPlayer().getVehicle() == null && Math.abs(move.getTo().getPitch()) < 80 && (pitchAccel < pitchAccelMax || yawAccel < yawAccelMax)) {
-            if (vl++ > vlMax) {
-                flag("YAW: " + MathUtils.round(yawAccel, 7) + " PITCH: " + MathUtils.round(pitchAccel, 7), true, true, AlertTier.LIKELY);
+                double delta = MathUtils.getDelta(lastRange, range);
+
+                if ((delta < 5 || range < 0.1) && verbose.flag(1, 1750L)) {
+                    flag("delta: " + delta + " range: " + range, true, true, AlertTier.POSSIBLE);
+                }
+                debug(Color.Green + "Range: " + range);
+                lastRange = range;
+                gcdValues.clear();
+            } else {
+                gcdValues.add(gcd / 10000D);
             }
-        } else vl -= vl > 0 ? vlSub : 0;
+        }
 
-        debug("VL: " + vl + " YAW: " + yawAccel + " PITCH: " + pitchAccel + " YAWD: " + yawDelta);
+        debug("YAW: " + gcd + " OPTIFINE: " + getData().isCinematicMode());
     }
+
 
     @Override
     public void onBukkitEvent(Event event) {

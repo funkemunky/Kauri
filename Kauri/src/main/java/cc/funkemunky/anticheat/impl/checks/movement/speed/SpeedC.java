@@ -1,57 +1,62 @@
 package cc.funkemunky.anticheat.impl.checks.movement.speed;
 
-import cc.funkemunky.anticheat.Kauri;
-import cc.funkemunky.anticheat.api.checks.AlertTier;
-import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckInfo;
-import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.checks.*;
+import cc.funkemunky.anticheat.api.utils.BukkitEvents;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
-import cc.funkemunky.anticheat.api.utils.Packets;
-import cc.funkemunky.anticheat.api.utils.Verbose;
-import cc.funkemunky.api.tinyprotocol.api.Packet;
+import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.Init;
-import cc.funkemunky.api.utils.PlayerUtils;
+import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.ReflectionsUtil;
-import javafx.scene.control.Alert;
 import lombok.val;
-import org.bukkit.block.Block;
 import org.bukkit.event.Event;
-import org.bukkit.potion.PotionEffectType;
+import org.bukkit.event.player.PlayerMoveEvent;
 
-
-@Packets(packets = {Packet.Client.LEGACY_POSITION, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.POSITION, Packet.Client.POSITION_LOOK})
-//@Init
-@CheckInfo(name = "Speed (Type C)", description = "Checks the in-air and on-ground deceleration of the client. More accurate.", type = CheckType.SPEED, maxVL = 125)
+@CheckInfo(name = "Speed (Type C)", description = "Ensures that the acceleration of a player is normal.", type = CheckType.SPEED)
+@Init
+@BukkitEvents(events = {PlayerMoveEvent.class})
 public class SpeedC extends Check {
 
-    private boolean lastGround, lastLastGround;
-
+    /*
+    What could cause false positives: water, ladders, slimes, initial grounding or jumping, ice.
+     */
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        val move = getData().getMovementProcessor();
 
-        val ground = move.isServerOnGround();
-        val sprinting = getData().getActionProcessor().isSprinting();
-        val accel = move.getDeltaXZ() - move.getLastDeltaXZ();
-        val delta = accel - (sprinting ? 0.026f : 0.02f);
-
-        if(delta > 1E-6
-                && !lastGround
-                && !lastLastGround
-                && !getData().isGeneralCancel()
-                && !move.isOnHalfBlock()
-                && getData().getVelocityProcessor().getLastVelocity().hasPassed(10)) {
-            flag("accel=" + accel + " delta=" + delta, true, true, AlertTier.HIGH);
-        }
-
-        lastLastGround = lastGround;
-        lastGround = ground;
     }
+
+    private int groundTicks, airTicks, vl;
+    private double lastDxz;
 
     @Override
     public void onBukkitEvent(Event event) {
+        PlayerMoveEvent e = (PlayerMoveEvent) event;
 
+        if(MiscUtils.cancelForFlight(getData(), 4, false)) return;
+
+        val dxz = MathUtils.hypot(e.getTo().getX() - e.getFrom().getX(), e.getTo().getZ() - e.getFrom().getZ());
+        val onGround = e.getPlayer().isOnGround();
+
+        if(onGround) {
+            groundTicks++;
+            airTicks = 0;
+        } else {
+            airTicks++;
+            groundTicks = 0;
+        }
+
+        val underBlock = BlockUtils.getBlock(e.getPlayer().getLocation().clone().subtract(0, 0.25,0));
+        val decel = onGround ? ReflectionsUtil.getFriction(underBlock) : Atlas.getInstance().getBlockBoxManager().getBlockBox().getMovementFactor(e.getPlayer());
+        val difference = lastDxz - dxz;
+
+        if(groundTicks > 1 && airTicks > 1 && MathUtils.getDelta(decel, difference) > 1E-6) {
+            if(vl++ > 4) {
+                flag(difference + ">-" + decel, true, true, AlertTier.HIGH);
+            } else flag(difference + ">-" + decel, true, false, AlertTier.LOW);
+        } else vl-= vl > 0 ? 1 : 0;
+
+
+        debug("decel=" + decel + " dxz=" + dxz);
+        lastDxz = dxz;
     }
 }
-

@@ -10,6 +10,7 @@ import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.*;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Vehicle;
@@ -20,11 +21,13 @@ import java.util.List;
 
 @Getter
 public class MovementProcessor {
-    private boolean lastFlight, flight, isLagging, clientOnGround, serverOnGround, fullyInAir, inAir, hasJumped, inLiquid, blocksOnTop, pistonsNear, onHalfBlock,
+    private boolean lastFlight, flight, clientOnGround, serverOnGround, fullyInAir, inAir, hasJumped, inLiquid, blocksOnTop, pistonsNear, onHalfBlock,
             onClimbable, onIce, collidesHorizontally, tookVelocity, inWeb, onSlime, onSlimeBefore, onSoulSand, isRiptiding, halfBlocksAround, isNearGround, isInsideBlock, blocksNear, blocksAround;
     private int airTicks, groundTicks, iceTicks, climbTicks, halfBlockTicks, soulSandTicks, blockAboveTicks, optifineTicks, liquidTicks, webTicks, yawZeroTicks, pitchZeroTicks;
-    private float deltaY, lastDeltaXZ, yawDelta, pitchDelta, lastYawDelta, lastPitchDelta, lastDeltaY, deltaXZ, distanceToGround, serverYVelocity, lastServerYVelocity, serverYAcceleration, clientYAcceleration, lastClientYAcceleration, lastServerYAcceleration, jumpVelocity, cinematicYawDelta, cinematicPitchDelta, lastCinematicPitchDelta, lastCinematicYawDelta;
+    private float deltaY, lastDeltaXZ, slimeHeight, fallDistance, yawDelta, pitchDelta, lastYawDelta, lastPitchDelta, lastDeltaY, deltaXZ, lastServerYVelocity, serverYAcceleration, clientYAcceleration, lastClientYAcceleration, lastServerYAcceleration, jumpVelocity, cinematicYawDelta, cinematicPitchDelta, lastCinematicPitchDelta, lastCinematicYawDelta;
     private CustomLocation from, to;
+    @Setter
+    private float serverYVelocity;
     private PastLocation pastLocation = new PastLocation();
     private TickTimer lastRiptide = new TickTimer(6), lastVehicle = new TickTimer(4), lastFlightToggle = new TickTimer(10);
     private List<BoundingBox> boxes = new ArrayList<>();
@@ -90,6 +93,10 @@ public class MovementProcessor {
                     airTicks++;
                     groundTicks = 0;
                 }
+
+                if(onSlime) {
+                    slimeHeight = fallDistance * 0.75f;
+                }
             }
             tookVelocity = System.currentTimeMillis() - data.getVelocityProcessor().getLastVelocityTimestamp() < 100L;
             jumpVelocity = 0.42f + (PlayerUtils.getPotionEffectLevel(packet.getPlayer(), PotionEffectType.JUMP) * 0.1f);
@@ -120,6 +127,10 @@ public class MovementProcessor {
             } else if (!inAir) {
                 hasJumped = true;
             }
+
+            if(serverOnGround) {
+                fallDistance = 0;
+            } else fallDistance = Math.max(0, fallDistance - deltaY);
 
             lastFlight = flight;
             flight = player.getAllowFlight();
