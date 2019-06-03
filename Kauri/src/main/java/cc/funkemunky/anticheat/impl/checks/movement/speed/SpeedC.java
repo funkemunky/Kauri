@@ -13,7 +13,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 @CheckInfo(name = "Speed (Type C)", description = "Ensures that the acceleration of a player is normal.", type = CheckType.SPEED)
-@Init
+//@Init
 @BukkitEvents(events = {PlayerMoveEvent.class})
 public class SpeedC extends Check {
 

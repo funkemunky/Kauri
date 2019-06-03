@@ -20,6 +20,7 @@ import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.updater.UpdaterUtils;
 import cc.funkemunky.api.utils.*;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.HandlerList;
@@ -72,8 +73,8 @@ public class Kauri extends JavaPlugin {
         instance = this;
         saveDefaultConfig();
         saveDefaultMessages();
-        /*if (Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled())
-            return;*/
+        if (Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled())
+            return;
 
         profiler = new BaseProfiler();
         profileStart = System.currentTimeMillis();
