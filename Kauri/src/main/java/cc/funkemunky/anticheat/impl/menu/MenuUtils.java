@@ -3,6 +3,7 @@ package cc.funkemunky.anticheat.impl.menu;
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.utils.ItemBuilder;
 import cc.funkemunky.anticheat.api.utils.menu.Menu;
 import cc.funkemunky.anticheat.api.utils.menu.button.Button;
 import cc.funkemunky.anticheat.api.utils.menu.button.ClickAction;
@@ -11,12 +12,17 @@ import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MiscUtils;
+import lombok.val;
+import org.apache.commons.lang3.time.DurationFormatUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Init
 public class
@@ -110,13 +116,27 @@ MenuUtils {
             }));
         }
 
-        menu.setItem(49, createButton(false, MiscUtils.createItem(Material.REDSTONE, 1, Color.Red + "Clear Logs"),
+        val clearLogsButton = createButton(false, MiscUtils.createItem(Material.REDSTONE, 1, Color.Red + "Clear Logs"),
                 ((player, infoPair) -> {
                     logs.clear();
                     Kauri.getInstance().getLoggerManager().clearLogs(target.getUniqueId());
                     infoPair.getMenu().close(player);
                     openLogGUI(player, target);
-                })));
+                }));
+        menu.setItem(53, clearLogsButton);
+        menu.setItem(45, clearLogsButton);
+
+        ItemBuilder playerHead = new ItemBuilder(Material.SKULL_ITEM);
+
+        playerHead.amount(1);
+        playerHead.durability(3);
+        playerHead.name(Color.Red + target.getName());
+        playerHead.owner(target.getName());
+        playerHead.lore("", "&7Banned: &f" + (banReason.equals("none") ? "Not by Kauri." : banReason), "&7Last On: &f" + DurationFormatUtils.formatDurationWords(System.currentTimeMillis() - target.getLastPlayed(), true, true) + " ago");
+
+        val playerInfoButton = new Button(false, playerHead.build());
+
+        menu.setItem(49, playerInfoButton);
         menu.showMenu(toOpen);
     }
 
@@ -148,8 +168,55 @@ MenuUtils {
         menu.showMenu(toOpen);
     }
 
-    public static void openRecentViolators(Player toOpen) {
-        ChestMenu menu = new ChestMenu(Color.Dark_Gray + "Recent Violators", 5);
+    public static void openRecentViolators(Player toOpen, int page) {
+        ChestMenu menu = new ChestMenu(Color.Dark_Gray + "Recent Violators", 6);
+
+        val recentViolations = Kauri.getInstance().getLoggerManager().getRecentViolators();
+
+
+        val buttons = recentViolations.stream().map(uuid -> {
+            OfflinePlayer target = Bukkit.getOfflinePlayer(uuid);
+
+            ItemBuilder playerHead = new ItemBuilder(Material.SKULL_ITEM);
+
+            playerHead.amount(1);
+            playerHead.durability(3);
+            playerHead.owner(target.getName());
+            playerHead.name(Color.Yellow + target.getName());
+            playerHead.lore("", "&f&oLeft Click &7&oto view logs.", "&f&oRight Click &7&oto teleport.");
+
+            return new Button(false, playerHead.build(), (player, action) -> {
+                if(action.getClickType().toString().contains("LEFT")) {
+                    openLogGUI(player, target);
+                } else {
+                    val playerTarget = Bukkit.getPlayer(target.getUniqueId());
+
+                    if(playerTarget != null) {
+                        player.teleport(playerTarget);
+                    } else {
+                        player.sendMessage(Color.Red + "Could not teleport you to that player since he/she is not online.");
+                    }
+                }
+            });
+        }).collect(Collectors.toList());
+        int pageMax = Math.min(buttons.size(), page * 36), pageMin = Math.min(buttons.size(), (page - 1) * 36);
+        if (page > 1) {
+            menu.setItem(48, createButton(false, MiscUtils.createItem(Material.SIGN, 1, Color.Gray + "Backward Page: " + Color.White + (page - 1)), (player, infoPair) -> {
+                openRecentViolators(player, page  - 1);
+            }));
+        }
+
+        if (buttons.size() > pageMax) {
+            menu.setItem(50, createButton(false, MiscUtils.createItem(Material.SIGN, 1, Color.Gray + "Forward Page: " + Color.White + (page + 1)), (player, infoPair) -> {
+                openRecentViolators(player, page + 1);
+            }));
+        }
+
+        for(int i = pageMin ; i < pageMax ; i++) {
+            menu.addItem(buttons.get(i));
+        }
+
+        menu.showMenu(toOpen);
     }
 
     private static Button checkButton(Check check, int page) {

@@ -78,7 +78,7 @@ public class LoggerManager {
 
     public boolean isBanned(UUID uuid) {
         Database database = Atlas.getInstance().getDatabaseManager().getDatabase("KauriLogs");
-        return database.getDatabaseValues().keySet().stream().anyMatch(key -> key.startsWith(uuid.toString()));
+        return database.getDatabaseValues().keySet().stream().anyMatch(key -> key.equals(uuid.toString() + ";banned"));
     }
 
     public void removeBan(UUID uuid) {
@@ -93,9 +93,14 @@ public class LoggerManager {
     public String getBanReason(UUID uuid) {
         Database database = Atlas.getInstance().getDatabaseManager().getDatabase("KauriLogs");
 
-        Optional<String> reasonOp = database.getDatabaseValues().keySet().stream().filter(key -> key.startsWith(uuid.toString())).findFirst();
+        Optional<String> reasonOp = database.getDatabaseValues().keySet().stream().filter(key -> key.equals(uuid.toString() + ";banned")).findFirst();
 
-        return reasonOp.orElse("none");
+        val key = reasonOp.orElse("none");
+
+        if(!key.equals("none")) {
+            return (String) database.getField(key);
+        }
+        return "none";
     }
 
     public int addAndGetViolation(UUID uuid, Check check) {

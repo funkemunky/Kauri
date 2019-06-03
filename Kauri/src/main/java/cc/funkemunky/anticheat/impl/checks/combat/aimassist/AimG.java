@@ -21,7 +21,7 @@ import java.util.LinkedList;
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK,})
 @Init
-@CheckInfo(name = "Aim (Type H)", description = "Looks for a common ratio of pitch movement in AimBots.", type = CheckType.AIM, executable = false)
+@CheckInfo(name = "Aim (Type G)", description = "Looks for a common ratio of pitch movement in AimBots.", type = CheckType.AIM, executable = false)
 public class AimG extends Check {
 
     private final Deque<Float> pitchDeque = new LinkedList<>();

@@ -43,7 +43,6 @@ public class AntiVPN extends AntiPUP {
     @EventHandler(priority = EventPriority.LOW)
     public void onPlayerJoin(PlayerLoginEvent event) {
         Kauri.getInstance().getAntiPUPManager().pupThread.execute(() -> {
-            Kauri.getInstance().getProfiler().start("pup:AntiVpn:AsyncPlayerPreLoginEvent");
             long timestamp = System.currentTimeMillis();
             if(timestamp - Kauri.getInstance().lastLogin > 150L) {
                 VPNResponse response = Kauri.getInstance().getVpnUtils().getResponse(event.getAddress().getHostAddress());
@@ -57,7 +56,6 @@ public class AntiVPN extends AntiPUP {
                 }
             }
             Kauri.getInstance().lastLogin = timestamp;
-            Kauri.getInstance().getProfiler().stop("pup:AntiVpn:AsyncPlayerPreLoginEvent");
         });
     }
 }

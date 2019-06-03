@@ -15,7 +15,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
 import org.bukkit.util.Vector;
 
-@CheckInfo(name = "Reach (Type A)", description = "A very accurate and fast 3.1 reach check.", type = CheckType.REACH, cancelType = CancelType.COMBAT, maxVL = 40)
+@CheckInfo(name = "Reach", description = "A very accurate and fast 3.1 reach check.", type = CheckType.REACH, cancelType = CancelType.COMBAT, maxVL = 40)
 @Packets(packets = {Packet.Client.ARM_ANIMATION, Packet.Client.LOOK, Packet.Client.POSITION, Packet.Client.POSITION_LOOK, Packet.Client.FLYING, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION, Packet.Client.LEGACY_LOOK})
 @Init
 public class Reach extends Check {
@@ -49,7 +49,7 @@ public class Reach extends Check {
                     return;
                 }
 
-                val traverse = trace.traverse(calcDistance * 1.25, 0.1);
+                val traverse = trace.traverse(calcDistance, 0.1);
                 float distance = (float)traverse.stream()
                         .filter((vec) -> location.stream().anyMatch((loc) -> getHitbox(target, loc).intersectsWithBox(vec)))
                         .mapToDouble((vec) -> vec.distance(to.toVector()))

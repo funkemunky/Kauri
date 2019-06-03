@@ -11,7 +11,7 @@ import org.bukkit.event.Event;
 
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LOOK, Packet.Client.LEGACY_LOOK, Packet.Client.LEGACY_POSITION_LOOK})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Aim (Type E)", description = "Looks for suspicious yaw and pitch movements. Not recommended for banning.", type = CheckType.AIM, cancelType = CancelType.MOTION, maxVL = 200, executable = false, cancellable = false)
+@CheckInfo(name = "Aim (Type D)", description = "Looks for suspicious yaw and pitch movements. Not recommended for banning.", type = CheckType.AIM, cancelType = CancelType.MOTION, maxVL = 200, executable = false, cancellable = false)
 public class AimD extends Check {
 
     private int vl;

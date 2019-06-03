@@ -21,9 +21,11 @@ import org.bukkit.entity.Player;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class LagArgument extends FunkeArgument {
     public LagArgument(FunkeCommand parent, String name, String display, String description, String... permission) {
@@ -91,18 +93,18 @@ public class LagArgument extends FunkeArgument {
                     body.add(MiscUtils.lineNoStrike());
                     val results = Kauri.getInstance().getProfiler().results(ResultsType.TOTAL);
 
-                    double totalPCT = 0;
-                    double totalMS = 0;
+                    AtomicReference<Double> totalMS = new AtomicReference<>((double) 0);
 
-                    for (String key : results.keySet()) {
-                        body.add(key + ":");
-                        double ms = results.get(key) / Kauri.getInstance().getProfiler().calls.get(key);
-                        totalMS+=ms;
-                        body.add("PCT: "  + MathUtils.round(ms / 50 * 100, 4));
-                        body.add("MS: " + ms + "ms");
-                    }
-
-                    body.add("Total PCT: " +  MathUtils.round(totalMS / 50 * 100, 4) + "%");
+                    results.keySet().stream()
+                            .sorted(Comparator.comparing(key -> results.get(key) / Kauri.getInstance().getProfiler().calls.get(key), Comparator.reverseOrder()))
+                            .forEachOrdered(key -> {
+                                body.add(key + ":");
+                                double ms = results.get(key) / Kauri.getInstance().getProfiler().calls.get(key);
+                                totalMS.updateAndGet(v -> (v + ms));
+                                body.add("PCT: "  + MathUtils.round(ms / 50D * 100, 4));
+                                body.add("MS: " + ms + "ms");
+                            });
+                    body.add("Total PCT: " +  MathUtils.round(totalMS.get() / 50 * 100, 4) + "%");
                     body.add("Total Time: " + totalMS + "ms");
                     body.add("Total Calls: " + Kauri.getInstance().getProfiler().totalCalls);
                     body.add(MiscUtils.lineNoStrike());

@@ -32,8 +32,6 @@ public class SpeedC extends Check {
     public void onBukkitEvent(Event event) {
         PlayerMoveEvent e = (PlayerMoveEvent) event;
 
-        if(MiscUtils.cancelForFlight(getData(), 4, false)) return;
-
         val dxz = MathUtils.hypot(e.getTo().getX() - e.getFrom().getX(), e.getTo().getZ() - e.getFrom().getZ());
         val onGround = e.getPlayer().isOnGround();
 
@@ -46,17 +44,17 @@ public class SpeedC extends Check {
         }
 
         val underBlock = BlockUtils.getBlock(e.getPlayer().getLocation().clone().subtract(0, 0.25,0));
-        val decel = onGround ? ReflectionsUtil.getFriction(underBlock) : Atlas.getInstance().getBlockBoxManager().getBlockBox().getMovementFactor(e.getPlayer());
-        val difference = lastDxz - dxz;
+        val decel = onGround ? ReflectionsUtil.getFriction(underBlock) : (getData().getActionProcessor().isSprinting() ? 0.026f : 0.02f);
+        val difference = MathUtils.getDelta(lastDxz, dxz);
 
-        if(groundTicks > 1 && airTicks > 1 && MathUtils.getDelta(decel, difference) > 1E-6) {
+        if(airTicks > 3 && MathUtils.getDelta(decel, difference) > 0.03 && !MiscUtils.cancelForFlight(getData(), 8, false)) {
             if(vl++ > 4) {
                 flag(difference + ">-" + decel, true, true, AlertTier.HIGH);
-            } else flag(difference + ">-" + decel, true, false, AlertTier.LOW);
+            } else flag(difference + ">-" + decel, true, false, AlertTier.POSSIBLE);
         } else vl-= vl > 0 ? 1 : 0;
 
 
-        debug("decel=" + decel + " dxz=" + dxz);
+        debug("decel=" + decel + " difference=" + difference + " vl=" + vl);
         lastDxz = dxz;
     }
 }

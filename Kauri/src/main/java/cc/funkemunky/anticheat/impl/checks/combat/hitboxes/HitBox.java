@@ -30,7 +30,7 @@ public class HitBox extends Check {
 
             val trace = new RayTrace(origin.toVector(), origin.getDirection());
 
-            val vectors = trace.traverse(3.1, 0.05);
+            val vectors = trace.traverse(3.2, 0.05);
 
             val pastLoc = getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), 150 + Math.abs(getData().getPing() - getData().getLastPing()));
 

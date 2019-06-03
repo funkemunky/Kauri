@@ -8,7 +8,7 @@ import cc.funkemunky.api.utils.Init;
 import lombok.val;
 import org.bukkit.event.Event;
 
-@CheckInfo(name = "Aim (Type K)", description = "Looks for rounded rotational values", type = CheckType.AIM, cancelType = CancelType.MOTION, developer = true, executable = false)
+@CheckInfo(name = "Aim (Type I)", description = "Looks for rounded rotational values", type = CheckType.AIM, cancelType = CancelType.MOTION, developer = true, executable = false)
 @Init
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LOOK, Packet.Client.LEGACY_LOOK, Packet.Client.LEGACY_POSITION_LOOK})
 public class AimI extends Check {
@@ -26,6 +26,8 @@ public class AimI extends Check {
                 flag("YD: " + move.getYawDelta() + " YAW: " + move.getTo().getYaw(), true, true, AlertTier.HIGH);
             }
         }
+
+        debug("yawDelta=" + move.getYawDelta() + " yaw=" + move.getTo().getYaw());
     }
 
     @Override

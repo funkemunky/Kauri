@@ -14,7 +14,7 @@ import org.bukkit.util.Vector;
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK,})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Aim (Type G)", description = "Looks for a common angle mistake in clients. By Itz_Lucky.", type = CheckType.AIM, cancelType = CancelType.MOTION, maxVL = 50)
+@CheckInfo(name = "Aim (Type F)", description = "Looks for a common angle mistake in clients. By Itz_Lucky.", type = CheckType.AIM, cancelType = CancelType.MOTION, maxVL = 50)
 public class AimF extends Check {
 
     private Verbose verbose = new Verbose();

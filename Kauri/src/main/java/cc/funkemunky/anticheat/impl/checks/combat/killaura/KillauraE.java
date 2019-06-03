@@ -28,7 +28,7 @@ import java.util.stream.StreamSupport;
 
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LOOK, Packet.Client.LEGACY_LOOK, Packet.Client.LEGACY_POSITION_LOOK})
 @Init
-@CheckInfo(name = "Killaura (Type G)", description = "Raytraces to check if there are blocks obstructing the path of attack.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, executable = false, developer = true)
+@CheckInfo(name = "Killaura (Type E)", description = "Raytraces to check if there are blocks obstructing the path of attack.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, executable = false, developer = true)
 public class KillauraE extends Check {
 
     //TODO Test for false positives.

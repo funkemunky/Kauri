@@ -78,15 +78,14 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
         });
     }
     private void banUser() {
-        if(!getData().isBanned()) {
+        if(!getData().isBanned() && executable) {
             getData().setBanned(true);
             Kauri.getInstance().getStatsManager().addBan();
-            Kauri.getInstance().getLoggerManager().addBan(getData().getUuid(), this);
             new BukkitRunnable() {
                 public void run() {
+                    vl = 0;
                     execCommand.forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replace("%player%", getData().getPlayer().getName()).replace("%check%", getName())));
-                    getData().getPacketChecks().values().forEach(checkList -> checkList.forEach(check -> check.vl = 0));
-                    getData().getBukkitChecks().values().forEach(checkList -> checkList.forEach(check -> check.vl = 0));
+                    getData().setBanned(false);
                 }
             }.runTaskLater(Kauri.getInstance(), 10);
             if (CheckSettings.broadcastEnabled)

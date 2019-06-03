@@ -13,7 +13,7 @@ import org.bukkit.event.Event;
 
 @Packets(packets = {Packet.Client.USE_ENTITY})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Killaura (Type C)", description = "Checks for clients sprinting while attacking.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, maxVL = 60)
+@CheckInfo(name = "Killaura (Type B)", description = "Checks for clients sprinting while attacking.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, maxVL = 60)
 public class KillauraB extends Check {
 
     private Verbose verbose = new Verbose();

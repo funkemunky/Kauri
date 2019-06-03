@@ -21,10 +21,10 @@ public class FlyA extends Check {
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
-        if(MiscUtils.cancelForFlight(getData(), 4, false)) return;
+        if(MiscUtils.cancelForFlight(getData(), 8, false)) return;
 
 
-        if(MathUtils.getDelta(move.getServerYAcceleration(), move.getClientYAcceleration()) > 1E4 && move.getAirTicks() > 1 && !move.isServerOnGround()) {
+        if(MathUtils.getDelta(move.getServerYAcceleration(), move.getClientYAcceleration()) > 0.03 && move.getAirTicks() > 1 && !move.isServerOnGround()) {
             if((vl++) > 3) {
                 flag(move.getServerYAcceleration() + ">-" + move.getClientYAcceleration(), true, true, AlertTier.HIGH);
             } else if(move.getAirTicks() > 3) {

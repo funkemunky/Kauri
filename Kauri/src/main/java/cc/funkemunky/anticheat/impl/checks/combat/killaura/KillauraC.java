@@ -15,7 +15,7 @@ import java.util.LinkedList;
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Killaura (Type D)", description = "Detects over-randomization in killauras.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT)
+@CheckInfo(name = "Killaura (Type C)", description = "Detects over-randomization in killauras.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT)
 public class KillauraC extends Check {
 
     private float lastYaw, lastPitch;

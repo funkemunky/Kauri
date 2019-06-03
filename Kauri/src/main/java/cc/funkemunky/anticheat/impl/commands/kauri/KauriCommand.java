@@ -25,6 +25,7 @@ public class KauriCommand extends FunkeCommand {
         getArguments().add(new AlertsArgument(this, "alerts", "alerts [dev]", "toggle your alerts", "kauri.alerts", "kauri.staff"));
         getArguments().add(new SaveArgument(this, "save", "save", "save all data", "kauri.save"));
         getArguments().add(new LogArgument(this, "logs", "logs <player>", "view the logs of a player", "kauri.logs"));
+        getArguments().add(new RecentViolationsArgument(this, "recent", "recent", "view the recent violators.", "kauri.recent"));
         getArguments().add(new UpdateConfigArgument(this, "updateconfig", "updateConfig <config/messages> [args]", "update certain or all parts of a config", "kauri.updateConfig"));
         getArguments().add(new BoxWandArgument(this, "boxwand", "boxwand", "receive the magic box wand.", "kauri.boxwand"));
         getArguments().add(new BypassingArgument(this, "bypass", "bypass <player> [boolean]", "set a player to bypass detection without permissions.", "kauri.bypass.command"));

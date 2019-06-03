@@ -25,7 +25,7 @@ import java.util.List;
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
 @Init
-@CheckInfo(name = "Aim (Type F)", description = "Finds any suspiciously consistent variables.", type = CheckType.AIM, executable = false)
+@CheckInfo(name = "Aim (Type E)", description = "Finds any suspiciously consistent variables.", type = CheckType.AIM, executable = false)
 public class AimE extends Check {
 
     private List<Double> gcdValues = new ArrayList<>();
