@@ -7,15 +7,12 @@ import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInAbilitiesPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInEntityActionPacket;
-import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
 import org.bukkit.event.Event;
 
-@CheckInfo(name = "BadPackets (Type L)", description = "Ensures the fall distance is what it should be.", type = CheckType.MOVEMENT)
+@CheckInfo(name = "GroundSpoof (Type B)", description = "Ensures the fall distance is what it should be.", type = CheckType.MOVEMENT)
 @Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION})
 @Init
 public class GroundSpoofB extends Check {

@@ -1,11 +1,12 @@
 package cc.funkemunky.anticheat.impl.checks.movement.speed;
 
-import cc.funkemunky.anticheat.api.checks.*;
+import cc.funkemunky.anticheat.api.checks.AlertTier;
+import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
+import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.BukkitEvents;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
-import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.utils.BlockUtils;
-import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.ReflectionsUtil;
 import lombok.val;

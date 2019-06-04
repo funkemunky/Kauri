@@ -1,8 +1,8 @@
 package cc.funkemunky.anticheat.api.data.logging;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.val;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 

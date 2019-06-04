@@ -12,14 +12,14 @@ import org.bukkit.util.Vector;
 public class CustomLocation {
     private double x, y, z;
     private float yaw, pitch;
-    private int ticks;
+    private long timeStamp;
 
     public CustomLocation(double x, double y, double z) {
         this.x = x;
         this.y = y;
         this.z = z;
 
-        ticks = Kauri.getInstance().getCurrentTicks();
+        timeStamp = System.currentTimeMillis();
     }
 
     public CustomLocation(double x, double y, double z, float yaw, float pitch) {
@@ -29,7 +29,7 @@ public class CustomLocation {
         this.yaw = yaw;
         this.pitch = pitch;
 
-        ticks = Kauri.getInstance().getCurrentTicks();
+        timeStamp = System.currentTimeMillis();
     }
 
     public CustomLocation(double x, double y, double z, float yaw, float pitch, long timeStamp) {
@@ -38,7 +38,7 @@ public class CustomLocation {
         this.z = z;
         this.yaw = yaw;
         this.pitch = pitch;
-        ticks = Kauri.getInstance().getCurrentTicks();
+        this.timeStamp = timeStamp;
     }
 
     public CustomLocation(Location loc) {
@@ -48,11 +48,11 @@ public class CustomLocation {
         this.yaw = loc.getYaw();
         this.pitch = loc.getPitch();
 
-        ticks = Kauri.getInstance().getCurrentTicks();
+        timeStamp = System.currentTimeMillis();
     }
 
     public CustomLocation clone() {
-        return new CustomLocation(x, y, z, yaw, pitch, ticks);
+        return new CustomLocation(x, y, z, yaw, pitch, timeStamp);
     }
 
     public Location toLocation(World world) {

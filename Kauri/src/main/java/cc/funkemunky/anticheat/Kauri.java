@@ -31,10 +31,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.*;
 import java.math.RoundingMode;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Level;
 
@@ -73,8 +74,7 @@ public class Kauri extends JavaPlugin {
         instance = this;
         saveDefaultConfig();
         saveDefaultMessages();
-        if (Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled())
-            return;
+        if (Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled()) ;
 
         profiler = new BaseProfiler();
         profileStart = System.currentTimeMillis();

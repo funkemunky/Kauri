@@ -4,7 +4,6 @@ import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.utils.Messages;
-import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.commands.ancmd.Command;
 import cc.funkemunky.api.commands.ancmd.CommandAdapter;
 import cc.funkemunky.api.utils.Color;

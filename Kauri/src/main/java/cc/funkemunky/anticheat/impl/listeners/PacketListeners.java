@@ -4,7 +4,6 @@ import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckSettings;
 import cc.funkemunky.anticheat.api.data.PlayerData;
-import cc.funkemunky.anticheat.api.utils.CustomLocation;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.events.AtlasListener;
 import cc.funkemunky.api.events.Listen;
@@ -28,7 +27,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
 @Init
 public class PacketListeners implements AtlasListener {

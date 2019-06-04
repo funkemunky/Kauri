@@ -1,6 +1,5 @@
 package cc.funkemunky.dev;
 
-import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.dev.exceptions.CheckDoesNotExistException;
 
 public class KauriAPI {

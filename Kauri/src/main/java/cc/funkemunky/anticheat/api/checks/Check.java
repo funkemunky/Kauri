@@ -7,7 +7,6 @@ import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.JsonMessage;
 import cc.funkemunky.api.utils.MiscUtils;
-import cc.funkemunky.api.utils.TickTimer;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;

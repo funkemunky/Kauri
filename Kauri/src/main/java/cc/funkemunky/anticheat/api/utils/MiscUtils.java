@@ -113,7 +113,7 @@ public class MiscUtils {
                 || move.getLastRiptide().hasNotPassed(8)
                 || move.isPistonsNear()
                 || move.getTo() != null && move.getTo().toVector().distance(move.getFrom().toVector()) < 0.005
-                || velocity.getLastVelocity().hasNotPassed(velocityTicks);
+                || velocity.getLastVelocity().hasNotPassed(velocityTicks + MiscUtils.millisToTicks(data.getPing()) * 3);
     }
 
     public static Class<?> getClass(String string) {

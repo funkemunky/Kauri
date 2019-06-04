@@ -2,29 +2,16 @@ package cc.funkemunky.anticheat.impl.checks.combat.killaura;
 
 import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.Packets;
-import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
-import cc.funkemunky.api.utils.*;
+import cc.funkemunky.api.utils.Init;
+import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.math.RayTrace;
 import lombok.val;
-import lombok.var;
 import one.util.streamex.StreamEx;
-import org.bukkit.block.Block;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
-import org.bukkit.util.Vector;
 
 import java.util.Comparator;
-import java.util.List;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LOOK, Packet.Client.LEGACY_LOOK, Packet.Client.LEGACY_POSITION_LOOK})
 @Init

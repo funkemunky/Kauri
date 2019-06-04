@@ -1,6 +1,5 @@
 package cc.funkemunky.anticheat.api.data.processors;
 
-import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.utils.CollisionAssessment;
 import cc.funkemunky.anticheat.api.utils.CustomLocation;
@@ -12,7 +11,6 @@ import cc.funkemunky.api.utils.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.potion.PotionEffectType;
 

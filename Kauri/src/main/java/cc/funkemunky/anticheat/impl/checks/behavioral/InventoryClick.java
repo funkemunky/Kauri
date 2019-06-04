@@ -7,7 +7,6 @@ import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.math.RollingAverage;
-import cc.funkemunky.api.utils.math.RollingAverageDouble;
 import lombok.val;
 import org.bukkit.event.Event;
 

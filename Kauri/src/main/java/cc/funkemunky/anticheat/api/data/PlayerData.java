@@ -22,9 +22,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Getter
@@ -84,13 +88,15 @@ public class PlayerData {
         Kauri.getInstance().getCheckManager().loadChecksIntoData(this);
         Kauri.getInstance().getAntiPUPManager().loadMethodsIntoData(this);
 
-        Atlas.getInstance().getSchedular().scheduleAtFixedRate(() -> {
-            if (target != null && !target.isDead()) {
-                entityFrom = entityTo;
-                entityTo = new CustomLocation(target.getLocation());
-                entityPastLocation.addLocation(entityTo);
+        new BukkitRunnable() {
+            public void run() {
+                if (target != null && !target.isDead()) {
+                    entityFrom = entityTo;
+                    entityTo = new CustomLocation(target.getLocation());
+                    entityPastLocation.addLocation(entityTo);
+                }
             }
-        }, 50L, 50L, TimeUnit.MILLISECONDS);
+        }.runTaskTimer(Kauri.getInstance(), 0L, 1L);
     }
 
     public boolean isServerPos() {

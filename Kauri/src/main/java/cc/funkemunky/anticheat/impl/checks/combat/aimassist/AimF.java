@@ -28,10 +28,11 @@ public class AimF extends Check {
         double angleMove = vector.distanceSquared((new Vector(move.getTo().getYaw() - move.getFrom().getYaw(), 0, move.getTo().getYaw() - move.getFrom().getYaw())));
 
         if (angleMove > 100000 && move.getDeltaXZ() > 0.2f && move.getDeltaXZ() < 1) {
-            if(verbose.flag(3, 1000L)) {
+            if(verbose.flag(5, 1000L)) {
                 flag("angle: " + angleMove, true, true, AlertTier.CERTAIN);
+            } else if(verbose.getVerbose() > 2) {
+                flag("angle: " + angleMove, true, true, AlertTier.LIKELY);
             }
-            flag("angle: " + angleMove, true, true, AlertTier.LIKELY);
         }
 
         debug("angle: " + angleMove);

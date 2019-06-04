@@ -4,7 +4,6 @@ import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockDigPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
 import cc.funkemunky.api.utils.Init;
 import org.bukkit.event.Event;
 

@@ -11,7 +11,6 @@ import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
 import org.bukkit.event.Event;
-import org.bukkit.util.Vector;
 
 @Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION, Packet.Server.ENTITY_VELOCITY})
 @cc.funkemunky.api.utils.Init

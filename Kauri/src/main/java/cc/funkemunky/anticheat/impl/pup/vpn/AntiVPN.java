@@ -5,20 +5,14 @@ import cc.funkemunky.anticheat.api.pup.AntiPUP;
 import cc.funkemunky.anticheat.api.pup.PuPType;
 import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.anticheat.api.utils.VPNResponse;
-import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.utils.Color;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerPreLoginEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.FutureTask;
 
 public class AntiVPN extends AntiPUP {
 

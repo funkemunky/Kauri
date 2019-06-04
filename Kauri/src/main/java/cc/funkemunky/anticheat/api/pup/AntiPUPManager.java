@@ -11,7 +11,6 @@ import cc.funkemunky.anticheat.impl.pup.exploits.BookEnchant;
 import cc.funkemunky.anticheat.impl.pup.vpn.AntiVPN;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.database.DatabaseType;
-import cc.funkemunky.api.database.flatfile.FlatfileDatabase;
 
 import java.util.ArrayList;
 import java.util.Arrays;

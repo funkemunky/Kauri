@@ -4,7 +4,6 @@ import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.Init;
-import cc.funkemunky.api.utils.TickTimer;
 import lombok.val;
 import org.bukkit.event.Event;
 

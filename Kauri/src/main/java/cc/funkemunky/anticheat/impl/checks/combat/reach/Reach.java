@@ -26,13 +26,13 @@ public class Reach extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         if(getData().getPlayer().getGameMode().equals(GameMode.CREATIVE)) return;
         if(packetType.equals(Packet.Client.ARM_ANIMATION)) {
-            vl-= vl > 0 ? 0.025 : 0;
+            vl-= vl > 0 ? 0.01 : 0;
         } else {
             val target = getData().getTarget();
             val move = getData().getMovementProcessor();
 
             if(target != null && getData().getLastLogin().hasPassed(5) && !getData().isServerPos() && getData().getLastAttack().hasNotPassed(0) && getData().getTransPing() < 450) {
-                long range = (move.getYawDelta() > 4 ? 150 : 100) + Math.abs(getData().getTransPing() - getData().getLastTransPing()) * 3;
+                long range = (move.getYawDelta() > 6 ? 200 : 150) + Math.abs(getData().getTransPing() - getData().getLastTransPing()) * 3;
                 val location = getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), range);
                 val to = move.getTo().toLocation(getData().getPlayer().getWorld()).add(0, getData().getActionProcessor().isSneaking() ? 1.53f : 1.64f, 0);
                 val trace = new RayTrace(to.toVector(), to.getDirection());
@@ -69,7 +69,7 @@ public class Reach extends Check {
                     } else {
                         flag("reach=" + distance, true, false, AlertTier.LOW);
                     }
-                } else vl-= vl > 0 ? 0.1 : 0;
+                } else vl-= vl > 0 ? 0.05 : 0;
 
                 debug((distance > 3 ? Color.Green : "") + "distance=" + distance + " vl=" + vl + " range=" + range);
             }

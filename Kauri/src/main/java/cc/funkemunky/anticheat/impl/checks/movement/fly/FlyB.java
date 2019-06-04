@@ -4,7 +4,6 @@ import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
-import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
@@ -24,7 +23,7 @@ public class FlyB extends Check {
         val max = predicatedMaxHeight();
         val move = getData().getMovementProcessor();
 
-        if(MiscUtils.cancelForFlight(getData(), -1, false)) return;
+        if(MiscUtils.cancelForFlight(getData(), 0, false)) return;
 
         if(move.getDeltaY() > max) {
             flag(move.getDeltaY() + ">-" + max, true, true, AlertTier.HIGH);

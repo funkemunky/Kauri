@@ -3,7 +3,6 @@ package cc.funkemunky.anticheat.impl.checks.combat.aimassist;
 import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
-import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import lombok.val;
 import org.bukkit.event.Event;
