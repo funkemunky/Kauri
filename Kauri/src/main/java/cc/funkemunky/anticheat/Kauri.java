@@ -74,7 +74,7 @@ public class Kauri extends JavaPlugin {
         instance = this;
         saveDefaultConfig();
         saveDefaultMessages();
-        if (Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled()) ;
+        //if (Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled()) ;
 
         profiler = new BaseProfiler();
         profileStart = System.currentTimeMillis();
