@@ -25,4 +25,13 @@ public class MathUtils {
         for (int i = 1; i < input.length; i++) result = lcm(result, input[i]);
         return result;
     }
+
+    public static boolean isPrimeNumber(long number) {
+        for(int i = 2 ; i < 9 ; i++) {
+            if(number % i == 0) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
