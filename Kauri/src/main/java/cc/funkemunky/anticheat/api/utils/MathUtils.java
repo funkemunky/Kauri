@@ -26,11 +26,13 @@ public class MathUtils {
         return result;
     }
 
-    public static boolean isPrimeNumber(long number) {
-        for(int i = 2 ; i < 9 ; i++) {
-            if(number % i == 0) {
+    public static boolean isPrimeNumber(long n) {
+        //check if n is a multiple of 2
+        if (n%2==0) return false;
+        //if not, then just check the odds
+        for(int i=3;i*i<=n;i+=2) {
+            if(n%i==0)
                 return false;
-            }
         }
         return true;
     }

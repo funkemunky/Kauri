@@ -1,5 +1,1 @@
-cc\funkemunky\anticheat\impl\checks\movement\groundspoof\GroundSpoofA.class
-cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimJ.class
-cc\funkemunky\anticheat\impl\commands\kauri\arguments\RecentViolationsArgument.class
-cc\funkemunky\anticheat\api\data\PlayerData$1.class
-cc\funkemunky\anticheat\impl\checks\movement\groundspoof\GroundSpoofB.class
+cc/funkemunky/anticheat/api/data/PlayerData$1.class
