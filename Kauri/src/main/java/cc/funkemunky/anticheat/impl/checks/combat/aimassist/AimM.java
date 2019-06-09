@@ -11,7 +11,7 @@ import cc.funkemunky.api.utils.Init;
 import lombok.val;
 import org.bukkit.event.Event;
 
-@Init
+//@Init
 @CheckInfo(name = "Aim (Type M)", description = "Checks if the relationship between yaw changes is a prime number.", type = CheckType.AIM, maxVL = 10, developer = true)
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LOOK})
 public class AimM extends Check {

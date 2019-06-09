@@ -18,7 +18,7 @@ import org.bukkit.event.Event;
         Packet.Client.LOOK,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
-@cc.funkemunky.api.utils.Init
+//@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Aim (Type K)", description = "Looks for weird offests using angular calculation.", maxVL = 50, cancelType = CancelType.MOTION, type = CheckType.AIM, developer = true)
 public class AimK extends Check {
 
