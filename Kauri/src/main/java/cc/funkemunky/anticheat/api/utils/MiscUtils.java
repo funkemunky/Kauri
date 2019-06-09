@@ -40,7 +40,7 @@ public class MiscUtils {
     }
 
     public static float getBaseSpeed(PlayerData data) {
-        return 0.25f + (PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.SPEED) * 0.062f) + ((data.getPlayer().getWalkSpeed() - 0.2f) * 1.6f);
+        return 0.25f + (PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.SPEED) * 0.062f) + (data.getPlayer().getWalkSpeed() - 0.2f) * 1.6f;
     }
 
     public static double hypot(double... value) {
