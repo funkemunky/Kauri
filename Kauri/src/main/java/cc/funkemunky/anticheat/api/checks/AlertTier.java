@@ -1,7 +1,11 @@
 package cc.funkemunky.anticheat.api.checks;
 
 import cc.funkemunky.anticheat.api.utils.Messages;
+import cc.funkemunky.api.utils.MathUtils;
 import lombok.Getter;
+
+import java.util.Arrays;
+import java.util.Comparator;
 
 @Getter
 public enum AlertTier {
@@ -13,5 +17,9 @@ public enum AlertTier {
     AlertTier(String name, int priority) {
         this.name = name;
         this.priority = priority;
+    }
+
+    public static AlertTier getByValue(int value) {
+        return Arrays.stream(values()).filter(tier -> Math.abs(tier.priority - value) == 0).findFirst().orElse(AlertTier.LOW);
     }
 }

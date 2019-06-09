@@ -21,7 +21,7 @@ public class KillauraE extends Check {
     //TODO Test for false positives.
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(getData().getTarget() != null && getData().getLastAttack().hasNotPassed(0)) {
+        if(getData().getTarget() != null && getData().getLastAttack().hasNotPassed(0) && !getData().isLagging()) {
             val move = getData().getMovementProcessor();
             val origin = move.getTo().toLocation(getData().getPlayer().getWorld()).add(0, 1.54, 0);
             val target = getData().getTarget();

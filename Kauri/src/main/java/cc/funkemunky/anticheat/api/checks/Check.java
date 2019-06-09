@@ -38,42 +38,46 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
         alertMessage = CheckSettings.alertMessage;
     }
 
-    protected void flag(String information, boolean cancel, boolean ban, AlertTier alertTier) {
+    protected void flag(String information, boolean cancel, boolean ban, AlertTier tier) {
         Kauri.getInstance().getCheckManager().getAlertsExecutable().execute(() -> {
-            data.getLastFlag().reset();
+            if(Kauri.getInstance().getTps() > CheckSettings.tpsThreshold) {
+                data.getLastFlag().reset();
+                final AlertTier alertTier = getData().isLagging() ? AlertTier.getByValue(tier.getPriority() - 2) : tier;
 
-            JsonMessage message = new JsonMessage();
+                JsonMessage message = new JsonMessage();
 
-            long timeStamp = System.currentTimeMillis();
-            if (cancel && cancellable) data.setCancelType(cancelType);
-            if (ban) {
-                if(!data.isLagging()) {
-                    vl++;
-                    Kauri.getInstance().getStatsManager().addFlag();
-                }
-                Kauri.getInstance().getLoggerManager().addViolation(data.getUuid(), this);
-            }
-            if (alertTier.equals(AlertTier.CERTAIN) || (vl > maxVL && executable && ban && !developer && !getData().isBanned())) {
-                banUser();
-            }
-            if (timeStamp - lastAlert > CheckSettings.alertsDelay) {
-                val dataToAlert = Kauri.getInstance().getDataManager().getDataObjects().keySet().stream().map(key -> Kauri.getInstance().getDataManager().getDataObjects().get(key)).filter(data -> data.getAlertTier() != null && data.getPlayer().hasPermission("kauri.alerts")).collect(Collectors.toList());
-                if (!developer && Kauri.getInstance().getTps() > CheckSettings.tpsThreshold) {
-                    message.addText(Color.translate(alertMessage.replace("%prefix%", CheckSettings.alertPrefix).replace("%check%", getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", String.valueOf(vl)).replace("%info%", information).replace("%chance%", alertTier.getName()))).addHoverText(Color.Gray + information);
+                long timeStamp = System.currentTimeMillis();
+                if (cancel && cancellable) data.setCancelType(cancelType);
 
-                    dataToAlert.stream().filter(data2 -> data2.getAlertTier().getPriority() <= alertTier.getPriority()).forEach(data2 -> message.sendToPlayer(data2.getPlayer()));
-                    if (CheckSettings.printToConsole) {
-                        MiscUtils.printToConsole(alertMessage.replace("%check%", (developer ? Color.Red + Color.Italics : "") + getName()).replace("%prefix%", CheckSettings.alertPrefix).replace("%check%", getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", String.valueOf(vl)).replace("%info%", information).replace("%chance%", alertTier.getName()));
+                if (ban) {
+                    if (!data.isLagging() && data.getLastLag().hasPassed(4)) {
+                        vl++;
+                        Kauri.getInstance().getStatsManager().addFlag();
                     }
-                } else {
-                    message.addText(Color.translate(alertMessage.replace("%prefix%", CheckSettings.devAlertPrefix).replace("%check%", Color.Red + Color.Italics + getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", "N/A").replace("%chance%", alertTier.getName()).replace("%info%", information))).addHoverText(Color.Gray + information);
-
-                    dataToAlert.stream().filter(PlayerData::isDeveloperAlerts).forEach(data -> message.sendToPlayer(data.getPlayer()));
+                    Kauri.getInstance().getLoggerManager().addViolation(data.getUuid(), this);
                 }
-                lastAlert = timeStamp;
-            }
+                if (alertTier.equals(AlertTier.CERTAIN) || (vl > maxVL && executable && ban && !developer && !getData().isBanned())) {
+                    banUser();
+                }
+                if (timeStamp - lastAlert > CheckSettings.alertsDelay) {
+                    val dataToAlert = Kauri.getInstance().getDataManager().getDataObjects().keySet().stream().map(key -> Kauri.getInstance().getDataManager().getDataObjects().get(key)).filter(data -> data.getAlertTier() != null && data.getPlayer().hasPermission("kauri.alerts")).collect(Collectors.toList());
+                    if (!developer) {
+                        message.addText(Color.translate(alertMessage.replace("%prefix%", CheckSettings.alertPrefix).replace("%check%", getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", String.valueOf(vl)).replace("%info%", information).replace("%chance%", alertTier.getName()))).addHoverText(Color.Gray + information);
 
-            if (CheckSettings.testMode && !data.isAlertsEnabled()) message.sendToPlayer(data.getPlayer());
+                        dataToAlert.stream().filter(data2 -> data2.getAlertTier().getPriority() <= alertTier.getPriority()).forEach(data2 -> message.sendToPlayer(data2.getPlayer()));
+                        if (CheckSettings.printToConsole) {
+                            MiscUtils.printToConsole(alertMessage.replace("%check%", (developer ? Color.Red + Color.Italics : "") + getName()).replace("%prefix%", CheckSettings.alertPrefix).replace("%check%", getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", String.valueOf(vl)).replace("%info%", information).replace("%chance%", alertTier.getName()));
+                        }
+                    } else {
+                        message.addText(Color.translate(alertMessage.replace("%prefix%", CheckSettings.devAlertPrefix).replace("%check%", Color.Red + Color.Italics + getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", "N/A").replace("%chance%", alertTier.getName()).replace("%info%", information))).addHoverText(Color.Gray + information);
+
+                        dataToAlert.stream().filter(PlayerData::isDeveloperAlerts).forEach(data -> message.sendToPlayer(data.getPlayer()));
+                    }
+                    lastAlert = timeStamp;
+                }
+
+                if (CheckSettings.testMode && !data.isAlertsEnabled()) message.sendToPlayer(data.getPlayer());
+            }
         });
     }
     private void banUser() {

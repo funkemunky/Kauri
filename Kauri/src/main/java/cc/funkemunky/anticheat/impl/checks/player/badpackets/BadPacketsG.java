@@ -18,10 +18,7 @@ import org.bukkit.event.Event;
         Packet.Client.FLYING,
         Packet.Client.POSITION,
         Packet.Client.POSITION_LOOK,
-        Packet.Client.LOOK,
-        Packet.Client.LEGACY_POSITION,
-        Packet.Client.LEGACY_POSITION_LOOK,
-        Packet.Client.LEGACY_LOOK})
+        Packet.Client.LOOK})
 @cc.funkemunky.api.utils.Init
 @CheckInfo(name = "BadPackets (Type G)", description = "Checks frequency of incoming packets. More detection, but less reliable.", type = CheckType.BADPACKETS, maxVL = 200, executable = false, developer = true)
 public class BadPacketsG extends Check {
@@ -59,7 +56,7 @@ public class BadPacketsG extends Check {
         val max = usingPaper ? 7.071f : Math.sqrt(Kauri.getInstance().getTickElapsed());
         val stdDev = this.statisticalAnalysis.getStdDev();
 
-        if (!MathUtils.approxEquals(deltaBalance, max, stdDev) && stdDev < max && getData().getLastLag().hasNotPassed(10)) {
+        if (!MathUtils.approxEquals(deltaBalance, max, stdDev) && !getData().isLagging() && stdDev < max && getData().getLastLag().hasNotPassed(10)) {
             if (lastLag.hasPassed() && vl++ > maxVL) {
                 this.flag("S: " + stdDev, false, true, vl > 60 ? AlertTier.HIGH : AlertTier.LIKELY);
             }

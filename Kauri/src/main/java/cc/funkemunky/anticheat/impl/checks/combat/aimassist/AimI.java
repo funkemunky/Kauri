@@ -21,7 +21,7 @@ public class AimI extends Check {
 
         if (getData().isServerPos()) return;
 
-        if (move.getYawDelta() > 0.1 && move.getYawDelta() % 0.5 == 0 || move.getTo().getYaw() % 1 == 0) {
+        if (move.getYawDelta() > 0.1 && (move.getYawDelta() % 0.5 == 0 || move.getTo().getYaw() % 1 == 0)) {
             if (verbose.flag(6, 600L)) {
                 flag("YD: " + move.getYawDelta() + " YAW: " + move.getTo().getYaw(), true, true, AlertTier.HIGH);
             }

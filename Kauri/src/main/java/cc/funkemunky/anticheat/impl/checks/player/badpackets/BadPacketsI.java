@@ -2,46 +2,35 @@ package cc.funkemunky.anticheat.impl.checks.player.badpackets;
 
 import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.Packets;
-import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockDigPacket;
 import cc.funkemunky.api.utils.Init;
 import org.bukkit.event.Event;
 
-@CheckInfo(name = "BadPackets (Type I)", description = "Looks for another mistake commonly found in autoblock modules on cheat clients.", type = CheckType.BADPACKETS, cancelType = CancelType.INTERACT)
+@CheckInfo(name = "BadPackets (Type I)", description = "Checks for instant blocks and unblocks.", type = CheckType.BADPACKETS, cancelType = CancelType.INTERACT, maxVL = 40)
+@Packets(packets = {Packet.Client.BLOCK_PLACE, Packet.Client.BLOCK_DIG})
 @Init
-@Packets(packets = {Packet.Client.USE_ENTITY, Packet.Client.BLOCK_PLACE})
 public class BadPacketsI extends Check {
 
-    @Setting(name = "theshold.vl.max")
-    private int maxVL = 12;
-
-    @Setting(name = "threshold.vl.reset")
-    private long resetTime = 600L;
-
-    @Setting(name = "threshold.vl.deduct")
-    private int deduct = 1;
-
-    private long blockPlace, useEntity;
+    private long lastBlockPlace;
     private Verbose verbose = new Verbose();
 
-    //TODO block place and block dig difference.
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if (packetType.equalsIgnoreCase(Packet.Client.USE_ENTITY)) {
-            if (timeStamp - useEntity < 5 || getData().isLagging()) return;
-            long delta = (timeStamp - blockPlace);
+        if(packetType.equals(Packet.Client.BLOCK_DIG)) {
+            WrappedInBlockDigPacket dig = new WrappedInBlockDigPacket(packet, getData().getPlayer());
 
-            if (delta == 0) {
-                if (verbose.flag(maxVL, resetTime, 2)) {
-                    flag(delta + "ms", true, true, AlertTier.HIGH);
+            if(dig.getAction().equals(WrappedInBlockDigPacket.EnumPlayerDigType.RELEASE_USE_ITEM)) {
+                long delta = timeStamp - lastBlockPlace;
+
+                if(!getData().isLagging() && getData().getLastLag().hasPassed(5) && delta == 0 && verbose.flag(4, 1000L)) {
+                    flag("delta=0", true, true, AlertTier.HIGH);
                 }
-            } else verbose.deduct(deduct);
-            debug("USE: [" + (timeStamp - blockPlace) + "ms]");
-            useEntity = timeStamp;
-        } else {
-            blockPlace = timeStamp;
-        }
+
+                debug("delta=" + delta);
+            }
+        } else if(packetType.equalsIgnoreCase(Packet.Client.BLOCK_PLACE)) lastBlockPlace = timeStamp;
     }
 
     @Override

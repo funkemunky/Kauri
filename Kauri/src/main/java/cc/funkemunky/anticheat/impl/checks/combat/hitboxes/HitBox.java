@@ -14,7 +14,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
 import org.bukkit.util.Vector;
 
-@CheckInfo(name = "HitBox", description = "Ensures that the player is not using any expanded form of a player hitbox.", type = CheckType.REACH, cancelType = CancelType.COMBAT, developer = true)
+@CheckInfo(name = "HitBox", description = "Ensures that the player is not using any expanded form of a player hitbox.", type = CheckType.REACH, cancelType = CancelType.COMBAT)
 @Packets(packets = {Packet.Client.USE_ENTITY, Packet.Client.ARM_ANIMATION})
 @Init
 public class HitBox extends Check {
@@ -36,7 +36,7 @@ public class HitBox extends Check {
 
             val doesMatch = vectors.stream().anyMatch(vec -> pastLoc.stream().anyMatch(loc -> getHitbox(getData().getTarget(), loc).intersectsWithBox(vec)));
 
-            if(!doesMatch) {
+            if(!doesMatch && !getData().isLagging()) {
                 val reach = pastLoc.stream().mapToDouble(loc -> loc.toVector().add(new Vector(0, 1.53, 0)).distance(origin.toVector())).average().getAsDouble();
 
                 if(vl++ > 8) {

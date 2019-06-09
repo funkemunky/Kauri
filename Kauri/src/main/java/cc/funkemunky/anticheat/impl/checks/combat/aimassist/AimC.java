@@ -17,7 +17,7 @@ public class AimC extends Check {
     private int vl;
 
     @Setting(name = "threshold.vl.max")
-    private int vlMax = 9;
+    private int vlMax = 15;
 
     @Setting(name = "threshold.vl.subtract")
     private int subtract = 2;

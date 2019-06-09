@@ -58,7 +58,7 @@ public class CollisionAssessment {
                 pistonsNear = true;
             }
 
-            if (BlockUtils.isSlab(block) || BlockUtils.isStair(block) || block.getType().getId() == 92 || block.getType().getId() == 397) {
+            if ((BlockUtils.isSlab(block) || BlockUtils.isStair(block) || block.getType().getId() == 92 || block.getType().getId() == 397) && bb.intersectsWithBox(data.getBoundingBox().grow(0,0.1f,0))) {
                 onHalfBlock = true;
             }
 
@@ -68,7 +68,6 @@ public class CollisionAssessment {
 
             if (bb.collidesHorizontally(playerBox.grow((ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_13) ? 0.05f : 0), 0, (ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_13) ? 0.05f : 0)))) {
                 collidesHorizontally = true;
-
             }
 
             if (bb.collidesVertically(playerBox.subtract(0, 0.1f, 0, 0, 0, 0)) && block.getType().toString().contains("SLIME")) {
