@@ -60,8 +60,8 @@ public class Kauri extends JavaPlugin {
     private BaseProfiler profiler;
     private VPNUtils vpnUtils;
 
-    private String requiredVersionOfAtlas = "1.2";
-    private List<String> usableVersionsOfAtlas = Arrays.asList("1.2", "1.2-PRE-b8");
+    private String requiredVersionOfAtlas = "1.2.2";
+    private List<String> usableVersionsOfAtlas = Arrays.asList("1.2", "1.2-PRE-b8", "1.2.1", "1.2.2");
 
     private FileConfiguration messages;
     private File messagesFile;
@@ -75,7 +75,7 @@ public class Kauri extends JavaPlugin {
         saveDefaultConfig();
         saveDefaultMessages();
 
-        if (Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled()) return;
+        //if (Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled()) return;
 
         profiler = new BaseProfiler();
         profileStart = System.currentTimeMillis();

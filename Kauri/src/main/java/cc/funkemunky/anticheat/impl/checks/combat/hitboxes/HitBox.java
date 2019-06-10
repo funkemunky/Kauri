@@ -30,7 +30,7 @@ public class HitBox extends Check {
 
             val trace = new RayTrace(origin.toVector(), origin.getDirection());
 
-            val vectors = trace.traverse(3.2, 0.05);
+            val vectors = trace.traverse(3.2, 0.1);
 
             val pastLoc = getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), 150 + Math.abs(getData().getPing() - getData().getLastPing()));
 
@@ -54,6 +54,6 @@ public class HitBox extends Check {
 
     private BoundingBox getHitbox(LivingEntity entity, CustomLocation l) {
         Vector dimensions = MiscUtils.entityDimensions.getOrDefault(entity.getType(), new Vector(0.35F, 1.85F, 0.35F));
-        return (new BoundingBox(l.toVector(), l.toVector())).grow(0.15F, 0.15F, 0.15F).grow((float)dimensions.getX(), 0.0F, (float)dimensions.getZ()).add(0.0F, 0.0F, 0.0F, 0.0F, (float)dimensions.getY(), 0.0F);
+        return (new BoundingBox(l.toVector(), l.toVector())).grow(0.24F, 0.2F, 0.24F).grow((float)dimensions.getX(), 0.0F, (float)dimensions.getZ()).add(0.0F, 0.0F, 0.0F, 0.0F, (float)dimensions.getY(), 0.0F);
     }
 }
