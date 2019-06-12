@@ -20,7 +20,6 @@ cc\funkemunky\anticheat\impl\checks\player\badpackets\BadPacketsD.class
 cc\funkemunky\anticheat\impl\pup\crashers\ChatSpam.class
 cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimA.class
 cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimD.class
-cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimM.class
 cc\funkemunky\anticheat\impl\checks\combat\autoclicker\AutoclickerF.class
 cc\funkemunky\anticheat\api\utils\Pastebin$Privacy.class
 cc\funkemunky\anticheat\impl\checks\player\badpackets\BadPacketsG.class
@@ -112,7 +111,6 @@ cc\funkemunky\anticheat\impl\pup\crashers\CommandSpam.class
 cc\funkemunky\anticheat\api\utils\json\JSONTokener.class
 cc\funkemunky\anticheat\impl\checks\combat\autoclicker\DoubleClick.class
 cc\funkemunky\anticheat\impl\checks\movement\noslowdown\NoSlowdownC.class
-cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimK.class
 cc\funkemunky\anticheat\impl\checks\combat\autoclicker\AutoclickerD.class
 cc\funkemunky\anticheat\impl\checks\combat\autoclicker\AutoclickerE$1.class
 cc\funkemunky\anticheat\impl\checks\movement\jesus\JesusA.class

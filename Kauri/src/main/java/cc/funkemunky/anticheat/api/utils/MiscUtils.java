@@ -4,6 +4,7 @@ import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.BoundingBox;
+import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.PlayerUtils;
 import lombok.val;
 import org.bukkit.Bukkit;
@@ -113,7 +114,7 @@ public class MiscUtils {
                 || move.getLastRiptide().hasNotPassed(8)
                 || move.isPistonsNear()
                 || move.getTo() != null && move.getTo().toVector().distance(move.getFrom().toVector()) < 0.005
-                || velocity.getLastVelocity().hasNotPassed(velocityTicks + MiscUtils.millisToTicks(data.getPing()) * 3);
+                || !MathUtils.elapsed(velocity.getLastVelocityTimestamp(), velocityTicks == 0 ? 0 : velocityTicks * 50 + data.getPing() * 3);
     }
 
     public static Class<?> getClass(String string) {

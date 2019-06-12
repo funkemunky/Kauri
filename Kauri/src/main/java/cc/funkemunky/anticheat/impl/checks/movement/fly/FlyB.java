@@ -20,7 +20,7 @@ public class FlyB extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        val max = predicatedMaxHeight();
+        val max = predicatedMaxHeight() + 0.25f;
         val move = getData().getMovementProcessor();
 
         if(MiscUtils.cancelForFlight(getData(), 0, false)) return;

@@ -10,20 +10,29 @@ import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.math.RayTrace;
 import lombok.val;
+import org.bukkit.GameMode;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 @CheckInfo(name = "HitBox", description = "Ensures that the player is not using any expanded form of a player hitbox.", type = CheckType.REACH, cancelType = CancelType.COMBAT)
-@Packets(packets = {Packet.Client.USE_ENTITY, Packet.Client.ARM_ANIMATION})
+@Packets(packets = {Packet.Client.FLYING, Packet.Client.POSITION_LOOK, Packet.Client.LOOK, Packet.Client.POSITION, Packet.Client.ARM_ANIMATION})
 @Init
 public class HitBox extends Check {
 
     private double vl;
+    private List<EntityType> allowedEntities = Arrays.asList(EntityType.ZOMBIE, EntityType.VILLAGER, EntityType.PLAYER, EntityType.SKELETON);
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(packetType.equals(Packet.Client.USE_ENTITY)) {
+        if(packetType.equalsIgnoreCase(Packet.Client.ARM_ANIMATION)) {
+            vl-= vl > 0 ? 0.05 : 0;
+        } else if(getData().getTarget() != null && allowedEntities.contains(getData().getTarget().getType()) && getData().getLastAttack().hasNotPassed(0) && !getData().getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
             val move = getData().getMovementProcessor();
 
             val origin = move.getTo().toLocation(getData().getPlayer().getWorld()).add(0, 1.53f, 0);
@@ -44,7 +53,7 @@ public class HitBox extends Check {
                 }
                 debug("vl=" + vl  + " distance1=" + reach);
             } else vl-= vl > 0 ? 0.5 : 0;
-        } else vl-= vl > 0 ? 0.05 : 0;
+        }
     }
 
     @Override

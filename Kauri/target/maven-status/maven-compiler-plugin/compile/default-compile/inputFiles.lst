@@ -48,7 +48,6 @@ C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\antichea
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\api\utils\json\HTTP.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\api\data\processors\VelocityProcessor.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\impl\commands\kauri\KauriCommand.java
-C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimM.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\api\data\banwave\BanwaveConfig.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\impl\checks\combat\autoclicker\AutoclickerA.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\impl\checks\movement\speed\SpeedC.java
@@ -164,4 +163,3 @@ C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\antichea
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\impl\checks\movement\noslowdown\NoSlowdownB.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\api\utils\json\JSONStringer.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\api\utils\menu\type\BukkitInventoryHolder.java
-C:\Users\suckm\Documents\GitHub\Kauri\Kauri\src\main\java\cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimK.java

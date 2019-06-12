@@ -27,7 +27,7 @@ public class FlyA extends Check {
         if(MathUtils.getDelta(move.getServerYAcceleration(), move.getClientYAcceleration()) > 0.03 && move.getAirTicks() > 1 && !move.isServerOnGround()) {
             if((vl++) > 3) {
                 flag(move.getServerYAcceleration() + ">-" + move.getClientYAcceleration(), true, true, AlertTier.HIGH);
-            } else if(move.getAirTicks() > 3 && MathUtils.getDelta(move.getServerYAcceleration(), move.getClientYAcceleration()) > 0.2) {
+            } else if(move.getAirTicks() > 3 && MathUtils.getDelta(move.getServerYAcceleration(), move.getClientYAcceleration()) > 0.4) {
                 flag(move.getServerYAcceleration() + ">-" + move.getClientYAcceleration(), true, true, AlertTier.LIKELY);
             }
         } else vl-= vl > 0 ? 1 : 0;

@@ -46,7 +46,7 @@ public class InventoryClick extends Check {
 
                     if(delta < 1) {
                         if(vl++ > 5) {
-                            flag("arm=" + MathUtils.round(armAverage, 2) + " inv=" + MathUtils.round(invAverage, 2), true, true, vl > 30 ? AlertTier.LIKELY : vl > 10 ? AlertTier.POSSIBLE : AlertTier.LOW);
+                            flag("arm=" + MathUtils.round(armAverage, 2) + " inv=" + MathUtils.round(invAverage, 2), true, true, vl > 12 ? AlertTier.LIKELY : vl > 8 ? AlertTier.POSSIBLE : AlertTier.LOW);
                         }
                     } else vl = 0;
 

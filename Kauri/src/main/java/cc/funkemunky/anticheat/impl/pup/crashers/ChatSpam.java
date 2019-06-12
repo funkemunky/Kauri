@@ -32,7 +32,7 @@ public class ChatSpam extends AntiPUP {
 
     @EventHandler
     public void onEvent(AsyncPlayerChatEvent event) {
-        if(event.getPlayer().getUniqueId().equals(getData().getUuid())) {
+        if(event.getPlayer() != null && event.getPlayer().getUniqueId().equals(getData().getUuid())) {
             String message = event.getMessage();
 
             if (!message.startsWith("/")) {

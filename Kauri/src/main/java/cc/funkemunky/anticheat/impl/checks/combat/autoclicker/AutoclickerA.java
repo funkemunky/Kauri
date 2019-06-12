@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.combat.autoclicker;
 
+import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
@@ -18,21 +19,13 @@ public class AutoclickerA extends Check {
     @Setting(name = "banCPS")
     private int banCPS = 30;
 
-    @Setting(name = "verboseThreshold")
-    private int verboseThreshold = 6;
-
-    @Setting(name = "verboseDeduct")
-    private double deduct = 0.25;
-
     private int ticks;
     private long lastTimeStamp;
     private double vl;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(MiscUtils.shouldReturnArmAnimation(getData())) return;
-
-        if(timeStamp - lastTimeStamp > 1000L) {
+        if(System.currentTimeMillis() - lastTimeStamp >= 1000L) {
             if(ticks > banCPS) {
                 if(vl++ > 2) {
                     flag("cps: " + ticks, true, true, AlertTier.CERTAIN);
@@ -40,7 +33,9 @@ public class AutoclickerA extends Check {
             } else if(ticks > maxCPS) {
                 flag("cps: " + ticks, true, true, AlertTier.LIKELY);
             }
+            debug("cps=" + ticks);
             ticks = 0;
+            lastTimeStamp = System.currentTimeMillis();
         } else ticks++;
     }
 

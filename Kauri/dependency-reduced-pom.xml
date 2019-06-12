@@ -5,7 +5,6 @@
   <artifactId>Kauri</artifactId>
   <version>b34</version>
   <build>
-    <defaultGoal>clean package</defaultGoal>
     <resources>
       <resource>
         <filtering>true</filtering>
@@ -46,9 +45,9 @@
   </repositories>
   <dependencies>
     <dependency>
-      <groupId>cc.funkemunky.plugins</groupId>
-      <artifactId>Atlas</artifactId>
-      <version>1.2-SNAPSHOT</version>
+      <groupId>org.github.lombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.18.0</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

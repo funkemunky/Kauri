@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 public @interface CheckInfo {
     String name() default "";
 
-    String description() default "Blocks cheats";
+    String description() default "Undefined description.    ";
 
     CheckType type() default CheckType.MOVEMENT;
 

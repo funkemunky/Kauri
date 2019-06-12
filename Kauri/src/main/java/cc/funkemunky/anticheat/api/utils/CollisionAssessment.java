@@ -58,7 +58,7 @@ public class CollisionAssessment {
                 pistonsNear = true;
             }
 
-            if ((BlockUtils.isSlab(block) || BlockUtils.isStair(block) || block.getType().getId() == 92 || block.getType().getId() == 397) && bb.intersectsWithBox(data.getBoundingBox().grow(0.1f,0.1f,0.1f))) {
+            if ((BlockUtils.isSlab(block) || BlockUtils.isStair(block) || block.getType().getId() == 92 || block.getType().getId() == 397) && bb.intersectsWithBox(data.getBoundingBox().grow(0.2f,1f,0.2f))) {
                 onHalfBlock = true;
             }
 

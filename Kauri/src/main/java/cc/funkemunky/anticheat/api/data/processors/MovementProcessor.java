@@ -169,7 +169,7 @@ public class MovementProcessor {
                 serverYVelocity = 0;
             }
 
-            if(data.getVelocityProcessor().getLastVelocity().hasNotPassed(1)) {
+            if(timeStamp - data.getVelocityProcessor().getLastVelocityTimestamp() <= 100L) {
                 serverYVelocity = data.getVelocityProcessor().getMotionY();
             }
 
