@@ -1,11 +1,9 @@
 package cc.funkemunky.anticheat.api.checks;
 
 import cc.funkemunky.anticheat.api.utils.Messages;
-import cc.funkemunky.api.utils.MathUtils;
 import lombok.Getter;
 
 import java.util.Arrays;
-import java.util.Comparator;
 
 @Getter
 public enum AlertTier {
