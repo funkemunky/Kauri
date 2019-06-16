@@ -10,7 +10,7 @@ import cc.funkemunky.api.utils.Init;
 import lombok.val;
 import org.bukkit.event.Event;
 
-@Init
+//@Init
 @CheckInfo(name = "Velocity (Type C)", type = CheckType.VELOCITY, developer = true)
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.POSITION, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION})
 public class VelocityC extends Check {

@@ -45,7 +45,6 @@ cc/funkemunky/anticheat/impl/commands/kauri/arguments/ReloadArgument.class
 cc/funkemunky/anticheat/impl/pup/crashers/YLevel.class
 cc/funkemunky/anticheat/impl/checks/combat/autoclicker/AutoclickerE$1.class
 cc/funkemunky/anticheat/impl/checks/combat/killaura/KillauraB.class
-cc/funkemunky/dev/exceptions/CheckDoesNotExistException.class
 cc/funkemunky/anticheat/api/utils/VPNUtils.class
 cc/funkemunky/anticheat/api/utils/DynamicRollingAverage.class
 cc/funkemunky/anticheat/impl/checks/combat/autoclicker/AutoclickerG.class
@@ -54,6 +53,7 @@ cc/funkemunky/anticheat/impl/checks/player/badpackets/BadPacketsG.class
 cc/funkemunky/anticheat/impl/checks/movement/velocity/VelocityA.class
 cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimI.class
 cc/funkemunky/anticheat/api/utils/BukkitEvents.class
+cc/funkemunky/anticheat/KauriAPI.class
 cc/funkemunky/anticheat/api/utils/json/XML.class
 cc/funkemunky/anticheat/impl/commands/kauri/arguments/BugReportArg.class
 cc/funkemunky/anticheat/api/utils/json/Cookie.class
@@ -99,7 +99,6 @@ cc/funkemunky/anticheat/api/utils/json/JSONTokener.class
 cc/funkemunky/anticheat/impl/checks/combat/fastbow/Fastbow.class
 cc/funkemunky/anticheat/api/data/PlayerData$1.class
 cc/funkemunky/anticheat/api/utils/menu/Menu.class
-cc/funkemunky/dev/ToggleType.class
 cc/funkemunky/anticheat/api/checks/AlertTier.class
 cc/funkemunky/anticheat/api/utils/menu/type/impl/ChestMenu.class
 cc/funkemunky/anticheat/api/data/PlayerData.class
@@ -160,7 +159,6 @@ cc/funkemunky/anticheat/api/utils/URLUtils.class
 cc/funkemunky/anticheat/impl/commands/kauri/arguments/MenuArgument.class
 cc/funkemunky/anticheat/impl/listeners/PlayerConnectionListeners.class
 cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimG.class
-cc/funkemunky/dev/KauriAPI.class
 cc/funkemunky/anticheat/impl/listeners/LegacyListeners.class
 cc/funkemunky/anticheat/api/checks/CheckInfo.class
 cc/funkemunky/anticheat/impl/menu/InputHandler.class

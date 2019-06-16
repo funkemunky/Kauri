@@ -31,7 +31,7 @@ public class GroundSpoofB extends Check {
         val deltaFD = MathUtils.getDelta(fallDistance, lastFallDistance);
 
         if(MathUtils.getDelta(deltaFD, Math.abs(getData().getMovementProcessor().getDeltaY())) > 0.5) {
-            if(verbose.flag(8, 500L)) {
+            if(verbose.flag(12, 500L)) {
                 flag(deltaFD + "<-" + getData().getMovementProcessor().getDeltaXZ(), true, true, verbose.getVerbose() > 10 ? AlertTier.LIKELY : AlertTier.POSSIBLE);
             }
         } else verbose.deduct();
