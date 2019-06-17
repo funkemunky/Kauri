@@ -13,7 +13,6 @@ import cc.funkemunky.anticheat.api.utils.CustomLocation;
 import cc.funkemunky.anticheat.api.utils.EvictingList;
 import cc.funkemunky.anticheat.api.utils.MCSmooth;
 import cc.funkemunky.anticheat.api.utils.PastLocation;
-import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.TickTimer;
 import lombok.Getter;
@@ -29,7 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 @Getter
 @Setter

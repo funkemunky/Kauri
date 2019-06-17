@@ -1,8 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.combat.autoclicker;
 
-import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.*;
-import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.tinyprotocol.api.Packet;

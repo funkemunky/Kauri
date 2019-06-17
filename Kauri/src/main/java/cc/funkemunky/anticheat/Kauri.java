@@ -20,7 +20,6 @@ import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.updater.UpdaterUtils;
 import cc.funkemunky.api.utils.*;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.HandlerList;
@@ -96,6 +95,7 @@ public class Kauri extends JavaPlugin {
         banwaveManager = new BanwaveManager();
 
         vpnUtils = new VPNUtils();
+        new KauriAPI();
 
         runTasks();
         registerCommands();
@@ -103,8 +103,6 @@ public class Kauri extends JavaPlugin {
 
         executorService = Executors.newSingleThreadScheduledExecutor();
         checkExecutor = Executors.newScheduledThreadPool(2);
-
-        //Registering all the commands
     }
 
     public void onDisable() {

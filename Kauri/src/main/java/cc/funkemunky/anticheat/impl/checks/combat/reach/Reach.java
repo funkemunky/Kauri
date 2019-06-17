@@ -4,18 +4,17 @@ import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.CustomLocation;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.RayTrace;
-import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedPacketPlayOutWorldParticle;
-import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumParticle;
-import cc.funkemunky.api.utils.*;
+import cc.funkemunky.api.utils.BoundingBox;
+import cc.funkemunky.api.utils.Color;
+import cc.funkemunky.api.utils.Init;
+import cc.funkemunky.api.utils.MiscUtils;
 import lombok.val;
 import org.bukkit.GameMode;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
 import org.bukkit.util.Vector;
 
-import java.util.Comparator;
 import java.util.stream.Collectors;
 
 @CheckInfo(name = "Reach", description = "A very accurate and fast 3.1 reach check.", type = CheckType.REACH, cancelType = CancelType.COMBAT, maxVL = 40)
