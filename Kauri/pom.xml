@@ -61,8 +61,7 @@
         <dependency>
             <groupId>cc.funkemunky.plugins</groupId>
             <artifactId>Atlas</artifactId>
-            <version>1.3-PRE</version>
-            <classifier>b4</classifier>
+            <version>1.3</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
