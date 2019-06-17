@@ -11,6 +11,7 @@ import cc.funkemunky.api.utils.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.potion.PotionEffectType;
 
@@ -98,7 +99,6 @@ public class MovementProcessor {
             }
             tookVelocity = System.currentTimeMillis() - data.getVelocityProcessor().getLastVelocityTimestamp() < 100L;
             jumpVelocity = 0.42f + (PlayerUtils.getPotionEffectLevel(packet.getPlayer(), PotionEffectType.JUMP) * 0.1f);
-
             val vecStream = data.getTeleportLocations().stream().filter(vec -> vec.distance(to.toVector()) < 0.45).findFirst().orElse(null);
 
             if(vecStream != null) {
