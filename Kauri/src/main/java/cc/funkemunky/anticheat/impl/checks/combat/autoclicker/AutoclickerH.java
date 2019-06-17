@@ -39,6 +39,7 @@ public class AutoclickerH extends Check {
                     }
                 } else if(vl2++ > 2) {
                     flag("avg=" + average + " std=" + std + "% delta=" + stdDelta, true, false, AlertTier.POSSIBLE);
+                    getData().getTypeH().flag(10, 8000L);
                 }
             } else {
                 vl-= vl > 0 ? .5 : 0;

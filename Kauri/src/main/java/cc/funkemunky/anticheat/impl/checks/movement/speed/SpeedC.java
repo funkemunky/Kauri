@@ -31,15 +31,16 @@ public class SpeedC extends Check {
 
         val decel = move.isServerOnGround() ? ReflectionsUtil.getFriction(BlockUtils.getBlock(move.getTo().toLocation(getData().getPlayer().getWorld()).clone().subtract(0, 0.25,0))) : (getData().getActionProcessor().isSprinting() ? 0.026f : 0.02f);
         val difference = MathUtils.getDelta(move.getLastDeltaXZ(), move.getDeltaXZ());
+        val decelDif = MathUtils.getDelta(decel, difference);
 
-        if(move.getAirTicks() > 3 && !getData().isLagging() && getData().getLastLag().hasPassed(5) && MathUtils.getDelta(decel, difference) > 0.03 && !MiscUtils.cancelForFlight(getData(), 15, false)) {
+        if(move.getAirTicks() > 3 && !getData().isLagging() && getData().getLastLag().hasPassed(5) && decelDif > 0.03 && !MiscUtils.cancelForFlight(getData(), 15, false)) {
             if(vl++ > 4) {
                 flag(difference + ">-" + decel, true, true, AlertTier.HIGH);
             } else flag(difference + ">-" + decel, true, false, AlertTier.POSSIBLE);
         } else vl-= vl > 0 ? 1 : 0;
 
 
-        debug("decel=" + decel + " difference=" + difference + " vl=" + vl);
+        debug("decel=" + decel + " difference=" + difference + " vl=" + vl + " decelDif=" + decelDif);
     }
 
     @Override

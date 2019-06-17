@@ -9,10 +9,7 @@ import cc.funkemunky.anticheat.api.data.processors.ActionProcessor;
 import cc.funkemunky.anticheat.api.data.processors.MovementProcessor;
 import cc.funkemunky.anticheat.api.data.processors.VelocityProcessor;
 import cc.funkemunky.anticheat.api.pup.AntiPUP;
-import cc.funkemunky.anticheat.api.utils.CustomLocation;
-import cc.funkemunky.anticheat.api.utils.EvictingList;
-import cc.funkemunky.anticheat.api.utils.MCSmooth;
-import cc.funkemunky.anticheat.api.utils.PastLocation;
+import cc.funkemunky.anticheat.api.utils.*;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.TickTimer;
 import lombok.Getter;
@@ -68,6 +65,9 @@ public class PlayerData {
     private MovementProcessor movementProcessor;
     private ActionProcessor actionProcessor;
     private VelocityProcessor velocityProcessor;
+
+    /* Combined Autoclicker Check */
+    private Verbose typeC = new Verbose(), typeD = new Verbose(), typeH = new Verbose();
 
     private long lastDig;
 
