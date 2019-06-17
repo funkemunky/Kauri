@@ -44,10 +44,10 @@ public class PacketListeners implements AtlasListener {
                 case Packet.Server.POSITION: {
                     WrappedOutPositionPacket position = new WrappedOutPositionPacket(event.getPacket(), event.getPlayer());
 
+                    data.setLastServerPosStamp(event.getTimeStamp());
                     data.getTeleportLocations().add(new Vector(position.getX(), position.getY(), position.getZ()));
                     data.getVelocityProcessor().velocityX = data.getVelocityProcessor().velocityY = data.getVelocityProcessor().velocityZ = 0;
                     data.getVelocityProcessor().setAttackedSinceVelocity(false);
-                    data.setLastServerPosStamp(event.getTimeStamp());
                     break;
                 }
                 case Packet.Server.KEEP_ALIVE:

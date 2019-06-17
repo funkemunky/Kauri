@@ -102,7 +102,7 @@ public class MovementProcessor {
             val vecStream = data.getTeleportLocations().stream().filter(vec -> vec.distance(to.toVector()) < 0.45).findFirst().orElse(null);
 
             if(vecStream != null) {
-                data.setLastServerPosStamp(timeStamp);
+                data.setLastServerPosStamp(System.currentTimeMillis());
                 data.getTeleportLocations().remove(vecStream);
                 from = to;
             }
