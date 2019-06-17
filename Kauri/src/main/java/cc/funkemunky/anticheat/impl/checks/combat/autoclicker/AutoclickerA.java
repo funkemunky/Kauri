@@ -43,4 +43,6 @@ public class AutoclickerA extends Check {
     public void onBukkitEvent(Event event) {
 
     }
+
+
 }
