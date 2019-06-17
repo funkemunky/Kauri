@@ -39,6 +39,7 @@ public class AutoclickerC extends Check {
                         if (Math.round(average) == average || Math.round(average) == average - 0.5) {
                             if (++vl > 10) {
                                 flag(average + " -> " + (double) Math.round(average) + " -> " + "0.0", false, true, AlertTier.LIKELY);
+                                getData().getTypeC().flag(10, 8000L);
                             }
                         } else {
                             vl -= vl > 0 ? 1 : 0;

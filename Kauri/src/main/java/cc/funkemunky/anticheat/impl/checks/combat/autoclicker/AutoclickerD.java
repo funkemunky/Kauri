@@ -40,8 +40,10 @@ public class AutoclickerD extends Check {
                     if (averageCps >= 8.0 && averageCps < 17 && maxCps == minCps && getData().getMovementProcessor().getLagTicks() == 0) {
                         if ((vl += 2) > 12.0) {
                             flag("t: " + vl, true, true, AlertTier.LIKELY);
+                            getData().getTypeD().flag(5, 8000L);
                         } else if(vl > 7) {
                             flag("t: " + vl, true, false, AlertTier.POSSIBLE);
+                            getData().getTypeD().flag(5, 8000L);
                         }
                     } else {
                         vl = Math.max(vl - 1, 0);
