@@ -10,7 +10,7 @@ import org.bukkit.event.Event;
 import java.util.ArrayList;
 import java.util.List;
 
-@CheckInfo(name = "Autoclicker (Type H)", description = "test", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT)
+@CheckInfo(name = "Autoclicker (Type H)", description = "Checks if the autoclicker clicks in a specific range set.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT)
 @Init
 @Packets(packets = {Packet.Client.ARM_ANIMATION})
 public class AutoclickerH extends Check {

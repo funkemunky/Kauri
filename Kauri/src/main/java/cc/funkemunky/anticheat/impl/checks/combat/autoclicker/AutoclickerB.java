@@ -21,7 +21,7 @@ import java.util.LinkedList;
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "AutoClicker (Type B)", description = "Looks for suspicious consistencies in CPS averages.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 20)
+@CheckInfo(name = "Autoclicker (Type B)", description = "Looks for suspicious consistencies in CPS averages.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 20)
 public class AutoclickerB extends Check {
 
     private final Deque<Double> averageDeque = new LinkedList<>();

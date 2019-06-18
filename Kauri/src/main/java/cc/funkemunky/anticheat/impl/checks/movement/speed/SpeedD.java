@@ -22,11 +22,12 @@ public class SpeedD extends Check {
         val move = getData().getMovementProcessor();
         val delta = MathUtils.getDelta(move.getDeltaXZ(), move.getLastDeltaXZ());
 
-        if(!move.isServerOnGround() && delta == 0) {
-            if(vl++ > 2) {
+
+        if(!move.isServerOnGround() && !getData().isGeneralCancel() && delta == 0 && move.getDeltaXZ() > 0.02) {
+            if(vl++ > 5) {
                 flag("delta==0", true, true, AlertTier.HIGH);
             }
-        } else vl-= vl > 0 ? 1 : 0;
+        } else vl-= vl > 0 ? 2 : 0;
     }
 
     @Override

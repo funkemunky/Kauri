@@ -63,7 +63,7 @@ public class Reach extends Check {
             });*/
 
             if(collided.size() > 0) {
-                if (distance > 3 && collided.size() > 34 && getData().getMovementProcessor().getLagTicks() == 0) {
+                if (distance > 3 && (collided.size() > 34 || distance > 3.75) && collided.size() > 8 && getData().getMovementProcessor().getLagTicks() == 0) {
                     if (vl++ > 12) {
                         flag("reach=" + distance, true, true, AlertTier.CERTAIN);
                     } else if (vl > 4) {

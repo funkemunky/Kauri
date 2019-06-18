@@ -4,6 +4,7 @@ import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
@@ -31,7 +32,7 @@ public class VelocityB extends Check {
                 velocityX = dy.getX();
                 velocityZ = dy.getZ();
             }
-        } else if(velocityX != 0.0D && velocityZ != 0.0D) {
+        } else if(velocityX != 0.0D && velocityZ != 0.0D && ticks++ >= MiscUtils.millisToTicks(getData().getPing())) {
             val move = getData().getMovementProcessor();
             double dy = move.getTo().getY() - move.getFrom().getY();
             if(dy > 0D && !getData().isServerPos()) {
@@ -44,16 +45,16 @@ public class VelocityB extends Check {
                     if(offsets.size() >= 4) {
                         double average = offsets.stream().mapToDouble(val -> val).average().getAsDouble();
                         double quotient =  average / velocityXZ;
-                        double threshold = (1 - aimove) / (getData().getLastAttack().hasNotPassed(3) ? 2.2f : 1.75);
+                        double threshold = (1 - aimove) / (getData().getLastAttack().hasNotPassed(3) ? 2.2f : 1.8);
 
                         if(quotient < threshold) {
                             if(vl++ > 8) {
                                 flag("quotient=" + quotient + " threshold=" + threshold + " avg=" + average, true, true, AlertTier.HIGH);
                             }
-                        } else vl-= vl > 0 ? .5 : 0;
+                        } else vl-= vl > 0 ? 1 : 0;
                         debug("q=" + quotient + "/" + threshold + " vl=" + vl + " vel=" + velocityXZ + " dxz=" + average);
                         offsets.clear();
-                        velocityX = velocityZ = 0;
+                        velocityX = velocityZ = ticks = 0;
                     }
                 }
             }

@@ -7,9 +7,9 @@ import cc.funkemunky.api.utils.Init;
 import org.bukkit.event.Event;
 
 @Init
-@CheckInfo(name = "AutoClicker (Type I)", description = "A combined autoclicker check.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 40)
+@CheckInfo(name = "Autoclicker (Type I)", description = "A combined autoclicker check.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 40)
 @Packets(packets = {Packet.Client.ARM_ANIMATION})
-public class AutoClickerI extends Check {
+public class AutoclickerI extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
