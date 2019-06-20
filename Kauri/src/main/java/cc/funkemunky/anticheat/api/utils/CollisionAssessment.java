@@ -62,7 +62,7 @@ public class CollisionAssessment {
                 onHalfBlock = true;
             }
 
-            if (BlockUtils.isIce(block) && playerBox.subtract(0, 0.5f, 0, 0, 0, 0).collidesVertically(bb)) {
+            if (BlockUtils.isIce(block) && playerBox.subtract(0, 1f, 0, 0, 0.5f, 0).collidesVertically(bb)) {
                 onIce = true;
             }
 

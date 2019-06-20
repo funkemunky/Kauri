@@ -18,7 +18,7 @@ public class SpeedB extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         if(getData().isGeneralCancel()) return;
         val move = getData().getMovementProcessor();
-        float threshold = MiscUtils.getBaseSpeed(getData()) + (move.isServerOnGround() ? 0.07f : 0.09f);
+        float threshold = MiscUtils.getBaseSpeed(getData()) + (move.isServerOnGround() ? 0.08f : 0.15f);
 
         threshold+= move.getHalfBlockTicks() > 0 ? 0.08 : 0;
         threshold+= move.isOnSlimeBefore() ? 0.025 : 0;
@@ -31,7 +31,7 @@ public class SpeedB extends Check {
             }
         } else vl-= vl > 0 ? 1 : 0;
 
-        debug(move.getDeltaXZ() + ">-" + threshold + " vl=" + vl + " block=" + move.getBlockAboveTicks() + " half=" + move.getHalfBlockTicks());
+        debug(move.getDeltaXZ() + ">-" + threshold + " vl=" + vl + " iceTicks=" + move.getIceTicks() + " block=" + move.getBlockAboveTicks() + " half=" + move.getHalfBlockTicks());
     }
 
     @Override

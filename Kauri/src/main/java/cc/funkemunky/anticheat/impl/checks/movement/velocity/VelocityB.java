@@ -32,31 +32,13 @@ public class VelocityB extends Check {
                 velocityX = dy.getX();
                 velocityZ = dy.getZ();
             }
-        } else if(velocityX != 0.0D && velocityZ != 0.0D && ticks++ >= MiscUtils.millisToTicks(getData().getPing())) {
+        } else {
             val move = getData().getMovementProcessor();
+            val vel = getData().getVelocityProcessor();
+            val vxz = MathUtils.hypot(move.getMotX(), move.getMotZ());
             double dy = move.getTo().getY() - move.getFrom().getY();
-            if(dy > 0D && !getData().isServerPos()) {
-                float aimove = Atlas.getInstance().getBlockBoxManager().getBlockBox().getAiSpeed(getData().getPlayer()) * 1.175f;
-                double velocityXZ = MathUtils.hypot(velocityX, velocityZ);
-                if(move.getBlockAboveTicks() == 0 && move.getLiquidTicks() == 0 && move.getWebTicks() == 0 && velocityXZ > 0.15 && !move.isBlocksNear()) {
-
-                    offsets.add(move.getDeltaXZ() * (getData().getLastAttack().hasNotPassed(3) ? 1.25f : 1));
-
-                    if(offsets.size() >= 4) {
-                        double average = offsets.stream().mapToDouble(val -> val).average().getAsDouble();
-                        double quotient =  average / velocityXZ;
-                        double threshold = (1 - aimove) / (getData().getLastAttack().hasNotPassed(3) ? 2.2f : 1.8);
-
-                        if(quotient < threshold) {
-                            if(vl++ > 8) {
-                                flag("quotient=" + quotient + " threshold=" + threshold + " avg=" + average, true, true, AlertTier.HIGH);
-                            }
-                        } else vl-= vl > 0 ? 1 : 0;
-                        debug("q=" + quotient + "/" + threshold + " vl=" + vl + " vel=" + velocityXZ + " dxz=" + average);
-                        offsets.clear();
-                        velocityX = velocityZ = ticks = 0;
-                    }
-                }
+            if(!getData().isServerPos()) {
+                debug("vxz=" + vxz + " dxz=" + move.getDeltaXZ());
             }
         }
 

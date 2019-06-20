@@ -13,7 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @CheckInfo(name = "Autoclicker (Type J)", description = "test", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT)
-@Init
+//@Init
 @Packets(packets = {Packet.Client.ARM_ANIMATION})
 public class AutoclickerJ extends Check {
 

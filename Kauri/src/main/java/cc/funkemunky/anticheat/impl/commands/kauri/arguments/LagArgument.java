@@ -125,6 +125,48 @@ public class LagArgument extends FunkeArgument {
                     }
                     break;
                 }
+                case "realprofile": {
+                    List<String> body = new ArrayList<>();
+                    body.add(MiscUtils.lineNoStrike());
+                    val results = Kauri.getInstance().getProfiler().results(ResultsType.TOTAL);
+
+                    AtomicReference<Double> totalMS = new AtomicReference<>((double) 0);
+                    long totalTime = System.currentTimeMillis() - Kauri.getInstance().getProfileStart();
+                    results.keySet().stream()
+                            .sorted(Comparator.comparing(key -> results.get(key) / Kauri.getInstance().getProfiler().calls.get(key), Comparator.reverseOrder()))
+                            .forEachOrdered(key -> {
+                                body.add(key + ":");
+                                double msTotal = results.get(key);
+                                double totalCalls = Kauri.getInstance().getProfiler().calls.get(key);
+                                double calls = totalCalls / (totalTime / 50f);
+                                double ms =  msTotal / (totalTime / 50f);
+                                totalMS.updateAndGet(v -> (v + ms));
+                                body.add("PCT: "  + MathUtils.round(ms / 50D * 100, 4));
+                                body.add("MS: " + ms + "ms");
+                                body.add("Calls:" + MathUtils.round(calls, 2));
+                            });
+                    body.add("Total PCT: " +  MathUtils.round(totalMS.get() / 50 * 100, 4) + "%");
+                    body.add("Total Time: " + totalMS + "ms");
+                    body.add("Total Calls: " + MathUtils.round( Kauri.getInstance().getProfiler().totalCalls / (totalTime / 50f), 2));
+                    body.add("Total Time: " + DurationFormatUtils.formatDurationWords(totalTime, true, true));
+                    body.add(MiscUtils.lineNoStrike());
+
+                    StringBuilder builder = new StringBuilder();
+                    for (String aBody : body) {
+                        builder.append(aBody).append(";");
+                    }
+
+                    builder.deleteCharAt(body.size() - 1);
+
+                    String bodyString = builder.toString().replaceAll(";", "\n");
+
+                    try {
+                        sender.sendMessage(Color.translate(profile.replace("%link%", Pastebin.makePaste(bodyString, "Kauri Profile: " + DateFormatUtils.format(System.currentTimeMillis(), ", ", TimeZone.getTimeZone("604")), Pastebin.Privacy.UNLISTED))));
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                }
                 case "server":
                     sendServerInfo(sender);
                     break;

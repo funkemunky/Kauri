@@ -22,6 +22,7 @@ import cc.funkemunky.api.utils.Init;
 import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -170,7 +171,7 @@ public class PacketListeners implements AtlasListener {
                         Location location = new Location(packet.getPlayer().getWorld(), packet.getPosition().getX(), packet.getPosition().getY(), packet.getPosition().getZ());
 
                         val block = BlockUtils.getBlock(location);
-                        if (location.distance(packet.getPlayer().getLocation()) < 15 && block != null && block.getType().isSolid() && packet.getItemStack().getType().isSolid()) {
+                        if (location.distance(packet.getPlayer().getLocation()) < 15 && block != null && (block.getType().isSolid() || BlockUtils.isLiquid(block))) {
                             data.getLastBlockPlace().reset();
                         }
                     }

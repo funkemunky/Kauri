@@ -14,7 +14,7 @@ import org.bukkit.event.Event;
 
 @CheckInfo(name = "GroundSpoof (Type B)", description = "Ensures the fall distance is what it should be.", type = CheckType.MOVEMENT)
 @Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION})
-@Init
+//@Init
 public class GroundSpoofB extends Check {
 
     private float lastFallDistance = 0;

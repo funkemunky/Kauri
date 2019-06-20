@@ -66,7 +66,7 @@ public class SpeedA extends Check {
 
         if (offsetDeque.size() == 5) {
             val account = account();
-            val maxOffset = 0.33f + account();
+            val maxOffset = 0.336f + account();
 
             offsetDeque.forEach(offset -> {
                 if (offset > maxOffset) {

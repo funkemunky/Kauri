@@ -2,9 +2,12 @@ package cc.funkemunky.anticheat.api.data.processors;
 
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
+import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
+import cc.funkemunky.api.utils.BlockUtils;
+import cc.funkemunky.api.utils.ReflectionsUtil;
 import cc.funkemunky.api.utils.TickTimer;
 import lombok.Getter;
 import lombok.Setter;
@@ -54,7 +57,7 @@ public class VelocityProcessor {
         if(velocityTicks > 1) {
             var multiplier = 0.91f;
 
-            if (packet.isGround()) multiplier = 0.68f;
+            if (packet.isGround()) multiplier*= ReflectionsUtil.getFriction(BlockUtils.getBlock(getData().getPlayer().getLocation().clone().subtract(0, 0.5f, 0)));
 
             motionX *= multiplier;
             motionZ *= multiplier;

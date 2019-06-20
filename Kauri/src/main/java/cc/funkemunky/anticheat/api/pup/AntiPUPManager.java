@@ -32,7 +32,7 @@ public class AntiPUPManager {
         List<AntiPUP> list = new ArrayList<>();
 
         addMethod(new AntiVPN("AntiVPN", PuPType.VPN, true), list);
-        addMethod(new ConsoleClient("ConsoleClient", PuPType.BOT, true), list);
+        //addMethod(new ConsoleClient("ConsoleClient", PuPType.BOT, true), list);
         addMethod(new ArmSwing("ArmSwing", PuPType.CRASH, true), list);
         addMethod(new Boxer("Boxer", PuPType.CRASH, true), list);
         addMethod(new YLevel("YLevel", PuPType.CRASH, true), list);
@@ -40,7 +40,7 @@ public class AntiPUPManager {
         addMethod(new CommandSpam("CommandSpam", PuPType.SPAM, true), list);
         addMethod(new ChatSpam("ChatSpam", PuPType.SPAM, true), list);
         addMethod(new BookEnchant("BookEnchant", PuPType.EXPLOIT, true), list);
-        addMethod(new WorldLoader("WorldLoader", PuPType.BOT, true), list);
+        //addMethod(new WorldLoader("WorldLoader", PuPType.BOT, true), list);
 
 
         for (AntiPUP pup : list) {

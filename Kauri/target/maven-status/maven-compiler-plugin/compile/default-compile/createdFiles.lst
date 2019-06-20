@@ -165,6 +165,7 @@ cc\funkemunky\anticheat\api\checks\CheckManager.class
 cc\funkemunky\anticheat\impl\checks\player\badpackets\BadPacketsB.class
 cc\funkemunky\anticheat\impl\commands\kauri\arguments\AntiVpnArgument.class
 cc\funkemunky\anticheat\api\utils\json\XMLTokener.class
+cc\funkemunky\anticheat\impl\checks\movement\speed\SpeedE.class
 cc\funkemunky\anticheat\impl\checks\movement\velocity\VelocityA.class
 cc\funkemunky\anticheat\impl\pup\crashers\ArmSwing.class
 cc\funkemunky\anticheat\api\utils\VPNUtils.class

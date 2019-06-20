@@ -25,6 +25,7 @@ public class MovementProcessor {
     private int airTicks, groundTicks, iceTicks, climbTicks, halfBlockTicks, soulSandTicks, blockAboveTicks, optifineTicks, liquidTicks, webTicks, yawZeroTicks, pitchZeroTicks;
     private float deltaY, lastDeltaXZ, slimeHeight, fallDistance, yawDelta, pitchDelta, lastYawDelta, lastPitchDelta, lastDeltaY, deltaXZ, lastServerYVelocity, serverYAcceleration, clientYAcceleration, lastClientYAcceleration, lastServerYAcceleration, jumpVelocity, cinematicYawDelta, cinematicPitchDelta, lastCinematicPitchDelta, lastCinematicYawDelta;
     private CustomLocation from, to;
+    private double motX, motY, motZ, lastMotX, lastMotY, lastMotZ;
     @Setter
     private float serverYVelocity;
     private PastLocation pastLocation = new PastLocation();
@@ -42,6 +43,7 @@ public class MovementProcessor {
         }
 
 
+        predict(data, .98f, .98f, true);
         from = to.clone();
         clientOnGround = packet.isGround();
 
@@ -124,6 +126,7 @@ public class MovementProcessor {
                 inAir = false;
             } else if (!inAir) {
                 hasJumped = true;
+                bF(data);
             }
 
             if(serverOnGround) {
@@ -238,6 +241,11 @@ public class MovementProcessor {
             pitchZeroTicks = Math.min(20, pitchZeroTicks + 1);
         } else pitchZeroTicks -= pitchZeroTicks > 0 ? 1 : 0;
 
+        lastMotX = motX;
+        lastMotY = motY;
+        lastMotZ = motZ;
+        predict(data, .98f, .98f, false);
+
         pastLocation.addLocation(new CustomLocation(to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch()));
         data.setGeneralCancel(data.isServerPos() || data.isLagging() || getLastFlightToggle().hasNotPassed(8) || !chunkLoaded || packet.getPlayer().getAllowFlight() || packet.getPlayer().getActivePotionEffects().stream().anyMatch(effect -> effect.getType().getName().toLowerCase().contains("levi")) || packet.getPlayer().getGameMode().toString().contains("CREATIVE") || packet.getPlayer().getGameMode().toString().contains("SPEC") || lastVehicle.hasNotPassed() || getLastRiptide().hasNotPassed(10) || data.getLastLogin().hasNotPassed(50) || data.getVelocityProcessor().getLastVelocity().hasNotPassed(25));
     }
@@ -276,5 +284,68 @@ public class MovementProcessor {
         return onGround;
     }
 
+
+    private void predict(PlayerData data, float strafe, float forward, boolean beginning) {
+        float f4 = 0.91F;
+
+        if(beginning) {
+
+            if (isClientOnGround()) {
+                f4 = ReflectionsUtil.getFriction(BlockUtils.getBlock(to.toLocation(data.getPlayer().getWorld()).clone().subtract(0, 1, 0))) * 0.91F;
+            }
+
+            float f = 0.16277136F / (f4 * f4 * f4);
+            float f5;
+
+            if (isClientOnGround()) {
+                f5 = Atlas.getInstance().getBlockBoxManager().getBlockBox().getAiSpeed(data.getPlayer()) * f;
+            } else {
+                f5 = data.getPlayer().isSprinting() ? 0.026f : 0.02f;
+            }
+
+            this.moveFlying(strafe, forward, f5);
+        } else {
+            if(isClientOnGround()) {
+                f4 = ReflectionsUtil.getFriction(BlockUtils.getBlock(to.toLocation(data.getPlayer().getWorld()).clone().subtract(0, 1, 0))) * 0.91F;
+            }
+
+            this.motY *= 0.9800000190734863D;
+            this.motX *= (double) f4;
+            this.motZ *= (double) f4;
+        }
+    }
+
+    public void moveFlying(float strafe, float forward, float friction) {
+        float f = strafe * strafe + forward * forward;
+
+        if (f >= 1.0E-4F) {
+            f = MathHelper.sqrt_float(f);
+
+            if (f < 1.0F) {
+                f = 1.0F;
+            }
+
+            f = friction / f;
+            strafe = strafe * f;
+            forward = forward * f;
+            float f1 = MathHelper.sin(to.getYaw() * (float) Math.PI / 180.0F);
+            float f2 = MathHelper.cos(to.getYaw() * (float) Math.PI / 180.0F);
+            this.motX += (double) (strafe * f2 - forward * f1);
+            this.motZ += (double) (forward * f2 + strafe * f1);
+        }
+    }
+    protected void bF(PlayerData data) {
+        this.motY = 0.42;
+        if (data.getPlayer().hasPotionEffect(PotionEffectType.JUMP)) {
+            this.motY += (PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.JUMP) * 0.1F);
+        }
+
+        if (data.getPlayer().isSprinting()) {
+            float f = to.getYaw() * 0.017453292F;
+
+            this.motX -= (MathHelper.sin(f) * 0.2F);
+            this.motZ += (MathHelper.cos(f) * 0.2F);
+        }
+    }
 
 }
