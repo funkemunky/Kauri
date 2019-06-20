@@ -43,7 +43,7 @@ public class MovementProcessor {
         }
 
 
-        predict(data, .98f, .98f, true);
+       // predict(data, .98f, .98f, true);
         from = to.clone();
         clientOnGround = packet.isGround();
 
@@ -126,7 +126,7 @@ public class MovementProcessor {
                 inAir = false;
             } else if (!inAir) {
                 hasJumped = true;
-                bF(data);
+                //bF(data);
             }
 
             if(serverOnGround) {
@@ -244,7 +244,7 @@ public class MovementProcessor {
         lastMotX = motX;
         lastMotY = motY;
         lastMotZ = motZ;
-        predict(data, .98f, .98f, false);
+        //predict(data, .98f, .98f, false);
 
         pastLocation.addLocation(new CustomLocation(to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch()));
         data.setGeneralCancel(data.isServerPos() || data.isLagging() || getLastFlightToggle().hasNotPassed(8) || !chunkLoaded || packet.getPlayer().getAllowFlight() || packet.getPlayer().getActivePotionEffects().stream().anyMatch(effect -> effect.getType().getName().toLowerCase().contains("levi")) || packet.getPlayer().getGameMode().toString().contains("CREATIVE") || packet.getPlayer().getGameMode().toString().contains("SPEC") || lastVehicle.hasNotPassed() || getLastRiptide().hasNotPassed(10) || data.getLastLogin().hasNotPassed(50) || data.getVelocityProcessor().getLastVelocity().hasNotPassed(25));
