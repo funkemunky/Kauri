@@ -18,7 +18,7 @@ public class SpeedB extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         if(getData().isGeneralCancel()) return;
         val move = getData().getMovementProcessor();
-        float threshold = MiscUtils.getBaseSpeed(getData()) + (move.isServerOnGround() ? 0.08f : 0.15f);
+        float threshold = MiscUtils.getBaseSpeed(getData()) + (move.isServerOnGround() ? 0.06f : 0.1f);
 
         threshold+= move.getHalfBlockTicks() > 0 ? 0.08 : 0;
         threshold+= move.isOnSlimeBefore() ? 0.025 : 0;
@@ -26,7 +26,7 @@ public class SpeedB extends Check {
         threshold+= move.getIceTicks() > 0 && move.getGroundTicks() < 8 ? 0.15 : 0;
 
         if(move.getDeltaXZ() > threshold) {
-            if(Math.min(vl+= 2, 40) > 30) {
+            if(Math.min(vl++, 40) > 20) {
                 flag("speed=" + move.getDeltaXZ(), true, true, AlertTier.HIGH);
             }
         } else vl-= vl > 0 ? 1 : 0;
