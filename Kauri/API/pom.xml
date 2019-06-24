@@ -5,7 +5,7 @@
     <parent>
         <artifactId>Kauri</artifactId>
         <groupId>cc.funkemunky.anticheat</groupId>
-        <version>b34</version>
+        <version>b35</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -70,6 +70,12 @@
             <groupId>org.github.spigot</groupId>
             <artifactId>1.7.10</artifactId>
             <version>1.7.10</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>cc.funkemunky.anticheat</groupId>
+            <artifactId>Impl</artifactId>
+            <version>b34</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
