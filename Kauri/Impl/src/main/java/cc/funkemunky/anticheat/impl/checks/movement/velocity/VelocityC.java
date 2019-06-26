@@ -48,7 +48,7 @@ public class VelocityC extends Check {
             double threshold = velocity;
             float percent = (float) MathUtils.round(deltaXZ / threshold * 100, 2);
 
-            if(percent < 85) {
+            if(percent < 85 && !getData().isGeneralCancel() && !move.isBlocksAround()) {
                 if(vl++ > 6) {
                     flag(percent + "<-80", false, true, AlertTier.HIGH);
                 }

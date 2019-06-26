@@ -46,9 +46,9 @@ public class AimD extends Check {
 
 
         if (yawDelta > minYawDelta && getData().getPlayer().getVehicle() == null && Math.abs(move.getTo().getPitch()) < 80 && (pitchAccel < pitchAccelMax || yawAccel < yawAccelMax)) {
-            if (vl++ > vlMax) {
-                flag("YAW: " + MathUtils.round(yawAccel, 7) + " PITCH: " + MathUtils.round(pitchAccel, 7), true, true, AlertTier.LIKELY);
-            }
+            if (vl++ > vlMax * 1.5) {
+                flag("YAW: " + MathUtils.round(yawAccel, 7) + " PITCH: " + MathUtils.round(pitchAccel, 7), true, true, AlertTier.HIGH);
+            } else if(vl > vlMax) flag("YAW: " + MathUtils.round(yawAccel, 7) + " PITCH: " + MathUtils.round(pitchAccel, 7), true, true, AlertTier.LIKELY);
         } else vl -= vl > 0 ? vlSub : 0;
 
         debug("VL: " + vl + " YAW: " + yawAccel + " PITCH: " + pitchAccel + " YAWD: " + yawDelta);

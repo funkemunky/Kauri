@@ -112,7 +112,7 @@ public class MovementProcessor {
             lastDeltaY = deltaY;
             lastDeltaXZ = deltaXZ;
             deltaY = (float) (to.getY() - from.getY());
-            deltaXZ = (float) (cc.funkemunky.anticheat.api.utils.MiscUtils.hypot(to.getX() - from.getX(), to.getZ() - from.getZ()));
+            deltaXZ = (float) (MiscUtils.hypot(to.getX() - from.getX(), to.getZ() - from.getZ()));
             lastClientYAcceleration = clientYAcceleration;
             clientYAcceleration = deltaY - lastDeltaY;
 

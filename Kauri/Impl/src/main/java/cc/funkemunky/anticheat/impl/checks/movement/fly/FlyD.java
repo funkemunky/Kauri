@@ -24,7 +24,7 @@ public class FlyD extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        if(!getData().isGeneralCancel() && !move.isServerOnGround() && move.getHalfBlockTicks() == 0 && move.getLiquidTicks() == 0 && move.getClimbTicks() == 0) {
+        if(!getData().isGeneralCancel() && !move.isServerOnGround() && move.getBlockAboveTicks() == 0 && move.getWebTicks() == 0 && move.getHalfBlockTicks() == 0 && move.getLiquidTicks() == 0 && move.getClimbTicks() == 0) {
             if(ticks++ >= 10) {
                 int size = yValues.size();
 

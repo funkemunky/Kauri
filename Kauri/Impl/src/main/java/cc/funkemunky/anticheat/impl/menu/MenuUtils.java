@@ -45,8 +45,20 @@ MenuUtils {
     }
 
     public static void openCheckEditGUI(Player toOpen, int page) {
+        openCheckEditGUI(null, toOpen, page);
+    }
+
+    public static void openCheckEditGUI(Menu menuInput, Player toOpen, int page) {
         CheckType type = CheckType.values()[Math.min(CheckType.values().length, page) - 1];
-        ChestMenu menu = new ChestMenu(Color.Dark_Gray + "Edit Checks: " + Color.Blue + type.toString(), 6);
+        ChestMenu menu;
+        boolean buildAtEnd = false;
+        if(menuInput == null) {
+            menu = new ChestMenu(Color.Dark_Gray + "Edit Checks: " + Color.Blue + type.toString(), 6);
+        } else {
+            menu = (ChestMenu) menuInput;
+            menu.contents = new Button[menu.getMenuDimension().getSize()];
+            buildAtEnd = true;
+        }
 
         boolean isBeginning = page <= 1, isEnd = page >= CheckType.values().length;
         Kauri.getInstance().getCheckManager().getChecks().stream().filter(check -> check.getType().equals(type)).forEach(check -> menu.addItem(checkButton(check, page)));
@@ -54,7 +66,7 @@ MenuUtils {
         menu.setItem(45, getModifyAllButton(page));
         if (!isBeginning) {
             menu.setItem(48, createButton(false, MiscUtils.createItem(Material.SIGN, 1, Color.Gray + "Backward Page: " + Color.White + (page - 1)), (player, infoPair) -> {
-                openCheckEditGUI(player, page - 1);
+                openCheckEditGUI(infoPair.getMenu(), player, page - 1);
             }));
         }
 
@@ -69,7 +81,7 @@ MenuUtils {
 
         if (!isEnd) {
             menu.setItem(50, createButton(false, MiscUtils.createItem(Material.SIGN, 1, Color.Gray + "Forward Page: " + Color.White + (page + 1)), (player, infoPair) -> {
-                openCheckEditGUI(player, page + 1);
+                openCheckEditGUI(infoPair.getMenu(), player, page + 1);
             }));
         }
 
@@ -79,7 +91,9 @@ MenuUtils {
             menu.setItem(menu.getMenuDimension().getSize() - 1, saveChangesButton(page));
         }
 
-        menu.showMenu(toOpen);
+        if(buildAtEnd) {
+            menu.buildInventory(false);
+        } else menu.showMenu(toOpen);
     }
 
     public static void openLogGUI(Player toOpen, OfflinePlayer target) {
@@ -241,120 +255,24 @@ MenuUtils {
                             Kauri.getInstance().getConfig().set("checks." + check.getName() + ".enabled", !check.isEnabled());
 
                             check.setEnabled(!check.isEnabled());
-                            boolean isBeginning = page <= 1, isEnd = page >= CheckType.values().length;
-                            Menu menu = infoPair.getMenu();
-                            List<Check> checks = new ArrayList<>();
-                            Kauri.getInstance().getCheckManager().getChecks().stream().filter(check2 -> check2.getType().equals(check.getType())).forEach(checks::add);
-
-                            for (int i = 0; i < checks.size(); i++) {
-                                infoPair.getMenu().setItem(i, checkButton(checks.get(i), page));
-                            }
-                            if (!isBeginning) {
-                                menu.setItem(48, createButton(false, MiscUtils.createItem(Material.SIGN, 1, Color.Gray + "Backward Page: " + Color.White + (page - 1)), (player, infoPair2) -> {
-                                    openCheckEditGUI(player, page - 1);
-                                }));
-                            }
-
-                            menu.setItem(49, createButton(false, MiscUtils.createItem(Material.COMPASS, 1, Color.Red + "Back to Main Menu", "&7&oShift Click"), (player, infoPair2) -> {
-                                switch (infoPair.getClickType()) {
-                                    case SHIFT_LEFT:
-                                    case SHIFT_RIGHT:
-                                        openMainGUI(player);
-                                        break;
-                                }
-                            }));
-
-                            if (!isEnd) {
-                                menu.setItem(50, createButton(false, MiscUtils.createItem(Material.SIGN, 1, Color.Gray + "Forward Page: " + Color.White + (page + 1)), (player, infoPair2) -> {
-                                    openCheckEditGUI(player, page + 1);
-                                }));
-                            }
-                            if (!hasModifiedChecks) {
-                                infoPair.getMenu().setItem(infoPair.getMenu().getMenuDimension().getSize() - 1, saveChangesButton(page));
-                                infoPair.getMenu().buildInventory(false);
-                            }
-                            infoPair.getMenu().buildInventory(false);
                             hasModifiedChecks = true;
+                            openCheckEditGUI(infoPair.getMenu(), player2, page);
                         }
                         break;
                         case SHIFT_LEFT: {
                             Kauri.getInstance().getConfig().set("checks." + check.getName() + ".executable", !check.isExecutable());
                             check.setExecutable(!check.isExecutable());
-                            boolean isBeginning = page <= 1, isEnd = page >= CheckType.values().length;
-                            Menu menu = infoPair.getMenu();
 
-                            List<Check> checks = new ArrayList<>();
-                            Kauri.getInstance().getCheckManager().getChecks().stream().filter(check2 -> check2.getType().equals(check.getType())).forEach(checks::add);
-
-                            for (int i = 0; i < checks.size(); i++) {
-                                infoPair.getMenu().setItem(i, checkButton(checks.get(i), page));
-                            }
-
-                            if (!isBeginning) {
-                                menu.setItem(48, createButton(false, MiscUtils.createItem(Material.SIGN, 1, Color.Gray + "Backward Page: " + Color.White + (page - 1)), (player, infoPair2) -> {
-                                    openCheckEditGUI(player, page - 1);
-                                }));
-                            }
-
-                            menu.setItem(49, createButton(false, MiscUtils.createItem(Material.COMPASS, 1, Color.Red + "Back to Main Menu", "&7&oShift Click"), (player, infoPair2) -> {
-                                switch (infoPair2.getClickType()) {
-                                    case SHIFT_LEFT:
-                                    case SHIFT_RIGHT:
-                                        openMainGUI(player);
-                                        break;
-                                }
-                            }));
-
-                            if (!isEnd) {
-                                menu.setItem(50, createButton(false, MiscUtils.createItem(Material.SIGN, 1, Color.Gray + "Forward Page: " + Color.White + (page + 1)), (player, infoPair2) -> {
-                                    openCheckEditGUI(player, page + 1);
-                                }));
-                            }
-                            if (!hasModifiedChecks) {
-                                infoPair.getMenu().setItem(infoPair.getMenu().getMenuDimension().getSize() - 1, saveChangesButton(page));
-                                infoPair.getMenu().buildInventory(false);
-                            }
-                            infoPair.getMenu().buildInventory(false);
                             hasModifiedChecks = true;
+                            openCheckEditGUI(infoPair.getMenu(), player2, page);
                             break;
                         }
                         case RIGHT: {
                             Kauri.getInstance().getConfig().set("checks." + check.getName() + ".cancellable", !check.isCancellable());
                             check.setCancellable(!check.isCancellable());
-                            boolean isBeginning = page <= 1, isEnd = page >= CheckType.values().length;
-                            Menu menu = infoPair.getMenu();
-                            List<Check> checks = new ArrayList<>();
-                            Kauri.getInstance().getCheckManager().getChecks().stream().filter(check2 -> check2.getType().equals(check.getType())).forEach(checks::add);
 
-                            for (int i = 0; i < checks.size(); i++) {
-                                infoPair.getMenu().setItem(i, checkButton(checks.get(i), page));
-                            }
-                            if (!isBeginning) {
-                                menu.setItem(48, createButton(false, MiscUtils.createItem(Material.SIGN, 1, Color.Gray + "Backward Page: " + Color.White + (page - 1)), (player, infoPair2) -> {
-                                    openCheckEditGUI(player, page - 1);
-                                }));
-                            }
-
-                            menu.setItem(49, createButton(false, MiscUtils.createItem(Material.COMPASS, 1, Color.Red + "Back to Main Menu", "&7&oShift Click"), (player, infoPair2) -> {
-                                switch (infoPair2.getClickType()) {
-                                    case SHIFT_LEFT:
-                                    case SHIFT_RIGHT:
-                                        openMainGUI(player);
-                                        break;
-                                }
-                            }));
-
-                            if (!isEnd) {
-                                menu.setItem(50, createButton(false, MiscUtils.createItem(Material.SIGN, 1, Color.Gray + "Forward Page: " + Color.White + (page + 1)), (player, infoPair2) -> {
-                                    openCheckEditGUI(player, page + 1);
-                                }));
-                            }
-
-                            if (!hasModifiedChecks) {
-                                infoPair.getMenu().setItem(infoPair.getMenu().getMenuDimension().getSize() - 1, saveChangesButton(page));
-                            }
-                            infoPair.getMenu().buildInventory(false);
                             hasModifiedChecks = true;
+                            openCheckEditGUI(infoPair.getMenu(), player2, page);
                             break;
                         }
                     }

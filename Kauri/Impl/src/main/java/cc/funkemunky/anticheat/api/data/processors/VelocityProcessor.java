@@ -28,7 +28,7 @@ public class VelocityProcessor {
 
     public void update(WrappedOutVelocityPacket packet) {
         maxVertical = motionY = (float) packet.getY();
-        maxHorizontal = (float) cc.funkemunky.anticheat.api.utils.MiscUtils.hypot(packet.getX(), packet.getZ());
+        maxHorizontal = (float) MiscUtils.hypot(packet.getX(), packet.getZ());
 
         if (packet.getId() == packet.getPlayer().getEntityId()) {
             lastVelocity.reset();

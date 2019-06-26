@@ -49,12 +49,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>cc.funkemunky.anticheat</groupId>
-            <artifactId>API</artifactId>
-            <version>LATEST</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>org.github.lombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.0</version>

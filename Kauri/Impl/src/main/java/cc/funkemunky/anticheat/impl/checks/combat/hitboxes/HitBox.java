@@ -3,12 +3,12 @@ package cc.funkemunky.anticheat.impl.checks.combat.hitboxes;
 import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.CustomLocation;
 import cc.funkemunky.anticheat.api.utils.Packets;
+import cc.funkemunky.anticheat.api.utils.RayTrace;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.MiscUtils;
-import cc.funkemunky.api.utils.math.RayTrace;
 import lombok.val;
 import org.bukkit.GameMode;
 import org.bukkit.entity.EntityType;
@@ -36,13 +36,11 @@ public class HitBox extends Check {
 
             val origin = move.getTo().toLocation(getData().getPlayer().getWorld()).add(0, 1.53f, 0);
 
-            val trace = new RayTrace(origin.toVector(), origin.getDirection());
+            val pastLoc = move.getPastLocation().getEstimatedLocation(getData().getTransPing(), 150);
 
-            val vectors = trace.traverse(3.2, 0.1);
+            val hitbox = getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), 150);
 
-            val pastLoc = getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), 150 + Math.abs(getData().getPing() - getData().getLastPing()));
-
-            val doesMatch = vectors.stream().anyMatch(vec -> pastLoc.stream().anyMatch(loc -> getHitbox(getData().getTarget(), loc).intersectsWithBox(vec)));
+            val doesMatch = pastLoc.stream().map(loc -> new RayTrace(loc.toVector().add(new Vector(0, 1.53f, 0)), loc.toLocation(getData().getPlayer().getWorld()).add(0, 1.53, 0).getDirection()).traverse(3.2, 0.2, 0.1, 1)).anyMatch(vecList -> vecList.stream().anyMatch(vec -> hitbox.stream().anyMatch(vec2 -> getHitbox(getData().getTarget(), vec2).collides(vec))));
 
             if(!doesMatch && !getData().isLagging()) {
                 val reach = pastLoc.stream().mapToDouble(loc -> loc.toVector().add(new Vector(0, 1.53, 0)).distance(origin.toVector())).average().getAsDouble();

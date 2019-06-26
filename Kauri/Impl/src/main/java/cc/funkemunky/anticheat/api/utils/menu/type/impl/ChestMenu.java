@@ -27,7 +27,7 @@ public class ChestMenu implements Menu {
     @Setter
     private Menu parent;
     private BukkitInventoryHolder holder;
-    private Button[] contents;
+    public Button[] contents;
     private CloseHandler closeHandler;
 
     public ChestMenu(@NonNull String title, int size) {
