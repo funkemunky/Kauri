@@ -45,20 +45,9 @@ MenuUtils {
     }
 
     public static void openCheckEditGUI(Player toOpen, int page) {
-        openCheckEditGUI(null, toOpen, page);
-    }
-
-    public static void openCheckEditGUI(Menu menuInput, Player toOpen, int page) {
         CheckType type = CheckType.values()[Math.min(CheckType.values().length, page) - 1];
-        ChestMenu menu;
+        ChestMenu menu = new ChestMenu(Color.Dark_Gray + "Edit Checks: " + Color.Blue + type.toString(), 6);;
         boolean buildAtEnd = false;
-        if(menuInput == null) {
-            menu = new ChestMenu(Color.Dark_Gray + "Edit Checks: " + Color.Blue + type.toString(), 6);
-        } else {
-            menu = (ChestMenu) menuInput;
-            menu.contents = new Button[menu.getMenuDimension().getSize()];
-            buildAtEnd = true;
-        }
 
         boolean isBeginning = page <= 1, isEnd = page >= CheckType.values().length;
         Kauri.getInstance().getCheckManager().getChecks().stream().filter(check -> check.getType().equals(type)).forEach(check -> menu.addItem(checkButton(check, page)));
@@ -66,7 +55,7 @@ MenuUtils {
         menu.setItem(45, getModifyAllButton(page));
         if (!isBeginning) {
             menu.setItem(48, createButton(false, MiscUtils.createItem(Material.SIGN, 1, Color.Gray + "Backward Page: " + Color.White + (page - 1)), (player, infoPair) -> {
-                openCheckEditGUI(infoPair.getMenu(), player, page - 1);
+                openCheckEditGUI(player, page - 1);
             }));
         }
 
@@ -81,7 +70,7 @@ MenuUtils {
 
         if (!isEnd) {
             menu.setItem(50, createButton(false, MiscUtils.createItem(Material.SIGN, 1, Color.Gray + "Forward Page: " + Color.White + (page + 1)), (player, infoPair) -> {
-                openCheckEditGUI(infoPair.getMenu(), player, page + 1);
+                openCheckEditGUI(player, page + 1);
             }));
         }
 
@@ -256,7 +245,7 @@ MenuUtils {
 
                             check.setEnabled(!check.isEnabled());
                             hasModifiedChecks = true;
-                            openCheckEditGUI(infoPair.getMenu(), player2, page);
+                            openCheckEditGUI(player2, page);
                         }
                         break;
                         case SHIFT_LEFT: {
@@ -264,7 +253,7 @@ MenuUtils {
                             check.setExecutable(!check.isExecutable());
 
                             hasModifiedChecks = true;
-                            openCheckEditGUI(infoPair.getMenu(), player2, page);
+                            openCheckEditGUI(player2, page);
                             break;
                         }
                         case RIGHT: {
@@ -272,7 +261,7 @@ MenuUtils {
                             check.setCancellable(!check.isCancellable());
 
                             hasModifiedChecks = true;
-                            openCheckEditGUI(infoPair.getMenu(), player2, page);
+                            openCheckEditGUI(player2, page);
                             break;
                         }
                     }

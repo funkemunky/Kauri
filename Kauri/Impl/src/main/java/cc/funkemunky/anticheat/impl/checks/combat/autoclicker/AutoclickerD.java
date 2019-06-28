@@ -13,9 +13,6 @@ import org.bukkit.event.Event;
         Packet.Client.POSITION,
         Packet.Client.POSITION_LOOK,
         Packet.Client.LOOK,
-        Packet.Client.LEGACY_POSITION,
-        Packet.Client.LEGACY_POSITION_LOOK,
-        Packet.Client.LEGACY_LOOK,
         Packet.Client.ARM_ANIMATION})
 @cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Autoclicker (Type D)", description = "Checks for very common autoclicker mistakes.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, executable = false, maxVL = 20)

@@ -30,6 +30,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 @Init
 public class PacketListeners implements AtlasListener {
@@ -51,6 +52,7 @@ public class PacketListeners implements AtlasListener {
                     data.getTeleportLocations().add(new Vector(position.getX(), position.getY(), position.getZ()));
                     data.getVelocityProcessor().velocityX = data.getVelocityProcessor().velocityY = data.getVelocityProcessor().velocityZ = 0;
                     data.getVelocityProcessor().setAttackedSinceVelocity(false);
+                    data.setTeleportTest(System.currentTimeMillis());
                     break;
                 }
                 case Packet.Server.KEEP_ALIVE:
@@ -128,7 +130,7 @@ public class PacketListeners implements AtlasListener {
                         //We use transPing for checking lag since the packet used is little known.
                         //AimH have not seen anyone create a spoof for it or even talk about the possibility of needing one.
                         //Large jumps in latency most of the intervalTime mean lag.
-                        data.setLagging(Math.abs(data.getTransPing() - data.getLastTransPing()) > 35);
+                        data.setLagging(Math.abs(data.getTransPing() - data.getLastTransPing()) > 40);
 
                         if (data.isLagging()) data.getLastLag().reset();
                     }
@@ -165,10 +167,7 @@ public class PacketListeners implements AtlasListener {
                 case Packet.Client.POSITION:
                 case Packet.Client.POSITION_LOOK:
                 case Packet.Client.LOOK:
-                case Packet.Client.LEGACY_POSITION:
-                case Packet.Client.FLYING:
-                case Packet.Client.LEGACY_POSITION_LOOK:
-                case Packet.Client.LEGACY_LOOK: {
+                case Packet.Client.FLYING: {
                     WrappedInFlyingPacket packet = new WrappedInFlyingPacket(event.getPacket(), player);
 
                     data.getMovementProcessor().update(data, packet);

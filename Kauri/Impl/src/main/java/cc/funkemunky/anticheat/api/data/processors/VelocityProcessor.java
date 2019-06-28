@@ -6,6 +6,7 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.BlockUtils;
+import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.ReflectionsUtil;
 import cc.funkemunky.api.utils.TickTimer;
 import lombok.Getter;
@@ -30,7 +31,7 @@ public class VelocityProcessor {
         maxVertical = motionY = (float) packet.getY();
         maxHorizontal = (float) MiscUtils.hypot(packet.getX(), packet.getZ());
 
-        if (packet.getId() == packet.getPlayer().getEntityId()) {
+        if (packet.getId() == packet.getPlayer().getEntityId() && (MathUtils.hypot(packet.getX(), packet.getZ()) > 1E-4 || Math.abs(packet.getY()) > 1E-5)) {
             lastVelocity.reset();
             lastVelocityTimestamp = System.currentTimeMillis();
         }
@@ -56,7 +57,7 @@ public class VelocityProcessor {
         if(velocityTicks > 1) {
             var multiplier = 0.91f;
 
-            if (packet.isGround()) multiplier*= ReflectionsUtil.getFriction(BlockUtils.getBlock(getData().getPlayer().getLocation().clone().subtract(0, 0.5f, 0)));
+            if (packet.isGround()) multiplier*= getData().getBlockBelow() != null ? ReflectionsUtil.getFriction(getData().getBlockBelow()) : 0.6;
 
             motionX *= multiplier;
             motionZ *= multiplier;

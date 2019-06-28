@@ -13,7 +13,7 @@ import org.bukkit.event.Event;
 
 import java.util.Comparator;
 
-@Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LOOK})
+@Packets(packets = {Packet.Client.USE_ENTITY})
 @Init
 @CheckInfo(name = "Killaura (Type D)", description = "Raytraces to check if there are blocks obstructing the path of attack.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, executable = false)
 public class KillauraD extends Check {
@@ -21,9 +21,9 @@ public class KillauraD extends Check {
     //TODO Test for false positives.
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(getData().getTarget() != null && getData().getLastAttack().hasNotPassed(0) && !getData().isLagging()) {
+        if(getData().getTarget() != null && !getData().isLagging()) {
             val move = getData().getMovementProcessor();
-            val origin = move.getTo().toLocation(getData().getPlayer().getWorld()).add(0, 1.54, 0);
+            val origin = getData().getPlayer().getEyeLocation();
             val target = getData().getTarget();
             val distance = move.getTo().toVector().setY(0).distance(target.getLocation().toVector().setY(0));
 
@@ -36,8 +36,8 @@ public class KillauraD extends Check {
                 return boxList.size() > 0 && boxList.stream().anyMatch(box -> box.intersectsWithBox(vec) && box.getMaximum().subtract(box.getMinimum()).lengthSquared() == 3);
             }).count();
 
-            if(count > 0) {
-                flag("colliding=" + count, true, true, AlertTier.HIGH);
+            if(count > 1) {
+                flag("colliding=" + count, true, true, AlertTier.LOW);
             }
 
             debug("collidng=" + count);

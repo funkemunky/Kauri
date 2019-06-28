@@ -12,7 +12,7 @@ import lombok.val;
 import org.bukkit.event.Event;
 
 @Init
-@Packets(packets = {Packet.Client.LOOK, Packet.Client.POSITION_LOOK, Packet.Client.LEGACY_LOOK, Packet.Client.LEGACY_POSITION_LOOK})
+@Packets(packets = {Packet.Client.LOOK, Packet.Client.POSITION_LOOK})
 @CheckInfo(name = "Aim (Type K)", description = "Looks for prime number in look movements", type = CheckType.AIM, developer = true)
 public class AimK extends Check {
 

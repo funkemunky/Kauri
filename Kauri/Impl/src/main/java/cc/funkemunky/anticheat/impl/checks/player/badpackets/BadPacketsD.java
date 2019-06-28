@@ -13,10 +13,7 @@ import org.bukkit.event.Event;
         Packet.Client.FLYING,
         Packet.Client.POSITION,
         Packet.Client.POSITION_LOOK,
-        Packet.Client.LOOK,
-        Packet.Client.LEGACY_POSITION,
-        Packet.Client.LEGACY_POSITION_LOOK,
-        Packet.Client.LEGACY_LOOK})
+        Packet.Client.LOOK})
 @cc.funkemunky.api.utils.Init
 @CheckInfo(name = "BadPackets (Type D)", description = "Compares the rate of interact packets to a certain frequency.", type = CheckType.BADPACKETS, cancelType = CancelType.INTERACT, maxVL = 50)
 public class BadPacketsD extends Check {

@@ -23,7 +23,7 @@ import java.util.Set;
 /* We use this to process the bounding boxes collided around the player for our checks to use as utils */
 public class CollisionAssessment {
     private PlayerData data;
-    private boolean onGround, fullyInAir, inLiquid, blocksOnTop, pistonsNear, onHalfBlock, onClimbable, onIce, collidesHorizontally, inWeb, onSlime, onSoulSand, blocksNear, blocksAround;
+    private boolean onGround, fullyInAir, inLiquid, liquidBelow, nearLiquid, blocksOnTop, pistonsNear, onHalfBlock, onClimbable, onIce, collidesHorizontally, inWeb, onSlime, onSoulSand, blocksNear, blocksAround;
     private Set<Material> materialsCollided;
     private BoundingBox playerBox;
 
@@ -42,12 +42,14 @@ public class CollisionAssessment {
         if(block == null && !isEntity) return;
 
         if (isEntity || BlockUtils.isSolid(block)) {
+            if(isEntity) bb = bb.grow(0.35f, 0.2f, 0.35f);
             if (bb.collidesVertically(playerBox.subtract(0, 0.1f, 0, 0, 1.4f, 0))) {
                 onGround = true;
             }
 
             if (getData().isDebuggingBox() && bb.collides(playerBox) && Kauri.getInstance().getCurrentTicks() % 2 == 0) {
-                Atlas.getInstance().getThreadPool().submit(() -> MiscUtils.createParticlesForBoundingBox(getData().getPlayer(), bb, WrappedEnumParticle.FLAME, 0.25f));
+                BoundingBox box = bb;
+                Atlas.getInstance().getThreadPool().submit(() -> MiscUtils.createParticlesForBoundingBox(getData().getPlayer(), box, WrappedEnumParticle.FLAME, 0.25f));
             }
 
             if (bb.collidesVertically(playerBox.add(0, 1.45f, 0, 0, 0.35f, 0))) {
@@ -58,7 +60,7 @@ public class CollisionAssessment {
                 pistonsNear = true;
             }
 
-            if ((BlockUtils.isSlab(block) || block.getType().toString().contains("DAYLIGHT_DETECTOR") || BlockUtils.isStair(block) || block.getType().getId() == 92 || block.getType().getId() == 397) && bb.intersectsWithBox(data.getBoundingBox().grow(0.2f,1f,0.2f))) {
+            if ((BlockUtils.isSlab(block) || block.getType().toString().contains("DAYLIGHT_DETECTOR") || block.getType().toString().contains("SKULL") || BlockUtils.isStair(block) || block.getType().getId() == 92 || block.getType().getId() == 397) && bb.intersectsWithBox(data.getBoundingBox().grow(0.2f,1f,0.2f))) {
                 onHalfBlock = true;
             }
 
@@ -78,7 +80,7 @@ public class CollisionAssessment {
                 onSoulSand = true;
             }
 
-            if (BlockUtils.isClimbableBlock(block) && bb.intersectsWithBox(data.getBoundingBox().grow(0.1f, 0.1f, 0.1f))) {
+            if (BlockUtils.isClimbableBlock(block) && bb.intersectsWithBox(data.getBoundingBox().grow(0.6f, 0.1f, 0.6f))) {
                 onClimbable = true;
             }
 
@@ -91,8 +93,14 @@ public class CollisionAssessment {
                 }
             }
         } else {
-            if (BlockUtils.isLiquid(block) && playerBox.grow(0.2f, 0.1f, 0.2f).collides(bb)) {
-                inLiquid = true;
+            if (BlockUtils.isLiquid(block)) {
+                if(playerBox.intersectsWithBox(bb)) {
+                    nearLiquid = inLiquid = true;
+                } else if(playerBox.subtract(0,0.025f,0,0,0,0).collides(bb)) {
+                    nearLiquid = liquidBelow = true;
+                } else if(playerBox.grow(0.2f, 0.1f, 0.2f).collides(bb)) {
+                    nearLiquid = true;
+                }
             }
             if (block.getType().toString().contains("WEB") && playerBox.collidesVertically(bb)) {
                 inWeb = true;

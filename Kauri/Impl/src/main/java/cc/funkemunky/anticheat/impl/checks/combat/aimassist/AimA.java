@@ -11,9 +11,7 @@ import org.bukkit.event.Event;
 
 @Packets(packets = {
         Packet.Client.POSITION_LOOK,
-        Packet.Client.LOOK,
-        Packet.Client.LEGACY_POSITION_LOOK,
-        Packet.Client.LEGACY_LOOK})
+        Packet.Client.LOOK})
 @cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Aim (Type A)", type = CheckType.AIM, cancelType = CancelType.MOTION, description = "Checks for the consistency in aim overall", executable = false, maxVL = 80)
 public class AimA extends Check {

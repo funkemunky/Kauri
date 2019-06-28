@@ -4,7 +4,9 @@ cc\funkemunky\anticheat\api\utils\Pastebin.class
 cc\funkemunky\anticheat\impl\listeners\PlayerConnectionListeners.class
 cc\funkemunky\anticheat\api\checks\Check$1.class
 cc\funkemunky\anticheat\api\pup\PuPType.class
+cc\funkemunky\anticheat\impl\checks\movement\jesus\JesusB.class
 cc\funkemunky\anticheat\api\utils\menu\mask\Mask.class
+cc\funkemunky\anticheat\api\utils\SkiddedUtils.class
 cc\funkemunky\anticheat\impl\menu\MenuUtils$1.class
 cc\funkemunky\anticheat\api\data\logging\LoggerManager.class
 cc\funkemunky\anticheat\api\utils\menu\Menu.class
@@ -29,6 +31,7 @@ cc\funkemunky\anticheat\api\utils\ItemBuilder.class
 cc\funkemunky\anticheat\api\utils\json\JSONObject.class
 cc\funkemunky\anticheat\api\checks\Check.class
 cc\funkemunky\anticheat\api\data\banwave\BanwaveConfig.class
+cc\funkemunky\anticheat\impl\checks\movement\fly\FlyE.class
 cc\funkemunky\anticheat\impl\commands\kauri\arguments\MenuArgument.class
 cc\funkemunky\anticheat\api\data\banwave\BanwaveManager$1.class
 cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimI.class
@@ -46,6 +49,7 @@ cc\funkemunky\anticheat\api\data\processors\VelocityProcessor.class
 cc\funkemunky\anticheat\impl\checks\movement\fastladder\FastLadder.class
 cc\funkemunky\anticheat\impl\menu\InputHandler.class
 cc\funkemunky\anticheat\api\utils\menu\button\Button.class
+cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimN.class
 cc\funkemunky\anticheat\impl\checks\combat\autoclicker\AutoclickerG.class
 cc\funkemunky\anticheat\impl\listeners\FunkeListeners.class
 cc\funkemunky\anticheat\impl\pup\bot\ConsoleClient.class
@@ -108,6 +112,7 @@ cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimG.class
 cc\funkemunky\anticheat\impl\checks\movement\noslowdown\NoSlowdownB.class
 cc\funkemunky\anticheat\impl\commands\kauri\arguments\RecentViolationsArgument.class
 cc\funkemunky\anticheat\impl\checks\combat\criticals\Criticals.class
+cc\funkemunky\anticheat\impl\checks\movement\fly\FlyF.class
 cc\funkemunky\anticheat\api\data\processors\ActionProcessor$1.class
 cc\funkemunky\anticheat\api\checks\AlertTier.class
 cc\funkemunky\anticheat\api\utils\EvictingList.class
@@ -148,6 +153,7 @@ cc\funkemunky\anticheat\api\event\PlayerCheatEvent.class
 cc\funkemunky\anticheat\api\utils\Message.class
 cc\funkemunky\anticheat\impl\checks\movement\speed\SpeedF.class
 cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimC.class
+cc\funkemunky\anticheat\impl\checks\movement\motion\MotionB.class
 cc\funkemunky\anticheat\api\data\processors\ActionProcessor.class
 cc\funkemunky\anticheat\api\utils\json\JSONTokener.class
 cc\funkemunky\anticheat\impl\checks\combat\autoclicker\DoubleClick.class

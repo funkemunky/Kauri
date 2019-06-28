@@ -41,11 +41,11 @@ public class SpeedF extends Check {
 
         float max = motionXZ + account();
 
-        if(move.getDeltaXZ() > 0 && getData().getLastBlockPlace().hasPassed(20) && getData().getLastLogin().hasPassed(20) && !getData().isServerPos() && !getData().getPlayer().getAllowFlight() && getData().getPlayer().getVehicle() == null && move.getLastRiptide().hasPassed(20) && !move.isTookVelocity() && !PlayerUtils.isGliding(getData().getPlayer())) {
+        if(move.getDeltaXZ() > 0 && getData().getMovementProcessor().getFrom().toVector().length() > 0 && !getData().getBlockInside().getType().isSolid() && getData().getLastBlockPlace().hasPassed(20) && getData().getLastLogin().hasPassed(20) && !getData().isServerPos() && !getData().getPlayer().getAllowFlight() && getData().getPlayer().getVehicle() == null && move.getLastRiptide().hasPassed(20) && !move.isTookVelocity() && !PlayerUtils.isGliding(getData().getPlayer())) {
             if(move.getDeltaXZ() > max) {
                 flag(move.getDeltaXZ() + ">-" + max, true, true, AlertTier.HIGH);
             }
-            debug(move.getDeltaXZ() + ", " + motionXZ + ", " + max);
+            debug(move.getDeltaXZ() + ", " + motionXZ + ", " + max + ", " + move.getIceTicks() + ", " + move.getHalfBlockTicks());
         }
     }
 
@@ -59,12 +59,12 @@ public class SpeedF extends Check {
 
         val move = getData().getMovementProcessor();
 
-        total += move.getIceTicks() > 0 ? .25 : 0;
+        total += move.getIceTicks() > 0 ? .32 : 0;
         total += (getData().getPlayer().getWalkSpeed() - 0.2) * 2.4;
         total += (getData().getLastBlockPlace().hasNotPassed(7)) ? 0.2 : 0;
         total += move.isOnSlimeBefore() ? 0.18 : 0;
         total += move.getBlockAboveTicks() > 0 ? move.getIceTicks() > 0 ? 0.4 : 0.25 : 0;
-        total += move.getHalfBlockTicks() > 0 ? 0.24 : 0;
+        total += move.getHalfBlockTicks() > 0 ? 0.34 : 0;
         return total;
     }
 }

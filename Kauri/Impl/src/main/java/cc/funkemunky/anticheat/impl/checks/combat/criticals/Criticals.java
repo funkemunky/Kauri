@@ -9,7 +9,7 @@ import org.bukkit.event.Event;
 
 @CheckInfo(name = "Criticals", type = CheckType.COMBAT, cancelType = CancelType.COMBAT, maxVL = 50, developer = true)
 @Init
-@Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION})
+@Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK})
 public class Criticals extends Check {
 
     @Override

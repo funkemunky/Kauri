@@ -9,9 +9,7 @@ import org.bukkit.event.Event;
 
 @Packets(packets = {
         Packet.Client.POSITION_LOOK,
-        Packet.Client.LOOK,
-        Packet.Client.LEGACY_POSITION_LOOK,
-        Packet.Client.LEGACY_LOOK})
+        Packet.Client.LOOK})
 @cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Aim (Type B)", description = "Checks for common denominators in the pitch.", cancelType = CancelType.MOTION, type = CheckType.AIM)
 public class AimB extends Check {
@@ -29,7 +27,7 @@ public class AimB extends Check {
             if (Math.abs(move.getTo().getPitch()) < 88.0f
                     && move.getPitchDelta() > 0
                     && move.getYawDelta() < 10
-                    && move.getOptifineTicks() < 10
+                    && move.getOptifineTicks() < 2
                     && pitchGCD < 131072L) {
                 if(vl++ > 60) {
                     flag(String.valueOf(pitchGCD / 2000), true, true, AlertTier.CERTAIN);

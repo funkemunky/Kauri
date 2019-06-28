@@ -15,7 +15,7 @@ import org.bukkit.event.Event;
 
 @CheckInfo(name = "Aim (Type J)", description = "A heuristic that looks for common patterns by advanced AimAssists (not stable) - FlyCode", type = CheckType.AIM, cancellable = false, executable = false)
 @Init
-@Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LOOK, Packet.Client.LEGACY_LOOK})
+@Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LOOK})
 public class AimJ extends Check {
 
     private int count;
@@ -73,8 +73,8 @@ public class AimJ extends Check {
                     if (move.getDeltaXZ() < 0.20) {
                         if (count > 0) count--;
                     }
-                    if (count > countMax && verbose.flag(4, 999L)) {
-                        flag("test", true, true, AlertTier.POSSIBLE);
+                    if (count > countMax && verbose.flag(8, 999L)) {
+                        flag("test", true, true, verbose.getVerbose() > 40 ? AlertTier.HIGH : verbose.getVerbose() > 20 ? AlertTier.LIKELY : AlertTier.POSSIBLE);
                     }
                     lastGcd = gcd;
                 }

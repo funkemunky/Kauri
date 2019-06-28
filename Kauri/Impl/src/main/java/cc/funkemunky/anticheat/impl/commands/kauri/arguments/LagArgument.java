@@ -76,6 +76,9 @@ public class LagArgument extends FunkeArgument {
     @Message(name = "command.lag.player.kauriPing")
     private String playerKauriPing = "&8» &eKauri&7: &f%ping%ms";
 
+    @Message(name = "command.lag.player.positionalPing")
+    private String playerPositionalPing = "&8» &ePositional&7: &f%ping%ms";
+
     @Message(name = "command.lag.player.stability")
     private String playerStability = "&6&lStability";
 
@@ -184,9 +187,10 @@ public class LagArgument extends FunkeArgument {
                                 sender.sendMessage(Color.translate(playerLatency));
                                 sender.sendMessage(Color.translate(playerBukkitPing.replace("%ping%", String.valueOf(data.getPing()))));
                                 sender.sendMessage(Color.translate(playerKauriPing.replace("%ping%", String.valueOf(data.getTransPing()))));
+                                sender.sendMessage(Color.translate(playerPositionalPing.replace("%ping%", String.valueOf(data.getTeleportPing()))));
                                 sender.sendMessage("");
                                 sender.sendMessage(Color.translate(playerStability));
-                                sender.sendMessage(Color.translate(playerPacketDrop.replace("%lastDrop%", DurationFormatUtils.formatDurationWords(data.getLastLag().getPassed() * 50, true, true))));
+                                sender.sendMessage(Color.translate(playerPacketDrop.replace("%lastDrop%", DurationFormatUtils.formatDurationWords(System.currentTimeMillis() - data.getLastPacketDrop(), true, true))));
                                 sender.sendMessage(MiscUtils.line(lineColor));
                             } else {
                                 sender.sendMessage(Color.translate(Messages.errorData));

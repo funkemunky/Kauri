@@ -1,17 +1,21 @@
 package cc.funkemunky.anticheat.api.utils;
 
 import cc.funkemunky.anticheat.api.data.PlayerData;
+import cc.funkemunky.anticheat.impl.checks.behavioral.InventoryClick;
 import cc.funkemunky.api.Atlas;
-import cc.funkemunky.api.utils.BlockUtils;
-import cc.funkemunky.api.utils.BoundingBox;
+import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutOpenWindow;
+import cc.funkemunky.api.tinyprotocol.packet.types.WrappedChatMessage;
+import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.PlayerUtils;
 import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.SimpleCommandMap;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.*;
 import org.bukkit.potion.PotionEffectType;
 

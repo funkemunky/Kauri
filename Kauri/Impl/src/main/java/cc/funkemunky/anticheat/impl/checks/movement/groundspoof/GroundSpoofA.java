@@ -26,6 +26,7 @@ public class GroundSpoofA extends Check {
                 || move.getClimbTicks() > 0
                 || move.getWebTicks() > 0
                 || move.isOnHalfBlock()
+                || getData().getBlockInside().getType().isSolid()
                 || !Atlas.getInstance().getBlockBoxManager().getBlockBox().isChunkLoaded(move.getTo().toLocation(getData().getPlayer().getWorld()))
                 || move.isBlocksOnTop())
             return;

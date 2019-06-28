@@ -29,7 +29,7 @@ public class SpeedC extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        val decel = move.isServerOnGround() ? ReflectionsUtil.getFriction(BlockUtils.getBlock(move.getTo().toLocation(getData().getPlayer().getWorld()).clone().subtract(0, 0.25,0))) : (getData().getActionProcessor().isSprinting() ? 0.026f : 0.02f);
+        val decel = move.isServerOnGround() ? getData().getBlockBelow() != null ? ReflectionsUtil.getFriction(getData().getBlockBelow()) : 0.6 : (getData().getActionProcessor().isSprinting() ? 0.026f : 0.02f);
         val difference = MathUtils.getDelta(move.getLastDeltaXZ(), move.getDeltaXZ());
         val decelDif = MathUtils.getDelta(decel, difference);
 

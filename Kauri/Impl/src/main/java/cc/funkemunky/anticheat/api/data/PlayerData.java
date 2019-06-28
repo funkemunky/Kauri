@@ -16,6 +16,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -52,14 +53,18 @@ public class PlayerData {
             lastBlockPlace = new TickTimer(30),
             lastFlag = new TickTimer(40),
             lastAttack = new TickTimer(4),
-            lastBlockBreak;
+            lastBlockBreak = new TickTimer(3),
+            lastPacketSkip = new TickTimer(5);
     private List<Vector> teleportLocations = new EvictingList<>(5);
     private float walkSpeed, flySpeed;
     private LivingEntity target, attacker;
-    private long transPing, lastTransaction, lastTransPing, ping, lastPing, lastKeepAlive, lastServerPosStamp, lastFlagTimestamp;
+    private long transPing, lastTransaction, lastTransPing, ping, lastPing, lastKeepAlive, lastServerPosStamp, lastFlagTimestamp, lastPacketDrop;
     private MCSmooth yawSmooth = new MCSmooth(), pitchSmooth = new MCSmooth();
     private CustomLocation entityFrom, entityTo, positionLoc;
     private PastLocation entityPastLocation = new PastLocation();
+    private Block blockBelow, blockAbove, blockInside;
+    private Location teleportLoc;
+    private long teleportTest, teleportPing;
 
     /* Processors */
     private MovementProcessor movementProcessor;

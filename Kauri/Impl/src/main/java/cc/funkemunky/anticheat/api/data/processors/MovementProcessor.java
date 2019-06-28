@@ -19,7 +19,7 @@ import java.util.List;
 
 @Getter
 public class MovementProcessor {
-    private boolean lastFlight, flight, clientOnGround, serverOnGround, fullyInAir, inAir, hasJumped, inLiquid, blocksOnTop, pistonsNear, onHalfBlock,
+    private boolean lastFlight, flight, inLiquid, liquidBelow, clientOnGround, serverOnGround, fullyInAir, inAir, hasJumped, nearLiquid, blocksOnTop, pistonsNear, onHalfBlock,
             onClimbable, onIce, collidesHorizontally, tookVelocity, inWeb, onSlime, onSlimeBefore, onSoulSand, isRiptiding, halfBlocksAround, isNearGround, isInsideBlock, blocksNear, blocksAround;
     private int airTicks, groundTicks, iceTicks, climbTicks, halfBlockTicks, soulSandTicks, blockAboveTicks, optifineTicks, liquidTicks, webTicks, yawZeroTicks, pitchZeroTicks;
     private float deltaY, lastDeltaXZ, slimeHeight, fallDistance, yawDelta, pitchDelta, lastYawDelta, lastPitchDelta, lastDeltaY, deltaXZ, lastServerYVelocity, serverYAcceleration, clientYAcceleration, lastClientYAcceleration, lastServerYAcceleration, jumpVelocity, cinematicYawDelta, cinematicPitchDelta, lastCinematicPitchDelta, lastCinematicYawDelta;
@@ -69,6 +69,7 @@ public class MovementProcessor {
                 serverOnGround = assessment.isOnGround();
                 blocksOnTop = assessment.isBlocksOnTop();
                 collidesHorizontally = assessment.isCollidesHorizontally();
+                nearLiquid = assessment.isNearLiquid();
                 inLiquid = assessment.isInLiquid();
                 onHalfBlock = assessment.isOnHalfBlock();
                 onIce = assessment.isOnIce();
@@ -103,7 +104,12 @@ public class MovementProcessor {
             val vecStream = data.getTeleportLocations().stream().filter(vec -> vec.distance(to.toVector()) < 0.45).findFirst().orElse(null);
 
             if(vecStream != null) {
-                data.setLastServerPosStamp(System.currentTimeMillis());
+                if(data.getTeleportLoc() != null && vecStream.distance(data.getTeleportLoc().toVector()) == 0) {
+                   data.setTeleportPing(System.currentTimeMillis() - data.getTeleportTest());
+                } else {
+                    data.setLastServerPosStamp(System.currentTimeMillis());
+                    data.setTeleportPing(System.currentTimeMillis() - data.getTeleportTest());
+                }
                 data.getTeleportLocations().remove(vecStream);
                 from = to;
             }
@@ -141,14 +147,21 @@ public class MovementProcessor {
 
             if(timeStamp - lastTimeStamp > 100) {
                 lagTicks = (timeStamp - lastTimeStamp - 50) / 50;
+                data.setLastPacketDrop(System.currentTimeMillis());
             } else lagTicks-= lagTicks > 0 ? 1 : 0;
 
             if(lagTicks > 0) {
-                data.getLastLag().reset();
+                data.getLastPacketSkip().reset();
             }
             val block = BlockUtils.getBlock(to.toLocation(data.getPlayer().getWorld()));
             val blockAbove = BlockUtils.getBlock(to.toLocation(data.getPlayer().getWorld()).clone().add(0, 1, 0));
+            val blockBelow = BlockUtils.getBlock(to.toLocation(data.getPlayer().getWorld()).clone().subtract(0, 1,0));
+
             isInsideBlock = block == null || blockAbove == null || BlockUtils.isSolid(block) || BlockUtils.isSolid(blockAbove);
+
+            data.setBlockAbove(blockAbove);
+            data.setBlockBelow(blockBelow);
+            data.setBlockInside(block);
 
             if (isRiptiding = Atlas.getInstance().getBlockBoxManager().getBlockBox().isRiptiding(packet.getPlayer()))
                 lastRiptide.reset();
@@ -196,11 +209,11 @@ public class MovementProcessor {
             if(data.isLoggedIn() && data.getLastLogin().hasPassed(2)) data.setLoggedIn(false);
 
 
-            iceTicks = onIce ? Math.min(40, iceTicks + 1) : Math.max(0, iceTicks - 1);
+            iceTicks = onIce ? Math.min(40, iceTicks + 2) : Math.max(0, iceTicks - 1);
             climbTicks = onClimbable ? Math.min(40, climbTicks + 1) : Math.max(0, climbTicks - 1);
             halfBlockTicks = onHalfBlock ? Math.min(40, halfBlockTicks + 2) : Math.max(0, halfBlockTicks - 1);
             blockAboveTicks = blocksOnTop ? Math.min(40, blockAboveTicks + 2) : Math.max(0, blockAboveTicks - 1);
-            liquidTicks = inLiquid ? Math.min(50, liquidTicks + 1) : Math.max(0, liquidTicks - 1);
+            liquidTicks = nearLiquid ? Math.min(50, liquidTicks + 1) : Math.max(0, liquidTicks - 1);
             soulSandTicks = onSoulSand ? Math.min(40, soulSandTicks + 1) : Math.max(0, soulSandTicks - 1);
             webTicks = inWeb ? Math.min(30, webTicks + 1) : Math.max(webTicks, webTicks - 1);
         } else if(!packet.isLook() && data.isLoggedIn()) {
@@ -234,6 +247,8 @@ public class MovementProcessor {
             }
             lastCinematicYawDelta = cinematicYawDelta;
             lastCinematicPitchDelta = cinematicPitchDelta;
+            cinematicYawDelta = smoothDelta;
+            cinematicPitchDelta = smoothDelta2;
         }
 
         if (to.getYaw() == from.getYaw()) {

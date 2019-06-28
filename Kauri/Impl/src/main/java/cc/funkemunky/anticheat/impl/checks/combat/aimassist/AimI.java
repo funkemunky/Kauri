@@ -10,7 +10,7 @@ import org.bukkit.event.Event;
 
 @CheckInfo(name = "Aim (Type I)", description = "Looks for rounded rotational values", type = CheckType.AIM, cancelType = CancelType.MOTION, executable = false)
 @Init
-@Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LOOK, Packet.Client.LEGACY_LOOK, Packet.Client.LEGACY_POSITION_LOOK})
+@Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LOOK})
 public class AimI extends Check {
 
     private Verbose verbose = new Verbose();

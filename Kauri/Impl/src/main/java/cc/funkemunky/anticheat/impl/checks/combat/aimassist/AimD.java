@@ -9,7 +9,7 @@ import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
 import org.bukkit.event.Event;
 
-@Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LOOK, Packet.Client.LEGACY_LOOK, Packet.Client.LEGACY_POSITION_LOOK})
+@Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LOOK})
 @cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Aim (Type D)", description = "Looks for suspicious yaw and pitch movements. Not recommended for banning.", type = CheckType.AIM, cancelType = CancelType.MOTION, maxVL = 200, executable = false, cancellable = false)
 public class AimD extends Check {

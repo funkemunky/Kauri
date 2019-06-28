@@ -16,10 +16,7 @@ import java.util.LinkedList;
         Packet.Client.FLYING,
         Packet.Client.POSITION,
         Packet.Client.POSITION_LOOK,
-        Packet.Client.LOOK,
-        Packet.Client.LEGACY_POSITION,
-        Packet.Client.LEGACY_POSITION_LOOK,
-        Packet.Client.LEGACY_LOOK})
+        Packet.Client.LOOK})
 @cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Autoclicker (Type B)", description = "Looks for suspicious consistencies in CPS averages.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 20)
 public class AutoclickerB extends Check {

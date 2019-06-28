@@ -1,10 +1,12 @@
 package cc.funkemunky.anticheat.api.utils.menu.type.impl;
 
 
+import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.menu.Menu;
 import cc.funkemunky.anticheat.api.utils.menu.button.Button;
 import cc.funkemunky.anticheat.api.utils.menu.type.BukkitInventoryHolder;
 import cc.funkemunky.anticheat.api.utils.menu.util.ArrayIterator;
+import cc.funkemunky.api.utils.Color;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -94,6 +96,7 @@ public class ChestMenu implements Menu {
             this.holder = new BukkitInventoryHolder(this);
             holder.setInventory(Bukkit.createInventory(holder, dimension.getSize(), title));
         }
+        holder.getInventory().clear();
         for (int i = 0; i < contents.length; i++) {
             Button button = contents[i];
             if (button != null) {

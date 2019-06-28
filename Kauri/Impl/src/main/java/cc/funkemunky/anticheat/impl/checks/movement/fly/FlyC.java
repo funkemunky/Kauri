@@ -23,7 +23,7 @@ public class FlyC extends Check {
         if(!getData().isGeneralCancel()) {
             double delta = Math.abs(move.getDeltaY() + move.getLastDeltaY());
 
-            if(delta < 0.001 && getData().getLastBlockPlace().hasPassed(20) && Math.abs(move.getDeltaY()) > 0 && !move.isInLiquid() && move.getWebTicks() == 0 && !move.isOnClimbable() && move.getHalfBlockTicks() == 0) {
+            if(delta < 0.001 && getData().getLastBlockPlace().hasPassed(20) && Math.abs(move.getDeltaY()) > 0 && !move.isNearLiquid() && move.getWebTicks() == 0 && !move.isOnClimbable() && move.getHalfBlockTicks() == 0) {
                 if((vl = Math.min(vl + 1, 5)) > 2) {
                     flag(move.getDeltaY() + ", " + move.getLastDeltaY(), true, true, AlertTier.HIGH);
                 }

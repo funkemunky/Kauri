@@ -11,10 +11,7 @@ import org.bukkit.event.Event;
         Packet.Client.FLYING,
         Packet.Client.POSITION,
         Packet.Client.POSITION_LOOK,
-        Packet.Client.LOOK,
-        Packet.Client.LEGACY_POSITION,
-        Packet.Client.LEGACY_POSITION_LOOK,
-        Packet.Client.LEGACY_LOOK})
+        Packet.Client.LOOK})
 //@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Autoclicker (Type F)", description = "Looks to see if the CPS is rounded consistently, something only autoclickers could do.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 50)
 public class AutoclickerF extends Check {

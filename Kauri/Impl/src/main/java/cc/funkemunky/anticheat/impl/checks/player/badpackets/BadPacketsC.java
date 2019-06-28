@@ -10,7 +10,7 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import lombok.val;
 import org.bukkit.event.Event;
 
-@Packets(packets = {Packet.Client.LOOK, Packet.Client.POSITION_LOOK, Packet.Client.LEGACY_LOOK, Packet.Client.LEGACY_POSITION_LOOK})
+@Packets(packets = {Packet.Client.LOOK, Packet.Client.POSITION_LOOK})
 @cc.funkemunky.api.utils.Init
 @CheckInfo(name = "BadPackets (Type C)", description = "Checks for impossible pitch rotation.", type = CheckType.BADPACKETS, maxVL = 2)
 public class BadPacketsC extends Check {

@@ -19,7 +19,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Init
-@CheckInfo(name = "Aim (Type M)", type = CheckType.AIM)
+@CheckInfo(name = "Aim (Type M)", description = "Designed to detect Vape's Aimassist while vertical aim is off.", type = CheckType.AIM)
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LOOK})
 public class AimM extends Check {
 
@@ -39,7 +39,7 @@ public class AimM extends Check {
         } else vl-= vl > 0 ? 0.25 : 0;*/
 
         if(delta > 1E-4 && getData().isCinematicMode() && move.getPitchDelta() == 0 && move.getYawDelta() > 0.8) {
-            if(vl++ > 30) {
+            if(vl++ > 20) {
                 flag("test", true, true, AlertTier.HIGH);
             }
             debug(Color.Green + "VL: " +  vl);

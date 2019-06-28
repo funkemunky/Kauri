@@ -42,7 +42,7 @@ public class HitBox extends Check {
 
             val doesMatch = pastLoc.stream().map(loc -> new RayTrace(loc.toVector().add(new Vector(0, 1.53f, 0)), loc.toLocation(getData().getPlayer().getWorld()).add(0, 1.53, 0).getDirection()).traverse(3.2, 0.2, 0.1, 1)).anyMatch(vecList -> vecList.stream().anyMatch(vec -> hitbox.stream().anyMatch(vec2 -> getHitbox(getData().getTarget(), vec2).collides(vec))));
 
-            if(!doesMatch && !getData().isLagging()) {
+            if(!doesMatch && !getData().isLagging() && getData().getLastPacketSkip().hasPassed(10)) {
                 val reach = pastLoc.stream().mapToDouble(loc -> loc.toVector().add(new Vector(0, 1.53, 0)).distance(origin.toVector())).average().getAsDouble();
 
                 if(vl++ > 8) {

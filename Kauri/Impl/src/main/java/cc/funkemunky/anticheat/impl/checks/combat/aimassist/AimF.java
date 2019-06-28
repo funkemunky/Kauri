@@ -10,9 +10,7 @@ import org.bukkit.util.Vector;
 
 @Packets(packets = {
         Packet.Client.LOOK,
-        Packet.Client.POSITION_LOOK,
-        Packet.Client.LEGACY_POSITION_LOOK,
-        Packet.Client.LEGACY_LOOK,})
+        Packet.Client.POSITION_LOOK})
 @cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Aim (Type F)", description = "Looks for a common angle mistake in clients. By Itz_Lucky.", type = CheckType.AIM, cancelType = CancelType.MOTION, maxVL = 50)
 public class AimF extends Check {

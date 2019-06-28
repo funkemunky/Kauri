@@ -21,9 +21,7 @@ import java.util.List;
 
 @Packets(packets = {
         Packet.Client.POSITION_LOOK,
-        Packet.Client.LOOK,
-        Packet.Client.LEGACY_POSITION_LOOK,
-        Packet.Client.LEGACY_LOOK})
+        Packet.Client.LOOK})
 @Init
 @CheckInfo(name = "Aim (Type E)", description = "Finds any suspiciously consistent variables.", type = CheckType.AIM, executable = false)
 public class AimE extends Check {

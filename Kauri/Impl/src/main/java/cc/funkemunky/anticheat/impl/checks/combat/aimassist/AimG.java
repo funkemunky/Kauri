@@ -17,9 +17,7 @@ import java.util.LinkedList;
 
 @Packets(packets = {
         Packet.Client.LOOK,
-        Packet.Client.POSITION_LOOK,
-        Packet.Client.LEGACY_POSITION_LOOK,
-        Packet.Client.LEGACY_LOOK,})
+        Packet.Client.POSITION_LOOK})
 @Init
 @CheckInfo(name = "Aim (Type G)", description = "Looks for a common ratio of pitch movement in AimBots.", type = CheckType.AIM, executable = false, developer = true)
 public class AimG extends Check {

@@ -65,7 +65,7 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
                     }
 
                     if (ban) {
-                        if (!data.isLagging() && data.getLastLag().hasPassed(4)) {
+                        if (data.getLastLag().hasPassed(8)) {
                             vl++;
                             Kauri.getInstance().getStatsManager().addFlag();
                         }
