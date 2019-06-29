@@ -17,7 +17,6 @@ cc\funkemunky\anticheat\impl\checks\player\badpackets\BadPacketsG.class
 cc\funkemunky\anticheat\impl\checks\movement\fly\FlyD.class
 cc\funkemunky\anticheat\impl\commands\kauri\arguments\BypassingArgument.class
 cc\funkemunky\anticheat\impl\listeners\PacketListeners$1.class
-cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimJ.class
 cc\funkemunky\anticheat\impl\commands\kauri\arguments\DelayArgument.class
 cc\funkemunky\anticheat\api\utils\MathUtils.class
 cc\funkemunky\anticheat\impl\checks\movement\velocity\VelocityB.class
@@ -108,7 +107,6 @@ cc\funkemunky\anticheat\impl\commands\kauri\AlertsCommand.class
 cc\funkemunky\anticheat\impl\checks\combat\autoclicker\AutoclickerC.class
 cc\funkemunky\anticheat\impl\commands\kauri\arguments\VelocityArgument.class
 cc\funkemunky\anticheat\Kauri$2.class
-cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimG.class
 cc\funkemunky\anticheat\impl\checks\movement\noslowdown\NoSlowdownB.class
 cc\funkemunky\anticheat\impl\commands\kauri\arguments\RecentViolationsArgument.class
 cc\funkemunky\anticheat\impl\checks\combat\criticals\Criticals.class

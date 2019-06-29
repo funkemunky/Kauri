@@ -15,7 +15,7 @@ import org.bukkit.event.Event;
 import java.util.ArrayList;
 import java.util.List;
 
-@Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION, Packet.Server.ENTITY_VELOCITY})
+@Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK, Packet.Client.USE_ENTITY, Packet.Server.ENTITY_VELOCITY})
 @cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Velocity (Type B)", description = "Checks for horizontal velocity modifications.", type = CheckType.VELOCITY, maxVL = 80, executable = false)
 public class VelocityB extends Check {
@@ -24,6 +24,7 @@ public class VelocityB extends Check {
 
     private double vl, velocityX, velocityZ;
     private int ticks;
+    private boolean shit;
 
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
@@ -33,29 +34,33 @@ public class VelocityB extends Check {
                 velocityX = dy.getX();
                 velocityZ = dy.getZ();
             }
-        } else if((velocityX != 0 || velocityZ != 0) && (ticks > 0 || move.getFrom().getY() % 1 == 0) && !move.isBlocksNear() && !move.isBlocksOnTop() && move.getLiquidTicks() == 0 && move.getWebTicks() == 0 &&
-                move.getDeltaY() > 0.0) {
+        } else if(packetType.equals(Packet.Client.USE_ENTITY)) {
+            velocityX*= 0.6;
+            velocityZ*= 0.6;
+        } else if((velocityX != 0 || velocityZ != 0) && (shit || (move.getFrom().getY() % 1 == 0 && move.getDeltaY() > 0)) && !move.isBlocksNear() && !move.isBlocksOnTop() && move.getLiquidTicks() == 0 && move.getWebTicks() == 0) {
 
-            if(getData().getLastAttack().hasNotPassed(0)) {
-                velocityX*= 0.6;
-                velocityZ*= 0.6;
+            if(!move.isServerOnGround() && move.getDeltaY() > 0) {
+                double velocityH = MathUtils.hypot(velocityX, velocityZ);
+
+                double ratio = move.getDeltaXZ() / velocityH;
+                if (ratio < 0.64) {
+                    if(vl++ > 8) {
+                        flag(MathUtils.round(ratio * 100, 2) + "%", true, true, AlertTier.HIGH);
+                    }
+                } else vl-= vl > 0 ? 0.4 : 0;
+                debug("ratio=" + ratio + " vl=" + vl + " shit=" + shit + " attack=" + getData().getLastAttack().getPassed());
+            } else {
+                velocityZ = velocityX = 0;
+                shit = false;
             }
 
-            double velocityH = MathUtils.hypot(velocityX, velocityZ);
-
-            double ratio = move.getDeltaXZ() / velocityH;
-            if (ratio < 0.62) {
-                if(vl++ > 8) {
-                    flag(MathUtils.round(ratio * 100, 2) + "%", true, true, AlertTier.HIGH);
-                }
-            } else vl-= vl > 0 ? 1 : 0;
-            debug("ratio=" + ratio + " vl=" + vl + " ticks=" + ticks);
-
-            if(ticks++ > 1) {
-                velocityX = velocityZ = ticks = 0;
+            if(!shit) {
+                velocityX/= 2;
+                velocityZ/= 2;
+                shit = true;
             } else {
-                velocityX/= 1.87728937729;
-                velocityZ/= 1.87728937729;
+                velocityX = velocityZ = 0;
+                shit = false;
             }
         }
     }
