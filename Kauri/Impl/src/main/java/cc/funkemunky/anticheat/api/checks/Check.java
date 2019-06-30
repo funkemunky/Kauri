@@ -16,9 +16,14 @@ import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 @Getter
@@ -47,7 +52,7 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
             if(Kauri.getInstance().getTps() > CheckSettings.tpsThreshold) {
                 PlayerCheatEvent event = new PlayerCheatEvent(getData().getPlayer(), this);
 
-                Atlas.getInstance().getEventManager().callEvent(event);
+                Bukkit.getPluginManager().callEvent(event);
 
                 if(!event.isCancelled()) {
                     data.getLastFlag().reset();
@@ -57,7 +62,7 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
                     if (cancel && cancellable) {
                         PlayerCancelEvent cancelEvent = new PlayerCancelEvent(getData().getPlayer(), this, cancelType);
 
-                        Atlas.getInstance().getEventManager().callEvent(cancelEvent);
+                        Bukkit.getPluginManager().callEvent(cancelEvent);
 
                         if(!cancelEvent.isCancelled()) {
                             getData().setCancelType(cancelEvent.getType());
@@ -78,7 +83,7 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
                     if((timeStamp - data.getLastFlagTimestamp()) > 5) {
                         JsonMessage message = new JsonMessage();
                         if (timeStamp - lastAlert > CheckSettings.alertsDelay) {
-                            val dataToAlert = Kauri.getInstance().getDataManager().getDataObjects().keySet().parallelStream().map(key -> Kauri.getInstance().getDataManager().getDataObjects().get(key)).filter(data -> data.getAlertTier() != null && data.getPlayer().hasPermission("kauri.alerts")).collect(Collectors.toList());
+                            val dataToAlert = Kauri.getInstance().getDataManager().getDataObjects().keySet().parallelStream().map(key -> Kauri.getInstance().getDataManager().getDataObjects().get(key)).filter(data -> data.isAlertsEnabled() && data.getAlertTier() != null && data.getPlayer().hasPermission("kauri.alerts")).collect(Collectors.toList());
                             if (!developer) {
                                 message.addText(Color.translate(alertMessage.replace("%prefix%", CheckSettings.alertPrefix).replace("%check%", getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", String.valueOf(vl)).replace("%info%", information).replace("%chance%", alertTier.getName()))).addHoverText(Color.Gray + information);
 
@@ -91,10 +96,11 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
 
                                 dataToAlert.stream().filter(PlayerData::isDeveloperAlerts).forEach(data -> message.sendToPlayer(data.getPlayer()));
                             }
+                            if (CheckSettings.testMode && !data.isAlertsEnabled()) {
+                                message.sendToPlayer(data.getPlayer());
+                            }
                             lastAlert = timeStamp;
                         }
-
-                        if (CheckSettings.testMode && !data.isAlertsEnabled()) message.sendToPlayer(data.getPlayer());
                     }
                     data.setLastFlagTimestamp(timeStamp);
                 }

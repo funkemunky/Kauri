@@ -13,7 +13,7 @@ import lombok.val;
 import org.bukkit.event.Event;
 
 @CheckInfo(name = "GroundSpoof (Type B)", description = "Ensures the fall distance is what it should be.", type = CheckType.MOVEMENT)
-@Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION})
+@Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK})
 @Init
 public class GroundSpoofB extends Check {
 
@@ -22,17 +22,18 @@ public class GroundSpoofB extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(getData().isGeneralCancel()) {
+        if(getData().isGeneralCancel() || getData().getMovementProcessor().getDeltaY() == 0) {
             lastFallDistance = 0;
             return;
         }
 
         val fallDistance = getData().getPlayer().getFallDistance();
         val deltaFD = MathUtils.getDelta(fallDistance, lastFallDistance);
+        val move = getData().getMovementProcessor();
 
-        if(MathUtils.getDelta(deltaFD, Math.abs(getData().getMovementProcessor().getDeltaY())) > Math.max(0.5, fallDistance / 5)) {
+        if(move.getDeltaY() < 0 && MathUtils.getDelta(deltaFD, Math.abs(move.getDeltaY())) > Math.max(0.5, fallDistance / 5)) {
             if(verbose.flag(12, 500L)) {
-                flag(deltaFD + "<-" + getData().getMovementProcessor().getDeltaXZ(), true, true, verbose.getVerbose() > 10 ? AlertTier.LIKELY : AlertTier.POSSIBLE);
+                flag(deltaFD + "<-" + move.getDeltaY(), true, true, verbose.getVerbose() > 10 ? AlertTier.LIKELY : AlertTier.POSSIBLE);
             }
         } else verbose.deduct();
         lastFallDistance = fallDistance;

@@ -36,7 +36,7 @@ public class HitBox extends Check {
 
             val origin = move.getTo().toLocation(getData().getPlayer().getWorld()).add(0, 1.53f, 0);
 
-            val pastLoc = move.getPastLocation().getEstimatedLocation(getData().getTransPing(), 150);
+            val pastLoc = move.getPastLocation().getEstimatedLocation(0, 150);
 
             val hitbox = getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), 150);
 

@@ -22,7 +22,7 @@ public class VelocityB extends Check {
 
     //Skidded from GCheat for now.
 
-    private double vl, velocityX, velocityZ;
+    private double vl, velocityX, velocityZ, lastDeltaXZ;
     private int ticks;
     private boolean shit;
 
@@ -39,24 +39,27 @@ public class VelocityB extends Check {
             velocityZ*= 0.6;
         } else if((velocityX != 0 || velocityZ != 0) && (shit || (move.getFrom().getY() % 1 == 0 && move.getDeltaY() > 0)) && !move.isBlocksNear() && !move.isBlocksOnTop() && move.getLiquidTicks() == 0 && move.getWebTicks() == 0) {
 
+            if(!shit) {
+                lastDeltaXZ = move.getLastDeltaXZ();
+            }
             if(!move.isServerOnGround() && move.getDeltaY() > 0) {
-                double velocityH = MathUtils.hypot(velocityX, velocityZ);
+                double velocityH = MathUtils.hypot(velocityX, velocityZ) - (shit ? lastDeltaXZ * 0.35F : 0);
 
                 double ratio = move.getDeltaXZ() / velocityH;
                 if (ratio < 0.64) {
                     if(vl++ > 8) {
-                        flag(MathUtils.round(ratio * 100, 2) + "%", true, true, AlertTier.HIGH);
+                        flag(MathUtils.round(ratio * 100, 2) + "%", true, true, AlertTier.LIKELY);
                     }
-                } else vl-= vl > 0 ? 0.4 : 0;
-                debug("ratio=" + ratio + " vl=" + vl + " shit=" + shit + " attack=" + getData().getLastAttack().getPassed());
+                } else vl-= vl > 0 ? 0.5 : 0;
+                debug("ratio=" + ratio + " vl=" + vl + " lastDelta=" + lastDeltaXZ + " deltaxz=" + move.getDeltaXZ() + " vel=" + velocityH);
             } else {
                 velocityZ = velocityX = 0;
                 shit = false;
             }
 
             if(!shit) {
-                velocityX/= 2;
-                velocityZ/= 2;
+                velocityX/= 1.85;
+                velocityZ/= 1.85;
                 shit = true;
             } else {
                 velocityX = velocityZ = 0;

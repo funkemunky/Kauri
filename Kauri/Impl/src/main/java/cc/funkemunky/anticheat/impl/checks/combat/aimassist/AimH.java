@@ -35,7 +35,7 @@ public class AimH extends Check {
             }
         } else verbose.deduct();
 
-        debug(verbose.getVerbose() + ", " + String.valueOf(yawGCD).length() + ", " + getData().isCinematicMode());
+        debug(verbose.getVerbose() + ", " + yawGCD + ", " + getData().isCinematicMode());
     }
 
     @Override

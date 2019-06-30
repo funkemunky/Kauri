@@ -58,7 +58,7 @@ public class AlertsArgument extends FunkeArgument {
                 data.setAlertTier(tier);
                 data.setAlertsEnabled(true);
                 player.sendMessage(Color.translate(Messages.setTierAlerts.replace("%tier%", tier.getName())));
-            } else if(args[1].equalsIgnoreCase("off")) {
+            } else if(args[1].equalsIgnoreCase("off") || args[1].equals("none")) {
                 data.setAlertsEnabled(false);
                 player.sendMessage(Color.translate(Messages.toggledAlerts.replace("%enabled%", "off")));
             } else {

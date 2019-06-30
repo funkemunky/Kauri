@@ -24,29 +24,18 @@ public class StatsManager {
     public StatsManager() {
         flagged = 0;
         banned = 0;
-        Atlas.getInstance().getDatabaseManager().createDatabase("KauriStats", DatabaseType.valueOf(type));
-        loadStats();
     }
 
     public void saveStats() {
-        Database database = Atlas.getInstance().getDatabaseManager().getDatabase("KauriStats");
-        database.getDatabaseValues().put("Kauri;flagged", flagged);
-        database.getDatabaseValues().put("Kauri;banned", banned);
-        database.saveDatabase();
+
     }
 
     public void loadStats() {
-        Database database = Atlas.getInstance().getDatabaseManager().getDatabase("KauriStats");
-        database.loadDatabase();
-        flagged = (int) database.getDatabaseValues().getOrDefault("Kauri;flagged", 0);
-        banned = (int) database.getDatabaseValues().getOrDefault("Kauri;banned", 0);
+
     }
 
     public void resetStats() {
-        flagged = banned = 0;
-        Database database = Atlas.getInstance().getDatabaseManager().getDatabase("KauriStats");
-        database.getDatabaseValues().clear();
-        database.saveDatabase();
+
     }
 
     public void addFlag() {

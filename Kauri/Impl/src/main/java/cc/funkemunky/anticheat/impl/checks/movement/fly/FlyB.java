@@ -20,7 +20,7 @@ public class FlyB extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        val max = predicatedMaxHeight() + 0.001f;
+        val max = MiscUtils.predicatedMaxHeight(getData()) + 0.001f;
         val move = getData().getMovementProcessor();
 
         if(MiscUtils.cancelForFlight(getData(), 0, false)) return;
@@ -35,18 +35,5 @@ public class FlyB extends Check {
     @Override
     public void onBukkitEvent(Event event) {
 
-    }
-
-    private double predicatedMaxHeight() {
-        val velocity = getData().getVelocityProcessor();
-        val move = getData().getMovementProcessor();
-
-        float baseHeight = 0.42f;
-
-        baseHeight+= PlayerUtils.getPotionEffectLevel(getData().getPlayer(), PotionEffectType.JUMP) * 0.11f;
-        baseHeight+= move.isOnSlimeBefore() ? move.getSlimeHeight() : 0;
-        baseHeight+= Math.max(0, velocity.getMotionY());
-
-        return baseHeight;
     }
 }

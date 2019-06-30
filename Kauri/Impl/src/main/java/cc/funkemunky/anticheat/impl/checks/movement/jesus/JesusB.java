@@ -24,7 +24,7 @@ public class JesusB extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        if(move.isInLiquid() && !getData().isGeneralCancel()) {
+        if((move.isInLiquid() || move.isLiquidBelow()) && !getData().isGeneralCancel()) {
             float threshold = move.getLiquidTicks() > 15 ? 0.198f : 0.38f;
 
             threshold+= PlayerUtils.getPotionEffectLevel(getData().getPlayer(), PotionEffectType.SPEED) * 0.015;

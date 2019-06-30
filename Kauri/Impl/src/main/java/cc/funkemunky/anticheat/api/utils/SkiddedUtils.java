@@ -18,7 +18,7 @@ public class SkiddedUtils {
         double deltaYaw = clamp180(playerRotation.getX() - expectedRotation.getX());
         double deltaPitch = clamp180(playerRotation.getY() - expectedRotation.getY());
 
-        double horizontalDistance = MathUtils.getHorizontalDistance(playerLoc, entityLoc);
+        double horizontalDistance = MathUtilsDL.getHorizontalDistance(playerLoc, entityLoc);
         double distance = getDistance3D(playerLoc, entityLoc);
 
         double offsetX = deltaYaw * horizontalDistance * distance;

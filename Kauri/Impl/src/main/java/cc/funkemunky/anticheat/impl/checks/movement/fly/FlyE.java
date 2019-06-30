@@ -19,7 +19,7 @@ public class FlyE extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        if(move.isHasJumped() && move.getAirTicks() > 20 && getData().getLastBlockPlace().hasPassed(40)) {
+        if(!getData().isGeneralCancel() && move.isHasJumped() && move.getAirTicks() > 20 && getData().getLastBlockPlace().hasPassed(40)) {
             flag(move.getDeltaY() + ";" + move.isHasJumped() + ";" + move.getAirTicks(), true, true, AlertTier.LIKELY);
         }
     }

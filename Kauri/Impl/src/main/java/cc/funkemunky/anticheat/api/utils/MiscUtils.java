@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.api.utils;
 
+import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.impl.checks.behavioral.InventoryClick;
 import cc.funkemunky.api.Atlas;
@@ -22,6 +23,10 @@ import org.bukkit.potion.PotionEffectType;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 public class MiscUtils {
@@ -88,6 +93,31 @@ public class MiscUtils {
 
     public static float gcd(float current, float previous) {
         return (previous <= 16384L) ? current : gcd(previous, current % previous);
+    }
+
+    public static void runOnMainThread(Runnable runnable) {
+        FutureTask submit = new FutureTask<>(() -> runnable);
+
+        Bukkit.getScheduler().scheduleSyncDelayedTask(Kauri.getInstance(), submit);
+
+        try {
+            submit.get(10L, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static float predicatedMaxHeight(PlayerData data) {
+        val velocity = data.getVelocityProcessor();
+        val move = data.getMovementProcessor();
+
+        float baseHeight = 0.42f;
+
+        baseHeight+= PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.JUMP) * 0.11f;
+        baseHeight+= move.isOnSlimeBefore() ? move.getSlimeHeight() : 0;
+        baseHeight+= Math.max(0, velocity.getMotionY());
+
+        return baseHeight;
     }
 
     public static boolean cancelForFlight(PlayerData data) {

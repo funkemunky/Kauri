@@ -33,7 +33,7 @@ public class AimM extends Check {
         val delta = MathUtils.getDelta(accelYaw, lastAccel);
         /*val pitchGCD = MiscUtils.gcd((long) (16777216L * move.getPitchDelta()), (long) (16777216L * move.getLastPitchDelta())) / 16777216F;
 
-        if((MathUtils.getDelta(accelYaw, yawGCD) < 1E-5 || (MathUtils.getDelta(accelPitch, pitchGCD) < 1E-5 && accelPitch > pitchGCD * 2)) && move.getYawDelta() > 0.7 && getData().isCinematicMode() && delta > 0.01) {
+        if((MathUtilsDL.getDelta(accelYaw, yawGCD) < 1E-5 || (MathUtilsDL.getDelta(accelPitch, pitchGCD) < 1E-5 && accelPitch > pitchGCD * 2)) && move.getYawDelta() > 0.7 && getData().isCinematicMode() && delta > 0.01) {
             debug(Color.Green + "Flag: " + vl++);
             debug("[" + accelYaw + ", " + yawGCD + "] , [" + accelPitch + ", " + pitchGCD + "] " + move.getYawDelta());
         } else vl-= vl > 0 ? 0.25 : 0;*/

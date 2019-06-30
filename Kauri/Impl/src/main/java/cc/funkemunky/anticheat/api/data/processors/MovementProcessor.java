@@ -22,7 +22,7 @@ public class MovementProcessor {
     private boolean lastFlight, flight, inLiquid, liquidBelow, clientOnGround, serverOnGround, fullyInAir, inAir, hasJumped, nearLiquid, blocksOnTop, pistonsNear, onHalfBlock,
             onClimbable, onIce, collidesHorizontally, tookVelocity, inWeb, onSlime, onSlimeBefore, onSoulSand, isRiptiding, halfBlocksAround, isNearGround, isInsideBlock, blocksNear, blocksAround;
     private int airTicks, groundTicks, iceTicks, climbTicks, halfBlockTicks, soulSandTicks, blockAboveTicks, optifineTicks, liquidTicks, webTicks, yawZeroTicks, pitchZeroTicks;
-    private float deltaY, lastDeltaXZ, slimeHeight, fallDistance, yawDelta, pitchDelta, lastYawDelta, lastPitchDelta, lastDeltaY, deltaXZ, lastServerYVelocity, serverYAcceleration, clientYAcceleration, lastClientYAcceleration, lastServerYAcceleration, jumpVelocity, cinematicYawDelta, cinematicPitchDelta, lastCinematicPitchDelta, lastCinematicYawDelta;
+    private float deltaY, lastDeltaXZ, slimeHeight, fallDistance, yawDelta, pitchDelta, lastYawDelta, lastPitchDelta, lastDeltaY, deltaXZ, lastServerYVelocity, serverYAcceleration, clientYAcceleration, lastClientYAcceleration, lastServerYAcceleration, cinematicYawDelta, cinematicPitchDelta, lastCinematicPitchDelta, lastCinematicYawDelta;
     private CustomLocation from, to;
     private double motX, motY, motZ, lastMotX, lastMotY, lastMotZ;
     @Setter
@@ -60,7 +60,7 @@ public class MovementProcessor {
                 CollisionAssessment assessment = new CollisionAssessment(data.getBoundingBox(), data);
 
                 //There are some entities that are collide-able like boats but are not considered blocks.
-                player.getNearbyEntities(1, 1, 1).stream().filter(entity -> entity instanceof Vehicle || entity.getType().name().toLowerCase().contains("shulker")).forEach(entity -> assessment.assessBox(ReflectionsUtil.toBoundingBox(ReflectionsUtil.getBoundingBox(entity)), player.getWorld(), true));
+                player.getNearbyEntities(1, 1, 1).stream().filter(entity -> (entity instanceof Vehicle && !entity.getType().toString().contains("MINECART")) || entity.getType().name().toLowerCase().contains("shulker")).forEach(entity -> assessment.assessBox(ReflectionsUtil.toBoundingBox(ReflectionsUtil.getBoundingBox(entity)), player.getWorld(), true));
 
                 //Now we scrub through the colliding boxes for any important information that could be fed into detections.
                 box.forEach(bb -> assessment.assessBox(bb, player.getWorld(), false));
@@ -71,6 +71,7 @@ public class MovementProcessor {
                 collidesHorizontally = assessment.isCollidesHorizontally();
                 nearLiquid = assessment.isNearLiquid();
                 inLiquid = assessment.isInLiquid();
+                liquidBelow = assessment.isLiquidBelow();
                 onHalfBlock = assessment.isOnHalfBlock();
                 onIce = assessment.isOnIce();
                 pistonsNear = assessment.isPistonsNear();
@@ -100,7 +101,6 @@ public class MovementProcessor {
                 }
             }
             tookVelocity = System.currentTimeMillis() - data.getVelocityProcessor().getLastVelocityTimestamp() < 1500L;
-            jumpVelocity = 0.42f + (PlayerUtils.getPotionEffectLevel(packet.getPlayer(), PotionEffectType.JUMP) * 0.1f);
             val vecStream = data.getTeleportLocations().stream().filter(vec -> vec.distance(to.toVector()) < 0.45).findFirst().orElse(null);
 
             if(vecStream != null) {
@@ -169,7 +169,7 @@ public class MovementProcessor {
             lastServerYVelocity = serverYVelocity;
 
             if (hasJumped) {
-                serverYVelocity = Math.min(deltaY, 0.42f);
+                serverYVelocity = Math.min(deltaY, MiscUtils.predicatedMaxHeight(data));
             } else if (inAir) {
                 serverYVelocity = (serverYVelocity - 0.08f) * 0.98f;
 

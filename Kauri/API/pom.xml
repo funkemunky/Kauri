@@ -76,7 +76,7 @@
         <dependency>
             <groupId>cc.funkemunky.anticheat</groupId>
             <artifactId>Impl</artifactId>
-            <version>b34</version>
+            <version>b35</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

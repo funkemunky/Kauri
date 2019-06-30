@@ -34,10 +34,11 @@ public class AlertsCommand {
             } else if(Arrays.stream(AlertTier.values()).anyMatch(tier -> tier.getName().equalsIgnoreCase(args[0]))) {
                 AlertTier tier = AlertTier.valueOf(args[0].toUpperCase());
                 data.setAlertTier(tier);
+                data.setAlertsEnabled(true);
                 player.sendMessage(Color.translate(Messages.setTierAlerts.replace("%tier%", tier.getName())));
-            } else if(args[0].equalsIgnoreCase("off")) {
+            } else if(args[0].equalsIgnoreCase("off") || args[0].equalsIgnoreCase("none")) {
                 player.sendMessage(Color.translate(Messages.toggledAlerts.replace("%enabled%", "off")));
-                data.setAlertTier(null);
+                data.setAlertsEnabled(false);
             } else {
                 player.sendMessage(Color.translate(Messages.invalidArguments));
                 player.sendMessage(Color.translate("&7Options: &f&odev&7, &f&olow&7, &f&opossible&7, &f&olikely&7, &f&ohigh&7, &f&ooff"));
