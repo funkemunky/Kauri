@@ -10,7 +10,7 @@ import cc.funkemunky.api.utils.Init;
 import lombok.val;
 import org.bukkit.event.Event;
 
-@Init
+//@Init
 @CheckInfo(name = "Fly (Type F)", description = "Checks for a bobbing movement far up into the air.", type = CheckType.FLY, maxVL = 60)
 @Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK})
 public class FlyF extends Check {

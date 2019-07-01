@@ -59,7 +59,7 @@ public class SpeedF extends Check {
 
         val move = getData().getMovementProcessor();
 
-        total += move.getIceTicks() > 0 ? .32 : 0;
+        total += move.getIceTicks() > 0 ? .43 + (0.012 * Math.min(move.getIceTicks(), 120)) : 0;
         total += (getData().getPlayer().getWalkSpeed() - 0.2) * 2.4;
         total += (getData().getLastBlockPlace().hasNotPassed(7)) ? 0.2 : 0;
         total += move.isOnSlimeBefore() ? 0.18 : 0;

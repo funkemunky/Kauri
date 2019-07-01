@@ -23,7 +23,7 @@ public class SpeedB extends Check {
         threshold+= move.getHalfBlockTicks() > 0 ? 0.08 : 0;
         threshold+= move.isOnSlimeBefore() ? 0.025 : 0;
         threshold+= move.getBlockAboveTicks() > 0 ? (move.getIceTicks() > 0 ? 0.565f : 0.25f) : 0;
-        threshold+= move.getIceTicks() > 0 && move.getGroundTicks() < 8 ? 0.15 : 0;
+        threshold+= move.getIceTicks() > 0 && (move.getGroundTicks() < 8 || move.getAirTicks() < 3) ? 0.28 : 0;
 
         if(move.getDeltaXZ() > threshold) {
             if(Math.min(vl++, 40) > 20) {

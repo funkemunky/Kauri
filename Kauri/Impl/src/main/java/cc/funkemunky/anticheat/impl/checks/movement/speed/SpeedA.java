@@ -110,7 +110,7 @@ public class SpeedA extends Check {
         val velocity = getData().getVelocityProcessor();
 
         total += PlayerUtils.getPotionEffectLevel(getData().getPlayer(), PotionEffectType.SPEED) * (move.isServerOnGround() ? 0.057f : 0.044f);
-        total += move.getIceTicks() > 0 && (move.getDeltaY() > 0.001 || move.getGroundTicks() < 6) ? 0.23 : 0;
+        total += move.getIceTicks() > 0 && (move.getDeltaY() > 0.001 || move.getGroundTicks() < 6 || move.getAirTicks() < 3) ? 0.38 + (0.012 * Math.min(move.getIceTicks(), 120)) : 0;
         total += (getData().getPlayer().getWalkSpeed() - 0.2) * 1.65;
         total += (getData().getLastBlockPlace().hasNotPassed(7)) ? 0.1 : 0;
         total += move.isOnSlimeBefore() ? 0.1 : 0;

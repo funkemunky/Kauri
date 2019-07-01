@@ -23,6 +23,8 @@ public class SpeedE extends Check {
 
         val accel = MathUtils.getDelta(move.getDeltaXZ(), move.getLastDeltaXZ());
         float max = 0.6f + MiscUtils.getBaseSpeed(getData());
+
+        max+= move.getBlockAboveTicks() > 0 ? 0.12 + (0.005 * Math.min(move.getIceTicks(), 120)) : 0;
         if(accel > max && !getData().isGeneralCancel()) {
             flag(accel + ">-" + max, true, true, AlertTier.HIGH);
         }

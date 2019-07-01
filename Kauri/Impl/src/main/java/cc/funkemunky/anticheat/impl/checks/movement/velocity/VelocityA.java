@@ -23,26 +23,27 @@ import org.bukkit.event.Event;
 public class VelocityA extends Check {
 
     private float lastVelocity;
-    private int vl;
+    private int vl, ticks;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
+        val move = getData().getMovementProcessor();
         if (packetType.equals(Packet.Server.ENTITY_VELOCITY)) {
             WrappedOutVelocityPacket velocity = new WrappedOutVelocityPacket(packet, getData().getPlayer());
 
-            if (velocity.getId() == velocity.getPlayer().getEntityId()&& getData().getMovementProcessor().getFrom().getY() % 1 == 0 && getData().getMovementProcessor().isClientOnGround()) {
+            if (velocity.getId() == velocity.getPlayer().getEntityId() && move.isClientOnGround()) {
                 lastVelocity = (float) velocity.getY();
             }
-        } else if (lastVelocity > 0 && getData().getMovementProcessor().getDeltaY() > 0) {
-            val ratio = Math.abs(getData().getMovementProcessor().getDeltaY() / lastVelocity);
+        } else if (lastVelocity > 0 && move.getFrom().getY() % 1 == 0 && (move.getDeltaY() > 0 || ticks++ > MathUtils.millisToTicks(getData().getTransPing())))  {
+            val ratio = Math.abs(move.getDeltaY() / lastVelocity);
             val percentage = MathUtils.round(ratio * 100D, 1);
 
-            if (ratio < 1 && !getData().getMovementProcessor().isBlocksOnTop() && !getData().isLagging() && !getData().isAbleToFly()) {
+            if (ratio < 1 && !move.isBlocksOnTop() && !getData().isLagging() && move.getLiquidTicks() < 1 && move.getClimbTicks() < 1 && !getData().getPlayer().getAllowFlight() && getData().getPlayer().getVehicle() == null) {
                 if(vl++ > 4) {
                     flag("velocity: " + percentage + "%", true, true, AlertTier.CERTAIN);
                 } else if(vl > 1) {
                     flag("velocity: " + percentage + "%", true, true, AlertTier.HIGH);
-                }  else {
+                } else {
                     flag("velocity: " + percentage + "%", false, false, AlertTier.POSSIBLE);
                 }
             } else {
@@ -51,7 +52,7 @@ public class VelocityA extends Check {
 
             debug("RATIO: " + ratio + " VL: " + vl + " DELTAY:" + (getData().getMovementProcessor().getTo().getY() - getData().getMovementProcessor().getFrom().getY()) + "VELOCITY: " + lastVelocity);
 
-            lastVelocity = 0;
+            lastVelocity = ticks = 0;
         }
     }
 

@@ -19,7 +19,7 @@ public class JesusA extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        if (move.isNearLiquid() && !move.isServerOnGround() && !getData().isGeneralCancel()) {
+        if (move.isNearLiquid() && !move.isServerOnGround() && !move.isBlocksOnTop() && !getData().isGeneralCancel()) {
             if (Math.abs(move.getDeltaY()) < 1E-4) {
                 if (verbose.flag(8, 500L)) {
                     flag(move.getDeltaY() + "b/s", true, true, AlertTier.LIKELY);
