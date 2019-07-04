@@ -1,8 +1,6 @@
 package cc.funkemunky.anticheat.api.utils;
 
 import cc.funkemunky.api.tinyprotocol.packet.types.MathHelper;
-import org.bukkit.Location;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;

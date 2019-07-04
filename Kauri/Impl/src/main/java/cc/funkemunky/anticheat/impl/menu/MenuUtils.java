@@ -4,7 +4,6 @@ import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.ItemBuilder;
-import cc.funkemunky.anticheat.api.utils.menu.Menu;
 import cc.funkemunky.anticheat.api.utils.menu.button.Button;
 import cc.funkemunky.anticheat.api.utils.menu.button.ClickAction;
 import cc.funkemunky.anticheat.api.utils.menu.type.impl.ChestMenu;

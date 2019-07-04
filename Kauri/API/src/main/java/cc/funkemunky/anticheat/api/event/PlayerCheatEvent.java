@@ -1,7 +1,6 @@
 package cc.funkemunky.anticheat.api.event;
 
 import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.api.events.AtlasEvent;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.entity.Player;

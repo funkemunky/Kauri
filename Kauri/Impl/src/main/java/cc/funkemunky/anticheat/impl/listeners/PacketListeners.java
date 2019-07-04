@@ -30,7 +30,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 
 @Init
 public class PacketListeners implements AtlasListener {

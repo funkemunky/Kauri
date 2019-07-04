@@ -1,26 +1,16 @@
 package cc.funkemunky.anticheat.api.checks;
 
-import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
-import cc.funkemunky.anticheat.api.event.PlayerCancelEvent;
-import cc.funkemunky.anticheat.api.event.PlayerCheatEvent;
-import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.event.system.Listener;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
-import cc.funkemunky.api.utils.Color;
-import cc.funkemunky.api.utils.JsonMessage;
-import cc.funkemunky.api.utils.MiscUtils;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.val;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
-import org.bukkit.event.HandlerList;
-import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter

@@ -11,8 +11,6 @@ import cc.funkemunky.api.utils.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.potion.PotionEffectType;
 
@@ -33,7 +31,6 @@ public class MovementProcessor {
     private TickTimer lastRiptide = new TickTimer(6), lastVehicle = new TickTimer(4), lastFlightToggle = new TickTimer(10);
     private List<BoundingBox> boxes = new ArrayList<>();
     private long lastTimeStamp, lookTicks, lagTicks;
-    private Location lastLoc;
 
     public void update(PlayerData data, WrappedInFlyingPacket packet) {
         val player = packet.getPlayer();
@@ -42,14 +39,6 @@ public class MovementProcessor {
         if (from == null || to == null) {
             from = new CustomLocation(0, 0, 0, 0, 0);
             to = new CustomLocation(0, 0, 0, 0, 0);
-        }
-
-        if(lastLoc == null) {
-            lastLoc = new Location(data.getPlayer().getWorld(),0,0,0);
-        }
-
-        if(lastLoc.getWorld().getUID() != data.getPlayer().getWorld().getUID()) {
-            data.setLastServerPosStamp(System.currentTimeMillis());
         }
 
        // predict(data, .98f, .98f, true);
@@ -279,7 +268,6 @@ public class MovementProcessor {
         //predict(data, .98f, .98f, false);
 
         pastLocation.addLocation(new CustomLocation(to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch()));
-        lastLoc = new Location(data.getPlayer().getWorld(),0,0,0);
         data.setGeneralCancel(data.isServerPos() || serverPos || data.isLagging() || getLastFlightToggle().hasNotPassed(8) || !chunkLoaded || packet.getPlayer().getAllowFlight() || packet.getPlayer().getActivePotionEffects().stream().anyMatch(effect -> effect.getType().getName().toLowerCase().contains("levi")) || packet.getPlayer().getGameMode().toString().contains("CREATIVE") || packet.getPlayer().getGameMode().toString().contains("SPEC") || lastVehicle.hasNotPassed() || getLastRiptide().hasNotPassed(10) || data.getLastLogin().hasNotPassed(50) || data.getVelocityProcessor().getLastVelocity().hasNotPassed(25));
     }
 

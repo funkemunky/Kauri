@@ -8,10 +8,8 @@ import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.Init;
-import cc.funkemunky.api.utils.PlayerUtils;
 import lombok.val;
 import org.bukkit.event.Event;
-import org.bukkit.potion.PotionEffectType;
 
 @Init
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.POSITION})

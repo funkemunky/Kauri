@@ -11,9 +11,6 @@ import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
 import org.bukkit.event.Event;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK, Packet.Client.USE_ENTITY, Packet.Server.ENTITY_VELOCITY})
 @cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Velocity (Type C)", description = "Checks for horizontal velocity modifications.", type = CheckType.VELOCITY, maxVL = 10)

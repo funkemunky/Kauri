@@ -2,9 +2,6 @@ package cc.funkemunky.anticheat.api.data.stats;
 
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
-import cc.funkemunky.api.Atlas;
-import cc.funkemunky.api.database.Database;
-import cc.funkemunky.api.database.DatabaseType;
 import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.Priority;

@@ -1,12 +1,10 @@
 package cc.funkemunky.anticheat.api.utils.menu.type.impl;
 
 
-import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.menu.Menu;
 import cc.funkemunky.anticheat.api.utils.menu.button.Button;
 import cc.funkemunky.anticheat.api.utils.menu.type.BukkitInventoryHolder;
 import cc.funkemunky.anticheat.api.utils.menu.util.ArrayIterator;
-import cc.funkemunky.api.utils.Color;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;

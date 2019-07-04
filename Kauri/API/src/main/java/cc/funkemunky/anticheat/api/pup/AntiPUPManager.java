@@ -1,17 +1,10 @@
 package cc.funkemunky.anticheat.api.pup;
 
-import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
-import cc.funkemunky.anticheat.api.utils.Packets;
-import cc.funkemunky.anticheat.api.utils.Setting;
-import cc.funkemunky.anticheat.impl.pup.crashers.*;
-import cc.funkemunky.anticheat.impl.pup.exploits.BookEnchant;
-import cc.funkemunky.anticheat.impl.pup.vpn.AntiVPN;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.database.DatabaseType;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;

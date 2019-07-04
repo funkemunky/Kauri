@@ -1,17 +1,17 @@
 package cc.funkemunky.anticheat.api.data.logging;
 
-import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.database.Database;
-import cc.funkemunky.api.database.DatabaseType;
 import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.Priority;
 import lombok.Getter;
-import lombok.val;
 
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Init(priority = Priority.HIGH)
