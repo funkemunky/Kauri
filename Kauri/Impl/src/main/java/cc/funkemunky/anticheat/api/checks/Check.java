@@ -4,6 +4,7 @@ import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.event.PlayerCancelEvent;
 import cc.funkemunky.anticheat.api.event.PlayerCheatEvent;
+import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.event.system.Listener;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.utils.Color;
@@ -41,7 +42,7 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
     }
 
     protected void flag(String information, boolean cancel, boolean ban, AlertTier tier) {
-        Kauri.getInstance().getCheckManager().getAlertsExecutable().execute(() -> {
+        Atlas.getInstance().getSchedular().execute(() -> {
             Kauri.getInstance().getProfiler().start("check:" + getName() + ":alert");
             if(Kauri.getInstance().getTps() > CheckSettings.tpsThreshold) {
                 PlayerCheatEvent event = new PlayerCheatEvent(getData().getPlayer(), this);

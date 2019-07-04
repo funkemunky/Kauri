@@ -113,7 +113,6 @@ public class Kauri extends JavaPlugin {
         dataManager.getDataObjects().clear();
         checkManager.getChecks().clear();
         Atlas.getInstance().getCommandManager().unregisterCommands(this);
-        checkManager.getAlertsExecutable().shutdownNow();
         executorService.shutdownNow();
     }
 

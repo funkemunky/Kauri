@@ -220,14 +220,18 @@ public class LagArgument extends FunkeArgument {
         sender.sendMessage(Color.translate(memory.replace("%free%", String.valueOf(freeMem)).replace("%total%", String.valueOf(totalMem))));
         sender.sendMessage("");
         sender.sendMessage(Color.translate(kauriRes));
-        float totalPCT = 0;
-        long totalTime = MathUtils.elapsed(Kauri.getInstance().getProfileStart());
-        for (String string : Kauri.getInstance().getProfiler().total.keySet()) {
-            double stringTotal = TimeUnit.NANOSECONDS.toMillis(Kauri.getInstance().getProfiler().total.get(string));
-            double pct = stringTotal / totalTime;
-            totalPCT += (pct);
-        }
-        sender.sendMessage(Color.translate(pctUsage.replace("%pct%", String.valueOf(totalPCT))));
+        val results = Kauri.getInstance().getProfiler().results(ResultsType.TOTAL);
+
+        AtomicReference<Double> totalMS = new AtomicReference<>((double) 0);
+        long totalTime = System.currentTimeMillis() - Kauri.getInstance().getProfileStart();
+        results.keySet().stream()
+                .sorted(Comparator.comparing(key -> results.get(key) / Kauri.getInstance().getProfiler().calls.get(key), Comparator.reverseOrder()))
+                .forEachOrdered(key -> {
+                    double msTotal = results.get(key);
+                    double ms =  msTotal / (totalTime / 50f);
+                    totalMS.updateAndGet(v -> (v + ms));
+                });
+        sender.sendMessage(Color.translate(pctUsage.replace("%pct%", String.valueOf(MathUtils.round(totalMS.get() / 50 * 100, 4)))));
         float cps = Kauri.getInstance().getProfiler().totalCalls / (float) totalTime;
         sender.sendMessage(Color.translate(callsPS.replace("%calls%", String.valueOf(MathUtils.round(cps, 1)))));
         sender.sendMessage(MiscUtils.line(lineColor));

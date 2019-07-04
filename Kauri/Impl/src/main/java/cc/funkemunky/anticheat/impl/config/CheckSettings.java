@@ -25,7 +25,7 @@ public class CheckSettings {
     public static boolean broadcastEnabled = false;
 
     @ConfigSetting(path = "executable.broadcast", name = "message")
-    public static String broadcastMessage = "&8--------------------------------\n&6&lKauri &7has removed &e%player% from the server for cheating.\n&8--------------------------------";
+    public static String broadcastMessage = "&8&m-----------------------------------------------------\n&6&lKauri &7has removed &e%player% &7from the server for cheating.\n&8&m-----------------------------------------------------";
 
     @ConfigSetting(path = "alerts", name = "alertsDelay")
     public static long alertsDelay = 1000;
@@ -40,7 +40,7 @@ public class CheckSettings {
     public static boolean enableOnJoin = true;
 
     @ConfigSetting(path = "bypass", name = "enabled")
-    public static boolean bypassEnabled = true;
+    public static boolean bypassEnabled = false;
 
     @ConfigSetting(path = "bypass", name = "permission")
     public static String bypassPermission = "kauri.bypass";
