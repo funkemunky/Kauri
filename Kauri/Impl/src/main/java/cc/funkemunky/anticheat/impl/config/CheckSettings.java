@@ -10,22 +10,22 @@ import java.util.List;
 @Init(priority = Priority.HIGHEST)
 public class CheckSettings {
     @ConfigSetting(name = "executableCommand")
-    static List<String> executableCommand = Collections.singletonList("ban %player% [Kauri] Unfair Advantage");
+    public static List<String> executableCommand = Collections.singletonList("ban %player% [Kauri] Unfair Advantage");
 
     @ConfigSetting(path = "alerts", name = "prefix")
-    static String alertPrefix = "&8[&6&lKauri&8]";
+    public static String alertPrefix = "&8[&6&lKauri&8]";
 
     @ConfigSetting(path = "alerts", name = "devPrefix")
-    static String devAlertPrefix = "&8[&c&lDEV&8]";
+    public static String devAlertPrefix = "&8[&c&lDEV&8]";
 
     @ConfigSetting(path = "alerts", name = "alertMessage")
-    static String alertMessage = "%prefix% &f%player% &7failed &f%check% &8(&7vl=&f%vl%&7, &7chance=&f%chance%&8)";
+    public static String alertMessage = "%prefix% &f%player% &7failed &f%check% &8(&7vl=&f%vl%&7, &7chance=&f%chance%&8)";
 
     @ConfigSetting(path = "executable.broadcast", name = "enabled")
-    static boolean broadcastEnabled = false;
+    public static boolean broadcastEnabled = false;
 
     @ConfigSetting(path = "executable.broadcast", name = "message")
-    static String broadcastMessage = "&8--------------------------------\n&6&lKauri &7has removed &e%player% from the server for cheating.\n&8--------------------------------";
+    public static String broadcastMessage = "&8--------------------------------\n&6&lKauri &7has removed &e%player% from the server for cheating.\n&8--------------------------------";
 
     @ConfigSetting(path = "alerts", name = "alertsDelay")
     public static long alertsDelay = 1000;
@@ -34,7 +34,7 @@ public class CheckSettings {
     public static boolean testMode = false;
 
     @ConfigSetting(path = "alerts", name = "printToConsole")
-    static boolean printToConsole = false;
+    public static boolean printToConsole = false;
 
     @ConfigSetting(path = "alerts", name = "enableOnJoin")
     public static boolean enableOnJoin = true;

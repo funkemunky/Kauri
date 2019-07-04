@@ -299,7 +299,7 @@ MenuUtils {
             hasModifiedChecks = false;
             Kauri.getInstance().saveConfig();
             Kauri.getInstance().reloadKauri();
-            openCheckEditGUI(player2, page);
+            Bukkit.dispatchCommand(player2, "kauri menu checks " + page);
         }));
     }
 

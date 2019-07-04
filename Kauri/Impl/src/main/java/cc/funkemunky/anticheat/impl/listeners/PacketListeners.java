@@ -232,7 +232,7 @@ public class PacketListeners implements AtlasListener {
 
     private void hopper(Object packet, String packetType, long timeStamp, PlayerData data) {
         if ((!CheckSettings.bypassEnabled || !data.getPlayer().hasPermission(CheckSettings.bypassPermission)) && !Kauri.getInstance().getCheckManager().isBypassing(data.getUuid())) {
-            Kauri.getInstance().getCheckExecutor().execute(() -> {
+            Kauri.getInstance().getExecutorService().execute(() -> {
                 if(data.getPacketChecks().containsKey(packetType)) {
                     data.getPacketChecks().getOrDefault(packetType, new ArrayList<>()).parallelStream().filter(Check::isEnabled).forEach(check ->
                     {
@@ -247,7 +247,7 @@ public class PacketListeners implements AtlasListener {
 
     private void debug(String packetType, PlayerData data) {
         if (!packetType.contains("Chat") && !packetType.contains("Chunk") && !packetType.contains("Equip")) {
-            Atlas.getInstance().getThreadPool().execute(() -> {
+            Kauri.getInstance().getExecutorService().execute(() -> {
                 Kauri.getInstance().getDataManager().getDataObjects().values().stream().filter(debugData -> debugData.isDebuggingPackets() && debugData.getDebuggingPlayer().equals(data.getUuid()) && (debugData.getSpecificPacketDebug().equals("*") || packetType.contains(debugData.getSpecificPacketDebug()))).forEach(debugData -> {
                     debugData.getPlayer().sendMessage(Color.translate("&8[&cPacketDebug&8] &7" + packetType));
                 });

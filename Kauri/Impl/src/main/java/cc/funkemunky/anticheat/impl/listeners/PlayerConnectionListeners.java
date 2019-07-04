@@ -28,14 +28,14 @@ public class PlayerConnectionListeners implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerJoin(PlayerJoinEvent event) {
-        Atlas.getInstance().getThreadPool().execute(() -> {
+        Kauri.getInstance().getExecutorService().execute(() -> {
             Kauri.getInstance().getDataManager().addData(event.getPlayer().getUniqueId());
             if (removeBanOnJoin && Kauri.getInstance().getLoggerManager().isBanned(event.getPlayer().getUniqueId())) {
                 Kauri.getInstance().getLoggerManager().removeBan(event.getPlayer().getUniqueId());
             }
         });
 
-        Atlas.getInstance().getSchedular().schedule(() -> {
+        Kauri.getInstance().getExecutorService().schedule(() -> {
             PlayerData data = Kauri.getInstance().getDataManager().getPlayerData(event.getPlayer().getUniqueId());
             WrappedOutPositionPacket pos = new WrappedOutPositionPacket();
             val loc = event.getPlayer().getLocation().clone();

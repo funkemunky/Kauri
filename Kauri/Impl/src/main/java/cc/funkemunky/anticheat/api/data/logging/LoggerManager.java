@@ -123,7 +123,7 @@ public class LoggerManager {
     }
 
     public void clearLogs(UUID uuid) {
-        Atlas.getInstance().getThreadPool().execute(() -> {
+        Atlas.getInstance().getService().execute(() -> {
             Database database = Atlas.getInstance().getDatabaseManager().getDatabase("KauriLogs");
             database.getDatabaseValues().keySet().stream().filter(key -> key.startsWith(uuid.toString())).forEach(key -> database.getDatabaseValues().remove(key));
             database.saveDatabase();

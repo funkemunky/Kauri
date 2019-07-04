@@ -54,7 +54,7 @@ public class Kauri extends JavaPlugin {
     private long lastTick, tickElapsed, profileStart;
     private double tps;
 
-    private ScheduledExecutorService executorService, checkExecutor, vpnSchedular = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledExecutorService executorService, vpnSchedular = Executors.newSingleThreadScheduledExecutor();
 
     private BaseProfiler profiler;
     private VPNUtils vpnUtils;
@@ -66,6 +66,8 @@ public class Kauri extends JavaPlugin {
     private File messagesFile;
     public ExecutorService dedicatedVPN = Executors.newSingleThreadExecutor();
     public long lastLogin;
+
+    private boolean testMode = true;
 
     @Override
     public void onEnable() {
@@ -102,7 +104,6 @@ public class Kauri extends JavaPlugin {
         registerListeners();
 
         executorService = Executors.newSingleThreadScheduledExecutor();
-        checkExecutor = Executors.newScheduledThreadPool(2);
     }
 
     public void onDisable() {
@@ -114,7 +115,6 @@ public class Kauri extends JavaPlugin {
         Atlas.getInstance().getCommandManager().unregisterCommands(this);
         checkManager.getAlertsExecutable().shutdownNow();
         executorService.shutdownNow();
-        checkExecutor.shutdownNow();
     }
 
     private void runTasks() {
@@ -174,18 +174,25 @@ public class Kauri extends JavaPlugin {
     }
 
     public void reloadKauri() {
-        reloadConfig();
-        reloadMessages();
-        checkManager = new CheckManager();
-        dataManager.getDataObjects().clear();
-        dataManager = new DataManager();
-        HandlerList.unregisterAll(this);
-        profiler.reset();
-        EventManager.unregisterAll(this);
-        Atlas.getInstance().getEventManager().unregisterAll(this);
-        startScanner(false);
-        antiPUPManager = new AntiPUPManager();
-        dataManager.registerAllPlayers();
+        if(testMode) {
+            reloadConfig();
+            reloadMessages();
+            checkManager = new CheckManager();
+            dataManager.getDataObjects().clear();
+            dataManager = new DataManager();
+            HandlerList.unregisterAll(this);
+            profiler.reset();
+            EventManager.unregisterAll(this);
+            Atlas.getInstance().getEventManager().unregisterAll(this);
+            startScanner(false);
+            antiPUPManager = new AntiPUPManager();
+            dataManager.registerAllPlayers();
+        } else {
+            MiscUtils.unloadPlugin("KauriLoader");
+            MiscUtils.unloadPlugin("Atlas");
+            MiscUtils.loadPlugin("Atlas");
+            MiscUtils.loadPlugin("KauriLoader");
+        }
     }
 
     private void registerListeners() {

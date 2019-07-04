@@ -43,7 +43,7 @@ public class BugReportArg extends FunkeArgument {
     }
 
     private void sendPastebin(CommandSender sender, StringBuilder config) {
-        Atlas.getInstance().getThreadPool().execute(() -> {
+        Atlas.getInstance().getService().execute(() -> {
             try {
                 sender.sendMessage(Color.Green + "Config Paste: " + Pastebin.makePaste(config.toString(), Kauri.getInstance().getServer().getName() + " Kauri Config", Pastebin.Privacy.UNLISTED));
             } catch (UnsupportedEncodingException e) {
