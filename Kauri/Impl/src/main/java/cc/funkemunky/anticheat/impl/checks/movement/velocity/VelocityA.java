@@ -39,12 +39,12 @@ public class VelocityA extends Check {
             val percentage = MathUtils.round(ratio * 100D, 1);
 
             if (ratio < 1 && !move.isBlocksOnTop() && !getData().isLagging() && move.getLiquidTicks() < 1 && move.getClimbTicks() < 1 && !getData().getPlayer().getAllowFlight() && getData().getPlayer().getVehicle() == null) {
-                if(vl++ > 4) {
+                if(vl++ > 10) {
                     flag("velocity: " + percentage + "%", true, true, AlertTier.CERTAIN);
-                } else if(vl > 1) {
+                } else if(vl > 5) {
                     flag("velocity: " + percentage + "%", true, true, AlertTier.HIGH);
-                } else {
-                    flag("velocity: " + percentage + "%", false, false, AlertTier.POSSIBLE);
+                } else if(vl > 2) {
+                    flag("velocity: " + percentage + "%", true, true, AlertTier.POSSIBLE);
                 }
             } else {
                 vl -= vl > 0 ? 1 : 0;

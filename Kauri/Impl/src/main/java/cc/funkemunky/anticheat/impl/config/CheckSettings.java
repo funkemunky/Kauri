@@ -1,4 +1,4 @@
-package cc.funkemunky.anticheat.api.checks;
+package cc.funkemunky.anticheat.impl.config;
 
 import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.Init;

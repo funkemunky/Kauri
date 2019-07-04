@@ -54,7 +54,7 @@ public class BanwaveManager {
                             this.cancel();
                         }
                     }
-                }.runTaskTimerAsynchronously(Kauri.getInstance(), 0, BanwaveConfig.getInstance().banSeconds * 20);
+                }.runTaskTimer(Kauri.getInstance(), 0, BanwaveConfig.getInstance().banSeconds * 20);
             } else {
                 judged.forEach(this::banCheater);
 
@@ -68,7 +68,11 @@ public class BanwaveManager {
         val name = getPlayerName(uuid);
         broadcast(addPlayerName(BanwaveConfig.getInstance().foundCheater, name));
 
-        Bukkit.dispatchCommand(Atlas.getInstance().getConsoleSender(), addPlayerName(BanwaveConfig.getInstance().punishCommand, name));
+        new BukkitRunnable() {
+            public void run() {
+                Bukkit.dispatchCommand(Atlas.getInstance().getConsoleSender(), addPlayerName(BanwaveConfig.getInstance().punishCommand, name));
+            }
+        }.runTask(Kauri.getInstance());
     }
 
     public List<UUID> judgeCheaters() {
