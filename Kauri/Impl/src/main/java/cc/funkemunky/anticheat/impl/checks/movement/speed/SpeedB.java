@@ -31,7 +31,7 @@ public class SpeedB extends Check {
             }
         } else vl-= vl > 0 ? 1 : 0;
 
-        debug(move.getDeltaXZ() + ">-" + threshold + " vl=" + vl + " iceTicks=" + move.getIceTicks() + " block=" + move.getBlockAboveTicks() + " half=" + move.getHalfBlockTicks());
+        debug(move.getDeltaXZ() + ">-" + threshold + " vl=" + vl + " iceTicks=" + move.getIceTicks() + " block=" + move.getBlockAboveTicks() + " half=" + move.getHalfBlockTicks() + " serverPos=" + (System.currentTimeMillis() - getData().getLastServerPosStamp()));
     }
 
     @Override

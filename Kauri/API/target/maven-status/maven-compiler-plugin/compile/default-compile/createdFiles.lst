@@ -2,7 +2,6 @@ cc\funkemunky\anticheat\api\pup\AntiPUP.class
 cc\funkemunky\anticheat\api\utils\BukkitEvents.class
 cc\funkemunky\anticheat\api\utils\Messages.class
 cc\funkemunky\anticheat\api\utils\Setting.class
-cc\funkemunky\anticheat\api\event\AtlasPlayerCheatEvent.class
 cc\funkemunky\anticheat\api\checks\CheckSettings.class
 cc\funkemunky\anticheat\api\event\PlayerCancelEvent.class
 cc\funkemunky\anticheat\api\pup\AntiPUPManager.class
