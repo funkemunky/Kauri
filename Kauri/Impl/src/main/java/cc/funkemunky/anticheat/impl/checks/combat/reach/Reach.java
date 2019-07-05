@@ -75,6 +75,10 @@ public class Reach extends Check {
                         flag("reach=" + distance, true, true, AlertTier.CERTAIN);
                     } else if (vl > highThreshold) {
                         flag("reach=" + distance, true, true, AlertTier.HIGH);
+                    } else if(vl > 2) {
+                        flag("reach=" + distance, true, true, vl > 3 ? AlertTier.LIKELY : AlertTier.POSSIBLE);
+                    } else {
+                        flag("reach=" + distance,true,true,AlertTier.LOW);
                     }
                 } else if(distance > 1) {
                     vl = Math.max(0, vl - 0.025f);

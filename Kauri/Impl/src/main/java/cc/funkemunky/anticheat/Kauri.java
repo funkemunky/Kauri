@@ -59,15 +59,15 @@ public class Kauri extends JavaPlugin {
     private BaseProfiler profiler;
     private VPNUtils vpnUtils;
 
-    private String requiredVersionOfAtlas = "1.3.2";
-    private List<String> usableVersionsOfAtlas = Arrays.asList("1.3.2");
+    private String requiredVersionOfAtlas = "1.3.4";
+    private List<String> usableVersionsOfAtlas = Arrays.asList("1.3.4");
 
     private FileConfiguration messages;
     private File messagesFile;
     public ExecutorService dedicatedVPN = Executors.newSingleThreadExecutor();
     public long lastLogin;
 
-    private boolean testMode = true;
+    private boolean testMode = false;
 
     @Override
     public void onEnable() {
