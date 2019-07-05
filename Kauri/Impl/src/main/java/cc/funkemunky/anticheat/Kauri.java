@@ -67,7 +67,7 @@ public class Kauri extends JavaPlugin {
     public ExecutorService dedicatedVPN = Executors.newSingleThreadExecutor();
     public long lastLogin;
 
-    private boolean testMode = false;
+    private boolean testMode = true;
 
     @Override
     public void onEnable() {
@@ -192,6 +192,17 @@ public class Kauri extends JavaPlugin {
             MiscUtils.loadPlugin("Atlas");
             MiscUtils.loadPlugin("KauriLoader");
         }
+    }
+
+    public void softReload() {
+        reloadConfig();
+        checkManager = new CheckManager();
+        startScanner(false);
+        antiPUPManager = new AntiPUPManager();
+        dataManager.getDataObjects().clear();
+        dataManager = new DataManager();
+        dataManager.registerAllPlayers();
+        profiler.reset();
     }
 
     private void registerListeners() {

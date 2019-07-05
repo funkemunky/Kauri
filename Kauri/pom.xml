@@ -7,7 +7,7 @@
     <groupId>cc.funkemunky.anticheat</groupId>
     <artifactId>Kauri</artifactId>
     <packaging>pom</packaging>
-    <version>b2</version>
+    <version>b3</version>
 
     <modules>
         <module>API</module>

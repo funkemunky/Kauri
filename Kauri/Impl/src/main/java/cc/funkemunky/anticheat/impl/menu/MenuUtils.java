@@ -164,6 +164,7 @@ MenuUtils {
             infoPair.getMenu().close(player);
             player.sendMessage(Color.translate("&8[&e&lKauri&8] &7Fully unloading and loading Kauri..."));
             Kauri.getInstance().reloadKauri();
+            Bukkit.dispatchCommand(player, "kauri menu");
         })));
 
         menu.showMenu(toOpen);
@@ -298,7 +299,7 @@ MenuUtils {
         return createButton(false, MiscUtils.createItem(Material.BOOK_AND_QUILL, 1, Color.Red + "Save Changes"), ((player2, infoPair) -> {
             hasModifiedChecks = false;
             Kauri.getInstance().saveConfig();
-            Kauri.getInstance().reloadKauri();
+            Kauri.getInstance().softReload();
             Bukkit.dispatchCommand(player2, "kauri menu checks " + page);
         }));
     }

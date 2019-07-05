@@ -22,6 +22,7 @@ import cc.funkemunky.api.tinyprotocol.packet.types.WrappedWatchableObject;
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
+import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -99,7 +100,7 @@ public class PacketListeners implements AtlasListener {
             }
 
             hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
-            debug(event.getType(), data);
+            //debug(event.getType(), data);
             if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
 
         }
@@ -223,7 +224,7 @@ public class PacketListeners implements AtlasListener {
                     break;
                 }
             }
-            debug(event.getType(), data);
+            //debug(event.getType(), data);
             hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
             if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
         }
@@ -232,14 +233,16 @@ public class PacketListeners implements AtlasListener {
 
     private void hopper(Object packet, String packetType, long timeStamp, PlayerData data) {
         if ((!CheckSettings.bypassEnabled || !data.getPlayer().hasPermission(CheckSettings.bypassPermission)) && !Kauri.getInstance().getCheckManager().isBypassing(data.getUuid())) {
-            Kauri.getInstance().getExecutorService().execute(() -> {
+            Kauri.getInstance().getCheckManager().getCheckExecutor().execute(() -> {
                 if(data.getPacketChecks().containsKey(packetType)) {
-                    data.getPacketChecks().getOrDefault(packetType, new ArrayList<>()).parallelStream().filter(Check::isEnabled).forEach(check ->
+                    //long test = System.nanoTime();
+                    data.getPacketChecks().getOrDefault(packetType, new ArrayList<>()).stream().filter(Check::isEnabled).forEach(check ->
                     {
                         Kauri.getInstance().getProfiler().start("check:" + check.getName() + "#" + packetType);
                         check.onPacket(packet, packetType, timeStamp);
                         Kauri.getInstance().getProfiler().stop("check:" + check.getName()  + "#" + packetType);
                     });
+                    //Bukkit.broadcastMessage(MathUtils.round((System.nanoTime() - test) / 1000000F, 4)  + "ms: " + packetType);
                 }
             });
         }

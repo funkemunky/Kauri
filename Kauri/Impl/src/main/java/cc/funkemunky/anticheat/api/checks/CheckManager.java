@@ -21,6 +21,7 @@ public class CheckManager {
     private List<Class<?>> checkClasses = new ArrayList<>();
     private Collection<Check> checks = new TreeSet<>(Comparator.comparing(Check::getName, Collator.getInstance()));
     private Set<UUID> bypassingPlayers = new HashSet<>();
+    private ExecutorService checkExecutor = Executors.newSingleThreadExecutor();
 
     public void registerCheck(Class<?> checkClass, Collection<Check> checkList) {
         try {
