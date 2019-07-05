@@ -1,6 +1,7 @@
 cc\funkemunky\anticheat\api\data\DataManager.class
 cc\funkemunky\anticheat\api\utils\json\HTTP.class
 cc\funkemunky\anticheat\api\utils\Pastebin.class
+cc\funkemunky\anticheat\api\checks\CheckManager$1.class
 cc\funkemunky\anticheat\impl\listeners\PlayerConnectionListeners.class
 cc\funkemunky\anticheat\api\checks\Check$1.class
 cc\funkemunky\anticheat\api\pup\PuPType.class

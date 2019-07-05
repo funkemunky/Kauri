@@ -67,7 +67,7 @@ public class Kauri extends JavaPlugin {
     public ExecutorService dedicatedVPN = Executors.newSingleThreadExecutor();
     public long lastLogin;
 
-    private boolean testMode = true;
+    private boolean testMode = false;
 
     @Override
     public void onEnable() {
@@ -146,10 +146,10 @@ public class Kauri extends JavaPlugin {
             public void run() {
                 this.sec = (System.currentTimeMillis() / 1000L);
                 if (this.currentSec == this.sec) {
-                    this.ticks += 1;
+                    this.ticks++;
                 } else {
                     this.currentSec = this.sec;
-                    Kauri.this.tps = (Kauri.this.tps == 0.0D ? this.ticks : (Kauri.this.tps + this.ticks) / 2.0D);
+                    Kauri.this.tps = (Kauri.this.tps == 0.0D ? this.ticks : (Kauri.this.tps + this.ticks) / 2.0D) + 1;
                     this.ticks = 0;
                 }
             }

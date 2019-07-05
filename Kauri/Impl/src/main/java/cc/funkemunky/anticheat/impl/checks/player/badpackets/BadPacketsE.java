@@ -24,7 +24,7 @@ public class BadPacketsE extends Check {
 
         if (!e.getRegainReason().equals(EntityRegainHealthEvent.RegainReason.SATIATED)) return;
 
-        if (verbose.flag(2, ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9) ? 750L : 450L)) {
+        if (verbose.flag(2, 450)) {
             flag(verbose.getLastFlag().getPassed() + "<-15", false, true, verbose.getVerbose() > 5 ? AlertTier.CERTAIN : AlertTier.HIGH);
         }
     }

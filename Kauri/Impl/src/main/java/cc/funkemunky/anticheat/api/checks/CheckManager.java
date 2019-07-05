@@ -8,12 +8,15 @@ import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.val;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.text.Collator;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -22,6 +25,8 @@ public class CheckManager {
     private Collection<Check> checks = new TreeSet<>(Comparator.comparing(Check::getName, Collator.getInstance()));
     private Set<UUID> bypassingPlayers = new HashSet<>();
     private ExecutorService checkExecutor = Executors.newSingleThreadExecutor();
+    private List<PlayerData> alerts = new ArrayList<>();
+    private List<PlayerData> devAlerts = new ArrayList<>();
 
     public void registerCheck(Class<?> checkClass, Collection<Check> checkList) {
         try {
@@ -74,6 +79,15 @@ public class CheckManager {
             if ((check.getMinimum() == null || ProtocolVersion.getGameVersion().isOrAbove(check.getMinimum())) && (check.getMaximum() == null || ProtocolVersion.getGameVersion().isBelow(check.getMaximum()))) {
                 checkList.add(check);
             }
+
+            new BukkitRunnable() {
+                public void run() {
+                    val dataToSort = Kauri.getInstance().getDataManager().getDataObjects().keySet().stream().map(key -> Kauri.getInstance().getDataManager().getDataObjects().get(key)).filter(data -> data.getPlayer().hasPermission("kauri.alerts") && data.isAlertsEnabled()).collect(Collectors.toList());
+
+                    alerts = new ArrayList<>(dataToSort);
+                    devAlerts = dataToSort.stream().filter(PlayerData::isDeveloperAlerts).collect(Collectors.toList());
+                }
+            }.runTaskTimerAsynchronously(Kauri.getInstance(), 40L, 20L);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }

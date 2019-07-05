@@ -299,7 +299,7 @@ MenuUtils {
         return createButton(false, MiscUtils.createItem(Material.BOOK_AND_QUILL, 1, Color.Red + "Save Changes"), ((player2, infoPair) -> {
             hasModifiedChecks = false;
             Kauri.getInstance().saveConfig();
-            Kauri.getInstance().softReload();
+            Kauri.getInstance().reloadKauri();
             Bukkit.dispatchCommand(player2, "kauri menu checks " + page);
         }));
     }

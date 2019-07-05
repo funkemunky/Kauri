@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -77,21 +78,18 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
 
                     if((timeStamp - data.getLastFlagTimestamp()) > 5) {
                         JsonMessage message = new JsonMessage();
-                        if (timeStamp - lastAlert > CheckSettings.alertsDelay) {
+                        if (timeStamp - lastAlert > Math.min(100, CheckSettings.alertsDelay)) {
                             if (!developer) {
                                 message.addText(Color.translate(alertMessage.replace("%prefix%", CheckSettings.alertPrefix).replace("%check%", getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", String.valueOf(vl)).replace("%info%", information).replace("%chance%", alertTier.getName()))).addHoverText(Color.Gray + information);
 
-                                Kauri.getInstance().getDataManager().getDataObjects().keySet().stream().filter(key -> {
-                                    PlayerData data = Kauri.getInstance().getDataManager().getDataObjects().get(key);
-                                    return data.isAlertsEnabled() && data.getPlayer().hasPermission("kauri.alerts");
-                                }).map(key -> Kauri.getInstance().getDataManager().getDataObjects().get(key)).collect(Collectors.toList()).stream().filter(data2 -> data2.getAlertTier().getPriority() <= alertTier.getPriority()).forEach(data2 -> message.sendToPlayer(data2.getPlayer()));
+                                Kauri.getInstance().getCheckManager().getAlerts().stream().filter(data2 -> data2.getAlertTier().getPriority() <= alertTier.getPriority()).forEach(data2 -> message.sendToPlayer(data2.getPlayer()));
                                 if (CheckSettings.printToConsole) {
                                     MiscUtils.printToConsole(alertMessage.replace("%check%", (developer ? Color.Red + Color.Italics : "") + getName()).replace("%prefix%", CheckSettings.alertPrefix).replace("%check%", getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", String.valueOf(vl)).replace("%info%", information).replace("%chance%", alertTier.getName()));
                                 }
                             } else {
                                 message.addText(Color.translate(alertMessage.replace("%prefix%", CheckSettings.devAlertPrefix).replace("%check%", Color.Red + Color.Italics + getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", "N/A").replace("%chance%", alertTier.getName()).replace("%info%", information))).addHoverText(Color.Gray + information);
 
-                                Kauri.getInstance().getDataManager().getDataObjects().keySet().stream().map(key -> Kauri.getInstance().getDataManager().getDataObjects().get(key)).collect(Collectors.toList()).stream().filter(PlayerData::isDeveloperAlerts).forEach(data -> message.sendToPlayer(data.getPlayer()));
+                                Kauri.getInstance().getCheckManager().getDevAlerts().forEach(data -> message.sendToPlayer(data.getPlayer()));
                             }
                             if (CheckSettings.testMode && !data.isAlertsEnabled()) {
                                 message.sendToPlayer(data.getPlayer());
