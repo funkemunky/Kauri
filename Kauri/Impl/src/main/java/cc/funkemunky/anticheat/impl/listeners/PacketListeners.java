@@ -239,7 +239,7 @@ public class PacketListeners implements AtlasListener {
         if ((!CheckSettings.bypassEnabled || !data.getPlayer().hasPermission(CheckSettings.bypassPermission)) && !Kauri.getInstance().getCheckManager().isBypassing(data.getUuid())) {
             if(data.getPacketChecks().containsKey(packetType)) {
                 //long test = System.nanoTime();
-                data.getPacketChecks().getOrDefault(packetType, new ArrayList<>()).stream().filter(Check::isEnabled).forEach(check ->
+                data.getPacketChecks().getOrDefault(packetType, new ArrayList<>()).parallelStream().filter(Check::isEnabled).forEach(check ->
                 {
                     Kauri.getInstance().getProfiler().start("check:" + check.getName() + "#" + packetType);
                     check.onPacket(packet, packetType, timeStamp);

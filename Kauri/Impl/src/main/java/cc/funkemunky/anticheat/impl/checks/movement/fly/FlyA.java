@@ -23,7 +23,7 @@ public class FlyA extends Check {
         val move = getData().getMovementProcessor();
         if(MiscUtils.cancelForFlight(getData(), 8, false)) return;
 
-        if(MathUtils.getDelta(move.getServerYAcceleration(), move.getClientYAcceleration()) > 0.06 && !move.isOnHalfBlock() && move.getAirTicks() > 1 && !move.isServerOnGround()) {
+        if(MathUtils.getDelta(move.getServerYAcceleration(), move.getClientYAcceleration()) > 0.04 && !move.isOnHalfBlock() && move.getAirTicks() > 2 && !move.isServerOnGround()) {
             if(vl++ > 3) {
                 flag(move.getServerYAcceleration() + ">-" + move.getClientYAcceleration(), true, true, AlertTier.HIGH);
             }

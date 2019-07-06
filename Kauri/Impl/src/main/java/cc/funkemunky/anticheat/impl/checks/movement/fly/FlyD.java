@@ -19,7 +19,7 @@ import java.util.Set;
 public class FlyD extends Check {
 
     private Set<Float> yValues = new HashSet<>();
-    private int ticks;
+    private int ticks, vl;
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
@@ -29,8 +29,10 @@ public class FlyD extends Check {
                 int size = yValues.size();
 
                 if(size < 5) {
-                    flag(size + "-<8", true, true, AlertTier.HIGH);
-                }
+                    if(vl++ > 1) {
+                        flag(size + "-<8", true, true, AlertTier.HIGH);
+                    }
+                } else vl-= vl > 0 ? 1 : 0;
                 debug("size=" + yValues.size());
                 ticks = 0;
                 yValues.clear();

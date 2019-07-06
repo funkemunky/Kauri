@@ -103,6 +103,6 @@ public class PlayerData {
     }
 
     public boolean isServerPos() {
-        return System.currentTimeMillis() - lastServerPosStamp < 150;
+        return System.currentTimeMillis() - lastServerPosStamp < 100 + transPing;
     }
 }

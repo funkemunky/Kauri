@@ -34,7 +34,7 @@ public class VelocityA extends Check {
             if (velocity.getId() == velocity.getPlayer().getEntityId() && move.isClientOnGround()) {
                 lastVelocity = (float) velocity.getY();
             }
-        } else if (lastVelocity > 0 && move.getFrom().getY() % 1 == 0 && (move.getDeltaY() > 0 || ticks++ > MathUtils.millisToTicks(getData().getTransPing())))  {
+        } else if (lastVelocity > 0 && move.getFrom().getY() % 1 == 0 && move.getDeltaY() > 0)  {
             val ratio = Math.abs(move.getDeltaY() / lastVelocity);
             val percentage = MathUtils.round(ratio * 100D, 1);
 
