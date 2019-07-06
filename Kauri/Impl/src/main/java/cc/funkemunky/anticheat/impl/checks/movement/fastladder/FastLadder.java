@@ -16,7 +16,7 @@ import org.bukkit.potion.PotionEffectType;
 public class FastLadder extends Check {
 
     @Setting(name = "threshold.verboseMaxSpeed")
-    private float verboseMaxSpeed = 0.118f;
+    private float verboseMaxSpeed = 0.124f;
 
     @Setting(name = "threshold.maxSpeed")
     private float maxSpeed = 0.45f;

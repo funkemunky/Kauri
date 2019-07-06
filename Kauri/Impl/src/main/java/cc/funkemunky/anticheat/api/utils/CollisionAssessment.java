@@ -60,7 +60,7 @@ public class CollisionAssessment {
                 pistonsNear = true;
             }
 
-            if ((BlockUtils.isSlab(block) || block.getType().toString().contains("DAYLIGHT_DETECTOR") || block.getType().toString().contains("SKULL") || BlockUtils.isStair(block) || block.getType().getId() == 92 || block.getType().getId() == 397) && bb.intersectsWithBox(data.getBoundingBox().grow(0.2f,1f,0.2f))) {
+            if ((BlockUtils.isSlab(block) || block.getType().toString().contains("DAYLIGHT_DETECTOR") || block.getType().toString().contains("SKULL") || BlockUtils.isStair(block) || block.getType().getId() == 92 || block.getType().getId() == 397) && (bb.intersectsWithBox(data.getBoundingBox().grow(0.2f,1f,0.2f)) || (BlockUtils.isFence(block) && data.getBoundingBox().subtract(0,0.25f,0,0,0,0).collides(bb)))) {
                 onHalfBlock = true;
             }
 

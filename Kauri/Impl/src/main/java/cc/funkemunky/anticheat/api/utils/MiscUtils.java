@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 public class MiscUtils {
 
     public static boolean shouldReturnArmAnimation(PlayerData data) {
-        return data.isBreakingBlock() || data.getLastBlockPlace().hasNotPassed(2);
+        return data.isBreakingBlock() || data.getLastBlockPlace().hasNotPassed(3);
     }
 
     public static float convertToMouseDelta(float value) {

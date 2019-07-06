@@ -57,6 +57,8 @@ public class AutoclickerC extends Check {
             }
         } else if (!MiscUtils.shouldReturnArmAnimation(getData())) {
             cps++;
+        } else {
+            cps = ticks = 0;
         }
     }
 

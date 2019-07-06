@@ -59,7 +59,7 @@ public class Reach extends Check {
                 lastAttack = timeStamp;
                 return;
             } else if(calcDistance > 40) {
-                flag(calcDistance + ">-20", true, false, AlertTier.LIKELY);
+                //flag(calcDistance + ">-20", true, false, AlertTier.LIKELY);
                 return;
             }
 
@@ -76,9 +76,9 @@ public class Reach extends Check {
                     } else if (vl > highThreshold) {
                         flag("reach=" + distance, true, true, AlertTier.HIGH);
                     } else if(vl > 2) {
-                        flag("reach=" + distance, true, true, vl > 3 ? AlertTier.LIKELY : AlertTier.POSSIBLE);
+                        flag("reach=" + distance, true, false, vl > 3 ? AlertTier.LIKELY : AlertTier.POSSIBLE);
                     } else {
-                        flag("reach=" + distance,true,true,AlertTier.LOW);
+                        flag("reach=" + distance,true,false,AlertTier.LOW);
                     }
                 } else if(distance > 1) {
                     vl = Math.max(0, vl - 0.025f);

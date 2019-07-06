@@ -181,6 +181,7 @@ public class PacketListeners implements AtlasListener {
 
                         switch (blockDig.getAction()) {
                             case START_DESTROY_BLOCK:
+                                data.getLastBlockBreak().reset();
                                 data.setBreakingBlock(true);
                                 break;
                             case ABORT_DESTROY_BLOCK:
@@ -210,6 +211,7 @@ public class PacketListeners implements AtlasListener {
                             val entity = packet.getEntity();
                             if (entity instanceof LivingEntity) {
                                 data.getLastAttack().reset();
+                                if(!data.getTarget().getUniqueId().equals(entity.getUniqueId())) data.getEntityPastLocation().getPreviousLocations().clear();
                                 data.setTarget((LivingEntity) entity);
 
                                 if (entity instanceof Player) {
