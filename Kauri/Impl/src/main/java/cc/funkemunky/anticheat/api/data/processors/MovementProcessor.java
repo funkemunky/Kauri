@@ -34,6 +34,8 @@ public class MovementProcessor {
 
     public void update(PlayerData data, WrappedInFlyingPacket packet) {
         val player = packet.getPlayer();
+
+        if(player == null) return;
         val timeStamp = System.currentTimeMillis();
         boolean chunkLoaded = Atlas.getInstance().getBlockBoxManager().getBlockBox().isChunkLoaded(player.getLocation());
         if (from == null || to == null) {

@@ -25,7 +25,10 @@ public class AutoclickerA extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(MiscUtils.shouldReturnArmAnimation(getData()) || getData().isLagging() || Kauri.getInstance().getTps() < 15) return;
+        if(MiscUtils.shouldReturnArmAnimation(getData()) || getData().isLagging() || Kauri.getInstance().getTps() < 15) {
+            ticks = 0;
+            return;
+        }
         if(System.currentTimeMillis() - lastTimeStamp >= 1000L) {
             if(ticks > banCPS) {
                 if(vl++ > 2) {

@@ -10,6 +10,7 @@ import cc.funkemunky.anticheat.api.data.processors.MovementProcessor;
 import cc.funkemunky.anticheat.api.data.processors.VelocityProcessor;
 import cc.funkemunky.anticheat.api.pup.AntiPUP;
 import cc.funkemunky.anticheat.api.utils.*;
+import cc.funkemunky.anticheat.impl.config.MiscSettings;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.TickTimer;
 import lombok.Getter;
@@ -89,20 +90,10 @@ public class PlayerData {
         movementProcessor = new MovementProcessor();
 
         Kauri.getInstance().getCheckManager().loadChecksIntoData(this);
-        Kauri.getInstance().getAntiPUPManager().loadMethodsIntoData(this);
-
-        new BukkitRunnable() {
-            public void run() {
-                if (target != null && !target.isDead()) {
-                    entityFrom = entityTo;
-                    entityTo = new CustomLocation(target.getLocation());
-                    entityPastLocation.addLocation(entityTo);
-                }
-            }
-        }.runTaskTimer(Kauri.getInstance(), 0L, 1L);
+       // Kauri.getInstance().getAntiPUPManager().loadMethodsIntoData(this);
     }
 
     public boolean isServerPos() {
-        return System.currentTimeMillis() - lastServerPosStamp < 100 + transPing;
+        return System.currentTimeMillis() - lastServerPosStamp < MiscSettings.serverPos + transPing;
     }
 }

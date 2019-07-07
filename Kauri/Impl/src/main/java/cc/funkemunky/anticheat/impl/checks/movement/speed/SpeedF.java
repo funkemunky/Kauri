@@ -41,7 +41,7 @@ public class SpeedF extends Check {
 
         float max = motionXZ + account();
 
-        if(move.getDeltaXZ() > 0 && getData().getMovementProcessor().getFrom().toVector().length() > 0 && !getData().getBlockInside().getType().isSolid() && getData().getLastBlockPlace().hasPassed(20) && getData().getLastLogin().hasPassed(20) && !move.isServerPos() && !getData().isServerPos() && !getData().getPlayer().getAllowFlight() && getData().getPlayer().getVehicle() == null && move.getLastRiptide().hasPassed(20) && !move.isTookVelocity() && !PlayerUtils.isGliding(getData().getPlayer())) {
+        if(move.getDeltaXZ() > 0 && getData().getMovementProcessor().getFrom().toVector().length() > 0 && getData().getBlockInside() != null && !getData().getBlockInside().getType().isSolid() && getData().getLastBlockPlace().hasPassed(20) && getData().getLastLogin().hasPassed(20) && !move.isServerPos() && !getData().isServerPos() && !getData().getPlayer().getAllowFlight() && getData().getPlayer().getVehicle() == null && move.getLastRiptide().hasPassed(20) && !move.isTookVelocity() && !PlayerUtils.isGliding(getData().getPlayer())) {
             if(move.getDeltaXZ() > max) {
                 flag(move.getDeltaXZ() + ">-" + max, true, true, AlertTier.HIGH);
             }
