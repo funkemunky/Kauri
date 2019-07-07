@@ -5,12 +5,15 @@ import cc.funkemunky.anticheat.api.utils.CollisionAssessment;
 import cc.funkemunky.anticheat.api.utils.CustomLocation;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.PastLocation;
+import cc.funkemunky.anticheat.impl.config.MiscSettings;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
+import org.bukkit.Bukkit;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.potion.PotionEffectType;
 
@@ -24,7 +27,6 @@ public class MovementProcessor {
     private int airTicks, groundTicks, iceTicks, climbTicks, halfBlockTicks, soulSandTicks, blockAboveTicks, optifineTicks, liquidTicks, webTicks, yawZeroTicks, pitchZeroTicks;
     private float deltaY, lastDeltaXZ, slimeHeight, fallDistance, yawDelta, pitchDelta, lastYawDelta, lastPitchDelta, lastDeltaY, deltaXZ, lastServerYVelocity, serverYAcceleration, clientYAcceleration, lastClientYAcceleration, lastServerYAcceleration, cinematicYawDelta, cinematicPitchDelta, lastCinematicPitchDelta, lastCinematicYawDelta;
     private CustomLocation from, to;
-    private double motX, motY, motZ, lastMotX, lastMotY, lastMotZ;
     @Setter
     private float serverYVelocity;
     private PastLocation pastLocation = new PastLocation();
@@ -43,7 +45,6 @@ public class MovementProcessor {
             to = new CustomLocation(0, 0, 0, 0, 0);
         }
 
-       // predict(data, .98f, .98f, true);
         from = to.clone();
         clientOnGround = packet.isGround();
 
@@ -56,7 +57,7 @@ public class MovementProcessor {
 
             if (chunkLoaded) {
                 //Here we get the colliding boundingboxes surrounding the player.
-                List<BoundingBox> box = boxes = Atlas.getInstance().getBlockBoxManager().getBlockBox().getCollidingBoxes(player.getWorld(), data.getBoundingBox().grow(2f, 2f, 2f));
+                List<BoundingBox> box = boxes = Atlas.getInstance().getBlockBoxManager().getBlockBox().getCollidingBoxes(player.getWorld(), data.getBoundingBox().grow(1.5f, 1.5f, 1.5f));
 
                 CollisionAssessment assessment = new CollisionAssessment(data.getBoundingBox(), data);
 
@@ -83,8 +84,7 @@ public class MovementProcessor {
                 blocksAround = assessment.isBlocksAround();
                 blocksNear = assessment.isBlocksNear();
                 halfBlocksAround = assessment.getMaterialsCollided().stream().anyMatch(material -> material.toString().contains("STAIR") || material.toString().contains("STEP") || material.toString().contains("SLAB") || material.toString().contains("SNOW") || material.toString().contains("CAKE") || material.toString().contains("BED") || material.toString().contains("SKULL"));
-
-                isNearGround = isNearGround(data, 1.5f);
+                isNearGround = assessment.isNearGround();
                 onSlime = assessment.isOnSlime();
 
                 if (serverOnGround) {
@@ -102,7 +102,7 @@ public class MovementProcessor {
                 }
             }
             tookVelocity = System.currentTimeMillis() - data.getVelocityProcessor().getLastVelocityTimestamp() < 1500L;
-            val vecStream = data.getTeleportLocations().stream().filter(vec -> vec.distance(to.toVector()) < 0.45).findFirst().orElse(null);
+            val vecStream = data.getTeleportLocations().stream().filter(vec -> (MiscSettings.horizontalServerPos ? MathUtils.offset(vec, to.toVector()) : vec.distance(to.toVector())) < 1E-8).findFirst().orElse(null);
 
             if(vecStream != null) {
                 if(data.getTeleportLoc() != null && vecStream.distance(data.getTeleportLoc().toVector()) == 0) {
@@ -111,11 +111,11 @@ public class MovementProcessor {
                     data.setTeleportPing(System.currentTimeMillis() - data.getTeleportTest());
                 }
                 data.setLastServerPosStamp(System.currentTimeMillis());
-                //Bukkit.broadcastMessage(data.getPlayer().getName() + " fucking teleported");
                 data.getTeleportLocations().remove(vecStream);
                 serverPos = true;
                 from = to;
-            } else if(serverPos) {
+            }
+            if(serverPos) {
                 serverPos = false;
             }
 
@@ -190,7 +190,7 @@ public class MovementProcessor {
             }
 
             if(timeStamp - data.getVelocityProcessor().getLastVelocityTimestamp() <= 100L) {
-                serverYVelocity = data.getVelocityProcessor().getMotionY();
+                serverYVelocity = deltaY;
             }
 
             if (getLastFlightToggle().hasNotPassed(3)) {
@@ -263,112 +263,9 @@ public class MovementProcessor {
         if (to.getPitch() == from.getPitch()) {
             pitchZeroTicks = Math.min(20, pitchZeroTicks + 1);
         } else pitchZeroTicks -= pitchZeroTicks > 0 ? 1 : 0;
-
-        lastMotX = motX;
-        lastMotY = motY;
-        lastMotZ = motZ;
         //predict(data, .98f, .98f, false);
 
         pastLocation.addLocation(new CustomLocation(to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch()));
         data.setGeneralCancel(serverPos || data.isServerPos() || data.isLagging() || getLastFlightToggle().hasNotPassed(8) || !chunkLoaded || packet.getPlayer().getAllowFlight() || packet.getPlayer().getActivePotionEffects().stream().anyMatch(effect -> effect.getType().getName().toLowerCase().contains("levi")) || packet.getPlayer().getGameMode().toString().contains("CREATIVE") || packet.getPlayer().getGameMode().toString().contains("SPEC") || lastVehicle.hasNotPassed() || getLastRiptide().hasNotPassed(10) || data.getLastLogin().hasNotPassed(50) || data.getVelocityProcessor().getLastVelocity().hasNotPassed(25));
     }
-
-    private float getDistanceToNearestBlock(PlayerData data) {
-        BoundingBox box = data.getBoundingBox().subtract(0, Math.min(2, Math.abs(serverYVelocity)), 0,0,0,0);
-
-        val colliding = box.getCollidingBlockBoxes(data.getPlayer());
-
-        return (float) colliding.stream().mapToDouble(cBox -> MathUtils.getDelta(to.getY(), cBox.maxY)).min().orElse(100);
-    }
-
-    public boolean isNearGround(PlayerData data, float amount) {
-        BoundingBox box = data.getBoundingBox().grow(amount, amount, amount).subtract(0, 0, 0, 0, 1.6f, 0);
-
-        boolean near = boxes.stream()
-                .anyMatch(box2 -> box.collides(box2) && !BlockUtils.isSolid(BlockUtils.getBlock(box2.getMinimum().toLocation(data.getPlayer().getWorld()).clone().add(0, 1, 0)))
-                        && box2.collidesVertically(box));
-        return near;
-    }
-
-    public boolean isOnGround(PlayerData data, float amount) {
-        BoundingBox box = data.getBoundingBox().grow(0.25f, 0, 0.25f).subtract(0, amount, 0, 0, 1.6f, 0);
-
-        boolean near = boxes.stream()
-                .anyMatch(box2 -> data.getBoundingBox().grow(1E-6f, 0.5f, 1E-6f).intersectsWithBox(box2) && box.collides(box2) && getTo().getY() + 0.1f >= box2.getMaximum().getY() && !BlockUtils.isSolid(BlockUtils.getBlock(box2.getMinimum().toLocation(data.getPlayer().getWorld()).clone().add(0, 1, 0)))
-                        && box2.collidesVertically(box));
-        return near;
-    }
-
-    public boolean isOnGround(BoundingBox inputBox, PlayerData data, float amount) {
-
-        BoundingBox box = inputBox.subtract(0, amount, 0, 0, 0, 0);
-
-        boolean onGround = box.getCollidingBlockBoxes(data.getPlayer()).stream().anyMatch(box::collidesVertically);
-        return onGround;
-    }
-
-
-    private void predict(PlayerData data, float strafe, float forward, boolean beginning) {
-        float f4 = 0.91F;
-
-        if(beginning) {
-
-            if (isClientOnGround()) {
-                f4 = ReflectionsUtil.getFriction(BlockUtils.getBlock(to.toLocation(data.getPlayer().getWorld()).clone().subtract(0, 1, 0))) * 0.91F;
-            }
-
-            float f = 0.16277136F / (f4 * f4 * f4);
-            float f5;
-
-            if (isClientOnGround()) {
-                f5 = Atlas.getInstance().getBlockBoxManager().getBlockBox().getAiSpeed(data.getPlayer()) * f;
-            } else {
-                f5 = data.getPlayer().isSprinting() ? 0.026f : 0.02f;
-            }
-
-            this.moveFlying(strafe, forward, f5);
-        } else {
-            if(isClientOnGround()) {
-                f4 = ReflectionsUtil.getFriction(BlockUtils.getBlock(to.toLocation(data.getPlayer().getWorld()).clone().subtract(0, 1, 0))) * 0.91F;
-            }
-
-            this.motY *= 0.9800000190734863D;
-            this.motX *= (double) f4;
-            this.motZ *= (double) f4;
-        }
-    }
-
-    public void moveFlying(float strafe, float forward, float friction) {
-        float f = strafe * strafe + forward * forward;
-
-        if (f >= 1.0E-4F) {
-            f = MathHelper.sqrt_float(f);
-
-            if (f < 1.0F) {
-                f = 1.0F;
-            }
-
-            f = friction / f;
-            strafe = strafe * f;
-            forward = forward * f;
-            float f1 = MathHelper.sin(to.getYaw() * (float) Math.PI / 180.0F);
-            float f2 = MathHelper.cos(to.getYaw() * (float) Math.PI / 180.0F);
-            this.motX += (double) (strafe * f2 - forward * f1);
-            this.motZ += (double) (forward * f2 + strafe * f1);
-        }
-    }
-    protected void bF(PlayerData data) {
-        this.motY = 0.42;
-        if (data.getPlayer().hasPotionEffect(PotionEffectType.JUMP)) {
-            this.motY += (PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.JUMP) * 0.1F);
-        }
-
-        if (data.getPlayer().isSprinting()) {
-            float f = to.getYaw() * 0.017453292F;
-
-            this.motX -= (MathHelper.sin(f) * 0.2F);
-            this.motZ += (MathHelper.cos(f) * 0.2F);
-        }
-    }
-
 }

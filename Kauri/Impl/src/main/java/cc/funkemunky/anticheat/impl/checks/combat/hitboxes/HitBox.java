@@ -21,7 +21,7 @@ import java.util.List;
 
 @CheckInfo(name = "HitBox", description = "Ensures that the player is not using any expanded form of a player hitbox.", type = CheckType.REACH, cancelType = CancelType.COMBAT)
 @Packets(packets = {Packet.Client.FLYING, Packet.Client.POSITION_LOOK, Packet.Client.LOOK, Packet.Client.POSITION, Packet.Client.ARM_ANIMATION})
-@Init
+//@Init
 public class HitBox extends Check {
 
     private double vl;

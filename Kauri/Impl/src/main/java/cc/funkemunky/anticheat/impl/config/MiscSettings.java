@@ -7,5 +7,8 @@ import cc.funkemunky.api.utils.Init;
 public class MiscSettings {
 
     @ConfigSetting(path = "values", name = "serverPos")
-    public static long serverPos = 100;
+    public static long serverPos = 50;
+
+    @ConfigSetting(path = "values", name = "horizontalServerPosCalc")
+    public static boolean horizontalServerPos = true;
 }

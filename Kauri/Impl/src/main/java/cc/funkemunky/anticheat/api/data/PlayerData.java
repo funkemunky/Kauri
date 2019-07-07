@@ -4,12 +4,12 @@ import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckSettings;
 import cc.funkemunky.anticheat.api.data.processors.ActionProcessor;
 import cc.funkemunky.anticheat.api.data.processors.MovementProcessor;
 import cc.funkemunky.anticheat.api.data.processors.VelocityProcessor;
 import cc.funkemunky.anticheat.api.pup.AntiPUP;
 import cc.funkemunky.anticheat.api.utils.*;
+import cc.funkemunky.anticheat.impl.config.CheckSettings;
 import cc.funkemunky.anticheat.impl.config.MiscSettings;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.TickTimer;
@@ -20,7 +20,6 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.HashMap;
@@ -94,6 +93,6 @@ public class PlayerData {
     }
 
     public boolean isServerPos() {
-        return System.currentTimeMillis() - lastServerPosStamp < MiscSettings.serverPos + transPing;
+        return System.currentTimeMillis() - lastServerPosStamp < MiscSettings.serverPos + (transPing / 5);
     }
 }

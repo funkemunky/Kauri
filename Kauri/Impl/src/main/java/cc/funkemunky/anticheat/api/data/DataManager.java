@@ -9,24 +9,23 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 @Getter
 public class DataManager {
     private Map<UUID, PlayerData> dataObjects = new ConcurrentHashMap<>();
 
     public DataManager() {
-        new BukkitRunnable() {
-            public void run() {
-                dataObjects.keySet().parallelStream().forEach(key -> {
-                    PlayerData data = dataObjects.get(key);
-                    if (data.getTarget() != null && !data.getTarget().isDead()) {
-                        data.setEntityFrom(data.getEntityTo());
-                        data.setEntityTo(new CustomLocation(data.getTarget().getLocation()));
-                        data.getEntityPastLocation().addLocation(data.getEntityTo());
-                    }
-                });
-            }
-        }.runTaskTimerAsynchronously(Kauri.getInstance(), 0L, 1L);
+        Kauri.getInstance().getExecutorService().scheduleAtFixedRate(() -> {
+            dataObjects.keySet().forEach(key -> {
+                PlayerData data = dataObjects.get(key);
+                if (data.getTarget() != null && !data.getTarget().isDead()) {
+                    data.setEntityFrom(data.getEntityTo());
+                    data.setEntityTo(new CustomLocation(data.getTarget().getLocation()));
+                    data.getEntityPastLocation().addLocation(data.getEntityTo());
+                }
+            });
+        }, 0L, 50L, TimeUnit.MILLISECONDS);
     }
 
     public PlayerData getPlayerData(UUID uuid) {

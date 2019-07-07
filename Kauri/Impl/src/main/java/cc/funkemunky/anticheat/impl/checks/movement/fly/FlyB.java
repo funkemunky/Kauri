@@ -21,7 +21,7 @@ public class FlyB extends Check {
         val max = MiscUtils.predicatedMaxHeight(getData()) + 0.001f;
         val move = getData().getMovementProcessor();
 
-        if(MiscUtils.cancelForFlight(getData(), 0, false)) return;
+        if(MiscUtils.cancelForFlight(getData(), 10, true)) return;
 
         if(move.getDeltaY() > max) {
             flag(move.getDeltaY() + ">-" + max, true, true, AlertTier.HIGH);

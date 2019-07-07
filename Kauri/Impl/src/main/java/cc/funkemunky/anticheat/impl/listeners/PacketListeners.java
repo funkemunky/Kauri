@@ -2,9 +2,8 @@ package cc.funkemunky.anticheat.impl.listeners;
 
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckSettings;
 import cc.funkemunky.anticheat.api.data.PlayerData;
-import cc.funkemunky.api.Atlas;
+import cc.funkemunky.anticheat.impl.config.CheckSettings;
 import cc.funkemunky.api.events.AtlasListener;
 import cc.funkemunky.api.events.Listen;
 import cc.funkemunky.api.events.ListenerPriority;
@@ -22,7 +21,6 @@ import cc.funkemunky.api.tinyprotocol.packet.types.WrappedWatchableObject;
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
-import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -239,11 +237,24 @@ public class PacketListeners implements AtlasListener {
         if ((!CheckSettings.bypassEnabled || !data.getPlayer().hasPermission(CheckSettings.bypassPermission)) && !Kauri.getInstance().getCheckManager().isBypassing(data.getUuid())) {
             if(data.getPacketChecks().containsKey(packetType)) {
                 //long test = System.nanoTime();
-                data.getPacketChecks().getOrDefault(packetType, new ArrayList<>()).parallelStream().filter(Check::isEnabled).forEach(check ->
+                data
+                        .getPacketChecks()
+                        .getOrDefault(packetType, new ArrayList<>())
+                        .stream().filter(Check::isEnabled)
+                        .forEach(check ->
                 {
-                    Kauri.getInstance().getProfiler().start("check:" + check.getName() + "#" + packetType);
-                    check.onPacket(packet, packetType, timeStamp);
-                    Kauri.getInstance().getProfiler().stop("check:" + check.getName()  + "#" + packetType);
+                    Kauri.getInstance()
+                            .getProfiler()
+                            .start("check:" +
+                            check.getName() + "#"
+                            + packetType);
+                    check
+                            .onPacket(packet, packetType, timeStamp);
+                    Kauri.getInstance()
+                            .getProfiler()
+                            .stop("check:" +
+                                    check.getName()  + "#"
+                                    + packetType);
                 });
                 //Bukkit.broadcastMessage(MathUtils.round((System.nanoTime() - test) / 1000000F, 4)  + "ms: " + packetType);
             }

@@ -23,7 +23,7 @@ import java.util.Set;
 /* We use this to process the bounding boxes collided around the player for our checks to use as utils */
 public class CollisionAssessment {
     private PlayerData data;
-    private boolean onGround, fullyInAir, inLiquid, liquidBelow, nearLiquid, blocksOnTop, pistonsNear, onHalfBlock, onClimbable, onIce, collidesHorizontally, inWeb, onSlime, onSoulSand, blocksNear, blocksAround;
+    private boolean onGround, nearGround, fullyInAir, inLiquid, liquidBelow, nearLiquid, blocksOnTop, pistonsNear, onHalfBlock, onClimbable, onIce, collidesHorizontally, inWeb, onSlime, onSoulSand, blocksNear, blocksAround;
     private Set<Material> materialsCollided;
     private BoundingBox playerBox;
 
@@ -66,6 +66,10 @@ public class CollisionAssessment {
 
             if (BlockUtils.isIce(block) && playerBox.subtract(0, 1f, 0, 0, 0.5f, 0).collidesVertically(bb)) {
                 onIce = true;
+            }
+
+            if(BlockUtils.isSolid(block)) {
+                nearGround = true;
             }
 
             if (bb.collidesHorizontally(playerBox.grow((ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_13) ? 0.05f : 0), 0, (ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_13) ? 0.05f : 0)))) {

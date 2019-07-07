@@ -1,8 +1,8 @@
 package cc.funkemunky.anticheat.api.utils;
 
-import cc.funkemunky.anticheat.api.checks.CheckSettings;
 import cc.funkemunky.anticheat.api.utils.json.JSONException;
 import cc.funkemunky.anticheat.api.utils.json.JSONObject;
+import cc.funkemunky.anticheat.impl.config.CheckSettings;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.database.Database;
 import lombok.val;

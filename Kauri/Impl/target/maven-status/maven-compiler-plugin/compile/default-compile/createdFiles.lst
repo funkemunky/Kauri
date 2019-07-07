@@ -73,7 +73,6 @@ cc/funkemunky/anticheat/impl/commands/kauri/arguments/BanwaveArgument.class
 cc/funkemunky/anticheat/api/utils/json/XMLTokener.class
 cc/funkemunky/anticheat/api/utils/CollisionAssessment.class
 cc/funkemunky/anticheat/api/utils/VPNResponse.class
-cc/funkemunky/anticheat/api/data/DataManager$1.class
 cc/funkemunky/anticheat/impl/checks/combat/autoclicker/AutoclickerI.class
 cc/funkemunky/anticheat/impl/checks/movement/speed/SpeedA.class
 cc/funkemunky/anticheat/api/utils/menu/Menu$MenuDimension.class
@@ -148,7 +147,6 @@ cc/funkemunky/anticheat/api/utils/menu/Menu.class
 cc/funkemunky/anticheat/api/checks/AlertTier.class
 cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimK.class
 cc/funkemunky/anticheat/api/utils/json/JSONArray.class
-cc/funkemunky/anticheat/api/checks/CheckSettings.class
 cc/funkemunky/anticheat/api/utils/menu/mask/Mask2D.class
 cc/funkemunky/anticheat/api/data/logging/Violation.class
 cc/funkemunky/anticheat/impl/listeners/PacketListeners.class

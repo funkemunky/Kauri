@@ -4,6 +4,7 @@ import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.event.PlayerCancelEvent;
 import cc.funkemunky.anticheat.api.event.PlayerCheatEvent;
+import cc.funkemunky.anticheat.impl.config.CheckSettings;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.event.system.Listener;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;

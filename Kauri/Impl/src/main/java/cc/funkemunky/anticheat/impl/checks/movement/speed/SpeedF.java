@@ -28,11 +28,11 @@ public class SpeedF extends Check {
         motionXZ = Math.max(MiscUtils.getBaseSpeed(getData()) + 0.046f, motionXZ * decel);
 
         if((move.getAirTicks() == 1 || move.isHasJumped()) && jumpticks <= 0) {
-            motionXZ = 2.75f * MiscUtils.getBaseSpeed(getData());
+            motionXZ = 3.5f * MiscUtils.getBaseSpeed(getData());
             jumpticks = 2;
         } else if((jumpticks-= jumpticks > 0 ? 1 : 0) == 0) {
             jumpticks = -1;
-            motionXZ/= 1.65;
+            motionXZ/= 1.5;
         }
 
         if(move.getGroundTicks() == 1) {
@@ -41,7 +41,7 @@ public class SpeedF extends Check {
 
         float max = motionXZ + account();
 
-        if(move.getDeltaXZ() > 0 && getData().getMovementProcessor().getFrom().toVector().length() > 0 && getData().getBlockInside() != null && !getData().getBlockInside().getType().isSolid() && getData().getLastBlockPlace().hasPassed(20) && getData().getLastLogin().hasPassed(20) && !move.isServerPos() && !getData().isServerPos() && !getData().getPlayer().getAllowFlight() && getData().getPlayer().getVehicle() == null && move.getLastRiptide().hasPassed(20) && !move.isTookVelocity() && !PlayerUtils.isGliding(getData().getPlayer())) {
+        if(move.getDeltaXZ() > 0 && getData().getMovementProcessor().getFrom().toVector().length() > 0 && !getData().isLagging() && getData().getBlockInside() != null && !getData().getBlockInside().getType().isSolid() && getData().getLastBlockPlace().hasPassed(20) && getData().getLastLogin().hasPassed(20) && !move.isServerPos() && !getData().isServerPos() && !getData().getPlayer().getAllowFlight() && getData().getPlayer().getVehicle() == null && move.getLastRiptide().hasPassed(20) && !move.isTookVelocity() && !PlayerUtils.isGliding(getData().getPlayer())) {
             if(move.getDeltaXZ() > max) {
                 flag(move.getDeltaXZ() + ">-" + max, true, true, AlertTier.HIGH);
             }

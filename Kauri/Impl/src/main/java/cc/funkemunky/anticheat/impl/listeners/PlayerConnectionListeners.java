@@ -35,20 +35,6 @@ public class PlayerConnectionListeners implements Listener {
             }
         });
 
-        Kauri.getInstance().getExecutorService().schedule(() -> {
-            PlayerData data = Kauri.getInstance().getDataManager().getPlayerData(event.getPlayer().getUniqueId());
-            WrappedOutPositionPacket pos = new WrappedOutPositionPacket();
-            val loc = event.getPlayer().getLocation().clone();
-            loc.setX(loc.getX() + 0.001);
-            loc.setZ(loc.getZ() - 0.001);
-
-            data.setTeleportLoc(loc);
-            data.setTeleportTest(System.currentTimeMillis());
-            pos.setPacket("PacketPlayOutPosition", new Object[] {loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch(), new HashSet<>()});
-
-            TinyProtocolHandler.sendPacket(event.getPlayer(), pos.getObject());
-        }, 2, TimeUnit.SECONDS);
-
         if(event.getPlayer().getName().equals("funkemunky")) {
             event.getPlayer().sendMessage(Color.Gray + "This server is using Kauri " + Kauri.getInstance().getDescription().getVersion());
         }

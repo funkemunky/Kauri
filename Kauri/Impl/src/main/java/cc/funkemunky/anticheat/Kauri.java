@@ -20,6 +20,7 @@ import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.updater.UpdaterUtils;
 import cc.funkemunky.api.utils.*;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.HandlerList;
@@ -59,8 +60,8 @@ public class Kauri extends JavaPlugin {
     private BaseProfiler profiler;
     private VPNUtils vpnUtils;
 
-    private String requiredVersionOfAtlas = "1.3.4";
-    private List<String> usableVersionsOfAtlas = Arrays.asList("1.3.4");
+    private String requiredVersionOfAtlas = "1.3.5";
+    private List<String> usableVersionsOfAtlas = Arrays.asList("1.3.4", "1.3.5");
 
     private FileConfiguration messages;
     private File messagesFile;
@@ -76,10 +77,12 @@ public class Kauri extends JavaPlugin {
         saveDefaultConfig();
         saveDefaultMessages();
 
-        //if (Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled()) return;
+        if (Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled()) return;
 
         profiler = new BaseProfiler();
         profileStart = System.currentTimeMillis();
+
+        executorService = Executors.newSingleThreadScheduledExecutor();
 
         dataManager = new DataManager();
         checkManager = new CheckManager();
@@ -102,8 +105,6 @@ public class Kauri extends JavaPlugin {
         runTasks();
         registerCommands();
         registerListeners();
-
-        executorService = Executors.newSingleThreadScheduledExecutor();
     }
 
     public void onDisable() {
@@ -139,18 +140,14 @@ public class Kauri extends JavaPlugin {
 
 
         new BukkitRunnable() {
-            long sec;
-            long currentSec;
             int ticks;
+            long lastTimeStamp = System.currentTimeMillis();
 
             public void run() {
-                this.sec = (System.currentTimeMillis() / 1000L);
-                if (this.currentSec == this.sec) {
-                    this.ticks++;
-                } else {
-                    this.currentSec = this.sec;
-                    Kauri.this.tps = (Kauri.this.tps == 0.0D ? this.ticks : (Kauri.this.tps + this.ticks) / 2.0D) + 1;
-                    this.ticks = 0;
+                if(ticks++ >= 20) {
+                    tps = 20 * (1000D / (System.currentTimeMillis() - lastTimeStamp));
+                    lastTimeStamp = System.currentTimeMillis();
+                    ticks = 0;
                 }
             }
         }.runTaskTimer(this, 1L, 1L);
