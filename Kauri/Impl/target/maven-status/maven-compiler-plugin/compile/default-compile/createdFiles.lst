@@ -95,11 +95,11 @@ cc\funkemunky\anticheat\api\data\PlayerData.class
 cc\funkemunky\anticheat\api\utils\CollisionAssessment.class
 cc\funkemunky\anticheat\api\utils\json\XML.class
 cc\funkemunky\anticheat\impl\checks\movement\groundspoof\GroundSpoofA.class
+cc\funkemunky\anticheat\impl\checks\combat\autoclicker\AutoClickerC.class
 cc\funkemunky\anticheat\impl\checks\player\badpackets\BadPacketsD.class
 cc\funkemunky\anticheat\impl\pup\crashers\ChatSpam.class
 cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimA.class
 cc\funkemunky\anticheat\impl\commands\kauri\AlertsCommand.class
-cc\funkemunky\anticheat\impl\checks\combat\autoclicker\AutoclickerC.class
 cc\funkemunky\anticheat\impl\commands\kauri\arguments\VelocityArgument.class
 cc\funkemunky\anticheat\Kauri$2.class
 cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimG.class
@@ -150,7 +150,6 @@ cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimC.class
 cc\funkemunky\anticheat\impl\checks\movement\motion\MotionB.class
 cc\funkemunky\anticheat\api\data\processors\ActionProcessor.class
 cc\funkemunky\anticheat\api\utils\json\JSONTokener.class
-cc\funkemunky\anticheat\impl\checks\combat\autoclicker\DoubleClick.class
 cc\funkemunky\anticheat\impl\checks\combat\autoclicker\AutoclickerD.class
 cc\funkemunky\anticheat\impl\checks\movement\jesus\JesusA.class
 cc\funkemunky\anticheat\impl\checks\movement\speed\SpeedC.class

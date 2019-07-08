@@ -12,7 +12,7 @@ import org.bukkit.event.Event;
 
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LOOK})
 @Init
-@CheckInfo(name = "AimA (Type E)", description = "Checks for low common denominators in other rotations - FlyCode.", type = CheckType.AIM, cancelType = CancelType.MOTION, executable = false)
+@CheckInfo(name = "Aim (Type E)", description = "Checks for low common denominators in other rotations - FlyCode.", type = CheckType.AIM, cancelType = CancelType.MOTION, executable = false)
 public class AimE extends Check {
 
     private Verbose verbose = new Verbose();

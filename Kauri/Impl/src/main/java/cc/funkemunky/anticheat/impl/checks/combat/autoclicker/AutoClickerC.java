@@ -3,18 +3,19 @@ package cc.funkemunky.anticheat.impl.checks.combat.autoclicker;
 import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
+import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.TickTimer;
 import org.bukkit.event.Event;
 
-@CheckInfo(name = "Autoclicker (DoubleClick)", description = "Checks for double clicking.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, executable = false)
+@CheckInfo(name = "Autoclicker (Type C)", description = "Checks for double clicking.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, executable = false)
 @Packets(packets = {
         Packet.Client.ARM_ANIMATION,
         Packet.Client.FLYING,
         Packet.Client.POSITION,
         Packet.Client.POSITION_LOOK,
         Packet.Client.LOOK})
-//@Init
-public class DoubleClick extends Check {
+@Init
+public class AutoClickerC extends Check {
 
     private long lastFlying, lastArm;
     private TickTimer lastLag = new TickTimer(1);
