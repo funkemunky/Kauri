@@ -12,7 +12,7 @@ import org.bukkit.util.Vector;
         Packet.Client.LOOK,
         Packet.Client.POSITION_LOOK})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "AimA (Type D)", description = "Looks for a common angle mistake in clients. By Itz_Lucky.", type = CheckType.AIM, cancelType = CancelType.MOTION, maxVL = 50)
+@CheckInfo(name = "Aim (Type D)", description = "Looks for a common angle mistake in clients. By Itz_Lucky.", type = CheckType.AIM, cancelType = CancelType.MOTION, maxVL = 50)
 public class AimD extends Check {
 
     private Verbose verbose = new Verbose();

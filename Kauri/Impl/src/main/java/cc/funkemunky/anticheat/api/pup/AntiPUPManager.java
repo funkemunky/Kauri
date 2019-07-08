@@ -18,11 +18,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class AntiPUPManager {
-    private List<AntiPUP> antibot;
+    private List<AntiPUP> antibot = new ArrayList<>();
     public ExecutorService pupThread = Executors.newFixedThreadPool(2);
 
     public AntiPUPManager() {
-        antibot = registerMethods();
+        //antibot = registerMethods();
         Atlas.getInstance().getDatabaseManager().createDatabase("VPN-Cache", DatabaseType.FLATFILE);
     }
 
