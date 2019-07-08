@@ -1,90 +1,611 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="ArtifactsWorkspaceSettings">
-    <artifacts-to-build>
-      <artifact name="Kauri:jar" />
-    </artifacts-to-build>
-  </component>
   <component name="ChangeListManager">
-    <list default="true" id="851cd6bf-ff2d-422b-9065-7b08de60f34f" name="Default Changelist" comment="" />
+    <list default="true" id="30684be1-e859-4983-94b8-cb3a923c58fc" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/API/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/checks/CallWrapper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/checks/Check.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/checks/CheckManager.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/checks/CheckType.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/checks/PacketMethod.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/data/DataManager.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/data/PlayerData.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/profiling/BaseProfiler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/profiling/Profiler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/profiling/ResultsType.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/profiling/ToggleableProfiler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/api/AbstractTinyProtocol.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/api/NMSObject.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/api/Packet.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/api/ProtocolVersion.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/api/TinyProtocol1_7.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/api/TinyProtocol1_8.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/api/TinyProtocolHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/packet/in/WrappedIn13KeepAlive.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/packet/in/WrappedInAbilitiesPacket.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/packet/in/WrappedInArmAnimationPacket.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/packet/in/WrappedInBlockDigPacket.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/packet/in/WrappedInBlockPlacePacket.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/packet/in/WrappedInClientCommandPacket.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/packet/in/WrappedInCloseWindowPacket.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/packet/in/WrappedInEntityActionPacket.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/packet/in/WrappedInFlyingPacket.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/packet/in/WrappedInHeldItemSlotPacket.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/packet/in/WrappedInKeepAlivePacket.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/packet/in/WrappedInSteerVehiclePacket.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/packet/in/WrappedInTabComplete.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/packet/in/WrappedInTransactionPacket.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/packet/in/WrappedInUseEntityPacket.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/packet/in/WrappedInVelocityPacket.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/packet/in/WrappedInWindowClickPacket.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/packet/types/BaseBlockPosition.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/packet/types/EnumDirection.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/packet/types/MathHelper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/packet/types/Vec3D.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/packet/types/WrappedChatMessage.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/packet/types/WrappedEnumParticle.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/packet/types/WrappedGameProfile.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/packet/types/WrappedWatchableObject.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/reflection/ConstructorInvoker.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/reflection/FieldAccessor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/reflection/MethodInvoker.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/reflection/Reflection.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/AutoLoad.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/BlockUtils.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/BoundingBox.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/ClassScanner.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/Color.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/Commands.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/ConfigSetting.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/ConfigUtils.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/CustomLocation.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/Dummy.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/FunkeFile.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/Init.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/JsonMessage.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/MCSmooth.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/MiscUtils.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/PastLocation.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/Pastebin.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/PlayerUtils.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/ReflectionsUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/TickTimer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/URLUtils.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/blockbox/BlockBox.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/blockbox/BlockBoxManager.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/blockbox/boxes/BlockBox1_10_R1.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/blockbox/boxes/BlockBox1_11_R1.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/blockbox/boxes/BlockBox1_12_R1.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/blockbox/boxes/BlockBox1_13_R1.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/blockbox/boxes/BlockBox1_13_R2.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/blockbox/boxes/BlockBox1_14_R1.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/blockbox/boxes/BlockBox1_7_R4.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/blockbox/boxes/BlockBox1_8_R1.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/blockbox/boxes/BlockBox1_8_R2.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/blockbox/boxes/BlockBox1_8_R3.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/blockbox/boxes/BlockBox1_9_R1.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/blockbox/boxes/BlockBox1_9_R2.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/blockbox/impl/BlockBox.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/blockbox/impl/BoundingBoxes.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/blockbox/impl/PistonBox.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/blockbox/impl/RegularBox.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/blockbox/impl/StairBox.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/math/Average.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/math/DynamicRollingAverage.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/math/Interval.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/math/MCSmooth.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/math/MathHelper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/math/MathUtils.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/math/RayTrace.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/math/RollingAverage.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/math/RollingAverageDouble.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/math/RollingAverageLong.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/math/StatisticalAnalysis.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Impl/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Impl/src/main/java/cc/funkemunky/anticheat/Kauri.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Impl/src/main/java/cc/funkemunky/anticheat/checks/Test.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Impl/src/main/java/cc/funkemunky/anticheat/data/SimpleDataManager.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Impl/src/main/java/cc/funkemunky/anticheat/data/SimplePlayerData.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/Kauri.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/.idea/libraries/Maven__cc_funkemunky_plugins_Atlas_1_3.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/.idea/libraries/Maven__org_github_lombok_lombok_1_18_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/.idea/libraries/Maven__org_github_paperspigot_1_8_8_1_8_8.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/.idea/libraries/Maven__org_github_spigot_1_7_10_1_7_10.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/.idea/libraries/spigot_1_12_2.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/dependency-reduced-pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/rebuild.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/Kauri.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/KauriAPI.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/checks/AlertTier.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/checks/CancelType.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/checks/Check.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/checks/CheckInfo.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/checks/CheckManager.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/checks/CheckSettings.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/checks/CheckType.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/data/DataManager.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/data/PlayerData.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/data/banwave/BanwaveConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/data/banwave/BanwaveManager.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/data/logging/LoggerManager.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/data/logging/Violation.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/data/processors/ActionProcessor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/data/processors/MovementProcessor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/data/processors/VelocityProcessor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/data/stats/StatsManager.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/event/TickEvent.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/pup/AntiPUP.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/pup/AntiPUPManager.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/pup/PuPType.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/BukkitEvents.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/CollisionAssessment.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/CustomLocation.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/DynamicRollingAverage.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/EvictingList.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/Interval.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/ItemBuilder.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/JsonReader.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/MCSmooth.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/MathUtils.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/Message.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/Messages.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/MiscUtils.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/MouseFilter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/Packets.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/PastLocation.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/Pastebin.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/RayTrace.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/Setting.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/StatisticalAnalysis.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/URLUtils.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/VPNResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/VPNUtils.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/Verbose.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/json/CDL.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/json/Cookie.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/json/CookieList.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/json/HTTP.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/json/HTTPTokener.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/json/JSONArray.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/json/JSONException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/json/JSONML.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/json/JSONObject.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/json/JSONString.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/json/JSONStringer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/json/JSONTokener.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/json/JSONWriter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/json/XML.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/json/XMLTokener.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/menu/Menu.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/menu/MenuListener.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/menu/button/Button.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/menu/button/ClickAction.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/menu/mask/Mask.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/menu/mask/Mask2D.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/menu/type/BukkitInventoryHolder.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/menu/type/impl/ChestMenu.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/api/utils/menu/util/ArrayIterator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/behavioral/InventoryClick.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimA.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimB.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimC.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimD.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimE.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimF.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimG.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimH.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimI.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimJ.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimK.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimL.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/autoclicker/AutoclickerA.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/autoclicker/AutoclickerB.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/autoclicker/AutoclickerC.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/autoclicker/AutoclickerD.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/autoclicker/AutoclickerE.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/autoclicker/AutoclickerF.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/autoclicker/AutoclickerG.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/autoclicker/AutoclickerH.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/autoclicker/AutoclickerI.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/autoclicker/AutoclickerJ.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/autoclicker/DoubleClick.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/criticals/Criticals.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/fastbow/Fastbow.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/hitboxes/HitBox.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/killaura/KillauraA.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/killaura/KillauraB.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/killaura/KillauraC.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/killaura/KillauraD.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/killaura/KillauraE.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/reach/Reach.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/fastladder/FastLadder.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/fly/FlyA.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/fly/FlyB.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/groundspoof/GroundSpoofA.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/groundspoof/GroundSpoofB.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/jesus/JesusA.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/motion/MotionA.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/motion/MotionB.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/noslowdown/NoSlowdownA.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/noslowdown/NoSlowdownB.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/noslowdown/NoSlowdownC.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/speed/SpeedA.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/speed/SpeedB.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/speed/SpeedC.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/speed/SpeedD.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/step/StepA.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/velocity/VelocityA.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/velocity/VelocityB.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/velocity/VelocityC.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/velocity/VelocityD.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/player/badpackets/BadPacketsA.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/player/badpackets/BadPacketsB.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/player/badpackets/BadPacketsC.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/player/badpackets/BadPacketsD.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/player/badpackets/BadPacketsE.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/player/badpackets/BadPacketsF.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/player/badpackets/BadPacketsG.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/player/badpackets/BadPacketsH.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/checks/player/badpackets/BadPacketsI.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/commands/kauri/AlertsCommand.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/commands/kauri/KauriCommand.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/commands/kauri/arguments/AlertsArgument.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/commands/kauri/arguments/AntiVpnArgument.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/commands/kauri/arguments/BanwaveArgument.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/commands/kauri/arguments/BoxWandArgument.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/commands/kauri/arguments/BugReportArg.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/commands/kauri/arguments/BypassingArgument.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/commands/kauri/arguments/DebugArgument.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/commands/kauri/arguments/DelayArgument.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/commands/kauri/arguments/LagArgument.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/commands/kauri/arguments/LogArgument.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/commands/kauri/arguments/MenuArgument.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/commands/kauri/arguments/RecentViolationsArgument.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/commands/kauri/arguments/ReloadArgument.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/commands/kauri/arguments/SaveArgument.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/commands/kauri/arguments/UpdateConfigArgument.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/commands/kauri/arguments/VelocityArgument.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/listeners/BukkitListeners.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/listeners/FunkeListeners.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/listeners/LegacyListeners.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/listeners/PacketListeners.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/listeners/PlayerConnectionListeners.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/menu/InputHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/menu/MenuUtils.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/menu/UpdateDataType.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/pup/bot/ConsoleClient.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/pup/bot/WorldLoader.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/pup/crashers/ArmSwing.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/pup/crashers/Boxer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/pup/crashers/ChatSpam.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/pup/crashers/CommandSpam.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/pup/crashers/MorePackets.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/pup/crashers/YLevel.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/pup/exploits/BookEnchant.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/java/cc/funkemunky/anticheat/impl/pup/vpn/AntiVPN.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/resources/config.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/resources/messages.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/src/main/resources/plugin.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/target/Kauri-b34-shaded.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/target/Kauri-b34.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/target/classes/config.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/target/classes/messages.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/target/classes/plugin.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/target/maven-archiver/pom.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Kauri/target/original-Kauri-b34.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriDownloader/.idea/artifacts/KauriDownloader_jar.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriDownloader/.idea/libraries/asm_all_5_2.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriDownloader/.idea/libraries/lombok.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriDownloader/.idea/libraries/spigot_1_7_10_SNAPSHOT_b1657.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriDownloader/out/artifacts/KauriDownloader_jar/KauriDownloader.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriDownloader/out/production/KauriDownloader/META-INF/KauriDownloader.kotlin_module" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriDownloader/out/production/KauriDownloader/config.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriDownloader/out/production/KauriDownloader/plugin.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriDownloader/resources/config.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriDownloader/resources/plugin.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriDownloader/src/cc/funkemunky/kauri/KauriDownloader.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriDownloader/src/cc/funkemunky/kauri/utils/DownloaderUtils.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriDownloader/src/cc/funkemunky/kauri/utils/MiscUtils.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriDownloader/src/cc/funkemunky/kauri/utils/ReflectionsUtil.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/rebuild.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/Kauri.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/checks/CancelType.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/checks/Check.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/checks/CheckInfo.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/checks/CheckManager.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/checks/CheckSettings.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/checks/CheckType.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/data/DataManager.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/data/PlayerData.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/data/banwave/BanwaveConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/data/banwave/BanwaveManager.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/data/logging/LoggerManager.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/data/processors/ActionProcessor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/data/processors/MovementProcessor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/data/processors/VelocityProcessor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/data/stats/StatsManager.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/event/TickEvent.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/BukkitEvents.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/CollisionAssessment.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/CustomLocation.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/DynamicRollingAverage.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/EvictingList.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/Interval.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/ItemBuilder.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/JsonReader.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/MCSmooth.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/MathUtils.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/Message.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/Messages.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/MiscUtils.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/MouseFilter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/Packets.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/PastLocation.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/Pastebin.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/Setting.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/StatisticalAnalysis.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/URLUtils.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/VPNResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/VPNUtils.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/Verbose.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/json/CDL.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/json/Cookie.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/json/CookieList.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/json/HTTP.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/json/HTTPTokener.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/json/JSONArray.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/json/JSONException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/json/JSONML.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/json/JSONObject.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/json/JSONString.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/json/JSONStringer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/json/JSONTokener.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/json/JSONWriter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/json/XML.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/json/XMLTokener.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/menu/Menu.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/menu/MenuListener.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/menu/button/Button.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/menu/button/ClickAction.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/menu/mask/Mask.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/menu/mask/Mask2D.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/menu/type/BukkitInventoryHolder.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/menu/type/impl/ChestMenu.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/api/utils/menu/util/ArrayIterator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimA.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimB.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimC.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimD.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimE.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/autoclicker/AutoclickerA.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/autoclicker/AutoclickerB.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/autoclicker/AutoclickerC.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/autoclicker/AutoclickerD.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/criticals/Criticals.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/fastbow/Fastbow.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/hitboxes/HitBox.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/killaura/KillauraA.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/killaura/KillauraB.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/killaura/KillauraC.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/killaura/KillauraD.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/killaura/KillauraE.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/killaura/KillauraF.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/killaura/KillauraG.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/reach/ReachA.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/reach/ReachB.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/combat/reach/ReachC.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/fastladder/FastLadder.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/fly/FlyA.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/fly/FlyB.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/fly/FlyC.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/fly/FlyD.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/fly/FlyE.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/groundspoof/GroundSpoof.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/jesus/JesusA.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/motion/MotionA.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/motion/MotionB.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/noslowdown/NoSlowdownA.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/noslowdown/NoSlowdownB.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/noslowdown/NoSlowdownC.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/speed/SpeedA.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/speed/SpeedB.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/speed/SpeedC.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/speed/SpeedD.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/step/StepA.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/velocity/VelocityA.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/movement/velocity/VelocityB.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/player/badpackets/BadPacketsA.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/player/badpackets/BadPacketsB.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/player/badpackets/BadPacketsC.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/player/badpackets/BadPacketsD.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/player/badpackets/BadPacketsE.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/player/badpackets/BadPacketsF.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/player/badpackets/BadPacketsG.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/player/badpackets/BadPacketsH.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/player/badpackets/BadPacketsI.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/player/badpackets/BadPacketsJ.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/player/badpackets/BadPacketsK.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/checks/player/badpackets/BadPacketsL.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/commands/kauri/AlertsCommand.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/commands/kauri/KauriCommand.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/commands/kauri/arguments/AlertsArgument.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/commands/kauri/arguments/BanwaveArgument.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/commands/kauri/arguments/BoxWandArgument.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/commands/kauri/arguments/BugReportArg.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/commands/kauri/arguments/BypassingArgument.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/commands/kauri/arguments/DebugArgument.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/commands/kauri/arguments/DelayArgument.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/commands/kauri/arguments/LagArgument.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/commands/kauri/arguments/LogArgument.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/commands/kauri/arguments/MenuArgument.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/commands/kauri/arguments/ReloadArgument.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/commands/kauri/arguments/SaveArgument.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/commands/kauri/arguments/UpdateConfigArgument.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/listeners/BukkitListeners.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/listeners/FunkeListeners.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/listeners/LegacyListeners.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/listeners/PacketListeners.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/listeners/PlayerConnectionListeners.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/menu/InputHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/menu/MenuUtils.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/java/cc/funkemunky/anticheat/impl/menu/UpdateDataType.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/resources/config.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/resources/messages.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/src/main/resources/plugin.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/target/Kauri-b34-shaded.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/target/Kauri-b34.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/target/KauriLite-b20.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/target/classes/config.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/target/classes/messages.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/target/classes/plugin.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/target/maven-archiver/pom.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/target/original-Kauri-b34.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KauriLite/target/original-KauriLite-b20.jar" beforeDir="false" />
+    </list>
     <ignored path="$PROJECT_DIR$/out/" />
+    <ignored path="$PROJECT_DIR$/target/" />
+    <ignored path="$PROJECT_DIR$/API/target/" />
+    <ignored path="$PROJECT_DIR$/Impl/target/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="FUSProjectUsageTrigger">
-    <session id="1061654436">
-      <usages-collector id="statistics.lifecycle.project">
-        <counts>
-          <entry key="project.closed" value="1" />
-          <entry key="project.open.time.0" value="1" />
-          <entry key="project.opened" value="1" />
-        </counts>
-      </usages-collector>
-    </session>
+  <component name="DefaultGradleProjectSettings">
+    <option name="testRunner" value="GRADLE" />
+    <option name="delegatedBuild" value="true" />
   </component>
   <component name="FileEditorManager">
-    <leaf />
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/checks/Check.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="119">
+              <caret line="7" column="25" selection-start-line="7" selection-start-column="25" selection-end-line="7" selection-end-column="25" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/checks/CallWrapper.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="136">
+              <caret line="8" column="24" selection-start-line="8" selection-start-column="24" selection-end-line="8" selection-end-column="24" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/checks/PacketMethod.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="51">
+              <caret line="3" column="27" selection-start-line="3" selection-start-column="27" selection-end-line="3" selection-end-column="27" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/checks/CheckManager.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="68">
+              <caret line="4" selection-start-line="4" selection-end-line="4" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/api/TinyProtocolHandler.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1513">
+              <caret line="93" column="18" selection-start-line="93" selection-start-column="18" selection-end-line="93" selection-end-column="18" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Impl/src/main/java/cc/funkemunky/anticheat/checks/Test.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="136">
+              <caret line="8" column="41" selection-start-line="8" selection-start-column="41" selection-end-line="8" selection-end-column="41" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/api/NMSObject.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="272">
+              <caret line="18" column="7" selection-start-line="18" selection-start-column="7" selection-end-line="18" selection-end-column="7" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/checks/CheckType.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="51">
+              <caret line="3" column="28" selection-start-line="3" selection-start-column="28" selection-end-line="3" selection-end-column="28" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Impl/src/main/java/cc/funkemunky/anticheat/data/SimplePlayerData.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="136">
+              <caret line="8" column="25" selection-start-line="8" selection-start-column="25" selection-end-line="8" selection-end-column="25" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/data/PlayerData.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="340">
+              <caret line="22" selection-start-line="22" selection-end-line="22" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="Kotlin File" />
+        <option value="Interface" />
         <option value="Class" />
+        <option value="AnnotationType" />
       </list>
     </option>
-  </component>
-  <component name="FindInProjectRecents">
-    <findStrings>
-      <find>getPostion</find>
-      <find>entityData</find>
-      <find>return</find>
-      <find>return;</find>
-      <find>setCancelled</find>
-      <find>lastAttack</find>
-      <find>getData().getPlayer().isSprinting()</find>
-      <find>broad</find>
-      <find>e.getPlayer()</find>
-      <find>iceTicks</find>
-      <find>alertsDelay</find>
-      <find>Mercury</find>
-      <find>new Button</find>
-      <find>iris</find>
-      <find>BadPAcket</find>
-      <find>String name, CancelType cancelType, int maxVL</find>
-      <find>&amp;b</find>
-      <find>infoPair</find>
-      <find>e.getFrom()</find>
-      <find>Iris</find>
-      <find>Object onPacket</find>
-      <find>return packet;</find>
-      <find>String name, CancelType cancelType</find>
-      <find>super(name, cancelType, maxVL);</find>
-      <find>super(name, cancelType, maxVL, enabled, executable, cancellable</find>
-    </findStrings>
-    <replaceStrings>
-      <replace>return packet;</replace>
-      <replace>getData().getActionProcessor().isSprinting()</replace>
-      <replace>player</replace>
-      <replace>kauri</replace>
-      <replace>String name, CheckType type, CancelType cancelType, int maxVL</replace>
-      <replace>&amp;e</replace>
-      <replace>infoPair2</replace>
-      <replace>from</replace>
-      <replace>Kauri</replace>
-      <replace>void</replace>
-      <replace>void onPacket</replace>
-      <replace />
-      <replace>return;</replace>
-      <replace>String name, CheckType type, CancelType cancelType</replace>
-      <replace>super(name, type, cancelType, maxVL);</replace>
-      <replace>super(name, type, cancelType, maxVL, enabled, executable, cancellable</replace>
-    </replaceStrings>
-    <dirStrings>
-      <dir>$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/combat/reach</dir>
-      <dir>$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement</dir>
-    </dirStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -92,77 +613,89 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/player/BadPacketsB.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/player/BadPacketsC.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/player/BadPacketsD.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/player/BadPacketsE.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/player/BadPacketsF.java" />
-        <option value="$PROJECT_DIR$/resources/config.yml" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/player/BadPacketsG.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/combat/killaura/KillAuraH.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/player/Timer.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/combat/killaura/KillauraH.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/combat/autoclicker/AutoclickerE.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/checks/CheckType.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/menu/MenuUtils.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimA.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimC.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/NoFall.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/SpeedE.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/SpeedD.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/utils/CollisionAssessment.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/commands/kauri/arguments/DebugArgument.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/combat/reach/ReachD.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/data/processors/MovementProcessor.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/data/processors/VelocityProcessor.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/listeners/PacketListeners.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/listeners/FunkeListeners.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/listeners/PlayerConnectionListeners.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/data/logging/LoggerManager.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/data/stats/StatsManager.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/data/PlayerData.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/checks/CheckSettings.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/checks/Check.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/Kauri.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimB.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/combat/hitboxes/HitBox.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/combat/killaura/KillauraG.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/FastLadder.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/FlyA.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/FlyC.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/FlyD.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/FlyE.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/FlyF.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/GroundSpoof.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/SpeedA.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/SpeedB.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/SpeedC.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/VelocityA.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/VelocityC.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/utils/MiscUtils.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/FlyB.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/checks/CheckManager.java" />
-        <option value="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/VelocityB.java" />
+        <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/math/RollingAverageLong.java" />
+        <option value="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/profiling/BaseProfiler.java" />
+        <option value="$PROJECT_DIR$/API/pom.xml" />
+        <option value="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/api/TinyProtocol1_8.java" />
+        <option value="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/api/TinyProtocol1_7.java" />
+        <option value="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/api/NMSObject.java" />
+        <option value="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/api/TinyProtocolHandler.java" />
+        <option value="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/packet/out/WrappedPacketPlayOutWorldParticle.java" />
+        <option value="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/math/RayTrace.java" />
+        <option value="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/Pastebin.java" />
+        <option value="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/math/MathUtils.java" />
+        <option value="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/CustomLocation.java" />
+        <option value="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/PastLocation.java" />
+        <option value="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/math/DynamicRollingAverage.java" />
+        <option value="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/math/StatisticalAnalysis.java" />
+        <option value="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/URLUtils.java" />
+        <option value="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/math/Interval.java" />
+        <option value="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/EvictingList.java" />
+        <option value="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/MCSmooth.java" />
+        <option value="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/Kauri.java" />
+        <option value="$PROJECT_DIR$/Impl/src/main/java/cc/funkemunky/anticheat/Kauri.java" />
+        <option value="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/data/DataManager.java" />
+        <option value="$PROJECT_DIR$/Impl/src/main/java/cc/funkemunky/anticheat/data/SimpleDataManager.java" />
+        <option value="$PROJECT_DIR$/Impl/pom.xml" />
+        <option value="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/checks/CheckType.java" />
+        <option value="$PROJECT_DIR$/Impl/src/main/java/cc/funkemunky/anticheat/tinyprotocol/api/TinyProtocolHandler.java" />
+        <option value="$PROJECT_DIR$/Impl/src/main/java/cc/funkemunky/anticheat/checks/Test.java" />
+        <option value="$PROJECT_DIR$/Impl/src/main/java/cc/funkemunky/anticheat/data/SimplePlayerData.java" />
+        <option value="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/data/PlayerData.java" />
+        <option value="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/checks/CallWrapper.java" />
+        <option value="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/Priority.java" />
+        <option value="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/checks/PacketMethod.java" />
+        <option value="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/checks/CheckManager.java" />
+        <option value="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/checks/Check.java" />
       </list>
+    </option>
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="importingSettings">
+      <MavenImportingSettings>
+        <option name="importAutomatically" value="true" />
+      </MavenImportingSettings>
     </option>
   </component>
   <component name="MavenProjectNavigator">
     <treeState>
-      <expand />
+      <expand>
+        <path>
+          <item name="" type="16c1761:MavenProjectsStructure$RootNode" />
+          <item name="API" type="9519ce18:MavenProjectsStructure$ProjectNode" />
+        </path>
+        <path>
+          <item name="" type="16c1761:MavenProjectsStructure$RootNode" />
+          <item name="API" type="9519ce18:MavenProjectsStructure$ProjectNode" />
+          <item name="Dependencies" type="f4be9f2a:MavenProjectsStructure$DependenciesNode" />
+        </path>
+        <path>
+          <item name="" type="16c1761:MavenProjectsStructure$RootNode" />
+          <item name="Kauri" type="9519ce18:MavenProjectsStructure$ProjectNode" />
+        </path>
+        <path>
+          <item name="" type="16c1761:MavenProjectsStructure$RootNode" />
+          <item name="Kauri" type="9519ce18:MavenProjectsStructure$ProjectNode" />
+          <item name="Dependencies" type="f4be9f2a:MavenProjectsStructure$DependenciesNode" />
+        </path>
+      </expand>
       <select />
     </treeState>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="width" value="1919" />
-    <option name="height" value="1080" />
+    <option name="x" value="1912" />
+    <option name="y" value="-8" />
+    <option name="width" value="1936" />
+    <option name="height" value="1056" />
   </component>
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
       <pane id="PackagesPane" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -173,72 +706,175 @@
             <path>
               <item name="Kauri" type="b2602c69:ProjectViewProjectNode" />
               <item name="Kauri" type="462c0819:PsiDirectoryNode" />
-              <item name="Kauri" type="462c0819:PsiDirectoryNode" />
+              <item name="API" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="Kauri" type="b2602c69:ProjectViewProjectNode" />
               <item name="Kauri" type="462c0819:PsiDirectoryNode" />
-              <item name="Kauri" type="462c0819:PsiDirectoryNode" />
+              <item name="API" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="Kauri" type="b2602c69:ProjectViewProjectNode" />
               <item name="Kauri" type="462c0819:PsiDirectoryNode" />
-              <item name="Kauri" type="462c0819:PsiDirectoryNode" />
+              <item name="API" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="cc" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="Kauri" type="b2602c69:ProjectViewProjectNode" />
               <item name="Kauri" type="462c0819:PsiDirectoryNode" />
-              <item name="Kauri" type="462c0819:PsiDirectoryNode" />
+              <item name="API" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="cc" type="462c0819:PsiDirectoryNode" />
-              <item name="funkemunky" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="Kauri" type="b2602c69:ProjectViewProjectNode" />
               <item name="Kauri" type="462c0819:PsiDirectoryNode" />
-              <item name="Kauri" type="462c0819:PsiDirectoryNode" />
+              <item name="API" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="cc" type="462c0819:PsiDirectoryNode" />
-              <item name="funkemunky" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
               <item name="anticheat" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Kauri" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Kauri" type="462c0819:PsiDirectoryNode" />
+              <item name="API" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="anticheat" type="462c0819:PsiDirectoryNode" />
+              <item name="checks" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Kauri" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Kauri" type="462c0819:PsiDirectoryNode" />
+              <item name="API" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="anticheat" type="462c0819:PsiDirectoryNode" />
+              <item name="data" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Kauri" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Kauri" type="462c0819:PsiDirectoryNode" />
+              <item name="API" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="anticheat" type="462c0819:PsiDirectoryNode" />
+              <item name="tinyprotocol" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Kauri" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Kauri" type="462c0819:PsiDirectoryNode" />
+              <item name="API" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="anticheat" type="462c0819:PsiDirectoryNode" />
+              <item name="tinyprotocol" type="462c0819:PsiDirectoryNode" />
+              <item name="api" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Kauri" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Kauri" type="462c0819:PsiDirectoryNode" />
+              <item name="API" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="anticheat" type="462c0819:PsiDirectoryNode" />
+              <item name="tinyprotocol" type="462c0819:PsiDirectoryNode" />
+              <item name="reflection" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Kauri" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Kauri" type="462c0819:PsiDirectoryNode" />
+              <item name="API" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="anticheat" type="462c0819:PsiDirectoryNode" />
+              <item name="utils" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Kauri" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Kauri" type="462c0819:PsiDirectoryNode" />
+              <item name="Impl" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Kauri" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Kauri" type="462c0819:PsiDirectoryNode" />
+              <item name="Impl" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Kauri" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Kauri" type="462c0819:PsiDirectoryNode" />
+              <item name="Impl" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Kauri" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Kauri" type="462c0819:PsiDirectoryNode" />
+              <item name="Impl" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Kauri" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Kauri" type="462c0819:PsiDirectoryNode" />
+              <item name="Impl" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="anticheat" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Kauri" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Kauri" type="462c0819:PsiDirectoryNode" />
+              <item name="Impl" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="anticheat" type="462c0819:PsiDirectoryNode" />
+              <item name="checks" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Kauri" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Kauri" type="462c0819:PsiDirectoryNode" />
+              <item name="Impl" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="anticheat" type="462c0819:PsiDirectoryNode" />
+              <item name="data" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="Downloaded.Files.Path.Enabled" value="false" />
-    <property name="Repository.Attach.JavaDocs" value="false" />
-    <property name="Repository.Attach.Sources" value="false" />
-    <property name="SearchEverywhereHistoryKey" value="&#9;FILE&#9;file:///Users/dawson/Documents/GitHub/Kauri/src/cc/funkemunky/anticheat/api/checks/CheckManager.java&#10;PacketPlayOutEntityMetadata&#9;PSI&#9;JAVA://net.minecraft.server.v1_8_R3.PacketPlayOutEntityMetadata" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1550842503507" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="project.structure.last.edited" value="Libraries" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15820312" />
     <property name="project.structure.side.proportion" value="0.2" />
-    <property name="settings.editor.selected.configurable" value="reference.projectsettings.compiler.annotationProcessors" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyClassDialog.RECENTS_KEY">
-      <recent name="cc.funkemunky.anticheat.impl.checks.combat.aimassist" />
-      <recent name="cc.funkemunky.anticheat.impl.listeners" />
-      <recent name="cc.funkemunky.anticheat.api.events" />
-      <recent name="cc.funkemunky.anticheat.api.mongo" />
-    </key>
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\suckm\Documents\GitHub\Kauri\src\cc\funkemunky\anticheat\impl\checks" />
-      <recent name="C:\Users\suckm\Documents\GitHub\Kauri\src\cc\funkemunky\anticheat\impl\checks\movement" />
-      <recent name="C:\Users\suckm\Documents\GitHub\Kauri\src\cc\funkemunky\anticheat\impl\checks\combat\killaura" />
-      <recent name="C:\Users\suckm\Documents\GitHub\Kauri\src\cc\funkemunky\anticheat\impl\commands\kauri\arguments" />
-      <recent name="$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/commands/kauri/arguments" />
+      <recent name="C:\Users\suckm\Documents\GitHub\Kauri\API\src\main\java\cc\funkemunky\anticheat" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -258,47 +894,23 @@
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="851cd6bf-ff2d-422b-9065-7b08de60f34f" name="Default Changelist" comment="" />
-      <created>1547825443233</created>
+      <changelist id="30684be1-e859-4983-94b8-cb3a923c58fc" name="Default Changelist" comment="" />
+      <created>1562599013033</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1547825443233</updated>
-      <workItem from="1550499346216" duration="688000" />
-      <workItem from="1550758378001" duration="3969000" />
-      <workItem from="1550843803584" duration="193000" />
-      <workItem from="1550866356519" duration="5000" />
+      <updated>1562599013033</updated>
+      <workItem from="1562599015970" duration="3794000" />
+      <workItem from="1562602846772" duration="672000" />
     </task>
-    <task id="LOCAL-00001" summary="Added killaura and fly check">
-      <created>1549026003737</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1549026003737</updated>
-    </task>
-    <task id="LOCAL-00002" summary="forgot to register packets (started working on timer)">
-      <created>1549026248602</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1549026248603</updated>
-    </task>
-    <task id="LOCAL-00003" summary="Small edits">
-      <created>1549026902947</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1549026902947</updated>
-    </task>
-    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="4855000" />
+    <option name="totallyTimeSpent" value="4466000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <frame x="1912" y="-8" width="1936" height="1056" extended-state="6" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.26545843" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25266525" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -306,106 +918,366 @@
       <window_info id="Capture Tool" order="5" />
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.3274918" />
+      <window_info anchor="bottom" id="Find" order="1" />
       <window_info anchor="bottom" id="Run" order="2" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Terminal" order="7" />
-      <window_info anchor="bottom" id="Event Log" order="8" side_tool="true" />
-      <window_info anchor="bottom" id="Version Control" order="9" />
-      <window_info anchor="bottom" id="Messages" order="10" weight="0.3261105" />
-      <window_info anchor="bottom" id="Docker" order="11" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Database Changes" order="12" />
+      <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Version Control" order="8" />
+      <window_info anchor="bottom" id="Database Changes" order="9" />
+      <window_info anchor="bottom" id="Terminal" order="10" />
+      <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="Palette" order="3" />
-      <window_info anchor="right" id="Capture Analysis" order="4" />
-      <window_info anchor="right" id="Theme Preview" order="5" />
-      <window_info anchor="right" id="Palette&#9;" order="6" />
-      <window_info anchor="right" id="Maven Projects" order="7" weight="0.3297568" />
-      <window_info anchor="right" id="Maven" order="8" />
-      <window_info anchor="right" id="Database" order="9" />
+      <window_info anchor="right" id="Theme Preview" order="4" />
+      <window_info anchor="right" id="Maven" order="5" weight="0.32995737" />
+      <window_info anchor="right" id="Capture Analysis" order="6" />
+      <window_info anchor="right" id="Palette&#9;" order="7" />
+      <window_info anchor="right" id="Database" order="8" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
-  <component name="VcsContentAnnotationSettings">
-    <option name="myLimit" value="2678400000" />
-  </component>
-  <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added killaura and fly check" />
-    <MESSAGE value="forgot to register packets (started working on timer)" />
-    <MESSAGE value="Small edits" />
-    <option name="LAST_COMMIT_MESSAGE" value="Small edits" />
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/api/AbstractTinyProtocol.java</url>
+          <properties />
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimA.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/player/BadPacketsF.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimC.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/utils/MCSmooth.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/combat/killaura/KillauraE.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/NoFall.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/combat/killaura/KillauraH.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/combat/autoclicker/AutoclickerE.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/SpeedD.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/utils/CollisionAssessment.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/commands/kauri/arguments/DebugArgument.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/combat/reach/ReachD.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/combat/reach/ReachC.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/menu/MenuUtils.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/data/processors/MovementProcessor.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/data/processors/VelocityProcessor.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/listeners/FunkeListeners.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/listeners/PlayerConnectionListeners.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/data/logging/LoggerManager.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/data/stats/StatsManager.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/listeners/PacketListeners.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/data/PlayerData.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/commands/kauri/arguments/SaveArgument.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/commands/kauri/arguments/ReloadArgument.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/commands/kauri/arguments/MenuArgument.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/player/Timer.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/checks/CheckSettings.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/checks/Check.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/commands/kauri/arguments/LagArgument.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/commands/kauri/arguments/LogArgument.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/player/BadPacketsE.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/Kauri.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/combat/aimassist/AimB.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/combat/hitboxes/HitBox.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/combat/killaura/KillauraG.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/FastLadder.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/FlyA.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/FlyC.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/FlyD.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/FlyE.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/FlyF.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/GroundSpoof.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/SpeedA.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/SpeedB.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/VelocityC.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/utils/MiscUtils.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/api/checks/CheckManager.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/VelocityB.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/SpeedC.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/VelocityA.java" />
-    <entry file="file://$PROJECT_DIR$/src/cc/funkemunky/anticheat/impl/checks/movement/FlyB.java" />
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/blockbox/BlockBox.java">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/Commands.java">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/blockbox/impl/PistonBox.java">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/math/RollingAverageLong.java">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/packet/types/WrappedEnumParticle.java">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/packet/in/WrappedInBlockPlacePacket.java">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/packet/in/WrappedInHeldItemSlotPacket.java">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/packet/types/EnumDirection.java">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/packet/in/WrappedInSteerVehiclePacket.java">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/packet/in/WrappedInClientCommandPacket.java">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/api/ProtocolVersion.java">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/packet/out/WrappedOutKeepAlivePacket.java">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/profiling/ToggleableProfiler.java">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/profiling/Profiler.java">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/profiling/ResultsType.java">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/profiling/BaseProfiler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="11" column="51" selection-start-line="11" selection-start-column="51" selection-end-line="11" selection-end-column="51" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="657">
+          <caret line="45" column="30" selection-start-line="45" selection-start-column="30" selection-end-line="45" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="323">
+          <caret line="19" column="29" selection-start-line="19" selection-start-column="29" selection-end-line="19" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/api/AbstractTinyProtocol.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="e#0#479#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/api/TinyProtocol1_7.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-270">
+          <caret line="30" column="22" selection-start-line="30" selection-start-column="22" selection-end-line="30" selection-end-column="22" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/api/TinyProtocol1_8.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="510">
+          <caret line="30" column="22" selection-start-line="30" selection-start-column="22" selection-end-line="30" selection-end-column="22" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/packet/out/WrappedPacketPlayOutWorldParticle.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="351">
+          <caret line="46" column="31" selection-start-line="46" selection-start-column="31" selection-end-line="46" selection-end-column="31" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/math/StatisticalAnalysis.java">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/math/DynamicRollingAverage.java">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/math/Interval.java">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/EvictingList.java">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/MCSmooth.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="425">
+          <caret line="25" column="1" selection-start-line="25" selection-start-column="1" selection-end-line="25" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/Pastebin.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="773">
+          <caret line="116" selection-start-line="116" selection-end-line="116" />
+          <folding>
+            <element signature="e#4133#4134#0" expanded="true" />
+            <element signature="e#4179#4180#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/math/RayTrace.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="773">
+          <caret line="149" column="1" lean-forward="true" selection-start-line="149" selection-start-column="1" selection-end-line="149" selection-end-column="1" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1159#1160#0" expanded="true" />
+            <element signature="e#1240#1241#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/math/MathHelper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="6" column="13" selection-start-line="6" selection-start-column="13" selection-end-line="6" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/math/MathUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-3028">
+          <caret line="2" selection-start-line="2" selection-end-line="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/PastLocation.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="1" selection-start-line="1" selection-end-line="1" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/URLUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="340">
+          <caret line="21" selection-start-line="21" selection-end-line="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/MiscUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="22" column="13" selection-start-line="22" selection-start-column="13" selection-end-line="22" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/CustomLocation.java">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/data/DataManager.kt" />
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/data/DataManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="7" column="35" selection-start-line="7" selection-start-column="35" selection-end-line="7" selection-end-column="35" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Impl/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="340">
+          <caret line="20" column="29" selection-start-line="20" selection-start-column="29" selection-end-line="20" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Impl/src/main/java/cc/funkemunky/anticheat/data/SimpleDataManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="10" selection-start-line="10" selection-end-line="10" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#409#410#0" expanded="true" />
+            <element signature="e#431#432#0" expanded="true" />
+            <element signature="e#515#516#0" expanded="true" />
+            <element signature="e#543#544#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Impl/src/main/java/cc/funkemunky/anticheat/Kauri.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="297">
+          <caret line="24" column="44" selection-start-line="24" selection-start-column="44" selection-end-line="24" selection-end-column="44" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/utils/Priority.java" />
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/checks/Check.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="7" column="25" selection-start-line="7" selection-start-column="25" selection-end-line="7" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/checks/CallWrapper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="8" column="24" selection-start-line="8" selection-start-column="24" selection-end-line="8" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/checks/PacketMethod.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="51">
+          <caret line="3" column="27" selection-start-line="3" selection-start-column="27" selection-end-line="3" selection-end-column="27" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/api/TinyProtocolHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1513">
+          <caret line="93" column="18" selection-start-line="93" selection-start-column="18" selection-end-line="93" selection-end-column="18" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Impl/src/main/java/cc/funkemunky/anticheat/checks/Test.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="8" column="41" selection-start-line="8" selection-start-column="41" selection-end-line="8" selection-end-column="41" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/tinyprotocol/api/NMSObject.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="272">
+          <caret line="18" column="7" selection-start-line="18" selection-start-column="7" selection-end-line="18" selection-end-column="7" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/checks/CheckType.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="51">
+          <caret line="3" column="28" selection-start-line="3" selection-start-column="28" selection-end-line="3" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Impl/src/main/java/cc/funkemunky/anticheat/data/SimplePlayerData.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="8" column="25" selection-start-line="8" selection-start-column="25" selection-end-line="8" selection-end-column="25" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/data/PlayerData.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="340">
+          <caret line="22" selection-start-line="22" selection-end-line="22" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/cc/funkemunky/anticheat/checks/CheckManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="4" selection-start-line="4" selection-end-line="4" />
+        </state>
+      </provider>
+    </entry>
   </component>
   <component name="masterDetails">
     <states>
       <state key="ArtifactsStructureConfigurable.UI">
         <settings>
           <artifact-editor />
-          <last-edited>Kauri:jar</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
                 <option value="0.2" />
-                <option value="0.5" />
               </list>
             </option>
           </splitter-proportions>
@@ -413,7 +1285,6 @@
       </state>
       <state key="FacetStructureConfigurable.UI">
         <settings>
-          <last-edited>No facets are configured</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
@@ -436,7 +1307,6 @@
       </state>
       <state key="JdkListConfigurable.UI">
         <settings>
-          <last-edited>1.8</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
@@ -448,11 +1318,12 @@
       </state>
       <state key="ModuleStructureConfigurable.UI">
         <settings>
-          <last-edited>Kauri</last-edited>
+          <last-edited>API</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
                 <option value="0.2" />
+                <option value="0.6" />
               </list>
             </option>
           </splitter-proportions>
@@ -472,11 +1343,10 @@
       </state>
       <state key="ProjectLibrariesConfigurable.UI">
         <settings>
-          <last-edited>Atlas</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
-                <option value="0.2076566" />
+                <option value="0.2" />
               </list>
             </option>
           </splitter-proportions>
