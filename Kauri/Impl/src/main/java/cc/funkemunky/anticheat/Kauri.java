@@ -69,7 +69,7 @@ public class Kauri extends JavaPlugin {
     public ExecutorService dedicatedVPN = Executors.newSingleThreadExecutor();
     public long lastLogin;
 
-    private boolean testMode = false;
+    private boolean testMode = true;
 
     @Override
     public void onEnable() {

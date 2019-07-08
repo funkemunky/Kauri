@@ -53,14 +53,14 @@ public class PacketListeners implements AtlasListener {
                     data.getVelocityProcessor().setAttackedSinceVelocity(false);
                     data.setTeleportTest(System.currentTimeMillis());
                     hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
-                    if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
+                    //if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
                     break;
                 }
                 case Packet.Server.KEEP_ALIVE:
                     data.setLastKeepAlive(event.getTimeStamp());
                     TinyProtocolHandler.sendPacket(event.getPlayer(), new WrappedOutTransaction(0, (short) 69, false).getObject());
                     hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
-                    if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
+                    //if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
                     break;
                 case Packet.Server.TRANSACTION: {
                     WrappedOutTransaction packet = new WrappedOutTransaction(event.getPacket(), event.getPlayer());
@@ -69,7 +69,7 @@ public class PacketListeners implements AtlasListener {
                         data.setLastTransaction(event.getTimeStamp());
                     }
                     hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
-                    if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
+                   // if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
                     break;
                 }
                 case Packet.Server.ENTITY_VELOCITY: {
@@ -77,7 +77,7 @@ public class PacketListeners implements AtlasListener {
 
                     data.getVelocityProcessor().update(packet);
                     hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
-                    if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
+                   // if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
                     break;
                 }
                 case Packet.Server.ENTITY_METADATA: {
@@ -102,12 +102,12 @@ public class PacketListeners implements AtlasListener {
                             event.setPacket(toSet.getObject());
                         }
                     }
-                    if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
+                   // if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
                     break;
                 }
                 case Packet.Server.ABILITIES: {
                     hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
-                    if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
+                    //if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
                     break;
                 }
             }
@@ -242,7 +242,7 @@ public class PacketListeners implements AtlasListener {
             }
             //debug(event.getType(), data);
             hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
-            if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
+            //if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
         }
         Kauri.getInstance().getProfiler().stop("event:PacketReceiveEvent");
     }
