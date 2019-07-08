@@ -45,12 +45,17 @@ public class BadPacketsG extends Check {
             return;
         }
 
-        if(!getData().isLagging()) this.statisticalAnalysis.addValue(timeStamp - lastFlying);
+        if(!getData().isLagging() && timeStamp - lastFlying > 5) {
+            this.statisticalAnalysis.addValue(timeStamp - lastFlying);
+        } else {
+            lastFlying = timeStamp;
+            return;
+        }
 
         val max = usingPaper ? 7.071f : Math.sqrt(Kauri.getInstance().getTickElapsed());
         val stdDev = this.statisticalAnalysis.getStdDev();
 
-        if (!MathUtils.approxEquals(deltaBalance, max, stdDev) && !getData().isLagging() && stdDev < max && getData().getLastLag().hasNotPassed(10)) {
+        if (!MathUtils.approxEquals(deltaBalance, max, stdDev) && !getData().isLagging() && stdDev < max && getData().getLastLag().hasPassed(10)) {
             if (vl++ > maxVL) {
                 this.flag("S: " + stdDev, false, true, vl > 60 ? AlertTier.HIGH : AlertTier.LIKELY);
             }
