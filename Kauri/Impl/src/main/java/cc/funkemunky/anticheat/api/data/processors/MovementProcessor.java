@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.api.data.processors;
 
+import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.utils.CollisionAssessment;
 import cc.funkemunky.anticheat.api.utils.CustomLocation;
@@ -32,9 +33,10 @@ public class MovementProcessor {
     private PastLocation pastLocation = new PastLocation();
     private TickTimer lastRiptide = new TickTimer(6), lastVehicle = new TickTimer(4), lastFlightToggle = new TickTimer(10);
     private List<BoundingBox> boxes = new ArrayList<>();
-    private long lastTimeStamp, lookTicks, lagTicks;
+    private long lastTimeStamp, lookTicks, lagTicks, pitchGCD, yawGCD, offset = 16777216L;
 
     public void update(PlayerData data, WrappedInFlyingPacket packet) {
+        Kauri.getInstance().getProfiler().start("data:MovementProcessor");
         val player = packet.getPlayer();
 
         if(player == null) return;
@@ -237,12 +239,14 @@ public class MovementProcessor {
             float yawDelta = this.yawDelta = MathUtils.getDelta(to.getYaw(), from.getYaw()), pitchDelta = this.pitchDelta = MathUtils.getDelta(to.getPitch(), from.getPitch());
             float smooth = data.getYawSmooth().smooth(yawDelta, MiscUtils.convertToMouseDelta(yawDelta)), smooth2 = data.getPitchSmooth().smooth(pitchDelta, MiscUtils.convertToMouseDelta(pitchDelta));
             if(data.isLoggedIn()) data.setLoggedIn(false);
-            val smoothDelta = MathUtils.getDelta(yawDelta, smooth);
-            val smoothDelta2 = MathUtils.getDelta(pitchDelta, smooth2);
+            float smoothDelta = MathUtils.getDelta(yawDelta, smooth);
+            float smoothDelta2 = MathUtils.getDelta(pitchDelta, smooth2);
 
             data.setCinematicMode((smoothDelta / yawDelta) < 0.1 || (smoothDelta2) < 0.02);
 
             lookTicks++;
+            yawGCD = MiscUtils.gcd((long) (yawDelta * offset), (long) (lastYawDelta * offset));
+            pitchGCD = MiscUtils.gcd((long) (pitchDelta * offset), (long) (lastPitchDelta * offset));
 
             //Bukkit.broadcastMessage(smoothDelta + "," + smoothDelta2 + ": " + "(" + smoothDelta / yawDelta + "), " + "(" + (smoothDelta2 / pitchDelta) + "): " + data.isCinematicMode());
             if (data.isCinematicMode()) {
@@ -267,5 +271,6 @@ public class MovementProcessor {
 
         pastLocation.addLocation(new CustomLocation(to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch()));
         data.setGeneralCancel(serverPos || data.isServerPos() || data.isLagging() || getLastFlightToggle().hasNotPassed(8) || !chunkLoaded || packet.getPlayer().getAllowFlight() || packet.getPlayer().getActivePotionEffects().stream().anyMatch(effect -> effect.getType().getName().toLowerCase().contains("levi")) || packet.getPlayer().getGameMode().toString().contains("CREATIVE") || packet.getPlayer().getGameMode().toString().contains("SPEC") || lastVehicle.hasNotPassed() || getLastRiptide().hasNotPassed(10) || data.getLastLogin().hasNotPassed(50) || data.getVelocityProcessor().getLastVelocity().hasNotPassed(25));
+        Kauri.getInstance().getProfiler().stop("data:MovementProcessor");
     }
 }

@@ -3,6 +3,7 @@ package cc.funkemunky.anticheat.impl.listeners;
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.data.PlayerData;
+import cc.funkemunky.anticheat.api.utils.CustomLocation;
 import cc.funkemunky.anticheat.impl.config.CheckSettings;
 import cc.funkemunky.api.events.AtlasListener;
 import cc.funkemunky.api.events.Listen;
@@ -51,11 +52,15 @@ public class PacketListeners implements AtlasListener {
                     data.getVelocityProcessor().velocityX = data.getVelocityProcessor().velocityY = data.getVelocityProcessor().velocityZ = 0;
                     data.getVelocityProcessor().setAttackedSinceVelocity(false);
                     data.setTeleportTest(System.currentTimeMillis());
+                    hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
+                    if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
                     break;
                 }
                 case Packet.Server.KEEP_ALIVE:
                     data.setLastKeepAlive(event.getTimeStamp());
                     TinyProtocolHandler.sendPacket(event.getPlayer(), new WrappedOutTransaction(0, (short) 69, false).getObject());
+                    hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
+                    if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
                     break;
                 case Packet.Server.TRANSACTION: {
                     WrappedOutTransaction packet = new WrappedOutTransaction(event.getPacket(), event.getPlayer());
@@ -63,12 +68,16 @@ public class PacketListeners implements AtlasListener {
                     if (packet.getAction() == (short) 69) {
                         data.setLastTransaction(event.getTimeStamp());
                     }
+                    hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
+                    if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
                     break;
                 }
                 case Packet.Server.ENTITY_VELOCITY: {
                     WrappedOutVelocityPacket packet = new WrappedOutVelocityPacket(event.getPacket(), event.getPlayer());
 
                     data.getVelocityProcessor().update(packet);
+                    hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
+                    if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
                     break;
                 }
                 case Packet.Server.ENTITY_METADATA: {
@@ -93,13 +102,15 @@ public class PacketListeners implements AtlasListener {
                             event.setPacket(toSet.getObject());
                         }
                     }
+                    if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
+                    break;
+                }
+                case Packet.Server.ABILITIES: {
+                    hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
+                    if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
                     break;
                 }
             }
-
-            hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
-            //debug(event.getType(), data);
-            //1if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
 
         }
         Kauri.getInstance().getProfiler().stop("event:PacketSendEvent");
@@ -107,157 +118,142 @@ public class PacketListeners implements AtlasListener {
 
     @Listen(priority = ListenerPriority.LOW)
     public void onEvent(PacketReceiveEvent event) {
-        Kauri.getInstance().getCheckManager().getCheckExecutor().execute(() -> {
-            if (event.getPlayer() == null || !Kauri.getInstance().getDataManager().getDataObjects().containsKey(event.getPlayer().getUniqueId()))
-                return;
+        if (event.getPlayer() == null || !Kauri.getInstance().getDataManager().getDataObjects().containsKey(event.getPlayer().getUniqueId()))
+            return;
 
-            Kauri.getInstance().getProfiler().start("event:PacketReceiveEvent");
-            PlayerData data = Kauri.getInstance().getDataManager().getPlayerData(event.getPlayer().getUniqueId());
+        Kauri.getInstance().getProfiler().start("event:PacketReceiveEvent");
+        PlayerData data = Kauri.getInstance().getDataManager().getPlayerData(event.getPlayer().getUniqueId());
 
-            Player player = Bukkit.getPlayer(event.getPlayer().getUniqueId());
+        Player player = Bukkit.getPlayer(event.getPlayer().getUniqueId());
 
-            if (data != null) {
-                switch (event.getType()) {
-                    //AimH use transaction packets for checking transPing rather than keepAlives since there really isn't anyone who would spoof the times of these.
-                    case Packet.Client.TRANSACTION: {
-                        WrappedInTransactionPacket packet = new WrappedInTransactionPacket(event.getPacket(), player);
+        if (data != null) {
+            switch (event.getType()) {
+                //AimE use transaction packets for checking transPing rather than keepAlives since there really isn't anyone who would spoof the times of these.
+                case Packet.Client.TRANSACTION: {
+                    WrappedInTransactionPacket packet = new WrappedInTransactionPacket(event.getPacket(), player);
 
-                        if (packet.getAction() == (short) 69) {
-                            data.setLastTransPing(data.getTransPing());
-                            data.setTransPing(event.getTimeStamp() - data.getLastTransaction());
+                    if (packet.getAction() == (short) 69) {
+                        data.setLastTransPing(data.getTransPing());
+                        data.setTransPing(event.getTimeStamp() - data.getLastTransaction());
 
-                            //We use transPing for checking lag since the packet used is little known.
-                            //AimH have not seen anyone create a spoof for it or even talk about the possibility of needing one.
-                            //Large jumps in latency most of the intervalTime mean lag.
-                            data.setLagging(Math.abs(data.getTransPing() - data.getLastTransPing()) > 40);
+                        //We use transPing for checking lag since the packet used is little known.
+                        //AimE have not seen anyone create a spoof for it or even talk about the possibility of needing one.
+                        //Large jumps in latency most of the intervalTime mean lag.
+                        data.setLagging(Math.abs(data.getTransPing() - data.getLastTransPing()) > 40);
 
-                            if (data.isLagging()) data.getLastLag().reset();
+                        if (data.isLagging()) data.getLastLag().reset();
+                    }
+                    break;
+                }
+                case Packet.Client.ENTITY_ACTION: {
+                    WrappedInEntityActionPacket packet = new WrappedInEntityActionPacket(event.getPacket(), player);
+
+                    data.getActionProcessor().update(packet);
+                    break;
+                }
+                case Packet.Client.CLOSE_WINDOW: {
+                    WrappedInCloseWindowPacket packet = new WrappedInCloseWindowPacket(event.getPacket(), player);
+
+                    data.getActionProcessor().update(packet);
+                    break;
+                }
+                case Packet.Client.KEEP_ALIVE: {
+                    data.setLastPing(data.getPing());
+                    data.setPing(event.getTimeStamp() - data.getLastKeepAlive());
+                    break;
+                }
+                case Packet.Client.ABILITIES: {
+                    WrappedInAbilitiesPacket packet = new WrappedInAbilitiesPacket(event.getPacket(), player);
+
+                    data.setAbleToFly(packet.isAllowedFlight());
+                    data.setCreativeMode(packet.isCreativeMode());
+                    data.setInvulnerable(packet.isInvulnerable());
+                    data.setFlying(packet.isFlying());
+                    data.setWalkSpeed(packet.getWalkSpeed());
+                    data.setFlySpeed(packet.getFlySpeed());
+                    break;
+                }
+                case Packet.Client.POSITION:
+                case Packet.Client.POSITION_LOOK:
+                case Packet.Client.LOOK:
+                case Packet.Client.FLYING: {
+                    WrappedInFlyingPacket packet = new WrappedInFlyingPacket(event.getPacket(), player);
+
+                    data.getMovementProcessor().update(data, packet);
+                    data.getVelocityProcessor().update(packet);
+                    if (data.getMovementProcessor().getTo() == null) return;
+                    if(data.getTarget() != null) {
+                        data.setEntityFrom(data.getEntityTo());
+                        data.setEntityTo(new CustomLocation(data.getTarget().getLocation()));
+                        data.getEntityPastLocation().addLocation(data.getEntityTo());
+                    }
+                    break;
+                }
+                case Packet.Client.BLOCK_DIG: {
+                    WrappedInBlockDigPacket blockDig = new WrappedInBlockDigPacket(event.getPacket(), player);
+
+                    switch (blockDig.getAction()) {
+                        case START_DESTROY_BLOCK:
+                            data.getLastBlockBreak().reset();
+                            data.setBreakingBlock(true);
+                            break;
+                        case ABORT_DESTROY_BLOCK:
+                        case STOP_DESTROY_BLOCK:
+                            data.setBreakingBlock(false);
+                            break;
+                    }
+                    break;
+                }
+                case Packet.Client.BLOCK_PLACE: {
+                    WrappedInBlockPlacePacket packet = new WrappedInBlockPlacePacket(event.getPacket(), player);
+
+                    if (packet.getItemStack() != null && packet.getPosition() != null && packet.getPosition().getX() != -1 && packet.getPosition().getY() != -1 && packet.getPosition().getZ() != -1) {
+                        Location location = new Location(packet.getPlayer().getWorld(), packet.getPosition().getX(), packet.getPosition().getY(), packet.getPosition().getZ());
+
+                        val block = BlockUtils.getBlock(location);
+                        if (location.distance(packet.getPlayer().getLocation()) < 15 && block != null && (block.getType().isSolid() || BlockUtils.isLiquid(block))) {
+                            data.getLastBlockPlace().reset();
                         }
-                        break;
                     }
-                    case Packet.Client.ENTITY_ACTION: {
-                        WrappedInEntityActionPacket packet = new WrappedInEntityActionPacket(event.getPacket(), player);
+                    break;
+                }
+                case Packet.Client.USE_ENTITY: {
+                    WrappedInUseEntityPacket packet = new WrappedInUseEntityPacket(event.getPacket(), player);
 
-                        data.getActionProcessor().update(packet);
-                        break;
-                    }
-                    case Packet.Client.CLOSE_WINDOW: {
-                        WrappedInCloseWindowPacket packet = new WrappedInCloseWindowPacket(event.getPacket(), player);
+                    if (packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) {
+                        val entity = packet.getEntity();
+                        if (entity instanceof LivingEntity) {
+                            data.getLastAttack().reset();
+                            if(data.getTarget() != null && !data.getTarget().getUniqueId().equals(entity.getUniqueId())) data.getEntityPastLocation().getPreviousLocations().clear();
+                            data.setTarget((LivingEntity) entity);
 
-                        data.getActionProcessor().update(packet);
-                        break;
-                    }
-                    case Packet.Client.KEEP_ALIVE: {
-                        data.setLastPing(data.getPing());
-                        data.setPing(event.getTimeStamp() - data.getLastKeepAlive());
-                        break;
-                    }
-                    case Packet.Client.ABILITIES: {
-                        WrappedInAbilitiesPacket packet = new WrappedInAbilitiesPacket(event.getPacket(), player);
+                            if (entity instanceof Player) {
+                                PlayerData dataEntity = Kauri.getInstance().getDataManager().getPlayerData(entity.getUniqueId());
 
-                        data.setAbleToFly(packet.isAllowedFlight());
-                        data.setCreativeMode(packet.isCreativeMode());
-                        data.setInvulnerable(packet.isInvulnerable());
-                        data.setFlying(packet.isFlying());
-                        data.setWalkSpeed(packet.getWalkSpeed());
-                        data.setFlySpeed(packet.getFlySpeed());
-                        break;
-                    }
-                    case Packet.Client.POSITION:
-                    case Packet.Client.POSITION_LOOK:
-                    case Packet.Client.LOOK:
-                    case Packet.Client.FLYING: {
-                        WrappedInFlyingPacket packet = new WrappedInFlyingPacket(event.getPacket(), player);
-
-                        data.getMovementProcessor().update(data, packet);
-                        data.getVelocityProcessor().update(packet);
-                        if (data.getMovementProcessor().getTo() == null) return;
-                        break;
-                    }
-                    case Packet.Client.BLOCK_DIG: {
-                        WrappedInBlockDigPacket blockDig = new WrappedInBlockDigPacket(event.getPacket(), player);
-
-                        switch (blockDig.getAction()) {
-                            case START_DESTROY_BLOCK:
-                                data.getLastBlockBreak().reset();
-                                data.setBreakingBlock(true);
-                                break;
-                            case ABORT_DESTROY_BLOCK:
-                            case STOP_DESTROY_BLOCK:
-                                data.setBreakingBlock(false);
-                                break;
-                        }
-                        break;
-                    }
-                    case Packet.Client.BLOCK_PLACE: {
-                        WrappedInBlockPlacePacket packet = new WrappedInBlockPlacePacket(event.getPacket(), player);
-
-                        if (packet.getItemStack() != null && packet.getPosition() != null && packet.getPosition().getX() != -1 && packet.getPosition().getY() != -1 && packet.getPosition().getZ() != -1) {
-                            Location location = new Location(packet.getPlayer().getWorld(), packet.getPosition().getX(), packet.getPosition().getY(), packet.getPosition().getZ());
-
-                            val block = BlockUtils.getBlock(location);
-                            if (location.distance(packet.getPlayer().getLocation()) < 15 && block != null && (block.getType().isSolid() || BlockUtils.isLiquid(block))) {
-                                data.getLastBlockPlace().reset();
-                            }
-                        }
-                        break;
-                    }
-                    case Packet.Client.USE_ENTITY: {
-                        WrappedInUseEntityPacket packet = new WrappedInUseEntityPacket(event.getPacket(), player);
-
-                        if (packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) {
-                            val entity = packet.getEntity();
-                            if (entity instanceof LivingEntity) {
-                                data.getLastAttack().reset();
-                                if(data.getTarget() != null && !data.getTarget().getUniqueId().equals(entity.getUniqueId())) data.getEntityPastLocation().getPreviousLocations().clear();
-                                data.setTarget((LivingEntity) entity);
-
-                                if (entity instanceof Player) {
-                                    PlayerData dataEntity = Kauri.getInstance().getDataManager().getPlayerData(entity.getUniqueId());
-
-                                    if (dataEntity != null) {
-                                        dataEntity.setAttacker(packet.getPlayer());
-                                    }
+                                if (dataEntity != null) {
+                                    dataEntity.setAttacker(packet.getPlayer());
                                 }
                             }
                         }
-                        data.getVelocityProcessor().update(packet);
-                        break;
                     }
+                    data.getVelocityProcessor().update(packet);
+                    break;
                 }
-                //debug(event.getType(), data);
-                hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
-                //if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
             }
-            Kauri.getInstance().getProfiler().stop("event:PacketReceiveEvent");
-        });
+            //debug(event.getType(), data);
+            hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
+            if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
+        }
+        Kauri.getInstance().getProfiler().stop("event:PacketReceiveEvent");
     }
 
     private void hopper(Object packet, String packetType, long timeStamp, PlayerData data) {
         if ((!CheckSettings.bypassEnabled || !data.getPlayer().hasPermission(CheckSettings.bypassPermission)) && !Kauri.getInstance().getCheckManager().isBypassing(data.getUuid())) {
-            if(data.getPacketChecks().containsKey(packetType)) {
-                //long test = System.nanoTime();
-                data
-                        .getPacketChecks()
-                        .getOrDefault(packetType, new ArrayList<>())
-                        .stream().filter(Check::isEnabled)
-                        .forEach(check ->
-                {
-                    Kauri.getInstance()
-                            .getProfiler()
-                            .start("check:" +
-                            check.getName() + "#"
-                            + packetType);
-                    check
-                            .onPacket(packet, packetType, timeStamp);
-                    Kauri.getInstance()
-                            .getProfiler()
-                            .stop("check:" +
-                                    check.getName()  + "#"
-                                    + packetType);
-                });
-                //Bukkit.broadcastMessage(MathUtils.round((System.nanoTime() - test) / 1000000F, 4)  + "ms: " + packetType);
-            }
+            Kauri.getInstance().getProfiler().start("checks:" + packetType);
+            data.getChecks().stream()
+                    .filter(check -> check.isEnabled() && check.getPackets().contains(packetType))
+                    .forEach(check -> check.onPacket(packet, packetType, timeStamp));
+            Kauri.getInstance().getProfiler().stop("checks:" + packetType);
         }
     }
 
@@ -272,6 +268,8 @@ public class PacketListeners implements AtlasListener {
     }
 
     private boolean hopperPup(Object packet, String packetType, long timestamp, PlayerData data) {
-        return data.getAntiPupMethods().getOrDefault(packetType, new ArrayList<>()).stream().anyMatch(pup -> pup.onPacket(packet, packetType, timestamp));
+        return data.getAntiPUP().stream()
+                .filter(pup -> pup.isEnabled() && pup.packets.contains(packetType))
+                .anyMatch(pup -> pup.onPacket(packet, packetType, timestamp));
     }
 }

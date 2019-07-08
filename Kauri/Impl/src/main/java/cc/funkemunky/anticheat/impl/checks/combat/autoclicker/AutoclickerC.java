@@ -1,64 +1,60 @@
 package cc.funkemunky.anticheat.impl.checks.combat.autoclicker;
 
 import cc.funkemunky.anticheat.api.checks.*;
-import cc.funkemunky.anticheat.api.utils.DynamicRollingAverage;
+import cc.funkemunky.anticheat.api.utils.Interval;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import lombok.val;
 import org.bukkit.event.Event;
 
-@Packets(packets = {
-        Packet.Client.ARM_ANIMATION,
-        Packet.Client.FLYING,
+
+@Packets(packets = {Packet.Client.FLYING,
         Packet.Client.POSITION,
         Packet.Client.POSITION_LOOK,
-        Packet.Client.LOOK})
+        Packet.Client.LOOK,
+        Packet.Client.ARM_ANIMATION})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Autoclicker (Type C)", description = "An overall average CPS check.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 20, executable = false)
+@CheckInfo(name = "Autoclicker (Type C)", description = "Checks for very common autoclicker mistakes.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, executable = false, maxVL = 20)
 public class AutoclickerC extends Check {
 
-
-    private final DynamicRollingAverage cpsAverage = new DynamicRollingAverage(5);
-    private int cps, ticks;
-    private double vl;
+    private int cps, ticks, vl;
+    private Interval fraction = new Interval(0, 5);
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         if (packetType.contains("Position") || packetType.contains("Look") || packetType.equals(Packet.Client.FLYING)) {
+            if (MiscUtils.shouldReturnArmAnimation(getData())) return;
             if (++ticks == 20) {
                 if (cps > 0) {
-                    cpsAverage.add(cps);
+                    fraction.add(cps);
 
-                    val average = cpsAverage.getAverage();
+                    val maxCps = fraction.max();
+                    val minCps = fraction.min();
 
-                    if (average >= 9.0) {
-                        if (Math.round(average) == average || Math.round(average) == average - 0.5) {
-                            if (++vl > 10) {
-                                flag(average + " -> " + (double) Math.round(average) + " -> " + "0.0", false, true, AlertTier.LIKELY);
-                                getData().getTypeC().flag(10, 8000L);
-                            }
-                        } else {
-                            vl -= vl > 0 ? 1 : 0;
+                    val averageCps = fraction.average();
+
+                    if (averageCps >= 8.0 && averageCps < 17 && maxCps == minCps && getData().getMovementProcessor().getLagTicks() == 0) {
+                        if ((vl += 2) > 12.0) {
+                            flag("t: " + vl, true, true, AlertTier.LIKELY);
+                            getData().getTypeD().flag(5, 8000L);
+                        } else if(vl > 7) {
+                            flag("t: " + vl, true, false, AlertTier.POSSIBLE);
+                            getData().getTypeD().flag(5, 8000L);
                         }
                     } else {
-                        vl -= vl > 0 ? 0.25 : 0;
+                        vl = Math.max(vl - 1, 0);
                     }
 
-                    if (cpsAverage.isReachedSize()) {
-                        cpsAverage.clearValues();
-                    }
+                    debug("AVERAGE: " + averageCps + " VL: " + vl + " MAX: " + maxCps + " MIN: " + minCps);
                 }
 
-                cps = 0;
                 ticks = 0;
-
-                debug("AV: " + cpsAverage.getAverage() + " VL: " + vl);
+                cps = 0;
+                fraction.clearIfMax();
             }
         } else if (!MiscUtils.shouldReturnArmAnimation(getData())) {
-            cps++;
-        } else {
-            cps = ticks = 0;
+            ++cps;
         }
     }
 

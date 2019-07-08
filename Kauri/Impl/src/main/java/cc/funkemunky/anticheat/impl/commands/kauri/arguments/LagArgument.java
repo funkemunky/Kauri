@@ -106,6 +106,7 @@ public class LagArgument extends FunkeArgument {
                                 totalMS.updateAndGet(v -> (v + ms));
                                 body.add("PCT: "  + MathUtils.round(ms / 50D * 100, 4));
                                 body.add("MS: " + ms + "ms");
+                                body.add("Calls:" + Kauri.getInstance().getProfiler().calls.get(key));
                             });
                     body.add("Total PCT: " +  MathUtils.round(totalMS.get() / 50 * 100, 4) + "%");
                     body.add("Total Time: " + totalMS + "ms");
@@ -220,20 +221,11 @@ public class LagArgument extends FunkeArgument {
         sender.sendMessage(Color.translate(memory.replace("%free%", String.valueOf(freeMem)).replace("%total%", String.valueOf(totalMem))));
         sender.sendMessage("");
         sender.sendMessage(Color.translate(kauriRes));
-        val results = Kauri.getInstance().getProfiler().results(ResultsType.TOTAL);
-
-        AtomicReference<Double> totalMS = new AtomicReference<>((double) 0);
         long totalTime = System.currentTimeMillis() - Kauri.getInstance().getProfileStart();
-        results.keySet().stream()
-                .sorted(Comparator.comparing(key -> results.get(key) / Kauri.getInstance().getProfiler().calls.get(key), Comparator.reverseOrder()))
-                .forEachOrdered(key -> {
-                    double msTotal = results.get(key);
-                    double ms =  msTotal / (totalTime / 50f);
-                    totalMS.updateAndGet(v -> (v + ms));
-                });
-        sender.sendMessage(Color.translate(pctUsage.replace("%pct%", String.valueOf(MathUtils.round(totalMS.get() / 50 * 100, 4)))));
+        double totalMS = Kauri.getInstance().getProfiler().samples.keySet().stream().mapToDouble(key -> Kauri.getInstance().getProfiler().samples.get(key) / 1000000D).sum();
+        sender.sendMessage(Color.translate(pctUsage.replace("%pct%", ((totalMS / totalTime / (50D / totalTime)) / 50) * 100 + "")));
         float cps = Kauri.getInstance().getProfiler().totalCalls / (float) totalTime;
-        sender.sendMessage(Color.translate(callsPS.replace("%calls%", String.valueOf(MathUtils.round(cps, 1)))));
+        sender.sendMessage(Color.translate(callsPS.replace("%calls%", String.valueOf(totalMS / totalTime / (50D / totalTime)))));
         sender.sendMessage(MiscUtils.line(lineColor));
     }
 }

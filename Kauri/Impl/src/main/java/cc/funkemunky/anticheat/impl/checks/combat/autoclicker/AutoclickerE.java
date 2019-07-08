@@ -4,61 +4,77 @@ import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockDigPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
 import org.bukkit.event.Event;
 
-@Packets(packets = {
-        Packet.Client.FLYING,
-        Packet.Client.POSITION,
-        Packet.Client.POSITION_LOOK,
-        Packet.Client.LOOK,
-        Packet.Client.ARM_ANIMATION,
-        Packet.Client.BLOCK_DIG})
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+@Packets(packets = {Packet.Client.ARM_ANIMATION})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Autoclicker (Type E)", description = "An unreasonable amount of CPS while breaking a block.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 20)
+@CheckInfo(name = "Autoclicker (Type E)", description = "A normal click consistency check.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 50, executable = false)
 public class AutoclickerE extends Check {
 
-    private boolean sent;
+    private long lastTS;
+    private double lastAverage;
     private int vl;
-    private long lastArm, lastRange;
+    private List<Long> msList = new ArrayList<>();
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if (MiscUtils.shouldReturnArmAnimation(getData())) return;
-        if (packet instanceof WrappedInBlockDigPacket) {
-            val digPacket = (WrappedInBlockDigPacket) packet;
-
-            val digType = digPacket.getAction();
-
-            switch (digType) {
-                case START_DESTROY_BLOCK: {
-                    sent = true;
-                    break;
-                }
-                case ABORT_DESTROY_BLOCK: {
-                    if (sent && lastRange > 10L) {
-                        if (++vl >= 10) {
-                            this.flag("V: " + vl, false, true, AlertTier.HIGH);
-                        }
-                    }
-                    break;
-                }
-            }
-        } else if (Packet.isPositionLook(packetType) || Packet.isPosition(packetType) || Packet.isLook(packetType) || packet instanceof WrappedInFlyingPacket) {
-            sent = false;
-        } else if (packetType.equals(Packet.Client.ARM_ANIMATION)) {
-            val now = System.currentTimeMillis();
-            val delay = now - this.lastArm;
-
-            this.lastArm = now;
-            this.lastRange = delay;
+        if(MiscUtils.shouldReturnArmAnimation(getData())) {
+            lastTS = timeStamp;
+            msList.clear();
+            return;
         }
+
+        long delta = timeStamp - lastTS;
+
+        if(msList.size() >= 20) {
+            double average = msList.stream().mapToDouble(lon -> lon).average().getAsDouble();
+
+            if(MathUtils.getDelta(average, lastAverage) < 3 && average < 180) {
+                if((vl = Math.min(12, vl + 1)) > 4) {
+                    flag(average + "=" + lastAverage + ", vl=" + vl, true, true, vl > 8 ? AlertTier.HIGH : AlertTier.LIKELY);
+                }
+            } else vl-= vl > 0 ? 1 : 0;
+
+            lastAverage = average;
+            msList.clear();
+        } else msList.add(delta);
+
+        lastTS = timeStamp;
     }
+
 
     @Override
     public void onBukkitEvent(Event event) {
 
+    }
+
+    private long getRange(List<Long> list) {
+        List<Long> use = new ArrayList<>(list);
+        Collections.sort(use);
+
+        return MathUtils.getDelta(use.get(0), use.get(use.size() - 1));
+    }
+
+    private double getAverageCPS(List<Long> list) {
+        List<Double> use = new ArrayList<>();
+
+        list.forEach(value -> use.add(1000D / value));
+
+        double total = 0;
+
+        for (double value : use) {
+            total += value;
+        }
+
+        total /= use.size();
+
+        return total;
     }
 }

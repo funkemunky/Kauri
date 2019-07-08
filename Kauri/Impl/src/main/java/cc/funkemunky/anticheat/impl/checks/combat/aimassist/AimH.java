@@ -1,41 +1,44 @@
 package cc.funkemunky.anticheat.impl.checks.combat.aimassist;
 
-import cc.funkemunky.anticheat.api.checks.*;
-import cc.funkemunky.anticheat.api.utils.MiscUtils;
+import cc.funkemunky.anticheat.api.checks.AlertTier;
+import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
+import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
-import cc.funkemunky.anticheat.api.utils.Setting;
-import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
+import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
+import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
 import org.bukkit.event.Event;
 
-@Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LOOK})
 @Init
-@CheckInfo(name = "Aim (Type H)", description = "Checks for low common denominators in other rotations - FlyCode.", type = CheckType.AIM, cancelType = CancelType.MOTION, executable = false)
+@CheckInfo(name = "AimA (Type H)", description = "Designed to detect Vape's Aimassist while vertical aim is off.", type = CheckType.AIM)
+@Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LOOK})
 public class AimH extends Check {
 
-    private Verbose verbose = new Verbose();
-
-    @Setting(name = "combatOnly")
-    private boolean combatOnly = true;
-
+    private double vl;
+    private float lastAccel;
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if (!MiscUtils.canDoCombat(combatOnly, getData())) return;
+        val move = getData().getMovementProcessor();
 
-        val yawDifference = getData().getMovementProcessor().getYawDelta();
+        val accelYaw = MathUtils.getDelta(move.getYawDelta(), move.getLastYawDelta());
+        val delta = MathUtils.getDelta(accelYaw, lastAccel);
+        /*val pitchGCD = MiscUtils.gcd((long) (16777216L * move.getPitchDelta()), (long) (16777216L * move.getLastPitchDelta())) / 16777216F;
 
-        val offset = 16777216L;
-        val yawGCD = MiscUtils.gcd((long) ((yawDifference) * offset), (long) ((getData().getMovementProcessor().getLastYawDelta()) * offset));
+        if((MathUtilsDL.getDelta(accelYaw, yawGCD) < 1E-5 || (MathUtilsDL.getDelta(accelPitch, pitchGCD) < 1E-5 && accelPitch > pitchGCD * 2)) && move.getYawDelta() > 0.7 && getData().isCinematicMode() && delta > 0.01) {
+            debug(Color.Green + "Flag: " + vl++);
+            debug("[" + accelYaw + ", " + yawGCD + "] , [" + accelPitch + ", " + pitchGCD + "] " + move.getYawDelta());
+        } else vl-= vl > 0 ? 0.25 : 0;*/
 
-        if (yawGCD < 1E6 && yawDifference > 0 && !getData().isCinematicMode()) {
-            if (verbose.flag(100, 200L)) {
-                flag("t: " + verbose.getVerbose() + " l: " + String.valueOf(yawGCD).length(), true, true, AlertTier.HIGH);
+        if(delta > 1E-4 && getData().isCinematicMode() && move.getPitchDelta() == 0 && move.getYawDelta() > 0.8) {
+            if(vl++ > 20) {
+                flag("test", true, true, AlertTier.HIGH);
             }
-        } else verbose.deduct();
-
-        debug(verbose.getVerbose() + ", " + yawGCD + ", " + getData().isCinematicMode());
+            debug(Color.Green + "VL: " +  vl);
+        } else vl-= vl > 0 ? 0.25 : 0;
+        lastAccel = accelYaw;
     }
 
     @Override

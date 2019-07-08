@@ -14,7 +14,7 @@ import org.bukkit.event.Event;
 import java.util.Comparator;
 
 @Packets(packets = {Packet.Client.USE_ENTITY})
-@Init
+//@Init
 @CheckInfo(name = "Killaura (Type D)", description = "Raytraces to check if there are blocks obstructing the path of attack.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, executable = false)
 public class KillauraD extends Check {
 

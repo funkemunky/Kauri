@@ -3,45 +3,43 @@ package cc.funkemunky.anticheat.impl.checks.combat.aimassist;
 import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
+import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
+import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
 import org.bukkit.event.Event;
 
-@Packets(packets = {
-        Packet.Client.POSITION_LOOK,
-        Packet.Client.LOOK})
+@Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LOOK})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Aim (Type B)", description = "Checks for common denominators in the pitch.", cancelType = CancelType.MOTION, type = CheckType.AIM)
+@CheckInfo(name = "AimA (Type B)", description = "Makes sure the aim acceleration is legitimate.", type = CheckType.AIM, cancelType = CancelType.MOTION, maxVL = 80)
 public class AimB extends Check {
 
-    private double vl;
+    private int vl;
+
+    @Setting(name = "threshold.vl.max")
+    private int vlMax = 15;
+
+    @Setting(name = "threshold.vl.subtract")
+    private int subtract = 2;
+
+    @Setting(name = "combatOnly")
+    private boolean combatOnly = true;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if (getData().getLastAttack().hasNotPassed(4)) {
-            val move = getData().getMovementProcessor();
+        val move = getData().getMovementProcessor();
+        val yawDelta = move.getYawDelta();
+        val yawAccel = MathUtils.getDelta(move.getYawDelta(), move.getLastYawDelta());
+        val pitchAccel = MathUtils.getDelta(move.getPitchDelta(), move.getLastPitchDelta());
 
-            val offset = 16777216L;
-            val pitchGCD = MiscUtils.gcd((long) (move.getPitchDelta() * offset), (long) (move.getLastPitchDelta() * offset));
+        if (!MiscUtils.canDoCombat(combatOnly, getData())) return;
 
-            if (Math.abs(move.getTo().getPitch()) < 88.0f
-                    && move.getPitchDelta() > 0
-                    && move.getYawDelta() < 10
-                    && move.getOptifineTicks() < 2
-                    && pitchGCD < 131072L) {
-                if(vl++ > 60) {
-                    flag(String.valueOf(pitchGCD / 2000), true, true, AlertTier.CERTAIN);
-                } else if (vl > 40) {
-                    flag(String.valueOf(pitchGCD / 2000), true, true, AlertTier.HIGH);
-                } else if(vl > 30) {
-                    flag(String.valueOf(pitchGCD / 2000), true, false, AlertTier.LIKELY);
-                }
-            } else {
-                vl -= vl > 0 ? 2 : 0;
+
+        if (yawAccel == 0 && pitchAccel == 0 && getData().getPlayer().getVehicle() == null && Math.abs(move.getTo().getPitch()) < 80 && yawDelta > 0.1) {
+            if (vl++ > vlMax) {
+                flag("p+y acceleration = 0; vl=" + vl, true, true, AlertTier.LIKELY);
             }
-
-            debug("VL: " + vl + " PITCH: " + pitchGCD + " OPTIFINE: " + getData().isCinematicMode());
-        }
+        } else vl -= vl > 0 ? subtract : 0;
     }
 
     @Override

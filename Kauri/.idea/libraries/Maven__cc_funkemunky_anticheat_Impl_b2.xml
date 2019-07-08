@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: cc.funkemunky.anticheat:Impl:b2">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/cc/funkemunky/anticheat/Impl/b2/Impl-b2.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/cc/funkemunky/anticheat/Impl/b2/Impl-b2-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/cc/funkemunky/anticheat/Impl/b2/Impl-b2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

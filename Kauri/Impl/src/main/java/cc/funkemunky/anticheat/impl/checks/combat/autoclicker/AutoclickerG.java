@@ -4,76 +4,63 @@ import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.utils.MathUtils;
-import lombok.val;
+import cc.funkemunky.api.utils.Init;
 import org.bukkit.event.Event;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
+@CheckInfo(name = "Autoclicker (Type G)", description = "Checks if the autoclicker clicks in a specific range set.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT)
+@Init
 @Packets(packets = {Packet.Client.ARM_ANIMATION})
-@cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Autoclicker (Type G)", description = "A normal click consistency check.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 50, executable = false)
 public class AutoclickerG extends Check {
 
-    private long lastTimeStamp, lastRange;
-    private double vl;
-    private List<Long> times = new CopyOnWriteArrayList<>();
+    private long lastTimeStamp;
+    private List<Long> list = new ArrayList<>();
+    private double lastStd, lastAverage, vl, vl2;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        val elapsed = timeStamp - lastTimeStamp;
-
-        if (elapsed > 2 && !MiscUtils.shouldReturnArmAnimation(getData())) {
-            if (times.size() >= 20) {
-                val range = getRange(times);
-                val average = getAverageCPS(times);
-
-                if (average > 110 && (range < 65 || MathUtils.getDelta(range, lastRange) < 3)) {
-                    if (vl++ > 5)
-                        flag(range + "<-65 || " + range + "≈" + lastRange + " [" + MathUtils.round(average, 2) + " CPS]", true, true, vl > 12 ? AlertTier.HIGH : AlertTier.LIKELY);
-                } else vl -= vl > 0 ? 0.5 : 0;
-
-                debug("VL: " + vl + " RANGE: " + range + " AVERAGE: " + average);
-                lastRange = range;
-                times.clear();
-            } else {
-                times.add(elapsed);
-            }
+        if(MiscUtils.shouldReturnArmAnimation(getData())) {
+            lastTimeStamp = timeStamp;
+            return;
         }
 
-        debug(getData().isBreakingBlock() + " , " + getData().getLastBlockPlace().getPassed());
+        long ms = timeStamp - lastTimeStamp;
 
+        if(list.size() >= 20) {
+            double average = list.stream().mapToLong(val -> val).average().orElse(0);
+            double std = Math.sqrt(list.stream().mapToDouble(val -> Math.pow(val - average, 2)).average().orElse(0));
+            double stdDelta = Math.abs(std - lastStd), avgDelta = Math.abs(average - lastAverage);
+
+            if(stdDelta < 5 && average > 65 && average < 120) {
+                if(avgDelta > 5) {
+                    if(vl++ > 5) {
+                        flag("avg=" + average + " std=" + std + "% delta=" + stdDelta, true, true, AlertTier.CERTAIN);
+                    } else if(vl > 2) {
+                        flag("avg=" + average + " std=" + std + "% delta=" + stdDelta, true, true, AlertTier.HIGH);
+                    }
+                } else if(vl2++ > 2) {
+                    flag("avg=" + average + " std=" + std + "% delta=" + stdDelta, true, false, AlertTier.POSSIBLE);
+                    getData().getTypeH().flag(10, 8000L);
+                }
+            } else {
+                vl-= vl > 0 ? .5 : 0;
+                vl2-= vl2 > 0 ? .5 : 0;
+            }
+
+            debug("avg=" + average + " std=" + std + "vl=" + vl);
+            list.clear();
+            lastStd = std;
+            lastAverage = average;
+        } else if(ms > 0 && ms < 400) {
+            list.add(ms);
+        }
         lastTimeStamp = timeStamp;
     }
 
     @Override
     public void onBukkitEvent(Event event) {
 
-    }
-
-    private long getRange(List<Long> list) {
-        List<Long> use = new ArrayList<>(list);
-        Collections.sort(use);
-
-        return MathUtils.getDelta(use.get(0), use.get(use.size() - 1));
-    }
-
-    private double getAverageCPS(List<Long> list) {
-        List<Double> use = new ArrayList<>();
-
-        list.forEach(value -> use.add(1000D / value));
-
-        double total = 0;
-
-        for (double value : use) {
-            total += value;
-        }
-
-        total /= use.size();
-
-        return total;
     }
 }

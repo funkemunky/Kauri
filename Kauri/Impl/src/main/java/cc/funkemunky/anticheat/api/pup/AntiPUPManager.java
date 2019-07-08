@@ -89,22 +89,11 @@ public class AntiPUPManager {
     }
 
     public void loadMethodsIntoData(PlayerData data) {
-        List<AntiPUP> methodList = registerMethods();
+        /*&List<AntiPUP> methodList = registerMethods();
 
         for (AntiPUP antiPUP : methodList) {
             antiPUP.setData(data);
-        }
-
-        methodList.stream().filter(method -> method.getClass().isAnnotationPresent(Packets.class)).forEach(method -> {
-            Packets packets = method.getClass().getAnnotation(Packets.class);
-
-            Arrays.stream(packets.packets()).forEach(packet -> {
-                List<AntiPUP> methods = data.getAntiPupMethods().getOrDefault(packet, new ArrayList<>());
-
-                methods.add(method);
-
-                data.getAntiPupMethods().put(packet, methods);
-            });
-        });
+            data.getAntiPUP().add(antiPUP);
+        }*/
     }
 }

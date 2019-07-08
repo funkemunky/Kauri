@@ -1,15 +1,12 @@
 package cc.funkemunky.anticheat.impl.checks.combat.autoclicker;
 
 import cc.funkemunky.anticheat.api.checks.*;
+import cc.funkemunky.anticheat.api.utils.DynamicRollingAverage;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import lombok.val;
 import org.bukkit.event.Event;
-
-import java.util.Arrays;
-import java.util.Deque;
-import java.util.LinkedList;
 
 @Packets(packets = {
         Packet.Client.ARM_ANIMATION,
@@ -18,76 +15,55 @@ import java.util.LinkedList;
         Packet.Client.POSITION_LOOK,
         Packet.Client.LOOK})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Autoclicker (Type B)", description = "Looks for suspicious consistencies in CPS averages.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 20)
+@CheckInfo(name = "Autoclicker (Type B)", description = "An overall average CPS check.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 20, executable = false)
 public class AutoclickerB extends Check {
 
-    private final Deque<Double> averageDeque = new LinkedList<>();
-    private final int[] cps = new int[]{0, 0, 0, 0};
-    private final double[] averages = new double[]{0.0, 0.0, 0.0, 0.0};
-    private int ticks, vl;
-    private long timestamp;
+
+    private final DynamicRollingAverage cpsAverage = new DynamicRollingAverage(5);
+    private int cps, ticks;
+    private double vl;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         if (packetType.contains("Position") || packetType.contains("Look") || packetType.equals(Packet.Client.FLYING)) {
-            ticks++;
+            if (++ticks == 20) {
+                if (cps > 0) {
+                    cpsAverage.add(cps);
 
-            if (ticks == 20 && cps[3] > 4) { // 20 ticks = 1 second
-                val now = timestamp;
+                    val average = cpsAverage.getAverage();
 
-                val cpsAverage = Arrays.stream(cps).average().orElse(0.0);
-                val avgAverage = Arrays.stream(averages).average().orElse(0.0);
-                averages[3] = cpsAverage;
-
-                val averageDiff = Math.round(Math.abs(cpsAverage - avgAverage) * 100.0) / 100.0;
-
-                if (averageDiff > 0.d && now - timestamp < 1000L) {
-                    averageDeque.add(averageDiff);
-                }
-
-                if (averageDeque.size() == 5) {
-                    val distinct = averageDeque.stream().distinct().count();
-                    val duplicates = averageDeque.size() - distinct;
-
-                    if (duplicates > 0) {
-                        vl += duplicates;
-
-                        if (vl > 3) {
-                            this.flag("D: " + duplicates, false, false, AlertTier.HIGH);
+                    if (average >= 9.0) {
+                        if (Math.round(average) == average || Math.round(average) == average - 0.5) {
+                            if (++vl > 10) {
+                                flag(average + " -> " + (double) Math.round(average) + " -> " + "0.0", false, true, AlertTier.LIKELY);
+                                getData().getTypeC().flag(10, 8000L);
+                            }
+                        } else {
+                            vl -= vl > 0 ? 1 : 0;
                         }
                     } else {
-                        vl -= vl > 0 ? 1 : 0;
+                        vl -= vl > 0 ? 0.25 : 0;
                     }
 
-                    averageDeque.clear();
+                    if (cpsAverage.isReachedSize()) {
+                        cpsAverage.clearValues();
+                    }
                 }
 
-                this.pass();
+                cps = 0;
                 ticks = 0;
+
+                debug("AV: " + cpsAverage.getAverage() + " VL: " + vl);
             }
         } else if (!MiscUtils.shouldReturnArmAnimation(getData())) {
-            cps[3] = cps[3] + 1;
-
-            val now = timestamp;
-
-            timestamp = now;
+            cps++;
+        } else {
+            cps = ticks = 0;
         }
     }
 
     @Override
     public void onBukkitEvent(Event event) {
 
-    }
-
-    private void pass() {
-        cps[0] = cps[1];
-        cps[1] = cps[2];
-        cps[2] = cps[3];
-        cps[3] = 0;
-
-        averages[0] = averages[1];
-        averages[1] = averages[2];
-        averages[2] = averages[3];
-        averages[3] = 0;
     }
 }

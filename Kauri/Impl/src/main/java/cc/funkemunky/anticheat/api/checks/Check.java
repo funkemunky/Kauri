@@ -38,6 +38,8 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
     private String alertMessage = "";
     private int vl = 0;
     private ProtocolVersion minimum, maximum;
+    private List<String> packets = new ArrayList<>();
+    private List<Class> events = new ArrayList<>();
 
     public Check() {
         alertMessage = CheckSettings.alertMessage;
@@ -79,7 +81,7 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
 
                     if((timeStamp - data.getLastFlagTimestamp()) > 5) {
                         JsonMessage message = new JsonMessage();
-                        if (timeStamp - lastAlert > Math.min(100, CheckSettings.alertsDelay)) {
+                        if (timeStamp - lastAlert > Math.max(100, CheckSettings.alertsDelay)) {
                             if (!developer) {
                                 message.addText(Color.translate(alertMessage.replace("%prefix%", CheckSettings.alertPrefix).replace("%check%", getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", String.valueOf(vl)).replace("%info%", information).replace("%chance%", alertTier.getName()))).addHoverText(Color.Gray + information);
 

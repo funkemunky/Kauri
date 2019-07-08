@@ -48,6 +48,18 @@ public class CheckManager {
             check.setBanWave(info.banWave());
             check.setBanWaveThreshold(info.banWaveThreshold());
 
+            if(checkClass.isAnnotationPresent(Packets.class)) {
+                Packets packet = checkClass.getAnnotation(Packets.class);
+
+                Arrays.stream(packet.packets()).forEach(pack -> check.getPackets().add(pack));
+            }
+
+            if(checkClass.isAnnotationPresent(BukkitEvents.class)) {
+                BukkitEvents events = checkClass.getAnnotation(BukkitEvents.class);
+
+                Arrays.stream(events.events()).forEach(event -> check.getEvents().add(event));
+            }
+
             Arrays.stream(check.getClass().getDeclaredFields()).filter(field -> {
                 field.setAccessible(true);
 
@@ -87,7 +99,7 @@ public class CheckManager {
                     alerts = new ArrayList<>(dataToSort);
                     devAlerts = dataToSort.stream().filter(PlayerData::isDeveloperAlerts).collect(Collectors.toList());
                 }
-            }.runTaskTimerAsynchronously(Kauri.getInstance(), 40L, 20L);
+            }.runTaskTimerAsynchronously(Kauri.getInstance(), 40L, 30L);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -102,30 +114,9 @@ public class CheckManager {
 
         checkClasses.forEach(clazz -> registerCheck(clazz, checkList));
 
-        checkList.forEach(check -> check.setData(data));
-
-        checkList.stream().filter(check -> check.getClass().isAnnotationPresent(Packets.class)).forEach(check -> {
-            Packets packets = check.getClass().getAnnotation(Packets.class);
-
-            Arrays.stream(packets.packets()).forEach(packet -> {
-                List<Check> checks = data.getPacketChecks().getOrDefault(packet, new ArrayList<>());
-
-                checks.add(check);
-
-                data.getPacketChecks().put(packet, checks);
-            });
-        });
-
-        checkList.stream().filter(check -> check.getClass().isAnnotationPresent(BukkitEvents.class)).forEach(check -> {
-            BukkitEvents events = check.getClass().getAnnotation(BukkitEvents.class);
-
-            Arrays.stream(events.events()).forEach(event -> {
-                List<Check> checks = data.getBukkitChecks().getOrDefault(event, new ArrayList<>());
-
-                checks.add(check);
-
-                data.getBukkitChecks().put(event, checks);
-            });
+        checkList.forEach(check -> {
+            check.setData(data);
+            data.getChecks().add(check);
         });
     }
 

@@ -28,6 +28,8 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
     private String alertMessage = "";
     private int vl = 0;
     private ProtocolVersion minimum, maximum;
+    private List<String> packets = new ArrayList<>();
+    private List<Class> events = new ArrayList<>();
 
     public Check() {
         alertMessage = CheckSettings.alertMessage;

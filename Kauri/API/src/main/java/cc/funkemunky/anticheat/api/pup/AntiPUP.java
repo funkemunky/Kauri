@@ -8,6 +8,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class AntiPUP implements Listener {
 
     @Getter
@@ -23,6 +26,8 @@ public abstract class AntiPUP implements Listener {
     @Getter
     @Setter
     private boolean enabled;
+
+    private List<String> packets = new ArrayList<>();
 
     public AntiPUP(String name, PuPType type, boolean enabled) {
         this.name = name;

@@ -22,10 +22,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Getter
 @Setter
@@ -40,9 +37,8 @@ public class PlayerData {
             cinematicMode, lagging, alertsEnabled, inventoryOpen, isPosition, loggedIn;
     private Player player;
 
-    private Map<String, List<Check>> packetChecks = new HashMap<>();
-    private Map<Class, List<Check>> bukkitChecks = new HashMap<>();
-    private Map<String, List<AntiPUP>> antiPupMethods = new HashMap<>();
+    private List<Check> checks = new ArrayList<>();
+    private List<AntiPUP> antiPUP = new ArrayList<>();
 
     private CancelType cancelType = CancelType.NONE;
     private Vector lastVelocityVector;
@@ -89,7 +85,7 @@ public class PlayerData {
         movementProcessor = new MovementProcessor();
 
         Kauri.getInstance().getCheckManager().loadChecksIntoData(this);
-       // Kauri.getInstance().getAntiPUPManager().loadMethodsIntoData(this);
+        Kauri.getInstance().getAntiPUPManager().loadMethodsIntoData(this);
     }
 
     public boolean isServerPos() {

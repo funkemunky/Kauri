@@ -3,9 +3,7 @@ package cc.funkemunky.anticheat.impl.checks.combat.aimassist;
 import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
-import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
 import org.bukkit.event.Event;
 
@@ -13,39 +11,34 @@ import org.bukkit.event.Event;
         Packet.Client.POSITION_LOOK,
         Packet.Client.LOOK})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Aim (Type A)", type = CheckType.AIM, cancelType = CancelType.MOTION, description = "Checks for the consistency in aim overall", executable = false, maxVL = 80)
+@CheckInfo(name = "Aim (Type A)", description = "Checks for common denominators in the pitch.", cancelType = CancelType.MOTION, type = CheckType.AIM)
 public class AimA extends Check {
 
-    private float lastWrapped, lastChange;
-    private int vl;
-
-    @Setting(name = "combatOnly")
-    private boolean combatOnly = true;
+    private double vl;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
+        if (getData().getLastAttack().hasNotPassed(4)) {
+            val move = getData().getMovementProcessor();
 
-        if (!MiscUtils.canDoCombat(combatOnly, getData())) return;
-
-        val yawChange = getData().getMovementProcessor().getYawDelta();
-        val pitchChange = getData().getMovementProcessor().getPitchDelta();
-
-        val wrappedCombined = MathUtils.yawTo180F(yawChange + pitchChange);
-
-        val wrappedChange = Math.abs(wrappedCombined - lastWrapped);
-
-        if (wrappedCombined > 1.5 && !getData().isCinematicMode() && wrappedChange < 0.3F && wrappedChange > 0.001F && wrappedChange != lastChange) {
-            if (++vl > 4) {
-                flag(wrappedCombined + " -> " + lastWrapped + " -> " + (double) Math.round(wrappedChange), true, false, AlertTier.LIKELY);
+            if (Math.abs(move.getTo().getPitch()) < 88.0f
+                    && move.getPitchDelta() > 0
+                    && move.getYawDelta() < 10
+                    && move.getOptifineTicks() < 2
+                    && move.getPitchGCD() < 131072L) {
+                if(vl++ > 60) {
+                    flag(String.valueOf(move.getPitchGCD() / 2000), true, true, AlertTier.CERTAIN);
+                } else if (vl > 40) {
+                    flag(String.valueOf(move.getPitchGCD() / 2000), true, true, AlertTier.HIGH);
+                } else if(vl > 30) {
+                    flag(String.valueOf(move.getPitchGCD() / 2000), true, false, AlertTier.LIKELY);
+                }
+            } else {
+                vl -= vl > 0 ? 2 : 0;
             }
-        } else {
-            vl -= vl > 0 ? 1 : 0;
+
+            debug("VL: " + vl + " PITCH: " + move.getPitchGCD() + " OPTIFINE: " + getData().isCinematicMode());
         }
-
-        debug(vl + ": " + wrappedCombined + ", " + wrappedChange + ", " + lastChange + ", " + getData().getMovementProcessor().getOptifineTicks());
-
-        lastWrapped = wrappedCombined;
-        lastChange = wrappedChange;
     }
 
     @Override
