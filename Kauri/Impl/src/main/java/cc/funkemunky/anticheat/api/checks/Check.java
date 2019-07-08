@@ -47,7 +47,6 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
 
     protected void flag(String information, boolean cancel, boolean ban, AlertTier tier) {
         Kauri.getInstance().getExecutorService().execute(() -> {
-            Kauri.getInstance().getProfiler().start("check:" + getName() + ":alert");
             if(Kauri.getInstance().getTps() > CheckSettings.tpsThreshold) {
                 PlayerCheatEvent event = new PlayerCheatEvent(getData().getPlayer(), this);
 
@@ -103,7 +102,6 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
                     data.setLastFlagTimestamp(timeStamp);
                 }
             }
-            Kauri.getInstance().getProfiler().stop("check:" + getName() + ":alert");
         });
     }
     private void banUser() {

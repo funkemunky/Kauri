@@ -51,7 +51,7 @@ public class PlayerData {
             lastAttack = new TickTimer(4),
             lastBlockBreak = new TickTimer(3),
             lastPacketSkip = new TickTimer(5);
-    private List<Vector> teleportLocations = new EvictingList<>(5);
+    private List<Vector> teleportLocations;
     private float walkSpeed, flySpeed;
     private LivingEntity target, attacker;
     private long transPing, lastTransaction, lastTransPing, ping, lastPing, lastKeepAlive, lastServerPosStamp, lastFlagTimestamp, lastPacketDrop;
@@ -77,6 +77,7 @@ public class PlayerData {
         this.player = Bukkit.getPlayer(uuid);
         lastLogin.reset();
         loggedIn = true;
+        teleportLocations = new EvictingList<>(5);
 
         if (CheckSettings.enableOnJoin && player.hasPermission("kauri.alerts")) alertsEnabled = true;
 

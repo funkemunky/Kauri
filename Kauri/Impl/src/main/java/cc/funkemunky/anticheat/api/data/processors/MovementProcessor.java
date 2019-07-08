@@ -15,11 +15,14 @@ import lombok.Setter;
 import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 public class MovementProcessor {
@@ -33,7 +36,8 @@ public class MovementProcessor {
     private PastLocation pastLocation = new PastLocation();
     private TickTimer lastRiptide = new TickTimer(6), lastVehicle = new TickTimer(4), lastFlightToggle = new TickTimer(10);
     private List<BoundingBox> boxes = new ArrayList<>();
-    private long lastTimeStamp, lookTicks, lagTicks, pitchGCD, yawGCD, offset = 16777216L;
+    private List<Entity> entitiesAround = new ArrayList<>();
+    private long lastTimeStamp, lagTicks, pitchGCD, yawGCD, offset = 16777216L;
 
     public void update(PlayerData data, WrappedInFlyingPacket packet) {
         Kauri.getInstance().getProfiler().start("data:MovementProcessor");
@@ -64,7 +68,12 @@ public class MovementProcessor {
                 CollisionAssessment assessment = new CollisionAssessment(data.getBoundingBox(), data);
 
                 //There are some entities that are collide-able like boats but are not considered blocks.
-                player.getNearbyEntities(1, 1, 1).stream().filter(entity -> (entity instanceof Vehicle && !entity.getType().toString().contains("MINECART")) || entity.getType().name().toLowerCase().contains("shulker")).forEach(entity -> assessment.assessBox(ReflectionsUtil.toBoundingBox(ReflectionsUtil.getBoundingBox(entity)), player.getWorld(), true));
+
+                if(Atlas.getInstance().getCurrentTicks() % 4 == 0) {
+                    entitiesAround = player.getNearbyEntities(1, 1, 1).stream().filter(entity -> (entity instanceof Vehicle && !entity.getType().toString().contains("MINECART")) || entity.getType().name().toLowerCase().contains("shulker")).collect(Collectors.toList());
+                }
+
+                entitiesAround.forEach(entity -> assessment.assessBox(ReflectionsUtil.toBoundingBox(ReflectionsUtil.getBoundingBox(entity)), player.getWorld(), true));
 
                 //Now we scrub through the colliding boxes for any important information that could be fed into detections.
                 box.forEach(bb -> assessment.assessBox(bb, player.getWorld(), false));
@@ -103,24 +112,7 @@ public class MovementProcessor {
                     slimeHeight = fallDistance * 0.75f;
                 }
             }
-            tookVelocity = System.currentTimeMillis() - data.getVelocityProcessor().getLastVelocityTimestamp() < 1500L;
-            val vecStream = data.getTeleportLocations().stream().filter(vec -> (MiscSettings.horizontalServerPos ? MathUtils.offset(vec, to.toVector()) : vec.distance(to.toVector())) < 1E-8).findFirst().orElse(null);
-
-            if(vecStream != null) {
-                if(data.getTeleportLoc() != null && vecStream.distance(data.getTeleportLoc().toVector()) == 0) {
-                   data.setTeleportPing(System.currentTimeMillis() - data.getTeleportTest());
-                } else {
-                    data.setTeleportPing(System.currentTimeMillis() - data.getTeleportTest());
-                }
-                data.setLastServerPosStamp(System.currentTimeMillis());
-                data.getTeleportLocations().remove(vecStream);
-                serverPos = true;
-                from = to;
-            }
-            if(serverPos) {
-                serverPos = false;
-            }
-
+            tookVelocity = timeStamp - data.getVelocityProcessor().getLastVelocityTimestamp() < 1500L;
 
             lastDeltaY = deltaY;
             lastDeltaXZ = deltaXZ;
@@ -154,7 +146,7 @@ public class MovementProcessor {
 
             if(timeStamp - lastTimeStamp > 100) {
                 lagTicks = (timeStamp - lastTimeStamp - 50) / 50;
-                data.setLastPacketDrop(System.currentTimeMillis());
+                data.setLastPacketDrop(timeStamp);
             } else lagTicks-= lagTicks > 0 ? 1 : 0;
 
             if(lagTicks > 0) {
@@ -199,8 +191,21 @@ public class MovementProcessor {
                 serverYVelocity = deltaY;
             }
 
-            if(System.currentTimeMillis() - data.getLastServerPosStamp() < 100L) {
+            val vecStream = data.getTeleportLocations().stream().filter(vec -> (MiscSettings.horizontalServerPos ? MathUtils.offset(vec, to.toVector()) : vec.distance(to.toVector())) < 1E-8).findFirst().orElse(null);
+
+            if(vecStream != null) {
+                if(data.getTeleportLoc() != null && vecStream.distance(data.getTeleportLoc().toVector()) == 0) {
+                    data.setTeleportPing(timeStamp - data.getTeleportTest());
+                } else {
+                    data.setTeleportPing(timeStamp - data.getTeleportTest());
+                }
+                data.setLastServerPosStamp(timeStamp);
+                data.getTeleportLocations().remove(vecStream);
                 serverYVelocity = deltaY;
+                serverPos = true;
+                from = to;
+            } else if(serverPos) {
+                serverPos = false;
             }
 
             lastServerYAcceleration = serverYAcceleration;
@@ -244,7 +249,6 @@ public class MovementProcessor {
 
             data.setCinematicMode((smoothDelta / yawDelta) < 0.1 || (smoothDelta2) < 0.02);
 
-            lookTicks++;
             yawGCD = MiscUtils.gcd((long) (yawDelta * offset), (long) (lastYawDelta * offset));
             pitchGCD = MiscUtils.gcd((long) (pitchDelta * offset), (long) (lastPitchDelta * offset));
 

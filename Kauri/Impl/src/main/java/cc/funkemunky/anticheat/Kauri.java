@@ -130,17 +130,6 @@ public class Kauri extends JavaPlugin {
         }.runTaskTimerAsynchronously(this, 1L, 1L);
 
         new BukkitRunnable() {
-            public void run() {
-                long timeStamp = System.currentTimeMillis();
-                tickElapsed = timeStamp - lastTick;
-                //Bukkit.broadcastMessage(tickElapsed + "ms" + ", " + getTPS());
-                lastTick = timeStamp;
-            }
-        }.runTaskTimer(Kauri.getInstance(), 0L, 1L);
-
-
-
-        new BukkitRunnable() {
             int ticks;
             long lastTimeStamp = System.currentTimeMillis();
 
@@ -150,6 +139,10 @@ public class Kauri extends JavaPlugin {
                     lastTimeStamp = System.currentTimeMillis();
                     ticks = 0;
                 }
+                long timeStamp = System.currentTimeMillis();
+                tickElapsed = timeStamp - lastTick;
+                //Bukkit.broadcastMessage(tickElapsed + "ms" + ", " + getTPS());
+                lastTick = timeStamp;
             }
         }.runTaskTimer(this, 1L, 1L);
     }

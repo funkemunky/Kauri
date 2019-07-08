@@ -2,8 +2,6 @@ package cc.funkemunky.anticheat.api.utils;
 
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
-import cc.funkemunky.api.Atlas;
-import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumParticle;
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.BoundingBox;
@@ -28,7 +26,6 @@ public class CollisionAssessment {
     private BoundingBox playerBox;
 
     public CollisionAssessment(BoundingBox playerBox, PlayerData data) {
-        onGround = inLiquid = blocksOnTop = pistonsNear = onHalfBlock = onClimbable = onIce = collidesHorizontally = inWeb = onSlime = false;
         fullyInAir = true;
         this.data = data;
         this.playerBox = playerBox;
@@ -41,10 +38,14 @@ public class CollisionAssessment {
 
         if(block == null && !isEntity) return;
 
-        if (isEntity || BlockUtils.isSolid(block)) {
+        if (isEntity || (!block.getType().equals(Material.AIR) && BlockUtils.isSolid(block))) {
             if(isEntity) bb = bb.grow(0.35f, 0.2f, 0.35f);
             if (bb.collidesVertically(playerBox.subtract(0, 0.1f, 0, 0, 1.4f, 0))) {
                 onGround = true;
+
+                if(!isEntity && block.getType().equals(Material.SOUL_SAND)) {
+                    onSoulSand = true;
+                }
             }
 
             if (getData().isDebuggingBox() && bb.collides(playerBox) && Kauri.getInstance().getCurrentTicks() % 2 == 0) {
@@ -52,47 +53,41 @@ public class CollisionAssessment {
                 Kauri.getInstance().getExecutorService().submit(() -> MiscUtils.createParticlesForBoundingBox(getData().getPlayer(), box, WrappedEnumParticle.FLAME, 0.25f));
             }
 
-            if (bb.collidesVertically(playerBox.add(0, 1.45f, 0, 0, 0.35f, 0))) {
-                blocksOnTop = true;
-            }
+            nearGround = true;
 
-            if (BlockUtils.isPiston(block)) {
-                pistonsNear = true;
-            }
-
-            if ((BlockUtils.isSlab(block) || block.getType().toString().contains("SNOW") || block.getType().toString().contains("DAYLIGHT_DETECTOR") || block.getType().toString().contains("SKULL") || BlockUtils.isStair(block) || block.getType().getId() == 92 || block.getType().getId() == 397) && (bb.intersectsWithBox(data.getBoundingBox().grow(0.2f,1f,0.2f)) || (BlockUtils.isFence(block) && data.getBoundingBox().subtract(0,0.25f,0,0,0,0).collides(bb)))) {
-                onHalfBlock = true;
-            }
-
-            if (BlockUtils.isIce(block) && playerBox.subtract(0, 1f, 0, 0, 0.5f, 0).collidesVertically(bb)) {
-                onIce = true;
-            }
-
-            if(BlockUtils.isSolid(block)) {
-                nearGround = true;
-            }
-
-            if (bb.collidesHorizontally(playerBox.grow((ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_13) ? 0.05f : 0), 0, (ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_13) ? 0.05f : 0)))) {
+            if (bb.collidesHorizontally(playerBox.grow(0.05f, 0, 0.05f))) {
                 collidesHorizontally = true;
             }
 
-            if (bb.collidesVertically(playerBox.subtract(0, 0.1f, 0, 0, 0, 0)) && block.getType().toString().contains("SLIME")) {
-                onSlime = true;
-            }
-
-            if (block.getType().toString().contains("SOUL") && bb.intersectsWithBox(getData().getBoundingBox().subtract(0, 0.01f, 0, 0, 1.4f, 0).shrink(0.2f, 0, 0.2f))) {
-                onSoulSand = true;
-            }
-
-            if (BlockUtils.isClimbableBlock(block) && bb.intersectsWithBox(data.getBoundingBox().grow(0.6f, 0.1f, 0.6f))) {
-                onClimbable = true;
-            }
-
             if (!isEntity) {
-                if (bb.intersectsWithBox(data.getBoundingBox().grow(1.0f, 0, 1.0f).shrink(0, 0.01f, 0))) {
-                    blocksNear = true;
+                if (bb.collidesVertically(playerBox.add(0, 1.45f, 0, 0, 0.35f, 0))) {
+                    blocksOnTop = true;
                 }
-                if (bb.intersectsWithBox(data.getBoundingBox().grow(1.5f, 1.5f, 1.5f))) {
+
+                if (BlockUtils.isPiston(block)) {
+                    pistonsNear = true;
+                } else if(BlockUtils.isSlab(block) || BlockUtils.isSlab(block) || block.getType().toString().contains("SNOW") || block.getType().toString().contains("DAYLIGHT_DETECTOR") || block.getType().toString().contains("SKULL") || BlockUtils.isStair(block) || block.getType().getId() == 92 || block.getType().getId() == 397) {
+                    if(bb.intersectsWithBox(data.getBoundingBox().grow(0.2f,1f,0.2f))) {
+                        onHalfBlock = true;
+                    }
+                } else if(BlockUtils.isFence(block))  {
+                    if(data.getBoundingBox().subtract(0,0.25f,0,0,0,0).collides(bb)) {
+                        onHalfBlock = true;
+                    }
+                } else if(BlockUtils.isClimbableBlock(block)) {
+                    if(bb.intersectsWithBox(data.getBoundingBox().grow(0.6f, 0.1f, 0.6f))) {
+                        onClimbable = true;
+                    }
+                } else if (playerBox.subtract(0, 1f, 0, 0, 0.5f, 0).collidesVertically(bb)) {
+                    if(BlockUtils.isIce(block)) {
+                        onIce = true;
+                    } else if(block.getType().toString().contains("SLIME")) {
+                        onSlime = true;
+                    }
+                }
+                if (bb.intersectsWithBox(data.getBoundingBox().grow(1.0f, 0, 1.0f).shrink(0, 0.01f, 0))) {
+                    blocksNear = blocksAround = true;
+                } else if (bb.intersectsWithBox(data.getBoundingBox().grow(1.5f, 1.5f, 1.5f))) {
                     blocksAround = true;
                 }
             }
