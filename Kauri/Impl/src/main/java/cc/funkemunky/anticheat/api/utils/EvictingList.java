@@ -5,9 +5,14 @@
 package cc.funkemunky.anticheat.api.utils;
 
 import java.util.Collection;
+import java.util.Deque;
 import java.util.LinkedList;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.DelayQueue;
+import java.util.concurrent.LinkedBlockingDeque;
 
-public class EvictingList<T> extends LinkedList<T> {
+public class EvictingList<T> extends CopyOnWriteArrayList<T> {
     private int maxSize;
 
     public EvictingList(int maxSize) {
@@ -25,7 +30,7 @@ public class EvictingList<T> extends LinkedList<T> {
 
     @Override
     public boolean add(T t) {
-        if (size() >= maxSize) removeFirst();
+        if (size() >= maxSize) remove(0);
         return super.add(t);
     }
 }

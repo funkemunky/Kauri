@@ -17,20 +17,35 @@ import org.bukkit.event.Event;
 @CheckInfo(name = "Fly (Type A)", description = "Ensures the acceleration of a player is legitimate.", type = CheckType.FLY, maxVL = 50)
 public class FlyA extends Check {
 
+    private double lastYChange;
     private int vl;
+
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
+        if(getData().isServerPos()) return;
         val move = getData().getMovementProcessor();
-        if(MiscUtils.cancelForFlight(getData(), 8, false)) return;
+        val from = move.getFrom();
+        val to = move.getTo();
 
-        if(MathUtils.getDelta(move.getServerYAcceleration(), move.getClientYAcceleration()) > 0.04 && !move.isOnHalfBlock() && move.getAirTicks() > 2 && !move.isServerOnGround()) {
-            if(vl++ > 3) {
-                flag(move.getServerYAcceleration() + ">-" + move.getClientYAcceleration(), true, true, AlertTier.HIGH);
-            }
-        } else vl-= vl > 0 ? 1 : 0;
+        val yChange = to.getY() - from.getY();
+        val predictedY = (lastYChange - 0.08D) * 0.9800000190734863D;
+        this.lastYChange = yChange;
 
-        debug("vl=" + vl + " server=" + move.getServerYAcceleration() + " client=" + move.getClientYAcceleration());
+        if (MiscUtils.cancelForFlight(getData(), 10, false)) return;
+
+        if (!move.isNearGround()) {
+            val offset = MathUtils.getDelta(yChange, predictedY);
+
+            if (offset > 0.00001) {
+                if(vl++ > 2) {
+                    this.flag("O -> " + offset, false, true, AlertTier.HIGH);
+                }
+            } else vl-= vl > 0 ? 1 : 0;
+
+            debug("VL: " + vl + "DIF: " + Math.abs(yChange - predictedY));
+        }
     }
+
 
     @Override
     public void onBukkitEvent(Event event) {
