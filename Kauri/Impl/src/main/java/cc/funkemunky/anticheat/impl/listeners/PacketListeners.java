@@ -182,11 +182,6 @@ public class PacketListeners implements AtlasListener {
                     data.getMovementProcessor().update(data, packet);
                     data.getVelocityProcessor().update(packet);
                     if (data.getMovementProcessor().getTo() == null) return;
-                    if(data.getTarget() != null) {
-                        data.setEntityFrom(data.getEntityTo());
-                        data.setEntityTo(new CustomLocation(data.getTarget().getLocation()));
-                        data.getEntityPastLocation().addLocation(data.getEntityTo());
-                    }
                     break;
                 }
                 case Packet.Client.BLOCK_DIG: {
@@ -215,6 +210,12 @@ public class PacketListeners implements AtlasListener {
                             data.getLastBlockPlace().reset();
                         }
                     }
+                    break;
+                }
+                case Packet.Client.ARM_ANIMATION: {
+                    WrappedInArmAnimationPacket packet = new WrappedInArmAnimationPacket(event.getPacket(), event.getPlayer());
+
+                    data.getSwingProcessor().onUpdate(packet, event.getTimeStamp());
                     break;
                 }
                 case Packet.Client.USE_ENTITY: {
@@ -249,13 +250,15 @@ public class PacketListeners implements AtlasListener {
 
     private void hopper(Object packet, String packetType, long timeStamp, PlayerData data) {
         if ((!CheckSettings.bypassEnabled || !data.getPlayer().hasPermission(CheckSettings.bypassPermission)) && !Kauri.getInstance().getCheckManager().isBypassing(data.getUuid())) {
-            data.getChecks().stream()
-                    .filter(check -> check.isEnabled() && check.getPackets().contains(packetType))
-                    .forEach(check -> {
-                        Kauri.getInstance().getProfiler().start("checks:" + check.getName());
-                        check.onPacket(packet, packetType, timeStamp);
-                        Kauri.getInstance().getProfiler().stop("checks:" + check.getName());
-                    });
+            Kauri.getInstance().getExecutorService().execute(() -> {
+                data.getChecks().stream()
+                        .filter(check -> check.isEnabled() && check.getPackets().contains(packetType))
+                        .forEach(check -> {
+                            Kauri.getInstance().getProfiler().start("checks:" + check.getName());
+                            check.onPacket(packet, packetType, timeStamp);
+                            Kauri.getInstance().getProfiler().stop("checks:" + check.getName());
+                        });
+            });
         }
     }
 

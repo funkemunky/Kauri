@@ -6,11 +6,13 @@ import cc.funkemunky.anticheat.api.checks.CancelType;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.data.processors.ActionProcessor;
 import cc.funkemunky.anticheat.api.data.processors.MovementProcessor;
+import cc.funkemunky.anticheat.api.data.processors.SwingProcessor;
 import cc.funkemunky.anticheat.api.data.processors.VelocityProcessor;
 import cc.funkemunky.anticheat.api.pup.AntiPUP;
 import cc.funkemunky.anticheat.api.utils.*;
 import cc.funkemunky.anticheat.impl.config.CheckSettings;
 import cc.funkemunky.anticheat.impl.config.MiscSettings;
+import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.TickTimer;
 import lombok.Getter;
@@ -20,9 +22,11 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Getter
 @Setter
@@ -66,6 +70,7 @@ public class PlayerData {
     private MovementProcessor movementProcessor;
     private ActionProcessor actionProcessor;
     private VelocityProcessor velocityProcessor;
+    private SwingProcessor swingProcessor;
 
     /* Combined Autoclicker Check */
     private Verbose typeC = new Verbose(), typeD = new Verbose(), typeH = new Verbose();
@@ -84,9 +89,18 @@ public class PlayerData {
         actionProcessor = new ActionProcessor();
         velocityProcessor = new VelocityProcessor(this);
         movementProcessor = new MovementProcessor();
+        swingProcessor = new SwingProcessor(this);
 
         Kauri.getInstance().getCheckManager().loadChecksIntoData(this);
         Kauri.getInstance().getAntiPUPManager().loadMethodsIntoData(this);
+
+        Atlas.getInstance().getSchedular().scheduleAtFixedRate(() -> {
+            if(target != null) {
+                setEntityFrom(getEntityTo());
+                setEntityTo(new CustomLocation(getTarget().getLocation()));
+                getEntityPastLocation().addLocation(getEntityTo());
+            }
+        }, 50L, 50L, TimeUnit.MILLISECONDS);
     }
 
     public boolean isServerPos() {

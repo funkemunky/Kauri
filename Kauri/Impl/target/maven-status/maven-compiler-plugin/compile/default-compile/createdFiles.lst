@@ -1,6 +1,7 @@
 cc\funkemunky\anticheat\api\data\DataManager.class
 cc\funkemunky\anticheat\api\utils\json\HTTP.class
 cc\funkemunky\anticheat\api\utils\Messages.class
+cc\funkemunky\anticheat\impl\checks\combat\autoclicker\AutoClickerI.class
 cc\funkemunky\anticheat\impl\checks\movement\fly\FlyA.class
 cc\funkemunky\anticheat\api\utils\Pastebin.class
 cc\funkemunky\anticheat\api\checks\CheckManager$1.class
@@ -29,7 +30,6 @@ cc\funkemunky\anticheat\api\utils\Pastebin$Privacy.class
 cc\funkemunky\anticheat\impl\checks\player\badpackets\BadPacketsG.class
 cc\funkemunky\anticheat\impl\config\CheckSettings.class
 cc\funkemunky\anticheat\impl\commands\kauri\AlertsCommand.class
-cc\funkemunky\anticheat\impl\checks\movement\fly\FlyD.class
 cc\funkemunky\anticheat\impl\commands\kauri\arguments\BypassingArgument.class
 cc\funkemunky\anticheat\impl\listeners\PacketListeners$1.class
 cc\funkemunky\anticheat\impl\commands\kauri\arguments\VelocityArgument.class
@@ -45,7 +45,6 @@ cc\funkemunky\anticheat\api\utils\menu\Menu$CloseHandler.class
 cc\funkemunky\anticheat\impl\commands\kauri\arguments\RecentViolationsArgument.class
 cc\funkemunky\anticheat\impl\checks\combat\criticals\Criticals.class
 cc\funkemunky\anticheat\api\utils\URLUtils.class
-cc\funkemunky\anticheat\impl\checks\movement\fly\FlyF.class
 cc\funkemunky\anticheat\api\data\processors\ActionProcessor$1.class
 cc\funkemunky\anticheat\impl\checks\combat\autoclicker\AutoclickerE.class
 cc\funkemunky\anticheat\impl\commands\kauri\arguments\LogArgument.class
@@ -56,8 +55,10 @@ cc\funkemunky\anticheat\api\data\processors\MovementProcessor.class
 cc\funkemunky\anticheat\api\utils\StatisticalAnalysis.class
 cc\funkemunky\anticheat\impl\checks\combat\killaura\KillauraE.class
 cc\funkemunky\anticheat\api\utils\ItemBuilder.class
+cc\funkemunky\anticheat\api\data\processors\SwingProcessor.class
 cc\funkemunky\anticheat\api\utils\json\JSONObject.class
 cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimH.class
+cc\funkemunky\anticheat\impl\checks\movement\speed\SpeedA.class
 cc\funkemunky\anticheat\impl\commands\kauri\arguments\BoxWandArgument.class
 cc\funkemunky\anticheat\api\checks\CancelType.class
 cc\funkemunky\anticheat\api\utils\MouseFilter.class
@@ -68,7 +69,6 @@ cc\funkemunky\anticheat\api\utils\json\JSONArray.class
 cc\funkemunky\anticheat\api\data\banwave\BanwaveConfig.class
 cc\funkemunky\anticheat\impl\pup\crashers\YLevel.class
 cc\funkemunky\anticheat\impl\commands\kauri\arguments\DebugArgument.class
-cc\funkemunky\anticheat\impl\checks\movement\fly\FlyE.class
 cc\funkemunky\anticheat\impl\commands\kauri\arguments\MenuArgument.class
 cc\funkemunky\anticheat\api\data\banwave\BanwaveManager$1.class
 cc\funkemunky\anticheat\api\utils\menu\type\impl\ChestMenu.class
@@ -76,7 +76,6 @@ cc\funkemunky\anticheat\impl\pup\crashers\Boxer.class
 cc\funkemunky\anticheat\impl\checks\player\badpackets\BadPacketsF.class
 cc\funkemunky\anticheat\api\utils\menu\button\ClickAction$InformationPair.class
 cc\funkemunky\anticheat\api\utils\Packets.class
-cc\funkemunky\anticheat\impl\checks\movement\velocity\VelocityD.class
 cc\funkemunky\anticheat\api\utils\json\JSONML.class
 cc\funkemunky\anticheat\api\data\banwave\BanwaveManager.class
 cc\funkemunky\anticheat\api\utils\menu\util\ArrayIterator.class
@@ -89,6 +88,7 @@ cc\funkemunky\anticheat\impl\checks\movement\speed\SpeedB.class
 cc\funkemunky\anticheat\api\pup\AntiPUP.class
 cc\funkemunky\anticheat\api\utils\BukkitEvents.class
 cc\funkemunky\anticheat\impl\checks\player\badpackets\BadPacketsC.class
+cc\funkemunky\anticheat\impl\checks\combat\autoclicker\AutoclickerJ.class
 cc\funkemunky\anticheat\api\event\PlayerCancelEvent.class
 cc\funkemunky\anticheat\api\pup\AntiPUPManager.class
 cc\funkemunky\anticheat\api\event\TickEvent.class
@@ -103,7 +103,6 @@ cc\funkemunky\anticheat\impl\commands\kauri\arguments\BanwaveArgument.class
 cc\funkemunky\anticheat\api\event\PlayerCheatEvent.class
 cc\funkemunky\anticheat\impl\menu\InputHandler.class
 cc\funkemunky\anticheat\api\utils\Message.class
-cc\funkemunky\anticheat\impl\checks\movement\speed\SpeedF.class
 cc\funkemunky\anticheat\api\utils\menu\button\Button.class
 cc\funkemunky\anticheat\impl\checks\combat\autoclicker\AutoclickerG.class
 cc\funkemunky\anticheat\impl\listeners\FunkeListeners.class
@@ -144,7 +143,6 @@ cc\funkemunky\anticheat\impl\checks\combat\killaura\KillauraB.class
 cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimE.class
 cc\funkemunky\anticheat\api\utils\json\JSONString.class
 cc\funkemunky\anticheat\impl\checks\player\badpackets\BadPacketsH.class
-cc\funkemunky\anticheat\impl\checks\movement\speed\SpeedD.class
 cc\funkemunky\anticheat\impl\checks\movement\groundspoof\GroundSpoofB.class
 cc\funkemunky\anticheat\impl\menu\UpdateDataType.class
 cc\funkemunky\anticheat\api\utils\MiscUtils.class
@@ -156,7 +154,6 @@ cc\funkemunky\anticheat\api\utils\menu\Menu$MenuDimension.class
 cc\funkemunky\anticheat\api\utils\json\JSONStringer.class
 cc\funkemunky\anticheat\impl\commands\kauri\KauriCommand.class
 cc\funkemunky\anticheat\api\data\logging\Violation.class
-cc\funkemunky\anticheat\impl\checks\movement\fly\FlyC.class
 cc\funkemunky\anticheat\Kauri$1.class
 cc\funkemunky\anticheat\impl\checks\player\badpackets\BadPacketsI.class
 cc\funkemunky\anticheat\impl\config\MiscSettings.class
@@ -166,7 +163,6 @@ cc\funkemunky\anticheat\api\checks\CheckManager.class
 cc\funkemunky\anticheat\impl\checks\combat\autoclicker\AutoclickerD$1.class
 cc\funkemunky\anticheat\impl\commands\kauri\arguments\AntiVpnArgument.class
 cc\funkemunky\anticheat\api\utils\json\XMLTokener.class
-cc\funkemunky\anticheat\impl\checks\movement\speed\SpeedE.class
 cc\funkemunky\anticheat\impl\checks\movement\velocity\VelocityA.class
 cc\funkemunky\anticheat\impl\pup\crashers\ArmSwing.class
 cc\funkemunky\anticheat\api\utils\VPNUtils.class

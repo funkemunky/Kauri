@@ -36,7 +36,7 @@ public class FlyA extends Check {
         if (!move.isNearGround()) {
             val offset = MathUtils.getDelta(yChange, predictedY);
 
-            if (offset > 0.00001) {
+            if (offset > 0.04) {
                 if(vl++ > 2) {
                     this.flag("O -> " + offset, false, true, AlertTier.HIGH);
                 }

@@ -8,6 +8,7 @@ C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\ant
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\checks\movement\motion\MotionA.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\checks\player\badpackets\BadPacketsF.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimA.java
+C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\checks\combat\autoclicker\AutoClickerI.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\pup\crashers\ArmSwing.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\api\utils\json\JSONTokener.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\checks\combat\killaura\KillauraC.java
@@ -33,7 +34,6 @@ C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\ant
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\api\utils\json\XML.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\commands\kauri\arguments\BoxWandArgument.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\api\utils\json\CDL.java
-C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\checks\movement\fly\FlyD.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimB.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\commands\kauri\KauriCommand.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\KauriAPI.java
@@ -49,7 +49,6 @@ C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\ant
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\api\utils\json\CookieList.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\checks\player\badpackets\BadPacketsE.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\api\data\stats\StatsManager.java
-C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\checks\movement\fly\FlyE.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\commands\kauri\arguments\BypassingArgument.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\Kauri.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\api\utils\MCSmooth.java
@@ -68,10 +67,10 @@ C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\ant
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\api\checks\CancelType.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\checks\movement\jesus\JesusB.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\api\utils\Packets.java
-C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\checks\movement\speed\SpeedD.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\api\data\logging\Violation.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\api\utils\menu\mask\Mask2D.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\api\utils\BukkitEvents.java
+C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\checks\movement\speed\SpeedA.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\config\CheckSettings.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\api\event\PlayerCheatEvent.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\api\data\DataManager.java
@@ -79,7 +78,6 @@ C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\ant
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\checks\movement\velocity\VelocityA.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\commands\kauri\arguments\LagArgument.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\checks\movement\noslowdown\NoSlowdownB.java
-C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\checks\movement\velocity\VelocityD.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\checks\combat\killaura\KillauraB.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\api\checks\CheckInfo.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\pup\vpn\AntiVPN.java
@@ -126,15 +124,14 @@ C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\ant
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\api\utils\MiscUtils.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\api\utils\json\JSONObject.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\api\utils\menu\MenuListener.java
-C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\checks\movement\speed\SpeedF.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\api\data\processors\VelocityProcessor.java
+C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\api\data\processors\SwingProcessor.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\checks\movement\noslowdown\NoSlowdownA.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\api\utils\json\JSONArray.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\api\utils\menu\type\impl\ChestMenu.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\api\utils\VPNResponse.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\api\utils\VPNUtils.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\checks\player\badpackets\BadPacketsD.java
-C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\checks\movement\speed\SpeedE.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\commands\kauri\arguments\DelayArgument.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\api\pup\PuPType.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\commands\kauri\arguments\AntiVpnArgument.java
@@ -151,12 +148,10 @@ C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\ant
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\api\checks\AlertTier.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\checks\combat\aimassist\AimF.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\checks\combat\autoclicker\AutoclickerD.java
-C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\checks\movement\fly\FlyF.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\api\utils\RayTrace.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\checks\combat\autoclicker\AutoclickerA.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\api\event\PlayerCancelEvent.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\checks\movement\jesus\JesusA.java
-C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\checks\movement\fly\FlyC.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\checks\behavioral\InventoryClick.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\impl\checks\movement\groundspoof\GroundSpoofB.java
 C:\Users\suckm\Documents\GitHub\Kauri\Kauri\Impl\src\main\java\cc\funkemunky\anticheat\api\checks\Check.java

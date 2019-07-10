@@ -19,7 +19,7 @@ import org.bukkit.util.Vector;
 import java.util.stream.Collectors;
 
 @CheckInfo(name = "Reach", description = "A very accurate and fast 3.1 reach check.", type = CheckType.REACH, cancelType = CancelType.COMBAT, maxVL = 40)
-@Packets(packets = {Packet.Client.USE_ENTITY})
+@Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.POSITION, Packet.Client.LOOK, Packet.Client.FLYING})
 @Init
 public class Reach extends Check {
 
@@ -46,7 +46,7 @@ public class Reach extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(!getData().getPlayer().getGameMode().equals(GameMode.CREATIVE) && getData().getTarget() != null && getData().getLastAttack().hasNotPassed(0) && getData().getLastLogin().hasPassed(5) && !getData().isServerPos() && getData().getTransPing() < 450) {
+        if(getData().getTarget() != null && getData().getLastAttack().hasNotPassed(0) && !getData().getPlayer().getGameMode().equals(GameMode.CREATIVE) && getData().getTarget() != null && getData().getLastAttack().hasNotPassed(0) && getData().getLastLogin().hasPassed(5) && !getData().isServerPos() && getData().getTransPing() < 450) {
             val move = getData().getMovementProcessor();
             long range = 200 + Math.abs(getData().getTransPing() - getData().getLastTransPing()) * 3;
             val location = getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), range);

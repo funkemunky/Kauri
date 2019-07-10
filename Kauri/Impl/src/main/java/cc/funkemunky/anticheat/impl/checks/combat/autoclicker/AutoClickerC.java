@@ -1,6 +1,7 @@
 package cc.funkemunky.anticheat.impl.checks.combat.autoclicker;
 
 import cc.funkemunky.anticheat.api.checks.*;
+import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.Init;
@@ -24,6 +25,10 @@ public class AutoClickerC extends Check {
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         if(packetType.equals(Packet.Client.ARM_ANIMATION)) {
+            if(MiscUtils.shouldReturnArmAnimation(getData())) {
+                lastArm = timeStamp;
+               return;
+            }
             if(timeStamp - lastArm == 0 && lastLag.hasPassed()) {
                 if(vl++ > 10) {
                     flag("vl=" + vl, true, true, AlertTier.HIGH);

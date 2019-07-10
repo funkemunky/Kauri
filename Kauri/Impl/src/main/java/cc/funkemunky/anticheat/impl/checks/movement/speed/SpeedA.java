@@ -8,7 +8,7 @@ import cc.funkemunky.api.utils.Init;
 import lombok.val;
 import org.bukkit.event.Event;
 
-@CheckInfo(name = "Speed (Type B)", type = CheckType.SPEED, cancelType = CancelType.MOTION, maxVL = 40)
+@CheckInfo(name = "Speed (Type A)", type = CheckType.SPEED, cancelType = CancelType.MOTION, maxVL = 40)
 @Init
 @Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION})
 public class SpeedA extends Check {
@@ -18,7 +18,7 @@ public class SpeedA extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         if(getData().isGeneralCancel()) return;
         val move = getData().getMovementProcessor();
-        float threshold = MiscUtils.getBaseSpeed(getData()) + (move.isServerOnGround() ? 0.06f : 0.1f);
+        float threshold = MiscUtils.getBaseSpeed(getData()) + (move.isServerOnGround() ? (move.getGroundTicks() > 8 ? 0.05f : 0.06f) : 0.1f);
 
         threshold+= move.getHalfBlockTicks() > 0 ? 0.08 : 0;
         threshold+= move.isOnSlimeBefore() ? 0.025 : 0;

@@ -29,7 +29,7 @@ public class AimD extends Check {
             if(verbose.flag(5, 1000L)) {
                 flag("angle: " + angleMove, true, true, AlertTier.CERTAIN);
             } else if(verbose.getVerbose() > 2) {
-                flag("angle: " + angleMove, true, true, AlertTier.LIKELY);
+                flag("angle: " + angleMove, true, true, AlertTier.HIGH);
             }
         }
 
