@@ -69,7 +69,7 @@ public class Kauri extends JavaPlugin {
     public ExecutorService dedicatedVPN = Executors.newSingleThreadExecutor();
     public long lastLogin;
 
-    private boolean testMode = false;
+    private boolean testMode = false, runningPaperSpigot;
 
     @Override
     public void onEnable() {
@@ -80,6 +80,9 @@ public class Kauri extends JavaPlugin {
 
         //if (Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled()) return;
 
+        if(Bukkit.getVersion().contains("Paper")) {
+            runningPaperSpigot = true;
+        }
         profiler = new BaseProfiler();
         profileStart = System.currentTimeMillis();
 

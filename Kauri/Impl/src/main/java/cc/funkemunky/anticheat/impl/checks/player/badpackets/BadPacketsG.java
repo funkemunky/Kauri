@@ -20,14 +20,14 @@ import org.bukkit.event.Event;
         Packet.Client.POSITION_LOOK,
         Packet.Client.LOOK})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "BadPackets (Type G)", description = "Checks frequency of incoming packets. More detection, but less reliable.", type = CheckType.BADPACKETS, maxVL = 200, executable = false, developer = true)
+@CheckInfo(name = "BadPackets (Type G)", description = "Checks frequency of incoming packets. More detection, but less reliable.", type = CheckType.BADPACKETS, maxVL = 200, executable = false)
 public class BadPacketsG extends Check {
 
     @Setting(name = "usingPaperSpigot")
     public boolean usingPaper = false;
 
     @Setting(name = "lenience")
-    public float deltaBalance = 0.02f;
+    public float deltaBalance = 0.025f;
 
     @Setting(name = "threshold.vl.max")
     private int maxVL = 30;
@@ -52,7 +52,7 @@ public class BadPacketsG extends Check {
             return;
         }
 
-        val max = usingPaper ? 7.071f : Math.sqrt(Kauri.getInstance().getTickElapsed());
+        val max = Math.sqrt((50 - (1000 / Kauri.getInstance().getTps())) + 50);
         val stdDev = this.statisticalAnalysis.getStdDev();
 
         if (!MathUtils.approxEquals(deltaBalance, max, stdDev) && !getData().isLagging() && stdDev < max && getData().getLastLag().hasPassed(10)) {
@@ -61,7 +61,7 @@ public class BadPacketsG extends Check {
             }
         } else vl -= vl > 0 ? 3 : 0;
 
-        debug("STD: " + stdDev + " VL: " + vl);
+        debug("STD: " + stdDev + " VL: " + vl + " max=" + max);
         this.lastFlying = timeStamp;
     }
 

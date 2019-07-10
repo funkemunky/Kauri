@@ -46,6 +46,7 @@ public class VelocityB extends Check {
                     if(vl++ > 8) {
                         flag(MathUtils.round(ratio * 100, 2) + "%", true, true, AlertTier.LIKELY);
                     }
+                    //TODO Test this change from 0.5 to 0.2 for false positives.
                 } else vl-= vl > 0 ? 0.2 : 0;
                 debug("ratio=" + ratio + " vl=" + vl + " lastDelta=" + lastDeltaXZ + " deltaxz=" + move.getDeltaXZ() + " vel=" + velocityH);
             } else {
