@@ -1,6 +1,7 @@
 package cc.funkemunky.anticheat.impl.commands.kauri.arguments;
 
 import cc.funkemunky.anticheat.Kauri;
+import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.utils.Message;
 import cc.funkemunky.anticheat.api.utils.Messages;
 import cc.funkemunky.api.commands.FunkeArgument;
@@ -11,14 +12,25 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UpdateConfigArgument extends FunkeArgument {
 
     public UpdateConfigArgument(FunkeCommand parent, String name, String display, String description, String... permission) {
         super(parent, name, display, description, permission);
 
-        addTabComplete(2, "messages", "config");
-        addTabComplete(3, "full", "checks", "pup", "antipup");
+        addTabComplete(2, "messages", "config", "check");
+        addTabComplete(3, "full,config,2", "checks,config,2", "pup,config,2", "antipup,config,2");
+        List<String> checks = new ArrayList<>();
+        Kauri.getInstance().getCheckManager().getChecks().forEach(check -> checks.add(check.getName().replaceAll(" ", "_")));
+
+        String[] checkArray = new String[checks.size()];
+
+        for (int i = 0; i < checks.size(); i++) {
+            checkArray[i] = checks.get(i) + ",check,2";
+        }
+        addTabComplete(3, checkArray);
     }
 
     @Message(name = "command.updateConfig.started")
@@ -39,9 +51,12 @@ public class UpdateConfigArgument extends FunkeArgument {
     @Message(name = "command.updateConfig.deletingSection")
     private String deletingSection = "&7Deleting %section% section...";
 
+    @Message(name = "command.updateConfig.provideChecks")
+    private String provideChecks = "&cYou must provide a proper check name to reset.";
+
     @Override
     public void onArgument(CommandSender sender, Command command, String[] args) {
-        if(args.length > 2) {
+        if(args.length > 1) {
             if(args[1].equalsIgnoreCase("messages")) {
                 sender.sendMessage(Color.translate(started.replace("%type%", "Messages")));
                 sender.sendMessage(Color.translate(deletingFile));
@@ -49,7 +64,7 @@ public class UpdateConfigArgument extends FunkeArgument {
                 sender.sendMessage(Color.translate(genNewConfig));
                 Kauri.getInstance().saveDefaultMessages();
                 sender.sendMessage(Color.translate(completed));
-            } else if(args[1].equalsIgnoreCase("config")) {
+            } else if(args[1].equalsIgnoreCase("config") && args.length > 2) {
                 val instance = Kauri.getInstance();
                 val config = instance.getConfig();
                 switch(args[2].toLowerCase()) {
@@ -87,6 +102,18 @@ public class UpdateConfigArgument extends FunkeArgument {
                         sender.sendMessage(Color.translate(Messages.invalidArguments));
                         break;
                 }
+            } else if(args[1].equals("check") && args.length > 2) {
+                String name = args[2].replace("_", " ");
+                if(Kauri.getInstance().getCheckManager().isCheck(name)) {
+                    Check check = Kauri.getInstance().getCheckManager().getCheck(name);
+
+                    sender.sendMessage(Color.translate(started.replace("%type%", "Check: " + check.getName())));
+                    sender.sendMessage(Color.translate(deletingSection.replace("%section%", "checks." + check.getName())));
+                    Kauri.getInstance().getConfig().set("checks." + check.getName(), null);
+                    sender.sendMessage(Color.translate(reloadingKauri));
+                    Kauri.getInstance().reloadKauri();
+                    sender.sendMessage(Color.translate(completed));
+                } else sender.sendMessage(Color.translate(provideChecks));
             } else {
                 sender.sendMessage(Color.translate(Messages.invalidArguments));
             }

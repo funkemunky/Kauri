@@ -27,10 +27,10 @@ public class BadPacketsG extends Check {
     public boolean usingPaper = false;
 
     @Setting(name = "lenience")
-    public float deltaBalance = 0.025f;
+    public float deltaBalance = 0.04f;
 
     @Setting(name = "threshold.vl.max")
-    private int maxVL = 30;
+    private int maxVL = 50;
 
     private long lastFlying;
     private int vl;
