@@ -20,4 +20,8 @@ public enum AlertTier {
     public static AlertTier getByValue(int value) {
         return Arrays.stream(values()).filter(tier -> Math.abs(tier.priority - value) == 0).findFirst().orElse(AlertTier.LOW);
     }
+
+    public static AlertTier getByName(String name) {
+        return Arrays.stream(values()).filter(tier -> tier.name.equals(name)).findFirst().orElse(AlertTier.LOW);
+    }
 }

@@ -72,7 +72,7 @@ public abstract class Check implements Listener, org.bukkit.event.Listener {
                             vl++;
                             Kauri.getInstance().getStatsManager().addFlag();
                         }
-                        Kauri.getInstance().getLoggerManager().addViolation(data.getUuid(), this);
+                        Kauri.getInstance().getLoggerManager().addViolation(data, this, information, tier);
                     }
                     if (alertTier.equals(AlertTier.CERTAIN) || (vl > maxVL && executable && ban && !developer && !getData().isBanned())) {
                         banUser();

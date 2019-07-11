@@ -1,26 +1,47 @@
 package cc.funkemunky.anticheat.api.data.logging;
 
+import cc.funkemunky.anticheat.api.checks.AlertTier;
+import cc.funkemunky.anticheat.api.utils.json.JSONException;
+import cc.funkemunky.anticheat.api.utils.json.JSONObject;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.val;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+@Getter
+@AllArgsConstructor
 public class Violation {
-    @Getter
-    private Map<String, Integer> violations = new LinkedHashMap<>();
+    private String checkName, info;
+    private double tps, ping;
+    private long timeStamp;
+    private AlertTier tier;
 
-    public void addViolation(String check) {
-        addViolation(check, 1);
+    public String toJson() {
+        JSONObject object = new JSONObject();
+
+        try {
+            object.put("check", checkName);
+            object.put("info", info);
+            object.put("tier", tier.getName());
+            object.put("tps", tps);
+            object.put("ping", ping);
+            object.put("timeStamp", timeStamp);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 
-    public void addViolation(String check, int count) {
-        val vl = violations.getOrDefault(check, 0);
+    public static Violation fromJson(String json) {
+        try {
+            JSONObject object = new JSONObject(json);
 
-        violations.put(check, vl + count);
-    }
-
-    public int getViolation(String check) {
-        return violations.getOrDefault(check, 0);
+            return new Violation(object.getString("check"), object.getString("info"), object.getDouble("tps"), object.getDouble("ping"), object.getLong("timeStamp"), AlertTier.getByName(object.getString("tier")));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

@@ -23,6 +23,9 @@ public class Messages {
     @Message(name = "command.error.checkDoesntExist")
     public static String checkDoesntExist = "&cThe check \"%check%\" does not exist.";
 
+    @Message(name = "command.error.playersOnly")
+    public static String playersOnly = "&cYou must be a player to run this command.";
+
     @Message(name = "command.alerts.toggledAlerts")
     public static String toggledAlerts = "&7Toggled your alerts &f%enabled%&7.";
 

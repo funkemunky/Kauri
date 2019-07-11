@@ -78,13 +78,13 @@ public class BanwaveManager {
     public List<UUID> judgeCheaters() {
         List<UUID> uuids = new ArrayList<>();
         Kauri.getInstance().getLoggerManager().getViolations().keySet().stream().filter(key -> {
-            val violationsToSort = Kauri.getInstance().getLoggerManager().getViolations().get(key);
+            val violationsToSort = Kauri.getInstance().getLoggerManager().getViolations(key);
 
             Map<Check, Integer> violations = new HashMap<>();
 
-            violationsToSort.getViolations().keySet().stream().filter(key2 -> Kauri.getInstance().getCheckManager().isCheck(key2) && Kauri.getInstance().getCheckManager().getCheck(key2).isBanWave()).forEach(key2 -> {
-                violations.put(Kauri.getInstance().getCheckManager().getCheck(key2), violationsToSort.getViolations().get(key2));
-            });
+            violationsToSort.keySet().stream()
+                    .filter(key2 -> Kauri.getInstance().getCheckManager().isCheck(key2) && Kauri.getInstance().getCheckManager().getCheck(key2).isBanWave())
+                    .forEach(key2 -> violations.put(Kauri.getInstance().getCheckManager().getCheck(key2), violationsToSort.get(key2)));
 
             return violations.keySet().stream().anyMatch(key2 -> key2.getBanWaveThreshold() > violations.get(key2));
         }).forEach(uuids::add);

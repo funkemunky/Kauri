@@ -99,7 +99,7 @@ public class Kauri extends JavaPlugin {
         //Starting up our utilities, managers, and tasks.
 
         statsManager = new StatsManager();
-        loggerManager = new LoggerManager();
+        loggerManager = new LoggerManager(Atlas.getInstance().getCarbon());
         loggerManager.loadFromDatabase();
         banwaveManager = new BanwaveManager();
 
