@@ -190,9 +190,13 @@ public class LoggerManager {
     public Map<String, Integer> getViolations(UUID uuid) {
         if(enabled) {
             if(violations.containsKey(uuid)) {
-                List<Violation> vl = violations.get(uuid);
+                List<Violation> vlList = violations.get(uuid);
 
-                return vl.stream().collect(Collectors.toMap(Violation::getCheckName, vio -> Collections.frequency(vl.stream().map(Violation::getCheckName).collect(Collectors.toList()), vio.getCheckName())));
+                Map<String, Integer> vls = new HashMap<>();
+
+                vlList.stream().forEach(vl -> vls.put(vl.getCheckName(), vls.getOrDefault(vl.getCheckName(), 0) + 1));
+
+                return vls;
             }
         }
         return new HashMap<>();
