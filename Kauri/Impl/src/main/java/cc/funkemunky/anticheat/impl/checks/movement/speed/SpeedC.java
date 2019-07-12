@@ -7,9 +7,11 @@ import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.Init;
+import cc.funkemunky.api.utils.PlayerUtils;
 import cc.funkemunky.api.utils.ReflectionsUtil;
 import lombok.val;
 import org.bukkit.event.Event;
+import org.bukkit.potion.PotionEffectType;
 
 @Init
 @Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK})
@@ -25,9 +27,9 @@ public class SpeedC extends Check {
 
         if(move.getGroundTicks() > 2 && !getData().isGeneralCancel() && move.getHalfBlockTicks() == 0 && move.getBlockAboveTicks() == 0 && move.getWebTicks() == 0 && move.getClimbTicks() == 0 && move.getLiquidTicks() == 0) {
             double predicted = move.getLastDeltaXZ() * ReflectionsUtil.getFriction(getData().getBlockBelow());
-            double delta = Math.abs((move.getDeltaXZ() - predicted) * 8.75);
+            double delta = Math.abs((move.getDeltaXZ() - predicted) * 8.75 - (0.5 * PlayerUtils.getPotionEffectLevel(getData().getPlayer(), PotionEffectType.SPEED)));
 
-            if(delta > 1.1) {
+            if(delta > 1.1 && getData().getWalkSpeed() < 0.21) {
                 if(vl++ > 5) {
                     flag("delta=" + delta, true, true, AlertTier.HIGH);
                 }
