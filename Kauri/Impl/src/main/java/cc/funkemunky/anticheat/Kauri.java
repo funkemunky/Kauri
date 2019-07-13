@@ -6,7 +6,6 @@ import cc.funkemunky.anticheat.api.data.DataManager;
 import cc.funkemunky.anticheat.api.data.banwave.BanwaveManager;
 import cc.funkemunky.anticheat.api.data.logging.LoggerManager;
 import cc.funkemunky.anticheat.api.data.stats.StatsManager;
-import cc.funkemunky.anticheat.api.event.TickEvent;
 import cc.funkemunky.anticheat.api.pup.AntiPUPManager;
 import cc.funkemunky.anticheat.api.utils.Message;
 import cc.funkemunky.anticheat.api.utils.VPNUtils;
@@ -59,8 +58,8 @@ public class Kauri extends JavaPlugin {
     private LoggerManager loggerManager;
     private BanwaveManager banwaveManager;
 
-    private int currentTicks;
-    private long lastTick, tickElapsed, profileStart;
+    private int ticks;
+    private long profileStart, lastTimeStamp, tpsMilliseconds;
     private double tps;
 
     private ScheduledExecutorService executorService, vpnSchedular = Executors.newSingleThreadScheduledExecutor();
@@ -132,22 +131,15 @@ public class Kauri extends JavaPlugin {
         //This allows us to use ticks for intervalTime comparisons to allow for more parrallel calculations to actual Minecraft
         //and it also has the added benefit of being lighter than using System.currentTimeMillis.
         new BukkitRunnable() {
-            int ticks;
-            long lastTimeStamp = System.currentTimeMillis();
 
             public void run() {
-                if(ticks++ >= 20) {
-                    tps = 20 * (1000D / (System.currentTimeMillis() - lastTimeStamp));
-                    lastTimeStamp = System.currentTimeMillis();
+                if(ticks++ >= 39) {
+                    long timeStamp = System.currentTimeMillis();
+                    tpsMilliseconds = timeStamp - lastTimeStamp;
+                    tps = 1000D / tpsMilliseconds * 40;
+                    lastTimeStamp = timeStamp;
                     ticks = 0;
                 }
-                TickEvent tickEvent = new TickEvent(currentTicks++);
-
-                Atlas.getInstance().getEventManager().callEvent(tickEvent);
-                long timeStamp = System.currentTimeMillis();
-                tickElapsed = timeStamp - lastTick;
-                //Bukkit.broadcastMessage(tickElapsed + "ms" + ", " + getTPS());
-                lastTick = timeStamp;
             }
         }.runTaskTimer(this, 1L, 1L);
         new BukkitRunnable() {
@@ -157,7 +149,7 @@ public class Kauri extends JavaPlugin {
                     List<LivingEntity> entities;
 
                     players = (entities = new ArrayList<>(world.getLivingEntities())).stream()
-                            .filter(ent -> ent instanceof Player && Bukkit.getOnlinePlayers().contains((Player) ent))
+                            .filter(ent -> ent instanceof Player && Bukkit.getOnlinePlayers().contains(ent))
                             .map(ent -> (Player) ent)
                             .collect(Collectors.toList());
 
@@ -214,12 +206,12 @@ public class Kauri extends JavaPlugin {
         Atlas.getInstance().getFunkeCommandManager().addCommand(this, new KauriCommand());
     }
 
-    public double getTPSMS() {
-        return 1000D / tickElapsed;
+    public double getTPS(RoundingMode mode, int places) {
+        return MathUtils.round(tps, places, mode);
     }
 
-    public double getTPS(RoundingMode mode, int places) {
-        return MathUtils.round(1000D / tickElapsed, places, mode);
+    public double getTpsMS() {
+        return 50 / (2000D / tpsMilliseconds);
     }
 
     public void reloadKauri() {

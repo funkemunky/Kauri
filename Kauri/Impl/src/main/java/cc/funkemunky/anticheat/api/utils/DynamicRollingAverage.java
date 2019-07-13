@@ -2,11 +2,11 @@ package cc.funkemunky.anticheat.api.utils;
 
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 public class DynamicRollingAverage {
-    private List<Double> values = new ArrayList<>();
+    private Deque<Double> values = new ArrayDeque<>();
 
     private int size;
 
@@ -33,8 +33,8 @@ public class DynamicRollingAverage {
         reachedSize = false;
     }
 
-    public List<Double> getCopy() {
-        return new ArrayList<>(values);
+    public Deque<Double> getCopy() {
+        return new ArrayDeque<>(values);
     }
 
     public double getAverage() {

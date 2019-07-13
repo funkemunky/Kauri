@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.api.utils;
 
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
+import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumParticle;
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.BoundingBox;
@@ -48,7 +49,7 @@ public class CollisionAssessment {
                 }
             }
 
-            if (getData().isDebuggingBox() && bb.collides(playerBox) && Kauri.getInstance().getCurrentTicks() % 2 == 0) {
+            if (getData().isDebuggingBox() && bb.collides(playerBox) && Atlas.getInstance().getCurrentTicks() % 2 == 0) {
                 BoundingBox box = bb;
                 Kauri.getInstance().getExecutorService().submit(() -> MiscUtils.createParticlesForBoundingBox(getData().getPlayer(), box, WrappedEnumParticle.FLAME, 0.25f));
             }

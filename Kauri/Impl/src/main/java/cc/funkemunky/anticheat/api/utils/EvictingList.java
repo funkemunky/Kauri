@@ -4,10 +4,11 @@
 
 package cc.funkemunky.anticheat.api.utils;
 
+import java.util.ArrayDeque;
 import java.util.Collection;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Stream;
 
-public class EvictingList<T> extends CopyOnWriteArrayList<T> {
+public class EvictingList<T> extends ArrayDeque<T> {
     private int maxSize;
 
     public EvictingList(int maxSize) {
@@ -29,5 +30,8 @@ public class EvictingList<T> extends CopyOnWriteArrayList<T> {
         return super.add(t);
     }
 
-
+    @Override
+    public Stream<T> stream() {
+        return new ArrayDeque<>(this).stream();
+    }
 }

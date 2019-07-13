@@ -26,7 +26,6 @@ import org.bukkit.util.Vector;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -57,7 +56,7 @@ public class PlayerData {
             lastAttack = new TickTimer(4),
             lastBlockBreak = new TickTimer(3),
             lastPacketSkip = new TickTimer(5);
-    private List<Vector> teleportLocations;
+    private EvictingList<Vector> teleportLocations;
     private float walkSpeed, flySpeed;
     private LivingEntity target, attacker;
     private long transPing, lastTransaction, lastTransPing, ping, lastPing, lastKeepAlive, lastServerPosStamp, lastFlagTimestamp, lastPacketDrop;
