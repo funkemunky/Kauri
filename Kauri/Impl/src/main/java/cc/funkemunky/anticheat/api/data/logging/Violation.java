@@ -5,10 +5,6 @@ import cc.funkemunky.anticheat.api.utils.json.JSONException;
 import cc.funkemunky.anticheat.api.utils.json.JSONObject;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.val;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 @Getter
 @AllArgsConstructor

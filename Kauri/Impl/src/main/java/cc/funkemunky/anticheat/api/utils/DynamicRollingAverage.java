@@ -4,10 +4,9 @@ import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class DynamicRollingAverage {
-    private List<Double> values = new CopyOnWriteArrayList<>();
+    private List<Double> values = new ArrayList<>();
 
     private int size;
 
@@ -34,7 +33,11 @@ public class DynamicRollingAverage {
         reachedSize = false;
     }
 
+    public List<Double> getCopy() {
+        return new ArrayList<>(values);
+    }
+
     public double getAverage() {
-        return this.values.stream().mapToDouble(i -> i).average().orElse(0.0);
+        return getCopy().stream().mapToDouble(i -> i).average().orElse(0.0);
     }
 }

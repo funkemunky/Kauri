@@ -1,7 +1,7 @@
 package cc.funkemunky.anticheat.api.checks;
 
 import cc.funkemunky.anticheat.api.data.PlayerData;
-import cc.funkemunky.api.event.system.Listener;
+import cc.funkemunky.anticheat.impl.config.CheckSettings;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,7 +14,7 @@ import java.util.Map;
 
 @Getter
 @Setter
-public abstract class Check implements Listener, org.bukkit.event.Listener {
+public abstract class Check {
     private String name;
     private CheckType type;
     private String description;

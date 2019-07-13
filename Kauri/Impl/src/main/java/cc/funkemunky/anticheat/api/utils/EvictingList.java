@@ -5,12 +5,7 @@
 package cc.funkemunky.anticheat.api.utils;
 
 import java.util.Collection;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.DelayQueue;
-import java.util.concurrent.LinkedBlockingDeque;
 
 public class EvictingList<T> extends CopyOnWriteArrayList<T> {
     private int maxSize;
@@ -33,4 +28,6 @@ public class EvictingList<T> extends CopyOnWriteArrayList<T> {
         if (size() >= maxSize) remove(0);
         return super.add(t);
     }
+
+
 }

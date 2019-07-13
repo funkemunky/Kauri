@@ -1,29 +1,69 @@
 package cc.funkemunky.anticheat.api.data.logging;
 
+import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.api.Atlas;
-import cc.funkemunky.api.database.Database;
+import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.Priority;
+import cc.funkemunky.carbon.Carbon;
+import cc.funkemunky.carbon.db.Database;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Init(priority = Priority.HIGH)
+@NoArgsConstructor
 public class LoggerManager {
     @Getter
-    private Map<UUID, Violation> violations = new ConcurrentHashMap<>();
+    private Map<UUID, List<Violation>> violations = new ConcurrentHashMap<>();
 
     @Getter
     private Set<UUID> recentViolators = new LinkedHashSet<>();
 
     @ConfigSetting(path = "data.logging", name = "type")
     public String type = "FLATFILE";
+
+    @ConfigSetting(path = "data.logging", name = "enabled")
+    public boolean enabled = true;
+
+    @ConfigSetting(path = "database.mysql", name = "ip")
+    private String mySQLIp = "localhost";
+
+    @ConfigSetting(path = "database.mysql", name = "port")
+    private int mySQLPort = 3306;
+
+    @ConfigSetting(path = "database.mysql", name = "username")
+    private String mySQLUsername = "username";
+
+    @ConfigSetting(path = "database.mysql", name = "password")
+    private String mySQLPassword = "password";
+
+    @ConfigSetting(path = "database.mysql", name = "database")
+    private String mySQLDatabase = "Kauri";
+
+    @ConfigSetting(path = "database.mongo", name = "ip")
+    private String mongoIp = "localhost";
+
+    @ConfigSetting(path = "database.mongo", name = "port")
+    private int mongoPort = 27107;
+
+    @ConfigSetting(path = "database.mongo", name = "username")
+    private String mongoUsername = "username";
+
+    @ConfigSetting(path = "database.mongo", name = "password")
+    private String mongoPassword = "password";
+
+    @ConfigSetting(path = "database.mongo", name = "database")
+    private String mongoDatabase = "Kauri";
+
+    public Database database;
+
+    public LoggerManager(Carbon carbon) {
+
+    }
 
     public void loadFromDatabase() {
 
@@ -33,7 +73,7 @@ public class LoggerManager {
 
     }
 
-    public void addViolation(UUID uuid, Check check) {
+    public void addViolation(PlayerData data, Check check, String info, AlertTier tier) {
 
     }
 
@@ -42,7 +82,10 @@ public class LoggerManager {
     }
 
     public boolean isBanned(UUID uuid) {
-        Database database = Atlas.getInstance().getDatabaseManager().getDatabase("KauriLogs");
+        if(!enabled) {
+            return false;
+        }
+        Database database = this.database;
         return database.getDatabaseValues().keySet().stream().anyMatch(key -> key.equals(uuid.toString() + ";banned"));
     }
 
@@ -52,15 +95,8 @@ public class LoggerManager {
 
 
     public String getBanReason(UUID uuid) {
+
         return "none";
-    }
-
-    public int addAndGetViolation(UUID uuid, Check check) {
-        return addAndGetViolation(uuid, check, 1);
-    }
-
-    public int addAndGetViolation(UUID uuid, Check check, int amount) {
-        return amount;
     }
 
     public void clearLogs(UUID uuid) {
@@ -68,10 +104,17 @@ public class LoggerManager {
     }
 
     public Map<String, Integer> getViolations(UUID uuid) {
-        return violations.getOrDefault(uuid, new Violation()).getViolations();
+
+        return new HashMap<>();
+    }
+
+    public List<Violation> getDetailedViolations(UUID uuid) {
+        if(!enabled) return new ArrayList<>();
+        return violations.getOrDefault(uuid, new ArrayList<>());
     }
 
     public int getViolations(Check check, UUID uuid) {
+        if(!enabled) return 0;
         Map<String, Integer> vls = getViolations(uuid);
 
         return vls.getOrDefault(check.getName(), 0);

@@ -16,13 +16,21 @@ import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.event.system.EventManager;
 import cc.funkemunky.api.events.AtlasListener;
 import cc.funkemunky.api.profiling.BaseProfiler;
+import cc.funkemunky.api.tinyprotocol.api.NMSObject;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
+import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutEntityMetadata;
+import cc.funkemunky.api.tinyprotocol.packet.types.WrappedWatchableObject;
+import cc.funkemunky.api.tinyprotocol.reflection.Reflection;
 import cc.funkemunky.api.updater.UpdaterUtils;
 import cc.funkemunky.api.utils.*;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
@@ -32,13 +40,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.*;
 import java.math.RoundingMode;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 @Getter
 public class Kauri extends JavaPlugin {
@@ -125,14 +132,6 @@ public class Kauri extends JavaPlugin {
         //This allows us to use ticks for intervalTime comparisons to allow for more parrallel calculations to actual Minecraft
         //and it also has the added benefit of being lighter than using System.currentTimeMillis.
         new BukkitRunnable() {
-            public void run() {
-                TickEvent tickEvent = new TickEvent(currentTicks++);
-
-                Atlas.getInstance().getEventManager().callEvent(tickEvent);
-            }
-        }.runTaskTimerAsynchronously(this, 1L, 1L);
-
-        new BukkitRunnable() {
             int ticks;
             long lastTimeStamp = System.currentTimeMillis();
 
@@ -142,12 +141,69 @@ public class Kauri extends JavaPlugin {
                     lastTimeStamp = System.currentTimeMillis();
                     ticks = 0;
                 }
+                TickEvent tickEvent = new TickEvent(currentTicks++);
+
+                Atlas.getInstance().getEventManager().callEvent(tickEvent);
                 long timeStamp = System.currentTimeMillis();
                 tickElapsed = timeStamp - lastTick;
                 //Bukkit.broadcastMessage(tickElapsed + "ms" + ", " + getTPS());
                 lastTick = timeStamp;
             }
         }.runTaskTimer(this, 1L, 1L);
+        new BukkitRunnable() {
+            public void run() {
+                for (World world : Bukkit.getWorlds()) {
+                    List<Player> players;
+                    List<LivingEntity> entities;
+
+                    players = (entities = new ArrayList<>(world.getLivingEntities())).stream()
+                            .filter(ent -> ent instanceof Player && Bukkit.getOnlinePlayers().contains((Player) ent))
+                            .map(ent -> (Player) ent)
+                            .collect(Collectors.toList());
+
+                    Map<Entity, Object> packetsToSend = new HashMap<>();
+                    Class<?> entityClass = ReflectionsUtil.getNMSClass("Entity");
+                    entities.forEach(ent -> {
+                       Object vanillaEnt = ReflectionsUtil.getEntity(ent);
+                       Object dataWatcher = ReflectionsUtil.getFieldValue(ReflectionsUtil.getFieldByName(entityClass, "datawatcher"), vanillaEnt);
+
+                        Map map = Reflection.getField(ReflectionsUtil.getNMSClass("DataWatcher"), Map.class, 1).get(dataWatcher);
+
+                        List<Object> watchables = new ArrayList<>();
+
+                        map.keySet().forEach(key -> watchables.add(map.get(key)));
+
+                        if(watchables.size() > 7) {
+                            WrappedOutEntityMetadata toSend = null;
+                            WrappedWatchableObject object7 = new WrappedWatchableObject(watchables.get(7)), object6 = new WrappedWatchableObject(watchables.get(6));
+
+                            if(object7.getWatchedObject() instanceof Float) {
+                                object7.setWatchedObject(1.0f);
+                                object7.setPacket(NMSObject.Type.WATCHABLE_OBJECT, object7.getObjectType(), object7.getDataValueId(), object7.getWatchedObject());
+
+                                watchables.set(7, object7.getObject());
+                                toSend = new WrappedOutEntityMetadata(ent.getEntityId(), watchables);
+                            } else if(object6.getWatchedObject() instanceof Float) {
+                                object6.setWatchedObject(1.0f);
+                                object6.setPacket(NMSObject.Type.WATCHABLE_OBJECT, object6.getObjectType(), object6.getDataValueId(), object6.getWatchedObject());
+
+                                watchables.set(6, object6.getObject());
+                                toSend = new WrappedOutEntityMetadata(ent.getEntityId(), watchables);
+                            }
+
+                            if(toSend != null) {
+                                packetsToSend.put(ent, toSend.getObject());
+                            }
+                        }
+                    });
+                    players.stream().forEach(pl -> packetsToSend.keySet().forEach(key -> {
+                        if(!key.getUniqueId().equals(pl.getUniqueId())) {
+                            TinyProtocolHandler.sendPacket(pl, packetsToSend.get(key));
+                        }
+                    }));
+                }
+            }
+        }.runTaskTimerAsynchronously(this, 20L, 30L);
     }
 
     public void startScanner(boolean configOnly) {

@@ -13,12 +13,8 @@ import cc.funkemunky.api.utils.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
-import org.bukkit.Bukkit;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Vehicle;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.List;

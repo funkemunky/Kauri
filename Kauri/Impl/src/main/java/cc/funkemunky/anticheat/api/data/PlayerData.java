@@ -22,10 +22,12 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Getter
@@ -41,8 +43,8 @@ public class PlayerData {
             cinematicMode, lagging, alertsEnabled, inventoryOpen, isPosition, loggedIn;
     private Player player;
 
-    private List<Check> checks = new ArrayList<>();
-    private List<AntiPUP> antiPUP = new ArrayList<>();
+    private Deque<Check> checks = new ArrayDeque<>();
+    private Deque<AntiPUP> antiPUP = new ArrayDeque<>();
 
     private CancelType cancelType = CancelType.NONE;
     private Vector lastVelocityVector;

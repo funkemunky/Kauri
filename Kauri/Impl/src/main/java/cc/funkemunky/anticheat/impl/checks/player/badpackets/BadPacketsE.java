@@ -3,7 +3,6 @@ package cc.funkemunky.anticheat.impl.checks.player.badpackets;
 import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.BukkitEvents;
 import cc.funkemunky.anticheat.api.utils.Verbose;
-import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import org.bukkit.event.Event;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 

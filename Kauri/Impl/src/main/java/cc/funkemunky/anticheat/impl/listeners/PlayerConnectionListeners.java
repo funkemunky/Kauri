@@ -1,24 +1,16 @@
 package cc.funkemunky.anticheat.impl.listeners;
 
 import cc.funkemunky.anticheat.Kauri;
-import cc.funkemunky.anticheat.api.data.PlayerData;
-import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
-import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutPositionPacket;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.Init;
-import lombok.val;
 import org.bukkit.Achievement;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-
-import java.util.HashSet;
-import java.util.concurrent.TimeUnit;
 
 @Init
 public class PlayerConnectionListeners implements Listener {

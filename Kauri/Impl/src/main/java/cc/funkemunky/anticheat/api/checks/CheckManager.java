@@ -14,8 +14,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.lang.reflect.InvocationTargetException;
 import java.text.Collator;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 @Getter
@@ -24,9 +22,9 @@ public class CheckManager {
     private List<Class<?>> checkClasses = new ArrayList<>();
     private Collection<Check> checks = new TreeSet<>(Comparator.comparing(Check::getName, Collator.getInstance()));
     private Set<UUID> bypassingPlayers = new HashSet<>();
-    private ExecutorService checkExecutor = Executors.newSingleThreadExecutor();
-    private List<PlayerData> alerts = new ArrayList<>();
-    private List<PlayerData> devAlerts = new ArrayList<>();
+    private Deque<PlayerData> alerts = new ArrayDeque<>();
+    private Deque<PlayerData> devAlerts = new ArrayDeque<>();
+    private Deque<PlayerData> debuggingPackets = new ArrayDeque<>();
 
     public void registerCheck(Class<?> checkClass, Collection<Check> checkList) {
         try {
@@ -94,10 +92,11 @@ public class CheckManager {
 
             new BukkitRunnable() {
                 public void run() {
-                    val dataToSort = Kauri.getInstance().getDataManager().getDataObjects().keySet().stream().map(key -> Kauri.getInstance().getDataManager().getDataObjects().get(key)).filter(data -> data.getPlayer().hasPermission("kauri.alerts") && data.isAlertsEnabled()).collect(Collectors.toList());
-
-                    alerts = new ArrayList<>(dataToSort);
-                    devAlerts = dataToSort.stream().filter(PlayerData::isDeveloperAlerts).collect(Collectors.toList());
+                    val dataList = new ArrayList<>(Kauri.getInstance().getDataManager().getDataObjects().values());
+                    val alertsOn = dataList.stream().filter(data -> data.getPlayer().hasPermission("kauri.alerts") && data.getAlertTier() != null).collect(Collectors.toList());
+                    alerts = new ArrayDeque<>(alertsOn);
+                    devAlerts = new ArrayDeque<>(alertsOn.stream().filter(PlayerData::isDeveloperAlerts).collect(Collectors.toList()));
+                    debuggingPackets = new ArrayDeque<>(dataList.stream().filter(PlayerData::isDebuggingPackets).collect(Collectors.toList()));
                 }
             }.runTaskTimerAsynchronously(Kauri.getInstance(), 40L, 30L);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {

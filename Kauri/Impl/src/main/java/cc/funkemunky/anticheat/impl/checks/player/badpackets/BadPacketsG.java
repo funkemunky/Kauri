@@ -10,7 +10,6 @@ import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.anticheat.api.utils.StatisticalAnalysis;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.TickTimer;
 import lombok.val;
 import org.bukkit.event.Event;
 
@@ -34,7 +33,7 @@ public class BadPacketsG extends Check {
 
     private long lastFlying;
     private int vl;
-    private StatisticalAnalysis statisticalAnalysis = new StatisticalAnalysis(20);
+    private StatisticalAnalysis statisticalAnalysis = new StatisticalAnalysis(40);
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
@@ -52,7 +51,7 @@ public class BadPacketsG extends Check {
             return;
         }
 
-        val max = Math.sqrt((50 - (1000 / Kauri.getInstance().getTps())) + 50);
+        val max = Math.min(7.065, Math.sqrt((50 - (1000 / Kauri.getInstance().getTps())) + 50));
         val stdDev = this.statisticalAnalysis.getStdDev();
 
         if (!MathUtils.approxEquals(deltaBalance, max, stdDev) && !getData().isLagging() && stdDev < max && getData().getLastLag().hasPassed(10)) {

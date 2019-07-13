@@ -26,28 +26,28 @@ public class Interval {
     }
 
     public double average() {
-        return valList.stream().mapToDouble(Long::doubleValue).average().orElse(0.0);
+        return getCopy().stream().mapToDouble(Long::doubleValue).average().orElse(0.0);
     }
 
     public double frequency(double freq) {
-        return Collections.frequency(valList, freq);
+        return Collections.frequency(getCopy(), freq);
     }
 
     public long distinct() {
-        return valList.stream().distinct().count();
+        return getCopy().stream().distinct().count();
     }
 
     public double std() {
         double average = average();
-        return Math.sqrt(valList.stream().mapToDouble(val -> Math.pow(val - average, 2)).average().orElse(0));
+        return Math.sqrt(getCopy().stream().mapToDouble(val -> Math.pow(val - average, 2)).average().orElse(0));
     }
 
     public double max() {
-        return valList.stream().mapToDouble(Long::doubleValue).max().orElse(0.0);
+        return getCopy().stream().mapToDouble(Long::doubleValue).max().orElse(0.0);
     }
 
     public double min() {
-        return valList.stream().mapToDouble(Long::doubleValue).min().orElse(0.0);
+        return getCopy().stream().mapToDouble(Long::doubleValue).min().orElse(0.0);
     }
 
     public void add(long x) {
@@ -66,5 +66,9 @@ public class Interval {
         if (valList.size() == max) {
             this.clear();
         }
+    }
+
+    public Deque<Long> getCopy() {
+        return new LinkedList<>(valList);
     }
 }

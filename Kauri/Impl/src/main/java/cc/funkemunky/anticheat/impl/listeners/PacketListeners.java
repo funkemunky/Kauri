@@ -1,24 +1,19 @@
 package cc.funkemunky.anticheat.impl.listeners;
 
 import cc.funkemunky.anticheat.Kauri;
-import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.data.PlayerData;
-import cc.funkemunky.anticheat.api.utils.CustomLocation;
 import cc.funkemunky.anticheat.impl.config.CheckSettings;
 import cc.funkemunky.api.events.AtlasListener;
 import cc.funkemunky.api.events.Listen;
 import cc.funkemunky.api.events.ListenerPriority;
 import cc.funkemunky.api.events.impl.PacketReceiveEvent;
 import cc.funkemunky.api.events.impl.PacketSendEvent;
-import cc.funkemunky.api.tinyprotocol.api.NMSObject;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.*;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutEntityMetadata;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutPositionPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
-import cc.funkemunky.api.tinyprotocol.packet.types.WrappedWatchableObject;
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
@@ -28,8 +23,6 @@ import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-
-import java.util.ArrayList;
 
 @Init
 public class PacketListeners implements AtlasListener {
@@ -52,15 +45,11 @@ public class PacketListeners implements AtlasListener {
                     data.getVelocityProcessor().velocityX = data.getVelocityProcessor().velocityY = data.getVelocityProcessor().velocityZ = 0;
                     data.getVelocityProcessor().setAttackedSinceVelocity(false);
                     data.setTeleportTest(System.currentTimeMillis());
-                    hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
-                    //if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
                     break;
                 }
                 case Packet.Server.KEEP_ALIVE:
                     data.setLastKeepAlive(event.getTimeStamp());
                     TinyProtocolHandler.sendPacket(event.getPlayer(), new WrappedOutTransaction(0, (short) 69, false).getObject());
-                    hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
-                    //if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
                     break;
                 case Packet.Server.TRANSACTION: {
                     WrappedOutTransaction packet = new WrappedOutTransaction(event.getPacket(), event.getPlayer());
@@ -68,55 +57,25 @@ public class PacketListeners implements AtlasListener {
                     if (packet.getAction() == (short) 69) {
                         data.setLastTransaction(event.getTimeStamp());
                     }
-                    hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
-                   // if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
                     break;
                 }
                 case Packet.Server.ENTITY_VELOCITY: {
                     WrappedOutVelocityPacket packet = new WrappedOutVelocityPacket(event.getPacket(), event.getPlayer());
 
                     data.getVelocityProcessor().update(packet);
-                    hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
-                   // if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
-                    break;
-                }
-                case Packet.Server.ENTITY_METADATA: {
-                    WrappedOutEntityMetadata packet = new WrappedOutEntityMetadata(event.getPacket(), event.getPlayer());
-
-                    if(packet.getWatchableObjects().size() > 7) {
-                        WrappedWatchableObject object7 = new WrappedWatchableObject(packet.getWatchableObjects().get(7)), object6 = new WrappedWatchableObject(packet.getWatchableObjects().get(6));
-
-                        if(object7.getWatchedObject() instanceof Float) {
-                            object7.setWatchedObject(1.0f);
-                            object7.setPacket(NMSObject.Type.WATCHABLE_OBJECT, object7.getObjectType(), object7.getDataValueId(), object7.getWatchedObject());
-
-                            packet.getWatchableObjects().set(7, object7.getObject());
-                            WrappedOutEntityMetadata toSet = new WrappedOutEntityMetadata(packet.getEntityId(), packet.getWatchableObjects());
-                            event.setPacket(toSet.getObject());
-                        } else if(object6.getWatchedObject() instanceof Float) {
-                            object6.setWatchedObject(1.0f);
-                            object6.setPacket(NMSObject.Type.WATCHABLE_OBJECT, object6.getObjectType(), object6.getDataValueId(), object6.getWatchedObject());
-
-                            packet.getWatchableObjects().set(6, object6.getObject());
-                            WrappedOutEntityMetadata toSet = new WrappedOutEntityMetadata(packet.getEntityId(), packet.getWatchableObjects());
-                            event.setPacket(toSet.getObject());
-                        }
-                    }
-                   // if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
-                    break;
-                }
-                case Packet.Server.ABILITIES: {
-                    hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
-                    //if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
                     break;
                 }
             }
 
+            if(!event.getType().equalsIgnoreCase(Packet.Server.CHAT)) {
+                hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data);
+                hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
+            }
         }
         Kauri.getInstance().getProfiler().stop("event:PacketSendEvent");
     }
 
-    @Listen(priority = ListenerPriority.LOW)
+    @Listen(priority = ListenerPriority.NORMAL)
     public void onEvent(PacketReceiveEvent event) {
         if (event.getPlayer() == null || !Kauri.getInstance().getDataManager().getDataObjects().containsKey(event.getPlayer().getUniqueId()))
             return;
@@ -241,40 +200,37 @@ public class PacketListeners implements AtlasListener {
                     break;
                 }
             }
-            //debug(event.getType(), data);
+            debug(event.getType(), data);
             hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
-            //if (hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
+            hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data);
         }
         Kauri.getInstance().getProfiler().stop("event:PacketReceiveEvent");
     }
 
     private void hopper(Object packet, String packetType, long timeStamp, PlayerData data) {
         if ((!CheckSettings.bypassEnabled || !data.getPlayer().hasPermission(CheckSettings.bypassPermission)) && !Kauri.getInstance().getCheckManager().isBypassing(data.getUuid())) {
-            Kauri.getInstance().getExecutorService().execute(() -> {
-                data.getChecks().stream()
+            Kauri.getInstance().getExecutorService().execute(() -> data.getChecks().stream()
                         .filter(check -> check.isEnabled() && check.getPackets().contains(packetType))
                         .forEach(check -> {
                             Kauri.getInstance().getProfiler().start("checks:" + check.getName());
                             check.onPacket(packet, packetType, timeStamp);
                             Kauri.getInstance().getProfiler().stop("checks:" + check.getName());
-                        });
-            });
+                        }));
         }
     }
 
     private void debug(String packetType, PlayerData data) {
         if (!packetType.contains("Chat") && !packetType.contains("Chunk") && !packetType.contains("Equip")) {
-            Kauri.getInstance().getExecutorService().execute(() -> {
-                Kauri.getInstance().getDataManager().getDataObjects().values().stream().filter(debugData -> debugData.isDebuggingPackets() && debugData.getDebuggingPlayer().equals(data.getUuid()) && (debugData.getSpecificPacketDebug().equals("*") || packetType.contains(debugData.getSpecificPacketDebug()))).forEach(debugData -> {
-                    debugData.getPlayer().sendMessage(Color.translate("&8[&cPacketDebug&8] &7" + packetType));
-                });
+            Kauri.getInstance().getCheckManager().getDebuggingPackets().stream().filter(debugData -> debugData.getDebuggingPlayer().equals(data.getUuid()) && (debugData.getSpecificPacketDebug().equals("*") || packetType.contains(debugData.getSpecificPacketDebug()))).forEach(debugData -> {
+                debugData.getPlayer().sendMessage(Color.translate("&8[&cPacketDebug&8] &7" + packetType));
             });
         }
     }
 
-    private boolean hopperPup(Object packet, String packetType, long timestamp, PlayerData data) {
-        return data.getAntiPUP().stream()
-                .filter(pup -> pup.isEnabled() && pup.packets.contains(packetType))
-                .anyMatch(pup -> pup.onPacket(packet, packetType, timestamp));
+    private void hopperPup(Object packet, String packetType, long timestamp, PlayerData data) {
+        Kauri.getInstance().getExecutorService().execute(() ->
+                data.getAntiPUP().stream()
+                    .filter(pup -> pup.isEnabled() && pup.packets.contains(packetType))
+                    .anyMatch(pup -> pup.onPacket(packet, packetType, timestamp)));
     }
 }

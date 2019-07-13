@@ -2,7 +2,6 @@ package cc.funkemunky.anticheat.api.pup;
 
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
-import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.anticheat.impl.pup.crashers.*;
 import cc.funkemunky.anticheat.impl.pup.exploits.BookEnchant;
