@@ -4,7 +4,6 @@ cc\funkemunky\anticheat\api\utils\Messages.class
 cc\funkemunky\anticheat\api\utils\Setting.class
 cc\funkemunky\anticheat\api\event\PlayerCancelEvent.class
 cc\funkemunky\anticheat\api\pup\AntiPUPManager.class
-cc\funkemunky\anticheat\api\event\TickEvent.class
 cc\funkemunky\anticheat\api\checks\AlertTier.class
 cc\funkemunky\anticheat\api\data\stats\StatsManager.class
 cc\funkemunky\anticheat\api\pup\PuPType.class

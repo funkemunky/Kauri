@@ -5,6 +5,7 @@ import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.events.AtlasListener;
 import cc.funkemunky.api.events.Listen;
+import cc.funkemunky.api.events.impl.TickEvent;
 import cc.funkemunky.api.utils.Init;
 
 @Init

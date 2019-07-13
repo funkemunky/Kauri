@@ -90,7 +90,6 @@ cc\funkemunky\anticheat\api\utils\BukkitEvents.class
 cc\funkemunky\anticheat\impl\checks\player\badpackets\BadPacketsC.class
 cc\funkemunky\anticheat\api\event\PlayerCancelEvent.class
 cc\funkemunky\anticheat\api\pup\AntiPUPManager.class
-cc\funkemunky\anticheat\api\event\TickEvent.class
 cc\funkemunky\anticheat\api\data\processors\VelocityProcessor.class
 cc\funkemunky\anticheat\api\utils\json\CDL.class
 cc\funkemunky\anticheat\impl\checks\combat\killaura\KillauraD.class
