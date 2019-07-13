@@ -4,9 +4,10 @@ import lombok.Getter;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.LinkedList;
 
 public class DynamicRollingAverage {
-    private Deque<Double> values = new ArrayDeque<>();
+    private LinkedList<Double> values = new LinkedList<>();
 
     private int size;
 

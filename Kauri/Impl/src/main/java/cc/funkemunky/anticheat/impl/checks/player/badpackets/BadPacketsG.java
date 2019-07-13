@@ -5,9 +5,7 @@ import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
-import cc.funkemunky.anticheat.api.utils.Packets;
-import cc.funkemunky.anticheat.api.utils.Setting;
-import cc.funkemunky.anticheat.api.utils.StatisticalAnalysis;
+import cc.funkemunky.anticheat.api.utils.*;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
@@ -33,7 +31,7 @@ public class BadPacketsG extends Check {
 
     private long lastFlying;
     private int vl;
-    private StatisticalAnalysis statisticalAnalysis = new StatisticalAnalysis(40);
+    private DynamicRollingAverage average = new DynamicRollingAverage(20);
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
@@ -45,22 +43,22 @@ public class BadPacketsG extends Check {
         }
 
         if(!getData().isLagging() && timeStamp - lastFlying > 5) {
-            this.statisticalAnalysis.addValue(timeStamp - lastFlying);
+            this.average.add(timeStamp - lastFlying);
         } else {
             lastFlying = timeStamp;
             return;
         }
 
         val max = Math.min(7.065, Math.sqrt((50 - (1000 / Kauri.getInstance().getTps())) + 50));
-        val stdDev = this.statisticalAnalysis.getStdDev();
+        val stdDev = Math.sqrt(this.average.getAverage());
 
-        if (!MathUtils.approxEquals(deltaBalance, max, stdDev) && !getData().isLagging() && stdDev < max && getData().getLastLag().hasPassed(10)) {
+        if (!MathUtils.approxEquals(deltaBalance, max, stdDev) && getData().getTransPing() < 150 && !getData().isLagging() && stdDev < max && getData().getLastLag().hasPassed(10)) {
             if (vl++ > maxVL) {
                 this.flag("S: " + stdDev, false, true, vl > 60 ? AlertTier.HIGH : AlertTier.LIKELY);
             }
         } else vl -= vl > 0 ? 3 : 0;
 
-        debug("STD: " + stdDev + " VL: " + vl + " max=" + max);
+        debug("STD: " + stdDev + " VL: " + vl + " max=" + max + " size=" + average.isReachedSize());
         this.lastFlying = timeStamp;
     }
 

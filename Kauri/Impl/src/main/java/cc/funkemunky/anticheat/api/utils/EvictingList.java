@@ -6,9 +6,10 @@ package cc.funkemunky.anticheat.api.utils;
 
 import java.util.ArrayDeque;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.stream.Stream;
 
-public class EvictingList<T> extends ArrayDeque<T> {
+public class EvictingList<T> extends LinkedList<T> {
     private int maxSize;
 
     public EvictingList(int maxSize) {

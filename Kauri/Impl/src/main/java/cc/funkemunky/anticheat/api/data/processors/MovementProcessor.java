@@ -187,21 +187,23 @@ public class MovementProcessor {
                 serverYVelocity = deltaY;
             }
 
-            val vecStream = data.getTeleportLocations().stream().filter(vec -> (MiscSettings.horizontalServerPos ? MathUtils.offset(vec, to.toVector()) : vec.distance(to.toVector())) < 1E-8).findFirst().orElse(null);
+            if(data.getTeleportLocations().size() > 0) {
+                val vecStream = data.getTeleportLocations().stream().filter(vec -> (MiscSettings.horizontalServerPos ? MathUtils.offset(vec, to.toVector()) : vec.distance(to.toVector())) < 1E-8).findFirst().orElse(null);
 
-            if(vecStream != null) {
-                if(data.getTeleportLoc() != null && vecStream.distance(data.getTeleportLoc().toVector()) == 0) {
-                    data.setTeleportPing(timeStamp - data.getTeleportTest());
-                } else {
-                    data.setTeleportPing(timeStamp - data.getTeleportTest());
+                if(vecStream != null) {
+                    if(data.getTeleportLoc() != null && vecStream.distance(data.getTeleportLoc().toVector()) == 0) {
+                        data.setTeleportPing(timeStamp - data.getTeleportTest());
+                    } else {
+                        data.setTeleportPing(timeStamp - data.getTeleportTest());
+                    }
+                    data.setLastServerPosStamp(timeStamp);
+                    data.getTeleportLocations().remove(vecStream);
+                    serverYVelocity = deltaY;
+                    serverPos = true;
+                    from = to;
+                } else if(serverPos) {
+                    serverPos = false;
                 }
-                data.setLastServerPosStamp(timeStamp);
-                data.getTeleportLocations().remove(vecStream);
-                serverYVelocity = deltaY;
-                serverPos = true;
-                from = to;
-            } else if(serverPos) {
-                serverPos = false;
             }
 
             lastServerYAcceleration = serverYAcceleration;
