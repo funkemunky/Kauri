@@ -65,14 +65,14 @@ public class MovementProcessor {
 
                 //There are some entities that are collide-able like boats but are not considered blocks.
 
-                if(Atlas.getInstance().getCurrentTicks() % 4 == 0) {
+                if(Atlas.getInstance().getCurrentTicks() % 2 == 0) {
                     entitiesAround = player.getNearbyEntities(1, 1, 1).stream().filter(entity -> (entity instanceof Vehicle && !entity.getType().toString().contains("MINECART")) || entity.getType().name().toLowerCase().contains("shulker")).collect(Collectors.toList());
                 }
 
                 entitiesAround.forEach(entity -> assessment.assessBox(ReflectionsUtil.toBoundingBox(ReflectionsUtil.getBoundingBox(entity)), player.getWorld(), true));
 
                 //Now we scrub through the colliding boxes for any important information that could be fed into detections.
-                box.forEach(bb -> assessment.assessBox(bb, player.getWorld(), false));
+                box.parallelStream().forEach(bb -> assessment.assessBox(bb, player.getWorld(), false));
 
 
                 serverOnGround = assessment.isOnGround();
