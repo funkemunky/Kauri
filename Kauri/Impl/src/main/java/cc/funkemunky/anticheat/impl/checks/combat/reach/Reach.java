@@ -6,10 +6,7 @@ import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.RayTrace;
 import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.utils.BoundingBox;
-import cc.funkemunky.api.utils.Color;
-import cc.funkemunky.api.utils.Init;
-import cc.funkemunky.api.utils.MiscUtils;
+import cc.funkemunky.api.utils.*;
 import lombok.val;
 import org.bukkit.GameMode;
 import org.bukkit.entity.LivingEntity;
@@ -69,6 +66,11 @@ public class Reach extends Check {
             float distance = (float) collided.stream().mapToDouble((vec) -> vec.distance(to.toVector()))
                     .min().orElse(0.0D);
 
+            if(getData().getTarget().getVelocity().getY() == 0) {
+                distance-= move.getDeltaXZ();
+                debug("subtracted");
+            }
+
             if(collided.size() > 0) {
                 if (distance > reachThreshold && (collided.size() > collidedThreshold || distance > bypassColReach) && collided.size() > collidedMin && getData().getMovementProcessor().getLagTicks() == 0) {
                     if (vl++ > certainThreshold) {
@@ -84,7 +86,7 @@ public class Reach extends Check {
                     vl = Math.max(0, vl - 0.025f);
                 }
 
-                debug((distance > reachThreshold && collided.size() > collidedThreshold ? Color.Green : "") + "distance=" + distance + " collided=" + collided.size() + " vl=" + vl + " range=" + range);
+                debug((distance > reachThreshold && collided.size() > collidedThreshold ? Color.Green : "") + "distance=" + distance + " collided=" + collided.size() + " vl=" + vl + " range=" + range + " target=" + getData().getTarget().getVelocity().getY());
             }
             lastAttack = timeStamp;
         }
