@@ -25,6 +25,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -78,7 +79,7 @@ public class LogArgument extends FunkeArgument {
                 }
                 case "details": {
                     if(args.length > 3) {
-                        int page = Math.min(1, MathUtils.tryParse(args[3]));
+                        int page = Math.max(1, MathUtils.tryParse(args[3]));
                         runDetailedLogs(target, sender, page);
                     } else {
                         runDetailedLogs(target, sender, 1);
@@ -155,10 +156,13 @@ public class LogArgument extends FunkeArgument {
     private void runDetailedLogs(OfflinePlayer target, CommandSender sender, int page) {
         List<Violation> violations = Kauri.getInstance().getLoggerManager().getDetailedViolations(target.getUniqueId());
 
+        violations.sort(Comparator.comparing(Violation::getTimeStamp, Comparator.reverseOrder()));
+
         if(violations.size() > 0) {
             int pageMin = Math.min((page - 1) * 15, violations.size()), pageMax = Math.min(page * 15, violations.size());
 
             sender.sendMessage(MiscUtils.line(Color.Dark_Gray));
+            sender.sendMessage(Color.translate("&7Page: &f" + page + "/" + (int)Math.ceil(violations.size() / 15D)));
             violations.subList(pageMin, pageMax).stream().sorted(Comparator.comparingLong(Violation::getTimeStamp)).map(vio -> Color.translate("&8- &e" + vio.getCheckName() + " &7(&f" + vio.getInfo() + "&7) &fTPS: " + MathUtils.round(vio.getTps(), 2) + " Ping: " + vio.getPing())).forEach(string -> sender.sendMessage(string));
             sender.sendMessage(MiscUtils.line(Color.Dark_Gray));
         } else sender.sendMessage(Color.translate(noLogs));

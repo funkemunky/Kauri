@@ -19,11 +19,12 @@ public class Violation {
 
         try {
             object.put("check", checkName);
-            object.put("info", info);
+            object.put("info", info.replace(":", "%%"));
             object.put("tier", tier.getName());
             object.put("tps", tps);
             object.put("ping", ping);
             object.put("timeStamp", timeStamp);
+            return object.toString();
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -34,7 +35,7 @@ public class Violation {
         try {
             JSONObject object = new JSONObject(json);
 
-            return new Violation(object.getString("check"), object.getString("info"), object.getDouble("tps"), object.getDouble("ping"), object.getLong("timeStamp"), AlertTier.getByName(object.getString("tier")));
+            return new Violation(object.getString("check"), object.getString("info").replace("%%", ":"), object.getDouble("tps"), object.getDouble("ping"), object.getLong("timeStamp"), AlertTier.getByName(object.getString("tier")));
         } catch (JSONException e) {
             e.printStackTrace();
         }

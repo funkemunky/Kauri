@@ -71,7 +71,7 @@ public class LoggerManager {
         if(!enabled) return;
         switch(type.toLowerCase()) {
             case "flatfile": {
-                carbon.createFlatfileDatabase(Kauri.getInstance().getDataFolder().getPath() + File.pathSeparator + "dbs", "KauriLogs");
+                carbon.createFlatfileDatabase(Kauri.getInstance().getDataFolder().getPath() + File.separator + "dbs", "KauriLogs");
                 break;
             }
             case "mysql": {
@@ -98,11 +98,29 @@ public class LoggerManager {
         Database database = this.database;
         database.loadDatabase();
 
-        violations = database.getDatabaseValues().keySet().stream().collect(Collectors.toMap(UUID::fromString, key -> {
-            String[] split = ((String)database.getDatabaseValues().get(key)).split("@");
+        violations = new ConcurrentHashMap<>();
 
-            return Arrays.stream(split).map(Violation::fromJson).collect(Collectors.toList());
-        }));
+        List<String> rawKeys = database.getDatabaseValues().keySet().stream().filter(key -> !key.contains("ban") && key.contains("@")).map(key -> key.split("@")[0]).collect(Collectors.toList());
+
+        for (String rawKey : rawKeys) {
+            int i = 0;
+            List<Violation> violations = new ArrayList<>();
+            while(database.getDatabaseValues().containsKey(rawKey + "@" + i)) {
+                String field = (String)database.getField(rawKey + "@" + i);
+                violations.add(Violation.fromJson(field));
+                i++;
+            }
+
+            this.violations.put(UUID.fromString(rawKey), violations);
+        }
+
+        List<String> normalKeys = database.getDatabaseValues().keySet().stream().filter(key -> !key.contains("ban") && !key.contains("@")).collect(Collectors.toList());
+
+        for(String normalKey : normalKeys) {
+            List<Violation> violations = this.violations.getOrDefault(UUID.fromString(normalKey), new ArrayList<>());
+
+            violations.add(Violation.fromJson((String)database.getField(normalKey)));
+        }
     }
 
     public void saveToDatabase() {
@@ -114,11 +132,11 @@ public class LoggerManager {
         violations.keySet().forEach(key -> {
             List<Violation> vls = violations.get(key);
 
-            StringBuilder builder = new StringBuilder();
-            vls.stream().map(Violation::toJson).forEach(string -> builder.append(string).append("@"));
-            builder.deleteCharAt(builder.length() - 1);
+            List<String> jsonStrings = vls.stream().map(Violation::toJson).collect(Collectors.toList());
 
-            database.inputField(key.toString(), builder.toString());
+            for (int i = 0; i < jsonStrings.size(); i++) {
+                database.inputField(key.toString() + "@" + i, jsonStrings.get(i));
+            }
         });
 
         database.saveDatabase();

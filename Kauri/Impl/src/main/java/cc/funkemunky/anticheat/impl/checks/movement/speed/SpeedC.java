@@ -27,13 +27,13 @@ public class SpeedC extends Check {
 
         if(move.getGroundTicks() > 2 && !getData().isGeneralCancel() && move.getHalfBlockTicks() == 0 && move.getBlockAboveTicks() == 0 && move.getWebTicks() == 0 && move.getClimbTicks() == 0 && move.getLiquidTicks() == 0) {
             double predicted = move.getLastDeltaXZ() * ReflectionsUtil.getFriction(getData().getBlockBelow());
-            double delta = Math.abs((move.getDeltaXZ() - predicted) * 8.75 - (0.5 * PlayerUtils.getPotionEffectLevel(getData().getPlayer(), PotionEffectType.SPEED)));
+            double delta = Math.abs((move.getDeltaXZ() - predicted) * 8.7 - (0.5 * PlayerUtils.getPotionEffectLevel(getData().getPlayer(), PotionEffectType.SPEED)));
 
             if(delta > 1.1 && getData().getWalkSpeed() < 0.21) {
                 if(vl++ > 5) {
                     flag("delta=" + delta, true, true, AlertTier.HIGH);
                 }
-            } else vl-= vl > 0 ? 1 : 0;
+            } else vl-= vl > 0 ? 2 : 0;
             debug("delta=" + delta + " vl=" + vl);
         }
     }

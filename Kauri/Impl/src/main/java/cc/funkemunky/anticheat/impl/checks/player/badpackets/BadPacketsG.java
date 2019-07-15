@@ -55,6 +55,8 @@ public class BadPacketsG extends Check {
         if (!MathUtils.approxEquals(deltaBalance, max, stdDev) && getData().getTransPing() < 150 && !getData().isLagging() && stdDev < max && getData().getLastLag().hasPassed(10)) {
             if (vl++ > maxVL) {
                 this.flag("S: " + stdDev, false, true, vl > 60 ? AlertTier.HIGH : AlertTier.LIKELY);
+                vl = 0;
+                average.clearValues();
             }
         } else vl -= vl > 0 ? 3 : 0;
 

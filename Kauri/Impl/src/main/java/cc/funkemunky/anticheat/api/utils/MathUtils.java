@@ -51,6 +51,11 @@ public class MathUtils {
         return n;
     }
 
+    public static double getDelta(double one, double two) {
+        double absOne = Math.abs(one), absTwo = Math.abs(two);
+        return Math.max(absOne, absTwo) - Math.min(absOne, absTwo);
+    }
+
     public static double bernoullis(double n,double k,double successProb) {
 
         double combo = MathUtils.combination(n, k);

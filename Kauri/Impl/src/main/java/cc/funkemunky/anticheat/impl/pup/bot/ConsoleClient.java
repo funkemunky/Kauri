@@ -9,7 +9,7 @@ import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.Color;
 import org.bukkit.scheduler.BukkitRunnable;
 
-@Packets(packets = {Packet.Client.FLYING, Packet.Client.POSITION, Packet.Client.POSITION_LOOK, Packet.Client.LOOK, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION, Packet.Client.LEGACY_LOOK, Packet.Client.KEEP_ALIVE})
+@Packets(packets = {Packet.Client.KEEP_ALIVE, Packet.Server.TRANSACTION, Packet.Client.TRANSACTION})
 public class ConsoleClient extends AntiPUP {
 
     @Setting(name = "kickMessage")
@@ -24,8 +24,8 @@ public class ConsoleClient extends AntiPUP {
 
     @Override
     public boolean onPacket(Object packet, String packetType, long timeStamp) {
-        if (packetType.equalsIgnoreCase(Packet.Client.KEEP_ALIVE)) {
-            if (timeStamp - lastFlying > 8000L && !getData().getPlayer().isDead() && getData().getLastLogin().hasPassed(10)) {
+        if (packetType.equalsIgnoreCase(Packet.Client.TRANSACTION)) {
+            if (System.currentTimeMillis() - getData().getLastTransaction() > 20000 && (System.currentTimeMillis() - getData().getLastKeepAlive()) < 3000) {
                 if (vl++ > 2) {
                     new BukkitRunnable() {
                         public void run() {
@@ -34,7 +34,7 @@ public class ConsoleClient extends AntiPUP {
                     }.runTask(Kauri.getInstance());
                 }
             } else vl = 0;
-        } else lastFlying = timeStamp;
+        }
         return false;
     }
 }

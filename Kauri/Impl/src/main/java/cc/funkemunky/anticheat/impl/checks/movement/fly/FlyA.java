@@ -36,13 +36,13 @@ public class FlyA extends Check {
         if (!move.isNearGround()) {
             val offset = MathUtils.getDelta(yChange, predictedY);
 
-            if (offset > 0.04) {
+            if (offset > 0.002) {
                 if(vl++ > 2) {
-                    this.flag("O -> " + offset, false, true, AlertTier.HIGH);
+                    this.flag("O -> " + offset, true, true, AlertTier.HIGH);
                 }
             } else vl-= vl > 0 ? 1 : 0;
 
-            debug("VL: " + vl + "DIF: " + Math.abs(yChange - predictedY));
+            debug("VL: " + vl + "DIF: " + offset);
         }
     }
 
