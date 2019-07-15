@@ -19,7 +19,6 @@ public class ConsoleClient extends AntiPUP {
         super(name, type, enabled);
     }
 
-    private long lastFlying;
     private int vl = 0;
 
     @Override
