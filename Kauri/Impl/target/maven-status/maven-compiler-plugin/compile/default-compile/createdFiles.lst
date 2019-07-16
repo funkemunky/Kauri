@@ -167,7 +167,6 @@ cc\funkemunky\anticheat\impl\pup\crashers\ArmSwing.class
 cc\funkemunky\anticheat\api\utils\VPNUtils.class
 cc\funkemunky\anticheat\impl\checks\combat\killaura\KillauraC.class
 cc\funkemunky\anticheat\impl\checks\movement\noslowdown\NoSlowdownA.class
-cc\funkemunky\anticheat\impl\pup\bot\ConsoleClient$1.class
 cc\funkemunky\anticheat\api\utils\menu\MenuListener.class
 cc\funkemunky\anticheat\impl\checks\combat\autoclicker\AutoclickerB.class
 cc\funkemunky\anticheat\api\utils\GenericCacheExample.class

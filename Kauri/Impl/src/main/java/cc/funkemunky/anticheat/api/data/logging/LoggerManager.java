@@ -100,8 +100,24 @@ public class LoggerManager {
 
         violations = new ConcurrentHashMap<>();
 
-        List<String> rawKeys = database.getDatabaseValues().keySet().stream().filter(key -> !key.contains("ban") && key.contains("@")).map(key -> key.split("@")[0]).collect(Collectors.toList());
+        for (String key : database.getDatabaseValues().keySet()) {
+            List<Violation> vls;
+            UUID uuid;
+            if(key.contains("@")) {
+                String[] splitKey = key.split("@");
+                uuid = UUID.fromString(splitKey[0]);
+                vls = violations.getOrDefault(uuid, new ArrayList<>());
 
+                vls.add(Violation.fromJson((String) database.getField(key)));
+            } else {
+                uuid = UUID.fromString(key);
+                vls = violations.getOrDefault(uuid, new ArrayList<>());
+                vls.add(Violation.fromJson((String) database.getField(key)));
+            }
+            violations.put(uuid, vls);
+         }
+
+        /*List<String> rawKeys = database.getDatabaseValues().keySet().parallelStream().filter(key -> !key.contains("ban") && key.contains("@")).map(key -> key.split("@")[0]).collect(Collectors.toList());
         for (String rawKey : rawKeys) {
             int i = 0;
             List<Violation> violations = new ArrayList<>();
@@ -114,13 +130,13 @@ public class LoggerManager {
             this.violations.put(UUID.fromString(rawKey), violations);
         }
 
-        List<String> normalKeys = database.getDatabaseValues().keySet().stream().filter(key -> !key.contains("ban") && !key.contains("@")).collect(Collectors.toList());
+        List<String> normalKeys = database.getDatabaseValues().keySet().parallelStream().filter(key -> !key.contains("ban") && !key.contains("@")).collect(Collectors.toList());
 
         for(String normalKey : normalKeys) {
             List<Violation> violations = this.violations.getOrDefault(UUID.fromString(normalKey), new ArrayList<>());
 
             violations.add(Violation.fromJson((String)database.getField(normalKey)));
-        }
+        }*/
     }
 
     public void saveToDatabase() {

@@ -7,9 +7,11 @@ import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.Color;
+import net.minecraft.server.v1_8_R3.PacketPlayInCustomPayload;
+import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
-@Packets(packets = {Packet.Client.KEEP_ALIVE, Packet.Server.TRANSACTION, Packet.Client.TRANSACTION})
+@Packets(packets = {Packet.Client.CUSTOM_PAYLOAD})
 public class ConsoleClient extends AntiPUP {
 
     @Setting(name = "kickMessage")
@@ -23,17 +25,9 @@ public class ConsoleClient extends AntiPUP {
 
     @Override
     public boolean onPacket(Object packet, String packetType, long timeStamp) {
-        if (packetType.equalsIgnoreCase(Packet.Client.TRANSACTION)) {
-            if (System.currentTimeMillis() - getData().getLastTransaction() > 20000 && (System.currentTimeMillis() - getData().getLastKeepAlive()) < 3000) {
-                if (vl++ > 2) {
-                    new BukkitRunnable() {
-                        public void run() {
-                            getData().getPlayer().kickPlayer(Color.translate(message));
-                        }
-                    }.runTask(Kauri.getInstance());
-                }
-            } else vl = 0;
-        }
+        PacketPlayInCustomPayload payload = (PacketPlayInCustomPayload) packet;
+
+        Bukkit.broadcastMessage(payload.a());
         return false;
     }
 }

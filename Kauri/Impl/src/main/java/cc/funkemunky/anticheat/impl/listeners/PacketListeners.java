@@ -2,6 +2,7 @@ package cc.funkemunky.anticheat.impl.listeners;
 
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
+import cc.funkemunky.anticheat.api.pup.AntiPUP;
 import cc.funkemunky.anticheat.impl.config.CheckSettings;
 import cc.funkemunky.api.events.AtlasListener;
 import cc.funkemunky.api.events.Listen;
@@ -68,8 +69,8 @@ public class PacketListeners implements AtlasListener {
             }
 
             if(!event.getType().equalsIgnoreCase(Packet.Server.CHAT)) {
-                hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data);
                 hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
+                if(hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
             }
         }
         Kauri.getInstance().getProfiler().stop("event:PacketSendEvent");
@@ -202,7 +203,7 @@ public class PacketListeners implements AtlasListener {
             }
             debug(event.getType(), data);
             hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
-            hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data);
+            if(hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
         }
         Kauri.getInstance().getProfiler().stop("event:PacketReceiveEvent");
     }
@@ -221,16 +222,19 @@ public class PacketListeners implements AtlasListener {
 
     private void debug(String packetType, PlayerData data) {
         if (!packetType.contains("Chat") && !packetType.contains("Chunk") && !packetType.contains("Equip")) {
-            Kauri.getInstance().getCheckManager().getDebuggingPackets().stream().filter(debugData -> debugData.getDebuggingPlayer().equals(data.getUuid()) && (debugData.getSpecificPacketDebug().equals("*") || packetType.contains(debugData.getSpecificPacketDebug()))).forEach(debugData -> {
+            for(PlayerData debugData : Kauri.getInstance().getCheckManager().getDebuggingPackets()) {
+                if(!debugData.getDebuggingPlayer().equals(data.getUuid()) || !(debugData.getSpecificPacketDebug().equals("*") && !packetType.contains(debugData.getSpecificPacketDebug()))) continue;
                 debugData.getPlayer().sendMessage(Color.translate("&8[&cPacketDebug&8] &7" + packetType));
-            });
+            }
         }
     }
 
-    private void hopperPup(Object packet, String packetType, long timestamp, PlayerData data) {
-        Kauri.getInstance().getExecutorService().execute(() ->
-                data.getAntiPUP().stream()
-                    .filter(pup -> pup.isEnabled() && pup.packets.contains(packetType))
-                    .forEach(pup -> pup.onPacket(packet, packetType, timestamp)));
+    private boolean hopperPup(Object packet, String packetType, long timestamp, PlayerData data) {
+        for (AntiPUP pup : data.getAntiPUP()) {
+            if(!pup.isEnabled() || !pup.packets.contains(packetType)) continue;
+
+            if(pup.onPacket(packet, packetType, timestamp)) return true;
+        }
+        return false;
     }
 }

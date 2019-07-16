@@ -68,7 +68,6 @@ public class Reach extends Check {
 
             if(getData().getTarget().getVelocity().getY() == 0) {
                 distance-= move.getDeltaXZ();
-                debug("subtracted");
             }
 
             if(collided.size() > 0) {
