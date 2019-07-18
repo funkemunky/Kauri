@@ -47,13 +47,4 @@
         </resources>
     </build>
 
-    <dependencies>
-        <dependency>
-            <groupId>me.mat1337.loader</groupId>
-            <artifactId>loader</artifactId>
-            <version>1.6</version>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
-
 </project>

@@ -1,15 +1,12 @@
 package cc.funkemunky.anticheat.impl.pup.bot;
 
-import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.pup.AntiPUP;
 import cc.funkemunky.anticheat.api.pup.PuPType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.utils.Color;
 import net.minecraft.server.v1_8_R3.PacketPlayInCustomPayload;
 import org.bukkit.Bukkit;
-import org.bukkit.scheduler.BukkitRunnable;
 
 @Packets(packets = {Packet.Client.CUSTOM_PAYLOAD})
 public class ConsoleClient extends AntiPUP {

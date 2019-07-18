@@ -19,7 +19,6 @@ import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
 import lombok.val;
-import net.minecraft.server.v1_8_R3.PacketPlayInSettings;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
@@ -203,11 +202,6 @@ public class PacketListeners implements AtlasListener {
                 }
             }
 
-            if(event.getPacket() instanceof PacketPlayInSettings) {
-                PacketPlayInSettings packet = (PacketPlayInSettings) event.getPacket();
-
-                Bukkit.broadcastMessage(packet.a() + ", " + "(skip b), " + packet.c().name() + ", " + packet.d() + ", " + packet.e());
-            }
             debug(event.getType(), data);
             hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
             if(hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) event.setCancelled(true);
