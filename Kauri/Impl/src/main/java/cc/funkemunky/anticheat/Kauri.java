@@ -24,6 +24,7 @@ import cc.funkemunky.api.tinyprotocol.reflection.Reflection;
 import cc.funkemunky.api.updater.UpdaterUtils;
 import cc.funkemunky.api.utils.*;
 import lombok.Getter;
+import me.mat1337.loader.Loader;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -75,7 +76,7 @@ public class Kauri extends JavaPlugin {
     public ExecutorService dedicatedVPN = Executors.newSingleThreadExecutor();
     public long lastLogin;
 
-    private boolean testMode = false, runningPaperSpigot;
+    private boolean testMode = true, runningPaperSpigot;
 
     @Override
     public void onEnable() {
@@ -142,60 +143,62 @@ public class Kauri extends JavaPlugin {
                 }
             }
         }.runTaskTimer(this, 1L, 1L);
-        new BukkitRunnable() {
-            public void run() {
-                for (World world : Bukkit.getWorlds()) {
-                    List<Player> players;
-                    List<LivingEntity> entities;
+       if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9)) {
+           new BukkitRunnable() {
+               public void run() {
+                   for (World world : Bukkit.getWorlds()) {
+                       List<Player> players;
+                       List<LivingEntity> entities;
 
-                    players = (entities = new ArrayList<>(world.getLivingEntities())).stream()
-                            .filter(ent -> ent instanceof Player && Bukkit.getOnlinePlayers().contains(ent))
-                            .map(ent -> (Player) ent)
-                            .collect(Collectors.toList());
+                       players = (entities = new ArrayList<>(world.getLivingEntities())).stream()
+                               .filter(ent -> ent instanceof Player && Bukkit.getOnlinePlayers().contains(ent))
+                               .map(ent -> (Player) ent)
+                               .collect(Collectors.toList());
 
-                    Map<Entity, Object> packetsToSend = new HashMap<>();
-                    Class<?> entityClass = ReflectionsUtil.getNMSClass("Entity");
-                    entities.forEach(ent -> {
-                       Object vanillaEnt = ReflectionsUtil.getEntity(ent);
-                       Object dataWatcher = ReflectionsUtil.getFieldValue(ReflectionsUtil.getFieldByName(entityClass, "datawatcher"), vanillaEnt);
+                       Map<Entity, Object> packetsToSend = new HashMap<>();
+                       Class<?> entityClass = ReflectionsUtil.getNMSClass("Entity");
+                       entities.forEach(ent -> {
+                           Object vanillaEnt = ReflectionsUtil.getEntity(ent);
+                           Object dataWatcher = ReflectionsUtil.getFieldValue(ReflectionsUtil.getFieldByName(entityClass, "datawatcher"), vanillaEnt);
 
-                        Map map = Reflection.getField(ReflectionsUtil.getNMSClass("DataWatcher"), Map.class, 1).get(dataWatcher);
+                           Map map = Reflection.getField(ReflectionsUtil.getNMSClass("DataWatcher"), Map.class, 1).get(dataWatcher);
 
-                        List<Object> watchables = new ArrayList<>();
+                           List<Object> watchables = new ArrayList<>();
 
-                        map.keySet().forEach(key -> watchables.add(map.get(key)));
+                           map.keySet().forEach(key -> watchables.add(map.get(key)));
 
-                        if(watchables.size() > 7) {
-                            WrappedOutEntityMetadata toSend = null;
-                            WrappedWatchableObject object7 = new WrappedWatchableObject(watchables.get(7)), object6 = new WrappedWatchableObject(watchables.get(6));
+                           if(watchables.size() > 7) {
+                               WrappedOutEntityMetadata toSend = null;
+                               WrappedWatchableObject object7 = new WrappedWatchableObject(watchables.get(7)), object6 = new WrappedWatchableObject(watchables.get(6));
 
-                            if(object7.getWatchedObject() instanceof Float) {
-                                object7.setWatchedObject(1.0f);
-                                object7.setPacket(NMSObject.Type.WATCHABLE_OBJECT, object7.getObjectType(), object7.getDataValueId(), object7.getWatchedObject());
+                               if(object7.getWatchedObject() instanceof Float) {
+                                   object7.setWatchedObject(1.0f);
+                                   object7.setPacket(NMSObject.Type.WATCHABLE_OBJECT, object7.getObjectType(), object7.getDataValueId(), object7.getWatchedObject());
 
-                                watchables.set(7, object7.getObject());
-                                toSend = new WrappedOutEntityMetadata(ent.getEntityId(), watchables);
-                            } else if(object6.getWatchedObject() instanceof Float) {
-                                object6.setWatchedObject(1.0f);
-                                object6.setPacket(NMSObject.Type.WATCHABLE_OBJECT, object6.getObjectType(), object6.getDataValueId(), object6.getWatchedObject());
+                                   watchables.set(7, object7.getObject());
+                                   toSend = new WrappedOutEntityMetadata(ent.getEntityId(), watchables);
+                               } else if(object6.getWatchedObject() instanceof Float) {
+                                   object6.setWatchedObject(1.0f);
+                                   object6.setPacket(NMSObject.Type.WATCHABLE_OBJECT, object6.getObjectType(), object6.getDataValueId(), object6.getWatchedObject());
 
-                                watchables.set(6, object6.getObject());
-                                toSend = new WrappedOutEntityMetadata(ent.getEntityId(), watchables);
-                            }
+                                   watchables.set(6, object6.getObject());
+                                   toSend = new WrappedOutEntityMetadata(ent.getEntityId(), watchables);
+                               }
 
-                            if(toSend != null) {
-                                packetsToSend.put(ent, toSend.getObject());
-                            }
-                        }
-                    });
-                    players.stream().forEach(pl -> packetsToSend.keySet().forEach(key -> {
-                        if(!key.getUniqueId().equals(pl.getUniqueId())) {
-                            TinyProtocolHandler.sendPacket(pl, packetsToSend.get(key));
-                        }
-                    }));
-                }
-            }
-        }.runTaskTimerAsynchronously(this, 20L, 30L);
+                               if(toSend != null) {
+                                   packetsToSend.put(ent, toSend.getObject());
+                               }
+                           }
+                       });
+                       players.stream().forEach(pl -> packetsToSend.keySet().forEach(key -> {
+                           if(!key.getUniqueId().equals(pl.getUniqueId())) {
+                               TinyProtocolHandler.sendPacket(pl, packetsToSend.get(key));
+                           }
+                       }));
+                   }
+               }
+           }.runTaskTimerAsynchronously(this, 20L, 30L);
+       }
     }
 
     public void startScanner(boolean configOnly) {
@@ -214,37 +217,51 @@ public class Kauri extends JavaPlugin {
         return 50 / (2000D / tpsMilliseconds);
     }
 
-    public void reloadKauri() {
-        if(testMode) {
+    public void reloadKauri(boolean reloadedMessages) {
+        MiscUtils.printToConsole("&cReloading Kauri...");
+        long start = System.currentTimeMillis();
+        if(!reloadedMessages) {
+            MiscUtils.printToConsole("&7Reloading configuration files...");
             reloadConfig();
-            reloadMessages();
+
+            MiscUtils.printToConsole("&7Unregistering listeners...");
+            HandlerList.unregisterAll(this);
+            Atlas.getInstance().getEventManager().unregisterAll(this);
+
+            MiscUtils.printToConsole("&7Unregistering tasks...");
+            Bukkit.getScheduler().cancelTasks(this);
+            //Clearing check manager garbage.
+            MiscUtils.printToConsole("&7Clearing check garbage...");
+            checkManager.getChecks().clear();
+            checkManager.getCheckClasses().clear();
+            checkManager.getDebuggingPackets().clear();
+            checkManager.getDevAlerts().clear();
+            checkManager.getAlerts().clear();
+            checkManager.getBypassingPlayers().clear();
             checkManager = new CheckManager();
+
+            //Clearing antiPuP garbage.
+            MiscUtils.printToConsole("&7Clearing AntiPUP garbage...");
+            antiPUPManager.pupThread.shutdown();
+            antiPUPManager = new AntiPUPManager();
+            MiscUtils.printToConsole("&7Clear PlayerData garbage...");
             dataManager.getDataObjects().clear();
             dataManager = new DataManager();
-            HandlerList.unregisterAll(this);
+            MiscUtils.printToConsole("&7Resetting profiler...");
             profiler.reset();
-            EventManager.unregisterAll(this);
-            Atlas.getInstance().getEventManager().unregisterAll(this);
-            startScanner(false);
-            antiPUPManager = new AntiPUPManager();
+            MiscUtils.printToConsole("&7Scanning for changes in config, messages, and to register checks...");
+            startScanner(true);
+            MiscUtils.printToConsole("&7Registering PlayerData objects of all online players...");
             dataManager.registerAllPlayers();
+            MiscUtils.printToConsole("&7Running tasks...");
+            runTasks();
         } else {
             MiscUtils.unloadPlugin("KauriLoader");
             MiscUtils.unloadPlugin("Atlas");
             MiscUtils.loadPlugin("Atlas");
             MiscUtils.loadPlugin("KauriLoader");
         }
-    }
-
-    public void softReload() {
-        reloadConfig();
-        checkManager = new CheckManager();
-        startScanner(false);
-        antiPUPManager = new AntiPUPManager();
-        dataManager.getDataObjects().clear();
-        dataManager = new DataManager();
-        dataManager.registerAllPlayers();
-        profiler.reset();
+        MiscUtils.printToConsole("&aCompleted reload in " + (System.currentTimeMillis() - start) + " milliseconds!");
     }
 
     private void registerListeners() {
@@ -367,7 +384,7 @@ public class Kauri extends JavaPlugin {
                                 } catch (IllegalAccessException e) {
                                     e.printStackTrace();
                                 }
-                            } else if (field.isAnnotationPresent(Message.class)) {
+                            } else if (!configOnly && field.isAnnotationPresent(Message.class)) {
                                 Message msg = field.getAnnotation(Message.class);
 
                                 MiscUtils.printToConsole("&eFound " + field.getName() + " Message (default=" + field.get(obj) + ").");

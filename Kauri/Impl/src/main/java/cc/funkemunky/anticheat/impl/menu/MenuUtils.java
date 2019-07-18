@@ -163,7 +163,7 @@ MenuUtils {
         menu.setItem(15, createButton(false, MiscUtils.createItem(Material.WATCH, 1, Color.Gold + "Reload Kauri"), ((player, infoPair) -> {
             infoPair.getMenu().close(player);
             player.sendMessage(Color.translate("&8[&e&lKauri&8] &7Fully unloading and loading Kauri..."));
-            Kauri.getInstance().reloadKauri();
+            Kauri.getInstance().reloadKauri(false);
             Bukkit.dispatchCommand(player, "kauri menu");
         })));
 
@@ -299,7 +299,7 @@ MenuUtils {
         return createButton(false, MiscUtils.createItem(Material.BOOK_AND_QUILL, 1, Color.Red + "Save Changes"), ((player2, infoPair) -> {
             hasModifiedChecks = false;
             Kauri.getInstance().saveConfig();
-            Kauri.getInstance().reloadKauri();
+            Kauri.getInstance().reloadKauri(false);
             Bukkit.dispatchCommand(player2, "kauri menu checks " + page);
         }));
     }

@@ -1,7 +1,6 @@
 package cc.funkemunky.anticheat.api.checks;
 
 import cc.funkemunky.anticheat.api.data.PlayerData;
-import cc.funkemunky.anticheat.impl.config.CheckSettings;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import lombok.Getter;
 import lombok.Setter;
