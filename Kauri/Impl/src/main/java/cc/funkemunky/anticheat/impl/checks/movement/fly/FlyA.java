@@ -24,26 +24,12 @@ public class FlyA extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         if(getData().isServerPos()) return;
         val move = getData().getMovementProcessor();
-        val from = move.getFrom();
-        val to = move.getTo();
 
-        val yChange = to.getY() - from.getY();
-        val predictedY = (lastYChange - 0.08D) * 0.9800000190734863D;
-        this.lastYChange = yChange;
-
-        if (MiscUtils.cancelForFlight(getData(), 10, false)) return;
-
-        if (!move.isNearGround()) {
-            val offset = MathUtils.getDelta(yChange, predictedY);
-
-            if (offset > 0.002) {
-                if(vl++ > 2) {
-                    this.flag("O -> " + offset, true, true, AlertTier.HIGH);
-                }
-            } else vl-= vl > 0 ? 1 : 0;
-
-            debug("VL: " + vl + "DIF: " + offset);
-        }
+        if(!MathUtils.approxEquals(0.02, move.getClientYAcceleration(), move.getServerYAcceleration()) && !MiscUtils.cancelForFlight(getData(), 10, true)) {
+            if(vl++ > 3) {
+                flag("delta=" + MathUtils.getDelta(move.getClientYAcceleration(), move.getServerYAcceleration()), true, true, AlertTier.HIGH);
+            }
+        } else vl-= vl > 0 ? 1 : 0;
     }
 
 
