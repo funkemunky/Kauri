@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Init
+//@Init
 @CheckInfo(name = "BadPackets (Type J)", type = CheckType.BADPACKETS, cancelType = CancelType.INTERACT)
 @Packets(packets = {Packet.Client.BLOCK_PLACE})
 public class BadPacketsJ extends Check {

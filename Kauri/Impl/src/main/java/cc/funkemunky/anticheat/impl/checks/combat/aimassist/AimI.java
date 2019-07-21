@@ -11,7 +11,7 @@ import lombok.val;
 import org.bukkit.event.Event;
 
 @Packets(packets = {Packet.Client.LOOK, Packet.Client.POSITION_LOOK})
-@Init
+//@Init
 @CheckInfo(name = "Aim (Type I)", developer = true, type = CheckType.AIM)
 public class AimI extends Check {
 

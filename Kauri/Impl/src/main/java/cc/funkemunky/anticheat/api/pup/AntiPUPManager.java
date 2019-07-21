@@ -22,7 +22,7 @@ public class AntiPUPManager {
     public ExecutorService pupThread = Executors.newFixedThreadPool(2);
 
     public AntiPUPManager() {
-        //antibot = registerMethods();
+        antibot = registerMethods();
         Atlas.getInstance().getDatabaseManager().createDatabase("VPN-Cache", DatabaseType.FLATFILE);
     }
 

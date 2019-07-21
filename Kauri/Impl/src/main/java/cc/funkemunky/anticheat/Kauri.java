@@ -49,31 +49,24 @@ import java.util.stream.Collectors;
 public class Kauri extends JavaPlugin {
     @Getter
     private static Kauri instance;
-
+    public ExecutorService dedicatedVPN = Executors.newSingleThreadExecutor();
+    public long lastLogin;
     private DataManager dataManager;
     private CheckManager checkManager;
     private StatsManager statsManager;
     private AntiPUPManager antiPUPManager;
     private LoggerManager loggerManager;
     private BanwaveManager banwaveManager;
-
     private int ticks;
     private long profileStart, lastTimeStamp, tpsMilliseconds;
     private double tps;
-
     private ScheduledExecutorService executorService, vpnSchedular = Executors.newSingleThreadScheduledExecutor();
-
     private BaseProfiler profiler;
     private VPNUtils vpnUtils;
-
     private String requiredVersionOfAtlas = "1.3.6";
     private List<String> usableVersionsOfAtlas = Arrays.asList("1.3.4", "1.3.5", "1.3.6");
-
     private FileConfiguration messages;
     private File messagesFile;
-    public ExecutorService dedicatedVPN = Executors.newSingleThreadExecutor();
-    public long lastLogin;
-
     private boolean testMode = true, runningPaperSpigot;
 
     @Override
@@ -218,47 +211,10 @@ public class Kauri extends JavaPlugin {
     public void reloadKauri(boolean reloadedMessages) {
         MiscUtils.printToConsole("&cReloading Kauri...");
         long start = System.currentTimeMillis();
-        if(!reloadedMessages) {
-            MiscUtils.printToConsole("&7Reloading configuration files...");
-            reloadConfig();
-
-            MiscUtils.printToConsole("&7Unregistering listeners...");
-            HandlerList.unregisterAll(this);
-            Atlas.getInstance().getEventManager().unregisterAll(this);
-
-            MiscUtils.printToConsole("&7Unregistering tasks...");
-            Bukkit.getScheduler().cancelTasks(this);
-            //Clearing check manager garbage.
-            MiscUtils.printToConsole("&7Clearing check garbage...");
-            checkManager.getChecks().clear();
-            checkManager.getCheckClasses().clear();
-            checkManager.getDebuggingPackets().clear();
-            checkManager.getDevAlerts().clear();
-            checkManager.getAlerts().clear();
-            checkManager.getBypassingPlayers().clear();
-            checkManager = new CheckManager();
-
-            //Clearing antiPuP garbage.
-            MiscUtils.printToConsole("&7Clearing AntiPUP garbage...");
-            antiPUPManager.pupThread.shutdown();
-            antiPUPManager = new AntiPUPManager();
-            MiscUtils.printToConsole("&7Clear PlayerData garbage...");
-            dataManager.getDataObjects().clear();
-            dataManager = new DataManager();
-            MiscUtils.printToConsole("&7Resetting profiler...");
-            profiler.reset();
-            MiscUtils.printToConsole("&7Scanning for changes in config, messages, and to register checks...");
-            startScanner(true);
-            MiscUtils.printToConsole("&7Registering PlayerData objects of all online players...");
-            dataManager.registerAllPlayers();
-            MiscUtils.printToConsole("&7Running tasks...");
-            runTasks();
-        } else {
-            MiscUtils.unloadPlugin("KauriLoader");
-            MiscUtils.unloadPlugin("Atlas");
-            MiscUtils.loadPlugin("Atlas");
-            MiscUtils.loadPlugin("KauriLoader");
-        }
+        MiscUtils.unloadPlugin("KauriLoader");
+        MiscUtils.unloadPlugin("Atlas");
+        MiscUtils.loadPlugin("Atlas");
+        MiscUtils.loadPlugin("KauriLoader");
         MiscUtils.printToConsole("&aCompleted reload in " + (System.currentTimeMillis() - start) + " milliseconds!");
     }
 

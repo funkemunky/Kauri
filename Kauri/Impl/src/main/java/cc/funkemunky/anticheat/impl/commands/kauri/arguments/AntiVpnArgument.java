@@ -40,7 +40,7 @@ public class AntiVpnArgument extends FunkeArgument {
         if (args.length == 1) {
             sender.sendMessage(MiscUtils.line(Color.Dark_Gray));
             sender.sendMessage(Color.Gold + Color.Bold + "AntiVPN Help");
-            sender.sendMessage(Color.translate("&7/%label% &fanalyze <player>".replaceAll("%label%", command.getLabel().toLowerCase())));
+            sender.sendMessage(Color.translate("&7/%label% antivpn &fanalyze <player>".replaceAll("%label%", command.getLabel().toLowerCase())));
             sender.sendMessage(MiscUtils.line(Color.Dark_Gray));
         } else if (args[1].equalsIgnoreCase("analyze")) {
             Player player = Bukkit.getPlayer(args[2]);
@@ -53,6 +53,26 @@ public class AntiVpnArgument extends FunkeArgument {
             VPNResponse apiResponse = Kauri.getInstance().getVpnUtils().getResponse(player);
 
             ChestMenu menu = new ChestMenu(player.getName() + "'s IP Information", 1);
+
+            boolean showInfo = !privacyMode || (override && sender.hasPermission(overridePerm));
+            if (apiResponse != null && apiResponse.isSuccess()) {
+                menu.setItem(1, getButton(Color.Aqua + "Using VPN", Material.REDSTONE, Color.Gray + apiResponse.isProxy()));
+                menu.setItem(3, getButton(Color.Aqua + "Location", Material.MAP, Color.Gray + (!showInfo ? "[redacted]" : apiResponse.getCity() + ", " + apiResponse.getCountryName())));
+                menu.setItem(5, getButton(Color.Aqua + "IP", Material.WATCH, Color.Gray + (!showInfo ? "[redacted]" : apiResponse.getIp())));
+                menu.setItem(7, getButton(Color.Aqua + "ISP", Material.PAPER, Color.Gray + (!showInfo ? "[redacted]" : apiResponse.getIsp())));
+            } else {
+                for (int i = 0; i < 9; i++) {
+                    menu.addItem(getButton(Color.Red + Color.Bold + "FAILED", Material.REDSTONE_BLOCK, ""));
+                }
+            }
+
+            menu.showMenu((Player) sender);
+        } else if(args[1].equalsIgnoreCase("lookup")) {
+            String ip = args[2];
+
+            VPNResponse apiResponse = Kauri.getInstance().getVpnUtils().getResponse(ip);
+
+            ChestMenu menu = new ChestMenu(ip + "'s IP Information", 1);
 
             boolean showInfo = !privacyMode || (override && sender.hasPermission(overridePerm));
             if (apiResponse != null && apiResponse.isSuccess()) {

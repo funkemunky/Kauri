@@ -19,7 +19,16 @@ public class Interval<T> extends LinkedList<T> {
     }
 
     public double average() {
-        return streamNumber().mapToDouble(val -> (double)val).average().orElse(0.0);
+        if(size() > 0) {
+            if(getFirst() instanceof Long) {
+                return streamNumber().mapToLong(val -> (long) val).average().orElse(0.0);
+            } else if(getFirst() instanceof Integer) {
+                return streamNumber().mapToInt(val -> (int) val).average().orElse(0.0);
+            } else {
+                return streamNumber().mapToDouble(val -> (double)val).average().orElse(0.0);
+            }
+        }
+        return 0;
     }
 
     public double frequency(double freq) {
@@ -32,15 +41,42 @@ public class Interval<T> extends LinkedList<T> {
 
     public double std() {
         double average = average();
-        return Math.sqrt(streamNumber().mapToDouble(val -> Math.pow((double)val - average, 2)).average().orElse(0));
+        if(size() > 0) {
+            if(getFirst() instanceof Long) {
+                return streamNumber().mapToLong(val -> (long)Math.pow((long)val - average, 2)).average().orElse(0.0);
+            } else if(getFirst() instanceof Integer) {
+                return streamNumber().mapToInt(val -> (int) Math.pow((int)val - average, 2)).average().orElse(0.0);
+            } else {
+                return Math.sqrt(streamNumber().mapToDouble(val -> Math.pow((double)val - average, 2)).average().orElse(0));
+            }
+        }
+        return 0;
     }
 
     public double max() {
-        return streamNumber().mapToDouble(val -> (double)val).max().orElse(0.0);
+        if(size() > 0) {
+            if(getFirst() instanceof Long) {
+                return streamNumber().mapToLong(val -> (long) val).max().orElse(0);
+            } else if(getFirst() instanceof Integer) {
+                return streamNumber().mapToInt(val -> (int) val).max().orElse(0);
+            } else {
+                return streamNumber().mapToDouble(val -> (double)val).max().orElse(0);
+            }
+        }
+        return 0;
     }
 
     public double min() {
-        return streamNumber().mapToDouble(val -> (double)val).min().orElse(0.0);
+        if(size() > 0) {
+            if(getFirst() instanceof Long) {
+                return streamNumber().mapToLong(val -> (long) val).min().orElse(0);
+            } else if(getFirst() instanceof Integer) {
+                return streamNumber().mapToInt(val -> (int) val).min().orElse(0);
+            } else {
+                return streamNumber().mapToDouble(val -> (double)val).min().orElse(0);
+            }
+        }
+        return 0;
     }
 
     public boolean add(T x) {

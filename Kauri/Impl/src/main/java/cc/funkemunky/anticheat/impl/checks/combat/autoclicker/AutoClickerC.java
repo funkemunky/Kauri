@@ -15,7 +15,7 @@ import org.bukkit.event.Event;
         Packet.Client.POSITION,
         Packet.Client.POSITION_LOOK,
         Packet.Client.LOOK})
-@Init
+//@Init
 public class AutoClickerC extends Check {
 
     private long lastFlying, lastArm;

@@ -229,9 +229,8 @@ MenuUtils {
 
         lore.addAll(Arrays.asList(splitIntoLine(check.getDescription(), 35)));
         lore.addAll(Arrays.asList("&eInstructions&7:",
-                "&8- &fLeft Click &7to toggle check on/off.",
-                "&8- &fShift + Left Click &7to toggle check executable-abilities.",
-                "&8- &fRight Click &7to toggle check cancellable-abilities."));
+                "&8- &fLeft Click &7to toggle check, executability, or cancellabilitty.",
+                "&8- &fRight Click &7to modify specific values."));
 
         return createButton(false,
                 MiscUtils.createItem(
@@ -241,31 +240,65 @@ MenuUtils {
                 ((player2, infoPair) -> {
                     switch (infoPair.getClickType()) {
                         case LEFT: {
-                            Kauri.getInstance().getConfig().set("checks." + check.getName() + ".enabled", !check.isEnabled());
-
-                            check.setEnabled(!check.isEnabled());
-                            hasModifiedChecks = true;
-                            openCheckEditGUI(player2, page);
-                        }
-                        break;
-                        case SHIFT_LEFT: {
-                            Kauri.getInstance().getConfig().set("checks." + check.getName() + ".executable", !check.isExecutable());
-                            check.setExecutable(!check.isExecutable());
-
-                            hasModifiedChecks = true;
-                            openCheckEditGUI(player2, page);
+                            toggleValues(player2, check, page);
                             break;
                         }
                         case RIGHT: {
-                            Kauri.getInstance().getConfig().set("checks." + check.getName() + ".cancellable", !check.isCancellable());
-                            check.setCancellable(!check.isCancellable());
-
-                            hasModifiedChecks = true;
-                            openCheckEditGUI(player2, page);
-                            break;
                         }
                     }
                 }));
+    }
+
+    private static void toggleValues(Player player, Check check, int page) {
+        ItemStack enabled, executable, cancellable;
+        ItemBuilder builder = new ItemBuilder(Material.STAINED_GLASS_PANE);
+        builder.amount(1);
+        builder.name("&7Enabled");
+        builder.durability(check.isEnabled() ? 13 : 14);
+        enabled = builder.build();
+        builder = new ItemBuilder(Material.STAINED_GLASS_PANE);
+        builder.name("&7Executable");
+        builder.durability(check.isExecutable() ? 13 : 14);
+        executable = builder.build();
+        builder = new ItemBuilder(Material.STAINED_GLASS_PANE);
+        builder.name("&7Cancellable");
+        builder.durability(check.isCancellable() ? 13 : 14);
+        cancellable = builder.build();
+
+        ChestMenu menu = new ChestMenu("Toggle" + check.getName() + "Values", 1);
+
+        menu.setItem(2, createButton(false, enabled, (pl, info) -> {
+            Kauri.getInstance().getConfig().set("checks." + check.getName() + ".enabled", !check.isEnabled());
+
+            check.setEnabled(!check.isEnabled());
+            hasModifiedChecks = true;
+            toggleValues(pl, check, page);
+        }));
+
+        menu.setItem(4, createButton(false, cancellable, (pl, info) -> {
+            Kauri.getInstance().getConfig().set("checks." + check.getName() + ".cancellable", !check.isCancellable());
+            check.setCancellable(!check.isCancellable());
+
+            hasModifiedChecks = true;
+            toggleValues(pl, check, page);
+        }));
+
+        menu.setItem(6, createButton(false, executable, (pl, info) -> {
+            Kauri.getInstance().getConfig().set("checks." + check.getName() + ".executable", !check.isExecutable());
+            check.setExecutable(!check.isExecutable());
+
+            hasModifiedChecks = true;
+            toggleValues(pl, check, page);
+        }));
+
+        Button button = createButton(false, MiscUtils.createItem(Material.BOOK, 1, "&cBack"), (pl, info) -> {
+            openCheckEditGUI(pl, page);
+        });
+
+        menu.setItem(8, button);
+        menu.setItem(0, button);
+
+        menu.showMenu(player);
     }
 
     private static String[] splitIntoLine(String input, int maxCharInLine) {

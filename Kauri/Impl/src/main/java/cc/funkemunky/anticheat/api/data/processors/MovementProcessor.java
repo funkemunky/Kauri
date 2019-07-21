@@ -164,7 +164,7 @@ public class MovementProcessor {
             lastServerYVelocity = serverYVelocity;
 
             if (hasJumped) {
-                serverYVelocity = Math.min(deltaY, MiscUtils.predicatedMaxHeight(data));
+                serverYVelocity = deltaY;
             } else if (inAir) {
                 serverYVelocity = (serverYVelocity - 0.08f) * 0.98f;
 
@@ -179,7 +179,7 @@ public class MovementProcessor {
                 serverYVelocity = 0;
             }
 
-            if(timeStamp - data.getVelocityProcessor().getLastVelocityTimestamp() <= 100L) {
+            if(timeStamp - data.getVelocityProcessor().getLastVelocityTimestamp() <= 100L + data.getTransPing()) {
                 serverYVelocity = deltaY;
             }
 
