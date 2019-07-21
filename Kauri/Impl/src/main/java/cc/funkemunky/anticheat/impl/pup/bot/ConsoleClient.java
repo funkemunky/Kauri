@@ -5,8 +5,6 @@ import cc.funkemunky.anticheat.api.pup.PuPType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import net.minecraft.server.v1_8_R3.PacketPlayInCustomPayload;
-import org.bukkit.Bukkit;
 
 @Packets(packets = {Packet.Client.CUSTOM_PAYLOAD})
 public class ConsoleClient extends AntiPUP {
@@ -22,9 +20,6 @@ public class ConsoleClient extends AntiPUP {
 
     @Override
     public boolean onPacket(Object packet, String packetType, long timeStamp) {
-        PacketPlayInCustomPayload payload = (PacketPlayInCustomPayload) packet;
-
-        Bukkit.broadcastMessage(payload.a());
         return false;
     }
 }

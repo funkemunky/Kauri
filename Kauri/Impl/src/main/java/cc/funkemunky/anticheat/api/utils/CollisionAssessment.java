@@ -22,7 +22,7 @@ import java.util.Set;
 /* We use this to process the bounding boxes collided around the player for our checks to use as utils */
 public class CollisionAssessment {
     private PlayerData data;
-    private boolean onGround, nearGround, fullyInAir, inLiquid, liquidBelow, nearLiquid, blocksOnTop, pistonsNear, onHalfBlock, onClimbable, onIce, collidesHorizontally, inWeb, onSlime, onSoulSand, blocksNear, blocksAround;
+    private boolean onGround, halfBlocksAround, nearGround, fullyInAir, inLiquid, liquidBelow, nearLiquid, blocksOnTop, pistonsNear, onHalfBlock, onClimbable, onIce, collidesHorizontally, inWeb, onSlime, onSoulSand, blocksNear, blocksAround;
     private Set<Material> materialsCollided;
     private BoundingBox playerBox;
 
@@ -71,6 +71,7 @@ public class CollisionAssessment {
                     if(bb.intersectsWithBox(data.getBoundingBox().grow(0.2f,1f,0.2f))) {
                         onHalfBlock = true;
                     }
+                    halfBlocksAround = true;
                 } else if(BlockUtils.isFence(block))  {
                     if(data.getBoundingBox().subtract(0,0.25f,0,0,0,0).collides(bb)) {
                         onHalfBlock = true;

@@ -36,7 +36,6 @@ public class MovementProcessor {
     private long lastTimeStamp, lagTicks, pitchGCD, yawGCD, offset = 16777216L;
 
     public void update(PlayerData data, WrappedInFlyingPacket packet) {
-        Kauri.getInstance().getProfiler().start("data:MovementProcessor");
         val player = packet.getPlayer();
 
         if(player == null) return;
@@ -66,13 +65,22 @@ public class MovementProcessor {
                 //There are some entities that are collide-able like boats but are not considered blocks.
 
                 if(Atlas.getInstance().getCurrentTicks() % 2 == 0) {
-                    entitiesAround = player.getNearbyEntities(1, 1, 1).stream().filter(entity -> (entity instanceof Vehicle && !entity.getType().toString().contains("MINECART")) || entity.getType().name().toLowerCase().contains("shulker")).collect(Collectors.toList());
+                    entitiesAround.clear();
+                    for (Entity entity : player.getNearbyEntities(1, 1, 1)) {
+                        if(!(entity instanceof Vehicle && !entity.getType().toString().contains("MINECART") && !entity.getType().toString().contains("SHULKER"))) continue;
+
+                        entitiesAround.add(entity);
+                    }
                 }
 
-                entitiesAround.forEach(entity -> assessment.assessBox(ReflectionsUtil.toBoundingBox(ReflectionsUtil.getBoundingBox(entity)), player.getWorld(), true));
+                for (Entity entity : entitiesAround) {
+                    assessment.assessBox(ReflectionsUtil.toBoundingBox(ReflectionsUtil.getBoundingBox(entity)), player.getWorld(), true);
+                }
 
                 //Now we scrub through the colliding boxes for any important information that could be fed into detections.
-                box.parallelStream().forEach(bb -> assessment.assessBox(bb, player.getWorld(), false));
+                for (BoundingBox bb : box) {
+                    assessment.assessBox(bb, player.getWorld(), false);
+                }
 
 
                 serverOnGround = assessment.isOnGround();
@@ -90,7 +98,7 @@ public class MovementProcessor {
                 onSoulSand = assessment.isOnSoulSand();
                 blocksAround = assessment.isBlocksAround();
                 blocksNear = assessment.isBlocksNear();
-                halfBlocksAround = assessment.getMaterialsCollided().stream().anyMatch(material -> material.toString().contains("STAIR") || material.toString().contains("STEP") || material.toString().contains("SLAB") || material.toString().contains("SNOW") || material.toString().contains("CAKE") || material.toString().contains("BED") || material.toString().contains("SKULL"));
+                halfBlocksAround = assessment.isHalfBlocksAround();
                 isNearGround = assessment.isNearGround();
                 onSlime = assessment.isOnSlime();
 
@@ -273,6 +281,5 @@ public class MovementProcessor {
 
         pastLocation.addLocation(new CustomLocation(to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch()));
         data.setGeneralCancel(data.isServerPos() || data.isLagging() || getLastFlightToggle().hasNotPassed(8) || !chunkLoaded || packet.getPlayer().getAllowFlight() || packet.getPlayer().getActivePotionEffects().stream().anyMatch(effect -> effect.getType().getName().toLowerCase().contains("levi")) || packet.getPlayer().getGameMode().toString().contains("CREATIVE") || packet.getPlayer().getGameMode().toString().contains("SPEC") || lastVehicle.hasNotPassed() || getLastRiptide().hasNotPassed(10) || data.getLastLogin().hasNotPassed(50) || data.getVelocityProcessor().getLastVelocity().hasNotPassed(25));
-        Kauri.getInstance().getProfiler().stop("data:MovementProcessor");
     }
 }

@@ -7,7 +7,7 @@
     <groupId>cc.funkemunky.anticheat</groupId>
     <artifactId>Kauri</artifactId>
     <packaging>pom</packaging>
-    <version>b5</version>
+    <version>b6</version>
 
     <modules>
         <module>API</module>
@@ -31,7 +31,7 @@
         <dependency>
             <groupId>cc.funkemunky.plugins</groupId>
             <artifactId>Atlas</artifactId>
-            <version>1.3.8</version>
+            <version>1.4</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

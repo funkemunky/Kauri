@@ -63,8 +63,8 @@ public class Kauri extends JavaPlugin {
     private ScheduledExecutorService executorService, vpnSchedular = Executors.newSingleThreadScheduledExecutor();
     private BaseProfiler profiler;
     private VPNUtils vpnUtils;
-    private String requiredVersionOfAtlas = "1.3.6";
-    private List<String> usableVersionsOfAtlas = Arrays.asList("1.3.4", "1.3.5", "1.3.6");
+    private String requiredVersionOfAtlas = "1.3.9";
+    private List<String> usableVersionsOfAtlas = Arrays.asList("1.3.4", "1.3.5", "1.3.6", "1.3.7", "1.3.8", "1.3.9");
     private FileConfiguration messages;
     private File messagesFile;
     private boolean testMode = true, runningPaperSpigot;

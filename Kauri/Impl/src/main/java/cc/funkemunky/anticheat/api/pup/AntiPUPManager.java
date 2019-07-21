@@ -30,7 +30,7 @@ public class AntiPUPManager {
         List<AntiPUP> list = new ArrayList<>();
 
         addMethod(new AntiVPN("AntiVPN", PuPType.VPN, true), list);
-        addMethod(new ConsoleClient("ConsoleClient", PuPType.BOT, true), list);
+        //addMethod(new ConsoleClient("ConsoleClient", PuPType.BOT, true), list);
         addMethod(new ArmSwing("ArmSwing", PuPType.CRASH, true), list);
         addMethod(new Boxer("Boxer", PuPType.CRASH, true), list);
         addMethod(new YLevel("YLevel", PuPType.CRASH, true), list);

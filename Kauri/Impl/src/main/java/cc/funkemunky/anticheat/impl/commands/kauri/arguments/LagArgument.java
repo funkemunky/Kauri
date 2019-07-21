@@ -5,6 +5,7 @@ import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.utils.Message;
 import cc.funkemunky.anticheat.api.utils.Messages;
 import cc.funkemunky.anticheat.api.utils.Pastebin;
+import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.commands.FunkeArgument;
 import cc.funkemunky.api.commands.FunkeCommand;
 import cc.funkemunky.api.profiling.ResultsType;
@@ -25,6 +26,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 public class LagArgument extends FunkeArgument {
     public LagArgument(FunkeCommand parent, String name, String display, String description, String... permission) {
@@ -33,7 +35,7 @@ public class LagArgument extends FunkeArgument {
         addAlias("tps");
         addAlias("transPing");
 
-        addTabComplete(2, "player", "server");
+        addTabComplete(2, "player", "server", "profile");
     }
 
     @Message(name = "command.lag.serverInfo.title")
@@ -91,82 +93,25 @@ public class LagArgument extends FunkeArgument {
         } else {
             switch (args[1].toLowerCase()) {
                 case "profile": {
-                    List<String> body = new ArrayList<>();
-                    body.add(MiscUtils.lineNoStrike());
-                    val results = Kauri.getInstance().getProfiler().results(ResultsType.TOTAL);
-
-                    AtomicReference<Double> totalMS = new AtomicReference<>((double) 0);
-
-                    results.keySet().stream()
-                            .sorted(Comparator.comparing(key -> results.get(key) / Kauri.getInstance().getProfiler().calls.get(key), Comparator.reverseOrder()))
-                            .forEachOrdered(key -> {
-                                body.add(key + ":");
-                                double ms = results.get(key) / Kauri.getInstance().getProfiler().calls.get(key);
-                                totalMS.updateAndGet(v -> (v + ms));
-                                body.add("PCT: "  + MathUtils.round(ms / 50D * 100, 4));
-                                body.add("MS: " + ms + "ms");
-                                body.add("Calls:" + Kauri.getInstance().getProfiler().calls.get(key));
-                            });
-                    body.add("Total PCT: " +  MathUtils.round(totalMS.get() / 50 * 100, 4) + "%");
-                    body.add("Total Time: " + totalMS + "ms");
-                    body.add("Total Calls: " + Kauri.getInstance().getProfiler().totalCalls);
-                    body.add(MiscUtils.lineNoStrike());
-
-                    StringBuilder builder = new StringBuilder();
-                    for (String aBody : body) {
-                        builder.append(aBody).append(";");
-                    }
-
-                    builder.deleteCharAt(body.size() - 1);
-
-                    String bodyString = builder.toString().replaceAll(";", "\n");
-
-                    try {
-                        sender.sendMessage(Color.translate(profile.replace("%link%", Pastebin.makePaste(bodyString, "Kauri Profile: " + DateFormatUtils.format(System.currentTimeMillis(), ", ", TimeZone.getTimeZone("604")), Pastebin.Privacy.UNLISTED))));
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
-                    break;
-                }
-                case "realprofile": {
-                    List<String> body = new ArrayList<>();
-                    body.add(MiscUtils.lineNoStrike());
-                    val results = Kauri.getInstance().getProfiler().results(ResultsType.TOTAL);
-
-                    AtomicReference<Double> totalMS = new AtomicReference<>((double) 0);
-                    long totalTime = System.currentTimeMillis() - Kauri.getInstance().getProfileStart();
-                    results.keySet().stream()
-                            .sorted(Comparator.comparing(key -> results.get(key) / Kauri.getInstance().getProfiler().calls.get(key), Comparator.reverseOrder()))
-                            .forEachOrdered(key -> {
-                                body.add(key + ":");
-                                double msTotal = results.get(key);
-                                double totalCalls = Kauri.getInstance().getProfiler().calls.get(key);
-                                double calls = totalCalls / (totalTime / 50f);
-                                double ms =  msTotal / (totalTime / 50f);
-                                totalMS.updateAndGet(v -> (v + ms));
-                                body.add("PCT: "  + MathUtils.round(ms / 50D * 100, 4));
-                                body.add("MS: " + ms + "ms");
-                                body.add("Calls:" + MathUtils.round(calls, 2));
-                            });
-                    body.add("Total PCT: " +  MathUtils.round(totalMS.get() / 50 * 100, 4) + "%");
-                    body.add("Total Time: " + totalMS + "ms");
-                    body.add("Total Calls: " + MathUtils.round( Kauri.getInstance().getProfiler().totalCalls / (totalTime / 50f), 2));
-                    body.add("Total Time: " + DurationFormatUtils.formatDurationWords(totalTime, true, true));
-                    body.add(MiscUtils.lineNoStrike());
-
-                    StringBuilder builder = new StringBuilder();
-                    for (String aBody : body) {
-                        builder.append(aBody).append(";");
-                    }
-
-                    builder.deleteCharAt(body.size() - 1);
-
-                    String bodyString = builder.toString().replaceAll(";", "\n");
-
-                    try {
-                        sender.sendMessage(Color.translate(profile.replace("%link%", Pastebin.makePaste(bodyString, "Kauri Profile: " + DateFormatUtils.format(System.currentTimeMillis(), ", ", TimeZone.getTimeZone("604")), Pastebin.Privacy.UNLISTED))));
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
+                    if(args.length > 2) {
+                        switch(args[2].toLowerCase()) {
+                            case "average":
+                            case "avg": {
+                                makePaste(sender, ResultsType.AVERAGE);
+                                break;
+                            }
+                            case "samples":
+                            case "sample": {
+                                makePaste(sender, ResultsType.SAMPLES);
+                                break;
+                            }
+                            default: {
+                                makePaste(sender, ResultsType.TOTAL);
+                                break;
+                            }
+                        }
+                    } else {
+                        makePaste(sender, ResultsType.TOTAL);
                     }
                     break;
                 }
@@ -226,5 +171,37 @@ public class LagArgument extends FunkeArgument {
         float cps = Kauri.getInstance().getProfiler().totalCalls / (float) totalTime;
         sender.sendMessage(Color.translate(callsPS.replace("%calls%", String.valueOf(totalMS / totalTime / (50D / totalTime)))));
         sender.sendMessage(MiscUtils.line(lineColor));
+    }
+
+    private void makePaste(CommandSender sender, ResultsType type) {
+        List<String> body = new ArrayList<>();
+        body.add(MiscUtils.lineNoStrike());
+        double total = 0;
+        val results = Kauri.getInstance().getProfiler().results(type);
+
+
+        for (String key : results.keySet().stream().sorted(Comparator.comparing(results::get, Comparator.reverseOrder())).collect(Collectors.toList())) {
+            //Converting nanoseconds to millis to be more readable.
+            double amount = results.get(key) / 1000000D;
+
+            total+= amount;
+            body.add(key + ": " + amount + "ms");
+        }
+        body.add(" ");
+        body.add("Total: " + total + "ms");
+        StringBuilder builder = new StringBuilder();
+        for (String aBody : body) {
+            builder.append(aBody).append(";");
+        }
+
+        builder.deleteCharAt(body.size() - 1);
+
+        String bodyString = builder.toString().replaceAll(";", "\n");
+
+        try {
+            sender.sendMessage(Color.Green + "Results: " + Pastebin.makePaste(bodyString, "Atlas Profile: " + DateFormatUtils.format(System.currentTimeMillis(), ", ", TimeZone.getTimeZone("604")), Pastebin.Privacy.UNLISTED));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 }
