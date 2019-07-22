@@ -6,6 +6,7 @@ import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
+import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.Init;
 import lombok.val;
@@ -16,12 +17,15 @@ import org.bukkit.event.Event;
 @Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK})
 public class FlyB extends Check {
 
+    private Verbose vl = new Verbose();
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
         if(!move.isNearGround() && !MiscUtils.cancelForFlight(getData(), 10, false) && move.getDeltaXZ() > move.getLastDeltaXZ() + 0.01) {
-            flag(move.getDeltaXZ() + ">-" + move.getLastDeltaXZ(), true, true, AlertTier.HIGH);
+            if(vl.flag(2, 1000L)) {
+                flag(move.getDeltaXZ() + ">-" + move.getLastDeltaXZ(), true, true, AlertTier.LIKELY);
+            }
         }
     }
 

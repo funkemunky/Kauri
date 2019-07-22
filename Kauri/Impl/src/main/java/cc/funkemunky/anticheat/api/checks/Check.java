@@ -107,7 +107,6 @@ public abstract class Check {
                 public void run() {
                     vl = 0;
                     execCommand.forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replace("%player%", getData().getPlayer().getName()).replace("%check%", getName())));
-                    getData().setBanned(false);
                 }
             }.runTaskLater(Kauri.getInstance(), 10);
             if (CheckSettings.broadcastEnabled)

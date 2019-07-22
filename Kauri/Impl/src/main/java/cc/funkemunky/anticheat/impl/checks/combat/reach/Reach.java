@@ -18,7 +18,7 @@ import org.bukkit.util.Vector;
 
 import java.util.stream.Collectors;
 
-@CheckInfo(name = "Reach", description = "A very accurate and fast 3.1 reach check.", type = CheckType.REACH, cancelType = CancelType.COMBAT, maxVL = 40)
+@CheckInfo(name = "Reach", description = "A very accurate and fast 3.1 reach check.", type = CheckType.REACH, cancelType = CancelType.COMBAT, maxVL = 10)
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.POSITION, Packet.Client.LOOK, Packet.Client.FLYING})
 @Init
 public class Reach extends Check {
@@ -75,7 +75,7 @@ public class Reach extends Check {
 
             if(collided.size() > 0) {
                 if (distance > reachThreshold && (collided.size() > collidedThreshold || distance > bypassColReach) && collided.size() > collidedMin && getData().getMovementProcessor().getLagTicks() == 0) {
-                    if (vl++ > certainThreshold) {
+                    if ((vl+= distance > 3.04f ? 1 : (distance > 3.02 ? 0.5f : .25f)) > certainThreshold) {
                         flag("reach=" + distance, true, true, AlertTier.CERTAIN);
                     } else if (vl > highThreshold) {
                         flag("reach=" + distance, true, true, AlertTier.HIGH);

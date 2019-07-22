@@ -8,9 +8,9 @@ import cc.funkemunky.api.utils.Init;
 import lombok.val;
 import org.bukkit.event.Event;
 
-@CheckInfo(name = "Speed (Type A)", type = CheckType.SPEED, cancelType = CancelType.MOTION, maxVL = 40)
+@CheckInfo(name = "Speed (Type A)", type = CheckType.SPEED, description = "A general limiting speed check with a verbose to prevent false positives.", maxVL = 40)
 @Init
-@Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION})
+@Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK})
 public class SpeedA extends Check {
 
     private float vl = 0;

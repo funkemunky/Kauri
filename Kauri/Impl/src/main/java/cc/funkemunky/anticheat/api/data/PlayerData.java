@@ -105,6 +105,6 @@ public class PlayerData {
     }
 
     public boolean isServerPos() {
-        return System.currentTimeMillis() - lastServerPosStamp < MiscSettings.serverPos + (transPing / 5);
+        return System.currentTimeMillis() - lastServerPosStamp < Math.max(50, MiscSettings.serverPos + (transPing));
     }
 }

@@ -41,7 +41,7 @@ public class CollisionAssessment {
 
         if (isEntity || (!block.getType().equals(Material.AIR) && BlockUtils.isSolid(block))) {
             if(isEntity) bb = bb.grow(0.35f, 0.2f, 0.35f);
-            if (bb.collidesVertically(playerBox.subtract(0, 0.1f, 0, 0, 1.4f, 0))) {
+            if (bb.collidesVertically(playerBox.subtract(0, 0.12f, 0, 0, 1f, 0))) {
                 onGround = true;
 
                 if(!isEntity && block.getType().equals(Material.SOUL_SAND)) {

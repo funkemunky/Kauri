@@ -154,6 +154,7 @@ public class PacketListeners implements AtlasListener {
                             break;
                         case ABORT_DESTROY_BLOCK:
                         case STOP_DESTROY_BLOCK:
+                            data.getLastBlockBreak().reset();
                             data.setBreakingBlock(false);
                             break;
                     }
@@ -175,6 +176,7 @@ public class PacketListeners implements AtlasListener {
                 case Packet.Client.ARM_ANIMATION: {
                     WrappedInArmAnimationPacket packet = new WrappedInArmAnimationPacket(event.getPacket(), event.getPlayer());
 
+                    if(data.isBreakingBlock()) data.getLastBlockBreak().reset();
                     data.getSwingProcessor().onUpdate(packet, event.getTimeStamp());
                     break;
                 }

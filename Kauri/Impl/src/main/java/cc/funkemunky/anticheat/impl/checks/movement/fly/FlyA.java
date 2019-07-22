@@ -14,7 +14,7 @@ import org.bukkit.event.Event;
 
 @Init
 @Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK})
-@CheckInfo(name = "Fly (Type A)", description = "Ensures the acceleration of a player is legitimate.", type = CheckType.FLY, maxVL = 50)
+@CheckInfo(name = "Fly (Type A)", description = "Ensures the acceleration of a player is legitimate.", type = CheckType.FLY)
 public class FlyA extends Check {
 
     private int vl;
@@ -25,10 +25,10 @@ public class FlyA extends Check {
         val move = getData().getMovementProcessor();
 
         if(!MathUtils.approxEquals(0.02, move.getClientYAcceleration(), move.getServerYAcceleration()) && !MiscUtils.cancelForFlight(getData(), 10, true)) {
-            if(vl++ > 3) {
-                flag("delta=" + MathUtils.getDelta(move.getClientYAcceleration(), move.getServerYAcceleration()), true, false, AlertTier.HIGH);
+            if(vl++ > 5) {
+                flag("delta=" + MathUtils.getDelta(move.getClientYAcceleration(), move.getServerYAcceleration()), true, true, AlertTier.HIGH);
             }
-        } else vl-= vl > 0 ? 1 : 0;
+        } else vl-= vl > 0 ? 2 : 0;
     }
 
 

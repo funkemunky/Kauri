@@ -14,7 +14,7 @@ import org.bukkit.event.Event;
 import org.bukkit.potion.PotionEffectType;
 
 @Init
-@CheckInfo(name = "Jesus (Type B)", description = "Makes sure the player isn't going faster than a certain speed in water.", type = CheckType.JESUS, maxVL = 60)
+@CheckInfo(name = "Jesus (Type B)", description = "Makes sure the player isn't going faster than a certain speed in water.", type = CheckType.JESUS, maxVL = 60, enabled = false, executable = false)
 @Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK})
 public class JesusB extends Check {
 

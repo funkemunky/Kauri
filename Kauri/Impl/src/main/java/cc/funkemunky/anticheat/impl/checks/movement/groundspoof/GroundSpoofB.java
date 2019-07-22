@@ -12,7 +12,7 @@ import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
 import org.bukkit.event.Event;
 
-@CheckInfo(name = "GroundSpoof (Type B)", description = "Ensures the fall distance is what it should be.", type = CheckType.MOVEMENT)
+@CheckInfo(name = "GroundSpoof (Type B)", description = "Ensures the fall distance is what it should be.", type = CheckType.MOVEMENT, executable = false)
 @Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK})
 @Init
 public class GroundSpoofB extends Check {

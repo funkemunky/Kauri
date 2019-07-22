@@ -8,9 +8,9 @@ import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import lombok.val;
 import org.bukkit.event.Event;
 
-@Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION})
+@Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Jesus (Type A)", description = "Looks for consistency in y movement in water.", type = CheckType.JESUS, maxVersion = ProtocolVersion.V1_12_2, cancelType = CancelType.MOTION, maxVL = 50)
+@CheckInfo(name = "Jesus (Type A)", description = "Looks for consistency in y movement in water.", type = CheckType.JESUS, maxVersion = ProtocolVersion.V1_12_2, cancelType = CancelType.MOTION, maxVL = 50, enabled = false, executable = false)
 public class JesusA extends Check {
 
     private Verbose verbose = new Verbose();

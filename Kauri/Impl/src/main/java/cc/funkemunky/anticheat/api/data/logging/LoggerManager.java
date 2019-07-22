@@ -227,7 +227,10 @@ public class LoggerManager {
 
                 Map<String, Integer> vls = new HashMap<>();
 
-                vlList.stream().forEach(vl -> vls.put(vl.getCheckName(), vls.getOrDefault(vl.getCheckName(), 0) + 1));
+                for (Violation vl : vlList) {
+                    vls.put(vl.getCheckName(),
+                            vls.getOrDefault(vl.getCheckName(), 0) + 1);
+                }
 
                 return vls;
             }

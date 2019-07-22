@@ -187,11 +187,13 @@ public class MovementProcessor {
                 serverYVelocity = 0;
             }
 
-            if(timeStamp - data.getVelocityProcessor().getLastVelocityTimestamp() <= 100L + data.getTransPing()) {
-                serverYVelocity = deltaY;
-            }
-
-            if (getLastFlightToggle().hasNotPassed(3)) {
+            if(onClimbable
+                    || inLiquid
+                    || inWeb
+                    || data.isServerPos()
+                    || lastVehicle.hasNotPassed(2 + MathUtils.floor(data.getTransPing() / 50D))
+                    || getLastFlightToggle().hasNotPassed(3)
+                    || timeStamp - data.getVelocityProcessor().getLastVelocityTimestamp() <= 100L + data.getTransPing()) {
                 serverYVelocity = deltaY;
             }
 
@@ -280,6 +282,6 @@ public class MovementProcessor {
         //predict(data, .98f, .98f, false);
 
         pastLocation.addLocation(new CustomLocation(to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch()));
-        data.setGeneralCancel(data.isServerPos() || data.isLagging() || getLastFlightToggle().hasNotPassed(8) || !chunkLoaded || packet.getPlayer().getAllowFlight() || packet.getPlayer().getActivePotionEffects().stream().anyMatch(effect -> effect.getType().getName().toLowerCase().contains("levi")) || packet.getPlayer().getGameMode().toString().contains("CREATIVE") || packet.getPlayer().getGameMode().toString().contains("SPEC") || lastVehicle.hasNotPassed() || getLastRiptide().hasNotPassed(10) || data.getLastLogin().hasNotPassed(50) || data.getVelocityProcessor().getLastVelocity().hasNotPassed(25));
+        data.setGeneralCancel(data.isServerPos() || data.isLagging() || lastVehicle.hasNotPassed(10) || getLastFlightToggle().hasNotPassed(8) || !chunkLoaded || packet.getPlayer().getAllowFlight() || packet.getPlayer().getActivePotionEffects().stream().anyMatch(effect -> effect.getType().getName().toLowerCase().contains("levi")) || packet.getPlayer().getGameMode().toString().contains("CREATIVE") || packet.getPlayer().getGameMode().toString().contains("SPEC") || lastVehicle.hasNotPassed() || getLastRiptide().hasNotPassed(10) || data.getLastLogin().hasNotPassed(50) || data.getVelocityProcessor().getLastVelocity().hasNotPassed(25));
     }
 }

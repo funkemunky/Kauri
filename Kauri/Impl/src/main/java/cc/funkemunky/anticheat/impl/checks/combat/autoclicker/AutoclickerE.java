@@ -18,9 +18,9 @@ public class AutoclickerE extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val swing = getData().getSwingProcessor();
         if(!MiscUtils.shouldReturnArmAnimation(getData()) && (timeStamp - swing.getLastDequeueProcess()) < 6) {
-            if(swing.getAverageDelta() < 3 && swing.getAverage() < 180) {
+            if(swing.getAverageDelta() < 3 && swing.getAverage() < 180 && swing.getAverage() > 68) {
                 if((vl = Math.min(12, vl + 1)) > 4) {
-                    flag(swing.getAverage() + "=" + swing.getLastAverage() + ", vl=" + vl, true, true, vl > 8 ? AlertTier.HIGH : AlertTier.LIKELY);
+                    flag(swing.getAverage() + "=" + swing.getLastAverage() + ", vl=" + vl, true, true, AlertTier.LIKELY);
                 }
             } else vl-= vl > 0 ? 1 : 0;
         }

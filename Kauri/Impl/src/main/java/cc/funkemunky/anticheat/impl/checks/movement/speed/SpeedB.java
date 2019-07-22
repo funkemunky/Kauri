@@ -23,13 +23,13 @@ public class SpeedB extends Check {
         double delta = (move.getDeltaXZ() - predicted) * 38.2;
 
         if(move.getAirTicks() > 2 && !getData().isGeneralCancel() && move.getBlockAboveTicks() == 0 && move.getHalfBlockTicks() == 0 && move.getWebTicks() == 0 && move.getLiquidTicks() == 0 && move.getClimbTicks() == 0) {
-            if(delta > 1.0001) {
-                if(vl++ > 2) {
+            if(delta > 1.001) {
+                if(vl++ > 3) {
                     flag("delta=" + delta, true, true, AlertTier.HIGH);
                 }
             } else vl-= vl > 0 ? 0.5 : 0;
             debug("delta=" + delta + " vl=" + vl);
-        }
+        } else vl-= vl > 0 ? 1 : 0;
     }
 
     @Override

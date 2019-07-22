@@ -63,7 +63,7 @@ public class AlertsArgument extends FunkeArgument {
                 player.sendMessage(Color.translate(Messages.toggledAlerts.replace("%enabled%", "off")));
             } else {
                 player.sendMessage(Color.translate(Messages.invalidArguments));
-                player.sendMessage(Color.translate("&7Options: &f&odev&7, &f&olow&7, &f&olikely77, &f&ohigh&7, &f&ooff"));
+                player.sendMessage(Color.translate("&7Options: &f&odev&7, &f&olow&7, &f&opossible&7, &f&olikely&7, &f&ohigh&7, &f&ooff"));
             }
         } else player.sendMessage(Color.translate(Messages.invalidArguments));
     }

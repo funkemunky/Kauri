@@ -42,6 +42,7 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
@@ -76,7 +77,7 @@ public class Kauri extends JavaPlugin {
         saveDefaultConfig();
         saveDefaultMessages();
 
-        //if (Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled()) return;
+        if (Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled()) return;
 
         if(Bukkit.getVersion().contains("Paper")) {
             runningPaperSpigot = true;

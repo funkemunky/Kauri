@@ -14,7 +14,7 @@ import org.bukkit.event.Event;
         Packet.Client.POSITION,
         Packet.Client.POSITION_LOOK,
         Packet.Client.LOOK})
-@cc.funkemunky.api.utils.Init
+//@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Killaura (Type A)", description = "Checks the intervalTime between certain packets and attacks.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, maxVL = 150)
 public class KillauraA extends Check {
 

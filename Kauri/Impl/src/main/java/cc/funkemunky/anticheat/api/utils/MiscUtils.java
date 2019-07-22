@@ -127,7 +127,7 @@ public class MiscUtils {
 
         return player.getAllowFlight()
                 || data.isServerPos()
-                || move.getLastVehicle().hasNotPassed(5)
+                || move.getLastVehicle().hasNotPassed(10)
                 || move.getLiquidTicks() > 0
                 || move.getWebTicks() > 0
                 || move.isTookVelocity()
