@@ -62,7 +62,7 @@ public class BadPacketsG extends Check {
             }
         } else vl -= vl > 0 ? 3 : 0;
 
-        debug("STD: " + stdDev + " VL: " + vl + " max=" + max + " size=" + average.isReachedSize());
+        debug("MS:" + (timeStamp - lastFlying) + "STD: " + stdDev + " VL: " + vl + " max=" + max + " size=" + average.isReachedSize());
         this.lastFlying = timeStamp;
     }
 

@@ -45,7 +45,7 @@ MenuUtils {
 
     public static void openCheckEditGUI(Player toOpen, int page) {
         CheckType type = CheckType.values()[Math.min(CheckType.values().length, page) - 1];
-        ChestMenu menu = new ChestMenu(Color.Dark_Gray + "Edit Checks: " + Color.Blue + type.toString(), 6);;
+        ChestMenu menu = new ChestMenu(Color.Dark_Gray + "Edit Checks: " + Color.Blue + type.toString(), 6);
         boolean buildAtEnd = false;
 
         boolean isBeginning = page <= 1, isEnd = page >= CheckType.values().length;

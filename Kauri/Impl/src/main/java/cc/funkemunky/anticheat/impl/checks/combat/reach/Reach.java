@@ -36,7 +36,7 @@ public class Reach extends Check {
     private int collidedMin = 8;
 
     @Setting(name = "threshold.bypassCollidedReach")
-    private float bypassColReach = 3.75f;
+    private float bypassColReach = 5f;
 
     @Setting(name = "threshold.vl.certain")
     private int certainThreshold = 12;

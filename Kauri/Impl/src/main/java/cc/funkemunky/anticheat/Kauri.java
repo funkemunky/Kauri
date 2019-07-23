@@ -77,7 +77,7 @@ public class Kauri extends JavaPlugin {
         saveDefaultConfig();
         saveDefaultMessages();
 
-        if (Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled()) return;
+        //if (Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled()) return;
 
         if(Bukkit.getVersion().contains("Paper")) {
             runningPaperSpigot = true;
@@ -135,62 +135,6 @@ public class Kauri extends JavaPlugin {
                 }
             }
         }.runTaskTimer(this, 1L, 1L);
-       if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9)) {
-           new BukkitRunnable() {
-               public void run() {
-                   for (World world : Bukkit.getWorlds()) {
-                       List<Player> players;
-                       List<LivingEntity> entities;
-
-                       players = (entities = new ArrayList<>(world.getLivingEntities())).stream()
-                               .filter(ent -> ent instanceof Player && Bukkit.getOnlinePlayers().contains(ent))
-                               .map(ent -> (Player) ent)
-                               .collect(Collectors.toList());
-
-                       Map<Entity, Object> packetsToSend = new HashMap<>();
-                       Class<?> entityClass = ReflectionsUtil.getNMSClass("Entity");
-                       entities.forEach(ent -> {
-                           Object vanillaEnt = ReflectionsUtil.getEntity(ent);
-                           Object dataWatcher = ReflectionsUtil.getFieldValue(ReflectionsUtil.getFieldByName(entityClass, "datawatcher"), vanillaEnt);
-
-                           Map map = Reflection.getField(ReflectionsUtil.getNMSClass("DataWatcher"), Map.class, 1).get(dataWatcher);
-
-                           List<Object> watchables = new ArrayList<>();
-
-                           map.keySet().forEach(key -> watchables.add(map.get(key)));
-
-                           if(watchables.size() > 7) {
-                               WrappedOutEntityMetadata toSend = null;
-                               WrappedWatchableObject object7 = new WrappedWatchableObject(watchables.get(7)), object6 = new WrappedWatchableObject(watchables.get(6));
-
-                               if(object7.getWatchedObject() instanceof Float) {
-                                   object7.setWatchedObject(1.0f);
-                                   object7.setPacket(NMSObject.Type.WATCHABLE_OBJECT, object7.getObjectType(), object7.getDataValueId(), object7.getWatchedObject());
-
-                                   watchables.set(7, object7.getObject());
-                                   toSend = new WrappedOutEntityMetadata(ent.getEntityId(), watchables);
-                               } else if(object6.getWatchedObject() instanceof Float) {
-                                   object6.setWatchedObject(1.0f);
-                                   object6.setPacket(NMSObject.Type.WATCHABLE_OBJECT, object6.getObjectType(), object6.getDataValueId(), object6.getWatchedObject());
-
-                                   watchables.set(6, object6.getObject());
-                                   toSend = new WrappedOutEntityMetadata(ent.getEntityId(), watchables);
-                               }
-
-                               if(toSend != null) {
-                                   packetsToSend.put(ent, toSend.getObject());
-                               }
-                           }
-                       });
-                       players.stream().forEach(pl -> packetsToSend.keySet().forEach(key -> {
-                           if(!key.getUniqueId().equals(pl.getUniqueId())) {
-                               TinyProtocolHandler.sendPacket(pl, packetsToSend.get(key));
-                           }
-                       }));
-                   }
-               }
-           }.runTaskTimerAsynchronously(this, 20L, 30L);
-       }
     }
 
     public void startScanner(boolean configOnly) {

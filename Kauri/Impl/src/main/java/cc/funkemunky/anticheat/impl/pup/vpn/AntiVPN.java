@@ -36,20 +36,22 @@ public class AntiVPN extends AntiPUP {
 
     @EventHandler(priority = EventPriority.LOW)
     public void onPlayerJoin(PlayerLoginEvent event) {
-        Kauri.getInstance().getAntiPUPManager().pupThread.execute(() -> {
-            long timestamp = System.currentTimeMillis();
-            if(timestamp - Kauri.getInstance().lastLogin > 150L) {
-                VPNResponse response = Kauri.getInstance().getVpnUtils().getResponse(event.getAddress().getHostAddress());
+        if(!event.getPlayer().hasPermission("kauri.antivpn.bypass")) {
+            Kauri.getInstance().getAntiPUPManager().pupThread.execute(() -> {
+                long timestamp = System.currentTimeMillis();
+                if(timestamp - Kauri.getInstance().lastLogin > 150L) {
+                    VPNResponse response = Kauri.getInstance().getVpnUtils().getResponse(event.getAddress().getHostAddress());
 
-                if (response == null) return;
+                    if (response == null) return;
 
-                if (response.isProxy()) {
-                    Bukkit.getScheduler().runTask(Kauri.getInstance(), () -> event.getPlayer().kickPlayer(Color.translate(usingProxy)));
-                } else if (blockCountries.contains(response.getCountryCode())) {
-                    Bukkit.getScheduler().runTask(Kauri.getInstance(), () -> event.getPlayer().kickPlayer(Color.translate(blockedCountry.replaceAll("%countryName%", response.getCountryName()))));
+                    if (response.isProxy()) {
+                        Bukkit.getScheduler().runTask(Kauri.getInstance(), () -> event.getPlayer().kickPlayer(Color.translate(usingProxy)));
+                    } else if (blockCountries.contains(response.getCountryCode())) {
+                        Bukkit.getScheduler().runTask(Kauri.getInstance(), () -> event.getPlayer().kickPlayer(Color.translate(blockedCountry.replaceAll("%countryName%", response.getCountryName()))));
+                    }
                 }
-            }
-            Kauri.getInstance().lastLogin = timestamp;
-        });
+                Kauri.getInstance().lastLogin = timestamp;
+            });
+        }
     }
 }
