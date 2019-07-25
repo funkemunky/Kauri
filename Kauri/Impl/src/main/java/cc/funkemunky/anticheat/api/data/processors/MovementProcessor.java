@@ -1,12 +1,10 @@
 package cc.funkemunky.anticheat.api.data.processors;
 
-import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.utils.CollisionAssessment;
 import cc.funkemunky.anticheat.api.utils.CustomLocation;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.PastLocation;
-import cc.funkemunky.anticheat.impl.config.MiscSettings;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.*;
@@ -18,7 +16,6 @@ import org.bukkit.entity.Vehicle;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 public class MovementProcessor {
@@ -195,25 +192,6 @@ public class MovementProcessor {
                     || getLastFlightToggle().hasNotPassed(3)
                     || timeStamp - data.getVelocityProcessor().getLastVelocityTimestamp() <= 100L + data.getTransPing()) {
                 serverYVelocity = deltaY;
-            }
-
-            if(data.getTeleportLocations().size() > 0) {
-                val vecStream = data.getTeleportLocations().stream().filter(vec -> (MiscSettings.horizontalServerPos ? MathUtils.offset(vec, to.toVector()) : vec.distance(to.toVector())) < 1E-8).findFirst().orElse(null);
-
-                if(vecStream != null) {
-                    if(data.getTeleportLoc() != null && vecStream.distance(data.getTeleportLoc().toVector()) == 0) {
-                        data.setTeleportPing(timeStamp - data.getTeleportTest());
-                    } else {
-                        data.setTeleportPing(timeStamp - data.getTeleportTest());
-                    }
-                    data.setLastServerPosStamp(timeStamp);
-                    data.getTeleportLocations().remove(vecStream);
-                    serverYVelocity = deltaY;
-                    serverPos = true;
-                    from = to;
-                } else if(serverPos) {
-                    serverPos = false;
-                }
             }
 
             lastServerYAcceleration = serverYAcceleration;

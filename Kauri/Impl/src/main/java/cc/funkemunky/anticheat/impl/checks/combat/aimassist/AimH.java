@@ -13,7 +13,7 @@ import lombok.val;
 import org.bukkit.event.Event;
 
 @Init
-@CheckInfo(name = "Aim (Type H)", description = "Designed to detect Vape's Aimassist while vertical aim is off.", type = CheckType.AIM)
+@CheckInfo(name = "Aim (Type H)", description = "Designed to detect Vape's Aimassist while vertical aim is off.", type = CheckType.AIM, executable = true, maxVL = 10)
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LOOK})
 public class AimH extends Check {
 

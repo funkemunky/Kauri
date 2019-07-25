@@ -18,7 +18,7 @@ import org.bukkit.util.Vector;
 
 import java.util.stream.Collectors;
 
-@CheckInfo(name = "Reach", description = "A very accurate and fast 3.1 reach check.", type = CheckType.REACH, cancelType = CancelType.COMBAT, maxVL = 10)
+@CheckInfo(name = "Reach", description = "A very accurate and fast 3.1 reach check.", type = CheckType.REACH, cancelType = CancelType.COMBAT, maxVL = 10, executable = true)
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.POSITION, Packet.Client.LOOK, Packet.Client.FLYING})
 @Init
 public class Reach extends Check {
@@ -33,10 +33,10 @@ public class Reach extends Check {
     private int collidedThreshold = 34;
 
     @Setting(name = "threshold.colidedMin")
-    private int collidedMin = 8;
+    private int collidedMin = 6;
 
     @Setting(name = "threshold.bypassCollidedReach")
-    private float bypassColReach = 5f;
+    private float bypassColReach = 4f;
 
     @Setting(name = "threshold.vl.certain")
     private int certainThreshold = 12;

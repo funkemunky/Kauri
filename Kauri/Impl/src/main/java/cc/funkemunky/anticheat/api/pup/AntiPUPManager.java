@@ -3,7 +3,6 @@ package cc.funkemunky.anticheat.api.pup;
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.utils.Setting;
-import cc.funkemunky.anticheat.impl.pup.bot.ConsoleClient;
 import cc.funkemunky.anticheat.impl.pup.crashers.*;
 import cc.funkemunky.anticheat.impl.pup.exploits.BookEnchant;
 import cc.funkemunky.anticheat.impl.pup.vpn.AntiVPN;
@@ -35,7 +34,6 @@ public class AntiPUPManager {
         addMethod(new Boxer("Boxer", PuPType.CRASH, true), list);
         addMethod(new YLevel("YLevel", PuPType.CRASH, true), list);
         addMethod(new MorePackets("MorePackets", PuPType.CRASH, true), list);
-        addMethod(new CommandSpam("CommandSpam", PuPType.SPAM, true), list);
         addMethod(new ChatSpam("ChatSpam", PuPType.SPAM, true), list);
         addMethod(new BookEnchant("BookEnchant", PuPType.EXPLOIT, true), list);
         //addMethod(new WorldLoader("WorldLoader", PuPType.BOT, true), list);

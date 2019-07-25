@@ -17,7 +17,7 @@ import org.bukkit.event.Event;
         Packet.Client.ARM_ANIMATION,
         Packet.Client.BLOCK_DIG})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Autoclicker (Type D)", description = "An unreasonable amount of CPS while breaking a block.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 20)
+@CheckInfo(name = "Autoclicker (Type D)", description = "An unreasonable amount of CPS while breaking a block.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 50)
 public class AutoclickerD extends Check {
 
     private boolean sent;
@@ -40,7 +40,7 @@ public class AutoclickerD extends Check {
                 case ABORT_DESTROY_BLOCK: {
                     if (sent && lastRange > 10L) {
                         if (++vl >= 10) {
-                            this.flag("V: " + vl, false, true, AlertTier.HIGH);
+                            this.flag("V: " + vl, true, true, AlertTier.HIGH);
                         }
                     }
                     break;

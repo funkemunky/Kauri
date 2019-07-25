@@ -8,7 +8,7 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 
 @BukkitEvents(events = {EntityRegainHealthEvent.class})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "BadPackets (Type E)", description = "Checks the rate of healing.", type = CheckType.BADPACKETS, cancelType = CancelType.HEALTH, maxVL = 20)
+@CheckInfo(name = "BadPackets (Type E)", description = "Checks the rate of healing.", type = CheckType.BADPACKETS, cancelType = CancelType.HEALTH, maxVL = 20, executable = true)
 public class BadPacketsE extends Check {
 
     private Verbose verbose = new Verbose();

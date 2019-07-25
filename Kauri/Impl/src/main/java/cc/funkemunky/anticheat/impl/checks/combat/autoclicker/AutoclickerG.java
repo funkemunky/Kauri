@@ -8,7 +8,7 @@ import cc.funkemunky.api.utils.Init;
 import lombok.val;
 import org.bukkit.event.Event;
 
-@CheckInfo(name = "Autoclicker (Type G)", description = "Checks if the autoclicker clicks in a specific range set.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT)
+@CheckInfo(name = "Autoclicker (Type G)", description = "Checks if the autoclicker clicks in a specific range set.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 4, executable = true)
 @Init
 @Packets(packets = {Packet.Client.ARM_ANIMATION})
 public class AutoclickerG extends Check {

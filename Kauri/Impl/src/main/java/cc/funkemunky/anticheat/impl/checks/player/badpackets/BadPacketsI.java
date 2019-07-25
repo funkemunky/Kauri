@@ -8,7 +8,7 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockDigPacket;
 import cc.funkemunky.api.utils.Init;
 import org.bukkit.event.Event;
 
-@CheckInfo(name = "BadPackets (Type I)", description = "Checks for instant blocks and unblocks.", type = CheckType.BADPACKETS, cancelType = CancelType.INTERACT, maxVL = 40)
+@CheckInfo(name = "BadPackets (Type I)", description = "Checks for instant blocks and unblocks.", type = CheckType.BADPACKETS, cancelType = CancelType.INTERACT, maxVL = 40, executable = true)
 @Packets(packets = {Packet.Client.BLOCK_PLACE, Packet.Client.BLOCK_DIG})
 @Init
 public class BadPacketsI extends Check {

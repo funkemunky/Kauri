@@ -15,7 +15,7 @@ import org.bukkit.event.Event;
         Packet.Client.POSITION_LOOK,
         Packet.Client.LOOK})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Autoclicker (Type B)", description = "An overall average CPS check.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 20, executable = false)
+@CheckInfo(name = "Autoclicker (Type B)", description = "An overall average CPS check.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 50)
 public class AutoclickerB extends Check {
 
 

@@ -45,6 +45,9 @@ public class BadPacketsF extends Check {
                 ticks = 0;
                 lastReset = timeStamp;
             }
+        } else {
+            ticks = 0;
+            lastReset = timeStamp;
         }
     }
 

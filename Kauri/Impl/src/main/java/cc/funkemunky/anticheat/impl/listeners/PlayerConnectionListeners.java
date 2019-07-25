@@ -5,6 +5,7 @@ import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.Init;
+import com.google.common.eventbus.AllowConcurrentEvents;
 import org.bukkit.Achievement;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -27,14 +28,13 @@ public class PlayerConnectionListeners implements Listener {
             }
         });
 
-        if(event.getPlayer().getName().equals("funkemunky")) {
+        if (event.getPlayer().getName().equals("funkemunky")) {
             event.getPlayer().sendMessage(Color.Gray + "This server is using Kauri " + Kauri.getInstance().getDescription().getVersion());
         }
 
         if (ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9))
             event.getPlayer().removeAchievement(Achievement.OPEN_INVENTORY);
     }
-
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Kauri.getInstance().getDataManager().removeData(event.getPlayer().getUniqueId());

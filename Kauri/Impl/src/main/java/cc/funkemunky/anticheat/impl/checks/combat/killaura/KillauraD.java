@@ -1,46 +1,41 @@
 package cc.funkemunky.anticheat.impl.checks.combat.killaura;
 
+import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.Packets;
-import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.utils.MiscUtils;
-import cc.funkemunky.api.utils.math.RayTrace;
-import lombok.val;
-import one.util.streamex.StreamEx;
+import cc.funkemunky.api.utils.Init;
 import org.bukkit.event.Event;
 
-import java.util.Comparator;
+import java.util.UUID;
 
+@CheckInfo(name = "Killaura (Type D)", description = "Looks for extremely fast switching between targets.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, maxVL = 35, executable = true)
+@Init
 @Packets(packets = {Packet.Client.USE_ENTITY})
-//@Init
-@CheckInfo(name = "Killaura (Type D)", description = "Raytraces to check if there are blocks obstructing the path of attack.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, executable = false)
 public class KillauraD extends Check {
 
-    //TODO Test for false positives.
+    private UUID lastTarget;
+    private long lastSwitch;
+    private int vl;
+
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(getData().getTarget() != null && !getData().isLagging()) {
-            val move = getData().getMovementProcessor();
-            val origin = getData().getPlayer().getEyeLocation();
-            val target = getData().getTarget();
-            val distance = move.getTo().toVector().setY(0).distance(target.getLocation().toVector().setY(0));
+        if(getData().getTarget() == null || getData().isLagging() || Kauri.getInstance().getTps() < 15) return;
 
-            RayTrace trace = new RayTrace(origin.toVector(), origin.getDirection());
-            val targetBox = MiscUtils.getEntityBoundingBox(target).grow(0.5f, 0.5f, 0.5f);
+        long delta = timeStamp - lastSwitch;
 
-            val count = StreamEx.of(trace.traverse(distance / 1.5f, 0.25)).sorted(Comparator.comparing(vec -> vec.distance(origin.toVector()))).takeWhile(vec -> !targetBox.collides(vec) && vec.distance(origin.toVector()) < origin.distance(target.getEyeLocation())).filter(vec -> {
-                val boxList = Atlas.getInstance().getBlockBoxManager().getBlockBox().getSpecificBox(vec.toLocation(target.getWorld()));
+        debug("delta=" + delta);
 
-                return boxList.size() > 0 && boxList.stream().anyMatch(box -> box.intersectsWithBox(vec) && box.getMaximum().subtract(box.getMinimum()).lengthSquared() == 3);
-            }).count();
-
-            if(count > 1) {
-                flag("colliding=" + count, true, true, AlertTier.LOW);
+        if(delta < 50) {
+            if(vl++ > 12) {
+                flag(delta + "<-50", true, true, vl > 30 ? AlertTier.CERTAIN : AlertTier.HIGH);
             }
+        } else vl = 0;
 
-            debug("collidng=" + count);
+        if(!getData().getTarget().getUniqueId().equals(lastTarget)) {
+            lastSwitch = timeStamp;
         }
+        lastTarget = getData().getTarget().getUniqueId();
     }
 
     @Override

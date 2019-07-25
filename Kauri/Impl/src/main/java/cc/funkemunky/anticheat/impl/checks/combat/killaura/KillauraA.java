@@ -14,7 +14,7 @@ import org.bukkit.event.Event;
         Packet.Client.POSITION,
         Packet.Client.POSITION_LOOK,
         Packet.Client.LOOK})
-//@cc.funkemunky.api.utils.Init
+@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Killaura (Type A)", description = "Checks the intervalTime between certain packets and attacks.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, maxVL = 150)
 public class KillauraA extends Check {
 
@@ -32,10 +32,10 @@ public class KillauraA extends Check {
             /*Checks the intervalTime difference between a flying packet and a use packet. If legit, it should normally be around 50ms.
             KillauraA modules tend to be made using a motion event, and client developers usually forget to make sure that the motion
             and the attack packets are being sent in separate ticks */
-            long elapsed = MathUtils.elapsed(lastFlying);
+            long elapsed = timeStamp - lastFlying;
             if (elapsed < 35) {
                 if (lastLag.hasPassed() && verbose++ > 12) {
-                    flag("t: post; " + elapsed + "<-10", true, true, verbose > 20 ? AlertTier.CERTAIN : AlertTier.HIGH);
+                    flag("t: post; " + elapsed + "<-10", true, true, AlertTier.POSSIBLE);
                 }
             } else {
                 verbose = 0;

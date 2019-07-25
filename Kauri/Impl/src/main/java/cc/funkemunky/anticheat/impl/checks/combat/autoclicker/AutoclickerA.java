@@ -10,7 +10,7 @@ import org.bukkit.event.Event;
 
 @Packets(packets = {Packet.Client.ARM_ANIMATION})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Autoclicker (Type A)", description = "A unique fast click check that detects jumps in CPS much faster.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT)
+@CheckInfo(name = "Autoclicker (Type A)", description = "A unique fast click check that detects jumps in CPS much faster.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, executable = true, maxVL = 12)
 public class AutoclickerA extends Check {
 
     @Setting(name = "maxCPS")
@@ -35,7 +35,7 @@ public class AutoclickerA extends Check {
                     flag("cps: " + ticks, true, true, AlertTier.CERTAIN);
                 } else flag("cps: " + ticks, true, true, AlertTier.HIGH);
             } else if(ticks > maxCPS) {
-                flag("cps: " + ticks, true, true, AlertTier.LIKELY);
+                flag("cps: " + ticks, true, false, AlertTier.LIKELY);
             }
             debug("cps=" + ticks);
             ticks = 0;

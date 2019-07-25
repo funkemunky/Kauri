@@ -76,7 +76,7 @@ public class UpdateConfigArgument extends FunkeArgument {
                         sender.sendMessage(Color.translate(genNewConfig));
                         instance.saveDefaultConfig();
                         sender.sendMessage(Color.translate(reloadingKauri));
-                        Kauri.getInstance().reloadKauri(true);
+                        Kauri.getInstance().reloadKauri();
                         sender.sendMessage(Color.translate(completed));
                         break;
                     case "checks":
@@ -85,7 +85,7 @@ public class UpdateConfigArgument extends FunkeArgument {
                         config.set("checks", null);
                         instance.saveConfig();
                         sender.sendMessage(Color.translate(reloadingKauri));
-                        Kauri.getInstance().reloadKauri(false);
+                        Kauri.getInstance().reloadKauri();
                         sender.sendMessage(Color.translate(completed));
                         break;
                     case "pup":
@@ -95,7 +95,7 @@ public class UpdateConfigArgument extends FunkeArgument {
                         config.set("antipup", null);
                         instance.saveConfig();
                         sender.sendMessage(Color.translate(reloadingKauri));
-                        Kauri.getInstance().reloadKauri(false);
+                        Kauri.getInstance().reloadKauri();
                         sender.sendMessage(Color.translate(completed));
                         break;
                     default:
@@ -111,7 +111,7 @@ public class UpdateConfigArgument extends FunkeArgument {
                     sender.sendMessage(Color.translate(deletingSection.replace("%section%", "checks." + check.getName())));
                     Kauri.getInstance().getConfig().set("checks." + check.getName(), null);
                     sender.sendMessage(Color.translate(reloadingKauri));
-                    Kauri.getInstance().reloadKauri(false);
+                    Kauri.getInstance().reloadKauri();
                     sender.sendMessage(Color.translate(completed));
                 } else sender.sendMessage(Color.translate(provideChecks));
             } else {

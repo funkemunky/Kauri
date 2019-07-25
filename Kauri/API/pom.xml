@@ -5,7 +5,7 @@
     <parent>
         <artifactId>Kauri</artifactId>
         <groupId>cc.funkemunky.anticheat</groupId>
-        <version>b6</version>
+        <version>b7</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 

@@ -1,6 +1,9 @@
 package cc.funkemunky.anticheat.impl.checks.movement.speed;
 
-import cc.funkemunky.anticheat.api.checks.*;
+import cc.funkemunky.anticheat.api.checks.AlertTier;
+import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
+import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
@@ -8,7 +11,7 @@ import cc.funkemunky.api.utils.Init;
 import lombok.val;
 import org.bukkit.event.Event;
 
-@CheckInfo(name = "Speed (Type A)", type = CheckType.SPEED, description = "A general limiting speed check with a verbose to prevent false positives.", maxVL = 40)
+@CheckInfo(name = "Speed (Type A)", type = CheckType.SPEED, description = "A general limiting speed check with a verbose to prevent false positives.", maxVL = 40, executable = true)
 @Init
 @Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK})
 public class SpeedA extends Check {

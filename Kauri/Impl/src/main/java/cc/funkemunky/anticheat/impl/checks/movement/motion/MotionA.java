@@ -11,8 +11,8 @@ import lombok.val;
 import org.bukkit.event.Event;
 import org.bukkit.util.Vector;
 
-@CheckInfo(name = "Motion (Type A)", description = "Looks for illegitimate omni-directional sprinting.", type = CheckType.MOTION, maxVL = 50)
-@Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION})
+@CheckInfo(name = "Motion (Type A)", description = "Looks for illegitimate omni-directional sprinting.", type = CheckType.MOTION, maxVL = 50, executable = true)
+@Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK})
 @Init
 public class MotionA extends Check {
 

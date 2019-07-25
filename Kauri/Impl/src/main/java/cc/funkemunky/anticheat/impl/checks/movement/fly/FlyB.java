@@ -12,7 +12,7 @@ import cc.funkemunky.api.utils.Init;
 import lombok.val;
 import org.bukkit.event.Event;
 
-@CheckInfo(name = "Fly (Type B)", description = "Checks for a player double jumping impossibly.", type = CheckType.FLY)
+@CheckInfo(name = "Fly (Type B)", description = "Checks for a player double jumping impossibly.", type = CheckType.FLY, maxVL = 60)
 @Init
 @Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK})
 public class FlyB extends Check {
@@ -22,8 +22,8 @@ public class FlyB extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        if(!move.isNearGround() && !MiscUtils.cancelForFlight(getData(), 10, false) && move.getDeltaXZ() > move.getLastDeltaXZ() + 0.01) {
-            if(vl.flag(2, 1000L)) {
+        if(!move.isNearGround() && !MiscUtils.cancelForFlight(getData(), 10, false) && move.getDeltaY() > move.getLastDeltaY() + 0.01) {
+            if(vl.flag(1, 2000L)) {
                 flag(move.getDeltaXZ() + ">-" + move.getLastDeltaXZ(), true, true, AlertTier.LIKELY);
             }
         }

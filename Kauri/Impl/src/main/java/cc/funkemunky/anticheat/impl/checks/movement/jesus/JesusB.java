@@ -7,6 +7,7 @@ import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.PlayerUtils;
 import lombok.val;
@@ -14,7 +15,7 @@ import org.bukkit.event.Event;
 import org.bukkit.potion.PotionEffectType;
 
 @Init
-@CheckInfo(name = "Jesus (Type B)", description = "Makes sure the player isn't going faster than a certain speed in water.", type = CheckType.JESUS, maxVL = 60, enabled = false, executable = false)
+@CheckInfo(name = "Jesus (Type B)", description = "Makes sure the player isn't going faster than a certain speed in water.", type = CheckType.JESUS, maxVL = 60, maxVersion = ProtocolVersion.V1_12_2)
 @Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK})
 public class JesusB extends Check {
 
@@ -24,7 +25,7 @@ public class JesusB extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        if((move.isInLiquid() || move.isLiquidBelow()) && !getData().isGeneralCancel()) {
+        if((move.isInLiquid() || move.isLiquidBelow()) && !getData().isGeneralCancel() && !move.isNearGround()) {
             float threshold = move.getLiquidTicks() > 15 ? 0.198f : 0.38f;
 
             threshold+= PlayerUtils.getPotionEffectLevel(getData().getPlayer(), PotionEffectType.SPEED) * 0.015;
@@ -39,10 +40,10 @@ public class JesusB extends Check {
             threshold+= depthMult;
 
             if(move.getDeltaXZ() > threshold) {
-                if(vl++ > 5 || move.getDeltaXZ() - threshold > 0.3) {
+                if(vl++ > 5) {
                     flag(move.getDeltaXZ() + ">-" + threshold, true, true, AlertTier.HIGH);
                 }
-            } else vl-= vl > 0 ? 1 : 0;
+            } else vl-= vl > 0 ? 2 : 0;
         }
     }
 

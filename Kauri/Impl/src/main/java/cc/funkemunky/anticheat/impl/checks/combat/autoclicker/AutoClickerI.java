@@ -30,7 +30,7 @@ public class AutoClickerI extends Check {
                     flag("distinct=" + swing.getDistinct() + " stdDelta=" + swing.getStdDelta(), true, true, AlertTier.HIGH);
                 }
             } else vl-= vl > 0 ? 1 : 0;
-            debug( "range=" + range + " delta=" + delta + " vl=" + vl);
+            debug( "range=" + range + " delta=" + delta + " vl=" + vl + " lastBlockBreak" + getData().getLastBlockBreak().getPassed() + " isBreaking=" + getData().isBreakingBlock());
             lastRange = range;
         }
     }

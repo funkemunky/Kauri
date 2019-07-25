@@ -11,7 +11,7 @@ import lombok.val;
 import org.bukkit.event.Event;
 
 @Init
-@CheckInfo(name = "InventoryClick", description = "Looks for consistent cps inside an inventory and out.", type = CheckType.BEHAVIORAL, cancelType = CancelType.NONE, cancellable = false, executable = false)
+@CheckInfo(name = "InventoryClick", description = "Looks for consistent cps inside an inventory and out.", type = CheckType.BEHAVIORAL, cancelType = CancelType.NONE)
 @Packets(packets = {Packet.Client.ARM_ANIMATION, Packet.Client.WINDOW_CLICK})
 public class InventoryClick extends Check {
 

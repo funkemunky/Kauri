@@ -1,6 +1,9 @@
 package cc.funkemunky.anticheat.impl.checks.combat.aimassist;
 
-import cc.funkemunky.anticheat.api.checks.*;
+import cc.funkemunky.anticheat.api.checks.AlertTier;
+import cc.funkemunky.anticheat.api.checks.Check;
+import cc.funkemunky.anticheat.api.checks.CheckInfo;
+import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
@@ -12,7 +15,7 @@ import org.bukkit.util.Vector;
         Packet.Client.LOOK,
         Packet.Client.POSITION_LOOK})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Aim (Type D)", description = "Looks for a common angle mistake in clients. By Itz_Lucky.", type = CheckType.AIM, cancelType = CancelType.MOTION, maxVL = 50)
+@CheckInfo(name = "Aim (Type D)", description = "Looks for a common angle mistake in clients. By Itz_Lucky.", type = CheckType.AIM, executable = true, maxVL = 10)
 public class AimD extends Check {
 
     private Verbose verbose = new Verbose();

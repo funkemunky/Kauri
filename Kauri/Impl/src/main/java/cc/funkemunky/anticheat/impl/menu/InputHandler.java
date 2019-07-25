@@ -7,8 +7,5 @@ import org.bukkit.event.block.SignChangeEvent;
 //@Init
 public class InputHandler implements Listener {
 
-    @EventHandler
-    public void onEvent(SignChangeEvent event) {
-
-    }
+    private boolean testMode = false;
 }

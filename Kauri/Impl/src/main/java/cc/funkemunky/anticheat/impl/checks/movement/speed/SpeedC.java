@@ -6,14 +6,13 @@ import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.PlayerUtils;
 import cc.funkemunky.api.utils.ReflectionsUtil;
 import lombok.val;
 import org.bukkit.event.Event;
 import org.bukkit.potion.PotionEffectType;
 
-@Init
+//@Init
 @Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK})
 @CheckInfo(name = "Speed (Type C)", description = "Checks for legitimate acceleration on ground.", type = CheckType.SPEED, maxVL = 75)
 public class SpeedC extends Check {
@@ -29,7 +28,7 @@ public class SpeedC extends Check {
             double predicted = move.getLastDeltaXZ() * ReflectionsUtil.getFriction(getData().getBlockBelow());
             double delta = Math.abs((move.getDeltaXZ() - predicted) * 8.7 - (0.5 * PlayerUtils.getPotionEffectLevel(getData().getPlayer(), PotionEffectType.SPEED)));
 
-            if(delta > 1.2 && getData().getWalkSpeed() < 0.21) {
+            if(delta > 1.1 && getData().getWalkSpeed() < 0.21) {
                 if(vl++ > 5) {
                     flag("delta=" + delta, true, true, AlertTier.HIGH);
                 }

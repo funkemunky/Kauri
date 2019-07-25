@@ -4,11 +4,10 @@ import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.TickTimer;
 import org.bukkit.event.Event;
 
-@CheckInfo(name = "Autoclicker (Type C)", description = "Checks for double clicking.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, executable = false)
+@CheckInfo(name = "Autoclicker (Type C)", description = "Checks for double clicking.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT)
 @Packets(packets = {
         Packet.Client.ARM_ANIMATION,
         Packet.Client.FLYING,

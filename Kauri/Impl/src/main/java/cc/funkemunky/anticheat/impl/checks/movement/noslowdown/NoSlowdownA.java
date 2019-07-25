@@ -16,7 +16,7 @@ import lombok.val;
 import org.bukkit.event.Event;
 
 @Init
-@CheckInfo(name = "NoSlowdown (Type A)", description = "Looks for players using items but not slowing down.", executable = false)
+@CheckInfo(name = "NoSlowdown (Type A)", description = "Looks for players using items but not slowing down.")
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.POSITION, Packet.Client.HELD_ITEM_SLOT})
 public class NoSlowdownA extends Check {
 
@@ -40,7 +40,7 @@ public class NoSlowdownA extends Check {
 
             if (action.isUsingItem() && move.getDeltaXZ() > baseSpeed) {
                 if (verbose.flag(20, 500L)) {
-                    flag(MathUtils.round(move.getDeltaXZ(), 3) + ">- " + baseSpeed, true, false, AlertTier.HIGH);
+                    flag(MathUtils.round(move.getDeltaXZ(), 3) + ">- " + baseSpeed, true, false, verbose.getVerbose() > 40 ? AlertTier.LIKELY : AlertTier.POSSIBLE);
                 } else if(verbose.getVerbose() > 10 && verbose.getVerbose() < 13) {
                     WrappedOutHeldItemSlot slot = new WrappedOutHeldItemSlot(this.slot);
 

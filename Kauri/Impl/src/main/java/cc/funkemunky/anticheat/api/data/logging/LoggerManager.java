@@ -165,6 +165,8 @@ public class LoggerManager {
             violations.add(new Violation(check.getName(), info, Kauri.getInstance().getTps(), data.getTransPing(), System.currentTimeMillis(), tier));
 
             this.violations.put(data.getUuid(), violations);
+
+            this.recentViolators.add(data.getPlayer().getUniqueId());
         }
     }
 

@@ -6,29 +6,26 @@ import cc.funkemunky.anticheat.api.data.DataManager;
 import cc.funkemunky.anticheat.api.data.banwave.BanwaveManager;
 import cc.funkemunky.anticheat.api.data.logging.LoggerManager;
 import cc.funkemunky.anticheat.api.data.stats.StatsManager;
+import cc.funkemunky.anticheat.api.lunar.LunarClientAPI;
+import cc.funkemunky.anticheat.api.lunar.event.AuthenticateEvent;
+import cc.funkemunky.anticheat.api.lunar.user.User;
 import cc.funkemunky.anticheat.api.pup.AntiPUPManager;
 import cc.funkemunky.anticheat.api.utils.Message;
 import cc.funkemunky.anticheat.api.utils.VPNUtils;
 import cc.funkemunky.anticheat.impl.commands.kauri.KauriCommand;
 import cc.funkemunky.anticheat.impl.listeners.LegacyListeners;
+import cc.funkemunky.anticheat.impl.menu.InputHandler;
 import cc.funkemunky.api.Atlas;
+import cc.funkemunky.api.event.system.EventManager;
 import cc.funkemunky.api.events.AtlasListener;
 import cc.funkemunky.api.profiling.BaseProfiler;
-import cc.funkemunky.api.tinyprotocol.api.NMSObject;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
-import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutEntityMetadata;
-import cc.funkemunky.api.tinyprotocol.packet.types.WrappedWatchableObject;
-import cc.funkemunky.api.tinyprotocol.reflection.Reflection;
 import cc.funkemunky.api.updater.UpdaterUtils;
 import cc.funkemunky.api.utils.*;
 import lombok.Getter;
 import org.bukkit.Bukkit;
-import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
@@ -38,13 +35,13 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.*;
 import java.math.RoundingMode;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 
 @Getter
 public class Kauri extends JavaPlugin {
@@ -59,7 +56,7 @@ public class Kauri extends JavaPlugin {
     private LoggerManager loggerManager;
     private BanwaveManager banwaveManager;
     private int ticks;
-    private long profileStart, lastTimeStamp, tpsMilliseconds;
+    private long profileStart, lastTimeStamp, lastTPS, tpsMilliseconds;
     private double tps;
     private ScheduledExecutorService executorService, vpnSchedular = Executors.newSingleThreadScheduledExecutor();
     private BaseProfiler profiler;
@@ -68,7 +65,7 @@ public class Kauri extends JavaPlugin {
     private List<String> usableVersionsOfAtlas = Arrays.asList("1.3.4", "1.3.5", "1.3.6", "1.3.7", "1.3.8", "1.3.9");
     private FileConfiguration messages;
     private File messagesFile;
-    private boolean testMode = true, runningPaperSpigot;
+    private boolean runningPaperSpigot;
 
     @Override
     public void onEnable() {
@@ -77,11 +74,12 @@ public class Kauri extends JavaPlugin {
         saveDefaultConfig();
         saveDefaultMessages();
 
-        //if (Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled()) return;
+        if (!(boolean)ReflectionsUtil.getFieldValue(ReflectionsUtil.getFieldByName(ReflectionsUtil.getClass("cc.funkemunky.anticheat.impl.menu.InputHandler"), "testMode"), new InputHandler()) && (Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled())) return;
 
         if(Bukkit.getVersion().contains("Paper")) {
             runningPaperSpigot = true;
         }
+
         profiler = new BaseProfiler();
         profileStart = System.currentTimeMillis();
 
@@ -105,6 +103,8 @@ public class Kauri extends JavaPlugin {
         vpnUtils = new VPNUtils();
         new KauriAPI();
 
+        registerLunarClient();
+
         runTasks();
         registerCommands();
         registerListeners();
@@ -118,6 +118,8 @@ public class Kauri extends JavaPlugin {
         checkManager.getChecks().clear();
         Atlas.getInstance().getCommandManager().unregisterCommands(this);
         executorService.shutdownNow();
+        Bukkit.getMessenger().unregisterIncomingPluginChannel(this, "Lunar-Client");
+        Bukkit.getMessenger().unregisterOutgoingPluginChannel(this, "Lunar-Client");
     }
 
     private void runTasks() {
@@ -133,6 +135,7 @@ public class Kauri extends JavaPlugin {
                     lastTimeStamp = timeStamp;
                     ticks = 0;
                 }
+                lastTPS = System.currentTimeMillis();
             }
         }.runTaskTimer(this, 1L, 1L);
     }
@@ -145,6 +148,28 @@ public class Kauri extends JavaPlugin {
         Atlas.getInstance().getFunkeCommandManager().addCommand(this, new KauriCommand());
     }
 
+    private void registerLunarClient() {
+        this.getServer().getMessenger().registerOutgoingPluginChannel(this, "Lunar-Client");
+        this.getServer().getMessenger().registerIncomingPluginChannel(this, "Lunar-Client", (channel, player, bytes) -> {
+            if (bytes[0] == 26) {
+                User user = LunarClientAPI.getInstance().getUserManager().getPlayerData(player);
+                if (user != null && !user.isLunarClient()){
+                    user.setLunarClient(true);
+                }
+
+                AuthenticateEvent event = new AuthenticateEvent(player);
+
+                Atlas.getInstance().getEventManager().callEvent(event);
+
+                for (Player other : Bukkit.getServer().getOnlinePlayers()) {
+                    if (LunarClientAPI.getInstance().isAuthenticated(other)) {
+                        other.sendPluginMessage(Kauri.this, channel, bytes);
+                    }
+                }
+            }
+        });
+    }
+
     public double getTPS(RoundingMode mode, int places) {
         return MathUtils.round(tps, places, mode);
     }
@@ -153,14 +178,28 @@ public class Kauri extends JavaPlugin {
         return 50 / (2000D / tpsMilliseconds);
     }
 
-    public void reloadKauri(boolean reloadedMessages) {
-        MiscUtils.printToConsole("&cReloading Kauri...");
-        long start = System.currentTimeMillis();
-        MiscUtils.unloadPlugin("KauriLoader");
-        MiscUtils.unloadPlugin("Atlas");
-        MiscUtils.loadPlugin("Atlas");
-        MiscUtils.loadPlugin("KauriLoader");
-        MiscUtils.printToConsole("&aCompleted reload in " + (System.currentTimeMillis() - start) + " milliseconds!");
+    public void reloadKauri() {
+        if(!(boolean)ReflectionsUtil.getFieldValue(ReflectionsUtil.getFieldByName(ReflectionsUtil.getClass("cc.funkemunky.anticheat.impl.menu.InputHandler"), "testMode"), new InputHandler())) {
+            MiscUtils.printToConsole("&cReloading Kauri...");
+            long start = System.currentTimeMillis();
+            MiscUtils.unloadPlugin("KauriLoader");
+            MiscUtils.unloadPlugin("Atlas");
+            MiscUtils.loadPlugin("Atlas");
+            MiscUtils.loadPlugin("KauriLoader");
+            MiscUtils.printToConsole("&aCompleted reload in " + (System.currentTimeMillis() - start) + " milliseconds!");
+        } else {
+            reloadConfig();
+            reloadMessages();
+            checkManager = new CheckManager();
+            dataManager = new DataManager();
+            HandlerList.unregisterAll(this);
+            profiler.reset();
+            EventManager.unregisterAll(this);
+            Atlas.getInstance().getEventManager().unregisterAll(this);
+            startScanner(false);
+            antiPUPManager = new AntiPUPManager();
+            dataManager.registerAllPlayers();
+        }
     }
 
     private void registerListeners() {

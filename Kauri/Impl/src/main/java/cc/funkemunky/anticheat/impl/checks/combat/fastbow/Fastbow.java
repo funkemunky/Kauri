@@ -12,7 +12,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 
 @BukkitEvents(events = {ProjectileLaunchEvent.class})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Fastbow", description = "Makes sure the rate of fire is legitimate.", type = CheckType.COMBAT, cancelType = CancelType.INTERACT, maxVL = 20)
+@CheckInfo(name = "Fastbow", description = "Makes sure the rate of fire is legitimate.", type = CheckType.COMBAT, cancelType = CancelType.INTERACT, maxVL = 20, executable = true)
 public class Fastbow extends Check {
     private TickTimer lastShoot = new TickTimer(10);
     private Verbose verbose = new Verbose();

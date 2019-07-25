@@ -27,10 +27,10 @@ public class ReloadArgument extends FunkeArgument {
         commandSender.sendMessage(Color.translate(started));
         if(args.length > 1) {
             if(args[1].equalsIgnoreCase("full")) {
-                Kauri.getInstance().reloadKauri(true);
+                Kauri.getInstance().reloadKauri();
             } else commandSender.sendMessage(Color.translate(Messages.invalidArguments));
         } else {
-            Kauri.getInstance().reloadKauri(false);
+            Kauri.getInstance().reloadKauri();
         }
         commandSender.sendMessage(Color.translate(completed));
     }

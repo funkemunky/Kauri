@@ -9,9 +9,9 @@ import cc.funkemunky.api.utils.Init;
 import lombok.val;
 import org.bukkit.event.Event;
 
-@CheckInfo(name = "GroundSpoof (Type A)", type = CheckType.MOVEMENT, cancelType = CancelType.MOTION, executable = false)
+@CheckInfo(name = "GroundSpoof (Type A)", description = "Spoofing as though the player has never touched the ground.", type = CheckType.MOVEMENT, cancelType = CancelType.MOTION)
 @Init
-@Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK, Packet.Client.LEGACY_POSITION_LOOK, Packet.Client.LEGACY_POSITION})
+@Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK})
 public class GroundSpoofA extends Check {
 
     private Verbose verbose = new Verbose();
@@ -31,8 +31,8 @@ public class GroundSpoofA extends Check {
                 || move.isBlocksOnTop())
             return;
 
-        if(move.isServerOnGround() != move.isClientOnGround() && timeStamp - lastPacket > 5L) {
-            if(verbose.flag(14, 400L)) {
+        if(move.isServerOnGround() && !move.isClientOnGround() && timeStamp - lastPacket > 5L) {
+            if(verbose.flag(14, 800L)) {
                 flag("client=" + move.isClientOnGround() + " server=" + move.isServerOnGround(), true, true, verbose.getVerbose() > 20 ? AlertTier.HIGH : AlertTier.LIKELY);
             }
         } else verbose.deduct();

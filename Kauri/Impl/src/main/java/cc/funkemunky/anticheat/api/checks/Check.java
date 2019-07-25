@@ -42,7 +42,7 @@ public abstract class Check {
 
     protected void flag(String information, boolean cancel, boolean ban, AlertTier tier) {
         Kauri.getInstance().getExecutorService().execute(() -> {
-            if(Kauri.getInstance().getTps() > CheckSettings.tpsThreshold) {
+            if(Kauri.getInstance().getTps() > CheckSettings.tpsThreshold && System.currentTimeMillis() - Kauri.getInstance().getLastTPS() < 100) {
                 PlayerCheatEvent event = new PlayerCheatEvent(getData().getPlayer(), this);
 
                 Bukkit.getPluginManager().callEvent(event);

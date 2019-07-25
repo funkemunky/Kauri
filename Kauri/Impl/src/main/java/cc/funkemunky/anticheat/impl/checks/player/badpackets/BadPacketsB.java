@@ -8,7 +8,6 @@ import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.BoundingBox;
-import cc.funkemunky.api.utils.Init;
 import lombok.val;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -23,7 +22,7 @@ import java.util.stream.Collectors;
 //@Init
 @CheckInfo(name = "BadPackets (Type J)", type = CheckType.BADPACKETS, cancelType = CancelType.INTERACT)
 @Packets(packets = {Packet.Client.BLOCK_PLACE})
-public class BadPacketsJ extends Check {
+public class BadPacketsB extends Check {
 
     private int vl;
 

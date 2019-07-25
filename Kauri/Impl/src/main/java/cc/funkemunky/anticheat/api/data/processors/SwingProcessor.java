@@ -35,8 +35,8 @@ public class SwingProcessor {
                 stdDelta = MathUtils.getDelta(std, lastStd);
                 interval.clear();
                 lastDequeueProcess = timeStamp;
-            } else interval.add(ms);
+            }
+            lastClick = timeStamp;
         }
-        lastClick = timeStamp;
     }
 }

@@ -22,9 +22,9 @@ public @interface CheckInfo {
 
     boolean enabled() default true;
 
-    boolean executable() default true;
+    boolean executable() default false;
 
-    boolean cancellable() default true;
+    boolean cancellable() default false;
 
     boolean developer() default false;
 
