@@ -26,3 +26,6 @@ hs_err_pid*
 **/.idea/*.*
 **/out/*.*
 Kauri/.idea/misc.xml
+*.lst
+Kauri/API/target/**
+Kauri/Impl/target/**
