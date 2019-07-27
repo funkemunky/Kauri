@@ -12,7 +12,7 @@ import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
 import org.bukkit.event.Event;
 
-@Init
+//@Init
 @Packets(packets = {Packet.Client.ARM_ANIMATION})
 @CheckInfo(name = "AutoClicker (Type I)", type = CheckType.AUTOCLICKER, maxVL = 50, executable = false)
 public class AutoClickerI extends Check {

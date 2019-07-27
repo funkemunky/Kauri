@@ -1,6 +1,7 @@
 package cc.funkemunky.anticheat.api.utils;
 
 import java.util.Collections;
+import java.util.DoubleSummaryStatistics;
 import java.util.LinkedList;
 import java.util.stream.Stream;
 
@@ -35,8 +36,12 @@ public class Interval<T> extends LinkedList<T> {
         return Collections.frequency(this, freq);
     }
 
-    public long distinct() {
+    public long distinctCount() {
         return streamNumber().distinct().count();
+    }
+
+    public Stream<Number> distinct() {
+        return streamNumber().distinct();
     }
 
     public double std() {

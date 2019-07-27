@@ -14,7 +14,7 @@ import org.bukkit.event.Event;
 @Packets(packets = {
         Packet.Client.POSITION_LOOK,
         Packet.Client.LOOK})
-@cc.funkemunky.api.utils.Init
+//@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Aim (Type I)", maxVL = 25, executable = true, type = CheckType.AIM)
 public class AimI extends Check {
 

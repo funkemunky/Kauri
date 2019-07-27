@@ -41,6 +41,8 @@ public class KillauraA extends Check {
                 verbose = 0;
             }
 
+            debug("elapsed=" + elapsed + " verbose=" + verbose);
+
         } else {
             if (MathUtils.getDelta(timeStamp, lastFlying) < 5) lastLag.reset();
             lastFlying = timeStamp;

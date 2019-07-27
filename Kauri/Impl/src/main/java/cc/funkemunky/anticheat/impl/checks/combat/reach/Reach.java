@@ -6,14 +6,12 @@ import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.RayTrace;
 import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.utils.BoundingBox;
-import cc.funkemunky.api.utils.Color;
-import cc.funkemunky.api.utils.Init;
-import cc.funkemunky.api.utils.MiscUtils;
+import cc.funkemunky.api.utils.*;
 import lombok.val;
 import org.bukkit.GameMode;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.stream.Collectors;
@@ -30,7 +28,7 @@ public class Reach extends Check {
     private float reachThreshold = 3f;
 
     @Setting(name = "threshold.collided")
-    private int collidedThreshold = 34;
+    private int collidedThreshold = 20;
 
     @Setting(name = "threshold.colidedMin")
     private int collidedMin = 6;
@@ -39,10 +37,10 @@ public class Reach extends Check {
     private float bypassColReach = 4f;
 
     @Setting(name = "threshold.vl.certain")
-    private int certainThreshold = 12;
+    private int certainThreshold = 16;
 
     @Setting(name = "threshold.vl.high")
-    private int highThreshold = 5;
+    private int highThreshold = 6;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
@@ -69,26 +67,26 @@ public class Reach extends Check {
             float distance = (float) collided.stream().mapToDouble((vec) -> vec.distance(to.toVector()))
                     .min().orElse(0.0D);
 
-            if(getData().getTarget().getVelocity().getY() == 0) {
-                distance-= move.getDeltaXZ();
+            if(getData().getTarget().getVelocity().getY() == 0 || PlayerUtils.getPotionEffectLevel(getData().getPlayer(), PotionEffectType.SPEED) > 0) {
+                distance-= move.getDeltaXZ() / 1.55f;
             }
 
             if(collided.size() > 0) {
-                if (distance > reachThreshold && (collided.size() > collidedThreshold || distance > bypassColReach) && collided.size() > collidedMin && getData().getMovementProcessor().getLagTicks() == 0) {
+                if (distance > reachThreshold && (collided.size() > collidedThreshold || distance > bypassColReach) && collided.size() > collidedMin && !getData().isLagging()) {
                     if ((vl+= distance > 3.04f ? 1 : (distance > 3.02 ? 0.5f : .25f)) > certainThreshold) {
                         flag("reach=" + distance, true, true, AlertTier.CERTAIN);
                     } else if (vl > highThreshold) {
                         flag("reach=" + distance, true, true, AlertTier.HIGH);
-                    } else if(vl > 2) {
-                        flag("reach=" + distance, true, false, vl > 3 ? AlertTier.LIKELY : AlertTier.POSSIBLE);
+                    } else if(vl > 4) {
+                        flag("reach=" + distance, true, false, vl > 6 ? AlertTier.LIKELY : AlertTier.POSSIBLE);
                     } else {
                         flag("reach=" + distance,true,false,AlertTier.LOW);
                     }
-                } else if(distance > 1) {
-                    vl = Math.max(0, vl - 0.025f);
+                } else if(distance > 0.8) {
+                    vl = Math.max(0, vl - 0.05f);
                 }
 
-                debug((distance > reachThreshold && collided.size() > collidedThreshold ? Color.Green : "") + "distance=" + distance + " collided=" + collided.size() + " vl=" + vl + " range=" + range + " target=" + getData().getTarget().getVelocity().getY());
+                debug((distance > reachThreshold && (collided.size() > collidedThreshold || distance > bypassColReach) && collided.size() > collidedMin && !getData().isLagging() ? Color.Green : "") + "distance=" + distance + " collided=" + collided.size() + " vl=" + vl + " range=" + range + " target=" + getData().getTarget().getVelocity().getY());
             }
             lastAttack = timeStamp;
         }

@@ -39,6 +39,7 @@ public class FlyA extends Check {
                 if(verbose.flag(3, 500L)) {
                     flag("predicted=" + predicted + " deltaY=" + move.getDeltaY() + " delta=" + delta, true, true, AlertTier.HIGH);
                 }
+                debug(Color.Green + "Flagged: ");
             }
 
             debug("predicted=" + predicted + " deltaY=" + move.getDeltaY());

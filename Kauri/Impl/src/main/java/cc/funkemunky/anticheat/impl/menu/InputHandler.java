@@ -1,11 +1,9 @@
 package cc.funkemunky.anticheat.impl.menu;
 
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.SignChangeEvent;
 
 //@Init
 public class InputHandler implements Listener {
 
-    private boolean testMode = false;
+    private boolean testMode = true;
 }

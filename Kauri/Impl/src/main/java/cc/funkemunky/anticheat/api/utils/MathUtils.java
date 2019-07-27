@@ -121,6 +121,14 @@ public class MathUtils {
         return theta;
     }
 
+    public static float normalizeAngle(float yaw) {
+        return yaw % 360;
+    }
+
+    public static double normalizeAngle(double yaw) {
+        return yaw % 360;
+    }
+
     public static float[] getRotationFromPosition(final CustomLocation playerLocation, final CustomLocation targetLocation) {
         final double xDiff = targetLocation.getX() - playerLocation.getX();
         final double zDiff = targetLocation.getZ() - playerLocation.getZ();

@@ -29,7 +29,7 @@ public class SwingProcessor {
                 lastStd = std;
                 std = interval.std();
                 lastDistinct = distinct;
-                distinct = interval.distinct();
+                distinct = interval.distinctCount();
                 max = interval.max();
                 min = interval.min();
                 stdDelta = MathUtils.getDelta(std, lastStd);
