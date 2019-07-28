@@ -3,9 +3,9 @@ package cc.funkemunky.anticheat.api.pup;
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.utils.Setting;
+import cc.funkemunky.anticheat.impl.pup.bot.ConsoleClient;
 import cc.funkemunky.anticheat.impl.pup.crashers.*;
 import cc.funkemunky.anticheat.impl.pup.exploits.BookEnchant;
-import cc.funkemunky.anticheat.impl.pup.vpn.AntiVPN;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.database.DatabaseType;
 
@@ -28,11 +28,9 @@ public class AntiPUPManager {
     public List<AntiPUP> registerMethods() {
         List<AntiPUP> list = new ArrayList<>();
 
-        addMethod(new AntiVPN("AntiVPN", PuPType.VPN, true), list);
-        //addMethod(new ConsoleClient("ConsoleClient", PuPType.BOT, true), list);
+        addMethod(new ConsoleClient("ConsoleClient", PuPType.BOT, true), list);
         addMethod(new ArmSwing("ArmSwing", PuPType.CRASH, true), list);
         addMethod(new Boxer("Boxer", PuPType.CRASH, true), list);
-        addMethod(new YLevel("YLevel", PuPType.CRASH, true), list);
         addMethod(new MorePackets("MorePackets", PuPType.CRASH, true), list);
         addMethod(new ChatSpam("ChatSpam", PuPType.SPAM, true), list);
         addMethod(new BookEnchant("BookEnchant", PuPType.EXPLOIT, true), list);
@@ -87,11 +85,11 @@ public class AntiPUPManager {
     }
 
     public void loadMethodsIntoData(PlayerData data) {
-        /*&List<AntiPUP> methodList = registerMethods();
+        List<AntiPUP> methodList = registerMethods();
 
         for (AntiPUP antiPUP : methodList) {
             antiPUP.setData(data);
             data.getAntiPUP().add(antiPUP);
-        }*/
+        }
     }
 }

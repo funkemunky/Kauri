@@ -11,7 +11,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-@Init(commands = true)
 public class LunarClientCommand {
 
     @Command(name = "alunarclient", description = "View who's on lunar client.", permission = "atlas.command.lunarclient", aliases = {"alunar", "alc", "lc", "lunar", "lunarclient"})

@@ -13,7 +13,7 @@ import cc.funkemunky.api.utils.Init;
 import lombok.val;
 import org.bukkit.event.Event;
 
-@Init
+//@Init
 @CheckInfo(name = "Aim (Type J)", type = CheckType.AIM)
 @Packets(packets = {Packet.Client.LOOK, Packet.Client.POSITION_LOOK})
 public class AimJ extends Check {

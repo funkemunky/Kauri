@@ -1,42 +1,37 @@
-package cc.funkemunky.anticheat.impl.pup.vpn;
+package cc.funkemunky.anticheat.impl.listeners;
 
 import cc.funkemunky.anticheat.Kauri;
-import cc.funkemunky.anticheat.api.pup.AntiPUP;
-import cc.funkemunky.anticheat.api.pup.PuPType;
-import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.anticheat.api.utils.VPNResponse;
 import cc.funkemunky.api.utils.Color;
+import cc.funkemunky.api.utils.ConfigSetting;
+import cc.funkemunky.api.utils.Init;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AntiVPN extends AntiPUP {
+@Init
+public class AntiVPNListeners implements Listener {
 
-    @Setting(name = "blockedCountries")
+    @ConfigSetting(path = "antivpn", name = "blockedCountries")
     private List<String> blockCountries = new ArrayList<>();
 
-    @Setting(name = "kickReason.usingProxy")
+    @ConfigSetting(path = "antivpn", name = "kickReason.usingProxy")
     private String usingProxy = "&cYou are not allowed to use a VPN or Proxy.";
 
-    @Setting(name = "kickReason.blockedCountry")
+    @ConfigSetting(path = "antivpn", name = "kickReason.blockedCountry")
     private String blockedCountry = "&cThe country %countryName% is blocked from this server";
 
-    public AntiVPN(String name, PuPType type, boolean enabled) {
-        super(name, type, enabled);
-    }
-
-    @Override
-    public boolean onPacket(Object packet, String packetType, long timestamp) {
-        return false;
-    }
+    @ConfigSetting(path = "antivpn", name = "kickReason.blockedCountry")
+    private boolean enabled = true;
 
     @EventHandler(priority = EventPriority.LOW)
     public void onPlayerJoin(PlayerLoginEvent event) {
-        if(!event.getPlayer().hasPermission("kauri.antivpn.bypass")) {
+        if(enabled && !event.getPlayer().hasPermission("kauri.antivpn.bypass")) {
             Kauri.getInstance().getAntiPUPManager().pupThread.execute(() -> {
                 long timestamp = System.currentTimeMillis();
                 if(timestamp - Kauri.getInstance().lastLogin > 150L) {

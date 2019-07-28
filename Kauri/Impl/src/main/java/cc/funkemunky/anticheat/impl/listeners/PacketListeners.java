@@ -205,8 +205,11 @@ public class PacketListeners implements AtlasListener {
             }
 
             debug(event.getType(), data);
-            hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
-            hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data);
+            if(hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data)) {
+                event.setCancelled(true);
+            } else {
+                hopper(event.getPacket(), event.getType(), event.getTimeStamp(), data);
+            }
         }
         Kauri.getInstance().getProfiler().stop("event:PacketReceiveEvent");
     }
@@ -234,11 +237,14 @@ public class PacketListeners implements AtlasListener {
         }
     }
 
-    private void hopperPup(Object packet, String packetType, long timestamp, PlayerData data) {
+    private boolean hopperPup(Object packet, String packetType, long timestamp, PlayerData data) {
         for (AntiPUP pup : data.getAntiPUP()) {
             if(!pup.isEnabled() || !pup.packets.contains(packetType)) continue;
 
-            pup.onPacket(packet, packetType, timestamp);
+            if(pup.onPacket(packet, packetType, timestamp)) {
+                return true;
+            }
         }
+        return false;
     }
 }

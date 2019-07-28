@@ -103,7 +103,7 @@ public class Kauri extends JavaPlugin {
         vpnUtils = new VPNUtils();
         new KauriAPI();
 
-        registerLunarClient();
+        //registerLunarClient();
 
         runTasks();
         registerCommands();

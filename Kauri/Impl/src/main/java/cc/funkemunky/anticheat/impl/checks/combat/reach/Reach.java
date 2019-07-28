@@ -9,11 +9,14 @@ import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.*;
 import lombok.val;
 import org.bukkit.GameMode;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @CheckInfo(name = "Reach", description = "A very accurate and fast 3.1 reach check.", type = CheckType.REACH, cancelType = CancelType.COMBAT, maxVL = 10, executable = true)
@@ -42,9 +45,11 @@ public class Reach extends Check {
     @Setting(name = "threshold.vl.high")
     private int highThreshold = 6;
 
+    private List<EntityType> allowedEntities = Arrays.asList(EntityType.PLAYER, EntityType.SKELETON, EntityType.ZOMBIE, EntityType.PIG_ZOMBIE, EntityType.VILLAGER, EntityType.IRON_GOLEM);
+
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(getData().getTarget() != null && getData().getLastAttack().hasNotPassed(0) && !getData().getPlayer().getGameMode().equals(GameMode.CREATIVE) && getData().getTarget() != null && getData().getLastAttack().hasNotPassed(0) && getData().getLastLogin().hasPassed(5) && !getData().isServerPos() && getData().getTransPing() < 450) {
+        if(getData().getTarget() != null && allowedEntities.contains(getData().getTarget().getType()) && getData().getLastAttack().hasNotPassed(0) && !getData().getPlayer().getGameMode().equals(GameMode.CREATIVE) && getData().getTarget() != null && getData().getLastAttack().hasNotPassed(0) && getData().getLastLogin().hasPassed(5) && !getData().isServerPos() && getData().getTransPing() < 450) {
             val move = getData().getMovementProcessor();
             long range = 200 + Math.abs(getData().getTransPing() - getData().getLastTransPing()) * 3;
             val location = getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), range);

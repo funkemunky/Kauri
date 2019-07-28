@@ -64,6 +64,9 @@ public class LoggerManager {
 
     @ConfigSetting(path = "database.mongo", name = "database")
     private String mongoDatabase = "Kauri";
+
+    @ConfigSetting(path = "database.logging", name = "printToConsole")
+    private boolean printToConsole = true;
     
     public Database database;
 
@@ -141,7 +144,7 @@ public class LoggerManager {
 
     public void saveToDatabase() {
         if(!enabled) return;
-        MiscUtils.printToConsole(Color.Green + "Saving logs to database...");
+        if(printToConsole) MiscUtils.printToConsole(Color.Green + "Saving logs to database...");
         Database database = this.database;
 
         database.getDatabaseValues().clear();

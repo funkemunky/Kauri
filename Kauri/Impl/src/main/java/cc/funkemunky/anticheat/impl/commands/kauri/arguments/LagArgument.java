@@ -8,6 +8,8 @@ import cc.funkemunky.anticheat.api.utils.Pastebin;
 import cc.funkemunky.api.commands.FunkeArgument;
 import cc.funkemunky.api.commands.FunkeCommand;
 import cc.funkemunky.api.profiling.ResultsType;
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
+import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.MiscUtils;
@@ -84,6 +86,9 @@ public class LagArgument extends FunkeArgument {
     @Message(name = "command.lag.player.lastPacketDrop")
     private String playerPacketDrop = "&8» &eLast Packet Drop&7: &f%lastDrop% ago.";
 
+    @Message(name = "command.lag.player.protocolVersion")
+    private String protocolVersion = "&8» &eMinecraft Version&7: &f%version% (%versionNumber%)";
+
     @Override
     public void onArgument(CommandSender sender, Command command, String[] args) {
         if (args.length == 1) {
@@ -96,6 +101,10 @@ public class LagArgument extends FunkeArgument {
                             case "average":
                             case "avg": {
                                 makePaste(sender, ResultsType.AVERAGE);
+                                break;
+                            }
+                            case "tick": {
+                                makePaste(sender, ResultsType.TICK);
                                 break;
                             }
                             case "samples":
@@ -134,6 +143,9 @@ public class LagArgument extends FunkeArgument {
                                 sender.sendMessage("");
                                 sender.sendMessage(Color.translate(playerStability));
                                 sender.sendMessage(Color.translate(playerPacketDrop.replace("%lastDrop%", DurationFormatUtils.formatDurationWords(System.currentTimeMillis() - data.getLastPacketDrop(), true, true))));
+                                sender.sendMessage("");
+                                int protocol = TinyProtocolHandler.getProtocolVersion(player);
+                                sender.sendMessage(Color.translate(protocolVersion.replace("%version%", ProtocolVersion.getVersion(protocol).getServerVersion()).replace("%versionNumber%", String.valueOf(protocol))));
                                 sender.sendMessage(MiscUtils.line(lineColor));
                             } else {
                                 sender.sendMessage(Color.translate(Messages.errorData));
@@ -164,8 +176,9 @@ public class LagArgument extends FunkeArgument {
         sender.sendMessage("");
         sender.sendMessage(Color.translate(kauriRes));
         long totalTime = System.currentTimeMillis() - Kauri.getInstance().getProfileStart();
-        double totalMS = Kauri.getInstance().getProfiler().samples.keySet().stream().mapToDouble(key -> Kauri.getInstance().getProfiler().samples.get(key) / 1000000D).sum();
-        sender.sendMessage(Color.translate(pctUsage.replace("%pct%", ((totalMS / totalTime / (50D / totalTime)) / 50) * 100 + "")));
+        val results = Kauri.getInstance().getProfiler().results(ResultsType.TICK);
+        double totalMS = results.keySet().stream().mapToDouble(results::get).sum() / 1000000;
+        sender.sendMessage(Color.translate(pctUsage.replace("%pct%", (totalMS / 50 * 100) + "")));
         float cps = Kauri.getInstance().getProfiler().totalCalls / (float) totalTime;
         sender.sendMessage(Color.translate(callsPS.replace("%calls%", String.valueOf(totalMS / totalTime / (50D / totalTime)))));
         sender.sendMessage(MiscUtils.line(lineColor));
@@ -197,7 +210,7 @@ public class LagArgument extends FunkeArgument {
         String bodyString = builder.toString().replaceAll(";", "\n");
 
         try {
-            sender.sendMessage(Color.Green + "Results: " + Pastebin.makePaste(bodyString, "Atlas Profile: " + DateFormatUtils.format(System.currentTimeMillis(), ", ", TimeZone.getTimeZone("604")), Pastebin.Privacy.UNLISTED));
+            sender.sendMessage(Color.Green + "Results: " + Pastebin.makePaste(bodyString, "Kauri Profile: " + DateFormatUtils.format(System.currentTimeMillis(), ", ", TimeZone.getTimeZone("604")), Pastebin.Privacy.UNLISTED));
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
