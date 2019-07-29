@@ -29,3 +29,7 @@ Kauri/.idea/misc.xml
 *.lst
 Kauri/API/target/**
 Kauri/Impl/target/**
+Kauri/.idea/**
+.idea/**
+/Impl/target/**
+API/target/**
