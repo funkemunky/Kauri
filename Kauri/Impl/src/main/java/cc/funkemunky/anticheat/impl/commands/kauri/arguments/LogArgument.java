@@ -138,6 +138,11 @@ public class LogArgument extends FunkeArgument {
 
             try {
                 URL url2Run = new URL(url.toString());
+
+                val connection = url2Run.openConnection();
+
+                connection.setConnectTimeout(2000);
+                connection.setReadTimeout(2000);
                 //%3F
                 BufferedReader reader = new BufferedReader(new InputStreamReader(url2Run.openConnection().getInputStream(), Charset.forName("UTF-8")));
 

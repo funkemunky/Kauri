@@ -6,9 +6,6 @@ import cc.funkemunky.anticheat.api.data.DataManager;
 import cc.funkemunky.anticheat.api.data.banwave.BanwaveManager;
 import cc.funkemunky.anticheat.api.data.logging.LoggerManager;
 import cc.funkemunky.anticheat.api.data.stats.StatsManager;
-import cc.funkemunky.anticheat.api.lunar.LunarClientAPI;
-import cc.funkemunky.anticheat.api.lunar.event.AuthenticateEvent;
-import cc.funkemunky.anticheat.api.lunar.user.User;
 import cc.funkemunky.anticheat.api.pup.AntiPUPManager;
 import cc.funkemunky.anticheat.api.utils.Message;
 import cc.funkemunky.anticheat.api.utils.VPNUtils;
@@ -146,28 +143,6 @@ public class Kauri extends JavaPlugin {
 
     private void registerCommands() {
         Atlas.getInstance().getFunkeCommandManager().addCommand(this, new KauriCommand());
-    }
-
-    private void registerLunarClient() {
-        this.getServer().getMessenger().registerOutgoingPluginChannel(this, "Lunar-Client");
-        this.getServer().getMessenger().registerIncomingPluginChannel(this, "Lunar-Client", (channel, player, bytes) -> {
-            if (bytes[0] == 26) {
-                User user = LunarClientAPI.getInstance().getUserManager().getPlayerData(player);
-                if (user != null && !user.isLunarClient()){
-                    user.setLunarClient(true);
-                }
-
-                AuthenticateEvent event = new AuthenticateEvent(player);
-
-                Atlas.getInstance().getEventManager().callEvent(event);
-
-                for (Player other : Bukkit.getServer().getOnlinePlayers()) {
-                    if (LunarClientAPI.getInstance().isAuthenticated(other)) {
-                        other.sendPluginMessage(Kauri.this, channel, bytes);
-                    }
-                }
-            }
-        });
     }
 
     public double getTPS(RoundingMode mode, int places) {
