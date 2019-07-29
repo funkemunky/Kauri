@@ -33,3 +33,4 @@ Kauri/.idea/**
 .idea/**
 /Impl/target/**
 API/target/**
+.settings
