@@ -44,7 +44,8 @@ public class VelocityB extends Check {
                 double ratio = move.getDeltaXZ() / velocityH;
                 if (ratio < 0.63) {
                     if(vl++ > 8) {
-                        flag(MathUtils.round(ratio * 100, 2) + "%", true, true, AlertTier.LIKELY);
+                        double pct = MathUtils.round(ratio * 100, 2);
+                        flag(pct + "%" + " or" + (pct + 37) + "% [vl=" + vl + "]", true, true, AlertTier.LIKELY);
                     }
                     //TODO Test this change from 0.5 to 0.2 for false positives.
                 } else vl-= vl > 0 ? 0.2 : 0;

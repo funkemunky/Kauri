@@ -26,8 +26,8 @@ public class ConsoleClient extends AntiPUP {
     public boolean onPacket(Object packet, String packetType, long timeStamp) {
         long delta = timeStamp - lastFlying;
 
-        if(delta > 100) {
-            if(vl++ > 8 && !kicked) {
+        if(delta > 200) {
+            if(vl++ > 120 && !kicked) {
                 new BukkitRunnable() {
                     public void run() {
                         kicked = true;

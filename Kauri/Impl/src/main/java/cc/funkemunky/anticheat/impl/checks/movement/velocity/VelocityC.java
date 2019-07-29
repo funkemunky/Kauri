@@ -36,7 +36,8 @@ public class VelocityC extends Check {
             double ratio = move.getDeltaXZ() / velocityH;
             if (ratio < 0.62) {
                 if(vl++ > 8) {
-                    flag(MathUtils.round(ratio * 100, 2) + "%", true, true, AlertTier.HIGH);
+                    double pct = MathUtils.round(ratio * 100, 2);
+                    flag(pct + "%" + " or" + (pct + 38) + "% [vl=" + vl + "]", true, true, AlertTier.HIGH);
                 }
             } else vl-= vl > 0 ? 0.45 : 0;
             debug("ratio=" + ratio + " vl=" + vl + " attack=" + getData().getLastAttack().getPassed());
