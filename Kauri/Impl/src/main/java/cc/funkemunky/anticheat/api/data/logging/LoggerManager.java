@@ -219,7 +219,10 @@ public class LoggerManager {
         if(enabled) {
             Atlas.getInstance().getService().execute(() -> {
                 Database database = this.database;
-                database.getDatabaseValues().keySet().stream().filter(key -> key.startsWith(uuid.toString())).forEach(key -> database.getDatabaseValues().remove(key));
+                database.getDatabaseValues().keySet().stream().filter(key -> key.startsWith(uuid.toString())).forEach(key -> {
+                    database.getDatabaseValues().remove(key);
+                });
+                violations.remove(uuid);
                 database.saveDatabase();
             });
         }
