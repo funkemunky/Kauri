@@ -36,17 +36,17 @@ public class Messages {
     public static String toggledDevAlerts = "&7Toggled your developer alerts &f%enabled%&7.";
 
     @Message(name = "field.alertTiers.certain")
-    public static String alertTierCertain = "Certain";
+    public static String certain = "Certain";
 
     @Message(name = "field.alertTiers.high")
-    public static String alertTierHigh = "High";
+    public static String high = "High";
 
     @Message(name = "field.alertTiers.likely")
-    public static String alertTierLikely = "Likely";
+    public static String likely = "Likely";
 
     @Message(name = "field.alertTiers.possible")
-    public static String alertTierPossible = "Possible";
+    public static String possible = "Possible";
 
     @Message(name = "field.alertTiers.low")
-    public static String alertTierLow = "Low";
+    public static String low = "Low";
 }

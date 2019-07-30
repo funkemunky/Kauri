@@ -32,7 +32,7 @@ public class AlertsCommand {
                 data.setDeveloperAlerts(!data.isDeveloperAlerts());
                 player.sendMessage(Color.translate(Messages.toggledDevAlerts.replace("%enabled%", (data.isDeveloperAlerts() ? "on" : "off"))));
             } else if(Arrays.stream(AlertTier.values()).anyMatch(tier -> tier.getName().equalsIgnoreCase(args[0]))) {
-                AlertTier tier = AlertTier.valueOf(args[0].toUpperCase());
+                AlertTier tier = AlertTier.getByName(args[0]);
                 data.setAlertTier(tier);
                 data.setAlertsEnabled(true);
                 player.sendMessage(Color.translate(Messages.setTierAlerts.replace("%tier%", tier.getName())));
