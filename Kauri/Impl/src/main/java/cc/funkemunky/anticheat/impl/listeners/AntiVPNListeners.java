@@ -26,7 +26,7 @@ public class AntiVPNListeners implements Listener {
     @ConfigSetting(path = "antivpn", name = "kickReason.blockedCountry")
     private String blockedCountry = "&cThe country %countryName% is blocked from this server";
 
-    @ConfigSetting(path = "antivpn", name = "kickReason.blockedCountry")
+    @ConfigSetting(path = "antivpn", name = "kickReason.enabled")
     private boolean enabled = true;
 
     @EventHandler(priority = EventPriority.LOW)

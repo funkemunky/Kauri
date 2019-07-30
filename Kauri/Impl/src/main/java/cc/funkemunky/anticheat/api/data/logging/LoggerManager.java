@@ -16,11 +16,12 @@ import org.bukkit.Bukkit;
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
-@Init(priority = Priority.HIGH)
+@Init(priority = Priority.HIGHEST)
 @NoArgsConstructor
 public class LoggerManager {
     @Getter
@@ -30,43 +31,43 @@ public class LoggerManager {
     private Set<UUID> recentViolators = new LinkedHashSet<>();
 
     @ConfigSetting(path = "data.logging", name = "type")
-    public String type = "FLATFILE";
+    public static String type = "FLATFILE";
     
     @ConfigSetting(path = "data.logging", name = "enabled")
-    public boolean enabled = true;
+    public static boolean enabled = true;
     
     @ConfigSetting(path = "database.mysql", name = "ip")
-    private String mySQLIp = "localhost";
+    public static String mySQLIp = "localhost";
     
     @ConfigSetting(path = "database.mysql", name = "port")
-    private int mySQLPort = 3306;
+    public static int mySQLPort = 3306;
     
     @ConfigSetting(path = "database.mysql", name = "username")
-    private String mySQLUsername = "username";
+    public static String mySQLUsername = "username";
     
     @ConfigSetting(path = "database.mysql", name = "password")
-    private String mySQLPassword = "password";
+    public static String mySQLPassword = "password";
     
     @ConfigSetting(path = "database.mysql", name = "database")
-    private String mySQLDatabase = "Kauri";
+    public static String mySQLDatabase = "Kauri";
 
     @ConfigSetting(path = "database.mongo", name = "ip")
-    private String mongoIp = "localhost";
+    public static String mongoIp = "localhost";
 
     @ConfigSetting(path = "database.mongo", name = "port")
-    private int mongoPort = 27107;
+    public static int mongoPort = 27107;
 
     @ConfigSetting(path = "database.mongo", name = "username")
-    private String mongoUsername = "username";
+    public static String mongoUsername = "username";
 
     @ConfigSetting(path = "database.mongo", name = "password")
-    private String mongoPassword = "password";
+    public static String mongoPassword = "password";
 
     @ConfigSetting(path = "database.mongo", name = "database")
-    private String mongoDatabase = "Kauri";
+    public static String mongoDatabase = "Kauri";
 
     @ConfigSetting(path = "database.logging", name = "printToConsole")
-    private boolean printToConsole = true;
+    private static boolean printToConsole = true;
     
     public Database database;
 
@@ -75,15 +76,18 @@ public class LoggerManager {
         switch(type.toLowerCase()) {
             case "flatfile": {
                 carbon.createFlatfileDatabase(Kauri.getInstance().getDataFolder().getPath() + File.separator + "dbs", "KauriLogs");
+                MiscUtils.printToConsole("&aCreated Flatfile DB!");
                 break;
             }
             case "mysql": {
                 carbon.createSQLDatabase("KauriLogs", mySQLIp, mySQLUsername, mySQLPassword, mySQLDatabase, mySQLPort);
+                MiscUtils.printToConsole("&aConnected to MySQL!");
                 break;
             }
             case "mongo": {
                 carbon.initMongo(mongoIp, mongoPort, mongoDatabase, mongoUsername, mongoPassword);
                 carbon.createMongoDatabase("KauriLogs");
+                MiscUtils.printToConsole("&aConnected to MongoDB!");
                 break;
             }
             default: {
@@ -218,11 +222,20 @@ public class LoggerManager {
     public void clearLogs(UUID uuid) {
         if(enabled) {
             Atlas.getInstance().getService().execute(() -> {
-                Database database = this.database;
-                database.getDatabaseValues().keySet().stream().filter(key -> key.startsWith(uuid.toString())).forEach(key -> {
-                    database.getDatabaseValues().remove(key);
-                });
                 violations.remove(uuid);
+                database.saveDatabase();
+            });
+        }
+    }
+
+    public void clearLogs(UUID uuid, String specifics) {
+        if(enabled && violations.containsKey(uuid)) {
+            Atlas.getInstance().getService().execute(() -> {
+                List<Violation> vls = new CopyOnWriteArrayList<>(violations.get(uuid));
+
+                vls.parallelStream().filter(vl -> vl.getCheckName().equalsIgnoreCase(specifics)).forEach(vls::remove);
+
+                violations.put(uuid, vls);
                 database.saveDatabase();
             });
         }

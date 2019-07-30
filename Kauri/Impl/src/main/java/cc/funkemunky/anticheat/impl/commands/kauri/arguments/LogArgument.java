@@ -27,6 +27,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class LogArgument extends FunkeArgument {
 
@@ -35,7 +36,12 @@ public class LogArgument extends FunkeArgument {
 
         addAlias("log");
         addAlias("view");
-        addTabComplete(2, "gui", "web", "details");
+        addTabComplete(2, "gui", "web", "details", "clear");
+        addTabComplete(4, "all,clear,2");
+        addTabComplete(4, Kauri.getInstance().getCheckManager().getChecks().stream()
+                .map(check -> check.getName().replace(" ", "_") + ",clear,2")
+                .collect(Collectors.toList())
+                .toArray(new String[] {}));
     }
 
     @Message(name = "command.log.viewWeb")
@@ -46,6 +52,15 @@ public class LogArgument extends FunkeArgument {
 
     @Message(name = "command.log.loggingDisabled")
     private String loggingDisabled = "&cLogging is currently disabled in the config.";
+
+    @Message(name = "command.log.clear.invalidArgs")
+    private String invalidArgs = "&cInvalid arguments.\n&7Options: &fall&7, &f[check name]";
+
+    @Message(name = "command.log.clear.all")
+    private String clearedAllLogs = "&7Cleared all logs from &c%player%&7.";
+
+    @Message(name = "command.log.clear.specific")
+    private String clearSpecificLogs = "&7Cleared all logs for &f%check% &7from &f%player%&7.";
 
     @ConfigSetting(path = "command.log", name = "defaultInterface")
     private String defaultInterface = "web";
@@ -74,6 +89,31 @@ public class LogArgument extends FunkeArgument {
                 }
                 case "web": {
                     runWebLog(sender, target);
+                    break;
+                }
+                case "clear": {
+                    if(args.length > 3) {
+                        switch(args[3].toLowerCase()) {
+                            case "all":
+                            case "everything":
+                            case "gtfo": {
+                                Kauri.getInstance().getLoggerManager().clearLogs(target.getUniqueId());
+                                sender.sendMessage(Color.translate(clearedAllLogs.replace("%player%", target.getName())));
+                                break;
+                            }
+                            default: {
+                                String arg = args[3].replace("_", " ");
+                                if(Kauri.getInstance().getCheckManager().isCheck(arg)) {
+
+                                    Kauri.getInstance().getLoggerManager().clearLogs(target.getUniqueId(), arg);
+                                    sender.sendMessage(Color.translate(clearSpecificLogs.replace("%check%", arg).replace("%player%", target.getName())));
+                                } else {
+                                    sender.sendMessage(Color.translate(invalidArgs));
+                                }
+                                break;
+                            }
+                        }
+                    } else sender.sendMessage(Color.translate(invalidArgs));
                     break;
                 }
                 case "details": {

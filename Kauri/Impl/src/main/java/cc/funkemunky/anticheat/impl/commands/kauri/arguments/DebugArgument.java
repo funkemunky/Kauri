@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class DebugArgument extends FunkeArgument {
 
@@ -24,7 +25,8 @@ public class DebugArgument extends FunkeArgument {
         addTabComplete(2, "none");
         addTabComplete(2, "box");
         addTabComplete(2, "packets");
-        List<String> checks = new ArrayList<>();
+        /*List<String> checks = new ArrayList<>();
+
         Kauri.getInstance().getCheckManager().getChecks().forEach(check -> checks.add(check.getName().replaceAll(" ", "_")));
 
         String[] checkArray = new String[checks.size()];
@@ -32,7 +34,12 @@ public class DebugArgument extends FunkeArgument {
         for (int i = 0; i < checks.size(); i++) {
             checkArray[i] = checks.get(i);
         }
-        addTabComplete(2, checkArray);
+        addTabComplete(2, checkArray);*/
+
+        addTabComplete(2, Kauri.getInstance().getCheckManager().getChecks().stream()
+                .map(check -> check.getName().replace(" ", "_"))
+                .collect(Collectors.toList())
+                .toArray(new String[] {}));
 
         setPlayerOnly(true);
     }

@@ -31,6 +31,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.*;
+import java.lang.reflect.Modifier;
 import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -92,9 +93,9 @@ public class Kauri extends JavaPlugin {
 
         //Starting up our utilities, managers, and tasks.
 
-        statsManager = new StatsManager();
         loggerManager = new LoggerManager(Atlas.getInstance().getCarbon());
         loggerManager.loadFromDatabase();
+        statsManager = new StatsManager();
         banwaveManager = new BanwaveManager();
 
         vpnUtils = new VPNUtils();
@@ -110,13 +111,14 @@ public class Kauri extends JavaPlugin {
     public void onDisable() {
         statsManager.saveStats();
         loggerManager.saveToDatabase();
+        loggerManager.getViolations().clear();
         org.bukkit.event.HandlerList.unregisterAll(this);
         dataManager.getDataObjects().clear();
         checkManager.getChecks().clear();
         Atlas.getInstance().getCommandManager().unregisterCommands(this);
         executorService.shutdownNow();
-        Bukkit.getMessenger().unregisterIncomingPluginChannel(this, "Lunar-Client");
-        Bukkit.getMessenger().unregisterOutgoingPluginChannel(this, "Lunar-Client");
+        //Bukkit.getMessenger().unregisterIncomingPluginChannel(this, "Lunar-Client");
+        //Bukkit.getMessenger().unregisterOutgoingPluginChannel(this, "Lunar-Client");
     }
 
     private void runTasks() {
@@ -134,7 +136,7 @@ public class Kauri extends JavaPlugin {
                 }
                 lastTPS = System.currentTimeMillis();
             }
-        }.runTaskTimer(this, 1L, 1L);
+        }.runTaskTimer(this, 0L, 0L);
     }
 
     public void startScanner(boolean configOnly) {
@@ -290,7 +292,7 @@ public class Kauri extends JavaPlugin {
                                         plugin.getConfig().set(path, field.get(obj));
                                         plugin.saveConfig();
                                     } else {
-                                        field.set(obj, plugin.getConfig().get(path));
+                                        field.set(Modifier.isStatic(field.getModifiers()) ? null : obj, plugin.getConfig().get(path));
 
                                         MiscUtils.printToConsole("&eValue found in configuration! Set value to &a" + plugin.getConfig().get(path));
                                     }
@@ -303,7 +305,7 @@ public class Kauri extends JavaPlugin {
                                 MiscUtils.printToConsole("&eFound " + field.getName() + " Message (default=" + field.get(obj) + ").");
                                 if (getMessages().get(msg.name()) != null) {
                                     MiscUtils.printToConsole("&eValue not found in message configuration! Setting default into messages.yml...");
-                                    field.set(obj, getMessages().getString(msg.name()));
+                                    field.set(Modifier.isStatic(field.getModifiers()) ? null : obj, getMessages().getString(msg.name()));
                                 } else {
                                     getMessages().set(msg.name(), field.get(obj));
                                     saveMessages();

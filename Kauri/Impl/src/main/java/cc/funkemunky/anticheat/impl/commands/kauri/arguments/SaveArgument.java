@@ -23,6 +23,9 @@ public class SaveArgument extends FunkeArgument {
     public void onArgument(CommandSender sender, Command command, String[] args) {
         sender.sendMessage(Color.translate(started));
         Kauri.getInstance().getLoggerManager().saveToDatabase();
+        Kauri.getInstance().getLoggerManager().loadFromDatabase();
+        Kauri.getInstance().getStatsManager().saveStats();
+        Kauri.getInstance().getStatsManager().loadStats();
         sender.sendMessage(Color.translate(completed));
     }
 }
