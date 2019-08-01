@@ -1,8 +1,0 @@
-name: Kauri
-main: cc.funkemunky.anticheat.Kauri
-desciption: A new evolution in detection.
-version: b51
-depend: [Atlas]
-authors: [funkemunky, Elevated]
-commands:
-  kauri:

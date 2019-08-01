@@ -7,10 +7,11 @@ import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
+import cc.funkemunky.api.utils.Init;
 import lombok.val;
 import org.bukkit.event.Event;
 
-//@Init
+@Init
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.POSITION})
 @CheckInfo(name = "Speed (Type D)", description = "Sets a maximum limit to how fast a player can move in a tick.", type = CheckType.SPEED, maxVL = 50)
 public class SpeedD extends Check {

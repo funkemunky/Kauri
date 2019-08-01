@@ -54,7 +54,7 @@ public class AlertsArgument extends FunkeArgument {
                 data.setAlertsEnabled(true);
                 player.sendMessage(Color.translate(Messages.toggledDevAlerts.replace("%enabled%", (data.isDeveloperAlerts() ? "on" : "off"))));
             } else if(Arrays.stream(AlertTier.values()).anyMatch(tier -> tier.getName().equalsIgnoreCase(args[1]))) {
-                AlertTier tier = AlertTier.valueOf(args[1].toUpperCase());
+                AlertTier tier = AlertTier.getByName(args[1]);
                 data.setAlertTier(tier);
                 data.setAlertsEnabled(true);
                 player.sendMessage(Color.translate(Messages.setTierAlerts.replace("%tier%", tier.getName())));

@@ -6,13 +6,14 @@ import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
+import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.PlayerUtils;
 import cc.funkemunky.api.utils.ReflectionsUtil;
 import lombok.val;
 import org.bukkit.event.Event;
 import org.bukkit.potion.PotionEffectType;
 
-//@Init
+@Init
 @Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK})
 @CheckInfo(name = "Speed (Type C)", description = "Checks for legitimate acceleration on ground.", type = CheckType.SPEED, maxVL = 75)
 public class SpeedC extends Check {

@@ -1,14 +1,19 @@
 package cc.funkemunky.anticheat.api.checks;
 
 import cc.funkemunky.anticheat.api.utils.Messages;
+import cc.funkemunky.api.utils.Init;
+import cc.funkemunky.api.utils.ReflectionsUtil;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Arrays;
 
 @Getter
+@Init
 public enum AlertTier {
-    LOW(Messages.alertTierLow, 0), POSSIBLE(Messages.alertTierPossible, 1), LIKELY(Messages.alertTierLikely, 2), HIGH(Messages.alertTierHigh, 3), CERTAIN(Messages.alertTierCertain, 4);
+    LOW(Messages.low, 0), POSSIBLE(Messages.possible, 1), LIKELY(Messages.likely, 2), HIGH(Messages.high, 3), CERTAIN(Messages.certain, 4);
 
+    @Setter
     private String name;
     private int priority;
 
@@ -22,6 +27,11 @@ public enum AlertTier {
     }
 
     public static AlertTier getByName(String name) {
-        return Arrays.stream(values()).filter(tier -> tier.name.equals(name)).findFirst().orElse(AlertTier.LOW);
+        return Arrays.stream(values()).filter(tier -> tier.getName().equalsIgnoreCase(name)).findFirst().orElse(AlertTier.LOW);
+    }
+
+    public String getName() {
+        String msg = (String) ReflectionsUtil.getFieldValue(ReflectionsUtil.getFieldByName(Messages.class, name().toLowerCase()), null);
+        return msg;
     }
 }
