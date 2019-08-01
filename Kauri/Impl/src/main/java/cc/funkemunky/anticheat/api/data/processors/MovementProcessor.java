@@ -19,7 +19,7 @@ import java.util.List;
 
 @Getter
 public class MovementProcessor {
-    private boolean lastFlight, serverPos, flight, inLiquid, liquidBelow, clientOnGround, serverOnGround, fullyInAir, inAir, hasJumped, nearLiquid, blocksOnTop, pistonsNear, onHalfBlock,
+    private boolean lastFlight, cancelFlight, serverPos, flight, inLiquid, liquidBelow, clientOnGround, serverOnGround, fullyInAir, inAir, hasJumped, nearLiquid, blocksOnTop, pistonsNear, onHalfBlock,
             onClimbable, onIce, collidesHorizontally, tookVelocity, inWeb, onSlime, onSlimeBefore, onSoulSand, isRiptiding, halfBlocksAround, isNearGround, isInsideBlock, blocksNear, blocksAround;
     private int airTicks, groundTicks, iceTicks, climbTicks, halfBlockTicks, soulSandTicks, blockAboveTicks, optifineTicks, liquidTicks, webTicks, yawZeroTicks, pitchZeroTicks;
     private float deltaY, lastDeltaXZ, slimeHeight, fallDistance, yawDelta, pitchDelta, lastYawDelta, lastPitchDelta, lastDeltaY, deltaXZ, lastServerYVelocity, serverYAcceleration, clientYAcceleration, lastClientYAcceleration, lastServerYAcceleration, cinematicYawDelta, cinematicPitchDelta, lastCinematicPitchDelta, lastCinematicYawDelta;
@@ -55,7 +55,7 @@ public class MovementProcessor {
 
             if (chunkLoaded) {
                 //Here we get the colliding boundingboxes surrounding the player.
-                List<BoundingBox> box = boxes = Atlas.getInstance().getBlockBoxManager().getBlockBox().getCollidingBoxes(player.getWorld(), data.getBoundingBox().grow(1.5f, 1.5f, 1.5f));
+                List<BoundingBox> box = boxes = Atlas.getInstance().getBlockBoxManager().getBlockBox().getCollidingBoxes(player.getWorld(), data.getBoundingBox().grow(1f, 1f, 1f));
 
                 CollisionAssessment assessment = new CollisionAssessment(data.getBoundingBox(), data);
 
@@ -75,9 +75,7 @@ public class MovementProcessor {
                 }
 
                 //Now we scrub through the colliding boxes for any important information that could be fed into detections.
-                for (BoundingBox bb : box) {
-                    assessment.assessBox(bb, player.getWorld(), false);
-                }
+                box.parallelStream().forEach(bb -> assessment.assessBox(bb, player.getWorld(), false));
 
 
                 serverOnGround = assessment.isOnGround();
@@ -217,6 +215,28 @@ public class MovementProcessor {
         } else if(!packet.isLook() && data.isLoggedIn()) {
             data.getLastLogin().reset();
         }
+        
+        cancelFlight = player.getAllowFlight()
+                || data.isServerPos()
+                || getLastVehicle().hasNotPassed(10)
+                || getLiquidTicks() > 0
+                || getWebTicks() > 0
+                || isTookVelocity()
+                || !Atlas.getInstance().getBlockBoxManager().getBlockBox().isChunkLoaded(data.getPlayer().getLocation())
+                || data.getLastLogin().hasNotPassed(50)
+                || getClimbTicks() > 0
+                || data.getLastBlockPlace().hasNotPassed(15)
+                || player.getActivePotionEffects().stream().anyMatch(effect -> effect.toString().toLowerCase().contains("levi"))
+                || (isServerOnGround() && isOnHalfBlock())
+                || isRiptiding()
+                || getHalfBlockTicks() > 0
+                || isBlocksOnTop()
+                || isOnSlimeBefore()
+                || getLastRiptide().hasNotPassed(8)
+                || isPistonsNear()
+                || getTo() != null && getTo().toVector().distance(getFrom().toVector()) < 0.005
+                || !MathUtils.elapsed(data.getVelocityProcessor().getLastVelocityTimestamp(), 500 + data.getPing() * 3);
+
         if (player.getVehicle() != null || PlayerUtils.isGliding(player)) lastVehicle.reset();
 
         if (packet.isLook()) {

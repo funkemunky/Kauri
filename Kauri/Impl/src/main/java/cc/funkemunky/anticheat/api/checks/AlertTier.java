@@ -9,7 +9,6 @@ import lombok.Setter;
 import java.util.Arrays;
 
 @Getter
-@Init
 public enum AlertTier {
     LOW(Messages.low, 0), POSSIBLE(Messages.possible, 1), LIKELY(Messages.likely, 2), HIGH(Messages.high, 3), CERTAIN(Messages.certain, 4);
 

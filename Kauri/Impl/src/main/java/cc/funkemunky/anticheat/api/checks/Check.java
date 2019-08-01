@@ -149,9 +149,7 @@ public abstract class Check {
     }
 
     public void debug(String debugString) {
-        Kauri.getInstance().getDataManager().getDataObjects().values().stream()
-                .filter(dData -> dData.getDebuggingPlayer() != null && dData.getDebuggingCheck() != null && dData.getDebuggingCheck().getName().equals(name) && dData.getDebuggingPlayer().equals(data.getUuid()))
-                .forEach(dData -> dData.getPlayer().sendMessage(Color.translate("&8[&cDebug&8] &7" + debugString)));
+
     }
 
     public abstract void onPacket(Object packet, String packetType, long timeStamp);

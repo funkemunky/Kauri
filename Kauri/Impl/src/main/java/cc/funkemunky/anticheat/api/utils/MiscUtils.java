@@ -121,31 +121,7 @@ public class MiscUtils {
     }
 
     public static boolean cancelForFlight(PlayerData data, int velocityTicks, boolean groundCheck) {
-        val move = data.getMovementProcessor();
-        val player = data.getPlayer();
-        val velocity = data.getVelocityProcessor();
-
-        return player.getAllowFlight()
-                || data.isServerPos()
-                || move.getLastVehicle().hasNotPassed(10)
-                || move.getLiquidTicks() > 0
-                || move.getWebTicks() > 0
-                || move.isTookVelocity()
-                || !Atlas.getInstance().getBlockBoxManager().getBlockBox().isChunkLoaded(data.getPlayer().getLocation())
-                || data.getLastLogin().hasNotPassed(50)
-                || move.getClimbTicks() > 0
-                || data.getLastBlockPlace().hasNotPassed(15)
-                || player.getActivePotionEffects().stream().anyMatch(effect -> effect.toString().toLowerCase().contains("levi"))
-                || (move.isServerOnGround() && move.isOnHalfBlock())
-                || (move.isServerOnGround() && groundCheck)
-                || move.isRiptiding()
-                || move.getHalfBlockTicks() > 0
-                || move.isBlocksOnTop()
-                || move.isOnSlimeBefore()
-                || move.getLastRiptide().hasNotPassed(8)
-                || move.isPistonsNear()
-                || move.getTo() != null && move.getTo().toVector().distance(move.getFrom().toVector()) < 0.005
-                || !MathUtils.elapsed(velocity.getLastVelocityTimestamp(), velocityTicks == 0 ? 0 : velocityTicks * 50 + data.getPing() * 3);
+        return data.getMovementProcessor().isCancelFlight();
     }
 
     public static Class<?> getClass(String string) {

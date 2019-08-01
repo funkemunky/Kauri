@@ -39,7 +39,7 @@ public class VelocityB extends Check {
                 lastDeltaXZ = move.getLastDeltaXZ();
             }
             if(!move.isServerOnGround() && move.getDeltaY() > 0) {
-                double velocityH = MathUtils.hypot(velocityX, velocityZ) - (shit ? lastDeltaXZ * 0.35F : 0);
+                double velocityH = MathUtils.hypot(velocityX, velocityZ) - Math.min(0.4, shit ? lastDeltaXZ * 0.35F : 0);
 
                 double ratio = move.getDeltaXZ() / velocityH;
                 if (ratio < 0.63) {
