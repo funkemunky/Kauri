@@ -22,9 +22,21 @@ public class CheckManager {
     private List<Class<?>> checkClasses = new ArrayList<>();
     private Collection<Check> checks = new TreeSet<>(Comparator.comparing(Check::getName, Collator.getInstance()));
     private Set<UUID> bypassingPlayers = new HashSet<>();
-    private Deque<PlayerData> alerts = new ArrayDeque<>();
-    private Deque<PlayerData> devAlerts = new ArrayDeque<>();
-    private Deque<PlayerData> debuggingPackets = new ArrayDeque<>();
+    private List<PlayerData> alerts = new ArrayList<>();
+    private List<PlayerData> devAlerts = new ArrayList<>();
+    private List<PlayerData> debuggingPackets = new ArrayList<>();
+
+    public CheckManager() {
+        new BukkitRunnable() {
+            public void run() {
+                val dataList = new ArrayList<>(Kauri.getInstance().getDataManager().getDataObjects().values());
+                val alertsOn = dataList.stream().filter(data -> data.getPlayer().hasPermission("kauri.alerts") && data.getAlertTier() != null).collect(Collectors.toList());
+                alerts = new ArrayList<>(alertsOn);
+                devAlerts = new ArrayList<>(alertsOn.stream().filter(PlayerData::isDeveloperAlerts).collect(Collectors.toList()));
+                debuggingPackets = new ArrayList<>(dataList.stream().filter(PlayerData::isDebuggingPackets).collect(Collectors.toList()));
+            }
+        }.runTaskTimerAsynchronously(Kauri.getInstance(), 40L, 30L);
+    }
 
     public void registerCheck(Class<?> checkClass, Collection<Check> checkList) {
         try {
@@ -89,16 +101,6 @@ public class CheckManager {
             if ((check.getMinimum() == null || ProtocolVersion.getGameVersion().isOrAbove(check.getMinimum())) && (check.getMaximum() == null || ProtocolVersion.getGameVersion().isBelow(check.getMaximum()))) {
                 checkList.add(check);
             }
-
-            new BukkitRunnable() {
-                public void run() {
-                    val dataList = new ArrayList<>(Kauri.getInstance().getDataManager().getDataObjects().values());
-                    val alertsOn = dataList.stream().filter(data -> data.getPlayer().hasPermission("kauri.alerts") && data.getAlertTier() != null).collect(Collectors.toList());
-                    alerts = new ArrayDeque<>(alertsOn);
-                    devAlerts = new ArrayDeque<>(alertsOn.stream().filter(PlayerData::isDeveloperAlerts).collect(Collectors.toList()));
-                    debuggingPackets = new ArrayDeque<>(dataList.stream().filter(PlayerData::isDebuggingPackets).collect(Collectors.toList()));
-                }
-            }.runTaskTimerAsynchronously(Kauri.getInstance(), 40L, 30L);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
