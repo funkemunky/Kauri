@@ -8,6 +8,7 @@ import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.BoundingBox;
+import cc.funkemunky.api.utils.Init;
 import lombok.val;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -19,8 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-//@Init
-@CheckInfo(name = "BadPackets (Type J)", type = CheckType.BADPACKETS, cancelType = CancelType.INTERACT)
+@Init
+@CheckInfo(name = "BadPackets (Type B)", type = CheckType.BADPACKETS, cancelType = CancelType.INTERACT)
 @Packets(packets = {Packet.Client.BLOCK_PLACE})
 public class BadPacketsB extends Check {
 
@@ -44,6 +45,7 @@ public class BadPacketsB extends Check {
                     vecs.addAll(trace.traverse(getData().getPlayer().getGameMode().equals(GameMode.CREATIVE) ? 7 : 4.5, 0.2));
                 }
                 List<BoundingBox> boxes = Atlas.getInstance().getBlockBoxManager().getBlockBox().getSpecificBox(block.getLocation()).stream().map(box -> box.grow(0.25f, 0.25f, 0.25f)).collect(Collectors.toList());
+
                 if(vecs.stream().noneMatch(vec -> boxes.stream().anyMatch(box -> box.collides(vec)))) {
                     if(vl++ > 2) {
                         flag("none", true, true, AlertTier.HIGH);
