@@ -5,6 +5,7 @@ import cc.funkemunky.anticheat.api.utils.CollisionAssessment;
 import cc.funkemunky.anticheat.api.utils.CustomLocation;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.PastLocation;
+import cc.funkemunky.anticheat.impl.config.MiscSettings;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.*;
@@ -212,6 +213,25 @@ public class MovementProcessor {
             liquidTicks = nearLiquid ? Math.min(50, liquidTicks + 1) : Math.max(0, liquidTicks - 1);
             soulSandTicks = onSoulSand ? Math.min(40, soulSandTicks + 1) : Math.max(0, soulSandTicks - 1);
             webTicks = inWeb ? Math.min(30, webTicks + 1) : Math.max(webTicks, webTicks - 1);
+
+            if (data.getTeleportLocations().size() > 0) {
+                val vecStream = data.getTeleportLocations().stream().filter(vec -> (MiscSettings.horizontalServerPos ? MathUtils.offset(vec, to.toVector()) : vec.distance(to.toVector())) < 1E-8).findFirst().orElse(null);
+
+                if (vecStream != null) {
+                    if (data.getTeleportLoc() != null && vecStream.distance(data.getTeleportLoc().toVector()) == 0) {
+                        data.setTeleportPing(timeStamp - data.getTeleportTest());
+                    } else {
+                        data.setTeleportPing(timeStamp - data.getTeleportTest());
+                    }
+                    data.setLastServerPosStamp(timeStamp);
+                    data.getTeleportLocations().remove(vecStream);
+                    serverYVelocity = deltaY;
+                    serverPos = true;
+                    from = to;
+                } else if (serverPos) {
+                    serverPos = false;
+                }
+            }
         } else if(!packet.isLook() && data.isLoggedIn()) {
             data.getLastLogin().reset();
         }
