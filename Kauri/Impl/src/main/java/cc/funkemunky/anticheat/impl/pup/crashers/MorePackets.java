@@ -34,9 +34,9 @@ public class MorePackets extends AntiPUP {
     public boolean onPacket(Object packet, String packetType, long timeStamp) {
 
         long delta = timeStamp - lastTimeStamp;
-        if (delta <= 2) {
-            if(vl++ > 20) {
-                if (vl > maxVL) {
+        if (delta <= 5) {
+            if(vl++ > maxVL) {
+                if (vl > maxVL * 2.5) {
                     if (!kicked) {
                         new BukkitRunnable() {
                             public void run() {
@@ -50,7 +50,7 @@ public class MorePackets extends AntiPUP {
                 }
                 return true;
             }
-        } else vl -= vl > 0 ? 2 : 0;
+        } else vl = 0;
         lastTimeStamp = timeStamp;
         return false;
     }
