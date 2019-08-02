@@ -5,7 +5,6 @@ import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.Init;
-import com.google.common.eventbus.AllowConcurrentEvents;
 import org.bukkit.Achievement;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
