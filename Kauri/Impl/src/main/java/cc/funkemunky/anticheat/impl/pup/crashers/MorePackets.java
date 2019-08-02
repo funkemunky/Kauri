@@ -22,9 +22,6 @@ public class MorePackets extends AntiPUP {
     @Setting(name = "kick.message")
     private String kickMessage = "You are sending too many packets.";
 
-    @Setting(name = "maxVL")
-    private int maxVL = 40;
-
     private long lastTimeStamp;
 
     private int vl;
@@ -34,9 +31,9 @@ public class MorePackets extends AntiPUP {
     public boolean onPacket(Object packet, String packetType, long timeStamp) {
 
         long delta = timeStamp - lastTimeStamp;
-        if (delta <= 5) {
-            if(vl++ > maxVL) {
-                if (vl > maxVL * 2.5) {
+        if (delta < 20 && timeStamp - Kauri.getInstance().getLastTPS() < 150) {
+            if(vl++ > 80) {
+                if (vl > 200) {
                     if (!kicked) {
                         new BukkitRunnable() {
                             public void run() {
