@@ -235,6 +235,8 @@ public class MovementProcessor {
         } else if(!packet.isLook() && data.isLoggedIn()) {
             data.getLastLogin().reset();
         }
+
+        boolean hasLevi = packet.getPlayer().getActivePotionEffects().stream().anyMatch(effect -> effect.getType().getName().toLowerCase().contains("levi"));
         
         cancelFlight = player.getAllowFlight()
                 || data.isServerPos()
@@ -246,7 +248,7 @@ public class MovementProcessor {
                 || data.getLastLogin().hasNotPassed(50)
                 || getClimbTicks() > 0
                 || data.getLastBlockPlace().hasNotPassed(15)
-                || player.getActivePotionEffects().stream().anyMatch(effect -> effect.toString().toLowerCase().contains("levi"))
+                || hasLevi
                 || (isServerOnGround() && isOnHalfBlock())
                 || isRiptiding()
                 || getHalfBlockTicks() > 0
@@ -300,6 +302,6 @@ public class MovementProcessor {
         //predict(data, .98f, .98f, false);
 
         pastLocation.addLocation(new CustomLocation(to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch()));
-        data.setGeneralCancel(data.isServerPos() || data.isLagging() || lastVehicle.hasNotPassed(10) || getLastFlightToggle().hasNotPassed(8) || !chunkLoaded || packet.getPlayer().getAllowFlight() || packet.getPlayer().getActivePotionEffects().stream().anyMatch(effect -> effect.getType().getName().toLowerCase().contains("levi")) || packet.getPlayer().getGameMode().toString().contains("CREATIVE") || packet.getPlayer().getGameMode().toString().contains("SPEC") || lastVehicle.hasNotPassed() || getLastRiptide().hasNotPassed(10) || data.getLastLogin().hasNotPassed(50) || data.getVelocityProcessor().getLastVelocity().hasNotPassed(25));
+        data.setGeneralCancel(data.isServerPos() || data.isLagging() || lastVehicle.hasNotPassed(10) || getLastFlightToggle().hasNotPassed(8) || !chunkLoaded || packet.getPlayer().getAllowFlight() || hasLevi || packet.getPlayer().getGameMode().toString().contains("CREATIVE") || packet.getPlayer().getGameMode().toString().contains("SPEC") || lastVehicle.hasNotPassed() || getLastRiptide().hasNotPassed(10) || data.getLastLogin().hasNotPassed(50) || data.getVelocityProcessor().getLastVelocity().hasNotPassed(25));
     }
 }

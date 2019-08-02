@@ -31,8 +31,8 @@ public class GroundSpoofA extends Check {
                 || move.isBlocksOnTop())
             return;
 
-        if(move.isServerOnGround() && !move.isClientOnGround() && timeStamp - lastPacket > 5L) {
-            if(verbose.flag(14, 800L)) {
+        if(move.isServerOnGround() != move.isClientOnGround() && timeStamp - lastPacket > 5L) {
+            if(verbose.flag(7, 800L)) {
                 flag("client=" + move.isClientOnGround() + " server=" + move.isServerOnGround(), true, true, verbose.getVerbose() > 20 ? AlertTier.HIGH : AlertTier.LIKELY);
             }
         } else verbose.deduct();

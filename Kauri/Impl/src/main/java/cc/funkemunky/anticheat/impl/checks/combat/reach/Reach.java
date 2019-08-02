@@ -78,7 +78,7 @@ public class Reach extends Check {
 
             if(collided.size() > 0) {
                 if (distance > reachThreshold && (collided.size() > collidedThreshold || distance > bypassColReach) && collided.size() > collidedMin && !getData().isLagging()) {
-                    if ((vl+= distance > 3.04f ? 1 : (distance > 3.02 ? 0.5f : .25f)) > certainThreshold) {
+                    if ((vl+= distance > 3.02 ? 1f : .5f) > certainThreshold) {
                         flag("reach=" + distance, true, true, AlertTier.CERTAIN);
                     } else if (vl > highThreshold) {
                         flag("reach=" + distance, true, true, AlertTier.HIGH);

@@ -25,6 +25,7 @@ public class CheckManager {
     private List<PlayerData> alerts = new ArrayList<>();
     private List<PlayerData> devAlerts = new ArrayList<>();
     private List<PlayerData> debuggingPackets = new ArrayList<>();
+    private Map<UUID, List<PlayerData>> debuggingPlayers = new HashMap<>();
 
     public CheckManager() {
         new BukkitRunnable() {
@@ -34,6 +35,14 @@ public class CheckManager {
                 alerts = new ArrayList<>(alertsOn);
                 devAlerts = new ArrayList<>(alertsOn.stream().filter(PlayerData::isDeveloperAlerts).collect(Collectors.toList()));
                 debuggingPackets = new ArrayList<>(dataList.stream().filter(PlayerData::isDebuggingPackets).collect(Collectors.toList()));
+                debuggingPlayers.clear();
+                dataList.stream().filter(data -> data.getDebuggingPlayer() != null).forEach(data -> {
+                    List<PlayerData> datas = debuggingPlayers.getOrDefault(data.getDebuggingPlayer(), new ArrayList<>());
+
+                    datas.add(data);
+
+                    debuggingPlayers.put(data.getDebuggingPlayer(), datas);
+                });
             }
         }.runTaskTimerAsynchronously(Kauri.getInstance(), 40L, 30L);
     }

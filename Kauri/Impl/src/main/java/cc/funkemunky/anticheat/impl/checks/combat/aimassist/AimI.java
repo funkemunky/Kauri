@@ -11,37 +11,27 @@ import cc.funkemunky.api.utils.TickTimer;
 import lombok.val;
 import org.bukkit.event.Event;
 
+import java.util.Set;
+
 @Packets(packets = {
         Packet.Client.POSITION_LOOK,
         Packet.Client.LOOK})
-//@cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Aim (Type I)", maxVL = 25, executable = true, type = CheckType.AIM)
+@cc.funkemunky.api.utils.Init
+@CheckInfo(name = "Aim (Type I)", maxVL = 50, type = CheckType.AIM)
 public class AimI extends Check {
 
-    private int ticks = 0;
     private double vl;
-    private TickTimer lastFlag = new TickTimer(5);
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
-        val div = (move.getYawGCD() / (double) move.getOffset());
 
-        if(move.getYawDelta() < 0.1) return;
-
-        if ((move.getYawDelta() / div % 1 == 0 || move.getLastYawDelta() / div % 1 == 0)) {
-            debug(Color.Green + "Ticks: " + ticks);
-
-            ticks = 0;
-        } else ticks++;
-
-        debug("ticks=" + ticks + " [" + (move.getYawDelta() / div) + ", " + (move.getLastYawDelta() / div) + "]");
-
-        //debug("GCD: " + gcd + " div: " + div + " 1: " + (move.getYawDelta() / div));
-        //debug("1: " + (move.getYawDelta() / div) + " 2: " + (move.getLastYawDelta() / div));
-        //debug("1: " + (move.getYawDelta() / move.getLastYawDelta() / div));
-        //debug("LCM: " + lcm);
-        //debug("1: " + (one / (double) lcm) + " 2: " + (two / (double) lcm));
+        if(move.getLastPitchDelta() == move.getPitchDelta() && move.getPitchDelta() > 0.1) {
+            if(vl++ > 8) {
+                flag("pitch=" + move.getPitchDelta() + " vl=" + vl, true, true, vl > 14 ? AlertTier.HIGH : AlertTier.LIKELY);
+            }
+        } else vl-= vl > 0 ? 0.25 : 0;
+        debug("pitch=" + move.getPitchDelta() + " yaw=" + move.getYawDelta() + " vl=" + vl);
     }
 
     @Override

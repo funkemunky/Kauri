@@ -5,5 +5,5 @@ import org.bukkit.event.Listener;
 //@Init
 public class InputHandler implements Listener {
 
-    private boolean testMode = false;
+    private boolean testMode = true;
 }
