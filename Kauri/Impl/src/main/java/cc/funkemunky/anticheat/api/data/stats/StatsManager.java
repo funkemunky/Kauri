@@ -3,12 +3,12 @@ package cc.funkemunky.anticheat.api.data.stats;
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.api.Atlas;
-import cc.funkemunky.carbon.db.Database;
 import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.Priority;
 import cc.funkemunky.carbon.Carbon;
+import cc.funkemunky.carbon.db.Database;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 

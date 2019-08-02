@@ -1,7 +1,6 @@
 package cc.funkemunky.anticheat.api.checks;
 
 import cc.funkemunky.anticheat.api.utils.Messages;
-import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.ReflectionsUtil;
 import lombok.Getter;
 import lombok.Setter;
