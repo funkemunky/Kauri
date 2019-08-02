@@ -7,31 +7,29 @@ import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.Color;
-import cc.funkemunky.api.utils.TickTimer;
+import cc.funkemunky.api.utils.Init;
+import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
 import org.bukkit.event.Event;
-
-import java.util.Set;
 
 @Packets(packets = {
         Packet.Client.POSITION_LOOK,
         Packet.Client.LOOK})
-@cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Aim (Type I)", maxVL = 50, type = CheckType.AIM)
+@Init
+@CheckInfo(name = "Aim (Type I)", description = "Ensures that pitch acceleration is legitimate.", maxVL = 50, type = CheckType.AIM)
 public class AimI extends Check {
 
     private double vl;
-
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        if(move.getLastPitchDelta() == move.getPitchDelta() && move.getPitchDelta() > 0.1) {
-            if(vl++ > 8) {
-                flag("pitch=" + move.getPitchDelta() + " vl=" + vl, true, true, vl > 14 ? AlertTier.HIGH : AlertTier.LIKELY);
+        if(MathUtils.approxEquals(1E-5, move.getPitchDelta(), move.getLastPitchDelta()) && move.getPitchDelta() > 0.18) {
+            if(vl++ > 7) {
+                flag("pitch=" + move.getPitchDelta() + " last=" + move.getLastPitchDelta() + " vl=" + vl, true, true, vl > 15 ? AlertTier.HIGH : AlertTier.LIKELY);
             }
         } else vl-= vl > 0 ? 0.25 : 0;
-        debug("pitch=" + move.getPitchDelta() + " yaw=" + move.getYawDelta() + " vl=" + vl);
+        debug("pitch=" + move.getPitchDelta() + " last=" + move.getLastPitchDelta() + " vl=" + vl);
     }
 
     @Override

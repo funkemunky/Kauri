@@ -6,6 +6,7 @@ import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.CustomLocation;
 import cc.funkemunky.anticheat.api.utils.MathUtils;
+import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.Color;
@@ -51,15 +52,16 @@ public class MotionB extends Check {
         Vector dir = move.getTo().toLocation(getData().getPlayer().getWorld()).getDirection();
         float yaw = (float)(Math.atan2(dir.getZ(), dir.getX()) * 180.0 / 3.141592653589793) - 90.0f;
 
-        float delta = MathUtils.getDistanceBetweenAngles(yaw, direction[0]);
-        float difference = cc.funkemunky.api.utils.MathUtils.getDelta(delta, lastDirDelta);
+        float delta = Math.max(0, MathUtils.getDistanceBetweenAngles(yaw, direction[0]) - move.getYawDelta());
 
-        if(delta > 10 && difference < 10 && difference > 3 && getData().getLastAttack().hasNotPassed(1)) {
+        float shit = Math.round(delta) % 15;
+
+        if(delta > 10 && shit > 10 && move.getDeltaXZ() > (MiscUtils.getBaseSpeed(getData()) - 0.04f)) {
             if(vl++ > 8) {
-                flag("delta=" + delta + " diff=" + difference, true, true, vl > 15 ? AlertTier.HIGH : AlertTier.LIKELY);
+                flag("delta=" + delta + " diff=" + move.getYawDelta(), true, true, vl > 15 ? AlertTier.HIGH : AlertTier.LIKELY);
             }
-        } else vl-= vl > 0 ? 0.2f : 0;
-        debug("delta=" + delta + " diff=" + difference + " vl=" + vl);
+        } else vl -= vl > 0 ? 0.25 : 0;
+        debug("delta=" + delta + " diff=" + move.getYawDelta() + " vl=" + vl + " shit=" + shit);
         lastDirDelta = delta;
     }
 

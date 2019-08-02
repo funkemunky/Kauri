@@ -4,11 +4,12 @@ import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockDigPacket;
 import cc.funkemunky.api.utils.Init;
 import org.bukkit.event.Event;
 
-@CheckInfo(name = "BadPackets (Type I)", description = "Checks for instant blocks and unblocks.", type = CheckType.BADPACKETS, cancelType = CancelType.INTERACT, maxVL = 40, executable = true)
+@CheckInfo(name = "BadPackets (Type I)", description = "Checks for instant blocks and unblocks.", type = CheckType.BADPACKETS, cancelType = CancelType.INTERACT, maxVL = 40, executable = true, maxVersion = ProtocolVersion.V1_8_9)
 @Packets(packets = {Packet.Client.BLOCK_PLACE, Packet.Client.BLOCK_DIG})
 @Init
 public class BadPacketsI extends Check {

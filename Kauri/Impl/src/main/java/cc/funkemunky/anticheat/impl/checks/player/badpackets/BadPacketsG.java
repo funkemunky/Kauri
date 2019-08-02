@@ -8,6 +8,7 @@ import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.DynamicRollingAverage;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
+import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
@@ -51,18 +52,20 @@ public class BadPacketsG extends Check {
             return;
         }
 
-        val max = Math.min(7.065, Math.sqrt((50 - (1000 / Kauri.getInstance().getTps())) + 50));
-        val stdDev = Math.sqrt(this.average.getAverage());
+        if(Atlas.getInstance().getCurrentTicks() % 2 == 0) {
+            val max = Math.min(7.065, Math.sqrt((50 - (1000 / Kauri.getInstance().getTps())) + 50));
+            val stdDev = Math.sqrt(this.average.getAverage());
 
-        if (!MathUtils.approxEquals(deltaBalance, max, stdDev) && getData().getTransPing() < 150 && !getData().isLagging() && stdDev < max && getData().getLastLag().hasPassed(10)) {
-            if (vl++ > maxVL) {
-                this.flag("S: " + stdDev, false, true, vl > 60 ? AlertTier.HIGH : AlertTier.LIKELY);
-                vl = 0;
-                average.clearValues();
-            }
-        } else vl -= vl > 0 ? 3 : 0;
+            if (!MathUtils.approxEquals(deltaBalance, max, stdDev) && getData().getTransPing() < 150 && !getData().isLagging() && stdDev < max && getData().getLastLag().hasPassed(10)) {
+                if (vl++ > maxVL) {
+                    this.flag("S: " + stdDev, false, true, vl > 60 ? AlertTier.HIGH : AlertTier.LIKELY);
+                    vl = 0;
+                    average.clearValues();
+                }
+            } else vl -= vl > 0 ? 3 : 0;
 
-        debug("MS:" + (timeStamp - lastFlying) + "STD: " + stdDev + " VL: " + vl + " max=" + max + " size=" + average.isReachedSize());
+            debug("MS:" + (timeStamp - lastFlying) + "STD: " + stdDev + " VL: " + vl + " max=" + max + " size=" + average.isReachedSize());
+        }
         this.lastFlying = timeStamp;
     }
 

@@ -5,6 +5,7 @@ import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.event.PlayerCancelEvent;
 import cc.funkemunky.anticheat.api.event.PlayerCheatEvent;
 import cc.funkemunky.anticheat.impl.config.CheckSettings;
+import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.JsonMessage;
@@ -149,11 +150,13 @@ public abstract class Check {
     }
 
     public void debug(String debugString) {
-        if(Kauri.getInstance().getCheckManager().getDebuggingPlayers().containsKey(data.getUuid())) {
-            List<PlayerData> dataList = Kauri.getInstance().getCheckManager().getDebuggingPlayers().get(data.getUuid());
+        Atlas.getInstance().getService().execute(() -> {
+            if(Kauri.getInstance().getCheckManager().getDebuggingPlayers().containsKey(data.getUuid())) {
+                List<PlayerData> dataList = Kauri.getInstance().getCheckManager().getDebuggingPlayers().get(data.getUuid());
 
-            dataList.stream().filter(data -> data.getDebuggingCheck().getName().equalsIgnoreCase(getName())).forEach(dData -> dData.getPlayer().sendMessage(Color.translate("&8[&cDebug&8] &7" + debugString)));
-        }
+                dataList.stream().filter(data -> data.getDebuggingCheck().getName().equalsIgnoreCase(getName())).forEach(dData -> dData.getPlayer().sendMessage(Color.translate("&8[&cDebug&8] &7" + debugString)));
+            }
+        });
     }
 
     public abstract void onPacket(Object packet, String packetType, long timeStamp);

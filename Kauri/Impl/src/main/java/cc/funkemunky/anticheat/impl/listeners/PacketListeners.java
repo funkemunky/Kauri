@@ -4,6 +4,7 @@ import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.pup.AntiPUP;
 import cc.funkemunky.anticheat.impl.config.CheckSettings;
+import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.events.AtlasListener;
 import cc.funkemunky.api.events.Listen;
 import cc.funkemunky.api.events.ListenerPriority;
@@ -86,7 +87,7 @@ public class PacketListeners implements AtlasListener {
         Player player = Bukkit.getPlayer(event.getPlayer().getUniqueId());
 
         if (data != null) {
-            Kauri.getInstance().getExecutorService().execute(() -> {
+            Atlas.getInstance().getService().execute(() -> {
                 Kauri.getInstance().getProfiler().start("event:PacketReceiveEvent");
                 switch (event.getType()) {
                     //AimE use transaction packets for checking transPing rather than keepAlives since there really isn't anyone who would spoof the times of these.
@@ -217,13 +218,14 @@ public class PacketListeners implements AtlasListener {
 
     private void hopper(Object packet, String packetType, long timeStamp, PlayerData data) {
         if ((!CheckSettings.bypassEnabled || !data.getPlayer().hasPermission(CheckSettings.bypassPermission)) && !Kauri.getInstance().getCheckManager().isBypassing(data.getUuid())) {
-            data.getChecks().parallelStream()
-                    .filter(check -> check.isEnabled() && check.getPackets().contains(packetType))
-                    .forEach(check -> {
-                        Kauri.getInstance().getProfiler().start("checks:" + check.getName());
-                        check.onPacket(packet, packetType, timeStamp);
-                        Kauri.getInstance().getProfiler().stop("checks:" + check.getName());
-                    });
+            Kauri.getInstance().getExecutorService().execute(() ->
+                data.getChecks().parallelStream()
+                        .filter(check -> check.isEnabled() && check.getPackets().contains(packetType))
+                        .forEach(check -> {
+                            Kauri.getInstance().getProfiler().start("checks:" + check.getName());
+                            check.onPacket(packet, packetType, timeStamp);
+                            Kauri.getInstance().getProfiler().stop("checks:" + check.getName());
+                        }));
         }
     }
 

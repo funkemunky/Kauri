@@ -21,13 +21,7 @@ public class GroundSpoofA extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        if(getData().isGeneralCancel()
-                || move.getLiquidTicks() > 0
-                || move.getClimbTicks() > 0
-                || move.getWebTicks() > 0
-                || move.isOnHalfBlock()
-                || (getData().getBlockInside() != null && getData().getBlockInside().getType().isSolid())
-                || !Atlas.getInstance().getBlockBoxManager().getBlockBox().isChunkLoaded(move.getTo().toLocation(getData().getPlayer().getWorld()))
+        if(move.isCancelFlight()
                 || move.isBlocksOnTop())
             return;
 
