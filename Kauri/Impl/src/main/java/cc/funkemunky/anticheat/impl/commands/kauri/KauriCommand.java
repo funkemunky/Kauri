@@ -3,7 +3,11 @@ package cc.funkemunky.anticheat.impl.commands.kauri;
 import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.utils.Message;
 import cc.funkemunky.anticheat.impl.commands.kauri.arguments.*;
+import cc.funkemunky.anticheat.impl.listeners.CustomListeners;
+import cc.funkemunky.anticheat.impl.listeners.ImportantListeners;
+import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.commands.FunkeCommand;
+import cc.funkemunky.api.commands.ancmd.SpigotCommand;
 import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.MiscUtils;
 
@@ -11,7 +15,14 @@ import java.util.Arrays;
 
 public class KauriCommand extends FunkeCommand {
     public KauriCommand() {
-        super(Kauri.getInstance(), "kauri", "Kauri", "The Kauri anticheat main command.", "kauri.command");
+        super(Kauri.getInstance(), "kauri", "Kauri", "The Anticheat main command.", "kauri.command", true);
+
+        if(CustomListeners.isAllowed) {
+            setName(ImportantListeners.mainCommand);
+            setDisplay(ImportantListeners.mainDisplay);
+        }
+        SpigotCommand command = new SpigotCommand(getName(), this, Kauri.getInstance(), true);
+        Atlas.getInstance().getCommandManager().getMap().register(Kauri.getInstance().getName(), command);
     }
 
     @Override

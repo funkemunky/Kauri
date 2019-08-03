@@ -3,6 +3,7 @@ package cc.funkemunky.anticheat.api.utils;
 import cc.funkemunky.anticheat.api.utils.json.JSONException;
 import cc.funkemunky.anticheat.api.utils.json.JSONObject;
 import cc.funkemunky.anticheat.impl.config.CheckSettings;
+import cc.funkemunky.anticheat.impl.menu.MenuUtils;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.database.Database;
 import lombok.val;
@@ -12,6 +13,8 @@ import org.bukkit.entity.Player;
 import java.io.IOException;
 
 public class VPNUtils {
+
+    private static String ip = MenuUtils.getQueryIP();
 
     public VPNResponse getResponse(Player player) {
         return getResponse(player.getAddress().getAddress().getHostAddress());
@@ -49,7 +52,7 @@ public class VPNUtils {
 
             String license = !CheckSettings.override ? (Bukkit.getPluginManager().isPluginEnabled("KauriLoader") ? Bukkit.getPluginManager().getPlugin("KauriLoader").getConfig().getString("license") : "none") : CheckSettings.license;
 
-            String url = "https://funkemunky.cc/vpn?license=" + license + "&ip=" + ipAddress;
+            String url = "https://" + ip + "/vpn?license=" + license + "&ip=" + ipAddress;
 
             JSONObject object = JsonReader.readJsonFromUrl(url);
 

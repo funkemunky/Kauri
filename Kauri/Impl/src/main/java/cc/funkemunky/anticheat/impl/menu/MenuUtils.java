@@ -7,10 +7,13 @@ import cc.funkemunky.anticheat.api.utils.ItemBuilder;
 import cc.funkemunky.anticheat.api.utils.menu.button.Button;
 import cc.funkemunky.anticheat.api.utils.menu.button.ClickAction;
 import cc.funkemunky.anticheat.api.utils.menu.type.impl.ChestMenu;
+import cc.funkemunky.anticheat.impl.listeners.CustomListeners;
+import cc.funkemunky.anticheat.impl.listeners.ImportantListeners;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MiscUtils;
+import com.sun.tools.internal.ws.wsdl.document.Import;
 import lombok.val;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.bukkit.Bukkit;
@@ -19,6 +22,12 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import javax.net.ssl.HttpsURLConnection;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLDecoder;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -141,6 +150,27 @@ MenuUtils {
         menu.showMenu(toOpen);
     }
 
+    public static boolean isGUIAllowed() {
+        try {
+            String license = Bukkit.getPluginManager().isPluginEnabled("KauriLoader") && !ImportantListeners.customSub ? Bukkit.getPluginManager().getPlugin("KauriLoader").getConfig().getString("license") : ImportantListeners.license;
+            URL url = new URL(URLDecoder.decode("https://" + getQueryIP() + "/api/license/custom?name=" + (ImportantListeners.customSub ? "Customizer" : "Kauri") + "&license=" + license, "UTF-8"));
+
+            HttpsURLConnection urlConn = (HttpsURLConnection) url.openConnection();
+            urlConn.setHostnameVerifier((hostname, sslSession) -> true);
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
+
+            String line = reader.readLine();
+
+            if(line != null) {
+                return Boolean.parseBoolean(line);
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public static void openMainGUI(Player toOpen) {
         ChestMenu menu = new ChestMenu(Color.Dark_Gray + "Kauri Menu", 3);
 
@@ -247,6 +277,22 @@ MenuUtils {
                         }
                     }
                 }));
+    }
+
+    public static String getQueryIP() {
+        try {
+            URL url = new URL("https://pastebin.com/raw/SmgcLYZe");
+            URLConnection connection = url.openConnection();
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+            String line = reader.readLine();
+
+            if(line != null) return line;
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        return "funkemunky.cc";
     }
 
     private static void toggleValues(Player player, Check check, int page) {

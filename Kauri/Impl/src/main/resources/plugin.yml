@@ -4,5 +4,3 @@ desciption: A new evolution in detection.
 version: ${project.version}
 depend: [Atlas]
 authors: [funkemunky, Elevated]
-commands:
-  kauri:

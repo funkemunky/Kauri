@@ -10,6 +10,8 @@ import cc.funkemunky.anticheat.api.pup.AntiPUPManager;
 import cc.funkemunky.anticheat.api.utils.Message;
 import cc.funkemunky.anticheat.api.utils.VPNUtils;
 import cc.funkemunky.anticheat.impl.commands.kauri.KauriCommand;
+import cc.funkemunky.anticheat.impl.listeners.CustomListeners;
+import cc.funkemunky.anticheat.impl.listeners.ImportantListeners;
 import cc.funkemunky.anticheat.impl.listeners.LegacyListeners;
 import cc.funkemunky.anticheat.impl.menu.InputHandler;
 import cc.funkemunky.api.Atlas;
@@ -19,6 +21,7 @@ import cc.funkemunky.api.profiling.BaseProfiler;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.updater.UpdaterUtils;
 import cc.funkemunky.api.utils.*;
+import com.sun.tools.internal.ws.wsdl.document.Import;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -103,18 +106,20 @@ public class Kauri extends JavaPlugin {
         //registerLunarClient();
 
         runTasks();
-        registerCommands();
         registerListeners();
+        registerCommands();
     }
 
     public void onDisable() {
         statsManager.saveStats();
         loggerManager.saveToDatabase();
         loggerManager.getViolations().clear();
+        Atlas.getInstance().getCommandManager().getMap().getCommand(ImportantListeners.mainCommand).unregister(Atlas.getInstance().getCommandManager().getMap());
         org.bukkit.event.HandlerList.unregisterAll(this);
         dataManager.getDataObjects().clear();
         checkManager.getChecks().clear();
         Atlas.getInstance().getCommandManager().unregisterCommands(this);
+        Atlas.getInstance().getCommandManager().unregisterBukkitCommand(Atlas.getInstance().getCommandManager().getMap().getCommand(CustomListeners.isAllowed ? ImportantListeners.mainCommand : "kauri"));
         executorService.shutdownNow();
         //Bukkit.getMessenger().unregisterIncomingPluginChannel(this, "Lunar-Client");
         //Bukkit.getMessenger().unregisterOutgoingPluginChannel(this, "Lunar-Client");

@@ -1,56 +1,49 @@
 package cc.funkemunky.anticheat.impl.listeners;
 
-import cc.funkemunky.anticheat.api.utils.Message;
+import cc.funkemunky.anticheat.Kauri;
+import cc.funkemunky.anticheat.api.utils.Messages;
+import cc.funkemunky.anticheat.impl.menu.MenuUtils;
 import cc.funkemunky.api.events.AtlasListener;
 import cc.funkemunky.api.events.Listen;
 import cc.funkemunky.api.events.ListenerPriority;
 import cc.funkemunky.api.events.impl.PacketReceiveEvent;
 import cc.funkemunky.api.events.impl.PacketSendEvent;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
+import cc.funkemunky.api.tinyprotocol.api.packets.reflections.Reflections;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInChatPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTabComplete;
+import cc.funkemunky.api.tinyprotocol.reflection.Reflection;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.Init;
+import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Init
 public class CustomListeners implements AtlasListener {
 
-    private List<String> tabHider = Arrays.asList("ver", "version", "icanhasbukkit", "about", "kauri");
-
-    @Message(name = "command.plugins.message")
-    private static String message = "&fPlugins (%length%): &f{plugins}";
-
-    @Message(name = "command.plugins.pluginFormat")
-    private static String pluginFormat = "&a{plugin}&f, ";
-
-    @ConfigSetting(path = "kauri.customize.hideKauri", name = "enabled")
-    private boolean hideKauri = true;
-
-    @ConfigSetting(path = "kauri.customize.hideAtlas", name = "enabled")
-    private boolean hideAtlas = true;
-
-    @ConfigSetting(path = "kauri.customize.hideKauri", name = "replace.enabled")
-    private boolean replaceKauri = true;
-
-    @ConfigSetting(path = "kauri.customize.hideKauri", name = "replace.string")
-    private String replaceKauriString = "Anticheat";
-
     private String unknownCommand;
+
+    public static boolean isAllowed = false;
 
     public CustomListeners() {
         unknownCommand = Bukkit.spigot().getSpigotConfig().getString("messages.unknown-command");
+
+        isAllowed = MenuUtils.isGUIAllowed();
     }
 
     @Listen(priority = ListenerPriority.HIGHEST)
     public void onEvent(PacketSendEvent event) {
-        if((hideKauri || hideAtlas) && !event.getPlayer().hasPermission("kauri.command")) {
+        if(!isAllowed) return;
+        if((ImportantListeners.hideKauri || ImportantListeners.hideAtlas) && !event.getPlayer().hasPermission("kauri.command")) {
             if(event.getType().equals(Packet.Server.TAB_COMPLETE)) {
                 WrappedOutTabComplete packet = new WrappedOutTabComplete(event.getPacket(), event.getPlayer());
 
@@ -61,11 +54,11 @@ public class CustomListeners implements AtlasListener {
                 for (int i = 0; i < results.length; i++) {
                     String result = results[i].toLowerCase();
 
-                    if(hideKauri && result.contains("kauri")) {
-                        if(replaceKauri) {
-                            endResults.add(replaceKauriString);
+                    if(ImportantListeners.hideKauri && result.contains("kauri")) {
+                        if(ImportantListeners.replaceKauri && results.length > 4) {
+                            endResults.add(ImportantListeners.replaceKauriString);
                         }
-                    } else if(!hideAtlas || !result.contains("atlas")) {
+                    } else if(!ImportantListeners.hideAtlas || !result.contains("atlas")) {
                         endResults.add(results[i]);
                     }
                 }
@@ -79,45 +72,74 @@ public class CustomListeners implements AtlasListener {
 
     @Listen(priority = ListenerPriority.HIGHEST)
     public void onEvent(PacketReceiveEvent event) {
-        if(true) {
-            if(event.getType().equals(Packet.Client.CHAT)) {
-                WrappedInChatPacket packet = new WrappedInChatPacket(event.getPacket(), event.getPlayer());
+        if(!isAllowed) return;
+        if(event.getType().equals(Packet.Client.CHAT)) {
+            WrappedInChatPacket packet = new WrappedInChatPacket(event.getPacket(), event.getPlayer());
+            if (!event.getPlayer().hasPermission("kauri.command")) {
 
-                if(packet.getMessage().startsWith("/") && packet.getMessage().length() > 1) {
+                if (packet.getMessage().startsWith("/") && packet.getMessage().length() > 1) {
                     String formatted = packet.getMessage().substring(1).toLowerCase();
-                    switch(formatted) {
+
+                    if (formatted.split(" ")[0].equals(ImportantListeners.replaceKauriString.toLowerCase()) || formatted.split(" ")[0].equals(ImportantListeners.mainCommand)) {
+                        event.setCancelled(true);
+                        event.getPlayer().sendMessage(Color.Red + "No permission.");
+                        return;
+                    }
+                    switch (formatted.split(" ")[0]) {
                         case "pl":
                         case "plugins": {
-                            event.setCancelled(true);
+                            if (ImportantListeners.pluginsEnabled) {
+                                event.setCancelled(true);
 
-                            String plugins = "";
-                            int size = 0;
-                            for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
-                                if((plugin.getName().contains("Kauri") && !replaceKauri && hideKauri) || (plugin.getName().contains("Atlas") && hideAtlas)) continue;
+                                String plugins = "";
+                                int size = 0;
+                                for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
+                                    if ((plugin.getName().contains("Kauri") && !ImportantListeners.replaceKauri && ImportantListeners.hideKauri) || (plugin.getName().contains("Atlas") && ImportantListeners.hideAtlas))
+                                        continue;
 
-                                plugins+= pluginFormat.replace("{plugin}", plugin.getName().contains("Kauri") && replaceKauri ? replaceKauriString : plugin.getName());
-                                size++;
+                                    plugins += ImportantListeners.pluginFormat.replace("{plugin}", plugin.getName().contains("Kauri") && ImportantListeners.replaceKauri ? ImportantListeners.replaceKauriString : plugin.getName());
+                                    size++;
+                                }
+
+                                if (size > 0) {
+                                    plugins = plugins.substring(0, plugins.length() - 2);
+                                }
+
+                                event.getPlayer().sendMessage(Color.translate(ImportantListeners.message.replace("%length%", String.valueOf(size)).replace("{plugins}", plugins)));
                             }
-
-                            if(size > 0) {
-                                plugins = plugins.substring(0, plugins.length() - 2);
-                            }
-
-                            event.getPlayer().sendMessage(Color.translate(message.replace("%length%", String.valueOf(size)).replace("{plugins}", plugins)));
                             break;
                         }
-                        case "kauri":
-                        case "alerts": {
-                            if(hideKauri) {
+                        case "kauri": {
+                            if (ImportantListeners.hideKauri) {
                                 event.setCancelled(true);
                                 event.getPlayer().sendMessage(unknownCommand);
+                            }
+                            break;
+                        }
+                        case "anticheat": {
+                            if (ImportantListeners.hideKauri) {
+                                event.setCancelled(true);
+                                event.getPlayer().sendMessage(Color.Red + "No permission.");
                             }
                             break;
                         }
                         case "atlas": {
-                            if(hideAtlas) {
+                            if (ImportantListeners.hideAtlas) {
                                 event.setCancelled(true);
                                 event.getPlayer().sendMessage(unknownCommand);
+                            }
+                            break;
+                        }
+                        case "?":
+                        case "help": {
+                            val split = packet.getMessage().split(" ");
+
+                            if (split.length > 1) {
+                                String message = packet.getMessage().replace(split[0] + " ", "");
+                                if ((ImportantListeners.hideKauri && message.toLowerCase().contains("kauri")) || (ImportantListeners.hideAtlas && message.toLowerCase().contains("atlas"))) {
+                                    event.setCancelled(true);
+                                    event.getPlayer().sendMessage(Color.Red + "No help for " + message);
+                                }
                             }
                             break;
                         }
