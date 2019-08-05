@@ -26,7 +26,7 @@ public class CustomListeners implements AtlasListener {
     public static boolean isAllowed = false;
 
     public CustomListeners() {
-        unknownCommand = Bukkit.spigot().getSpigotConfig().getString("messages.unknown-command");
+        unknownCommand = Bukkit.spigot().getConfig().getString("messages.unknown-command");
 
         isAllowed = MenuUtils.isGUIAllowed();
     }

@@ -23,7 +23,7 @@ public class AimI extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        if(MathUtils.approxEquals(1E-5, move.getPitchDelta(), move.getLastPitchDelta()) && move.getPitchDelta() > 0.4) {
+        if(MathUtils.approxEquals(1E-5, move.getPitchDelta(), move.getLastPitchDelta()) && move.getPitchDelta() > 0.4 && !getData().isCinematicMode()) {
             if((vl = Math.min(20, vl + 1)) > 7) {
                 flag("pitch=" + move.getPitchDelta() + " last=" + move.getLastPitchDelta() + " vl=" + vl, true, true, vl > 15 ? AlertTier.HIGH : AlertTier.LIKELY);
             }
