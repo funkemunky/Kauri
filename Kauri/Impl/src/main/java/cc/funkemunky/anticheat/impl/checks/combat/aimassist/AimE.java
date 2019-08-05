@@ -15,7 +15,7 @@ import org.bukkit.event.Event;
 
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LOOK})
 @Init
-@CheckInfo(name = "Aim (Type E)", description = "Checks for low common denominators in other rotations - FlyCode.", type = CheckType.AIM, maxVL = 50)
+@CheckInfo(name = "Aim (Type E)", description = "Checks for low common denominators in other rotations.", type = CheckType.AIM, maxVL = 50)
 public class AimE extends Check {
 
     private double vl;
@@ -28,10 +28,12 @@ public class AimE extends Check {
 
         float accel = Math.abs(move.getYawDelta() - move.getLastYawDelta());
         if(move.getYawGCD() < threshold && !getData().isCinematicMode() && accel < 4.2) {
-            vl++;
-        } else vl-= vl > 0 ? 0.5 : 0;
+            if(vl++ > 30) {
+                flag("yaw=" + move.getYawGCD() + " vl=" + vl + " yd=" + move.getYawDelta(), true, true, vl > 50 ? AlertTier.HIGH : AlertTier.LIKELY);
+            }
+        } else vl-= vl > 0 ? (getData().isCinematicMode() ? 1 : 0.5) : 0;
 
-        debug("SD=" + move.getYawGCD() + " PD:" + move.getCinematicPitchDelta() + " mode=" + getData().isCinematicMode());
+        debug("yaw=" + move.getYawGCD() + " vl=" + vl + " cinematic=" + getData().isCinematicMode());
 
     }
 

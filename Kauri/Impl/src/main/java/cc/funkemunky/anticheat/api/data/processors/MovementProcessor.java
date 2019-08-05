@@ -274,15 +274,15 @@ public class MovementProcessor {
             if(data.isLoggedIn()) data.setLoggedIn(false);
             lastCinematicYawDelta = cinematicYawDelta;
             lastCinematicPitchDelta = cinematicPitchDelta;
-            cinematicYawDelta = MathUtils.getDelta(yawDelta, smooth);
-            cinematicPitchDelta = MathUtils.getDelta(pitchDelta, smooth2);
+            cinematicYawDelta = MathUtils.getDelta(yawDelta, smooth) / Math.max(0.1f, yawDelta);
+            cinematicPitchDelta = MathUtils.getDelta(pitchDelta, smooth2) / Math.max(0.1f, pitchDelta);
 
             if (Float.isNaN(cinematicPitchDelta) || Float.isNaN(cinematicYawDelta)) {
                 data.getYawSmooth().reset();
                 data.getPitchSmooth().reset();
             }
 
-            data.setCinematicMode(cinematicYawDelta < 1 && cinematicPitchDelta < 1);
+            data.setCinematicMode(cinematicYawDelta < 0.2 && cinematicPitchDelta < 0.15);
 
             yawGCD = MiscUtils.gcd((long) (yawDelta * offset), (long) (lastYawDelta * offset));
             pitchGCD = MiscUtils.gcd((long) (pitchDelta * offset), (long) (lastPitchDelta * offset));
