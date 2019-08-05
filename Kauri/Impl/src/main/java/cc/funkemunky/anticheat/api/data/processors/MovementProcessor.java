@@ -272,10 +272,17 @@ public class MovementProcessor {
             float yawDelta = this.yawDelta = MathUtils.getDelta(to.getYaw(), from.getYaw()), pitchDelta = this.pitchDelta = MathUtils.getDelta(to.getPitch(), from.getPitch());
             float smooth = data.getYawSmooth().smooth(yawDelta, MiscUtils.convertToMouseDelta(yawDelta)), smooth2 = data.getPitchSmooth().smooth(pitchDelta, MiscUtils.convertToMouseDelta(pitchDelta));
             if(data.isLoggedIn()) data.setLoggedIn(false);
-            float smoothDelta = MathUtils.getDelta(yawDelta, smooth);
-            float smoothDelta2 = MathUtils.getDelta(pitchDelta, smooth2);
+            lastCinematicYawDelta = cinematicYawDelta;
+            lastCinematicPitchDelta = cinematicPitchDelta;
+            cinematicYawDelta = MathUtils.getDelta(yawDelta, smooth);
+            cinematicPitchDelta = MathUtils.getDelta(pitchDelta, smooth2);
 
-            data.setCinematicMode((smoothDelta / yawDelta) < 0.1 || (smoothDelta2) < 0.02);
+            if (Float.isNaN(cinematicPitchDelta) || Float.isNaN(cinematicYawDelta)) {
+                data.getYawSmooth().reset();
+                data.getPitchSmooth().reset();
+            }
+
+            data.setCinematicMode(cinematicYawDelta < 1 && cinematicPitchDelta < 1);
 
             yawGCD = MiscUtils.gcd((long) (yawDelta * offset), (long) (lastYawDelta * offset));
             pitchGCD = MiscUtils.gcd((long) (pitchDelta * offset), (long) (lastPitchDelta * offset));
@@ -286,10 +293,6 @@ public class MovementProcessor {
             } else if (optifineTicks > 0) {
                 optifineTicks -= 3;
             }
-            lastCinematicYawDelta = cinematicYawDelta;
-            lastCinematicPitchDelta = cinematicPitchDelta;
-            cinematicYawDelta = smoothDelta;
-            cinematicPitchDelta = smoothDelta2;
         }
 
         if (to.getYaw() == from.getYaw()) {

@@ -18,24 +18,21 @@ import org.bukkit.event.Event;
 @CheckInfo(name = "Aim (Type E)", description = "Checks for low common denominators in other rotations - FlyCode.", type = CheckType.AIM, maxVL = 50)
 public class AimE extends Check {
 
-    private Verbose verbose = new Verbose();
-
-    @Setting(name = "combatOnly")
-    private boolean combatOnly = true;
+    private double vl;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if (!MiscUtils.canDoCombat(combatOnly, getData())) return;
-
         val move = getData().getMovementProcessor();
 
-        if (move.getYawGCD() < 1E6 && move.getYawDelta() > 0 && !getData().isCinematicMode()) {
-            if (verbose.flag(100, 500L)) {
-                flag("t: " + verbose.getVerbose() + " g=" + move.getYawGCD(), true, true, AlertTier.HIGH);
-            }
-        } else verbose.deduct(2);
+        long threshold = move.getYawDelta() > 10 ? 30000 : 100000;
 
-        debug(verbose.getVerbose() + ", " + move.getYawGCD() + ", " + getData().isCinematicMode());
+        float accel = Math.abs(move.getYawDelta() - move.getLastYawDelta());
+        if(move.getYawGCD() < threshold && !getData().isCinematicMode() && accel < 4.2) {
+            vl++;
+        } else vl-= vl > 0 ? 0.5 : 0;
+
+        debug("SD=" + move.getYawGCD() + " PD:" + move.getCinematicPitchDelta() + " mode=" + getData().isCinematicMode());
+
     }
 
     @Override

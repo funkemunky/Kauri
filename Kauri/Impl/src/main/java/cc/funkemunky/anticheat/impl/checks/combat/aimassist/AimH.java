@@ -13,32 +13,27 @@ import lombok.val;
 import org.bukkit.event.Event;
 
 @Init
-@CheckInfo(name = "Aim (Type H)", description = "Designed to detect Vape's Aimassist while vertical aim is off.", type = CheckType.AIM, executable = true, maxVL = 10)
+@CheckInfo(name = "Aim (Type H)", description = "Designed to detect Vape's Aimassist.", type = CheckType.AIM, executable = true, maxVL = 10)
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LOOK})
 public class AimH extends Check {
 
     private double vl;
-    private float lastAccel;
+    private float lastAccel, lastDelta;
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        val accelYaw = MathUtils.getDelta(move.getYawDelta(), move.getLastYawDelta());
-        val delta = MathUtils.getDelta(accelYaw, lastAccel);
-        /*val pitchGCD = MiscUtils.gcd((long) (16777216L * move.getPitchDelta()), (long) (16777216L * move.getLastPitchDelta())) / 16777216F;
+        float accel = Math.abs(move.getYawDelta() - move.getLastYawDelta());
+        float delta = Math.abs(accel - lastAccel);
+        float deltaAccel = Math.abs(accel - delta);
 
-        if((MathUtilsDL.getDelta(accelYaw, yawGCD) < 1E-5 || (MathUtilsDL.getDelta(accelPitch, pitchGCD) < 1E-5 && accelPitch > pitchGCD * 2)) && move.getYawDelta() > 0.7 && getData().isCinematicMode() && delta > 0.01) {
-            debug(Color.Green + "Flag: " + vl++);
-            debug("[" + accelYaw + ", " + yawGCD + "] , [" + accelPitch + ", " + pitchGCD + "] " + move.getYawDelta());
-        } else vl-= vl > 0 ? 0.25 : 0;*/
+        if((move.getCinematicYawDelta() < 0.4 && move.getYawDelta() > 0.8 && accel > 0.1 && delta > 0.1)) {
+            debug(Color.Green + "Flag");
+        }
 
-        if(delta > 1E-4 && getData().isCinematicMode() && move.getPitchDelta() == 0 && move.getYawDelta() > 0.8) {
-            if(vl++ > 20) {
-                flag("test", true, true, AlertTier.HIGH);
-            }
-            debug(Color.Green + "VL: " +  vl);
-        } else vl-= vl > 0 ? 0.25 : 0;
-        lastAccel = accelYaw;
+        debug("accel=" + accel + " delta=" + delta + " cinematic=" + move.getCinematicYawDelta() + " yd=" + move.getYawDelta());
+        lastDelta = delta;
+        lastAccel = accel;
     }
 
     @Override

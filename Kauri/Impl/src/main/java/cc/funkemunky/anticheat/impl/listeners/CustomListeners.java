@@ -1,7 +1,5 @@
 package cc.funkemunky.anticheat.impl.listeners;
 
-import cc.funkemunky.anticheat.Kauri;
-import cc.funkemunky.anticheat.api.utils.Messages;
 import cc.funkemunky.anticheat.impl.menu.MenuUtils;
 import cc.funkemunky.api.events.AtlasListener;
 import cc.funkemunky.api.events.Listen;
@@ -9,21 +7,14 @@ import cc.funkemunky.api.events.ListenerPriority;
 import cc.funkemunky.api.events.impl.PacketReceiveEvent;
 import cc.funkemunky.api.events.impl.PacketSendEvent;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.tinyprotocol.api.packets.reflections.Reflections;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInChatPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTabComplete;
-import cc.funkemunky.api.tinyprotocol.reflection.Reflection;
 import cc.funkemunky.api.utils.Color;
-import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.Init;
 import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -21,7 +21,6 @@ import cc.funkemunky.api.profiling.BaseProfiler;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.updater.UpdaterUtils;
 import cc.funkemunky.api.utils.*;
-import com.sun.tools.internal.ws.wsdl.document.Import;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -74,7 +73,7 @@ public class Kauri extends JavaPlugin {
         saveDefaultConfig();
         saveDefaultMessages();
 
-        if (!(boolean)ReflectionsUtil.getFieldValue(ReflectionsUtil.getFieldByName(ReflectionsUtil.getClass("cc.funkemunky.anticheat.impl.menu.InputHandler"), "testMode"), new InputHandler()) && (Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled())) return;
+        if (InputHandler.testMode == -69 && (Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled())) return;
 
         if(Bukkit.getVersion().contains("Paper")) {
             runningPaperSpigot = true;
@@ -160,7 +159,7 @@ public class Kauri extends JavaPlugin {
     }
 
     public void reloadKauri() {
-        if(!(boolean)ReflectionsUtil.getFieldValue(ReflectionsUtil.getFieldByName(ReflectionsUtil.getClass("cc.funkemunky.anticheat.impl.menu.InputHandler"), "testMode"), new InputHandler())) {
+        if(InputHandler.testMode == -69) {
             MiscUtils.printToConsole("&cReloading Kauri...");
             long start = System.currentTimeMillis();
             MiscUtils.unloadPlugin("KauriLoader");
@@ -171,14 +170,13 @@ public class Kauri extends JavaPlugin {
         } else {
             reloadConfig();
             reloadMessages();
-            checkManager = new CheckManager();
-            dataManager = new DataManager();
-            HandlerList.unregisterAll(this);
             profiler.reset();
-            EventManager.unregisterAll(this);
+            HandlerList.unregisterAll(this);
             Atlas.getInstance().getEventManager().unregisterAll(this);
-            startScanner(false);
+            checkManager = new CheckManager();
             antiPUPManager = new AntiPUPManager();
+            dataManager = new DataManager();
+            startScanner(false);
             dataManager.registerAllPlayers();
         }
     }
