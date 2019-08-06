@@ -79,13 +79,13 @@ public class Reach extends Check {
             if(collided.size() > 0) {
                 if (distance > reachThreshold && (collided.size() > collidedThreshold || distance > bypassColReach) && collided.size() > collidedMin && !getData().isLagging()) {
                     if ((vl+= distance > 3.02 ? 1f : .5f) > certainThreshold) {
-                        flag("reach=" + distance, true, true, AlertTier.CERTAIN);
+                        flag("reach=" + distance + " vl=" + vl + " collided=" + collided, true, true, AlertTier.CERTAIN);
                     } else if (vl > highThreshold) {
-                        flag("reach=" + distance, true, true, AlertTier.HIGH);
+                        flag("reach=" + distance + " vl=" + vl + " collided=" + collided, true, true, AlertTier.HIGH);
                     } else if(vl > 4) {
-                        flag("reach=" + distance, true, false, vl > 6 ? AlertTier.LIKELY : AlertTier.POSSIBLE);
+                        flag("reach=" + distance + " vl=" + vl + " collided=" + collided, true, false, vl > 6 ? AlertTier.LIKELY : AlertTier.POSSIBLE);
                     } else {
-                        flag("reach=" + distance,true,false,AlertTier.LOW);
+                        flag("reach=" + distance + " vl=" + vl + " collided=" + collided,true,false,AlertTier.LOW);
                     }
                 } else if(distance > 0.8) {
                     vl = Math.max(0, vl - 0.05f);

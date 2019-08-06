@@ -16,6 +16,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Vehicle;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Getter
@@ -30,7 +31,7 @@ public class MovementProcessor {
     private PastLocation pastLocation = new PastLocation();
     private TickTimer lastRiptide = new TickTimer(6), lastVehicle = new TickTimer(4), lastFlightToggle = new TickTimer(10);
     private List<BoundingBox> boxes = new ArrayList<>();
-    private List<Entity> entitiesAround = new ArrayList<>();
+    private List<Entity> entitiesAround = Collections.synchronizedList(new ArrayList<>());
     private long lastTimeStamp, lagTicks, pitchGCD, yawGCD, offset = 16777216L;
 
     public void update(PlayerData data, WrappedInFlyingPacket packet) {

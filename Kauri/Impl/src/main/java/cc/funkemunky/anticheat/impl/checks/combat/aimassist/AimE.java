@@ -27,7 +27,7 @@ public class AimE extends Check {
         long threshold = move.getYawDelta() > 10 ? 30000 : 100000;
 
         float accel = Math.abs(move.getYawDelta() - move.getLastYawDelta());
-        if(move.getYawGCD() < threshold && !getData().isCinematicMode() && accel < 4.2) {
+        if(move.getYawGCD() < threshold && !getData().isCinematicMode() && accel < 4.2 && move.getYawDelta() > 0.6) {
             if(vl++ > 30) {
                 flag("yaw=" + move.getYawGCD() + " vl=" + vl + " yd=" + move.getYawDelta(), true, true, vl > 50 ? AlertTier.HIGH : AlertTier.LIKELY);
             }
