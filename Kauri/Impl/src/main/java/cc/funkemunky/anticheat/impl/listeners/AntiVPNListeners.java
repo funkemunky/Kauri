@@ -34,7 +34,7 @@ public class AntiVPNListeners implements Listener {
         if(enabled && !event.getPlayer().hasPermission("kauri.antivpn.bypass")) {
             Kauri.getInstance().getAntiPUPManager().pupThread.execute(() -> {
                 long timestamp = System.currentTimeMillis();
-                if(timestamp - Kauri.getInstance().lastLogin > 150L) {
+                if(timestamp - Kauri.getInstance().lastLogin > 100L && event.getAddress() != null) {
                     VPNResponse response = Kauri.getInstance().getVpnUtils().getResponse(event.getAddress().getHostAddress());
 
                     if (response == null) return;
