@@ -10,8 +10,10 @@ import cc.funkemunky.anticheat.impl.pup.crashers.ChatSpam;
 import cc.funkemunky.anticheat.impl.pup.crashers.MorePackets;
 import cc.funkemunky.anticheat.impl.pup.exploits.BookEnchant;
 import cc.funkemunky.api.Atlas;
-import cc.funkemunky.api.database.DatabaseType;
+import cc.funkemunky.carbon.db.Database;
+import cc.funkemunky.carbon.db.DatabaseType;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,10 +24,12 @@ import java.util.concurrent.Executors;
 public class AntiPUPManager {
     private List<AntiPUP> antibot = new ArrayList<>();
     public ExecutorService pupThread = Executors.newFixedThreadPool(2);
+    public Database vpnCache;
 
     public AntiPUPManager() {
         antibot = registerMethods();
-        Atlas.getInstance().getDatabaseManager().createDatabase("VPN-Cache", DatabaseType.FLATFILE);
+        Atlas.getInstance().getCarbon().createFlatfileDatabase(Kauri.getInstance().getDataFolder().getPath() + File.separator + "dbs", "VPN-Cache");
+        vpnCache = Atlas.getInstance().getCarbon().getDatabase("VPN-Cache");
     }
 
     public List<AntiPUP> registerMethods() {

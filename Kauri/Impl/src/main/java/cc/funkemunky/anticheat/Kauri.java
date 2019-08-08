@@ -15,7 +15,6 @@ import cc.funkemunky.anticheat.impl.listeners.ImportantListeners;
 import cc.funkemunky.anticheat.impl.listeners.LegacyListeners;
 import cc.funkemunky.anticheat.impl.menu.InputHandler;
 import cc.funkemunky.api.Atlas;
-import cc.funkemunky.api.event.system.EventManager;
 import cc.funkemunky.api.events.AtlasListener;
 import cc.funkemunky.api.profiling.BaseProfiler;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
@@ -268,10 +267,8 @@ public class Kauri extends JavaPlugin {
                     if (obj instanceof Listener) {
                         MiscUtils.printToConsole("&eFound " + clazz.getSimpleName() + " Bukkit listener. Registering...");
                         plugin.getServer().getPluginManager().registerEvents((Listener) obj, plugin);
-                    } else if (obj instanceof cc.funkemunky.api.event.system.Listener) {
-                        MiscUtils.printToConsole("&eFound " + clazz.getSimpleName() + "(deprecated) Atlas listener. Registering...");
-                        cc.funkemunky.api.event.system.EventManager.register(plugin, (cc.funkemunky.api.event.system.Listener) obj);
-                    } else if (obj instanceof AtlasListener) {
+                    }
+                    if (obj instanceof AtlasListener) {
                         MiscUtils.printToConsole("&eFound " + clazz.getSimpleName() + "Atlas listener. Registering...");
                         Atlas.getInstance().getEventManager().registerListeners((AtlasListener) obj, plugin);
                     }

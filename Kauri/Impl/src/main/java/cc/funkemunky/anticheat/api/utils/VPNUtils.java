@@ -1,11 +1,10 @@
 package cc.funkemunky.anticheat.api.utils;
 
+import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.utils.json.JSONException;
 import cc.funkemunky.anticheat.api.utils.json.JSONObject;
 import cc.funkemunky.anticheat.impl.config.CheckSettings;
 import cc.funkemunky.anticheat.impl.menu.MenuUtils;
-import cc.funkemunky.api.Atlas;
-import cc.funkemunky.api.database.Database;
 import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -21,21 +20,18 @@ public class VPNUtils {
     }
 
     public void cacheReponse(VPNResponse reponse) {
-        Database database = Atlas.getInstance().getDatabaseManager().getDatabase("VPN-Cache");
 
         try {
-            database.inputField(reponse.getIp(), reponse.toJson().toString());
+            Kauri.getInstance().getAntiPUPManager().vpnCache.inputField(reponse.getIp(), reponse.toJson().toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
     public VPNResponse getIfCached(String ipAddress) {
-        Database database = Atlas.getInstance().getDatabaseManager().getDatabase("VPN-Cache");
-
-        if(database.getDatabaseValues().containsKey(ipAddress)) {
+        if( Kauri.getInstance().getAntiPUPManager().vpnCache.getDatabaseValues().containsKey(ipAddress)) {
             try {
-                return VPNResponse.fromJson((String) database.getField(ipAddress));
+                return VPNResponse.fromJson((String)  Kauri.getInstance().getAntiPUPManager().vpnCache.getField(ipAddress));
             } catch (JSONException e) {
                 e.printStackTrace();
             }

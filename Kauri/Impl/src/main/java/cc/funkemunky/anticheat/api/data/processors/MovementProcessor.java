@@ -1,23 +1,21 @@
 package cc.funkemunky.anticheat.api.data.processors;
 
 import cc.funkemunky.anticheat.api.data.PlayerData;
-import cc.funkemunky.anticheat.api.utils.CollisionAssessment;
-import cc.funkemunky.anticheat.api.utils.CustomLocation;
+import cc.funkemunky.anticheat.api.utils.*;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
-import cc.funkemunky.anticheat.api.utils.PastLocation;
 import cc.funkemunky.anticheat.impl.config.MiscSettings;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.*;
+import cc.funkemunky.api.utils.MathUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Vehicle;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Getter
 public class MovementProcessor {
@@ -32,7 +30,10 @@ public class MovementProcessor {
     private TickTimer lastRiptide = new TickTimer(6), lastVehicle = new TickTimer(4), lastFlightToggle = new TickTimer(10);
     private List<BoundingBox> boxes = new ArrayList<>();
     private List<Entity> entitiesAround = Collections.synchronizedList(new ArrayList<>());
-    private long lastTimeStamp, lagTicks, pitchGCD, yawGCD, offset = 16777216L;
+    private long lastTimeStamp, lagTicks, pitchGCD, yawGCD, lastPitchGCD, lastYawGCD, offset = 16777216L;
+    private MCSmooth mouseFilterX = new MCSmooth(), mouseFilterY = new MCSmooth();
+
+    private static List<Float> sensitivities = Arrays.asList(.50f, .75f, 1f, 1.25f, 1.5f, 1.75f, 2f);
 
     public void update(PlayerData data, WrappedInFlyingPacket packet) {
         val player = packet.getPlayer();
@@ -271,21 +272,24 @@ public class MovementProcessor {
             lastYawDelta = yawDelta;
             lastPitchDelta = pitchDelta;
             float yawDelta = this.yawDelta = MathUtils.getDelta(to.getYaw(), from.getYaw()), pitchDelta = this.pitchDelta = MathUtils.getDelta(to.getPitch(), from.getPitch());
-            float smooth = data.getYawSmooth().smooth(yawDelta, MiscUtils.convertToMouseDelta(yawDelta)), smooth2 = data.getPitchSmooth().smooth(pitchDelta, MiscUtils.convertToMouseDelta(pitchDelta));
             if(data.isLoggedIn()) data.setLoggedIn(false);
+
             lastCinematicYawDelta = cinematicYawDelta;
             lastCinematicPitchDelta = cinematicPitchDelta;
-            cinematicYawDelta = MathUtils.getDelta(yawDelta, smooth) / Math.max(0.1f, yawDelta);
-            cinematicPitchDelta = MathUtils.getDelta(pitchDelta, smooth2) / Math.max(0.1f, pitchDelta);
+            //Test the performance of these functions
+            cinematicYawDelta = cc.funkemunky.anticheat.api.utils.MathUtils.getDistanceBetweenAngles(findClosestCinematicYaw(data, getYawDelta(), getLastYawDelta()), getYawDelta());
+            cinematicPitchDelta = Math.abs(to.getPitch() - findClosestCinematicPitch(data, to.getPitch(), from.getPitch()));
 
             if (Float.isNaN(cinematicPitchDelta) || Float.isNaN(cinematicYawDelta)) {
                 data.getYawSmooth().reset();
                 data.getPitchSmooth().reset();
             }
 
-            data.setCinematicMode(cinematicYawDelta < 0.2 && cinematicPitchDelta < 0.15);
+            data.setCinematicMode((cinematicYawDelta < Math.min(4, getYawDelta() * 0.02f) && getYawDelta() > 0) || (cinematicPitchDelta < (getPitchDelta() > 1 ? Math.min(6, getPitchDelta()) : 0.3) && getPitchDelta() > 0));
 
+            lastYawGCD = yawGCD;
             yawGCD = MiscUtils.gcd((long) (yawDelta * offset), (long) (lastYawDelta * offset));
+            lastPitchGCD = pitchGCD;
             pitchGCD = MiscUtils.gcd((long) (pitchDelta * offset), (long) (lastPitchDelta * offset));
 
             //Bukkit.broadcastMessage(smoothDelta + "," + smoothDelta2 + ": " + "(" + smoothDelta / yawDelta + "), " + "(" + (smoothDelta2 / pitchDelta) + "): " + data.isCinematicMode());
@@ -294,6 +298,9 @@ public class MovementProcessor {
             } else if (optifineTicks > 0) {
                 optifineTicks -= 3;
             }
+        } else {
+            data.getPitchSmooth().reset();
+            data.getYawSmooth().reset();
         }
 
         if (to.getYaw() == from.getYaw()) {
@@ -307,5 +314,51 @@ public class MovementProcessor {
 
         pastLocation.addLocation(new CustomLocation(to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch()));
         data.setGeneralCancel(data.isServerPos() || data.isLagging() || lastVehicle.hasNotPassed(10) || getLastFlightToggle().hasNotPassed(8) || !chunkLoaded || packet.getPlayer().getAllowFlight() || hasLevi || packet.getPlayer().getGameMode().toString().contains("CREATIVE") || packet.getPlayer().getGameMode().toString().contains("SPEC") || lastVehicle.hasNotPassed() || getLastRiptide().hasNotPassed(10) || data.getLastLogin().hasNotPassed(50) || data.getVelocityProcessor().getLastVelocity().hasNotPassed(25));
+    }
+
+    /*
+        Minecraft Code for Cinematic:
+            if (this.mc.gameSettings.smoothCamera) {
+                float f = this.mc.gameSettings.mouseSensitivity * 0.6F + 0.2F;
+                float f1 = f * f * f * 8.0F;
+                this.smoothCamFilterX = this.mouseFilterXAxis.smooth(this.smoothCamYaw, 0.05F * f1);
+                this.smoothCamFilterY = this.mouseFilterYAxis.smooth(this.smoothCamPitch, 0.05F * f1);
+                this.smoothCamPartialTicks = 0.0F;
+                this.smoothCamYaw = 0.0F;
+                this.smoothCamPitch = 0.0F;
+            } else {
+                this.smoothCamFilterX = 0.0F;
+                this.smoothCamFilterY = 0.0F;
+                this.mouseFilterXAxis.reset();
+                this.mouseFilterYAxis.reset();
+            }
+     */
+
+    private float findClosestCinematicYaw(PlayerData data, float yaw, float lastYaw) {
+        float value = sensitivities.stream().sorted(Comparator.comparing(val -> {
+            float f = val * 0.6f + .2f;
+            float f1 = (f * f * f) * 8f;
+            float smooth = mouseFilterX.smooth(lastYaw, 0.05f * f1);
+            mouseFilterX.reset();
+            return cc.funkemunky.anticheat.api.utils.MathUtils.getDistanceBetweenAngles(yaw, smooth);
+        }, Comparator.naturalOrder())).findFirst().orElse(1f);
+
+        float f = value * 0.6f + .2f;
+        float f1 = (f * f * f) * 8f;
+        return data.getYawSmooth().smooth(lastYaw, 0.05f * f1);
+    }
+
+    private float findClosestCinematicPitch(PlayerData data, float pitch, float lastPitch) {
+        float value = sensitivities.stream().sorted(Comparator.comparing(val -> {
+            float f = val * 0.6f + .2f;
+            float f1 = (f * f * f) * 8f;
+            float smooth = mouseFilterY.smooth(lastPitch, 0.05f * f1);
+            mouseFilterY.reset();
+            return MathUtils.getDelta(pitch, smooth);
+        }, Comparator.naturalOrder())).findFirst().orElse(1f);
+
+        float f = value * 0.6f + .2f;
+        float f1 = (f * f * f) * 8f;
+        return data.getPitchSmooth().smooth(lastPitch, 0.05f * f1);
     }
 }

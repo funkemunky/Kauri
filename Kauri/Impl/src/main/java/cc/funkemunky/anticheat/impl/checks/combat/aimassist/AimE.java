@@ -26,14 +26,15 @@ public class AimE extends Check {
 
         long threshold = move.getYawDelta() > 10 ? 30000 : 100000;
 
-        float accel = Math.abs(move.getYawDelta() - move.getLastYawDelta());
-        if(move.getYawGCD() < threshold && !getData().isCinematicMode() && accel < 4.2 && move.getYawDelta() > 0.6) {
+        if(move.getYawDelta() == move.getLastYawDelta() || Math.abs(move.getTo().getPitch()) == 90) return;
+
+        if(move.getYawGCD() < threshold && (move.getYawDelta() > 0.6 || move.getYawGCD() != move.getLastYawGCD()) && !getData().isCinematicMode()) {
             if(vl++ > 30) {
                 flag("yaw=" + move.getYawGCD() + " vl=" + vl + " yd=" + move.getYawDelta(), true, true, vl > 50 ? AlertTier.HIGH : AlertTier.LIKELY);
             }
-        } else vl-= vl > 0 ? (getData().isCinematicMode() ? 1 : 0.5) : 0;
+        } else vl-= vl > 0 ? (getData().isCinematicMode() || move.getYawGCD() == move.getLastYawGCD() ? 1 : 0.5) : 0;
 
-        debug("yaw=" + move.getYawGCD() + " vl=" + vl + " cinematic=" + getData().isCinematicMode());
+        debug("yaw=" + move.getYawGCD() + " vl=" + vl + " cinematic=" + getData().isCinematicMode() + " yaw=" + move.getCinematicYawDelta() + " pitch=" + move.getCinematicPitchDelta());
 
     }
 
