@@ -29,13 +29,16 @@ public class AimJ extends Check {
                 && move.getYawDelta() < 12
                 && move.getLastYawDelta() < 12
                 && offset < 0.05
-                && (MathUtils.getDelta(move.getYawDelta(), move.getLastYawDelta()) / offset % 1 != 0)
+                && !getData().isCinematicMode()
+                && MathUtils.getDelta(move.getYawDelta(), move.getLastYawDelta()) < 2
+                && move.getPitchDelta() < 3
+                && (MathUtils.getDelta(move.getYawDelta(), move.getLastYawDelta()) / offset % 1 > 0.1)
                 && move.getYawGCD() == move.getLastYawGCD()) {
             if(vl++ > 3) {
                 flag("g=" + move.getYawGCD() + " y1=" + move.getYawDelta() + " y2=" + move.getLastYawDelta(), true, true, AlertTier.HIGH);
             }
             debug(Color.Green + "Flag: " + "yaw=" + move.getYawDelta() + " lastYaw=" + move.getLastYawDelta() + " gcd=" + (move.getYawGCD() / (float) move.getOffset()) + " vl=" + vl);
-        } else vl -= vl > 0 ? 0.02 : 0;
+        } else vl -= vl > 0 ? 0.04 : 0;
     }
 
     @Override
