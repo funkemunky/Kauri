@@ -285,7 +285,7 @@ public class MovementProcessor {
                 data.getPitchSmooth().reset();
             }
 
-            data.setCinematicMode((cinematicYawDelta < Math.min(4, getYawDelta() * 0.02f) && getYawDelta() > 0) || (cinematicPitchDelta < (getPitchDelta() > 1 ? Math.min(6, getPitchDelta()) : 0.3) && getPitchDelta() > 0));
+            data.setCinematicMode((cinematicYawDelta < Math.min(4, getYawDelta() * 0.02f) && getYawDelta() > 0) || (cinematicPitchDelta < (getPitchDelta() > 0.5 ? Math.min(6, getPitchDelta()) : 0.3) && getPitchDelta() > 0));
 
             lastYawGCD = yawGCD;
             yawGCD = MiscUtils.gcd((long) (yawDelta * offset), (long) (lastYawDelta * offset));
