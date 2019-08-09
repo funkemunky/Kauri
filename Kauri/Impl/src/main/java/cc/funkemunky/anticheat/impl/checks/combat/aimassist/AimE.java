@@ -24,7 +24,7 @@ public class AimE extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        long threshold = move.getYawDelta() > 10 ? 30000 : 100000;
+        long threshold = move.getYawDelta() > 10 ? 30000 : 60000;
 
         if(move.getYawDelta() == move.getLastYawDelta() || Math.abs(move.getTo().getPitch()) == 90) return;
 
