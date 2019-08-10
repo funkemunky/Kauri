@@ -17,7 +17,10 @@ import org.bukkit.event.Event;
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LOOK})
 public class AimJ extends Check {
 
-    private double vl;
+    private Verbose secondary = new Verbose();
+    private float lastDelta;
+    private int vl;
+    private long lastFlag;
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
@@ -26,25 +29,29 @@ public class AimJ extends Check {
 
         float offset = (move.getYawGCD() / (float) move.getOffset());
         float delta = MathUtils.getDelta(move.getYawDelta(), move.getLastYawDelta()) / offset % 1;
-        if(move.getYawDelta() != move.getLastYawDelta()
-                && move.getYawDelta() < 12
-                && move.getLastYawDelta() < 12
-                && offset < 0.05
-                && !getData().isCinematicMode()
-                && MathUtils.getDelta(move.getYawDelta(), move.getLastYawDelta()) < 4
-                && move.getPitchDelta() < 5
-                && (delta > 0.02)
+        if(move.getYawDelta() > 1
+                && move.getLastYawDelta() > 1
+                && move.getYawDelta() < 13
+                && move.getLastYawDelta() < 13
+                && MathUtils.getDelta(move.getYawDelta(), move.getLastYawDelta()) > 0.5
                 && move.getYawGCD() == move.getLastYawGCD()) {
-            //if(vl++ > 3) {
-               // flag("g=" + move.getYawGCD() + " y1=" + move.getYawDelta() + " y2=" + move.getLastYawDelta(), true, true, AlertTier.HIGH);
-            //}
-            //debug(Color.Green + "Flag: " + "yaw=" + move.getYawDelta() + " lastYaw=" + move.getLastYawDelta() + " gcd=" + (move.getYawGCD() / (float) move.getOffset()) + " vl=" + vl);
-        } else vl -= vl > 0 ? 0.04 : 0;
+            vl++;
+            if(vl >= 3) {
+                if(secondary.flag(5, 5000L)) {
+                    flag("g=" + move.getYawGCD() + " y1=" + move.getYawDelta() + " y2=" + move.getLastYawDelta(), true, true, AlertTier.HIGH);
+                }
+                vl = 0;
+            }
+            debug(Color.Green + "Flag: " + "yaw=" + move.getYawDelta() + " lastYaw=" + move.getLastYawDelta() + " gcd=" + (move.getYawGCD() / (float) move.getOffset()) + " vl=" + vl + " secondary=" + secondary.getVerbose() + " lastFlag=" + (timeStamp - lastFlag));
 
-        if(move.getYawDelta() != move.getLastYawDelta()
-                && move.getYawGCD() == move.getLastYawGCD()) {
-            debug("delta" + delta + " offset=" + offset);
+            lastFlag = timeStamp;
+        } else if(timeStamp - lastFlag >= 250) {
+            vl = 0;
         }
+
+        lastDelta = delta;
+
+        //debug("offset=" + offset + " delta=" + delta + " gcd=" + move.getYawGCD());
     }
 
     @Override
