@@ -25,7 +25,7 @@ public class AimJ extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        if(move.getYawDelta() == 0) return;
+        if(move.getYawDelta() == 0 || getData().getLastAttack().hasPassed(20)) return;
 
         float offset = (move.getYawGCD() / (float) move.getOffset());
         float delta = MathUtils.getDelta(move.getYawDelta(), move.getLastYawDelta()) / offset % 1;

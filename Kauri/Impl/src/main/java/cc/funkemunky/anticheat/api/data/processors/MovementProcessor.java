@@ -16,6 +16,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Vehicle;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Getter
 public class MovementProcessor {
@@ -29,7 +30,7 @@ public class MovementProcessor {
     private PastLocation pastLocation = new PastLocation();
     private TickTimer lastRiptide = new TickTimer(6), lastVehicle = new TickTimer(4), lastFlightToggle = new TickTimer(10);
     private List<BoundingBox> boxes = new ArrayList<>();
-    private List<Entity> entitiesAround = Collections.synchronizedList(new ArrayList<>());
+    private List<Entity> entitiesAround = new CopyOnWriteArrayList<>();
     private long lastTimeStamp, lagTicks, pitchGCD, yawGCD, lastPitchGCD, lastYawGCD, offset = 16777216L;
     private MCSmooth mouseFilterX = new MCSmooth(), mouseFilterY = new MCSmooth();
 
