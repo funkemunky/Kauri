@@ -281,7 +281,6 @@ MenuUtils {
         try {
             URL url = new URL("https://pastebin.com/raw/SmgcLYZe");
             URLConnection connection = url.openConnection();
-            connection.setConnectTimeout(2000);
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
