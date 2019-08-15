@@ -319,7 +319,6 @@ public class Kauri extends JavaPlugin {
                 }
 
                 if (clazz.isAnnotationPresent(CheckInfo.class)) {
-                    System.out.println(clazz.getSimpleName());
                     getCheckManager().getCheckClasses().add(clazz);
 
                     MiscUtils.printToConsole("&eFound check &a" + ((CheckInfo) clazz.getAnnotation(CheckInfo.class)).name() + "&e! Registering...");
