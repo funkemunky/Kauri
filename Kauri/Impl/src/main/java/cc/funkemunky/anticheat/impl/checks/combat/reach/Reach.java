@@ -72,7 +72,7 @@ public class Reach extends Check {
             float distance = (float) collided.stream().mapToDouble((vec) -> vec.distance(to.toVector()))
                     .min().orElse(0.0D);
 
-            if(getData().getTarget().getVelocity().getY() == 0 || PlayerUtils.getPotionEffectLevel(getData().getPlayer(), PotionEffectType.SPEED) > 0) {
+            if(MathUtils.hypot(getData().getTarget().getVelocity().getX(), getData().getTarget().getVelocity().getZ()) < 0.05 || PlayerUtils.getPotionEffectLevel(getData().getPlayer(), PotionEffectType.SPEED) > 0) {
                 distance-= move.getDeltaXZ() / 1.55f;
             }
 
