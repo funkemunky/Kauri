@@ -28,7 +28,7 @@ public class AimE extends Check {
 
         if(move.getYawDelta() == move.getLastYawDelta() || Math.abs(move.getTo().getPitch()) == 90) return;
 
-        if(move.getYawGCD() < threshold && (move.getYawDelta() > 0.6 || move.getYawGCD() != move.getLastYawGCD()) && !getData().isCinematicMode()) {
+        if(move.getYawGCD() < threshold && move.getYawDelta() > 0.35 && (move.getYawDelta() > 0.6 || move.getYawGCD() != move.getLastYawGCD()) && !getData().isCinematicMode()) {
             if(vl++ > 30) {
                 flag("yaw=" + move.getYawGCD() + " vl=" + vl + " yd=" + move.getYawDelta(), true, true, vl > 50 ? AlertTier.HIGH : AlertTier.LIKELY);
             }

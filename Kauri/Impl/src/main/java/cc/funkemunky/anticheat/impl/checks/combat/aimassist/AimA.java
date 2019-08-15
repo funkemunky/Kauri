@@ -21,9 +21,9 @@ public class AimA extends Check {
             val move = getData().getMovementProcessor();
 
             if (Math.abs(move.getTo().getPitch()) < 88.0f
-                    && move.getPitchDelta() > 0
+                    && move.getPitchDelta() > 0.2
                     && move.getYawDelta() < 10
-                    && move.getOptifineTicks() < 2
+                    && !getData().isCinematicMode()
                     && move.getPitchGCD() < 131072L) {
                 if(vl++ > 50) {
                     flag(String.valueOf(move.getPitchGCD() / 2000), true, true, AlertTier.CERTAIN);

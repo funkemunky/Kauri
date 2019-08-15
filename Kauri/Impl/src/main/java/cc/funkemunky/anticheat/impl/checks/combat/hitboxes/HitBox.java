@@ -25,7 +25,14 @@ import java.util.List;
 public class HitBox extends Check {
 
     private double vl;
-    private List<EntityType> allowedEntities = Arrays.asList(EntityType.ZOMBIE, EntityType.VILLAGER, EntityType.PLAYER, EntityType.SKELETON);
+    private List<EntityType> allowedEntities = Arrays.asList(
+            EntityType.ZOMBIE,
+            EntityType.VILLAGER,
+            EntityType.PLAYER,
+            EntityType.SKELETON,
+            EntityType.WITCH,
+            EntityType.CREEPER,
+            EntityType.ENDERMAN);
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
@@ -43,7 +50,7 @@ public class HitBox extends Check {
             val doesMatch = pastLoc.stream().map(loc -> new RayTrace(loc.toVector().add(new Vector(0, 1.53f, 0)), loc.toLocation(getData().getPlayer().getWorld()).add(0, 1.53, 0).getDirection()).traverse(3.2, 0.2, 0.1, 1)).anyMatch(vecList -> vecList.stream().anyMatch(vec -> hitbox.stream().anyMatch(vec2 -> getHitbox(getData().getTarget(), vec2).collides(vec))));
 
             if(!doesMatch && !getData().isLagging() && getData().getLastPacketSkip().hasPassed(10)) {
-                val reach = pastLoc.stream().mapToDouble(loc -> loc.toVector().add(new Vector(0, 1.53, 0)).distance(origin.toVector())).average().getAsDouble();
+                val reach = pastLoc.stream().mapToDouble(loc -> loc.toVector().add(new Vector(0, 1.53, 0)).distance(origin.toVector())).max().getAsDouble();
 
                 if(vl++ > 8) {
                     flag("distance=" + MathUtils.round(reach, 2) + " vl=" + vl, true, true, AlertTier.LIKELY);
