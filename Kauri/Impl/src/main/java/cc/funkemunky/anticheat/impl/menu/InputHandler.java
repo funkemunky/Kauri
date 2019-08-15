@@ -6,5 +6,5 @@ import org.bukkit.event.Listener;
 //Put to -69 on for nontestmode.
 public class InputHandler implements Listener {
 
-    public static int testMode = -70;
+    public static int testMode = -69;
 }

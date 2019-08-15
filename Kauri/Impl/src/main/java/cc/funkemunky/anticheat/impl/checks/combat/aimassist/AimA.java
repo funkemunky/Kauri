@@ -18,22 +18,27 @@ public class AimA extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        val move = getData().getMovementProcessor();
+        if (getData().getLastAttack().hasNotPassed(4)) {
+            val move = getData().getMovementProcessor();
 
-        if (Math.abs(move.getTo().getPitch()) < 88.0f
-                && move.getPitchGCD() != move.getLastPitchGCD()
-                && !getData().isCinematicMode()
-                && move.getPitchGCD() < 131072L) {
-            if(vl++ > 40) {
-                flag(String.valueOf(move.getPitchGCD() / 2000), true, true, AlertTier.CERTAIN);
-            } else if (vl > 20) {
-                flag(String.valueOf(move.getPitchGCD() / 2000), true, true, AlertTier.HIGH);
-            } else if(vl > 10) {
-                flag(String.valueOf(move.getPitchGCD() / 2000), true, false, AlertTier.LIKELY);
+            if (Math.abs(move.getTo().getPitch()) < 88.0f
+                    && move.getPitchDelta() > 0.2
+                    && move.getYawDelta() < 10
+                    && !getData().isCinematicMode()
+                    && move.getPitchGCD() < 131072L) {
+                if(vl++ > 50) {
+                    flag(String.valueOf(move.getPitchGCD() / 2000), true, true, AlertTier.CERTAIN);
+                } else if (vl > 35) {
+                    flag(String.valueOf(move.getPitchGCD() / 2000), true, true, AlertTier.HIGH);
+                } else if(vl > 24) {
+                    flag(String.valueOf(move.getPitchGCD() / 2000), true, false, AlertTier.LIKELY);
+                }
+            } else {
+                vl -= vl > 0 ? 2 : 0;
             }
-        } else vl-= vl > 0 ? (getData().isCinematicMode() ? 1 : 0.25) : 0;
 
-        debug("VL: " + vl + " PITCH: " + move.getPitchGCD() + " OPTIFINE: " + getData().isCinematicMode());
+            debug("VL: " + vl + " PITCH: " + move.getPitchGCD() + " OPTIFINE: " + getData().isCinematicMode());
+        }
     }
 
     @Override

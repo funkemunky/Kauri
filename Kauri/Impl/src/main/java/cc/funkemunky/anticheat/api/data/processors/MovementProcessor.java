@@ -293,8 +293,7 @@ public class MovementProcessor {
             lastPitchGCD = pitchGCD;
             pitchGCD = MiscUtils.gcd((long) (pitchDelta * offset), (long) (lastPitchDelta * offset));
 
-            Bukkit.broadcastMessage(cinematicYawDelta + ", " + cinematicPitchDelta);
-
+            //Bukkit.broadcastMessage(smoothDelta + "," + smoothDelta2 + ": " + "(" + smoothDelta / yawDelta + "), " + "(" + (smoothDelta2 / pitchDelta) + "): " + data.isCinematicMode());
             if (data.isCinematicMode()) {
                 optifineTicks += optifineTicks < 60 ? 1 : 0;
             } else if (optifineTicks > 0) {
