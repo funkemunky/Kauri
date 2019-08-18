@@ -38,9 +38,8 @@ public class BadPacketsG extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        val data = this.getData();
-
-        if (data.getLastLogin().hasNotPassed(15) || data.isServerPos()) {
+        val move = getData().getMovementProcessor();
+        if (getData().getLastLogin().hasNotPassed(15) || move.isServerPos()) {
             lastFlying = timeStamp;
             return;
         }

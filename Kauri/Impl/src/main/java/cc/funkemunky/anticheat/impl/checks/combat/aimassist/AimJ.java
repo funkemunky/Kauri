@@ -4,7 +4,8 @@ import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
-import cc.funkemunky.anticheat.api.utils.*;
+import cc.funkemunky.anticheat.api.utils.Packets;
+import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
@@ -33,7 +34,7 @@ public class AimJ extends Check {
                 && move.getLastYawDelta() > 1
                 && move.getYawDelta() < 13
                 && move.getLastYawDelta() < 13
-                && MathUtils.getDelta(move.getYawDelta(), move.getLastYawDelta()) > 0.5
+                && MathUtils.getDelta(move.getYawDelta(), move.getLastYawDelta()) < 0.5
                 && move.getYawGCD() == move.getLastYawGCD()) {
             vl++;
             if(vl >= 3) {

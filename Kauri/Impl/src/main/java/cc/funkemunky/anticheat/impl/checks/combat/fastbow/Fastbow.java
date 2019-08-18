@@ -14,8 +14,8 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 @cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Fastbow", description = "Makes sure the rate of fire is legitimate.", type = CheckType.COMBAT, cancelType = CancelType.INTERACT, maxVL = 20, executable = true)
 public class Fastbow extends Check {
-    private TickTimer lastShoot = new TickTimer(10);
-    private Verbose verbose = new Verbose();
+    private long lastShoot;
+    private int vl;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
@@ -29,15 +29,15 @@ public class Fastbow extends Check {
 
         Arrow arrow = (Arrow) e.getEntity();
 
-        if (arrow.getVelocity().length() > .14 && lastShoot.hasNotPassed(6)) {
-            if (verbose.flagB(5, 1)) {
-                flag("t: " + lastShoot.getPassed() + "; v: " + MathUtils.round(arrow.getVelocity().length(), 5), true, true, verbose.getVerbose() > 7 ? AlertTier.CERTAIN : AlertTier.HIGH);
-            }
-        } else {
-            verbose.deduct();
-        }
+        long elapsed = System.currentTimeMillis() - lastShoot, threshold = Math.round(arrow.getVelocity().length() * 250L);
 
-        debug(verbose.getVerbose() + ": " + arrow.getVelocity().length() + ", " + lastShoot.getPassed());
-        lastShoot.reset();
+        if(elapsed < threshold) {
+            if(vl++ > 3) {
+                flag("vl=" + vl + " threshold=" + threshold + " elapsed=" + elapsed, true, true, AlertTier.HIGH);
+            }
+        } else vl-= vl > 0 ? 1 : 0;
+
+        debug(vl+ ": " + arrow.getVelocity().length() + ", " + elapsed);
+        lastShoot = System.currentTimeMillis();
     }
 }

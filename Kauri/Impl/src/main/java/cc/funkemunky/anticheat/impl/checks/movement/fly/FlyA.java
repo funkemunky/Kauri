@@ -22,10 +22,10 @@ public class FlyA extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(getData().isServerPos()) return;
         val move = getData().getMovementProcessor();
+        if(move.isServerPos()) return;
 
-        if(!move.isServerOnGround() && !move.isNearGround() && move.getAirTicks() > 1 && !MiscUtils.cancelForFlight(getData(), 12, false)) {
+        if(!move.isServerOnGround() && !move.isNearGround() && move.getAirTicks() > 1 && !move.isCancelFlight()) {
             float predicted = (move.getLastDeltaY() - 0.08f) * 0.98f;
 
             if(Math.abs(predicted) < 0.005) {

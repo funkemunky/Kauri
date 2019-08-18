@@ -23,7 +23,7 @@ public class AimD extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        if (getData().isServerPos() || move.isServerPos() || getData().getLastLogin().hasNotPassed(20)) return;
+        if (move.isServerPos() || move.isServerPos() || getData().getLastLogin().hasNotPassed(20)) return;
 
         Vector vector = new Vector(move.getTo().getX() - move.getFrom().getX(), 0, move.getTo().getZ() - move.getFrom().getZ());
         double angleMove = vector.distanceSquared((new Vector(move.getTo().getYaw() - move.getFrom().getYaw(), 0, move.getTo().getYaw() - move.getFrom().getYaw())));

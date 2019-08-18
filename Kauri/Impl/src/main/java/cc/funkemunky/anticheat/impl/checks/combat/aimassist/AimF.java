@@ -19,7 +19,7 @@ public class AimF extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        if (getData().isServerPos()) return;
+        if (move.isServerPos()) return;
 
         if (move.getYawDelta() > 0.1 && (move.getTo().getYaw() % 1 == 0) && move.getTo().getYaw() > 0) {
             if (verbose.flag(9, 500L)) {

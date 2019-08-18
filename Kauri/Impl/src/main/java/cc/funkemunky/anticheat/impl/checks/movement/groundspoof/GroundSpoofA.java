@@ -21,14 +21,15 @@ public class GroundSpoofA extends Check {
         val move = getData().getMovementProcessor();
 
         if(move.isCancelFlight()
+                || getData().isLagging()
                 || move.isBlocksOnTop())
             return;
 
-        if(move.isServerOnGround() != move.isClientOnGround() && timeStamp - lastPacket > 5L) {
-            if(verbose.flag(7, 800L)) {
+        if(move.isServerOnGround() != move.isClientOnGround()) {
+            if(verbose.flag(7, 1200L)) {
                 flag("client=" + move.isClientOnGround() + " server=" + move.isServerOnGround(), true, true, verbose.getVerbose() > 20 ? AlertTier.HIGH : AlertTier.LIKELY);
             }
-        } else verbose.deduct();
+        } else verbose.deduct(0.5);
 
         lastPacket = timeStamp;
         debug("client=" + move.isClientOnGround() + " server=" + move.isServerOnGround() + " vl=" + verbose.getVerbose() + " dy=" + move.getDeltaY() + " y=" + move.getTo().getY());

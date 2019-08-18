@@ -19,7 +19,7 @@ public class VelocityProcessor {
     public double velocityX, velocityY, velocityZ;
     private PlayerData data;
     private long lastVelocityTimestamp, velocityTicks;
-    private boolean attackedSinceVelocity;
+    private boolean attackedSinceVelocity, velocity;
     private TickTimer lastVelocity = new TickTimer(40);
 
     public VelocityProcessor(PlayerData data) {

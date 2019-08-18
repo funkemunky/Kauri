@@ -11,7 +11,6 @@ import cc.funkemunky.anticheat.impl.pup.crashers.MorePackets;
 import cc.funkemunky.anticheat.impl.pup.exploits.BookEnchant;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.carbon.db.Database;
-import cc.funkemunky.carbon.db.DatabaseType;
 
 import java.io.File;
 import java.util.ArrayList;

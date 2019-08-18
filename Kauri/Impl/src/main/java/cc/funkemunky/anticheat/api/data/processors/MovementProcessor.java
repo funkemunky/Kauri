@@ -1,21 +1,23 @@
 package cc.funkemunky.anticheat.api.data.processors;
 
 import cc.funkemunky.anticheat.api.data.PlayerData;
-import cc.funkemunky.anticheat.api.utils.*;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
+import cc.funkemunky.anticheat.api.utils.*;
 import cc.funkemunky.anticheat.impl.config.MiscSettings;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Vehicle;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Getter
@@ -23,7 +25,7 @@ public class MovementProcessor {
     private boolean lastFlight, cancelFlight, serverPos, flight, inLiquid, liquidBelow, clientOnGround, serverOnGround, fullyInAir, inAir, hasJumped, nearLiquid, blocksOnTop, pistonsNear, onHalfBlock,
             onClimbable, onIce, collidesHorizontally, tookVelocity, inWeb, onSlime, onSlimeBefore, onSoulSand, isRiptiding, halfBlocksAround, isNearGround, isInsideBlock, blocksNear, blocksAround;
     private int airTicks, groundTicks, iceTicks, climbTicks, halfBlockTicks, soulSandTicks, blockAboveTicks, optifineTicks, liquidTicks, webTicks, yawZeroTicks, pitchZeroTicks;
-    private float deltaY, lastDeltaXZ, slimeHeight, fallDistance, yawDelta, pitchDelta, lastYawDelta, lastPitchDelta, lastDeltaY, deltaXZ, lastServerYVelocity, serverYAcceleration, clientYAcceleration, lastClientYAcceleration, lastServerYAcceleration, cinematicYawDelta, cinematicPitchDelta, lastCinematicPitchDelta, lastCinematicYawDelta;
+    private float cinematicYaw, cinematicPitch, lastCinematicYaw, lastCinematicPitch, deltaY, lastDeltaXZ, slimeHeight, fallDistance, yawDelta, pitchDelta, lastYawDelta, lastPitchDelta, lastDeltaY, deltaXZ, lastServerYVelocity, serverYAcceleration, clientYAcceleration, lastClientYAcceleration, lastServerYAcceleration, cinematicYawDelta, cinematicPitchDelta, lastCinematicPitchDelta, lastCinematicYawDelta;
     private CustomLocation from, to;
     @Setter
     private float serverYVelocity;
@@ -189,7 +191,7 @@ public class MovementProcessor {
             if(onClimbable
                     || inLiquid
                     || inWeb
-                    || data.isServerPos()
+                    || (serverPos && serverOnGround)
                     || lastVehicle.hasNotPassed(2 + MathUtils.floor(data.getTransPing() / 50D))
                     || getLastFlightToggle().hasNotPassed(3)
                     || timeStamp - data.getVelocityProcessor().getLastVelocityTimestamp() <= 100L + data.getTransPing()) {
@@ -242,7 +244,7 @@ public class MovementProcessor {
         boolean hasLevi = packet.getPlayer().getActivePotionEffects().stream().anyMatch(effect -> effect.getType().getName().toLowerCase().contains("levi"));
         
         cancelFlight = player.getAllowFlight()
-                || data.isServerPos()
+                || serverPos
                 || getLastVehicle().hasNotPassed(10)
                 || getLiquidTicks() > 0
                 || getWebTicks() > 0
@@ -275,19 +277,17 @@ public class MovementProcessor {
             float yawDelta = this.yawDelta = MathUtils.getDelta(to.getYaw(), from.getYaw()), pitchDelta = this.pitchDelta = MathUtils.getDelta(to.getPitch(), from.getPitch());
             if(data.isLoggedIn()) data.setLoggedIn(false);
 
-            lastCinematicYawDelta = cinematicYawDelta;
-            lastCinematicPitchDelta = cinematicPitchDelta;
-            //Test the performance of these functions
-            cinematicYawDelta = cc.funkemunky.anticheat.api.utils.MathUtils.getDistanceBetweenAngles(findClosestCinematicYaw(data, getYawDelta(), getLastYawDelta()), getYawDelta());
-            cinematicPitchDelta = Math.abs(to.getPitch() - findClosestCinematicPitch(data, to.getPitch(), from.getPitch()));
+            cinematicYaw =  findClosestCinematicYaw(data, to.getYaw(), from.getYaw());
+            cinematicPitch = findClosestCinematicPitch(data, to.getPitch(), from.getPitch());
+            cinematicYawDelta = MathUtils.getDelta(cinematicYaw, lastCinematicYaw);
+            cinematicPitchDelta = MathUtils.getDelta(cinematicPitch, lastCinematicPitch);
 
             if (Float.isNaN(cinematicPitchDelta) || Float.isNaN(cinematicYawDelta)) {
                 data.getYawSmooth().reset();
                 data.getPitchSmooth().reset();
             }
 
-            data.setCinematicMode((cinematicYawDelta < Math.min(4, getYawDelta() * 0.02f) && getYawDelta() > 0) || (cinematicPitchDelta < (getPitchDelta() > 0.5 ? Math.min(6, getPitchDelta()) : 0.3) && getPitchDelta() > 0));
-
+            data.setCinematicMode(MathUtils.getDelta(cinematicPitch, to.getPitch()) < 0.21);
             lastYawGCD = yawGCD;
             yawGCD = MiscUtils.gcd((long) (yawDelta * offset), (long) (lastYawDelta * offset));
             lastPitchGCD = pitchGCD;
@@ -314,7 +314,7 @@ public class MovementProcessor {
         //predict(data, .98f, .98f, false);
 
         pastLocation.addLocation(new CustomLocation(to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch()));
-        data.setGeneralCancel(data.isServerPos() || data.isLagging() || lastVehicle.hasNotPassed(10) || getLastFlightToggle().hasNotPassed(8) || !chunkLoaded || packet.getPlayer().getAllowFlight() || hasLevi || packet.getPlayer().getGameMode().toString().contains("CREATIVE") || packet.getPlayer().getGameMode().toString().contains("SPEC") || lastVehicle.hasNotPassed() || getLastRiptide().hasNotPassed(10) || data.getLastLogin().hasNotPassed(50) || data.getVelocityProcessor().getLastVelocity().hasNotPassed(25));
+        data.setGeneralCancel(serverPos || data.isLagging() || lastVehicle.hasNotPassed(10) || getLastFlightToggle().hasNotPassed(8) || !chunkLoaded || packet.getPlayer().getAllowFlight() || hasLevi || packet.getPlayer().getGameMode().toString().contains("CREATIVE") || packet.getPlayer().getGameMode().toString().contains("SPEC") || lastVehicle.hasNotPassed() || getLastRiptide().hasNotPassed(10) || data.getLastLogin().hasNotPassed(50) || data.getVelocityProcessor().getLastVelocity().hasNotPassed(25));
     }
 
     /*

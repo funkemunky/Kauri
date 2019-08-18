@@ -49,8 +49,8 @@ public class Reach extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(getData().getTarget() != null && allowedEntities.contains(getData().getTarget().getType()) && getData().getLastAttack().hasNotPassed(0) && !getData().getPlayer().getGameMode().equals(GameMode.CREATIVE) && getData().getTarget() != null && getData().getLastAttack().hasNotPassed(0) && getData().getLastLogin().hasPassed(5) && !getData().isServerPos() && getData().getTransPing() < 450) {
-            val move = getData().getMovementProcessor();
+        val move = getData().getMovementProcessor();
+        if(getData().getTarget() != null && allowedEntities.contains(getData().getTarget().getType()) && getData().getLastAttack().hasNotPassed(0) && !getData().getPlayer().getGameMode().equals(GameMode.CREATIVE) && getData().getTarget() != null && getData().getLastAttack().hasNotPassed(0) && getData().getLastLogin().hasPassed(5) && !move.isServerPos() && getData().getTransPing() < 450) {
             long range = 200 + Math.abs(getData().getTransPing() - getData().getLastTransPing()) * 3;
             val location = getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), range);
             val to = move.getTo().toLocation(getData().getPlayer().getWorld()).add(0, getData().getPlayer().getEyeHeight(), 0);

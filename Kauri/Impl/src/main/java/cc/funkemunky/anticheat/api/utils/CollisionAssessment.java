@@ -1,12 +1,8 @@
 package cc.funkemunky.anticheat.api.utils;
 
-import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
-import cc.funkemunky.api.Atlas;
-import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumParticle;
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.BoundingBox;
-import cc.funkemunky.api.utils.MiscUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
@@ -14,23 +10,24 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Setter
 /* We use this to process the bounding boxes collided around the player for our checks to use as utils */
 public class CollisionAssessment {
     private PlayerData data;
-    private boolean onGround, halfBlocksAround, nearGround, fullyInAir, inLiquid, liquidBelow, nearLiquid, blocksOnTop, pistonsNear, onHalfBlock, onClimbable, onIce, collidesHorizontally, inWeb, onSlime, onSoulSand, blocksNear, blocksAround;
+    private boolean onGround, halfBlocksAround, nearGround, liquidAllAround, fullyInAir, inLiquid, liquidBelow, nearLiquid, blocksOnTop, pistonsNear, onHalfBlock, onClimbable, onIce, collidesHorizontally, inWeb, onSlime, onSoulSand, blocksNear, blocksAround;
     private Set<Material> materialsCollided;
+    private List<Float> blockHeights;
     private BoundingBox playerBox;
-
+    private int liquidTicks;
     public CollisionAssessment(BoundingBox playerBox, PlayerData data) {
         fullyInAir = true;
         this.data = data;
         this.playerBox = playerBox;
         materialsCollided = new HashSet<>();
+        blockHeights = Collections.synchronizedList(new ArrayList<>());
     }
 
     public void assessBox(BoundingBox bb, World world, boolean isEntity) {
@@ -49,9 +46,8 @@ public class CollisionAssessment {
                 }
             }
 
-            if (getData().isDebuggingBox() && bb.collides(playerBox) && Atlas.getInstance().getCurrentTicks() % 2 == 0) {
-                BoundingBox box = bb;
-                Kauri.getInstance().getExecutorService().submit(() -> MiscUtils.createParticlesForBoundingBox(getData().getPlayer(), box, WrappedEnumParticle.FLAME, 0.25f));
+            if(bb.collides(playerBox.subtract(0, 0.6f,0,0,0.2f,0).grow(1f, 0, 1f))) {
+                blockHeights.add(bb.maxY - bb.minY);
             }
 
             nearGround = true;
@@ -67,17 +63,17 @@ public class CollisionAssessment {
 
                 if (BlockUtils.isPiston(block)) {
                     pistonsNear = true;
-                } else if(BlockUtils.isSlab(block) || BlockUtils.isSlab(block) || block.getType().toString().contains("SNOW") || block.getType().toString().contains("DAYLIGHT_DETECTOR") || block.getType().toString().contains("SKULL") || BlockUtils.isStair(block) || block.getType().getId() == 92 || block.getType().getId() == 397) {
-                    if(bb.intersectsWithBox(data.getBoundingBox().grow(0.2f,1f,0.2f))) {
+                } else if(BlockUtils.isSlab(block) || BlockUtils.isSlab(block) || block.getType().toString().contains("CAKE") || block.getType().toString().contains("SNOW") || block.getType().toString().contains("DAYLIGHT_DETECTOR") || block.getType().toString().contains("SKULL") || block.getType().toString().contains("BED") || block.getType().toString().contains("DIODE") || BlockUtils.isStair(block) || block.getType().getId() == 92 || block.getType().getId() == 397) {
+                    if(bb.intersectsWithBox(getData().getBoundingBox().grow(0.2f,1f,0.2f))) {
                         onHalfBlock = true;
                     }
                     halfBlocksAround = true;
                 } else if(BlockUtils.isFence(block))  {
-                    if(data.getBoundingBox().subtract(0,0.25f,0,0,0,0).collides(bb)) {
+                    if(getData().getBoundingBox().subtract(0,0.25f,0,0,0,0).collides(bb)) {
                         onHalfBlock = true;
                     }
                 } else if(BlockUtils.isClimbableBlock(block)) {
-                    if(bb.intersectsWithBox(data.getBoundingBox().grow(0.6f, 0.1f, 0.6f))) {
+                    if(bb.intersectsWithBox(getData().getBoundingBox().grow(0.6f, 0.1f, 0.6f))) {
                         onClimbable = true;
                     }
                 } else if (playerBox.subtract(0, 1f, 0, 0, 0.5f, 0).collidesVertically(bb)) {
@@ -89,18 +85,23 @@ public class CollisionAssessment {
                 }
                 if (bb.intersectsWithBox(data.getBoundingBox().grow(1.0f, 0, 1.0f).shrink(0, 0.01f, 0))) {
                     blocksNear = blocksAround = true;
-                } else if (bb.intersectsWithBox(data.getBoundingBox().grow(1.5f, 1.5f, 1.5f))) {
+                } else if (bb.intersectsWithBox(getData().getBoundingBox().grow(1.5f, 1.5f, 1.5f))) {
                     blocksAround = true;
                 }
             }
         } else {
             if (BlockUtils.isLiquid(block)) {
-                if(playerBox.intersectsWithBox(bb)) {
+                if(playerBox.collides(bb.grow(0.1f,0,0.1f))) {
                     nearLiquid = inLiquid = true;
                 } else if(playerBox.subtract(0,0.025f,0,0,0,0).collides(bb)) {
                     nearLiquid = liquidBelow = true;
                 } else if(playerBox.grow(0.2f, 0.1f, 0.2f).collides(bb)) {
                     nearLiquid = true;
+                }
+                if(playerBox.grow(1f, 0, 1f).subtract(0, 0.5f, 0,0,1.2f,0f).collides(bb)) {
+                    if(liquidTicks++ >= 6) {
+                        liquidAllAround = true;
+                    }
                 }
             }
             if (block.getType().toString().contains("WEB") && playerBox.collidesVertically(bb)) {

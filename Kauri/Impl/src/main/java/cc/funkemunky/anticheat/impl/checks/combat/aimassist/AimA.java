@@ -26,15 +26,15 @@ public class AimA extends Check {
                     && move.getYawDelta() < 10
                     && !getData().isCinematicMode()
                     && move.getPitchGCD() < 131072L) {
-                if(vl++ > 50) {
+                if(vl++ > 40) {
                     flag(String.valueOf(move.getPitchGCD() / 2000), true, true, AlertTier.CERTAIN);
-                } else if (vl > 35) {
+                } else if (vl > 27) {
                     flag(String.valueOf(move.getPitchGCD() / 2000), true, true, AlertTier.HIGH);
-                } else if(vl > 24) {
+                } else if(vl > 19) {
                     flag(String.valueOf(move.getPitchGCD() / 2000), true, false, AlertTier.LIKELY);
                 }
             } else {
-                vl -= vl > 0 ? 2 : 0;
+                vl -= vl > 0 ? (getData().isCinematicMode() ? 1 : 0.5) : 0;
             }
 
             debug("VL: " + vl + " PITCH: " + move.getPitchGCD() + " OPTIFINE: " + getData().isCinematicMode());

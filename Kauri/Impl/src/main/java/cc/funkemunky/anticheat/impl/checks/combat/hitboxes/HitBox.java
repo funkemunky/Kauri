@@ -43,20 +43,20 @@ public class HitBox extends Check {
 
             val origin = move.getTo().toLocation(getData().getPlayer().getWorld()).add(0, 1.53f, 0);
 
-            val pastLoc = move.getPastLocation().getEstimatedLocation(0, 150);
+            val pastLoc = move.getPastLocation().getEstimatedLocation(getData().getTransPing(), 200);
 
-            val hitbox = getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), 150);
+            val hitbox = getData().getEntityPastLocation().getEstimatedLocation(0, 150);
 
-            val doesMatch = pastLoc.stream().map(loc -> new RayTrace(loc.toVector().add(new Vector(0, 1.53f, 0)), loc.toLocation(getData().getPlayer().getWorld()).add(0, 1.53, 0).getDirection()).traverse(3.2, 0.2, 0.1, 1)).anyMatch(vecList -> vecList.stream().anyMatch(vec -> hitbox.stream().anyMatch(vec2 -> getHitbox(getData().getTarget(), vec2).collides(vec))));
+            val doesMatch = pastLoc.stream().map(loc -> new RayTrace(loc.toVector().add(new Vector(0, 1.53f, 0)), loc.toLocation(getData().getPlayer().getWorld()).add(0, 1.53, 0).getDirection()).traverse(3.4, 0.1, 0.05, Math.min(2, getData().getTarget().getLocation().distance(getData().getPlayer().getLocation()) / 2))).anyMatch(vecList -> vecList.parallelStream().anyMatch(vec -> hitbox.stream().anyMatch(vec2 -> getHitbox(getData().getTarget(), vec2).collides(vec))));
 
-            if(!doesMatch && !getData().isLagging() && getData().getLastPacketSkip().hasPassed(10)) {
-                val reach = pastLoc.stream().mapToDouble(loc -> loc.toVector().add(new Vector(0, 1.53, 0)).distance(origin.toVector())).max().getAsDouble();
+            if(!doesMatch && !getData().isLagging()) {
+                val reach = hitbox.stream().mapToDouble(loc -> loc.toVector().add(new Vector(0, 1.53, 0)).distance(origin.toVector())).average().orElse(0);
 
                 if(vl++ > 8) {
-                    flag("distance=" + MathUtils.round(reach, 2) + " vl=" + vl, true, true, AlertTier.LIKELY);
+                    flag("distance=" + reach + " vl=" + vl, true, true, AlertTier.HIGH);
                 }
-                debug("vl=" + vl  + " distance1=" + reach);
-            } else vl-= vl > 0 ? 0.5 : 0;
+                debug("vl=" + vl + " distance=" + reach);
+            } else vl-= vl > 0 ? 1 : 0;
         }
     }
 

@@ -4,10 +4,7 @@
 
 package cc.funkemunky.anticheat.api.utils;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Stream;
 

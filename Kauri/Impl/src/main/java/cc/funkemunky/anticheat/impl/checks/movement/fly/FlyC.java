@@ -22,7 +22,7 @@ public class FlyC extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        float threshold =  MiscUtils.predicatedMaxHeight(getData()) + 0.1f;
+        float threshold =  MiscUtils.getPredictedJumpHeight(getData()) + 0.1f;
         if(!move.isCancelFlight() && move.getDeltaY() > threshold) {
             flag(move.getDeltaY() + ">-" + threshold, true, true, verbose.flag(4, 1000L) ? AlertTier.HIGH : AlertTier.LIKELY);
         }

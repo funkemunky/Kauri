@@ -154,7 +154,9 @@ public abstract class Check {
             if(Kauri.getInstance().getCheckManager().getDebuggingPlayers().containsKey(data.getUuid())) {
                 List<PlayerData> dataList = Kauri.getInstance().getCheckManager().getDebuggingPlayers().get(data.getUuid());
 
-                dataList.stream().filter(data -> data.getDebuggingCheck().getName().equalsIgnoreCase(getName())).forEach(dData -> dData.getPlayer().sendMessage(Color.translate("&8[&cDebug&8] &7" + debugString)));
+                dataList.stream().filter(data ->
+                        data.getDebuggingCheck().getName().equalsIgnoreCase(getName()))
+                        .forEach(dData -> dData.getPlayer().sendMessage(Color.translate("&8[&cDebug&8] &7" + debugString)));
             }
         });
     }
