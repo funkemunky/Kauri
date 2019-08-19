@@ -13,15 +13,18 @@ import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
 import org.bukkit.event.Event;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Init
 @CheckInfo(name = "Aim (Type J)", type = CheckType.AIM)
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LOOK})
 public class AimJ extends Check {
 
-    private Verbose secondary = new Verbose();
-    private float lastDelta;
-    private int vl;
-    private long lastFlag;
+    private double vl;
+    private Verbose verbose = new Verbose();
+
+    private Set<Long> dups = new HashSet<>();
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
@@ -30,29 +33,22 @@ public class AimJ extends Check {
 
         float offset = (move.getYawGCD() / (float) move.getOffset());
         float delta = MathUtils.getDelta(move.getYawDelta(), move.getLastYawDelta()) / offset % 1;
-        if(move.getYawDelta() > 1
-                && move.getLastYawDelta() > 1
-                && move.getYawDelta() < 13
-                && move.getLastYawDelta() < 13
-                && MathUtils.getDelta(move.getYawDelta(), move.getLastYawDelta()) < 0.5
-                && move.getYawGCD() == move.getLastYawGCD()) {
-            vl++;
-            if(vl >= 3) {
-                if(secondary.flag(5, 5000L)) {
-                    flag("g=" + move.getYawGCD() + " y1=" + move.getYawDelta() + " y2=" + move.getLastYawDelta(), true, true, AlertTier.HIGH);
-                }
-                vl = 0;
+
+        if(move.getYawGCD() == move.getLastYawGCD() && delta == 0  && move.getYawDelta() > 0.45 && offset < 1) {
+            double duplicates = verbose.getVerbose() - dups.size();
+            if(verbose.flag(5, 800L) && duplicates > 6) {
+                flag("holy shit", true, true, AlertTier.HIGH);
             }
-            debug(Color.Green + "Flag: " + "yaw=" + move.getYawDelta() + " lastYaw=" + move.getLastYawDelta() + " gcd=" + (move.getYawGCD() / (float) move.getOffset()) + " vl=" + vl + " secondary=" + secondary.getVerbose() + " lastFlag=" + (timeStamp - lastFlag));
 
-            lastFlag = timeStamp;
-        } else if(timeStamp - lastFlag >= 250) {
-            vl = 0;
-        }
+            if(verbose.getVerbose()  < 2) {
+                dups.clear();
+            } else {
+                dups.add(move.getYawGCD());
+            }
+            debug(Color.Green + "Flag: " + "vl= " + vl + " verbose=" + verbose.getVerbose() + " offset=" + offset + " delta="+ delta + " duplicates=" + duplicates + " yaw=" + move.getYawDelta());
+        } else vl = vl > 0 ? vl - 0.5 : 0;
 
-        lastDelta = delta;
-
-        //debug("offset=" + offset + " delta=" + delta + " gcd=" + move.getYawGCD());
+       //debug("offset=" + offset + " delta=" + delta + " gcd=" + move.getYawGCD());
     }
 
     @Override

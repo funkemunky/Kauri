@@ -36,7 +36,8 @@ public class AimE extends Check {
                 cinematicTicks = 0;
             }
         } else cinematicTicks-= cinematicTicks > 0 ? 2 : 0;
-        if(move.getYawGCD() < threshold && !cinematic && accel < 3 && move.getYawDelta() > 0.35 && (move.getYawDelta() > 0.6 || move.getYawGCD() != move.getLastYawGCD()) && !getData().isCinematicMode()) {
+
+        if(move.getYawGCD() < threshold && !cinematic && move.getYawDelta() > 0.35 && (move.getYawDelta() > 0.6 || move.getYawGCD() != move.getLastYawGCD())) {
             if(vl++ > 30) {
                 flag("yaw=" + move.getYawGCD() + " vl=" + vl + " yd=" + move.getYawDelta(), true, true, vl > 50 ? AlertTier.HIGH : AlertTier.LIKELY);
             }
