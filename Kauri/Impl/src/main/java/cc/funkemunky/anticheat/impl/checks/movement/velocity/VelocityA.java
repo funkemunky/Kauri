@@ -38,7 +38,7 @@ public class VelocityA extends Check {
             val ratio = Math.abs(move.getDeltaY() / lastVelocity);
             val percentage = MathUtils.round(ratio * 100D, 1);
 
-            if (ratio < 1 && !move.isBlocksOnTop() && !getData().isLagging() && move.getLiquidTicks() < 1 && move.getClimbTicks() < 1 && !getData().getPlayer().getAllowFlight() && getData().getPlayer().getVehicle() == null) {
+            if ((MathUtils.getDelta(move.getDeltaY(), lastVelocity) > 0.1 || ratio < 1) && !move.isBlocksOnTop() && !getData().isLagging() && move.getLiquidTicks() < 1 && move.getClimbTicks() < 1 && !getData().getPlayer().getAllowFlight() && getData().getPlayer().getVehicle() == null) {
                 if(vl++ > 10) {
                     flag("velocity: " + percentage + "%", true, true, AlertTier.CERTAIN);
                 } else if(vl > 5) {
