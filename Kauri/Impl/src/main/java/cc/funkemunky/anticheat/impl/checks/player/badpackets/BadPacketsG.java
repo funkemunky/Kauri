@@ -5,12 +5,10 @@ import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
-import cc.funkemunky.anticheat.api.utils.DynamicRollingAverage;
+import cc.funkemunky.anticheat.api.utils.Interval;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
-import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
 import org.bukkit.event.Event;
 
@@ -33,8 +31,8 @@ public class BadPacketsG extends Check {
     private int maxVL = 50;
 
     private long lastFlying;
-    private int vl;
-    private DynamicRollingAverage average = new DynamicRollingAverage(20);
+    private double vl;
+    private Interval<Long> interval = new Interval<>(0, 20);
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
@@ -45,26 +43,22 @@ public class BadPacketsG extends Check {
         }
 
         if(!getData().isLagging() && timeStamp - lastFlying > 5) {
-            this.average.add(timeStamp - lastFlying);
+            this.interval.add(timeStamp - lastFlying);
         } else {
             lastFlying = timeStamp;
             return;
         }
 
-        if(Atlas.getInstance().getCurrentTicks() % 2 == 0) {
-            val max = Math.min(7.065, Math.sqrt((50 - (1000 / Kauri.getInstance().getTps())) + 50));
-            val stdDev = Math.sqrt(this.average.getAverage());
+        double avg = interval.average();
+        double pct = (1000 / Kauri.getInstance().getTps()) / avg * 100;
 
-            if (!MathUtils.approxEquals(deltaBalance, max, stdDev) && getData().getTransPing() < 150 && !getData().isLagging() && stdDev < max && getData().getLastLag().hasPassed(10)) {
-                if (vl++ > maxVL) {
-                    this.flag("S: " + stdDev, false, true, vl > 60 ? AlertTier.HIGH : AlertTier.LIKELY);
-                    vl = 0;
-                    average.clearValues();
-                }
-            } else vl -= vl > 0 ? 3 : 0;
+        if(pct > 100.2) {
+            if(vl++ > 20) {
+                flag("pct=" + pct + "%", true, true, vl > 30 ? AlertTier.HIGH : AlertTier.LIKELY);
+            }
+        } else vl-= vl > 0 ? 2 : 0;
 
-            debug("MS:" + (timeStamp - lastFlying) + "STD: " + stdDev + " VL: " + vl + " max=" + max + " size=" + average.isReachedSize());
-        }
+        debug("avg=" + avg + " pct=" + pct + "%" + " vl=" + vl);
         this.lastFlying = timeStamp;
     }
 

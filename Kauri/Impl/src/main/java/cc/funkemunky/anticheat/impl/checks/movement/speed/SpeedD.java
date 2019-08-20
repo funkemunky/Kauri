@@ -13,14 +13,14 @@ import org.bukkit.event.Event;
 
 @Init
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.POSITION})
-@CheckInfo(name = "Speed (Type D)", description = "Sets a maximum limit to how fast a player can move in a tick.", type = CheckType.SPEED, maxVL = 50)
+@CheckInfo(name = "Speed (Type D)", description = "Sets a maximum limit to how fast a player can move in a tick.", type = CheckType.SPEED, maxVL = 50, executable = true)
 public class SpeedD extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        val max = MiscUtils.getBaseSpeed(getData()) + 0.8;
+        val max = MiscUtils.getBaseSpeed(getData()) + 1.1;
 
         if(move.getDeltaXZ() > max && !getData().isGeneralCancel()) {
             flag(move.getDeltaXZ() + ">-" + max, true, true, AlertTier.HIGH);

@@ -236,6 +236,8 @@ public class MovementProcessor {
                 } else if (serverPos) {
                     serverPos = false;
                 }
+            } else if (serverPos) {
+                serverPos = false;
             }
         } else if(!packet.isLook() && data.isLoggedIn()) {
             data.getLastLogin().reset();
@@ -288,7 +290,7 @@ public class MovementProcessor {
                 data.getPitchSmooth().reset();
             }
 
-            data.setCinematicMode(MathUtils.getDelta(cinematicPitch, to.getPitch()) < 0.21);
+            data.setCinematicMode(MathUtils.getDelta(cinematicPitch, to.getPitch()) < 0.21 && pitchDelta > 0.01);
             lastYawGCD = yawGCD;
             yawGCD = MiscUtils.gcd((long) (yawDelta * offset), (long) (lastYawDelta * offset));
             lastPitchGCD = pitchGCD;

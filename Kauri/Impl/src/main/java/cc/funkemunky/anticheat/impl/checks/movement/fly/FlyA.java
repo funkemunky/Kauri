@@ -34,7 +34,7 @@ public class FlyA extends Check {
 
             float delta = Math.abs(predicted - move.getDeltaY());
 
-            if(delta > 1E-5) {
+            if(delta > 0.08) {
                 if(verbose.flag(3, 500L)) {
                     flag("predicted=" + predicted + " deltaY=" + move.getDeltaY() + " delta=" + delta, true, true, AlertTier.HIGH);
                 }
