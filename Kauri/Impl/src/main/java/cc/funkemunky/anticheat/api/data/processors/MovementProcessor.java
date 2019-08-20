@@ -248,6 +248,7 @@ public class MovementProcessor {
         cancelFlight = player.getAllowFlight()
                 || serverPos
                 || getLastVehicle().hasNotPassed(10)
+                || getLastFlightToggle().hasNotPassed(10)
                 || getLiquidTicks() > 0
                 || getWebTicks() > 0
                 || isTookVelocity()
