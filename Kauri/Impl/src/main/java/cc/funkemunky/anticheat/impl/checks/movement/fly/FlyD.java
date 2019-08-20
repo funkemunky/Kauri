@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.movement.fly;
 
+import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
@@ -13,7 +14,7 @@ import lombok.val;
 import org.bukkit.event.Event;
 
 @Init
-@CheckInfo(name = "Fly (Type D)", description = "Ensures the jump height of the player is legitimate.", type = CheckType.FLY, maxVL = 15, executable = true)
+@CheckInfo(name = "Fly (Type D)", description = "Ensures the jump height of the player is legitimate.", type = CheckType.FLY, maxVL = 15)
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.POSITION})
 public class FlyD extends Check {
     @Override
@@ -24,13 +25,17 @@ public class FlyD extends Check {
         if(move.isHasJumped()
                 && move.getDeltaY() != predicted
                 && !move.isServerPos()
+                && !getData().isLagging()
+                && Kauri.getInstance().getTps() > 16
+                && move.getAirTicks() == 1
                 && move.getBlockAboveTicks() == 0
                 && move.getHalfBlockTicks() == 0
                 && move.getDeltaY() > 0
                 && !move.isOnSlimeBefore()
                 && move.getLiquidTicks() == 0
                 && move.getWebTicks() == 0
-                && move.getClimbTicks() == 0 && getData().getVelocityProcessor().getLastVelocity().hasPassed(5 + MathUtils.millisToTicks(getData().getTransPing()))) {
+                && move.getClimbTicks() == 0
+                && getData().getVelocityProcessor().getLastVelocity().hasPassed(5 + MathUtils.millisToTicks(getData().getTransPing()))) {
             flag("predicted=" + predicted + " deltaY=" + move.getDeltaY(), true, true, AlertTier.HIGH);
         }
 
