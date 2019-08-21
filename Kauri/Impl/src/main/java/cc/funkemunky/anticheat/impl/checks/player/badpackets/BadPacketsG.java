@@ -54,7 +54,7 @@ public class BadPacketsG extends Check {
 
         if(pct > 100.2) {
             if(vl++ > 20) {
-                flag("pct=" + pct + "%", true, true, vl > 30 ? AlertTier.HIGH : AlertTier.LIKELY);
+                flag("pct=" + pct + "%", true, true, vl > 40 ? AlertTier.HIGH : AlertTier.LIKELY);
             }
         } else vl-= vl > 0 ? 2 : 0;
 

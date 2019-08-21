@@ -19,11 +19,11 @@ public class AimJ extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        if(move.getPitchDelta() < 0.008 && move.getYawDelta() > 0.8) {
-            if(vl++ > 8) {
-                flag("pitchDelta=" + move.getPitchDelta(), true, true, vl > 15 ? AlertTier.HIGH : AlertTier.LIKELY);
+        if(move.getPitchDelta() < 0.008 && move.getYawDelta() > 0.6) {
+            if(vl++ > 20) {
+                flag("pitchDelta=" + move.getPitchDelta(), true, true, vl > 50 ? AlertTier.HIGH : AlertTier.LIKELY);
             }
-        } else vl-= vl > 0 ? 2 : 0;
+        } else vl = 0;
     }
 
     @Override

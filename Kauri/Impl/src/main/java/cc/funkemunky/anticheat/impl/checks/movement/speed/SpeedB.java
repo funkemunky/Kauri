@@ -25,10 +25,10 @@ public class SpeedB extends Check {
 
         if(move.getAirTicks() > 2 && !getData().isGeneralCancel() && getData().getLastBlockPlace().hasPassed(10) && move.getBlockAboveTicks() == 0 && move.getHalfBlockTicks() == 0 && move.getWebTicks() == 0 && move.getLiquidTicks() == 0 && move.getClimbTicks() == 0) {
             if(delta > 1.001 + (move.getYawDelta() > 4 ? .15 : 0)) {
-                if(vl.flag(5, 800L) || delta > 8) {
+                if(vl.flag(7, 800L) || delta > 8) {
                     flag("delta=" + delta, true, true, AlertTier.HIGH);
                 }
-            } else vl.deduct(0.5);
+            } else vl.deduct(1);
             debug("delta=" + delta + " vl=" + vl.getVerbose());
         }
     }
