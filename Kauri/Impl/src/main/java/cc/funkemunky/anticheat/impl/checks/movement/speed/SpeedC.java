@@ -13,7 +13,7 @@ import lombok.val;
 import org.bukkit.event.Event;
 import org.bukkit.potion.PotionEffectType;
 
-@Init
+//@Init
 @Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK})
 @CheckInfo(name = "Speed (Type C)", description = "Checks for legitimate acceleration on ground.", type = CheckType.SPEED, maxVL = 75)
 public class SpeedC extends Check {

@@ -13,8 +13,6 @@ import java.io.IOException;
 
 public class VPNUtils {
 
-    private static String ip = MenuUtils.getQueryIP();
-
     public VPNResponse getResponse(Player player) {
         return getResponse(player.getAddress().getAddress().getHostAddress());
     }
@@ -48,7 +46,7 @@ public class VPNUtils {
 
             String license = !CheckSettings.override ? (Bukkit.getPluginManager().isPluginEnabled("KauriLoader") ? Bukkit.getPluginManager().getPlugin("KauriLoader").getConfig().getString("license") : "none") : CheckSettings.license;
 
-            String url = "https://" + ip + "/vpn?license=" + license + "&ip=" + ipAddress;
+            String url = "https://funkemunky.cc/vpn?license=" + license + "&ip=" + ipAddress;
 
             JSONObject object = JsonReader.readJsonFromUrl(url);
 

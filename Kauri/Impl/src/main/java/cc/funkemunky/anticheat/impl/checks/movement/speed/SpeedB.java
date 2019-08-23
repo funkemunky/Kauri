@@ -24,11 +24,11 @@ public class SpeedB extends Check {
         double delta = (move.getDeltaXZ() - predicted) * 38.4;
 
         if(move.getAirTicks() > 2 && !getData().isGeneralCancel() && getData().getLastBlockPlace().hasPassed(10) && move.getBlockAboveTicks() == 0 && move.getHalfBlockTicks() == 0 && move.getWebTicks() == 0 && move.getLiquidTicks() == 0 && move.getClimbTicks() == 0) {
-            if(delta > 1.001 + (move.getYawDelta() > 4 ? .15 : 0)) {
-                if(vl.flag(7, 800L) || delta > 8) {
+            if(delta > 1.001 + (move.getYawDelta() > 2 ? .15 : 0)) {
+                if(vl.flag(20, 800L) || delta > 15) {
                     flag("delta=" + delta, true, true, AlertTier.HIGH);
                 }
-            } else vl.deduct(1);
+            } else vl.deduct(0.5);
             debug("delta=" + delta + " vl=" + vl.getVerbose());
         }
     }

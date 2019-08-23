@@ -5,10 +5,12 @@ import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.utils.EvictingList;
 import cc.funkemunky.anticheat.api.utils.Interval;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
+import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
 import org.bukkit.event.Event;
 
@@ -21,45 +23,35 @@ import org.bukkit.event.Event;
 @CheckInfo(name = "BadPackets (Type G)", description = "Checks frequency of incoming packets. More detection, but less reliable.", type = CheckType.BADPACKETS, maxVL = 200, executable = false)
 public class BadPacketsG extends Check {
 
-    @Setting(name = "usingPaperSpigot")
-    public boolean usingPaper = false;
-
-    @Setting(name = "lenience")
-    public float deltaBalance = 0.04f;
-
-    @Setting(name = "threshold.vl.max")
-    private int maxVL = 50;
-
-    private long lastFlying;
+    private long lastTS;
     private double vl;
-    private Interval<Long> interval = new Interval<>(0, 20);
+    private EvictingList<Long> times = new EvictingList<>(20);
+
+    @Setting(name = "verbose.max")
+    private static int verboseVL = 80;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
-        if (getData().getLastLogin().hasNotPassed(15) || move.isServerPos()) {
-            lastFlying = timeStamp;
-            return;
+
+        long elapsed = timeStamp - lastTS;
+
+        if(getData().getLastLogin().hasPassed(10) && !move.isServerPos()) {
+            times.add(elapsed);
+
+            double average = times.stream().mapToLong(val -> val).average().orElse(50.0);
+            double ratio = 50 / average;
+            double pct = ratio * 100;
+
+            if((pct > 100.3) && (timeStamp - getData().getLastServerPosStamp() > 150L) && !getData().isLagging() && System.currentTimeMillis() - Kauri.getInstance().getLastTPS() < 150 && Kauri.getInstance().getTps() > 18.5) {
+                if(vl++ > verboseVL) {
+                    flag("pct=" + MathUtils.round(pct, 2) + "%, vl=" + vl, true, true, AlertTier.HIGH);
+                }
+            } else vl-= vl > 0 ? 1.5 : 0;
+
+            debug("pct=" + pct + ", vl=" + vl);
         }
-
-        if(!getData().isLagging() && timeStamp - lastFlying > 5) {
-            this.interval.add(timeStamp - lastFlying);
-        } else {
-            lastFlying = timeStamp;
-            return;
-        }
-
-        double avg = interval.average();
-        double pct = (1000 / Kauri.getInstance().getTps()) / avg * 100;
-
-        if(pct > 100.2) {
-            if(vl++ > 20) {
-                flag("pct=" + pct + "%", true, true, vl > 40 ? AlertTier.HIGH : AlertTier.LIKELY);
-            }
-        } else vl-= vl > 0 ? 2 : 0;
-
-        debug("avg=" + avg + " pct=" + pct + "%" + " vl=" + vl);
-        this.lastFlying = timeStamp;
+        lastTS = timeStamp;
     }
 
     @Override

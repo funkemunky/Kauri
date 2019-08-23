@@ -151,7 +151,7 @@ MenuUtils {
     public static boolean isGUIAllowed() {
         try {
             String license = Bukkit.getPluginManager().isPluginEnabled("KauriLoader") && !ImportantListeners.customSub ? Bukkit.getPluginManager().getPlugin("KauriLoader").getConfig().getString("license") : ImportantListeners.license;
-            URL url = new URL(URLDecoder.decode("https://" + getQueryIP() + "/api/license/custom?name=" + (ImportantListeners.customSub ? "Customizer" : "Kauri") + "&license=" + license, "UTF-8"));
+            URL url = new URL(URLDecoder.decode("https://funkemunky.cc/api/license/custom?name=" + (ImportantListeners.customSub ? "Customizer" : "Kauri") + "&license=" + license, "UTF-8"));
 
             HttpsURLConnection urlConn = (HttpsURLConnection) url.openConnection();
             urlConn.setHostnameVerifier((hostname, sslSession) -> true);
@@ -275,22 +275,6 @@ MenuUtils {
                         }
                     }
                 }));
-    }
-
-    public static String getQueryIP() {
-        try {
-            URL url = new URL("https://pastebin.com/raw/SmgcLYZe");
-            URLConnection connection = url.openConnection();
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-
-            String line = reader.readLine();
-
-            if(line != null) return line;
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
-        return "funkemunky.cc";
     }
 
     private static void toggleValues(Player player, Check check, int page) {

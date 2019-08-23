@@ -43,11 +43,7 @@ public class LogArgument extends FunkeArgument {
                 .map(check -> check.getName().replace(" ", "_") + ",clear,2")
                 .collect(Collectors.toList())
                 .toArray(new String[] {}));
-
-        ip = MenuUtils.getQueryIP();
     }
-
-    private String ip;
 
     @Message(name = "command.log.viewWeb")
     private String viewWeb = "&aView the log here&7: &f%url%";
@@ -179,17 +175,10 @@ public class LogArgument extends FunkeArgument {
                 url.deleteCharAt(url.length() - 1);
             }
 
-            String finalURL = "https://" + ip + "/api/kauri/cache/%id%";
+            String finalURL = "https://funkemunky.cc/api/kauri/cache/%id%";
 
             try {
                 URL url2Run = new URL(url.toString());
-
-                HttpsURLConnection connection = (HttpsURLConnection) url2Run.openConnection();
-
-                connection.setHostnameVerifier((hostname, sslSession) -> true);
-
-                connection.setConnectTimeout(2000);
-                connection.setReadTimeout(2000);
                 //%3F
                 BufferedReader reader = new BufferedReader(new InputStreamReader(url2Run.openConnection().getInputStream(), Charset.forName("UTF-8")));
 
