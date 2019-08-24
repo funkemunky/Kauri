@@ -18,9 +18,10 @@ import org.bukkit.util.Vector;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @CheckInfo(name = "HitBox", description = "Ensures that the player is not using any expanded form of a player hitbox.", type = CheckType.REACH, cancelType = CancelType.COMBAT)
-@Packets(packets = {Packet.Client.FLYING, Packet.Client.POSITION_LOOK, Packet.Client.LOOK, Packet.Client.POSITION, Packet.Client.ARM_ANIMATION})
+@Packets(packets = {Packet.Client.FLYING, Packet.Client.POSITION_LOOK, Packet.Client.LOOK, Packet.Client.POSITION})
 @Init
 public class HitBox extends Check {
 
@@ -33,30 +34,30 @@ public class HitBox extends Check {
             EntityType.WITCH,
             EntityType.CREEPER,
             EntityType.ENDERMAN);
+    private long lastTimeStamp;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(packetType.equalsIgnoreCase(Packet.Client.ARM_ANIMATION)) {
-            vl-= vl > 0 ? 0.05 : 0;
-        } else if(getData().getTarget() != null && allowedEntities.contains(getData().getTarget().getType()) && getData().getLastAttack().hasNotPassed(0) && !getData().getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
+        if(timeStamp - lastTimeStamp <= 4) {
+            lastTimeStamp = timeStamp;
+            return;
+        }
+        lastTimeStamp = timeStamp;
+        if(getData().getLastAttack().hasNotPassed(0) && getData().getTarget() != null && allowedEntities.contains(getData().getTarget().getType())) {
             val move = getData().getMovementProcessor();
 
-            val origin = move.getTo().toLocation(getData().getPlayer().getWorld()).add(0, 1.53f, 0);
+            val locs = move.getPastLocation().getEstimatedLocation(0, 100 + (getData().getTransPing() - getData().getLastTransPing())).stream().map(loc -> loc.add(0, getData().getPlayer().getEyeHeight(), 0L)).collect(Collectors.toList());
 
-            val pastLoc = move.getPastLocation().getEstimatedLocation(getData().getTransPing(), 200);
+            List<BoundingBox> hitbox = getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), 150).stream().map(loc -> getHitbox(getData().getTarget(), loc)).collect(Collectors.toList());
+            val collided = locs.stream().filter(loc -> new RayTrace(loc.toVector(), loc.toLocation(getData().getPlayer().getWorld()).getDirection()).traverse(3.5f, 0.1f).parallelStream().anyMatch(vec -> hitbox.stream().anyMatch(box -> box.collides(vec)))).collect(Collectors.toList());
 
-            val hitbox = getData().getEntityPastLocation().getEstimatedLocation(0, 150);
-
-            val doesMatch = pastLoc.stream().map(loc -> new RayTrace(loc.toVector().add(new Vector(0, 1.53f, 0)), loc.toLocation(getData().getPlayer().getWorld()).add(0, 1.53, 0).getDirection()).traverse(3.4, 0.1, 0.05, Math.min(2, getData().getTarget().getLocation().distance(getData().getPlayer().getLocation()) / 2))).anyMatch(vecList -> vecList.parallelStream().anyMatch(vec -> hitbox.stream().anyMatch(vec2 -> getHitbox(getData().getTarget(), vec2).collides(vec))));
-
-            if(!doesMatch && !getData().isLagging()) {
-                val reach = hitbox.stream().mapToDouble(loc -> loc.toVector().add(new Vector(0, 1.53, 0)).distance(origin.toVector())).average().orElse(0);
-
+            if(getData().getLastTargetSwitch().hasPassed() && collided.size() == 0 && !getData().isLagging()) {
                 if(vl++ > 8) {
-                    flag("distance=" + reach + " vl=" + vl, true, true, AlertTier.HIGH);
+                    flag("vl=" + vl + " ping=" + getData().getTransPing(), true, true, vl > 12 ? AlertTier.HIGH : AlertTier.LIKELY);
                 }
-                debug("vl=" + vl + " distance=" + reach);
-            } else vl-= vl > 0 ? 1 : 0;
+            } else vl-= vl > 0 ? 0.5 : 0;
+            debug("collided=" + collided + " vl=" + vl + " ping=" + getData().getTransPing());
+            collided.clear();
         }
     }
 

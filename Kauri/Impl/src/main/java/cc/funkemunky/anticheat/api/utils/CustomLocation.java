@@ -61,4 +61,12 @@ public class CustomLocation {
     public Vector toVector() {
         return new Vector(x, y, z);
     }
+
+    public CustomLocation add(double x, double y, double z) {
+        this.x+= x;
+        this.y+= y;
+        this.z+= z;
+
+        return this;
+    }
 }

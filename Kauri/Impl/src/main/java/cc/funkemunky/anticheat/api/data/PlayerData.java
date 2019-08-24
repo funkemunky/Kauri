@@ -55,7 +55,8 @@ public class PlayerData {
             lastFlag = new TickTimer(40),
             lastAttack = new TickTimer(4),
             lastBlockBreak = new TickTimer(3),
-            lastPacketSkip = new TickTimer(5);
+            lastPacketSkip = new TickTimer(5),
+            lastTargetSwitch = new TickTimer(5);
     private EvictingList<Vector> teleportLocations;
     private float walkSpeed, flySpeed;
     private LivingEntity target, attacker;

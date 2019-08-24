@@ -25,7 +25,7 @@ public class BadPacketsG extends Check {
 
     private long lastTS;
     private double vl;
-    private EvictingList<Long> times = new EvictingList<>(20);
+    private EvictingList<Long> times = new EvictingList<>(15);
 
     @Setting(name = "verbose.max")
     private static int verboseVL = 80;
@@ -37,7 +37,7 @@ public class BadPacketsG extends Check {
         long elapsed = timeStamp - lastTS;
 
         if(getData().getLastLogin().hasPassed(10) && !move.isServerPos()) {
-            times.add(elapsed);
+            if(elapsed > 2) times.add(elapsed);
 
             double average = times.stream().mapToLong(val -> val).average().orElse(50.0);
             double ratio = 50 / average;

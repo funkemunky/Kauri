@@ -68,11 +68,13 @@ public class Kauri extends JavaPlugin {
     @Override
     public void onEnable() {
         //This allows us to access this class's contents from others places.
+        MiscUtils.printToConsole("&cStarting Kauri...");
         instance = this;
         saveDefaultConfig();
         saveDefaultMessages();
 
         if (InputHandler.testMode == -69 && (Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled())) return;
+
 
         if(Bukkit.getVersion().contains("Paper")) {
             runningPaperSpigot = true;
@@ -100,8 +102,6 @@ public class Kauri extends JavaPlugin {
 
         vpnUtils = new VPNUtils();
         new KauriAPI();
-
-        //registerLunarClient();
 
         runTasks();
         registerListeners();

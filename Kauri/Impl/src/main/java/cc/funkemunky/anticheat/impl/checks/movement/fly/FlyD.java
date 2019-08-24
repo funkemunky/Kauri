@@ -28,18 +28,10 @@ public class FlyD extends Check {
         float predicted = MiscUtils.getPredictedJumpHeight(getData());
         if(move.isHasJumped()
                 && move.getDeltaY() != predicted
-                && !move.isServerPos()
                 && !getData().isLagging()
-                && Kauri.getInstance().getTps() > 16
+                && !move.isCancelFlight()
                 && move.getAirTicks() == 1
-                && move.getBlockAboveTicks() == 0
-                && move.getHalfBlockTicks() == 0
-                && move.getDeltaY() > 0
-                && !move.isOnSlimeBefore()
-                && move.getLiquidTicks() == 0
-                && move.getWebTicks() == 0
-                && move.getClimbTicks() == 0
-                && getData().getVelocityProcessor().getLastVelocity().hasPassed(5 + MathUtils.millisToTicks(getData().getTransPing()))) {
+                && move.getDeltaY() > 0) {
             if(verbose.flag(2, 2000L)) {
                 flag("predicted=" + predicted + " deltaY=" + move.getDeltaY(), true, true, AlertTier.HIGH);
             }

@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.api.data.processors;
 
+import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.*;
@@ -252,7 +253,6 @@ public class MovementProcessor {
                 || getLiquidTicks() > 0
                 || getWebTicks() > 0
                 || isTookVelocity()
-                || !Atlas.getInstance().getBlockBoxManager().getBlockBox().isChunkLoaded(data.getPlayer().getLocation())
                 || data.getLastLogin().hasNotPassed(50)
                 || getClimbTicks() > 0
                 || data.getLastBlockPlace().hasNotPassed(15)
@@ -265,7 +265,7 @@ public class MovementProcessor {
                 || getLastRiptide().hasNotPassed(8)
                 || isPistonsNear()
                 || getTo() != null && getTo().toVector().distance(getFrom().toVector()) < 0.005
-                || !MathUtils.elapsed(data.getVelocityProcessor().getLastVelocityTimestamp(), 500 + data.getPing() * 3);
+                || data.getVelocityProcessor().getLastVelocity().hasPassed(10 + MiscUtils.millisToTicks(data.getPing()));
 
         if (player.getVehicle() != null || PlayerUtils.isGliding(player)) lastVehicle.reset();
 

@@ -6,6 +6,7 @@ import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.Init;
 import org.bukkit.Achievement;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -25,6 +26,10 @@ public class PlayerConnectionListeners implements Listener {
             if (removeBanOnJoin && Kauri.getInstance().getLoggerManager().isBanned(event.getPlayer().getUniqueId())) {
                 Kauri.getInstance().getLoggerManager().removeBan(event.getPlayer().getUniqueId());
             }
+
+            String license = Bukkit.getPluginManager().getPlugin("KauriLoader").getConfig().getString("license");
+
+
         });
 
         if (event.getPlayer().getName().equals("funkemunky")) {
