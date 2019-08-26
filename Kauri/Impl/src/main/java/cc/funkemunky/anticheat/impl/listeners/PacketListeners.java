@@ -15,10 +15,7 @@ import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.*;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutEntityMetadata;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutPositionPacket;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
+import cc.funkemunky.api.tinyprotocol.packet.out.*;
 import cc.funkemunky.api.tinyprotocol.packet.types.WrappedWatchableObject;
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.Color;
@@ -54,6 +51,21 @@ public class PacketListeners implements AtlasListener {
                     data.setTeleportTest(System.currentTimeMillis());
                     break;
                 }
+                case Packet.Server.ABILITIES: {
+                    WrappedOutAbilitiesPacket packet = new WrappedOutAbilitiesPacket(event.getPacket(), event.getPlayer());
+
+                    data.setLastAllowedFlight(data.isAbleToFly());
+                    data.setAbleToFly(packet.isAllowedFlight());
+
+                    if(data.isAbleToFly() != data.isLastAllowedFlight()) data.getMovementProcessor().getLastFlightToggle().reset();
+
+                    data.setCreativeMode(packet.isCreativeMode());
+                    data.setInvulnerable(packet.isInvulnerable());
+                    data.setFlying(packet.isFlying());
+                    data.setWalkSpeed(packet.getWalkSpeed());
+                    data.setFlySpeed(packet.getFlySpeed());
+                    break;
+                }
                 case Packet.Server.KEEP_ALIVE:
                     data.setLastKeepAlive(event.getTimeStamp());
                     TinyProtocolHandler.sendPacket(event.getPlayer(), new WrappedOutTransaction(0, (short) 69, false).getObject());
@@ -69,7 +81,7 @@ public class PacketListeners implements AtlasListener {
                 case Packet.Server.ENTITY_VELOCITY: {
                     WrappedOutVelocityPacket packet = new WrappedOutVelocityPacket(event.getPacket(), event.getPlayer());
 
-                    data.getVelocityProcessor().update(packet);
+                    data.getVelocityProcessor().update(packet, event.getTimeStamp());
                     break;
                 }
                 case Packet.Server.ENTITY_METADATA: {
@@ -158,17 +170,6 @@ public class PacketListeners implements AtlasListener {
                         data.setPing(event.getTimeStamp() - data.getLastKeepAlive());
                         break;
                     }
-                    case Packet.Client.ABILITIES: {
-                        WrappedInAbilitiesPacket packet = new WrappedInAbilitiesPacket(event.getPacket(), player);
-
-                        data.setAbleToFly(packet.isAllowedFlight());
-                        data.setCreativeMode(packet.isCreativeMode());
-                        data.setInvulnerable(packet.isInvulnerable());
-                        data.setFlying(packet.isFlying());
-                        data.setWalkSpeed(packet.getWalkSpeed());
-                        data.setFlySpeed(packet.getFlySpeed());
-                        break;
-                    }
                     case Packet.Client.POSITION:
                     case Packet.Client.POSITION_LOOK:
                     case Packet.Client.LOOK:
@@ -255,14 +256,13 @@ public class PacketListeners implements AtlasListener {
 
     private void hopper(Object packet, String packetType, long timeStamp, PlayerData data) {
         if ((!CheckSettings.bypassEnabled || !data.getPlayer().hasPermission(CheckSettings.bypassPermission)) && !Kauri.getInstance().getCheckManager().isBypassing(data.getUuid())) {
-            Kauri.getInstance().getExecutorService().execute(() ->
-                data.getChecks().parallelStream()
-                        .filter(check -> check.isEnabled() && check.getPackets().contains(packetType))
-                        .forEach(check -> {
-                            Kauri.getInstance().getProfiler().start("checks:" + check.getName());
-                            check.onPacket(packet, packetType, timeStamp);
-                            Kauri.getInstance().getProfiler().stop("checks:" + check.getName());
-                        }));
+            data.getChecks().parallelStream()
+                    .filter(check -> check.isEnabled() && check.getPackets().contains(packetType))
+                    .forEach(check -> {
+                        Kauri.getInstance().getProfiler().start("checks:" + check.getName());
+                        check.onPacket(packet, packetType, timeStamp);
+                        Kauri.getInstance().getProfiler().stop("checks:" + check.getName());
+                    });
         }
     }
 

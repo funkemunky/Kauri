@@ -39,7 +39,7 @@ public class PlayerData {
     private String specificPacketDebug = "";
     private boolean debuggingBox, debuggingPackets, banned = false, developerAlerts,
             ableToFly, creativeMode, invulnerable, flying, generalCancel, breakingBlock,
-            cinematicMode, lagging, alertsEnabled, inventoryOpen, isPosition, loggedIn;
+            cinematicMode, lastAllowedFlight, lagging, alertsEnabled, inventoryOpen, isPosition, loggedIn;
     private Player player;
 
     private List<Check> checks = new ArrayList<>();

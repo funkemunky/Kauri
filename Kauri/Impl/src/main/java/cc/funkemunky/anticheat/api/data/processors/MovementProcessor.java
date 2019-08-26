@@ -143,12 +143,6 @@ public class MovementProcessor {
                 fallDistance = 0;
             } else fallDistance = Math.max(0, fallDistance - deltaY);
 
-            lastFlight = flight;
-            flight = player.getAllowFlight();
-            if (flight != lastFlight) {
-                getLastFlightToggle().reset();
-            }
-
 
             if(timeStamp - lastTimeStamp > 100) {
                 lagTicks = (timeStamp - lastTimeStamp - 50) / 50;
@@ -290,7 +284,7 @@ public class MovementProcessor {
                 data.getPitchSmooth().reset();
             }
 
-            data.setCinematicMode(MathUtils.getDelta(cinematicPitch, to.getPitch()) < 0.21 && pitchDelta > 0.01);
+            data.setCinematicMode(MathUtils.getDelta(cinematicPitch, to.getPitch()) < 0.4 && pitchDelta > 0.01);
             lastYawGCD = yawGCD;
             yawGCD = MiscUtils.gcd((long) (yawDelta * offset), (long) (lastYawDelta * offset));
             lastPitchGCD = pitchGCD;
@@ -317,7 +311,7 @@ public class MovementProcessor {
         //predict(data, .98f, .98f, false);
 
         pastLocation.addLocation(new CustomLocation(to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch()));
-        data.setGeneralCancel(serverPos || data.isLagging() || lastVehicle.hasNotPassed(10) || getLastFlightToggle().hasNotPassed(8) || !chunkLoaded || packet.getPlayer().getAllowFlight() || hasLevi || packet.getPlayer().getGameMode().toString().contains("CREATIVE") || packet.getPlayer().getGameMode().toString().contains("SPEC") || lastVehicle.hasNotPassed() || getLastRiptide().hasNotPassed(10) || data.getLastLogin().hasNotPassed(50) || data.getVelocityProcessor().getLastVelocity().hasNotPassed(25));
+        data.setGeneralCancel(serverPos || data.isLagging() || lastVehicle.hasNotPassed(10) || getLastFlightToggle().hasNotPassed(15) || !chunkLoaded || packet.getPlayer().getAllowFlight() || hasLevi || packet.getPlayer().getGameMode().toString().contains("CREATIVE") || packet.getPlayer().getGameMode().toString().contains("SPEC") || lastVehicle.hasNotPassed() || getLastRiptide().hasNotPassed(10) || data.getLastLogin().hasNotPassed(50) || data.getVelocityProcessor().getLastVelocity().hasNotPassed(25));
     }
 
     /*

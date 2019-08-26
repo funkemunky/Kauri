@@ -19,7 +19,6 @@ public class SpeedA extends Check {
     private float vl = 0;
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(getData().isGeneralCancel()) return;
         val move = getData().getMovementProcessor();
         float threshold = MiscUtils.getBaseSpeed(getData()) + (move.isServerOnGround() ? (move.getGroundTicks() > 8 ? 0.05f : 0.06f) : 0.1f);
 
@@ -28,7 +27,7 @@ public class SpeedA extends Check {
         threshold+= move.getBlockAboveTicks() > 0 ? (move.getIceTicks() > 0 ? 0.565f : 0.25f) : 0;
         threshold+= move.getIceTicks() > 0 && (move.getGroundTicks() < 8 || move.getAirTicks() < 3) ? 0.28 : 0;
 
-        if(move.getDeltaXZ() > 0 && move.getDeltaXZ() > threshold && getData().getVelocityProcessor().getLastVelocity().hasPassed(60)) {
+        if(move.getDeltaXZ() > 0 && !getData().isGeneralCancel() && move.getDeltaXZ() > threshold && getData().getVelocityProcessor().getLastVelocity().hasPassed(60)) {
             if(Math.min(vl++, 40) > 20) {
                 flag("speed=" + move.getDeltaXZ(), true, true, AlertTier.HIGH);
             }

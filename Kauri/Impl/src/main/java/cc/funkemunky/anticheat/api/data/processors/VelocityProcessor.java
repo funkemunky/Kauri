@@ -26,67 +26,65 @@ public class VelocityProcessor {
         this.data = data;
     }
 
-    public void update(WrappedOutVelocityPacket packet) {
+    public void update(WrappedOutVelocityPacket packet, long timeStamp) {
         maxVertical = motionY = (float) packet.getY();
         maxHorizontal = (float) MiscUtils.hypot(packet.getX(), packet.getZ());
 
         if (packet.getId() == packet.getPlayer().getEntityId() && (MathUtils.hypot(packet.getX(), packet.getZ()) > 1E-4 || Math.abs(packet.getY()) > 1E-5)) {
             lastVelocity.reset();
-            lastVelocityTimestamp = System.currentTimeMillis();
-        }
+            lastVelocityTimestamp = timeStamp;
 
-        if (data.getMovementProcessor().isClientOnGround() && data.getMovementProcessor().getFrom().getY() % 1 == 0) {
             velocityX = packet.getX();
             velocityY = packet.getY();
 
             data.getMovementProcessor().setServerYVelocity(data.getMovementProcessor().getServerYVelocity() + (float) velocityY);
             velocityZ = packet.getZ();
-        }
 
-        motionX = (float) packet.getX();
-        motionZ = (float) packet.getZ();
-        velocityTicks = 0;
+            motionX = (float) packet.getX();
+            motionZ = (float) packet.getZ();
+            velocityTicks = 0;
+        }
     }
 
     public void update(WrappedInFlyingPacket packet) {
-        var motionX = this.motionX;
-        var motionZ = this.motionZ;
-        var motionY = this.motionY;
+        if((MathUtils.hypot(velocityX, velocityZ) > 0 || Math.abs(packet.getY()) > 0)) {
+            velocityTicks++;
+            var motionX = this.motionX;
+            var motionZ = this.motionZ;
+            var motionY = this.motionY;
 
-        if(velocityTicks > 1) {
-            var multiplier = 0.91f;
+            if(velocityTicks > MathUtils.millisToTicks(getData().getTransPing())) {
+                var multiplier = 0.91f;
 
-            if (packet.isGround()) multiplier*= getData().getBlockBelow() != null ? ReflectionsUtil.getFriction(getData().getBlockBelow()) : 0.6;
+                if (packet.isGround()) multiplier*= getData().getBlockBelow() != null ? ReflectionsUtil.getFriction(getData().getBlockBelow()) : 0.6;
 
-            motionX *= multiplier;
-            motionZ *= multiplier;
+                motionX *= multiplier;
+                motionZ *= multiplier;
 
-            if (packet.isGround()) {
-                motionY = 0;
-            } else if (motionY > 0) {
-                motionY -= 0.08f;
-                motionY *= 0.98f;
+                if (motionY > 0) {
+                    motionY -= 0.08f;
+                    motionY *= 0.98f;
+                } else if(packet.isGround()) motionY = 0;
+
+                if (motionY < 0.0005) {
+                    motionY = 0;
+                }
+                if (motionX < 0.0005) {
+                    motionX = 0;
+                }
+
+                if (motionZ < 0.0005) {
+                    motionZ = 0;
+                }
             }
 
-            if (motionY < 0.0005) {
-                motionY = 0;
-            }
-            if (motionX < 0.0005) {
-                motionX = 0;
-            }
-
-            if (motionZ < 0.0005) {
-                motionZ = 0;
-            }
+            lastMotionX = this.motionX;
+            lastMotionY = this.motionY;
+            lastMotionZ = this.motionZ;
+            this.motionX = motionX;
+            this.motionY = motionY;
+            this.motionZ = motionZ;
         }
-
-        lastMotionX = this.motionX;
-        lastMotionY = this.motionY;
-        lastMotionZ = this.motionZ;
-        this.motionX = motionX;
-        this.motionY = motionY;
-        this.motionZ = motionZ;
-        velocityTicks++;
     }
 
     public void update(WrappedInUseEntityPacket packet) {

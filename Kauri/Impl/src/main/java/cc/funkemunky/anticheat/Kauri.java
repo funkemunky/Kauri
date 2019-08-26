@@ -116,7 +116,7 @@ public class Kauri extends JavaPlugin {
         org.bukkit.event.HandlerList.unregisterAll(this);
         dataManager.getDataObjects().clear();
         checkManager.getChecks().clear();
-        Atlas.getInstance().getCommandManager().unregisterCommands(this);
+        Atlas.getInstance().getCommandManager().unregisterCommands();
         Atlas.getInstance().getCommandManager().unregisterBukkitCommand(Atlas.getInstance().getCommandManager().getMap().getCommand(CustomListeners.isAllowed ? ImportantListeners.mainCommand : "kauri"));
         executorService.shutdownNow();
         //Bukkit.getMessenger().unregisterIncomingPluginChannel(this, "Lunar-Client");

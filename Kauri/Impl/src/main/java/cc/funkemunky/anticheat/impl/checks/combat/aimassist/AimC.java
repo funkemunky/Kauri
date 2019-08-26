@@ -26,10 +26,10 @@ public class AimC extends Check {
     private int vlSub = 2;
 
     @Setting(name = "threshold.yawAccel")
-    private double yawAccelMax = 1E-5;
+    private double yawAccelMax = 1E-3;
 
     @Setting(name = "threshold.pitchAccel")
-    private double pitchAccelMax = 1E-7;
+    private double pitchAccelMax = 1E-4;
 
     @Setting(name = "threshold.minYawDelta")
     private double minYawDelta = 0.6;
