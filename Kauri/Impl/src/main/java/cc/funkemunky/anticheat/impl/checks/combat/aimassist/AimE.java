@@ -23,6 +23,11 @@ public class AimE extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
+        if(move.getYawDelta() < 0.58) {
+            vl-= vl > 0 ? 0.05 : 0;
+            return;
+        }
+
         long threshold = move.getYawDelta() > 10 ? 30000 : 60000;
 
         if(move.getYawDelta() == move.getLastYawDelta() || Math.abs(move.getTo().getPitch()) == 90) return;
@@ -37,7 +42,7 @@ public class AimE extends Check {
             }
         } else cinematicTicks-= cinematicTicks > 0 ? 2 : 0;
 
-        if(move.getYawGCD() < threshold && !cinematic && move.getYawDelta() > 0.35 && (move.getYawDelta() > 0.6 || move.getYawGCD() != move.getLastYawGCD())) {
+        if(move.getYawGCD() < threshold && !cinematic && (move.getYawDelta() > 0.6 || move.getYawGCD() != move.getLastYawGCD())) {
             if(vl++ > 30) {
                 flag("yaw=" + move.getYawGCD() + " vl=" + vl + " yd=" + move.getYawDelta(), true, true, vl > 50 ? AlertTier.HIGH : AlertTier.LIKELY);
             }

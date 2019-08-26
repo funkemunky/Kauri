@@ -5,11 +5,7 @@ import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
-import cc.funkemunky.anticheat.api.utils.SkiddedUtils;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutEntityMetadata;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
@@ -19,30 +15,23 @@ import org.bukkit.event.Event;
         Packet.Client.POSITION_LOOK,
         Packet.Client.POSITION,
         Packet.Client.FLYING,
-        Packet.Client.LOOK,
-        Packet.Server.ENTITY_VELOCITY})
+        Packet.Client.LOOK})
 @cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Velocity (Type A)", description = "Detects any vertical velocity modification below 100%.", type = CheckType.VELOCITY, maxVL = 40, executable = true)
 public class VelocityA extends Check {
 
-    private float velocityY;
+    private float velocityY, vl;
     private long lastVelocity;
+    private int ticks;
+
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(packetType.equalsIgnoreCase(Packet.Server.ENTITY_VELOCITY)) {
-            WrappedOutVelocityPacket velocity = new WrappedOutVelocityPacket(packet, getData().getPlayer());
+        val move = getData().getMovementProcessor();
 
-            if(velocity.getY() != 0 && velocity.getId() == getData().getPlayer().getEntityId()) {
-                velocityY = (float) velocity.getY();
-                lastVelocity = timeStamp;
-            }
-        } else {
-            val move = getData().getMovementProcessor();
+        val ping = getData().getTransPing();
+        long delta = System.currentTimeMillis() - getData().getVelocityProcessor().getLastVelocityTimestamp();
 
-            val ping = getData().getTransPing();
-            long delta = System.currentTimeMillis() - getData().getVelocityProcessor().getLastVelocityTimestamp();
-
-            long pingTicks = MathUtils.millisToTicks(ping), deltaTicks = MathUtils.millisToTicks(delta);
+        long pingTicks = MathUtils.millisToTicks(ping), deltaTicks = MathUtils.millisToTicks(delta);
             /*if(deltaTicks == pingTicks) {
                 debug(Color.Green + "ping=" + ping + " timeDelta=" + delta + " deltaY=" + move.getDeltaY() + " velocityY=" + getData().getVelocityProcessor().getVelocityY());
             } else if(MathUtils.approxEquals(2, MathUtils.millisToTicks(delta), MathUtils.millisToTicks(ping))) {
@@ -50,9 +39,37 @@ public class VelocityA extends Check {
                 debug("deltaY=" + move.getDeltaY() + " velocityY=" + getData().getVelocityProcessor().getVelocityY() + " motY=" + getData().getVelocityProcessor().getMotionY() + " pingTicks=" + pingTicks + " deltaTicks=" + deltaTicks);
             }*/
 
-            if(deltaTicks >= pingTicks && MathUtils.approxEquals(2, MathUtils.millisToTicks(delta), MathUtils.millisToTicks(ping))) {
+        //if this works, great! if not, use the one below since it is more likely to work from theory.
+            /*if(deltaTicks >= pingTicks && MathUtils.approxEquals(2, deltaTicks, pingTicks)) {
                 if(!MathUtils.approxEquals(0.01, getData().getVelocityProcessor().getMotionY(), move.getDeltaY())) {
                     debug(Color.Green + "Flag: " + getData().getVelocityProcessor().getMotionY() + ", " + move.getDeltaY());
+                }
+            }*/
+
+        if (deltaTicks <= pingTicks) ticks = 0;
+
+        long subtracted = deltaTicks - pingTicks;
+        if (deltaTicks >= pingTicks && subtracted < 3) {
+            ticks++;
+
+            if (!getData().isLagging()) {
+                float predicted = (float) getData().getVelocityProcessor().getVelocityY();
+
+                for (long i = 1; i < ticks; i++) {
+                    predicted -= 0.08f;
+                    predicted *= 0.98f;
+
+                    if (Math.abs(predicted) < 0.005) predicted = 0;
+                }
+
+                if (!MathUtils.approxEquals(1E-5, predicted, move.getDeltaY()) && predicted > 0) {
+                    if(vl++ > 9) {
+                        flag("predicted=" + predicted + " deltaY=" + move.getDeltaY() + " vl=" + vl, true, true, vl > 14 ? AlertTier.HIGH : AlertTier.LIKELY);
+                    }
+                    debug(Color.Green + "Flag: " + vl + " predicted=" + predicted + " deltaY=" + move.getDeltaY() + " vl=" + vl);
+                } else {
+                    vl-= vl > 0 ? 0.5 : 0;
+                    debug("predicted=" + predicted + " deltaY=" + move.getDeltaY() + " vl=" + vl);
                 }
             }
         }

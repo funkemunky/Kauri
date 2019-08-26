@@ -47,8 +47,10 @@ public class VelocityProcessor {
     }
 
     public void update(WrappedInFlyingPacket packet) {
-        if((MathUtils.hypot(velocityX, velocityZ) > 0 || Math.abs(packet.getY()) > 0)) {
-            velocityTicks++;
+        if((MathUtils.hypot(velocityX, velocityZ) > 0 || Math.abs(velocityY) > 0)) {
+            if(velocityTicks++ > 8 + MathUtils.millisToTicks(getData().getTransPing()) && packet.isGround()) {
+                velocityX = velocityY = velocityZ = 0;
+            }
             var motionX = this.motionX;
             var motionZ = this.motionZ;
             var motionY = this.motionY;
