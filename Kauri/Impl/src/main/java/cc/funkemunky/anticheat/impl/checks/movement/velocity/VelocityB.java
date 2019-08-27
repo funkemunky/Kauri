@@ -35,6 +35,7 @@ public class VelocityB extends Check {
                 velocityY = velocity.getY();
                 velocityZ = velocity.getZ();
                 velocityTimestamp = timeStamp;
+                debug("Sent velocity (" + System.currentTimeMillis() + ") [" + velocityX + ", " + velocityY + ", " + velocityZ + "]");
             }
         } else {
             val move = getData().getMovementProcessor();
@@ -42,17 +43,16 @@ public class VelocityB extends Check {
 
             long delta = timeStamp - velocityTimestamp, ping = getData().getTransPing();
             long deltaTicks = MathUtils.millisToTicks(delta), pingTicks = MathUtils.millisToTicks(ping);
-            float predicted = (float) MathUtils.hypot(velocityX * (getData().getLastAttack().hasNotPassed(0) ? 0.6f : 1), velocityZ * (getData().getLastAttack().hasNotPassed(0) ? 0.6f : 1));
             //TODO Debug proper dividend.
-            float deltaX = move.getDeltaX() - (move.getLastDeltaX() / (getData().getLastAttack().hasNotPassed(0) ? 1.4f : 1.78f)), deltaZ = move.getDeltaZ() - (move.getLastDeltaZ() / (getData().getLastAttack().hasNotPassed(0) ? 1.4f : 1.78f));
-            float deltaXZ = (float) MathUtils.hypot(deltaX, deltaZ);
 
-            if(velocityY > 0 && deltaTicks >= pingTicks && move.getDeltaY() > 0 && move.getFrom().getY() % 1 == 0) {
-                float pct = deltaXZ / predicted * 100;
-                if(pct < 99 && getData().getBoundingBox().shrink(0, 0.1f, 0).grow(1f, 0, 1f).getCollidingBlockBoxes(getData().getPlayer()).size() == 0) {
-                    debug(Color.Green + "Flag: " + pct);
-                }
-                debug("pct=" + pct + " deltaXZ=" + deltaXZ + " predicted=" + predicted + " deltaY=" + move.getDeltaY() + " velocityY=" + velocityY + " pingTicks=" + pingTicks + " deltaTicks=" + deltaTicks);
+            if(MathUtils.approxEquals(0.01, velocityY, move.getDeltaY()) && velocityY > 0) {
+                float valueX = (float)(velocityX - move.getLastDeltaX());
+                float valueZ = (float)(velocityZ - move.getLastDeltaZ());
+
+                float predicted = (float)MathUtils.hypot(valueX, valueZ);
+                float ratio = move.getDeltaXZ() / predicted, pct = ratio * 100;
+                debug(move.getDeltaX() + ", " + move.getDeltaY() + ", " + move.getDeltaZ() + " deltaXZ=" + move.getDeltaXZ());
+                //debug("predicted=" + predicted + " deltaXZ=" + move.getDeltaXZ() + " pct=" + pct);
                 velocityX = velocityY = velocityZ = 0;
             }
         }
