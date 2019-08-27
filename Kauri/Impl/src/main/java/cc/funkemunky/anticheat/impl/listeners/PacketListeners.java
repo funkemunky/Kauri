@@ -256,13 +256,15 @@ public class PacketListeners implements AtlasListener {
 
     private void hopper(Object packet, String packetType, long timeStamp, PlayerData data) {
         if ((!CheckSettings.bypassEnabled || !data.getPlayer().hasPermission(CheckSettings.bypassPermission)) && !Kauri.getInstance().getCheckManager().isBypassing(data.getUuid())) {
-            data.getChecks().parallelStream()
-                    .filter(check -> check.isEnabled() && check.getPackets().contains(packetType))
-                    .forEach(check -> {
-                        Kauri.getInstance().getProfiler().start("checks:" + check.getName());
-                        check.onPacket(packet, packetType, timeStamp);
-                        Kauri.getInstance().getProfiler().stop("checks:" + check.getName());
-                    });
+            Kauri.getInstance().getExecutorService().execute(() -> {
+                data.getChecks().parallelStream()
+                        .filter(check -> check.isEnabled() && check.getPackets().contains(packetType))
+                        .forEach(check -> {
+                            Kauri.getInstance().getProfiler().start("checks:" + check.getName());
+                            check.onPacket(packet, packetType, timeStamp);
+                            Kauri.getInstance().getProfiler().stop("checks:" + check.getName());
+                        });
+            });
         }
     }
 

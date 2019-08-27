@@ -43,7 +43,7 @@ public class BadPacketsG extends Check {
             double ratio = 50 / average;
             double pct = ratio * 100;
 
-            if((pct > 100.3) && (timeStamp - getData().getLastServerPosStamp() > 150L) && !getData().isLagging() && System.currentTimeMillis() - Kauri.getInstance().getLastTPS() < 150 && Kauri.getInstance().getTps() > 18.5) {
+            if((pct > 101) && (timeStamp - getData().getLastServerPosStamp() > 150L) && !getData().isLagging() && System.currentTimeMillis() - Kauri.getInstance().getLastTPS() < 150 && Kauri.getInstance().getTps() > 18.5) {
                 if(vl++ > verboseVL) {
                     flag("pct=" + MathUtils.round(pct, 2) + "%, vl=" + vl, true, true, AlertTier.HIGH);
                 }

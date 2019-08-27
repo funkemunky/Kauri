@@ -29,7 +29,7 @@ public class VelocityA extends Check {
         val move = getData().getMovementProcessor();
 
         val ping = getData().getTransPing();
-        long delta = System.currentTimeMillis() - getData().getVelocityProcessor().getLastVelocityTimestamp();
+        long delta = timeStamp - getData().getVelocityProcessor().getLastVelocityTimestamp();
 
         long pingTicks = MathUtils.millisToTicks(ping), deltaTicks = MathUtils.millisToTicks(delta);
             /*if(deltaTicks == pingTicks) {
@@ -49,17 +49,17 @@ public class VelocityA extends Check {
         if (deltaTicks <= pingTicks) ticks = 0;
 
         long subtracted = deltaTicks - pingTicks;
-        if (deltaTicks >= pingTicks && subtracted < 3) {
+        if (((move.getDeltaY() > 0 && deltaTicks >= pingTicks) || deltaTicks > pingTicks) && subtracted < 3) {
             ticks++;
 
-            if (!getData().isLagging()) {
+            if (!getData().isLagging() && !move.isBlocksOnTop()) {
                 float predicted = (float) getData().getVelocityProcessor().getVelocityY();
 
                 for (long i = 1; i < ticks; i++) {
                     predicted -= 0.08f;
                     predicted *= 0.98f;
 
-                    if (Math.abs(predicted) < 0.005) predicted = 0;
+                    if (Math.abs(predicted) < 0.0005) predicted = 0;
                 }
 
                 if (!MathUtils.approxEquals(1E-5, predicted, move.getDeltaY()) && predicted > 0) {

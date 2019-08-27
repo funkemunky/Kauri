@@ -26,7 +26,7 @@ public class MovementProcessor {
     private boolean lastFlight, cancelFlight, serverPos, flight, inLiquid, liquidBelow, clientOnGround, serverOnGround, fullyInAir, inAir, hasJumped, nearLiquid, blocksOnTop, pistonsNear, onHalfBlock,
             onClimbable, onIce, collidesHorizontally, tookVelocity, inWeb, onSlime, onSlimeBefore, onSoulSand, isRiptiding, halfBlocksAround, isNearGround, isInsideBlock, blocksNear, blocksAround;
     private int airTicks, groundTicks, iceTicks, climbTicks, halfBlockTicks, soulSandTicks, blockAboveTicks, optifineTicks, liquidTicks, webTicks, yawZeroTicks, pitchZeroTicks;
-    private float cinematicYaw, cinematicPitch, lastCinematicYaw, lastCinematicPitch, deltaY, lastDeltaXZ, slimeHeight, fallDistance, yawDelta, pitchDelta, lastYawDelta, lastPitchDelta, lastDeltaY, deltaXZ, lastServerYVelocity, serverYAcceleration, clientYAcceleration, lastClientYAcceleration, lastServerYAcceleration, cinematicYawDelta, cinematicPitchDelta, lastCinematicPitchDelta, lastCinematicYawDelta;
+    private float cinematicYaw, cinematicPitch, lastCinematicYaw, lastCinematicPitch, deltaY, lastDeltaXZ, slimeHeight, fallDistance, yawDelta, pitchDelta, lastYawDelta, lastPitchDelta, lastDeltaY, deltaXZ, deltaX, lastDeltaX, deltaZ, lastDeltaZ, lastServerYVelocity, serverYAcceleration, clientYAcceleration, lastClientYAcceleration, lastServerYAcceleration, cinematicYawDelta, cinematicPitchDelta, lastCinematicPitchDelta, lastCinematicYawDelta;
     private CustomLocation from, to;
     @Setter
     private float serverYVelocity;
@@ -34,7 +34,7 @@ public class MovementProcessor {
     private TickTimer lastRiptide = new TickTimer(6), lastVehicle = new TickTimer(4), lastFlightToggle = new TickTimer(10);
     private List<BoundingBox> boxes = new ArrayList<>();
     private List<Entity> entitiesAround = new CopyOnWriteArrayList<>();
-    private long lastTimeStamp, lagTicks, pitchGCD, yawGCD, lastPitchGCD, lastYawGCD, offset = 16777216L;
+    private long lastTimeStamp, lagTicks, pitchGCD, lagTime, yawGCD, lastPitchGCD, lastYawGCD, offset = 16777216L;
     private MCSmooth mouseFilterX = new MCSmooth(), mouseFilterY = new MCSmooth();
 
     private static List<Float> sensitivities = Arrays.asList(.50f, .75f, 1f, 1.25f, 1.5f, 1.75f, 2f);
@@ -120,10 +120,6 @@ public class MovementProcessor {
             }
             tookVelocity = timeStamp - data.getVelocityProcessor().getLastVelocityTimestamp() < 1500L;
 
-            lastDeltaY = deltaY;
-            lastDeltaXZ = deltaXZ;
-            deltaY = (float) (to.getY() - from.getY());
-            deltaXZ = (float) (MiscUtils.hypot(to.getX() - from.getX(), to.getZ() - from.getZ()));
             lastClientYAcceleration = clientYAcceleration;
             clientYAcceleration = deltaY - lastDeltaY;
 
@@ -144,14 +140,15 @@ public class MovementProcessor {
             } else fallDistance = Math.max(0, fallDistance - deltaY);
 
 
-            if(timeStamp - lastTimeStamp > 100) {
-                lagTicks = (timeStamp - lastTimeStamp - 50) / 50;
+            if(timeStamp - lastTimeStamp >= 100) {
+                lagTicks = MathUtils.millisToTicks(timeStamp - lastTimeStamp - 50);
                 data.setLastPacketDrop(timeStamp);
+                lagTime = timeStamp - lastTimeStamp - 50;
             } else lagTicks-= lagTicks > 0 ? 1 : 0;
 
             if(lagTicks > 0) {
                 data.getLastPacketSkip().reset();
-            }
+            } else lagTime = 0;
             val block = BlockUtils.getBlock(to.toLocation(data.getPlayer().getWorld()));
             val blockAbove = BlockUtils.getBlock(to.toLocation(data.getPlayer().getWorld()).clone().add(0, 1, 0));
             val blockBelow = BlockUtils.getBlock(to.toLocation(data.getPlayer().getWorld()).clone().subtract(0, 1,0));
@@ -176,7 +173,7 @@ public class MovementProcessor {
                     serverYVelocity = 0;
                 }
 
-                if(deltaXZ == 0 & serverYVelocity == 0) {
+                if(MathUtils.hypot(to.getX() - from.getX(), to.getZ() - from.getZ()) == 0 & serverYVelocity == 0) {
                     serverYVelocity = (serverYVelocity - 0.08f) * 0.98f;
                 }
             } else {
@@ -237,6 +234,15 @@ public class MovementProcessor {
         } else if(!packet.isLook() && data.isLoggedIn()) {
             data.getLastLogin().reset();
         }
+
+        lastDeltaY = deltaY;
+        lastDeltaXZ = deltaXZ;
+        lastDeltaX = deltaX;
+        lastDeltaZ = deltaZ;
+        deltaY = (float) (to.getY() - from.getY());
+        deltaX = (float) (to.getX() - from.getX());
+        deltaZ = (float) (to.getZ() - from.getZ());
+        deltaXZ = (float) (MiscUtils.hypot(deltaX, deltaZ));
 
         boolean hasLevi = packet.getPlayer().getActivePotionEffects().stream().anyMatch(effect -> effect.getType().getName().toLowerCase().contains("levi"));
         
