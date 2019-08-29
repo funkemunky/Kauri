@@ -1,9 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.combat.autoclicker;
 
-import cc.funkemunky.anticheat.api.checks.CancelType;
-import cc.funkemunky.anticheat.api.checks.Check;
-import cc.funkemunky.anticheat.api.checks.CheckInfo;
-import cc.funkemunky.anticheat.api.checks.CheckType;
+import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.Interval;
 import cc.funkemunky.anticheat.api.utils.MathUtils;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
@@ -19,36 +16,39 @@ import org.bukkit.event.Event;
 @Packets(packets = {Packet.Client.ARM_ANIMATION})
 public class AutoclickerB extends Check {
 
-    private Interval<Float> cpsList = new Interval<>(0, 40);
+    private Interval<Double> cpsList = new Interval<>(0, 30);
     private long lastClick;
     private double lastStd, lastAverage;
+    private double vl;
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         if(!MiscUtils.shouldReturnArmAnimation(getData())) {
-            if(timeStamp - lastClick > 2000) {
-                cpsList.clear();
-                return;
-            }
 
-            float cps = 1000f / timeStamp;
+            double cps = 1000f / (timeStamp - lastClick);
 
-            if(cpsList.size() >= 40) {
-                val std = cpsList.std();
-                val average = cpsList.average();
+            if(cpsList.size() >= 30) {
+                val std = (float) cpsList.std();
+                val average = (float) cpsList.average();
                 val distinct = cpsList.distinctCount();
-                if(std > 4 && MathUtils.getDelta(std, lastStd) < 1) {
+                if(std > 4 && distinct < 12 && average > 8 && MathUtils.getDelta(std, lastStd) < 0.75) {
                     debug(Color.Green + "Flag");
-                }
-                if(MathUtils.getDelta(average, lastAverage) < 1 && std > 3) {
+                    vl++;
+                } else if(MathUtils.getDelta(average, lastAverage) < 1 && std > 4) {
                     debug(Color.Green + "Flag 2");
-                }
-                if(distinct > 15 && MathUtils.getDelta(std, lastStd) < 1) {
+                    vl++;
+                } else if(distinct > 15 && std < 3) {
                     debug(Color.Green + "Flag 3");
+                    vl++;
+                } else vl-= vl > 0 ? 2 : 0;
+
+                if(vl > 6) {
+                    flag("std=" + std + " avg=" + average + " distinct=" + distinct + " vl=" + vl, true, true, AlertTier.HIGH);
                 }
 
-                debug("std=" + std + " avg=" + average + " distinct=" + distinct);
+                debug("std=" + std + " avg=" + average + " distinct=" + distinct + " vl=" + vl);
                 lastStd = std;
                 lastAverage = average;
+                cpsList.clearIfMax();
                 cpsList.clear();
             } else cpsList.add(cps);
 

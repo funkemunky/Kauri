@@ -88,7 +88,7 @@ public class VelocityB extends Check {
                     double pct = move.getDeltaXZ() / velocityXZ * 100;
 
                     if(pct < 99.5) {
-                        if((vl+= move.getFrom().getY() % 1 != 0 ? 2 : 1) > 5) {
+                        if((vl+= move.getFrom().getY() % 1 != 0 ? 2 : 1) > 7) {
                             flag("vl=" + vl + " pct=" + pct + "%", true, true, AlertTier.HIGH);
                         }
                         debug(Color.Green + "Flag: " + pct + "%: " + vl);

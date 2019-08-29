@@ -11,39 +11,33 @@ import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
 import org.bukkit.event.Event;
 
-@Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK, Packet.Client.USE_ENTITY, Packet.Server.ENTITY_VELOCITY})
+@Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK, Packet.Client.LOOK, Packet.Client.FLYING})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Velocity (Type C)", description = "Checks for horizontal velocity modifications.", type = CheckType.VELOCITY, maxVL = 20)
+@CheckInfo(name = "Velocity (Type C)", description = "Checks for horizontal velocity modifications.", type = CheckType.VELOCITY, maxVL = 20, executable = true)
 public class VelocityC extends Check {
 
-    private double vl, velocityX, velocityZ;
-
+    private float vl;
+    private boolean didShit;
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
-        if(packetType.equalsIgnoreCase(Packet.Server.ENTITY_VELOCITY)) {
-            WrappedOutVelocityPacket dy = new WrappedOutVelocityPacket(packet, getData().getPlayer());
-            if(dy.getId() == getData().getPlayer().getEntityId() && move.isServerOnGround()) {
-                velocityX = dy.getX();
-                velocityZ = dy.getZ();
-            }
-        } else if(packetType.equals(Packet.Client.USE_ENTITY)) {
-            velocityX*= 0.6;
-            velocityZ*= 0.6;
-        } else if((velocityX != 0 || velocityZ != 0) && move.getDeltaY() > 0 && move.getFrom().getY() % 1 == 0 && !move.isBlocksNear() && !move.isBlocksOnTop() && move.getLiquidTicks() == 0 && move.getWebTicks() == 0) {
+        val velocity = getData().getVelocityProcessor();
 
-            double velocityH = MathUtils.hypot(velocityX, velocityZ);
+        val deltaTicks = MathUtils.millisToTicks(timeStamp - velocity.getLastVelocityTimestamp());
+        val pingTicks = MathUtils.millisToTicks(getData().getTransPing());
 
-            double ratio = move.getDeltaXZ() / velocityH;
-            if (ratio < 0.62) {
-                if(vl++ > 8) {
-                    double pct = MathUtils.round(ratio * 100, 2);
-                    flag(pct + "%" + " or" + (pct + 38) + "% [vl=" + vl + "]", true, true, AlertTier.HIGH);
+        boolean fromYInt = move.getFrom().getY() % 1 == 0;
+        if(((deltaTicks == pingTicks && move.getDeltaY() > 0) || deltaTicks == pingTicks + 1) && (fromYInt || move.isServerOnGround()) && !move.isBlocksOnTop() && !didShit) {
+            val ratio = move.getDeltaY() / (float)velocity.getVelocityY();
+            val pct = ratio * 100;
+
+            if(pct < 99.99) {
+                if(vl++ > 2) {
+                    flag("pct=" + MathUtils.round(pct, 2) + "% predicted=" + velocity.getVelocityY() + " vl=" + vl, true, true, AlertTier.HIGH);
                 }
-            } else vl-= vl > 0 ? 0.45 : 0;
-            debug("ratio=" + ratio + " vl=" + vl + " attack=" + getData().getLastAttack().getPassed());
-
-            velocityX = velocityZ = 0;
-        }
+            } else vl-= vl > 0 ? 1 : 0;
+            debug("velocityY=" + velocity.getVelocityY() + " deltaY=" + move.getDeltaY() + " pct=" + pct + "% vl=" + vl);
+            didShit = true;
+        } else didShit = false;
     }
 
     @Override

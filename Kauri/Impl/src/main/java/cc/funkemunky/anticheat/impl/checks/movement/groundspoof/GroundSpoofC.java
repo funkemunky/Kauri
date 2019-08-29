@@ -22,7 +22,7 @@ public class GroundSpoofC extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        if(move.isClientOnGround() && !move.isNearGround()) {
+        if(move.isClientOnGround() && !move.isNearGround() && !move.isServerPos()) {
             flag("airTicks=" + move.getAirTicks() + " fallDistance=" + move.getFallDistance(), true, true, verbose.flag(2, 3000L) ? AlertTier.HIGH : AlertTier.LIKELY);
         }
     }

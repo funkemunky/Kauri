@@ -15,6 +15,7 @@ import org.bukkit.event.Event;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,10 +32,10 @@ public class Reach extends Check {
     private float reachThreshold = 3f;
 
     @Setting(name = "threshold.collided")
-    private int collidedThreshold = 20;
+    private int collidedThreshold = 22;
 
     @Setting(name = "threshold.colidedMin")
-    private int collidedMin = 6;
+    private int collidedMin = 8;
 
     @Setting(name = "threshold.bypassCollidedReach")
     private float bypassColReach = 4f;
@@ -50,35 +51,32 @@ public class Reach extends Check {
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
-        if(getData().getTarget() != null && allowedEntities.contains(getData().getTarget().getType()) && getData().getLastAttack().hasNotPassed(0) && !getData().getPlayer().getGameMode().equals(GameMode.CREATIVE) && getData().getTarget() != null && getData().getLastAttack().hasNotPassed(0) && getData().getLastLogin().hasPassed(5) && !move.isServerPos() && getData().getTransPing() < 450) {
-            long range = 200 + Math.abs(getData().getTransPing() - getData().getLastTransPing()) * 3;
+        if(getData().getTarget() != null && getData().getLastAttack().hasNotPassed(0) && allowedEntities.contains(getData().getTarget().getType()) && !getData().getPlayer().getGameMode().equals(GameMode.CREATIVE) && getData().getLastLogin().hasPassed(5) && !move.isServerPos() && getData().getTransPing() < 450) {
+            long range = (move.getYawDelta() > 5 ? 150 : 100) + Math.abs(getData().getTransPing() - getData().getLastTransPing()) * 2;
             val location = getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), range);
             val to = move.getTo().toLocation(getData().getPlayer().getWorld()).add(0, getData().getPlayer().getEyeHeight(), 0);
-            val trace = new RayTrace(to.toVector(), to.getDirection());
 
             val calcDistance = getData().getTarget().getLocation().distance(to);
 
             if(timeStamp - lastAttack <= 5) {
                 lastAttack = timeStamp;
                 return;
-            } else if(calcDistance > 40) {
-                //flag(calcDistance + ">-20", true, false, AlertTier.LIKELY);
+            } else if(calcDistance > 20) {
                 return;
             }
 
-            val traverse = trace.traverse(0, calcDistance * 1.25f, 0.1, 0.02, 2.8, 4);
+            val locs = move.getPastLocation().getEstimatedLocation(0, ((getData().getTarget().getVelocity().getY() <= 0 && move.getDeltaXZ() > cc.funkemunky.anticheat.api.utils.MiscUtils.getBaseSpeed(getData())) ? 50 : (move.getYawDelta() > 5 ? 50 : 0)) + (getData().getTransPing() - getData().getLastTransPing()) * 2).stream().map(loc -> loc.add(0, getData().getPlayer().getEyeHeight(), 0L)).collect(Collectors.toList());
+            List<Vector> traverse = new ArrayList<>();
+            locs.stream().map(loc -> new RayTrace(loc.toVector(), loc.toLocation(getData().getPlayer().getWorld()).getDirection()).traverse(0, calcDistance * 2f, 0.1, 0.02, 2.8, 3.7)).forEach(traverse::addAll);
             val collided = traverse.stream().filter((vec) -> location.stream().anyMatch((loc) -> getHitbox(getData().getTarget(), loc).collides(vec))).collect(Collectors.toList());
 
             float distance = (float) collided.stream().mapToDouble((vec) -> vec.distance(to.toVector()))
                     .min().orElse(0.0D);
 
-            if(getData().getTarget().getVelocity().getY() == 0 || PlayerUtils.getPotionEffectLevel(getData().getPlayer(), PotionEffectType.SPEED) > 0) {
-                distance-= move.getDeltaXZ() / 1.55f;
-            }
-
             if(collided.size() > 0) {
                 if (distance > reachThreshold && (collided.size() > collidedThreshold || distance > bypassColReach) && collided.size() > collidedMin && !getData().isLagging()) {
-                    if ((vl+= distance > 3.02 ? 1f : .5f) > certainThreshold) {
+                    vl++;
+                    if (vl > certainThreshold) {
                         flag("reach=" + distance + " vl=" + vl + " collided=" + collided.size(), true, true, AlertTier.CERTAIN);
                     } else if (vl > highThreshold) {
                         flag("reach=" + distance + " vl=" + vl + " collided=" + collided.size(), true, true, AlertTier.HIGH);
@@ -91,7 +89,7 @@ public class Reach extends Check {
                     vl = Math.max(0, vl - 0.05f);
                 }
 
-                debug((distance > reachThreshold && (collided.size() > collidedThreshold || distance > bypassColReach) && collided.size() > collidedMin && !getData().isLagging() ? Color.Green : "") + "distance=" + distance + " collided=" + collided.size() + " vl=" + vl + " range=" + range + " target=" + getData().getTarget().getVelocity().getY());
+                debug((distance > reachThreshold && (collided.size() > collidedThreshold || distance > bypassColReach) && collided.size() > collidedMin && !getData().isLagging() ? Color.Green : "") + "distance=" + distance + " collided=" + collided.size() + " vl=" + vl + " range=" + range + " target=" + getData().getTarget().getVelocity().getY() + " eye=" + getData().getPlayer().getEyeHeight());
             }
             lastAttack = timeStamp;
         }

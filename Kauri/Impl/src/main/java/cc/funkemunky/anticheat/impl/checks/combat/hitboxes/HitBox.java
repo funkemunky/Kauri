@@ -5,10 +5,7 @@ import cc.funkemunky.anticheat.api.utils.CustomLocation;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.RayTrace;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.utils.BoundingBox;
-import cc.funkemunky.api.utils.Init;
-import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.MiscUtils;
+import cc.funkemunky.api.utils.*;
 import lombok.val;
 import org.bukkit.GameMode;
 import org.bukkit.entity.EntityType;
@@ -46,17 +43,18 @@ public class HitBox extends Check {
         if(getData().getLastAttack().hasNotPassed(0) && getData().getTarget() != null && allowedEntities.contains(getData().getTarget().getType())) {
             val move = getData().getMovementProcessor();
 
-            val locs = move.getPastLocation().getEstimatedLocation(0, 100 + (getData().getTransPing() - getData().getLastTransPing())).stream().map(loc -> loc.add(0, getData().getPlayer().getEyeHeight(), 0L)).collect(Collectors.toList());
+            val locs = move.getPastLocation().getEstimatedLocation(0, (move.getYawDelta() > 3 ? 150 : 100) + (getData().getTransPing() - getData().getLastTransPing()) * 2).stream().map(loc -> loc.add(0, 1.54f, 0L)).collect(Collectors.toList());
 
-            List<BoundingBox> hitbox = getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), 150).stream().map(loc -> getHitbox(getData().getTarget(), loc)).collect(Collectors.toList());
-            val collided = locs.stream().filter(loc -> new RayTrace(loc.toVector(), loc.toLocation(getData().getPlayer().getWorld()).getDirection()).traverse(3f, 0.1f).parallelStream().anyMatch(vec -> hitbox.stream().anyMatch(box -> box.collides(vec)))).collect(Collectors.toList());
+            List<BoundingBox> hitbox = getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), (move.getYawDelta() > 5 ? 200 : 150) + (getData().getTransPing() - getData().getLastTransPing()) * 2).stream().map(loc -> getHitbox(getData().getTarget(), loc)).collect(Collectors.toList());
+            val collided = locs.stream().filter(loc -> new RayTrace(loc.toVector(), loc.toLocation(getData().getPlayer().getWorld()).getDirection()).traverse(3f, 0.1, 0.025, 2.5).parallelStream().anyMatch(vec -> hitbox.stream().anyMatch(box -> box.collides(vec)))).collect(Collectors.toList());
 
             if(getData().getLastTargetSwitch().hasPassed() && collided.size() == 0 && !getData().isLagging()) {
                 if(vl++ > 8) {
                     flag("vl=" + vl + " ping=" + getData().getTransPing(), true, true, vl > 12 ? AlertTier.HIGH : AlertTier.LIKELY);
                 }
-            } else vl-= vl > 0 ? 0.5 : 0;
-            debug("collided=" + collided + " vl=" + vl + " ping=" + getData().getTransPing());
+                debug(Color.Green + "Flag: " + vl);
+            } else vl-= vl > 0 ? 0.2 : 0;
+            debug("collided=" + collided.size() + " vl=" + vl + " ping=" + getData().getTransPing());
             collided.clear();
         }
     }
@@ -68,6 +66,6 @@ public class HitBox extends Check {
 
     private BoundingBox getHitbox(LivingEntity entity, CustomLocation l) {
         Vector dimensions = MiscUtils.entityDimensions.getOrDefault(entity.getType(), new Vector(0.35F, 1.85F, 0.35F));
-        return (new BoundingBox(l.toVector(), l.toVector())).grow(0.24F, 0.2F, 0.24F).grow((float)dimensions.getX(), 0.0F, (float)dimensions.getZ()).add(0.0F, 0.0F, 0.0F, 0.0F, (float)dimensions.getY(), 0.0F);
+        return (new BoundingBox(l.toVector(), l.toVector())).grow(0.32F, 0.25F, 0.35F).grow((float)dimensions.getX(), 0.0F, (float)dimensions.getZ()).add(0.0F, 0.0F, 0.0F, 0.0F, (float)dimensions.getY(), 0.0F);
     }
 }
