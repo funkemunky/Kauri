@@ -33,6 +33,7 @@ public abstract class Check {
     private Map<String, Object> settings = new HashMap<>();
     private String alertMessage = "";
     private int vl = 0;
+    private int minVL = 5;
     private ProtocolVersion minimum, maximum;
     private List<String> packets = new ArrayList<>();
     private List<Class> events = new ArrayList<>();
@@ -74,9 +75,9 @@ public abstract class Check {
                         banUser();
                     }
 
-                    if((timeStamp - data.getLastFlagTimestamp()) > 5) {
+                    if(vl > minVL && (timeStamp - data.getLastFlagTimestamp()) > 5) {
                         JsonMessage message = new JsonMessage();
-                        if (timeStamp - lastAlert > Math.max(100, CheckSettings.alertsDelay)) {
+                        if (timeStamp - lastAlert > CheckSettings.alertsDelay) {
                             if (!developer) {
                                 message.addText(Color.translate(alertMessage.replace("%prefix%", CheckSettings.alertPrefix).replace("%check%", getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", String.valueOf(vl)).replace("%info%", information).replace("%chance%", alertTier.getName()))).addHoverText(Color.Gray + information);
 
@@ -94,8 +95,8 @@ public abstract class Check {
                             }
                             lastAlert = timeStamp;
                         }
+                        data.setLastFlagTimestamp(timeStamp);
                     }
-                    data.setLastFlagTimestamp(timeStamp);
                 }
             }
         });
