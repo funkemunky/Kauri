@@ -23,6 +23,8 @@ public class MotionB extends Check {
     private boolean isAirBorne;
     private Vector velocity;
     private long velocityTimestamp;
+
+    //TODO Debug and test.
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         if(packetType.equals(Packet.Server.ENTITY_VELOCITY)) {

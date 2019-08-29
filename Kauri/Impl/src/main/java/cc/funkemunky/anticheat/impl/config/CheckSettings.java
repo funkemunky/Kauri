@@ -55,7 +55,7 @@ public class CheckSettings {
     public static double tpsThreshold = 14.0;
 
     @ConfigSetting(path = "alerts", name = "resetInterval")
-    public static long alertsResetInterval = 5000L;
+    public static long alertsResetInterval = 60000L;
 
     @ConfigSetting(path = "antivpn.license", name = "code")
     public static String license = "";
