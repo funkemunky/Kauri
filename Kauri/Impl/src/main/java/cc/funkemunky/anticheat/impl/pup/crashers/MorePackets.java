@@ -16,10 +16,10 @@ public class MorePackets extends AntiPUP {
     }
 
     @Setting(name = "kick.enabled")
-    private boolean kick = true;
+    private static boolean kick = true;
 
     @Setting(name = "kick.message")
-    private String kickMessage = "You are sending too many packets.";
+    private static String kickMessage = "You are sending too many packets.";
 
     private long lastTimeStamp;
 

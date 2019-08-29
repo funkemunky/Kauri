@@ -20,22 +20,22 @@ public class AimC extends Check {
     private int vl;
 
     @Setting(name = "threshold.verbose.max")
-    private int vlMax = 40;
+    private static int vlMax = 40;
 
     @Setting(name = "threshold.verbose.subtract")
-    private int vlSub = 2;
+    private static int vlSub = 2;
 
     @Setting(name = "threshold.yawAccel")
-    private double yawAccelMax = 1E-3;
+    private static double yawAccelMax = 1E-3;
 
     @Setting(name = "threshold.pitchAccel")
-    private double pitchAccelMax = 1E-4;
+    private static double pitchAccelMax = 1E-4;
 
     @Setting(name = "threshold.minYawDelta")
-    private double minYawDelta = 0.6;
+    private static double minYawDelta = 0.6;
 
     @Setting(name = "combatOnly")
-    private boolean combatOnly = true;
+    private static boolean combatOnly = true;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {

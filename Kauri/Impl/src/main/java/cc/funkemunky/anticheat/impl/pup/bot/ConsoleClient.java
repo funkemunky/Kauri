@@ -13,7 +13,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class ConsoleClient extends AntiPUP {
 
     @Setting(name = "kickMessage")
-    private String message = "&cConsole clients are not allowed.\n&7&oNot a console client? &fDon't freeze your game!";
+    private static String message = "&cConsole clients are not allowed.\n&7&oNot a console client? &fDon't freeze your game!";
 
     public ConsoleClient(String name, PuPType type, boolean enabled) {
         super(name, type, enabled);

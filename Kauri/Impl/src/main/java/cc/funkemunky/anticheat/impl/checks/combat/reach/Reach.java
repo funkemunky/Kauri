@@ -29,22 +29,22 @@ public class Reach extends Check {
     private long lastAttack;
 
     @Setting(name = "threshold.reach")
-    private float reachThreshold = 3f;
+    private static float reachThreshold = 3f;
 
     @Setting(name = "threshold.collided")
-    private int collidedThreshold = 22;
+    private static int collidedThreshold = 22;
 
     @Setting(name = "threshold.colidedMin")
-    private int collidedMin = 8;
+    private static int collidedMin = 8;
 
     @Setting(name = "threshold.bypassCollidedReach")
-    private float bypassColReach = 4f;
+    private static float bypassColReach = 4f;
 
     @Setting(name = "threshold.vl.certain")
-    private int certainThreshold = 16;
+    private static int certainThreshold = 16;
 
     @Setting(name = "threshold.vl.high")
-    private int highThreshold = 6;
+    private static int highThreshold = 6;
 
     private List<EntityType> allowedEntities = Arrays.asList(EntityType.PLAYER, EntityType.SKELETON, EntityType.ZOMBIE, EntityType.PIG_ZOMBIE, EntityType.VILLAGER, EntityType.IRON_GOLEM);
 
