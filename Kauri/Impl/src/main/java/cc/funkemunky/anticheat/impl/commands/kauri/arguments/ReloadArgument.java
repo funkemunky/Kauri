@@ -17,10 +17,10 @@ public class ReloadArgument extends FunkeArgument {
     }
 
     @Message(name = "command.reload.started")
-    private String started = "&7Reloading Kauri...";
+    private static String started = "&7Reloading Kauri...";
 
     @Message(name = "command.reload.completed")
-    private String completed = "&aCompleted!";
+    private static String completed = "&aCompleted!";
 
     @Override
     public void onArgument(CommandSender commandSender, Command command, String[] args) {

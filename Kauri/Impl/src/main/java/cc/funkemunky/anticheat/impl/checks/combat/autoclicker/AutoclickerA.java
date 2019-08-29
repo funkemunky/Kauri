@@ -14,10 +14,10 @@ import org.bukkit.event.Event;
 public class AutoclickerA extends Check {
 
     @Setting(name = "maxCPS")
-    private int maxCPS = 18;
+    private static int maxCPS = 18;
 
     @Setting(name = "banCPS")
-    private int banCPS = 30;
+    private static int banCPS = 30;
 
     private int ticks;
     private long lastTimeStamp;

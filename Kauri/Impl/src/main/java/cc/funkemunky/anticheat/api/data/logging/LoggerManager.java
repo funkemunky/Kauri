@@ -26,6 +26,8 @@ import java.util.stream.Collectors;
 public class LoggerManager {
     @Getter
     private Map<UUID, List<Violation>> violations = new ConcurrentHashMap<>();
+    @Getter
+    private Map<UUID, List<Check>> checkStamp = new HashMap<>();
 
     @Getter
     private Set<UUID> recentViolators = new LinkedHashSet<>();

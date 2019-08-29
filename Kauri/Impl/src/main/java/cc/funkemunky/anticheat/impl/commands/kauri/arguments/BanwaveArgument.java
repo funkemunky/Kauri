@@ -11,7 +11,7 @@ import org.bukkit.command.CommandSender;
 public class BanwaveArgument extends FunkeArgument {
 
     @Message(name = "command.banwave.forced")
-    private String forcedBW = "&aForced the ban wave.";
+    private static String forcedBW = "&aForced the ban wave.";
 
     public BanwaveArgument(FunkeCommand parent, String name, String display, String description, String... permission) {
         super(parent, name, display, description, permission);

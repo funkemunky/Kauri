@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 public class BoxWandArgument extends FunkeArgument {
 
     @Message(name = "command.boxwand.received")
-    private String received = "&aGave you the magic box wand. Use it wisely.";
+    private static String received = "&aGave you the magic box wand. Use it wisely.";
 
     public BoxWandArgument(FunkeCommand parent, String name, String display, String description, String... permission) {
         super(parent, name, display, description, permission);

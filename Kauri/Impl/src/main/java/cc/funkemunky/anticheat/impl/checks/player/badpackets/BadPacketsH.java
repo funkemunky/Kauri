@@ -14,13 +14,13 @@ import org.bukkit.event.Event;
 public class BadPacketsH extends Check {
 
     @Setting(name = "theshold.vl.max")
-    private int maxVL = 14;
+    private static int maxVL = 14;
 
     @Setting(name = "threshold.vl.reset")
-    private long resetTime = 600L;
+    private static long resetTime = 600L;
 
     @Setting(name = "threshold.vl.deduct")
-    private int deduct = 1;
+    private static int deduct = 1;
 
     private long blockDig, useEntity;
     private Verbose verbose = new Verbose();

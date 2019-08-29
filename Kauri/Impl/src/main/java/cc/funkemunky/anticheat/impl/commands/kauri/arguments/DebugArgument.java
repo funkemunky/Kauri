@@ -43,22 +43,22 @@ public class DebugArgument extends FunkeArgument {
     }
 
     @Message(name = "command.debug.boxDebug")
-    private String boxDebug = "&7Set box debug to: &f%debugging%";
+    private static String boxDebug = "&7Set box debug to: &f%debugging%";
 
     @Message(name = "command.debug.stoppedDebug")
-    private String stoppedDebug = "&cStopped any debug messages from being sent to you.";
+    private static String stoppedDebug = "&cStopped any debug messages from being sent to you.";
 
     @Message(name = "command.debug.debugPacketsSender")
-    private String packetsSender = "&7You are now debugging your packets.";
+    private static String packetsSender = "&7You are now debugging your packets.";
 
     @Message(name = "command.debug.debugPacketsTarget")
-    private String packetsTarget = "&7You are not debugging &f%target%&7's packets.";
+    private static String packetsTarget = "&7You are not debugging &f%target%&7's packets.";
 
     @Message(name = "command.debug.debugCheckSender")
-    private String checkSender = "&7You are now debugging &f%check% &7for yourself.";
+    private static String checkSender = "&7You are now debugging &f%check% &7for yourself.";
 
     @Message(name = "command.debug.debugCheckTarget")
-    private String checkTarget = "&7You are now debugging &f%check% for &f%target%&7.";
+    private static String checkTarget = "&7You are now debugging &f%check% for &f%target%&7.";
 
     @Override
     public void onArgument(CommandSender sender, Command command, String[] args) {

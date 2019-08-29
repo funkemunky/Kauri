@@ -22,10 +22,10 @@ import org.bukkit.event.Event;
 public class BadPacketsF extends Check {
 
     @Setting(name = "threshold.intervalTime")
-    private long threshold = 980L;
+    private static long threshold = 980L;
 
     @Setting(name = "threshold.vl.max")
-    private int maxVL = 4;
+    private static int maxVL = 4;
 
     private int ticks, vl;
     private long lastReset;

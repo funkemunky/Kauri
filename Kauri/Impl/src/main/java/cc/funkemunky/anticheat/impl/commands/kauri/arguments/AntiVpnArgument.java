@@ -20,13 +20,13 @@ import org.bukkit.inventory.ItemStack;
 
 public class AntiVpnArgument extends FunkeArgument {
     @ConfigSetting(path = "antivpn.privacyMode", name = "enabled")
-    private boolean privacyMode = false;
+    private static boolean privacyMode = false;
 
     @ConfigSetting(path = "antivpn.privacyMode", name = "overrideForPermission")
-    private boolean override = false;
+    private static boolean override = false;
 
     @ConfigSetting(path = "antivpn.privacyMode", name = "overridePermission")
-    private String overridePerm = "kauri.antivpn.privacyOverride";
+    private static String overridePerm = "kauri.antivpn.privacyOverride";
 
     public AntiVpnArgument(FunkeCommand parent, String name, String display, String description, String... permission) {
         super(parent, name, display, description, permission);

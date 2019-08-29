@@ -46,25 +46,25 @@ public class LogArgument extends FunkeArgument {
     }
 
     @Message(name = "command.log.viewWeb")
-    private String viewWeb = "&aView the log here&7: &f%url%";
+    private static String viewWeb = "&aView the log here&7: &f%url%";
 
     @Message(name = "command.log.noLogs")
-    private String noLogs = "&cThis player does not have any logs.";
+    private static String noLogs = "&cThis player does not have any logs.";
 
     @Message(name = "command.log.loggingDisabled")
-    private String loggingDisabled = "&cLogging is currently disabled in the config.";
+    private static String loggingDisabled = "&cLogging is currently disabled in the config.";
 
     @Message(name = "command.log.clear.invalidArgs")
-    private String invalidArgs = "&cInvalid arguments.\n&7Options: &fall&7, &f[check name]";
+    private static String invalidArgs = "&cInvalid arguments.\n&7Options: &fall&7, &f[check name]";
 
     @Message(name = "command.log.clear.all")
-    private String clearedAllLogs = "&7Cleared all logs from &c%player%&7.";
+    private static String clearedAllLogs = "&7Cleared all logs from &c%player%&7.";
 
     @Message(name = "command.log.clear.specific")
-    private String clearSpecificLogs = "&7Cleared all logs for &f%check% &7from &f%player%&7.";
+    private static String clearSpecificLogs = "&7Cleared all logs for &f%check% &7from &f%player%&7.";
 
     @ConfigSetting(path = "command.log", name = "defaultInterface")
-    private String defaultInterface = "web";
+    private static String defaultInterface = "web";
 
     @Override
     public void onArgument(CommandSender sender, Command command, String[] args) {

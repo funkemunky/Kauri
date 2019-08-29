@@ -6,43 +6,37 @@ import lombok.Getter;
 
 @Init
 public class BanwaveConfig {
-    @Getter
-    private static BanwaveConfig instance;
-
-    public BanwaveConfig() {
-        instance = this;
-    }
 
     @ConfigSetting(path = "banwave", name = "enabled")
-    public boolean enabled = false;
+    public static boolean enabled = false;
 
     @ConfigSetting(path = "banwave", name = "broadcast")
-    public boolean broadcast = false;
+    public static boolean broadcast = false;
 
     @ConfigSetting(path = "banwave", name = "messageAdmins")
-    public boolean msgAdmins = true;
+    public static boolean msgAdmins = true;
 
     @ConfigSetting(path = "banwave", name = "banInstantly")
-    public boolean banInstantly = true;
+    public static boolean banInstantly = true;
 
     @ConfigSetting(path = "banwave", name = "punishCommand")
-    public String punishCommand = "ban %player% [Kauri] Judgement Day";
+    public static String punishCommand = "ban %player% [Kauri] Judgement Day";
 
     @ConfigSetting(path = "banwave.interval", name = "intervalTime")
-    public int intervalTime = 30;
+    public static int intervalTime = 30;
 
     @ConfigSetting(path = "banwave.interval", name = "timeUnit")
-    public String intervalUnit = "minutes";
+    public static String intervalUnit = "minutes";
 
     @ConfigSetting(path = "banwave.banRate", name = "banSeconds")
-    public int banSeconds = 2;
+    public static int banSeconds = 2;
 
     @ConfigSetting(path = "banwave.message", name = "start")
-    public String startBanwave = "&8[&6&lKauri&8] &7Now running a banwave, where everyone will be judged as either a cheater, or legitimate.";
+    public static String startBanwave = "&8[&6&lKauri&8] &7Now running a banwave, where everyone will be judged as either a cheater, or legitimate.";
 
     @ConfigSetting(path = "banwave.message", name = "foundCheater")
-    public String foundCheater = "&8[&6&lKauri&8] &7Judged &e%player% &7as a cheater and has now been removed.";
+    public static String foundCheater = "&8[&6&lKauri&8] &7Judged &e%player% &7as a cheater and has now been removed.";
 
     @ConfigSetting(path = "banwave.message", name = "complete")
-    public String completed = "&8[&6&lKauri&8] &eJudgement Day &7 has been completed.";
+    public static String completed = "&8[&6&lKauri&8] &eJudgement Day &7 has been completed.";
 }

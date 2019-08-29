@@ -26,21 +26,21 @@ public class BanwaveManager {
         service = Executors.newSingleThreadExecutor();
 
         executor.scheduleAtFixedRate(() -> {
-            if (BanwaveConfig.getInstance().enabled) {
+            if (BanwaveConfig.enabled) {
                 runJudgementDay();
             }
-        }, BanwaveConfig.getInstance().intervalTime, BanwaveConfig.getInstance().intervalTime, TimeUnit.valueOf(BanwaveConfig.getInstance().intervalUnit.toUpperCase()));
+        }, BanwaveConfig.intervalTime, BanwaveConfig.intervalTime, TimeUnit.valueOf(BanwaveConfig.intervalUnit.toUpperCase()));
     }
 
     public void runJudgementDay() {
         service.execute(() -> {
             log("&cStarted banwave!");
-            broadcast(BanwaveConfig.getInstance().startBanwave);
+            broadcast(BanwaveConfig.startBanwave);
             log("&7Judging players...");
             val judged = judgeCheaters();
             log("&7Found a total of &e" + judged.size() + " cheaters&7.");
 
-            if (!BanwaveConfig.getInstance().banInstantly) {
+            if (!BanwaveConfig.banInstantly) {
                 AtomicInteger integer = new AtomicInteger(0);
 
                 new BukkitRunnable() {
@@ -50,27 +50,27 @@ public class BanwaveManager {
                             integer.getAndIncrement();
                         } else {
                             log("&aCompleted!");
-                            broadcast(BanwaveConfig.getInstance().completed);
+                            broadcast(BanwaveConfig.completed);
                             this.cancel();
                         }
                     }
-                }.runTaskTimer(Kauri.getInstance(), 0, BanwaveConfig.getInstance().banSeconds * 20);
+                }.runTaskTimer(Kauri.getInstance(), 0, BanwaveConfig.banSeconds * 20);
             } else {
                 judged.forEach(this::banCheater);
 
                 log("&aCompleted!");
-                broadcast(BanwaveConfig.getInstance().completed);
+                broadcast(BanwaveConfig.completed);
             }
         });
     }
 
     public void banCheater(UUID uuid) {
         val name = getPlayerName(uuid);
-        broadcast(addPlayerName(BanwaveConfig.getInstance().foundCheater, name));
+        broadcast(addPlayerName(BanwaveConfig.foundCheater, name));
 
         new BukkitRunnable() {
             public void run() {
-                Bukkit.dispatchCommand(Atlas.getInstance().getConsoleSender(), addPlayerName(BanwaveConfig.getInstance().punishCommand, name));
+                Bukkit.dispatchCommand(Atlas.getInstance().getConsoleSender(), addPlayerName(BanwaveConfig.punishCommand, name));
             }
         }.runTask(Kauri.getInstance());
     }
@@ -106,7 +106,7 @@ public class BanwaveManager {
 
     private void log(String message) {
         MiscUtils.printToConsole(message);
-        if (BanwaveConfig.getInstance().msgAdmins) {
+        if (BanwaveConfig.msgAdmins) {
             Kauri.getInstance().getDataManager().getDataObjects().keySet().stream()
                     .filter(key -> Kauri.getInstance().getDataManager().getDataObjects().get(key).isAlertsEnabled())
                     .forEach(key -> {
@@ -118,6 +118,6 @@ public class BanwaveManager {
     }
 
     private void broadcast(String message) {
-        if (BanwaveConfig.getInstance().broadcast) Bukkit.broadcastMessage(Color.translate(message));
+        if (BanwaveConfig.broadcast) Bukkit.broadcastMessage(Color.translate(message));
     }
 }

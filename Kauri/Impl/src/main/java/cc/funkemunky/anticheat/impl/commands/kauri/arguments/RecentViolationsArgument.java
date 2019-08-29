@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 public class RecentViolationsArgument extends FunkeArgument {
 
     @Message(name = "command.recentViolations.opened")
-    private String opened = "&aYou are now viewing the recent violators.";
+    private static String opened = "&aYou are now viewing the recent violators.";
 
     public RecentViolationsArgument(FunkeCommand parent, String name, String display, String description, String... permissions) {
         super(parent, name, display, description, permissions);

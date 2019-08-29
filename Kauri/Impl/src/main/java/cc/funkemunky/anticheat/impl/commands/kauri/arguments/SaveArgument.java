@@ -14,10 +14,10 @@ public class SaveArgument extends FunkeArgument {
     }
 
     @Message(name = "command.save.started")
-    private String started = "&7Saving all data...";
+    private static String started = "&7Saving all data...";
 
     @Message(name = "command.save.completed")
-    private String completed = "&aCompleted!";
+    private static String completed = "&aCompleted!";
 
     @Override
     public void onArgument(CommandSender sender, Command command, String[] args) {

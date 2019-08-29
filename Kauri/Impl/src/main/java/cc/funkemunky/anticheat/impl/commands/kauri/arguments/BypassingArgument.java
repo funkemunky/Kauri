@@ -21,10 +21,10 @@ public class BypassingArgument extends FunkeArgument {
 
 
     @Message(name = "command.bypassing.isBypassing")
-    private String isBypassing = "&7The player &f%player% &7is now bypassing Kauri's checks.";
+    private static String isBypassing = "&7The player &f%player% &7is now bypassing Kauri's checks.";
 
     @Message(name = "command.bypassing.notBypassing")
-    private String notBypassing = "&7The player &f%player% &7is no longer bypassing Kauri's checks.";
+    private static String notBypassing = "&7The player &f%player% &7is no longer bypassing Kauri's checks.";
 
     @Override
     public void onArgument(CommandSender sender, Command command, String[] args) {

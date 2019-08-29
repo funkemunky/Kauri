@@ -34,25 +34,25 @@ public class UpdateConfigArgument extends FunkeArgument {
     }
 
     @Message(name = "command.updateConfig.started")
-    private String started = "&7Config Updater started! Updating: &f%type%&7.";
+    private static String started = "&7Config Updater started! Updating: &f%type%&7.";
 
     @Message(name = "command.updateConfig.deletingFile")
-    private String deletingFile = "&7Deleting file...";
+    private static String deletingFile = "&7Deleting file...";
 
     @Message(name = "command.updateConfig.gen.newConfig")
-    private String genNewConfig = "&7Generating new config...";
+    private static String genNewConfig = "&7Generating new config...";
 
     @Message(name = "command.updateConfig.completed")
-    private String completed = "&aCompleted!";
+    private static String completed = "&aCompleted!";
 
     @Message(name = "command.updateConfig.reloading")
-    private String reloadingKauri = "&7Reloading Kauri...";
+    private static String reloadingKauri = "&7Reloading Kauri...";
 
     @Message(name = "command.updateConfig.deletingSection")
-    private String deletingSection = "&7Deleting %section% section...";
+    private static String deletingSection = "&7Deleting %section% section...";
 
     @Message(name = "command.updateConfig.provideChecks")
-    private String provideChecks = "&cYou must provide a proper check name to reset.";
+    private static String provideChecks = "&cYou must provide a proper check name to reset.";
 
     @Override
     public void onArgument(CommandSender sender, Command command, String[] args) {

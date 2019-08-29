@@ -18,16 +18,16 @@ import java.util.List;
 public class AntiVPNListeners implements Listener {
 
     @ConfigSetting(path = "antivpn", name = "blockedCountries")
-    private List<String> blockCountries = new ArrayList<>();
+    private static List<String> blockCountries = new ArrayList<>();
 
     @ConfigSetting(path = "antivpn", name = "kickReason.usingProxy")
-    private String usingProxy = "&cYou are not allowed to use a VPN or Proxy.";
+    private static String usingProxy = "&cYou are not allowed to use a VPN or Proxy.";
 
     @ConfigSetting(path = "antivpn", name = "kickReason.blockedCountry")
-    private String blockedCountry = "&cThe country %countryName% is blocked from this server";
+    private static String blockedCountry = "&cThe country %countryName% is blocked from this server";
 
     @ConfigSetting(path = "antivpn", name = "kickReason.enabled")
-    private boolean enabled = true;
+    private static boolean enabled = true;
 
     @EventHandler(priority = EventPriority.LOW)
     public void onPlayerJoin(PlayerLoginEvent event) {

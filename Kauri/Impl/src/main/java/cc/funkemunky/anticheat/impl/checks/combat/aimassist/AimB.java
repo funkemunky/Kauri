@@ -17,13 +17,13 @@ public class AimB extends Check {
     private int vl;
 
     @Setting(name = "threshold.vl.max")
-    private int vlMax = 15;
+    private static int vlMax = 15;
 
     @Setting(name = "threshold.vl.subtract")
-    private int subtract = 2;
+    private static int subtract = 2;
 
     @Setting(name = "combatOnly")
-    private boolean combatOnly = true;
+    private static boolean combatOnly = true;
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {

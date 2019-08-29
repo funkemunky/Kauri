@@ -33,8 +33,8 @@ public class CheckManager {
                 val dataList = new ArrayList<>(Kauri.getInstance().getDataManager().getDataObjects().values());
                 val alertsOn = dataList.stream().filter(data -> data.getPlayer().hasPermission("kauri.alerts") && data.getAlertTier() != null).collect(Collectors.toList());
                 alerts = new ArrayList<>(alertsOn);
-                devAlerts = new ArrayList<>(alertsOn.stream().filter(PlayerData::isDeveloperAlerts).collect(Collectors.toList()));
-                debuggingPackets = new ArrayList<>(dataList.stream().filter(PlayerData::isDebuggingPackets).collect(Collectors.toList()));
+                devAlerts = alertsOn.stream().filter(PlayerData::isDeveloperAlerts).collect(Collectors.toList());
+                debuggingPackets = dataList.stream().filter(PlayerData::isDebuggingPackets).collect(Collectors.toList());
                 debuggingPlayers.clear();
                 dataList.stream().filter(data -> data.getDebuggingPlayer() != null).forEach(data -> {
                     List<PlayerData> datas = debuggingPlayers.getOrDefault(data.getDebuggingPlayer(), new ArrayList<>());
@@ -42,6 +42,12 @@ public class CheckManager {
                     datas.add(data);
 
                     debuggingPlayers.put(data.getDebuggingPlayer(), datas);
+                });
+                val checkStamp = Kauri.getInstance().getLoggerManager().getCheckStamp();
+                dataList.forEach(data -> {
+                    List<Check> checks = new ArrayList<>(data.getChecks());
+
+                    checkStamp.put(data.getUuid(), checks);
                 });
             }
         }.runTaskTimerAsynchronously(Kauri.getInstance(), 40L, 30L);

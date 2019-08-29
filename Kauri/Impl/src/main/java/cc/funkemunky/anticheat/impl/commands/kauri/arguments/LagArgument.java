@@ -39,55 +39,55 @@ public class LagArgument extends FunkeArgument {
     }
 
     @Message(name = "command.lag.serverInfo.title")
-    private String serverInfo = "&6&lServer Info";
+    private static String serverInfo = "&6&lServer Info";
 
     @Message(name = "command.lag.serverInfo.tps")
-    private String tps = "&8» &eTPS&7: &f%tps%";
+    private static String tps = "&8» &eTPS&7: &f%tps%";
 
     @Message(name = "command.lag.serverInfo.tickTime")
-    private String tickTime = "&8» &eMS&7: &f%ms%";
+    private static String tickTime = "&8» &eMS&7: &f%ms%";
 
     @Message(name = "command.lag.serverInfo.memory")
-    private String memory = "&8» &eMemory&7: &f%free%GB/%total%GB";
+    private static String memory = "&8» &eMemory&7: &f%free%GB/%total%GB";
 
     @Message(name = "command.lag.lineColor")
-    private String lineColor = Color.Dark_Gray;
+    private static String lineColor = Color.Dark_Gray;
 
     @Message(name = "command.lag.kauri.title")
-    private String kauriRes = "&6&lKauri Resources";
+    private static String kauriRes = "&6&lKauri Resources";
 
     @Message(name = "command.lag.kauri.pctUsage")
-    private String pctUsage = "&8» &ePercent Usage&7: &f%pct%%";
+    private static String pctUsage = "&8» &ePercent Usage&7: &f%pct%%";
 
     @Message(name = "command.lag.kauri.callsPerSecond")
-    private String callsPS = "&8» &eCalls Per Second&7: &f%calls%";
+    private static String callsPS = "&8» &eCalls Per Second&7: &f%calls%";
 
     @Message(name = "command.lag.profile")
-    private String profile = "&7Results: &f%link%";
+    private static String profile = "&7Results: &f%link%";
 
     @Message(name = "command.lag.player.title")
-    private String playerTitle = "&f&l%player%&7&l's Lag";
+    private static String playerTitle = "&f&l%player%&7&l's Lag";
 
     @Message(name = "command.lag.player.latency")
-    private String playerLatency = "&6&lLatency";
+    private static String playerLatency = "&6&lLatency";
 
     @Message(name = "command.lag.player.bukkitPing")
-    private String playerBukkitPing = "&8» &eBukkit&7: &f%ping%ms";
+    private static String playerBukkitPing = "&8» &eBukkit&7: &f%ping%ms";
 
     @Message(name = "command.lag.player.kauriPing")
-    private String playerKauriPing = "&8» &eKauri&7: &f%ping%ms";
+    private static String playerKauriPing = "&8» &eKauri&7: &f%ping%ms";
 
     @Message(name = "command.lag.player.positionalPing")
-    private String playerPositionalPing = "&8» &ePositional&7: &f%ping%ms";
+    private static String playerPositionalPing = "&8» &ePositional&7: &f%ping%ms";
 
     @Message(name = "command.lag.player.stability")
-    private String playerStability = "&6&lStability";
+    private static String playerStability = "&6&lStability";
 
     @Message(name = "command.lag.player.lastPacketDrop")
-    private String playerPacketDrop = "&8» &eLast Packet Drop&7: &f%lastDrop% ago.";
+    private static String playerPacketDrop = "&8» &eLast Packet Drop&7: &f%lastDrop% ago.";
 
     @Message(name = "command.lag.player.protocolVersion")
-    private String protocolVersion = "&8» &eMinecraft Version&7: &f%version% (%versionNumber%)";
+    private static String protocolVersion = "&8» &eMinecraft Version&7: &f%version% (%versionNumber%)";
 
     @Override
     public void onArgument(CommandSender sender, Command command, String[] args) {

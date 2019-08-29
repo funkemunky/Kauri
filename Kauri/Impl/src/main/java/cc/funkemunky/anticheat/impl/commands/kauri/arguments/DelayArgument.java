@@ -16,7 +16,7 @@ public class DelayArgument extends FunkeArgument {
     }
 
     @Message(name = "command.delay.setDelay")
-    private String message = "&7Set the delay for alerts to &f%ms%ms&7.";
+    private static String message = "&7Set the delay for alerts to &f%ms%ms&7.";
 
     @Override
     public void onArgument(CommandSender sender, Command command, String[] args) {

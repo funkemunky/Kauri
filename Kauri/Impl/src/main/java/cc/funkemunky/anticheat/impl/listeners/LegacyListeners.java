@@ -11,6 +11,8 @@ public class LegacyListeners implements Listener {
 
     @EventHandler
     public void onEvent(PlayerAchievementAwardedEvent event) {
+        if(!PlayerConnectionListeners.inventoryChecking) return;
+
         if (event.getAchievement().equals(Achievement.OPEN_INVENTORY)) {
             PlayerData data = Kauri.getInstance().getDataManager().getPlayerData(event.getPlayer().getUniqueId());
 
