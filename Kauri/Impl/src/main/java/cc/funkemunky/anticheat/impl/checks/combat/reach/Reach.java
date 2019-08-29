@@ -6,13 +6,15 @@ import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.RayTrace;
 import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.utils.*;
+import cc.funkemunky.api.utils.BoundingBox;
+import cc.funkemunky.api.utils.Color;
+import cc.funkemunky.api.utils.Init;
+import cc.funkemunky.api.utils.MiscUtils;
 import lombok.val;
 import org.bukkit.GameMode;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;

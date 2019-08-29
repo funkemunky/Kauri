@@ -6,7 +6,6 @@ import cc.funkemunky.anticheat.api.utils.RayTrace;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.BoundingBox;
-import cc.funkemunky.api.utils.Init;
 import lombok.val;
 import org.bukkit.Location;
 import org.bukkit.event.Event;

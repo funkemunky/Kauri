@@ -4,7 +4,6 @@ import cc.funkemunky.anticheat.Kauri;
 import cc.funkemunky.anticheat.api.utils.json.JSONException;
 import cc.funkemunky.anticheat.api.utils.json.JSONObject;
 import cc.funkemunky.anticheat.impl.config.CheckSettings;
-import cc.funkemunky.anticheat.impl.menu.MenuUtils;
 import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

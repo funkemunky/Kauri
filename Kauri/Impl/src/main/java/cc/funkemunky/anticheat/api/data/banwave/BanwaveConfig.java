@@ -2,7 +2,6 @@ package cc.funkemunky.anticheat.api.data.banwave;
 
 import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.Init;
-import lombok.Getter;
 
 @Init
 public class BanwaveConfig {

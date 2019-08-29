@@ -2,9 +2,6 @@ package cc.funkemunky.anticheat.impl.checks.combat.fastbow;
 
 import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.BukkitEvents;
-import cc.funkemunky.anticheat.api.utils.Verbose;
-import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.TickTimer;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.Event;
