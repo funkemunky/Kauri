@@ -28,7 +28,7 @@ public abstract class Check {
     private PlayerData data;
     private int maxVL, banWaveThreshold;
     private boolean enabled, executable, cancellable, developer, isBanWave;
-    private long lastAlert;
+    private long lastAlert, lastReset;
     private List<String> execCommand = new ArrayList<>();
     private Map<String, Object> settings = new HashMap<>();
     private String alertMessage = "";

@@ -5,6 +5,7 @@ import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.anticheat.api.utils.BukkitEvents;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.anticheat.api.utils.Setting;
+import cc.funkemunky.anticheat.impl.config.CheckSettings;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,6 +28,7 @@ public class CheckManager {
     private List<PlayerData> debuggingPackets = new ArrayList<>();
     private Map<UUID, List<PlayerData>> debuggingPlayers = new HashMap<>();
 
+
     public CheckManager() {
         new BukkitRunnable() {
             public void run() {
@@ -44,13 +46,18 @@ public class CheckManager {
                     debuggingPlayers.put(data.getDebuggingPlayer(), datas);
                 });
                 val checkStamp = Kauri.getInstance().getLoggerManager().getCheckStamp();
+                //TODO Test to make sure this actually updates the vl.
                 dataList.forEach(data -> {
-                    List<Check> checks = new ArrayList<>(data.getChecks());
+                    List<Check> checks = data.getChecks().parallelStream()
+                            .filter(check -> System.currentTimeMillis() - check.getLastReset() > CheckSettings.alertsResetInterval)
+                            .peek(check -> check.setVl(0)).collect(Collectors.toList());
 
                     checkStamp.put(data.getUuid(), checks);
                 });
             }
         }.runTaskTimerAsynchronously(Kauri.getInstance(), 40L, 30L);
+
+
     }
 
     public void registerCheck(Class<?> checkClass, Collection<Check> checkList) {
