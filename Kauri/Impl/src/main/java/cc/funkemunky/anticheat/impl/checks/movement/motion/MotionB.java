@@ -16,6 +16,9 @@ import org.bukkit.event.Event;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
+import java.util.Arrays;
+import java.util.List;
+
 @Init
 @CheckInfo(name = "Motion (Type B)", description = "Predicts the movement of a player and ensures is legitimate.", type = CheckType.MOTION, maxVL = 50)
 @Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK, Packet.Client.FLYING, Packet.Client.LOOK, Packet.Server.ENTITY_VELOCITY})
@@ -26,6 +29,17 @@ public class MotionB extends Check {
     private float vl;
     private Vector velocity;
     private long velocityTimestamp;
+
+    private static List<float[]> motions = Arrays.asList(
+            new float[] {0, 0},
+            new float[] {0, 0.98f},
+            new float[] {0, -.98f},
+            new float[] {.98f, 0},
+            new float[] {.98f, 0.98f},
+            new float[] {.98f, -.98f},
+            new float[] {-.98f, 0},
+            new float[] {-.98f, .98f},
+            new float[] {-.98f, 0});
 
     //TODO Debug and test.
     @Override
