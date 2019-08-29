@@ -1,5 +1,6 @@
 package cc.funkemunky.anticheat.impl.checks.movement.motion;
 
+import cc.funkemunky.anticheat.api.checks.AlertTier;
 import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
@@ -9,18 +10,20 @@ import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.*;
 import lombok.val;
+import org.bukkit.Bukkit;
+import org.bukkit.block.Block;
 import org.bukkit.event.Event;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 @Init
-@CheckInfo(name = "Motion (Type B)", description = "Checks to make sure horizontal movement is legitimate.", type = CheckType.MOTION, maxVL = 50, developer = true)
+@CheckInfo(name = "Motion (Type B)", description = "Predicts the movement of a player and ensures is legitimate.", type = CheckType.MOTION, maxVL = 50)
 @Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK, Packet.Client.FLYING, Packet.Client.LOOK, Packet.Server.ENTITY_VELOCITY})
 public class MotionB extends Check {
 
     private float motionX, motionY, motionZ;
-    private boolean jumped;
     private boolean isAirBorne;
+    private float vl;
     private Vector velocity;
     private long velocityTimestamp;
 
@@ -39,10 +42,24 @@ public class MotionB extends Check {
 
             runMovement();
 
-            if(!getData().isGeneralCancel() && !getData().getActionProcessor().isUsingItem()) {
+            if(!getData().isGeneralCancel() && move.getHalfBlockTicks() == 0 && move.getLiquidTicks() == 0 && !move.isBlocksOnTop() && !move.isCollidesHorizontally() && !getData().getActionProcessor().isUsingItem()) {
+                if(move.isServerOnGround() && move.getTo().getY() % 1 == 0 && move.getDeltaY() < 0 && move.getDeltaY() > motionY) motionY = move.getDeltaY();
                 val predicted = new Vector(motionX, motionY, motionZ);
+                val to = new Vector(move.getDeltaX(), move.getDeltaY(), move.getDeltaZ());
 
-                val distance = predicted.distance(move.getTo().toVector());
+                val distance = predicted.distance(to);
+
+                if(distance > 0.025) {
+                    float predictedXZ = (float) MathUtils.hypot(predicted.getX(), predicted.getZ()), predictedY = (float) predicted.getY();
+                    vl++;
+                    if(vl > 20) {
+                        flag("vl=" + vl + " predictedXZ=" + predictedXZ + " predictedY=" + predictedY + " deltaXZ=" + move.getDeltaXZ() + " deltaY=" + move.getDeltaY(), true, true, AlertTier.HIGH);
+                    }
+                    debug(Color.Green + "Flag: " + distance + " vl=" + vl);
+                } else {
+                    vl-= vl > 0 ? 0.5 : 0;
+                    debug("distance=" + distance + " vl=" + vl);
+                }
             }
 
             moveEntityWithHeading(0,0, true);
@@ -60,6 +77,8 @@ public class MotionB extends Check {
     private void runMovement() {
         val move = getData().getMovementProcessor();
 
+        val to = new Vector(move.getDeltaX(), move.getDeltaY(), move.getDeltaZ());
+
         if(velocity != null && (System.currentTimeMillis() - velocityTimestamp) > getData().getTransPing()) {
             motionX = (float) velocity.getX();
             motionY = (float) velocity.getY();
@@ -71,6 +90,7 @@ public class MotionB extends Check {
         if(Math.abs(motionZ) < 0.005) motionZ = 0;
 
         float bmotionx = motionX, bmotiony = motionY, bmotionz = motionZ;
+        boolean lastAirborne = isAirBorne;
 
         moveEntityWithHeading(0, 0.98f, false);
 
@@ -78,11 +98,12 @@ public class MotionB extends Check {
             jump();
         }
 
-        val distanceOne = new Vector(motionX, motionY, motionZ).distance(move.getTo().toVector());
+        val distanceOne = new Vector(motionX, motionY, motionZ).distance(to);
 
         motionX = bmotionx;
         motionY = bmotiony;
         motionZ = bmotionz;
+        isAirBorne = lastAirborne;
 
         moveEntityWithHeading(0.98f, 0.98f, false);
 
@@ -90,24 +111,50 @@ public class MotionB extends Check {
             jump();
         }
 
-        val distanceTwo = new Vector(motionX, motionY, motionZ).distance(move.getTo().toVector());
+        val distanceTwo = new Vector(motionX, motionY, motionZ).distance(to);
 
         motionX = bmotionx;
         motionY = bmotiony;
         motionZ = bmotionz;
+        isAirBorne = lastAirborne;
 
-        if(distanceOne < distanceTwo) {
+        moveEntityWithHeading(0f, 0f, false);
+
+        if(!isAirBorne && MathUtils.approxEquals(0.01, move.getDeltaY(), cc.funkemunky.anticheat.api.utils.MiscUtils.getPredictedJumpHeight(getData()))) {
+            jump();
+        }
+
+        val distanceThree = new Vector(motionX, motionY, motionZ).distance(to);
+
+        motionX = bmotionx;
+        motionY = bmotiony;
+        motionZ = bmotionz;
+        isAirBorne = lastAirborne;
+
+        if(distanceOne < distanceTwo && distanceOne < distanceThree) {
             moveEntityWithHeading(0, 0.98f, false);
 
             if(!isAirBorne && MathUtils.approxEquals(0.01, move.getDeltaY(), cc.funkemunky.anticheat.api.utils.MiscUtils.getPredictedJumpHeight(getData()))) {
                 jump();
             }
-        } else {
+        } else if(distanceTwo < distanceOne && distanceTwo < distanceThree) {
             moveEntityWithHeading(0.98f, 0.98f, false);
 
             if(!isAirBorne && MathUtils.approxEquals(0.01, move.getDeltaY(), cc.funkemunky.anticheat.api.utils.MiscUtils.getPredictedJumpHeight(getData()))) {
                 jump();
             }
+        } else if(distanceThree < distanceTwo && distanceThree < distanceOne) {
+            moveEntityWithHeading(0f, 0f, false);
+
+            if(!isAirBorne && MathUtils.approxEquals(0.01, move.getDeltaY(), cc.funkemunky.anticheat.api.utils.MiscUtils.getPredictedJumpHeight(getData()))) {
+                jump();
+            }
+        } else {
+            debug("well shit");
+        }
+
+        if(move.isClientOnGround()) {
+            isAirBorne = false;
         }
     }
     private void moveEntityWithHeading(float strafe, float forward, boolean after) {
@@ -115,8 +162,8 @@ public class MotionB extends Check {
         float f4 = 0.91F;
 
         if (move.isClientOnGround()) {
-            isAirBorne = false;
-            f4 = (getData().getBlockBelow() != null ? ReflectionsUtil.getFriction(getData().getBlockBelow()) : 0.68f) * 0.91F;
+            Block below = BlockUtils.getBlock(move.getTo().toLocation(getData().getPlayer().getWorld()).subtract(0, 0.5f, 0));
+            f4 = (below != null && below.getType().isSolid() ? ReflectionsUtil.getFriction(getData().getBlockBelow()) : 0.68f) * 0.91F;
         }
 
         if(!after) {
