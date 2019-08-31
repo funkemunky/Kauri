@@ -6,6 +6,7 @@ import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.MiscUtils;
 import cc.funkemunky.anticheat.api.utils.Packets;
+import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.Init;
 import lombok.val;
@@ -17,6 +18,7 @@ import org.bukkit.event.Event;
 public class SpeedA extends Check {
 
     private float vl = 0;
+
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
@@ -27,7 +29,7 @@ public class SpeedA extends Check {
         threshold+= move.getBlockAboveTicks() > 0 ? (move.getIceTicks() > 0 ? 0.565f : 0.25f) : 0;
         threshold+= move.getIceTicks() > 0 && (move.getGroundTicks() < 8 || move.getAirTicks() < 3) ? 0.28 : 0;
 
-        if(move.getDeltaXZ() > 0 && !getData().isGeneralCancel() && move.getDeltaXZ() > threshold && getData().getVelocityProcessor().getLastVelocity().hasPassed(60)) {
+        if(move.getDeltaXZ() > 0 && !getData().isGeneralCancel() && move.getDeltaXZ() > threshold && !getData().takingVelocity(50)) {
             if(Math.min(vl++, 40) > 20) {
                 flag("speed=" + move.getDeltaXZ(), true, true, AlertTier.HIGH);
             }

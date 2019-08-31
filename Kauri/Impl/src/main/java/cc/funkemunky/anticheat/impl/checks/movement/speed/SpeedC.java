@@ -24,7 +24,7 @@ public class SpeedC extends Check {
 
         if(getData().getBlockBelow() == null) return;
 
-        if(move.getGroundTicks() > 3 && move.getDeltaXZ() > 0 && !getData().isGeneralCancel() && move.getHalfBlockTicks() == 0 && move.getBlockAboveTicks() == 0 && move.getWebTicks() == 0 && move.getClimbTicks() == 0 && move.getLiquidTicks() == 0) {
+        if(move.getGroundTicks() > 3 && move.getDeltaXZ() > 0 && !getData().isGeneralCancel() && !getData().takingVelocity(10) && move.getHalfBlockTicks() == 0 && move.getBlockAboveTicks() == 0 && move.getWebTicks() == 0 && move.getClimbTicks() == 0 && move.getLiquidTicks() == 0) {
             double predicted = move.getLastDeltaXZ() * ReflectionsUtil.getFriction(getData().getBlockBelow());
             double delta = Math.abs((move.getDeltaXZ() - predicted) * 8.7 - (0.5 * PlayerUtils.getPotionEffectLevel(getData().getPlayer(), PotionEffectType.SPEED)));
 

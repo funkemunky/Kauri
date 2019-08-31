@@ -22,7 +22,7 @@ public class SpeedD extends Check {
 
         val max = MiscUtils.getBaseSpeed(getData()) + 1.1;
 
-        if(move.getDeltaXZ() > max && !getData().isGeneralCancel()) {
+        if(move.getDeltaXZ() > max && !getData().isGeneralCancel() && !getData().takingVelocity(20)) {
             flag(move.getDeltaXZ() + ">-" + max, true, true, AlertTier.HIGH);
         }
     }

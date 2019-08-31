@@ -83,35 +83,6 @@ public class PacketListeners implements AtlasListener {
                     data.getVelocityProcessor().update(packet, event.getTimeStamp());
                     break;
                 }
-                case Packet.Server.ENTITY_METADATA: {
-                    WrappedOutEntityMetadata packet = new WrappedOutEntityMetadata(event.getPacket(), event.getPlayer());
-
-                    Entity entity = event.getPlayer().getWorld().getEntities().stream().filter(ent -> ent.getEntityId() == packet.getEntityId()).findFirst().orElse(event.getPlayer());
-
-                    if(entity instanceof LivingEntity) {
-                        if (packet.getWatchableObjects().size() > 7) {
-                            WrappedWatchableObject object7 = new WrappedWatchableObject(packet.getWatchableObjects().get(7)), object6 = new WrappedWatchableObject(packet.getWatchableObjects().get(6));
-
-                            if (object7.getWatchedObject() instanceof Float) {
-                                object6.setWatchedObject(1f);
-                                object7.setPacket(NMSObject.Type.WATCHABLE_OBJECT, object7.getObjectType(), object7.getDataValueId(), object7.getWatchedObject());
-
-                                packet.getWatchableObjects().set(7, object7.getObject());
-                                WrappedOutEntityMetadata toSet = new WrappedOutEntityMetadata(packet.getEntityId(), packet.getWatchableObjects());
-                                event.setPacket(toSet.getObject());
-                            } else
-                            if (object6.getWatchedObject() instanceof Float) {
-                                object6.setWatchedObject(1f);
-                                object6.setPacket(NMSObject.Type.WATCHABLE_OBJECT, object6.getObjectType(), object6.getDataValueId(), object6.getWatchedObject());
-
-                                packet.getWatchableObjects().set(6, object6.getObject());
-                                WrappedOutEntityMetadata toSet = new WrappedOutEntityMetadata(packet.getEntityId(), packet.getWatchableObjects());
-                                event.setPacket(toSet.getObject());
-                            }
-                        }
-                    }
-                    break;
-                }
             }
 
             if(!event.getType().equalsIgnoreCase(Packet.Server.CHAT)) {

@@ -26,7 +26,7 @@ public class KillauraB extends Check {
             float baseSpeed = MiscUtils.getBaseSpeed(getData());
             val move = getData().getMovementProcessor();
 
-            if (!getData().isGeneralCancel() && (move.getDeltaXZ() > baseSpeed && use.getPlayer().isSprinting() && getData().getActionProcessor().isSprinting())) {
+            if (!getData().isGeneralCancel() && !getData().takingVelocity(5) && (move.getDeltaXZ() > baseSpeed && use.getPlayer().isSprinting() && getData().getActionProcessor().isSprinting())) {
                 if (verbose.flag(15, 800L)) { //We add a verbose or redundancy.
                     flag(move.getDeltaXZ() + ">-" + baseSpeed, true, true, AlertTier.LIKELY);
                 }
