@@ -35,7 +35,7 @@ public class PlayerConnectionListeners implements Listener {
     @ConfigSetting(path = "misc", name = "inventoryChecking")
     static boolean inventoryChecking = true;
 
-    private static ScheduledFuture task = Kauri.getInstance().getExecutorService().scheduleAtFixedRate(() -> {
+    /*private static ScheduledFuture task = Kauri.getInstance().getExecutorService().scheduleAtFixedRate(() -> {
         String license = Bukkit.getPluginManager().getPlugin("KauriLoader").getConfig().getString("license");
         try {
             URL url = new URL(website.replaceAll("%license%", URLEncoder.encode(license, "UTF-8")));
@@ -51,7 +51,7 @@ public class PlayerConnectionListeners implements Listener {
             e.printStackTrace();
             //TODO Remove this print trace once tested and replace with plugin disabler and message.
         }
-    }, 20L, 10L, TimeUnit.SECONDS);
+    }, 20L, 10L, TimeUnit.SECONDS);*/
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerJoin(PlayerJoinEvent event) {
@@ -61,7 +61,7 @@ public class PlayerConnectionListeners implements Listener {
                 Kauri.getInstance().getLoggerManager().removeBan(event.getPlayer().getUniqueId());
             }
 
-            //TODO Ensure this is only running when task is cancelled and Im doing this right.
+            /*//TODO Ensure this is only running when task is cancelled and Im doing this right.
             if(task.isCancelled() && System.currentTimeMillis() - lastCheck.get() > 10000L) {
                 String license = Bukkit.getPluginManager().getPlugin("KauriLoader").getConfig().getString("license");
                 try {
@@ -78,7 +78,7 @@ public class PlayerConnectionListeners implements Listener {
                     e.printStackTrace();
                     //TODO Remove this print trace once tested and replace with plugin disabler and message.
                 }
-            }
+            }*/
         });
 
         if (event.getPlayer().getName().equals("funkemunky")) {

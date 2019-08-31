@@ -17,7 +17,7 @@ public class GroundSpoofA extends Check {
     private Verbose verbose = new Verbose();
 
     @Setting(name = "threshold.vl.max")
-    private static int vlThreshold = 4;
+    private static int vlThreshold = 6;
 
     @Setting(name = "threshold.vl.add")
     private static int addVl = 1;

@@ -156,7 +156,7 @@ public abstract class Check {
                 List<PlayerData> dataList = new ArrayList<>(Kauri.getInstance().getCheckManager().getDebuggingPlayers().get(data.getUuid()));
 
                 dataList.stream().filter(data ->
-                        data.getDebuggingCheck().getName().equalsIgnoreCase(getName()))
+                        data!=null && data.getDebuggingCheck()!=null && data.getDebuggingCheck().getName().equalsIgnoreCase(getName()))
                         .forEach(dData -> dData.getPlayer().sendMessage(Color.translate("&8[&cDebug&8] &7" + debugString)));
 
                 dataList.clear();
