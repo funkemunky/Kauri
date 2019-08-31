@@ -28,12 +28,12 @@ public class AimE extends Check {
             return;
         }
 
-        long threshold = move.getYawDelta() > 10 ? 30000 : 60000;
+        long threshold = move.getYawDelta() > 14 ? 30000 : 100000;
 
         if(move.getYawDelta() == move.getLastYawDelta() || Math.abs(move.getTo().getPitch()) == 90) return;
 
         float accel = MathUtils.getDelta(move.getYawDelta(), move.getLastYawDelta());
-        boolean cinematic = getData().isCinematicMode() || MathUtils.getDelta(move.getTo().getYaw(), move.getCinematicYaw()) < Math.min(8, Math.max(1, accel * 6));
+        boolean cinematic = getData().isCinematicMode() ||  (MathUtils.getDelta(move.getTo().getYaw(), move.getCinematicYaw()) < Math.min(5, Math.max(1, accel * 8)) && accel < 0.3);
 
         if(cinematic) {
             if(cinematicTicks++ > 40) {
@@ -43,10 +43,10 @@ public class AimE extends Check {
         } else cinematicTicks-= cinematicTicks > 0 ? 2 : 0;
 
         if(move.getYawGCD() < threshold && !cinematic && (move.getYawDelta() > 0.6 || move.getYawGCD() != move.getLastYawGCD())) {
-            if(vl++ > 30) {
+            if(move.getYawDelta() < 15 && accel < 3 && vl++ > 40) {
                 flag("yaw=" + move.getYawGCD() + " vl=" + vl + " yd=" + move.getYawDelta(), true, true, vl > 50 ? AlertTier.HIGH : AlertTier.LIKELY);
             }
-        } else vl-= vl > 0 ? (getData().isCinematicMode() || move.getYawGCD() == move.getLastYawGCD() ? 1 : 0.5) : 0;
+        } else vl-= vl > 0 ? (cinematic ? 0.5 : 0.25) : 0;
 
         debug("yaw=" + move.getYawGCD() + " vl=" + vl + " cinematic=" + cinematic + " yawDelta=" + move.getYawDelta());
 

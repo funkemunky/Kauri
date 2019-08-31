@@ -276,7 +276,7 @@ public class MovementProcessor {
             //Used to separate a legitimate aimbot-like rotation from a cheat.
             lastYawDelta = yawDelta;
             lastPitchDelta = pitchDelta;
-            float yawDelta = this.yawDelta = MathUtils.getDelta(to.getYaw(), from.getYaw()), pitchDelta = this.pitchDelta = MathUtils.getDelta(to.getPitch(), from.getPitch());
+            float yawDelta = this.yawDelta = cc.funkemunky.anticheat.api.utils.MathUtils.getDistanceBetweenAngles(to.getYaw(), from.getYaw()), pitchDelta = this.pitchDelta = MathUtils.getDelta(to.getPitch(), from.getPitch());
             if(data.isLoggedIn()) data.setLoggedIn(false);
 
             cinematicYaw =  findClosestCinematicYaw(data, to.getYaw(), from.getYaw());
