@@ -4,6 +4,7 @@ import cc.funkemunky.anticheat.api.checks.*;
 import cc.funkemunky.anticheat.api.utils.Packets;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.Init;
+import cc.funkemunky.api.utils.MathUtils;
 import lombok.val;
 import org.bukkit.event.Event;
 
@@ -16,7 +17,7 @@ public class Criticals extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        if(getData().getLastAttack().hasNotPassed(1) && !getData().isGeneralCancel() && move.getGroundTicks() > 10) {
+        if(getData().getLastAttack().hasNotPassed(1) && !getData().isGeneralCancel() && !getData().takingVelocity(4) && move.getGroundTicks() > 10) {
             if(move.getDeltaY() < 0 && !move.isHalfBlocksAround() && !move.isBlocksOnTop()) {
                 flag(move.getDeltaY() + "<-0", true, true, AlertTier.HIGH);
             }

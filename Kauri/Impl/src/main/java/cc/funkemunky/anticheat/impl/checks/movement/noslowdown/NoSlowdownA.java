@@ -36,7 +36,7 @@ public class NoSlowdownA extends Check {
             val action = getData().getActionProcessor();
             val baseSpeed = MiscUtils.getBaseSpeed(getData()) - 0.02f;
 
-            if (timeStamp - lastTimeStamp < 5 || getData().isGeneralCancel()) return;
+            if (timeStamp - lastTimeStamp < 5 || getData().isGeneralCancel() || !getData().takingVelocity(15)) return;
 
             if (action.isUsingItem() && move.getDeltaXZ() > baseSpeed) {
                 if (verbose.flag(20, 500L)) {

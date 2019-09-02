@@ -5,6 +5,7 @@ import cc.funkemunky.anticheat.api.checks.Check;
 import cc.funkemunky.anticheat.api.checks.CheckInfo;
 import cc.funkemunky.anticheat.api.checks.CheckType;
 import cc.funkemunky.anticheat.api.utils.Packets;
+import cc.funkemunky.anticheat.api.utils.Setting;
 import cc.funkemunky.anticheat.api.utils.Verbose;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.Init;
@@ -20,9 +21,15 @@ public class GroundSpoofB extends Check {
     private float lastFallDistance = 0;
     private Verbose verbose = new Verbose();
 
+    @Setting(name = "threshold.vl.max")
+    private static int vlMax = 12;
+
+    @Setting(name = "threshold.vl.reset")
+    private static long vlReset = 500L;
+
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(getData().isGeneralCancel() || getData().getMovementProcessor().getDeltaY() == 0) {
+        if(getData().isGeneralCancel() || getData().takingVelocity(10) || getData().getMovementProcessor().getDeltaY() == 0) {
             lastFallDistance = 0;
             return;
         }
@@ -32,7 +39,7 @@ public class GroundSpoofB extends Check {
         val move = getData().getMovementProcessor();
 
         if(move.getDeltaY() < 0 && MathUtils.getDelta(deltaFD, Math.abs(move.getDeltaY())) > Math.max(0.5, fallDistance / 5)) {
-            if(verbose.flag(12, 500L)) {
+            if(verbose.flag(vlMax, vlReset)) {
                 flag(deltaFD + "<-" + move.getDeltaY(), true, true, verbose.getVerbose() > 10 ? AlertTier.LIKELY : AlertTier.POSSIBLE);
             }
         } else verbose.deduct();

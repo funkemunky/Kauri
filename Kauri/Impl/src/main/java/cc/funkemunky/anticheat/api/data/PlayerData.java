@@ -14,6 +14,7 @@ import cc.funkemunky.anticheat.impl.config.CheckSettings;
 import cc.funkemunky.anticheat.impl.config.MiscSettings;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.utils.BoundingBox;
+import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.TickTimer;
 import lombok.Getter;
 import lombok.Setter;
@@ -107,5 +108,9 @@ public class PlayerData {
 
     public boolean isServerPos() {
         return System.currentTimeMillis() - lastServerPosStamp < Math.max(50, MiscSettings.serverPos + (transPing));
+    }
+
+    public boolean takingVelocity(int ticks) {
+        return velocityProcessor.getLastVelocity().hasNotPassed(ticks + MathUtils.millisToTicks(transPing));
     }
 }

@@ -45,10 +45,10 @@ public class HitBox extends Check {
         if(getData().getLastAttack().hasNotPassed(0) && getData().getTarget() != null && allowedEntities.contains(getData().getTarget().getType())) {
             val move = getData().getMovementProcessor();
 
-            val locs = move.getPastLocation().getEstimatedLocation(0, (move.getYawDelta() > 3 ? 150 : 100) + (getData().getTransPing() - getData().getLastTransPing()) * 2).stream().map(loc -> loc.add(0, 1.54f, 0L)).collect(Collectors.toList());
+            val locs = move.getPastLocation().getEstimatedLocation(0, (move.getYawDelta() > 3 ? 150 : 100) + (getData().getTransPing() - getData().getLastTransPing()) * 2).stream().map(loc -> loc.add(0, getData().getPlayer().getEyeHeight(), 0L)).collect(Collectors.toList());
 
             List<BoundingBox> hitbox = getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), (move.getYawDelta() > 5 ? 200 : 150) + (getData().getTransPing() - getData().getLastTransPing()) * 2).stream().map(loc -> getHitbox(getData().getTarget(), loc)).collect(Collectors.toList());
-            val collided = locs.stream().filter(loc -> new RayTrace(loc.toVector(), loc.toLocation(getData().getPlayer().getWorld()).getDirection()).traverse(3f, 0.1, 0.025, 2.5).parallelStream().anyMatch(vec -> hitbox.stream().anyMatch(box -> box.collides(vec)))).collect(Collectors.toList());
+            val collided = locs.stream().filter(loc -> new RayTrace(loc.toVector(), loc.toLocation(getData().getPlayer().getWorld()).getDirection()).traverse(3.4f, 0.1, 0.05, 2.8).parallelStream().anyMatch(vec -> hitbox.stream().anyMatch(box -> box.collides(vec)))).collect(Collectors.toList());
 
             if(getData().getLastTargetSwitch().hasPassed() && collided.size() == 0 && !getData().isLagging()) {
                 if(vl++ > 8) {
@@ -68,6 +68,6 @@ public class HitBox extends Check {
 
     private BoundingBox getHitbox(LivingEntity entity, CustomLocation l) {
         Vector dimensions = MiscUtils.entityDimensions.getOrDefault(entity.getType(), new Vector(0.35F, 1.85F, 0.35F));
-        return (new BoundingBox(l.toVector(), l.toVector())).grow(0.32F, 0.25F, 0.35F).grow((float)dimensions.getX(), 0.0F, (float)dimensions.getZ()).add(0.0F, 0.0F, 0.0F, 0.0F, (float)dimensions.getY(), 0.0F);
+        return (new BoundingBox(l.toVector(), l.toVector())).grow(0.35F, 0.25F, 0.35F).grow((float)dimensions.getX(), 0.0F, (float)dimensions.getZ()).add(0.0F, 0.0F, 0.0F, 0.0F, (float)dimensions.getY(), 0.0F);
     }
 }

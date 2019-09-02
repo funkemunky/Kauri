@@ -24,7 +24,7 @@ public class NoSlowdownB extends Check {
         val move = getData().getMovementProcessor();
         val baseSpeed = MiscUtils.getBaseSpeed(getData()) - 0.04;
 
-        if (getData().isGeneralCancel()) return;
+        if (getData().isGeneralCancel() || getData().takingVelocity(20)) return;
 
         if (move.isOnSoulSand() && move.isServerOnGround() && move.getDeltaXZ() > baseSpeed) {
             if (verbose.flag(6, 400L)) {

@@ -10,7 +10,7 @@ import lombok.val;
 import org.bukkit.event.Event;
 
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.POSITION, Packet.Client.LEGACY_POSITION, Packet.Client.LEGACY_POSITION_LOOK})
-@cc.funkemunky.api.utils.Init
+//@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Step (Type A)", description = "Checks for illegitimate collisions.", type = CheckType.STEP, maxVL = 50, executable = false)
 public class StepA extends Check {
 
@@ -21,7 +21,7 @@ public class StepA extends Check {
         val move = getData().getMovementProcessor();
 
         debug(move.isServerOnGround() + "");
-        if (getData().isGeneralCancel() && move.isHalfBlocksAround()) return;
+        if (getData().isGeneralCancel() && getData().takingVelocity(10) && move.isHalfBlocksAround()) return;
 
         if (move.isCollidesHorizontally()) {
             debug("TOTAL: " + (yTotal += move.getDeltaY()));

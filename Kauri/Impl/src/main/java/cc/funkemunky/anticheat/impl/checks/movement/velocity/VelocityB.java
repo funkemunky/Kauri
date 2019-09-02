@@ -42,7 +42,7 @@ public class VelocityB extends Check {
             new float[] {.98f, -.98f},
             new float[] {-.98f, 0},
             new float[] {-.98f, .98f},
-            new float[] {-.98f, 0});
+            new float[] {-.98f, -.98f});
 
     public void onPacket(Object packet, String packetType, long timeStamp) {
         if(packetType.equals(Packet.Server.ENTITY_VELOCITY)) {
@@ -61,7 +61,6 @@ public class VelocityB extends Check {
 
             long delta = timeStamp - velocityTimestamp, ping = getData().getTransPing();
             long deltaTicks = MathUtils.millisToTicks(delta), pingTicks = MathUtils.millisToTicks(ping);
-            //TODO Debug proper dividend.
 
             if(velocityY > 0 && MathUtils.approxEquals(0.01, velocityY, move.getDeltaY())) {
                 if(getData().getBoundingBox().shrink(0, 0.1f, 0).grow(1,0,1).getCollidingBlockBoxes(getData().getPlayer()).size() == 0) {

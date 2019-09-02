@@ -39,6 +39,10 @@ public class AutoclickerB extends Check {
                 } else if(distinct > 15 && std < 3) {
                     debug(Color.Green + "Flag 3");
                     vl++;
+                } else if(average > 8 && std < 0.9) {
+                    debug(Color.Green + "Flag 4");
+                    vl++;
+
                 } else vl-= vl > 0 ? 2 : 0;
 
                 if(vl > 6) {
