@@ -17,7 +17,7 @@ import org.bukkit.event.Event;
         Packet.Client.LEGACY_POSITION,
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
-@cc.funkemunky.api.utils.Init
+//@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "BadPackets (Type F)", description = "Checks frequency of incoming packets. More reliable, but less detection.", type = CheckType.BADPACKETS, maxVL = 40)
 public class BadPacketsF extends Check {
 

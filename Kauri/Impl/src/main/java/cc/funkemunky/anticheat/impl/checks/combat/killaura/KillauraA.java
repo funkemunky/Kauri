@@ -33,13 +33,13 @@ public class KillauraA extends Check {
             KillauraA modules tend to be made using a motion event, and client developers usually forget to make sure that the motion
             and the attack packets are being sent in separate ticks */
             long elapsed = timeStamp - lastFlying;
-            if (elapsed < 35) {
-                if (lastLag.hasPassed() && verbose++ > 12) {
+            if (elapsed < 35 && lastLag.hasPassed()) {
+                if (verbose++ > 12) {
                     flag("t: post; " + elapsed + "<-10", true, true, AlertTier.POSSIBLE);
                 }
-            } else {
-                verbose = 0;
-            }
+            } else if(lastLag.hasNotPassed()) {
+                verbose-= verbose > 0 ? 2 : 0;
+            } else verbose = 0;
 
             debug("elapsed=" + elapsed + " verbose=" + verbose);
 

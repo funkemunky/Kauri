@@ -256,6 +256,7 @@ public class MovementProcessor {
                 || getClimbTicks() > 0
                 || data.getLastBlockPlace().hasNotPassed(15)
                 || hasLevi
+                || (timeStamp - data.getLastRespawn()) < 50 + data.getTransPing() * 2
                 || (isServerOnGround() && isOnHalfBlock())
                 || isRiptiding()
                 || getHalfBlockTicks() > 0
@@ -316,7 +317,7 @@ public class MovementProcessor {
         //predict(data, .98f, .98f, false);
 
         pastLocation.addLocation(new CustomLocation(to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch()));
-        data.setGeneralCancel(serverPos || data.isLagging() || lastVehicle.hasNotPassed(10) || getLastFlightToggle().hasNotPassed(15) || !chunkLoaded || packet.getPlayer().getAllowFlight() || hasLevi || packet.getPlayer().getGameMode().toString().contains("CREATIVE") || packet.getPlayer().getGameMode().toString().contains("SPEC") || lastVehicle.hasNotPassed() || getLastRiptide().hasNotPassed(10) || data.getLastLogin().hasNotPassed(50));
+        data.setGeneralCancel(serverPos || ((timeStamp - data.getLastRespawn()) < 150 + data.getTransPing() * 2) || data.isLagging() || lastVehicle.hasNotPassed(10) || getLastFlightToggle().hasNotPassed(15) || !chunkLoaded || packet.getPlayer().getAllowFlight() || hasLevi || packet.getPlayer().getGameMode().toString().contains("CREATIVE") || packet.getPlayer().getGameMode().toString().contains("SPEC") || lastVehicle.hasNotPassed() || getLastRiptide().hasNotPassed(10) || data.getLastLogin().hasNotPassed(50));
     }
 
     /*

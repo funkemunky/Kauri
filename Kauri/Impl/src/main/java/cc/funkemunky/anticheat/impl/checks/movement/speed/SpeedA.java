@@ -30,7 +30,7 @@ public class SpeedA extends Check {
         threshold+= move.getIceTicks() > 0 && (move.getGroundTicks() < 8 || move.getAirTicks() < 3) ? 0.28 : 0;
 
         if(move.getDeltaXZ() > 0 && !getData().isGeneralCancel() && move.getDeltaXZ() > threshold && !getData().takingVelocity(50)) {
-            if(Math.min(vl++, 40) > 20) {
+            if(Math.min(vl++, 45) > 30) {
                 flag("speed=" + move.getDeltaXZ(), true, true, AlertTier.HIGH);
             }
         } else vl-= vl > 0 ? 1 : 0;

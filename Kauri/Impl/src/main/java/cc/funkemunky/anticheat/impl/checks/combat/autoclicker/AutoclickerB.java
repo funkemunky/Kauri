@@ -36,7 +36,7 @@ public class AutoclickerB extends Check {
                 } else if(MathUtils.getDelta(average, lastAverage) < 0.1 && !cc.funkemunky.api.utils.MathUtils.approxEquals(0.2, MathUtils.getDelta(average, lastAverage), MathUtils.getDelta(std, lastStd)) && std > 4) {
                     debug(Color.Green + "Flag 2");
                     vl++;
-                } else if(distinct > 15 && std < 3) {
+                } else if(distinct > 15 && std < 3 && average > 8) {
                     debug(Color.Green + "Flag 3");
                     vl++;
                 } else if(average > 8 && std < 0.9) {

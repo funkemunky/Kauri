@@ -27,20 +27,24 @@ public class BadPacketsA extends Check {
         if (packetType.equalsIgnoreCase(Packet.Server.ABILITIES)) {
             WrappedOutAbilitiesPacket abilities = new WrappedOutAbilitiesPacket(packet, getData().getPlayer());
 
-            if (abilities.isAllowedFlight() && !getData().isCreativeMode()) {
+            if (abilities.isAllowedFlight()) {
                 serverSent = true;
-            }
+            } else serverSent = false;
         } else if (packetType.equalsIgnoreCase(Packet.Client.ABILITIES)) {
             WrappedInAbilitiesPacket abilities = new WrappedInAbilitiesPacket(packet, getData().getPlayer());
 
-            if (abilities.isAllowedFlight() != lastAllowedFlight && abilities.isAllowedFlight() && !getData().isCreativeMode() && !serverSent) {
+            if (abilities.isAllowedFlight() != lastAllowedFlight
+                    && getData().getLastLogin().hasPassed(40)
+                    && abilities.isAllowedFlight()
+                    && (timeStamp - getData().getLastRespawn()) > 100 + getData().getTransPing()
+                    && !getData().getMovementProcessor().isServerPos()
+                    && !getData().isCreativeMode()
+                    && !serverSent) {
                 flag("fake news abilities packet", true, true, AlertTier.HIGH);
                 getData().getPlayer().setAllowFlight(false);
             }
 
             lastAllowedFlight = abilities.isAllowedFlight();
-
-            serverSent = false;
         }
     }
 

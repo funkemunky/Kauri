@@ -50,6 +50,12 @@ public class PacketListeners implements AtlasListener {
                     data.setTeleportTest(System.currentTimeMillis());
                     break;
                 }
+                case Packet.Server.RESPAWN: {
+                    //WrappedOutRespawnPacket respawn = new WrappedOutRespawnPacket(event.getPacket(), event.getPlayer());
+
+                    data.setLastRespawn(System.currentTimeMillis());
+                    break;
+                }
                 case Packet.Server.ABILITIES: {
                     WrappedOutAbilitiesPacket packet = new WrappedOutAbilitiesPacket(event.getPacket(), event.getPlayer());
 

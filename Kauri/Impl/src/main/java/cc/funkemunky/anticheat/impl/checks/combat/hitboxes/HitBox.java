@@ -45,18 +45,17 @@ public class HitBox extends Check {
         if(getData().getLastAttack().hasNotPassed(0) && getData().getTarget() != null && allowedEntities.contains(getData().getTarget().getType())) {
             val move = getData().getMovementProcessor();
 
-            val locs = move.getPastLocation().getEstimatedLocation(0, (move.getYawDelta() > 3 ? 150 : 100) + (getData().getTransPing() - getData().getLastTransPing()) * 2).stream().map(loc -> loc.add(0, getData().getPlayer().getEyeHeight(), 0L)).collect(Collectors.toList());
+            val locs = move.getPastLocation().getEstimatedLocation(0, 100 + (getData().getTransPing() - getData().getLastTransPing())).stream().map(loc -> loc.add(0, getData().getPlayer().getEyeHeight(), 0L)).collect(Collectors.toList());
 
-            List<BoundingBox> hitbox = getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), (move.getYawDelta() > 5 ? 200 : 150) + (getData().getTransPing() - getData().getLastTransPing()) * 2).stream().map(loc -> getHitbox(getData().getTarget(), loc)).collect(Collectors.toList());
-            val collided = locs.stream().filter(loc -> new RayTrace(loc.toVector(), loc.toLocation(getData().getPlayer().getWorld()).getDirection()).traverse(3.4f, 0.1, 0.05, 2.8).parallelStream().anyMatch(vec -> hitbox.stream().anyMatch(box -> box.collides(vec)))).collect(Collectors.toList());
+            List<BoundingBox> hitbox = getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), 150).stream().map(loc -> getHitbox(getData().getTarget(), loc)).collect(Collectors.toList());
+            val collided = locs.stream().filter(loc -> new RayTrace(loc.toVector(), loc.toLocation(getData().getPlayer().getWorld()).getDirection()).traverse(3.5f, 0.1f).parallelStream().anyMatch(vec -> hitbox.stream().anyMatch(box -> box.collides(vec)))).collect(Collectors.toList());
 
             if(getData().getLastTargetSwitch().hasPassed() && collided.size() == 0 && !getData().isLagging()) {
                 if(vl++ > 8) {
                     flag("vl=" + vl + " ping=" + getData().getTransPing(), true, true, vl > 12 ? AlertTier.HIGH : AlertTier.LIKELY);
                 }
-                debug(Color.Green + "Flag: " + vl);
-            } else vl-= vl > 0 ? 0.2 : 0;
-            debug("collided=" + collided.size() + " vl=" + vl + " ping=" + getData().getTransPing());
+            } else vl-= vl > 0 ? 0.5 : 0;
+            debug("collided=" + collided + " vl=" + vl + " ping=" + getData().getTransPing());
             collided.clear();
         }
     }

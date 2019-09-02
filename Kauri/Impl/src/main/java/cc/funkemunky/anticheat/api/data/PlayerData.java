@@ -61,7 +61,7 @@ public class PlayerData {
     private EvictingList<Vector> teleportLocations;
     private float walkSpeed, flySpeed;
     private LivingEntity target, attacker;
-    private long transPing, lastTransaction, lastTransPing, ping, lastPing, lastKeepAlive, lastServerPosStamp, lastFlagTimestamp, lastPacketDrop;
+    private long transPing, lastRespawn, lastTransaction, lastTransPing, ping, lastPing, lastKeepAlive, lastServerPosStamp, lastFlagTimestamp, lastPacketDrop;
     private MCSmooth yawSmooth = new MCSmooth(), pitchSmooth = new MCSmooth();
     private CustomLocation entityFrom, entityTo, positionLoc;
     private PastLocation entityPastLocation = new PastLocation();

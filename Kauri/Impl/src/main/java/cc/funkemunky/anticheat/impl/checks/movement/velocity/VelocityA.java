@@ -16,7 +16,7 @@ import org.bukkit.event.Event;
         Packet.Client.POSITION,
         Packet.Client.FLYING,
         Packet.Client.LOOK})
-@cc.funkemunky.api.utils.Init
+//@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Velocity (Type A)", description = "Detects any vertical velocity modification below 100%.", type = CheckType.VELOCITY, maxVL = 40, executable = true)
 public class VelocityA extends Check {
 
@@ -62,7 +62,7 @@ public class VelocityA extends Check {
                     if (Math.abs(predicted) < 0.0005) predicted = 0;
                 }
 
-                if (!MathUtils.approxEquals(1E-5, predicted, move.getDeltaY()) && predicted > 0) {
+                if (!MathUtils.approxEquals(1E-5, predicted, move.getDeltaY()) && !getData().isLagging() && predicted > 0) {
                     if(vl++ > 9) {
                         flag("predicted=" + predicted + " deltaY=" + move.getDeltaY() + " vl=" + vl, true, true, vl > 14 ? AlertTier.HIGH : AlertTier.LIKELY);
                     }

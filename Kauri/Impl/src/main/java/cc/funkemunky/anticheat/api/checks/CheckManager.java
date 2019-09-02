@@ -47,13 +47,6 @@ public class CheckManager {
                 });
                 val checkStamp = Kauri.getInstance().getLoggerManager().getCheckStamp();
                 //TODO Test to make sure this actually updates the vl.
-                dataList.forEach(data -> {
-                    List<Check> checks = data.getChecks().parallelStream()
-                            .filter(check -> System.currentTimeMillis() - check.getLastReset() > CheckSettings.alertsResetInterval)
-                            .peek(check -> check.setVl(0)).collect(Collectors.toList());
-
-                    checkStamp.put(data.getUuid(), checks);
-                });
             }
         }.runTaskTimerAsynchronously(Kauri.getInstance(), 40L, 30L);
 

@@ -56,7 +56,9 @@ public class BadPacketsB extends Check {
         long count = vecs.stream().filter(vec -> boxes.stream().anyMatch(box -> box.collides(vec))).count();
         if(count == 0) {
             vl++;
-            flag("none", true, true, vl > 1 ? AlertTier.HIGH : AlertTier.LIKELY);
+            if(vl > 2) {
+                flag("none", true, true, vl > 3 ? AlertTier.HIGH : AlertTier.LIKELY);
+            }
         } else vl-= vl > 0 ? 0.5 : 0;
 
         debug("count=" + count + " vl=" + vl);

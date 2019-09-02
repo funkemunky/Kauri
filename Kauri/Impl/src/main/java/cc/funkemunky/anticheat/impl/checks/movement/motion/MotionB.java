@@ -70,10 +70,10 @@ public class MotionB extends Check {
                     }
                     debug(Color.Green + "Flag: " + distance + " vl=" + vl + " predicted=" + predictedXZ + " deltaXZ=" + move.getDeltaXZ());
                 } else {
-                    vl-= vl > 0 ? 0.5 : 0;
+                    vl-= vl > 0 ? 1 : 0;
                     if(move.getDeltaXZ() > 0) debug("distance=" + distance + " vl=" + vl);
                 }
-            }
+            } else vl -= vl > 0 ? 0.5 : 0;
 
             moveEntityWithHeading(0,0, true);
 
