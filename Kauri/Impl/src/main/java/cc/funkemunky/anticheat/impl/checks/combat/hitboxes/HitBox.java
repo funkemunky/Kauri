@@ -48,7 +48,7 @@ public class HitBox extends Check {
             val locs = move.getPastLocation().getEstimatedLocation(0, (move.getYawDelta() > 3 ? 150 : 100) + (getData().getTransPing() - getData().getLastTransPing()) * 2).stream().map(loc -> loc.add(0, getData().getPlayer().getEyeHeight(), 0L)).collect(Collectors.toList());
 
             List<BoundingBox> hitbox = getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), (move.getYawDelta() > 5 ? 200 : 150) + (getData().getTransPing() - getData().getLastTransPing()) * 2).stream().map(loc -> getHitbox(getData().getTarget(), loc)).collect(Collectors.toList());
-            val collided = locs.stream().filter(loc -> new RayTrace(loc.toVector(), loc.toLocation(getData().getPlayer().getWorld()).getDirection()).traverse(3.1f, 0.1, 0.025, 2.5).parallelStream().anyMatch(vec -> hitbox.stream().anyMatch(box -> box.collides(vec)))).collect(Collectors.toList());
+            val collided = locs.stream().filter(loc -> new RayTrace(loc.toVector(), loc.toLocation(getData().getPlayer().getWorld()).getDirection()).traverse(3.4f, 0.1, 0.05, 2.8).parallelStream().anyMatch(vec -> hitbox.stream().anyMatch(box -> box.collides(vec)))).collect(Collectors.toList());
 
             if(getData().getLastTargetSwitch().hasPassed() && collided.size() == 0 && !getData().isLagging()) {
                 if(vl++ > 8) {

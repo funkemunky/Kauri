@@ -31,10 +31,10 @@ public class MotionB extends Check {
 
     private static List<float[]> motions = Collections.synchronizedList(Arrays.asList(
             new float[] {0, 0},
-            new float[] {0, 0.98f},
+            new float[] {0, .98f},
             new float[] {0, -.98f},
             new float[] {.98f, 0},
-            new float[] {.98f, 0.98f},
+            new float[] {.98f, .98f},
             new float[] {.98f, -.98f},
             new float[] {-.98f, 0},
             new float[] {-.98f, .98f},

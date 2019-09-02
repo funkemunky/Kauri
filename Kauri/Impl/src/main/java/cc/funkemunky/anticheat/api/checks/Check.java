@@ -75,7 +75,7 @@ public abstract class Check {
                         banUser();
                     }
 
-                    if(vl > minVL && (timeStamp - data.getLastFlagTimestamp()) > 5) {
+                    if((timeStamp - data.getLastFlagTimestamp()) > 5) {
                         JsonMessage message = new JsonMessage();
                         if (timeStamp - lastAlert > CheckSettings.alertsDelay) {
                             if (!developer) {
