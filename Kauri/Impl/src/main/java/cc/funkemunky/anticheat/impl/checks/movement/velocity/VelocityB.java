@@ -80,8 +80,8 @@ public class VelocityB extends Check {
 
                     double velocityXZ =
                             Math.hypot(
-                                    min[0] * (getData().getLastAttack().hasNotPassed(0) ? 0.6f : 1)
-                                    , min[1] * (getData().getLastAttack().hasNotPassed(0) ? 0.6f : 1)) * (move.getFrom().getY() % 1 != 0 || move.getLastDeltaXZ() == 0 ? 1 : (1 - (MiscUtils.getBaseSpeed(getData()) / 2)));
+                                    min[0] * ((getData().getLastAttack().hasNotPassed(0) ? 0.6f : 1)  * (move.getFrom().getY() % 1 != 0 || move.getLastDeltaXZ() == 0 ? 1 : (1 - (move.getBaseSpeed() / 2))))
+                                    , min[1] * (getData().getLastAttack().hasNotPassed(0) ? 0.6f : 1)) * (move.getFrom().getY() % 1 != 0 || move.getLastDeltaXZ() == 0 ? 1 : (1 - (move.getBaseSpeed() / 2)));
 
                     double pct = move.getDeltaXZ() / velocityXZ * 100;
 

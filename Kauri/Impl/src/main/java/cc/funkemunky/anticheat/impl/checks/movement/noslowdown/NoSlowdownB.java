@@ -22,7 +22,7 @@ public class NoSlowdownB extends Check {
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
-        val baseSpeed = MiscUtils.getBaseSpeed(getData()) - 0.04;
+        val baseSpeed = move.getBaseSpeed() - 0.04;
 
         if (getData().isGeneralCancel() || getData().takingVelocity(20)) return;
 

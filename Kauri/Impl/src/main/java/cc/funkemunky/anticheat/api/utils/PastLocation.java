@@ -15,15 +15,15 @@ public class PastLocation {
     private List<CustomLocation> previousLocations = new CopyOnWriteArrayList<>();
 
     public CustomLocation getPreviousLocation(long time) {
-        return (this.previousLocations.stream().min(Comparator.comparingLong((loc) -> MathUtils.getDelta((System.currentTimeMillis() - loc.getTimeStamp()), time))).orElse(this.previousLocations.get(0)));
+        return (this.previousLocations.stream()
+                .min(Comparator.comparingLong((loc) -> MathUtils.getDelta((System.currentTimeMillis() - loc.getTimeStamp()), time)))
+                .orElse(this.previousLocations.get(0)));
     }
 
     public List<CustomLocation> getEstimatedLocation(long time, long delta) {
-        new ArrayList();
         long currentTimestamp = System.currentTimeMillis();
         return this.previousLocations.stream().filter(loc -> MathUtils.getDelta((currentTimestamp - loc.getTimeStamp()), time) <= delta).collect(Collectors.toList());
     }
-
 
     public void addLocation(Location location) {
         if (previousLocations.size() >= 20) {

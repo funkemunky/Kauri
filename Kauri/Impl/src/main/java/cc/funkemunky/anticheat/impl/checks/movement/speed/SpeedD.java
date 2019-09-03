@@ -20,7 +20,7 @@ public class SpeedD extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        val max = MiscUtils.getBaseSpeed(getData()) + 1.1;
+        val max = move.getBaseSpeed() + 1.1;
 
         if(move.getDeltaXZ() > max && !getData().isGeneralCancel() && !getData().takingVelocity(20)) {
             flag(move.getDeltaXZ() + ">-" + max, true, true, AlertTier.HIGH);

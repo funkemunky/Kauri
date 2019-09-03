@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Init
-@CheckInfo(name = "BadPackets (Type B)", type = CheckType.BADPACKETS, cancelType = CancelType.INTERACT)
+@CheckInfo(name = "BadPackets (Type B)", type = CheckType.BADPACKETS, cancelType = CancelType.PLACE)
 @BukkitEvents(events = {BlockPlaceEvent.class})
 public class BadPacketsB extends Check {
 
@@ -33,7 +33,7 @@ public class BadPacketsB extends Check {
     public void onBukkitEvent(Event event) {
         BlockPlaceEvent e = (BlockPlaceEvent) event;
 
-        if(e.getBlockPlaced() == null || !BlockUtils.isSolid(e.getBlockPlaced())|| !e.getPlayer().getGameMode().equals(GameMode.SURVIVAL)) return;
+        if(e.getBlockPlaced() == null || !e.getItemInHand().getType().isSolid() || !BlockUtils.isSolid(e.getBlockPlaced())|| !e.getPlayer().getGameMode().equals(GameMode.SURVIVAL)) return;
 
         List<BoundingBox> boxes = Atlas.getInstance().getBlockBoxManager().getBlockBox().getSpecificBox(e.getBlockPlaced().getLocation());
 

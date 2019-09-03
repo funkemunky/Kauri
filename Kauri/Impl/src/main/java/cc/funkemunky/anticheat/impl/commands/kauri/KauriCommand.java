@@ -43,6 +43,7 @@ public class KauriCommand extends FunkeCommand {
         getArguments().add(new AntiVpnArgument(this, "antivpn", "antivpn <args>", "manage the antivpn.", "kauri.antivpn"));
         getArguments().add(new BanwaveArgument(this, "banwave", "banwave", "force a ban wave to run.", "kauri.banwave"));
         getArguments().add(new VelocityArgument(this, "velocity", "velocity <xz> <y>", "apply velocity.", "kauri.velocity"));
+        getArguments().add(new AdminArgument(this, "admin", "admin <arg> [args]", "admin stuff.", "kauri.admin"));
 
         getArguments().forEach(argument -> {
             Arrays.stream(argument.getClass().getDeclaredFields()).filter(field -> field.getAnnotations().length > 0).forEach(field -> {

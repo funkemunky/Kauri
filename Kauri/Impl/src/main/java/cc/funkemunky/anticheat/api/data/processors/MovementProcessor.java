@@ -22,10 +22,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @Getter
 public class MovementProcessor {
-    private boolean lastFlight, cancelFlight, serverPos, flight, inLiquid, liquidBelow, clientOnGround, serverOnGround, fullyInAir, inAir, hasJumped, nearLiquid, blocksOnTop, pistonsNear, onHalfBlock,
+    private boolean cancelFlight, serverPos, inLiquid, liquidBelow, clientOnGround, serverOnGround, fullyInAir, inAir, hasJumped, nearLiquid, blocksOnTop, pistonsNear, onHalfBlock,
             onClimbable, onIce, collidesHorizontally, tookVelocity, inWeb, onSlime, onSlimeBefore, onSoulSand, isRiptiding, halfBlocksAround, isNearGround, isInsideBlock, blocksNear, blocksAround;
     private int airTicks, groundTicks, iceTicks, climbTicks, halfBlockTicks, soulSandTicks, blockAboveTicks, optifineTicks, liquidTicks, webTicks, yawZeroTicks, pitchZeroTicks;
-    private float cinematicYaw, cinematicPitch, lastCinematicYaw, lastCinematicPitch, deltaY, lastDeltaXZ, slimeHeight, fallDistance, yawDelta, pitchDelta, lastYawDelta, lastPitchDelta, lastDeltaY, deltaXZ, deltaX, lastDeltaX, deltaZ, lastDeltaZ, lastServerYVelocity, serverYAcceleration, clientYAcceleration, lastClientYAcceleration, lastServerYAcceleration, cinematicYawDelta, cinematicPitchDelta, lastCinematicPitchDelta, lastCinematicYawDelta;
+    private float cinematicYaw, baseSpeed, cinematicPitch, lastCinematicYaw, lastCinematicPitch, deltaY, lastDeltaXZ, slimeHeight, fallDistance, yawDelta, pitchDelta, lastYawDelta, lastPitchDelta, lastDeltaY, deltaXZ, deltaX, lastDeltaX, deltaZ, lastDeltaZ, lastServerYVelocity, serverYAcceleration, clientYAcceleration, lastClientYAcceleration, lastServerYAcceleration, cinematicYawDelta, cinematicPitchDelta, lastCinematicPitchDelta, lastCinematicYawDelta;
     private CustomLocation from, to;
     @Setter
     private float serverYVelocity;
@@ -117,6 +117,7 @@ public class MovementProcessor {
                     slimeHeight = fallDistance * 0.75f;
                 }
             }
+            baseSpeed = MiscUtils.getBaseSpeed(data);
             tookVelocity = timeStamp - data.getVelocityProcessor().getLastVelocityTimestamp() < 1500L;
 
             lastClientYAcceleration = clientYAcceleration;

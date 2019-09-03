@@ -54,10 +54,7 @@ public class Reach extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
         if(getData().getTarget() != null && getData().getLastAttack().hasNotPassed(0) && allowedEntities.contains(getData().getTarget().getType()) && !getData().getPlayer().getGameMode().equals(GameMode.CREATIVE) && getData().getLastLogin().hasPassed(5) && !move.isServerPos() && getData().getTransPing() < 450) {
-            long range = (move.getYawDelta() > 5 ? 150 : 100) + Math.abs(getData().getTransPing() - getData().getLastTransPing()) * 2;
-            val location = getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), range);
             val to = move.getTo().toLocation(getData().getPlayer().getWorld()).add(0, getData().getPlayer().getEyeHeight(), 0);
-
             val calcDistance = getData().getTarget().getLocation().distance(to);
 
             if(timeStamp - lastAttack <= 5) {
@@ -67,10 +64,28 @@ public class Reach extends Check {
                 return;
             }
 
-            val locs = move.getPastLocation().getEstimatedLocation(0, ((getData().getTarget().getVelocity().getY() <= 0 && move.getDeltaXZ() > cc.funkemunky.anticheat.api.utils.MiscUtils.getBaseSpeed(getData())) ? 50 : (move.getYawDelta() > 5 ? 50 : 0)) + (getData().getTransPing() - getData().getLastTransPing()) * 2).stream().map(loc -> loc.add(0, getData().getPlayer().getEyeHeight(), 0L)).collect(Collectors.toList());
+            long range = (getData().getTransPing() > 140 ? 150L: 100L) + Math.abs(getData().getTransPing() - getData().getLastTransPing()) * 2;
+            val location = getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), range);
+
+            val locs = move.getPastLocation().getEstimatedLocation(0, 50L)
+                    .stream()
+                    .map(loc -> loc
+                            .toLocation(getData().getPlayer().getWorld())
+                            .clone()
+                            .add(0, getData().getPlayer().getEyeHeight(), 0))
+                    .collect(Collectors.toList());
+
             List<Vector> traverse = new ArrayList<>();
-            locs.stream().map(loc -> new RayTrace(loc.toVector(), loc.toLocation(getData().getPlayer().getWorld()).getDirection()).traverse(0, calcDistance * 2f, 0.1, 0.02, 2.8, 3.7)).forEach(traverse::addAll);
-            val collided = traverse.stream().filter((vec) -> location.stream().anyMatch((loc) -> getHitbox(getData().getTarget(), loc).collides(vec))).collect(Collectors.toList());
+
+            locs.stream()
+                    .map(loc ->
+                            new RayTrace(loc.toVector(), loc.getDirection())
+                                    .traverse(0, calcDistance * 1.5f, 0.1, 0.02, 2.8, 3.5))
+                    .forEach(traverse::addAll);
+
+            val collided = traverse.stream()
+                    .filter((vec) -> location.stream().anyMatch(loc -> getHitbox(getData().getTarget(), loc).collides(vec)))
+                    .collect(Collectors.toList());
 
             float distance = (float) collided.stream().mapToDouble((vec) -> vec.distance(to.toVector()))
                     .min().orElse(0.0D);
@@ -83,9 +98,9 @@ public class Reach extends Check {
                     } else if (vl > highThreshold) {
                         flag("reach=" + distance + " vl=" + vl + " collided=" + collided.size(), true, true, AlertTier.HIGH);
                     } else if(vl > 4) {
-                        flag("reach=" + distance + " vl=" + vl + " collided=" + collided.size(), true, false, vl > 6 ? AlertTier.LIKELY : AlertTier.POSSIBLE);
+                        flag("reach=" + distance + " vl=" + vl + " collided=" + collided.size(), true, true, vl > 6 ? 1 : 0, vl > 6 ? AlertTier.LIKELY : AlertTier.POSSIBLE);
                     } else {
-                        flag("reach=" + distance + " vl=" + vl + " collided=" + collided.size(),true,false,AlertTier.LOW);
+                        flag("reach=" + distance + " vl=" + vl + " collided=" + collided.size(),true,true, 0, AlertTier.LOW);
                     }
                 } else if(distance > 0.8) {
                     vl = Math.max(0, vl - 0.05f);

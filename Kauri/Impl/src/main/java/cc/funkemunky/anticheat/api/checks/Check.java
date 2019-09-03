@@ -43,6 +43,10 @@ public abstract class Check {
     }
 
     protected void flag(String information, boolean cancel, boolean ban, AlertTier tier) {
+        flag(information, cancel, ban, 1, tier);
+    }
+
+    protected void flag(String information, boolean cancel, boolean ban, int vlToAdd, AlertTier tier) {
         Kauri.getInstance().getExecutorService().execute(() -> {
             if(Kauri.getInstance().getTps() > CheckSettings.tpsThreshold && System.currentTimeMillis() - Kauri.getInstance().getLastTPS() < 100) {
                 PlayerCheatEvent event = new PlayerCheatEvent(getData().getPlayer(), this);
@@ -66,7 +70,7 @@ public abstract class Check {
 
                     if (ban) {
                         if (data.getLastLag().hasPassed(8)) {
-                            vl++;
+                            vl+= vlToAdd;
                             Kauri.getInstance().getStatsManager().addFlag();
                         }
                         Kauri.getInstance().getLoggerManager().addViolation(data, this, information, tier);

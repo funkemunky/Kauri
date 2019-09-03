@@ -10,7 +10,6 @@ import lombok.val;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 
-//Removed for lag
 @Packets(packets = {Packet.Client.USE_ENTITY})
 @cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Killaura (Type B)", description = "Checks for clients sprinting while attacking.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, maxVL = 60)
@@ -23,12 +22,11 @@ public class KillauraB extends Check {
         WrappedInUseEntityPacket use = new WrappedInUseEntityPacket(packet, getData().getPlayer());
 
         if (use.getEntity() instanceof Player && use.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) { //A player only stops sprinting when hitting a player.
-            float baseSpeed = MiscUtils.getBaseSpeed(getData());
             val move = getData().getMovementProcessor();
 
-            if (!getData().isGeneralCancel() && !getData().takingVelocity(5) && (move.getDeltaXZ() > baseSpeed && use.getPlayer().isSprinting() && getData().getActionProcessor().isSprinting())) {
+            if (!getData().isGeneralCancel() && !getData().isLagging() && !getData().takingVelocity(5) && (move.getDeltaXZ() > move.getBaseSpeed() && use.getPlayer().isSprinting() && getData().getActionProcessor().isSprinting())) {
                 if (verbose.flag(15, 800L)) { //We add a verbose or redundancy.
-                    flag(move.getDeltaXZ() + ">-" + baseSpeed, true, true, AlertTier.LIKELY);
+                    flag(move.getDeltaXZ() + ">-" + move.getBaseSpeed(), true, true, AlertTier.LIKELY);
                 }
             } else verbose.deduct();
         }

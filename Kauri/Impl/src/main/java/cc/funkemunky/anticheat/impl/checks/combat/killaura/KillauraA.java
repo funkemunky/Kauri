@@ -20,7 +20,6 @@ public class KillauraA extends Check {
 
     private long lastFlying = 0;
     private int verbose;
-    private TickTimer lastLag = new TickTimer(4);
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
@@ -33,20 +32,17 @@ public class KillauraA extends Check {
             KillauraA modules tend to be made using a motion event, and client developers usually forget to make sure that the motion
             and the attack packets are being sent in separate ticks */
             long elapsed = timeStamp - lastFlying;
-            if (elapsed < 35 && lastLag.hasPassed()) {
+            if (elapsed < 35 && !getData().isLagging()) {
                 if (verbose++ > 12) {
-                    flag("t: post; " + elapsed + "<-10", true, true, AlertTier.POSSIBLE);
+                    flag("t: post; " + elapsed + "<-35", true, true, AlertTier.POSSIBLE);
                 }
-            } else if(lastLag.hasNotPassed()) {
-                verbose-= verbose > 0 ? 2 : 0;
+            } else if(getData().isLagging()) {
+                verbose-= verbose > 0 ? 1 : 0;
             } else verbose = 0;
 
             debug("elapsed=" + elapsed + " verbose=" + verbose);
 
-        } else {
-            if (MathUtils.getDelta(timeStamp, lastFlying) < 5) lastLag.reset();
-            lastFlying = timeStamp;
-        }
+        } else lastFlying = timeStamp;
     }
 
     @Override
