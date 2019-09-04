@@ -25,7 +25,7 @@ public class FlyE extends Check {
             return;
         }
 
-        if(move.getDeltaY() < 1E-6 && !move.isServerOnGround()) {
+        if(Math.abs(move.getDeltaY()) < 1E-6 && !move.isServerOnGround()) {
             if(vl++ > 4) {
                 flag("deltaY=" + move.getDeltaY() + " vl=" + vl, true, true, AlertTier.HIGH);
             }

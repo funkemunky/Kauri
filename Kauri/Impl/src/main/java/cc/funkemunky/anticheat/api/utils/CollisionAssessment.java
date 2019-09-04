@@ -40,17 +40,18 @@ public class CollisionAssessment {
             if(isEntity) bb = bb.grow(0.35f, 0.2f, 0.35f);
             if (bb.collidesVertically(playerBox.subtract(0, 0.12f, 0, 0, 1f, 0))) {
                 onGround = true;
+                nearGround = true;
 
                 if(!isEntity && block.getType().equals(Material.SOUL_SAND)) {
                     onSoulSand = true;
                 }
+            } else if(bb.collidesVertically(playerBox.subtract(0, 0.8f,0,0,1f,0))) {
+                nearGround = true;
             }
 
             if(bb.collides(playerBox.subtract(0, 0.6f,0,0,0.2f,0).grow(1f, 0, 1f))) {
                 blockHeights.add(bb.maxY - bb.minY);
             }
-
-            nearGround = true;
 
             if (bb.collidesHorizontally(playerBox.grow(0.05f, 0, 0.05f))) {
                 collidesHorizontally = true;
