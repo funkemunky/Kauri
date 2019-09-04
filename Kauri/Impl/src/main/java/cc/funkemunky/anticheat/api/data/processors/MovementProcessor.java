@@ -200,7 +200,6 @@ public class MovementProcessor {
 
             lastTimeStamp = timeStamp;
 
-            if(data.isLoggedIn() && data.getLastLogin().hasPassed(2)) data.setLoggedIn(false);
 
 
             iceTicks = onIce ? Math.min(40, iceTicks + 2) : Math.max(0, iceTicks - 1);
@@ -235,6 +234,8 @@ public class MovementProcessor {
             data.getLastLogin().reset();
         }
 
+        if(data.isLoggedIn()) data.setLoggedIn(false);
+
         lastDeltaY = deltaY;
         lastDeltaXZ = deltaXZ;
         lastDeltaX = deltaX;
@@ -265,8 +266,7 @@ public class MovementProcessor {
                 || isOnSlimeBefore()
                 || getLastRiptide().hasNotPassed(8)
                 || isPistonsNear()
-                || getTo() != null && getTo().toVector().distance(getFrom().toVector()) < 0.005
-                || data.getVelocityProcessor().getLastVelocity().hasPassed(10 + MiscUtils.millisToTicks(data.getPing()));
+                || data.getVelocityProcessor().getLastVelocity().hasNotPassed(10 + MiscUtils.millisToTicks(data.getPing()));
 
         if (player.getVehicle() != null || PlayerUtils.isGliding(player)) lastVehicle.reset();
 
