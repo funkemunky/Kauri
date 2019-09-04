@@ -29,17 +29,20 @@ public class NoSlowdownC extends Check {
         if (move.isInWeb() && move.getWebTicks() > 4) {
             if (accel > accelerationMax) {
                 if (verbose.flag(4, 500L)) {
-                    flag(MathUtils.round(accel, 4) + ">-" + accelerationMax, true, true, AlertTier.HIGH);
+                    flag(MathUtils.round(accel, 4) + ">-" + accelerationMax,
+                            true, true, AlertTier.HIGH);
                 }
             } else verbose.deduct();
 
             if (move.getDeltaXZ() > baseSpeed) {
                 if (verbose2.flag(6, 500L)) {
-                    flag(MathUtils.round(move.getDeltaXZ(), 4) + ">-" + baseSpeed, true, true, AlertTier.HIGH);
+                    flag(MathUtils.round(move.getDeltaXZ(), 4) + ">-" + baseSpeed,
+                            true, true, AlertTier.HIGH);
                 }
             } else verbose2.deduct();
 
-            debug("[" + verbose.getVerbose() + "," + verbose2.getVerbose() + "]: " + accel + ", " + move.getDeltaXZ());
+            debug("[" + verbose.getVerbose() + "," + verbose2.getVerbose() + "]: " + accel + ", "
+                    + move.getDeltaXZ());
         }
     }
 

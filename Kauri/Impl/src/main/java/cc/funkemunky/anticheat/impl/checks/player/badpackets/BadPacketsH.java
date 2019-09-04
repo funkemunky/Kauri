@@ -8,7 +8,9 @@ import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.utils.Init;
 import org.bukkit.event.Event;
 
-@CheckInfo(name = "BadPackets (Type H)", description = "Looks for a mistake commonly found in autoblock modules on cheat clients.", type = CheckType.BADPACKETS, cancelType = CancelType.INTERACT, executable = true, maxVL = 75)
+@CheckInfo(name = "BadPackets (Type H)",
+        description = "Looks for a mistake commonly found in autoblock modules on cheat clients.",
+        type = CheckType.BADPACKETS, cancelType = CancelType.INTERACT, executable = true, maxVL = 75)
 @Init
 @Packets(packets = {Packet.Client.USE_ENTITY, Packet.Client.BLOCK_DIG})
 public class BadPacketsH extends Check {

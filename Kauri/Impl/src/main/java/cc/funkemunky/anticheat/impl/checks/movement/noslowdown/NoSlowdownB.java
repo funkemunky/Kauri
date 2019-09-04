@@ -28,7 +28,10 @@ public class NoSlowdownB extends Check {
 
         if (move.isOnSoulSand() && move.isServerOnGround() && move.getDeltaXZ() > baseSpeed) {
             if (verbose.flag(6, 400L)) {
-                flag(MathUtils.round(move.getDeltaXZ(), 3) + ">-" + baseSpeed, true, false, AlertTier.HIGH);
+                flag(MathUtils.round(move.getDeltaXZ(), 3) + ">-" + baseSpeed,
+                        true,
+                        false,
+                        AlertTier.HIGH);
             }
         } else verbose.deduct();
     }

@@ -17,7 +17,10 @@ public class Criticals extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        if(getData().getLastAttack().hasNotPassed(1) && !getData().isGeneralCancel() && !getData().takingVelocity(4) && move.getGroundTicks() > 10) {
+        if(getData().getLastAttack().hasNotPassed(1)
+                && !getData().isGeneralCancel()
+                && !getData().takingVelocity(4)
+                && move.getGroundTicks() > 10) {
             if(move.getDeltaY() < 0 && !move.isHalfBlocksAround() && !move.isBlocksOnTop()) {
                 flag(move.getDeltaY() + "<-0", true, true, AlertTier.HIGH);
             }

@@ -36,11 +36,15 @@ public class GroundSpoofA extends Check {
 
         if(move.isServerOnGround() != move.isClientOnGround()) {
             if(verbose.flag(vlThreshold, 1200L, addVl)) {
-                flag("client=" + move.isClientOnGround() + " server=" + move.isServerOnGround(), true, true, verbose.getVerbose() > 20 ? AlertTier.HIGH : AlertTier.LIKELY);
+                flag("client=" + move.isClientOnGround() + " server=" + move.isServerOnGround(),
+                        true,
+                        true,
+                        verbose.getVerbose() > 20 ? AlertTier.HIGH : AlertTier.LIKELY);
             }
         } else verbose.deduct(deductVl);
 
-        debug("client=" + move.isClientOnGround() + " server=" + move.isServerOnGround() + " vl=" + verbose.getVerbose() + " dy=" + move.getDeltaY() + " y=" + move.getTo().getY());
+        debug("client=" + move.isClientOnGround() + " server=" + move.isServerOnGround() + " vl="
+                + verbose.getVerbose() + " dy=" + move.getDeltaY() + " y=" + move.getTo().getY());
     }
 
     @Override

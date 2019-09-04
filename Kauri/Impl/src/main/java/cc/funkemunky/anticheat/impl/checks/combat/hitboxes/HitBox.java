@@ -25,7 +25,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@CheckInfo(name = "HitBox", description = "Ensures that the player is not using any expanded form of a player hitbox.", type = CheckType.REACH, cancelType = CancelType.COMBAT)
+@CheckInfo(name = "HitBox", description = "Ensures that the player is not using any expanded form of a player hitbox.",
+        type = CheckType.REACH, cancelType = CancelType.COMBAT)
 @Packets(packets = {Packet.Client.FLYING, Packet.Client.POSITION_LOOK, Packet.Client.LOOK, Packet.Client.POSITION})
 @Init
 public class HitBox extends Check {
@@ -55,16 +56,20 @@ public class HitBox extends Check {
                 && allowedEntities.contains(getData().getTarget().getType())
                 && !getData().isCreativeMode()) {
 
-            val rayTrace = move.getPastLocation().getEstimatedLocation(0, move.getYawDelta() > 10 ? 100L : 50L)
+            val rayTrace = move.getPastLocation()
+                    .getEstimatedLocation(0, move.getYawDelta() > 10 ? 100L : 50L)
                     .stream()
-                    .map(loc -> loc.toLocation(getData().getPlayer().getWorld()).clone().add(0, getData().getPlayer().getEyeHeight(), 0))
+                    .map(loc ->
+                            loc.toLocation(getData().getPlayer().getWorld()).clone()
+                            .add(0, getData().getPlayer().getEyeHeight(), 0))
                     .map(loc -> new RayTrace(loc.toVector(), loc.getDirection()))
                     .collect(Collectors.toList());
 
             List<Vector> vectors = new ArrayList<>();
             rayTrace.stream().map(trace -> trace.traverse(3.2f, 0.1f)).forEach(vectors::addAll);
 
-            val entityLocations = getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), 150L)
+            val entityLocations = getData().getEntityPastLocation()
+                    .getEstimatedLocation(getData().getTransPing(), 150L)
                     .stream()
                     .map(loc -> getHitbox(getData().getTarget(), loc))
                     .collect(Collectors.toList());
@@ -76,7 +81,10 @@ public class HitBox extends Check {
 
             if(collided.size() == 0) {
                 if(vl++ > 6) {
-                    flag("collided=0 ping=" + getData().getTransPing() + " vl=" + vl, true, true, AlertTier.HIGH);
+                    flag("collided=0 ping=" + getData().getTransPing() + " vl=" + vl,
+                            true,
+                            true,
+                            AlertTier.HIGH);
                 }
             } else vl-= vl > 0 ? 0.25 : 0;
 

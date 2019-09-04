@@ -9,9 +9,10 @@ import cc.funkemunky.api.tinyprotocol.api.Packet;
 import lombok.val;
 import org.bukkit.event.Event;
 
-@Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.POSITION, Packet.Client.LEGACY_POSITION, Packet.Client.LEGACY_POSITION_LOOK})
+@Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.POSITION})
 //@cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Step (Type A)", description = "Checks for illegitimate collisions.", type = CheckType.STEP, maxVL = 50, executable = false)
+@CheckInfo(name = "Step (Type A)", description = "Checks for illegitimate collisions.", type = CheckType.STEP,
+        maxVL = 50)
 public class StepA extends Check {
 
     private float yTotal;

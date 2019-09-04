@@ -23,7 +23,10 @@ public class FlyB extends Check {
 
         if(!move.isNearGround() && !move.isCancelFlight() && move.getDeltaY() > move.getLastDeltaY() + 0.01) {
             if(vl.flag(1, 2000L)) {
-                flag(move.getDeltaXZ() + ">-" + move.getLastDeltaXZ(), true, true, AlertTier.LIKELY);
+                flag(move.getDeltaXZ() + ">-" + move.getLastDeltaXZ(),
+                        true,
+                        true,
+                        AlertTier.LIKELY);
             }
         }
     }

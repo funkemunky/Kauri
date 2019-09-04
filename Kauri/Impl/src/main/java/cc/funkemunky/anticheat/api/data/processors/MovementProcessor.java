@@ -22,15 +22,24 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @Getter
 public class MovementProcessor {
-    private boolean cancelFlight, serverPos, inLiquid, liquidBelow, clientOnGround, serverOnGround, fullyInAir, inAir, hasJumped, nearLiquid, blocksOnTop, pistonsNear, onHalfBlock,
-            onClimbable, onIce, collidesHorizontally, tookVelocity, inWeb, onSlime, onSlimeBefore, onSoulSand, isRiptiding, halfBlocksAround, isNearGround, isInsideBlock, blocksNear, blocksAround;
-    private int airTicks, groundTicks, iceTicks, climbTicks, halfBlockTicks, soulSandTicks, blockAboveTicks, optifineTicks, liquidTicks, webTicks, yawZeroTicks, pitchZeroTicks;
-    private float cinematicYaw, baseSpeed, cinematicPitch, lastCinematicYaw, lastCinematicPitch, deltaY, lastDeltaXZ, slimeHeight, fallDistance, yawDelta, pitchDelta, lastYawDelta, lastPitchDelta, lastDeltaY, deltaXZ, deltaX, lastDeltaX, deltaZ, lastDeltaZ, lastServerYVelocity, serverYAcceleration, clientYAcceleration, lastClientYAcceleration, lastServerYAcceleration, cinematicYawDelta, cinematicPitchDelta, lastCinematicPitchDelta, lastCinematicYawDelta;
+    private boolean cancelFlight, serverPos, inLiquid, liquidBelow, clientOnGround, serverOnGround,
+            fullyInAir, inAir, hasJumped, nearLiquid, blocksOnTop, pistonsNear, onHalfBlock,
+            onClimbable, onIce, collidesHorizontally, tookVelocity, inWeb, onSlime, onSlimeBefore,
+            onSoulSand, isRiptiding, halfBlocksAround, isNearGround, isInsideBlock, blocksNear, blocksAround;
+    private int airTicks, groundTicks, iceTicks, climbTicks, halfBlockTicks, soulSandTicks, blockAboveTicks,
+            optifineTicks, liquidTicks, webTicks, yawZeroTicks, pitchZeroTicks;
+    private float cinematicYaw, baseSpeed, cinematicPitch, deltaY, lastDeltaXZ, slimeHeight,
+            fallDistance, yawDelta, pitchDelta, lastYawDelta, lastPitchDelta, lastDeltaY,
+            deltaXZ, deltaX, lastDeltaX, deltaZ, lastDeltaZ, lastServerYVelocity, serverYAcceleration,
+            clientYAcceleration, lastClientYAcceleration, lastServerYAcceleration;
     private CustomLocation from, to;
     @Setter
     private float serverYVelocity;
     private PastLocation pastLocation = new PastLocation();
-    private TickTimer lastRiptide = new TickTimer(6), lastVehicle = new TickTimer(4), lastFlightToggle = new TickTimer(10);
+    private TickTimer
+            lastRiptide = new TickTimer(6),
+            lastVehicle = new TickTimer(4),
+            lastFlightToggle = new TickTimer(10);
     private List<BoundingBox> boxes = new ArrayList<>();
     private List<Entity> entitiesAround = new CopyOnWriteArrayList<>();
     private long lastTimeStamp, lagTicks, pitchGCD, lagTime, yawGCD, lastPitchGCD, lastYawGCD, offset = 16777216L;
@@ -43,7 +52,9 @@ public class MovementProcessor {
 
         if(player == null) return;
         val timeStamp = System.currentTimeMillis();
-        boolean chunkLoaded = Atlas.getInstance().getBlockBoxManager().getBlockBox().isChunkLoaded(player.getLocation());
+        boolean chunkLoaded = Atlas.getInstance().getBlockBoxManager()
+                .getBlockBox()
+                .isChunkLoaded(player.getLocation());
         if (from == null || to == null) {
             from = new CustomLocation(0, 0, 0, 0, 0);
             to = new CustomLocation(0, 0, 0, 0, 0);
@@ -57,11 +68,15 @@ public class MovementProcessor {
             to.setY(packet.getY());
             to.setZ(packet.getZ());
 
-            data.setBoundingBox(new BoundingBox(to.toVector(), to.toVector()).grow(0.3f, 0, 0.3f).add(0,0,0,0,1.84f,0));
+            data.setBoundingBox(new BoundingBox(to.toVector(), to.toVector())
+                    .grow(0.3f, 0, 0.3f)
+                    .add(0,0,0,0,1.84f,0));
 
             if (chunkLoaded) {
                 //Here we get the colliding boundingboxes surrounding the player.
-                List<BoundingBox> box = boxes = Atlas.getInstance().getBlockBoxManager().getBlockBox().getCollidingBoxes(player.getWorld(), data.getBoundingBox().grow(1f, 1f, 1f));
+                List<BoundingBox> box = boxes = Atlas.getInstance().getBlockBoxManager()
+                        .getBlockBox()
+                        .getCollidingBoxes(player.getWorld(), data.getBoundingBox().grow(1f, 1f, 1f));
 
                 CollisionAssessment assessment = new CollisionAssessment(data.getBoundingBox(), data);
 
@@ -70,17 +85,25 @@ public class MovementProcessor {
                 if(Atlas.getInstance().getCurrentTicks() % 2 == 0) {
                     entitiesAround.clear();
                     for (Entity entity : player.getNearbyEntities(1, 1, 1)) {
-                        if(!(entity instanceof Vehicle && !entity.getType().toString().contains("MINECART") && !entity.getType().toString().contains("SHULKER"))) continue;
+                        if(!(entity instanceof Vehicle
+                                && !entity.getType().toString().contains("MINECART")
+                                && !entity.getType().toString().contains("SHULKER"))) continue;
 
                         entitiesAround.add(entity);
                     }
                 }
 
                 for (Entity entity : entitiesAround) {
-                    assessment.assessBox(ReflectionsUtil.toBoundingBox(ReflectionsUtil.getBoundingBox(entity)), player.getWorld(), true);
+                    assessment.assessBox(
+                            ReflectionsUtil
+                                    .toBoundingBox(
+                                            ReflectionsUtil.getBoundingBox(entity)),
+                            player.getWorld(),
+                            true);
                 }
 
-                //Now we scrub through the colliding boxes for any important information that could be fed into detections.
+                //Now we scrub through the colliding boxes for any important information
+                // that could be fed into detections.
                 box.parallelStream().forEach(bb -> assessment.assessBox(bb, player.getWorld(), false));
 
 
@@ -150,10 +173,15 @@ public class MovementProcessor {
                 data.getLastPacketSkip().reset();
             } else lagTime = 0;
             val block = BlockUtils.getBlock(to.toLocation(data.getPlayer().getWorld()));
-            val blockAbove = BlockUtils.getBlock(to.toLocation(data.getPlayer().getWorld()).clone().add(0, 1, 0));
-            val blockBelow = BlockUtils.getBlock(to.toLocation(data.getPlayer().getWorld()).clone().subtract(0, 1,0));
+            val blockAbove = BlockUtils.getBlock(to.toLocation(data.getPlayer().getWorld()).clone()
+                    .add(0, 1, 0));
+            val blockBelow = BlockUtils.getBlock(to.toLocation(data.getPlayer().getWorld()).clone()
+                    .subtract(0, 1,0));
 
-            isInsideBlock = block == null || blockAbove == null || BlockUtils.isSolid(block) || BlockUtils.isSolid(blockAbove);
+            isInsideBlock = block == null
+                    || blockAbove == null
+                    || BlockUtils.isSolid(block)
+                    || BlockUtils.isSolid(blockAbove);
 
             data.setBlockAbove(blockAbove);
             data.setBlockBelow(blockBelow);
@@ -186,7 +214,8 @@ public class MovementProcessor {
                     || (serverPos && serverOnGround)
                     || lastVehicle.hasNotPassed(2 + MathUtils.floor(data.getTransPing() / 50D))
                     || getLastFlightToggle().hasNotPassed(3)
-                    || timeStamp - data.getVelocityProcessor().getLastVelocityTimestamp() <= 100L + data.getTransPing()) {
+                    || timeStamp -
+                    data.getVelocityProcessor().getLastVelocityTimestamp() <= 100L + data.getTransPing()) {
                 serverYVelocity = deltaY;
             }
 
@@ -211,7 +240,14 @@ public class MovementProcessor {
             webTicks = inWeb ? Math.min(30, webTicks + 1) : Math.max(webTicks, webTicks - 1);
 
             if (data.getTeleportLocations().size() > 0) {
-                val vecStream = data.getTeleportLocations().stream().filter(vec -> (MiscSettings.horizontalServerPos ? MathUtils.offset(vec, to.toVector()) : vec.distance(to.toVector())) < 1E-8).findFirst().orElse(null);
+                val vecStream = data.getTeleportLocations()
+                        .stream()
+                        .filter(vec ->
+                                (MiscSettings.horizontalServerPos
+                                        ? MathUtils.offset(vec, to.toVector())
+                                        : vec.distance(to.toVector())) < 1E-8)
+                        .findFirst()
+                        .orElse(null);
 
                 if (vecStream != null) {
                     if (data.getTeleportLoc() != null && vecStream.distance(data.getTeleportLoc().toVector()) == 0) {
@@ -245,7 +281,9 @@ public class MovementProcessor {
         deltaZ = (float) (to.getZ() - from.getZ());
         deltaXZ = (float) (MiscUtils.hypot(deltaX, deltaZ));
 
-        boolean hasLevi = packet.getPlayer().getActivePotionEffects().stream().anyMatch(effect -> effect.getType().getName().toLowerCase().contains("levi"));
+        boolean hasLevi = packet.getPlayer().getActivePotionEffects()
+                .stream()
+                .anyMatch(effect -> effect.getType().getName().toLowerCase().contains("levi"));
         
         cancelFlight = player.getAllowFlight()
                 || serverPos
@@ -266,7 +304,8 @@ public class MovementProcessor {
                 || isOnSlimeBefore()
                 || getLastRiptide().hasNotPassed(8)
                 || isPistonsNear()
-                || data.getVelocityProcessor().getLastVelocity().hasNotPassed(10 + MiscUtils.millisToTicks(data.getPing()));
+                || data.getVelocityProcessor().getLastVelocity()
+                .hasNotPassed(10 + MiscUtils.millisToTicks(data.getPing()));
 
         if (player.getVehicle() != null || PlayerUtils.isGliding(player)) lastVehicle.reset();
 
@@ -274,19 +313,26 @@ public class MovementProcessor {
             to.setYaw(packet.getYaw());
             to.setPitch(packet.getPitch());
 
-            //Algorithm stripped from the MC client which calculates the deceleration of rotation when using cinematic/optifine zoom.
+            //Algorithm stripped from the MC client which calculates the deceleration of rotation
+            //when using cinematic/optifine zoom.
             //Used to separate a legitimate aimbot-like rotation from a cheat.
             lastYawDelta = yawDelta;
             lastPitchDelta = pitchDelta;
-            float yawDelta = this.yawDelta = cc.funkemunky.anticheat.api.utils.MathUtils.getDistanceBetweenAngles(to.getYaw(), from.getYaw()), pitchDelta = this.pitchDelta = MathUtils.getDelta(to.getPitch(), from.getPitch());
+            float yawDelta
+                    = this.yawDelta
+                    = cc.funkemunky.anticheat.api.utils.MathUtils
+                    .getDistanceBetweenAngles(
+                            to.getYaw(),
+                            from.getYaw()),
+                    pitchDelta
+                            = this.pitchDelta
+                            = MathUtils.getDelta(to.getPitch(), from.getPitch());
             if(data.isLoggedIn()) data.setLoggedIn(false);
 
             cinematicYaw =  findClosestCinematicYaw(data, to.getYaw(), from.getYaw());
             cinematicPitch = findClosestCinematicPitch(data, to.getPitch(), from.getPitch());
-            cinematicYawDelta = MathUtils.getDelta(cinematicYaw, lastCinematicYaw);
-            cinematicPitchDelta = MathUtils.getDelta(cinematicPitch, lastCinematicPitch);
 
-            if (Float.isNaN(cinematicPitchDelta) || Float.isNaN(cinematicYawDelta)) {
+            if (Float.isNaN(cinematicPitch) || Float.isNaN(cinematicYaw)) {
                 data.getYawSmooth().reset();
                 data.getPitchSmooth().reset();
             }
@@ -297,7 +343,6 @@ public class MovementProcessor {
             lastPitchGCD = pitchGCD;
             pitchGCD = MiscUtils.gcd((long) (pitchDelta * offset), (long) (lastPitchDelta * offset));
 
-            //Bukkit.broadcastMessage(smoothDelta + "," + smoothDelta2 + ": " + "(" + smoothDelta / yawDelta + "), " + "(" + (smoothDelta2 / pitchDelta) + "): " + data.isCinematicMode());
             if (data.isCinematicMode()) {
                 optifineTicks += optifineTicks < 60 ? 1 : 0;
             } else if (optifineTicks > 0) {
@@ -315,38 +360,19 @@ public class MovementProcessor {
         if (to.getPitch() == from.getPitch()) {
             pitchZeroTicks = Math.min(20, pitchZeroTicks + 1);
         } else pitchZeroTicks -= pitchZeroTicks > 0 ? 1 : 0;
-        //predict(data, .98f, .98f, false);
 
         pastLocation.addLocation(new CustomLocation(to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch()));
         data.setGeneralCancel(serverPos || ((timeStamp - data.getLastRespawn()) < 150 + data.getTransPing() * 2) || data.isLagging() || lastVehicle.hasNotPassed(10) || getLastFlightToggle().hasNotPassed(15) || !chunkLoaded || packet.getPlayer().getAllowFlight() || hasLevi || packet.getPlayer().getGameMode().toString().contains("CREATIVE") || packet.getPlayer().getGameMode().toString().contains("SPEC") || lastVehicle.hasNotPassed() || getLastRiptide().hasNotPassed(10) || data.getLastLogin().hasNotPassed(50));
     }
 
-    /*
-        Minecraft Code for Cinematic:
-            if (this.mc.gameSettings.smoothCamera) {
-                float f = this.mc.gameSettings.mouseSensitivity * 0.6F + 0.2F;
-                float f1 = f * f * f * 8.0F;
-                this.smoothCamFilterX = this.mouseFilterXAxis.smooth(this.smoothCamYaw, 0.05F * f1);
-                this.smoothCamFilterY = this.mouseFilterYAxis.smooth(this.smoothCamPitch, 0.05F * f1);
-                this.smoothCamPartialTicks = 0.0F;
-                this.smoothCamYaw = 0.0F;
-                this.smoothCamPitch = 0.0F;
-            } else {
-                this.smoothCamFilterX = 0.0F;
-                this.smoothCamFilterY = 0.0F;
-                this.mouseFilterXAxis.reset();
-                this.mouseFilterYAxis.reset();
-            }
-     */
-
     private float findClosestCinematicYaw(PlayerData data, float yaw, float lastYaw) {
-        float value = sensitivities.stream().sorted(Comparator.comparing(val -> {
+        float value = sensitivities.stream().min(Comparator.comparing(val -> {
             float f = val * 0.6f + .2f;
             float f1 = (f * f * f) * 8f;
             float smooth = mouseFilterX.smooth(lastYaw, 0.05f * f1);
             mouseFilterX.reset();
             return cc.funkemunky.anticheat.api.utils.MathUtils.getDistanceBetweenAngles(yaw, smooth);
-        }, Comparator.naturalOrder())).findFirst().orElse(1f);
+        }, Comparator.naturalOrder())).orElse(1f);
 
         float f = value * 0.6f + .2f;
         float f1 = (f * f * f) * 8f;
@@ -354,13 +380,13 @@ public class MovementProcessor {
     }
 
     private float findClosestCinematicPitch(PlayerData data, float pitch, float lastPitch) {
-        float value = sensitivities.stream().sorted(Comparator.comparing(val -> {
+        float value = sensitivities.stream().min(Comparator.comparing(val -> {
             float f = val * 0.6f + .2f;
             float f1 = (f * f * f) * 8f;
             float smooth = mouseFilterY.smooth(lastPitch, 0.05f * f1);
             mouseFilterY.reset();
             return MathUtils.getDelta(pitch, smooth);
-        }, Comparator.naturalOrder())).findFirst().orElse(1f);
+        }, Comparator.naturalOrder())).orElse(1f);
 
         float f = value * 0.6f + .2f;
         float f1 = (f * f * f) * 8f;

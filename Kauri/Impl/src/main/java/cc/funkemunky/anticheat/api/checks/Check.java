@@ -48,18 +48,22 @@ public abstract class Check {
 
     protected void flag(String information, boolean cancel, boolean ban, int vlToAdd, AlertTier tier) {
         Kauri.getInstance().getExecutorService().execute(() -> {
-            if(Kauri.getInstance().getTps() > CheckSettings.tpsThreshold && System.currentTimeMillis() - Kauri.getInstance().getLastTPS() < 100) {
+            if(Kauri.getInstance().getTps() > CheckSettings.tpsThreshold
+                    && System.currentTimeMillis() - Kauri.getInstance().getLastTPS() < 100) {
                 PlayerCheatEvent event = new PlayerCheatEvent(getData().getPlayer(), this);
 
                 Bukkit.getPluginManager().callEvent(event);
 
                 if(!event.isCancelled()) {
                     data.getLastFlag().reset();
-                    final AlertTier alertTier = getData().isLagging() ? AlertTier.getByValue(tier.getPriority() - 2) : tier;
+                    final AlertTier alertTier = getData().isLagging()
+                            ? AlertTier.getByValue(tier.getPriority() - 2)
+                            : tier;
 
                     long timeStamp = System.currentTimeMillis();
                     if (cancel && cancellable) {
-                        PlayerCancelEvent cancelEvent = new PlayerCancelEvent(getData().getPlayer(), this, cancelType);
+                        PlayerCancelEvent cancelEvent =
+                                new PlayerCancelEvent(getData().getPlayer(), this, cancelType);
 
                         Bukkit.getPluginManager().callEvent(cancelEvent);
 
@@ -75,7 +79,8 @@ public abstract class Check {
                         }
                         Kauri.getInstance().getLoggerManager().addViolation(data, this, information, tier);
                     }
-                    if (alertTier.equals(AlertTier.CERTAIN) || (vl > maxVL && executable && ban && !developer && !getData().isBanned())) {
+                    if (alertTier.equals(AlertTier.CERTAIN)
+                            || (vl > maxVL && executable && ban && !developer && !getData().isBanned())) {
                         banUser();
                     }
 
@@ -83,16 +88,43 @@ public abstract class Check {
                         JsonMessage message = new JsonMessage();
                         if (timeStamp - lastAlert > CheckSettings.alertsDelay) {
                             if (!developer) {
-                                message.addText(Color.translate(alertMessage.replace("%prefix%", CheckSettings.alertPrefix).replace("%check%", getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", String.valueOf(vl)).replace("%info%", information).replace("%chance%", alertTier.getName()))).addHoverText(Color.Gray + information);
+                                message.addText(Color.translate(
+                                        alertMessage.
+                                                replace("%prefix%", CheckSettings.alertPrefix)
+                                                .replace("%check%", getName())
+                                                .replace("%player%", data.getPlayer().getName())
+                                                .replace("%vl%", String.valueOf(vl))
+                                                .replace("%info%", information)
+                                                .replace("%chance%", alertTier.getName())))
+                                        .addHoverText(Color.Gray + information);
 
-                                Kauri.getInstance().getCheckManager().getAlerts().stream().filter(data2 -> data2.getAlertTier().getPriority() <= alertTier.getPriority()).forEach(data2 -> message.sendToPlayer(data2.getPlayer()));
+                                Kauri.getInstance().getCheckManager().getAlerts().stream()
+                                        .filter(data2 -> data2.getAlertTier().getPriority() <= alertTier.getPriority())
+                                        .forEach(data2 -> message.sendToPlayer(data2.getPlayer()));
                                 if (CheckSettings.printToConsole) {
-                                    MiscUtils.printToConsole(alertMessage.replace("%check%", (developer ? Color.Red + Color.Italics : "") + getName()).replace("%prefix%", CheckSettings.alertPrefix).replace("%check%", getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", String.valueOf(vl)).replace("%info%", information).replace("%chance%", alertTier.getName()));
+                                    MiscUtils.printToConsole(alertMessage
+                                            .replace("%check%",
+                                                    (developer ? Color.Red + Color.Italics : "") + getName())
+                                            .replace("%prefix%", CheckSettings.alertPrefix)
+                                            .replace("%check%", getName())
+                                            .replace("%player%", data.getPlayer().getName())
+                                            .replace("%vl%", String.valueOf(vl))
+                                            .replace("%info%", information)
+                                            .replace("%chance%", alertTier.getName()));
                                 }
                             } else {
-                                message.addText(Color.translate(alertMessage.replace("%prefix%", CheckSettings.devAlertPrefix).replace("%check%", Color.Red + Color.Italics + getName()).replace("%player%", data.getPlayer().getName()).replace("%vl%", "N/A").replace("%chance%", alertTier.getName()).replace("%info%", information))).addHoverText(Color.Gray + information);
+                                message.addText(Color.translate(alertMessage
+                                        .replace("%prefix%", CheckSettings.devAlertPrefix)
+                                        .replace("%check%", Color.Red + Color.Italics + getName())
+                                        .replace("%player%", data.getPlayer().getName())
+                                        .replace("%vl%", "N/A")
+                                        .replace("%chance%", alertTier.getName())
+                                        .replace("%info%", information)))
+                                        .addHoverText(Color.Gray + information);
 
-                                Kauri.getInstance().getCheckManager().getDevAlerts().forEach(data -> message.sendToPlayer(data.getPlayer()));
+                                Kauri.getInstance().getCheckManager()
+                                        .getDevAlerts()
+                                        .forEach(data -> message.sendToPlayer(data.getPlayer()));
                             }
                             if (CheckSettings.testMode && !data.isAlertsEnabled()) {
                                 message.sendToPlayer(data.getPlayer());
@@ -112,11 +144,15 @@ public abstract class Check {
             new BukkitRunnable() {
                 public void run() {
                     vl = 0;
-                    execCommand.forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replace("%player%", getData().getPlayer().getName()).replace("%check%", getName())));
+                    execCommand.forEach(cmd ->
+                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd
+                                            .replace("%player%", getData().getPlayer().getName())
+                                            .replace("%check%", getName())));
                 }
             }.runTaskLater(Kauri.getInstance(), 10);
             if (CheckSettings.broadcastEnabled)
-                Bukkit.broadcastMessage(Color.translate(CheckSettings.broadcastMessage.replace("%player%", getData().getPlayer().getName())));
+                Bukkit.broadcastMessage(Color.translate(CheckSettings.broadcastMessage
+                        .replace("%player%", getData().getPlayer().getName())));
             Kauri.getInstance().getLoggerManager().addBan(data.getUuid(), this);
         }
     }
@@ -157,11 +193,15 @@ public abstract class Check {
     public void debug(String debugString) {
         Atlas.getInstance().getService().execute(() -> {
             if(Kauri.getInstance().getCheckManager().getDebuggingPlayers().containsKey(data.getUuid())) {
-                List<PlayerData> dataList = new ArrayList<>(Kauri.getInstance().getCheckManager().getDebuggingPlayers().get(data.getUuid()));
+                List<PlayerData> dataList = new ArrayList<>(Kauri.getInstance().getCheckManager()
+                        .getDebuggingPlayers().get(data.getUuid()));
 
                 dataList.stream().filter(data ->
-                        data!=null && data.getDebuggingCheck()!=null && data.getDebuggingCheck().getName().equalsIgnoreCase(getName()))
-                        .forEach(dData -> dData.getPlayer().sendMessage(Color.translate("&8[&cDebug&8] &7" + debugString)));
+                        data != null
+                                && data.getDebuggingCheck() != null
+                                && data.getDebuggingCheck().getName().equalsIgnoreCase(getName()))
+                        .forEach(dData -> dData.getPlayer()
+                                .sendMessage(Color.translate("&8[&cDebug&8] &7" + debugString)));
 
                 dataList.clear();
             }

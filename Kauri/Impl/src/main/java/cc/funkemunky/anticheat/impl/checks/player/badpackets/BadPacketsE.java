@@ -8,7 +8,8 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 
 @BukkitEvents(events = {EntityRegainHealthEvent.class})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "BadPackets (Type E)", description = "Checks the rate of healing.", type = CheckType.BADPACKETS, cancelType = CancelType.HEALTH, maxVL = 20, executable = true)
+@CheckInfo(name = "BadPackets (Type E)", description = "Checks the rate of healing.",
+        type = CheckType.BADPACKETS, cancelType = CancelType.HEALTH, maxVL = 20, executable = true)
 public class BadPacketsE extends Check {
 
     private Verbose verbose = new Verbose();
@@ -24,7 +25,8 @@ public class BadPacketsE extends Check {
         if (!e.getRegainReason().equals(EntityRegainHealthEvent.RegainReason.SATIATED)) return;
 
         if (verbose.flag(2, 450)) {
-            flag(verbose.getLastFlag().getPassed() + "<-15", false, true, verbose.getVerbose() > 5 ? AlertTier.CERTAIN : AlertTier.HIGH);
+            flag(verbose.getLastFlag().getPassed() + "<-15", false, true,
+                    verbose.getVerbose() > 5 ? AlertTier.CERTAIN : AlertTier.HIGH);
         }
     }
 }

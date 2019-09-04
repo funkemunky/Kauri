@@ -18,7 +18,9 @@ import org.bukkit.event.Event;
         Packet.Client.LEGACY_POSITION_LOOK,
         Packet.Client.LEGACY_LOOK})
 //@cc.funkemunky.api.utils.Init
-@CheckInfo(name = "BadPackets (Type F)", description = "Checks frequency of incoming packets. More reliable, but less detection.", type = CheckType.BADPACKETS, maxVL = 40)
+@CheckInfo(name = "BadPackets (Type F)",
+        description = "Checks frequency of incoming packets. More reliable, but less detection.",
+        type = CheckType.BADPACKETS, maxVL = 40)
 public class BadPacketsF extends Check {
 
     @Setting(name = "threshold.intervalTime")
@@ -32,7 +34,9 @@ public class BadPacketsF extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if (!getData().isLagging() && !getData().getMovementProcessor().isServerPos() && getData().getLastLogin().hasPassed(40)) {
+        if (!getData().isLagging()
+                && !getData().getMovementProcessor().isServerPos()
+                && getData().getLastLogin().hasPassed(40)) {
             if (ticks++ >= 20) {
                 val elapsed = timeStamp - lastReset;
                 if (elapsed < threshold) {

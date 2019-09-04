@@ -12,7 +12,8 @@ import lombok.val;
 import org.bukkit.event.Event;
 
 @Init
-@CheckInfo(name = "Autoclicker (Type B)", description = "Checks for consistency within certain areas.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 50)
+@CheckInfo(name = "Autoclicker (Type B)", description = "Checks for consistency within certain areas.",
+        type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 50)
 @Packets(packets = {Packet.Client.ARM_ANIMATION})
 public class AutoclickerB extends Check {
 
@@ -30,10 +31,19 @@ public class AutoclickerB extends Check {
                 val std = (float) cpsList.std();
                 val average = (float) cpsList.average();
                 val distinct = cpsList.distinctCount();
-                if(std > 4 && average > 8 && (distinct < 15 || MathUtils.getDelta(average, lastAverage) > 2.5) && MathUtils.getDelta(std, lastStd) < 1.1) {
+                if(std > 4
+                        && average > 8
+                        && (distinct < 15 || MathUtils.getDelta(average, lastAverage) > 2.5)
+                        && MathUtils.getDelta(std, lastStd) < 1.1) {
                     debug(Color.Green + "Flag");
                     vl+= 2;
-                } else if(MathUtils.getDelta(average, lastAverage) < 0.1 && !cc.funkemunky.api.utils.MathUtils.approxEquals(0.2, MathUtils.getDelta(average, lastAverage), MathUtils.getDelta(std, lastStd)) && std > 4) {
+                } else if(MathUtils.getDelta(average, lastAverage) < 0.1
+                        && !cc.funkemunky.api.utils.MathUtils
+                        .approxEquals(
+                                0.2,
+                                MathUtils.getDelta(average, lastAverage),
+                                MathUtils.getDelta(std, lastStd))
+                        && std > 4) {
                     debug(Color.Green + "Flag 2");
                     vl++;
                 } else if(distinct > 15 && std < 3 && average > 8) {
@@ -46,7 +56,8 @@ public class AutoclickerB extends Check {
                 } else vl-= vl > 0 ? 2 : 0;
 
                 if(vl > 6) {
-                    flag("std=" + std + " avg=" + average + " distinct=" + distinct + " vl=" + vl, true, true, AlertTier.HIGH);
+                    flag("std=" + std + " avg=" + average + " distinct=" + distinct + " vl=" + vl,
+                            true, true, AlertTier.HIGH);
                 }
 
                 debug("std=" + std + " avg=" + average + " distinct=" + distinct + " vl=" + vl);

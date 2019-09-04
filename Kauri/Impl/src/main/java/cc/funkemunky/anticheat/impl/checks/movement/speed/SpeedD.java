@@ -13,7 +13,8 @@ import org.bukkit.event.Event;
 
 @Init
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.POSITION})
-@CheckInfo(name = "Speed (Type D)", description = "Sets a maximum limit to how fast a player can move in a tick.", type = CheckType.SPEED, maxVL = 50, executable = true)
+@CheckInfo(name = "Speed (Type D)", description = "Sets a maximum limit to how fast a player can move in a tick.",
+        type = CheckType.SPEED, maxVL = 50, executable = true)
 public class SpeedD extends Check {
 
     @Override

@@ -31,11 +31,15 @@ public class FlyD extends Check {
                 && move.getAirTicks() == 1
                 && move.getDeltaY() > 0) {
             if(verbose.flag(2, 2000L)) {
-                flag("predicted=" + predicted + " deltaY=" + move.getDeltaY(), true, true, AlertTier.HIGH);
+                flag("predicted=" + predicted + " deltaY=" + move.getDeltaY(),
+                        true,
+                        true,
+                        AlertTier.HIGH);
             }
         }
 
-        debug("predicted=" + predicted + " deltaY=" + move.getDeltaY() + " onGround=" + move.isServerOnGround() + " airTicks=" + move.getAirTicks());
+        debug("predicted=" + predicted + " deltaY=" + move.getDeltaY() + " onGround="
+                + move.isServerOnGround() + " airTicks=" + move.getAirTicks());
     }
 
     @Override

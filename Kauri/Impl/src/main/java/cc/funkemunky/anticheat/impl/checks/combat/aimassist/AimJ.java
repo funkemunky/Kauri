@@ -23,7 +23,8 @@ public class AimJ extends Check {
 
         if(move.getPitchDelta() < 0.0086 && getData().getLastAttack().hasNotPassed(10)) {
             if(vl++ > 30) {
-                flag("pitchDelta=" + move.getPitchDelta(), true, true, vl > 50 ? AlertTier.HIGH : AlertTier.LIKELY);
+                flag("pitchDelta=" + move.getPitchDelta(), true, true,
+                        vl > 50 ? AlertTier.HIGH : AlertTier.LIKELY);
             }
         } else vl = 0;
     }

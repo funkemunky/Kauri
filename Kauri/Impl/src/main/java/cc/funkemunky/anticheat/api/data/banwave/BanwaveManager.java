@@ -29,7 +29,9 @@ public class BanwaveManager {
             if (BanwaveConfig.enabled) {
                 runJudgementDay();
             }
-        }, BanwaveConfig.intervalTime, BanwaveConfig.intervalTime, TimeUnit.valueOf(BanwaveConfig.intervalUnit.toUpperCase()));
+        }, BanwaveConfig.intervalTime,
+                BanwaveConfig.intervalTime,
+                TimeUnit.valueOf(BanwaveConfig.intervalUnit.toUpperCase()));
     }
 
     public void runJudgementDay() {
@@ -70,7 +72,8 @@ public class BanwaveManager {
 
         new BukkitRunnable() {
             public void run() {
-                Bukkit.dispatchCommand(Atlas.getInstance().getConsoleSender(), addPlayerName(BanwaveConfig.punishCommand, name));
+                Bukkit.dispatchCommand(Atlas.getInstance().getConsoleSender(),
+                        addPlayerName(BanwaveConfig.punishCommand, name));
             }
         }.runTask(Kauri.getInstance());
     }
@@ -83,8 +86,10 @@ public class BanwaveManager {
             Map<Check, Integer> violations = new HashMap<>();
 
             violationsToSort.keySet().stream()
-                    .filter(key2 -> Kauri.getInstance().getCheckManager().isCheck(key2) && Kauri.getInstance().getCheckManager().getCheck(key2).isBanWave())
-                    .forEach(key2 -> violations.put(Kauri.getInstance().getCheckManager().getCheck(key2), violationsToSort.get(key2)));
+                    .filter(key2 -> Kauri.getInstance().getCheckManager().isCheck(key2)
+                            && Kauri.getInstance().getCheckManager().getCheck(key2).isBanWave())
+                    .forEach(key2 -> violations.put(Kauri.getInstance().getCheckManager()
+                            .getCheck(key2), violationsToSort.get(key2)));
 
             return violations.keySet().stream().anyMatch(key2 -> key2.getBanWaveThreshold() > violations.get(key2));
         }).forEach(uuids::add);

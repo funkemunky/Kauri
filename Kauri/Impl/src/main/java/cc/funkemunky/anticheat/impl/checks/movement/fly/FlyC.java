@@ -24,7 +24,10 @@ public class FlyC extends Check {
 
         float threshold =  MiscUtils.getPredictedJumpHeight(getData()) + 0.1f;
         if(!move.isCancelFlight() && move.getDeltaY() > threshold) {
-            flag(move.getDeltaY() + ">-" + threshold, true, true, verbose.flag(4, 1000L) ? AlertTier.HIGH : AlertTier.LIKELY);
+            flag(move.getDeltaY() + ">-" + threshold,
+                    true,
+                    true,
+                    verbose.flag(4, 1000L) ? AlertTier.HIGH : AlertTier.LIKELY);
         }
     }
 

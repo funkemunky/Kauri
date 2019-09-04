@@ -10,7 +10,8 @@ import org.bukkit.event.Event;
 
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LOOK})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Aim (Type B)", description = "Makes sure the aim acceleration is legitimate.", type = CheckType.AIM, cancelType = CancelType.MOTION, maxVL = 80, executable = true)
+@CheckInfo(name = "Aim (Type B)", description = "Makes sure the aim acceleration is legitimate.", type = CheckType.AIM,
+        cancelType = CancelType.MOTION, maxVL = 80, executable = true)
 public class AimB extends Check {
 
     private int vl;
@@ -31,9 +32,12 @@ public class AimB extends Check {
         val yawAccel = MathUtils.getDelta(move.getYawDelta(), move.getLastYawDelta());
         val pitchAccel = MathUtils.getDelta(move.getPitchDelta(), move.getLastPitchDelta());
 
-        if (yawAccel == 0 && pitchAccel == 0 && getData().getPlayer().getVehicle() == null && Math.abs(move.getTo().getPitch()) < 80 && yawDelta > 0.1) {
+        if (yawAccel == 0 && pitchAccel == 0
+                && getData().getPlayer().getVehicle() == null
+                && Math.abs(move.getTo().getPitch()) < 80
+                && yawDelta > 0.1) {
             if (vl++ > vlMax) {
-                flag("p+y acceleration = 0; vl=" + vl, true, true, AlertTier.LIKELY);
+                flag("p|y = 0; vl=" + vl, true, true, AlertTier.LIKELY);
             }
         } else vl -= vl > 0 ? subtract : 0;
     }

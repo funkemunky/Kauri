@@ -10,7 +10,9 @@ import org.bukkit.event.Event;
 
 @Packets(packets = {Packet.Client.ARM_ANIMATION})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Autoclicker (Type A)", description = "A unique fast click check that detects jumps in CPS much faster.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, executable = true, maxVL = 12)
+@CheckInfo(name = "Autoclicker (Type A)",
+        description = "Calculates how many clicks per second is received to the server.",
+        type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, executable = true, maxVL = 12)
 public class AutoclickerA extends Check {
 
     @Setting(name = "maxCPS")
@@ -25,7 +27,9 @@ public class AutoclickerA extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(MiscUtils.shouldReturnArmAnimation(getData()) || getData().isLagging() || Kauri.getInstance().getTps() < 15) {
+        if(MiscUtils.shouldReturnArmAnimation(getData())
+                || getData().isLagging()
+                || Kauri.getInstance().getTps() < 15) {
             ticks = 0;
             return;
         }

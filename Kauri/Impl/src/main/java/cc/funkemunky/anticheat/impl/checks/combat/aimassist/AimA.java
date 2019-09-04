@@ -11,7 +11,8 @@ import org.bukkit.event.Event;
         Packet.Client.POSITION_LOOK,
         Packet.Client.LOOK})
 @Init
-@CheckInfo(name = "Aim (Type A)", description = "Checks for common denominators in the pitch.", cancelType = CancelType.MOTION, type = CheckType.AIM, executable = true, maxVL = 20)
+@CheckInfo(name = "Aim (Type A)", description = "Checks for common denominators in the pitch.",
+        cancelType = CancelType.MOTION, type = CheckType.AIM, executable = true, maxVL = 20)
 public class AimA extends Check {
 
     private double vl;
@@ -37,7 +38,9 @@ public class AimA extends Check {
                 vl -= vl > 0 ? (getData().isCinematicMode() ? 1 : 0.5) : 0;
             }
 
-            debug("VL: " + vl + " PITCH: " + move.getPitchGCD() + " OPTIFINE: " + getData().isCinematicMode());
+            debug("VL: " + vl
+                    + " PITCH: " + move.getPitchGCD()
+                    + " OPTIFINE: " + getData().isCinematicMode());
         }
     }
 

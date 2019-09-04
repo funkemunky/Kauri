@@ -19,7 +19,9 @@ import org.bukkit.event.Event;
         Packet.Client.POSITION_LOOK,
         Packet.Client.LOOK})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "BadPackets (Type G)", description = "Checks frequency of incoming packets. More detection, but less reliable.", type = CheckType.BADPACKETS, maxVL = 200, executable = false)
+@CheckInfo(name = "BadPackets (Type G)",
+        description = "Checks frequency of incoming packets. More detection, but less reliable.",
+        type = CheckType.BADPACKETS, maxVL = 200)
 public class BadPacketsG extends Check {
 
     private long lastTS;
@@ -42,9 +44,13 @@ public class BadPacketsG extends Check {
             double ratio = 50 / average;
             double pct = ratio * 100;
 
-            if((pct > 101) && (timeStamp - getData().getLastServerPosStamp() > 150L) && !getData().isLagging() && System.currentTimeMillis() - Kauri.getInstance().getLastTPS() < 150 && Kauri.getInstance().getTps() > 18.5) {
+            if((pct > 101) && (timeStamp - getData().getLastServerPosStamp() > 150L)
+                    && !getData().isLagging()
+                    && System.currentTimeMillis() - Kauri.getInstance().getLastTPS() < 150
+                    && Kauri.getInstance().getTps() > 18.5) {
                 if(vl++ > verboseVL) {
-                    flag("pct=" + MathUtils.round(pct, 2) + "%, vl=" + vl, true, true, AlertTier.HIGH);
+                    flag("pct=" + MathUtils.round(pct, 2) + "%, vl=" + vl,
+                            true, true, AlertTier.HIGH);
                 }
             } else vl-= vl > 0 ? 1.5 : 0;
 

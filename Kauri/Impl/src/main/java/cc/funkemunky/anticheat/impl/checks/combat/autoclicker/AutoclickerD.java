@@ -14,8 +14,9 @@ import java.util.List;
 
 @Init
 @Packets(packets = {Packet.Client.ARM_ANIMATION})
-@CheckInfo(name = "Autoclicker (Type J)", description = "Checks if your CPS is constant nibba.", type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 50)
-public class AutoclickerJ extends Check {
+@CheckInfo(name = "Autoclicker (Type D)", description = "Checks if your CPS is constant (hehe xd).",
+        type = CheckType.AUTOCLICKER, cancelType = CancelType.INTERACT, maxVL = 50)
+public class AutoclickerD extends Check {
 
     private List<Long> cpsList = new ArrayList<>();
     private long lastClick;
@@ -30,11 +31,14 @@ public class AutoclickerJ extends Check {
         val delta = timeStamp - lastClick;
 
         if(cpsList.size() > 15) {
-            double average = 1000 / cpsList.stream().mapToLong(val -> val).average().getAsDouble();
+            double average = 1000 / cpsList.stream().mapToLong(val -> val).average().orElse(-1);
+
+            if(average < 0) return;
 
             if(average > 7.4 && MathUtils.getDelta(average, lastAverage) < 0.75) {
                 if(vl++ > 5) {
-                    flag("your mom a hoe", true, true, vl > 10 ? AlertTier.HIGH : AlertTier.LIKELY);
+                    flag("your mom a hoe", true, true,
+                            vl > 10 ? AlertTier.HIGH : AlertTier.LIKELY);
                 }
             } else vl-= vl > 0 ? 1 : 0;
 

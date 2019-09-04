@@ -27,7 +27,8 @@ import java.util.List;
         Packet.Client.FLYING,
         Packet.Server.ENTITY_VELOCITY})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Velocity (Type B)", description = "Checks for horizontal velocity modifications.", type = CheckType.VELOCITY, maxVL = 20)
+@CheckInfo(name = "Velocity (Type B)", description = "Checks for horizontal velocity modifications.",
+        type = CheckType.VELOCITY, maxVL = 20)
 public class VelocityB extends Check {
 
     private float vl, velocityX, velocityZ, velocityY;
@@ -53,7 +54,8 @@ public class VelocityB extends Check {
                 velocityY = (float) velocity.getY();
                 velocityZ = (float) velocity.getZ();
                 velocityTimestamp = timeStamp;
-                debug("Sent velocity (" + System.currentTimeMillis() + ") [" + velocityX + ", " + velocityY + ", " + velocityZ + "]");
+                debug("Sent velocity (" + System.currentTimeMillis() + ") ["
+                        + velocityX + ", " + velocityY + ", " + velocityZ + "]");
             }
         } else {
             val move = getData().getMovementProcessor();
@@ -63,14 +65,18 @@ public class VelocityB extends Check {
             long deltaTicks = MathUtils.millisToTicks(delta), pingTicks = MathUtils.millisToTicks(ping);
 
             if(velocityY > 0 && MathUtils.approxEquals(0.01, velocityY, move.getDeltaY())) {
-                if(getData().getBoundingBox().shrink(0, 0.1f, 0).grow(1,0,1).getCollidingBlockBoxes(getData().getPlayer()).size() == 0) {
+                if(getData().getBoundingBox().shrink(0, 0.1f, 0)
+                        .grow(1,0,1)
+                        .getCollidingBlockBoxes(getData().getPlayer()).size() == 0) {
                     //debug(velocityX + ", " + velocityZ);
                     float friction = getData().getActionProcessor().isSprinting() ? 0.026f : 0.02f;
 
                     List<double[]> arrays = new ArrayList<>();
 
-                    motions.forEach(array -> arrays.add(moveFlying(array[0], array[1], MathUtils.yawTo180F(move.getTo().getYaw()), 0.026f)));
-                    motions.forEach(array -> arrays.add(moveFlying(array[0], array[1], MathUtils.yawTo180F(move.getTo().getYaw()), 0.02f)));
+                    motions.forEach(array -> arrays.add(
+                            moveFlying(array[0], array[1], MathUtils.yawTo180F(move.getTo().getYaw()), 0.026f)));
+                    motions.forEach(array -> arrays.add(
+                            moveFlying(array[0], array[1], MathUtils.yawTo180F(move.getTo().getYaw()), 0.02f)));
 
                     double[] min = arrays.stream().min(Comparator.comparing(array -> {
                         double velocityXZ = Math.hypot(array[0], array[1]);
@@ -80,8 +86,14 @@ public class VelocityB extends Check {
 
                     double velocityXZ =
                             Math.hypot(
-                                    min[0] * ((getData().getLastAttack().hasNotPassed(0) ? 0.6f : 1)  * (move.getFrom().getY() % 1 != 0 || move.getLastDeltaXZ() == 0 ? 1 : (1 - (move.getBaseSpeed() / 2))))
-                                    , min[1] * (getData().getLastAttack().hasNotPassed(0) ? 0.6f : 1)) * (move.getFrom().getY() % 1 != 0 || move.getLastDeltaXZ() == 0 ? 1 : (1 - (move.getBaseSpeed() / 2)));
+                                    min[0] * ((getData().getLastAttack().hasNotPassed(0) ? 0.6f : 1)  *
+                                            (move.getFrom().getY() % 1 != 0 || move.getLastDeltaXZ() == 0
+                                                    ? 1
+                                                    : (1 - (move.getBaseSpeed() / 2))))
+                                    , min[1] * (getData().getLastAttack().hasNotPassed(0) ? 0.6f : 1)) *
+                                    (move.getFrom().getY() % 1 != 0 || move.getLastDeltaXZ() == 0
+                                            ? 1
+                                            : (1 - (move.getBaseSpeed() / 2)));
 
                     double pct = move.getDeltaXZ() / velocityXZ * 100;
 
@@ -94,7 +106,8 @@ public class VelocityB extends Check {
 
                     debug("sprint: " + velocityXZ + ", " + move.getDeltaXZ());
 
-                    debug("(" + velocityX + ", " + velocityZ + "), (" + move.getDeltaX() + ", " + move.getDeltaZ() + ")");
+                    debug("(" + velocityX + ", " + velocityZ + "), (" + move.getDeltaX() + ", "
+                            + move.getDeltaZ() + ")");
                 }
                 velocityY = velocityX = velocityZ = 0;
             }
