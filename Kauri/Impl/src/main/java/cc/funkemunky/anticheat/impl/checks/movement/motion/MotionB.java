@@ -92,7 +92,9 @@ public class MotionB extends Check {
 
         val to = new Vector(move.getDeltaX(), move.getDeltaY(), move.getDeltaZ());
 
-        if(velocity != null && MathUtils.millisToTicks(System.currentTimeMillis() - velocityTimestamp) > MathUtils.millisToTicks(getData().getTransPing())) {
+        if(velocity != null
+                && MathUtils.millisToTicks(System.currentTimeMillis() - velocityTimestamp)
+                > MathUtils.millisToTicks(getData().getTransPing())) {
             motionX = (float) velocity.getX();
             motionY = (float) velocity.getY();
             motionZ = (float) velocity.getZ();

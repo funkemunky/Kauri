@@ -30,14 +30,16 @@ public class VelocityProcessor {
         maxVertical = motionY = (float) packet.getY();
         maxHorizontal = (float) MiscUtils.hypot(packet.getX(), packet.getZ());
 
-        if (packet.getId() == packet.getPlayer().getEntityId() && (MathUtils.hypot(packet.getX(), packet.getZ()) > 1E-4 || Math.abs(packet.getY()) > 1E-5)) {
+        if (packet.getId() == packet.getPlayer().getEntityId()
+                && (MathUtils.hypot(packet.getX(), packet.getZ()) > 1E-4 || Math.abs(packet.getY()) > 1E-5)) {
             lastVelocity.reset();
             lastVelocityTimestamp = timeStamp;
 
             velocityX = packet.getX();
             velocityY = packet.getY();
 
-            data.getMovementProcessor().setServerYVelocity(data.getMovementProcessor().getServerYVelocity() + (float) velocityY);
+            data.getMovementProcessor()
+                    .setServerYVelocity(data.getMovementProcessor().getServerYVelocity() + (float) velocityY);
             velocityZ = packet.getZ();
 
             motionX = (float) packet.getX();
@@ -58,7 +60,9 @@ public class VelocityProcessor {
             if(velocityTicks > MathUtils.millisToTicks(getData().getTransPing())) {
                 var multiplier = 0.91f;
 
-                if (packet.isGround()) multiplier*= getData().getBlockBelow() != null ? ReflectionsUtil.getFriction(getData().getBlockBelow()) : 0.6;
+                if (packet.isGround()) multiplier*= getData().getBlockBelow() != null
+                        ? ReflectionsUtil.getFriction(getData().getBlockBelow())
+                        : 0.6;
 
                 motionX *= multiplier;
                 motionZ *= multiplier;

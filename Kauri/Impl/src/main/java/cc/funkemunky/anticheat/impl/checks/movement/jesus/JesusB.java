@@ -25,7 +25,10 @@ public class JesusB extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        if((move.isInLiquid() || move.isLiquidBelow()) && !getData().isGeneralCancel() && !getData().takingVelocity(20) && !move.isNearGround()) {
+        if((move.isInLiquid() || move.isLiquidBelow())
+                && !getData().isGeneralCancel()
+                && !getData().takingVelocity(20)
+                && !move.isNearGround()) {
             float threshold = move.getLiquidTicks() > 15 ? 0.198f : 0.38f;
 
             threshold+= PlayerUtils.getPotionEffectLevel(getData().getPlayer(), PotionEffectType.SPEED) * 0.015;
@@ -34,7 +37,12 @@ public class JesusB extends Check {
             if(depthStrider > 0) {
                 if(move.isServerOnGround()) depthMult*= 0.5f;
 
-                depthMult = (float) Math.sqrt((Atlas.getInstance().getBlockBoxManager().getBlockBox().getAiSpeed(getData().getPlayer()) * 1 - 0.02f) * depthMult / 3);
+                depthMult =
+                        (float) Math.sqrt(
+                                (Atlas.getInstance().getBlockBoxManager()
+                                        .getBlockBox()
+                                        .getAiSpeed(getData().getPlayer()) * 1 - 0.02f)
+                                        * depthMult / 3);
             }
 
             threshold+= depthMult;

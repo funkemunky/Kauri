@@ -14,7 +14,9 @@ import org.bukkit.event.Event;
 
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LOOK})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Aim (Type C)", description = "Looks for suspicious yaw and pitch movements. Not recommended for banning.", type = CheckType.AIM)
+@CheckInfo(name = "Aim (Type C)",
+        description = "Looks for suspicious yaw and pitch movements. Not recommended for banning.",
+        type = CheckType.AIM)
 public class AimC extends Check {
 
     private int vl;
@@ -48,10 +50,17 @@ public class AimC extends Check {
         if (!MiscUtils.canDoCombat(combatOnly, getData())) return;
 
 
-        if (yawDelta > minYawDelta && getData().getPlayer().getVehicle() == null && Math.abs(move.getTo().getPitch()) < 80 && (pitchAccel < pitchAccelMax || yawAccel < yawAccelMax)) {
+        if (yawDelta > minYawDelta
+                && getData().getPlayer().getVehicle() == null
+                && Math.abs(move.getTo().getPitch()) < 80
+                && (pitchAccel < pitchAccelMax || yawAccel < yawAccelMax)) {
             if (vl++ > vlMax * 1.5) {
-                flag("YAW: " + MathUtils.round(yawAccel, 7) + " PITCH: " + MathUtils.round(pitchAccel, 7), true, true, AlertTier.HIGH);
-            } else if(vl > vlMax) flag("YAW: " + MathUtils.round(yawAccel, 7) + " PITCH: " + MathUtils.round(pitchAccel, 7), true, true, AlertTier.LIKELY);
+                flag("YAW: " + MathUtils.round(yawAccel, 7)
+                        + " PITCH: " + MathUtils.round(pitchAccel, 7),
+                        true, true, AlertTier.HIGH);
+            } else if(vl > vlMax) flag("YAW: " + MathUtils.round(yawAccel, 7)
+                    + " PITCH: " + MathUtils.round(pitchAccel, 7),
+                    true, true, AlertTier.LIKELY);
         } else vl -= vl > 0 ? vlSub : 0;
 
         debug("VL: " + vl + " YAW: " + yawAccel + " PITCH: " + pitchAccel + " YAWD: " + yawDelta);

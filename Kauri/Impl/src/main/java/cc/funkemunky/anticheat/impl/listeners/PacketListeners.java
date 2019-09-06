@@ -35,7 +35,6 @@ public class PacketListeners implements AtlasListener {
         if (event.getPlayer() == null || !event.getPlayer().isOnline() || !Kauri.getInstance().getDataManager().getDataObjects().containsKey(event.getPlayer().getUniqueId()))
             return;
 
-        Kauri.getInstance().getProfiler().start("event:PacketSendEvent");
         PlayerData data = Kauri.getInstance().getDataManager().getPlayerData(event.getPlayer().getUniqueId());
 
         if (data != null) {
@@ -96,7 +95,6 @@ public class PacketListeners implements AtlasListener {
                 hopperPup(event.getPacket(), event.getType(), event.getTimeStamp(), data);
             }
         }
-        Kauri.getInstance().getProfiler().stop("event:PacketSendEvent");
     }
 
     @Listen(priority = ListenerPriority.NORMAL)

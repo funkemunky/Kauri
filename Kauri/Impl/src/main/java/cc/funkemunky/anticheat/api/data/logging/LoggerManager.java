@@ -77,12 +77,20 @@ public class LoggerManager {
         if(!enabled) return;
         switch(type.toLowerCase()) {
             case "flatfile": {
-                carbon.createFlatfileDatabase(Kauri.getInstance().getDataFolder().getPath() + File.separator + "dbs", "KauriLogs");
+                carbon
+                        .createFlatfileDatabase(
+                                Kauri.getInstance().getDataFolder().getPath() + File.separator + "dbs",
+                                "KauriLogs");
                 MiscUtils.printToConsole("&aCreated Flatfile DB!");
                 break;
             }
             case "mysql": {
-                carbon.createSQLDatabase("KauriLogs", mySQLIp, mySQLUsername, mySQLPassword, mySQLDatabase, mySQLPort);
+                carbon.createSQLDatabase("KauriLogs",
+                        mySQLIp,
+                        mySQLUsername,
+                        mySQLPassword,
+                        mySQLDatabase,
+                        mySQLPort);
                 MiscUtils.printToConsole("&aConnected to MySQL!");
                 break;
             }
@@ -93,13 +101,16 @@ public class LoggerManager {
                 break;
             }
             default: {
-                Bukkit.getLogger().log(Level.SEVERE, "Database type \"" + type + "\" is not a valid database format! Logging functionality is disabled.");
+                Bukkit.getLogger().log(Level.SEVERE,
+                        "Database type \""
+                                + type + "\" is not a valid database format! Logging functionality is disabled.");
                 enabled = false;
                 return;
             }
         }
         database = carbon.getDatabase("KauriLogs");
-        Kauri.getInstance().getExecutorService().scheduleAtFixedRate(this::saveToDatabase, 1, 5, TimeUnit.MINUTES);
+        Kauri.getInstance().getExecutorService()
+                .scheduleAtFixedRate(this::saveToDatabase, 1, 5, TimeUnit.MINUTES);
     }
 
     public void loadFromDatabase() {
@@ -125,27 +136,6 @@ public class LoggerManager {
             }
             violations.put(uuid, vls);
          }
-
-        /*List<String> rawKeys = database.getDatabaseValues().keySet().parallelStream().filter(key -> !key.contains("ban") && key.contains("@")).map(key -> key.split("@")[0]).collect(Collectors.toList());
-        for (String rawKey : rawKeys) {
-            int i = 0;
-            List<Violation> violations = new ArrayList<>();
-            while(database.getDatabaseValues().containsKey(rawKey + "@" + i)) {
-                String field = (String)database.getField(rawKey + "@" + i);
-                violations.add(Violation.fromJson(field));
-                i++;
-            }
-
-            this.violations.put(UUID.fromString(rawKey), violations);
-        }
-
-        List<String> normalKeys = database.getDatabaseValues().keySet().parallelStream().filter(key -> !key.contains("ban") && !key.contains("@")).collect(Collectors.toList());
-
-        for(String normalKey : normalKeys) {
-            List<Violation> violations = this.violations.getOrDefault(UUID.fromString(normalKey), new ArrayList<>());
-
-            violations.add(Violation.fromJson((String)database.getField(normalKey)));
-        }*/
     }
 
     public void saveToDatabase() {
@@ -171,7 +161,13 @@ public class LoggerManager {
         if(enabled) {
             List<Violation> violations = this.violations.getOrDefault(data.getUuid(), new ArrayList<>());
 
-            violations.add(new Violation(check.getName(), info, Kauri.getInstance().getTps(), data.getTransPing(), System.currentTimeMillis(), tier));
+            violations.add(new Violation(
+                    check.getName(),
+                    info,
+                    Kauri.getInstance().getTps(),
+                    data.getTransPing(),
+                    System.currentTimeMillis(),
+                    tier));
 
             this.violations.put(data.getUuid(), violations);
 
@@ -210,7 +206,10 @@ public class LoggerManager {
         if(enabled) {
             Database database = this.database;
 
-            Optional<String> reasonOp = database.getDatabaseValues().keySet().stream().filter(key -> key.equals(uuid.toString() + ";banned")).findFirst();
+            Optional<String> reasonOp = database.getDatabaseValues().keySet()
+                    .stream()
+                    .filter(key -> key.equals(uuid.toString() + ";banned"))
+                    .findFirst();
 
             val key = reasonOp.orElse("none");
 
@@ -235,7 +234,9 @@ public class LoggerManager {
             Atlas.getInstance().getService().execute(() -> {
                 List<Violation> vls = new CopyOnWriteArrayList<>(violations.get(uuid));
 
-                vls.parallelStream().filter(vl -> vl.getCheckName().equalsIgnoreCase(specifics)).forEach(vls::remove);
+                vls.parallelStream()
+                        .filter(vl -> vl.getCheckName().equalsIgnoreCase(specifics))
+                        .forEach(vls::remove);
 
                 violations.put(uuid, vls);
                 database.saveDatabase();

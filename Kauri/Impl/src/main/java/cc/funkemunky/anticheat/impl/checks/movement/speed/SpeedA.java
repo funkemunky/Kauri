@@ -12,7 +12,9 @@ import cc.funkemunky.api.utils.Init;
 import lombok.val;
 import org.bukkit.event.Event;
 
-@CheckInfo(name = "Speed (Type A)", type = CheckType.SPEED, description = "A general limiting speed check with a verbose to prevent false positives.", maxVL = 40, executable = true)
+@CheckInfo(name = "Speed (Type A)", type = CheckType.SPEED,
+        description = "A general limiting speed check with a verbose to prevent false positives.",
+        maxVL = 40, executable = true)
 @Init
 @Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK})
 public class SpeedA extends Check {
@@ -22,20 +24,26 @@ public class SpeedA extends Check {
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
-        float threshold = move.getBaseSpeed() + (move.isServerOnGround() ? (move.getGroundTicks() > 8 ? 0.05f : 0.06f) : 0.1f);
+        float threshold = move.getBaseSpeed() + (move.isServerOnGround()
+                ? (move.getGroundTicks() > 8 ? 0.05f : 0.06f)
+                : 0.1f);
 
         threshold+= move.getHalfBlockTicks() > 0 ? 0.08 : 0;
         threshold+= move.isOnSlimeBefore() ? 0.025 : 0;
         threshold+= move.getBlockAboveTicks() > 0 ? (move.getIceTicks() > 0 ? 0.565f : 0.25f) : 0;
         threshold+= move.getIceTicks() > 0 && (move.getGroundTicks() < 8 || move.getAirTicks() < 3) ? 0.28 : 0;
 
-        if(move.getDeltaXZ() > 0 && !getData().isGeneralCancel() && move.getDeltaXZ() > threshold && !getData().takingVelocity(50)) {
+        if(move.getDeltaXZ() > 0
+                && !getData().isGeneralCancel()
+                && move.getDeltaXZ() > threshold
+                && !getData().takingVelocity(50)) {
             if(Math.min(vl++, 45) > 30) {
                 flag("speed=" + move.getDeltaXZ(), true, true, AlertTier.HIGH);
             }
         } else vl-= vl > 0 ? 1 : 0;
 
-        debug(move.getDeltaXZ() + ">-" + threshold + " vl=" + vl + " iceTicks=" + move.getIceTicks() + " block=" + move.getBlockAboveTicks() + " half=" + move.getHalfBlockTicks() + " serverPos=" + (System.currentTimeMillis() - getData().getLastServerPosStamp()));
+        debug(move.getDeltaXZ() + ">-" + threshold + " vl=" + vl + " iceTicks=" + move.getIceTicks()
+                + " block=" + move.getBlockAboveTicks() + " half=" + move.getHalfBlockTicks() + " serverPos=" + (System.currentTimeMillis() - getData().getLastServerPosStamp()));
     }
 
     @Override

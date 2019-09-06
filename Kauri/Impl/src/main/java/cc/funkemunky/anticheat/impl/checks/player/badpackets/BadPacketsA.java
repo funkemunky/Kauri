@@ -14,11 +14,10 @@ import org.bukkit.event.Event;
         Packet.Client.ABILITIES,
         Packet.Server.ABILITIES,
         Packet.Client.POSITION,
-        Packet.Client.POSITION_LOOK,
-        Packet.Client.LEGACY_POSITION,
-        Packet.Client.LEGACY_POSITION_LOOK,})
+        Packet.Client.POSITION_LOOK})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "BadPackets (Type A)", description = "Prevents the client from spoofing the ability to fly.", type = CheckType.BADPACKETS, maxVL = 40)
+@CheckInfo(name = "BadPackets (Type A)", description = "Prevents the client from spoofing the ability to fly.",
+        type = CheckType.BADPACKETS, maxVL = 40)
 public class BadPacketsA extends Check {
     private boolean serverSent, lastAllowedFlight;
 

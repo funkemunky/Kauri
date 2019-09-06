@@ -12,7 +12,8 @@ import org.bukkit.event.Event;
 
 @Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK, Packet.Client.LOOK, Packet.Client.FLYING})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Velocity (Type C)", description = "Checks for vertical velocity modifications.", type = CheckType.VELOCITY, maxVL = 20, executable = true)
+@CheckInfo(name = "Velocity (Type C)", description = "Checks for vertical velocity modifications.",
+        type = CheckType.VELOCITY, maxVL = 20, executable = true)
 public class VelocityC extends Check {
 
     private float vl;
@@ -25,7 +26,11 @@ public class VelocityC extends Check {
         val pingTicks = MathUtils.millisToTicks(getData().getTransPing());
 
         boolean fromYInt = move.getFrom().getY() % 1 == 0;
-        if(((deltaTicks == pingTicks && move.getDeltaY() > 0) || deltaTicks == pingTicks + 1) && (fromYInt || move.isServerOnGround()) && !move.isBlocksOnTop() && !didShit && velocity.getVelocityY() > 0) {
+        if(((deltaTicks == pingTicks && move.getDeltaY() > 0) || deltaTicks == pingTicks + 1)
+                && (fromYInt || move.isServerOnGround())
+                && !move.isBlocksOnTop()
+                && !didShit
+                && velocity.getVelocityY() > 0) {
             val ratio = move.getDeltaY() / (float)velocity.getVelocityY();
             val pct = ratio * 100;
 
@@ -34,7 +39,8 @@ public class VelocityC extends Check {
                     flag("pct=" + MathUtils.round(pct, 2) + "% predicted=" + velocity.getVelocityY() + " vl=" + vl, true, true, AlertTier.HIGH);
                 }
             } else vl-= vl > 0 ? 1 : 0;
-            debug("velocityY=" + velocity.getVelocityY() + " deltaY=" + move.getDeltaY() + " pct=" + pct + "% vl=" + vl);
+            debug("velocityY=" + velocity.getVelocityY() + " deltaY=" + move.getDeltaY()
+                    + " pct=" + pct + "% vl=" + vl);
             didShit = true;
         } else didShit = false;
     }

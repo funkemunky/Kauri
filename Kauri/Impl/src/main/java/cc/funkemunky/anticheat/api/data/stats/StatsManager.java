@@ -35,12 +35,20 @@ public class StatsManager {
         Carbon carbon = Atlas.getInstance().getCarbon();
         switch(type.toLowerCase()) {
             case "flatfile": {
-                carbon.createFlatfileDatabase(Kauri.getInstance().getDataFolder().getPath() + File.separator + "dbs", "KauriStats");
+                carbon.createFlatfileDatabase(
+                        Kauri.getInstance().getDataFolder().getPath() + File.separator + "dbs",
+                        "KauriStats");
                 MiscUtils.printToConsole("&aCreated Flatfile DB!");
                 break;
             }
             case "mysql": {
-                carbon.createSQLDatabase("KauriStats", mySQLIp, mySQLUsername, mySQLPassword, mySQLDatabase, mySQLPort);
+                carbon.createSQLDatabase(
+                        "KauriStats",
+                        mySQLIp,
+                        mySQLUsername,
+                        mySQLPassword,
+                        mySQLDatabase,
+                        mySQLPort);
                 MiscUtils.printToConsole("&aConnected to MySQL!");
                 break;
             }

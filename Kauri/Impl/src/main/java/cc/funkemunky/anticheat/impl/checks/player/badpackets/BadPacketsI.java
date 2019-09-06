@@ -9,7 +9,10 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockDigPacket;
 import cc.funkemunky.api.utils.Init;
 import org.bukkit.event.Event;
 
-@CheckInfo(name = "BadPackets (Type I)", description = "Checks for instant blocks and unblocks.", type = CheckType.BADPACKETS, cancelType = CancelType.INTERACT, maxVL = 40, executable = true, maxVersion = ProtocolVersion.V1_8_9)
+@CheckInfo(name = "BadPackets (Type I)", description = "Checks for instant blocks and unblocks.",
+        type = CheckType.BADPACKETS, cancelType = CancelType.INTERACT, maxVL = 40,
+        executable = true,
+        maxVersion = ProtocolVersion.V1_8_9)
 @Packets(packets = {Packet.Client.BLOCK_PLACE, Packet.Client.BLOCK_DIG})
 @Init
 public class BadPacketsI extends Check {
@@ -25,7 +28,10 @@ public class BadPacketsI extends Check {
             if(dig.getAction().equals(WrappedInBlockDigPacket.EnumPlayerDigType.RELEASE_USE_ITEM)) {
                 long delta = timeStamp - lastBlockPlace;
 
-                if(!getData().isLagging() && getData().getLastLag().hasPassed(5) && delta == 0 && verbose.flag(4, 1000L)) {
+                if(!getData().isLagging()
+                        && getData().getLastLag().hasPassed(5)
+                        && delta == 0
+                        && verbose.flag(4, 1000L)) {
                     flag("delta=0", true, true, AlertTier.HIGH);
                 }
 

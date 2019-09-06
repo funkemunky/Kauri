@@ -9,7 +9,8 @@ import org.bukkit.event.Event;
 
 import java.util.UUID;
 
-@CheckInfo(name = "Killaura (Type D)", description = "Looks for extremely fast switching between targets.", type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, maxVL = 35, executable = true)
+@CheckInfo(name = "Killaura (Type D)", description = "Looks for extremely fast switching between targets.",
+        type = CheckType.KILLAURA, cancelType = CancelType.COMBAT, maxVL = 35, executable = true)
 @Init
 @Packets(packets = {Packet.Client.USE_ENTITY})
 public class KillauraD extends Check {

@@ -33,9 +33,13 @@ public class BadPacketsB extends Check {
     public void onBukkitEvent(Event event) {
         BlockPlaceEvent e = (BlockPlaceEvent) event;
 
-        if(e.getBlockPlaced() == null || !e.getItemInHand().getType().isSolid() || !BlockUtils.isSolid(e.getBlockPlaced())|| !e.getPlayer().getGameMode().equals(GameMode.SURVIVAL)) return;
+        if(e.getBlockPlaced() == null
+                || !e.getItemInHand().getType().isSolid()
+                || !BlockUtils.isSolid(e.getBlockPlaced())
+                || !e.getPlayer().getGameMode().equals(GameMode.SURVIVAL)) return;
 
-        List<BoundingBox> boxes = Atlas.getInstance().getBlockBoxManager().getBlockBox().getSpecificBox(e.getBlockPlaced().getLocation());
+        List<BoundingBox> boxes = Atlas.getInstance().getBlockBoxManager().getBlockBox()
+                .getSpecificBox(e.getBlockPlaced().getLocation());
 
         if(boxes.size() == 0) return;
 
@@ -44,7 +48,12 @@ public class BadPacketsB extends Check {
         if(blockBox.maxY - blockBox.minY != 1) return;
 
         val move = getData().getMovementProcessor();
-        val originLocs = move.getPastLocation().getEstimatedLocation(getData().getTransPing(), 100).stream().map(loc -> loc.clone().toLocation(getData().getPlayer().getWorld()).add(0, getData().getActionProcessor().isSneaking() ? 1.53f : 1.62f, 0)).collect(Collectors.toList());
+        val originLocs = move.getPastLocation().getEstimatedLocation(getData().getTransPing(), 100)
+                .stream()
+                .map(loc -> loc.clone().toLocation(getData().getPlayer().getWorld())
+                        .add(0, getData().getActionProcessor().isSneaking() ? 1.53f : 1.62f, 0))
+                .collect(Collectors.toList());
+
         RayTrace trace;
         List<Vector> vecs = new ArrayList<>();
 

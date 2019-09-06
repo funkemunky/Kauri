@@ -17,7 +17,8 @@ import org.bukkit.event.Event;
         Packet.Client.FLYING,
         Packet.Client.LOOK})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Velocity (Type A)", description = "Detects any vertical velocity modification below 100%.", type = CheckType.VELOCITY, maxVL = 40, executable = true)
+@CheckInfo(name = "Velocity (Type A)", description = "Detects any vertical velocity modification below 100%.",
+        type = CheckType.VELOCITY, maxVL = 40, executable = true)
 public class VelocityA extends Check {
 
     private float vl;
@@ -48,7 +49,11 @@ public class VelocityA extends Check {
         if (deltaTicks <= pingTicks) ticks = 0;
 
         long subtracted = deltaTicks - pingTicks;
-        if (((move.getDeltaY() > 0 &&  MathUtils.approxEquals(0.01, getData().getVelocityProcessor().getVelocityY(), move.getDeltaY()) && deltaTicks >= pingTicks) || deltaTicks > pingTicks) && subtracted < 3 && getData().getVelocityProcessor().getVelocityY() > 0) {
+        if (((move.getDeltaY() > 0 &&
+                MathUtils.approxEquals(0.01, getData().getVelocityProcessor().getVelocityY(), move.getDeltaY())
+                && deltaTicks >= pingTicks) || deltaTicks > pingTicks)
+                && subtracted < 3
+                && getData().getVelocityProcessor().getVelocityY() > 0) {
             ticks++;
 
             if (!getData().isLagging() && !move.isBlocksOnTop()) {
@@ -61,11 +66,19 @@ public class VelocityA extends Check {
                     if (Math.abs(predicted) < 0.0005) predicted = 0;
                 }
 
-                if (!MathUtils.approxEquals(1E-5, predicted, move.getDeltaY()) && !getData().isLagging() && predicted > 0 && getData().getBoundingBox().shrink(0, 0.1f, 0).grow(1,0,1).getCollidingBlockBoxes(getData().getPlayer()).size() == 0) {
+                if (!MathUtils.approxEquals(1E-5, predicted, move.getDeltaY())
+                        && !getData().isLagging()
+                        && predicted > 0
+                        && getData().getBoundingBox()
+                        .shrink(0, 0.1f, 0)
+                        .grow(1,0,1)
+                        .getCollidingBlockBoxes(getData().getPlayer()).size() == 0) {
                     if(vl++ > 9) {
-                        flag("predicted=" + predicted + " deltaY=" + move.getDeltaY() + " vl=" + vl, true, true, vl > 14 ? AlertTier.HIGH : AlertTier.LIKELY);
+                        flag("predicted=" + predicted + " deltaY=" + move.getDeltaY() + " vl=" + vl,
+                                true, true, vl > 14 ? AlertTier.HIGH : AlertTier.LIKELY);
                     }
-                    debug(Color.Green + "Flag: " + vl + " predicted=" + predicted + " deltaY=" + move.getDeltaY() + " vl=" + vl);
+                    debug(Color.Green + "Flag: " + vl + " predicted=" + predicted + " deltaY="
+                            + move.getDeltaY() + " vl=" + vl);
                 } else {
                     vl-= vl > 0 ? 0.5 : 0;
                     debug("predicted=" + predicted + " deltaY=" + move.getDeltaY() + " vl=" + vl);

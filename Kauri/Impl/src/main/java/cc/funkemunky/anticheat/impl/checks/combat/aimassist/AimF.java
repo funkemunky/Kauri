@@ -8,7 +8,8 @@ import cc.funkemunky.api.utils.Init;
 import lombok.val;
 import org.bukkit.event.Event;
 
-@CheckInfo(name = "Aim (Type F)", description = "Looks for rounded rotational values", type = CheckType.AIM, cancelType = CancelType.MOTION, executable = true, maxVL = 15)
+@CheckInfo(name = "Aim (Type F)", description = "Looks for rounded rotational values", type = CheckType.AIM,
+        cancelType = CancelType.MOTION, executable = true, maxVL = 15)
 @Init
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.LOOK})
 public class AimF extends Check {
@@ -23,7 +24,8 @@ public class AimF extends Check {
 
         if (move.getYawDelta() > 0.1 && (move.getTo().getYaw() % 1 == 0) && move.getTo().getYaw() > 0) {
             if (verbose.flag(9, 500L)) {
-                flag("YD: " + move.getYawDelta() + " YAW: " + move.getTo().getYaw(), true, true, AlertTier.HIGH);
+                flag("YD: " + move.getYawDelta() + " YAW: " + move.getTo().getYaw(),
+                        true, true, AlertTier.HIGH);
             }
         }
 

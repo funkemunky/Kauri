@@ -37,7 +37,10 @@ public class MotionA extends Check {
         val move = getData().getMovementProcessor();
         val player = getData().getPlayer();
 
-        if(action.isSprinting() && player.isSprinting() && !getData().isGeneralCancel() && !getData().takingVelocity(velocityCancelTicks)) {
+        if(action.isSprinting()
+                && player.isSprinting()
+                && !getData().isGeneralCancel()
+                && !getData().takingVelocity(velocityCancelTicks)) {
             val direction = move.getTo().toLocation(player.getWorld()).getDirection().setY(0);
             val moveVector = new Vector(move.getTo().getX() - move.getFrom().getX(), 0, move.getTo().getZ() - move.getFrom().getZ());
 

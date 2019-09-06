@@ -36,11 +36,16 @@ public class NoSlowdownA extends Check {
             val action = getData().getActionProcessor();
             val baseSpeed = move.getBaseSpeed() - 0.02f;
 
-            if (timeStamp - lastTimeStamp < 5 || getData().isGeneralCancel() || !getData().takingVelocity(15)) return;
+            if (timeStamp - lastTimeStamp < 5
+                    || getData().isGeneralCancel()
+                    || !getData().takingVelocity(15)) return;
 
             if (action.isUsingItem() && move.getDeltaXZ() > baseSpeed) {
                 if (verbose.flag(20, 500L)) {
-                    flag(MathUtils.round(move.getDeltaXZ(), 3) + ">- " + baseSpeed, true, false, verbose.getVerbose() > 40 ? AlertTier.LIKELY : AlertTier.POSSIBLE);
+                    flag(MathUtils.round(move.getDeltaXZ(), 3) + ">- " + baseSpeed,
+                            true,
+                            false,
+                            verbose.getVerbose() > 40 ? AlertTier.LIKELY : AlertTier.POSSIBLE);
                 } else if(verbose.getVerbose() > 10 && verbose.getVerbose() < 13) {
                     WrappedOutHeldItemSlot slot = new WrappedOutHeldItemSlot(this.slot);
 

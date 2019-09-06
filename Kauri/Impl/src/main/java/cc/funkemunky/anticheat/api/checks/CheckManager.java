@@ -33,20 +33,26 @@ public class CheckManager {
         new BukkitRunnable() {
             public void run() {
                 val dataList = new ArrayList<>(Kauri.getInstance().getDataManager().getDataObjects().values());
-                val alertsOn = dataList.stream().filter(data -> data.getPlayer().hasPermission("kauri.alerts") && data.getAlertTier() != null).collect(Collectors.toList());
+                val alertsOn = dataList.stream()
+                        .filter(data ->
+                                data.getPlayer().hasPermission("kauri.alerts")
+                                && data.getAlertTier() != null)
+                        .collect(Collectors.toList());
                 alerts = new ArrayList<>(alertsOn);
                 devAlerts = alertsOn.stream().filter(PlayerData::isDeveloperAlerts).collect(Collectors.toList());
-                debuggingPackets = dataList.stream().filter(PlayerData::isDebuggingPackets).collect(Collectors.toList());
+                debuggingPackets = dataList.stream()
+                        .filter(PlayerData::isDebuggingPackets)
+                        .collect(Collectors.toList());
                 debuggingPlayers.clear();
-                dataList.stream().filter(data -> data.getDebuggingPlayer() != null).forEach(data -> {
-                    List<PlayerData> datas = debuggingPlayers.getOrDefault(data.getDebuggingPlayer(), new ArrayList<>());
+                dataList.stream().filter(data -> data.getDebuggingPlayer() != null)
+                        .forEach(data -> {
+                            List<PlayerData> datas = debuggingPlayers
+                                    .getOrDefault(data.getDebuggingPlayer(), new ArrayList<>());
 
-                    datas.add(data);
+                            datas.add(data);
 
-                    debuggingPlayers.put(data.getDebuggingPlayer(), datas);
-                });
-                val checkStamp = Kauri.getInstance().getLoggerManager().getCheckStamp();
-                //TODO Test to make sure this actually updates the vl.
+                            debuggingPlayers.put(data.getDebuggingPlayer(), datas);
+                        });
             }
         }.runTaskTimerAsynchronously(Kauri.getInstance(), 40L, 30L);
 
@@ -103,7 +109,8 @@ public class CheckManager {
                             field.set(check, val);
                         }
                     } else {
-                        Kauri.getInstance().getConfig().set("checks." + check.getName() + ".settings." + field.getName(), field.get(check));
+                        Kauri.getInstance().getConfig()
+                                .set("checks." + check.getName() + ".settings." + field.getName(), field.get(check));
                         Kauri.getInstance().saveConfig();
                     }
                 } catch (IllegalAccessException e) {
@@ -113,7 +120,8 @@ public class CheckManager {
 
             check.loadFromConfig();
 
-            if ((check.getMinimum() == null || ProtocolVersion.getGameVersion().isOrAbove(check.getMinimum())) && (check.getMaximum() == null || ProtocolVersion.getGameVersion().isBelow(check.getMaximum()))) {
+            if ((check.getMinimum() == null || ProtocolVersion.getGameVersion().isOrAbove(check.getMinimum()))
+                    && (check.getMaximum() == null || ProtocolVersion.getGameVersion().isBelow(check.getMaximum()))) {
                 checkList.add(check);
             }
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {

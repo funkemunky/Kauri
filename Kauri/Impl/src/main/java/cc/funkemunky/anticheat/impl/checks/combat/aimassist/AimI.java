@@ -15,7 +15,8 @@ import org.bukkit.event.Event;
         Packet.Client.POSITION_LOOK,
         Packet.Client.LOOK})
 @Init
-@CheckInfo(name = "Aim (Type I)", description = "Ensures that pitch acceleration is legitimate.", maxVL = 50, type = CheckType.AIM)
+@CheckInfo(name = "Aim (Type I)", description = "Ensures that pitch acceleration is legitimate.",
+        maxVL = 50, type = CheckType.AIM)
 public class AimI extends Check {
 
     private double vl;
@@ -23,9 +24,12 @@ public class AimI extends Check {
     public void onPacket(Object packet, String packetType, long timeStamp) {
         val move = getData().getMovementProcessor();
 
-        if(MathUtils.approxEquals(1E-5, move.getPitchDelta(), move.getLastPitchDelta()) && move.getPitchDelta() > 0.4 && !getData().isCinematicMode()) {
+        if(MathUtils.approxEquals(1E-5, move.getPitchDelta(), move.getLastPitchDelta())
+                && move.getPitchDelta() > 0.4
+                && !getData().isCinematicMode()) {
             if((vl = Math.min(20, vl + 1)) > 7) {
-                flag("pitch=" + move.getPitchDelta() + " last=" + move.getLastPitchDelta() + " vl=" + vl, true, true, vl > 15 ? AlertTier.HIGH : AlertTier.LIKELY);
+                flag("pitch=" + move.getPitchDelta() + " last=" + move.getLastPitchDelta() + " vl=" + vl,
+                        true, true, vl > 15 ? AlertTier.HIGH : AlertTier.LIKELY);
             }
         } else vl-= vl > 0 ? 0.25 : 0;
         debug("pitch=" + move.getPitchDelta() + " last=" + move.getLastPitchDelta() + " vl=" + vl);

@@ -15,7 +15,8 @@ import org.bukkit.event.Event;
         Packet.Client.POSITION_LOOK,
         Packet.Client.LOOK})
 @cc.funkemunky.api.utils.Init
-@CheckInfo(name = "Aim (Type G)", description = "A heuristic which looks for one thing all aimbots have in common.", maxVL = 25, executable = true, type = CheckType.AIM)
+@CheckInfo(name = "Aim (Type G)", description = "A heuristic which looks for one thing all aimbots have in common.",
+        maxVL = 25, executable = true, type = CheckType.AIM)
 public class AimG extends Check {
 
     private int ticks = 0;

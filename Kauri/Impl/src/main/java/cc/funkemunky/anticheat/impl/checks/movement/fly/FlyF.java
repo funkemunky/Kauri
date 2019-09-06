@@ -11,7 +11,9 @@ import lombok.val;
 import org.bukkit.event.Event;
 
 @Init
-@CheckInfo(name = "Fly (Type F)", description = "Checks for impossibly low acceleration changes.", type = CheckType.FLY, maxVL = 40)
+@CheckInfo(name = "Fly (Type F)", description = "Checks for impossibly low acceleration changes.",
+        type = CheckType.FLY,
+        maxVL = 40)
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.POSITION})
 public class FlyF extends Check {
     private float vl;
@@ -26,11 +28,15 @@ public class FlyF extends Check {
 
         if(Math.abs(move.getClientYAcceleration()) < 0.01 && !move.isServerOnGround()) {
             if(vl++ > 5) {
-                flag("accel=" + move.getClientYAcceleration() + " vl=" + vl, true, true, AlertTier.HIGH);
+                flag("accel=" + move.getClientYAcceleration() + " vl=" + vl,
+                        true,
+                        true,
+                        AlertTier.HIGH);
             }
         } else vl-= vl > 0 ? 0.5 : 0;
 
-        debug("accel=" + move.getClientYAcceleration() + " deltaY=" + move.getDeltaY() + " vl=" + vl + " onGround=" + move.isServerOnGround());
+        debug("accel=" + move.getClientYAcceleration() + " deltaY=" + move.getDeltaY()
+                + " vl=" + vl + " onGround=" + move.isServerOnGround());
     }
 
     @Override

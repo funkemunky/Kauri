@@ -29,7 +29,9 @@ public class GroundSpoofB extends Check {
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {
-        if(getData().isGeneralCancel() || getData().takingVelocity(10) || getData().getMovementProcessor().getDeltaY() == 0) {
+        if(getData().isGeneralCancel()
+                || getData().takingVelocity(10)
+                || getData().getMovementProcessor().getDeltaY() == 0) {
             lastFallDistance = 0;
             return;
         }
@@ -38,9 +40,11 @@ public class GroundSpoofB extends Check {
         val deltaFD = MathUtils.getDelta(fallDistance, lastFallDistance);
         val move = getData().getMovementProcessor();
 
-        if(move.getDeltaY() < 0 && MathUtils.getDelta(deltaFD, Math.abs(move.getDeltaY())) > Math.max(0.5, fallDistance / 5)) {
+        if(move.getDeltaY() < 0
+                && MathUtils.getDelta(deltaFD, Math.abs(move.getDeltaY())) > Math.max(0.5, fallDistance / 5)) {
             if(verbose.flag(vlMax, vlReset)) {
-                flag(deltaFD + "<-" + move.getDeltaY(), true, true, verbose.getVerbose() > 10 ? AlertTier.LIKELY : AlertTier.POSSIBLE);
+                flag(deltaFD + "<-" + move.getDeltaY(), true, true,
+                        verbose.getVerbose() > 10 ? AlertTier.LIKELY : AlertTier.POSSIBLE);
             }
         } else verbose.deduct();
         lastFallDistance = fallDistance;
