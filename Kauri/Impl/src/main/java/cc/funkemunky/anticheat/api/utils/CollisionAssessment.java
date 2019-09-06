@@ -45,7 +45,7 @@ public class CollisionAssessment {
                 if(!isEntity && block.getType().equals(Material.SOUL_SAND)) {
                     onSoulSand = true;
                 }
-            } else if(bb.collidesVertically(playerBox.subtract(0, 0.8f,0,0,1f,0))) {
+            } else if(bb.collidesVertically(playerBox.subtract(0, 0.8f,0,0,1f,0).grow(0.5f, 0, 0.5f))) {
                 nearGround = true;
             }
 

@@ -64,7 +64,7 @@ public class Reach extends Check {
                 return;
             }
 
-            long range = (getData().getTransPing() > 140 ? 150L: 100L) + Math.abs(getData().getTransPing() - getData().getLastTransPing()) * 2;
+            long range = 150L + Math.abs(getData().getTransPing() - getData().getLastTransPing()) * 2;
             val location = getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), range);
 
             val locs = move.getPastLocation().getEstimatedLocation(0, 50L)

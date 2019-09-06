@@ -26,7 +26,7 @@ import java.util.List;
         Packet.Client.LOOK,
         Packet.Client.FLYING,
         Packet.Server.ENTITY_VELOCITY})
-@cc.funkemunky.api.utils.Init
+//@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Velocity (Type B)", description = "Checks for horizontal velocity modifications.", type = CheckType.VELOCITY, maxVL = 20)
 public class VelocityB extends Check {
 
