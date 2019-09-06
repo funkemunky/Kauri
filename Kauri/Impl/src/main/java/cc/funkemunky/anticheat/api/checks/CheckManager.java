@@ -10,6 +10,7 @@ import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
+import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.lang.reflect.InvocationTargetException;
@@ -91,7 +92,7 @@ public class CheckManager {
                 Arrays.stream(events.events()).forEach(event -> check.getEvents().add(event));
             }
 
-            Arrays.stream(check.getClass().getDeclaredFields()).filter(field -> {
+            /*Arrays.stream(check.getClass().getDeclaredFields()).filter(field -> {
                 field.setAccessible(true);
 
                 return field.isAnnotationPresent(Setting.class);
@@ -100,11 +101,20 @@ public class CheckManager {
                     field.setAccessible(true);
 
                     String path = "checks." + check.getName() + ".settings." + field.getName();
+                    System.out.println("Processing: " + check.getName() + ":" + field.getName());
                     if (Kauri.getInstance().getConfig().get(path) != null) {
                         Object val = Kauri.getInstance().getConfig().get(path);
 
                         if (val instanceof Double && field.get(check) instanceof Float) {
                             field.set(check, (float) (double) val);
+                        } else if(field.getType().equals(int.class) || field.getType().equals(Integer.class)) {
+                            field.set(check, (int) val);
+                        } else if(field.getType().equals(double.class) || field.getType().equals(Double.class)) {
+                            field.set(check, val);
+                        } else if(field.getType().equals(float.class) || field.getType().equals(Float.class)) {
+                            field.set(check, (float) val);
+                        } else if(field.getType().equals(long.class) || field.getType().equals(Long.class)) {
+                            field.set(check, (long) val);
                         } else {
                             field.set(check, val);
                         }
@@ -116,7 +126,7 @@ public class CheckManager {
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
-            });
+            });*/
 
             check.loadFromConfig();
 

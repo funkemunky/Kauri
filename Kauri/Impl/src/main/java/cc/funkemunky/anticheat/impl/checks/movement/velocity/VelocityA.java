@@ -16,7 +16,7 @@ import org.bukkit.event.Event;
         Packet.Client.POSITION,
         Packet.Client.FLYING,
         Packet.Client.LOOK})
-@cc.funkemunky.api.utils.Init
+//@cc.funkemunky.api.utils.Init
 @CheckInfo(name = "Velocity (Type A)", description = "Detects any vertical velocity modification below 100%.",
         type = CheckType.VELOCITY, maxVL = 40, executable = true)
 public class VelocityA extends Check {

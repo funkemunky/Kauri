@@ -10,19 +10,17 @@ import cc.funkemunky.api.events.Listen;
 import cc.funkemunky.api.events.ListenerPriority;
 import cc.funkemunky.api.events.impl.PacketReceiveEvent;
 import cc.funkemunky.api.events.impl.PacketSendEvent;
-import cc.funkemunky.api.tinyprotocol.api.NMSObject;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.*;
 import cc.funkemunky.api.tinyprotocol.packet.out.*;
-import cc.funkemunky.api.tinyprotocol.packet.types.WrappedWatchableObject;
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
+import cc.funkemunky.api.utils.ReflectionsUtil;
 import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -198,12 +196,20 @@ public class PacketListeners implements AtlasListener {
                             val entity = packet.getEntity();
                             if (entity instanceof LivingEntity) {
                                 data.getLastAttack().reset();
+
+                                boolean wasNull = false;
                                 if(data.getTarget() != null && !data.getTarget().getUniqueId().equals(entity.getUniqueId())) {
                                     data.getEntityPastLocation().getPreviousLocations().clear();
                                     data.getLastTargetSwitch().reset();
+                                    data.setTargetBounds(ReflectionsUtil.getBoundingBox(data.getTarget()));
+                                } else if(data.getTarget() == null) {
+                                    wasNull = true;
                                 }
                                 data.setTarget((LivingEntity) entity);
 
+                                if(wasNull) {
+                                    data.setTargetBounds(ReflectionsUtil.getBoundingBox(data.getTarget()));
+                                }
                                 if (entity instanceof Player) {
                                     PlayerData dataEntity = Kauri.getInstance().getDataManager().getPlayerData(entity.getUniqueId());
 

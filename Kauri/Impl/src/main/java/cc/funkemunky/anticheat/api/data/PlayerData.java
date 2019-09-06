@@ -48,7 +48,7 @@ public class PlayerData {
 
     private CancelType cancelType = CancelType.NONE;
     private Vector lastVelocityVector;
-    private BoundingBox boundingBox;
+    private BoundingBox boundingBox, targetBounds;
     private TickTimer lastMovementCancel = new TickTimer(4),
             lastLag = new TickTimer(20),
             lastLogin = new TickTimer(60),

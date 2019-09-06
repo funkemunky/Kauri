@@ -16,10 +16,10 @@ public class GroundSpoofA extends Check {
 
     private Verbose verbose = new Verbose();
 
-    @Setting(name = "threshold.vl.max")
+    @Setting(name = "threshold.vl.maxVl")
     private static int vlThreshold = 6;
 
-    @Setting(name = "threshold.vl.add")
+    @Setting(name = "threshold.vl.toAdd")
     private static int addVl = 1;
 
     @Setting(name = "threshold.vl.deduct")
@@ -31,6 +31,7 @@ public class GroundSpoofA extends Check {
         val move = getData().getMovementProcessor();
 
         if(move.isCancelFlight()
+                || getData().takingVelocity(10)
                 || move.isBlocksOnTop())
             return;
 

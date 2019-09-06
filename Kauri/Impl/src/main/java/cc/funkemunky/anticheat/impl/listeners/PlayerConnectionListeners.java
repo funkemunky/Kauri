@@ -29,8 +29,9 @@ public class PlayerConnectionListeners implements Listener {
 
     @ConfigSetting(path = "data.logging", name = "removeBanInfoOnJoin")
     private static boolean removeBanOnJoin = true;
-    private static AtomicLong lastCheck = new AtomicLong(System.currentTimeMillis());
-    private static String website = "https://funkemunky.cc/download/verify?license=%license%&downloader=Kauri";
+
+   /* private static AtomicLong lastCheck = new AtomicLong(System.currentTimeMillis());
+    private static String website = "https://funkemunky.cc/download/verify?license=%license%&downloader=Kauri";*/
 
     @ConfigSetting(path = "misc", name = "inventoryChecking")
     static boolean inventoryChecking = true;

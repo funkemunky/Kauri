@@ -48,7 +48,7 @@ public class Reach extends Check {
     @Setting(name = "threshold.vl.high")
     private static int highThreshold = 6;
 
-    private List<EntityType> allowedEntities = Arrays.asList(EntityType.PLAYER, EntityType.SKELETON, EntityType.ZOMBIE, EntityType.PIG_ZOMBIE, EntityType.VILLAGER, EntityType.IRON_GOLEM);
+    private static List<EntityType> allowedEntities = Arrays.asList(EntityType.PLAYER, EntityType.SKELETON, EntityType.ZOMBIE, EntityType.PIG_ZOMBIE, EntityType.VILLAGER, EntityType.IRON_GOLEM);
 
     @Override
     public void onPacket(Object packet, String packetType, long timeStamp) {

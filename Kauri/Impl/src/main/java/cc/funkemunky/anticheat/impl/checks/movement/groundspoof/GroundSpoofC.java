@@ -25,6 +25,8 @@ public class GroundSpoofC extends Check {
         if(move.isClientOnGround()
                 && !move.isServerOnGround()
                 && !move.isNearGround()
+                && move.getAirTicks() > 3
+                && move.getFallDistance() > 2.8
                 && !getData().isGeneralCancel()) {
             if(verbose.flag(1, 2000L)) {
                 flag("airTicks=" + move.getAirTicks() + " fallDistance=" + move.getFallDistance(),

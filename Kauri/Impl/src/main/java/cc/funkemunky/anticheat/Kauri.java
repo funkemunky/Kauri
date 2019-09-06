@@ -291,9 +291,8 @@ public class Kauri extends JavaPlugin {
                                         plugin.getConfig().set(path, field.get(obj));
                                         plugin.saveConfig();
                                     } else {
-                                        field.set(Modifier.isStatic(field.getModifiers()) ? null : obj, plugin.getConfig().get(path));
-
                                         MiscUtils.printToConsole("&eValue found in configuration! Set value to &a" + plugin.getConfig().get(path));
+                                        field.set(Modifier.isStatic(field.getModifiers()) ? null : obj, plugin.getConfig().get(path));
                                     }
                                 } catch (IllegalAccessException e) {
                                     e.printStackTrace();

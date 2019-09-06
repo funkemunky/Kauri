@@ -30,10 +30,10 @@ public class AutoclickerB extends Check {
                 val std = (float) cpsList.std();
                 val average = (float) cpsList.average();
                 val distinct = cpsList.distinctCount();
-                if(std > 4 && average > 8 && MathUtils.getDelta(std, lastStd) < 1.1) {
+                if(std > 3 && average > 8 && MathUtils.getDelta(std, lastStd) < 1.1 && MathUtils.getDelta(average, lastAverage) > 0.8) {
                     debug(Color.Green + "Flag");
-                    vl+= MathUtils.getDelta(average, lastAverage) > 0.5 ? 2 : 1;
-                } else if(MathUtils.getDelta(average, lastAverage) < 0.1 && !cc.funkemunky.api.utils.MathUtils.approxEquals(0.2, MathUtils.getDelta(average, lastAverage), MathUtils.getDelta(std, lastStd)) && std > 4) {
+                    vl+= 2;
+                } else if(std < 2.5 && average > 8 && distinct > 17) {
                     debug(Color.Green + "Flag 2");
                     vl++;
                 } else vl-= vl > 0 ? 2 : 0;
