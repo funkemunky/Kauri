@@ -1,6 +1,5 @@
-package dev.brighten.anticheat.api.check;
+package dev.brighten.anticheat.check.api;
 
-import javax.annotation.processing.SupportedAnnotationTypes;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -9,6 +8,5 @@ public @interface CheckInfo {
     String name() default "yourmom";
     String description() default "No description provided.";
     boolean enabled() default true;
-    boolean executable() default false;
-    float maxVL() default 20f;
+    boolean executable() default true;
 }

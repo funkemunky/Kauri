@@ -1,10 +1,9 @@
-package dev.brighten.anticheat.impl.check.combat.autoclicker;
+package dev.brighten.anticheat.check.impl.combat.autoclicker;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
-import dev.brighten.anticheat.api.check.Check;
-import dev.brighten.anticheat.api.check.CheckInfo;
-import dev.brighten.anticheat.api.check.Packet;
-import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.check.api.Check;
+import dev.brighten.anticheat.check.api.CheckInfo;
+import dev.brighten.anticheat.check.api.Packet;
 
 @CheckInfo(name = "Autoclicker (Type A)", description = "A fast click check.", executable = true)
 public class AutoclickerA extends Check {
@@ -24,6 +23,6 @@ public class AutoclickerA extends Check {
             }
             ticks = 0;
             lastClick = System.currentTimeMillis();
-        } else ticks++;
+        } else if(data.playerInfo.lastBrokenBlock.hasPassed(5)) ticks++;
     }
 }

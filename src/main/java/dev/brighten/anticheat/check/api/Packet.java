@@ -1,4 +1,4 @@
-package dev.brighten.anticheat.api.check;
+package dev.brighten.anticheat.check.api;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
