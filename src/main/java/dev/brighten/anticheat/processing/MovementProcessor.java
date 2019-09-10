@@ -2,20 +2,26 @@ package dev.brighten.anticheat.processing;
 
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.BoundingBox;
-import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.KLocation;
+import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.MovementUtils;
 import dev.brighten.anticheat.utils.VanillaUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.block.Block;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.List;
-import java.util.Optional;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.*;
 
 public class MovementProcessor {
+
+    private static List<Float> sensitivities = Arrays.asList(.50f, .75f, 1f, 1.25f, 1.5f, 1.75f, 2f);
+
+    public static float offset = 16777216L;
 
     public static void preProcess(ObjectData data, WrappedInFlyingPacket packet) {
         /* Pre Motion Y Prediction */
@@ -24,6 +30,10 @@ public class MovementProcessor {
         if(Math.abs(data.playerInfo.pDeltaY) < 0.005) {
             data.playerInfo.pDeltaY = 0;
         }
+
+        data.playerInfo.lpDeltaX = data.playerInfo.pDeltaX;
+        data.playerInfo.lpDeltaZ = data.playerInfo.pDeltaZ;
+        data.playerInfo.lpDeltaXZ = data.playerInfo.pDeltaXZ;
     }
 
     public static void process(ObjectData data, WrappedInFlyingPacket packet) {
@@ -59,6 +69,10 @@ public class MovementProcessor {
             data.playerInfo.to.pitch = packet.getPitch();
         }
 
+        if(data.playerInfo.breakingBlock) {
+            data.playerInfo.lastBrokenBlock.reset();
+        }
+
         data.playerInfo.to.timeStamp = System.currentTimeMillis();
 
         data.playerInfo.clientGround = packet.isGround();
@@ -90,6 +104,8 @@ public class MovementProcessor {
         data.playerInfo.deltaX = (float) (data.playerInfo.to.x - data.playerInfo.from.x);
         data.playerInfo.deltaY = (float) (data.playerInfo.to.y - data.playerInfo.from.y);
         data.playerInfo.deltaZ = (float) (data.playerInfo.to.z - data.playerInfo.from.z);
+        data.playerInfo.lDeltaXZ = data.playerInfo.deltaXZ;
+        data.playerInfo.deltaXZ = (float)MathUtils.hypot(data.playerInfo.deltaX, data.playerInfo.deltaZ);
 
         //Setting the angle delta for use in checks to prevent repeated functions.
         data.playerInfo.lDeltaYaw = data.playerInfo.deltaYaw;
@@ -98,6 +114,24 @@ public class MovementProcessor {
                 MathUtils.yawTo180F(data.playerInfo.to.yaw),
                 MathUtils.yawTo180F(data.playerInfo.from.yaw));
         data.playerInfo.deltaPitch = data.playerInfo.to.pitch - data.playerInfo.from.pitch;
+
+        if(packet.isLook()) {
+            data.playerInfo.cinematicYaw = findClosestCinematicYaw(data, data.playerInfo.to.yaw, data.playerInfo.from.yaw);
+            data.playerInfo.cinematicPitch = findClosestCinematicPitch(data, data.playerInfo.to.pitch, data.playerInfo.from.pitch);
+
+
+            if (Float.isNaN(data.playerInfo.cinematicPitch) || Float.isNaN(data.playerInfo.cinematicYaw)) {
+                data.playerInfo.yawSmooth.reset();
+                data.playerInfo.pitchSmooth.reset();
+            }
+
+            data.playerInfo.cinematicModePitch = (MathUtils.getDelta(data.playerInfo.cinematicPitch, data.playerInfo.to.pitch) < 0.4 && Math.abs(data.playerInfo.deltaPitch) > 0.01);
+
+            data.playerInfo.lastYawGCD = data.playerInfo.yawGCD;
+            data.playerInfo.yawGCD = MiscUtils.gcd((long) (data.playerInfo.deltaYaw * offset), (long) (data.playerInfo.lDeltaYaw * offset));
+            data.playerInfo.lastPitchGCD = data.playerInfo.pitchGCD;
+            data.playerInfo.pitchGCD = MiscUtils.gcd((long) (Math.abs(data.playerInfo.deltaPitch) * offset), (long) (Math.abs(data.playerInfo.lDeltaPitch) * offset));
+        }
 
         //Setting fallDistance
         if(!data.playerInfo.serverGround
@@ -110,8 +144,9 @@ public class MovementProcessor {
 
         //Running jump check
         if(!data.playerInfo.clientGround) {
-            if(!data.playerInfo.jumped && !data.playerInfo.inAir) {
+            if(!data.playerInfo.jumped && !data.playerInfo.inAir && data.playerInfo.deltaY > 0) {
                data.playerInfo.jumped = true;
+                jump(data);
             } else {
                 data.playerInfo.inAir = true;
                 data.playerInfo.jumped = false;
@@ -176,6 +211,89 @@ public class MovementProcessor {
                 || data.playerInfo.serverPos
                 || Kauri.INSTANCE.lastTickLag.hasNotPassed(5);
 
+        data.playerInfo.generalCancel = data.playerInfo.canFly
+                || data.playerInfo.inCreative
+                || hasLevi
+                || data.playerInfo.lastVelocity.hasNotPassed(5 + MathUtils.millisToTicks(data.lagInfo.ping))
+                || data.playerInfo.serverPos
+                || Kauri.INSTANCE.lastTickLag.hasNotPassed(5);
+
+        /* Motion XZ prediction */
+        int precision = String.valueOf((int) Math.abs(data.playerInfo.to.x > data.playerInfo.to.z ? data.playerInfo.to.x : data.playerInfo.to.x)).length();
+        precision = 15 - precision;
+        double preD = Double.valueOf("1.2E-" + Math.max(3, precision - 5)); // the motion deviates further and further from the coordinates 0 0 0. this value fix this
+
+        double mx = data.playerInfo.deltaX - data.playerInfo.lDeltaX * 0.91f; // mx, mz is an Value to calculate the rotation and the Key of the Player
+        double mz = data.playerInfo.deltaZ - data.playerInfo.lDeltaZ * 0.91f;
+
+        float motionYaw = (float) (Math.atan2(mz, mx) * 180.0D / Math.PI) - 90.0F;
+
+        int direction = 6;
+
+        motionYaw -= data.playerInfo.to.yaw;
+
+        while (motionYaw > 360.0F)
+            motionYaw -= 360.0F;
+        while (motionYaw < 0.0F)
+            motionYaw += 360.0F;
+
+        motionYaw /= 45.0F; // converts the rotationYaw of the Motion to integers to get keys
+
+        float moveS = 0.0F; // is like the ClientSide moveStrafing moveForward
+        float moveF = 0.0F;
+        String key = "Nothing";
+
+        if(Math.abs(Math.abs(mx) + Math.abs(mz)) > preD) {
+            direction = (int) new BigDecimal(motionYaw).setScale(1, RoundingMode.HALF_UP).doubleValue();
+            if (direction == 1) {
+                moveF = 1F;
+                moveS = -1F;
+                key = "W + D";
+            } else if (direction == 2) {
+                moveS = -1F;
+                key = "D";
+            } else if (direction == 3) {
+                moveF = -1F;
+                moveS = -1F;
+                key = "S + D";
+            } else if (direction == 4) {
+                moveF = -1F;
+                key = "S";
+            } else if (direction == 5) {
+                moveF = -1F;
+                moveS = 1F;
+                key = "S + A";
+            } else if (direction == 6) {
+                moveS = 1F;
+                key = "A";
+            } else if (direction == 7) {
+                moveF = 1F;
+                moveS = 1F;
+                key = "W + A";
+            } else if (direction == 8) {
+                moveF = 1F;
+                key = "W";
+            } else if (direction == 0) {
+                moveF = 1F;
+                key = "W";
+            }
+        }
+
+        data.playerInfo.key = key;
+        data.playerInfo.strafe = moveS * 0.98f;
+        data.playerInfo.forward = moveF * 0.98f;
+
+        if(Math.abs(data.playerInfo.pDeltaX) < 0.005) data.playerInfo.pDeltaX = 0;
+        if(Math.abs(data.playerInfo.pDeltaZ) < 0.005) data.playerInfo.pDeltaZ = 0;
+
+        moveEntityWithHeading(data, false);
+
+        if(data.playerInfo.lastAttack.hasNotPassed(0)) {
+            data.playerInfo.pDeltaX*= 0.6f;
+            data.playerInfo.pDeltaZ*= 0.6f;
+        }
+
+        data.playerInfo.pDeltaXZ = (float)MathUtils.hypot(data.playerInfo.pDeltaX, data.playerInfo.pDeltaZ);
         /* Motion Y prediction */
 
         //Checking for jump movement
@@ -253,5 +371,105 @@ public class MovementProcessor {
 
         data.playerInfo.pDeltaY-= 0.08f;
         data.playerInfo.pDeltaY*= 0.98f;
+
+        moveEntityWithHeading(data, true);
+        if(data.playerInfo.serverPos) data.playerInfo.pDeltaX = data.playerInfo.pDeltaY = data.playerInfo.pDeltaZ = 0;
     }
+
+    /* Motion XZ Prediction methods */
+
+
+    private static void moveEntityWithHeading(ObjectData data, boolean after) {
+        float f4 = 0.91F;
+
+        if (data.playerInfo.clientGround) {
+            Block below = BlockUtils.getBlock(data.playerInfo.to.toLocation(data.getPlayer().getWorld()).subtract(0, 0.5f, 0));
+            f4 = (below != null && below.getType().isSolid() ? ReflectionsUtil.getFriction(below) : 0.68f) * 0.91F;
+        }
+
+        if(!after) {
+            float f = 0.16277136F / (f4 * f4 * f4);
+            float f5;
+
+            if (data.playerInfo.clientGround) {
+                f5 = Atlas.getInstance().getBlockBoxManager().getBlockBox().getAiSpeed(data.getPlayer()) * f;
+            } else {
+                f5 = data.playerInfo.sprinting ? 0.026f : 0.02f;
+            }
+
+            moveFlying(data, f5);
+        } else {
+            data.playerInfo.pDeltaX*= f4;
+            data.playerInfo.pDeltaZ*= f4;
+        }
+    }
+
+    private static void moveFlying(ObjectData data, float friction) {
+        float strafe = data.playerInfo.strafe, forward = data.playerInfo.forward;
+        float f = strafe * strafe + forward * forward;
+
+        if (f >= 1.0E-4F) {
+            f = MathHelper.sqrt_float(f);
+
+            if (f < 1.0F) {
+                f = 1.0F;
+            }
+
+            f = friction / f;
+            strafe = strafe * f;
+            forward = forward * f;
+            float f1 = MathHelper.sin(MathUtils.yawTo180F(data.playerInfo.from.yaw) * (float) Math.PI / 180.0F);
+            float f2 = MathHelper.cos(MathUtils.yawTo180F(data.playerInfo.from.yaw) * (float) Math.PI / 180.0F);
+            data.playerInfo.pDeltaX += (double) (strafe * f2 - forward * f1);
+            data.playerInfo.pDeltaZ += (double) (forward * f2 + strafe * f1);
+        }
+    }
+
+    private static void jump(ObjectData data) {
+        data.playerInfo.lpDeltaY = 0.42F;
+
+        int jump = PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.JUMP);
+        if (jump > 0) {
+            data.playerInfo.lpDeltaY += jump * 0.1F;
+        }
+
+        if (data.playerInfo.sprinting) {
+            float f = MathUtils.yawTo180F(data.playerInfo.from.yaw) * 0.017453292F;
+            data.playerInfo.pDeltaX -= (double) (MathHelper.sin(f) * 0.2F);
+            data.playerInfo.pDeltaZ += (double) (MathHelper.cos(f) * 0.2F);
+        }
+    }
+
+
+
+    /* Cinematic Yaw Methods */
+
+    private static float findClosestCinematicYaw(ObjectData data, float yaw, float lastYaw) {
+        float value = sensitivities.stream().min(Comparator.comparing(val -> {
+            float f = val * 0.6f + .2f;
+            float f1 = (f * f * f) * 8f;
+            float smooth = data.playerInfo.mouseFilterX.smooth(lastYaw, 0.05f * f1);
+            data.playerInfo.mouseFilterX.reset();
+            return MathUtils.getDelta(MathUtils.yawTo180F(yaw), MathUtils.yawTo180F(smooth));
+        }, Comparator.naturalOrder())).orElse(1f);
+
+        float f = value * 0.6f + .2f;
+        float f1 = (f * f * f) * 8f;
+        return data.playerInfo.yawSmooth.smooth(lastYaw, 0.05f * f1);
+    }
+
+    private static float findClosestCinematicPitch(ObjectData data, float pitch, float lastPitch) {
+        float value = sensitivities.stream().min(Comparator.comparing(val -> {
+            float f = val * 0.6f + .2f;
+            float f1 = (f * f * f) * 8f;
+            float smooth = data.playerInfo.mouseFilterY.smooth(lastPitch, 0.05f * f1);
+            data.playerInfo.mouseFilterY.reset();
+            return MathUtils.getDelta(pitch, smooth);
+        }, Comparator.naturalOrder())).orElse(1f);
+
+        float f = value * 0.6f + .2f;
+        float f1 = (f * f * f) * 8f;
+        return data.playerInfo.pitchSmooth.smooth(lastPitch, 0.05f * f1);
+    }
+
 }

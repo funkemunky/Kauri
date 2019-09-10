@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.check.impl.combat.reach;
 
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedPacketPlayOutWorldParticle;
 import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumParticle;
@@ -21,11 +22,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 
-@CheckInfo(name = "Reach (Type A)", description = "Ensures the reach of a player is legitimate.")
-public class ReachA extends Check {
+@CheckInfo(name = "Reach", description = "Ensures the reach of a player is legitimate.")
+public class Reach extends Check {
 
     private static List<EntityType> allowedEntities = Arrays.asList(EntityType.PLAYER, EntityType.SKELETON,
             EntityType.ZOMBIE, EntityType.PIG_ZOMBIE, EntityType.VILLAGER, EntityType.IRON_GOLEM);
+
+    @Packet
+    public void onArm(WrappedInArmAnimationPacket packet) {
+        vl-= vl > 0 ? 0.01 : 0;
+    }
 
     @Packet
     public void onUse(WrappedInFlyingPacket packet) {
@@ -39,7 +45,7 @@ public class ReachA extends Check {
                     .collect(Collectors.toList());
 
             List<BoundingBox> previousLocations = data.targetPastLocation
-                    .getEstimatedLocation(data.transPing, 150)
+                    .getEstimatedLocation(data.lagInfo.transPing, 150)
                     .parallelStream()
                     .map(loc -> getHitbox(loc, data.target.getType()))
                     .collect(Collectors.toList());
@@ -51,17 +57,20 @@ public class ReachA extends Check {
             List<Double> collided = getColliding(distance, rayTrace, previousLocations);
 
             if(collided.size() > 5) {
-                double avg = collided.stream().mapToDouble(val -> val).average().orElse(-1D);
-                double calcDistance = collided.stream().mapToDouble(val -> val).min().orElse(-1D);
+                float calcDistance = (float) collided
+                        .stream()
+                        .mapToDouble(val -> val)
+                        .min()
+                        .orElse(-1D);
 
                 if(calcDistance > 0) {
                     if(calcDistance > 3) {
-                        if(vl++ > 8) {
-                            flag("reach=" + calcDistance + " collided=" + collided.size());
-                        }
+                        if(vl++ > 15) {
+                            punish();
+                        } else if(vl > 6) flag("reach=" + calcDistance + " collided=" + collided.size());
                     } else vl-= vl > 0 ? 0.05 : 0;
                     debug("reach=" + calcDistance + " collided="
-                            + collided.size() + " avg=" + avg + "  vl=" + vl);
+                            + collided.size() + "  vl=" + vl);
                 }
             } else vl-= vl > 0 ? 0.02 : 0;
         }
@@ -74,7 +83,7 @@ public class ReachA extends Check {
                 && !data.playerInfo.inCreative;
     }
 
-    private List<Double> getColliding(double distance, List<Location> traces, List<BoundingBox> boxes) {
+    private static List<Double> getColliding(double distance, List<Location> traces, List<BoundingBox> boxes) {
         List<Double> collided = new ArrayList<>();
         for (Location loc : traces) {
             RayTrace trace = new RayTrace(loc.toVector(), loc.getDirection());
@@ -84,10 +93,11 @@ public class ReachA extends Check {
                     0.1,
                     0.02f,
                     2.8f,
-                    3.6f)
+                    3.5f)
                     .parallelStream()
                     .filter(vec -> boxes.stream().anyMatch(box -> box.collides(vec)))
                     .map(vec -> vec.distance(loc.toVector()))
+                    .sequential()
                     .forEach(collided::add);
         }
 

@@ -65,30 +65,8 @@ public class Kauri extends JavaPlugin {
         MiscUtils.printToConsole("&7Shutting down all Bukkit tasks...");
         Bukkit.getScheduler().cancelTasks(this); //Cancelling all Bukkit tasks for this plugin.
 
-        MiscUtils.printToConsole("&7Collecting all fields to remove.");
-        WrappedClass dataClass = new WrappedClass(ObjectData.class);
-        List<WrappedField> fields = Arrays.stream(dataClass.getParent().getDeclaredFields())
-                .map(field -> new WrappedField(dataClass, field))
-                .collect(Collectors.toList());
-
-        MiscUtils.printToConsole("&7Clearing all fields in all ObjectData classes (" + Kauri.INSTANCE.dataManager.dataMap.size() + ")...");
-        //Looping through each data object to clear the stuff stored inside.
-        Kauri.INSTANCE.dataManager.dataMap.keySet().forEach(key -> {
-            ObjectData data = Kauri.INSTANCE.dataManager.dataMap.get(key);
-            //Clearing checks.
-            data.checkManager.checkMethods.clear();
-            data.checkManager.checks.clear();
-
-            //Just lets us go through every field automatically without having
-            //to type it all manually.
-            for (WrappedField field : fields) {
-                if(!field.getType().equals(boolean.class) && !dev.brighten.anticheat.utils.MiscUtils.isReflectedAsNumber(field.getType())) {
-                    field.set(data, null);
-                }
-            }
-        });
-
-        MiscUtils.printToConsole("&7Unloading DataManager...");
+        Kauri.INSTANCE.dataManager.dataMap.keySet().forEach(key -> Kauri.INSTANCE.dataManager.dataMap.remove(key));
+       /* MiscUtils.printToConsole("&7Unloading DataManager...");
         //Clearing the dataManager.
         Kauri.INSTANCE.dataManager.dataMap.clear();
         Kauri.INSTANCE.dataManager.dataMap = null;
@@ -101,9 +79,8 @@ public class Kauri extends JavaPlugin {
         Check.checkSettings.clear();
         profiler.enabled = false;
         profiler = null;
-        packetProcessor = null;
-        executor.shutdown(); //Shutting down threads.
-        INSTANCE = null;
+        packetProcessor = null;*/
+        executor.shutdownNow(); //Shutting down threads.
     }
 
     public void load() {
@@ -126,7 +103,12 @@ public class Kauri extends JavaPlugin {
         MiscUtils.printToConsole(Color.Gray + "Running tps task...");
         runTpsTask();
         profiler = new ToggleableProfiler();
-        enabled = true;
+        RunUtils.taskLater(() ->  enabled = true, 4);
+
+        if(Bukkit.getOnlinePlayers().size() > 0) {
+            MiscUtils.printToConsole(Color.Gray + "Detected players! Creating data objects...");
+            Bukkit.getOnlinePlayers().forEach(dataManager::createData);
+        }
     }
 
     private void runTpsTask() {

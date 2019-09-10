@@ -14,12 +14,15 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.utils.CollisionHandler;
 import dev.brighten.anticheat.utils.KLocation;
+import dev.brighten.anticheat.utils.MouseFilter;
 import dev.brighten.anticheat.utils.PastLocation;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class ObjectData {
@@ -32,22 +35,21 @@ public class ObjectData {
     public String debugging;
     public UUID debugged;
 
-    public long ping, transPing;
     public TickTimer creation;
     public PastLocation pastLocation,
             targetPastLocation;
     public LivingEntity target;
     public BoundingBox box, targetBounds;
     public ObjectData INSTANCE;
-    public CheckManager checkManager = new CheckManager();
+    public CheckManager checkManager;
     public PlayerInformation playerInfo;
     public BlockInformation blockInfo;
     public LagInformation lagInfo;
+    public List<LivingEntity> entitiesNearPlayer = new ArrayList<>();
 
     public ObjectData(UUID uuid) {
         this.uuid = uuid;
         INSTANCE = this;
-        checkManager.addChecks();
         creation = new TickTimer(10);
         alerts = getPlayer().hasPermission("kauri.alerts");
         creation.reset();
@@ -56,6 +58,8 @@ public class ObjectData {
         lagInfo = new LagInformation();
         pastLocation = new PastLocation();
         targetPastLocation = new PastLocation();
+        checkManager = new CheckManager();
+        checkManager.addChecks();
     }
 
     public Player getPlayer() {
@@ -71,21 +75,24 @@ public class ObjectData {
 
         public void runPacket(NMSObject object) {
             if(!checkMethods.containsKey(object.getClass())) return;
-            Kauri.INSTANCE.executor.execute(() -> {
-                checkMethods.get(object.getClass()).parallelStream().forEach(entry -> {
-                    Check check = checks.get(entry.getKey());
-                    Kauri.INSTANCE.profiler.start("check:" + check.name);
+            checkMethods.get(object.getClass()).parallelStream().forEach(entry -> {
+                Check check = checks.get(entry.getKey());
+                Kauri.INSTANCE.profiler.start("check:" + check.name);
 
-                    if(check.enabled) {
-                        entry.getValue().invoke(check, object);
+                if(check.enabled) {
+                    try {
+                        entry.getValue().getMethod().invoke(check, object);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        System.out.println("Error on " + check.name);
+                        e.printStackTrace();
                     }
-                    Kauri.INSTANCE.profiler.stop("check:" + check.name);
-                });
+                }
+                Kauri.INSTANCE.profiler.stop("check:" + check.name);
             });
         }
 
         protected void addChecks() {
-            Check.checkClasses.keySet().stream()
+            Check.checkClasses.keySet().parallelStream()
                     .map(clazz -> {
                         CheckInfo settings = Check.checkClasses.get(clazz);
                         Check check = clazz.getConstructor().newInstance();
@@ -97,6 +104,7 @@ public class ObjectData {
                         check.description = settings.description();
                         return check;
                     })
+                    .sequential()
                     .forEach(check -> checks.put(check.name, check));
 
             for (String name : checks.keySet()) {
@@ -104,8 +112,10 @@ public class ObjectData {
                 WrappedClass checkClass = new WrappedClass(check.getClass());
                 System.out.println("Added check: " + name);
                 Arrays.stream(check.getClass().getDeclaredMethods())
+                        .parallel()
                         .filter(method -> method.isAnnotationPresent(Packet.class))
                         .map(method -> new WrappedMethod(checkClass, method))
+                        .sequential()
                         .forEach(method -> {
                             Class<?> parameter = method.getParameters().get(0);
                             List<Map.Entry<String, WrappedMethod>> methods = checkMethods.getOrDefault(
@@ -127,10 +137,23 @@ public class ObjectData {
                 collidesVertically, collidesHorizontally, canFly, inCreative;
         public boolean generalCancel, flightCancel;
         public boolean wasOnIce, wasOnSlime, jumped, inAir, breakingBlock;
-        public float deltaY, lDeltaY, deltaX, lDeltaX, deltaZ, lDeltaZ, deltaXZ, lDeltaXZ, prePDeltaY;
+        public float deltaY, lDeltaY, deltaX, lDeltaX, deltaZ, lDeltaZ, deltaXZ, lDeltaXZ, pDeltaXZ, lpDeltaXZ, prePDeltaY;
         public float pDeltaY, pDeltaX, pDeltaZ, lpDeltaX, lpDeltaY, lpDeltaZ;
         public float deltaYaw, deltaPitch, lDeltaYaw, lDeltaPitch;
         public float fallDistance;
+
+        //Move
+        public float strafe, forward;
+        public String key;
+
+        //Cinematic
+        public float cinematicYaw, cinematicPitch;
+        public boolean cinematicModeYaw, cinematicModePitch;
+        public MouseFilter yawSmooth = new MouseFilter(), pitchSmooth = new MouseFilter(),
+                mouseFilterX = new MouseFilter(), mouseFilterY = new MouseFilter();
+
+        //Gcd
+        public float yawGCD, pitchGCD, lastYawGCD, lastPitchGCD;
 
         //Server Position
         public long lastServerPos;

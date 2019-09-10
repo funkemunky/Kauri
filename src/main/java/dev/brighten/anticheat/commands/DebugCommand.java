@@ -47,6 +47,7 @@ public class DebugCommand {
 
         data.debugging = null;
         data.debugged = null;
+        Kauri.INSTANCE.dataManager.debugging.remove(data);
 
         cmd.getPlayer().sendMessage(Color.Green + "Turned off your debugging.");
     }

@@ -18,7 +18,6 @@ import java.util.concurrent.TimeUnit;
 public class PacketProcessor {
 
     public void processClient(ObjectData data, Object object, String type) {
-        if(!Kauri.INSTANCE.isEnabled()) return;
         switch(type) {
             case Packet.Client.USE_ENTITY: {
                 WrappedInUseEntityPacket packet = new WrappedInUseEntityPacket(object, data.getPlayer());
@@ -65,6 +64,7 @@ public class PacketProcessor {
             case Packet.Client.ENTITY_ACTION: {
                 WrappedInEntityActionPacket packet = new WrappedInEntityActionPacket(object, data.getPlayer());
 
+                ActionProcessor.process(data, packet);
                 data.checkManager.runPacket(packet);
                 break;
             }
@@ -140,9 +140,11 @@ public class PacketProcessor {
             case Packet.Server.ENTITY_VELOCITY: {
                 WrappedOutVelocityPacket packet = new WrappedOutVelocityPacket(object, data.getPlayer());
 
-                data.playerInfo.lastVelocity.reset();
+                if(packet.getId() == data.getPlayer().getEntityId()) {
+                    data.playerInfo.lastVelocity.reset();
 
-                Atlas.getInstance().getSchedular().schedule(() -> data.playerInfo.pDeltaY = (float)packet.getY(), data.lagInfo.transPing, TimeUnit.MILLISECONDS);
+                    Atlas.getInstance().getSchedular().schedule(() -> data.playerInfo.pDeltaY = (float)packet.getY(), data.lagInfo.transPing, TimeUnit.MILLISECONDS);
+                }
                 data.checkManager.runPacket(packet);
                 break;
             }

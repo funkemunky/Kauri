@@ -19,4 +19,12 @@ public class MiscUtils {
     public static boolean isReflectedAsNumber(Class<?> type) {
         return Number.class.isAssignableFrom(type) || NUMBER_REFLECTED_PRIMITIVES.contains(type);
     }
+
+    public static long gcd(long current, long previous) {
+        return (previous <= 16384L) ? current : gcd(previous, current % previous);
+    }
+
+    public static float gcd(float current, float previous) {
+        return (previous <= 16384L) ? current : gcd(previous, current % previous);
+    }
 }
