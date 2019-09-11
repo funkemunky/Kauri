@@ -15,6 +15,7 @@ import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerD;
 import dev.brighten.anticheat.check.impl.combat.hitbox.Hitboxes;
 import dev.brighten.anticheat.check.impl.combat.reach.Reach;
 import dev.brighten.anticheat.check.impl.movement.fly.FlyA;
+import dev.brighten.anticheat.check.impl.movement.fly.FlyB;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFall;
 import dev.brighten.anticheat.check.impl.movement.speed.SpeedA;
 import dev.brighten.anticheat.check.impl.movement.speed.SpeedB;
@@ -99,6 +100,7 @@ public class Check {
         register(new AutoclickerC());
         register(new AutoclickerD());
         register(new FlyA());
+        register(new FlyB());
         register(new NoFall());
         register(new Reach());
         register(new Hitboxes());

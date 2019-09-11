@@ -1,11 +1,7 @@
 package dev.brighten.anticheat.utils;
 
-import cc.funkemunky.api.Atlas;
-import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumParticle;
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.BoundingBox;
-import cc.funkemunky.api.utils.MiscUtils;
-import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -15,7 +11,7 @@ import java.util.*;
 public class CollisionHandler {
     private ObjectData data;
     public boolean onGround, nearGround, collidesHorizontally, collidesVertically,
-            onSlab, onStairs, onHalfBlock, inLiquid, inWeb, onSlime, onIce, onSoulSand;
+            onSlab, onStairs, onHalfBlock, inLiquid, inWeb, onSlime, onIce, onSoulSand, inWater, inLava;
     public List<Block> blocksUnderPlayer = Collections.synchronizedList(new ArrayList<>());
     public List<Map.Entry<Block, BoundingBox>> boxesColliding = Collections.synchronizedList(new ArrayList<>()), allBlocks = Collections.synchronizedList(new ArrayList<>());
 
@@ -65,6 +61,12 @@ public class CollisionHandler {
             if(data.box.grow(0.01f,0.01f,0.01f).collides(box)) {
                if(BlockUtils.isLiquid(block)) {
                    inLiquid = true;
+
+                   if(block.getType().toString().contains("LAVA")) {
+                       inLava = true;
+                   } else {
+                       inLiquid = true;
+                   }
                } else if(block.getType().toString().contains("WEB")) {
                    inWeb = true;
                }

@@ -1,17 +1,13 @@
 package dev.brighten.anticheat;
 
 import cc.funkemunky.api.Atlas;
-import cc.funkemunky.api.profiling.BaseProfiler;
 import cc.funkemunky.api.profiling.ToggleableProfiler;
-import cc.funkemunky.api.tinyprotocol.api.packets.reflections.types.WrappedClass;
-import cc.funkemunky.api.tinyprotocol.api.packets.reflections.types.WrappedField;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.TickTimer;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.data.DataManager;
-import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.processing.PacketProcessor;
 import org.bukkit.Bukkit;
@@ -19,11 +15,8 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
 public class Kauri extends JavaPlugin {
 
@@ -66,7 +59,7 @@ public class Kauri extends JavaPlugin {
         Bukkit.getScheduler().cancelTasks(this); //Cancelling all Bukkit tasks for this plugin.
 
         Kauri.INSTANCE.dataManager.dataMap.keySet().forEach(key -> Kauri.INSTANCE.dataManager.dataMap.remove(key));
-       /* MiscUtils.printToConsole("&7Unloading DataManager...");
+        MiscUtils.printToConsole("&7Unloading DataManager...");
         //Clearing the dataManager.
         Kauri.INSTANCE.dataManager.dataMap.clear();
         Kauri.INSTANCE.dataManager.dataMap = null;
@@ -79,7 +72,7 @@ public class Kauri extends JavaPlugin {
         Check.checkSettings.clear();
         profiler.enabled = false;
         profiler = null;
-        packetProcessor = null;*/
+        packetProcessor = null;
         executor.shutdownNow(); //Shutting down threads.
     }
 

@@ -1,8 +1,6 @@
 package dev.brighten.anticheat.utils;
 
 
-import jdk.nashorn.internal.objects.annotations.Getter;
-
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;

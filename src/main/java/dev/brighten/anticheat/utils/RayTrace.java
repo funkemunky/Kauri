@@ -1,7 +1,6 @@
 package dev.brighten.anticheat.utils;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
-import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.utils.BoundingBox;
 import org.bukkit.Effect;
 import org.bukkit.World;

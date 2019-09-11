@@ -1,7 +1,6 @@
 package dev.brighten.anticheat.check.impl.movement.speed;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -14,7 +13,7 @@ public class SpeedA extends Check {
     private String lastKey = "";
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
-        double deltaXZ = data.playerInfo.deltaXZ;
+        /*double deltaXZ = data.playerInfo.deltaXZ;
         if(!packet.isPos() || deltaXZ < 0.1 || data.playerInfo.generalCancel) {
             moveTicks = 0;
             return;
@@ -37,6 +36,6 @@ public class SpeedA extends Check {
 
         moveTicks++;
         lastKey = data.playerInfo.key;
-        debug("delta=" + deltaXZ + " predicted=" + predictedXZ + " key=" +data.playerInfo.key + " forward=" + data.playerInfo.forward + " strafe=" + data.playerInfo.strafe);
+        debug("delta=" + deltaXZ + " predicted=" + predictedXZ + " key=" +data.playerInfo.key + " forward=" + data.playerInfo.forward + " strafe=" + data.playerInfo.strafe);*/
     }
 }

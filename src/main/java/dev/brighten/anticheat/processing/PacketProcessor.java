@@ -7,7 +7,6 @@ import cc.funkemunky.api.tinyprotocol.packet.in.*;
 import cc.funkemunky.api.tinyprotocol.packet.out.*;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.ReflectionsUtil;
-import cc.funkemunky.api.utils.RunUtils;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.KLocation;
@@ -19,6 +18,13 @@ public class PacketProcessor {
 
     public void processClient(ObjectData data, Object object, String type) {
         switch(type) {
+            case Packet.Client.ABILITIES: {
+                WrappedInAbilitiesPacket packet = new WrappedInAbilitiesPacket(object, data.getPlayer());
+
+                data.playerInfo.isFlying = packet.isFlying();
+                data.checkManager.runPacket(packet);
+                break;
+            }
             case Packet.Client.USE_ENTITY: {
                 WrappedInUseEntityPacket packet = new WrappedInUseEntityPacket(object, data.getPlayer());
 
@@ -50,15 +56,13 @@ public class PacketProcessor {
                 }
                 data.lagInfo.lastFlying = currentTime;
                 Kauri.INSTANCE.profiler.start("flying:process:pre");
-                MovementProcessor.preProcess(data, packet);
+                data.predictionService.pre(packet);
                 Kauri.INSTANCE.profiler.stop("flying:process:pre");
                 Kauri.INSTANCE.profiler.start("flying:process:present");
                 MovementProcessor.process(data, packet);
+                data.predictionService.move(packet);
                 Kauri.INSTANCE.profiler.stop("flying:process:present");
                 data.checkManager.runPacket(packet);
-                Kauri.INSTANCE.profiler.start("flying:process:post");
-                MovementProcessor.postProcess(data, packet);
-                Kauri.INSTANCE.profiler.stop("flying:process:post");
                 break;
             }
             case Packet.Client.ENTITY_ACTION: {
@@ -134,6 +138,7 @@ public class PacketProcessor {
 
                 data.playerInfo.canFly = packet.isAllowedFlight();
                 data.playerInfo.inCreative = packet.isCreativeMode();
+                data.playerInfo.isFlying = packet.isFlying();
                 data.checkManager.runPacket(packet);
                 break;
             }
