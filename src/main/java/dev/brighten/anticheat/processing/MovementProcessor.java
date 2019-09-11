@@ -191,6 +191,8 @@ public class MovementProcessor {
         data.playerInfo.flightCancel = data.playerInfo.canFly
                 || data.playerInfo.inCreative
                 || hasLevi
+                || data.playerInfo.liquidTicks > 0
+                || data.playerInfo.climbTicks > 0
                 || data.playerInfo.serverPos
                 || Kauri.INSTANCE.lastTickLag.hasNotPassed(5);
 
