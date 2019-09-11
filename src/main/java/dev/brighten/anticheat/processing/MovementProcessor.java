@@ -288,11 +288,6 @@ public class MovementProcessor {
 
         moveEntityWithHeading(data, false);
 
-        if(data.playerInfo.lastAttack.hasNotPassed(0)) {
-            data.playerInfo.pDeltaX*= 0.6f;
-            data.playerInfo.pDeltaZ*= 0.6f;
-        }
-
         data.playerInfo.pDeltaXZ = (float)MathUtils.hypot(data.playerInfo.pDeltaX, data.playerInfo.pDeltaZ);
         /* Motion Y prediction */
 
