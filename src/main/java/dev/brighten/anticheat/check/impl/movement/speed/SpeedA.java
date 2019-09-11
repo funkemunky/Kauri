@@ -10,20 +10,16 @@ import dev.brighten.anticheat.check.api.Packet;
 public class SpeedA extends Check {
 
     private long moveTicks, keyTicks;
-    private String lastKey = "";
+
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
-        /*double deltaXZ = data.playerInfo.deltaXZ;
+        double deltaXZ = data.playerInfo.deltaXZ;
         if(!packet.isPos() || deltaXZ < 0.1 || data.playerInfo.generalCancel) {
             moveTicks = 0;
             return;
         }
 
-        if(!lastKey.equals(data.playerInfo.key)) {
-            keyTicks = 0;
-        } else keyTicks++;
-
-        double predictedXZ = MathUtils.hypot(data.playerInfo.pDeltaX, data.playerInfo.pDeltaZ) + (moveTicks < 30 ? 0.005 : 0) + 0.001 + (keyTicks < 10 ? 0.03 : 0);
+        double predictedXZ = MathUtils.hypot(data.predictionService.motionX, data.predictionService.motionZ);
 
         if(deltaXZ > predictedXZ) {
             vl++;
@@ -35,7 +31,6 @@ public class SpeedA extends Check {
         } else vl-= vl > 0 ? 0.5 : 0;
 
         moveTicks++;
-        lastKey = data.playerInfo.key;
-        debug("delta=" + deltaXZ + " predicted=" + predictedXZ + " key=" +data.playerInfo.key + " forward=" + data.playerInfo.forward + " strafe=" + data.playerInfo.strafe);*/
+        debug("x=" + data.playerInfo.deltaX + " z=" + data.playerInfo.deltaZ + " px=" + data.predictionService.motionX + ", pz=" + data.predictionService.motionZ);
     }
 }

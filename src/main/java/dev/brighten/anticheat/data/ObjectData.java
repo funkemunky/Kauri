@@ -55,6 +55,8 @@ public class ObjectData {
         predictionService.posX = getPlayer().getLocation().getX();
         predictionService.posY = getPlayer().getLocation().getY();
         predictionService.posZ = getPlayer().getLocation().getZ();
+        predictionService.box = new BoundingBox(getPlayer().getLocation().toVector(), getPlayer().getLocation().toVector())
+                .grow(0.3f,0,0.3f).add(0,0,0,0,1.8f,0);
     }
 
     public Player getPlayer() {

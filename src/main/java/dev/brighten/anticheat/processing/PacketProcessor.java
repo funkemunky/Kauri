@@ -60,7 +60,15 @@ public class PacketProcessor {
                 Kauri.INSTANCE.profiler.stop("flying:process:pre");
                 Kauri.INSTANCE.profiler.start("flying:process:present");
                 MovementProcessor.process(data, packet);
-                data.predictionService.move(packet);
+                if(packet.isPos()) {
+                    if(data.box != null) {
+                        data.predictionService.move(packet);
+                    } else {
+                        data.predictionService.posX = packet.getX();
+                        data.predictionService.posY = packet.getY();
+                        data.predictionService.posZ = packet.getZ();
+                    }
+                }
                 Kauri.INSTANCE.profiler.stop("flying:process:present");
                 data.checkManager.runPacket(packet);
                 break;

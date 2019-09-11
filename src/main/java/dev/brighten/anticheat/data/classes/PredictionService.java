@@ -23,6 +23,7 @@ public class PredictionService {
     public float moveStrafing, moveForward, aiMoveSpeed, distanceWalkedModified, distanceWalkedOnStepModified, fallDistance;
     public double posX, posY, posZ, lPosX, lPosY, lPosZ, nextStepDistance;
     public String key;
+    public BoundingBox box = new BoundingBox(0,0,0,0,0,0);
 
     public PredictionService(ObjectData data) {
         this.data = data;
@@ -41,6 +42,8 @@ public class PredictionService {
         if (Math.abs(this.motionZ) < 0.005D) {
             this.motionZ = 0.0D;
         }
+
+        box = data.box;
 
         int precision = String.valueOf((int) Math.abs(data.playerInfo.to.x > data.playerInfo.to.z ? data.playerInfo.to.x : data.playerInfo.to.x)).length();
         precision = 15 - precision;
@@ -109,16 +112,17 @@ public class PredictionService {
         moveStrafing*= 0.98f;
         moveForward*= 0.98f;
 
+        if(data.playerInfo.collidedGround) isAirBorne = false;
+
         //Setting AI move speed
         aiMoveSpeed = Atlas.getInstance().getBlockBoxManager().getBlockBox().getAiSpeed(data.getPlayer());
     }
 
     public void move(WrappedInFlyingPacket packet) {
-        if(data.playerInfo.to == null) return;
+        moveEntityWithHeading(moveStrafing, moveForward);
         if(lastOnGround && !data.playerInfo.collidedGround && !isAirBorne && data.playerInfo.deltaY > 0) {
             jump();
         }
-        moveEntityWithHeading(moveStrafing, moveForward);
     }
 
     public void velocity(WrappedOutVelocityPacket packet) {
@@ -154,7 +158,7 @@ public class PredictionService {
             if (!data.blockInfo.inLava || data.playerInfo.isFlying) {
                 float f4 = 0.91F;
 
-                Location loc = new Location(data.getPlayer().getWorld(), posX, data.box.minY, posZ);
+                Location loc = new Location(data.getPlayer().getWorld(), posX, box.minY, posZ);
                 if (data.playerInfo.collidedGround) {
                     Block block = BlockUtils.getBlock(loc.clone().subtract(0, 1,0));
                     f4 = block != null ? ReflectionsUtil.getFriction(block) : 0.6f * 0.91f;
@@ -279,7 +283,7 @@ public class PredictionService {
             double d6;
 
             for (d6 = 0.05D; x != 0.0D && Atlas.getInstance().getBlockBoxManager().getBlockBox()
-                .getCollidingBoxes(data.getPlayer().getWorld(), data.box.add((float)x, -1.0f, 0.0f)).isEmpty(); d3 = x) {
+                .getCollidingBoxes(data.getPlayer().getWorld(), box.add((float)x, -1.0f, 0.0f)).isEmpty(); d3 = x) {
                 if (x < d6 && x >= -d6) {
                     x = 0.0D;
                 } else if (x > 0.0D) {
@@ -290,7 +294,7 @@ public class PredictionService {
             }
 
             for (; z != 0.0D && Atlas.getInstance().getBlockBoxManager().getBlockBox()
-                .getCollidingBoxes(data.getPlayer().getWorld(), data.box.add(0.0f, -1.0f, (float)z)).isEmpty(); d5 = z) {
+                .getCollidingBoxes(data.getPlayer().getWorld(), box.add(0.0f, -1.0f, (float)z)).isEmpty(); d5 = z) {
                 if (z < d6 && z >= -d6) {
                     z = 0.0D;
                 } else if (z > 0.0D) {
@@ -301,7 +305,7 @@ public class PredictionService {
             }
 
             for (; x != 0.0D && z != 0.0D && Atlas.getInstance().getBlockBoxManager().getBlockBox()
-                .getCollidingBoxes(data.getPlayer().getWorld(), data.box.add((float)x, -1.0f, (float)z)).isEmpty(); d5 = z) {
+                .getCollidingBoxes(data.getPlayer().getWorld(), box.add((float)x, -1.0f, (float)z)).isEmpty(); d5 = z) {
                 if (x < d6 && x >= -d6) {
                     x = 0.0D;
                 } else if (x > 0.0D) {
@@ -323,8 +327,8 @@ public class PredictionService {
         }
 
         List<BoundingBox> list1 = Atlas.getInstance().getBlockBoxManager().getBlockBox()
-                .getCollidingBoxes(data.getPlayer().getWorld(), data.box.addCoord((float)x, (float)y, (float)z));
-        BoundingBox boundingBox = data.box;
+                .getCollidingBoxes(data.getPlayer().getWorld(), box.addCoord((float)x, (float)y, (float)z));
+        BoundingBox boundingBox = box;
 
         for (BoundingBox boundingBox1 : list1) {
             y = boundingBox1.calculateYOffset(boundingBox, y);
@@ -344,8 +348,8 @@ public class PredictionService {
         }
 
         boundingBox = boundingBox.add(0.0F, 0.0F, (float)z);
-        
-        this.resetPositionToBB();
+
+        this.resetPositionToBB(boundingBox);
         data.playerInfo.collidesHorizontally = d3 != x || d5 != z;
         data.playerInfo.collidesVertically = d4 != y;
         lastOnGround = data.playerInfo.collidedGround;
@@ -357,7 +361,7 @@ public class PredictionService {
         Location blockpos = new Location(data.getPlayer().getWorld(), i, j, k);
         Block block1 = BlockUtils.getBlock(blockpos);
 
-        if (block1.getType().equals(Material.AIR)) {
+        if (block1 != null && block1.getType().equals(Material.AIR)) {
             Block block = BlockUtils.getBlock(blockpos.clone().subtract(0, 1, 0));
 
             if(BlockUtils.isFence(block) || BlockUtils.isFenceGate(block) || block.getType().toString().contains("WALL")) {
@@ -388,14 +392,14 @@ public class PredictionService {
             double d13 = this.posY - d1;
             double d14 = this.posZ - d2;
 
-            if (!BlockUtils.isClimbableBlock(block1)) {
+            if (block1 != null && !BlockUtils.isClimbableBlock(block1)) {
                 d13 = 0.0D;
             }
 
             this.distanceWalkedModified = (float) ((double) this.distanceWalkedModified + (double) MathHelper.sqrt_double(d12 * d12 + d14 * d14) * 0.6D);
             this.distanceWalkedOnStepModified = (float) ((double) this.distanceWalkedOnStepModified + (double) MathHelper.sqrt_double(d12 * d12 + d13 * d13 + d14 * d14) * 0.6D);
 
-            if (this.distanceWalkedOnStepModified > (float) this.nextStepDistance && !block1.getType().equals(Material.AIR)) {
+            if (this.distanceWalkedOnStepModified > (float) this.nextStepDistance && block1 != null && !block1.getType().equals(Material.AIR)) {
                 this.nextStepDistance = (int) this.distanceWalkedOnStepModified + 1;
 
                 if (data.blockInfo.inWater) {
@@ -439,21 +443,21 @@ public class PredictionService {
      * Checks if the offset position from the entity's current position is inside of liquid. Args: x, y, z
      */
     private boolean isOffsetPositionInLiquid(double x, double y, double z) {
-        BoundingBox box = data.box.add((float)x, (float)y, (float)z);
+        BoundingBox box = this.box.add((float)x, (float)y, (float)z);
         return data.blockInfo.allBlocks.stream().filter(entry -> entry.getValue().collides(box)).anyMatch(entry -> BlockUtils.isLiquid(entry.getKey()));
     }
 
-    private void resetPositionToBB() {
-        this.posX = (data.box.minX + data.box.maxX) / 2.0D;
-        this.posY = data.box.minY;
-        this.posZ = (data.box.minZ + data.box.maxZ) / 2.0D;
+    private void resetPositionToBB(BoundingBox box) {
+        this.posX = (box.minX + box.maxX) / 2.0D;
+        this.posY = box.minY;
+        this.posZ = (box.minZ + box.maxZ) / 2.0D;
     }
 
     private void updateFallState(double y, boolean onGroundIn, Block blockIn, Location pos) {
         if (onGroundIn) {
             if (this.fallDistance > 0.0F) {
-                if (blockIn != null 
-                        && blockIn.getType().toString().contains("SLIME") 
+                if (blockIn != null
+                        && blockIn.getType().toString().contains("SLIME")
                         && !data.playerInfo.sneaking) {
                     this.fall(this.fallDistance, 0F);
                 } else {
