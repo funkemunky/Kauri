@@ -188,6 +188,8 @@ public class PredictionService {
                         this.motionY = -0.15D;
                     }
 
+                    data.blockInfo.onClimbable = true;
+
                     boolean flag = data.playerInfo.sneaking;
 
                     if (flag && this.motionY < 0.0D) {
@@ -199,6 +201,7 @@ public class PredictionService {
 
                 if (data.playerInfo.collidesHorizontally && onLadder) {
                     this.motionY = 0.2D;
+                    data.blockInfo.onClimbable = true;
                 }
 
                 if (!Atlas.getInstance().getBlockBoxManager().getBlockBox().isChunkLoaded(loc)) {
@@ -257,6 +260,10 @@ public class PredictionService {
                 this.motionY = 0.30000001192092896D;
             }
         }
+    }
+
+    public void post(WrappedInFlyingPacket packet) {
+        data.blockInfo.onClimbable = false;
     }
 
     private void moveEntity(double x, double y, double z) {

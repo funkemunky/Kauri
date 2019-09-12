@@ -16,7 +16,7 @@ import java.util.Map;
 public class BlockInformation {
     private ObjectData objectData;
     public boolean onClimbable, onSlab, onStairs, onHalfBlock, inLiquid, inLava, inWater, inWeb, onSlime, onIce,
-            onSoulSand;
+            onSoulSand, blocksAbove;
     public List<Block> blocksUnderPlayer = new ArrayList<>();
     public List<Map.Entry<Block, BoundingBox>> boxesColliding = new ArrayList<>(), allBlocks = new ArrayList<>();
 
@@ -61,5 +61,6 @@ public class BlockInformation {
         onSoulSand = handler.onSoulSand;
         inLava = handler.inLava;
         inWater = handler.inWater;
+        blocksAbove = handler.blocksAbove;
     }
 }

@@ -173,6 +173,10 @@ public class MovementProcessor {
             data.playerInfo.slimeTicks++;
         } else data.playerInfo.slimeTicks-= data.playerInfo.slimeTicks > 0 ? 1 : 0;
 
+        if(data.blockInfo.blocksAbove) {
+            data.playerInfo.blocksAboveTicks++;
+        } else data.playerInfo.blocksAboveTicks-= data.playerInfo.blocksAboveTicks > 0 ? 1 : 0;
+
         //Player ground/air positioning ticks.
         if(!data.playerInfo.serverGround) {
             data.playerInfo.airTicks++;

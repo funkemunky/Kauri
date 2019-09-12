@@ -71,6 +71,7 @@ public class PacketProcessor {
                 }
                 Kauri.INSTANCE.profiler.stop("flying:process:present");
                 data.checkManager.runPacket(packet);
+                data.predictionService.post(packet);
                 break;
             }
             case Packet.Client.ENTITY_ACTION: {
