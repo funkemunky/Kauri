@@ -100,16 +100,24 @@ public class MovementProcessor {
         data.playerInfo.deltaPitch = data.playerInfo.to.pitch - data.playerInfo.from.pitch;
 
         if(packet.isLook()) {
+            data.playerInfo.lCinematicYaw = data.playerInfo.cinematicYaw;
+            data.playerInfo.lCinematicPitch = data.playerInfo.cinematicPitch;
             data.playerInfo.cinematicYaw = findClosestCinematicYaw(data, data.playerInfo.to.yaw, data.playerInfo.from.yaw);
             data.playerInfo.cinematicPitch = findClosestCinematicPitch(data, data.playerInfo.to.pitch, data.playerInfo.from.pitch);
 
+            data.playerInfo.cDeltaYaw = MathUtils.getAngleDelta(data.playerInfo.cinematicYaw, data.playerInfo.lCinematicYaw);
+            data.playerInfo.cDeltaPitch = MathUtils.getAngleDelta(data.playerInfo.cinematicPitch, data.playerInfo.lCinematicPitch);
+
+            data.playerInfo.cinematicModeYaw = MathUtils.getDelta(data.playerInfo.cDeltaYaw, data.playerInfo.deltaYaw) < (data.playerInfo.deltaYaw > 20 ? 2 : 0.51);
+
+            data.playerInfo.cinematicModePitch =
+                    MathUtils.getDelta(data.playerInfo.cDeltaPitch, data.playerInfo.deltaPitch)
+                            < (data.playerInfo.deltaPitch > 12 ? 1.1 : (data.playerInfo.deltaYaw > 15 ? 0.55f : 0.31));
 
             if (Float.isNaN(data.playerInfo.cinematicPitch) || Float.isNaN(data.playerInfo.cinematicYaw)) {
                 data.playerInfo.yawSmooth.reset();
                 data.playerInfo.pitchSmooth.reset();
             }
-
-            data.playerInfo.cinematicModePitch = (MathUtils.getDelta(data.playerInfo.cinematicPitch, data.playerInfo.to.pitch) < 0.4 && Math.abs(data.playerInfo.deltaPitch) > 0.01);
 
             data.playerInfo.lastYawGCD = data.playerInfo.yawGCD;
             data.playerInfo.yawGCD = MiscUtils.gcd((long) (data.playerInfo.deltaYaw * offset), (long) (data.playerInfo.lDeltaYaw * offset));

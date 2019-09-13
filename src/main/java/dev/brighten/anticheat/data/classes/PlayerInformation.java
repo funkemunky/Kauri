@@ -20,7 +20,8 @@ public class PlayerInformation {
     public String key;
 
     //Cinematic
-    public float cinematicYaw, cinematicPitch;
+    public float lCinematicYaw, lCinematicPitch;
+    public float cinematicYaw, cinematicPitch, cDeltaYaw, cDeltaPitch;
     public boolean cinematicModeYaw, cinematicModePitch;
     public MouseFilter yawSmooth = new MouseFilter(), pitchSmooth = new MouseFilter(),
             mouseFilterX = new MouseFilter(), mouseFilterY = new MouseFilter();
