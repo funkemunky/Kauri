@@ -165,7 +165,7 @@ public class PredictionService {
                 }
 
                 Block block = BlockUtils.getBlock(loc);
-                boolean onLadder = block != null ? BlockUtils.isClimbableBlock(block) : false;
+                boolean onLadder = block != null && BlockUtils.isClimbableBlock(block);
 
                 float f = 0.16277136F / (f4 * f4 * f4);
                 float f5;

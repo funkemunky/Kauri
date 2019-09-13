@@ -25,4 +25,17 @@ public class MovementUtils {
     public static float getBaseSpeed(ObjectData data) {
         return 0.25f + (PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.SPEED) * (data.playerInfo.serverGround ? 0.045f : 0.028f)) + (Math.max(0, data.getPlayer().getWalkSpeed() - 0.2f) * 1.6f);
     }
+
+    public static float getFriction(ObjectData data) {
+        float friction = 0f;
+
+        if(!data.playerInfo.serverGround) {
+            if(data.blockInfo.onSlime) {
+                friction = 0.8f;
+            } else if(data.blockInfo.onIce) {
+                friction = 0.98f;
+            }
+        }
+        return friction;
+    }
 }

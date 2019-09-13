@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.data.classes;
 
 import cc.funkemunky.api.Atlas;
+import cc.funkemunky.api.reflection.MinecraftReflection;
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.ReflectionsUtil;
@@ -26,10 +27,10 @@ public class BlockInformation {
 
     public void runCollisionCheck() {
         if(objectData.creation.hasNotPassed(2)) return; //Prevents errors, especially on plugin reloads.
+        long stamp = System.nanoTime();
         CollisionHandler handler = new CollisionHandler(objectData);
 
-        List<BoundingBox> boxes = Atlas.getInstance().getBlockBoxManager().getBlockBox()
-                .getCollidingBoxes(objectData.getPlayer().getWorld(), objectData.box.grow(1f,1f,1f));
+        List<BoundingBox> boxes = MinecraftReflection.getCollidingBoxes(objectData.getPlayer().getWorld(), objectData.box.grow(1,1,1));
 
         //Running block checking;
         boxes.parallelStream().forEach(box -> {
@@ -62,5 +63,10 @@ public class BlockInformation {
         inLava = handler.inLava;
         inWater = handler.inWater;
         blocksAbove = handler.blocksAbove;
+
+        long extense = System.nanoTime() - stamp;
+
+        double ms = extense / 1000000D;
+
     }
 }
