@@ -8,6 +8,7 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.MiscUtils;
 
 //TODO Test this with Vape and Vape Lite. Trying other things too.
+//TODO Test for false positives with cinematic or check if cinematic causes the check to just not work.
 @CheckInfo(name = "Aim (Type D)", description = "Designed to detect aimassists attempting to use cinematic smoothing.")
 public class AimD extends Check {
 
