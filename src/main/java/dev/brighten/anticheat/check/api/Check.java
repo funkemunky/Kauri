@@ -8,6 +8,7 @@ import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.impl.combat.aim.AimA;
 import dev.brighten.anticheat.check.impl.combat.aim.AimB;
 import dev.brighten.anticheat.check.impl.combat.aim.AimC;
+import dev.brighten.anticheat.check.impl.combat.aim.AimD;
 import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerA;
 import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerB;
 import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerC;
@@ -105,6 +106,7 @@ public class Check {
         register(new AimA());
         register(new AimB());
         register(new AimC());
+        register(new AimD());
         register(new SpeedA());
         register(new SpeedB());
     }
