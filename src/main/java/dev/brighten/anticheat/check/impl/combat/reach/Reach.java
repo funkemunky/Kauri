@@ -10,6 +10,7 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.KLocation;
 import dev.brighten.anticheat.utils.RayTrace;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.Vector;
@@ -42,14 +43,14 @@ public class Reach extends Check {
                     .collect(Collectors.toList());
 
             List<BoundingBox> previousLocations = data.targetPastLocation
-                    .getEstimatedLocation(data.lagInfo.transPing, 150)
+                    .getEstimatedLocation(data.lagInfo.transPing, 150L)
                     .parallelStream()
                     .map(loc -> getHitbox(loc, data.target.getType()))
                     .collect(Collectors.toList());
 
             double distance = Math.min(6, data.target
                     .getLocation().toVector()
-                    .distance(data.playerInfo.to.toVector()) * 1.5f);
+                    .distance(data.playerInfo.to.toVector()) * 1.2f);
 
             List<Double> collided = getColliding(distance, rayTrace, previousLocations);
 
@@ -77,7 +78,8 @@ public class Reach extends Check {
         return data.playerInfo.lastAttack.hasNotPassed(0)
                 && data.target != null
                 && allowedEntities.contains(data.target.getType())
-                && !data.playerInfo.inCreative;
+                && !data.playerInfo.inCreative
+                && !data.getPlayer().getGameMode().equals(GameMode.CREATIVE);
     }
 
     private static List<Double> getColliding(double distance, List<Location> traces, List<BoundingBox> boxes) {
@@ -106,6 +108,6 @@ public class Reach extends Check {
         return new BoundingBox(loc.toVector(), loc.toVector())
                 .grow((float)bounds.getX(), 0, (float)bounds.getZ())
                 .add(0,0,0,0,(float)bounds.getY(),0)
-                .grow(0.1f,0.1f,0.1f);
+                .grow(0.12f,0.12f,0.12f);
     }
 }

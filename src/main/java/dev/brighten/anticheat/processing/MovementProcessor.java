@@ -108,11 +108,11 @@ public class MovementProcessor {
             data.playerInfo.cDeltaYaw = MathUtils.getAngleDelta(data.playerInfo.cinematicYaw, data.playerInfo.lCinematicYaw);
             data.playerInfo.cDeltaPitch = MathUtils.getAngleDelta(data.playerInfo.cinematicPitch, data.playerInfo.lCinematicPitch);
 
-            data.playerInfo.cinematicModeYaw = MathUtils.getDelta(data.playerInfo.cDeltaYaw, data.playerInfo.deltaYaw) < (data.playerInfo.deltaYaw > 20 ? 2 : 0.51);
+            data.playerInfo.cinematicModeYaw = MathUtils.getDelta(data.playerInfo.cDeltaYaw, data.playerInfo.deltaYaw) < (Math.abs(data.playerInfo.deltaYaw )> 20 ? 2 : 0.51);
 
             data.playerInfo.cinematicModePitch =
                     MathUtils.getDelta(data.playerInfo.cDeltaPitch, data.playerInfo.deltaPitch)
-                            < (data.playerInfo.deltaPitch > 12 ? 1.1 : (data.playerInfo.deltaYaw > 15 ? 0.55f : 0.31));
+                            < (data.playerInfo.deltaPitch > 12 ? 1.1 : (data.playerInfo.deltaYaw > 15 ? 0.55f : 0.31)) && Math.abs(data.playerInfo.deltaPitch) > 1E-7;
 
             if (Float.isNaN(data.playerInfo.cinematicPitch) || Float.isNaN(data.playerInfo.cinematicYaw)) {
                 data.playerInfo.yawSmooth.reset();
@@ -203,6 +203,7 @@ public class MovementProcessor {
         data.playerInfo.flightCancel = data.playerInfo.canFly
                 || data.playerInfo.inCreative
                 || hasLevi
+                || !data.getPlayer().getAllowFlight()
                 || data.playerInfo.liquidTicks > 0
                 || data.playerInfo.climbTicks > 0
                 || data.playerInfo.serverPos
@@ -211,6 +212,7 @@ public class MovementProcessor {
         data.playerInfo.generalCancel = data.playerInfo.canFly
                 || data.playerInfo.inCreative
                 || hasLevi
+                || !data.getPlayer().getAllowFlight()
                 || data.playerInfo.lastVelocity.hasNotPassed(5 + MathUtils.millisToTicks(data.lagInfo.ping))
                 || data.playerInfo.serverPos
                 || Kauri.INSTANCE.lastTickLag.hasNotPassed(5);

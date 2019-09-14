@@ -11,18 +11,16 @@ public class AimC extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if(packet.isLook() && data.playerInfo.deltaYaw > 0) {
-            if(!data.playerInfo.cinematicModeYaw) {
-                if(data.playerInfo.yawGCD < 1E6) {
-                    if((vl+= (data.playerInfo.deltaYaw < 2 ? 2 : 1)) > 150) {
-                        punish();
-                    } else if(vl > 80) {
-                        flag("yaw=" + data.playerInfo.deltaYaw + " g=" + data.playerInfo.yawGCD);
-                    }
-                } else vl-= vl > 0 ? (data.playerInfo.deltaYaw > 10 ? 20 : (data.playerInfo.deltaYaw > 1 ? 5 : 2)) : 0;
-                debug("gcd=" + data.playerInfo.yawGCD
-                        + " yawDelta=" + MathUtils.round(data.playerInfo.deltaYaw, 3) + " vl=" + vl);
-            } else vl-= vl > 0 ? 0.25 : 0;
-        }
+        if(!packet.isLook()) return;
+
+        float accel = MathUtils.getDelta(data.playerInfo.deltaPitch, data.playerInfo.lDeltaPitch);
+
+        if(accel < 1E-5 && (Math.abs(data.playerInfo.deltaPitch) > 0 || data.playerInfo.deltaYaw > 2)) {
+            if(vl++ > 100) {
+                punish();
+            } else if(vl > 40) {
+                flag("accel=" + accel + " deltaPitch=" + data.playerInfo.deltaPitch);
+            }
+        } else vl-= vl > 0 ? 6 : 0;
     }
 }

@@ -37,12 +37,12 @@ public class SpeedB extends Check {
         motionX = data.playerInfo.lDeltaX * toMultiply;
         motionZ = data.playerInfo.lDeltaZ * toMultiply;
 
-       // float moveFlyingFriction = data.playerInfo.serverGround ?
+        float moveFlyingFriction = data.playerInfo.serverGround ? 0.16277136F / (friction * friction * friction) : (data.playerInfo.sprinting ? 0.026f : 0.02f);
 
         //Now we run the moveFlying, which is the only modification done before position method is run.
         //Note that the position method really only changes the motion when collisions are made, so a collision check.
         //Will have to be frun.
-       // moveFlying(data.predictionService.moveStrafing, data.predictionService.moveForward, );
+        moveFlying(data.predictionService.moveStrafing, data.predictionService.moveForward, moveFlyingFriction);
     }
 
     private void moveFlying(float strafe, float forward, float friction) {

@@ -2,10 +2,8 @@ package dev.brighten.anticheat.data.classes;
 
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.reflection.MinecraftReflection;
-import cc.funkemunky.api.utils.BlockUtils;
-import cc.funkemunky.api.utils.BoundingBox;
-import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.ReflectionsUtil;
+import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumParticle;
+import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.utils.CollisionHandler;
@@ -35,6 +33,9 @@ public class BlockInformation {
 
         //Running block checking;
         boxes.parallelStream().forEach(box -> {
+            if(Atlas.getInstance().getCurrentTicks() % 4 == 0) {
+                Atlas.getInstance().getSchedular().execute(() -> MiscUtils.createParticlesForBoundingBox(objectData.getPlayer(), box, WrappedEnumParticle.FLAME, 0.25f));
+            }
             Block block = BlockUtils.getBlock(box.getMinimum().toLocation(objectData.getPlayer().getWorld()));
 
             if(block != null) {

@@ -44,7 +44,8 @@ public class PlayerInformation {
     public int liquidTicks, groundTicks, airTicks, halfBlockTicks, webTicks, climbTicks, slimeTicks, iceTicks,
             blocksAboveTicks;
     public TickTimer lastBrokenBlock = new TickTimer(5),
-            lastVelocity = new TickTimer(20);
+            lastVelocity = new TickTimer(20),
+            lastTargetSwitch = new TickTimer(3);
 
     public KLocation from, to;
 }

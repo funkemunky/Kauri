@@ -9,6 +9,7 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.KLocation;
 import dev.brighten.anticheat.utils.RayTrace;
+import org.bukkit.GameMode;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.Vector;
 
@@ -44,7 +45,7 @@ public class Hitboxes extends Check {
         if (checkParameters(data)) {
 
             List<RayTrace> rayTrace = data.pastLocation
-                    .getEstimatedLocation(0, data.playerInfo.deltaYaw > 10 ? 100L : 50L)
+                    .getEstimatedLocation(0,100L)
                     .stream()
                     .map(loc ->
                             loc.toLocation(data.getPlayer().getWorld()).clone()
@@ -83,7 +84,9 @@ public class Hitboxes extends Check {
         return data.playerInfo.lastAttack.hasNotPassed(0)
                 && data.target != null
                 && allowedEntities.contains(data.target.getType())
-                && !data.playerInfo.inCreative;
+                && !data.playerInfo.inCreative
+                && data.playerInfo.lastTargetSwitch.hasPassed()
+                && !data.getPlayer().getGameMode().equals(GameMode.CREATIVE);
     }
 
     private static BoundingBox getHitbox(EntityType type, KLocation loc) {

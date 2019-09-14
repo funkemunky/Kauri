@@ -32,9 +32,10 @@ public class PacketProcessor {
                     data.playerInfo.lastAttack.reset();
 
                     if(packet.getEntity() instanceof LivingEntity) {
-                        if(data.target !=null && data.target.getUniqueId() != packet.getEntity().getUniqueId()) {
+                        if(data.target != null && !data.target.getUniqueId().equals(packet.getEntity().getUniqueId())) {
                             //Resetting location to prevent false positives.
                             data.targetPastLocation.previousLocations.clear();
+                            data.playerInfo.lastTargetSwitch.reset();
                             data.targetBounds = ReflectionsUtil.toBoundingBox(ReflectionsUtil.getBoundingBox(data.target));
                         }
 

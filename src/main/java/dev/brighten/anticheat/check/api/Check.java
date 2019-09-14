@@ -5,10 +5,7 @@ import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.MiscUtils;
 import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.check.impl.combat.aim.AimA;
-import dev.brighten.anticheat.check.impl.combat.aim.AimB;
-import dev.brighten.anticheat.check.impl.combat.aim.AimC;
-import dev.brighten.anticheat.check.impl.combat.aim.AimD;
+import dev.brighten.anticheat.check.impl.combat.aim.*;
 import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerA;
 import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerB;
 import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerC;
@@ -107,6 +104,7 @@ public class Check {
         register(new AimB());
         register(new AimC());
         register(new AimD());
+        register(new AimE());
         register(new SpeedA());
         register(new SpeedB());
     }
