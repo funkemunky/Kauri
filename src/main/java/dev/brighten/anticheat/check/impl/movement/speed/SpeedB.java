@@ -21,6 +21,7 @@ public class SpeedB extends Check {
     public void onFlying(WrappedInFlyingPacket packet) {
         if(!packet.isPos() ||
                 data.playerInfo.generalCancel
+                || data.playerInfo.lastVelocity.hasPassed(5 + MathUtils.millisToTicks(data.lagInfo.ping))
                 || data.playerInfo.liquidTicks > 0
                 || data.playerInfo.webTicks > 0
                 || Atlas.getInstance().getBlockBoxManager().getBlockBox().isUsingItem(data.getPlayer())

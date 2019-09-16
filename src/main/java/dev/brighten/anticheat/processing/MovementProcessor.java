@@ -224,7 +224,6 @@ public class MovementProcessor {
                 || hasLevi
                 || data.creation.hasNotPassed(15)
                 || block == null
-                || data.playerInfo.lastVelocity.hasNotPassed(5 + MathUtils.millisToTicks(data.lagInfo.ping))
                 || data.playerInfo.serverPos
                 || Kauri.INSTANCE.lastTickLag.hasNotPassed(5);
 

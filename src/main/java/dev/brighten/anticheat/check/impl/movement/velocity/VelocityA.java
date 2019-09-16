@@ -10,38 +10,44 @@ import dev.brighten.anticheat.check.api.Packet;
 @CheckInfo(name = "VelocityA")
 public class VelocityA extends Check {
 
-    private float vY;
+    private double vY;
     private boolean moved;
     private int moveTicks;
+    private long velocityTS;
     @Packet
     public void onVelocity(WrappedOutVelocityPacket packet) {
-        if(packet.getId() == data.getPlayer().getEntityId()) vY = (float) packet.getY();
+        if(packet.getId() == data.getPlayer().getEntityId()) {
+            vY = (float) packet.getY();
+            velocityTS = System.currentTimeMillis();
+        }
     }
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if(data.playerInfo.serverGround) {
-            moved = false;
-            if(moveTicks > 0) vY = 0;
+        if(data.playerInfo.serverGround && moveTicks > 0) {
+            vY = moveTicks = 0;
         }
 
-        if(data.playerInfo.deltaY > 0 && data.playerInfo.from.y % 0.5 == 0 && vY != 0
+        if((data.playerInfo.deltaY > 0 && data.playerInfo.from.y % 0.5 == 0
+                || moveTicks > 0
+                || (System.currentTimeMillis() - velocityTS) > data.lagInfo.transPing * 2)
+                && vY != 0
+                && !data.playerInfo.generalCancel
                 && data.playerInfo.blocksAboveTicks == 0
                 && !data.playerInfo.canFly) {
-            moved = true;
 
-            float pct = data.playerInfo.deltaY / vY * 100F;
+            float pct = data.playerInfo.deltaY / (float)vY * 100F;
 
-            if(pct < 100) {
+            if(pct < 99.999) {
                 if(vl++ > 20) {
-                    //punish();
-                }
+                    punish();
+                } else if(vl > 4) flag("pct=" + MathUtils.round(pct, 2) + "%");
             }
 
             debug("pct=" + pct);
 
-            vY-= 0.08f;
-            vY*= 0.98f;
+            vY-= 0.08;
+            vY*= 0.9800000190734863D;
             if(moveTicks++ > 4) {
                 vY = 0;
                 moveTicks = 0;
