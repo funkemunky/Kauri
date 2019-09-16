@@ -7,7 +7,7 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 
-@CheckInfo(name = "BadPackets (Type A)", description = "Checks for blockDig and blockPlace times.")
+@CheckInfo(name = "BadPackets (A)", description = "Checks for blockDig and blockPlace times.")
 public class BadPacketsA extends Check {
 
     private long lastBlockPlace;

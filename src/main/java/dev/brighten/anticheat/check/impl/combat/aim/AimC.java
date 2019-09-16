@@ -6,7 +6,7 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 
-@CheckInfo(name = "Aim (Type C)", description = "Checks for common denominators in yaw difference.")
+@CheckInfo(name = "Aim (C)", description = "Checks for common denominators in yaw difference.")
 public class AimC extends Check {
 
     @Packet

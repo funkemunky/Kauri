@@ -12,7 +12,7 @@ import org.bukkit.entity.LivingEntity;
 
 import java.util.Comparator;
 
-@CheckInfo(name = "Aim (Type A)", description = "A check that detects aim.")
+@CheckInfo(name = "Aim (A)", description = "A check that detects aim.")
 public class AimA extends Check {
     private Interval<Double> offsetInterval = new Interval<>(0, 30);
 

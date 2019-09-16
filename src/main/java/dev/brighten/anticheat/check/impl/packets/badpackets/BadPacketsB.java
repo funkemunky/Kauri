@@ -6,7 +6,7 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 
-@CheckInfo(name = "BadPackets (Type B)", description = "Checks for block place packets before flying is sent.")
+@CheckInfo(name = "BadPackets (B)", description = "Checks for block place packets before flying is sent.")
 public class BadPacketsB extends Check {
 
     private long lastFlying;

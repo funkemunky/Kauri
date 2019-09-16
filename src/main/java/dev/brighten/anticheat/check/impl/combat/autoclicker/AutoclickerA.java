@@ -5,7 +5,7 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 
-@CheckInfo(name = "Autoclicker (Type A)", description = "A fast click check.", executable = true)
+@CheckInfo(name = "Autoclicker (A)", description = "A fast click check.", executable = true)
 public class AutoclickerA extends Check {
 
     private int ticks;

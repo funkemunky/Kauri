@@ -6,7 +6,7 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.MovementUtils;
 
-@CheckInfo(name = "Speed (Type D)", description = "A ground speed check.")
+@CheckInfo(name = "Speed (D)", description = "A ground speed check.")
 public class SpeedD extends Check {
 
     @Packet

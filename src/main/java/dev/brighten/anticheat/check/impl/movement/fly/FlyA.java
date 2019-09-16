@@ -6,7 +6,7 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 
-@CheckInfo(name = "Fly (Type A)", description = "It's a fly check. Isn't that cool?")
+@CheckInfo(name = "Fly (A)", description = "It's a fly check. Isn't that cool?")
 public class FlyA extends Check {
 
     @Packet

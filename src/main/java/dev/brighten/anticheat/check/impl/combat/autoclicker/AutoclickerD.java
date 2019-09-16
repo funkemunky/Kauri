@@ -6,7 +6,7 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 
-@CheckInfo(name = "Autoclicker (Type D)", description = "It's an autoclicker check")
+@CheckInfo(name = "Autoclicker (D)", description = "It's an autoclicker check")
 public class AutoclickerD extends Check {
 
     private Interval<Long> interval = new Interval<>(0, 30);

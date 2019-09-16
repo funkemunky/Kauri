@@ -13,7 +13,7 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.MovementUtils;
 import org.bukkit.potion.PotionEffectType;
 
-@CheckInfo(name = "Speed (Type B)", description = "Ensures acceleration is legit.")
+@CheckInfo(name = "Speed (B)", description = "Ensures acceleration is legit.")
 public class SpeedB extends Check {
 
     private float motionX, motionZ;

@@ -7,7 +7,7 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.MovementUtils;
 
-@CheckInfo(name = "Speed (Type C)", description = "Checks for instance changes in movement.")
+@CheckInfo(name = "Speed (C)", description = "Checks for instance changes in movement.")
 public class SpeedC extends Check {
 
     @Packet

@@ -125,6 +125,9 @@ public class PacketProcessor {
                     if(MathUtils.getDelta(data.lagInfo.lastTransPing, data.lagInfo.transPing) > 40) {
                         data.lagInfo.lastPingDrop.reset();
                     }
+
+                    data.lagInfo.pingAverages.add(data.lagInfo.transPing);
+                    data.lagInfo.averagePing = data.lagInfo.pingAverages.getAverage();
                 }
                 data.checkManager.runPacket(packet);
                 break;

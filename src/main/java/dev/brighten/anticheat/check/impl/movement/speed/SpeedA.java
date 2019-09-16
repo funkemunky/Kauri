@@ -6,7 +6,7 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.MovementUtils;
 
-@CheckInfo(name = "Speed (Type A)", description = "A speed check")
+@CheckInfo(name = "Speed (A)", description = "A speed check")
 public class SpeedA extends Check {
 
     private long moveTicks, keyTicks;

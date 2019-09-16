@@ -2,6 +2,8 @@ package dev.brighten.anticheat.data;
 
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.TickTimer;
+import cc.funkemunky.api.utils.math.RollingAverageLong;
+import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.classes.BlockInformation;
 import dev.brighten.anticheat.data.classes.CheckManager;
@@ -69,9 +71,10 @@ public class ObjectData {
 
     public class LagInformation {
         public long lastKeepAlive, lastTrans;
-        public long ping, transPing, lastPing, lastTransPing;
+        public long ping, averagePing, transPing, lastPing, lastTransPing;
         public boolean lagging;
         public TickTimer lastPacketDrop = new TickTimer(10), lastPingDrop = new TickTimer(40);
+        public RollingAverageLong pingAverages = new RollingAverageLong(10, 0);
         public long lastFlying;
     }
 

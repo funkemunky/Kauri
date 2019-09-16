@@ -5,10 +5,9 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 
-@CheckInfo(name = "Aim (Type E)")
+@CheckInfo(name = "Aim (E)")
 public class AimE extends Check {
 
-    float lastYaw, lastYD;
     @Packet
     public void flying(WrappedInFlyingPacket packet) {
         if(packet.isLook() && data.playerInfo.lastAttack.hasNotPassed(20)) {

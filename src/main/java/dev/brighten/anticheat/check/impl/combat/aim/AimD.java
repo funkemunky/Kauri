@@ -13,7 +13,7 @@ import java.util.Set;
 
 //TODO Test this with Vape and Vape Lite. Trying other things too.
 //TODO Test for false positives with cinematic or check if cinematic causes the check to just not work.
-@CheckInfo(name = "Aim (Type D)", description = "Designed to detect aimassists attempting to use cinematic smoothing.")
+@CheckInfo(name = "Aim (D)", description = "Designed to detect aimassists attempting to use cinematic smoothing.")
 public class AimD extends Check {
 
     private long lastGCD;

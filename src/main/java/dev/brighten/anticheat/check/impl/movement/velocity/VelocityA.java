@@ -7,7 +7,7 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 
-@CheckInfo(name = "VelocityA")
+@CheckInfo(name = "Velocity (A)", description = "Checks for vertical velocity modifications.")
 public class VelocityA extends Check {
 
     private double vY;

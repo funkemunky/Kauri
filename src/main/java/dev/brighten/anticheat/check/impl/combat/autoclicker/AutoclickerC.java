@@ -7,7 +7,7 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 
-@CheckInfo(name = "Autoclicker (Type C)", description = "Checks for abnormally consistent CPS.")
+@CheckInfo(name = "Autoclicker (C)", description = "Checks for abnormally consistent CPS.")
 public class AutoclickerC extends Check {
 
     private long lastClick;
