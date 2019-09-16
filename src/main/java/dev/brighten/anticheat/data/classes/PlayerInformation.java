@@ -6,14 +6,14 @@ import dev.brighten.anticheat.utils.KLocation;
 import dev.brighten.anticheat.utils.MouseFilter;
 
 public class PlayerInformation {
-    public boolean serverGround, lServerGround, clientGround, nearGround, collidedGround,
-            collidesVertically, collidesHorizontally, canFly, inCreative, isFlying, collided, blocksAbove;
+    public boolean serverGround, clientGround, nearGround,
+            collidesVertically, collidesHorizontally, canFly, inCreative, isFlying, collided,
+            onLadder;
     public boolean generalCancel, flightCancel;
     public boolean wasOnIce, wasOnSlime, jumped, inAir, breakingBlock;
-    public float deltaY, lDeltaY, deltaX, lDeltaX, deltaZ, lDeltaZ, deltaXZ, lDeltaXZ, pDeltaXZ, lpDeltaXZ, prePDeltaY;
-    public float pDeltaY, pDeltaX, pDeltaZ, lpDeltaX, lpDeltaY, lpDeltaZ;
+    public float deltaY, lDeltaY, deltaX, lDeltaX, deltaZ, lDeltaZ, deltaXZ, lDeltaXZ, fallDistance;
+    public float pDeltaY;
     public float deltaYaw, deltaPitch, lDeltaYaw, lDeltaPitch;
-    public float fallDistance;
 
     //Move
     public float strafe, forward;
@@ -45,7 +45,8 @@ public class PlayerInformation {
             blocksAboveTicks;
     public TickTimer lastBrokenBlock = new TickTimer(5),
             lastVelocity = new TickTimer(20),
-            lastTargetSwitch = new TickTimer(3);
+            lastTargetSwitch = new TickTimer(3),
+            lastBlockPlace = new TickTimer(10);
 
     public KLocation from, to;
 }

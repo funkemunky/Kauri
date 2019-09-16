@@ -2,6 +2,7 @@ package dev.brighten.anticheat.data;
 
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.TickTimer;
+import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.classes.BlockInformation;
 import dev.brighten.anticheat.data.classes.CheckManager;
 import dev.brighten.anticheat.data.classes.PlayerInformation;
@@ -42,7 +43,9 @@ public class ObjectData {
         this.uuid = uuid;
         INSTANCE = this;
         creation = new TickTimer(10);
-        alerts = getPlayer().hasPermission("kauri.alerts");
+        if(alerts = getPlayer().hasPermission("kauri.alerts")) {
+            Kauri.INSTANCE.dataManager.hasAlerts.add(this);
+        }
         creation.reset();
         playerInfo = new PlayerInformation();
         blockInfo = new BlockInformation(this);
@@ -52,11 +55,9 @@ public class ObjectData {
         checkManager = new CheckManager(this);
         checkManager.addChecks();
         predictionService = new PredictionService(this);
-        predictionService.posX = getPlayer().getLocation().getX();
-        predictionService.posY = getPlayer().getLocation().getY();
-        predictionService.posZ = getPlayer().getLocation().getZ();
         predictionService.box = new BoundingBox(getPlayer().getLocation().toVector(), getPlayer().getLocation().toVector())
                 .grow(0.3f,0,0.3f).add(0,0,0,0,1.8f,0);
+
     }
 
     public Player getPlayer() {
@@ -72,5 +73,10 @@ public class ObjectData {
         public boolean lagging;
         public TickTimer lastPacketDrop = new TickTimer(10), lastPingDrop = new TickTimer(40);
         public long lastFlying;
+    }
+
+    public void onLogout() {
+        Kauri.INSTANCE.dataManager.hasAlerts.remove(this);
+        Kauri.INSTANCE.dataManager.debugging.remove(this);
     }
 }

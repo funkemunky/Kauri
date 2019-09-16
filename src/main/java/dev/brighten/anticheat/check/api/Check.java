@@ -16,6 +16,13 @@ import dev.brighten.anticheat.check.impl.movement.fly.FlyA;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFall;
 import dev.brighten.anticheat.check.impl.movement.speed.SpeedA;
 import dev.brighten.anticheat.check.impl.movement.speed.SpeedB;
+import dev.brighten.anticheat.check.impl.movement.speed.SpeedC;
+import dev.brighten.anticheat.check.impl.movement.speed.SpeedD;
+import dev.brighten.anticheat.check.impl.movement.velocity.VelocityA;
+import dev.brighten.anticheat.check.impl.packets.Timer;
+import dev.brighten.anticheat.check.impl.packets.badpackets.BadPacketsA;
+import dev.brighten.anticheat.check.impl.packets.badpackets.BadPacketsB;
+import dev.brighten.anticheat.check.impl.packets.badpackets.BadPacketsC;
 import dev.brighten.anticheat.data.ObjectData;
 import org.bukkit.Bukkit;
 
@@ -107,6 +114,13 @@ public class Check {
         register(new AimE());
         register(new SpeedA());
         register(new SpeedB());
+        register(new SpeedC());
+        register(new SpeedD());
+        register(new Timer());
+        register(new BadPacketsA());
+        register(new BadPacketsB());
+        register(new BadPacketsC());
+        register(new VelocityA());
     }
 
     public static boolean isCheck(String name) {

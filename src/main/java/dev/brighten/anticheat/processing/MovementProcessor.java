@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.processing;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.Kauri;
@@ -8,6 +9,7 @@ import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.KLocation;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.MovementUtils;
+import org.bukkit.block.Block;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -94,9 +96,7 @@ public class MovementProcessor {
         //Setting the angle delta for use in checks to prevent repeated functions.
         data.playerInfo.lDeltaYaw = data.playerInfo.deltaYaw;
         data.playerInfo.lDeltaPitch = data.playerInfo.deltaPitch;
-        data.playerInfo.deltaYaw = MathUtils.getDelta(
-                MathUtils.yawTo180F(data.playerInfo.to.yaw),
-                MathUtils.yawTo180F(data.playerInfo.from.yaw));
+        data.playerInfo.deltaYaw = MathUtils.getAngleDelta(data.playerInfo.to.yaw, data.playerInfo.from.yaw);
         data.playerInfo.deltaPitch = data.playerInfo.to.pitch - data.playerInfo.from.pitch;
 
         if(packet.isLook()) {
@@ -154,6 +154,15 @@ public class MovementProcessor {
 
         /* General Ticking */
 
+        Block block = BlockUtils.getBlock(data.playerInfo.to.toLocation(data.getPlayer().getWorld()));
+
+        if(block != null && BlockUtils.isClimbableBlock(block)) {
+            if(data.playerInfo.collidesHorizontally) {
+                data.blockInfo.onClimbable = true;
+            } else data.blockInfo.onClimbable = data.playerInfo.deltaY <= 0;
+            data.playerInfo.onLadder = true;
+        } else data.playerInfo.onLadder = data.blockInfo.onClimbable = false;
+
         //Checking if user is in liquid.
         if(data.blockInfo.inLiquid) {
             data.playerInfo.liquidTicks++;
@@ -203,16 +212,18 @@ public class MovementProcessor {
         data.playerInfo.flightCancel = data.playerInfo.canFly
                 || data.playerInfo.inCreative
                 || hasLevi
-                || !data.getPlayer().getAllowFlight()
+                || block == null
                 || data.playerInfo.liquidTicks > 0
                 || data.playerInfo.climbTicks > 0
+                || data.creation.hasNotPassed(15)
                 || data.playerInfo.serverPos
                 || Kauri.INSTANCE.lastTickLag.hasNotPassed(5);
 
         data.playerInfo.generalCancel = data.playerInfo.canFly
                 || data.playerInfo.inCreative
                 || hasLevi
-                || !data.getPlayer().getAllowFlight()
+                || data.creation.hasNotPassed(15)
+                || block == null
                 || data.playerInfo.lastVelocity.hasNotPassed(5 + MathUtils.millisToTicks(data.lagInfo.ping))
                 || data.playerInfo.serverPos
                 || Kauri.INSTANCE.lastTickLag.hasNotPassed(5);

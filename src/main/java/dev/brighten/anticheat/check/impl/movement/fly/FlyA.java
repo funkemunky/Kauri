@@ -17,10 +17,10 @@ public class FlyA extends Check {
             if(Math.abs(predicted) < 0.005) predicted = 0;
 
             float delta = MathUtils.getDelta(predicted, data.playerInfo.deltaY);
-            if(delta > 0.01 && data.playerInfo.airTicks > 2 && !data.playerInfo.flightCancel && !data.blockInfo.onClimbable) {
+            if(delta > 0.01 && data.playerInfo.airTicks > 2 && !data.playerInfo.flightCancel && data.playerInfo.lastBlockPlace.hasPassed(5) && !data.blockInfo.onClimbable) {
                 if(vl++ > 40) {
                     punish();
-                } else if(vl > 2) flag("ping=%p tps=%t delta=" + MathUtils.round(MathUtils.getDelta(data.playerInfo.deltaY, data.playerInfo.pDeltaY), 5));
+                } else if(vl > 2) flag("ping=%p tps=%t delta=" + MathUtils.round(delta, 5));
             } else vl-= vl > 0 ? 0.25f : 0;
             debug("deltaY=" + data.playerInfo.deltaY + " pDeltaY=" + data.playerInfo.pDeltaY + " onGround=" + data.playerInfo.serverGround + " collidedVert=" + data.playerInfo.collidesVertically);
         }

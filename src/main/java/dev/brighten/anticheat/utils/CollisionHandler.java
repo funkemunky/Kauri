@@ -61,6 +61,9 @@ public class CollisionHandler {
             if(data.box.collidesHorizontally(box)) {
                 collidesHorizontally = true;
             }
+            if(data.box.collidesVertically(box)) {
+                collidesVertically = true;
+            }
         } else {
             if(data.box.grow(0.01f,0.01f,0.01f).collides(box)) {
                if(BlockUtils.isLiquid(block)) {

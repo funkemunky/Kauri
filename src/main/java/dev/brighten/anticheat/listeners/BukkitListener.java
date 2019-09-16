@@ -1,7 +1,8 @@
 package dev.brighten.anticheat.listeners;
 
-import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.reflection.MinecraftReflection;
+import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumParticle;
+import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MiscUtils;
 import dev.brighten.anticheat.Kauri;
@@ -13,6 +14,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.List;
 
 @Init
 public class BukkitListener implements Listener {
@@ -36,7 +39,11 @@ public class BukkitListener implements Listener {
 
 
         if(event.getItem() != null && event.getItem().isSimilar(MAGIC_WAND)) {
-            MinecraftReflection.getCollidingBoxes()
+            List<BoundingBox> boxes = MinecraftReflection.getBlockBox(event.getPlayer(), event.getClickedBlock());
+
+            for (BoundingBox box : boxes) {
+                MiscUtils.createParticlesForBoundingBox(event.getPlayer(), box, WrappedEnumParticle.FLAME, 0.2f);
+            }
             event.setCancelled(true);
         }
     }

@@ -3,4 +3,4 @@ main: dev.brighten.anticheat.Kauri
 description: You won't see this nibba.
 author: "funkemunky"
 depend: [Atlas]
-version: v${project.version}
+version: ${project.version}

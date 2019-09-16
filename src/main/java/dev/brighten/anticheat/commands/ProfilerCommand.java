@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Init(commands = true)
 public class ProfilerCommand {
 
-    @Command(name = "kauri.profile", description = "run a profile on Kauri.", permission = {"kauri.profile"})
+    @Command(name = "kauri.profile", display = "profile", description = "run a profile on Kauri.", permission = {"kauri.profile"})
     public void onCommand(CommandAdapter cmd) {
         if(cmd.getArgs().length > 0) {
             switch(cmd.getArgs()[0].toLowerCase()) {

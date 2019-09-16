@@ -22,6 +22,8 @@ public class PacketProcessor {
                 WrappedInAbilitiesPacket packet = new WrappedInAbilitiesPacket(object, data.getPlayer());
 
                 data.playerInfo.isFlying = packet.isFlying();
+                data.playerInfo.canFly = packet.isAllowedFlight();
+                data.playerInfo.inCreative = packet.isCreativeMode();
                 data.checkManager.runPacket(packet);
                 break;
             }
@@ -57,22 +59,14 @@ public class PacketProcessor {
                 }
                 data.lagInfo.lastFlying = currentTime;
                 Kauri.INSTANCE.profiler.start("flying:process:pre");
-                data.predictionService.pre(packet);
+                if(packet.isPos()) data.predictionService.pre(packet);
                 Kauri.INSTANCE.profiler.stop("flying:process:pre");
-                Kauri.INSTANCE.profiler.start("flying:process:present");
+                Kauri.INSTANCE.profiler.start("flying:process");
                 MovementProcessor.process(data, packet);
-                if(packet.isPos()) {
-                    if(data.box != null) {
-                        data.predictionService.move(packet);
-                    } else {
-                        data.predictionService.posX = packet.getX();
-                        data.predictionService.posY = packet.getY();
-                        data.predictionService.posZ = packet.getZ();
-                    }
-                }
-                Kauri.INSTANCE.profiler.stop("flying:process:present");
+                if(packet.isPos()) data.predictionService.move(packet);
                 data.checkManager.runPacket(packet);
-                data.predictionService.post(packet);
+                if(packet.isPos()) data.predictionService.post(packet);
+                Kauri.INSTANCE.profiler.stop("flying:process");
                 break;
             }
             case Packet.Client.ENTITY_ACTION: {
@@ -104,6 +98,9 @@ public class PacketProcessor {
             case Packet.Client.BLOCK_PLACE: {
                 WrappedInBlockPlacePacket packet = new WrappedInBlockPlacePacket(object, data.getPlayer());
 
+                if(packet.getItemStack() != null && packet.getItemStack().getType().isSolid()) {
+                    data.playerInfo.lastBlockPlace.reset();
+                }
                 data.checkManager.runPacket(packet);
                 break;
             }
@@ -157,8 +154,7 @@ public class PacketProcessor {
 
                 if(packet.getId() == data.getPlayer().getEntityId()) {
                     data.playerInfo.lastVelocity.reset();
-
-                    Atlas.getInstance().getSchedular().schedule(() -> data.playerInfo.pDeltaY = (float)packet.getY(), data.lagInfo.transPing, TimeUnit.MILLISECONDS);
+                    data.predictionService.velocity(packet);
                 }
                 data.checkManager.runPacket(packet);
                 break;

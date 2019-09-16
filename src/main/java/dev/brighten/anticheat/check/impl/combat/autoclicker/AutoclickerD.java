@@ -19,7 +19,7 @@ public class AutoclickerD extends Check {
             if(interval.size() > 25) {
                 double disease = interval.std();
                 double avg = interval.average();
-                if(disease < 19 || (disease > 90)) {
+                if(disease < 19) {
                     vl++;
                     if(vl > 13) {
                         punish();

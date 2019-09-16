@@ -27,14 +27,12 @@ public class MovementUtils {
     }
 
     public static float getFriction(ObjectData data) {
-        float friction = 0f;
+        float friction = 0.6f;
 
-        if(!data.playerInfo.serverGround) {
-            if(data.blockInfo.onSlime) {
-                friction = 0.8f;
-            } else if(data.blockInfo.onIce) {
-                friction = 0.98f;
-            }
+        if(data.blockInfo.onSlime) {
+            friction = 0.8f;
+        } else if(data.blockInfo.onIce) {
+            friction = 0.98f;
         }
         return friction;
     }

@@ -5,6 +5,7 @@ import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.processing.MovementProcessor;
 import dev.brighten.anticheat.utils.MiscUtils;
 
 import java.util.HashSet;
@@ -17,49 +18,58 @@ public class AimD extends Check {
 
     private long lastGCD;
     private boolean equal;
-    private Set<Float> deltas = new HashSet<>();
+    private int yawTicks, pitchTicks, sprintTicks;
+    private float lastPitch, lastYaw, verbose;
+
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
-        if(!packet.isLook()) return;
 
-        long gcd = MiscUtils.gcd((long)data.playerInfo.pitchGCD, (long)data.playerInfo.lastPitchGCD);
+        if(data.playerInfo.deltaYaw == 0) {
+            yawTicks++;
+        } else yawTicks = 0;
 
-        if(gcd == lastGCD && (gcd > 0 || data.playerInfo.deltaYaw > 2)) {
-            vl++;
-            equal = true;
-        } else if(!equal) {
-            vl = 0;
-        } else {
-            equal = false;
-            vl-= vl > 0 ? 1 : 0;
+        if(data.playerInfo.deltaPitch == 0) {
+            pitchTicks++;
+        } else pitchTicks = 0;
+
+        if(!data.playerInfo.sprinting) {
+            sprintTicks++;
+        } else sprintTicks = 0;
+
+        if(packet.isLook()) {
+            if(data.playerInfo.lastAttack.hasPassed(10) || sprintTicks > 4) {
+                verbose = 0;
+                return;
+            }
+
+            float pitchDelta = MathUtils.getDelta(data.playerInfo.to.pitch, lastPitch);
+            long gcd = MiscUtils.gcd((long)(pitchDelta * MovementProcessor.offset), (long)(lastPitch * MovementProcessor.offset));
+
+            int resetInteger = yawTicks > 2 ? (pitchTicks * yawTicks) : yawTicks;
+
+            if(resetInteger > 3 && verbose > 0) {
+                verbose--;
+            }
+
+            if(data.playerInfo.cinematicModePitch && verbose > 0) {
+                verbose-= verbose > 0 ? 4 : 0;
+            }
+            if(gcd == lastGCD && Math.abs(data.playerInfo.to.pitch) < 75) {
+                verbose+=2;
+            } else verbose-= verbose > 0 ? 2 : 0;
+
+            debug("verbose=" + verbose + " gcd=" + gcd + " lGCD=" + lastGCD);
+            if(data.playerInfo.deltaPitch == 0) {
+                if(verbose > 10) {
+                    vl++;
+                    if(vl > 10) {
+                        punish();
+                    } else flag("verbose=" + verbose + " g=" + gcd);
+                }
+                lastYaw = data.playerInfo.to.yaw;
+                lastPitch = data.playerInfo.to.pitch;
+                lastGCD = gcd;
+            }
         }
-
-        if(data.playerInfo.cinematicModeYaw || data.playerInfo.cinematicModePitch) vl = 0;
-
-        if(vl > 14) {
-            punish();
-        } else if(vl > 8) flag("pitch=0" + "g=" + gcd);
-
-        lastGCD = gcd;
-
-        debug("pitchDelta=" + MathUtils.round(data.playerInfo.deltaPitch, 2) + " gcd="
-                + gcd + " vl=" + vl + " usingCinematic=" + data.playerInfo.cinematicModePitch);
-
-       /*if(data.playerInfo.deltaPitch == 0 || data.playerInfo.cinematicModePitch) return;
-
-        long gcd = MiscUtils.gcd((long)data.playerInfo.pitchGCD, (long)data.playerInfo.lastPitchGCD);
-       if(ticks++ > 40) {
-
-           if(deltas.size() < 30) {
-               if(vl++ > 10) {
-                   punish();
-               } else if(vl > 5) {
-                   flag("size=" + deltas.size());
-               }
-           } else vl = 0;
-           debug("size=" + deltas.size() + " vl=" + vl);
-           deltas.clear();
-           ticks = 0;
-       } else deltas.add(gcd);*/
     }
 }
