@@ -34,7 +34,7 @@ public class Reach extends Check {
     @Packet
     public void onUse(WrappedInFlyingPacket packet) {
         if(checkParameters(data)) {
-            List<Location> rayTrace = data.pastLocation.getEstimatedLocation(0, 100L)
+            List<Location> rayTrace = data.pastLocation.getEstimatedLocation(0, 50)
                     .stream()
                     .map(loc -> {
                         return loc.toLocation(data.getPlayer().getWorld())

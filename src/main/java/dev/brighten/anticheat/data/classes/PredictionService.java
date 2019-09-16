@@ -36,8 +36,8 @@ public class PredictionService {
         precision = 15 - precision;
         double preD = Double.parseDouble("1.2E-" + Math.max(3, precision - 5)); // the motion deviates further and further from the coordinates 0 0 0. this value fix this
 
-        double mx = data.playerInfo.deltaX - data.playerInfo.lDeltaX * (data.playerInfo.serverGround ? MovementUtils.getFriction(data) * 0.91f : 0.91f); // mx, mz is an Value to calculate the rotation and the Key of the Player
-        double mz = data.playerInfo.deltaZ - data.playerInfo.lDeltaZ * (data.playerInfo.serverGround ? MovementUtils.getFriction(data) * 0.91f : 0.91f);
+        double mx = data.playerInfo.deltaX - data.playerInfo.lDeltaX * (packet.isGround() ? MovementUtils.getFriction(data) * 0.91f : 0.91f); // mx, mz is an Value to calculate the rotation and the Key of the Player
+        double mz = data.playerInfo.deltaZ - data.playerInfo.lDeltaZ * (packet.isGround() ? MovementUtils.getFriction(data) * 0.91f : 0.91f);
 
         float motionYaw = (float) (Math.atan2(mz, mx) * 180.0D / Math.PI) - 90.0F;
 
@@ -168,6 +168,26 @@ public class PredictionService {
 
         if (data.getPlayer().hasPotionEffect(PotionEffectType.JUMP)) {
             this.motionY += (double) (PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.JUMP) * 0.1F);
+        }
+    }
+
+    private void moveFlying(float strafe, float forward, float friction) {
+        float f = strafe * strafe + forward * forward;
+
+        if (f >= 1.0E-4F) {
+            f = MathHelper.sqrt_float(f);
+
+            if (f < 1.0F) {
+                f = 1.0F;
+            }
+
+            f = friction / f;
+            strafe = strafe * f;
+            forward = forward * f;
+            float f1 = MathHelper.sin(data.playerInfo.to.yaw * (float) Math.PI / 180.0F);
+            float f2 = MathHelper.cos(data.playerInfo.to.yaw * (float) Math.PI / 180.0F);
+            this.motionX += (double) (strafe * f2 - forward * f1);
+            this.motionZ += (double) (forward * f2 + strafe * f1);
         }
     }
 }

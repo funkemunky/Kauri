@@ -28,21 +28,27 @@ public class VelocityA extends Check {
             vY = moveTicks = 0;
         }
 
+        if(moveTicks == 0 && (System.currentTimeMillis() - velocityTS) > data.lagInfo.transPing * 2) {
+            vY = 0;
+            moveTicks = 0;
+            return;
+        }
+
         if(vY != 0 && (data.playerInfo.deltaY > 0
                 || moveTicks > 0
-                || (System.currentTimeMillis() - velocityTS) > data.lagInfo.transPing * 2)
-                && data.playerInfo.from.y % 0.5 == 0
+                || (System.currentTimeMillis() - velocityTS) > data.lagInfo.transPing)
+                && (data.playerInfo.from.y % 0.5 == 0 || moveTicks > 0)
                 && !data.playerInfo.generalCancel
                 && data.playerInfo.blocksAboveTicks == 0
                 && !data.playerInfo.canFly) {
 
             float pct = data.playerInfo.deltaY / (float) vY * 100F;
 
-            if (pct < 99.999) {
+            if (pct < 99.999 && !data.blockInfo.blocksAbove && !data.playerInfo.collidesHorizontally) {
                 if (vl++ > 20) {
                     punish();
                 } else if (vl > 4) flag("pct=" + MathUtils.round(pct, 2) + "%");
-            }
+            } else vl-= vl > 0 ? 0.5 : 0;
 
             debug("pct=" + pct);
 
@@ -53,5 +59,7 @@ public class VelocityA extends Check {
                 moveTicks = 0;
             }
         }
+
+
     }
 }

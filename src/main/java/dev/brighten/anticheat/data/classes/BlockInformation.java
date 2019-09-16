@@ -19,7 +19,7 @@ import java.util.Map;
 public class BlockInformation {
     private ObjectData objectData;
     public boolean onClimbable, onSlab, onStairs, onHalfBlock, inLiquid, inLava, inWater, inWeb, onSlime, onIce,
-            onSoulSand, blocksAbove, collidesVertically, collidesHorizontally;
+            onSoulSand, blocksAbove, collidesVertically, collidesHorizontally, blocksNear;
 
     public BlockInformation(ObjectData objectData) {
         this.objectData = objectData;
@@ -64,5 +64,8 @@ public class BlockInformation {
         blocksAbove = handler.blocksAbove;
         collidesHorizontally = handler.collidesHorizontally;
         collidesVertically = handler.collidesVertically;
+        blocksNear = handler.blocksNear;
+
+        boxes.clear();
     }
 }

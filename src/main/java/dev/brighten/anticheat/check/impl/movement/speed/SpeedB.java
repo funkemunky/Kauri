@@ -26,10 +26,8 @@ public class SpeedB extends Check {
                 || data.playerInfo.webTicks > 0
                 || Atlas.getInstance().getBlockBoxManager().getBlockBox().isUsingItem(data.getPlayer())
                 || data.blockInfo.blocksAbove
-                || data.playerInfo.halfBlockTicks > 0
-                || Atlas.getInstance().getBlockBoxManager().getBlockBox()
-                .getCollidingBoxes(data.getPlayer().getWorld(),
-                        data.box.grow(0.1f, -.2f, 0.1f)).parallelStream().anyMatch(box -> box.collidesHorizontally(data.box.grow(0.1f, 0, 0.1f)))) return;
+                || data.blockInfo.blocksNear
+                || data.playerInfo.halfBlockTicks > 0) return;
 
         if (data.playerInfo.airTicks > 1) {
             runMotionPrediction();

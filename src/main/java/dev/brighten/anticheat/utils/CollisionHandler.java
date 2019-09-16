@@ -10,7 +10,7 @@ import java.util.*;
 
 public class CollisionHandler {
     private ObjectData data;
-    public boolean onGround, nearGround, collidesHorizontally, collidesVertically,
+    public boolean onGround, blocksNear, nearGround, collidesHorizontally, collidesVertically,
             onSlab, onStairs, onHalfBlock, inLiquid, inWeb, onSlime, onIce, onSoulSand, inWater, inLava, blocksAbove;
     public List<Block> blocksUnderPlayer = Collections.synchronizedList(new ArrayList<>());
     public List<Map.Entry<Block, BoundingBox>> boxesColliding = Collections.synchronizedList(new ArrayList<>()), allBlocks = Collections.synchronizedList(new ArrayList<>());
@@ -51,6 +51,10 @@ public class CollisionHandler {
             } else if(box.collidesVertically(data.box
                     .subtract(0, 1, 0,0,1,0))) {
                 nearGround = true;
+            }
+
+            if(data.box.grow(0.3f, -1E-5f, 0.3f).collidesHorizontally(box)) {
+                blocksNear = true;
             }
 
             if(data.box.add(0,0.5f,0,0,0.5f,0).collidesVertically(box)) {

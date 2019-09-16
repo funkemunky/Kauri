@@ -17,7 +17,11 @@ public class FlyA extends Check {
             if(Math.abs(predicted) < 0.005) predicted = 0;
 
             float delta = MathUtils.getDelta(predicted, data.playerInfo.deltaY);
-            if(delta > 0.01 && data.playerInfo.airTicks > 2 && !data.playerInfo.flightCancel && data.playerInfo.lastBlockPlace.hasPassed(5) && !data.blockInfo.onClimbable) {
+            if(delta > 0.01 && data.playerInfo.airTicks > 2
+                    && !data.playerInfo.flightCancel
+                    && data.playerInfo.lastVelocity.hasPassed(4)
+                    && data.playerInfo.lastBlockPlace.hasPassed(5)
+                    && !data.blockInfo.onClimbable) {
                 if(vl++ > 40) {
                     punish();
                 } else if(vl > 2) flag("ping=%p tps=%t delta=" + MathUtils.round(delta, 5));
