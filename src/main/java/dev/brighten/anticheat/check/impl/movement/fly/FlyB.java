@@ -11,7 +11,9 @@ public class FlyB extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if(!packet.isPos()) return;
+        if(!packet.isPos()
+                || data.playerInfo.flightCancel
+                || data.playerInfo.lastVelocity.hasNotPassed(20)) return;
         float max = MovementUtils.getJumpHeight(data.getPlayer()) + 0.01f;
 
         if(data.playerInfo.deltaY > max) {

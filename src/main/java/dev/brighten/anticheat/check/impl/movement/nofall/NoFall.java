@@ -13,6 +13,7 @@ public class NoFall extends Check {
     public void onPacket(WrappedInFlyingPacket packet) {
         boolean onGround = data.playerInfo.serverGround;
         if(packet.isGround() != onGround && !data.playerInfo.generalCancel
+                && !data.playerInfo.collidesHorizontally
                 && data.playerInfo.lastVelocity.hasPassed(5 + MathUtils.millisToTicks(data.lagInfo.ping))) {
             if(vl++ > 30) {
                 punish();

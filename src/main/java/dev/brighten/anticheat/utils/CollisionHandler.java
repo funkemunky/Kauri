@@ -25,8 +25,7 @@ public class CollisionHandler {
         }
 
         if(entity || BlockUtils.isSolid(block)) {
-            if(data.box.subtract(0,0.5f,0,0,0.5f,0).collidesVertically(box)
-                    || box.collidesVertically(data.box
+            if(box.collidesVertically(data.box
                     .subtract(0, 0.1f, 0, 0, 1, 0))) {
                 onGround = nearGround = true;
 
@@ -65,7 +64,7 @@ public class CollisionHandler {
                 collidesVertically = true;
             }
         } else {
-            if(data.box.grow(0.01f,0.01f,0.01f).collides(box)) {
+            if(data.box.grow(0.05f,0.05f,0.05f).collides(box)) {
                if(BlockUtils.isLiquid(block)) {
                    inLiquid = true;
 

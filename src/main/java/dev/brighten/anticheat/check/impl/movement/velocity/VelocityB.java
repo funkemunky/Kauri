@@ -42,7 +42,7 @@ public class VelocityB extends Check {
             if(airTicks > 2) {
 
                 float predicted = (float) MathUtils.hypot(vX, vZ);
-                float pct = data.playerInfo.deltaXZ / predicted;
+                float pct = data.playerInfo.deltaXZ / predicted * 100;
 
                 if(pct < 99.999) {
                     //TODO flag
