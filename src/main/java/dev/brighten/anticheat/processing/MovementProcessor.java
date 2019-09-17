@@ -29,7 +29,6 @@ public class MovementProcessor {
             data.playerInfo.from
                     = data.playerInfo.to
                     = new KLocation(packet.getX(), packet.getY(), packet.getZ(), packet.getYaw(), packet.getPitch());
-            data.playerInfo.clientGround = packet.isGround(); //When a player logs in, he/she may not move.
         } else {
             data.playerInfo.from = new KLocation(
                     data.playerInfo.to.x,
@@ -61,6 +60,7 @@ public class MovementProcessor {
 
         data.playerInfo.to.timeStamp = System.currentTimeMillis();
 
+        data.playerInfo.lClientGround = data.playerInfo.clientGround;
         data.playerInfo.clientGround = packet.isGround();
 
         //Checking for position changes
@@ -215,14 +215,14 @@ public class MovementProcessor {
                 || block == null
                 || data.playerInfo.liquidTicks > 0
                 || data.playerInfo.climbTicks > 0
-                || data.creation.hasNotPassed(15)
+                || data.creation.hasNotPassed(40)
                 || data.playerInfo.serverPos
                 || Kauri.INSTANCE.lastTickLag.hasNotPassed(5);
 
         data.playerInfo.generalCancel = data.playerInfo.canFly
                 || data.playerInfo.inCreative
                 || hasLevi
-                || data.creation.hasNotPassed(15)
+                || data.creation.hasNotPassed(40)
                 || block == null
                 || data.playerInfo.serverPos
                 || Kauri.INSTANCE.lastTickLag.hasNotPassed(5);

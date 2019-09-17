@@ -6,7 +6,7 @@ import dev.brighten.anticheat.utils.KLocation;
 import dev.brighten.anticheat.utils.MouseFilter;
 
 public class PlayerInformation {
-    public boolean serverGround, clientGround, nearGround,
+    public boolean serverGround, lClientGround, clientGround, nearGround,
             collidesVertically, collidesHorizontally, canFly, inCreative, isFlying, collided,
             onLadder;
     public boolean generalCancel, flightCancel;

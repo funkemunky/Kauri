@@ -14,7 +14,7 @@ public class VelocityA extends Check {
     private long velocityTS;
     @Packet
     public void onVelocity(WrappedOutVelocityPacket packet) {
-        if(packet.getId() == data.getPlayer().getEntityId()) {
+        if(packet.getId() == data.getPlayer().getEntityId() && packet.getY() > 0) {
             vY = (float) packet.getY();
             velocityTS = System.currentTimeMillis();
         }
