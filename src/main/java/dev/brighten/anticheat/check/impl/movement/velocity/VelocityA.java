@@ -11,8 +11,6 @@ import dev.brighten.anticheat.check.api.Packet;
 public class VelocityA extends Check {
 
     private double vY;
-    private boolean moved;
-    private int moveTicks;
     private long velocityTS;
     @Packet
     public void onVelocity(WrappedOutVelocityPacket packet) {
@@ -24,20 +22,8 @@ public class VelocityA extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if(data.playerInfo.serverGround && moveTicks > 0) {
-            vY = moveTicks = 0;
-        }
-
-        if(moveTicks == 0 && (System.currentTimeMillis() - velocityTS) > data.lagInfo.transPing * 2) {
-            vY = 0;
-            moveTicks = 0;
-            return;
-        }
-
-        if(vY != 0 && (data.playerInfo.deltaY > 0
-                || moveTicks > 0
-                || (System.currentTimeMillis() - velocityTS) > data.lagInfo.transPing)
-                && (data.playerInfo.from.y % 0.5 == 0 || moveTicks > 0)
+        if(vY != 0 && ((data.playerInfo.deltaY > 0 && data.playerInfo.from.y % 0.5 == 0)
+                || (System.currentTimeMillis() - velocityTS) > data.lagInfo.transPing * 2)
                 && !data.playerInfo.generalCancel
                 && data.playerInfo.blocksAboveTicks == 0
                 && !data.playerInfo.canFly) {
@@ -49,17 +35,9 @@ public class VelocityA extends Check {
                     punish();
                 } else if (vl > 4) flag("pct=" + MathUtils.round(pct, 2) + "%");
             } else vl-= vl > 0 ? 0.5 : 0;
+            vY = 0;
 
-            debug("pct=" + pct);
-
-            vY -= 0.08;
-            vY *= 0.9800000190734863D;
-            if (moveTicks++ > 4) {
-                vY = 0;
-                moveTicks = 0;
-            }
+            debug("pct=" + pct + " vl=" + vl);
         }
-
-
     }
 }

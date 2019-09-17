@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.check.impl.movement.velocity;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.MathHelper;
 import cc.funkemunky.api.utils.MathUtils;
@@ -13,6 +14,7 @@ public class VelocityB extends Check {
 
     private double vX, vZ;
     private long timeStamp, ticks, airTicks, groundTicks;
+    private boolean didUseEntity;
     private float lastMS, lastMF, moveStrafing, moveForward;
 
     @Packet
@@ -21,6 +23,14 @@ public class VelocityB extends Check {
             timeStamp = System.currentTimeMillis();
             vX = packet.getX();
             vZ = packet.getZ();
+        }
+    }
+
+    @Packet
+    public void onUseEntity(WrappedInUseEntityPacket packet) {
+        if(packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) {
+            vX*= 0.6f;
+            vZ*= 0.6f;
         }
     }
 
@@ -54,7 +64,7 @@ public class VelocityB extends Check {
 
                     moveFlying(lastMS, lastMF, data.playerInfo.sprinting ? 0.026f : 0.02f);
 
-                    if(lastPct < data.playerInfo.deltaXZ / MathUtils.hypot(vX, vZ) * 100) {
+                    if(lastPct > data.playerInfo.deltaXZ / MathUtils.hypot(vX, vZ) * 100) {
                         moveForward = lastMF;
                         moveStrafing = lastMS;
                     } else {
@@ -67,11 +77,11 @@ public class VelocityB extends Check {
                     float predicted = (float) MathUtils.hypot(vX, vZ);
                     float pct = data.playerInfo.deltaXZ / predicted * 100;
 
-                    if (pct < 99.98) {
-                        if(vl++ > 15) {
+                    if (pct < 99.1) {
+                        if(vl++ > 18) {
                             punish();
-                        } else if(vl > 5) flag("pct=" + MathUtils.round(pct, 3) + "%");
-                    } else vl-= vl > 0 ? 0.05 : 0;
+                        } else if(vl > 11) flag("pct=" + MathUtils.round(pct, 3) + "%");
+                    } else vl-= vl > 0 ? 0.1 : 0;
 
                     debug("pct=" + pct + " key=" + data.predictionService.key);
 
