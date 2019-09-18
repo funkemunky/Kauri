@@ -117,6 +117,7 @@ public class Check {
         register(new AimC());
         register(new AimD());
         register(new AimE());
+        register(new AimF());
         register(new SpeedA());
         register(new SpeedB());
         register(new SpeedC());
@@ -126,7 +127,7 @@ public class Check {
         register(new BadPacketsB());
         register(new BadPacketsC());
         register(new VelocityA());
-        register(new VelocityB());
+        //register(new VelocityB());
     }
 
     public static boolean isCheck(String name) {

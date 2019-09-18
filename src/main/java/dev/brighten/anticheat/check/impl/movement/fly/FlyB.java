@@ -15,6 +15,7 @@ public class FlyB extends Check {
                 || data.playerInfo.flightCancel
                 || data.playerInfo.halfBlockTicks > 0
                 || data.playerInfo.lastVelocity.hasNotPassed(20)) return;
+
         float max = MovementUtils.getJumpHeight(data.getPlayer()) + 0.01f;
 
         if(data.playerInfo.deltaY > max) {
