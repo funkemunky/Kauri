@@ -36,13 +36,6 @@ public class VelocityB extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if(data.playerInfo.clientGround) {
-            groundTicks++;
-            airTicks = 0;
-        } else {
-            airTicks++;
-            groundTicks = 0;
-        }
 
         if(data.lagInfo.lastPingDrop.hasNotPassed(40)) {
             vX = vZ = 0;
@@ -51,8 +44,8 @@ public class VelocityB extends Check {
         }
 
         if((vX != 0 || vZ != 0)) {
-            if(airTicks > 2 && !data.blockInfo.blocksNear) {
-                if(System.currentTimeMillis() - timeStamp >= data.lagInfo.averagePing) {
+            if(data.playerInfo.airTicks > 2 && !data.blockInfo.blocksNear) {
+                if(MathUtils.millisToTicks(System.currentTimeMillis() - timeStamp) > MathUtils.millisToTicks(data.lagInfo.averagePing)) {
                     double lVX = vX, lVZ = vZ;
 
                     moveFlying(data.predictionService.moveStrafing, data.predictionService.moveForward, data.playerInfo.sprinting ? 0.026f : 0.02f);
@@ -78,10 +71,10 @@ public class VelocityB extends Check {
                     float pct = data.playerInfo.deltaXZ / predicted * 100;
 
                     if (pct < 99.1) {
-                        if(vl++ > 18) {
+                        if(vl++ > 40) {
                             punish();
-                        } else if(vl > 11) flag("pct=" + MathUtils.round(pct, 3) + "%");
-                    } else vl-= vl > 0 ? 0.1 : 0;
+                        } else if(vl > 20) flag("pct=" + MathUtils.round(pct, 3) + "%");
+                    } else vl-= vl > 0 ? 0.25 : 0;
 
                     debug("pct=" + pct + " key=" + data.predictionService.key);
 
