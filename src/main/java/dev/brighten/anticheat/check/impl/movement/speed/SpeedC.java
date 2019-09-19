@@ -12,7 +12,9 @@ public class SpeedC extends Check {
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
-        if(packet.isPos() && !data.playerInfo.generalCancel && data.playerInfo.lastVelocity.hasPassed(5 + MathUtils.millisToTicks(data.lagInfo.ping))) {
+        if(packet.isPos()
+                && !data.playerInfo.generalCancel
+                && data.playerInfo.lastVelocity.hasPassed(5 + MathUtils.millisToTicks(data.lagInfo.ping))) {
             float baseSpeed = MovementUtils.getBaseSpeed(data) + (data.playerInfo.serverGround ? 0.3f : 0.5f);
 
             if(data.blockInfo.blocksAbove && data.playerInfo.wasOnIce) baseSpeed+= 0.5f;
@@ -20,7 +22,8 @@ public class SpeedC extends Check {
             if(data.playerInfo.deltaXZ > baseSpeed) {
                 if(vl++ > 4) {
                     punish();
-                } if(vl > 1 || (data.playerInfo.deltaXZ - baseSpeed) > 1.2) flag(data.playerInfo.deltaXZ + ">-" + baseSpeed);
+                } if(vl > 1 || (data.playerInfo.deltaXZ - baseSpeed) > 1.2)
+                    flag(data.playerInfo.deltaXZ + ">-" + baseSpeed);
             } else vl-= vl > 0 ? 0.1 : 0;
             debug("base=" + baseSpeed + " deltaXZ=" + data.playerInfo.deltaXZ);
         }

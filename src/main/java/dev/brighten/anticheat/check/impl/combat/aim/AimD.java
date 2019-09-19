@@ -43,7 +43,8 @@ public class AimD extends Check {
             }
 
             float pitchDelta = MathUtils.getDelta(data.playerInfo.to.pitch, lastPitch);
-            long gcd = MiscUtils.gcd((long)(pitchDelta * MovementProcessor.offset), (long)(lastPitch * MovementProcessor.offset));
+            long gcd = MiscUtils.gcd((long)(pitchDelta * MovementProcessor.offset),
+                    (long)(lastPitch * MovementProcessor.offset));
 
             int resetInteger = yawTicks > 2 ? (pitchTicks * yawTicks) : yawTicks;
 

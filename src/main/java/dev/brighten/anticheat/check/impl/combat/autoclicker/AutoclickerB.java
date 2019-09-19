@@ -24,7 +24,7 @@ public class AutoclickerB extends Check {
                 double avg = interval.average(), std = interval.std();
                 double avgDelta = MathUtils.getDelta(lastAvg, avg), stdDelta = MathUtils.getDelta(std, lastStd);
 
-                if(avgDelta > 8 && stdDelta < 3 || (std > 30 && avgDelta < 1 && stdDelta < 4)) {
+                if(avgDelta > 8 && stdDelta < 3) {
                     debug(Color.Green + "Flag");
                     vl++;
                     if(vl > 6) {

@@ -26,7 +26,8 @@ public class FlyA extends Check {
                     punish();
                 } else if(vl > 2) flag("ping=%p tps=%t delta=" + MathUtils.round(delta, 5));
             } else vl-= vl > 0 ? 0.25f : 0;
-            debug("deltaY=" + data.playerInfo.deltaY + " pDeltaY=" + data.playerInfo.pDeltaY + " onGround=" + data.playerInfo.serverGround + " collidedVert=" + data.playerInfo.collidesVertically);
+            debug("deltaY=" + data.playerInfo.deltaY + " pDeltaY=" + data.playerInfo.pDeltaY + " onGround="
+                    + data.playerInfo.serverGround + " collidedVert=" + data.playerInfo.collidesVertically);
         }
     }
 }

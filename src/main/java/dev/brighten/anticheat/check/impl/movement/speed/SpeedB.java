@@ -60,7 +60,8 @@ public class SpeedB extends Check {
         motionX = data.playerInfo.lDeltaX * toMultiply;
         motionZ = data.playerInfo.lDeltaZ * toMultiply;
 
-        float moveFlyingFriction = data.playerInfo.clientGround ? movementFactor * (0.16277136F / (toMultiply * toMultiply * toMultiply))
+        float moveFlyingFriction = data.playerInfo.clientGround ? movementFactor
+                * (0.16277136F / (toMultiply * toMultiply * toMultiply))
                 : (data.playerInfo.sprinting ? 0.026f : 0.02f);
 
         //Now we run the moveFlying, which is the only modification done before position method is run.
