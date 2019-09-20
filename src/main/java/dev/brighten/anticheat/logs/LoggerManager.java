@@ -1,8 +1,25 @@
 package dev.brighten.anticheat.logs;
 
 import cc.funkemunky.api.Atlas;
+import cc.funkemunky.api.utils.ConfigSetting;
+import cc.funkemunky.api.utils.Init;
+import cc.funkemunky.api.utils.MiscUtils;
+import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.carbon.db.Database;
+import cc.funkemunky.carbon.db.Structure;
+import cc.funkemunky.carbon.db.StructureSet;
+import dev.brighten.anticheat.Kauri;
+import dev.brighten.anticheat.check.api.Check;
+import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.logs.objects.Log;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+@Init
 public class LoggerManager {
 
     public Database logsDatabase;
@@ -11,10 +28,92 @@ public class LoggerManager {
 
     }
 
+    /*My SQL */
+    @ConfigSetting(path = "database.mysql", name = "enabled")
+    private static boolean mySQLEnabled = false;
+
+    @ConfigSetting(path = "database.mysql", name = "username")
+    private static String sqlUsername = "root";
+
+    @ConfigSetting(path = "database.mysql", name = "database")
+    private static String sqlDatabase = "Kauri";
+
+    @ConfigSetting(path = "database.mysql", name = "password")
+    private static String sqlPassword = "password";
+
+    @ConfigSetting(path = "database.mysql", name = "ip")
+    private static String sqlIp = "127.0.0.1";
+
+    @ConfigSetting(path = "database.mysql", name = "port")
+    private static int sqlPort = 3306;
+
+    /* Mongo */
+    @ConfigSetting(path = "database.mongo", name = "enabled")
+    private static boolean mongoEnabled = false;
+
+    @ConfigSetting(path = "database.mongo", name = "username")
+    private static String mongoUsername = "root";
+
+    @ConfigSetting(path = "database.mongo", name = "password")
+    private static String mongoPassword = "password";
+
+    @ConfigSetting(path = "database.mongo", name = "database")
+    private static String mongoDatabase = "Kauri";
+
+    @ConfigSetting(path = "database.mongo", name = "ip")
+    private static String mongoIp = "127.0.0.1";
+
+    @ConfigSetting(path = "database.mongo", name = "port")
+    private static int mongoPort = 27017;
+
     public LoggerManager(boolean aLittleStupid) {
         if(aLittleStupid) {
-            Atlas.getInstance().getCarbon().createFlatfileDatabase("logs");
+            if(mySQLEnabled) {
+                MiscUtils.printToConsole("&7Setting up SQL...");
+                Atlas.getInstance().getCarbon().createSQLDatabase(sqlDatabase, sqlIp, sqlPort, sqlUsername, sqlPassword);
+            } else if(mongoEnabled) {
+                MiscUtils.printToConsole("&7Setting up Mongo...");
+                Atlas.getInstance().getCarbon().initMongo(mongoDatabase, mongoIp, mongoPort, mongoUsername, mongoPassword);
+                Atlas.getInstance().getCarbon().createMongoDatabase("logs");
+            } else {
+                MiscUtils.printToConsole("&7Setting up FlatfileDB...");
+                Atlas.getInstance().getCarbon().createFlatfileDatabase(Kauri.INSTANCE.getDataFolder().getPath(), "logs");
+            }
             logsDatabase = Atlas.getInstance().getCarbon().getDatabase("logs");
+            MiscUtils.printToConsole("&7Loading database...");
+            logsDatabase.loadDatabase();
         }
     }
+
+    public void addLog(ObjectData data, Check check) {
+        Log log = new Log(check.name, check.vl, data.lagInfo.transPing, System.currentTimeMillis(), Kauri.INSTANCE.tps);
+
+        StructureSet set = logsDatabase.createStructureSet(
+                new Structure("uuid", data.getPlayer().getUniqueId().toString()),
+                new Structure("checkName", log.checkName),
+                new Structure("vl", log.vl),
+                new Structure("ping", log.ping),
+                new Structure("timeStamp", log.timeStamp),
+                new Structure("tps", log.tps));
+
+        logsDatabase.inputField(set);
+    }
+
+    public List<Log> getLogs(UUID uuid) {
+        List<StructureSet> sets = logsDatabase.getFieldsByStructure(struct ->
+                struct.name.equals("uuid")
+                        && String.valueOf(struct.object).equals(uuid.toString()));
+
+        return sets.stream().map(set -> new Log(
+                String.valueOf(set.getStructureByName("checkName").get().object),
+                (double)set.getStructureByName("vl").get().object,
+                (long)set.getStructureByName("ping").get().object,
+                (long)set.getStructureByName("timeStamp").get().object,
+                (double)set.getStructureByName("tps").get().object)).collect(Collectors.toList());
+    }
+
+    private void save() {
+        RunUtils.taskTimerAsync(() -> logsDatabase.saveDatabase(), 6000, 6000);
+    }
+
 }

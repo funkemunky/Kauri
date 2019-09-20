@@ -78,6 +78,7 @@ public class Check {
                 .replace("%t", String.valueOf(MathUtils.round(Kauri.INSTANCE.tps, 2)));
         if(Kauri.INSTANCE.lastTickLag.hasPassed() && (data.lagInfo.lastPacketDrop.hasPassed(5) || data.lagInfo.lastPingDrop.hasPassed())) {
             float vl = this.vl;
+            Kauri.INSTANCE.loggerManager.addLog(data, this);
             Kauri.INSTANCE.dataManager.hasAlerts.forEach(data -> {
                 data.getPlayer().sendMessage(Color.translate("&8[&6K&8] &f" + this.data.getPlayer().getName() + " &7flagged &f" + name + " &8(&e" + info + "&8) &8[&c" + vl + "&8]"));
             });

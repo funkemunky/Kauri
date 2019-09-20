@@ -8,6 +8,7 @@ import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.TickTimer;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.data.DataManager;
+import dev.brighten.anticheat.logs.LoggerManager;
 import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.processing.PacketProcessor;
 import org.bukkit.Bukkit;
@@ -24,6 +25,7 @@ public class Kauri extends JavaPlugin {
 
     public PacketProcessor packetProcessor;
     public DataManager dataManager;
+    public LoggerManager loggerManager;
 
     //Lag Information
     public double tps;
@@ -47,6 +49,7 @@ public class Kauri extends JavaPlugin {
 
     public void unload() {
         enabled = false;
+        loggerManager.logsDatabase.saveDatabase();
         //Clearing all fields in ObjectData to prevent work from GC.
         MiscUtils.printToConsole("&7Shutting down threadPool and saving config...");
         saveConfig(); //Saving config.
@@ -88,6 +91,7 @@ public class Kauri extends JavaPlugin {
         MiscUtils.printToConsole(Color.Gray + "Registering processors...");
         packetProcessor = new PacketProcessor();
         dataManager = new DataManager();
+        loggerManager = new LoggerManager(true);
         EntityProcessor.start();
 
         MiscUtils.printToConsole(Color.Gray + "Registering checks...");
