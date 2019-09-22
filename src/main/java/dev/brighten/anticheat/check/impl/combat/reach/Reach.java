@@ -43,7 +43,7 @@ public class Reach extends Check {
                     .collect(Collectors.toList());
 
             List<BoundingBox> previousLocations = data.targetPastLocation
-                    .getEstimatedLocation(data.lagInfo.transPing
+                    .getEstimatedLocation(data.lagInfo.transPing / 2
                             , 100L + (data.lagInfo.transPing - data.lagInfo.lastTransPing))
                     .parallelStream()
                     .map(loc -> getHitbox(loc, data.target.getType()))

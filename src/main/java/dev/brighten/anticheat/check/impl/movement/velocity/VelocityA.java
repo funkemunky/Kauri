@@ -22,11 +22,11 @@ public class VelocityA extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if(vY != 0 && ((data.playerInfo.deltaY > 0 && data.playerInfo.from.y % 0.5 == 0)
-                || (System.currentTimeMillis() - velocityTS) > data.lagInfo.transPing * 2)
+        if(vY != 0
+                && ((data.playerInfo.deltaY > 0 && data.playerInfo.from.y % 0.5 == 0)
                 && !data.playerInfo.generalCancel
                 && data.playerInfo.blocksAboveTicks == 0
-                && !data.playerInfo.canFly) {
+                && !data.playerInfo.canFly)) {
 
             float pct = data.playerInfo.deltaY / (float) vY * 100F;
 

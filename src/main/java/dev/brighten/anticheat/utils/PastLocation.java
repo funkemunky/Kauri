@@ -19,7 +19,11 @@ public class PastLocation {
 
     public List<KLocation> getEstimatedLocation(long time, long delta) {
         long currentTimestamp = System.currentTimeMillis();
-        return this.previousLocations.stream().filter(loc -> MathUtils.getDelta((currentTimestamp - loc.timeStamp), time) <= delta).collect(Collectors.toList());
+        return this.previousLocations.stream()
+                .filter(loc -> MathUtils.getDelta(
+                        MathUtils.millisToTicks(currentTimestamp - loc.timeStamp), MathUtils.millisToTicks(time))
+                        <= MathUtils.millisToTicks(delta))
+                .collect(Collectors.toList());
     }
 
     public void addLocation(Location location) {

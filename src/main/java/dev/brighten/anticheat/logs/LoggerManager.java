@@ -13,9 +13,7 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.logs.objects.Log;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -82,6 +80,7 @@ public class LoggerManager {
             logsDatabase = Atlas.getInstance().getCarbon().getDatabase("logs");
             MiscUtils.printToConsole("&7Loading database...");
             logsDatabase.loadDatabase();
+            save();
         }
     }
 

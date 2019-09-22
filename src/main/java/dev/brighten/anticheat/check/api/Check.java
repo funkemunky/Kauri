@@ -119,6 +119,7 @@ public class Check {
         register(new AimD());
         register(new AimE());
         register(new AimF());
+        register(new AimG());
         register(new SpeedA());
         register(new SpeedB());
         register(new SpeedC());

@@ -12,7 +12,7 @@ import dev.brighten.anticheat.check.api.Packet;
 public class AutoclickerB extends Check {
 
     private long lastClick;
-    private Interval<Long> interval = new Interval<>(0, 12);
+    private Interval<Long> interval = new Interval<>(0, 50);
     private double lastStd, lastAvg;
 
     @Packet
@@ -20,17 +20,18 @@ public class AutoclickerB extends Check {
         long range = System.currentTimeMillis() - lastClick;
 
         if(range < 1E6 && !data.playerInfo.breakingBlock) {
-            if(interval.size() >= 10) {
+            if(interval.size() >= 25) {
                 double avg = interval.average(), std = interval.std();
                 double avgDelta = MathUtils.getDelta(lastAvg, avg), stdDelta = MathUtils.getDelta(std, lastStd);
 
-                if(avgDelta > 8 && stdDelta < 3) {
+                if(stdDelta < 2.5 && (avgDelta > 10 || (std > 25)) && avg < 118) {
                     debug(Color.Green + "Flag");
                     vl++;
                     if(vl > 6) {
                         punish();
-                    } else if(vl > 2) flag("std=" + std + " avg=" + avg + " stdDelta=" + stdDelta + " avgDelta=" + avgDelta + " ping=%p");
-                } else vl-= vl > 0 ? 0.1 : 0;
+                    } else if(vl > 3) flag("std=" + std + " avg=" + avg
+                            + " stdDelta=" + stdDelta + " avgDelta=" + avgDelta + " ping=%p");
+                } else vl-= vl > 0 ? 0.25 : 0;
 
                 debug("avg=" + avg + " std=" + std + " size=" + interval.size());
                 lastStd = std;
