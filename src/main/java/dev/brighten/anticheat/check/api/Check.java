@@ -137,4 +137,8 @@ public class Check {
     public static boolean isCheck(String name) {
         return checkClasses.values().stream().anyMatch(val -> val.name().equalsIgnoreCase(name));
     }
+
+    public static CheckInfo getCheckInfo(String name) {
+        return checkClasses.values().stream().filter(val -> val.name().equalsIgnoreCase(name)).findFirst().orElse(null);
+    }
 }
