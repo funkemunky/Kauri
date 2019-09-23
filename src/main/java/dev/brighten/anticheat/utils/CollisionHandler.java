@@ -20,7 +20,7 @@ public class CollisionHandler {
     }
 
     public void onCollide(Block block, BoundingBox box, boolean entity) {
-        if(data.box.collides(box) && block != null){
+        if(data.box.collides(box) && block != null) {
             boxesColliding.add(new AbstractMap.SimpleEntry<>(block, box));
         }
 

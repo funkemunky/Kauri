@@ -22,6 +22,7 @@ import dev.brighten.anticheat.check.impl.movement.speed.SpeedC;
 import dev.brighten.anticheat.check.impl.movement.speed.SpeedD;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityA;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityB;
+import dev.brighten.anticheat.check.impl.movement.velocity.VelocityC;
 import dev.brighten.anticheat.check.impl.packets.Timer;
 import dev.brighten.anticheat.check.impl.packets.badpackets.BadPacketsA;
 import dev.brighten.anticheat.check.impl.packets.badpackets.BadPacketsB;
@@ -129,7 +130,8 @@ public class Check {
         register(new BadPacketsB());
         register(new BadPacketsC());
         register(new VelocityA());
-        //register(new VelocityB());
+        register(new VelocityB());
+        register(new VelocityC());
     }
 
     public static boolean isCheck(String name) {

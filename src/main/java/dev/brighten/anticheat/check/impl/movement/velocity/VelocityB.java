@@ -46,35 +46,17 @@ public class VelocityB extends Check {
         if((vX != 0 || vZ != 0)) {
             if(data.playerInfo.airTicks > 2 && !data.blockInfo.blocksNear) {
                 if(MathUtils.millisToTicks(System.currentTimeMillis() - timeStamp) > MathUtils.millisToTicks(data.lagInfo.averagePing)) {
-                    double lVX = vX, lVZ = vZ;
 
                     moveFlying(data.predictionService.moveStrafing, data.predictionService.moveForward, data.playerInfo.sprinting ? 0.026f : 0.02f);
-
-                    double lastPct = data.playerInfo.deltaXZ / MathUtils.hypot(vX, vZ) * 100;
-
-                    vX = lVX;
-                    vZ = lVZ;
-
-                    moveFlying(lastMS, lastMF, data.playerInfo.sprinting ? 0.026f : 0.02f);
-
-                    if(lastPct > data.playerInfo.deltaXZ / MathUtils.hypot(vX, vZ) * 100) {
-                        moveForward = lastMF;
-                        moveStrafing = lastMS;
-                    } else {
-                        vX = lVX;
-                        vZ = lVZ;
-
-                        moveFlying(data.predictionService.moveStrafing, data.predictionService.moveForward, data.playerInfo.sprinting ? 0.026f : 0.02f);
-                    }
 
                     float predicted = (float) MathUtils.hypot(vX, vZ);
                     float pct = data.playerInfo.deltaXZ / predicted * 100;
 
-                    if (pct < 99.1) {
+                    /*if (pct < 99.1) {
                         if(vl++ > 40) {
                             punish();
                         } else if(vl > 20) flag("pct=" + MathUtils.round(pct, 3) + "%");
-                    } else vl-= vl > 0 ? 0.25 : 0;
+                    } else vl-= vl > 0 ? 0.25 : 0;*/
 
                     debug("pct=" + pct + " key=" + data.predictionService.key);
 
