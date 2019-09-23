@@ -44,8 +44,8 @@ public class VelocityB extends Check {
         }
 
         if((vX != 0 || vZ != 0)) {
-            if(data.playerInfo.airTicks > 2 && !data.blockInfo.blocksNear) {
-                if(MathUtils.millisToTicks(System.currentTimeMillis() - timeStamp) > MathUtils.millisToTicks(data.lagInfo.averagePing)) {
+            if(data.playerInfo.airTicks > 1 && !data.blockInfo.blocksNear) {
+                if(data.playerInfo.lastVelocity.hasNotPassed(3)) {
 
                     moveFlying(data.predictionService.moveStrafing, data.predictionService.moveForward, data.playerInfo.sprinting ? 0.026f : 0.02f);
 

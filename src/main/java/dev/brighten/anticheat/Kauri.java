@@ -100,6 +100,7 @@ public class Kauri extends JavaPlugin {
         MiscUtils.printToConsole(Color.Gray + "Running tps task...");
         runTpsTask();
         profiler = new ToggleableProfiler();
+        profiler.enabled = true;
         RunUtils.taskLater(() ->  enabled = true, 4);
 
         if(Bukkit.getOnlinePlayers().size() > 0) {

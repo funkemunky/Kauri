@@ -1,6 +1,9 @@
 package dev.brighten.anticheat.processing;
 
+import cc.funkemunky.api.Atlas;
+import cc.funkemunky.api.reflection.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumAnimation;
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.MathUtils;
@@ -9,6 +12,7 @@ import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.KLocation;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.MovementUtils;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 
 import java.util.Arrays;
@@ -62,19 +66,6 @@ public class MovementProcessor {
 
         data.playerInfo.lClientGround = data.playerInfo.clientGround;
         data.playerInfo.clientGround = packet.isGround();
-
-        //Checking for position changes
-        if(data.playerInfo.posLocs.size() > 0) {
-            Optional<KLocation> optional = data.playerInfo.posLocs.stream()
-                    .filter(loc -> MovementUtils.getHorizontalDistance(loc, data.playerInfo.to) <= 1E-8)
-                    .findFirst();
-
-            if(optional.isPresent()) {
-                data.playerInfo.serverPos = true;
-                data.playerInfo.lastServerPos = System.currentTimeMillis();
-                data.playerInfo.posLocs.remove(optional.get());
-            } else data.playerInfo.serverPos = false;
-        } else data.playerInfo.serverPos = false;
 
         //Setting boundingBox
         data.box = new BoundingBox(data.playerInfo.to.toVector(), data.playerInfo.to.toVector())
@@ -154,7 +145,7 @@ public class MovementProcessor {
 
         /* General Ticking */
 
-        Block block = BlockUtils.getBlock(data.playerInfo.to.toLocation(data.getPlayer().getWorld()));
+        Block block = data.playerInfo.worldLoaded ? data.playerInfo.to.toLocation(data.getPlayer().getWorld()).getBlock() : null;
 
         if(block != null && BlockUtils.isClimbableBlock(block)) {
             if(data.playerInfo.collidesHorizontally) {
@@ -190,6 +181,10 @@ public class MovementProcessor {
             data.playerInfo.slimeTicks++;
         } else data.playerInfo.slimeTicks-= data.playerInfo.slimeTicks > 0 ? 1 : 0;
 
+        if(data.blockInfo.onSoulSand) {
+            data.playerInfo.soulSandTicks++;
+        } else data.playerInfo.soulSandTicks-= data.playerInfo.soulSandTicks > 0 ? 1 : 0;
+
         if(data.blockInfo.blocksAbove) {
             data.playerInfo.blocksAboveTicks++;
         } else data.playerInfo.blocksAboveTicks-= data.playerInfo.blocksAboveTicks > 0 ? 1 : 0;
@@ -202,6 +197,10 @@ public class MovementProcessor {
             data.playerInfo.groundTicks++;
             data.playerInfo.airTicks = 0;
         }
+
+        data.playerInfo.usingItem = data.getPlayer().getItemInHand() != null
+                && !data.getPlayer().getItemInHand().getType().equals(Material.AIR)
+                && !MinecraftReflection.getItemAnimation(data.getPlayer().getItemInHand()).equals(WrappedEnumAnimation.NONE);
 
         /* General Cancel Booleans */
         boolean hasLevi = data.getPlayer().getActivePotionEffects().size() > 0

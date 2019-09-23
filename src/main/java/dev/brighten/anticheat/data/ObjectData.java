@@ -40,9 +40,11 @@ public class ObjectData {
     public LagInformation lagInfo;
     public PredictionService predictionService;
     public List<LivingEntity> entitiesNearPlayer = new ArrayList<>();
+    public int hashCode;
 
     public ObjectData(UUID uuid) {
         this.uuid = uuid;
+        hashCode = uuid.hashCode();
         INSTANCE = this;
         creation = new TickTimer(10);
         if(alerts = getPlayer().hasPermission("kauri.alerts")) {
@@ -57,8 +59,6 @@ public class ObjectData {
         checkManager = new CheckManager(this);
         checkManager.addChecks();
         predictionService = new PredictionService(this);
-        predictionService.box = new BoundingBox(getPlayer().getLocation().toVector(), getPlayer().getLocation().toVector())
-                .grow(0.3f,0,0.3f).add(0,0,0,0,1.8f,0);
 
     }
 

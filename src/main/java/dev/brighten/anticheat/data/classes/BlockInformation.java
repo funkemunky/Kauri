@@ -7,6 +7,7 @@ import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.ReflectionsUtil;
+import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.utils.CollisionHandler;
@@ -26,19 +27,21 @@ public class BlockInformation {
     }
 
     public void runCollisionCheck() {
+        Kauri.INSTANCE.profiler.start("blockInfo:runCollisionCheck:boxProcessing");
         CollisionHandler handler = new CollisionHandler(objectData);
 
         List<BoundingBox> boxes = Atlas.getInstance().getBlockBoxManager().getBlockBox().getCollidingBoxes(objectData.getPlayer().getWorld(), objectData.box.grow(1,1,1));
 
         //Running block checking;
         boxes.parallelStream().forEach(box -> {
-            Block block = BlockUtils.getBlock(box.getMinimum().toLocation(objectData.getPlayer().getWorld()));
+            Block block = box.getMinimum().toLocation(objectData.getPlayer().getWorld()).getBlock();
 
             if(block != null) {
                 handler.onCollide(block, box, false);
             }
         });
-
+        Kauri.INSTANCE.profiler.stop("blockInfo:runCollisionCheck:boxProcessing");
+        Kauri.INSTANCE.profiler.start("blockInfo:runCollisionCheck:rest");
             //Running entity boundingBox check.
         EntityProcessor.vehicles.get(objectData.getPlayer().getWorld().getUID())
                     .stream()
@@ -67,5 +70,6 @@ public class BlockInformation {
         blocksNear = handler.blocksNear;
 
         boxes.clear();
+        Kauri.INSTANCE.profiler.stop("blockInfo:runCollisionCheck:rest");
     }
 }
