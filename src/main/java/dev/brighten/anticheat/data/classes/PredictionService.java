@@ -29,7 +29,7 @@ public class PredictionService {
             lastOnGround, onGround, lastSprint, fMath, fastMath, walkSpecial, lastVelocity;
     public double posX, posY, posZ, lPosX, lPosY, lPosZ, rmotionX, rmotionY, rmotionZ, lmotionX, lmotionZ, lmotionY;
     public TickTimer lastUseItem = new TickTimer(10);
-    public float walkSpeed, yaw, pitch, moveStrafing, moveForward;
+    public float walkSpeed, yaw, pitch, moveStrafing, moveForward, aiMoveSpeed;
     public String key;
 
     public PredictionService(ObjectData data) {
@@ -362,29 +362,27 @@ public class PredictionService {
                 }
 
                 float var5;
-                float var3 = 0.54600006F;
-//				SLIME var3 = 0.72800004F;
-//				ICE var3 = 0.89180005F;
+                float var3 = MovementUtils.getFriction(data) * 0.91f;
 
-                float getAIMoveSpeed = 0.1f;
+                aiMoveSpeed =  0.1f;
                 if (sprint)
-                    getAIMoveSpeed += 0.03000001F;
+                    aiMoveSpeed += 0.03000001F;
 
                 if(data.getPlayer().hasPotionEffect(PotionEffectType.SPEED)) {
-                    getAIMoveSpeed += (PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.SPEED) * (0.20000000298023224D)) * getAIMoveSpeed;
+                    aiMoveSpeed += (PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.SPEED) * (0.20000000298023224D)) * aiMoveSpeed;
                 }
                 if(data.getPlayer().hasPotionEffect(PotionEffectType.SLOW)) {
-                    getAIMoveSpeed += (PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.SLOW) * (-0.15000000596046448D)) * getAIMoveSpeed;
+                    aiMoveSpeed += (PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.SLOW) * (-0.15000000596046448D)) * aiMoveSpeed;
                 }
 
-                //getAIMoveSpeed+= (data.getPlayer().getWalkSpeed() - 0.2) * 5 * 0.45;
+                //aiMoveSpeed+= (data.getPlayer().getWalkSpeed() - 0.2) * 5 * 0.45;
 
-                //Bukkit.broadcastMessage(getAIMoveSpeed + "");
+                //Bukkit.broadcastMessage(aiMoveSpeed + "");
 
                 float var4 = 0.16277136F / (var3 * var3 * var3);
 
                 if (lastOnGround) {
-                    var5 = getAIMoveSpeed * var4;
+                    var5 = aiMoveSpeed * var4;
                 } else {
                     var5 = jumpMovementFactor;
                 }

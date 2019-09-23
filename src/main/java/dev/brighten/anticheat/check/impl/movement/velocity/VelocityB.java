@@ -8,19 +8,19 @@ import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.utils.MovementUtils;
 
 @CheckInfo(name = "Velocity (B)", description = "A horizontally velocity check.")
 public class VelocityB extends Check {
 
     private double vX, vZ;
-    private long timeStamp, ticks, airTicks, groundTicks;
-    private boolean didUseEntity;
-    private float lastMS, lastMF, moveStrafing, moveForward;
+    private long  ticks;
+    private String lastKey;
+    private boolean attackedSinceVelocity;
 
     @Packet
     public void onVelocity(WrappedOutVelocityPacket packet) {
         if(packet.getId() == data.getPlayer().getEntityId()) {
-            timeStamp = System.currentTimeMillis();
             vX = packet.getX();
             vZ = packet.getZ();
         }
@@ -28,9 +28,12 @@ public class VelocityB extends Check {
 
     @Packet
     public void onUseEntity(WrappedInUseEntityPacket packet) {
-        if(packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) {
+        if((vX != 0 || vZ != 0)
+                && !attackedSinceVelocity
+                && packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) {
             vX*= 0.6f;
             vZ*= 0.6f;
+            attackedSinceVelocity = true;
         }
     }
 
@@ -43,49 +46,92 @@ public class VelocityB extends Check {
             return;
         }
 
-        if((vX != 0 || vZ != 0)) {
-            if(data.playerInfo.airTicks > 1 && !data.playerInfo.clientGround && !data.blockInfo.blocksNear) {
-                if(data.playerInfo.lastVelocity.hasNotPassed(3)) {
+        if(data.playerInfo.lastVelocity.hasNotPassed(1)) attackedSinceVelocity = false;
 
+        if((vX != 0 || vZ != 0)) {
+            if(!data.blockInfo.blocksNear
+                    && data.playerInfo.airTicks > 1
+                    && !data.playerInfo.lClientGround) {
+                if(data.playerInfo.lastVelocity.hasNotPassed(3)) {
                     double lVX = vX, lVZ = vZ;
 
-                    moveFlying(data.predictionService.moveStrafing, data.predictionService.moveForward, data.playerInfo.sprinting ? 0.026f : 0.02f);
+                    float f4 = 0.91f;
+
+                    if(packet.isGround()) {
+                        f4*= MovementUtils.getFriction(data);
+                    }
+
+                    float f = 0.16277136F / (f4 * f4 * f4);
+                    float f5;
+
+                    if (packet.isGround()) {
+                        f5 = data.predictionService.aiMoveSpeed * f;
+                    } else {
+                        f5 = data.playerInfo.sprinting ? 0.026f : 0.02f;
+                    }
+
+                    moveFlying(data.predictionService.moveStrafing, data.predictionService.moveForward, f5);
 
                     float predicted = (float) MathUtils.hypot(vX, vZ);
                     float pct = data.playerInfo.deltaXZ / predicted * 100;
 
-                    if(pct < 100 && data.predictionService.key.contains("S")) {
+                    float lPct = pct;
+                    if(pct < 100) {
                         vX = lVX;
                         vZ = lVZ;
 
                         debug("lPCT=" + pct);
-                        moveFlying(0.98f,0, data.playerInfo.sprinting ? 0.026f : 0.02f);
-                        predicted = (float) MathUtils.hypot(vX, vZ);
-                        pct = data.playerInfo.deltaXZ / predicted * 100;
+                        if(!lastKey.contains("S") && data.predictionService.key.contains("S")) {
+                            moveFlying(0.98f,0, f5);
+                            predicted = (float) MathUtils.hypot(vX, vZ);
+                            pct = data.playerInfo.deltaXZ / predicted * 100;
+                        } else if(!lastKey.contains("W") && data.predictionService.key.contains("W")) {
+                            moveFlying(-0.98f,0, f5);
+                            predicted = (float) MathUtils.hypot(vX, vZ);
+                            pct = data.playerInfo.deltaXZ / predicted * 100;
+                        }
+
+                        if(MathUtils.getDelta(pct, 100) > MathUtils.getDelta(lPct, 100)) {
+                            vX = lVX;
+                            vZ = lVZ;
+
+                            moveFlying(data.predictionService.moveStrafing, data.predictionService.moveForward, f5);
+                            predicted = (float) MathUtils.hypot(vX, vZ);
+                            pct = data.playerInfo.deltaXZ / predicted * 100;
+                        }
                     }
 
-                    if (pct < 95.8) {
-                        if(vl++ > 40) {
+                    if (pct < (data.predictionService.key.equals("Nothing") ? 99 : 96.2)
+                            && !data.predictionService.key.contains("D")
+                            && !data.predictionService.key.contains("A")) {
+                        if(vl++ > 22) {
                             punish();
-                        } else if(vl > 20) flag("pct=" + MathUtils.round(pct, 3) + "%");
+                        } else if(vl > 12) flag("pct=" + MathUtils.round(pct, 3) + "%");
                     } else vl-= vl > 0 ? 0.25 : 0;
 
-                    debug("pct=" + pct + " key=" + data.predictionService.key + " sprint=" + data.playerInfo.sprinting);
+                    debug("pct=" + pct + " key=" + data.predictionService.key
+                            + " sprint=" + data.playerInfo.sprinting + " ground=" + packet.isGround() + " vl=" + vl);
 
                     if (ticks++ > 5) {
                         vX = vZ = 0;
                         ticks = 0;
                     }
-                    vX *= 0.91;
-                    vZ *= 0.91;
+
+                    f4 = 0.91f;
+
+                    if(data.playerInfo.clientGround ||  data.playerInfo.jumped) {
+                        f4*= MovementUtils.getFriction(data);
+                    }
+
+                    vX *= f4;
+                    vZ *= f4;
                 }
             } else {
                 vX = vZ = 0;
                 ticks = 0;
             }
         }
-        lastMF = data.predictionService.moveForward;
-        lastMS = data.predictionService.moveStrafing;
+        lastKey = data.predictionService.key;
     }
 
     private void moveFlying(float strafe, float forward, float friction) {

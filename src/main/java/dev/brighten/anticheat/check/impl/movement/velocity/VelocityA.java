@@ -24,6 +24,7 @@ public class VelocityA extends Check {
         if(vY > 0
                 && data.playerInfo.lastVelocity.hasNotPassed(4)
                 && !data.playerInfo.generalCancel
+                && data.playerInfo.worldLoaded
                 && data.playerInfo.blocksAboveTicks == 0
                 && !data.playerInfo.canFly) {
 
