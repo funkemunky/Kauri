@@ -44,7 +44,7 @@ public class VelocityB extends Check {
         }
 
         if((vX != 0 || vZ != 0)) {
-            if(data.playerInfo.airTicks > 1 && !data.blockInfo.blocksNear) {
+            if(data.playerInfo.airTicks > 2 && !data.playerInfo.clientGround && !data.blockInfo.blocksNear) {
                 if(data.playerInfo.lastVelocity.hasNotPassed(3)) {
 
                     moveFlying(data.predictionService.moveStrafing, data.predictionService.moveForward, data.playerInfo.sprinting ? 0.026f : 0.02f);
@@ -52,11 +52,11 @@ public class VelocityB extends Check {
                     float predicted = (float) MathUtils.hypot(vX, vZ);
                     float pct = data.playerInfo.deltaXZ / predicted * 100;
 
-                    /*if (pct < 99.1) {
+                    if (pct < 97.1) {
                         if(vl++ > 40) {
                             punish();
                         } else if(vl > 20) flag("pct=" + MathUtils.round(pct, 3) + "%");
-                    } else vl-= vl > 0 ? 0.25 : 0;*/
+                    } else vl-= vl > 0 ? 0.25 : 0;
 
                     debug("pct=" + pct + " key=" + data.predictionService.key);
 

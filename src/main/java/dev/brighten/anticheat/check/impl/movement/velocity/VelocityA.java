@@ -11,22 +11,21 @@ import dev.brighten.anticheat.check.api.Packet;
 public class VelocityA extends Check {
 
     private double vY;
-    private long velocityTS;
+    private long ticks;
     @Packet
     public void onVelocity(WrappedOutVelocityPacket packet) {
         if(packet.getId() == data.getPlayer().getEntityId() && packet.getY() > 0) {
             vY = (float) packet.getY();
-            velocityTS = System.currentTimeMillis();
         }
     }
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if(vY != 0
-                && ((data.playerInfo.deltaY > 0 && data.playerInfo.from.y % 0.5 == 0)
+        if(vY > 0
+                && data.playerInfo.lastVelocity.hasNotPassed(4)
                 && !data.playerInfo.generalCancel
                 && data.playerInfo.blocksAboveTicks == 0
-                && !data.playerInfo.canFly)) {
+                && !data.playerInfo.canFly) {
 
             float pct = data.playerInfo.deltaY / (float) vY * 100F;
 
@@ -35,9 +34,11 @@ public class VelocityA extends Check {
                     punish();
                 } else if (vl > 4) flag("pct=" + MathUtils.round(pct, 2) + "%");
             } else vl-= vl > 0 ? 0.5 : 0;
-            vY = 0;
+
+            vY-= 0.08;
+            vY*= 0.98;
 
             debug("pct=" + pct + " vl=" + vl);
-        }
+        } else if(vY < 0) vY = 0;
     }
 }
