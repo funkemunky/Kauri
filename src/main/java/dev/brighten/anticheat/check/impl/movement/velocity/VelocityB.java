@@ -44,23 +44,35 @@ public class VelocityB extends Check {
         }
 
         if((vX != 0 || vZ != 0)) {
-            if(data.playerInfo.airTicks > 2 && !data.playerInfo.clientGround && !data.blockInfo.blocksNear) {
+            if(data.playerInfo.airTicks > 1 && !data.playerInfo.clientGround && !data.blockInfo.blocksNear) {
                 if(data.playerInfo.lastVelocity.hasNotPassed(3)) {
+
+                    double lVX = vX, lVZ = vZ;
 
                     moveFlying(data.predictionService.moveStrafing, data.predictionService.moveForward, data.playerInfo.sprinting ? 0.026f : 0.02f);
 
                     float predicted = (float) MathUtils.hypot(vX, vZ);
                     float pct = data.playerInfo.deltaXZ / predicted * 100;
 
-                    if (pct < 97.1) {
+                    if(pct < 100 && data.predictionService.key.contains("S")) {
+                        vX = lVX;
+                        vZ = lVZ;
+
+                        debug("lPCT=" + pct);
+                        moveFlying(0.98f,0, data.playerInfo.sprinting ? 0.026f : 0.02f);
+                        predicted = (float) MathUtils.hypot(vX, vZ);
+                        pct = data.playerInfo.deltaXZ / predicted * 100;
+                    }
+
+                    if (pct < 95.8) {
                         if(vl++ > 40) {
                             punish();
                         } else if(vl > 20) flag("pct=" + MathUtils.round(pct, 3) + "%");
                     } else vl-= vl > 0 ? 0.25 : 0;
 
-                    debug("pct=" + pct + " key=" + data.predictionService.key);
+                    debug("pct=" + pct + " key=" + data.predictionService.key + " sprint=" + data.playerInfo.sprinting);
 
-                    if (ticks++ > 4) {
+                    if (ticks++ > 5) {
                         vX = vZ = 0;
                         ticks = 0;
                     }
