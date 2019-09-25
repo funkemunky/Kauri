@@ -15,8 +15,7 @@ public class Timer extends Check {
     private EvictingList<Long> times = new EvictingList<>(15);
 
     @Packet
-    public void onPacket(WrappedInFlyingPacket packet) {
-        long timeStamp = System.currentTimeMillis();
+    public void onPacket(WrappedInFlyingPacket packet, long timeStamp) {
         long elapsed = timeStamp - lastTS;
 
         if(data.creation.hasPassed(10) && !data.playerInfo.serverPos) {

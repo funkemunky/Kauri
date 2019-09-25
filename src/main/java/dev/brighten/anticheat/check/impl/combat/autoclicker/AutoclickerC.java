@@ -14,9 +14,9 @@ public class AutoclickerC extends Check {
     private double lastAvg;
     private Interval<Long> interval = new Interval<>(0, 12);
     @Packet
-    public void onPacket(WrappedInArmAnimationPacket packet) {
+    public void onPacket(WrappedInArmAnimationPacket packet, long timeStamp) {
 
-        long delta = System.currentTimeMillis() - lastClick;
+        long delta = timeStamp - lastClick;
 
         if(interval.size() >= 10 && !data.playerInfo.breakingBlock) {
             double avg = interval.average();
@@ -36,6 +36,6 @@ public class AutoclickerC extends Check {
             lastAvg = avg;
         } else interval.add(delta);
 
-        lastClick = System.currentTimeMillis();
+        lastClick = timeStamp;
     }
 }

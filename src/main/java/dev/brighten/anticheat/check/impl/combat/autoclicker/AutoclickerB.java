@@ -16,8 +16,8 @@ public class AutoclickerB extends Check {
     private double lastStd, lastAvg;
 
     @Packet
-    public void onPacket(WrappedInArmAnimationPacket packet) {
-        long range = System.currentTimeMillis() - lastClick;
+    public void onPacket(WrappedInArmAnimationPacket packet, long timeStamp) {
+        long range = timeStamp - lastClick;
 
         if(range < 1E6 && !data.playerInfo.breakingBlock) {
             if(interval.size() >= 25) {
@@ -39,6 +39,6 @@ public class AutoclickerB extends Check {
                 interval.clear();
             } else interval.add(range);
         }
-        lastClick = System.currentTimeMillis();
+        lastClick = timeStamp;
     }
 }

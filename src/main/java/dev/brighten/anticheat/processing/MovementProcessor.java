@@ -26,7 +26,7 @@ public class MovementProcessor {
 
     public static float offset = 16777216L;
 
-    public static void process(ObjectData data, WrappedInFlyingPacket packet) {
+    public static void process(ObjectData data, WrappedInFlyingPacket packet, long timeStamp) {
         //We check if it's null and intialize the from and to as equal to prevent large deltas causing false positives since there
         //was no previous from (Ex: delta of 380 instead of 0.45 caused by jump jump in location from 0,0,0 to 380,0,0)
         if(data.playerInfo.from == null) {
@@ -62,7 +62,7 @@ public class MovementProcessor {
             data.playerInfo.lastBrokenBlock.reset();
         }
 
-        data.playerInfo.to.timeStamp = System.currentTimeMillis();
+        data.playerInfo.to.timeStamp = timeStamp;
 
         data.playerInfo.lClientGround = data.playerInfo.clientGround;
         data.playerInfo.clientGround = packet.isGround();
