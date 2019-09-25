@@ -10,6 +10,8 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.MovementUtils;
 
+import java.util.*;
+
 @CheckInfo(name = "Velocity (B)", description = "A horizontally velocity check.")
 public class VelocityB extends Check {
 
@@ -17,6 +19,17 @@ public class VelocityB extends Check {
     private long  ticks;
     private String lastKey;
     private boolean attackedSinceVelocity;
+
+    private static List<float[]> motions = Collections.synchronizedList(Arrays.asList(
+            new float[] {0, 0},
+            new float[] {0, .98f},
+            new float[] {0, -.98f},
+            new float[] {.98f, 0},
+            new float[] {.98f, .98f},
+            new float[] {.98f, -.98f},
+            new float[] {-.98f, 0},
+            new float[] {-.98f, .98f},
+            new float[] {-.98f, -.98f}));
 
     @Packet
     public void onVelocity(WrappedOutVelocityPacket packet) {
@@ -53,8 +66,6 @@ public class VelocityB extends Check {
                     && data.playerInfo.airTicks > 1
                     && !data.playerInfo.lClientGround) {
                 if(data.playerInfo.lastVelocity.hasNotPassed(3)) {
-                    double lVX = vX, lVZ = vZ;
-
                     float f4 = 0.91f;
 
                     if(packet.isGround()) {
@@ -70,44 +81,38 @@ public class VelocityB extends Check {
                         f5 = data.playerInfo.sprinting ? 0.026f : 0.02f;
                     }
 
-                    moveFlying(data.predictionService.moveStrafing, data.predictionService.moveForward, f5);
+                    double pct = 0;
+                    double lVX = vX, lVZ = vZ;
 
-                    float predicted = (float) MathUtils.hypot(vX, vZ);
-                    float pct = data.playerInfo.deltaXZ / predicted * 100;
+                    Optional<float[]> optionalMotion = motions.stream()
+                            .min(Comparator.comparing(motion -> {
+                                moveFlying(motion[0], motion[1], f5);
+                                double vXZ = MathUtils.hypot(vX, vZ);
+                                vX = lVX;
+                                vZ = lVZ;
+                                return MathUtils.getDelta(vXZ, data.playerInfo.deltaXZ);
+                            }));
 
-                    float lPct = pct;
-                    if(pct < 100) {
-                        vX = lVX;
-                        vZ = lVZ;
+                    float[] motion = new float[2];
 
-                        debug("lPCT=" + pct);
-                        if(!lastKey.contains("S") && data.predictionService.key.contains("S")) {
-                            moveFlying(0.98f,0, f5);
-                            predicted = (float) MathUtils.hypot(vX, vZ);
-                            pct = data.playerInfo.deltaXZ / predicted * 100;
-                        } else if(!lastKey.contains("W") && data.predictionService.key.contains("W")) {
-                            moveFlying(-0.98f,0, f5);
-                            predicted = (float) MathUtils.hypot(vX, vZ);
-                            pct = data.playerInfo.deltaXZ / predicted * 100;
-                        }
-
-                        if(MathUtils.getDelta(pct, 100) > MathUtils.getDelta(lPct, 100)) {
-                            vX = lVX;
-                            vZ = lVZ;
-
-                            moveFlying(data.predictionService.moveStrafing, data.predictionService.moveForward, f5);
-                            predicted = (float) MathUtils.hypot(vX, vZ);
-                            pct = data.playerInfo.deltaXZ / predicted * 100;
-                        }
+                    if(optionalMotion.isPresent()) {
+                        motion = optionalMotion.get();
+                    } else {
+                        motion[0] = data.predictionService.moveForward;
+                        motion[1] = data.predictionService.moveStrafing;
                     }
+                    moveFlying(motion[0], motion[1], f5);
 
-                    if (pct < (data.predictionService.key.equals("Nothing") ? 99 : 96.2)
+                    double vXZ = MathUtils.hypot(vX, vZ);
+                    pct = data.playerInfo.deltaXZ / vXZ * 100;
+
+                    if (pct < 99.9999
                             && !data.predictionService.key.contains("D")
                             && !data.predictionService.key.contains("A")) {
-                        if(vl++ > 22) {
+                        if(vl++ > 20) {
                             punish();
                         } else if(vl > 12) flag("pct=" + MathUtils.round(pct, 3) + "%");
-                    } else vl-= vl > 0 ? 0.25 : 0;
+                    } else vl-= vl > 0 ? 0.1 : 0;
 
                     debug("pct=" + pct + " key=" + data.predictionService.key
                             + " sprint=" + data.playerInfo.sprinting + " ground=" + packet.isGround() + " vl=" + vl);
