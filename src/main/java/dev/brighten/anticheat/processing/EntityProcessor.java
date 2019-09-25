@@ -50,6 +50,6 @@ public class EntityProcessor {
     }
 
     public static void start() {
-        task = RunUtils.taskTimer(EntityProcessor::runEntityProcessor, 2L, 20L);
+        task = RunUtils.taskTimerAsync(EntityProcessor::runEntityProcessor, Kauri.INSTANCE, 2L, 20L);
     }
 }
