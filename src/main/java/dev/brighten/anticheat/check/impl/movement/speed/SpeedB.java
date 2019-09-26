@@ -27,7 +27,10 @@ public class SpeedB extends Check {
                 || Atlas.getInstance().getBlockBoxManager().getBlockBox().isUsingItem(data.getPlayer())
                 || data.blockInfo.blocksAbove
                 || data.blockInfo.blocksNear
-                || data.playerInfo.halfBlockTicks > 0) return;
+                || data.playerInfo.halfBlockTicks > 0) {
+            vl-= vl > 0 ? 0.25 : 0;
+            return;
+        }
 
         if (data.playerInfo.airTicks > 1) {
             runMotionPrediction();

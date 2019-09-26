@@ -9,4 +9,5 @@ public @interface CheckInfo {
     String description() default "No description provided.";
     boolean enabled() default true;
     boolean executable() default true;
+    boolean developer() default false;
 }

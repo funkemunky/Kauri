@@ -44,7 +44,7 @@ public class Check {
 
     public ObjectData data;
     public String name, description;
-    public boolean enabled, executable;
+    public boolean enabled, executable, developer;
     public float vl;
 
     private static void register(Check check) {

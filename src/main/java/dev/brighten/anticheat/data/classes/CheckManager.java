@@ -54,6 +54,7 @@ public class CheckManager {
                     CheckSettings checkSettings = Check.checkSettings.get(clazz);
                     check.enabled = checkSettings.enabled;
                     check.executable = checkSettings.executable;
+                    check.developer = settings.developer();
                     check.name = settings.name();
                     check.description = settings.description();
                     return check;
