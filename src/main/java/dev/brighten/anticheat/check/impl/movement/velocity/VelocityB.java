@@ -41,12 +41,10 @@ public class VelocityB extends Check {
 
     @Packet
     public void onUseEntity(WrappedInUseEntityPacket packet) {
-        if((vX != 0 || vZ != 0)
-                && !attackedSinceVelocity
+        if(data.playerInfo.lastVelocity.hasNotPassed(6)
                 && packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) {
             vX*= 0.6f;
             vZ*= 0.6f;
-            attackedSinceVelocity = true;
         }
     }
 
@@ -59,23 +57,19 @@ public class VelocityB extends Check {
             return;
         }
 
-        if(data.playerInfo.lastVelocity.hasNotPassed(1)) attackedSinceVelocity = false;
-
         if((vX != 0 || vZ != 0)) {
-            if(!data.blockInfo.blocksNear
-                    && data.playerInfo.airTicks > 1
-                    && !data.playerInfo.lClientGround) {
-                if(data.playerInfo.lastVelocity.hasNotPassed(3)) {
+            if(!data.blockInfo.blocksNear && !data.playerInfo.clientGround) {
+                if(data.playerInfo.lastVelocity.hasNotPassed(6)) {
                     float f4 = 0.91f;
 
-                    if(packet.isGround()) {
-                        f4*= MovementUtils.getFriction(data);
+                    if (data.playerInfo.lClientGround) {
+                        f4 *= MovementUtils.getFriction(data);
                     }
 
                     float f = 0.16277136F / (f4 * f4 * f4);
                     float f5;
 
-                    if (packet.isGround()) {
+                    if (data.playerInfo.lClientGround) {
                         f5 = data.predictionService.aiMoveSpeed * f;
                     } else {
                         f5 = data.playerInfo.sprinting ? 0.026f : 0.02f;
@@ -87,15 +81,16 @@ public class VelocityB extends Check {
                     Optional<float[]> optionalMotion = motions.stream()
                             .min(Comparator.comparing(motion -> {
                                 moveFlying(motion[0], motion[1], f5);
-                                double vXZ = MathUtils.hypot(vX, vZ);
-                                vX = lVX;
-                                vZ = lVZ;
-                                return MathUtils.getDelta(vXZ, data.playerInfo.deltaXZ);
+                                double vX = this.vX, vZ = this.vZ;
+                                this.vX = lVX;
+                                this.vZ = lVZ;
+                                return MathUtils.getDelta(vX, data.playerInfo.deltaX)
+                                        + MathUtils.getDelta(vZ, data.playerInfo.deltaZ);
                             }));
 
                     float[] motion = new float[2];
 
-                    if(optionalMotion.isPresent()) {
+                    if (optionalMotion.isPresent()) {
                         motion = optionalMotion.get();
                     } else {
                         motion[0] = data.predictionService.moveForward;
@@ -106,36 +101,34 @@ public class VelocityB extends Check {
                     double vXZ = MathUtils.hypot(vX, vZ);
                     pct = data.playerInfo.deltaXZ / vXZ * 100;
 
-                    if (pct < 99.9999
-                            && !data.predictionService.key.contains("D")
-                            && !data.predictionService.key.contains("A")) {
-                        if(vl++ > 20) {
+                    if (pct < 99.7) {
+                        if (vl++ > 20) {
                             punish();
-                        } else if(vl > 12) flag("pct=" + MathUtils.round(pct, 3) + "%");
-                    } else vl-= vl > 0 ? 0.1 : 0;
+                        } else if (vl > 12) flag("pct=" + MathUtils.round(pct, 3) + "%");
+                    } else vl -= vl > 0 ? 1 : 0;
 
                     debug("pct=" + pct + " key=" + data.predictionService.key
                             + " sprint=" + data.playerInfo.sprinting + " ground=" + packet.isGround() + " vl=" + vl);
 
-                    if (ticks++ > 5) {
+                    f4 = 0.91f;
+
+                    if (data.playerInfo.lClientGround) {
+                        f4 *= MovementUtils.getFriction(data);
+                    }
+
+                    vX *= (double) f4;
+                    vZ *= (double) f4;
+
+                    if(data.playerInfo.lastVelocity.hasPassed(4)) {
                         vX = vZ = 0;
                         ticks = 0;
                     }
-
-                    f4 = 0.91f;
-
-                    if(data.playerInfo.clientGround ||  data.playerInfo.jumped) {
-                        f4*= MovementUtils.getFriction(data);
-                    }
-
-                    vX *= f4;
-                    vZ *= f4;
                 }
             } else {
                 vX = vZ = 0;
                 ticks = 0;
             }
-        }
+        } else attackedSinceVelocity = false;
         lastKey = data.predictionService.key;
     }
 
@@ -152,8 +145,8 @@ public class VelocityB extends Check {
             f = friction / f;
             strafe = strafe * f;
             forward = forward * f;
-            float f1 = MathHelper.sin(data.playerInfo.to.yaw * (float) Math.PI / 180.0F);
-            float f2 = MathHelper.cos(data.playerInfo.to.yaw * (float) Math.PI / 180.0F);
+            float f1 = MathHelper.sin(data.playerInfo.from.yaw * (float) Math.PI / 180.0F);
+            float f2 = MathHelper.cos(data.playerInfo.from.yaw * (float) Math.PI / 180.0F);
             vX += (strafe * f2 - forward * f1);
             vZ += (forward * f2 + strafe * f1);
         }

@@ -49,11 +49,11 @@ public class CollisionHandler {
                     }
                 }
             } else if(box.collidesVertically(data.box
-                    .subtract(0, 1, 0,0,1,0))) {
+                    .subtract(0, 1.5f, 0,0,0.25f,0))) {
                 nearGround = true;
             }
 
-            if(data.box.grow(0.3f, -1E-5f, 0.3f).collidesHorizontally(box)) {
+            if(data.box.grow(0.3f, -0.1f, 0.3f).collidesHorizontally(box)) {
                 blocksNear = true;
             }
 
@@ -82,6 +82,10 @@ public class CollisionHandler {
                }
             }
         }
+
+        /*if(Atlas.getInstance().getCurrentTicks() % 5 == 0) {
+            Kauri.INSTANCE.executor.execute(() -> MiscUtils.createParticlesForBoundingBox(data.getPlayer(), box, WrappedEnumParticle.FLAME, 0.25f));
+        }*/
         if(!entity) {
             allBlocks.add(new AbstractMap.SimpleEntry<>(block, box));
         }

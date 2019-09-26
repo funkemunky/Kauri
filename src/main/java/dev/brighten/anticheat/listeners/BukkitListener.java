@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.listeners;
 
+import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.reflection.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumParticle;
 import cc.funkemunky.api.utils.BoundingBox;
@@ -37,9 +38,11 @@ public class BukkitListener implements Listener {
     public void onInteract(PlayerInteractEvent event) {
         if(event.getClickedBlock() == null || !event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) return;
 
-
         if(event.getItem() != null && event.getItem().isSimilar(MAGIC_WAND)) {
-            List<BoundingBox> boxes = MinecraftReflection.getBlockBox(event.getPlayer(), event.getClickedBlock());
+            List<BoundingBox> boxes = Atlas.getInstance().getBlockBoxManager().getBlockBox()
+                    .getCollidingBoxes(event.getPlayer().getWorld(),
+                            new BoundingBox(event.getClickedBlock().getLocation().toVector(), event.getClickedBlock().getLocation().toVector())
+                                    .add(0,0,0,0,1.5f,0).grow(0.1f,0,0.1f));
 
             for (BoundingBox box : boxes) {
                 MiscUtils.createParticlesForBoundingBox(event.getPlayer(), box, WrappedEnumParticle.FLAME, 0.2f);

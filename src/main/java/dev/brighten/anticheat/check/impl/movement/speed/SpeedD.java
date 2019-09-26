@@ -18,6 +18,7 @@ public class SpeedD extends Check {
 
        if(data.playerInfo.serverGround
                && data.playerInfo.deltaXZ > baseSpeed
+               && data.playerInfo.halfBlockTicks == 0
                && !data.playerInfo.generalCancel
                && data.playerInfo.lastVelocity.hasPassed(20 + MathUtils.millisToTicks(data.lagInfo.ping))) {
            if(vl++ > 30) {

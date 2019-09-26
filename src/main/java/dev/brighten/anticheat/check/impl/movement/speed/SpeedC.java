@@ -15,7 +15,7 @@ public class SpeedC extends Check {
         if(packet.isPos()
                 && !data.playerInfo.generalCancel
                 && data.playerInfo.lastVelocity.hasPassed(5 + MathUtils.millisToTicks(data.lagInfo.ping))) {
-            float baseSpeed = MovementUtils.getBaseSpeed(data) + (data.playerInfo.serverGround ? 0.3f : 0.5f);
+            float baseSpeed = MovementUtils.getBaseSpeed(data) + (data.playerInfo.serverGround ? 0.35f : 0.5f);
 
             if(data.blockInfo.blocksAbove && data.playerInfo.wasOnIce) baseSpeed+= 0.5f;
 

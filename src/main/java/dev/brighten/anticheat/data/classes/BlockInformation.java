@@ -30,7 +30,7 @@ public class BlockInformation {
         Kauri.INSTANCE.profiler.start("blockInfo:runCollisionCheck:boxProcessing");
         CollisionHandler handler = new CollisionHandler(objectData);
 
-        List<BoundingBox> boxes = Atlas.getInstance().getBlockBoxManager().getBlockBox().getCollidingBoxes(objectData.getPlayer().getWorld(), objectData.box.grow(1,1,1));
+        List<BoundingBox> boxes = Atlas.getInstance().getBlockBoxManager().getBlockBox().getCollidingBoxes(objectData.getPlayer().getWorld(), objectData.box.grow(1.5f,2,1.5f));
 
         //Running block checking;
         boxes.parallelStream().forEach(box -> {
