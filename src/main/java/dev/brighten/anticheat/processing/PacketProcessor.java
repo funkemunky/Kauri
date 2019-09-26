@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 public class PacketProcessor {
 
-    public void processClient(ObjectData data, Object object, String type) {
+    public void processClient(ObjectData data, Object object, String type, long timeStamp) {
         switch(type) {
             case Packet.Client.ABILITIES: {
                 WrappedInAbilitiesPacket packet = new WrappedInAbilitiesPacket(object, data.getPlayer());
@@ -24,7 +24,7 @@ public class PacketProcessor {
                 data.playerInfo.isFlying = packet.isFlying();
                 data.playerInfo.canFly = packet.isAllowedFlight();
                 data.playerInfo.inCreative = packet.isCreativeMode();
-                data.checkManager.runPacket(packet);
+                data.checkManager.runPacket(packet, timeStamp);
                 break;
             }
             case Packet.Client.USE_ENTITY: {
@@ -44,7 +44,7 @@ public class PacketProcessor {
                         data.target = (LivingEntity) packet.getEntity();
                     }
                 }
-                data.checkManager.runPacket(packet);
+                data.checkManager.runPacket(packet, timeStamp);
                 break;
             }
             case Packet.Client.FLYING:
@@ -62,8 +62,8 @@ public class PacketProcessor {
                 data.playerInfo.worldLoaded = Atlas.getInstance().getBlockBoxManager().getBlockBox()
                         .isChunkLoaded(data.getPlayer().getLocation());
                 Kauri.INSTANCE.profiler.start("flying:process");
-                MovementProcessor.process(data, packet);
-                data.checkManager.runPacket(packet);
+                MovementProcessor.process(data, packet, timeStamp);
+                data.checkManager.runPacket(packet, timeStamp);
                 Kauri.INSTANCE.profiler.stop("flying:process");
                 if(data.playerInfo.serverPos) data.playerInfo.serverPos = false;
                 break;
@@ -72,7 +72,7 @@ public class PacketProcessor {
                 WrappedInEntityActionPacket packet = new WrappedInEntityActionPacket(object, data.getPlayer());
 
                 ActionProcessor.process(data, packet);
-                data.checkManager.runPacket(packet);
+                data.checkManager.runPacket(packet, timeStamp);
                 break;
             }
             case Packet.Client.BLOCK_DIG: {
@@ -91,7 +91,7 @@ public class PacketProcessor {
                         break;
                     }
                 }
-                data.checkManager.runPacket(packet);
+                data.checkManager.runPacket(packet, timeStamp);
                 break;
             }
             case Packet.Client.BLOCK_PLACE: {
@@ -100,7 +100,7 @@ public class PacketProcessor {
                 if(packet.getItemStack() != null && packet.getItemStack().getType().isSolid()) {
                     data.playerInfo.lastBlockPlace.reset();
                 }
-                data.checkManager.runPacket(packet);
+                data.checkManager.runPacket(packet, timeStamp);
                 break;
             }
             case Packet.Client.KEEP_ALIVE: {
@@ -114,7 +114,7 @@ public class PacketProcessor {
                 } else {
                     data.lagInfo.lastPing = data.lagInfo.ping;
                     data.lagInfo.ping = System.currentTimeMillis() - data.lagInfo.lastKeepAlive;
-                    data.checkManager.runPacket(packet);
+                    data.checkManager.runPacket(packet, timeStamp);
                 }
                 break;
             }
@@ -135,19 +135,19 @@ public class PacketProcessor {
                     data.lagInfo.pingAverages.add(data.lagInfo.transPing);
                     data.lagInfo.averagePing = data.lagInfo.pingAverages.getAverage();
                 }
-                data.checkManager.runPacket(packet);
+                data.checkManager.runPacket(packet, timeStamp);
                 break;
             }
             case Packet.Client.ARM_ANIMATION: {
                 WrappedInArmAnimationPacket packet = new WrappedInArmAnimationPacket(object, data.getPlayer());
 
-                data.checkManager.runPacket(packet);
+                data.checkManager.runPacket(packet, timeStamp);
                 break;
             }
         }
     }
 
-    public void processServer(ObjectData data, Object object, String type) {
+    public void processServer(ObjectData data, Object object, String type, long timeStamp) {
         switch(type) {
             case Packet.Server.ABILITIES: {
                 WrappedOutAbilitiesPacket packet = new WrappedOutAbilitiesPacket(object, data.getPlayer());
@@ -155,7 +155,7 @@ public class PacketProcessor {
                 data.playerInfo.canFly = packet.isAllowedFlight();
                 data.playerInfo.inCreative = packet.isCreativeMode();
                 data.playerInfo.isFlying = packet.isFlying();
-                data.checkManager.runPacket(packet);
+                data.checkManager.runPacket(packet, timeStamp);
                 break;
             }
             case Packet.Server.ENTITY_VELOCITY: {
@@ -164,14 +164,14 @@ public class PacketProcessor {
                 if(packet.getId() == data.getPlayer().getEntityId()) {
                     TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutKeepAlivePacket(data.getPlayer().getEntityId() + 2000).getObject());
                 }
-                data.checkManager.runPacket(packet);
+                data.checkManager.runPacket(packet, timeStamp);
                 break;
             }
             case Packet.Server.KEEP_ALIVE: {
                 WrappedOutKeepAlivePacket packet = new WrappedOutKeepAlivePacket(object, data.getPlayer());
 
                 data.lagInfo.lastKeepAlive = System.currentTimeMillis();
-                data.checkManager.runPacket(packet);
+                data.checkManager.runPacket(packet, timeStamp);
                 TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutTransaction(0, (short)69, false).getObject());
                 break;
             }
@@ -188,7 +188,7 @@ public class PacketProcessor {
 
                 data.playerInfo.posLocs.add(new KLocation(packet.getX(), packet.getY(), packet.getZ(), packet.getYaw(), packet.getPitch()));
                 data.playerInfo.lastServerPos = System.currentTimeMillis();
-                data.checkManager.runPacket(packet);
+                data.checkManager.runPacket(packet, timeStamp);
                 TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutKeepAlivePacket(data.getPlayer().getEntityId() + 1500).getObject());
                 break;
             }

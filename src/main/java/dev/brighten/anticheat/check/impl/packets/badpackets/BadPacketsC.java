@@ -13,18 +13,18 @@ public class BadPacketsC extends Check {
     private long lastFlying;
 
     @Packet
-    public void onPlace(WrappedInBlockDigPacket place) {
-        long delta = System.currentTimeMillis() - lastFlying;
+    public void onPlace(WrappedInBlockDigPacket place, long timeStamp) {
+        long delta = timeStamp - lastFlying;
         if(delta < 5) {
-            /*if(vl++ > 20) {
+            if(vl++ > 20) {
                 //punish();
-            } else if(vl > 4) flag("sent dig before flying packet.");*/
+            } else if(vl > 4) flag("sent dig before flying packet.");
         }
         debug("delta=" + delta + "ms");
     }
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
-        lastFlying = System.currentTimeMillis();
+    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
+        lastFlying = timeStamp;
     }
 }

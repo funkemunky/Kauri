@@ -34,8 +34,7 @@ public class Hitboxes extends Check {
     private long lastTimeStamp;
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
-        long timeStamp = System.currentTimeMillis();
+    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if (timeStamp - lastTimeStamp <= 4) {
             lastTimeStamp = timeStamp;
             return;

@@ -13,8 +13,8 @@ public class BadPacketsA extends Check {
     private long lastBlockPlace;
 
     @Packet
-    public void onDig(WrappedInBlockDigPacket packet) {
-        if(System.currentTimeMillis() - lastBlockPlace < 5) {
+    public void onDig(WrappedInBlockDigPacket packet, long timeStamp) {
+        if(timeStamp - lastBlockPlace < 5) {
             if(vl++ > 12) {
                 punish();
             } else if(vl > 4) {
@@ -24,7 +24,7 @@ public class BadPacketsA extends Check {
     }
 
     @Packet
-    public void onPlace(WrappedInBlockPlacePacket packet) {
-        if(BlockUtils.isTool(packet.getItemStack())) lastBlockPlace = System.currentTimeMillis();
+    public void onPlace(WrappedInBlockPlacePacket packet, long timeStamp) {
+        if(BlockUtils.isTool(packet.getItemStack())) lastBlockPlace = timeStamp;
     }
 }

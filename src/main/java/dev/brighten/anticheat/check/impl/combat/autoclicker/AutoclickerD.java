@@ -13,9 +13,9 @@ public class AutoclickerD extends Check {
     private long lastClick;
 
     @Packet
-    public void onArm(WrappedInArmAnimationPacket packet) {
+    public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
         if(data.playerInfo.lastBrokenBlock.hasPassed(5)) {
-            long delta = System.currentTimeMillis() - lastClick;
+            long delta = timeStamp - lastClick;
             if(interval.size() > 25) {
                 double disease = interval.std();
                 double avg = interval.average();
@@ -32,6 +32,6 @@ public class AutoclickerD extends Check {
                 interval.clear();
             } else interval.add(delta);
         }
-        lastClick = System.currentTimeMillis();
+        lastClick = timeStamp;
     }
 }

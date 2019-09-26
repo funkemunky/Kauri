@@ -12,8 +12,8 @@ public class AutoclickerA extends Check {
     private long lastClick;
 
     @Packet
-    public void onArmAnimation(WrappedInArmAnimationPacket packet) {
-        if(System.currentTimeMillis() - lastClick > 1000L) {
+    public void onArmAnimation(WrappedInArmAnimationPacket packet, long timeStamp) {
+        if(timeStamp - lastClick > 1000L) {
             if(ticks > 20) {
                 vl++;
                 flag("cps=" + ticks + " ping=%p tps=%t");
@@ -22,7 +22,7 @@ public class AutoclickerA extends Check {
                 punish();
             }
             ticks = 0;
-            lastClick = System.currentTimeMillis();
+            lastClick = timeStamp;
         } else if(data.playerInfo.lastBrokenBlock.hasPassed(5)) ticks++;
     }
 }

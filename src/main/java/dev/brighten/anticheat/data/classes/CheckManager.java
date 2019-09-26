@@ -23,7 +23,7 @@ public class CheckManager {
         this.objectData = objectData;
     }
 
-    public void runPacket(NMSObject object) {
+    public void runPacket(NMSObject object, long timeStamp) {
         if(!checkMethods.containsKey(object.getClass())) return;
         checkMethods.get(object.getClass()).parallelStream().forEach(entry -> {
             Check check = checks.get(entry.getKey());
@@ -31,7 +31,11 @@ public class CheckManager {
 
             if(check.enabled) {
                 try {
-                    entry.getValue().getMethod().invoke(check, object);
+                    if(entry.getValue().getMethod().getParameterCount() > 1) {
+                        entry.getValue().getMethod().invoke(check, object, timeStamp);
+                    } else {
+                        entry.getValue().getMethod().invoke(check, object);
+                    }
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     System.out.println("Error on " + check.name);
                     e.printStackTrace();
