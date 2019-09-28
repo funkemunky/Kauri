@@ -55,9 +55,9 @@ public class Check {
         CheckInfo info = check.getClass().getAnnotation(CheckInfo.class);
         MiscUtils.printToConsole("Registered: " + info.name());
         WrappedClass checkClass = new WrappedClass(check.getClass());
-        String name = checkClass.getClass().getSimpleName();
-        CheckSettings settings = new CheckSettings();
-        if(Kauri.INSTANCE.getConfig().contains("checks." + name)) {
+        String name = info.name();
+        CheckSettings settings = new CheckSettings(info.name(), info.description());
+        if(Kauri.INSTANCE.getConfig().get("checks." + name + ".enabled") != null) {
             settings.enabled = Kauri.INSTANCE.getConfig().getBoolean("checks." + name + ".enabled");
             settings.executable = Kauri.INSTANCE.getConfig().getBoolean("checks." + name + ".executable");
         } else {
@@ -138,5 +138,9 @@ public class Check {
 
     public static CheckInfo getCheckInfo(String name) {
         return checkClasses.values().stream().filter(val -> val.name().equalsIgnoreCase(name)).findFirst().orElse(null);
+    }
+
+    public static CheckSettings getCheckSettings(String name) {
+        return checkSettings.values().stream().filter(val -> val.name.equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 }

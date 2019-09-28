@@ -53,6 +53,11 @@
             <version>1.5.5</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>cc.funkemunky.utils</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.0</version>
+        </dependency>
     </dependencies>
 
 </project>

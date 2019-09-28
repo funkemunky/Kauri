@@ -9,6 +9,8 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.MovementUtils;
+import lombok.val;
+import org.bukkit.enchantments.Enchantment;
 
 import java.util.*;
 
@@ -41,7 +43,9 @@ public class VelocityB extends Check {
 
     @Packet
     public void onUseEntity(WrappedInUseEntityPacket packet) {
-        if(data.playerInfo.lastVelocity.hasNotPassed(6)
+        if((data.playerInfo.sprinting ||
+                data.getPlayer().getItemInHand() != null
+                        && data.getPlayer().getItemInHand().containsEnchantment(Enchantment.KNOCKBACK))
                 && packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) {
             vX*= 0.6f;
             vZ*= 0.6f;
@@ -58,71 +62,80 @@ public class VelocityB extends Check {
         }
 
         if((vX != 0 || vZ != 0)) {
-            if(!data.blockInfo.blocksNear && !data.playerInfo.clientGround) {
+            if(!data.blockInfo.blocksNear  ) {
                 if(data.playerInfo.lastVelocity.hasNotPassed(6)) {
-                    float f4 = 0.91f;
+                    if(!data.playerInfo.lClientGround && !data.playerInfo.clientGround) {
+                        float f4 = 0.91f;
 
-                    if (data.playerInfo.lClientGround) {
-                        f4 *= MovementUtils.getFriction(data);
-                    }
+                        if (data.playerInfo.lClientGround) {
+                            f4 *= MovementUtils.getFriction(data);
+                        }
 
-                    float f = 0.16277136F / (f4 * f4 * f4);
-                    float f5;
+                        float f = 0.16277136F / (f4 * f4 * f4);
+                        float f5;
 
-                    if (data.playerInfo.lClientGround) {
-                        f5 = data.predictionService.aiMoveSpeed * f;
-                    } else {
-                        f5 = data.playerInfo.sprinting ? 0.026f : 0.02f;
-                    }
+                        if (data.playerInfo.lClientGround) {
+                            f5 = data.predictionService.aiMoveSpeed * f;
+                        } else {
+                            f5 = data.playerInfo.sprinting ? 0.026f : 0.02f;
+                        }
 
-                    double pct = 0;
-                    double lVX = vX, lVZ = vZ;
+                        double pct = 0;
+                        double lVX = vX, lVZ = vZ;
 
-                    Optional<float[]> optionalMotion = motions.stream()
-                            .min(Comparator.comparing(motion -> {
-                                moveFlying(motion[0], motion[1], f5);
-                                double vX = this.vX, vZ = this.vZ;
-                                this.vX = lVX;
-                                this.vZ = lVZ;
-                                return MathUtils.getDelta(vX, data.playerInfo.deltaX)
-                                        + MathUtils.getDelta(vZ, data.playerInfo.deltaZ);
-                            }));
+                        float[] motion = new float[2];
 
-                    float[] motion = new float[2];
+                        Optional<float[]> optionalMotion = motions.stream()
+                                .min(Comparator.comparing(mot -> {
+                                    moveFlying(mot[0], mot[1], f5);
+                                    double vX = this.vX, vZ = this.vZ;
+                                    this.vX = lVX;
+                                    this.vZ = lVZ;
 
-                    if (optionalMotion.isPresent()) {
-                        motion = optionalMotion.get();
-                    } else {
-                        motion[0] = data.predictionService.moveForward;
-                        motion[1] = data.predictionService.moveStrafing;
-                    }
-                    moveFlying(motion[0], motion[1], f5);
+                                    return MathUtils.getDelta(vX, data.playerInfo.deltaX)
+                                            + MathUtils.getDelta(vZ, data.playerInfo.deltaZ);
+                                }));
 
-                    double vXZ = MathUtils.hypot(vX, vZ);
-                    pct = data.playerInfo.deltaXZ / vXZ * 100;
+                        if (optionalMotion.isPresent()) {
+                            motion = optionalMotion.get();
 
-                    if (pct < 99.7) {
-                        if (vl++ > 20) {
-                            punish();
-                        } else if (vl > 12) flag("pct=" + MathUtils.round(pct, 3) + "%");
-                    } else vl -= vl > 0 ? 1 : 0;
+                            debug("motion: " + motion[0] + ", " + motion[1]);
+                        } else {
+                            motion[0] = data.predictionService.moveForward;
+                            motion[1] = data.predictionService.moveStrafing;
+                        }
 
-                    debug("pct=" + pct + " key=" + data.predictionService.key
-                            + " sprint=" + data.playerInfo.sprinting + " ground=" + packet.isGround() + " vl=" + vl);
+                        moveFlying(motion[0], motion[1], f5);
 
-                    f4 = 0.91f;
+                        double vXZ = MathUtils.hypot(vX, vZ);
+                        pct = data.playerInfo.deltaXZ / vXZ * 100;
 
-                    if (data.playerInfo.lClientGround) {
-                        f4 *= MovementUtils.getFriction(data);
-                    }
+                        if (pct < 99.8) {
+                            if (vl++ > 35) {
+                                punish();
+                            } else if (vl > 22) flag("pct=" + MathUtils.round(pct, 3) + "%");
+                        } else vl -= vl > 0 ? 0.5 : 0;
 
-                    vX *= (double) f4;
-                    vZ *= (double) f4;
+                        debug("pct=" + pct + " key=" + data.predictionService.key
+                                + " sprint=" + data.playerInfo.sprinting + " ground=" + packet.isGround() + " vl=" + vl);
 
-                    if(data.playerInfo.lastVelocity.hasPassed(4)) {
-                        vX = vZ = 0;
-                        ticks = 0;
-                    }
+                        //debug("vX=" + vX + " vZ=" + vZ);
+                        //debug("dX=" + data.playerInfo.deltaX + " dZ=" + data.playerInfo.deltaZ);
+
+                        f4 = 0.91f;
+
+                        if (data.playerInfo.lClientGround) {
+                            f4 *= MovementUtils.getFriction(data);
+                        }
+
+                        vX *= (double) f4;
+                        vZ *= (double) f4;
+
+                        if(data.playerInfo.lastVelocity.hasPassed(4)) {
+                            vX = vZ = 0;
+                            ticks = 0;
+                        }
+                    } else vX = vZ = 0;
                 }
             } else {
                 vX = vZ = 0;
