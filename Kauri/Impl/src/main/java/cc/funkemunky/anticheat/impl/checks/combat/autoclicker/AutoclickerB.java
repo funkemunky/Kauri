@@ -32,11 +32,8 @@ public class AutoclickerB extends Check {
                 val distinct = cpsList.distinctCount();
                 if(std > 3 && average > 8 && MathUtils.getDelta(std, lastStd) < 1.1 && MathUtils.getDelta(average, lastAverage) > 0.8) {
                     debug(Color.Green + "Flag");
-                    vl+= 2;
-                } else if(std < 2.5 && average > 8 && distinct > 17) {
-                    debug(Color.Green + "Flag 2");
                     vl++;
-                } else vl-= vl > 0 ? 2 : 0;
+                }else vl-= vl > 0 ? 1 : 0;
 
                 if(vl > 6) {
                     flag("std=" + std + " avg=" + average + " distinct=" + distinct + " vl=" + vl, true, true, AlertTier.HIGH);

@@ -24,8 +24,9 @@ public class SpeedB extends Check {
         double predicted = move.getLastDeltaXZ() * 0.91f;
         double delta = (move.getDeltaXZ() - predicted) * 38.4;
 
-        if(move.getAirTicks() > 3 && !getData().isGeneralCancel()
-                && getData().getVelocityProcessor().getLastVelocity().hasNotPassed(10)
+        if(move.getAirTicks() > 3
+                && !getData().isGeneralCancel()
+                && (timeStamp - getData().getVelocityProcessor().getLastVelocityTimestamp() > 500)
                 && getData().getLastBlockPlace().hasPassed(10)
                 && move.getBlockAboveTicks() == 0
                 && move.getHalfBlockTicks() == 0

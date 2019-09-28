@@ -35,10 +35,13 @@ public class AutoclickerD extends Check {
 
             if(average < 0) return;
 
-            if(average > 7.4 && MathUtils.getDelta(average, lastAverage) < 0.75) {
+            double deltaAvg = MathUtils.getDelta(average, lastAverage);
+
+            if(average > 7.4 && deltaAvg < 0.75) {
                 if(vl++ > 5) {
-                    flag("your mom a hoe", true, true,
-                            vl > 10 ? AlertTier.HIGH : AlertTier.LIKELY);
+                    flag("avg=" + cc.funkemunky.api.utils.MathUtils.round(average, 3)
+                                    + " delta=" + cc.funkemunky.api.utils.MathUtils.round(deltaAvg, 6),
+                            true, true, vl > 10 ? AlertTier.HIGH : AlertTier.LIKELY);
                 }
             } else vl-= vl > 0 ? 1 : 0;
 

@@ -12,6 +12,7 @@ import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MiscUtils;
 import lombok.val;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
@@ -20,6 +21,7 @@ import org.bukkit.util.Vector;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @CheckInfo(name = "Reach", description = "A very accurate and fast 3.1 reach check.", type = CheckType.REACH, cancelType = CancelType.COMBAT, maxVL = 10, executable = true)
@@ -64,49 +66,51 @@ public class Reach extends Check {
                 return;
             }
 
-            long range = 150L + Math.abs(getData().getTransPing() - getData().getLastTransPing()) * 2;
-            val location = getData().getEntityPastLocation().getEstimatedLocation(getData().getTransPing(), range);
+            val location = getData().getEntityPastLocation().
+                    getEstimatedLocation(getData().getTransPing(), 
+                            50L + Math.abs(getData().getTransPing() - getData().getLastTransPing()) * 2)
+                    .stream().map(loc -> getHitbox(getData().getTarget(), loc)).collect(Collectors.toList());
 
-            val locs = move.getPastLocation().getEstimatedLocation(0, 50L)
+            val locs = move.getPastLocation().getEstimatedLocation(0, 100L)
                     .stream()
                     .map(loc -> loc
                             .toLocation(getData().getPlayer().getWorld())
                             .clone()
                             .add(0, getData().getPlayer().getEyeHeight(), 0))
                     .collect(Collectors.toList());
+            
+            List<Double> distances = new ArrayList<>();
 
-            List<Vector> traverse = new ArrayList<>();
+            locs.forEach(loc -> new RayTrace(loc.toVector(), loc.getDirection())
+                    .traverse(0, calcDistance * 1.5f, 0.1,
+                    0.02, 2.8, 3.5)
+                    .stream()
+                    .filter(vec -> location
+                            .stream()
+                            .anyMatch(box -> box.collides(vec)))
+                    .mapToDouble(vec -> vec.distance(loc.toVector()))
+                    .forEach(distances::add));
 
-            locs.stream()
-                    .map(loc ->
-                            new RayTrace(loc.toVector(), loc.getDirection())
-                                    .traverse(0, calcDistance * 1.5f, 0.1, 0.02, 2.8, 3.5))
-                    .forEach(traverse::addAll);
-
-            val collided = traverse.stream()
-                    .filter((vec) -> location.stream().anyMatch(loc -> getHitbox(getData().getTarget(), loc).collides(vec)))
-                    .collect(Collectors.toList());
-
-            float distance = (float) collided.stream().mapToDouble((vec) -> vec.distance(to.toVector()))
+            float distance = (float)distances.stream().mapToDouble(dub -> dub)
                     .min().orElse(0.0D);
 
-            if(collided.size() > 0) {
-                if (distance > reachThreshold && (collided.size() > collidedThreshold || distance > bypassColReach) && collided.size() > collidedMin && !getData().isLagging()) {
+            if(distances.size() > 0) {
+                if (distance > reachThreshold && (distances.size() > collidedThreshold || distance > bypassColReach) && distances.size() > collidedMin && !getData().isLagging()) {
                     vl+= distance > 3.02 ? 1 : 0.5;
                     if (vl > certainThreshold) {
-                        flag("reach=" + distance + " vl=" + vl + " collided=" + collided.size(), true, true, AlertTier.CERTAIN);
+                        flag("reach=" + distance + " vl=" + vl + " collided=" + distances.size(), true, true, AlertTier.CERTAIN);
                     } else if (vl > highThreshold) {
-                        flag("reach=" + distance + " vl=" + vl + " collided=" + collided.size(), true, true, AlertTier.HIGH);
+                        flag("reach=" + distance + " vl=" + vl + " collided=" + distances.size(), true, true, AlertTier.HIGH);
                     } else if(vl > 4) {
-                        flag("reach=" + distance + " vl=" + vl + " collided=" + collided.size(), true, true, vl > 6 ? 1 : 0, vl > 6 ? AlertTier.LIKELY : AlertTier.POSSIBLE);
+                        flag("reach=" + distance + " vl=" + vl + " collided=" + distances.size(), true, true, vl > 6 ? 1 : 0, vl > 6 ? AlertTier.LIKELY : AlertTier.POSSIBLE);
                     } else {
-                        flag("reach=" + distance + " vl=" + vl + " collided=" + collided.size(),true,true, 0, AlertTier.LOW);
+                        flag("reach=" + distance + " vl=" + vl + " collided=" + distances.size(),true,true, 0, AlertTier.LOW);
                     }
                 } else if(distance > 0.8) {
                     vl = Math.max(0, vl - 0.05f);
                 }
 
-                debug((distance > reachThreshold && (collided.size() > collidedThreshold || distance > bypassColReach) && collided.size() > collidedMin && !getData().isLagging() ? Color.Green : "") + "distance=" + distance + " collided=" + collided.size() + " vl=" + vl + " range=" + range + " target=" + getData().getTarget().getVelocity().getY() + " eye=" + getData().getPlayer().getEyeHeight());
+                debug((distance > reachThreshold && (distances.size() > collidedThreshold || distance > bypassColReach) && distances.size() > collidedMin && !getData().isLagging() ? Color.Green : "") + "distance=" + distance + " collided=" + distances.size() + " vl=" + vl + " eye=" + getData().getPlayer().getEyeHeight());
             }
             lastAttack = timeStamp;
         }

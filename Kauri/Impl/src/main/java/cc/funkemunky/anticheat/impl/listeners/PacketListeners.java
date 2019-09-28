@@ -41,6 +41,7 @@ public class PacketListeners implements AtlasListener {
                     WrappedOutPositionPacket position = new WrappedOutPositionPacket(event.getPacket(), event.getPlayer());
 
                     data.setLastServerPosStamp(event.getTimeStamp());
+                    TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutKeepAlivePacket(data.getPlayer().getEntityId() + 1500).getObject());
                     data.getTeleportLocations().add(new Vector(position.getX(), position.getY(), position.getZ()));
                     data.getVelocityProcessor().velocityX = data.getVelocityProcessor().velocityY = data.getVelocityProcessor().velocityZ = 0;
                     data.getVelocityProcessor().setAttackedSinceVelocity(false);
@@ -83,7 +84,10 @@ public class PacketListeners implements AtlasListener {
                 case Packet.Server.ENTITY_VELOCITY: {
                     WrappedOutVelocityPacket packet = new WrappedOutVelocityPacket(event.getPacket(), event.getPlayer());
 
-                    data.getVelocityProcessor().update(packet, event.getTimeStamp());
+                    if(packet.getId() == data.getPlayer().getEntityId()) {
+                        TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutKeepAlivePacket(data.getPlayer().getEntityId() + 2000).getObject());
+                        data.getVelocityProcessor().update(packet, event.getTimeStamp());
+                    }
                     break;
                 }
             }
@@ -138,8 +142,16 @@ public class PacketListeners implements AtlasListener {
                         break;
                     }
                     case Packet.Client.KEEP_ALIVE: {
-                        data.setLastPing(data.getPing());
-                        data.setPing(event.getTimeStamp() - data.getLastKeepAlive());
+                        WrappedInKeepAlivePacket packet = new WrappedInKeepAlivePacket(event.getPacket(), event.getPlayer());
+                        if(packet.getTime() == (data.getPlayer().getEntityId() + 1500)) {
+                            data.setLastServerPosStamp(System.currentTimeMillis());
+                        } else if(packet.getTime() == (data.getPlayer().getEntityId() + 2000)) {
+                            data.getVelocityProcessor().getLastVelocity().reset();
+                            data.getVelocityProcessor().setLastVelocityTimestamp(System.currentTimeMillis());
+                        } else {
+                            data.setLastPing(data.getPing());
+                            data.setPing(event.getTimeStamp() - data.getLastKeepAlive());
+                        }
                         break;
                     }
                     case Packet.Client.POSITION:
@@ -197,19 +209,12 @@ public class PacketListeners implements AtlasListener {
                             if (entity instanceof LivingEntity) {
                                 data.getLastAttack().reset();
 
-                                boolean wasNull = false;
                                 if(data.getTarget() != null && !data.getTarget().getUniqueId().equals(entity.getUniqueId())) {
                                     data.getEntityPastLocation().getPreviousLocations().clear();
                                     data.getLastTargetSwitch().reset();
-                                    data.setTargetBounds(ReflectionsUtil.getBoundingBox(data.getTarget()));
-                                } else if(data.getTarget() == null) {
-                                    wasNull = true;
                                 }
                                 data.setTarget((LivingEntity) entity);
 
-                                if(wasNull) {
-                                    data.setTargetBounds(ReflectionsUtil.getBoundingBox(data.getTarget()));
-                                }
                                 if (entity instanceof Player) {
                                     PlayerData dataEntity = Kauri.getInstance().getDataManager().getPlayerData(entity.getUniqueId());
 

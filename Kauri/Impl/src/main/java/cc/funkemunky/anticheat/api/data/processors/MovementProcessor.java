@@ -22,7 +22,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @Getter
 public class MovementProcessor {
-    private boolean cancelFlight, serverPos, inLiquid, liquidBelow, clientOnGround, serverOnGround,
+    private boolean cancelFlight, inLiquid, liquidBelow, clientOnGround, serverOnGround,
             fullyInAir, inAir, hasJumped, nearLiquid, blocksOnTop, pistonsNear, onHalfBlock,
             onClimbable, onIce, collidesHorizontally, tookVelocity, inWeb, onSlime, onSlimeBefore,
             onSoulSand, isRiptiding, halfBlocksAround, isNearGround, isInsideBlock, blocksNear, blocksAround;
@@ -35,6 +35,8 @@ public class MovementProcessor {
     private CustomLocation from, to;
     @Setter
     private float serverYVelocity;
+    @Setter
+    private boolean serverPos;
     private PastLocation pastLocation = new PastLocation();
     private TickTimer
             lastRiptide = new TickTimer(6),
@@ -239,33 +241,7 @@ public class MovementProcessor {
             soulSandTicks = onSoulSand ? Math.min(40, soulSandTicks + 1) : Math.max(0, soulSandTicks - 1);
             webTicks = inWeb ? Math.min(30, webTicks + 1) : Math.max(webTicks, webTicks - 1);
 
-            if (data.getTeleportLocations().size() > 0) {
-                val vecStream = data.getTeleportLocations()
-                        .stream()
-                        .filter(vec ->
-                                (MiscSettings.horizontalServerPos
-                                        ? MathUtils.offset(vec, to.toVector())
-                                        : vec.distance(to.toVector())) < 1E-8)
-                        .findFirst()
-                        .orElse(null);
-
-                if (vecStream != null) {
-                    if (data.getTeleportLoc() != null && vecStream.distance(data.getTeleportLoc().toVector()) == 0) {
-                        data.setTeleportPing(timeStamp - data.getTeleportTest());
-                    } else {
-                        data.setTeleportPing(timeStamp - data.getTeleportTest());
-                    }
-                    data.setLastServerPosStamp(timeStamp);
-                    data.getTeleportLocations().remove(vecStream);
-                    serverYVelocity = deltaY;
-                    serverPos = true;
-                    from = to;
-                } else if (serverPos) {
-                    serverPos = false;
-                }
-            } else if (serverPos) {
-                serverPos = false;
-            }
+            serverPos = timeStamp - data.getLastServerPosStamp() < 55L;
         } else if(!packet.isLook() && data.isLoggedIn()) {
             data.getLastLogin().reset();
         }
