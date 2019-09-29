@@ -27,7 +27,6 @@ public class BlockInformation {
     }
 
     public void runCollisionCheck() {
-        Kauri.INSTANCE.profiler.start("blockInfo:runCollisionCheck:boxProcessing");
         CollisionHandler handler = new CollisionHandler(objectData);
 
         List<BoundingBox> boxes = Atlas.getInstance().getBlockBoxManager().getBlockBox().getCollidingBoxes(objectData.getPlayer().getWorld(), objectData.box.grow(1.5f,2,1.5f));
@@ -40,8 +39,6 @@ public class BlockInformation {
                 handler.onCollide(block, box, false);
             }
         });
-        Kauri.INSTANCE.profiler.stop("blockInfo:runCollisionCheck:boxProcessing");
-        Kauri.INSTANCE.profiler.start("blockInfo:runCollisionCheck:rest");
             //Running entity boundingBox check.
         EntityProcessor.vehicles.get(objectData.getPlayer().getWorld().getUID())
                     .stream()
@@ -70,6 +67,5 @@ public class BlockInformation {
         blocksNear = handler.blocksNear;
 
         boxes.clear();
-        Kauri.INSTANCE.profiler.stop("blockInfo:runCollisionCheck:rest");
     }
 }

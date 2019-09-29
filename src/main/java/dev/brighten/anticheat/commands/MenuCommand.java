@@ -4,19 +4,30 @@ import cc.funkemunky.api.commands.ancmd.Command;
 import cc.funkemunky.api.commands.ancmd.CommandAdapter;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
+import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.MiscUtils;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
-import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.CheckSettings;
+import dev.brighten.anticheat.logs.objects.Log;
+import dev.brighten.anticheat.utils.ItemBuilder;
+import dev.brighten.anticheat.utils.Pastebin;
+import dev.brighten.anticheat.utils.menu.Menu;
 import dev.brighten.anticheat.utils.menu.button.Button;
 import dev.brighten.anticheat.utils.menu.button.ClickAction;
 import dev.brighten.anticheat.utils.menu.type.impl.ChestMenu;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Init(commands = true)
 public class MenuCommand {
@@ -67,23 +78,29 @@ public class MenuCommand {
         }, "", "&7Toggle Kauri checks on or off."));
         menu.setItem(13, createButton(Material.ENCHANTED_BOOK, 1, "&cKauri Anticheat",
                 (player, info) -> {
-                    player.closeInventory();
-                    player.sendMessage(MiscUtils.line(Color.Dark_Gray));
-                    player.sendMessage(Color.translate("&6Discord: &fhttps://discord.me/Brighten"));
-                    player.sendMessage(Color.translate("&6Website: &fhttps://funkemunky.cc/contact"));
-                    player.sendMessage(MiscUtils.line(Color.Dark_Gray));
+                    if (info.getClickType().equals(ClickType.RIGHT)
+                            || info.getClickType().equals(ClickType.SHIFT_RIGHT)) {
+                        menu.setParent(null);
+                        menu.close(player);
+                        player.sendMessage(MiscUtils.line(Color.Dark_Gray));
+                        player.sendMessage(Color.translate("&6Discord: &fhttps://discord.me/Brighten"));
+                        player.sendMessage(Color.translate("&6Website: &fhttps://funkemunky.cc/contact"));
+                        player.sendMessage(MiscUtils.line(Color.Dark_Gray));
+                    }
                 },
                 "", "&7You are using &6Kauri Anticheat v" +
                         Kauri.INSTANCE.getDescription().getVersion(), "&e&oRight Click &7&oclick to get support."));
-        menu.setItem(15, createButton(Material.PAPER, 1, "&cView Recent Violators", (player, info) -> {
-            //TODO open recent violators menu.
+        menu.setItem(15, createButton(Material.PAPER, 1, "&cView Recent Violators",
+                (player, info) -> {
+            getRecentViolatorsMenu().showMenu(player);
         }, "", "&7View players who flagged checks recently."));
-        menu.buildInventory(true);
         return menu;
     }
 
     private ChestMenu getChecksMenu() {
         ChestMenu menu = new ChestMenu(Color.Gold + "Checks", 6);
+
+        menu.setParent(getMainMenu());
 
         List<CheckSettings> values = new ArrayList<>(Check.checkSettings.values());
 
@@ -92,7 +109,7 @@ public class MenuCommand {
         for (int i = 0; i < values.size(); i++) {
             CheckSettings val = values.get(i);
 
-            String enabled = "checks." + val.name+ ".enabled";
+            String enabled = "checks." + val.name + ".enabled";
             String executable = "checks." + val.name + ".executable";
 
             List<String> lore = new ArrayList<>(Arrays.asList("&7",
@@ -115,7 +132,7 @@ public class MenuCommand {
                                 Kauri.INSTANCE.getConfig().set(enabled, settings.enabled);
                                 Kauri.INSTANCE.saveConfig();
 
-                                if(!settings.enabled) {
+                                if (!settings.enabled) {
                                     info.getButton().getStack().setType(Material.PAPER);
                                 } else {
                                     info.getButton().getStack().setType(settings.executable ? Material.MAP : Material.EMPTY_MAP);
@@ -139,7 +156,7 @@ public class MenuCommand {
                                 Kauri.INSTANCE.getConfig().set(executable, settings.executable);
                                 Kauri.INSTANCE.saveConfig();
 
-                                if(settings.enabled) {
+                                if (settings.enabled) {
                                     info.getButton().getStack().setType(settings.executable ? Material.MAP : Material.EMPTY_MAP);
                                 }
 
@@ -158,7 +175,78 @@ public class MenuCommand {
 
             menu.addItem(button);
         }
+        menu.setItem(53, goBack());
         return menu;
+    }
+
+    private ChestMenu getRecentViolatorsMenu() {
+        ChestMenu menu = new ChestMenu(Color.Gold + "Recent Violators", 6);
+
+        menu.setParent(getMainMenu());
+
+        Map<UUID, List<Log>> logs = Kauri.INSTANCE.loggerManager.getLogsWithinTimeFrame(TimeUnit.DAYS.toMillis(1));
+
+        List<UUID> sortedIds = logs.keySet().stream().sorted(Comparator.comparing(key -> logs.get(key).get(0).timeStamp)).collect(Collectors.toList());
+
+        for (int i = 0; i < Math.min(45, sortedIds.size()); i++) {
+            UUID uuid = sortedIds.get(i);
+            OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
+            Log vl = logs.get(uuid).get(0);
+
+            ItemBuilder builder = new ItemBuilder(Material.SKULL_ITEM);
+
+            builder.amount(1);
+            builder.durability(3);
+            builder.owner(player.getName());
+            builder.name(Color.Green + player.getName());
+            builder.lore("", "&eCheck&7: &f" + vl.checkName, "&eVL&7: &f" + vl.vl, "&ePing&7: &f" + vl.ping,
+                    "&eTPS&7: &f" + MathUtils.round(vl.tps, 2), "",
+                    "&f&oShift-Left Click &7&oto view full logs.");
+            menu.addItem(new Button(false, builder.build(),
+                    (target, info) -> {
+                if(info.getClickType().equals(ClickType.SHIFT_LEFT)) {
+                    menu.setParent(null);
+                    menu.close(target);
+                    target.sendMessage(Color.Green + getLogsFromUUID(uuid));
+                }
+            }));
+        }
+        menu.setItem(53, goBack());
+        return menu;
+    }
+
+    private Button goBack() {
+        return createButton(Material.REDSTONE,1, "&cBack", (player, info) -> {
+            info.getMenu().close(player);
+        });
+    }
+
+    private static String getLogsFromUUID(UUID uuid) {
+        Kauri.INSTANCE.profiler.start("cmd:logs");
+        List<Log> logs = Kauri.INSTANCE.loggerManager.getLogs(uuid);
+        Kauri.INSTANCE.profiler.stop("cmd:logs");
+
+        if(logs.size() == 0) return "No Logs";
+
+        StringBuilder body = new StringBuilder();
+
+        SimpleDateFormat format = new SimpleDateFormat("MM/dd/YYYY hh:mm");
+        format.setTimeZone(TimeZone.getTimeZone("US/Eastern"));
+
+        OfflinePlayer pl = Bukkit.getOfflinePlayer(uuid);
+        for (Log log : logs) {
+            body.append("(").append(format.format(new Date(log.timeStamp))).append("): ").append(pl.getName())
+                    .append(" failed ").append(log.checkName).append(" at VL ").append(log.vl)
+                    .append(" (tps=").append(MathUtils.round(log.tps, 4)).append(" ping=").append(log.ping)
+                    .append(")").append("\n");
+        }
+
+        try {
+            return Pastebin.makePaste(body.toString(), pl.getName() + "'s Log", Pastebin.Privacy.UNLISTED);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return "Error";
     }
 
 }

@@ -51,6 +51,9 @@ public class MovementProcessor {
             data.playerInfo.to.z = packet.getZ();
         }
 
+        data.playerInfo.worldLoaded = Atlas.getInstance().getBlockBoxManager().getBlockBox()
+                .isChunkLoaded(data.playerInfo.to.toLocation(data.getPlayer().getWorld()));
+
         //We set the yaw and pitch like this to prevent inaccurate data input. Like above, it will return both pitch
         //and yaw as 0 if it isnt a look packet.
         if(packet.isLook()) {

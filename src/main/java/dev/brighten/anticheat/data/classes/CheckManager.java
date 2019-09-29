@@ -27,7 +27,6 @@ public class CheckManager {
         if(!checkMethods.containsKey(object.getClass())) return;
         checkMethods.get(object.getClass()).parallelStream().forEach(entry -> {
             Check check = checks.get(entry.getKey());
-            Kauri.INSTANCE.profiler.start("check:" + check.name);
 
             if(check.enabled) {
                 try {
@@ -41,7 +40,6 @@ public class CheckManager {
                     e.printStackTrace();
                 }
             }
-            Kauri.INSTANCE.profiler.stop("check:" + check.name);
         });
     }
 
@@ -65,7 +63,7 @@ public class CheckManager {
         for (String name : checks.keySet()) {
             Check check = checks.get(name);
             WrappedClass checkClass = new WrappedClass(check.getClass());
-            System.out.println("Added check: " + name);
+
             Arrays.stream(check.getClass().getDeclaredMethods())
                     .parallel()
                     .filter(method -> method.isAnnotationPresent(Packet.class))
@@ -78,8 +76,6 @@ public class CheckManager {
 
                         methods.add(new AbstractMap.SimpleEntry<>(
                                 check.name, method));
-
-                        System.out.println("added packet method: " + method.getName());
                         checkMethods.put(parameter, methods);
                     });
         }

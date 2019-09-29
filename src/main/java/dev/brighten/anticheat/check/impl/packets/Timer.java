@@ -19,7 +19,7 @@ public class Timer extends Check {
         long elapsed = timeStamp - lastTS;
 
         if(data.creation.hasPassed(10) && !data.playerInfo.serverPos) {
-            if(elapsed > 2) times.add(elapsed);
+            if(elapsed > 4) times.add(elapsed);
 
             double average = times.stream().mapToLong(val -> val).average().orElse(50.0);
             double ratio = 50 / average;

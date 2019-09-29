@@ -13,8 +13,7 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.logs.objects.Log;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Init
@@ -109,6 +108,34 @@ public class LoggerManager {
                 (long)set.getStructureByName("ping").get().object,
                 (long)set.getStructureByName("timeStamp").get().object,
                 (double)set.getStructureByName("tps").get().object)).collect(Collectors.toList());
+    }
+
+    public Map<UUID, List<Log>> getLogsWithinTimeFrame(long timeFrame) {
+        long currentTime = System.currentTimeMillis();
+
+        Map<UUID, List<Log>> logs = new HashMap<>();
+
+        logsDatabase.getDatabaseValues().stream().filter(set -> {
+            Optional<Structure> optional = set.getStructureByName("timeStamp");
+
+            return optional.isPresent() && (currentTime - (long)optional.get().object) < timeFrame;
+        }).forEach(set -> {
+            UUID uuid = UUID.fromString((String)set.getStructureByName("uuid").get().object);
+            List<Log> logList = logs.getOrDefault(uuid, new ArrayList<>());
+
+            logList.add(new Log(
+                    String.valueOf(set.getStructureByName("checkName").get().object),
+                    (double)set.getStructureByName("vl").get().object,
+                    (long)set.getStructureByName("ping").get().object,
+                    (long)set.getStructureByName("timeStamp").get().object,
+                    (double)set.getStructureByName("tps").get().object));
+
+            logs.put(uuid, logList);
+        });
+
+        logs.values().forEach(list -> list.sort(Comparator.comparing(log -> currentTime - log.timeStamp)));
+
+        return logs;
     }
 
     private void save() {

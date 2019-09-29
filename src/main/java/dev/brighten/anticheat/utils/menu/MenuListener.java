@@ -1,9 +1,12 @@
 package dev.brighten.anticheat.utils.menu;
 
 import cc.funkemunky.api.utils.Init;
+import cc.funkemunky.api.utils.RunUtils;
+import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.utils.menu.button.Button;
 import dev.brighten.anticheat.utils.menu.button.ClickAction;
 import dev.brighten.anticheat.utils.menu.type.BukkitInventoryHolder;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -15,6 +18,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Optional;
 
@@ -64,7 +68,7 @@ public class MenuListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     private void onInventoryClose(InventoryCloseEvent event) {
         if (!(event.getPlayer() instanceof Player)) return;
 
@@ -76,7 +80,16 @@ public class MenuListener implements Listener {
 
             if (menu != null) {
                 menu.handleClose((Player) event.getPlayer());
-                menu.getParent().ifPresent(parent -> parent.showMenu((Player) event.getPlayer()));
+
+                menu.getParent().ifPresent(buttons -> new BukkitRunnable() {
+                    public void run() {
+                        if (event.getPlayer().getOpenInventory() == null
+                                || (!(event.getPlayer().getOpenInventory().getTopInventory().getHolder() instanceof BukkitInventoryHolder))) {
+                            buttons.showMenu((Player) event.getPlayer());
+                            this.cancel();
+                        }
+                    }
+                }.runTaskTimer(Kauri.INSTANCE, 2L, 0L));
             }
         }
     }

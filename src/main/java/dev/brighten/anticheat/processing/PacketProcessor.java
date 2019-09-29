@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 public class PacketProcessor {
 
     public void processClient(ObjectData data, Object object, String type, long timeStamp) {
+        Kauri.INSTANCE.profiler.start("packet:client:" + getType(type));
         switch(type) {
             case Packet.Client.ABILITIES: {
                 WrappedInAbilitiesPacket packet = new WrappedInAbilitiesPacket(object, data.getPlayer());
@@ -58,13 +59,8 @@ public class PacketProcessor {
                     data.lagInfo.lastPacketDrop.reset();
                 }
                 data.lagInfo.lastFlying = currentTime;
-
-                data.playerInfo.worldLoaded = Atlas.getInstance().getBlockBoxManager().getBlockBox()
-                        .isChunkLoaded(data.getPlayer().getLocation());
-                Kauri.INSTANCE.profiler.start("flying:process");
                 MovementProcessor.process(data, packet, timeStamp);
                 data.checkManager.runPacket(packet, timeStamp);
-                Kauri.INSTANCE.profiler.stop("flying:process");
                 if(data.playerInfo.serverPos) data.playerInfo.serverPos = false;
                 break;
             }
@@ -145,9 +141,11 @@ public class PacketProcessor {
                 break;
             }
         }
+        Kauri.INSTANCE.profiler.stop("packet:client:" + getType(type));
     }
 
     public void processServer(ObjectData data, Object object, String type, long timeStamp) {
+        Kauri.INSTANCE.profiler.start("packet:server:" + type);
         switch(type) {
             case Packet.Server.ABILITIES: {
                 WrappedOutAbilitiesPacket packet = new WrappedOutAbilitiesPacket(object, data.getPlayer());
@@ -191,6 +189,21 @@ public class PacketProcessor {
                 data.checkManager.runPacket(packet, timeStamp);
                 TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutKeepAlivePacket(data.getPlayer().getEntityId() + 1500).getObject());
                 break;
+            }
+        }
+        Kauri.INSTANCE.profiler.stop("packet:server:" + type);
+    }
+
+    private static String getType(String type) {
+        switch(type) {
+            case Packet.Client.FLYING:
+            case Packet.Client.POSITION:
+            case Packet.Client.POSITION_LOOK:
+            case Packet.Client.LOOK: {
+                return "PacketPlayInFlying";
+            }
+            default: {
+                return type;
             }
         }
     }

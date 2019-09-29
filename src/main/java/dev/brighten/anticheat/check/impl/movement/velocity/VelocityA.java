@@ -20,17 +20,18 @@ public class VelocityA extends Check {
     }
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
+    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(vY > 0
                 && data.playerInfo.lastVelocity.hasNotPassed(4)
                 && !data.playerInfo.generalCancel
+                && (timeStamp - data.playerInfo.lastServerPos) > 400L
                 && data.playerInfo.worldLoaded
                 && data.playerInfo.blocksAboveTicks == 0
                 && !data.playerInfo.canFly) {
 
             float pct = data.playerInfo.deltaY / (float) vY * 100F;
 
-            if (pct < 99.999999 && !data.blockInfo.blocksAbove && !data.playerInfo.collidesHorizontally) {
+            if (pct < 99.999 && !data.blockInfo.blocksAbove && !data.playerInfo.collidesHorizontally) {
                 if (vl++ > 20) {
                     punish();
                 } else if (vl > 4) flag("pct=" + MathUtils.round(pct, 2) + "%");

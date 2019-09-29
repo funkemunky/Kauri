@@ -63,7 +63,7 @@ public class Reach extends Check {
                         .orElse(-1D);
 
                 if(calcDistance > 0) {
-                    if(calcDistance > 3) {
+                    if(calcDistance > 3 && collided.size() > 20) {
                         if(vl++ > 15) {
                             punish();
                         } else if(vl > 6) flag("reach=" + calcDistance + " collided=" + collided.size());
