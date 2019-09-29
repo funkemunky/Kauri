@@ -241,7 +241,7 @@ public class MovementProcessor {
             soulSandTicks = onSoulSand ? Math.min(40, soulSandTicks + 1) : Math.max(0, soulSandTicks - 1);
             webTicks = inWeb ? Math.min(30, webTicks + 1) : Math.max(webTicks, webTicks - 1);
 
-            serverPos = timeStamp - data.getLastServerPosStamp() < 55L;
+            serverPos = timeStamp - data.getLastServerPosStamp() < 100L;
         } else if(!packet.isLook() && data.isLoggedIn()) {
             data.getLastLogin().reset();
         }

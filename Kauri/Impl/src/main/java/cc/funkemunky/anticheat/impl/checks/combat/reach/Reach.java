@@ -32,24 +32,6 @@ public class Reach extends Check {
     private float vl;
     private long lastAttack;
 
-    @Setting(name = "threshold.reach")
-    private static float reachThreshold = 3f;
-
-    @Setting(name = "threshold.collided")
-    private static int collidedThreshold = 22;
-
-    @Setting(name = "threshold.colidedMin")
-    private static int collidedMin = 8;
-
-    @Setting(name = "threshold.bypassCollidedReach")
-    private static float bypassColReach = 4f;
-
-    @Setting(name = "threshold.vl.certain")
-    private static int certainThreshold = 16;
-
-    @Setting(name = "threshold.vl.high")
-    private static int highThreshold = 6;
-
     private static List<EntityType> allowedEntities = Arrays.asList(EntityType.PLAYER, EntityType.SKELETON, EntityType.ZOMBIE, EntityType.PIG_ZOMBIE, EntityType.VILLAGER, EntityType.IRON_GOLEM);
 
     @Override
@@ -68,7 +50,7 @@ public class Reach extends Check {
 
             val location = getData().getEntityPastLocation().
                     getEstimatedLocation(getData().getTransPing(), 
-                            50L + Math.abs(getData().getTransPing() - getData().getLastTransPing()) * 2)
+                            100L + Math.abs(getData().getTransPing() - getData().getLastTransPing()) * 2)
                     .stream().map(loc -> getHitbox(getData().getTarget(), loc)).collect(Collectors.toList());
 
             val locs = move.getPastLocation().getEstimatedLocation(0, 100L)
@@ -95,11 +77,11 @@ public class Reach extends Check {
                     .min().orElse(0.0D);
 
             if(distances.size() > 0) {
-                if (distance > reachThreshold && (distances.size() > collidedThreshold || distance > bypassColReach) && distances.size() > collidedMin && !getData().isLagging()) {
+                if (distance > 3 && distances.size() > 25 && !getData().isLagging()) {
                     vl+= distance > 3.02 ? 1 : 0.5;
-                    if (vl > certainThreshold) {
+                    if (vl > 16) {
                         flag("reach=" + distance + " vl=" + vl + " collided=" + distances.size(), true, true, AlertTier.CERTAIN);
-                    } else if (vl > highThreshold) {
+                    } else if (vl > 9) {
                         flag("reach=" + distance + " vl=" + vl + " collided=" + distances.size(), true, true, AlertTier.HIGH);
                     } else if(vl > 4) {
                         flag("reach=" + distance + " vl=" + vl + " collided=" + distances.size(), true, true, vl > 6 ? 1 : 0, vl > 6 ? AlertTier.LIKELY : AlertTier.POSSIBLE);
@@ -110,7 +92,7 @@ public class Reach extends Check {
                     vl = Math.max(0, vl - 0.05f);
                 }
 
-                debug((distance > reachThreshold && (distances.size() > collidedThreshold || distance > bypassColReach) && distances.size() > collidedMin && !getData().isLagging() ? Color.Green : "") + "distance=" + distance + " collided=" + distances.size() + " vl=" + vl + " eye=" + getData().getPlayer().getEyeHeight());
+                debug((distance > 3 && distances.size() > 25 && !getData().isLagging() ? Color.Green : "") + "distance=" + distance + " collided=" + distances.size() + " vl=" + vl + " eye=" + getData().getPlayer().getEyeHeight());
             }
             lastAttack = timeStamp;
         }
