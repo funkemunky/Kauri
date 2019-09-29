@@ -57,7 +57,7 @@ public class HitBox extends Check {
                 && !getData().isCreativeMode()) {
 
             val rayTrace = move.getPastLocation()
-                    .getEstimatedLocation(0, move.getYawDelta() > 10 ? 100L : 50L)
+                    .getEstimatedLocation(0, 100L)
                     .stream()
                     .map(loc ->
                             loc.toLocation(getData().getPlayer().getWorld()).clone()

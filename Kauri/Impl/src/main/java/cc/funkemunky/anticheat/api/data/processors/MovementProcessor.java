@@ -174,11 +174,11 @@ public class MovementProcessor {
             if(lagTicks > 0) {
                 data.getLastPacketSkip().reset();
             } else lagTime = 0;
-            val block = BlockUtils.getBlock(to.toLocation(data.getPlayer().getWorld()));
-            val blockAbove = BlockUtils.getBlock(to.toLocation(data.getPlayer().getWorld()).clone()
-                    .add(0, 1, 0));
-            val blockBelow = BlockUtils.getBlock(to.toLocation(data.getPlayer().getWorld()).clone()
-                    .subtract(0, 1,0));
+            val block = chunkLoaded ? to.toLocation(data.getPlayer().getWorld()).getBlock() : null;
+            val blockAbove = chunkLoaded ? to.toLocation(data.getPlayer().getWorld()).clone()
+                    .add(0, 1, 0).getBlock() : null;
+            val blockBelow = chunkLoaded ? to.toLocation(data.getPlayer().getWorld()).clone()
+                    .subtract(0, 1,0).getBlock() : null;
 
             isInsideBlock = block == null
                     || blockAbove == null
@@ -241,7 +241,34 @@ public class MovementProcessor {
             soulSandTicks = onSoulSand ? Math.min(40, soulSandTicks + 1) : Math.max(0, soulSandTicks - 1);
             webTicks = inWeb ? Math.min(30, webTicks + 1) : Math.max(webTicks, webTicks - 1);
 
-            serverPos = timeStamp - data.getLastServerPosStamp() < 100L;
+
+            if (data.getTeleportLocations().size() > 0) {
+                val vecStream = data.getTeleportLocations()
+                        .stream()
+                        .filter(vec ->
+                                (MiscSettings.horizontalServerPos
+                                        ? MathUtils.offset(vec, to.toVector())
+                                        : vec.distance(to.toVector())) < 1E-8)
+                        .findFirst()
+                        .orElse(null);
+
+                if (vecStream != null) {
+                    if (data.getTeleportLoc() != null && vecStream.distance(data.getTeleportLoc().toVector()) == 0) {
+                        data.setTeleportPing(timeStamp - data.getTeleportTest());
+                    } else {
+                        data.setTeleportPing(timeStamp - data.getTeleportTest());
+                    }
+                    data.setLastServerPosStamp(timeStamp);
+                    data.getTeleportLocations().remove(vecStream);
+                    serverYVelocity = deltaY;
+                    serverPos = true;
+                    from = to;
+                } else if (serverPos) {
+                    serverPos = false;
+                }
+            } else {
+                serverPos = timeStamp - data.getLastServerPosStamp() < 100L;
+            }
         } else if(!packet.isLook() && data.isLoggedIn()) {
             data.getLastLogin().reset();
         }
@@ -263,6 +290,7 @@ public class MovementProcessor {
         
         cancelFlight = player.getAllowFlight()
                 || serverPos
+                || !chunkLoaded
                 || getLastVehicle().hasNotPassed(10)
                 || getLastFlightToggle().hasNotPassed(10)
                 || getLiquidTicks() > 0
