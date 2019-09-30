@@ -11,7 +11,7 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 @Init(commands = true)
 public class ToggleCommand {
 
-    @Command(name = "kauri.toggle", description = "Toggle a check on or off.",
+    @Command(name = "kauri.toggle", description = "Toggle a check on or off.", display = "toggle",
             usage = "/<command>", aliases = {"toggleCheck", "tCheck", "kauri.t"}, permission = "kauri.toggle")
     public void onCommand(CommandAdapter cmd) {
         if(cmd.getArgs().length > 0) {
