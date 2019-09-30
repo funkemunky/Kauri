@@ -15,7 +15,7 @@ public class PlayerInformation {
     public float deltaYaw, deltaPitch, lDeltaYaw, lDeltaPitch;
 
     //Move
-    public float strafe, forward;
+    public float strafe, forward, sensitivity;
     public String key;
 
     //Cinematic

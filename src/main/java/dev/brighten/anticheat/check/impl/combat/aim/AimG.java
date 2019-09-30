@@ -19,7 +19,8 @@ public class AimG extends Check {
             long gcd = MiscUtils.gcd((long)(data.playerInfo.deltaYaw * MovementProcessor.offset),
                     (long)(data.playerInfo.deltaPitch * MovementProcessor.offset));
 
-            if(gcd < 1E5 && (Math.abs(data.playerInfo.deltaPitch) > 0.5 || data.playerInfo.deltaYaw > 0.5)) {
+            if(gcd < 1E5 && (Math.abs(data.playerInfo.deltaPitch) > 0.5 || data.playerInfo.deltaYaw > 0.5)
+                    && !data.playerInfo.cinematicModeYaw) {
                 if(vl++ > 50) {
                     punish();
                 } else if(vl > 20) {
