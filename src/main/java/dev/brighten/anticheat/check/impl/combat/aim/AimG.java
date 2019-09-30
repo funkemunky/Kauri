@@ -11,7 +11,7 @@ import dev.brighten.anticheat.processing.MovementProcessor;
 import dev.brighten.anticheat.utils.MiscUtils;
 
 @CheckInfo(name = "Aim (G)", description = "Another style of denominator check on both pitch and yaw.",
-        checkType = CheckType.AIM)
+        checkType = CheckType.AIM, punishVL = 50)
 public class AimG extends Check {
 
     private long lastGCD;
@@ -23,9 +23,7 @@ public class AimG extends Check {
 
             if(gcd < 1E5 && (Math.abs(data.playerInfo.deltaPitch) > 0.5 || data.playerInfo.deltaYaw > 0.5)
                     && !data.playerInfo.cinematicModeYaw) {
-                if(vl++ > 50) {
-                    punish();
-                } else if(vl > 20) {
+                if(vl++ > 20) {
                     flag("g=" + gcd + " yawDelta=" + data.playerInfo.deltaYaw + " pitchDelta=" + data.playerInfo.deltaPitch);
                 }
             } else vl-= vl > 0 ? 0.25 : 0;

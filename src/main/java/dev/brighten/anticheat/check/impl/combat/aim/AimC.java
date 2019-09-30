@@ -7,7 +7,8 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
 
-@CheckInfo(name = "Aim (C)", description = "Checks for common denominators in yaw difference.", checkType = CheckType.AIM)
+@CheckInfo(name = "Aim (C)", description = "Checks for common denominators in yaw difference.",
+        checkType = CheckType.AIM, punishVL = 100)
 public class AimC extends Check {
 
     @Packet
@@ -17,9 +18,7 @@ public class AimC extends Check {
         float accel = MathUtils.getDelta(data.playerInfo.deltaPitch, data.playerInfo.lDeltaPitch);
 
         if(accel < 1E-5 && (Math.abs(data.playerInfo.deltaPitch) > 0 || data.playerInfo.deltaYaw > 2)) {
-            if(vl++ > 100) {
-                punish();
-            } else if(vl > 40) {
+            if(vl++ > 40) {
                 flag("accel=" + accel + " deltaPitch=" + data.playerInfo.deltaPitch);
             }
         } else vl-= vl > 0 ? 6 : 0;

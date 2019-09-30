@@ -6,6 +6,7 @@ import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.MiscUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
+import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.KLocation;
@@ -20,7 +21,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@CheckInfo(name = "Reach", description = "Ensures the reach of a player is legitimate.")
+@CheckInfo(name = "Reach", description = "Ensures the reach of a player is legitimate.",
+        checkType = CheckType.HITBOX, punishVL = 15)
 public class Reach extends Check {
 
     private static List<EntityType> allowedEntities = Arrays.asList(EntityType.PLAYER, EntityType.SKELETON,
@@ -64,9 +66,9 @@ public class Reach extends Check {
 
                 if(calcDistance > 0) {
                     if(calcDistance > 3 && collided.size() > 20) {
-                        if(vl++ > 15) {
-                            punish();
-                        } else if(vl > 6) flag("reach=" + calcDistance + " collided=" + collided.size());
+                        if(vl++ > 6) {
+                            flag("reach=" + calcDistance + " collided=" + collided.size());
+                        }
                     } else vl-= vl > 0 ? 0.05 : 0;
                     debug("reach=" + calcDistance + " collided="
                             + collided.size() + "  vl=" + vl);

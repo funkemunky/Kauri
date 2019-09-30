@@ -7,7 +7,8 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
 
-@CheckInfo(name = "Autoclicker (D)", description = "It's an autoclicker check", checkType = CheckType.AUTOCLICKER)
+@CheckInfo(name = "Autoclicker (D)", description = "It's an autoclicker check",
+        checkType = CheckType.AUTOCLICKER, punishVL = 13)
 public class AutoclickerD extends Check {
 
     private Interval<Long> interval = new Interval<>(0, 30);
@@ -21,10 +22,7 @@ public class AutoclickerD extends Check {
                 double disease = interval.std();
                 double avg = interval.average();
                 if(disease < 19) {
-                    vl++;
-                    if(vl > 13) {
-                        punish();
-                    } else if(vl > 5) {
+                    if(vl++ > 5) {
                         flag("std=" + disease);
                     }
 

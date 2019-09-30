@@ -11,4 +11,6 @@ import java.lang.annotation.Retention;
 public class CheckSettings {
     public boolean enabled, executable;
     public final String name, description;
+    public final CheckType type;
+    public final int punishVl;
 }

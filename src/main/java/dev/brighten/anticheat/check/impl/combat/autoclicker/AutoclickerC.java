@@ -9,7 +9,7 @@ import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
 
 @CheckInfo(name = "Autoclicker (C)", description = "Checks for abnormally consistent CPS.",
-        checkType = CheckType.AUTOCLICKER)
+        checkType = CheckType.AUTOCLICKER, punishVL = 20)
 public class AutoclickerC extends Check {
 
     private long lastClick;
@@ -24,13 +24,8 @@ public class AutoclickerC extends Check {
             double avg = interval.average();
 
             if(MathUtils.getDelta(avg, lastAvg) <= 0.4) {
-                vl++;
-
-                if(vl > 20) {
-                    punish();
-                } else if(vl > 9) {
+                if(vl++ > 9)
                     flag("avg=" + avg + " ping=%p tps=%t");
-                }
             } else vl = 0;
 
             debug("vl=" + vl + " avg=" + avg + " lAvg=" + lastAvg);

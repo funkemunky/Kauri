@@ -7,6 +7,7 @@ import cc.funkemunky.api.utils.MathHelper;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
+import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.MovementUtils;
 import lombok.val;
@@ -14,13 +15,11 @@ import org.bukkit.enchantments.Enchantment;
 
 import java.util.*;
 
-@CheckInfo(name = "Velocity (B)", description = "A horizontally velocity check.")
+@CheckInfo(name = "Velocity (B)", description = "A horizontally velocity check.", checkType = CheckType.VELOCITY,
+        punishVL = 28)
 public class VelocityB extends Check {
 
     private double vX, vZ;
-    private long  ticks;
-    private String lastKey;
-    private boolean attackedSinceVelocity;
 
     private static List<float[]> motions = Collections.synchronizedList(Arrays.asList(
             new float[] {0, 0},
@@ -59,7 +58,10 @@ public class VelocityB extends Check {
                 if(!data.playerInfo.lClientGround
                         && !data.playerInfo.clientGround
                         && !data.blockInfo.blocksNear
-                        && (timeStamp - data.playerInfo.lastServerPos) > 400L) {
+                        && !data.blockInfo.inWeb
+                        && !data.lagInfo.lagging
+                        && !data.playerInfo.serverPos
+                        && !data.getPlayer().getAllowFlight()) {
                     float f4 = 0.91f;
 
                     if (data.playerInfo.lClientGround) {
@@ -112,9 +114,7 @@ public class VelocityB extends Check {
                     pct = data.playerInfo.deltaXZ / vXZ * 100;
 
                     if (pct < 99.85) {
-                        if (vl++ > 28) {
-                            punish();
-                        } else if (vl > 15) flag("pct=" + MathUtils.round(pct, 3) + "%");
+                        if (vl++ > 15) flag("pct=" + MathUtils.round(pct, 3) + "%");
                     } else vl -= vl > 0 ? 0.5 : 0;
 
                     debug("pct=" + pct + " key=" + data.predictionService.key
@@ -129,17 +129,15 @@ public class VelocityB extends Check {
                         f4 *= MovementUtils.getFriction(data);
                     }
 
-                    vX *= (double) f4;
-                    vZ *= (double) f4;
+                    vX *= f4;
+                    vZ *= f4;
 
                     if(data.playerInfo.lastVelocity.hasPassed(4)) {
                         vX = vZ = 0;
-                        ticks = 0;
                     }
                 } else vX = vZ = 0;
             }
-        } else attackedSinceVelocity = false;
-        lastKey = data.predictionService.key;
+        }
     }
 
     private void moveFlying(float strafe, float forward, float friction) {

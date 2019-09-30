@@ -9,13 +9,8 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.processing.MovementProcessor;
 import dev.brighten.anticheat.utils.MiscUtils;
 
-import java.util.HashSet;
-import java.util.Set;
-
-//TODO Test this with Vape and Vape Lite. Trying other things too.
-//TODO Test for false positives with cinematic or check if cinematic causes the check to just not work.
 @CheckInfo(name = "Aim (D)", description = "Designed to detect aimassists attempting to use cinematic smoothing.",
-        checkType = CheckType.AIM)
+        checkType = CheckType.AIM, punishVL = 10)
 public class AimD extends Check {
 
     private long lastGCD;
@@ -65,9 +60,7 @@ public class AimD extends Check {
             if(data.playerInfo.deltaPitch == 0) {
                 if(verbose > 10) {
                     vl++;
-                    if(vl > 10) {
-                        punish();
-                    } else flag("verbose=" + verbose + " g=" + gcd);
+                    flag("verbose=" + verbose + " g=" + gcd);
                 }
                 lastYaw = data.playerInfo.to.yaw;
                 lastPitch = data.playerInfo.to.pitch;

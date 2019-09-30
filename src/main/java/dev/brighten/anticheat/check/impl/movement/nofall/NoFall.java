@@ -4,9 +4,11 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
+import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
 
-@CheckInfo(name = "NoFall", description = "Checks to make sure the ground packet from the client is legit.")
+@CheckInfo(name = "NoFall", description = "Checks to make sure the ground packet from the client is legit",
+        checkType = CheckType.BADPACKETS, punishVL = 30)
 public class NoFall extends Check {
 
     @Packet
@@ -15,9 +17,7 @@ public class NoFall extends Check {
         if(packet.isGround() != onGround && !data.playerInfo.generalCancel
                 && !data.playerInfo.collidesHorizontally
                 && data.playerInfo.lastVelocity.hasPassed(5 + MathUtils.millisToTicks(data.lagInfo.ping))) {
-            if(vl++ > 30) {
-                punish();
-            } else if(vl > 6) {
+            if(vl++ > 6) {
                 flag("client=" + packet.isGround() + " server=" + onGround);
             }
         } else vl-= vl > 0 ? 0.5 : 0;

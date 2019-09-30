@@ -13,7 +13,7 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.MovementUtils;
 import org.bukkit.potion.PotionEffectType;
 
-@CheckInfo(name = "Speed (B)", description = "Ensures acceleration is legit.")
+@CheckInfo(name = "Speed (B)", description = "Ensures horizontal acceleration is legit.", punishVL = 50)
 public class SpeedB extends Check {
 
     private float motionX, motionZ;
@@ -34,13 +34,11 @@ public class SpeedB extends Check {
 
         if (data.playerInfo.airTicks > 1) {
             runMotionPrediction();
-            float predicted = (float) MathUtils.hypot(motionX, motionZ);
+            float predicted = MathUtils.hypot(motionX, motionZ);
 
             if(MathUtils.getDelta(predicted, data.playerInfo.deltaXZ) > (data.playerInfo.deltaXZ > 0.23 ? 0.001 : 0.1)
                     && data.playerInfo.deltaYaw < 5) {
-                if(vl++ > 50) {
-                    punish();
-                } else if(vl > 10) flag("predicted=" + predicted + " deltaXZ=" + data.playerInfo.deltaXZ);
+                if(vl++ > 10) flag("predicted=" + predicted + " deltaXZ=" + data.playerInfo.deltaXZ);
             } else vl-= vl > 0 ? 2 : 0;
 
             debug("predicted=" + predicted + " deltaXZ=" + data.playerInfo.deltaXZ + " vl=" + vl);

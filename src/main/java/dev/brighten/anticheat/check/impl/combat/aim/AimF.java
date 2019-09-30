@@ -7,7 +7,7 @@ import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
 
 @CheckInfo(name = "Aim (F)", description = "Checks for natural numbers in yaw rotation (near impossible to do consistently).",
-        checkType = CheckType.AIM)
+        checkType = CheckType.AIM, punishVL = 12)
 public class AimF extends Check {
 
     @Packet
@@ -17,9 +17,7 @@ public class AimF extends Check {
         if(data.playerInfo.deltaYaw > 0
                 && !data.playerInfo.serverPos
                 && Math.abs(data.playerInfo.deltaYaw) % 0.5 == 0) {
-            if(vl++ > 12) {
-                punish();
-            } else if(vl > 4) {
+            if(vl++ > 4) {
                 flag("deltaYaw=" + data.playerInfo.deltaYaw);
             }
         } else vl-= vl > 0 ? 0.25 : 0;

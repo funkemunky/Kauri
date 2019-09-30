@@ -10,7 +10,7 @@ import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
 
 @CheckInfo(name = "Autoclicker (B)", description = "Checks for consistent patterns in CPS.",
-        checkType = CheckType.AUTOCLICKER)
+        checkType = CheckType.AUTOCLICKER, punishVL = 6)
 public class AutoclickerB extends Check {
 
     private long lastClick;
@@ -28,10 +28,7 @@ public class AutoclickerB extends Check {
 
                 if(stdDelta < 2.5 && (avgDelta > 10 || (std > 25)) && avg < 118) {
                     debug(Color.Green + "Flag");
-                    vl++;
-                    if(vl > 6) {
-                        punish();
-                    } else if(vl > 3) flag("std=" + std + " avg=" + avg
+                    if(vl++ > 3) flag("std=" + std + " avg=" + avg
                             + " stdDelta=" + stdDelta + " avgDelta=" + avgDelta + " ping=%p");
                 } else vl-= vl > 0 ? 0.25 : 0;
 

@@ -7,7 +7,7 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.MovementUtils;
 
-@CheckInfo(name = "Speed (D)", description = "A ground speed check.")
+@CheckInfo(name = "Speed (D)", description = "A simple ground speed check.", punishVL = 30)
 public class SpeedD extends Check {
 
     @Packet
@@ -21,9 +21,7 @@ public class SpeedD extends Check {
                && data.playerInfo.halfBlockTicks == 0
                && !data.playerInfo.generalCancel
                && data.playerInfo.lastVelocity.hasPassed(20 + MathUtils.millisToTicks(data.lagInfo.ping))) {
-           if(vl++ > 30) {
-               punish();
-           } else if(vl > 5) flag(data.playerInfo.deltaXZ + ">-" + baseSpeed);
+           if(vl++ > 5) flag(data.playerInfo.deltaXZ + ">-" + baseSpeed);
        } else vl-= vl > 0 ? 0.25 : 0;
     }
 

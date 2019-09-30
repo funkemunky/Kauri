@@ -28,7 +28,9 @@ import dev.brighten.anticheat.check.impl.packets.badpackets.BadPacketsB;
 import dev.brighten.anticheat.check.impl.packets.badpackets.BadPacketsC;
 import dev.brighten.anticheat.data.ObjectData;
 import org.bukkit.Bukkit;
+import org.bukkit.command.ConsoleCommandSender;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,7 +47,8 @@ public class Check {
     public ObjectData data;
     public String name, description;
     public boolean enabled, executable, developer;
-    public float vl;
+    public float vl, punishVl;
+    public CheckType checkType;
 
     private static void register(Check check) {
         if(!check.getClass().isAnnotationPresent(CheckInfo.class)) {
@@ -56,7 +59,7 @@ public class Check {
         MiscUtils.printToConsole("Registered: " + info.name());
         WrappedClass checkClass = new WrappedClass(check.getClass());
         String name = info.name();
-        CheckSettings settings = new CheckSettings(info.name(), info.description());
+        CheckSettings settings = new CheckSettings(info.name(), info.description(), info.checkType(), info.punishVL());
         if(Kauri.INSTANCE.getConfig().get("checks." + name + ".enabled") != null) {
             settings.enabled = Kauri.INSTANCE.getConfig().getBoolean("checks." + name + ".enabled");
             settings.executable = Kauri.INSTANCE.getConfig().getBoolean("checks." + name + ".executable");
@@ -77,18 +80,27 @@ public class Check {
                 .replace("%p", String.valueOf(data.lagInfo.transPing))
                 .replace("%t", String.valueOf(MathUtils.round(Kauri.INSTANCE.tps, 2)));
         if(Kauri.INSTANCE.lastTickLag.hasPassed() && (data.lagInfo.lastPacketDrop.hasPassed(5) || data.lagInfo.lastPingDrop.hasPassed())) {
-            float vl = this.vl;
             Kauri.INSTANCE.loggerManager.addLog(data, this);
             Kauri.INSTANCE.dataManager.hasAlerts.forEach(data -> {
                 data.getPlayer().sendMessage(Color.translate("&8[&6K&8] &f" + this.data.getPlayer().getName() + " &7flagged &f" + name + " &8(&e" + info + "&8) &8[&c" + vl + "&8]"));
             });
+
+            if(punishVl != -1 && vl > punishVl) {
+                punish();
+            }
         }
     }
 
     public void punish() {
         if(executable) {
-            Bukkit.broadcastMessage("Nibba " + data.getPlayer().getName() + " got banned hehe xd.");
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kick " + data.getPlayer().getName() + " [Kauri] you suck");
+            if(!Config.broadcastMessage.equalsIgnoreCase("off")) {
+                Bukkit.broadcastMessage(Color.translate(Config.broadcastMessage));
+            }
+            ConsoleCommandSender sender = Bukkit.getConsoleSender();
+            Config.punishCommands.
+                    forEach(cmd -> Bukkit.dispatchCommand(
+                            sender,
+                            cmd.replace("%name%", data.getPlayer().getName())));
             vl = 0;
         }
     }

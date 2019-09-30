@@ -6,7 +6,8 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
 
-@CheckInfo(name = "Autoclicker (A)", description = "A fast click check.", checkType = CheckType.AUTOCLICKER)
+@CheckInfo(name = "Autoclicker (A)", description = "A fast click check.", checkType = CheckType.AUTOCLICKER,
+        punishVL = 50)
 public class AutoclickerA extends Check {
 
     private int ticks;
@@ -15,13 +16,13 @@ public class AutoclickerA extends Check {
     @Packet
     public void onArmAnimation(WrappedInArmAnimationPacket packet, long timeStamp) {
         if(timeStamp - lastClick > 1000L) {
-            if(ticks > 20) {
+            if(ticks > 30) {
+                vl++;
+                punish();
+            } else if(ticks > 20) {
                 vl++;
                 flag("cps=" + ticks + " ping=%p tps=%t");
-            }
-            if(ticks > 30) {
-                punish();
-            }
+            } else vl-= vl > 0 ? 0.2 : 0;
             ticks = 0;
             lastClick = timeStamp;
         } else if(data.playerInfo.lastBrokenBlock.hasPassed(5)) ticks++;

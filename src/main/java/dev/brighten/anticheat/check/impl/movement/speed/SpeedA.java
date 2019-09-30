@@ -6,7 +6,8 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.MovementUtils;
 
-@CheckInfo(name = "Speed (A)", description = "A speed check")
+@CheckInfo(name = "Speed (A)", description = "A simple limiting speed check with a high verbose threshold.",
+        punishVL = 50)
 public class SpeedA extends Check {
 
     private long moveTicks, keyTicks;
@@ -26,9 +27,7 @@ public class SpeedA extends Check {
         baseSpeed+= data.playerInfo.wasOnSlime ? 0.1 : 0;
 
         if(data.playerInfo.deltaXZ > baseSpeed) {
-            if(vl++ > 50) {
-                punish();
-            } else if(vl > 25) flag(data.playerInfo.deltaXZ + ">-" + baseSpeed);
+            if(vl++ > 25) flag(data.playerInfo.deltaXZ + ">-" + baseSpeed);
         } else vl-= vl > 0 ? 1 : 0;
 
         debug("deltaXZ=" + data.playerInfo.deltaXZ + " baseSpeed=" + baseSpeed + " vl=" + vl

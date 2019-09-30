@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @CheckInfo(name = "Hitboxes", description = "Ensures the player is looking at the target when attacking.",
-        checkType = CheckType.HITBOX)
+        checkType = CheckType.HITBOX, punishVL = 20)
 public class Hitboxes extends Check {
 
     private static List<EntityType> allowedEntities = Arrays.asList(
@@ -72,9 +72,7 @@ public class Hitboxes extends Check {
             }
 
             if (collided.size() == 0) {
-                if (vl++ > 20) {
-                    punish();
-                } else if(vl > 6)  flag("collided=0 ping=%p tps=%t");
+                if(vl++ > 6)  flag("collided=0 ping=%p tps=%t");
             } else vl -= vl > 0 ? 0.25 : 0;
 
             debug("collided=" + collided.size());

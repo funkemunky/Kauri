@@ -5,13 +5,15 @@ import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
+import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
 
-@CheckInfo(name = "Velocity (A)", description = "Checks for vertical velocity modifications.")
+@CheckInfo(name = "Velocity (A)", description = "Checks for vertical velocity modifications.",
+        checkType = CheckType.VELOCITY, punishVL = 20)
 public class VelocityA extends Check {
 
     private double vY;
-    private long ticks;
+
     @Packet
     public void onVelocity(WrappedOutVelocityPacket packet) {
         if(packet.getId() == data.getPlayer().getEntityId() && packet.getY() > 0) {
@@ -35,9 +37,7 @@ public class VelocityA extends Check {
             float pct = data.playerInfo.deltaY / (float) vY * 100F;
 
             if (pct < 99.999 && !data.blockInfo.blocksAbove && !data.playerInfo.collidesHorizontally) {
-                if (vl++ > 20) {
-                    punish();
-                } else if (vl > 4) flag("pct=" + MathUtils.round(pct, 2) + "%");
+                if (vl++ > 4) flag("pct=" + MathUtils.round(pct, 2) + "%");
             } else vl-= vl > 0 ? 0.2 : 0;
 
             vY-= 0.08;
