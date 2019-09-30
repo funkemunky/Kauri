@@ -5,11 +5,13 @@ import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
+import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.processing.MovementProcessor;
 import dev.brighten.anticheat.utils.MiscUtils;
 
-@CheckInfo(name = "Aim (G)")
+@CheckInfo(name = "Aim (G)", description = "Another style of denominator check on both pitch and yaw.",
+        checkType = CheckType.AIM)
 public class AimG extends Check {
 
     private long lastGCD;

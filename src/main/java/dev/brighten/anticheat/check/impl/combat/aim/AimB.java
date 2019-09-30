@@ -3,9 +3,10 @@ package dev.brighten.anticheat.check.impl.combat.aim;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
+import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
 
-@CheckInfo(name = "Aim (B)", description = "Checks for common denominators in pitch difference.")
+@CheckInfo(name = "Aim (B)", description = "Checks for common denominators in pitch difference.", checkType = CheckType.AIM)
 public class AimB extends Check {
 
     @Packet

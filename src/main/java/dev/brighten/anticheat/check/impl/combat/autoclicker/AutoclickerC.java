@@ -5,9 +5,11 @@ import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.objects.Interval;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
+import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
 
-@CheckInfo(name = "Autoclicker (C)", description = "Checks for abnormally consistent CPS.")
+@CheckInfo(name = "Autoclicker (C)", description = "Checks for abnormally consistent CPS.",
+        checkType = CheckType.AUTOCLICKER)
 public class AutoclickerC extends Check {
 
     private long lastClick;

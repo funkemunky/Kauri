@@ -6,9 +6,11 @@ import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.objects.Interval;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
+import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
 
-@CheckInfo(name = "Autoclicker (B)", description = "Checks for consistent patterns in CPS.")
+@CheckInfo(name = "Autoclicker (B)", description = "Checks for consistent patterns in CPS.",
+        checkType = CheckType.AUTOCLICKER)
 public class AutoclickerB extends Check {
 
     private long lastClick;

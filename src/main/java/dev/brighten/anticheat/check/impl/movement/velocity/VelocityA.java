@@ -24,8 +24,11 @@ public class VelocityA extends Check {
         if(vY > 0
                 && data.playerInfo.lastVelocity.hasNotPassed(4)
                 && !data.playerInfo.generalCancel
-                && (timeStamp - data.playerInfo.lastServerPos) > 400L
+                && !data.playerInfo.serverPos
+                && !data.lagInfo.lagging
                 && data.playerInfo.worldLoaded
+                && !data.blockInfo.inWeb
+                && !data.blockInfo.onClimbable
                 && data.playerInfo.blocksAboveTicks == 0
                 && !data.playerInfo.canFly) {
 

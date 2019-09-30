@@ -3,9 +3,11 @@ package dev.brighten.anticheat.check.impl.combat.aim;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
+import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
 
-@CheckInfo(name = "Aim (E)")
+@CheckInfo(name = "Aim (E)", description = "Checks for very large differences in deviation of yaw.",
+        checkType = CheckType.AIM)
 public class AimE extends Check {
 
     @Packet

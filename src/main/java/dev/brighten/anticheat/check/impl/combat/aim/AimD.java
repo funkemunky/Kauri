@@ -4,6 +4,7 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
+import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.processing.MovementProcessor;
 import dev.brighten.anticheat.utils.MiscUtils;
@@ -13,7 +14,8 @@ import java.util.Set;
 
 //TODO Test this with Vape and Vape Lite. Trying other things too.
 //TODO Test for false positives with cinematic or check if cinematic causes the check to just not work.
-@CheckInfo(name = "Aim (D)", description = "Designed to detect aimassists attempting to use cinematic smoothing.")
+@CheckInfo(name = "Aim (D)", description = "Designed to detect aimassists attempting to use cinematic smoothing.",
+        checkType = CheckType.AIM)
 public class AimD extends Check {
 
     private long lastGCD;

@@ -10,4 +10,7 @@ public @interface CheckInfo {
     boolean enabled() default true;
     boolean executable() default true;
     boolean developer() default false;
+    int punishVL() default -1;
+    CheckType checkType() default CheckType.SPEED;
+
 }

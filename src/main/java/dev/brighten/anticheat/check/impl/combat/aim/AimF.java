@@ -3,9 +3,11 @@ package dev.brighten.anticheat.check.impl.combat.aim;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
+import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
 
-@CheckInfo(name = "Aim (F)", description = "Checks for natural numbers in yaw rotation (near impossible to do consistently).")
+@CheckInfo(name = "Aim (F)", description = "Checks for natural numbers in yaw rotation (near impossible to do consistently).",
+        checkType = CheckType.AIM)
 public class AimF extends Check {
 
     @Packet

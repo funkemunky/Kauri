@@ -6,13 +6,14 @@ import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.objects.Interval;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
+import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 
 import java.util.Comparator;
 
-@CheckInfo(name = "Aim (A)", description = "A check that detects aim.")
+@CheckInfo(name = "Aim (A)", description = "A check that detects aim.", checkType = CheckType.AIM)
 public class AimA extends Check {
     private Interval<Double> offsetInterval = new Interval<>(0, 30);
 

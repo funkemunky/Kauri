@@ -4,9 +4,10 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
+import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
 
-@CheckInfo(name = "Aim (C)", description = "Checks for common denominators in yaw difference.")
+@CheckInfo(name = "Aim (C)", description = "Checks for common denominators in yaw difference.", checkType = CheckType.AIM)
 public class AimC extends Check {
 
     @Packet

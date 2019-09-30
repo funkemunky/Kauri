@@ -4,9 +4,10 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.utils.objects.Interval;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
+import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
 
-@CheckInfo(name = "Autoclicker (D)", description = "It's an autoclicker check")
+@CheckInfo(name = "Autoclicker (D)", description = "It's an autoclicker check", checkType = CheckType.AUTOCLICKER)
 public class AutoclickerD extends Check {
 
     private Interval<Long> interval = new Interval<>(0, 30);

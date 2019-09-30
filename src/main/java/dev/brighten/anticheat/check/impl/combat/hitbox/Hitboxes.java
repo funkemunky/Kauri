@@ -5,6 +5,7 @@ import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.MiscUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
+import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.KLocation;
@@ -18,7 +19,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@CheckInfo(name = "Hitboxes", description = "Ensures the player is looking at the target when attacking.")
+@CheckInfo(name = "Hitboxes", description = "Ensures the player is looking at the target when attacking.",
+        checkType = CheckType.HITBOX)
 public class Hitboxes extends Check {
 
     private static List<EntityType> allowedEntities = Arrays.asList(

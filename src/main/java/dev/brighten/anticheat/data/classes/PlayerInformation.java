@@ -14,10 +14,6 @@ public class PlayerInformation {
     public float pDeltaY;
     public float deltaYaw, deltaPitch, lDeltaYaw, lDeltaPitch;
 
-    //Move
-    public float strafe, forward, sensitivity;
-    public String key;
-
     //Cinematic
     public float lCinematicYaw, lCinematicPitch;
     public float cinematicYaw, cinematicPitch, cDeltaYaw, cDeltaPitch;
