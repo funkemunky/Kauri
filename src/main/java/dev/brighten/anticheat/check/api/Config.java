@@ -18,4 +18,7 @@ public class Config {
     static String broadcastMessage = MiscUtils.line(Color.Dark_Gray)
             + "\n&e%name% &7was removed by &6Kauri &7because of an &fUnfair Advantage&7."
             + MiscUtils.line(Color.Dark_Gray);
+
+    @ConfigSetting(path = "alerts", name = "bungee")
+    public static boolean bungeeAlerts = false;
 }

@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.check.api;
 
+import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.packets.reflections.types.WrappedClass;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MathUtils;
@@ -30,6 +31,7 @@ import dev.brighten.anticheat.data.ObjectData;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -87,6 +89,14 @@ public class Check {
 
             if(punishVl != -1 && vl > punishVl) {
                 punish();
+            }
+
+            if(Config.bungeeAlerts) {
+                try {
+                    Atlas.getInstance().getBungeeManager().sendObjects("ALL", data.getPlayer().getUniqueId(), name, vl, info);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
