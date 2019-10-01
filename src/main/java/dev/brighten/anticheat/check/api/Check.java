@@ -92,9 +92,9 @@ public class Check {
     }
 
     public void punish() {
-        if(executable) {
+        if(executable && punishVl != -1 && vl > punishVl) {
             if(!Config.broadcastMessage.equalsIgnoreCase("off")) {
-                Bukkit.broadcastMessage(Color.translate(Config.broadcastMessage));
+                Bukkit.broadcastMessage(Color.translate(Config.broadcastMessage.replace("%name%", data.getPlayer().getName())));
             }
             ConsoleCommandSender sender = Bukkit.getConsoleSender();
             Config.punishCommands.

@@ -37,8 +37,8 @@ public class VelocityA extends Check {
             float pct = data.playerInfo.deltaY / (float) vY * 100F;
 
             if (pct < 99.999 && !data.blockInfo.blocksAbove && !data.playerInfo.collidesHorizontally) {
-                if (vl++ > 4) flag("pct=" + MathUtils.round(pct, 2) + "%");
-            } else vl-= vl > 0 ? 0.2 : 0;
+                if (vl++ > 9) flag("pct=" + MathUtils.round(pct, 2) + "%");
+            } else vl-= vl > 0 ? 0.25 : 0;
 
             vY-= 0.08;
             vY*= 0.98;

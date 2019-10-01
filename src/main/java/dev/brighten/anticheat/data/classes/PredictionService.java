@@ -142,9 +142,6 @@ public class PredictionService {
             case Packet.Client.POSITION_LOOK:
             case Packet.Client.LOOK:
             case Packet.Client.POSITION:
-            case Packet.Client.LEGACY_LOOK:
-            case Packet.Client.LEGACY_POSITION_LOOK:
-            case Packet.Client.LEGACY_POSITION:
             case Packet.Client.FLYING: {
                 WrappedInFlyingPacket packet = new WrappedInFlyingPacket(e.getPacket(), e.getPlayer());
 

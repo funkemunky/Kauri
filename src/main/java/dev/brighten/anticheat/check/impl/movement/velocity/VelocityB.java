@@ -42,9 +42,10 @@ public class VelocityB extends Check {
 
     @Packet
     public void onUseEntity(WrappedInUseEntityPacket packet) {
-        if((data.playerInfo.sprinting ||
-                data.getPlayer().getItemInHand() != null
-                        && data.getPlayer().getItemInHand().containsEnchantment(Enchantment.KNOCKBACK))
+        if( data.playerInfo.lastVelocity.hasNotPassed(5)
+                && (data.predictionService.lastSprint || (
+                        data.getPlayer().getItemInHand() != null
+                        && data.getPlayer().getItemInHand().containsEnchantment(Enchantment.KNOCKBACK)))
                 && packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) {
             vX*= 0.6f;
             vZ*= 0.6f;
@@ -55,9 +56,7 @@ public class VelocityB extends Check {
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if((vX != 0 || vZ != 0)) {
             if(data.playerInfo.lastVelocity.hasNotPassed(5)) {
-                if(!data.playerInfo.lClientGround
-                        && !data.playerInfo.clientGround
-                        && !data.blockInfo.blocksNear
+                if(!data.blockInfo.blocksNear
                         && !data.blockInfo.inWeb
                         && !data.lagInfo.lagging
                         && !data.playerInfo.serverPos
@@ -113,21 +112,15 @@ public class VelocityB extends Check {
                     double vXZ = MathUtils.hypot(vX, vZ);
                     pct = data.playerInfo.deltaXZ / vXZ * 100;
 
-                    if (pct < 99.85) {
+                    if (pct < 99.4) {
                         if (vl++ > 15) flag("pct=" + MathUtils.round(pct, 3) + "%");
-                    } else vl -= vl > 0 ? 0.5 : 0;
+                    } else vl -= vl > 0 ? 0.2 : 0;
 
                     debug("pct=" + pct + " key=" + data.predictionService.key
                             + " sprint=" + data.playerInfo.sprinting + " ground=" + packet.isGround() + " vl=" + vl);
 
                     //debug("vX=" + vX + " vZ=" + vZ);
                     //debug("dX=" + data.playerInfo.deltaX + " dZ=" + data.playerInfo.deltaZ);
-
-                    f4 = 0.91f;
-
-                    if (data.playerInfo.lClientGround) {
-                        f4 *= MovementUtils.getFriction(data);
-                    }
 
                     vX *= f4;
                     vZ *= f4;

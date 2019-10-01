@@ -76,7 +76,7 @@ public class LoggerManager {
                 MiscUtils.printToConsole("&7Setting up FlatfileDB...");
                 Atlas.getInstance().getCarbon().createFlatfileDatabase(Kauri.INSTANCE.getDataFolder().getPath(), "logs");
             }
-            logsDatabase = Atlas.getInstance().getCarbon().getDatabase("logs");
+            logsDatabase = Atlas.getInstance().getCarbon().getDatabase(mySQLEnabled ? sqlDatabase : "logs");
             MiscUtils.printToConsole("&7Loading database...");
             logsDatabase.loadDatabase();
             save();

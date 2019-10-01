@@ -55,6 +55,8 @@ public class CheckManager {
                     check.developer = settings.developer();
                     check.name = settings.name();
                     check.description = settings.description();
+                    check.punishVl = settings.punishVL();
+                    check.checkType = settings.checkType();
                     return check;
                 })
                 .sequential()

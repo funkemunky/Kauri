@@ -1,7 +1,9 @@
 package dev.brighten.anticheat.check.api;
 
+import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.Init;
+import cc.funkemunky.api.utils.MiscUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -10,8 +12,10 @@ import java.util.List;
 public class Config {
 
     @ConfigSetting(path = "punishments", name = "commands")
-    static List<String> punishCommands = Arrays.asList("kick %name% [Kauri] you suck");
+    static List<String> punishCommands = Arrays.asList("kick %name% [Kauri] Unfair Advantage -s");
 
     @ConfigSetting(path = "punishments", name = "broadcast")
-    static String broadcastMessage = "&7Bruh kachigga &e%name% got banned for cheating by your boi &6&lKauri 2.0 &7!!";
+    static String broadcastMessage = MiscUtils.line(Color.Dark_Gray)
+            + "\n&e%name% &7was removed by &6Kauri &7because of an &fUnfair Advantage&7."
+            + MiscUtils.line(Color.Dark_Gray);
 }

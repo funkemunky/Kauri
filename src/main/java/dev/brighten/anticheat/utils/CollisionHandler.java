@@ -48,16 +48,16 @@ public class CollisionHandler {
                         onHalfBlock = true;
                     }
                 }
-            } else if(box.collidesVertically(data.box
-                    .subtract(0, 1.5f, 0,0,0.25f,0))) {
+            } else if(box.intersectsWithBox(data.box
+                    .subtract(0, 2f, 0,0,0.25f,0))) {
                 nearGround = true;
             }
 
-            if(data.box.grow(0.3f, -0.1f, 0.3f).collidesHorizontally(box)) {
+            if(data.box.grow(0.4f, -0.1f, 0.4f).collidesHorizontally(box)) {
                 blocksNear = true;
             }
 
-            if(data.box.add(0,0.5f,0,0,0.5f,0).collidesVertically(box)) {
+            if(data.box.add(0,0.25f,0,0,0.5f,0).collidesVertically(box)) {
                 blocksAbove = true;
             }
 
