@@ -76,6 +76,9 @@ public class MovementProcessor {
         data.playerInfo.clientGround = packet.isGround();
 
         //Setting boundingBox
+        data.predictionService.box = new BoundingBox(data.playerInfo.from.toVector(), data.playerInfo.from.toVector())
+                .grow(0.3f, 0, 0.3f)
+                .add(0, 0, 0, 0, 1.8f, 0);;
         data.box = new BoundingBox(data.playerInfo.to.toVector(), data.playerInfo.to.toVector())
                 .grow(0.3f, 0, 0.3f)
                 .add(0, 0, 0, 0, 1.8f, 0);
