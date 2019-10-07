@@ -22,6 +22,8 @@ public class AimG extends Check {
                     (long)(data.playerInfo.deltaPitch * MovementProcessor.offset));
 
             if(gcd < 1E5 && (Math.abs(data.playerInfo.deltaPitch) > 0.5 || data.playerInfo.deltaYaw > 0.5)
+                    && data.playerInfo.deltaYaw < 12
+                    && data.playerInfo.deltaPitch < 12
                     && !data.playerInfo.cinematicModeYaw) {
                 if(vl++ > 20) {
                     flag("g=" + gcd + " yawDelta=" + data.playerInfo.deltaYaw + " pitchDelta=" + data.playerInfo.deltaPitch);

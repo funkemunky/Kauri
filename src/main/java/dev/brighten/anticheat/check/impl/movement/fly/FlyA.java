@@ -21,6 +21,8 @@ public class FlyA extends Check {
             float delta = MathUtils.getDelta(predicted, data.playerInfo.deltaY);
             if(delta > 0.01 && data.playerInfo.airTicks > 2
                     && !data.playerInfo.flightCancel
+                    && !data.playerInfo.clientGround
+                    && !data.playerInfo.lClientGround
                     && data.playerInfo.lastVelocity.hasPassed(10)
                     && data.playerInfo.lastBlockPlace.hasPassed(5)
                     && !data.blockInfo.onClimbable) {
