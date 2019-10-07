@@ -7,7 +7,7 @@ import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
 
 @CheckInfo(name = "Fly (C)", description = "Checks for changes in y motion in air.",
-        checkType = CheckType.FLIGHT, punishVL = 12)
+        checkType = CheckType.FLIGHT, punishVL = 12, executable = false)
 public class FlyC extends Check {
 
     @Packet
