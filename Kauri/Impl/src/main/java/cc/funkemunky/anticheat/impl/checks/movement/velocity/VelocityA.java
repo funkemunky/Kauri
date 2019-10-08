@@ -48,7 +48,7 @@ public class VelocityA extends Check {
                     double pct = deltaY / vY * 100;
 
                     if(pct < 99.999) {
-                        if(vl++ > 8) {
+                        if(vl++ > 15) {
                             flag("pct=" + MathUtils.round(pct, 3), true, true, AlertTier.HIGH);
                         }
                     } else vl-= vl > 0 ? 0.2f : 0;

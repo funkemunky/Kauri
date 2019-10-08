@@ -14,7 +14,7 @@ import lombok.val;
 import org.bukkit.event.Event;
 
 @CheckInfo(name = "Velocity (Type B)", description = "Checks to see if the horizontal velocity of a player is legitimate.",
-        executable = true, type = CheckType.VELOCITY)
+        type = CheckType.VELOCITY, developer = true)
 @Init
 @Packets(packets = {Packet.Client.POSITION, Packet.Client.POSITION_LOOK, Packet.Client.LOOK,
         Packet.Client.FLYING, Packet.Server.ENTITY_VELOCITY, Packet.Client.USE_ENTITY})

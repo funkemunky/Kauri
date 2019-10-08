@@ -23,11 +23,11 @@ public class FlyC extends Check {
         val move = getData().getMovementProcessor();
 
         float threshold =  MiscUtils.getPredictedJumpHeight(getData()) + 0.1f;
-        if(!move.isCancelFlight() && move.getDeltaY() > threshold) {
+        if(!move.isCancelFlight() && verbose.flag(2, 1000L) && move.getDeltaY() > threshold) {
             flag(move.getDeltaY() + ">-" + threshold,
                     true,
                     true,
-                    verbose.flag(4, 1000L) ? AlertTier.HIGH : AlertTier.LIKELY);
+                    verbose.getVerbose() > 4 ? AlertTier.HIGH : AlertTier.LIKELY);
         }
     }
 

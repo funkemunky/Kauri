@@ -29,7 +29,7 @@ public class FlyE extends Check {
             if(vl++ > 4) {
                 flag("deltaY=" + move.getDeltaY() + " vl=" + vl, true, true, AlertTier.HIGH);
             }
-        } else vl-= vl > 0 ? 0.5 : 0;
+        } else vl-= vl > 0 ? 1 : 0;
 
         debug("deltaY=" + move.getDeltaY() + " vl=" + vl + " onGround=" + move.isServerOnGround());
     }
