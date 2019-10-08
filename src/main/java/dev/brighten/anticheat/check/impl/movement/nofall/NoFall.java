@@ -8,7 +8,7 @@ import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
 
 @CheckInfo(name = "NoFall", description = "Checks to make sure the ground packet from the client is legit",
-        checkType = CheckType.BADPACKETS, punishVL = 30)
+        checkType = CheckType.BADPACKETS, punishVL = 30, executable = false)
 public class NoFall extends Check {
 
     @Packet

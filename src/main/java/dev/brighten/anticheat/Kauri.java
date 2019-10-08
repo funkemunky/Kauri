@@ -40,6 +40,12 @@ public class Kauri extends JavaPlugin {
         MiscUtils.printToConsole(Color.Red + "Starting Kauri " + getDescription().getVersion() + "...");
         INSTANCE = this;
 
+        if(!getServer().getPluginManager().isPluginEnabled("KauriLoader")) {
+            MiscUtils.printToConsole("&cPlugin was not loaded through the loader.");
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
+
         load(); //Everything in one method so we can use it in other places like when reloading.
     }
 
