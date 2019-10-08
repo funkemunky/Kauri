@@ -7,6 +7,7 @@ import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.logs.objects.Log;
+import dev.brighten.anticheat.logs.objects.Punishment;
 import dev.brighten.anticheat.utils.Pastebin;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -14,10 +15,7 @@ import org.bukkit.entity.Player;
 
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
-import java.util.UUID;
+import java.util.*;
 
 @Init(commands = true)
 public class LogCommand {
@@ -25,19 +23,20 @@ public class LogCommand {
     @Command(name = "kauri.logs", description = "View the logs of a user.", display = "logs [player]",
             usage = "/<command> [player]", aliases = {"logs"}, permission = "kauri.logs")
     public void onCommand(CommandAdapter cmd) {
-        if(cmd.getArgs().length == 0) {
-            if(cmd.getSender() instanceof Player) {
-                cmd.getSender().sendMessage(Color.Green + "Logs: " + getLogsFromUUID(cmd.getPlayer().getUniqueId()));
-            } else cmd.getSender().sendMessage(Color.Red + "You cannot view your own logs since you are not a player.");
-        } else {
-            cmd.getSender().sendMessage(Color.Green + "Logs: " + getLogsFromUUID(Bukkit.getOfflinePlayer(cmd.getArgs()[0]).getUniqueId()));
-        }
+        Kauri.INSTANCE.executor.execute(() -> {
+            if(cmd.getArgs().length == 0) {
+                if(cmd.getSender() instanceof Player) {
+                    cmd.getSender().sendMessage(Color.Green + "Logs: " + getLogsFromUUID(cmd.getPlayer().getUniqueId()));
+                } else cmd.getSender().sendMessage(Color.Red + "You cannot view your own logs since you are not a player.");
+            } else {
+                cmd.getSender().sendMessage(Color.Green + "Logs: " + getLogsFromUUID(Bukkit.getOfflinePlayer(cmd.getArgs()[0]).getUniqueId()));
+            }
+        });
     }
 
     private static String getLogsFromUUID(UUID uuid) {
-        Kauri.INSTANCE.profiler.start("cmd:logs");
         List<Log> logs = Kauri.INSTANCE.loggerManager.getLogs(uuid);
-        Kauri.INSTANCE.profiler.stop("cmd:logs");
+        List<Punishment> punishments = Kauri.INSTANCE.loggerManager.getPunishments(uuid);
 
         if(logs.size() == 0) return "No Logs";
 
@@ -47,11 +46,24 @@ public class LogCommand {
         format.setTimeZone(TimeZone.getTimeZone("US/Eastern"));
 
         OfflinePlayer pl = Bukkit.getOfflinePlayer(uuid);
+
+        SortedMap<Long, String> eventsByStamp = new TreeMap<>(Comparator.comparing(key -> key, Comparator.naturalOrder()));
+
         for (Log log : logs) {
-            body.append("(").append(format.format(new Date(log.timeStamp))).append("): ").append(pl.getName())
-                    .append(" failed ").append(log.checkName).append(" at VL ").append(log.vl)
-                    .append(" (tps=").append(MathUtils.round(log.tps, 4)).append(" ping=").append(log.ping)
-                    .append(")").append("\n");
+            String built = "(" + format.format(new Date(log.timeStamp)) + "): " + pl.getName() + " failed "
+                    + log.checkName + " at VL: [" + MathUtils.round(log.vl, 2)
+                    + "] (tps=" + MathUtils.round(log.tps, 4) + " ping=" + log.ping + ")";
+            eventsByStamp.put(log.timeStamp, built);
+        }
+
+        for (Punishment punishment : punishments) {
+            String built = "Punishment applied @ (" + format.format(new Date(punishment.timeStamp)) + ") from check"
+                    + punishment.checkName;
+            eventsByStamp.put(punishment.timeStamp, built);
+        }
+
+        for (Long key : eventsByStamp.keySet()) {
+            body.append(eventsByStamp.get(key));
         }
 
         try {

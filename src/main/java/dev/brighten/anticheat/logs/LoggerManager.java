@@ -12,6 +12,7 @@ import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.logs.objects.Log;
+import dev.brighten.anticheat.logs.objects.Punishment;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -83,17 +84,30 @@ public class LoggerManager {
         }
     }
 
-    public void addLog(ObjectData data, Check check) {
-        Log log = new Log(check.name, check.vl, data.lagInfo.transPing, System.currentTimeMillis(), Kauri.INSTANCE.tps);
+    public void addLog(ObjectData data, Check check, String info) {
+        Log log = new Log(check.name, info, check.vl, data.lagInfo.transPing, System.currentTimeMillis(), Kauri.INSTANCE.tps);
 
         StructureSet set = logsDatabase.createStructureSet(
-                new Structure("uuid", data.getPlayer().getUniqueId().toString()),
+                new Structure("uuid", data.uuid.toString()),
                 new Structure("checkName", log.checkName),
                 new Structure("vl", log.vl),
+                new Structure("info", log.info),
                 new Structure("ping", log.ping),
                 new Structure("timeStamp", log.timeStamp),
                 new Structure("tps", log.tps));
 
+        logsDatabase.inputField(set);
+    }
+
+    public void addPunishment(ObjectData data, Check check) {
+        Punishment punishment = new Punishment(data.uuid, check.name, System.currentTimeMillis());
+        
+        StructureSet set = logsDatabase.createStructureSet(
+                new Structure("type", "punishment"),
+                new Structure("uuid", data.uuid.toString()), 
+                new Structure("checkName", punishment.checkName),
+                new Structure("timeStamp", punishment.timeStamp));
+        
         logsDatabase.inputField(set);
     }
 
@@ -104,10 +118,21 @@ public class LoggerManager {
 
         return sets.stream().map(set -> new Log(
                 String.valueOf(set.getStructureByName("checkName").get().object),
+                String.valueOf(set.getStructureByName("info").get().object),
                 (double)set.getStructureByName("vl").get().object,
                 (long)set.getStructureByName("ping").get().object,
                 (long)set.getStructureByName("timeStamp").get().object,
                 (double)set.getStructureByName("tps").get().object)).collect(Collectors.toList());
+    }
+    
+    public List<Punishment> getPunishments(UUID uuid) {
+        List<StructureSet> structureSets = logsDatabase.getFieldsByStructure(
+                (struct -> struct.name.equals("type") && String.valueOf(struct.object).equals("punishment")),
+                (struct -> struct.name.equals("uuid") && UUID.fromString(String.valueOf(struct.object)).equals(uuid)));
+
+        return structureSets.stream().map(set -> new Punishment(uuid,
+                String.valueOf(set.getStructureByName("checkName").get().object),
+                (long)set.getStructureByName("timeStamp").get().object)).collect(Collectors.toList());
     }
 
     public Map<UUID, List<Log>> getLogsWithinTimeFrame(long timeFrame) {
@@ -125,6 +150,7 @@ public class LoggerManager {
 
             logList.add(new Log(
                     String.valueOf(set.getStructureByName("checkName").get().object),
+                    String.valueOf(set.getStructureByName("info").get().object),
                     (double)set.getStructureByName("vl").get().object,
                     (long)set.getStructureByName("ping").get().object,
                     (long)set.getStructureByName("timeStamp").get().object,
