@@ -7,22 +7,22 @@ import cc.funkemunky.api.utils.json.JSONObject;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @AllArgsConstructor
 @NoArgsConstructor
-public class Log {
+public class Punishment {
+    public UUID uuid;
+    public String checkName;
+    public long timeStamp;
+    private static WrappedClass punishClass = new WrappedClass(Punishment.class);
 
-    public String checkName, info;
-    public double vl;
-    public long ping, timeStamp;
-    public double tps;
-    private static WrappedClass logClass = new WrappedClass(Log.class);
-
-    public static Log fromJson(String jsonString) {
+    public static Punishment fromJson(String jsonString) {
         try {
             JSONObject object = new JSONObject(jsonString);
-            Log log = new Log();
+            Punishment log = new Punishment();
 
-            for (WrappedField field : logClass.getFields(true)) {
+            for (WrappedField field : punishClass.getFields(true)) {
                 field.set(log, object.get(field.getField().getName()));
             }
 
@@ -37,7 +37,7 @@ public class Log {
         JSONObject object = new JSONObject();
 
         try {
-            for (WrappedField field : logClass.getFields(true)) {
+            for (WrappedField field : punishClass.getFields(true)) {
                 object.put(field.getField().getName(), (Object)field.get(this));
             }
         } catch (JSONException e) {
