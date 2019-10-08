@@ -127,6 +127,10 @@ public class MovementProcessor {
             data.playerInfo.pitchGCD = MiscUtils.gcd((long) (Math.abs(data.playerInfo.deltaPitch) * offset), (long) (Math.abs(data.playerInfo.lDeltaPitch) * offset));
         }
 
+        data.playerInfo.usingItem = (data.playerInfo.itemAnimation = data.getPlayer().getItemInHand() != null
+                ? MinecraftReflection.getItemAnimation(data.getPlayer().getItemInHand())
+                : WrappedEnumAnimation.NONE) != WrappedEnumAnimation.NONE;
+
         //Setting fallDistance
         if (!data.playerInfo.serverGround
                 && data.playerInfo.deltaY < 0

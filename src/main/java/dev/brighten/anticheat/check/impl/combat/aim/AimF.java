@@ -21,5 +21,7 @@ public class AimF extends Check {
                 flag("deltaYaw=" + data.playerInfo.deltaYaw);
             }
         } else vl-= vl > 0 ? 0.25 : 0;
+
+        debug("yaw=" + data.playerInfo.deltaYaw + " pitch=" + data.playerInfo.deltaPitch);
     }
 }

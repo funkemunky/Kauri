@@ -1,12 +1,13 @@
 package dev.brighten.anticheat.data.classes;
 
+import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumAnimation;
 import cc.funkemunky.api.utils.TickTimer;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.utils.KLocation;
 import dev.brighten.anticheat.utils.MouseFilter;
 
 public class PlayerInformation {
-    public boolean serverGround, lClientGround, clientGround, nearGround,
+    public boolean serverGround, lClientGround, clientGround, nearGround, useItem,
             collidesVertically, collidesHorizontally, canFly, inCreative, isFlying, collided,
             onLadder, usingItem, wasOnIce, wasOnSlime, jumped, inAir, breakingBlock, worldLoaded;
     public boolean generalCancel, flightCancel;
@@ -20,6 +21,8 @@ public class PlayerInformation {
     public boolean cinematicModeYaw, cinematicModePitch;
     public MouseFilter yawSmooth = new MouseFilter(), pitchSmooth = new MouseFilter(),
             mouseFilterX = new MouseFilter(), mouseFilterY = new MouseFilter();
+
+    public WrappedEnumAnimation itemAnimation;
 
     //Gcd
     public float yawGCD, pitchGCD, lastYawGCD, lastPitchGCD;
