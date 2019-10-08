@@ -41,7 +41,7 @@ public class PacketListeners implements AtlasListener {
                     WrappedOutPositionPacket position = new WrappedOutPositionPacket(event.getPacket(), event.getPlayer());
 
                     data.setLastServerPosStamp(event.getTimeStamp());
-                    TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutKeepAlivePacket(data.getPlayer().getEntityId() + 1500).getObject());
+                    TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutTransaction(0, (short)(data.getPlayer().getEntityId() + 1500), false).getObject());
                     data.getTeleportLocations().add(new Vector(position.getX(), position.getY(), position.getZ()));
                     data.getVelocityProcessor().velocityX = data.getVelocityProcessor().velocityY = data.getVelocityProcessor().velocityZ = 0;
                     data.getVelocityProcessor().setAttackedSinceVelocity(false);
@@ -85,7 +85,7 @@ public class PacketListeners implements AtlasListener {
                     WrappedOutVelocityPacket packet = new WrappedOutVelocityPacket(event.getPacket(), event.getPlayer());
 
                     if(packet.getId() == data.getPlayer().getEntityId()) {
-                        TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutKeepAlivePacket(data.getPlayer().getEntityId() + 2000).getObject());
+                        TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutTransaction(0, (short)(data.getPlayer().getEntityId() + 2000), false).getObject());
                         data.getVelocityProcessor().update(packet, event.getTimeStamp());
                     }
                     break;
@@ -116,7 +116,12 @@ public class PacketListeners implements AtlasListener {
                     case Packet.Client.TRANSACTION: {
                         WrappedInTransactionPacket packet = new WrappedInTransactionPacket(event.getPacket(), player);
 
-                        if (packet.getAction() == (short) 69) {
+                        if(packet.getAction() == (data.getPlayer().getEntityId() + 1500)) {
+                            data.setLastServerPosStamp(System.currentTimeMillis());
+                        } else if(packet.getAction() == (data.getPlayer().getEntityId() + 2000)) {
+                            data.getVelocityProcessor().getLastVelocity().reset();
+                            data.getVelocityProcessor().setLastVelocityTimestamp(System.currentTimeMillis());
+                        } else if (packet.getAction() == (short) 69) {
                             data.setLastTransPing(data.getTransPing());
                             data.setTransPing(event.getTimeStamp() - data.getLastTransaction());
 
@@ -143,15 +148,8 @@ public class PacketListeners implements AtlasListener {
                     }
                     case Packet.Client.KEEP_ALIVE: {
                         WrappedInKeepAlivePacket packet = new WrappedInKeepAlivePacket(event.getPacket(), event.getPlayer());
-                        if(packet.getTime() == (data.getPlayer().getEntityId() + 1500)) {
-                            data.setLastServerPosStamp(System.currentTimeMillis());
-                        } else if(packet.getTime() == (data.getPlayer().getEntityId() + 2000)) {
-                            data.getVelocityProcessor().getLastVelocity().reset();
-                            data.getVelocityProcessor().setLastVelocityTimestamp(System.currentTimeMillis());
-                        } else {
-                            data.setLastPing(data.getPing());
-                            data.setPing(event.getTimeStamp() - data.getLastKeepAlive());
-                        }
+                        data.setLastPing(data.getPing());
+                        data.setPing(event.getTimeStamp() - data.getLastKeepAlive());
                         break;
                     }
                     case Packet.Client.POSITION:

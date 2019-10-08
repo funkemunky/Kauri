@@ -176,7 +176,7 @@ public class LagArgument extends FunkeArgument {
         sender.sendMessage("");
         sender.sendMessage(Color.translate(kauriRes));
         long totalTime = System.currentTimeMillis() - Kauri.getInstance().getProfileStart();
-        val results = Kauri.getInstance().getProfiler().results(ResultsType.TICK);
+        val results = Kauri.getInstance().getProfiler().results(ResultsType.SAMPLES);
         double totalMS = results.keySet().stream().mapToDouble(results::get).sum() / 1000000;
         sender.sendMessage(Color.translate(pctUsage.replace("%pct%", (totalMS / 50 * 100) + "")));
         float cps = Kauri.getInstance().getProfiler().totalCalls / (float) totalTime;
