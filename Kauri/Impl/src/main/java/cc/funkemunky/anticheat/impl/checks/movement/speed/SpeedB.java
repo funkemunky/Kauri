@@ -12,7 +12,7 @@ import lombok.val;
 import org.bukkit.event.Event;
 
 @Packets(packets = {Packet.Client.POSITION_LOOK, Packet.Client.POSITION})
-@Init
+//@Init
 @CheckInfo(name = "Speed (Type B)", description = "Ensures air acceleration is legitimate.",
         type = CheckType.SPEED, maxVL = 75)
 public class SpeedB extends Check {

@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Init
+//@Init
 @CheckInfo(name = "BadPackets (Type B)", type = CheckType.BADPACKETS, cancelType = CancelType.PLACE)
 @BukkitEvents(events = {BlockPlaceEvent.class})
 public class BadPacketsB extends Check {
