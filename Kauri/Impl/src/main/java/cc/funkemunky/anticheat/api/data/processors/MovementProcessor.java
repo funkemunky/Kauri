@@ -54,8 +54,6 @@ public class MovementProcessor {
 
         if(player == null) return;
         val timeStamp = System.currentTimeMillis();
-        data.setWorldLoaded(Atlas.getInstance().getBlockBoxManager().getBlockBox()
-                .isChunkLoaded(data.getMovementProcessor().to.toLocation(data.getPlayer().getWorld())));
         if (from == null || to == null) {
             from = new CustomLocation(0, 0, 0, 0, 0);
             to = new CustomLocation(0, 0, 0, 0, 0);
@@ -68,6 +66,8 @@ public class MovementProcessor {
             to.setX(packet.getX());
             to.setY(packet.getY());
             to.setZ(packet.getZ());
+            data.setWorldLoaded(Atlas.getInstance().getBlockBoxManager().getBlockBox()
+                    .isChunkLoaded(data.getMovementProcessor().to.toLocation(data.getPlayer().getWorld())));
 
             data.setBoundingBox(new BoundingBox(to.toVector(), to.toVector())
                     .grow(0.3f, 0, 0.3f)
@@ -175,7 +175,7 @@ public class MovementProcessor {
             } else lagTime = 0;
 
             boolean okayToGetBlock = data.isWorldLoaded() && data.getLastLogin().hasPassed(5);
-            
+
             val block = okayToGetBlock ? to.toLocation(data.getPlayer().getWorld()).getBlock() : null;
             val blockAbove = okayToGetBlock ? to.toLocation(data.getPlayer().getWorld()).clone()
                     .add(0, 1, 0).getBlock() : null;
@@ -273,6 +273,11 @@ public class MovementProcessor {
             }
         } else if(!packet.isLook() && data.isLoggedIn()) {
             data.getLastLogin().reset();
+            data.setWorldLoaded(Atlas.getInstance().getBlockBoxManager().getBlockBox()
+                    .isChunkLoaded(data.getMovementProcessor().to.toLocation(data.getPlayer().getWorld())));
+        } else {
+            data.setWorldLoaded(Atlas.getInstance().getBlockBoxManager().getBlockBox()
+                    .isChunkLoaded(data.getMovementProcessor().to.toLocation(data.getPlayer().getWorld())));
         }
 
         if(data.isLoggedIn()) data.setLoggedIn(false);
