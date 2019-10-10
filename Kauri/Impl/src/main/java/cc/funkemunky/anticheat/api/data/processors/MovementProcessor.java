@@ -54,9 +54,8 @@ public class MovementProcessor {
 
         if(player == null) return;
         val timeStamp = System.currentTimeMillis();
-        boolean chunkLoaded = Atlas.getInstance().getBlockBoxManager()
-                .getBlockBox()
-                .isChunkLoaded(player.getLocation());
+        data.setWorldLoaded(Atlas.getInstance().getBlockBoxManager().getBlockBox()
+                .isChunkLoaded(data.getMovementProcessor().to.toLocation(data.getPlayer().getWorld())));
         if (from == null || to == null) {
             from = new CustomLocation(0, 0, 0, 0, 0);
             to = new CustomLocation(0, 0, 0, 0, 0);
@@ -74,7 +73,7 @@ public class MovementProcessor {
                     .grow(0.3f, 0, 0.3f)
                     .add(0,0,0,0,1.84f,0));
 
-            if (chunkLoaded) {
+            if (data.isWorldLoaded()) {
                 //Here we get the colliding boundingboxes surrounding the player.
                 List<BoundingBox> box = boxes = Atlas.getInstance().getBlockBoxManager()
                         .getBlockBox()
@@ -174,10 +173,13 @@ public class MovementProcessor {
             if(lagTicks > 0) {
                 data.getLastPacketSkip().reset();
             } else lagTime = 0;
-            val block = chunkLoaded ? to.toLocation(data.getPlayer().getWorld()).getBlock() : null;
-            val blockAbove = chunkLoaded ? to.toLocation(data.getPlayer().getWorld()).clone()
+
+            boolean okayToGetBlock = data.isWorldLoaded() && data.getLastLogin().hasPassed(5);
+            
+            val block = okayToGetBlock ? to.toLocation(data.getPlayer().getWorld()).getBlock() : null;
+            val blockAbove = okayToGetBlock ? to.toLocation(data.getPlayer().getWorld()).clone()
                     .add(0, 1, 0).getBlock() : null;
-            val blockBelow = chunkLoaded ? to.toLocation(data.getPlayer().getWorld()).clone()
+            val blockBelow = okayToGetBlock ? to.toLocation(data.getPlayer().getWorld()).clone()
                     .subtract(0, 1,0).getBlock() : null;
 
             isInsideBlock = block == null
@@ -290,7 +292,7 @@ public class MovementProcessor {
         
         cancelFlight = player.getAllowFlight()
                 || serverPos
-                || !chunkLoaded
+                || !data.isWorldLoaded()
                 || getLastVehicle().hasNotPassed(10)
                 || getLastFlightToggle().hasNotPassed(10)
                 || getLiquidTicks() > 0
@@ -366,7 +368,14 @@ public class MovementProcessor {
         } else pitchZeroTicks -= pitchZeroTicks > 0 ? 1 : 0;
 
         pastLocation.addLocation(new CustomLocation(to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch()));
-        data.setGeneralCancel(serverPos || ((timeStamp - data.getLastRespawn()) < 150 + data.getTransPing() * 2) || data.isLagging() || lastVehicle.hasNotPassed(10) || getLastFlightToggle().hasNotPassed(15) || !chunkLoaded || packet.getPlayer().getAllowFlight() || hasLevi || packet.getPlayer().getGameMode().toString().contains("CREATIVE") || packet.getPlayer().getGameMode().toString().contains("SPEC") || lastVehicle.hasNotPassed() || getLastRiptide().hasNotPassed(10) || data.getLastLogin().hasNotPassed(50));
+        data.setGeneralCancel(serverPos || ((timeStamp - data.getLastRespawn()) < 150 + data.getTransPing() * 2)
+                || data.isLagging() || lastVehicle.hasNotPassed(10)
+                || getLastFlightToggle().hasNotPassed(15) || !data.isWorldLoaded()
+                || packet.getPlayer().getAllowFlight() || hasLevi
+                || packet.getPlayer().getGameMode().toString().contains("CREATIVE")
+                || packet.getPlayer().getGameMode().toString().contains("SPEC")
+                || lastVehicle.hasNotPassed() || getLastRiptide().hasNotPassed(10)
+                || data.getLastLogin().hasNotPassed(50));
     }
 
     private float findClosestCinematicYaw(PlayerData data, float yaw, float lastYaw) {

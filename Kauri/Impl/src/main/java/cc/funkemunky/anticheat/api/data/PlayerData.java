@@ -39,7 +39,7 @@ public class PlayerData {
     private AlertTier alertTier = AlertTier.HIGH;
     private String specificPacketDebug = "";
     private boolean debuggingBox, debuggingPackets, banned = false, developerAlerts,
-            ableToFly, creativeMode, invulnerable, flying, generalCancel, breakingBlock,
+            ableToFly, creativeMode, invulnerable, flying, generalCancel, breakingBlock, worldLoaded,
             cinematicMode, lastAllowedFlight, lagging, alertsEnabled, inventoryOpen, isPosition, loggedIn;
     private Player player;
 
