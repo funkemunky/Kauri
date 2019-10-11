@@ -37,7 +37,7 @@ public class SpeedB extends Check {
         if (data.playerInfo.airTicks > 1) {
             double accel = data.playerInfo.deltaXZ - data.playerInfo.lDeltaXZ;
             float delta = (float) MathUtils.getDelta(lPAccel, accel);
-            if(delta < 1E-5) {
+            if(delta > 0.001) {
                 if(vl++ > 6) {
                     flag("delta=" + delta);
                 }
