@@ -82,7 +82,7 @@ public class Check {
                 .replace("%p", String.valueOf(data.lagInfo.transPing))
                 .replace("%t", String.valueOf(MathUtils.round(Kauri.INSTANCE.tps, 2)));
         if(Kauri.INSTANCE.lastTickLag.hasPassed() && (data.lagInfo.lastPacketDrop.hasPassed(5) || data.lagInfo.lastPingDrop.hasPassed())) {
-            Kauri.INSTANCE.loggerManager.addLog(data, this);
+            Kauri.INSTANCE.loggerManager.addLog(data, this, info);
             Kauri.INSTANCE.dataManager.hasAlerts.forEach(data -> {
                 data.getPlayer().sendMessage(Color.translate("&8[&6K&8] &f" + this.data.getPlayer().getName() + " &7flagged &f" + name + " &8(&e" + info + "&8) &8[&c" + vl + "&8]"));
             });
@@ -103,6 +103,7 @@ public class Check {
 
     public void punish() {
         if(executable && punishVl != -1 && vl > punishVl) {
+            Kauri.INSTANCE.loggerManager.addPunishment(data, this);
             if(!Config.broadcastMessage.equalsIgnoreCase("off")) {
                 Bukkit.broadcastMessage(Color.translate(Config.broadcastMessage.replace("%name%", data.getPlayer().getName())));
             }

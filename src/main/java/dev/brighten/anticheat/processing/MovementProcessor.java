@@ -127,7 +127,8 @@ public class MovementProcessor {
             data.playerInfo.pitchGCD = MiscUtils.gcd((long) (Math.abs(data.playerInfo.deltaPitch) * offset), (long) (Math.abs(data.playerInfo.lDeltaPitch) * offset));
         }
 
-        data.playerInfo.usingItem = (data.playerInfo.itemAnimation = data.getPlayer().getItemInHand() != null
+        data.playerInfo.usingItem = (data.playerInfo.itemAnimation =
+                data.getPlayer().getItemInHand() != null && !data.getPlayer().getItemInHand().getType().equals(Material.AIR)
                 ? MinecraftReflection.getItemAnimation(data.getPlayer().getItemInHand())
                 : WrappedEnumAnimation.NONE) != WrappedEnumAnimation.NONE;
 

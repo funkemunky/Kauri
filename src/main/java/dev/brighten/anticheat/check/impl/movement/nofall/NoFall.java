@@ -8,22 +8,18 @@ import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
 
 @CheckInfo(name = "NoFall", description = "Checks to make sure the ground packet from the client is legit",
-        checkType = CheckType.BADPACKETS, punishVL = 30, executable = false)
+        checkType = CheckType.BADPACKETS, punishVL = 20, executable = false)
 public class NoFall extends Check {
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
-        boolean onGround = data.playerInfo.serverGround;
-        if(packet.isGround() != onGround && !data.playerInfo.generalCancel
-                && !data.playerInfo.collidesHorizontally
-                && data.playerInfo.lastVelocity.hasPassed(5 + MathUtils.millisToTicks(data.lagInfo.ping))) {
-            if(vl++ > 6) {
-                flag("client=" + packet.isGround() + " server=" + onGround);
-            }
-        } else vl-= vl > 0 ? 0.5 : 0;
-
-        if(data.playerInfo.deltaX != 0 || data.playerInfo.deltaY != 0 || data.playerInfo.deltaZ != 0) {
-            debug("vl=" + vl + " client=" + packet.isGround() + " server=" + onGround);
+        if(packet.isPos()) {
+            if((data.playerInfo.deltaY == 0 && !data.playerInfo.clientGround)
+                    || (data.playerInfo.deltaY != 0 && data.playerInfo.clientGround)) {
+                if(vl++ > 5) {
+                    flag("deltaY=" + data.playerInfo.deltaY + " client=" + data.playerInfo.clientGround);
+                }
+            } else vl-= vl > 0 ? 1 : 0;
         }
     }
 }
