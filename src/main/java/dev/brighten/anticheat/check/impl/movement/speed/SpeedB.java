@@ -24,6 +24,7 @@ public class SpeedB extends Check {
                 || data.playerInfo.lastVelocity.hasNotPassed(5)
                 || data.playerInfo.liquidTicks > 0
                 || data.playerInfo.webTicks > 0
+                || data.playerInfo.lastBlockPlace.hasNotPassed(10)
                 || Atlas.getInstance().getBlockBoxManager().getBlockBox().isUsingItem(data.getPlayer())
                 || data.blockInfo.blocksAbove
                 || data.blockInfo.blocksNear
@@ -37,7 +38,7 @@ public class SpeedB extends Check {
         if (data.playerInfo.airTicks > 1) {
             double accel = data.playerInfo.deltaXZ - data.playerInfo.lDeltaXZ;
             float delta = (float) MathUtils.getDelta(lPAccel, accel);
-            if(delta > 0.001) {
+            if(delta > 0.1) {
                 if(vl++ > 6) {
                     flag("delta=" + delta);
                 }

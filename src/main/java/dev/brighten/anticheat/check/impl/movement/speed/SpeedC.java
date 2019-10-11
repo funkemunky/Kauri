@@ -17,7 +17,7 @@ public class SpeedC extends Check {
                 && data.playerInfo.lastVelocity.hasPassed(5 + MathUtils.millisToTicks(data.lagInfo.ping))) {
             float baseSpeed = MovementUtils.getBaseSpeed(data) + (data.playerInfo.serverGround ? 0.35f : 0.5f);
 
-            if(data.blockInfo.blocksAbove && data.playerInfo.wasOnIce) baseSpeed+= 0.5f;
+            if(data.blockInfo.blocksAbove || data.playerInfo.iceTicks > 0) baseSpeed+= baseSpeed * 0.5 + 0.5;
 
             if(data.playerInfo.deltaXZ > baseSpeed) {
                 if(vl++ > 1 || (data.playerInfo.deltaXZ - baseSpeed) > 1.2)

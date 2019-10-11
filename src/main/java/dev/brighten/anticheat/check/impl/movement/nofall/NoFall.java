@@ -14,7 +14,10 @@ public class NoFall extends Check {
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
         if(packet.isPos()) {
-            if((data.playerInfo.deltaY == 0 && !data.playerInfo.clientGround)
+            if((data.playerInfo.deltaXZ > 0 || data.playerInfo.deltaY > 0)
+                    && !data.playerInfo.isFlying
+                    && !data.playerInfo.onLadder
+                    && (data.playerInfo.deltaY == 0 && !data.playerInfo.clientGround)
                     || (data.playerInfo.deltaY != 0 && data.playerInfo.clientGround)) {
                 if(vl++ > 5) {
                     flag("deltaY=" + data.playerInfo.deltaY + " client=" + data.playerInfo.clientGround);

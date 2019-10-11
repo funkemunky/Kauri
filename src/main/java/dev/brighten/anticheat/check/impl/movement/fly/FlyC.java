@@ -15,6 +15,7 @@ public class FlyC extends Check {
         if(!packet.isPos()) return;
 
         if(!data.playerInfo.nearGround
+                && data.playerInfo.lastBlockPlace.hasPassed(20)
                 && !data.playerInfo.flightCancel
                 && data.playerInfo.lastVelocity.hasPassed(5)
                 && data.playerInfo.airTicks > 3

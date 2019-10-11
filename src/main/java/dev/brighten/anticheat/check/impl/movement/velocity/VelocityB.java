@@ -58,6 +58,7 @@ public class VelocityB extends Check {
             if(data.playerInfo.lastVelocity.hasNotPassed(5)) {
                 if(!data.blockInfo.blocksNear
                         && !data.blockInfo.inWeb
+                        && !data.playerInfo.onLadder
                         && !data.lagInfo.lagging
                         && !data.playerInfo.serverPos
                         && !data.getPlayer().getAllowFlight()) {

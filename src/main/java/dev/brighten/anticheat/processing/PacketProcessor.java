@@ -3,6 +3,7 @@ package dev.brighten.anticheat.processing;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
+import cc.funkemunky.api.tinyprotocol.packet.GeneralWrapper;
 import cc.funkemunky.api.tinyprotocol.packet.in.*;
 import cc.funkemunky.api.tinyprotocol.packet.out.*;
 import cc.funkemunky.api.utils.MathUtils;
@@ -136,6 +137,18 @@ public class PacketProcessor {
             }
             case Packet.Client.ARM_ANIMATION: {
                 WrappedInArmAnimationPacket packet = new WrappedInArmAnimationPacket(object, data.getPlayer());
+
+                data.checkManager.runPacket(packet, timeStamp);
+                break;
+            }
+            case Packet.Client.HELD_ITEM_SLOT: {
+                WrappedInHeldItemSlotPacket packet = new WrappedInHeldItemSlotPacket(object, data.getPlayer());
+
+                data.checkManager.runPacket(packet, timeStamp);
+                break;
+            }
+            case Packet.Client.WINDOW_CLICK: {
+                WrappedInWindowClickPacket packet = new WrappedInWindowClickPacket(object, data.getPlayer());
 
                 data.checkManager.runPacket(packet, timeStamp);
                 break;

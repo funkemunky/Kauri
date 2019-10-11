@@ -49,7 +49,7 @@ public class CollisionHandler {
                     }
                 }
             } else if(box.intersectsWithBox(data.box
-                    .subtract(0, 2f, 0,0,0.25f,0))) {
+                    .subtract(0, 2f, 0,0,0.25f,0).grow(0.25f, 0, 0.25f))) {
                 nearGround = true;
             }
 

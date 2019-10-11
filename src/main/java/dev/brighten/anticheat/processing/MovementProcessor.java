@@ -227,6 +227,7 @@ public class MovementProcessor {
         data.playerInfo.flightCancel = data.playerInfo.canFly
                 || data.playerInfo.inCreative
                 || hasLevi
+                || data.playerInfo.webTicks > 0
                 || !data.playerInfo.worldLoaded
                 || block == null
                 || data.playerInfo.liquidTicks > 0
