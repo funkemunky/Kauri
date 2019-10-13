@@ -12,7 +12,7 @@ public class BadPacketsG extends Check {
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
         if(packet.isPos() && !data.playerInfo.serverPos) {
-            if(Math.abs(packet.getY()) > Float.MAX_VALUE) {
+            if(Math.abs(packet.getY()) > Float.MAX_VALUE - 100) {
                 vl+= 2;
                 flag("y=" + packet.getY());
             }

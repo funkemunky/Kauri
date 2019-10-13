@@ -21,4 +21,7 @@ public class Config {
 
     @ConfigSetting(path = "alerts", name = "bungee")
     public static boolean bungeeAlerts = false;
+
+    @ConfigSetting(path = "alerts", name = "delay")
+    public static long alertsDelay = 500;
 }

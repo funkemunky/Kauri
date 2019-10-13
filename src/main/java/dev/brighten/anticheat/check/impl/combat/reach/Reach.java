@@ -65,7 +65,7 @@ public class Reach extends Check {
                         .orElse(-1D);
 
                 if(calcDistance > 0) {
-                    if(calcDistance > 3 && collided.size() > 20) {
+                    if(calcDistance > 3 && collided.size() > 36) {
                         if(vl++ > 6) {
                             flag("reach=" + calcDistance + " collided=" + collided.size());
                         }
@@ -111,6 +111,6 @@ public class Reach extends Check {
         return new BoundingBox(loc.toVector(), loc.toVector())
                 .grow((float)bounds.getX(), 0, (float)bounds.getZ())
                 .add(0,0,0,0,(float)bounds.getY(),0)
-                .grow(0.12f,0.12f,0.12f);
+                .grow(0.15f,0.15f,0.15f);
     }
 }

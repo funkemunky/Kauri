@@ -49,7 +49,7 @@ public class Kauri extends JavaPlugin {
 
     public void unload() {
         enabled = false;
-        loggerManager.logsDatabase.saveDatabase();
+        executor.execute(() -> loggerManager.logsDatabase.saveDatabase());
         //Clearing all fields in ObjectData to prevent work from GC.
         MiscUtils.printToConsole("&7Shutting down threadPool and saving config...");
         saveConfig(); //Saving config.
@@ -76,7 +76,7 @@ public class Kauri extends JavaPlugin {
         profiler.enabled = false;
         profiler = null;
         packetProcessor = null;
-        executor.shutdownNow(); //Shutting down threads.
+        executor.shutdown(); //Shutting down threads.
     }
 
     public void load() {
@@ -118,7 +118,7 @@ public class Kauri extends JavaPlugin {
                 ticks++;
                 long currentTime = System.currentTimeMillis();
 
-                if(currentTime - lastTick > 101) {
+                if(currentTime - lastTick > 120) {
                     lastTickLag.reset();
                 }
                 if(ticks >= 10) {

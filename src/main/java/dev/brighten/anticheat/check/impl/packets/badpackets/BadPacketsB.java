@@ -16,8 +16,8 @@ public class BadPacketsB extends Check {
     public void onPlace(WrappedInBlockPlacePacket place, long timeStamp) {
         long delta = timeStamp - lastFlying;
         if(delta < 5 && !data.lagInfo.lagging) {
-            if(vl > 4) flag("sent place before flying packet.");
-        }
+            if(vl++ > 4) flag("sent place before flying packet.");
+        } else vl-= vl > 0 ? 2 : 0;
         debug("delta=" + delta + "ms");
     }
 

@@ -25,7 +25,7 @@ public class SpeedD extends Check {
                && !data.playerInfo.generalCancel
                && data.playerInfo.lastVelocity.hasPassed(20 + MathUtils.millisToTicks(data.lagInfo.ping))) {
            if(vl++ > 5) flag(data.playerInfo.deltaXZ + ">-" + baseSpeed);
-       } else vl-= vl > 0 ? 0.25 : 0;
+       } else vl-= vl > 0 ? 0.025 : 0;
     }
 
 }

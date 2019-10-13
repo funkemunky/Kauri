@@ -20,6 +20,7 @@ public class BadPacketsH extends Check {
 
             if(delta < 35) {
                 if(verbose++ > 5) {
+                    vl++;
                     flag("delta=" + delta);
                 }
             } else verbose-= verbose > 0 ? 1 : 0;

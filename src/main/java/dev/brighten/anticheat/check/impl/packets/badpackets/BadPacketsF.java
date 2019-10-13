@@ -16,7 +16,7 @@ public class BadPacketsF extends Check {
 
         long delta = timeStamp - lastHeldItem;
 
-        if(delta < 3) {
+        if(delta < 5) {
             if(vl++ > 50) {
                 flag("delta=" + delta);
             }

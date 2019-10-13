@@ -1,9 +1,7 @@
 package dev.brighten.anticheat.processing;
 
-import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
-import cc.funkemunky.api.tinyprotocol.packet.GeneralWrapper;
 import cc.funkemunky.api.tinyprotocol.packet.in.*;
 import cc.funkemunky.api.tinyprotocol.packet.out.*;
 import cc.funkemunky.api.utils.MathUtils;
@@ -13,8 +11,6 @@ import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.KLocation;
 import org.bukkit.entity.LivingEntity;
 
-import java.util.concurrent.TimeUnit;
-
 public class PacketProcessor {
 
     public void processClient(ObjectData data, Object object, String type, long timeStamp) {
@@ -23,8 +19,8 @@ public class PacketProcessor {
             case Packet.Client.ABILITIES: {
                 WrappedInAbilitiesPacket packet = new WrappedInAbilitiesPacket(object, data.getPlayer());
 
-                data.playerInfo.isFlying = packet.isFlying();
-                data.playerInfo.canFly = packet.isAllowedFlight();
+                data.playerInfo.serverIsFlying = packet.isFlying();
+                data.playerInfo.serverCanFly = packet.isAllowedFlight();
                 data.playerInfo.inCreative = packet.isCreativeMode();
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
@@ -163,9 +159,9 @@ public class PacketProcessor {
             case Packet.Server.ABILITIES: {
                 WrappedOutAbilitiesPacket packet = new WrappedOutAbilitiesPacket(object, data.getPlayer());
 
-                data.playerInfo.canFly = packet.isAllowedFlight();
+                data.playerInfo.serverCanFly = packet.isAllowedFlight();
                 data.playerInfo.inCreative = packet.isCreativeMode();
-                data.playerInfo.isFlying = packet.isFlying();
+                data.playerInfo.serverIsFlying = packet.isFlying();
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
             }
