@@ -17,10 +17,7 @@ import dev.brighten.anticheat.check.impl.movement.fly.FlyA;
 import dev.brighten.anticheat.check.impl.movement.fly.FlyB;
 import dev.brighten.anticheat.check.impl.movement.fly.FlyC;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFall;
-import dev.brighten.anticheat.check.impl.movement.speed.SpeedA;
-import dev.brighten.anticheat.check.impl.movement.speed.SpeedB;
-import dev.brighten.anticheat.check.impl.movement.speed.SpeedC;
-import dev.brighten.anticheat.check.impl.movement.speed.SpeedD;
+import dev.brighten.anticheat.check.impl.movement.speed.*;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityA;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityB;
 import dev.brighten.anticheat.check.impl.packets.Timer;
@@ -32,7 +29,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -148,6 +144,7 @@ public class Check {
         register(new SpeedB());
         register(new SpeedC());
         register(new SpeedD());
+        register(new SpeedF());
         register(new Timer());
         register(new BadPacketsA());
         register(new BadPacketsB());
