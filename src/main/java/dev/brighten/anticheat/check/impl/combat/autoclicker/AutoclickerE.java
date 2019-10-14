@@ -21,6 +21,11 @@ public class AutoclickerE extends Check {
     public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
         long delta = timeStamp - lastClick;
 
+        if(delta > 500) {
+            lastClick = timeStamp;
+            return;
+        }
+
         float gcd =
                 MiscUtils.gcd(delta * MovementProcessor.offset, lastDelta * MovementProcessor.offset);
         long shit = (long) (gcd / MovementProcessor.offset);
@@ -33,7 +38,7 @@ public class AutoclickerE extends Check {
                 if(vl++ > 8) {
                     flag("std=" + std + " avg=" + avg);
                 }
-            } else vl-= vl > 0 ? 0.1 : 0;
+            } else vl-= vl > 0 ? 0.25 : 0;
 
             debug("std=" + std + " avg=" + avg);
             interval.clear();

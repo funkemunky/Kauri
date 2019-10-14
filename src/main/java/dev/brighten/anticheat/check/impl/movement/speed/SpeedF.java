@@ -17,7 +17,9 @@ public class SpeedF extends Check {
         if(packet.isPos()) {
             float accel = Math.abs(data.playerInfo.deltaXZ - data.playerInfo.lDeltaXZ);
 
-            if(!data.playerInfo.clientGround && MathUtils.getDelta(accel, lastAccel) < 0.001) {
+            if(!data.playerInfo.clientGround
+                    && !data.playerInfo.generalCancel
+                    && MathUtils.getDelta(accel, lastAccel) < 0.001) {
                 if(vl++ > 5) {
                     flag("accel=" + accel + " lAccel=" + lastAccel);
                 }
