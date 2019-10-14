@@ -12,14 +12,11 @@ import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.KLocation;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.MovementUtils;
-import net.minecraft.server.v1_7_R4.IWorldAccess;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 public class MovementProcessor {
 
@@ -52,6 +49,8 @@ public class MovementProcessor {
             data.playerInfo.to.z = packet.getZ();
         }
 
+        data.playerInfo.jumpHeight = MovementUtils.getJumpHeight(data.getPlayer());
+
         data.playerInfo.worldLoaded = Atlas.getInstance().getBlockBoxManager().getBlockBox()
                 .isChunkLoaded(data.playerInfo.to.toLocation(data.getPlayer().getWorld()));
 
@@ -64,6 +63,12 @@ public class MovementProcessor {
         if (packet.isLook()) {
             data.playerInfo.to.yaw = packet.getYaw();
             data.playerInfo.to.pitch = packet.getPitch();
+        }
+
+        //Fixes glitch when logging in.
+        if(data.creation.hasNotPassed(20)) {
+            data.playerInfo.serverCanFly = data.getPlayer().getAllowFlight();
+            data.playerInfo.serverIsFlying = data.getPlayer().isFlying();
         }
 
         if (data.playerInfo.breakingBlock) {
@@ -127,10 +132,7 @@ public class MovementProcessor {
             data.playerInfo.pitchGCD = MiscUtils.gcd((long) (Math.abs(data.playerInfo.deltaPitch) * offset), (long) (Math.abs(data.playerInfo.lDeltaPitch) * offset));
         }
 
-        data.playerInfo.usingItem = (data.playerInfo.itemAnimation =
-                data.getPlayer().getItemInHand() != null && !data.getPlayer().getItemInHand().getType().equals(Material.AIR)
-                ? MinecraftReflection.getItemAnimation(data.getPlayer().getItemInHand())
-                : WrappedEnumAnimation.NONE) != WrappedEnumAnimation.NONE;
+        data.playerInfo.usingItem = data.getPlayer().isBlocking() ||  Atlas.getInstance().getBlockBoxManager().getBlockBox().isUsingItem(data.getPlayer());
 
         //Setting fallDistance
         if (!data.playerInfo.serverGround
@@ -214,19 +216,16 @@ public class MovementProcessor {
             data.playerInfo.airTicks = 0;
         }
 
-        data.playerInfo.usingItem = data.getPlayer().getItemInHand() != null
-                && !data.getPlayer().getItemInHand().getType().equals(Material.AIR)
-                && !MinecraftReflection.getItemAnimation(data.getPlayer().getItemInHand()).equals(WrappedEnumAnimation.NONE);
-
         /* General Cancel Booleans */
         boolean hasLevi = data.getPlayer().getActivePotionEffects().size() > 0
                 && data.getPlayer().getActivePotionEffects()
                 .stream()
                 .anyMatch(effect -> effect.getType().toString().contains("LEVI"));
 
-        data.playerInfo.flightCancel = data.playerInfo.canFly
+        data.playerInfo.flightCancel = data.playerInfo.serverCanFly
                 || data.playerInfo.inCreative
                 || hasLevi
+                || data.playerInfo.webTicks > 0
                 || !data.playerInfo.worldLoaded
                 || block == null
                 || data.playerInfo.liquidTicks > 0
@@ -235,7 +234,7 @@ public class MovementProcessor {
                 || data.playerInfo.serverPos
                 || Kauri.INSTANCE.lastTickLag.hasNotPassed(5);
 
-        data.playerInfo.generalCancel = data.playerInfo.canFly
+        data.playerInfo.generalCancel = data.playerInfo.serverCanFly
                 || data.playerInfo.inCreative
                 || hasLevi
                 || !data.playerInfo.worldLoaded

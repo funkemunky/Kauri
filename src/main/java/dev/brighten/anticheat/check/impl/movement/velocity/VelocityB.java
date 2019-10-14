@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.check.impl.movement.velocity;
 
+import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
@@ -58,9 +59,17 @@ public class VelocityB extends Check {
             if(data.playerInfo.lastVelocity.hasNotPassed(5)) {
                 if(!data.blockInfo.blocksNear
                         && !data.blockInfo.inWeb
+                        && !data.playerInfo.onLadder
                         && !data.lagInfo.lagging
                         && !data.playerInfo.serverPos
                         && !data.getPlayer().getAllowFlight()) {
+
+                    if(Atlas.getInstance().getBlockBoxManager().getBlockBox().isUsingItem(data.getPlayer())) {
+                        vX = vZ = 0;
+                        vl-= vl > 0 ? 1 : 0;
+                        return;
+                    }
+
                     float f4 = 0.91f;
 
                     if (data.playerInfo.lClientGround) {
@@ -120,7 +129,7 @@ public class VelocityB extends Check {
                             + " sprint=" + data.playerInfo.sprinting + " ground=" + packet.isGround() + " vl=" + vl);
 
                     //debug("vX=" + vX + " vZ=" + vZ);
-                    //debug("dX=" + data.playerInfo.deltaX + " dZ=" + data.playerInfo.deltaZ);
+                    //debug("dX=" + data.playerInfo.deltaX + " dZ=" + data.playerInfo.deltaZ + " item=" +);
 
                     vX *= f4;
                     vZ *= f4;

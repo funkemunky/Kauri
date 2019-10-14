@@ -32,7 +32,7 @@ public class VelocityA extends Check {
                 && !data.blockInfo.inWeb
                 && !data.blockInfo.onClimbable
                 && data.playerInfo.blocksAboveTicks == 0
-                && !data.playerInfo.canFly) {
+                && !data.playerInfo.serverCanFly) {
 
             float pct = data.playerInfo.deltaY / (float) vY * 100F;
 

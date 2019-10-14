@@ -16,17 +16,16 @@ public class SpeedD extends Check {
                + 0.075f
                + (data.playerInfo.groundTicks < 8 ? 0.4f * (float)Math.pow(0.75f, data.playerInfo.groundTicks) : 0);
 
-       if(data.playerInfo.iceTicks > 0 && data.playerInfo.groundTicks < 13) {
-           baseSpeed+= 0.25f;
-       }
-
        if(data.playerInfo.serverGround
+               && data.playerInfo.clientGround
+               && data.playerInfo.iceTicks == 0
+               && !data.blockInfo.blocksAbove
                && data.playerInfo.deltaXZ > baseSpeed
                && data.playerInfo.halfBlockTicks == 0
                && !data.playerInfo.generalCancel
                && data.playerInfo.lastVelocity.hasPassed(20 + MathUtils.millisToTicks(data.lagInfo.ping))) {
            if(vl++ > 5) flag(data.playerInfo.deltaXZ + ">-" + baseSpeed);
-       } else vl-= vl > 0 ? 0.25 : 0;
+       } else vl-= vl > 0 ? 0.025 : 0;
     }
 
 }

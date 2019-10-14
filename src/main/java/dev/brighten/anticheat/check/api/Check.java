@@ -5,25 +5,23 @@ import cc.funkemunky.api.tinyprotocol.api.packets.reflections.types.WrappedClass
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.MiscUtils;
+import cc.funkemunky.api.utils.TickTimer;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.impl.combat.aim.*;
-import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerA;
-import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerB;
-import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerC;
-import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerD;
+import dev.brighten.anticheat.check.impl.combat.autoclicker.*;
 import dev.brighten.anticheat.check.impl.combat.hitbox.Hitboxes;
 import dev.brighten.anticheat.check.impl.combat.reach.Reach;
 import dev.brighten.anticheat.check.impl.movement.fly.FlyA;
 import dev.brighten.anticheat.check.impl.movement.fly.FlyB;
 import dev.brighten.anticheat.check.impl.movement.fly.FlyC;
-import dev.brighten.anticheat.check.impl.movement.nofall.NoFall;
+import dev.brighten.anticheat.check.impl.movement.fly.FlyD;
+import dev.brighten.anticheat.check.impl.movement.nofall.NoFallA;
+import dev.brighten.anticheat.check.impl.movement.nofall.NoFallB;
 import dev.brighten.anticheat.check.impl.movement.speed.*;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityA;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityB;
 import dev.brighten.anticheat.check.impl.packets.Timer;
-import dev.brighten.anticheat.check.impl.packets.badpackets.BadPacketsA;
-import dev.brighten.anticheat.check.impl.packets.badpackets.BadPacketsB;
-import dev.brighten.anticheat.check.impl.packets.badpackets.BadPacketsC;
+import dev.brighten.anticheat.check.impl.packets.badpackets.*;
 import dev.brighten.anticheat.data.ObjectData;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
@@ -47,6 +45,8 @@ public class Check {
     public boolean enabled, executable, developer;
     public float vl, punishVl;
     public CheckType checkType;
+
+    private TickTimer lastAlert = new TickTimer(MathUtils.millisToTicks(Config.alertsDelay));
 
     private static void register(Check check) {
         if(!check.getClass().isAnnotationPresent(CheckInfo.class)) {
@@ -79,9 +79,15 @@ public class Check {
                 .replace("%t", String.valueOf(MathUtils.round(Kauri.INSTANCE.tps, 2)));
         if(Kauri.INSTANCE.lastTickLag.hasPassed() && (data.lagInfo.lastPacketDrop.hasPassed(5) || data.lagInfo.lastPingDrop.hasPassed())) {
             Kauri.INSTANCE.loggerManager.addLog(data, this, info);
-            Kauri.INSTANCE.dataManager.hasAlerts.forEach(data -> {
-                data.getPlayer().sendMessage(Color.translate("&8[&6K&8] &f" + this.data.getPlayer().getName() + " &7flagged &f" + name + " &8(&e" + info + "&8) &8[&c" + vl + "&8]"));
-            });
+
+            if(lastAlert.hasPassed(MathUtils.millisToTicks(Config.alertsDelay))) {
+                Kauri.INSTANCE.dataManager.hasAlerts.forEach(data -> {
+                    data.getPlayer().sendMessage(Color.translate("&8[&6K&8] &f" + this.data.getPlayer().getName()
+                            + " &7flagged &f" + name
+                            + " &8(&e" + info + "&8) &8[&c" + MathUtils.round(vl, 2) + "&8]"));
+                });
+                lastAlert.reset();
+            }
 
             if(punishVl != -1 && vl > punishVl) {
                 punish();
@@ -89,7 +95,9 @@ public class Check {
 
             if(Config.bungeeAlerts) {
                 try {
-                    Atlas.getInstance().getBungeeManager().sendObjects("ALL", data.getPlayer().getUniqueId(), name, vl, info);
+                    Atlas.getInstance().getBungeeManager()
+                            .sendObjects("ALL", data.getPlayer().getUniqueId(), name,
+                                    MathUtils.round(vl, 2), info);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -126,10 +134,13 @@ public class Check {
         register(new AutoclickerB());
         register(new AutoclickerC());
         register(new AutoclickerD());
+        register(new AutoclickerE());
         register(new FlyA());
         register(new FlyB());
         register(new FlyC());
-        register(new NoFall());
+        register(new FlyD());
+        register(new NoFallA());
+        register(new NoFallB());
         register(new Reach());
         register(new Hitboxes());
         register(new AimA());
@@ -140,15 +151,26 @@ public class Check {
         register(new AimF());
         register(new AimG());
         register(new AimH());
+        register(new AimI());
         register(new SpeedA());
         register(new SpeedB());
         register(new SpeedC());
         register(new SpeedD());
+        register(new SpeedE());
         register(new SpeedF());
         register(new Timer());
         register(new BadPacketsA());
         register(new BadPacketsB());
         register(new BadPacketsC());
+        register(new BadPacketsD());
+        register(new BadPacketsE());
+        register(new BadPacketsF());
+        register(new BadPacketsG());
+        register(new BadPacketsH());
+        register(new BadPacketsI());
+        register(new BadPacketsJ());
+        register(new BadPacketsK());
+        register(new BadPacketsL());
         register(new VelocityA());
         register(new VelocityB());
     }

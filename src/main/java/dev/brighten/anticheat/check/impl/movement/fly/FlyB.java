@@ -11,6 +11,7 @@ import dev.brighten.anticheat.utils.MovementUtils;
         checkType = CheckType.FLIGHT, punishVL = 5)
 public class FlyB extends Check {
 
+    private float jumpHeight;
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if(!packet.isPos()
@@ -18,7 +19,8 @@ public class FlyB extends Check {
                 || data.playerInfo.halfBlockTicks > 0
                 || data.playerInfo.lastVelocity.hasNotPassed(20)) return;
 
-        float max = MovementUtils.getJumpHeight(data.getPlayer()) + 0.01f;
+        if(data.playerInfo.serverGround || data.playerInfo.clientGround) jumpHeight = data.playerInfo.jumpHeight;
+        float max = jumpHeight + 0.01f;
 
         if(data.playerInfo.deltaY > max) {
             if(vl++ > 1) {

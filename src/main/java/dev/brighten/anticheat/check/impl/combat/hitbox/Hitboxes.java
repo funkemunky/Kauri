@@ -3,6 +3,7 @@ package dev.brighten.anticheat.check.impl.combat.hitbox;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.MiscUtils;
+import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.CheckType;
@@ -82,6 +83,7 @@ public class Hitboxes extends Check {
     private static boolean checkParameters(ObjectData data) {
         return data.playerInfo.lastAttack.hasNotPassed(0)
                 && data.target != null
+                && Kauri.INSTANCE.lastTickLag.hasPassed(10)
                 && allowedEntities.contains(data.target.getType())
                 && !data.playerInfo.inCreative
                 && data.playerInfo.lastTargetSwitch.hasPassed()

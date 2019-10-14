@@ -34,7 +34,7 @@ public class PredictionService {
     public BoundingBox box;
     public float walkSpeed, yaw, pitch, moveStrafing, moveForward, aiMoveSpeed, distanceWalkedModified,
             distanceWalkedOnStepModified, nextStepDistance, fallDistance;
-    public String key;
+    public String key = "Nothing";
 
     public PredictionService(ObjectData data) {
         this.data = data;

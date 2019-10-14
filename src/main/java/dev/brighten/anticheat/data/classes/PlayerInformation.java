@@ -8,10 +8,11 @@ import dev.brighten.anticheat.utils.MouseFilter;
 
 public class PlayerInformation {
     public boolean serverGround, lClientGround, clientGround, nearGround, useItem,
-            collidesVertically, collidesHorizontally, canFly, inCreative, isFlying, collided,
-            onLadder, usingItem, wasOnIce, wasOnSlime, jumped, inAir, breakingBlock, worldLoaded;
+            collidesVertically, collidesHorizontally, serverCanFly, inCreative, serverIsFlying, collided,
+            onLadder, usingItem, wasOnIce, wasOnSlime, jumped, inAir, breakingBlock, worldLoaded,
+            clientIsFlying, clientCanFly;
     public boolean generalCancel, flightCancel;
-    public float deltaY, lDeltaY, deltaX, lDeltaX, deltaZ, lDeltaZ, deltaXZ, lDeltaXZ, fallDistance;
+    public float deltaY, lDeltaY, deltaX, lDeltaX, deltaZ, lDeltaZ, deltaXZ, lDeltaXZ, fallDistance, jumpHeight;
     public float pDeltaY;
     public float deltaYaw, deltaPitch, lDeltaYaw, lDeltaPitch;
 
