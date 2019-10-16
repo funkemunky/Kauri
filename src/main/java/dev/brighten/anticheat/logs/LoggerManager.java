@@ -114,7 +114,7 @@ public class LoggerManager {
     public List<Log> getLogs(UUID uuid) {
         List<StructureSet> sets = logsDatabase.getFieldsByStructure(struct ->
                 struct.name.equals("uuid")
-                        && String.valueOf(struct.object).equals(uuid.toString()));
+                        && String.valueOf(struct.object).equals(uuid.toString()), struct -> !struct.name.equals("type"));
 
         return sets.stream().map(set -> new Log(
                 String.valueOf(set.getStructureByName("checkName").get().object),

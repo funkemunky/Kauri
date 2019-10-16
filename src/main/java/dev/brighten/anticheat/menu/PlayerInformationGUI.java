@@ -20,13 +20,16 @@ import dev.brighten.anticheat.utils.menu.button.Button;
 import dev.brighten.anticheat.utils.menu.type.impl.ChestMenu;
 import lombok.val;
 import org.apache.commons.lang.time.DurationFormatUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
-public class PlayerInformation extends ChestMenu {
+public class PlayerInformationGUI extends ChestMenu {
 
     public ObjectData data;
     private static String line = MiscUtils.line(Color.Dark_Gray);
@@ -34,12 +37,9 @@ public class PlayerInformation extends ChestMenu {
     private Button playerButton, forgeButton, violationsButton;
     private BukkitTask updatingTask;
     private ModData modData;
-    private List<Log> logs;
-    private static WrappedClass nbtCompound = Reflections.getNMSClass("NBTTagCompound");
-    private static WrappedMethod setString = nbtCompound.getMethod("setString", String.class, String.class);
 
-    public PlayerInformation(ObjectData data, String title, int size) {
-        super(title, size);
+    public PlayerInformationGUI(ObjectData data) {
+        super(data.getPlayer().getName() + "'s Information", 3);
         this.data = data;
         this.modData = ForgeHandler.getMods(data.getPlayer());
 
@@ -53,9 +53,15 @@ public class PlayerInformation extends ChestMenu {
                 modData == null
                 || modData.getMods().size() == 0 ? null : (player, info) -> modsGUI().showMenu(player)));
         violationsButton = new Button(false, violationsButton(), (player, info) -> {
+            if(info.getClickType().name().contains("LEFT")) {
+                player.closeInventory();
+                data.getPlayer().sendMessage(Color.Green + LogCommand.getLogsFromUUID(data.getPlayer().getUniqueId()));
+            }
+        });
 
-        })
-
+        setItem(13, playerButton);
+        setItem(11, forgeButton);
+        setItem(15, violationsButton);
     }
 
     private ItemStack playerSkull() {
@@ -75,27 +81,8 @@ public class PlayerInformation extends ChestMenu {
         return vioItem.build();
     }
 
-    private ChestMenu logMenu() {
-        ChestMenu menu = new ChestMenu("Click the book", 3);
-
-        String log = LogCommand.getLogsFromUUID(data.getPlayer().getUniqueId());
-
-        ItemStack book = MiscUtils.createItem(Material.BOOK, 1, "&6Open Log",
-                "",
-                "&7&oLeft click to open URL",
-                log);
-
-        Object compound = nbtCompound.getConstructor().newInstance();
-        setString.invoke(compound, "action", "open_url");
-        setString.invoke(compound, "value", log);
-        Object vanillaBook = CraftReflection.getVanillaItemStack(book);
-
-        val setTag = MinecraftReflection.itemStack.getMethod("setTag", Object.class);
-
-        setTag.invoke(vanillaBook, compound);
-    }
-
     private ItemStack forgeItem() {
+        modData = ForgeHandler.getMods(data.getPlayer());
         ItemBuilder forgeItem = new ItemBuilder(Material.ANVIL);
 
         forgeItem.amount(1);
@@ -115,7 +102,8 @@ public class PlayerInformation extends ChestMenu {
             loreList.add("&c&oNo mods.");
         }
         loreList.add(halfLine);
-        forgeItem.lore(loreList);
+
+        forgeItem.lore(loreList.stream().map(Color::translate).collect(Collectors.toList()));
 
         return forgeItem.build();
     }
@@ -123,7 +111,7 @@ public class PlayerInformation extends ChestMenu {
     private ItemStack violationsButton() {
         ItemBuilder violationsItem = new ItemBuilder(Material.ENCHANTED_BOOK);
 
-        logs = Kauri.INSTANCE.loggerManager.getLogs(data.getPlayer().getUniqueId());
+        List<Log> logs = Kauri.INSTANCE.loggerManager.getLogs(data.getPlayer().getUniqueId());
 
         violationsItem.amount(1);
         violationsItem.name(Color.Gold + "Violations");
@@ -132,6 +120,8 @@ public class PlayerInformation extends ChestMenu {
                 "&fThis player currently has &e" + logs.size() + " logs&f.",
                 "&7&oRight click to view logs",
                 halfLine);
+
+        logs.clear();
         return violationsItem.build();
     }
 
@@ -151,8 +141,6 @@ public class PlayerInformation extends ChestMenu {
 
         return subMenu;
     }
-
-    private void
 
     private void update() {
         updatingTask = RunUtils.taskTimerAsync(() -> {

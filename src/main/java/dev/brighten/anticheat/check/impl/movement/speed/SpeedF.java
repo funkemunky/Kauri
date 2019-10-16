@@ -11,20 +11,22 @@ import dev.brighten.anticheat.check.api.Packet;
         checkType = CheckType.SPEED, punishVL = 20)
 public class SpeedF extends Check {
 
-    private float lastAccel;
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if(packet.isPos()) {
             float accel = Math.abs(data.playerInfo.deltaXZ - data.playerInfo.lDeltaXZ);
 
-            if(!data.playerInfo.clientGround
-                    && !data.playerInfo.generalCancel
-                    && MathUtils.getDelta(accel, lastAccel) < 0.001) {
+            if(data.playerInfo.clientGround) return;
+
+            if(!data.playerInfo.generalCancel
+                    && (data.playerInfo.deltaXZ > 0.1 || data.playerInfo.lDeltaXZ > 0.1)
+                    && accel < 0.0001) {
                 if(vl++ > 5) {
-                    flag("accel=" + accel + " lAccel=" + lastAccel);
+                    flag("accel=" + accel);
                 }
             } else vl-= vl > 0 ? 0.5 : 0;
-            lastAccel = accel;
+
+            debug("accel=" + accel + " vl=" + vl);
         }
     }
 }
