@@ -34,7 +34,7 @@ public class LogCommand {
         });
     }
 
-    private static String getLogsFromUUID(UUID uuid) {
+    public static String getLogsFromUUID(UUID uuid) {
         List<Log> logs = Kauri.INSTANCE.loggerManager.getLogs(uuid);
         List<Punishment> punishments = Kauri.INSTANCE.loggerManager.getPunishments(uuid);
 
