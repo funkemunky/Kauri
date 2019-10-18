@@ -15,6 +15,7 @@ public class PlayerInformation {
     public float deltaY, lDeltaY, deltaX, lDeltaX, deltaZ, lDeltaZ, deltaXZ, lDeltaXZ, fallDistance, jumpHeight;
     public float pDeltaY;
     public float deltaYaw, deltaPitch, lDeltaYaw, lDeltaPitch;
+    public long lastVelocityTimestamp;
 
     //Cinematic
     public float lCinematicYaw, lCinematicPitch;

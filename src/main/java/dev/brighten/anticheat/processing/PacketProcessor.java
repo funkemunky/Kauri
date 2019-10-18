@@ -99,22 +99,23 @@ public class PacketProcessor {
             case Packet.Client.KEEP_ALIVE: {
                 WrappedInKeepAlivePacket packet = new WrappedInKeepAlivePacket(object, data.getPlayer());
 
-                if(packet.getTime() == (data.getPlayer().getEntityId() + 1500)) {
-                    data.playerInfo.serverPos = true;
-                    data.playerInfo.lastServerPos = System.currentTimeMillis();
-                } else if(packet.getTime() == (data.getPlayer().getEntityId() + 2000)) {
-                    data.playerInfo.lastVelocity.reset();
-                } else {
-                    data.lagInfo.lastPing = data.lagInfo.ping;
-                    data.lagInfo.ping = System.currentTimeMillis() - data.lagInfo.lastKeepAlive;
-                    data.checkManager.runPacket(packet, timeStamp);
-                }
+                data.lagInfo.lastPing = data.lagInfo.ping;
+                data.lagInfo.ping = System.currentTimeMillis() - data.lagInfo.lastKeepAlive;
+                data.checkManager.runPacket(packet, timeStamp);
                 break;
             }
             case Packet.Client.TRANSACTION: {
                 WrappedInTransactionPacket packet = new WrappedInTransactionPacket(object, data.getPlayer());
 
-                if (packet.getAction() == (short) 69) {
+                if(packet.getAction() == (short) 100) {
+                    data.playerInfo.lastServerPos = System.currentTimeMillis();
+                    data.playerInfo.serverPos = true;
+                }
+                else if(packet.getAction() == (short) 101) {
+                    data.playerInfo.lastVelocity.reset();
+                    data.playerInfo.lastVelocityTimestamp = System.currentTimeMillis();
+                }
+                else if (packet.getAction() == (short) 69) {
                     data.lagInfo.lastTransPing = data.lagInfo.transPing;
                     data.lagInfo.transPing = System.currentTimeMillis() - data.lagInfo.lastTrans;
 
@@ -169,7 +170,7 @@ public class PacketProcessor {
                 WrappedOutVelocityPacket packet = new WrappedOutVelocityPacket(object, data.getPlayer());
 
                 if(packet.getId() == data.getPlayer().getEntityId()) {
-                    TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutKeepAlivePacket(data.getPlayer().getEntityId() + 2000).getObject());
+                    TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutTransaction(0, (short)101, false).getObject());
                 }
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
@@ -196,7 +197,7 @@ public class PacketProcessor {
                 data.playerInfo.posLocs.add(new KLocation(packet.getX(), packet.getY(), packet.getZ(), packet.getYaw(), packet.getPitch()));
                 data.playerInfo.lastServerPos = System.currentTimeMillis();
                 data.checkManager.runPacket(packet, timeStamp);
-                TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutKeepAlivePacket(data.getPlayer().getEntityId() + 1500).getObject());
+                TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutTransaction(0, (short)100, false).getObject());
                 break;
             }
         }

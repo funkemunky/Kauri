@@ -14,13 +14,14 @@ public class BadPacketsI extends Check {
     public void windowClick(WrappedInWindowClickPacket packet) {
         if(data.playerInfo.deltaXZ > 0.1
                 && !data.playerInfo.serverPos
-                && !data.playerInfo.lastVelocity.hasPassed(30)
+                && data.playerInfo.lastVelocity.hasPassed(30)
                 && data.playerInfo.serverGround
                 && !data.blockInfo.inLiquid
                 && !data.blockInfo.onIce
                 && !data.playerInfo.serverIsFlying) {
-            vl++;
-            flag("dropped item while moving");
-        }
+            if(vl++ > 2) {
+                flag("clicked in window while moving");
+            }
+        } else vl-= vl > 0 ? 0.02 : 0;
     }
 }
