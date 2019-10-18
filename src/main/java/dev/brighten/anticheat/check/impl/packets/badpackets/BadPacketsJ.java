@@ -12,7 +12,11 @@ public class BadPacketsJ extends Check {
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
         if(packet.isPos()) {
-            if(!data.predictionService.key.contains("W") && data.playerInfo.sprinting && !data.predictionService.key.equals("Nothing")) {
+            if(!data.predictionService.key.contains("W")
+                    && !data.blockInfo.collidesHorizontally
+                    && data.playerInfo.deltaXZ > 0.1
+                    && data.playerInfo.sprinting
+                    && !data.predictionService.key.equals("Nothing")) {
                 if(vl++ > 5) {
                     flag("key=" + data.predictionService.key + "; sprinting");
                 }

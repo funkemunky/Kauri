@@ -20,7 +20,7 @@ public class SpeedF extends Check {
 
             if(!data.playerInfo.generalCancel
                     && (data.playerInfo.deltaXZ > 0.1 || data.playerInfo.lDeltaXZ > 0.1)
-                    && accel < 0.0001) {
+                    && accel < 0.00001) {
                 if(vl++ > 5) {
                     flag("accel=" + accel);
                 }

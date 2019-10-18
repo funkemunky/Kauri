@@ -9,6 +9,7 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.CheckSettings;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.data.ObjectData;
+import lombok.val;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -25,19 +26,16 @@ public class CheckManager {
 
     public void runPacket(NMSObject object, long timeStamp) {
         if(!checkMethods.containsKey(object.getClass())) return;
-        checkMethods.get(object.getClass()).parallelStream().forEach(entry -> {
+
+        val methods = checkMethods.get(object.getClass());
+        methods.parallelStream().forEach(entry -> {
             Check check = checks.get(entry.getKey());
 
             if(check.enabled) {
-                try {
-                    if(entry.getValue().getMethod().getParameterCount() > 1) {
-                        entry.getValue().getMethod().invoke(check, object, timeStamp);
-                    } else {
-                        entry.getValue().getMethod().invoke(check, object);
-                    }
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    System.out.println("Error on " + check.name);
-                    e.printStackTrace();
+                if(entry.getValue().getMethod().getParameterCount() > 1) {
+                    entry.getValue().invoke(check, object, timeStamp);
+                } else {
+                    entry.getValue().invoke(check, object);
                 }
             }
         });
