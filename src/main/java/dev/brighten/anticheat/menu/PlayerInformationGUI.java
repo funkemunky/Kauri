@@ -118,7 +118,7 @@ public class PlayerInformationGUI extends ChestMenu {
         violationsItem.lore("",
                 halfLine,
                 "&fThis player currently has &e" + logs.size() + " logs&f.",
-                "&7&oRight click to view logs",
+                "&7&oLeft click to view logs",
                 halfLine);
 
         logs.clear();

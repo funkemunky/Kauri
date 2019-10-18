@@ -63,7 +63,7 @@ public class LogCommand {
         }
 
         for (Long key : eventsByStamp.keySet()) {
-            body.append(eventsByStamp.get(key));
+            body.append(eventsByStamp.get(key)).append("\n");
         }
 
         try {
