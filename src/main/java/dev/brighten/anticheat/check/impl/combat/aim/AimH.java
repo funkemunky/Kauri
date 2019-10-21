@@ -16,8 +16,7 @@ public class AimH extends Check {
         if(packet.isLook()) {
             float absPitch = Math.abs((float) MathUtils.trim(4, data.playerInfo.deltaPitch));
             String string = String.valueOf(absPitch);
-            String string2 = String.valueOf((float) MathUtils.trim(4, data.playerInfo.deltaYaw));
-            if((absPitch > 1 && string.length() < 4) && data.playerInfo.lastAttack.hasNotPassed(10)) {
+            if((absPitch > 1 && string.length() < 3) && data.playerInfo.lastAttack.hasNotPassed(10)) {
                 if(vl++ > 4) {
                     flag("deltaPitch=" + absPitch);
                 }

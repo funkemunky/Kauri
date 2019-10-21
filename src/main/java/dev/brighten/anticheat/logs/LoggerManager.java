@@ -78,9 +78,11 @@ public class LoggerManager {
                 Atlas.getInstance().getCarbon().createFlatfileDatabase(Kauri.INSTANCE.getDataFolder().getPath(), "logs");
             }
             logsDatabase = Atlas.getInstance().getCarbon().getDatabase(mySQLEnabled ? sqlDatabase : "logs");
-            MiscUtils.printToConsole("&7Loading database...");
-            logsDatabase.loadDatabase();
-            save();
+            MiscUtils.printToConsole("&7Loading database on second thread...");
+            Kauri.INSTANCE.executor.execute(() -> {
+                logsDatabase.loadDatabase();
+                save();
+            });
         }
     }
 

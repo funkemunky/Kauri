@@ -26,7 +26,7 @@ public class AimB extends Check {
                 if(vl++ > 20) {
                     flag("offset=" + data.playerInfo.pitchGCD + " deltaPitch=" + data.playerInfo.deltaPitch);
                 }
-            } else vl-= vl > 0 ? 1 : 0;
+            } else vl-= vl > 0 ? 0.5 : 0;
             debug("gcd=" + data.playerInfo.pitchGCD
                     + " deltaPitch=" + data.playerInfo.deltaPitch + " vl=" + vl);
         }

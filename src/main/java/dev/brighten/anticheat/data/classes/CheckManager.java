@@ -4,12 +4,10 @@ import cc.funkemunky.api.tinyprotocol.api.NMSObject;
 import cc.funkemunky.api.tinyprotocol.api.packets.reflections.types.WrappedClass;
 import cc.funkemunky.api.tinyprotocol.api.packets.reflections.types.WrappedMethod;
 import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.check.api.Check;
-import dev.brighten.anticheat.check.api.CheckInfo;
-import dev.brighten.anticheat.check.api.CheckSettings;
-import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.data.ObjectData;
 import lombok.val;
+import org.bukkit.event.Event;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -28,17 +26,34 @@ public class CheckManager {
         if(!checkMethods.containsKey(object.getClass())) return;
 
         val methods = checkMethods.get(object.getClass());
-        methods.parallelStream().forEach(entry -> {
-            Check check = checks.get(entry.getKey());
+        methods.parallelStream().filter(entry -> entry.getValue().getMethod().isAnnotationPresent(Packet.class))
+                .forEach(entry -> {
+                    Check check = checks.get(entry.getKey());
 
-            if(check.enabled) {
-                if(entry.getValue().getMethod().getParameterCount() > 1) {
-                    entry.getValue().invoke(check, object, timeStamp);
-                } else {
-                    entry.getValue().invoke(check, object);
-                }
-            }
-        });
+                    if(check.enabled) {
+                        if(entry.getValue().getMethod().getParameterCount() > 1) {
+                            entry.getValue().invoke(check, object, timeStamp);
+                        } else {
+                            entry.getValue().invoke(check, object);
+                        }
+                    }
+                });
+    }
+
+    public void runEvent(Event event) {
+        if(!checkMethods.containsKey(event.getClass())) return;
+
+        val methods = checkMethods.get(event.getClass());
+
+        methods.parallelStream().filter(entry ->
+                entry.getValue().getMethod().isAnnotationPresent(dev.brighten.anticheat.check.api.Event.class))
+                .forEach(entry -> {
+                    Check check = checks.get(entry.getKey());
+
+                    if(check.enabled) {
+                        entry.getValue().invoke(check, event);
+                    }
+                });
     }
 
     public void addChecks() {
@@ -66,7 +81,8 @@ public class CheckManager {
 
             Arrays.stream(check.getClass().getDeclaredMethods())
                     .parallel()
-                    .filter(method -> method.isAnnotationPresent(Packet.class))
+                    .filter(method -> method.isAnnotationPresent(Packet.class)
+                            || method.isAnnotationPresent(dev.brighten.anticheat.check.api.Event.class))
                     .map(method -> new WrappedMethod(checkClass, method))
                     .forEach(method -> {
                         Class<?> parameter = method.getParameters().get(0);

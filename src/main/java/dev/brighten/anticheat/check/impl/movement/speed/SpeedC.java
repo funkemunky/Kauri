@@ -15,12 +15,12 @@ public class SpeedC extends Check {
         if(packet.isPos()
                 && !data.playerInfo.generalCancel
                 && data.playerInfo.lastVelocity.hasPassed(5 + MathUtils.millisToTicks(data.lagInfo.ping))) {
-            float baseSpeed = MovementUtils.getBaseSpeed(data) + (data.playerInfo.serverGround ? 0.35f : 0.5f);
+            float baseSpeed = MovementUtils.getBaseSpeed(data) + (data.playerInfo.serverGround ? 0.4f : 0.6f);
 
             if(data.blockInfo.blocksAbove || data.playerInfo.iceTicks > 0) baseSpeed+= baseSpeed * 0.5 + 0.5;
 
             if(data.playerInfo.deltaXZ > baseSpeed) {
-                if(vl++ > 1 || (data.playerInfo.deltaXZ - baseSpeed) > 1.2)
+                if(vl++ > 2)
                     flag(data.playerInfo.deltaXZ + ">-" + baseSpeed);
             } else vl-= vl > 0 ? 0.1 : 0;
             debug("base=" + baseSpeed + " deltaXZ=" + data.playerInfo.deltaXZ);

@@ -179,7 +179,7 @@ public class MovementProcessor {
 
         //Half block ticking (slabs, stairs, bed, cauldron, etc.)
         if (data.blockInfo.onHalfBlock) {
-            data.playerInfo.halfBlockTicks++;
+            data.playerInfo.halfBlockTicks+= 2;
         } else data.playerInfo.halfBlockTicks -= data.playerInfo.halfBlockTicks > 0 ? 1 : 0;
 
         //We dont check if theyre still on ice because this would be useless to checks that check a player in air too.

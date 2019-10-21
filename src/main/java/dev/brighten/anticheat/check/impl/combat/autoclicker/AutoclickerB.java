@@ -30,7 +30,7 @@ public class AutoclickerB extends Check {
                     debug(Color.Green + "Flag");
                     if(vl++ > 3) flag("std=" + std + " avg=" + avg
                             + " stdDelta=" + stdDelta + " avgDelta=" + avgDelta + " ping=%p");
-                } else vl-= vl > 0 ? 0.25 : 0;
+                } else vl-= vl > 0 ? 0.2 : 0;
 
                 debug("avg=" + avg + " std=" + std + " size=" + interval.size());
                 lastStd = std;

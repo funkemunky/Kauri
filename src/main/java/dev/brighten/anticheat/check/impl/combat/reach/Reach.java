@@ -46,7 +46,7 @@ public class Reach extends Check {
 
             List<BoundingBox> previousLocations = data.targetPastLocation
                     .getEstimatedLocation(data.lagInfo.transPing / 2
-                            , 100L + (data.lagInfo.transPing - data.lagInfo.lastTransPing))
+                            , 150L + (data.lagInfo.transPing - data.lagInfo.lastTransPing))
                     .parallelStream()
                     .map(loc -> getHitbox(loc, data.target.getType()))
                     .collect(Collectors.toList());
@@ -65,15 +65,15 @@ public class Reach extends Check {
                         .orElse(-1D);
 
                 if(calcDistance > 0) {
-                    if(calcDistance > 3 && collided.size() > 36) {
+                    if(calcDistance > 3 && collided.size() > 20) {
                         if(vl++ > 6) {
                             flag("reach=" + calcDistance + " collided=" + collided.size());
                         }
-                    } else vl-= vl > 0 ? 0.05 : 0;
+                    } else vl-= vl > 0 ? 0.025 : 0;
                     debug("reach=" + calcDistance + " collided="
                             + collided.size() + "  vl=" + vl);
                 }
-            } else vl-= vl > 0 ? 0.02 : 0;
+            } else vl-= vl > 0 ? 0.01 : 0;
         }
     }
 
@@ -111,6 +111,6 @@ public class Reach extends Check {
         return new BoundingBox(loc.toVector(), loc.toVector())
                 .grow((float)bounds.getX(), 0, (float)bounds.getZ())
                 .add(0,0,0,0,(float)bounds.getY(),0)
-                .grow(0.15f,0.15f,0.15f);
+                .grow(0.1f,0.1f,0.1f);
     }
 }

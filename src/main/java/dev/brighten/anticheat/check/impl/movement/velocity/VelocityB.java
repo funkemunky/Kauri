@@ -123,7 +123,7 @@ public class VelocityB extends Check {
 
                     if (pct < 99.4) {
                         if (vl++ > 15) flag("pct=" + MathUtils.round(pct, 3) + "%");
-                    } else vl -= vl > 0 ? 0.2 : 0;
+                    } else vl -= vl > 0 ? 0.5 : 0;
 
                     debug("pct=" + pct + " key=" + data.predictionService.key
                             + " sprint=" + data.playerInfo.sprinting + " ground=" + packet.isGround() + " vl=" + vl);

@@ -9,11 +9,10 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.processing.MovementProcessor;
 import dev.brighten.anticheat.utils.MiscUtils;
 
-@CheckInfo(name = "Autoclicker (E)", description = "Checks for the range of autoclicker.", punishVL = 15)
+@CheckInfo(name = "Autoclicker (E)", description = "Checks for the range of autoclicker.", punishVL = 15, executable = false)
 public class AutoclickerE extends Check {
 
-    private long lastClick, lastDelta, ticks;
-    private float lastGCD;
+    private long lastClick, lastDelta;
     private double lastStd;
     private Interval<Long> interval = new Interval<>(0, 45);
 
@@ -21,8 +20,9 @@ public class AutoclickerE extends Check {
     public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
         long delta = timeStamp - lastClick;
 
-        if(delta > 500) {
+        if(delta > 140) {
             lastClick = timeStamp;
+            vl-= vl > 0 ? 0.02 : 0;
             return;
         }
 
@@ -34,19 +34,17 @@ public class AutoclickerE extends Check {
             double std = interval.std();
             double avg = interval.average();
 
-            if((std < 22 || MathUtils.getDelta(std, lastStd) < 2)) {
+            if((std < avg || MathUtils.getDelta(std, lastStd) < 3) || (MathUtils.getDelta(std, avg) < 3 && std > 35)) {
                 if(vl++ > 8) {
                     flag("std=" + std + " avg=" + avg);
                 }
-            } else vl-= vl > 0 ? 0.25 : 0;
+            } else vl-= vl > 0 ? 0.1 : 0;
 
-            debug("std=" + std + " avg=" + avg);
+            debug("std=" + std + " avg=" + avg + " vl=" + vl);
             interval.clear();
+            lastStd = std;
         } else interval.add(shit);
 
-        //debug("gcd=" + gcd + " delta=" + delta + "  vl=" + vl + " shit=" + (gcd / MovementProcessor.offset));
-
-        lastGCD = gcd;
         lastDelta = delta;
         lastClick = timeStamp;
     }

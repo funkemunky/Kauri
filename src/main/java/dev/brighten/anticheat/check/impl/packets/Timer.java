@@ -14,7 +14,7 @@ import dev.brighten.anticheat.check.api.Packet;
 public class Timer extends Check {
 
     private long lastTS;
-    private EvictingList<Long> times = new EvictingList<>(15);
+    private EvictingList<Long> times = new EvictingList<>(30);
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet, long timeStamp) {
@@ -27,7 +27,7 @@ public class Timer extends Check {
             double ratio = 50 / average;
             double pct = ratio * 100;
 
-            if((pct > 101 || pct < 70) && (timeStamp - data.playerInfo.lastServerPos > 150L)
+            if((pct > 101) && (timeStamp - data.playerInfo.lastServerPos > 150L)
                     && MathUtils.getDelta(data.lagInfo.lastTransPing, data.lagInfo.transPing) < 30
                     && Kauri.INSTANCE.lastTickLag.hasPassed(5)
                     && Kauri.INSTANCE.tps > 18.5) {

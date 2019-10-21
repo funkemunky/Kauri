@@ -19,7 +19,7 @@ public class FlyB extends Check {
                 || data.playerInfo.halfBlockTicks > 0
                 || data.playerInfo.lastVelocity.hasNotPassed(20)) return;
 
-        if(data.playerInfo.serverGround || data.playerInfo.clientGround) jumpHeight = data.playerInfo.jumpHeight;
+        if(data.playerInfo.serverGround || data.playerInfo.clientGround) jumpHeight = MovementUtils.getJumpHeight(data.getPlayer());
         float max = jumpHeight + 0.01f;
 
         if(data.playerInfo.deltaY > max) {

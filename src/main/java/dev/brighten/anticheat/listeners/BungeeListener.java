@@ -11,6 +11,8 @@ import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Config;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.HashMap;
@@ -18,7 +20,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Init
-public class BungeeListener implements AtlasListener {
+public class BungeeListener implements AtlasListener, Listener {
 
     //uuid, info, checkName, vl
     public Map<CheckEntry, TickTimer> lastAlertsMap = new HashMap<>();
@@ -52,7 +54,7 @@ public class BungeeListener implements AtlasListener {
         }
     }
 
-    @Listen
+    @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         lastAlertsMap.keySet()
                 .stream()

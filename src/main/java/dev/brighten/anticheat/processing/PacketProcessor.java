@@ -4,11 +4,14 @@ import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.*;
 import cc.funkemunky.api.tinyprotocol.packet.out.*;
+import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.ReflectionsUtil;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.KLocation;
+import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 
 public class PacketProcessor {
@@ -93,6 +96,7 @@ public class PacketProcessor {
                 if(packet.getItemStack() != null && packet.getItemStack().getType().isSolid()) {
                     data.playerInfo.lastBlockPlace.reset();
                 }
+
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
             }

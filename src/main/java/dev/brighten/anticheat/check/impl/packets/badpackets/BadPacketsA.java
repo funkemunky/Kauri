@@ -25,6 +25,7 @@ public class BadPacketsA extends Check {
 
     @Packet
     public void onPlace(WrappedInBlockPlacePacket packet, long timeStamp) {
-        if(BlockUtils.isTool(packet.getItemStack())) lastBlockPlace = timeStamp;
+        if(packet.getPlayer().getItemInHand() != null
+                && BlockUtils.isTool(packet.getPlayer().getItemInHand())) lastBlockPlace = timeStamp;
     }
 }

@@ -17,6 +17,7 @@ public class FlyC extends Check {
         if(!data.playerInfo.nearGround
                 && data.playerInfo.lastBlockPlace.hasPassed(20)
                 && !data.playerInfo.flightCancel
+                && data.lagInfo.lastPacketDrop.hasPassed(10)
                 && data.playerInfo.lastVelocity.hasPassed(5)
                 && data.playerInfo.airTicks > 3
                 && data.playerInfo.deltaY > data.playerInfo.lDeltaY + 1E-4) {

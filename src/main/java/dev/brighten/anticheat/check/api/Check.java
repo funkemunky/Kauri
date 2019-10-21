@@ -2,10 +2,7 @@ package dev.brighten.anticheat.check.api;
 
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.packets.reflections.types.WrappedClass;
-import cc.funkemunky.api.utils.Color;
-import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.MiscUtils;
-import cc.funkemunky.api.utils.TickTimer;
+import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.impl.combat.aim.*;
 import dev.brighten.anticheat.check.impl.combat.autoclicker.*;
@@ -17,6 +14,7 @@ import dev.brighten.anticheat.check.impl.movement.fly.FlyC;
 import dev.brighten.anticheat.check.impl.movement.fly.FlyD;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallA;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallB;
+import dev.brighten.anticheat.check.impl.movement.phase.Phase;
 import dev.brighten.anticheat.check.impl.movement.speed.*;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityA;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityB;
@@ -106,18 +104,20 @@ public class Check {
     }
 
     public void punish() {
-        if(executable && punishVl != -1 && vl > punishVl) {
-            Kauri.INSTANCE.loggerManager.addPunishment(data, this);
-            if(!Config.broadcastMessage.equalsIgnoreCase("off")) {
-                Bukkit.broadcastMessage(Color.translate(Config.broadcastMessage.replace("%name%", data.getPlayer().getName())));
+        RunUtils.task(() -> {
+            if(executable && punishVl != -1 && vl > punishVl) {
+                Kauri.INSTANCE.loggerManager.addPunishment(data, this);
+                if(!Config.broadcastMessage.equalsIgnoreCase("off")) {
+                    Bukkit.broadcastMessage(Color.translate(Config.broadcastMessage.replace("%name%", data.getPlayer().getName())));
+                }
+                ConsoleCommandSender sender = Bukkit.getConsoleSender();
+                Config.punishCommands.
+                        forEach(cmd -> Bukkit.dispatchCommand(
+                                sender,
+                                cmd.replace("%name%", data.getPlayer().getName())));
+                vl = 0;
             }
-            ConsoleCommandSender sender = Bukkit.getConsoleSender();
-            Config.punishCommands.
-                    forEach(cmd -> Bukkit.dispatchCommand(
-                            sender,
-                            cmd.replace("%name%", data.getPlayer().getName())));
-            vl = 0;
-        }
+        }, Kauri.INSTANCE);
     }
 
     public void debug(String information) {
@@ -158,6 +158,7 @@ public class Check {
         register(new SpeedD());
         register(new SpeedE());
         register(new SpeedF());
+        register(new Phase());
         register(new Timer());
         register(new BadPacketsA());
         register(new BadPacketsB());

@@ -7,7 +7,7 @@ import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
 
 @CheckInfo(name = "Speed (F)", description = "Checks for very consistent acceleration on the x and z axis.",
-        checkType = CheckType.SPEED, punishVL = 20)
+        checkType = CheckType.SPEED, punishVL = 20, executable = false)
 public class SpeedF extends Check {
 
     @Packet

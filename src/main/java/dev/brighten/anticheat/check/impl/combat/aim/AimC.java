@@ -18,6 +18,7 @@ public class AimC extends Check {
         float accel = MathUtils.getDelta(data.playerInfo.deltaPitch, data.playerInfo.lDeltaPitch);
 
         if(accel < 1E-5 && (Math.abs(data.playerInfo.deltaPitch) > 0 || data.playerInfo.deltaYaw > 2)
+
                 && Math.abs(data.playerInfo.to.pitch) < 80) {
             if(vl++ > 40) {
                 flag("accel=" + accel + " deltaPitch=" + data.playerInfo.deltaPitch);

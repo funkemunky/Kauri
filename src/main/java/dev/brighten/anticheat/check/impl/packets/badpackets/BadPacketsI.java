@@ -19,9 +19,9 @@ public class BadPacketsI extends Check {
                 && !data.blockInfo.inLiquid
                 && !data.blockInfo.onIce
                 && !data.playerInfo.serverIsFlying) {
-            if(vl++ > 2) {
+            if(vl++ > 4) {
                 flag("clicked in window while moving");
             }
-        } else vl-= vl > 0 ? 0.02 : 0;
+        } else vl-= vl > 0 ? 0.5 : 0;
     }
 }
