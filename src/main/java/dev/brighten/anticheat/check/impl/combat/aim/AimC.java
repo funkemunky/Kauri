@@ -6,23 +6,25 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.processing.MovementProcessor;
 
 @CheckInfo(name = "Aim (C)", description = "Checks for common denominators in yaw difference.",
         checkType = CheckType.AIM, punishVL = 100)
 public class AimC extends Check {
 
+    private float lastGcd;
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if(!packet.isLook()) return;
 
-        float accel = MathUtils.getDelta(data.playerInfo.deltaPitch, data.playerInfo.lDeltaPitch);
+        float gcd = (data.playerInfo.yawGCD / MovementProcessor.offset);
 
-        if(accel < 1E-5 && (Math.abs(data.playerInfo.deltaPitch) > 0 || data.playerInfo.deltaYaw > 2)
+        if(MathUtils.getDelta(gcd, lastGcd) > 1E-4) {
+            vl++;
+        } else vl = 0;
 
-                && Math.abs(data.playerInfo.to.pitch) < 80) {
-            if(vl++ > 40) {
-                flag("accel=" + accel + " deltaPitch=" + data.playerInfo.deltaPitch);
-            }
-        } else vl-= vl > 0 ? 6 : 0;
+        debug(gcd + ", " + vl);
+
+        lastGcd = gcd;
     }
 }

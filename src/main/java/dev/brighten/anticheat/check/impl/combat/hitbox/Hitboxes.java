@@ -73,8 +73,8 @@ public class Hitboxes extends Check {
             }
 
             if (collided.size() == 0) {
-                if(vl++ > 6)  flag("collided=0 ping=%p tps=%t");
-            } else vl -= vl > 0 ? 0.25 : 0;
+                if(vl++ > 10)  flag("collided=0 ping=%p tps=%t");
+            } else vl -= vl > 0 ? 0.5 : 0;
 
             debug("collided=" + collided.size());
         }

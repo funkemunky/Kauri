@@ -16,6 +16,7 @@ public class NoFallA extends Check {
         if(packet.isPos()) {
             if((data.playerInfo.deltaXZ > 0 || data.playerInfo.deltaY > 0)
                     && !data.playerInfo.serverIsFlying
+                    && !data.playerInfo.serverPos
                     && !data.playerInfo.onLadder
                     && MathUtils.getDelta(0.5, Math.abs(data.playerInfo.deltaY)) > 1E-4
                     && data.playerInfo.halfBlockTicks == 0

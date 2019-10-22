@@ -65,7 +65,7 @@ public class Reach extends Check {
                         .orElse(-1D);
 
                 if(calcDistance > 0) {
-                    if(calcDistance > 3 && collided.size() > 20) {
+                    if(calcDistance > 3 && collided.size() > 25) {
                         if(vl++ > 6) {
                             flag("reach=" + calcDistance + " collided=" + collided.size());
                         }
@@ -85,7 +85,7 @@ public class Reach extends Check {
                 && !data.getPlayer().getGameMode().equals(GameMode.CREATIVE);
     }
 
-    private static List<Double> getColliding(double distance, List<Location> traces, List<BoundingBox> boxes) {
+    private List<Double> getColliding(double distance, List<Location> traces, List<BoundingBox> boxes) {
         List<Double> collided = new ArrayList<>();
         for (Location loc : traces) {
             RayTrace trace = new RayTrace(loc.toVector(), loc.getDirection());
@@ -98,7 +98,7 @@ public class Reach extends Check {
                     3.4f)
                     .parallelStream()
                     .filter(vec -> boxes.stream().anyMatch(box -> box.collides(vec)))
-                    .map(vec -> vec.distance(loc.toVector()))
+                    .map(vec -> vec.distance(data.playerInfo.to.toVector().add(new Vector(0, data.getPlayer().getEyeHeight(), 0))))
                     .sequential()
                     .forEach(collided::add);
         }
