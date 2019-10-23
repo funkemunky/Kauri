@@ -34,8 +34,8 @@ public class BadPacketsD extends Check {
     }
 
     @Packet
-    public void flying(WrappedInFlyingPacket packet) {
-        if(data.creation.hasNotPassed(20)) {
+    public void flying(WrappedInFlyingPacket packet, long timeStamp) {
+        if(timeStamp - data.creation > 1000L) {
             serverAllowed = data.getPlayer().getAllowFlight();
             clientAllowed = data.getPlayer().getAllowFlight();
         } else {

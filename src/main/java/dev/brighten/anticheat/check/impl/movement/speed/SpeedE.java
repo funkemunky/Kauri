@@ -12,8 +12,10 @@ import dev.brighten.anticheat.check.api.Packet;
 public class SpeedE extends Check {
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
-        if(packet.isPos() && !data.playerInfo.generalCancel && data.playerInfo.lastVelocity.hasPassed(5)) {
+    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
+        if(packet.isPos()
+                && !data.playerInfo.generalCancel
+                && timeStamp - data.playerInfo.lastVelocityTimestamp > 250L) {
             if(data.playerInfo.airTicks > 2) {
                 float accelX = MathUtils.getDelta(data.playerInfo.deltaX, data.playerInfo.lDeltaX);
                 float accelZ = MathUtils.getDelta(data.playerInfo.deltaZ, data.playerInfo.lDeltaZ);

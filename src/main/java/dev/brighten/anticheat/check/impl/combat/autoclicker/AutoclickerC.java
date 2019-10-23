@@ -20,7 +20,7 @@ public class AutoclickerC extends Check {
 
         long delta = timeStamp - lastClick;
 
-        if(interval.size() >= 10 && !data.playerInfo.breakingBlock) {
+        if(interval.size() >= 10 && data.playerInfo.lastBrokenBlock.hasPassed(5)) {
             double avg = interval.average();
 
             if(MathUtils.getDelta(avg, lastAvg) <= 0.4) {

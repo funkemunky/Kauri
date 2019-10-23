@@ -11,7 +11,7 @@ import dev.brighten.anticheat.utils.MovementUtils;
 public class SpeedD extends Check {
 
     @Packet
-    public void onPacket(WrappedInFlyingPacket packet) {
+    public void onPacket(WrappedInFlyingPacket packet, long timeStamp) {
        float baseSpeed = MovementUtils.getBaseSpeed(data)
                + 0.075f
                + (data.playerInfo.groundTicks < 8 ? 0.4f * (float)Math.pow(0.75f, data.playerInfo.groundTicks) : 0);
@@ -23,7 +23,7 @@ public class SpeedD extends Check {
                && data.playerInfo.deltaXZ > baseSpeed
                && data.playerInfo.halfBlockTicks == 0
                && !data.playerInfo.generalCancel
-               && data.playerInfo.lastVelocity.hasPassed(20 + MathUtils.millisToTicks(data.lagInfo.ping))) {
+               && timeStamp - data.playerInfo.lastVelocityTimestamp < 500L) {
            if(vl++ > 5) flag(data.playerInfo.deltaXZ + ">-" + baseSpeed);
        } else vl-= vl > 0 ? 0.025 : 0;
     }

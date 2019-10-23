@@ -11,10 +11,10 @@ import dev.brighten.anticheat.check.api.Packet;
 public class BadPacketsI extends Check {
 
     @Packet
-    public void windowClick(WrappedInWindowClickPacket packet) {
+    public void windowClick(WrappedInWindowClickPacket packet, long timeStamp) {
         if(data.playerInfo.deltaXZ > 0.1
                 && !data.playerInfo.serverPos
-                && data.playerInfo.lastVelocity.hasPassed(30)
+                && timeStamp - data.playerInfo.lastVelocityTimestamp > 3000L
                 && data.playerInfo.serverGround
                 && !data.blockInfo.inLiquid
                 && !data.blockInfo.onIce

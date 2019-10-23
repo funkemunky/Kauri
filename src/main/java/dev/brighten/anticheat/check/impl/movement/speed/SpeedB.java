@@ -18,10 +18,10 @@ public class SpeedB extends Check {
 
     private double lMotionXZ, lPAccel;
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
+    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(!packet.isPos() ||
                 data.playerInfo.generalCancel
-                || data.playerInfo.lastVelocity.hasNotPassed(5)
+                || timeStamp - data.playerInfo.lastVelocityTimestamp < 250L
                 || data.playerInfo.liquidTicks > 0
                 || data.playerInfo.webTicks > 0
                 || data.playerInfo.lastBlockPlace.hasNotPassed(10)

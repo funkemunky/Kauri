@@ -13,7 +13,7 @@ import dev.brighten.anticheat.utils.MovementUtils;
 public class FlyD extends Check {
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
+    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(packet.isPos()) {
             if(data.playerInfo.jumped
                     && !data.playerInfo.collidesVertically
@@ -21,7 +21,7 @@ public class FlyD extends Check {
                     && !data.playerInfo.flightCancel
                     && !data.playerInfo.wasOnSlime
                     && data.playerInfo.lastBlockPlace.hasPassed(10)
-                    && data.playerInfo.lastVelocity.hasPassed(5)) {
+                    && timeStamp - data.playerInfo.lastVelocityTimestamp > 250L) {
                 if(!MathUtils.approxEquals(0.001, data.playerInfo.jumpHeight, data.playerInfo.deltaY)) {
                     if(vl++ > 2) {
                         flag("deltaY=" + data.playerInfo.deltaY + " predicted=" + data.playerInfo.jumpHeight);
