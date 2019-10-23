@@ -20,9 +20,9 @@ public class AutoclickerE extends Check {
     public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
         long delta = timeStamp - lastClick;
 
-        if(delta > 140) {
+        if(delta > 140 || data.playerInfo.lastBrokenBlock.hasNotPassed(5)) {
             lastClick = timeStamp;
-            vl-= vl > 0 ? 0.02 : 0;
+            vl-= vl > 0 ? 0.01 : 0;
             return;
         }
 
@@ -34,7 +34,8 @@ public class AutoclickerE extends Check {
             double std = interval.std();
             double avg = interval.average();
 
-            if((std < avg || MathUtils.getDelta(std, lastStd) < 3) || (MathUtils.getDelta(std, avg) < 3 && std > 35)) {
+            if((std < avg || MathUtils.getDelta(std, lastStd) < 3)
+                    || (MathUtils.getDelta(std, avg) < (std > 10 ? 4 : 1))) {
                 if(vl++ > 8) {
                     flag("std=" + std + " avg=" + avg);
                 }

@@ -16,6 +16,7 @@ public class BadPacketsJ extends Check {
                     && !data.blockInfo.collidesHorizontally
                     && data.playerInfo.deltaXZ > 0.1
                     && data.playerInfo.sprinting
+                    && data.getPlayer().isSprinting()
                     && !data.predictionService.key.equals("Nothing")) {
                 if(vl++ > 5) {
                     flag("key=" + data.predictionService.key + "; sprinting");

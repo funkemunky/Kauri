@@ -3,6 +3,7 @@ package dev.brighten.anticheat.check.impl.combat.reach;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.BoundingBox;
+import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MiscUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -36,16 +37,8 @@ public class Reach extends Check {
     @Packet
     public void onUse(WrappedInFlyingPacket packet) {
         if(checkParameters(data)) {
-            List<Location> rayTrace = data.pastLocation.getEstimatedLocation(0, 100L)
-                    .stream()
-                    .map(loc -> {
-                        return loc.toLocation(data.getPlayer().getWorld())
-                                .add(0, data.getPlayer().getEyeHeight(), 0);
-                    })
-                    .collect(Collectors.toList());
-
             List<BoundingBox> previousLocations = data.targetPastLocation
-                    .getEstimatedLocation(data.lagInfo.transPing / 2
+                    .getEstimatedLocation(data.lagInfo.transPing
                             , 150L + (data.lagInfo.transPing - data.lagInfo.lastTransPing))
                     .parallelStream()
                     .map(loc -> getHitbox(loc, data.target.getType()))
@@ -55,7 +48,10 @@ public class Reach extends Check {
                     .getLocation().toVector()
                     .distance(data.playerInfo.to.toVector()) * 1.2f);
 
-            List<Double> collided = getColliding(distance, rayTrace, previousLocations);
+            List<Double> collided = getColliding(distance,
+                    data.playerInfo.to.toLocation(data.getPlayer().getWorld())
+                            .add(0, data.getPlayer().getEyeHeight(), 0),
+                    previousLocations);
 
             if(collided.size() > 5) {
                 float calcDistance = (float) collided
@@ -65,7 +61,7 @@ public class Reach extends Check {
                         .orElse(-1D);
 
                 if(calcDistance > 0) {
-                    if(calcDistance > 3 && collided.size() > 25) {
+                    if(calcDistance > 3 && collided.size() > 15) {
                         if(vl++ > 6) {
                             flag("reach=" + calcDistance + " collided=" + collided.size());
                         }
@@ -85,23 +81,21 @@ public class Reach extends Check {
                 && !data.getPlayer().getGameMode().equals(GameMode.CREATIVE);
     }
 
-    private List<Double> getColliding(double distance, List<Location> traces, List<BoundingBox> boxes) {
+    private List<Double> getColliding(double distance, Location loc, List<BoundingBox> boxes) {
         List<Double> collided = new ArrayList<>();
-        for (Location loc : traces) {
-            RayTrace trace = new RayTrace(loc.toVector(), loc.getDirection());
-            trace.traverse(
-                    distance > 5 ? 3 : 0,
-                    distance,
-                    distance > 5 ? 0.1 : 0.05,
-                    0.02f,
-                    2.9f,
-                    3.4f)
-                    .parallelStream()
-                    .filter(vec -> boxes.stream().anyMatch(box -> box.collides(vec)))
-                    .map(vec -> vec.distance(data.playerInfo.to.toVector().add(new Vector(0, data.getPlayer().getEyeHeight(), 0))))
-                    .sequential()
-                    .forEach(collided::add);
-        }
+        RayTrace trace = new RayTrace(loc.toVector(), loc.getDirection());
+        trace.traverse(
+                distance > 5 ? 3 : 0,
+                distance,
+                distance > 5 ? 0.1 : 0.05,
+                0.02f,
+                2.2f,
+                3.3f)
+                .parallelStream()
+                .filter(vec -> boxes.stream().anyMatch(box -> box.collides(vec)))
+                .map(vec -> vec.distance(loc.toVector()))
+                .sequential()
+                .forEach(collided::add);
 
         return collided;
     }
@@ -111,6 +105,6 @@ public class Reach extends Check {
         return new BoundingBox(loc.toVector(), loc.toVector())
                 .grow((float)bounds.getX(), 0, (float)bounds.getZ())
                 .add(0,0,0,0,(float)bounds.getY(),0)
-                .grow(0.1f,0.1f,0.1f);
+                .grow(0.11f,0.11f,0.11f);
     }
 }

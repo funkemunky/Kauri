@@ -14,14 +14,15 @@ public class Config {
     @ConfigSetting(path = "punishments", name = "commands")
     static List<String> punishCommands = Arrays.asList("kick %name% [Kauri] Unfair Advantage -s");
 
-    @ConfigSetting(path = "punishments", name = "broadcast")
+    @ConfigSetting(path = "punishments", name = "broadcast",
+            comment = "Set string to \"none\" if you want to disable broadcast.")
     static String broadcastMessage = MiscUtils.line(Color.Dark_Gray)
             + "\n&e%name% &7was removed by &6Kauri &7because of an &fUnfair Advantage&7."
             + MiscUtils.line(Color.Dark_Gray);
 
-    @ConfigSetting(path = "alerts", name = "bungee")
+    @ConfigSetting(path = "alerts", name = "bungee", comment = "Sends alerts across servers.")
     public static boolean bungeeAlerts = false;
 
-    @ConfigSetting(path = "alerts", name = "delay")
+    @ConfigSetting(path = "alerts", name = "delay", comment = "The delay between alerts sending.")
     public static long alertsDelay = 500;
 }

@@ -56,12 +56,12 @@ public class Check {
         WrappedClass checkClass = new WrappedClass(check.getClass());
         String name = info.name();
         CheckSettings settings = new CheckSettings(info.name(), info.description(), info.checkType(), info.punishVL());
-        if(Kauri.INSTANCE.getConfig().get("checks." + name + ".enabled") != null) {
-            settings.enabled = Kauri.INSTANCE.getConfig().getBoolean("checks." + name + ".enabled");
-            settings.executable = Kauri.INSTANCE.getConfig().getBoolean("checks." + name + ".executable");
+        if(Kauri.INSTANCE.kauriConfig.get("checks." + name + ".enabled") != null) {
+            settings.enabled = Kauri.INSTANCE.kauriConfig.getBoolean("checks." + name + ".enabled");
+            settings.executable = Kauri.INSTANCE.kauriConfig.getBoolean("checks." + name + ".executable");
         } else {
-            Kauri.INSTANCE.getConfig().set("checks." + name + ".enabled", info.enabled());
-            Kauri.INSTANCE.getConfig().set("checks." + name + ".executable", info.executable());
+            Kauri.INSTANCE.kauriConfig.set("checks." + name + ".enabled", info.enabled());
+            Kauri.INSTANCE.kauriConfig.set("checks." + name + ".executable", info.executable());
             Kauri.INSTANCE.saveConfig();
 
             settings.enabled = info.enabled();

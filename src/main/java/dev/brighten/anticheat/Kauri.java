@@ -1,6 +1,9 @@
 package dev.brighten.anticheat;
 
 import cc.funkemunky.api.Atlas;
+import cc.funkemunky.api.config.system.Configuration;
+import cc.funkemunky.api.config.system.ConfigurationProvider;
+import cc.funkemunky.api.config.system.YamlConfiguration;
 import cc.funkemunky.api.profiling.ToggleableProfiler;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MiscUtils;
@@ -16,6 +19,8 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -35,6 +40,9 @@ public class Kauri extends JavaPlugin {
     public ToggleableProfiler profiler;
 
     public boolean enabled = false;
+
+    //Config Stuff
+    public Configuration kauriConfig;
 
     public void onEnable() {
         MiscUtils.printToConsole(Color.Red + "Starting Kauri " + getDescription().getVersion() + "...");
@@ -84,10 +92,14 @@ public class Kauri extends JavaPlugin {
         executor = Executors.newFixedThreadPool(3);
 
         MiscUtils.printToConsole(Color.Gray + "Loading config...");
-        saveDefaultConfig();
+        kauriConfig = YamlConfiguration.saveDefaultConfig(this, "config.yml");
 
         MiscUtils.printToConsole(Color.Gray + "Running scanner...");
-        Atlas.getInstance().initializeScanner(getClass(), this, true, true);
+        Atlas.getInstance().initializeScanner(getClass(),
+                this,
+                true,
+                true,
+                kauriConfig);
         MiscUtils.printToConsole(Color.Gray + "Registering processors...");
         packetProcessor = new PacketProcessor();
         dataManager = new DataManager();
@@ -106,6 +118,26 @@ public class Kauri extends JavaPlugin {
         if(Bukkit.getOnlinePlayers().size() > 0) {
             MiscUtils.printToConsole(Color.Gray + "Detected players! Creating data objects...");
             Bukkit.getOnlinePlayers().forEach(dataManager::createData);
+        }
+    }
+
+    public void saveConfig() {
+        try {
+            ConfigurationProvider.getProvider(YamlConfiguration.class).save(kauriConfig, new File(getDataFolder(), "config.yml"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void reloadConfig() {
+        try {
+            File file;
+            if(!(file = new File(getDataFolder(), "config.yml")).exists()) {
+                YamlConfiguration.saveDefaultConfig(this, "config.yml");
+            }
+            ConfigurationProvider.getProvider(YamlConfiguration.class).load(file);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

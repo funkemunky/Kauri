@@ -29,7 +29,7 @@ public class DelayCommand {
                 Config.alertsDelay = delay;
                 ConfigSetting setting = field.getAnnotation(ConfigSetting.class);
 
-                Kauri.INSTANCE.getConfig().set(setting.path() + setting.name(), delay);
+                Kauri.INSTANCE.kauriConfig.set(setting.path() + setting.name(), delay);
                 Kauri.INSTANCE.saveConfig();
                 cmd.getSender().sendMessage(Color.Green + "Delay set!");
             } catch(NumberFormatException e) {
