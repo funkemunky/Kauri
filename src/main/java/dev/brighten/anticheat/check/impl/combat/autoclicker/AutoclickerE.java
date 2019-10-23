@@ -34,7 +34,7 @@ public class AutoclickerE extends Check {
             double std = interval.std();
             double avg = interval.average();
 
-            if((std < avg || MathUtils.getDelta(std, lastStd) < 3) || (MathUtils.getDelta(std, avg) < 3 && std > 35)) {
+            if(MathUtils.getDelta(std, lastStd) < 3 || (MathUtils.getDelta(std, avg) < 3 && std > 35)) {
                 if(vl++ > 8) {
                     flag("std=" + std + " avg=" + avg);
                 }

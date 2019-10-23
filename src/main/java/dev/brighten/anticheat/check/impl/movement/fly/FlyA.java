@@ -12,7 +12,7 @@ import dev.brighten.anticheat.check.api.Packet;
 public class FlyA extends Check {
 
     @Packet
-    public void onMove(WrappedInFlyingPacket packet) {
+    public void onMove(WrappedInFlyingPacket packet, long timeStamp) {
         if(packet.isPos()) {
             float predicted = (data.playerInfo.lDeltaY - 0.08f) * 0.98f;
 
@@ -23,7 +23,7 @@ public class FlyA extends Check {
                     && !data.playerInfo.flightCancel
                     && !data.playerInfo.clientGround
                     && !data.playerInfo.lClientGround
-                    && data.playerInfo.lastVelocity.hasPassed(10)
+                    && timeStamp - data.playerInfo.lastVelocityTimestamp > 600L
                     && data.playerInfo.lastBlockPlace.hasPassed(5)
                     && !data.blockInfo.onClimbable) {
                 if(vl++ > 2) flag("ping=%p tps=%t delta=" + MathUtils.round(delta, 5));

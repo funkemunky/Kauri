@@ -11,10 +11,10 @@ import dev.brighten.anticheat.utils.MovementUtils;
 public class SpeedC extends Check {
 
     @Packet
-    public void onPacket(WrappedInFlyingPacket packet) {
+    public void onPacket(WrappedInFlyingPacket packet, long timeStamp) {
         if(packet.isPos()
                 && !data.playerInfo.generalCancel
-                && data.playerInfo.lastVelocity.hasPassed(5 + MathUtils.millisToTicks(data.lagInfo.ping))) {
+                && timeStamp - data.playerInfo.lastVelocityTimestamp > 500L) {
             float baseSpeed = MovementUtils.getBaseSpeed(data) + (data.playerInfo.serverGround ? 0.4f : 0.6f);
 
             if(data.blockInfo.blocksAbove || data.playerInfo.iceTicks > 0) baseSpeed+= baseSpeed * 0.5 + 0.5;

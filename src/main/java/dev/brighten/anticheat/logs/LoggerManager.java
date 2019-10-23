@@ -13,6 +13,7 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.logs.objects.Punishment;
+import lombok.val;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -118,13 +119,19 @@ public class LoggerManager {
                 struct.name.equals("uuid")
                         && String.valueOf(struct.object).equals(uuid.toString()), struct -> !struct.name.equals("type"));
 
-        return sets.stream().map(set -> new Log(
-                String.valueOf(set.getStructureByName("checkName").get().object),
-                String.valueOf(set.getStructureByName("info").get().object),
-                (double)set.getStructureByName("vl").get().object,
-                (long)set.getStructureByName("ping").get().object,
-                (long)set.getStructureByName("timeStamp").get().object,
-                (double)set.getStructureByName("tps").get().object)).collect(Collectors.toList());
+        return sets.stream().map(set -> {
+            val optional = set.getStructureByName("ping");
+
+            if(optional.isPresent()) {
+                return new Log(
+                        String.valueOf(set.getStructureByName("checkName").get().object),
+                        String.valueOf(set.getStructureByName("info").get().object),
+                        (double)set.getStructureByName("vl").get().object,
+                        (long)set.getStructureByName("ping").get().object,
+                        (long)set.getStructureByName("timeStamp").get().object,
+                        (double)set.getStructureByName("tps").get().object);
+            } else return null;
+        }).filter(Objects::nonNull).collect(Collectors.toList());
     }
     
     public List<Punishment> getPunishments(UUID uuid) {

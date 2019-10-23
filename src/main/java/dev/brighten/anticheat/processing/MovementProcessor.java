@@ -66,7 +66,7 @@ public class MovementProcessor {
         }
 
         //Fixes glitch when logging in.
-        if(data.creation.hasNotPassed(20)) {
+        if(timeStamp - data.creation < 1000) {
             data.playerInfo.serverCanFly = data.getPlayer().getAllowFlight();
             data.playerInfo.serverIsFlying = data.getPlayer().isFlying();
         }
@@ -98,7 +98,7 @@ public class MovementProcessor {
         data.playerInfo.deltaY = (float) (data.playerInfo.to.y - data.playerInfo.from.y);
         data.playerInfo.deltaZ = (float) (data.playerInfo.to.z - data.playerInfo.from.z);
         data.playerInfo.lDeltaXZ = data.playerInfo.deltaXZ;
-        data.playerInfo.deltaXZ = (float) MathUtils.hypot(data.playerInfo.deltaX, data.playerInfo.deltaZ);
+        data.playerInfo.deltaXZ = MathUtils.hypot(data.playerInfo.deltaX, data.playerInfo.deltaZ);
 
         //Setting the angle delta for use in checks to prevent repeated functions.
         data.playerInfo.lDeltaYaw = data.playerInfo.deltaYaw;
@@ -230,7 +230,7 @@ public class MovementProcessor {
                 || block == null
                 || data.playerInfo.liquidTicks > 0
                 || data.playerInfo.climbTicks > 0
-                || data.creation.hasNotPassed(40)
+                || timeStamp - data.creation < 2000
                 || data.playerInfo.serverPos
                 || Kauri.INSTANCE.lastTickLag.hasNotPassed(5);
 
@@ -238,7 +238,7 @@ public class MovementProcessor {
                 || data.playerInfo.inCreative
                 || hasLevi
                 || !data.playerInfo.worldLoaded
-                || data.creation.hasNotPassed(40)
+                || timeStamp - data.creation < 2000
                 || block == null
                 || data.playerInfo.serverPos
                 || Kauri.INSTANCE.lastTickLag.hasNotPassed(5);

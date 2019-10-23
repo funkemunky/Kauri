@@ -32,7 +32,7 @@ public class Phase extends Check {
     @Event
     public void onFlying(PlayerMoveEvent event) {
         if(event.getTo().distance(event.getFrom()) > 0) {
-            if(Kauri.INSTANCE.enabled && data.creation.hasPassed(5)
+            if(Kauri.INSTANCE.enabled
                     && !data.playerInfo.serverCanFly
                     && !data.playerInfo.inCreative) {
                 if(lastboxes.size() > 0) {

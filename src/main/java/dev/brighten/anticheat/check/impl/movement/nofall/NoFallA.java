@@ -20,8 +20,8 @@ public class NoFallA extends Check {
                     && !data.playerInfo.onLadder
                     && MathUtils.getDelta(0.5, Math.abs(data.playerInfo.deltaY)) > 1E-4
                     && data.playerInfo.halfBlockTicks == 0
-                    && (data.playerInfo.deltaY == 0 && !data.playerInfo.clientGround)
-                    || (data.playerInfo.deltaY != 0 && data.playerInfo.clientGround)) {
+                    && (data.playerInfo.deltaY == 0 && !data.playerInfo.clientGround && data.playerInfo.airTicks > 1)
+                    || (data.playerInfo.deltaY != 0 && data.playerInfo.clientGround && data.playerInfo.groundTicks > 2)) {
                 if(vl++ > 5) {
                     flag("deltaY=" + data.playerInfo.deltaY + " client=" + data.playerInfo.clientGround);
                 }

@@ -13,11 +13,11 @@ public class FlyB extends Check {
 
     private float jumpHeight;
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
+    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(!packet.isPos()
                 || data.playerInfo.flightCancel
                 || data.playerInfo.halfBlockTicks > 0
-                || data.playerInfo.lastVelocity.hasNotPassed(20)) return;
+                || timeStamp - data.playerInfo.lastVelocityTimestamp < 1000L) return;
 
         if(data.playerInfo.serverGround || data.playerInfo.clientGround) jumpHeight = MovementUtils.getJumpHeight(data.getPlayer());
         float max = jumpHeight + 0.01f;

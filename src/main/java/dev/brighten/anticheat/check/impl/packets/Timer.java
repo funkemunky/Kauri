@@ -20,7 +20,7 @@ public class Timer extends Check {
     public void onPacket(WrappedInFlyingPacket packet, long timeStamp) {
         long elapsed = timeStamp - lastTS;
 
-        if(data.creation.hasPassed(10) && !data.playerInfo.serverPos) {
+        if(timeStamp - data.creation > 500 && !data.playerInfo.serverPos) {
             if(elapsed > 4) times.add(elapsed);
 
             double average = times.stream().mapToLong(val -> val).average().orElse(50.0);

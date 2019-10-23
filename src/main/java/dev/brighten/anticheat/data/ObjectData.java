@@ -28,7 +28,7 @@ public class ObjectData {
     public String debugging;
     public UUID debugged;
 
-    public TickTimer creation;
+    public long creation;
     public PastLocation pastLocation,
             targetPastLocation;
     public LivingEntity target;
@@ -46,11 +46,10 @@ public class ObjectData {
         this.uuid = uuid;
         hashCode = uuid.hashCode();
         INSTANCE = this;
-        creation = new TickTimer(10);
         if(alerts = getPlayer().hasPermission("kauri.alerts")) {
             Kauri.INSTANCE.dataManager.hasAlerts.add(this);
         }
-        creation.reset();
+        creation = System.currentTimeMillis();
         playerInfo = new PlayerInformation();
         blockInfo = new BlockInformation(this);
         lagInfo = new LagInformation();
