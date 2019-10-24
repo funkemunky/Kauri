@@ -39,7 +39,7 @@ public class Reach extends Check {
     public void onUse(WrappedInFlyingPacket packet) {
         if(checkParameters(data)) {
             List<Location> rayTrace = data.pastLocation.getEstimatedLocation(
-                    data.lagInfo.transPing / 2, 150 +
+                    data.lagInfo.transPing / 2, 50 +
                     MathUtils.getDelta(data.lagInfo.lastTransPing, data.lagInfo.transPing))
                     .stream()
                     .map(loc -> loc.toLocation(data.getPlayer().getWorld())
@@ -95,9 +95,9 @@ public class Reach extends Check {
             trace.traverse(0,
                     distance,
                     0.05,
-                    0.02f,
-                    2.7f,
-                    3.2f)
+                    0.025f,
+                    2.6f,
+                    3.3f)
                     .parallelStream()
                     .filter(vec -> boxes.stream().anyMatch(box -> box.collides(vec)))
                     .map(vec -> vec.distance(loc.toVector()))

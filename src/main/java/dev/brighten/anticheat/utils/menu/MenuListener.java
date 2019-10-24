@@ -1,26 +1,28 @@
 package dev.brighten.anticheat.utils.menu;
 
+import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
-import cc.funkemunky.api.utils.RunUtils;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.utils.menu.button.Button;
 import dev.brighten.anticheat.utils.menu.button.ClickAction;
 import dev.brighten.anticheat.utils.menu.type.BukkitInventoryHolder;
-import org.bukkit.Bukkit;
+import dev.brighten.anticheat.utils.menu.type.impl.ValueMenu;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author Missionary (missionarymc@gmail.com)
@@ -28,6 +30,8 @@ import java.util.Optional;
  */
 @Init
 public class MenuListener implements Listener {
+
+    public static Map<AnvilInventory, ValueMenu> anvils = new HashMap<>();
 
     @EventHandler(priority = EventPriority.LOW)
     private void onInventoryClick(InventoryClickEvent event) {
@@ -56,7 +60,8 @@ public class MenuListener implements Listener {
                         if (button.getConsumer() == null) { // Allows for Buttons to not have an action.
                             return;
                         }
-                        button.getConsumer().accept((Player) event.getWhoClicked(), new ClickAction.InformationPair(button, event.getClick(), menu));
+                        button.getConsumer().accept((Player) event.getWhoClicked(),
+                                new ClickAction.InformationPair(button, event.getClick(), menu));
 
                         if (!button.isMoveable()) {
                             event.setResult(Event.Result.DENY);
@@ -65,6 +70,12 @@ public class MenuListener implements Listener {
                     });
                 }
             }
+        }
+        if(!event.getAction().equals(InventoryAction.NOTHING)
+                && inventory instanceof AnvilInventory
+                && anvils.containsKey(inventory)) {
+            event.setResult(Event.Result.DENY);
+            event.setCancelled(true);
         }
     }
 
@@ -84,13 +95,20 @@ public class MenuListener implements Listener {
                 menu.getParent().ifPresent(buttons -> new BukkitRunnable() {
                     public void run() {
                         if (event.getPlayer().getOpenInventory() == null
-                                || (!(event.getPlayer().getOpenInventory().getTopInventory().getHolder() instanceof BukkitInventoryHolder))) {
+                                || (!(event.getPlayer().getOpenInventory().getTopInventory().getHolder()
+                                instanceof BukkitInventoryHolder))) {
                             buttons.showMenu((Player) event.getPlayer());
                             this.cancel();
                         }
                     }
                 }.runTaskTimer(Kauri.INSTANCE, 2L, 0L));
             }
+        }
+        if(inventory instanceof AnvilInventory && anvils.containsKey(inventory)) {
+            AnvilInventory anvil = (AnvilInventory) inventory;
+
+            anvils.get(anvil).consumer.accept(event.getPlayer(), Color.translate(anvil.getName()));
+            anvils.remove(anvil);
         }
     }
 
