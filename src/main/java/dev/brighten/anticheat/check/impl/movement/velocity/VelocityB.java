@@ -85,7 +85,7 @@ public class VelocityB extends Check {
                         f5 = data.playerInfo.sprinting ? 0.026f : 0.02f;
                     }
 
-                    double pct;
+                    double pct = 0;
                     double lVX = vX, lVZ = vZ;
 
                     float[] motion = new float[2];

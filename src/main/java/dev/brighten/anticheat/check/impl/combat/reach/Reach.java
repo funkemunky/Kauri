@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @CheckInfo(name = "Reach", description = "Ensures the reach of a player is legitimate.",
-        checkType = CheckType.HITBOX, punishVL = 12)
+        checkType = CheckType.HITBOX, punishVL = 10)
 public class Reach extends Check {
 
     private static List<EntityType> allowedEntities = Arrays.asList(EntityType.PLAYER, EntityType.SKELETON,
@@ -39,7 +39,7 @@ public class Reach extends Check {
     public void onUse(WrappedInFlyingPacket packet) {
         if(checkParameters(data)) {
             List<Location> rayTrace = data.pastLocation.getEstimatedLocation(
-                    data.lagInfo.transPing / 2, (data.lagInfo.transPing < 50 ? 100 : 50) +
+                    data.lagInfo.transPing / 2, 150 +
                     MathUtils.getDelta(data.lagInfo.lastTransPing, data.lagInfo.transPing))
                     .stream()
                     .map(loc -> loc.toLocation(data.getPlayer().getWorld())
@@ -48,7 +48,7 @@ public class Reach extends Check {
 
             List<BoundingBox> previousLocations = data.targetPastLocation
                     .getEstimatedLocation(data.lagInfo.transPing / 2
-                            , (data.lagInfo.transPing < 50 ? 150 : 100)
+                            , 200
                                     + (data.lagInfo.transPing - data.lagInfo.lastTransPing))
                     .parallelStream()
                     .map(loc -> getHitbox(loc, data.target.getType()))
@@ -68,15 +68,15 @@ public class Reach extends Check {
                         .orElse(-1D);
 
                 if(calcDistance > 0) {
-                    if(calcDistance > 3 && collided.size() > 13) {
-                        if(vl++ > 6) {
+                    if(calcDistance > 3 && collided.size() > 10) {
+                        if(vl++ > 4) {
                             flag("reach=" + calcDistance + " collided=" + collided.size());
                         }
-                    } else vl-= vl > 0 ? 0.05 : 0;
+                    } else vl-= vl > 0 ? 0.025 : 0;
                     debug("reach=" + calcDistance + " collided="
                             + collided.size() + "  vl=" + vl);
                 }
-            } else vl-= vl > 0 ? 0.02 : 0;
+            } else vl-= vl > 0 ? 0.01 : 0;
         }
     }
 
@@ -96,8 +96,8 @@ public class Reach extends Check {
                     distance,
                     0.05,
                     0.02f,
-                    2.6f,
-                    3.4f)
+                    2.7f,
+                    3.2f)
                     .parallelStream()
                     .filter(vec -> boxes.stream().anyMatch(box -> box.collides(vec)))
                     .map(vec -> vec.distance(loc.toVector()))

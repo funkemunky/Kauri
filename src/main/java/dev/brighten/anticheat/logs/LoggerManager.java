@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.logs;
 
 import cc.funkemunky.api.Atlas;
+import cc.funkemunky.api.tinyprotocol.api.packets.reflections.types.WrappedClass;
 import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MiscUtils;
@@ -13,7 +14,6 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.logs.objects.Punishment;
-import lombok.val;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -80,10 +80,8 @@ public class LoggerManager {
             }
             logsDatabase = Atlas.getInstance().getCarbon().getDatabase(mySQLEnabled ? sqlDatabase : "logs");
             MiscUtils.printToConsole("&7Loading database on second thread...");
-            Kauri.INSTANCE.executor.execute(() -> {
-                logsDatabase.loadDatabase();
-                save();
-            });
+            logsDatabase.loadDatabase();
+            save();
         }
     }
 
@@ -114,24 +112,24 @@ public class LoggerManager {
         logsDatabase.inputField(set);
     }
 
+    private static List<String> names = Arrays.asList("timeStamp", "tps", "info", "checkName", "uuid", "ping", "vl");
     public List<Log> getLogs(UUID uuid) {
-        List<StructureSet> sets = logsDatabase.getFieldsByStructure(struct ->
-                struct.name.equals("uuid")
-                        && String.valueOf(struct.object).equals(uuid.toString()), struct -> !struct.name.equals("type"));
 
-        return sets.stream().map(set -> {
-            val optional = set.getStructureByName("ping");
+        List<StructureSet> sets = logsDatabase.getDatabaseValues()
+                .stream()
+                .filter(structSet -> structSet.structures
+                        .stream()
+                        .allMatch(struct -> names.stream().anyMatch(name -> struct.name.equals(name))))
+                .filter(structSet -> structSet.getStructureByName("uuid").get().object.equals(uuid.toString()))
+                .collect(Collectors.toList());
 
-            if(optional.isPresent()) {
-                return new Log(
-                        String.valueOf(set.getStructureByName("checkName").get().object),
-                        String.valueOf(set.getStructureByName("info").get().object),
-                        (double)set.getStructureByName("vl").get().object,
-                        (long)set.getStructureByName("ping").get().object,
-                        (long)set.getStructureByName("timeStamp").get().object,
-                        (double)set.getStructureByName("tps").get().object);
-            } else return null;
-        }).filter(Objects::nonNull).collect(Collectors.toList());
+        return sets.stream().map(set -> new Log(
+                    String.valueOf(set.getStructureByName("checkName").get().object),
+                    String.valueOf(set.getStructureByName("info").get().object),
+                    (double)set.getStructureByName("vl").get().object,
+                    (long)set.getStructureByName("ping").get().object,
+                    (long)set.getStructureByName("timeStamp").get().object,
+                    (double)set.getStructureByName("tps").get().object)).collect(Collectors.toList());
     }
     
     public List<Punishment> getPunishments(UUID uuid) {
@@ -149,21 +147,26 @@ public class LoggerManager {
 
         Map<UUID, List<Log>> logs = new HashMap<>();
 
-        logsDatabase.getDatabaseValues().stream().filter(set -> {
-            Optional<Structure> optional = set.getStructureByName("timeStamp");
+        logsDatabase.getDatabaseValues()
+                .stream()
+                .filter(structSet -> structSet.structures
+                        .stream()
+                        .allMatch(struct -> names.stream().anyMatch(name -> struct.name.equals(name))))
+                .filter(set -> {
+                    Optional<Structure> optional = set.getStructureByName("timeStamp");
 
-            return optional.isPresent() && (currentTime - (long)optional.get().object) < timeFrame;
-        }).forEach(set -> {
-            UUID uuid = UUID.fromString((String)set.getStructureByName("uuid").get().object);
+                    return optional.isPresent() && (currentTime - (long) optional.get().object) < timeFrame;
+                }).forEach(set -> {
+            UUID uuid = UUID.fromString((String) set.getStructureByName("uuid").get().object);
             List<Log> logList = logs.getOrDefault(uuid, new ArrayList<>());
 
             logList.add(new Log(
                     String.valueOf(set.getStructureByName("checkName").get().object),
                     String.valueOf(set.getStructureByName("info").get().object),
-                    (double)set.getStructureByName("vl").get().object,
-                    (long)set.getStructureByName("ping").get().object,
-                    (long)set.getStructureByName("timeStamp").get().object,
-                    (double)set.getStructureByName("tps").get().object));
+                    (double) set.getStructureByName("vl").get().object,
+                    (long) set.getStructureByName("ping").get().object,
+                    (long) set.getStructureByName("timeStamp").get().object,
+                    (double) set.getStructureByName("tps").get().object));
 
             logs.put(uuid, logList);
         });

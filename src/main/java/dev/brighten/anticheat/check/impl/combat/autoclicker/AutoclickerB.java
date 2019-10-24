@@ -26,11 +26,11 @@ public class AutoclickerB extends Check {
                 double avg = interval.average(), std = interval.std();
                 double avgDelta = MathUtils.getDelta(lastAvg, avg), stdDelta = MathUtils.getDelta(std, lastStd);
 
-                if(stdDelta < 2.5 && (avgDelta > 10 || (std > 25)) && avg < 118) {
+                if(stdDelta < 2.5 && (avgDelta > 10 || (std > 20)) && avg < 118) {
                     debug(Color.Green + "Flag");
                     if(vl++ > 3) flag("std=" + std + " avg=" + avg
                             + " stdDelta=" + stdDelta + " avgDelta=" + avgDelta + " ping=%p");
-                } else vl-= vl > 0 ? 0.2 : 0;
+                } else vl-= vl > 0 ? 0.25 : 0;
 
                 debug("avg=" + avg + " std=" + std + " size=" + interval.size());
                 lastStd = std;

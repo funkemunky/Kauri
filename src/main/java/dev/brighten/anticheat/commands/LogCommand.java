@@ -52,12 +52,12 @@ public class LogCommand {
         for (Log log : logs) {
             String built = "(" + format.format(new Date(log.timeStamp)) + "): " + pl.getName() + " failed "
                     + log.checkName + " at VL: [" + MathUtils.round(log.vl, 2)
-                    + "] (tps=" + MathUtils.round(log.tps, 4) + " ping=" + log.ping + ")";
+                    + "] (tps=" + MathUtils.round(log.tps, 4) + " ping=" + log.ping + " info=[" + log.info + "])";
             eventsByStamp.put(log.timeStamp, built);
         }
 
         for (Punishment punishment : punishments) {
-            String built = "Punishment applied @ (" + format.format(new Date(punishment.timeStamp)) + ") from check"
+            String built = "Punishment applied @ (" + format.format(new Date(punishment.timeStamp)) + ") from check "
                     + punishment.checkName;
             eventsByStamp.put(punishment.timeStamp, built);
         }

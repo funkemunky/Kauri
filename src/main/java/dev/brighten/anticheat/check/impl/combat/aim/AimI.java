@@ -15,9 +15,7 @@ public class AimI extends Check {
         if(packet.isLook()) {
             if(MathUtils.getDelta(data.playerInfo.deltaPitch, data.playerInfo.lDeltaPitch) < 1E-5
                     && (data.playerInfo.deltaPitch > 0 || data.playerInfo.deltaYaw > 0.8)
-                    && (data.playerInfo.deltaXZ > 0
-                    || data.playerInfo.deltaY > 0
-                    || data.playerInfo.lastAttack.hasNotPassed(20))
+                    && data.playerInfo.lastAttack.hasNotPassed(20)
                     && Math.abs(data.playerInfo.to.pitch) < 70) {
                 if(data.playerInfo.deltaYaw > 0.4 && vl++ > 10) {
                     flag("shit=" + data.playerInfo.deltaPitch);

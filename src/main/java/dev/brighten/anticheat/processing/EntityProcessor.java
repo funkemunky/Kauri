@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.processing;
 
+import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.utils.RunUtils;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
@@ -23,30 +24,13 @@ public class EntityProcessor {
     public static BukkitTask task;
 
     private static void runEntityProcessor() {
-        Map<UUID, List<LivingEntity>> entities = new HashMap<>();
-        for (World world : Bukkit.getWorlds()) {
-            vehicles.put(world.getUID(), world.getEntities()
-                    .parallelStream()
-                    .filter(entity -> entity instanceof Vehicle)
-                    .collect(Collectors.toList()));
-
-            entities.put(world.getUID(), world.getEntities()
-                    .parallelStream()
-                    .filter(entity -> entity instanceof LivingEntity)
-                    .map(entity -> (LivingEntity)entity)
-                    .collect(Collectors.toList()));
+        for (UUID uuid : Atlas.getInstance().getEntities().keySet()) {
+            vehicles.put(uuid,
+                    Atlas.getInstance().getEntities().get(uuid)
+                            .stream()
+                            .filter(entity -> entity instanceof Vehicle)
+                            .collect(Collectors.toList()));
         }
-        for (ObjectData data : Kauri.INSTANCE.dataManager.dataMap.values()) {
-            List<LivingEntity> entityList = entities.get(data.getPlayer().getWorld().getUID());
-            data.entitiesNearPlayer.clear();
-            entityList
-                    .parallelStream()
-                    .filter(entity -> entity.getLocation().distance(data.getPlayer().getLocation()) < 6)
-                    .sequential()
-                    .forEach(data.entitiesNearPlayer::add);
-        }
-        entities.clear();
-        entities = null;
     }
 
     public static void start() {
