@@ -22,7 +22,7 @@ public class VelocityA extends Check {
     }
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
+    public void onFlying(WrappedInFlyingPacket packet) {
         if(vY > 0
                 && data.playerInfo.lastVelocity.hasNotPassed(4)
                 && !data.playerInfo.generalCancel
@@ -31,8 +31,7 @@ public class VelocityA extends Check {
                 && data.playerInfo.worldLoaded
                 && !data.blockInfo.inWeb
                 && !data.blockInfo.onClimbable
-                && data.playerInfo.blocksAboveTicks == 0
-                && !data.playerInfo.serverCanFly) {
+                && data.playerInfo.blocksAboveTicks == 0) {
 
             float pct = data.playerInfo.deltaY / (float) vY * 100F;
 

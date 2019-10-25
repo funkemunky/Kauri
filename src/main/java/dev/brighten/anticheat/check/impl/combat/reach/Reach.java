@@ -1,7 +1,10 @@
 package dev.brighten.anticheat.check.impl.combat.reach;
 
+import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedPacketPlayOutWorldParticle;
+import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumParticle;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MathUtils;
@@ -38,27 +41,24 @@ public class Reach extends Check {
     @Packet
     public void onUse(WrappedInFlyingPacket packet) {
         if(checkParameters(data)) {
-            List<Location> rayTrace = data.pastLocation.getEstimatedLocation(
-                    data.lagInfo.transPing / 2, 50 +
-                    MathUtils.getDelta(data.lagInfo.lastTransPing, data.lagInfo.transPing))
+            List<Location> point = data.pastLocation
+                    .getEstimatedLocation(0L, 50L)
                     .stream()
-                    .map(loc -> loc.toLocation(data.getPlayer().getWorld())
+                    .map(kloc -> kloc.toLocation(data.getPlayer().getWorld())
                             .add(0, data.getPlayer().getEyeHeight(), 0))
                     .collect(Collectors.toList());
 
             List<BoundingBox> previousLocations = data.targetPastLocation
-                    .getEstimatedLocation(data.lagInfo.transPing / 2
-                            , 200
-                                    + (data.lagInfo.transPing - data.lagInfo.lastTransPing))
+                    .getEstimatedLocation(data.lagInfo.transPing, 150L)
                     .parallelStream()
                     .map(loc -> getHitbox(loc, data.target.getType()))
                     .collect(Collectors.toList());
 
-            double distance = Math.min(6, data.target
+            double distance = Math.min(7, data.target
                     .getLocation().toVector()
-                    .distance(data.playerInfo.to.toVector()) * 1.2f);
+                    .distance(data.playerInfo.to.toVector()) * 1.5f);
 
-            List<Double> collided = getColliding(distance, rayTrace, previousLocations);
+            List<Double> collided = getColliding(distance, point, previousLocations);
 
             if(collided.size() > 5) {
                 float calcDistance = (float) collided
@@ -68,13 +68,13 @@ public class Reach extends Check {
                         .orElse(-1D);
 
                 if(calcDistance > 0) {
-                    if(calcDistance > 3 && collided.size() > 10) {
+                    if(calcDistance > 3.05 && collided.size() > 26) {
                         if(vl++ > 4) {
                             flag("reach=" + calcDistance + " collided=" + collided.size());
                         }
-                    } else vl-= vl > 0 ? 0.025 : 0;
+                    } else vl-= vl > 0 ? 0.02 : 0;
                     debug("reach=" + calcDistance + " collided="
-                            + collided.size() + "  vl=" + vl);
+                            + collided.size() + "  vl=" + vl + " lagging=" + data.lagInfo.lagging);
                 }
             } else vl-= vl > 0 ? 0.01 : 0;
         }
@@ -88,14 +88,15 @@ public class Reach extends Check {
                 && !data.getPlayer().getGameMode().equals(GameMode.CREATIVE);
     }
 
-    private static List<Double> getColliding(double distance, List<Location> traces, List<BoundingBox> boxes) {
+    private List<Double> getColliding(double distance, List<Location> locList, List<BoundingBox> boxes) {
         List<Double> collided = new ArrayList<>();
-        for (Location loc : traces) {
+
+        for (Location loc : locList) {
             RayTrace trace = new RayTrace(loc.toVector(), loc.getDirection());
             trace.traverse(0,
                     distance,
                     0.05,
-                    0.025f,
+                    0.02f,
                     2.6f,
                     3.3f)
                     .parallelStream()

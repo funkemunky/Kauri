@@ -14,7 +14,7 @@ import org.bukkit.entity.Player;
 public class PlayerInfoCommand {
 
     @Command(name = "kauri.info", description = "get the information of a player", display = "info [player]",
-            aliases = {"playerinfo", "pi", "kauri.pi", "kauri.playerinfo"}, playerOnly = true)
+            aliases = {"playerinfo", "pi", "kauri.pi", "kauri.playerinfo"}, playerOnly = true, permission = "kauri.info")
     public void onCommand(CommandAdapter cmd) {
         if(cmd.getArgs().length > 0) {
             Player player = Bukkit.getPlayer(cmd.getArgs()[0]);
