@@ -33,6 +33,7 @@ public class PacketProcessor {
 
                 if(packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) {
                     data.playerInfo.lastAttack.reset();
+                    data.playerInfo.lastAttackTimeStamp = timeStamp;
 
                     if(packet.getEntity() instanceof LivingEntity) {
                         if(data.target != null && !data.target.getUniqueId().equals(packet.getEntity().getUniqueId())) {

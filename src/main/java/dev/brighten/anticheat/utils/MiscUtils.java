@@ -4,8 +4,7 @@ import cc.funkemunky.api.utils.MathUtils;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class MiscUtils {
 
@@ -22,6 +21,45 @@ public class MiscUtils {
         NUMBER_REFLECTED_PRIMITIVES = s;
     }
 
+    public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
+        List<Map.Entry<K, V>> list = new ArrayList<>(map.entrySet());
+        list.sort(Map.Entry.comparingByValue());
+
+        Map<K, V> result = new LinkedHashMap<>();
+        for (Map.Entry<K, V> entry : list) {
+            result.put(entry.getKey(), entry.getValue());
+        }
+
+        return result;
+    }
+
+    private static final int[] decimalPlaces = {0, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000};
+
+    public static double format(double d, int dec) {
+        return (long) (d * decimalPlaces[dec] + 0.5) / (double) decimalPlaces[dec];
+    }
+
+    public static String drawUsage(long max, long time) {
+        double chunk = max / 50;
+        StringBuilder line = new StringBuilder("[");
+        for (int i = 0; i < 50; i++) {
+            line.append((chunk * i < time ? "§c" : "§7") + "❘");
+        }
+        String zeros = "00";
+        String nums = String.valueOf( MathUtils.round(((time / (double) max) * 100), 4));
+        return line.toString() + "§f] §c" + nums + "% §f❘";
+    }
+
+    public static String drawUsage(long max, double time) {
+        double chunk = max / 50;
+        StringBuilder line = new StringBuilder("[");
+        for (int i = 0; i < 50; i++) {
+            line.append((chunk * i < time ? "§c" : "§7") + "❘");
+        }
+        String zeros = "00";
+        String nums = Integer.toString((int) ((time / (double) max) * 100));
+        return line.toString() + "§f] §c" + zeros.substring(0, 3 - nums.length()) + nums + "% §f❘";
+    }
     public static float getYawChangeToEntity(Player player, LivingEntity entity, KLocation from, KLocation to) {
         double deltaX = entity.getLocation().getX() - player.getLocation().getX();
         double deltaZ = entity.getLocation().getZ() - player.getLocation().getZ();

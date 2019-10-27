@@ -36,6 +36,7 @@ public class PlayerInformation {
 
     //Attack
     public TickTimer lastAttack = new TickTimer(5);
+    public long lastAttackTimeStamp;
 
     //actions
     public boolean sneaking, sprinting, ridingJump;

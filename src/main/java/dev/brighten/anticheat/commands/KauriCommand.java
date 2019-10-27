@@ -8,7 +8,7 @@ import cc.funkemunky.api.utils.Init;
 @Init(commands = true)
 public class KauriCommand {
 
-    @Command(name = "kauri", description = "The Kauri main command.", display = "Kauri", aliases = {"anticheat"})
+    @Command(name = "kauri", description = "The Kauri main command.", display = "Kauri", aliases = {"anticheat"}, permission = "kauri.command")
     public void onCommand(CommandAdapter cmd) {
         Atlas.getInstance().getCommandManager().runHelpMessage(cmd, cmd.getSender(), Atlas.getInstance().getCommandManager().getDefaultScheme());
     }

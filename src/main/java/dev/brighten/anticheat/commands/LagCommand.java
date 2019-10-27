@@ -30,7 +30,7 @@ public class LagCommand {
         cmd.getSender().sendMessage(Color.translate("&eKauri CPU Usage:" +
                 MathUtils.round(50D / Kauri.INSTANCE.profiler.results(ResultsType.TICK).values()
                         .stream()
-                        .mapToDouble(val -> val)
+                        .mapToDouble(val -> val.two)
                         .sum())));
         cmd.getSender().sendMessage(MiscUtils.line(Color.Dark_Gray));
     }

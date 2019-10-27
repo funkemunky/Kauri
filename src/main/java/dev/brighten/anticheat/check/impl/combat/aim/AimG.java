@@ -11,7 +11,7 @@ import dev.brighten.anticheat.processing.MovementProcessor;
 import dev.brighten.anticheat.utils.MiscUtils;
 
 @CheckInfo(name = "Aim (G)", description = "Another style of denominator check on both pitch and yaw.",
-        checkType = CheckType.AIM, punishVL = 80)
+        checkType = CheckType.AIM, punishVL = 80, enabled = false, executable = false)
 public class AimG extends Check {
 
     private long lastGCD;
