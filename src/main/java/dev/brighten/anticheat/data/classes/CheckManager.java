@@ -1,8 +1,8 @@
 package dev.brighten.anticheat.data.classes;
 
+import cc.funkemunky.api.reflections.types.WrappedClass;
+import cc.funkemunky.api.reflections.types.WrappedMethod;
 import cc.funkemunky.api.tinyprotocol.api.NMSObject;
-import cc.funkemunky.api.tinyprotocol.api.packets.reflections.types.WrappedClass;
-import cc.funkemunky.api.tinyprotocol.api.packets.reflections.types.WrappedMethod;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.CheckSettings;

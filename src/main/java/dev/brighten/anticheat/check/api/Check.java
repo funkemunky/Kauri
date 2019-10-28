@@ -1,7 +1,7 @@
 package dev.brighten.anticheat.check.api;
 
 import cc.funkemunky.api.Atlas;
-import cc.funkemunky.api.tinyprotocol.api.packets.reflections.types.WrappedClass;
+import cc.funkemunky.api.reflections.types.WrappedClass;
 import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.impl.combat.aim.*;

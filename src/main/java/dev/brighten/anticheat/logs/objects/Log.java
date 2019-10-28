@@ -1,7 +1,7 @@
 package dev.brighten.anticheat.logs.objects;
 
-import cc.funkemunky.api.tinyprotocol.api.packets.reflections.types.WrappedClass;
-import cc.funkemunky.api.tinyprotocol.api.packets.reflections.types.WrappedField;
+import cc.funkemunky.api.reflections.types.WrappedClass;
+import cc.funkemunky.api.reflections.types.WrappedField;
 import cc.funkemunky.api.utils.json.JSONException;
 import cc.funkemunky.api.utils.json.JSONObject;
 import lombok.AllArgsConstructor;
