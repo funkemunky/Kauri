@@ -1,6 +1,5 @@
 package dev.brighten.anticheat.check.impl.packets.badpackets;
 
-import cc.funkemunky.api.tinyprotocol.packet.GeneralWrapper;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInHeldItemSlotPacket;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;

@@ -1,7 +1,6 @@
 package dev.brighten.anticheat.listeners;
 
 import cc.funkemunky.api.Atlas;
-import cc.funkemunky.api.reflection.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumParticle;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.Init;

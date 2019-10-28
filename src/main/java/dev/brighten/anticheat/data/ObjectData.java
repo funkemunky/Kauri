@@ -3,7 +3,6 @@ package dev.brighten.anticheat.data;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.TickTimer;
 import cc.funkemunky.api.utils.math.RollingAverageLong;
-import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.classes.BlockInformation;
 import dev.brighten.anticheat.data.classes.CheckManager;

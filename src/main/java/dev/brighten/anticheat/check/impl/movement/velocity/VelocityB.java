@@ -11,7 +11,6 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.MovementUtils;
-import lombok.val;
 import org.bukkit.enchantments.Enchantment;
 
 import java.util.*;

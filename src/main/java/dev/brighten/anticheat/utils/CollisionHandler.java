@@ -1,11 +1,7 @@
 package dev.brighten.anticheat.utils;
 
-import cc.funkemunky.api.Atlas;
-import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumParticle;
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.BoundingBox;
-import cc.funkemunky.api.utils.MiscUtils;
-import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import org.bukkit.Material;
 import org.bukkit.block.Block;

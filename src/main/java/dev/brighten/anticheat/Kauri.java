@@ -40,7 +40,7 @@ public class Kauri extends JavaPlugin {
     public ToggleableProfiler profiler;
 
     public boolean enabled = false;
-    public TickTimer lastEnabled = new TickTimer(20);
+    public TickTimer lastEnabled;
 
     //Config Stuff
     public Configuration kauriConfig;
@@ -121,6 +121,7 @@ public class Kauri extends JavaPlugin {
                 Bukkit.getOnlinePlayers().forEach(dataManager::createData);
             }, this, 6L);
         }
+        lastEnabled = new TickTimer(20);
         enabled = true;
         lastEnabled.reset();
     }

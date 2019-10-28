@@ -2,12 +2,7 @@ package dev.brighten.anticheat.menu;
 
 import cc.funkemunky.api.handlers.ForgeHandler;
 import cc.funkemunky.api.handlers.ModData;
-import cc.funkemunky.api.reflection.CraftReflection;
-import cc.funkemunky.api.reflection.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
-import cc.funkemunky.api.tinyprotocol.api.packets.reflections.Reflections;
-import cc.funkemunky.api.tinyprotocol.api.packets.reflections.types.WrappedClass;
-import cc.funkemunky.api.tinyprotocol.api.packets.reflections.types.WrappedMethod;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
@@ -18,16 +13,15 @@ import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.utils.ItemBuilder;
 import dev.brighten.anticheat.utils.menu.button.Button;
 import dev.brighten.anticheat.utils.menu.type.impl.ChestMenu;
-import lombok.val;
 import org.apache.commons.lang.time.DurationFormatUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class PlayerInformationGUI extends ChestMenu {
@@ -79,8 +73,6 @@ public class PlayerInformationGUI extends ChestMenu {
                 "&eLast Packet Drop&7: &f" + DurationFormatUtils
                         .formatDurationHMS(data.lagInfo.lastPacketDrop.getPassed() * 50),
                 halfLine);
-
-        Bukkit.broadcastMessage(MinecraftReflection.getVersion(data.getPlayer()).getVersion() + "");
         return vioItem.build();
     }
 

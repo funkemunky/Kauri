@@ -3,15 +3,10 @@ package dev.brighten.anticheat.processing;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.utils.RunUtils;
 import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.data.ObjectData;
-import org.bukkit.Bukkit;
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;

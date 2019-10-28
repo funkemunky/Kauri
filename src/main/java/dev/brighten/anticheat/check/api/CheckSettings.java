@@ -1,10 +1,7 @@
 package dev.brighten.anticheat.check.api;
 
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-
-import java.lang.annotation.Retention;
 
 @AllArgsConstructor
 @RequiredArgsConstructor

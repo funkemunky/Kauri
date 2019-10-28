@@ -1,11 +1,7 @@
 package dev.brighten.anticheat.data.classes;
 
 import cc.funkemunky.api.Atlas;
-import cc.funkemunky.api.reflection.MinecraftReflection;
-import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumParticle;
-import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.BoundingBox;
-import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.ReflectionsUtil;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
@@ -13,9 +9,7 @@ import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.utils.CollisionHandler;
 import org.bukkit.block.Block;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class BlockInformation {
     private ObjectData objectData;

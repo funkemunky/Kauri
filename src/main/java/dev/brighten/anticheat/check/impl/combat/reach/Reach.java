@@ -3,6 +3,7 @@ package dev.brighten.anticheat.check.impl.combat.reach;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.BoundingBox;
+import cc.funkemunky.api.utils.MiscUtils;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -80,9 +81,7 @@ public class Reach extends Check {
 
     private static boolean checkParameters(ObjectData data, long timeStamp) {
         return timeStamp - data.playerInfo.lastAttackTimeStamp < 5
-                && data.target instanceof Player
-                && ((Player) data.target).isOnline()
-                && allowedEntities.contains(data.target.getType())
+                && data.target != null
                 && !data.playerInfo.inCreative
                 && !data.getPlayer().getGameMode().equals(GameMode.CREATIVE);
     }
@@ -109,8 +108,10 @@ public class Reach extends Check {
     }
 
     private static BoundingBox getHitbox(KLocation loc, EntityType type) {
+        Vector bounds = MiscUtils.entityDimensions.get(type);
         return new BoundingBox(loc.toVector(), loc.toVector())
-                .grow(0.4f, 0, 0.4f)
-                .add(0,0,0,0,1.8f,0);
+                .grow((float)bounds.getX(), 0, (float)bounds.getZ())
+                .add(0,0,0,0,(float)bounds.getY(),0)
+                .grow(0.1f,0.1f,0.1f);
     }
 }

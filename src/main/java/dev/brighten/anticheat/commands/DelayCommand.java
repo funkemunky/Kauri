@@ -3,7 +3,6 @@ package dev.brighten.anticheat.commands;
 import cc.funkemunky.api.commands.ancmd.Command;
 import cc.funkemunky.api.commands.ancmd.CommandAdapter;
 import cc.funkemunky.api.tinyprotocol.api.packets.reflections.types.WrappedClass;
-import cc.funkemunky.api.tinyprotocol.api.packets.reflections.types.WrappedField;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.Init;

@@ -1,14 +1,16 @@
 package dev.brighten.anticheat.check.impl.movement.phase;
 
 import cc.funkemunky.api.Atlas;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.TickTimer;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.check.api.*;
+import dev.brighten.anticheat.check.api.Check;
+import dev.brighten.anticheat.check.api.CheckInfo;
+import dev.brighten.anticheat.check.api.CheckType;
+import dev.brighten.anticheat.check.api.Event;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.event.block.Action;

@@ -12,14 +12,12 @@ import dev.brighten.anticheat.check.api.CheckSettings;
 import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.utils.ItemBuilder;
 import dev.brighten.anticheat.utils.Pastebin;
-import dev.brighten.anticheat.utils.menu.Menu;
 import dev.brighten.anticheat.utils.menu.button.Button;
 import dev.brighten.anticheat.utils.menu.button.ClickAction;
 import dev.brighten.anticheat.utils.menu.type.impl.ChestMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.meta.ItemMeta;
 
