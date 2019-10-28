@@ -11,6 +11,7 @@ public class PlayerInformation {
             collidesVertically, collidesHorizontally, serverCanFly, inCreative, serverIsFlying, collided,
             onLadder, usingItem, wasOnIce, wasOnSlime, jumped, inAir, breakingBlock, worldLoaded,
             clientIsFlying, clientCanFly;
+    public boolean testFly, lastTestFly;
     public boolean generalCancel, flightCancel;
     public float deltaY, lDeltaY, deltaX, lDeltaX, deltaZ, lDeltaZ, deltaXZ, lDeltaXZ, fallDistance, jumpHeight;
     public float pDeltaY;
@@ -47,7 +48,8 @@ public class PlayerInformation {
     public TickTimer lastBrokenBlock = new TickTimer(5),
             lastVelocity = new TickTimer(20),
             lastTargetSwitch = new TickTimer(3),
-            lastBlockPlace = new TickTimer(10);
+            lastBlockPlace = new TickTimer(10),
+            lastToggleFlight = new TickTimer(10);
 
     public KLocation from, to;
 }

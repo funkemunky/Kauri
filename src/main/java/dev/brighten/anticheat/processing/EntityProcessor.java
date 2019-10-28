@@ -34,6 +34,6 @@ public class EntityProcessor {
     }
 
     public static void start() {
-        task = RunUtils.taskTimerAsync(EntityProcessor::runEntityProcessor, Kauri.INSTANCE, 2L, 20L);
+        task = RunUtils.taskTimerAsync(EntityProcessor::runEntityProcessor, Kauri.INSTANCE, 0L, 20L);
     }
 }

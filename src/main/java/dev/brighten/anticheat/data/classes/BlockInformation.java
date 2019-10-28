@@ -27,6 +27,7 @@ public class BlockInformation {
     }
 
     public void runCollisionCheck() {
+        if(!Kauri.INSTANCE.enabled || Kauri.INSTANCE.lastEnabled.hasNotPassed(6)) return;
         CollisionHandler handler = new CollisionHandler(objectData);
 
         List<BoundingBox> boxes = Atlas.getInstance().getBlockBoxManager().getBlockBox().getCollidingBoxes(objectData.getPlayer().getWorld(), objectData.box.grow(1.5f,2,1.5f));

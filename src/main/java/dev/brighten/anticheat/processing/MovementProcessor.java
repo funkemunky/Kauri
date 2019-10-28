@@ -49,12 +49,18 @@ public class MovementProcessor {
             data.playerInfo.to.z = packet.getZ();
         }
 
+        if(data.playerInfo.testFly != data.playerInfo.lastTestFly)
+            data.playerInfo.lastToggleFlight.reset();
+
+        data.playerInfo.lastTestFly = data.playerInfo.testFly;
+        data.playerInfo.testFly = data.getPlayer().getAllowFlight();
+
         data.playerInfo.jumpHeight = MovementUtils.getJumpHeight(data.getPlayer());
 
         data.playerInfo.worldLoaded = Atlas.getInstance().getBlockBoxManager().getBlockBox()
                 .isChunkLoaded(data.playerInfo.to.toLocation(data.getPlayer().getWorld()));
 
-        data.lagInfo.lagging = data.lagInfo.lastPacketDrop.hasNotPassed(10)
+        data.lagInfo.lagging = data.lagInfo.lastPacketDrop.hasNotPassed(6)
                 || !data.playerInfo.worldLoaded
                 || Kauri.INSTANCE.lastTickLag.hasNotPassed(20);
 
@@ -228,6 +234,7 @@ public class MovementProcessor {
                 || data.playerInfo.webTicks > 0
                 || !data.playerInfo.worldLoaded
                 || block == null
+                || data.playerInfo.lastToggleFlight.hasNotPassed(40)
                 || data.playerInfo.liquidTicks > 0
                 || data.playerInfo.climbTicks > 0
                 || timeStamp - data.creation < 2000
@@ -238,6 +245,7 @@ public class MovementProcessor {
                 || data.playerInfo.inCreative
                 || hasLevi
                 || !data.playerInfo.worldLoaded
+                || data.playerInfo.lastToggleFlight.hasNotPassed(40)
                 || timeStamp - data.creation < 2000
                 || block == null
                 || data.playerInfo.serverPos

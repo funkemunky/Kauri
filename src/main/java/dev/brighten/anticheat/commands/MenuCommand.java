@@ -97,6 +97,12 @@ public class MenuCommand {
         return menu;
     }
 
+    private ChestMenu getChecksCategoryMenu() {
+        ChestMenu menu = new ChestMenu(Color.Gold + "Check Categories", 2);
+
+        return menu;
+    }
+
     private ChestMenu getChecksMenu() {
         ChestMenu menu = new ChestMenu(Color.Gold + "Checks", 6);
 
@@ -175,7 +181,6 @@ public class MenuCommand {
 
             menu.addItem(button);
         }
-        menu.setItem(53, goBack());
         return menu;
     }
 
@@ -211,14 +216,7 @@ public class MenuCommand {
                 }
             }));
         }
-        menu.setItem(53, goBack());
         return menu;
-    }
-
-    private Button goBack() {
-        return createButton(Material.REDSTONE,1, "&cBack", (player, info) -> {
-            info.getMenu().close(player);
-        });
     }
 
     private static String getLogsFromUUID(UUID uuid) {

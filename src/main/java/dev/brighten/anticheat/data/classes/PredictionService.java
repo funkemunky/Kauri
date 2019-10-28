@@ -654,7 +654,7 @@ public class PredictionService {
         if (data.playerInfo.liquidTicks > 0
                 || data.playerInfo.climbTicks > 0
                 || fly
-                || data.getPlayer().getGameMode() == GameMode.SPECTATOR) {
+                || data.getPlayer().getGameMode().toString().contains("SPEC")) {
             return false;
         }
 

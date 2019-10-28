@@ -46,8 +46,8 @@ public class MiscUtils {
             line.append((chunk * i < time ? "§c" : "§7") + "❘");
         }
         String zeros = "00";
-        String nums = String.valueOf( MathUtils.round(((time / (double) max) * 100), 4));
-        return line.toString() + "§f] §c" + nums + "% §f❘";
+        String nums = Integer.toString((int) ((time / (double) max) * 100));
+        return line.toString() + "§f] §c" + zeros.substring(0, 3 - nums.length()) + nums + "% §f❘";
     }
 
     public static String drawUsage(long max, double time) {
@@ -56,9 +56,8 @@ public class MiscUtils {
         for (int i = 0; i < 50; i++) {
             line.append((chunk * i < time ? "§c" : "§7") + "❘");
         }
-        String zeros = "00";
-        String nums = Integer.toString((int) ((time / (double) max) * 100));
-        return line.toString() + "§f] §c" + zeros.substring(0, 3 - nums.length()) + nums + "% §f❘";
+        String nums = String.valueOf(format((time / (double) max) * 100, 3));
+        return line.toString() + "§f] §c" + nums + "%";
     }
     public static float getYawChangeToEntity(Player player, LivingEntity entity, KLocation from, KLocation to) {
         double deltaX = entity.getLocation().getX() - player.getLocation().getX();

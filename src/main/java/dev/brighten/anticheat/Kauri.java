@@ -40,6 +40,7 @@ public class Kauri extends JavaPlugin {
     public ToggleableProfiler profiler;
 
     public boolean enabled = false;
+    public TickTimer lastEnabled = new TickTimer(20);
 
     //Config Stuff
     public Configuration kauriConfig;
@@ -113,12 +114,13 @@ public class Kauri extends JavaPlugin {
         runTpsTask();
         profiler = new ToggleableProfiler();
         profiler.enabled = true;
-        RunUtils.taskLater(() ->  enabled = true, 4);
 
         if(Bukkit.getOnlinePlayers().size() > 0) {
             MiscUtils.printToConsole(Color.Gray + "Detected players! Creating data objects...");
             Bukkit.getOnlinePlayers().forEach(dataManager::createData);
         }
+        enabled = true;
+        lastEnabled.reset();
     }
 
     public void saveConfig() {

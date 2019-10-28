@@ -56,7 +56,36 @@ public class ProfilerCommand {
                         .mapToLong(key -> Kauri.INSTANCE.profiler.total.get(key))
                         .sum();
 
-                List<Button> buttons = getButtonsPerPage(finalPage, total, sorted);
+                int size = sorted.size();
+                List<Map.Entry<String, Long>> entries = new ArrayList<>(sorted.entrySet());
+                List<Button> buttons = new ArrayList<>();
+
+                double samples = 0;
+
+                for (int i = size - Math.min(size - 10, 10); i < size; i++) {
+                    Map.Entry<String, Long> entry = entries.get(i);
+                    String name = entry.getKey();
+                    Long time = entry.getValue();
+
+                    buttons.add(new Button(false, new ItemBuilder(Material.REDSTONE)
+                            .amount(1)
+                            .name(Color.Gold + entry.getKey()).lore("",
+                                    "&7Weighted Usage: " + dev.brighten.anticheat.utils.MiscUtils.drawUsage(total, time),
+                                    "&7MS: &f" + dev.brighten.anticheat.utils.MiscUtils.format(time / 1000000D, 3),
+                                    "&7Samples: &f" + dev.brighten.anticheat.utils.MiscUtils
+                                            .format(Kauri.INSTANCE.profiler.samples
+                                                    .getOrDefault(name, 0L) / 1000000D, 3),
+                                    "&7Deviaion: &f" + dev.brighten.anticheat.utils.MiscUtils
+                                            .format(Kauri.INSTANCE.profiler.stddev
+                                                    .getOrDefault(name, 0L) / 1000000D, 3))
+                            .build()));
+                    samples+= Kauri.INSTANCE.profiler.samples
+                            .getOrDefault(name, 0L) / 1000000D;
+                }
+
+                buttons = buttons.subList(Math.min(buttons.size(),
+                        (finalPage - 1) * 45), Math.min(finalPage * 45, buttons.size()));
+
                 double totalMs = total / 1000000D;
                 long totalTime = Kauri.INSTANCE.profiler.totalCalls * 50;
                 if(finalPage > 1) {
@@ -69,9 +98,9 @@ public class ProfilerCommand {
                         new ItemBuilder(Material.REDSTONE)
                                 .amount(1)
                                 .name(Color.Gold + "Total").lore("",
-                                "&7Usage: " + dev.brighten.anticheat.utils.MiscUtils.drawUsage(total, dev.brighten.anticheat.utils.MiscUtils.format(totalMs / totalTime, 3)),
+                                "&7Usage: " + dev.brighten.anticheat.utils.MiscUtils.drawUsage(50, dev.brighten.anticheat.utils.MiscUtils.format(samples / 50, 3)),
                                 "&7Total: &f" + dev.brighten.anticheat.utils.MiscUtils.format(totalMs, 3),
-                                "&7Pct: &f" + dev.brighten.anticheat.utils.MiscUtils.format(totalMs / totalTime, 3) + "%",
+                                "&7Samples: &f" + dev.brighten.anticheat.utils.MiscUtils.format(samples, 3),
                                 "",
                                 "&7&oRight click to reset data.")
                                 .build(),
@@ -167,32 +196,5 @@ public class ProfilerCommand {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-    }
-
-    private List<Button> getButtonsPerPage(int page, long total, Map<String, Long> sorted) {
-        int size = sorted.size();
-        List<Map.Entry<String, Long>> entries = new ArrayList<>(sorted.entrySet());
-        List<Button> buttons = new ArrayList<>();
-
-        for (int i = size - Math.min(size - 10, 10); i < size; i++) {
-            Map.Entry<String, Long> entry = entries.get(i);
-            String name = entry.getKey();
-            Long time = entry.getValue();
-
-            buttons.add(new Button(false, new ItemBuilder(Material.REDSTONE)
-                    .amount(1)
-                    .name(Color.Gold + entry.getKey()).lore("",
-                            "&7Weighted Usage: " + dev.brighten.anticheat.utils.MiscUtils.drawUsage(total, time),
-                            "&7MS: &f" + dev.brighten.anticheat.utils.MiscUtils.format(time / 1000000D, 3),
-                            "&7Samples: &f" + dev.brighten.anticheat.utils.MiscUtils
-                                    .format(Kauri.INSTANCE.profiler.samples
-                                            .getOrDefault(name, 0L) / 1000000D, 3),
-                            "&7Deviaion: &f" + dev.brighten.anticheat.utils.MiscUtils
-                                    .format(Kauri.INSTANCE.profiler.stddev
-                                            .getOrDefault(name, 0L) / 1000000D, 3))
-                    .build()));
-        }
-
-        return buttons.subList(Math.min(buttons.size(), (page - 1) * 45), Math.min(page * 45, buttons.size()));
     }
 }
