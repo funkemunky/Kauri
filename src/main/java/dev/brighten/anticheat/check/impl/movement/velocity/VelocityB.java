@@ -54,12 +54,13 @@ public class VelocityB extends Check {
     }
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
+    public void onFlying(WrappedInFlyingPacket packet) {
         if((vX != 0 || vZ != 0)) {
             if(data.playerInfo.lastVelocity.hasNotPassed(5)) {
                 if(!data.blockInfo.blocksNear
                         && !data.blockInfo.inWeb
                         && !data.playerInfo.onLadder
+                        && !data.blockInfo.inLiquid
                         && !data.lagInfo.lagging
                         && !data.playerInfo.serverPos
                         && !data.getPlayer().getAllowFlight()) {
@@ -85,7 +86,7 @@ public class VelocityB extends Check {
                         f5 = data.playerInfo.sprinting ? 0.026f : 0.02f;
                     }
 
-                    double pct = 0;
+                    double pct = 100;
                     double lVX = vX, lVZ = vZ;
 
                     float[] motion = new float[2];

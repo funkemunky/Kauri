@@ -116,8 +116,10 @@ public class Kauri extends JavaPlugin {
         profiler.enabled = true;
 
         if(Bukkit.getOnlinePlayers().size() > 0) {
-            MiscUtils.printToConsole(Color.Gray + "Detected players! Creating data objects...");
-            Bukkit.getOnlinePlayers().forEach(dataManager::createData);
+            RunUtils.taskLater(() -> {
+                MiscUtils.printToConsole(Color.Gray + "Detected players! Creating data objects...");
+                Bukkit.getOnlinePlayers().forEach(dataManager::createData);
+            }, this, 6L);
         }
         enabled = true;
         lastEnabled.reset();

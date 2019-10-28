@@ -22,6 +22,7 @@ import lombok.val;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
@@ -78,6 +79,8 @@ public class PlayerInformationGUI extends ChestMenu {
                 "&eLast Packet Drop&7: &f" + DurationFormatUtils
                         .formatDurationHMS(data.lagInfo.lastPacketDrop.getPassed() * 50),
                 halfLine);
+
+        Bukkit.broadcastMessage(MinecraftReflection.getVersion(data.getPlayer()).getVersion() + "");
         return vioItem.build();
     }
 
@@ -151,5 +154,11 @@ public class PlayerInformationGUI extends ChestMenu {
             playerButton.getStack().setItemMeta(playerSkull().getItemMeta());
             buildInventory(false);
         }, Kauri.INSTANCE, 80L, 50L);
+    }
+
+    @Override
+    public void handleClose(Player player) {
+        super.handleClose(player);
+        updatingTask.cancel();
     }
 }
