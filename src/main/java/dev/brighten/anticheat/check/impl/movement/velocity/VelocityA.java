@@ -22,9 +22,9 @@ public class VelocityA extends Check {
     }
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
+    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(vY > 0
-                && data.playerInfo.lastVelocity.hasNotPassed(4)
+                && (timeStamp - data.playerInfo.lastVelocityTimestamp) < 200
                 && !data.playerInfo.generalCancel
                 && !data.playerInfo.serverPos
                 && !data.lagInfo.lagging
