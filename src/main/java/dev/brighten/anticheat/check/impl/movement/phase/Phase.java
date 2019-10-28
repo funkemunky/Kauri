@@ -43,8 +43,8 @@ public class Phase extends Check {
 
                 boolean flagged = false;
                 BoundingBox box = new BoundingBox(event.getTo().toVector(), event.getFrom().toVector())
-                        .grow(0.26f,0,0.26f)
-                        .add(0,0.1f,0,0,1.7f,0);
+                        .grow(0.25f,0,0.25f)
+                        .add(0,0.25f,0,0,1.72f,0);
 
                 List<BoundingBox> boxes = Atlas.getInstance().getBlockBoxManager().getBlockBox()
                         .getCollidingBoxes(data.getPlayer().getWorld(), box)
@@ -69,16 +69,17 @@ public class Phase extends Check {
                         .collect(Collectors.toList());
 
                 if (boxes.size() > 0) {
-                    if(lastboxes.size() == 0 && lastOpenDoor.hasPassed(5)) {
+                    if(lastOpenDoor.hasPassed(8)) {
                         setBack();
-                        if(vl++ > 10) {
+                        if (vl++ > 10) {
                             flag("phased");
                         }
                         flagged = true;
-                        lastFlag.reset();
                     }
-                } else if(lastFlag.hasPassed()) {
+                    lastFlag.reset();
+                } else if(!data.playerInfo.collidesHorizontally) {
                     nonColliding.add(event.getTo());
+                    vl-= vl > 0 ? 0.05 : 0;
                 }
 
                 if(!flagged) {
@@ -107,6 +108,6 @@ public class Phase extends Check {
 
     private void setBack() {
         RunUtils.task(() -> data.getPlayer()
-                .teleport(nonColliding.get(nonColliding.size() - 1)), Kauri.INSTANCE);
+                .teleport(nonColliding.get(0)), Kauri.INSTANCE);
     }
 }
