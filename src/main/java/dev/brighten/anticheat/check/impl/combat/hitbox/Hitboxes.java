@@ -95,6 +95,6 @@ public class Hitboxes extends Check {
         return new BoundingBox(loc.toVector(), loc.toVector())
                 .grow((float)bounds.getX(), 0, (float)bounds.getZ())
                 .add(0,0,0,0,(float)bounds.getY(),0)
-                .grow(0.2f,0.15f,0.2f);
+                .grow(0.12f,0f,0.12f).add(0,0,0,0,0.1f,0);
     }
 }

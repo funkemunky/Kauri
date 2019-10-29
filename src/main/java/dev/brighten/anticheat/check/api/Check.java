@@ -48,7 +48,8 @@ public class Check {
 
     private static void register(Check check) {
         if(!check.getClass().isAnnotationPresent(CheckInfo.class)) {
-            MiscUtils.printToConsole("Could not register "  + check.getClass().getSimpleName() + " because @CheckInfo was not present.");
+            MiscUtils.printToConsole("Could not register "  + check.getClass().getSimpleName()
+                    + " because @CheckInfo was not present.");
             return;
         }
         CheckInfo info = check.getClass().getAnnotation(CheckInfo.class);
@@ -75,7 +76,8 @@ public class Check {
         final String info = information
                 .replace("%p", String.valueOf(data.lagInfo.transPing))
                 .replace("%t", String.valueOf(MathUtils.round(Kauri.INSTANCE.tps, 2)));
-        if(Kauri.INSTANCE.lastTickLag.hasPassed() && (data.lagInfo.lastPacketDrop.hasPassed(5) || data.lagInfo.lastPingDrop.hasPassed())) {
+        if(Kauri.INSTANCE.lastTickLag.hasPassed() && (data.lagInfo.lastPacketDrop.hasPassed(5)
+                || data.lagInfo.lastPingDrop.hasPassed())) {
             Kauri.INSTANCE.loggerManager.addLog(data, this, info);
 
             if(lastAlert.hasPassed(MathUtils.millisToTicks(Config.alertsDelay))) {

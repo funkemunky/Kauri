@@ -16,7 +16,7 @@ public class VelocityA extends Check {
 
     @Packet
     public void onVelocity(WrappedOutVelocityPacket packet) {
-        if(packet.getId() == data.getPlayer().getEntityId() && packet.getY() > 0) {
+        if(packet.getId() == data.getPlayer().getEntityId() && packet.getY() > 0 && data.playerInfo.clientGround) {
             vY = (float) packet.getY();
         }
     }
@@ -35,7 +35,10 @@ public class VelocityA extends Check {
 
             float pct = data.playerInfo.deltaY / (float) vY * 100F;
 
-            if (pct < 99.999 && !data.blockInfo.blocksAbove && !data.playerInfo.collidesHorizontally) {
+            if (pct < 99.999
+                    && !data.playerInfo.lastBlockPlace.hasNotPassed(5)
+                    && !data.blockInfo.blocksAbove
+                    && !data.playerInfo.collidesHorizontally) {
                 if (vl++ > 9) flag("pct=" + MathUtils.round(pct, 2) + "%");
             } else vl-= vl > 0 ? 0.25 : 0;
 

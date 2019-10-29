@@ -3,6 +3,7 @@ package dev.brighten.anticheat.check.impl.combat.reach;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.BoundingBox;
+import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.Tuple;
 import dev.brighten.anticheat.Kauri;
@@ -71,16 +72,18 @@ public class Reach extends Check {
                 }
             }
 
-            if(collided > 0) {
+            if(collided > 1) {
                 double reach = reaches.stream().mapToDouble(val -> val).min().orElse(0);
 
-                if(reach > 3 && collided > 3) {
-                    vl++;
+                if(reach > 3.1) {
+                    if(collided > 3) {
+                        vl++;
+                    } vl+= 0.5;
                     if(vl > 2) {
-                        flag("reach=" + reach);
+                        flag("reach=" + reach + " collided=" + collided);
                     }
                 } else vl-= vl > 0 ? 0.05 : 0;
-                debug("reach=" + reach + " collided=" + collided);
+                debug((reach > 3.1 ? Color.Green : "") + "reach=" + reach + " collided=" + collided + "vl=" + vl);
             }
         }
     }
