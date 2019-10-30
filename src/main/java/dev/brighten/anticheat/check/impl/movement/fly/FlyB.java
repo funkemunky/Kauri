@@ -23,10 +23,11 @@ public class FlyB extends Check {
         float max = jumpHeight + 0.01f;
 
         if(data.playerInfo.deltaY > max && !data.playerInfo.serverGround) {
-            if(vl++ > 1) {
+            //We check for lag since this can sometimes affect false positives.
+            if((vl+= data.lagInfo.lagging ? 0.5 : 1) > (data.lagInfo.lagging ? 2 : 1)) {
                 flag(data.playerInfo.deltaY + ">-" + max);
             }
-        } else vl-= vl > 0 ? 0.02 : 0;
+        } else vl-= vl > 0 ? 0.025 : 0;
     }
 
 }

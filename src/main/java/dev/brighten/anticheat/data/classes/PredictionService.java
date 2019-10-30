@@ -12,6 +12,7 @@ import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.MovementUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -376,6 +377,8 @@ public class PredictionService {
                 if(data.getPlayer().hasPotionEffect(PotionEffectType.SLOW)) {
                     aiMoveSpeed += (PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.SLOW) * (-0.15000000596046448D)) * aiMoveSpeed;
                 }
+
+                Bukkit.broadcastMessage(aiMoveSpeed + ", " + Atlas.getInstance().getBlockBoxManager().getBlockBox().getAiSpeed(data.getPlayer()));
 
                 //aiMoveSpeed+= (data.getPlayer().getWalkSpeed() - 0.2) * 5 * 0.45;
 

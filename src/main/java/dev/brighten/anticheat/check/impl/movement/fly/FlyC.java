@@ -21,9 +21,9 @@ public class FlyC extends Check {
                 && timeStamp - data.playerInfo.lastVelocityTimestamp > 250L
                 && data.playerInfo.airTicks > 3
                 && data.playerInfo.deltaY > data.playerInfo.lDeltaY + 1E-4) {
-            if((vl+=2) > 3) {
+            if((vl+= (data.lagInfo.lagging ? 1 : 2)) > 3) {
                 flag("y=" + data.playerInfo.deltaY + " lY=" +  data.playerInfo.lDeltaY);
             }
-        } else vl-= vl > 0 ? 0.04 : 0;
+        } else vl-= vl > 0 ? 0.05 : 0;
     }
 }

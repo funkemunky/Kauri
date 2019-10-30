@@ -160,7 +160,6 @@ public class Check {
         register(new SpeedC());
         register(new SpeedD());
         register(new SpeedE());
-        register(new SpeedF());
         register(new Phase());
         register(new Timer());
         register(new BadPacketsA());

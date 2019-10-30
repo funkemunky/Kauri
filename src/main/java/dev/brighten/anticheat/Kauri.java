@@ -21,10 +21,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class Kauri extends JavaPlugin {
+public class Kauri extends JavaPlugin{
 
     public static Kauri INSTANCE;
 
