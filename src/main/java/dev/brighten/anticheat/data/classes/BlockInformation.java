@@ -8,7 +8,9 @@ import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.utils.CollisionHandler;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class BlockInformation {
@@ -21,7 +23,8 @@ public class BlockInformation {
     }
 
     public void runCollisionCheck() {
-        if(!Kauri.INSTANCE.enabled || Kauri.INSTANCE.lastEnabled.hasNotPassed(6)) return;
+        if(!Kauri.INSTANCE.enabled
+                || Kauri.INSTANCE.lastEnabled.hasNotPassed(6)) return;
         CollisionHandler handler = new CollisionHandler(objectData);
 
         List<BoundingBox> boxes = Atlas.getInstance().getBlockBoxManager().getBlockBox().getCollidingBoxes(objectData.getPlayer().getWorld(), objectData.box.grow(1.5f,2,1.5f));
@@ -35,7 +38,11 @@ public class BlockInformation {
             }
         });
             //Running entity boundingBox check.
-        EntityProcessor.vehicles.get(objectData.getPlayer().getWorld().getUID())
+        EntityProcessor.vehicles.computeIfAbsent(objectData.getPlayer().getWorld().getUID(), key -> {
+            List<Entity> emptyList = new ArrayList<>();
+            EntityProcessor.vehicles.put(key, emptyList);
+            return emptyList;
+        })
                     .stream()
                     .filter(entity -> entity.getLocation().distance(objectData.getPlayer().getLocation()) < 1.5)
                     .map(entity -> ReflectionsUtil.toBoundingBox(ReflectionsUtil.getBoundingBox(entity)))

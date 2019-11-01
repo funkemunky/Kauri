@@ -7,7 +7,6 @@ import org.bukkit.entity.Player;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.*;
 
 public class MiscUtils {

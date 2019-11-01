@@ -1,19 +1,23 @@
 package dev.brighten.anticheat.logs;
 
-import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.carbon.db.Database;
-import cc.funkemunky.carbon.db.Structure;
 import cc.funkemunky.carbon.db.StructureSet;
+import cc.funkemunky.carbon.db.flatfile.FlatfileDatabase;
+import cc.funkemunky.carbon.db.mongo.MongoDatabase;
+import cc.funkemunky.carbon.db.sql.MySQLDatabase;
+import cc.funkemunky.carbon.utils.Pair;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.logs.objects.Punishment;
+import org.apache.commons.lang.RandomStringUtils;
 
+import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -68,16 +72,17 @@ public class LoggerManager {
         if(aLittleStupid) {
             if(mySQLEnabled) {
                 MiscUtils.printToConsole("&7Setting up SQL...");
-                Atlas.getInstance().getCarbon().createSQLDatabase(sqlDatabase, sqlIp, sqlPort, sqlUsername, sqlPassword);
+                MySQLDatabase.setCredentials(sqlIp, sqlUsername, sqlPassword);
+                logsDatabase = new MySQLDatabase("logs", sqlDatabase, sqlPort);
             } else if(mongoEnabled) {
                 MiscUtils.printToConsole("&7Setting up Mongo...");
-                Atlas.getInstance().getCarbon().initMongo(mongoDatabase, mongoIp, mongoPort, mongoUsername, mongoPassword);
-                Atlas.getInstance().getCarbon().createMongoDatabase("logs");
+                logsDatabase = new MongoDatabase("logs",
+                        MongoDatabase.initMongo(mongoDatabase, mongoIp, mongoPort, mongoUsername, mongoPassword));
             } else {
                 MiscUtils.printToConsole("&7Setting up FlatfileDB...");
-                Atlas.getInstance().getCarbon().createFlatfileDatabase(Kauri.INSTANCE.getDataFolder().getPath(), "logs");
+                logsDatabase = new FlatfileDatabase("logs");
+                //Atlas.getInstance().getCarbon().createFlatfileDatabase(Kauri.INSTANCE.getDataFolder().getPath(), "logs");
             }
-            logsDatabase = Atlas.getInstance().getCarbon().getDatabase(mySQLEnabled ? sqlDatabase : "logs");
             MiscUtils.printToConsole("&7Loading database on second thread...");
             logsDatabase.loadDatabase();
             save();
@@ -87,58 +92,79 @@ public class LoggerManager {
     public void addLog(ObjectData data, Check check, String info) {
         Log log = new Log(check.name, info, check.vl, data.lagInfo.transPing, System.currentTimeMillis(), Kauri.INSTANCE.tps);
 
-        StructureSet set = logsDatabase.createStructureSet(
-                new Structure("uuid", data.uuid.toString()),
-                new Structure("checkName", log.checkName),
-                new Structure("vl", log.vl),
-                new Structure("info", log.info),
-                new Structure("ping", log.ping),
-                new Structure("timeStamp", log.timeStamp),
-                new Structure("tps", log.tps));
+        StructureSet set = logsDatabase.createStructure(RandomStringUtils.random(20),
+                new Pair<>("type", "log"),
+                new Pair<>("uuid", data.uuid.toString()),
+                new Pair<>("checkName", log.checkName),
+                new Pair<>("vl", log.vl),
+                new Pair<>("info", log.info),
+                new Pair<>("ping", log.ping),
+                new Pair<>("timeStamp", log.timeStamp),
+                new Pair<>("tps", log.tps));
 
-        logsDatabase.inputField(set);
+        logsDatabase.updateObject(set);
     }
 
     public void addPunishment(ObjectData data, Check check) {
         Punishment punishment = new Punishment(data.uuid, check.name, System.currentTimeMillis());
         
-        StructureSet set = logsDatabase.createStructureSet(
-                new Structure("type", "punishment"),
-                new Structure("uuid", data.uuid.toString()), 
-                new Structure("checkName", punishment.checkName),
-                new Structure("timeStamp", punishment.timeStamp));
+        StructureSet set = logsDatabase.createStructure(RandomStringUtils.random(20),
+                new Pair<>("type", "punishment"),
+                new Pair<>("uuid", data.uuid.toString()), 
+                new Pair<>("checkName", punishment.checkName),
+                new Pair<>("timeStamp", punishment.timeStamp));
         
-        logsDatabase.inputField(set);
+        logsDatabase.updateObject(set);
     }
 
-    private static List<String> names = Arrays.asList("timeStamp", "tps", "info", "checkName", "uuid", "ping", "vl");
     public List<Log> getLogs(UUID uuid) {
 
         List<StructureSet> sets = logsDatabase.getDatabaseValues()
                 .stream()
-                .filter(structSet -> structSet.structures
-                        .stream()
-                        .allMatch(struct -> names.stream().anyMatch(name -> struct.name.equals(name))))
-                .filter(structSet -> structSet.getStructureByName("uuid").get().object.equals(uuid.toString()))
+                .filter(structSet -> structSet.containsKey("type") && structSet.getField("type").equals("log"))
+                .filter(structSet -> structSet.getField("uuid").equals(uuid.toString()))
                 .collect(Collectors.toList());
 
         return sets.stream().map(set -> new Log(
-                    String.valueOf(set.getStructureByName("checkName").get().object),
-                    String.valueOf(set.getStructureByName("info").get().object),
-                    (double)set.getStructureByName("vl").get().object,
-                    (long)set.getStructureByName("ping").get().object,
-                    (long)set.getStructureByName("timeStamp").get().object,
-                    (double)set.getStructureByName("tps").get().object)).collect(Collectors.toList());
+                    String.valueOf(set.getField("checkName")),
+                    String.valueOf(set.getField("info")),
+                    set.getField("vl"),
+                    set.getField("ping"),
+                    set.getField("timeStamp"),
+                    set.getField("tps"))).collect(Collectors.toList());
+    }
+
+    public void convertDeprecatedLogs() {
+        if(logsDatabase instanceof FlatfileDatabase) {
+            File oldFile = new File(Kauri.INSTANCE.getDataFolder().getPath() + File.separator + "logs.txt");
+
+            if(oldFile.exists()) {
+                ((FlatfileDatabase) logsDatabase)
+                        .convertFromLegacy(oldFile);
+                logsDatabase.getDatabaseValues().stream()
+                        .filter(set -> !set.containsKey("type") && set.containsKey("vl"))
+                        .forEach(set -> {
+                            set.inputField("type", "log");
+                            logsDatabase.updateObject(set);
+                        });
+                logsDatabase.saveDatabase();
+            }
+        }
     }
     
     public List<Punishment> getPunishments(UUID uuid) {
-        List<StructureSet> structureSets = logsDatabase.getFieldsByStructure(
-                (struct -> struct.name.equals("type") && String.valueOf(struct.object).equals("punishment")),
-                (struct -> struct.name.equals("uuid") && UUID.fromString(String.valueOf(struct.object)).equals(uuid)));
+        List<StructureSet> structureSets = logsDatabase.getDatabaseValues()
+                .stream()
+                .filter(set -> set.containsKey("type") && set.getField("type").equals("punishment"))
+                .collect(Collectors.toList());
 
-        return structureSets.stream().map(set -> new Punishment(uuid,
-                String.valueOf(set.getStructureByName("checkName").get().object),
-                (long)set.getStructureByName("timeStamp").get().object)).collect(Collectors.toList());
+        return structureSets.stream()
+                .map(set ->
+                        new Punishment(
+                                uuid,
+                                String.valueOf(set.getField("checkName")),
+                                set.getField("timeStamp")))
+                .collect(Collectors.toList());
     }
 
     public Map<UUID, List<Log>> getLogsWithinTimeFrame(long timeFrame) {
@@ -148,24 +174,22 @@ public class LoggerManager {
 
         logsDatabase.getDatabaseValues()
                 .stream()
-                .filter(structSet -> structSet.structures
-                        .stream()
-                        .allMatch(struct -> names.stream().anyMatch(name -> struct.name.equals(name))))
+                .filter(structSet -> structSet.containsKey("type") && structSet.getField("type").equals("log"))
                 .filter(set -> {
-                    Optional<Structure> optional = set.getStructureByName("timeStamp");
+                    long timeStamp = set.getField("timeStamp");
 
-                    return optional.isPresent() && (currentTime - (long) optional.get().object) < timeFrame;
+                    return (currentTime - timeStamp) < timeFrame;
                 }).forEach(set -> {
-            UUID uuid = UUID.fromString((String) set.getStructureByName("uuid").get().object);
+            UUID uuid = UUID.fromString(set.getField("uuid"));
             List<Log> logList = logs.getOrDefault(uuid, new ArrayList<>());
 
             logList.add(new Log(
-                    String.valueOf(set.getStructureByName("checkName").get().object),
-                    String.valueOf(set.getStructureByName("info").get().object),
-                    (double) set.getStructureByName("vl").get().object,
-                    (long) set.getStructureByName("ping").get().object,
-                    (long) set.getStructureByName("timeStamp").get().object,
-                    (double) set.getStructureByName("tps").get().object));
+                    String.valueOf(set.getField("checkName")),
+                    String.valueOf(set.getField("info")),
+                    set.getField("vl"),
+                    set.getField("ping"),
+                    set.getField("timeStamp"),
+                    set.getField("tps")));
 
             logs.put(uuid, logList);
         });

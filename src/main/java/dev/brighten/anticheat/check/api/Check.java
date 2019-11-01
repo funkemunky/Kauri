@@ -21,6 +21,7 @@ import dev.brighten.anticheat.check.impl.movement.velocity.VelocityB;
 import dev.brighten.anticheat.check.impl.packets.Timer;
 import dev.brighten.anticheat.check.impl.packets.badpackets.*;
 import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.processing.EntityProcessor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 
@@ -57,12 +58,12 @@ public class Check {
         WrappedClass checkClass = new WrappedClass(check.getClass());
         String name = info.name();
         CheckSettings settings = new CheckSettings(info.name(), info.description(), info.checkType(), info.punishVL());
-        if(Kauri.INSTANCE.kauriConfig.get("checks." + name + ".enabled") != null) {
-            settings.enabled = Kauri.INSTANCE.kauriConfig.getBoolean("checks." + name + ".enabled");
-            settings.executable = Kauri.INSTANCE.kauriConfig.getBoolean("checks." + name + ".executable");
+        if(Kauri.INSTANCE.getConfig().get("checks." + name + ".enabled") != null) {
+            settings.enabled = Kauri.INSTANCE.getConfig().getBoolean("checks." + name + ".enabled");
+            settings.executable = Kauri.INSTANCE.getConfig().getBoolean("checks." + name + ".executable");
         } else {
-            Kauri.INSTANCE.kauriConfig.set("checks." + name + ".enabled", info.enabled());
-            Kauri.INSTANCE.kauriConfig.set("checks." + name + ".executable", info.executable());
+            Kauri.INSTANCE.getConfig().set("checks." + name + ".enabled", info.enabled());
+            Kauri.INSTANCE.getConfig().set("checks." + name + ".executable", info.executable());
             Kauri.INSTANCE.saveConfig();
 
             settings.enabled = info.enabled();
@@ -73,6 +74,10 @@ public class Check {
     }
 
     public void flag(String information) {
+        if(EntityProcessor.vehicles == null) {
+            vl = 0;
+            return;
+        }
         final String info = information
                 .replace("%p", String.valueOf(data.lagInfo.transPing))
                 .replace("%t", String.valueOf(MathUtils.round(Kauri.INSTANCE.tps, 2)));

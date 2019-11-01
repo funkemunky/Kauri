@@ -4,12 +4,6 @@ import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.commands.ancmd.Command;
 import cc.funkemunky.api.commands.ancmd.CommandAdapter;
 import cc.funkemunky.api.utils.Init;
-import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.utils.GeneralHash;
-import dev.brighten.anticheat.utils.MiscUtils;
-
-import java.io.*;
-import java.lang.reflect.Method;
 
 @Init(commands = true)
 public class KauriCommand {

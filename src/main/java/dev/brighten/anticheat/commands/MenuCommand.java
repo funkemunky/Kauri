@@ -133,7 +133,7 @@ public class MenuCommand {
                             case SHIFT_LEFT: {
                                 CheckSettings settings = Check.getCheckSettings(val.name);
                                 settings.enabled = !settings.enabled;
-                                Kauri.INSTANCE.kauriConfig.set(enabled, settings.enabled);
+                                Kauri.INSTANCE.getConfig().set(enabled, settings.enabled);
                                 Kauri.INSTANCE.saveConfig();
 
                                 if (!settings.enabled) {
@@ -157,7 +157,7 @@ public class MenuCommand {
                             case SHIFT_RIGHT: {
                                 CheckSettings settings = Check.getCheckSettings(val.name);
                                 settings.executable = !settings.executable;
-                                Kauri.INSTANCE.kauriConfig.set(executable, settings.executable);
+                                Kauri.INSTANCE.getConfig().set(executable, settings.executable);
                                 Kauri.INSTANCE.saveConfig();
 
                                 if (settings.enabled) {

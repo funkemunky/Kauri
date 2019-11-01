@@ -1,9 +1,6 @@
 package dev.brighten.anticheat;
 
 import cc.funkemunky.api.Atlas;
-import cc.funkemunky.api.config.system.Configuration;
-import cc.funkemunky.api.config.system.ConfigurationProvider;
-import cc.funkemunky.api.config.system.YamlConfiguration;
 import cc.funkemunky.api.profiling.ToggleableProfiler;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MiscUtils;
@@ -15,13 +12,12 @@ import dev.brighten.anticheat.logs.LoggerManager;
 import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.processing.PacketProcessor;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -42,9 +38,6 @@ public class Kauri extends JavaPlugin{
 
     public boolean enabled = false;
     public TickTimer lastEnabled;
-
-    //Config Stuff
-    public Configuration kauriConfig;
 
     public void onEnable() {
         MiscUtils.printToConsole(Color.Red + "Starting Kauri " + getDescription().getVersion() + "...");
@@ -67,7 +60,8 @@ public class Kauri extends JavaPlugin{
         HandlerList.unregisterAll(this); //Unregistering Bukkit listeners.
         Atlas.getInstance().getEventManager().unregisterAll(this); //Unregistering Atlas listeners.
         MiscUtils.printToConsole("&7Unregistering commands...");
-        Atlas.getInstance().getCommandManager().unregisterCommand("kauri"); //Unregister all commands starting with the arg "Kauri".
+        //Unregister all commands starting with the arg "Kauri"
+        Atlas.getInstance().getCommandManager().unregisterCommand("kauri");
         MiscUtils.printToConsole("&7Shutting down all Bukkit tasks...");
         Bukkit.getScheduler().cancelTasks(this); //Cancelling all Bukkit tasks for this plugin.
 
@@ -94,14 +88,12 @@ public class Kauri extends JavaPlugin{
         executor = Executors.newFixedThreadPool(3);
 
         MiscUtils.printToConsole(Color.Gray + "Loading config...");
-        kauriConfig = YamlConfiguration.saveDefaultConfig(this, "config.yml");
 
         MiscUtils.printToConsole(Color.Gray + "Running scanner...");
         Atlas.getInstance().initializeScanner(getClass(),
                 this,
                 true,
-                true,
-                kauriConfig);
+                true, null);
         MiscUtils.printToConsole(Color.Gray + "Registering processors...");
         packetProcessor = new PacketProcessor();
         dataManager = new DataManager();
@@ -125,25 +117,9 @@ public class Kauri extends JavaPlugin{
         lastEnabled = new TickTimer(20);
         enabled = true;
         lastEnabled.reset();
-    }
 
-    public void saveConfig() {
-        try {
-            ConfigurationProvider.getProvider(YamlConfiguration.class).save(kauriConfig, new File(getDataFolder(), "config.yml"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void reloadConfig() {
-        try {
-            File file;
-            if(!(file = new File(getDataFolder(), "config.yml")).exists()) {
-                YamlConfiguration.saveDefaultConfig(this, "config.yml");
-            }
-            ConfigurationProvider.getProvider(YamlConfiguration.class).load(file);
-        } catch (IOException e) {
-            e.printStackTrace();
+        for (World world : Bukkit.getWorlds()) {
+            EntityProcessor.vehicles.put(world.getUID(), new ArrayList<>());
         }
     }
 

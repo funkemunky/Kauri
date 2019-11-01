@@ -4,10 +4,8 @@ import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.Tuple;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import java.util.Collection;
 import java.util.List;
 
 public class RayCollision {

@@ -20,12 +20,12 @@ public class ToggleCommand {
 
                String path = "checks." + check.name() + ".enabled";
 
-               boolean toggleState = !Kauri.INSTANCE.kauriConfig.getBoolean(path);
+               boolean toggleState = !Kauri.INSTANCE.getConfig().getBoolean(path);
 
                cmd.getSender().sendMessage(Color.Gray + "Setting check state to "
                        + (toggleState ? Color.Green : Color.Red) + toggleState + Color.Gray + "...");
                cmd.getSender().sendMessage(Color.Red + "Setting in config...");
-               Kauri.INSTANCE.kauriConfig.set(path, toggleState);
+               Kauri.INSTANCE.getConfig().set(path, toggleState);
                Kauri.INSTANCE.saveConfig();
 
                cmd.getSender().sendMessage(Color.Red + "Refreshing data objects with updated information...");

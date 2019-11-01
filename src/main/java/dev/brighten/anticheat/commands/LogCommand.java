@@ -34,6 +34,14 @@ public class LogCommand {
         });
     }
 
+    @Command(name = "kauri.logs.import", description = "Import deprecated logs.", display = "logs import",
+            usage = "/<command>", consoleOnly = true, permission = "kauri.logs.import")
+    public void onCommandImport(CommandAdapter cmd) {
+        cmd.getSender().sendMessage(Color.Gray + "Importing from old file...");
+        Kauri.INSTANCE.loggerManager.convertDeprecatedLogs();
+        cmd.getSender().sendMessage(Color.Green + "Completed import. This does not need to be run again.");
+    }
+
     public static String getLogsFromUUID(UUID uuid) {
         List<Log> logs = Kauri.INSTANCE.loggerManager.getLogs(uuid);
         List<Punishment> punishments = Kauri.INSTANCE.loggerManager.getPunishments(uuid);
