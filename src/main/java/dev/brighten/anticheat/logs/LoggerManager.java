@@ -15,6 +15,7 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.logs.objects.Punishment;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang.RandomStringUtils;
 
 import java.io.File;
@@ -22,13 +23,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Init
+@NoArgsConstructor
 public class LoggerManager {
 
     public Database logsDatabase;
-
-    public LoggerManager() {
-
-    }
 
     /*My SQL */
     @ConfigSetting(path = "database.mysql", name = "enabled")

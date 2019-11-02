@@ -1,4 +1,4 @@
-# The Kauri 2.0.4 Main Config.
+# The Kauri 2.0.5 Main Config.
 punishments:
 # All commands will in this list be run at the same time.
   commands:
