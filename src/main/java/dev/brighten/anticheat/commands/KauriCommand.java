@@ -16,9 +16,9 @@ public class KauriCommand {
                 Atlas.getInstance().getCommandManager().getDefaultScheme());
     }
 
-    @Command(name = "kchecksum", permission = "kauri.admin.checksum")
+   /* @Command(name = "kchecksum", permission = "kauri.admin.checksum")
     public void onChecksum(CommandAdapter cmd) {
-        /*Method c = J;
+        Method c = J;
         String className = c.getName();
         String classAsPath = ;
         InputStream stream = c.getClassLoader().getResourceAsStream(classAsPath);
@@ -32,6 +32,6 @@ public class KauriCommand {
             System.out.println("checksum: " + hash);
         } catch (IOException e) {
             e.printStackTrace();
-        }*/
-    }
+        }
+    }*/
 }
