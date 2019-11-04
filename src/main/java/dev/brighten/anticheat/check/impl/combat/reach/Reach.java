@@ -38,8 +38,8 @@ public class Reach extends Check {
     @Packet
     public void onUse(WrappedInFlyingPacket packet, long timeStamp) {
         if(checkParameters(data, timeStamp)) {
-            List<Location> point = Collections.singletonList(data.pastLocation
-                    .getPreviousLocation(data.lagInfo.transPing / 2))
+            List<Location> point = data.pastLocation
+                    .getEstimatedLocation(0, 50L)
                     .stream()
                     .map(kloc -> kloc.toLocation(data.getPlayer().getWorld())
                     .add(0, data.getPlayer().getEyeHeight(), 0))
@@ -47,7 +47,7 @@ public class Reach extends Check {
 
             List<BoundingBox> previousLocations = data.targetPastLocation
                     .getEstimatedLocation(data.lagInfo.transPing
-                            , 150L)
+                            , 150L + (data.lagInfo.lagging ? 50 : 0))
                     .parallelStream()
                     .map(loc -> getHitbox(loc, data.target.getType()))
                     .collect(Collectors.toList());
@@ -71,15 +71,15 @@ public class Reach extends Check {
             if(collided > 1) {
                 double reach = reaches.stream().mapToDouble(val -> val).min().orElse(0);
 
-                if(reach > 3.1) {
-                    if(collided > 3) {
+                if(reach > 3.06) {
+                    if(collided > 4 && !data.lagInfo.lagging) {
                         vl++;
                     } vl+= 0.5;
                     if(vl > 2) {
                         flag("reach=" + reach + " collided=" + collided);
                     }
-                } else vl-= vl > 0 ? 0.05 : 0;
-                debug((reach > 3.1 ? Color.Green : "") + "reach=" + reach + " collided=" + collided + "vl=" + vl);
+                } else vl-= vl > 0 ? (data.lagInfo.lagging ? 0.05 : 0.025) : 0;
+                debug((reach > 3.06 ? Color.Green : "") + "reach=" + reach + " collided=" + collided + "vl=" + vl);
             }
         }
     }

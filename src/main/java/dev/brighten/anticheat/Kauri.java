@@ -93,7 +93,7 @@ public class Kauri extends JavaPlugin{
         Atlas.getInstance().initializeScanner(getClass(),
                 this,
                 true,
-                true, null);
+                true);
         MiscUtils.printToConsole(Color.Gray + "Registering processors...");
         packetProcessor = new PacketProcessor();
         dataManager = new DataManager();
