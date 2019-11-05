@@ -1,12 +1,9 @@
 package dev.brighten.anticheat.utils;
 
 import cc.funkemunky.api.utils.MathUtils;
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 
 public class MiscUtils {
@@ -22,12 +19,6 @@ public class MiscUtils {
         s.add(float.class);
         s.add(double.class);
         NUMBER_REFLECTED_PRIMITIVES = s;
-    }
-
-    public static byte[] toByteArray(InputStream var0) throws IOException {
-        ByteArrayOutputStream var1 = new ByteArrayOutputStream();
-        cc.funkemunky.api.utils.MiscUtils.copy(var0, var1);
-        return var1.toByteArray();
     }
 
     public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
