@@ -57,6 +57,9 @@ public class LoggerManager {
     @ConfigSetting(path = "database.mongo", name = "password")
     private static String mongoPassword = "password";
 
+    @ConfigSetting(path = "database.mongo", name = "requiresLoginDetails")
+    private static boolean mongoLoginDetails = false;
+
     @ConfigSetting(path = "database.mongo", name = "database")
     private static String mongoDatabase = "Kauri";
 
@@ -74,8 +77,13 @@ public class LoggerManager {
                 logsDatabase = new MySQLDatabase("logs", sqlDatabase, sqlPort);
             } else if(mongoEnabled) {
                 MiscUtils.printToConsole("&7Setting up Mongo...");
-                logsDatabase = new MongoDatabase("logs",
-                        MongoDatabase.initMongo(mongoDatabase, mongoIp, mongoPort, mongoUsername, mongoPassword));
+                if(mongoLoginDetails) {
+                    logsDatabase = new MongoDatabase("logs",
+                            MongoDatabase.initMongo(mongoDatabase, mongoIp, mongoPort, mongoUsername, mongoPassword));
+                } else {
+                    logsDatabase = new MongoDatabase("logs",
+                            MongoDatabase.initMongo(mongoDatabase, mongoIp, mongoPort));
+                }
             } else {
                 MiscUtils.printToConsole("&7Setting up FlatfileDB...");
                 logsDatabase = new FlatfileDatabase("logs");
