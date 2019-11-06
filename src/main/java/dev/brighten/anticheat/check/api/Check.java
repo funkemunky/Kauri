@@ -8,10 +8,7 @@ import dev.brighten.anticheat.check.impl.combat.aim.*;
 import dev.brighten.anticheat.check.impl.combat.autoclicker.*;
 import dev.brighten.anticheat.check.impl.combat.hitbox.Hitboxes;
 import dev.brighten.anticheat.check.impl.combat.reach.Reach;
-import dev.brighten.anticheat.check.impl.movement.fly.FlyA;
-import dev.brighten.anticheat.check.impl.movement.fly.FlyB;
-import dev.brighten.anticheat.check.impl.movement.fly.FlyC;
-import dev.brighten.anticheat.check.impl.movement.fly.FlyD;
+import dev.brighten.anticheat.check.impl.movement.fly.*;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallA;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallB;
 import dev.brighten.anticheat.check.impl.movement.phase.Phase;
@@ -21,7 +18,6 @@ import dev.brighten.anticheat.check.impl.movement.velocity.VelocityB;
 import dev.brighten.anticheat.check.impl.packets.Timer;
 import dev.brighten.anticheat.check.impl.packets.badpackets.*;
 import dev.brighten.anticheat.data.ObjectData;
-import dev.brighten.anticheat.processing.EntityProcessor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 
@@ -74,10 +70,6 @@ public class Check {
     }
 
     public void flag(String information) {
-        if(EntityProcessor.vehicles == null) {
-            vl = 0;
-            return;
-        }
         final String info = information
                 .replace("%p", String.valueOf(data.lagInfo.transPing))
                 .replace("%t", String.valueOf(MathUtils.round(Kauri.INSTANCE.tps, 2)));
@@ -86,11 +78,11 @@ public class Check {
             Kauri.INSTANCE.loggerManager.addLog(data, this, info);
 
             if(lastAlert.hasPassed(MathUtils.millisToTicks(Config.alertsDelay))) {
-                Kauri.INSTANCE.dataManager.hasAlerts.forEach(data -> {
-                    data.getPlayer().sendMessage(Color.translate("&8[&6K&8] &f" + this.data.getPlayer().getName()
-                            + " &7flagged &f" + name
-                            + " &8(&e" + info + "&8) &8[&c" + MathUtils.round(vl, 2) + "&8]"));
-                });
+                String message = Color.translate("&8[&6K&8] &f" + this.data.getPlayer().getName()
+                                + " &7flagged &f" + name
+                                + " &8(&e" + info + "&8) &8[&c" + MathUtils.round(vl, 2) + "&8]"
+                        + (developer ? "&c&o(Experimental)" : ""));
+                Kauri.INSTANCE.dataManager.hasAlerts.forEach(data -> data.getPlayer().sendMessage(message));
                 lastAlert.reset();
             }
 
@@ -115,7 +107,8 @@ public class Check {
             if(executable && punishVl != -1 && vl > punishVl) {
                 Kauri.INSTANCE.loggerManager.addPunishment(data, this);
                 if(!Config.broadcastMessage.equalsIgnoreCase("off")) {
-                    Bukkit.broadcastMessage(Color.translate(Config.broadcastMessage.replace("%name%", data.getPlayer().getName())));
+                    Bukkit.broadcastMessage(Color.translate(Config.broadcastMessage
+                            .replace("%name%", data.getPlayer().getName())));
                 }
                 ConsoleCommandSender sender = Bukkit.getConsoleSender();
                 Config.punishCommands.
@@ -146,6 +139,7 @@ public class Check {
         register(new FlyB());
         register(new FlyC());
         register(new FlyD());
+        register(new FlyE());
         register(new NoFallA());
         register(new NoFallB());
         register(new Reach());
@@ -188,10 +182,12 @@ public class Check {
     }
 
     public static CheckInfo getCheckInfo(String name) {
-        return checkClasses.values().stream().filter(val -> val.name().equalsIgnoreCase(name)).findFirst().orElse(null);
+        return checkClasses.values().stream().filter(val -> val.name().equalsIgnoreCase(name))
+                .findFirst().orElse(null);
     }
 
     public static CheckSettings getCheckSettings(String name) {
-        return checkSettings.values().stream().filter(val -> val.name.equalsIgnoreCase(name)).findFirst().orElse(null);
+        return checkSettings.values().stream().filter(val -> val.name.equalsIgnoreCase(name))
+                .findFirst().orElse(null);
     }
 }

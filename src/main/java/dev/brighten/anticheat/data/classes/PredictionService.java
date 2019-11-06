@@ -12,7 +12,6 @@ import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.MovementUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;

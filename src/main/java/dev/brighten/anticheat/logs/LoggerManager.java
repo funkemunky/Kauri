@@ -98,7 +98,7 @@ public class LoggerManager {
     public void addLog(ObjectData data, Check check, String info) {
         Log log = new Log(check.name, info, check.vl, data.lagInfo.transPing, System.currentTimeMillis(), Kauri.INSTANCE.tps);
 
-        StructureSet set = logsDatabase.createStructure(RandomStringUtils.random(20),
+        StructureSet set = logsDatabase.createStructure(UUID.randomUUID().toString(),
                 new Pair<>("type", "log"),
                 new Pair<>("uuid", data.uuid.toString()),
                 new Pair<>("checkName", log.checkName),
@@ -114,7 +114,7 @@ public class LoggerManager {
     public void addPunishment(ObjectData data, Check check) {
         Punishment punishment = new Punishment(data.uuid, check.name, System.currentTimeMillis());
         
-        StructureSet set = logsDatabase.createStructure(RandomStringUtils.random(20),
+        StructureSet set = logsDatabase.createStructure(UUID.randomUUID().toString(),
                 new Pair<>("type", "punishment"),
                 new Pair<>("uuid", data.uuid.toString()), 
                 new Pair<>("checkName", punishment.checkName),

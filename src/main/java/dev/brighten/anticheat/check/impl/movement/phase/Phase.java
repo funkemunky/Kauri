@@ -1,10 +1,7 @@
 package dev.brighten.anticheat.check.impl.movement.phase;
 
-import cc.funkemunky.api.Atlas;
-import cc.funkemunky.api.utils.BlockUtils;
-import cc.funkemunky.api.utils.BoundingBox;
-import cc.funkemunky.api.utils.RunUtils;
-import cc.funkemunky.api.utils.TickTimer;
+import cc.funkemunky.api.reflection.MinecraftReflection;
+import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
@@ -16,9 +13,7 @@ import org.bukkit.block.Block;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.material.Gate;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,7 +21,6 @@ import java.util.stream.Collectors;
         checkType = CheckType.GLITCH, enabled = false, executable = false, punishVL = 50)
 public class Phase extends Check {
 
-    private List<BoundingBox> lastboxes = new ArrayList<>();
     private TickTimer lastOpenDoor = new TickTimer(5);
     private EvictingList<Location> nonColliding = new EvictingList<>(5);
     private TickTimer lastFlag = new TickTimer(5);
@@ -37,29 +31,21 @@ public class Phase extends Check {
             if(Kauri.INSTANCE.enabled
                     && !data.playerInfo.serverCanFly
                     && !data.playerInfo.inCreative) {
-                if(lastboxes.size() > 0) {
-                    debug("From block");
-                }
 
                 boolean flagged = false;
-                BoundingBox box = new BoundingBox(event.getTo().toVector(), event.getFrom().toVector())
-                        .grow(0.25f,0,0.25f)
-                        .add(0,0.25f,0,0,1.72f,0);
+                BoundingBox box = new BoundingBox(event.getFrom().toVector(), event.getTo().toVector())
+                        .grow(0.3f,0,0.3f)
+                        .add(0,0f,0,0,1.8f,0);
 
-                List<BoundingBox> boxes = Atlas.getInstance().getBlockBoxManager().getBlockBox()
-                        .getCollidingBoxes(data.getPlayer().getWorld(), box)
+                List<BoundingBox> boxes = ReflectionsUtil
+                        .getCollidingBlocks(data.getPlayer(), MinecraftReflection.toAABB(box))
                         .parallelStream()
+                        .map(MinecraftReflection::fromAABB)
                         .filter(blockBox -> {
                             Block block = blockBox.getMinimum()
                                     .toLocation(data.getPlayer().getWorld())
                                     .getBlock();
 
-                            if(block.getType().getNewData(block.getData()) instanceof Gate) {
-                                Gate gate = (Gate) block.getType().getNewData(block.getData());
-
-                                return blockBox.intersectsWithBox(box)
-                                        && !gate.isOpen();
-                            }
                             return !BlockUtils.isStair(block)
                                     && !BlockUtils.isSlab(block)
                                     && blockBox.maxY - blockBox.minY != 0.5f
@@ -77,17 +63,13 @@ public class Phase extends Check {
                         flagged = true;
                     }
                     lastFlag.reset();
-                } else if(!data.playerInfo.collidesHorizontally) {
-                    nonColliding.add(event.getTo());
+                } else {
+                    if(!data.playerInfo.collidesHorizontally) nonColliding.add(event.getFrom());
                     vl-= vl > 0 ? 0.05 : 0;
                 }
 
-                if(!flagged) {
-                    lastboxes = boxes.stream()
-                            .filter(bbox -> bbox.intersectsWithBox(box.shrink(0.2f,0,0.2f)))
-                            .collect(Collectors.toList());
-                    vl-= vl > 0 ? 0.02 : 0;
-                } else lastboxes.clear();
+                if(!flagged) vl-= vl > 0 ? 0.02 : 0;
+
                 debug("size=" + boxes.size() + " nonColliding=" + nonColliding.size());
             }
         }
@@ -108,6 +90,6 @@ public class Phase extends Check {
 
     private void setBack() {
         RunUtils.task(() -> data.getPlayer()
-                .teleport(nonColliding.get(0)), Kauri.INSTANCE);
+                .teleport(nonColliding.get(nonColliding.size() - 1)), Kauri.INSTANCE);
     }
 }

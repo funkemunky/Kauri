@@ -9,7 +9,8 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.processing.MovementProcessor;
 import dev.brighten.anticheat.utils.MiscUtils;
 
-@CheckInfo(name = "Autoclicker (E)", description = "Checks for the range of autoclicker.", punishVL = 15, executable = false)
+@CheckInfo(name = "Autoclicker (E)", description = "Checks for the range of autoclicker.", punishVL = 15,
+        executable = false)
 public class AutoclickerE extends Check {
 
     private long lastClick, lastDelta;
@@ -34,8 +35,7 @@ public class AutoclickerE extends Check {
             double std = interval.std();
             double avg = interval.average();
 
-            if((std < avg || MathUtils.getDelta(std, lastStd) < 3)
-                    || (MathUtils.getDelta(std, avg) < (std > 10 ? 4 : 1))) {
+            if((std < avg || MathUtils.getDelta(std, lastStd) < 3) && MathUtils.getDelta(std, avg) > 2) {
                 if(vl++ > 8) {
                     flag("std=" + std + " avg=" + avg);
                 }
