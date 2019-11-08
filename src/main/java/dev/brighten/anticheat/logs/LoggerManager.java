@@ -132,12 +132,12 @@ public class LoggerManager {
                 .collect(Collectors.toList());
 
         return sets.stream().map(set -> new Log(
-                    String.valueOf(set.getField("checkName")),
-                    String.valueOf(set.getField("info")),
-                    set.getField("vl"),
-                    set.getField("ping"),
-                    set.getField("timeStamp"),
-                    set.getField("tps"))).collect(Collectors.toList());
+                    String.valueOf((String)set.getField("checkName")),
+                    String.valueOf((String)set.getField("info")),
+                Float.valueOf(set.getField("vl")),
+                (long)set.getField("ping"),
+                (long)set.getField("timeStamp"),
+                (double)set.getField("tps"))).collect(Collectors.toList());
     }
 
     public void convertDeprecatedLogs() {
