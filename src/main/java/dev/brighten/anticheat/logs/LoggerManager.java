@@ -16,7 +16,6 @@ import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.logs.objects.Punishment;
 import lombok.NoArgsConstructor;
-import org.apache.commons.lang.RandomStringUtils;
 
 import java.io.File;
 import java.util.*;
@@ -132,12 +131,12 @@ public class LoggerManager {
                 .collect(Collectors.toList());
 
         return sets.stream().map(set -> new Log(
-                    String.valueOf((String)set.getField("checkName")),
-                    String.valueOf((String)set.getField("info")),
-                Float.valueOf(set.getField("vl")),
-                (long)set.getField("ping"),
-                (long)set.getField("timeStamp"),
-                (double)set.getField("tps"))).collect(Collectors.toList());
+                set.getField("checkName"),
+                set.getField("info"),
+                set.getField("vl"),
+                set.getField("ping"),
+                set.getField("timeStamp"),
+                set.getField("tps"))).collect(Collectors.toList());
     }
 
     public void convertDeprecatedLogs() {
