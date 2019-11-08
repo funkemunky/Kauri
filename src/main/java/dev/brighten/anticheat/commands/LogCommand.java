@@ -28,13 +28,6 @@ public class LogCommand {
         Kauri.INSTANCE.executor.execute(() -> {
             if(cmd.getArgs().length == 0) {
                 if(cmd.getPlayer() != null) {
-                    ObjectData data = Kauri.INSTANCE.dataManager.getData(cmd.getPlayer());
-
-                    if(data == null) {
-                        cmd.getSender().sendMessage(Color.Green + "Logs: " + getLogsFromUUID(cmd.getPlayer().getUniqueId()));
-                        return;
-                    }
-
                     LogsGUI gui = new LogsGUI(cmd.getPlayer());
                     gui.showMenu(cmd.getPlayer());
                     cmd.getSender().sendMessage(Color.Green + "Opened menu.");
@@ -57,12 +50,22 @@ public class LogCommand {
         });
     }
 
-    @Command(name = "kauri.logs.import", description = "Import deprecated logs.", display = "logs import",
-            usage = "/<command>", consoleOnly = true, permission = "kauri.logs.import")
-    public void onCommandImport(CommandAdapter cmd) {
-        cmd.getSender().sendMessage(Color.Gray + "Importing from old file...");
-        Kauri.INSTANCE.loggerManager.convertDeprecatedLogs();
-        cmd.getSender().sendMessage(Color.Green + "Completed import. This does not need to be run again.");
+    @Command(name = "kauri.logs.clear", display = "logs clear [player]", description = "Clear logs of a player",
+            usage = "/<command> [playerName]",  permission = "kauri.logs.clear")
+    public void onLogsClear(CommandAdapter cmd) {
+        if(cmd.getArgs().length > 0) {
+            OfflinePlayer player = Bukkit.getOfflinePlayer(cmd.getArgs()[0]);
+
+            if(player == null) {
+                cmd.getSender().sendMessage(Color.Red + "Somehow, out of hundreds of millions of Minecraft"
+                        + " accounts, you found one that doesn't exist.");
+                return;
+            }
+
+            cmd.getSender().sendMessage(Color.Gray + "Clearing logs from " + player.getName() + "...");
+            Kauri.INSTANCE.loggerManager.clearLogs(player.getUniqueId());
+            cmd.getSender().sendMessage(Color.Green + "Logs cleared!");
+        } else cmd.getSender().sendMessage(Color.Red + "You must provide the name of a player.");
     }
 
     public static String getLogsFromUUID(UUID uuid) {

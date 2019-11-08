@@ -5,6 +5,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
 import java.util.*;
 
 public class MiscUtils {
@@ -100,6 +101,7 @@ public class MiscUtils {
     public static String timeStampToDate(long timeStamp) {
         SimpleDateFormat format = new SimpleDateFormat("MM/dd/YYYY (hh:mm)");
 
+        format.setTimeZone(TimeZone.getTimeZone("America/New_York"));
         Date date = new Date(timeStamp);
 
         return format.format(date);

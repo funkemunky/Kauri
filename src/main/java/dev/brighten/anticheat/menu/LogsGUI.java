@@ -41,6 +41,16 @@ public class LogsGUI extends ChestMenu {
         buildInventory(true);
     }
 
+    public LogsGUI(OfflinePlayer player, int page) {
+        super(player.getName() + "'s Violations", 6);
+
+        this.player = player;
+        currentPage.set(page);
+        updateLogs();
+        setButtons(1);
+        buildInventory(true);
+    }
+
     private void setButtons(int page) {
         List<Log> subList = logs.subList(Math.min((page - 1) * 45, logs.size()), Math.min(page * 45, logs.size()));
 
@@ -52,8 +62,8 @@ public class LogsGUI extends ChestMenu {
                     .amount(1).name(Color.Red + "Next Page &7(&e" + (page + 1) + "&7)").build(),
                     (player, info) -> {
                         if(info.getClickType().isLeftClick()) {
-                            setButtons(currentPage.incrementAndGet());
-                            buildInventory(false);
+                            close(player);
+                            new LogsGUI(LogsGUI.this.player, page + 1).showMenu(player);
                         }
                     });
             setItem(50, next);
@@ -78,8 +88,8 @@ public class LogsGUI extends ChestMenu {
                     .amount(1).name(Color.Red + "Previous Page &7(&e" + (page - 1) + "&7)").build(),
                     (player, info) -> {
                         if(info.getClickType().isLeftClick()) {
-                            setButtons(currentPage.decrementAndGet());
-                            buildInventory(false);
+                            close(player);
+                            new LogsGUI(LogsGUI.this.player, page - 1).showMenu(player);
                         }
                     });
             setItem(50, back);
@@ -101,7 +111,7 @@ public class LogsGUI extends ChestMenu {
     }
 
     private void runUpdater() {
-        RunUtils.taskTimerAsync(() -> {
+        updaterTask = RunUtils.taskTimerAsync(() -> {
             if(shown != null
                     && shown.getOpenInventory() != null
                     && shown.getOpenInventory().getTopInventory() != null
@@ -132,11 +142,12 @@ public class LogsGUI extends ChestMenu {
 
     private Button buttonFromLog(Log log) {
         return new Button(false, new ItemBuilder(Material.PAPER)
-                .amount(1).name(Color.Gold + MiscUtils.timeStampToDate(log.timeStamp))
-                .lore("", "&eCheck&8: &f" + log.checkName,
+                .amount(1).name(Color.Gold + log.checkName)
+                .lore("", "&eTime&8: &f" + MiscUtils.timeStampToDate(log.timeStamp),
                         "&eData&8: &f" + log.info,
                         "&eViolation Level&8: &f" + MathUtils.round(log.vl, 3),
-                        "&ePing&8: &f" + log.ping, "&e&8: &f" + MathUtils.round(log.tps, 2))
+                        "&ePing&8: &f" + log.ping,
+                        "&eTPS&8: &f" + MathUtils.round(log.tps, 2))
                 .build(), null);
     }
 }

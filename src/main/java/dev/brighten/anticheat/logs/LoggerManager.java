@@ -147,11 +147,20 @@ public class LoggerManager {
     public void convertDeprecatedLogs() {
 
     }
+
+    public void clearLogs(UUID uuid) {
+        logsDatabase.getDatabaseValues()
+                .stream()
+                .filter(set -> set.getField("uuid").equals(uuid.toString()))
+                .map(set -> set.id)
+                .forEach(logsDatabase::remove);
+    }
     
     public List<Punishment> getPunishments(UUID uuid) {
         List<StructureSet> structureSets = logsDatabase.getDatabaseValues()
                 .stream()
-                .filter(set -> set.containsKey("type") && set.getField("type").equals("punishment"))
+                .filter(set -> set.getField("uuid").equals(uuid.toString())
+                        && set.containsKey("type") && set.getField("type").equals("punishment"))
                 .collect(Collectors.toList());
 
         return structureSets.stream()
@@ -196,7 +205,7 @@ public class LoggerManager {
     }
 
     private void save() {
-        RunUtils.taskTimerAsync(() -> logsDatabase.saveDatabase(), 6000, 6000);
+        RunUtils.taskTimerAsync(() -> logsDatabase.saveDatabase(), 2400, 2400);
     }
 
 }

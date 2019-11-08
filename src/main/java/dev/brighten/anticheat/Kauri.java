@@ -52,7 +52,7 @@ public class Kauri extends JavaPlugin{
 
     public void unload() {
         enabled = false;
-        executor.execute(() -> loggerManager.logsDatabase.saveDatabase());
+        loggerManager.logsDatabase.saveDatabase();
         //Clearing all fields in ObjectData to prevent work from GC.
         MiscUtils.printToConsole("&7Shutting down threadPool and saving config...");
         saveConfig(); //Saving config.
