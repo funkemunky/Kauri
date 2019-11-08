@@ -55,7 +55,7 @@ public class Phase extends Check {
                         .collect(Collectors.toList());
 
                 if (boxes.size() > 0) {
-                    if(lastOpenDoor.hasPassed(8)) {
+                    if(lastOpenDoor.hasPassed(8) && (System.currentTimeMillis() - data.creation) > 250L) {
                         setBack();
                         if (vl++ > 10) {
                             flag("phased");
@@ -89,7 +89,9 @@ public class Phase extends Check {
     }
 
     private void setBack() {
-        RunUtils.task(() -> data.getPlayer()
-                .teleport(nonColliding.get(nonColliding.size() - 1)), Kauri.INSTANCE);
+        if(nonColliding.size() > 0) {
+            RunUtils.task(() -> data.getPlayer()
+                    .teleport(nonColliding.get(nonColliding.size() - 1)), Kauri.INSTANCE);
+        }
     }
 }

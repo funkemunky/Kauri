@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class Log {
 
     public String checkName, info;
-    public double vl;
+    public float vl;
     public long ping, timeStamp;
     public double tps;
     private static WrappedClass logClass = new WrappedClass(Log.class);

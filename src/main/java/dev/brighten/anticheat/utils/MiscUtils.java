@@ -4,6 +4,7 @@ import cc.funkemunky.api.utils.MathUtils;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class MiscUtils {
@@ -94,5 +95,13 @@ public class MiscUtils {
 
     public static float gcd(float current, float previous) {
         return (previous <= 16384L) ? current : gcd(previous, current % previous);
+    }
+
+    public static String timeStampToDate(long timeStamp) {
+        SimpleDateFormat format = new SimpleDateFormat("MM/dd/YYYY (hh:mm)");
+
+        Date date = new Date(timeStamp);
+
+        return format.format(date);
     }
 }

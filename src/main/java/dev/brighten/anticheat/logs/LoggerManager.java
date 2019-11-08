@@ -62,6 +62,9 @@ public class LoggerManager {
     @ConfigSetting(path = "database.mongo", name = "database")
     private static String mongoDatabase = "Kauri";
 
+    @ConfigSetting(path = "database.mongo", name = "authDatabase")
+    private static String authDatabase = "admin";
+
     @ConfigSetting(path = "database.mongo", name = "ip")
     private static String mongoIp = "127.0.0.1";
 
@@ -78,7 +81,8 @@ public class LoggerManager {
                 MiscUtils.printToConsole("&7Setting up Mongo...");
                 if(mongoLoginDetails) {
                     logsDatabase = new MongoDatabase("logs",
-                            MongoDatabase.initMongo(mongoDatabase, mongoIp, mongoPort, mongoUsername, mongoPassword));
+                            MongoDatabase.initMongo(mongoDatabase, authDatabase, mongoIp, mongoPort,
+                                    mongoUsername, mongoPassword));
                 } else {
                     logsDatabase = new MongoDatabase("logs",
                             MongoDatabase.initMongo(mongoDatabase, mongoIp, mongoPort));
@@ -86,7 +90,6 @@ public class LoggerManager {
             } else {
                 MiscUtils.printToConsole("&7Setting up FlatfileDB...");
                 logsDatabase = new FlatfileDatabase("logs");
-                //Atlas.getInstance().getCarbon().createFlatfileDatabase(Kauri.INSTANCE.getDataFolder().getPath(), "logs");
             }
             MiscUtils.printToConsole("&7Loading database on second thread...");
             logsDatabase.loadDatabase();
@@ -95,7 +98,8 @@ public class LoggerManager {
     }
 
     public void addLog(ObjectData data, Check check, String info) {
-        Log log = new Log(check.name, info, check.vl, data.lagInfo.transPing, System.currentTimeMillis(), Kauri.INSTANCE.tps);
+        Log log = new Log(check.name, info, check.vl, data.lagInfo.transPing,
+                System.currentTimeMillis(), Kauri.INSTANCE.tps);
 
         StructureSet set = logsDatabase.createStructure(UUID.randomUUID().toString(),
                 new Pair<>("type", "log"),
@@ -133,28 +137,15 @@ public class LoggerManager {
         return sets.stream().map(set -> new Log(
                 set.getField("checkName"),
                 set.getField("info"),
-                set.getField("vl"),
+                set.getFloat("vl"),
                 set.getField("ping"),
-                set.getField("timeStamp"),
-                set.getField("tps"))).collect(Collectors.toList());
+                set.getLong("timeStamp"),
+                set.getDouble("tps")))
+                .collect(Collectors.toList());
     }
 
     public void convertDeprecatedLogs() {
-        if(logsDatabase instanceof FlatfileDatabase) {
-            File oldFile = new File(Kauri.INSTANCE.getDataFolder().getPath() + File.separator + "logs.txt");
 
-            if(oldFile.exists()) {
-                ((FlatfileDatabase) logsDatabase)
-                        .convertFromLegacy(oldFile);
-                logsDatabase.getDatabaseValues().stream()
-                        .filter(set -> !set.containsKey("type") && set.containsKey("vl"))
-                        .forEach(set -> {
-                            set.inputField("type", "log");
-                            logsDatabase.updateObject(set);
-                        });
-                logsDatabase.saveDatabase();
-            }
-        }
     }
     
     public List<Punishment> getPunishments(UUID uuid) {

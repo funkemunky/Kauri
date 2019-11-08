@@ -6,8 +6,10 @@ import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.Kauri;
+import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.logs.objects.Punishment;
+import dev.brighten.anticheat.menu.LogsGUI;
 import dev.brighten.anticheat.utils.Pastebin;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -25,11 +27,32 @@ public class LogCommand {
     public void onCommand(CommandAdapter cmd) {
         Kauri.INSTANCE.executor.execute(() -> {
             if(cmd.getArgs().length == 0) {
-                if(cmd.getSender() instanceof Player) {
-                    cmd.getSender().sendMessage(Color.Green + "Logs: " + getLogsFromUUID(cmd.getPlayer().getUniqueId()));
+                if(cmd.getPlayer() != null) {
+                    ObjectData data = Kauri.INSTANCE.dataManager.getData(cmd.getPlayer());
+
+                    if(data == null) {
+                        cmd.getSender().sendMessage(Color.Green + "Logs: " + getLogsFromUUID(cmd.getPlayer().getUniqueId()));
+                        return;
+                    }
+
+                    LogsGUI gui = new LogsGUI(cmd.getPlayer());
+                    gui.showMenu(cmd.getPlayer());
+                    cmd.getSender().sendMessage(Color.Green + "Opened menu.");
                 } else cmd.getSender().sendMessage(Color.Red + "You cannot view your own logs since you are not a player.");
             } else {
-                cmd.getSender().sendMessage(Color.Green + "Logs: " + getLogsFromUUID(Bukkit.getOfflinePlayer(cmd.getArgs()[0]).getUniqueId()));
+                OfflinePlayer player = Bukkit.getOfflinePlayer(cmd.getArgs()[0]);
+
+                if(player == null) {
+                    cmd.getSender().sendMessage(Color.Red + "Somehow, out of hundreds of millions of Minecraft"
+                            + " accounts, you found one that doesn't exist.");
+                    return;
+                }
+
+                if(cmd.getPlayer() != null) {
+                    LogsGUI gui = new LogsGUI(cmd.getPlayer());
+                    gui.showMenu(cmd.getPlayer());
+                    cmd.getSender().sendMessage(Color.Green + "Opened menu.");
+                } else cmd.getSender().sendMessage(Color.Green + "Logs: " + getLogsFromUUID(Bukkit.getOfflinePlayer(cmd.getArgs()[0]).getUniqueId()));
             }
         });
     }
