@@ -31,7 +31,7 @@ public class Reach extends Check {
 
     @Packet
     public void onArm(WrappedInArmAnimationPacket packet) {
-        vl-= vl > 0 ? 0.005 : 0;
+        vl-= vl > 0 ? 0.0025 : 0;
     }
 
     @Packet
@@ -46,8 +46,8 @@ public class Reach extends Check {
 
             List<BoundingBox> previousLocations = data.targetPastLocation
                     .getEstimatedLocation(data.lagInfo.transPing
-                            , 150L + (data.lagInfo.lagging ? 50 : 0))
-                    .parallelStream()
+                            , 150L)
+                    .stream()
                     .map(loc -> getHitbox(loc, data.target.getType()))
                     .collect(Collectors.toList());
 
@@ -70,15 +70,12 @@ public class Reach extends Check {
             if(collided > 1) {
                 double reach = reaches.stream().mapToDouble(val -> val).min().orElse(0);
 
-                if(reach > 3.06) {
-                    if(collided > 4 && !data.lagInfo.lagging) {
-                        vl++;
-                    } vl+= 0.5;
-                    if(vl > 2) {
+                if(reach > 3.01 && collided > 3) {
+                    if((vl+= (collided > 4 ? 1 : 0.5f)) > 3) {
                         flag("reach=" + reach + " collided=" + collided);
                     }
-                } else vl-= vl > 0 ? (data.lagInfo.lagging ? 0.05 : 0.025) : 0;
-                debug((reach > 3.06 ? Color.Green : "") + "reach=" + reach + " collided=" + collided + "vl=" + vl);
+                } else vl-= vl > 0 ? (data.lagInfo.lagging ? 0.02 : 0.01) : 0;
+                debug((reach > 3.01 && collided > 3 ? Color.Green : "") + "reach=" + reach + " collided=" + collided + "vl=" + vl);
             }
         }
     }

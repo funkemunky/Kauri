@@ -10,8 +10,10 @@ import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.KLocation;
+import dev.brighten.anticheat.utils.RayCollision;
 import dev.brighten.anticheat.utils.RayTrace;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.Vector;
 
@@ -46,20 +48,13 @@ public class Hitboxes extends Check {
 
         if (checkParameters(data)) {
 
-            List<RayTrace> rayTrace = data.pastLocation
-                    .getEstimatedLocation(0,100L)
+            List<Location> origins = data.pastLocation
+                    .getEstimatedLocation(0,(data.lagInfo.transPing < 60 ? 150 : 100))
                     .stream()
                     .map(loc ->
                             loc.toLocation(data.getPlayer().getWorld()).clone()
                                     .add(0, data.getPlayer().getEyeHeight(), 0))
-                    .map(loc -> new RayTrace(loc.toVector(), loc.getDirection()))
                     .collect(Collectors.toList());
-
-            List<Vector> vectors = new ArrayList<>();
-            rayTrace.parallelStream()
-                    .map(trace -> trace.traverse(3.2f, 0.1f))
-                    .sequential()
-                    .forEach(vectors::addAll);
 
             List<BoundingBox> entityLocations = data.targetPastLocation
                     .getEstimatedLocation(data.lagInfo.transPing, 150L)
@@ -67,16 +62,26 @@ public class Hitboxes extends Check {
                     .map(loc -> getHitbox(data.target.getType(), loc))
                     .collect(Collectors.toList());
 
-            List<Vector> collided = new ArrayList<>();
-            for (BoundingBox box : entityLocations) {
-                vectors.parallelStream().filter(box::collides).sequential().forEach(collided::add);
-            }
+            long collided = origins.parallelStream().filter(loc -> {
+                RayCollision ray = new RayCollision(loc.toVector(), loc.getDirection());
 
-            if (collided.size() == 0) {
-                if(vl++ > 10)  flag("collided=0 ping=%p tps=%t");
-            } else vl -= vl > 0 ? 0.5 : 0;
+                for (BoundingBox box : entityLocations) {
+                    if(RayCollision.intersect(ray, box)) {
+                        return true;
+                    }
+                }
+                return false;
+            }).count();
 
-            debug("collided=" + collided.size());
+            if(collided == 0) {
+                if(data.lagInfo.lastPacketDrop.hasPassed(1)
+                        && Kauri.INSTANCE.lastTickLag.hasPassed(4)
+                        && vl++ > 7) {
+                    flag("collided=" + 0);
+                }
+            } else vl-= vl > 0 ? 0.25 : 0;
+
+            debug("collided=" + collided + " vl=" + vl);
         }
     }
 
@@ -95,6 +100,6 @@ public class Hitboxes extends Check {
         return new BoundingBox(loc.toVector(), loc.toVector())
                 .grow((float)bounds.getX(), 0, (float)bounds.getZ())
                 .add(0,0,0,0,(float)bounds.getY(),0)
-                .grow(0.12f,0f,0.12f).add(0,0,0,0,0.1f,0);
+                .grow(0.14f,0.1f,0.14f);
     }
 }

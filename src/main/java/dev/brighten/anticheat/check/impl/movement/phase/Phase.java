@@ -34,8 +34,8 @@ public class Phase extends Check {
 
                 boolean flagged = false;
                 BoundingBox box = new BoundingBox(event.getFrom().toVector(), event.getTo().toVector())
-                        .grow(0.3f,0,0.3f)
-                        .add(0,0f,0,0,1.8f,0);
+                        .grow(0.27f,0,0.27f)
+                        .add(0,0.08f,0,0,1.75f,0);
 
                 List<BoundingBox> boxes = ReflectionsUtil
                         .getCollidingBlocks(data.getPlayer(), MinecraftReflection.toAABB(box))

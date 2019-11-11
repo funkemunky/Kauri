@@ -47,7 +47,7 @@ public class LogsGUI extends ChestMenu {
         this.player = player;
         currentPage.set(page);
         updateLogs();
-        setButtons(1);
+        setButtons(page);
         buildInventory(true);
     }
 
@@ -69,11 +69,14 @@ public class LogsGUI extends ChestMenu {
             setItem(50, next);
         }
 
-        Button getPastebin = new Button(false, new ItemBuilder(Material.COMPASS)
-                .amount(1).name(Color.Red + "Share Logs")
-                .lore("", "&7&oThis will return an &f&ounlisted &7&opastebin link.").build(),
+        val punishments = Kauri.INSTANCE.loggerManager.getPunishments(player.getUniqueId());
+
+        Button getPastebin = new Button(false, new ItemBuilder(Material.SKULL_ITEM).owner(player.getName())
+                .amount(1).name(Color.Red + "funkemunky")
+                .lore("", "&6Punishments&8: &f" + punishments.size(), "",
+                        "&e&oRight Click &7&oto get an &f&ounlisted &7&opastebin link of the logs.").build(),
                 (player, info) -> {
-                    if (info.getClickType().isLeftClick()) {
+                    if (player.hasPermission("kauri.logs.pastebin") && info.getClickType().isRightClick()) {
                         close(player);
                         player.sendMessage(Color.Green + "Logs: "
                                 + LogCommand.getLogsFromUUID(LogsGUI.this.player.getUniqueId()));
@@ -92,7 +95,7 @@ public class LogsGUI extends ChestMenu {
                             new LogsGUI(LogsGUI.this.player, page - 1).showMenu(player);
                         }
                     });
-            setItem(50, back);
+            setItem(48, back);
         }
 
         //Setting all empty slots with a filler.

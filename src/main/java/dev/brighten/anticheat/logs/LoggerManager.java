@@ -29,47 +29,47 @@ public class LoggerManager {
 
     /*My SQL */
     @ConfigSetting(path = "database.mysql", name = "enabled")
-    private static boolean mySQLEnabled = false;
+    public static boolean mySQLEnabled = false;
 
     @ConfigSetting(path = "database.mysql", name = "username")
-    private static String sqlUsername = "root";
+    public static String sqlUsername = "root";
 
     @ConfigSetting(path = "database.mysql", name = "database")
-    private static String sqlDatabase = "Kauri";
+    public static String sqlDatabase = "Kauri";
 
     @ConfigSetting(path = "database.mysql", name = "password")
-    private static String sqlPassword = "password";
+    public static String sqlPassword = "password";
 
     @ConfigSetting(path = "database.mysql", name = "ip")
-    private static String sqlIp = "127.0.0.1";
+    public static String sqlIp = "127.0.0.1";
 
     @ConfigSetting(path = "database.mysql", name = "port")
-    private static int sqlPort = 3306;
+    public static int sqlPort = 3306;
 
     /* Mongo */
     @ConfigSetting(path = "database.mongo", name = "enabled")
-    private static boolean mongoEnabled = false;
+    public static boolean mongoEnabled = false;
 
     @ConfigSetting(path = "database.mongo", name = "username")
-    private static String mongoUsername = "root";
+    public static String mongoUsername = "root";
 
     @ConfigSetting(path = "database.mongo", name = "password")
-    private static String mongoPassword = "password";
+    public static String mongoPassword = "password";
 
     @ConfigSetting(path = "database.mongo", name = "requiresLoginDetails")
-    private static boolean mongoLoginDetails = false;
+    public static boolean mongoLoginDetails = false;
 
     @ConfigSetting(path = "database.mongo", name = "database")
-    private static String mongoDatabase = "Kauri";
+    public static String mongoDatabase = "Kauri";
 
     @ConfigSetting(path = "database.mongo", name = "authDatabase")
-    private static String authDatabase = "admin";
+    public static String authDatabase = "admin";
 
     @ConfigSetting(path = "database.mongo", name = "ip")
-    private static String mongoIp = "127.0.0.1";
+    public static String mongoIp = "127.0.0.1";
 
     @ConfigSetting(path = "database.mongo", name = "port")
-    private static int mongoPort = 27017;
+    public static int mongoPort = 27017;
 
     public LoggerManager(boolean aLittleStupid) {
         if(aLittleStupid) {
@@ -159,7 +159,7 @@ public class LoggerManager {
     public List<Punishment> getPunishments(UUID uuid) {
         List<StructureSet> structureSets = logsDatabase.getDatabaseValues()
                 .stream()
-                .filter(set -> set.getField("uuid").equals(uuid.toString())
+                .filter(set -> set.getField("uuid") != null && set.getField("uuid").equals(uuid.toString())
                         && set.containsKey("type") && set.getField("type").equals("punishment"))
                 .collect(Collectors.toList());
 
@@ -167,7 +167,7 @@ public class LoggerManager {
                 .map(set ->
                         new Punishment(
                                 uuid,
-                                String.valueOf(set.getField("checkName")),
+                                set.getField("checkName"),
                                 set.getField("timeStamp")))
                 .collect(Collectors.toList());
     }
