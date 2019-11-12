@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.check.impl.combat.reach;
 
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.BoundingBox;
@@ -37,9 +38,11 @@ public class Reach extends Check {
     @Packet
     public void onUse(WrappedInFlyingPacket packet, long timeStamp) {
         if(checkParameters(data, timeStamp)) {
+            long shit = timeStamp - 120;
             List<Location> point = data.pastLocation
-                    .getEstimatedLocation(0, 50L)
+                    .previousLocations
                     .stream()
+                    .filter(loc -> loc.timeStamp >= shit)
                     .map(kloc -> kloc.toLocation(data.getPlayer().getWorld())
                     .add(0, data.getPlayer().getEyeHeight(), 0))
                     .collect(Collectors.toList());
@@ -70,11 +73,11 @@ public class Reach extends Check {
             if(collided > 1) {
                 double reach = reaches.stream().mapToDouble(val -> val).min().orElse(0);
 
-                if(reach > 3.01 && collided > 3) {
-                    if((vl+= (collided > 4 ? 1 : 0.5f)) > 3) {
+                if(reach > 3.04 && collided > 9) {
+                    if((vl+= (collided > 10 ? 1 : 0.5f)) > 3) {
                         flag("reach=" + reach + " collided=" + collided);
                     }
-                } else vl-= vl > 0 ? (data.lagInfo.lagging ? 0.02 : 0.01) : 0;
+                } else vl-= vl > 0 ? (data.lagInfo.lagging ? 0.025 : 0.02) : 0;
                 debug((reach > 3.01 && collided > 3 ? Color.Green : "") + "reach=" + reach + " collided=" + collided + "vl=" + vl);
             }
         }
@@ -89,9 +92,15 @@ public class Reach extends Check {
 
     private static BoundingBox getHitbox(KLocation loc, EntityType type) {
         Vector bounds = MiscUtils.entityDimensions.get(type);
-        return new BoundingBox(loc.toVector(), loc.toVector())
+
+        BoundingBox box = new BoundingBox(loc.toVector(), loc.toVector())
                 .grow((float)bounds.getX(), 0, (float)bounds.getZ())
-                .add(0,0,0,0,(float)bounds.getY(),0)
-                .grow(0.1f,0,0.1f).add(0,0,0,0,0.05f,0);
+                .add(0,0,0,0,(float)bounds.getY(),0);
+
+        if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9)) {
+            return box.grow(0.1f,0,0.1f);
+        }
+
+        return box;
     }
 }

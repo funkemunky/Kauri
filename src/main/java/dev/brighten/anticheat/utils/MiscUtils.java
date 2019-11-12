@@ -1,5 +1,8 @@
 package dev.brighten.anticheat.utils;
 
+import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedPacketPlayOutWorldParticle;
+import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumParticle;
 import cc.funkemunky.api.utils.MathUtils;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -21,6 +24,17 @@ public class MiscUtils {
         s.add(float.class);
         s.add(double.class);
         NUMBER_REFLECTED_PRIMITIVES = s;
+    }
+
+    public static void drawRay(RayCollision collision, WrappedEnumParticle particle, Collection<? extends Player> players) {
+        for (double i = 0; i < 8; i += 0.2) {
+            float fx = (float) (collision.originX + (collision.directionX * i));
+            float fy = (float) (collision.originY + (collision.directionY * i));
+            float fz = (float) (collision.originZ + (collision.directionZ * i));
+            Object packet = new WrappedPacketPlayOutWorldParticle(particle, true, fx, fy, fz,
+                    0F, 0F, 0F, 0, 0).getObject();
+            for (Player p : players) TinyProtocolHandler.sendPacket(p, packet);
+        }
     }
 
     public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {

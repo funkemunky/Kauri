@@ -1,20 +1,23 @@
 package dev.brighten.anticheat.check.impl.movement.phase;
 
 import cc.funkemunky.api.reflection.MinecraftReflection;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumParticle;
 import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
+import cc.funkemunky.carbon.utils.Pair;
 import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.check.api.Check;
-import dev.brighten.anticheat.check.api.CheckInfo;
-import dev.brighten.anticheat.check.api.CheckType;
-import dev.brighten.anticheat.check.api.Event;
+import dev.brighten.anticheat.check.api.*;
+import dev.brighten.anticheat.utils.RayCollision;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.util.Vector;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @CheckInfo(name = "Phase", description = "Prevents players from glitching through blocks",
@@ -22,55 +25,76 @@ import java.util.stream.Collectors;
 public class Phase extends Check {
 
     private TickTimer lastOpenDoor = new TickTimer(5);
-    private EvictingList<Location> nonColliding = new EvictingList<>(5);
+    private EvictingList<Location> nonColliding = new EvictingList<>(10);
     private TickTimer lastFlag = new TickTimer(5);
 
-    @Event
-    public void onFlying(PlayerMoveEvent event) {
-        if(event.getTo().distance(event.getFrom()) > 0) {
-            if(Kauri.INSTANCE.enabled
-                    && !data.playerInfo.serverCanFly
-                    && !data.playerInfo.inCreative) {
+    @Packet
+    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
+        if(packet.isPos()
+                && data.playerInfo.deltaXZ != 0 || data.playerInfo.deltaY != 0
+                && Kauri.INSTANCE.enabled
+                && !data.playerInfo.serverCanFly
+                && !data.playerInfo.inCreative) {
 
-                boolean flagged = false;
-                BoundingBox box = new BoundingBox(event.getFrom().toVector(), event.getTo().toVector())
-                        .grow(0.27f,0,0.27f)
-                        .add(0,0.08f,0,0,1.75f,0);
+            BoundingBox currentBox = data.box.shrink(0.06f,0,0.05f);
+            BoundingBox fromBox = new BoundingBox(data.playerInfo.from.toVector(), data.playerInfo.from.toVector())
+                    .grow(0.24f,0,0.24f)
+                    .add(0,0,0,
+                            0, (float)data.getPlayer().getEyeHeight(), 0);
+            BoundingBox total = new BoundingBox(fromBox, currentBox);
 
-                List<BoundingBox> boxes = ReflectionsUtil
-                        .getCollidingBlocks(data.getPlayer(), MinecraftReflection.toAABB(box))
-                        .parallelStream()
-                        .map(MinecraftReflection::fromAABB)
-                        .filter(blockBox -> {
-                            Block block = blockBox.getMinimum()
-                                    .toLocation(data.getPlayer().getWorld())
-                                    .getBlock();
+            List<BoundingBox> colliding = MinecraftReflection
+                    .getCollidingBoxes(null, data.getPlayer().getWorld(), total);
 
-                            return !BlockUtils.isStair(block)
-                                    && !BlockUtils.isSlab(block)
-                                    && blockBox.maxY - blockBox.minY != 0.5f
-                                    && BlockUtils.isSolid(block)
-                                    && blockBox.intersectsWithBox(box);
-                        })
-                        .collect(Collectors.toList());
+            List<BoundingBox> phasedBlocks = colliding.stream()
+                    .filter(box -> !currentBox.collides(box) && fromBox.collides(box))
+                    .collect(Collectors.toList());
 
-                if (boxes.size() > 0) {
-                    if(lastOpenDoor.hasPassed(8) && (System.currentTimeMillis() - data.creation) > 250L) {
-                        setBack();
-                        if (vl++ > 10) {
-                            flag("phased");
-                        }
-                        flagged = true;
+            if(data.playerInfo.worldLoaded) {
+                Optional<Block> optional = phasedBlocks
+                        .stream()
+                        .map(box -> box.getMinimum().midpoint(box.getMaximum())
+                                .toLocation(data.getPlayer().getWorld()).getBlock())
+                        .filter(BlockUtils::isSolid).findFirst();
+                if(optional.isPresent()) {
+                    setBack();
+                    if(vl++ > 4) {
+                        flag("block=" + optional.get().getType().name().toLowerCase());
                     }
-                    lastFlag.reset();
+                } else if(currentBox.collides(fromBox) && !data.blockInfo.blocksNear) {
+                    nonColliding.add(data.playerInfo.from.toLocation(data.getPlayer().getWorld()));
+                    vl-= vl > 0 ? 0.025f : 0;
                 } else {
-                    if(!data.playerInfo.collidesHorizontally) nonColliding.add(event.getFrom());
-                    vl-= vl > 0 ? 0.05 : 0;
+                    vl-= vl > 0 ? 0.025f : 0;
                 }
 
-                if(!flagged) vl-= vl > 0 ? 0.02 : 0;
+                //Checking too see if the player clipped through blocks.
+                if(!currentBox.collides(fromBox) && timeStamp - data.creation > 250L) {
+                    Vector newLoc = data.playerInfo.to.toVector()
+                            .add(new Vector(0, (float)data.getPlayer().getEyeHeight(), 0));
+                    Vector from = data.playerInfo.from.toVector()
+                            .add(new Vector(0, (float)data.getPlayer().getEyeHeight(), 0));
 
-                debug("size=" + boxes.size() + " nonColliding=" + nonColliding.size());
+                    Vector dir = newLoc.clone().subtract(from.clone());
+                    RayCollision collision = new RayCollision(from, dir);
+
+                    Tuple<Double, Double> tuple = new Tuple<>(0.,0.);
+                    double distance = from.distance(newLoc);
+
+                    List<BoundingBox> allSolids = colliding.stream().filter(box ->
+                            BlockUtils.isSolid(box.getMinimum().midpoint(box.getMaximum())
+                            .toLocation(data.getPlayer().getWorld()).getBlock()))
+                            .collect(Collectors.toList());
+
+                    for(BoundingBox box : allSolids) {
+                        if(RayCollision.intersect(collision, box, tuple)) {
+                            if(tuple.one <= distance) {
+                                flag("clipped=" + distance);
+                                setBack();
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -90,8 +114,11 @@ public class Phase extends Check {
 
     private void setBack() {
         if(nonColliding.size() > 0) {
-            RunUtils.task(() -> data.getPlayer()
-                    .teleport(nonColliding.get(nonColliding.size() - 1)), Kauri.INSTANCE);
+            RunUtils.task(() -> {
+                if(nonColliding.size() > 0) {
+                    data.getPlayer().teleport(nonColliding.get(nonColliding.size() - 1));
+                } else data.getPlayer().teleport(data.playerInfo.from.toLocation(data.getPlayer().getWorld()));
+            }, Kauri.INSTANCE);
         }
     }
 }

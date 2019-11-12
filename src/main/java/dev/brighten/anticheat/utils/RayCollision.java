@@ -1,11 +1,16 @@
 package dev.brighten.anticheat.utils;
 
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedPacketPlayOutWorldParticle;
+import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumParticle;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.Tuple;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 public class RayCollision {
@@ -58,6 +63,10 @@ public class RayCollision {
         this.directionX = direction.getX();
         this.directionY = direction.getY();
         this.directionZ = direction.getZ();
+    }
+
+    public void draw(WrappedEnumParticle particle, Player... players) {
+        MiscUtils.drawRay(this,particle, Arrays.asList(players));
     }
 
     public KLocation getOrigin() {
