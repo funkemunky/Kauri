@@ -6,6 +6,9 @@ import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.impl.combat.aim.*;
 import dev.brighten.anticheat.check.impl.combat.autoclicker.*;
+import dev.brighten.anticheat.check.impl.combat.hand.HandA;
+import dev.brighten.anticheat.check.impl.combat.hand.HandB;
+import dev.brighten.anticheat.check.impl.combat.hand.HandC;
 import dev.brighten.anticheat.check.impl.combat.hitbox.Hitboxes;
 import dev.brighten.anticheat.check.impl.combat.reach.Reach;
 import dev.brighten.anticheat.check.impl.movement.fly.*;
@@ -15,6 +18,7 @@ import dev.brighten.anticheat.check.impl.movement.phase.Phase;
 import dev.brighten.anticheat.check.impl.movement.speed.*;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityA;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityB;
+import dev.brighten.anticheat.check.impl.movement.velocity.VelocityC;
 import dev.brighten.anticheat.check.impl.packets.Timer;
 import dev.brighten.anticheat.check.impl.packets.badpackets.*;
 import dev.brighten.anticheat.data.ObjectData;
@@ -175,6 +179,10 @@ public class Check {
         register(new BadPacketsL());
         register(new VelocityA());
         register(new VelocityB());
+        register(new VelocityC());
+        register(new HandA());
+        register(new HandB());
+        register(new HandC());
     }
 
     public static boolean isCheck(String name) {

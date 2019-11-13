@@ -58,7 +58,7 @@ public class MovementProcessor {
         data.playerInfo.worldLoaded = Atlas.getInstance().getBlockBoxManager().getBlockBox()
                 .isChunkLoaded(data.playerInfo.to.toLocation(data.getPlayer().getWorld()));
 
-        data.lagInfo.lagging = data.lagInfo.lastPacketDrop.hasNotPassed(6)
+        data.lagInfo.lagging = data.lagInfo.lastPacketDrop.hasNotPassed(3)
                 || !data.playerInfo.worldLoaded
                 || Kauri.INSTANCE.lastTickLag.hasNotPassed(20);
 

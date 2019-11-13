@@ -42,7 +42,7 @@ public class LogCommand {
                 }
 
                 if(cmd.getPlayer() != null) {
-                    LogsGUI gui = new LogsGUI(cmd.getPlayer());
+                    LogsGUI gui = new LogsGUI(player);
                     gui.showMenu(cmd.getPlayer());
                     cmd.getSender().sendMessage(Color.Green + "Opened menu.");
                 } else cmd.getSender().sendMessage(Color.Green + "Logs: " + getLogsFromUUID(Bukkit.getOfflinePlayer(cmd.getArgs()[0]).getUniqueId()));

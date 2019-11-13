@@ -21,7 +21,8 @@ import java.util.stream.IntStream;
 public class ChestMenu implements Menu {
 
     @Getter
-    private final String title;
+    @Setter
+    private String title;
     private final MenuDimension dimension;
     @Setter
     private Menu parent;

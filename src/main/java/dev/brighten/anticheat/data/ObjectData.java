@@ -24,9 +24,8 @@ public class ObjectData {
     public String debugging;
     public UUID debugged;
 
-    public long creation;
-    public PastLocation pastLocation,
-            targetPastLocation;
+    public long creation, lagTicks, noLagTicks;
+    public PastLocation pastLocation, targetPastLocation;
     public LivingEntity target;
     public BoundingBox box, targetBounds;
     public ObjectData INSTANCE;
@@ -35,7 +34,6 @@ public class ObjectData {
     public BlockInformation blockInfo;
     public LagInformation lagInfo;
     public PredictionService predictionService;
-    public List<LivingEntity> entitiesNearPlayer = new ArrayList<>();
     public int hashCode;
 
     public ObjectData(UUID uuid) {

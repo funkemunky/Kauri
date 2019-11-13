@@ -10,7 +10,7 @@ import dev.brighten.anticheat.processing.MovementProcessor;
 import dev.brighten.anticheat.utils.MiscUtils;
 
 @CheckInfo(name = "Autoclicker (E)", description = "Checks for the range of autoclicker.", punishVL = 15,
-        executable = false)
+        executable = false, developer = true)
 public class AutoclickerE extends Check {
 
     private long lastClick, lastDelta;

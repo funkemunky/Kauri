@@ -22,6 +22,7 @@ public class FlyA extends Check {
             if(delta > 0.01 && data.playerInfo.airTicks > 2
                     && !data.playerInfo.flightCancel
                     && !data.playerInfo.nearGround
+                    && !data.lagInfo.lagging
                     && timeStamp - data.playerInfo.lastVelocityTimestamp > 600L
                     && data.playerInfo.lastBlockPlace.hasPassed(5)
                     && !data.blockInfo.onClimbable) {

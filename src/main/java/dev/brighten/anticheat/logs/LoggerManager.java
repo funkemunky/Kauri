@@ -189,12 +189,12 @@ public class LoggerManager {
             List<Log> logList = logs.getOrDefault(uuid, new ArrayList<>());
 
             logList.add(new Log(
-                    String.valueOf(set.getField("checkName")),
-                    String.valueOf(set.getField("info")),
-                    set.getField("vl"),
+                    set.getField("checkName"),
+                    set.getField("info"),
+                    set.getFloat("vl"),
                     set.getField("ping"),
-                    set.getField("timeStamp"),
-                    set.getField("tps")));
+                    set.getLong("timeStamp"),
+                    set.getDouble("tps")));
 
             logs.put(uuid, logList);
         });

@@ -37,6 +37,10 @@ public class LogsGUI extends ChestMenu {
 
         this.player = player;
         updateLogs();
+
+        setTitle(Color.Gray + player.getName() + "'s Violations (" + Color.White + "1/"
+                + Math.round(logs.size() / 45F) + Color.Gray + ")");
+
         setButtons(1);
         buildInventory(true);
     }
@@ -46,15 +50,24 @@ public class LogsGUI extends ChestMenu {
 
         this.player = player;
         currentPage.set(page);
-        updateLogs();
         setButtons(page);
+        updateLogs();
+
+        setTitle(Color.Gray + player.getName() + "'s Violations (" + Color.White + page
+                + "/" + Math.round(logs.size() / 45F) + Color.Gray + ")");
+
         buildInventory(true);
     }
 
     private void setButtons(int page) {
+        if(page == 0 || getMenuDimension().getSize() <= 0) return;
+
+
         List<Log> subList = logs.subList(Math.min((page - 1) * 45, logs.size()), Math.min(page * 45, logs.size()));
 
-        subList.forEach(log -> addItem(buttonFromLog(log)));
+        for (int i = 0; i < subList.size(); i++) {
+            setItem(i, buttonFromLog(subList.get(i)));
+        }
 
         //Setting the next page option if possible.
         if(Math.min(page * 45, logs.size()) < logs.size()) {
@@ -71,8 +84,10 @@ public class LogsGUI extends ChestMenu {
 
         val punishments = Kauri.INSTANCE.loggerManager.getPunishments(player.getUniqueId());
 
-        Button getPastebin = new Button(false, new ItemBuilder(Material.SKULL_ITEM).owner(player.getName())
-                .amount(1).name(Color.Red + "funkemunky")
+        Button getPastebin = new Button(false, new ItemBuilder(Material.SKULL_ITEM).amount(1)
+                .durability(3)
+                .owner(player.getName())
+                .name(Color.Red + player.getName())
                 .lore("", "&6Punishments&8: &f" + punishments.size(), "",
                         "&e&oRight Click &7&oto get an &f&ounlisted &7&opastebin link of the logs.").build(),
                 (player, info) -> {

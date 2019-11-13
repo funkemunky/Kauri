@@ -25,19 +25,18 @@ import java.util.stream.Collectors;
 public class Phase extends Check {
 
     private TickTimer lastOpenDoor = new TickTimer(5);
-    private EvictingList<Location> nonColliding = new EvictingList<>(10);
-    private TickTimer lastFlag = new TickTimer(5);
+    private EvictingList<Location> nonColliding = new EvictingList<>(8);
 
-    @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if(packet.isPos()
+    @Event
+    public void on(PlayerMoveEvent e) {
+        if(e.getTo().distance(e.getFrom()) > 0
                 && data.playerInfo.deltaXZ != 0 || data.playerInfo.deltaY != 0
                 && Kauri.INSTANCE.enabled
                 && !data.playerInfo.serverCanFly
                 && !data.playerInfo.inCreative) {
 
             BoundingBox currentBox = data.box.shrink(0.06f,0,0.05f);
-            BoundingBox fromBox = new BoundingBox(data.playerInfo.from.toVector(), data.playerInfo.from.toVector())
+            BoundingBox fromBox = new BoundingBox(e.getFrom().toVector(), e.getFrom().toVector())
                     .grow(0.24f,0,0.24f)
                     .add(0,0,0,
                             0, (float)data.getPlayer().getEyeHeight(), 0);
@@ -57,22 +56,22 @@ public class Phase extends Check {
                                 .toLocation(data.getPlayer().getWorld()).getBlock())
                         .filter(BlockUtils::isSolid).findFirst();
                 if(optional.isPresent()) {
-                    setBack();
+                    setBack(e.getFrom());
                     if(vl++ > 4) {
                         flag("block=" + optional.get().getType().name().toLowerCase());
                     }
                 } else if(currentBox.collides(fromBox) && !data.blockInfo.blocksNear) {
-                    nonColliding.add(data.playerInfo.from.toLocation(data.getPlayer().getWorld()));
+                    nonColliding.add(e.getFrom());
                     vl-= vl > 0 ? 0.025f : 0;
                 } else {
                     vl-= vl > 0 ? 0.025f : 0;
                 }
 
                 //Checking too see if the player clipped through blocks.
-                if(!currentBox.collides(fromBox) && timeStamp - data.creation > 250L) {
-                    Vector newLoc = data.playerInfo.to.toVector()
+                if(!currentBox.collides(fromBox)) {
+                    Vector newLoc = e.getTo().toVector()
                             .add(new Vector(0, (float)data.getPlayer().getEyeHeight(), 0));
-                    Vector from = data.playerInfo.from.toVector()
+                    Vector from = e.getFrom().toVector()
                             .add(new Vector(0, (float)data.getPlayer().getEyeHeight(), 0));
 
                     Vector dir = newLoc.clone().subtract(from.clone());
@@ -83,14 +82,14 @@ public class Phase extends Check {
 
                     List<BoundingBox> allSolids = colliding.stream().filter(box ->
                             BlockUtils.isSolid(box.getMinimum().midpoint(box.getMaximum())
-                            .toLocation(data.getPlayer().getWorld()).getBlock()))
+                                    .toLocation(data.getPlayer().getWorld()).getBlock()))
                             .collect(Collectors.toList());
 
                     for(BoundingBox box : allSolids) {
                         if(RayCollision.intersect(collision, box, tuple)) {
                             if(tuple.one <= distance) {
                                 flag("clipped=" + distance);
-                                setBack();
+                                setBack(e.getFrom());
                             }
                         }
                     }
@@ -112,12 +111,12 @@ public class Phase extends Check {
         }
     }
 
-    private void setBack() {
+    private void setBack(Location from) {
         if(nonColliding.size() > 0) {
             RunUtils.task(() -> {
                 if(nonColliding.size() > 0) {
                     data.getPlayer().teleport(nonColliding.get(nonColliding.size() - 1));
-                } else data.getPlayer().teleport(data.playerInfo.from.toLocation(data.getPlayer().getWorld()));
+                } else data.getPlayer().teleport(from);
             }, Kauri.INSTANCE);
         }
     }
