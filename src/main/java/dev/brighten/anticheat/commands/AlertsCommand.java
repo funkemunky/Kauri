@@ -20,12 +20,15 @@ public class AlertsCommand {
 
             if(data.alerts) {
                 Kauri.INSTANCE.dataManager.hasAlerts.add(data);
-                cmd.getPlayer().sendMessage(Color.Green + "You are now viewing cheat alerts.");
+                cmd.getPlayer().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("alerts-on",
+                        "&aYou are now viewing cheat alerts."));
             } else {
                 Kauri.INSTANCE.dataManager.hasAlerts.remove(data);
-                cmd.getPlayer().sendMessage(Color.Red + "You are no longer viewing cheat alerts.");
+                cmd.getPlayer().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("alerts-none",
+                        "&cYou are no longer viewing cheat alerts."));
             }
-        } else cmd.getSender().sendMessage(Color.Red + "There was an error trying to find your data.");
+        } else cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("data-error",
+                "&cThere was an error trying to find your data."));
     }
 
 }

@@ -1,12 +1,14 @@
 package dev.brighten.anticheat;
 
 import cc.funkemunky.api.Atlas;
+import cc.funkemunky.api.config.MessageHandler;
 import cc.funkemunky.api.profiling.ToggleableProfiler;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.TickTimer;
 import dev.brighten.anticheat.check.api.Check;
+import dev.brighten.anticheat.check.api.Config;
 import dev.brighten.anticheat.data.DataManager;
 import dev.brighten.anticheat.logs.LoggerManager;
 import dev.brighten.anticheat.processing.EntityProcessor;
@@ -39,6 +41,8 @@ public class Kauri extends JavaPlugin{
     public boolean enabled = false;
     public TickTimer lastEnabled;
 
+    public MessageHandler msgHandler;
+
     public void onEnable() {
         MiscUtils.printToConsole(Color.Red + "Starting Kauri " + getDescription().getVersion() + "...");
         INSTANCE = this;
@@ -56,6 +60,7 @@ public class Kauri extends JavaPlugin{
         //Clearing all fields in ObjectData to prevent work from GC.
         MiscUtils.printToConsole("&7Shutting down threadPool and saving config...");
         saveConfig(); //Saving config.
+
         MiscUtils.printToConsole("&7Unregistering Atlas and Bukkit listeners...");
         HandlerList.unregisterAll(this); //Unregistering Bukkit listeners.
         Atlas.getInstance().getEventManager().unregisterAll(this); //Unregistering Atlas listeners.
@@ -88,12 +93,20 @@ public class Kauri extends JavaPlugin{
         executor = Executors.newFixedThreadPool(3);
 
         MiscUtils.printToConsole(Color.Gray + "Loading config...");
+        saveDefaultConfig();
+
+        MiscUtils.printToConsole(Color.Gray + "Loading messages...");
+        msgHandler = new MessageHandler(this);
 
         MiscUtils.printToConsole(Color.Gray + "Running scanner...");
         Atlas.getInstance().initializeScanner(getClass(),
                 this,
                 true,
                 true);
+
+        MiscUtils.printToConsole(Color.Gray + "Setting the language to " + Color.Yellow + Config.language);
+        msgHandler.setCurrentLang(Config.language);
+
         MiscUtils.printToConsole(Color.Gray + "Registering processors...");
         packetProcessor = new PacketProcessor();
         dataManager = new DataManager();
