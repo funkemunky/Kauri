@@ -82,10 +82,18 @@ public class Check {
             Kauri.INSTANCE.loggerManager.addLog(data, this, info);
 
             if(lastAlert.hasPassed(MathUtils.millisToTicks(Config.alertsDelay))) {
-                String message = Color.translate("&8[&6K&8] &f" + this.data.getPlayer().getName()
+                /*String message = Color.translate("&8[&6K&8] &f" + this.data.getPlayer().getName()
                                 + " &7flagged &f" + name
                                 + " &8(&e" + info + "&8) &8[&c" + MathUtils.round(vl, 2) + "&8]"
-                        + (developer ? "&c&o(Experimental)" : ""));
+                        + (developer ? "&c&o(Experimental)" : ""));*/
+                String message = Color.translate(Kauri.INSTANCE.msgHandler.getLanguage()
+                        .msg("cheat-alert",
+                                "&8[&6K&8] &f%player% &7flagged &f%check% &8(&e%info%&8) &8(&c%vl%&8]")
+                        .replace("%player%", data.getPlayer().getName())
+                        .replace("%check%", name)
+                        .replace("%info%", info)
+                        .replace("%vl%", String.valueOf(MathUtils.round(vl, 2))));
+
                 Kauri.INSTANCE.dataManager.hasAlerts.forEach(data -> data.getPlayer().sendMessage(message));
                 lastAlert.reset();
             }
