@@ -92,8 +92,8 @@ public class Check {
                         .replace("%player%", data.getPlayer().getName())
                         .replace("%check%", name)
                         .replace("%info%", info)
-                        .replace("%vl%", String.valueOf(MathUtils.round(vl, 2))))
-                        .replace("%experimental%", developer ? "&c&oExperimental" : "");
+                        .replace("%vl%", String.valueOf(MathUtils.round(vl, 2)))
+                        .replace("%experimental%", developer ? "&c&oExperimental" : ""));
 
                 Kauri.INSTANCE.dataManager.hasAlerts.forEach(data -> data.getPlayer().sendMessage(message));
                 lastAlert.reset();

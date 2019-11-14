@@ -39,8 +39,10 @@ public class VelocityC extends Check {
 
             if(!data.blockInfo.blocksAbove) {
                 if(ratio < 1) {
-                    flag("pct=" + pct + "%");
-                }
+                    if(vl++ > 3) {
+                        flag("pct=" + pct + "%");
+                    }
+                } else vl-= vl > 0 ? 0.25 : 0;
                 debug("ratio=" + MathUtils.round(ratio, 4) + " vl=" + vl);
             }
 
