@@ -88,11 +88,12 @@ public class Check {
                         + (developer ? "&c&o(Experimental)" : ""));*/
                 String message = Color.translate(Kauri.INSTANCE.msgHandler.getLanguage()
                         .msg("cheat-alert",
-                                "&8[&6K&8] &f%player% &7flagged &f%check% &8(&e%info%&8) &8(&c%vl%&8]")
+                                "&8[&6K&8] &f%player% &7flagged &f%check% &8(&e%info%&8) &8(&c%vl%&8] %experimental%")
                         .replace("%player%", data.getPlayer().getName())
                         .replace("%check%", name)
                         .replace("%info%", info)
-                        .replace("%vl%", String.valueOf(MathUtils.round(vl, 2))));
+                        .replace("%vl%", String.valueOf(MathUtils.round(vl, 2))))
+                        .replace("%experimental%", developer ? "&c&oExperimental" : "");
 
                 Kauri.INSTANCE.dataManager.hasAlerts.forEach(data -> data.getPlayer().sendMessage(message));
                 lastAlert.reset();
