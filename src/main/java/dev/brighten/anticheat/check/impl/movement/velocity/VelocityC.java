@@ -35,7 +35,7 @@ public class VelocityC extends Check {
                 && data.lagInfo.lastPacketDrop.hasPassed(2)
                 && delta > (data.lagInfo.ping * 1.5)))) {
             float ratio = data.playerInfo.deltaY / velocityY,
-                    pct = MathUtils.round(ratio * 100, 4) ;
+                    pct = MathUtils.round(ratio * 100, 4);
 
             if(!data.blockInfo.blocksAbove) {
                 if(ratio < 1) {

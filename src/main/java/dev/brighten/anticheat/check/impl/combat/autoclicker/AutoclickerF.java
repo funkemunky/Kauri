@@ -11,11 +11,9 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.MiscUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.LongSummaryStatistics;
 import java.util.stream.Collectors;
-import java.util.stream.LongStream;
 
 @CheckInfo(name = "Autoclicker (F)", description = "Looks for a flaw in autoclickers before they start clicking.",
         checkType = CheckType.AUTOCLICKER, punishVL = 5, developer = true, executable = false)
