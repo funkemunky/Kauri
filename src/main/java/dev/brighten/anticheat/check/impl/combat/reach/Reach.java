@@ -73,8 +73,8 @@ public class Reach extends Check {
             if(collided > 1) {
                 double reach = reaches.stream().mapToDouble(val -> val).min().orElse(0);
 
-                if(reach > 3.04 && collided > 9) {
-                    if((vl+= (collided > 10 ? 1 : 0.5f)) > 3) {
+                if(reach > 3.04 && collided > 8) {
+                    if((vl+= (collided > 10 ? 1 : 0.5f)) > 4) {
                         flag("reach=" + reach + " collided=" + collided);
                     }
                 } else vl-= vl > 0 ? (data.lagInfo.lagging ? 0.025 : 0.02) : 0;
