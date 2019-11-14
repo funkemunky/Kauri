@@ -24,7 +24,7 @@ public class FlyB extends Check {
 
         if(data.playerInfo.deltaY > max && !data.playerInfo.serverGround) {
             //We check for lag since this can sometimes affect false positives.
-            if((vl+= data.lagInfo.lagging ? 0.5 : 1) > (data.lagInfo.lagging ? 2 : 1)) {
+            if((vl+= data.lagInfo.lagging ? 0.5 : 1) > (data.lagInfo.lagging ? 3 : 2)) {
                 flag(data.playerInfo.deltaY + ">-" + max);
             }
         } else vl-= vl > 0 ? 0.025 : 0;
