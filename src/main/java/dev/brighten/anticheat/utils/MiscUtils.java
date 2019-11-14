@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.LongStream;
 
 public class MiscUtils {
 
@@ -47,6 +48,14 @@ public class MiscUtils {
         }
 
         return result;
+    }
+
+    public static LongStream listToStream(Collection<Long> collection) {
+        LongStream.Builder longBuilder = LongStream.builder();
+        for (Long aLong : collection) {
+            longBuilder.add(aLong);
+        }
+        return longBuilder.build();
     }
 
     private static final int[] decimalPlaces = {0, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000};

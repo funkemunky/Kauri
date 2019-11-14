@@ -139,6 +139,7 @@ public class Check {
         register(new AutoclickerC());
         register(new AutoclickerD());
         register(new AutoclickerE());
+        register(new AutoclickerF());
         register(new FlyA());
         register(new FlyB());
         register(new FlyC());
