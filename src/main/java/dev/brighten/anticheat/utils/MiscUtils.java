@@ -1,9 +1,15 @@
 package dev.brighten.anticheat.utils;
 
+import cc.funkemunky.api.reflection.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedPacketPlayOutWorldParticle;
+import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumAnimation;
 import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumParticle;
+import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MathUtils;
+import dev.brighten.anticheat.Kauri;
+import dev.brighten.anticheat.commands.KauriCommand;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -36,6 +42,20 @@ public class MiscUtils {
                     0F, 0F, 0F, 0, 0).getObject();
             for (Player p : players) TinyProtocolHandler.sendPacket(p, packet);
         }
+    }
+
+    public static void testMessage(String message) {
+        KauriCommand.getTesters().forEach(pl -> pl.sendMessage(Color.translate(message)));
+    }
+
+    public static boolean isAnimated(HumanEntity entity) {
+        Object itemInUse = MinecraftReflection.getItemInUse(entity);
+
+        if(itemInUse == null) return false;
+
+        Object animation = MinecraftReflection.getItemAnimation(itemInUse);
+
+        return !WrappedEnumAnimation.fromNMS(animation).equals(WrappedEnumAnimation.NONE);
     }
 
     public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {

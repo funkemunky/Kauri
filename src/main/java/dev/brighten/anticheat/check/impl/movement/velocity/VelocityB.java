@@ -10,6 +10,7 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.MovementUtils;
 import org.bukkit.enchantments.Enchantment;
 
@@ -20,23 +21,15 @@ import java.util.*;
 public class VelocityB extends Check {
 
     private double vX, vZ;
-
-    private static List<float[]> motions = Collections.synchronizedList(Arrays.asList(
-            new float[] {0, 0},
-            new float[] {0, .98f},
-            new float[] {0, -.98f},
-            new float[] {.98f, 0},
-            new float[] {.98f, .98f},
-            new float[] {.98f, -.98f},
-            new float[] {-.98f, 0},
-            new float[] {-.98f, .98f},
-            new float[] {-.98f, -.98f}));
+    private long velocityTS;
+    private float forward, strafe;
 
     @Packet
-    public void onVelocity(WrappedOutVelocityPacket packet) {
+    public void onVelocity(WrappedOutVelocityPacket packet, long timeStamp) {
         if(packet.getId() == data.getPlayer().getEntityId()) {
             vX = packet.getX();
             vZ = packet.getZ();
+            velocityTS = timeStamp;
         }
     }
 
@@ -53,9 +46,9 @@ public class VelocityB extends Check {
     }
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
+    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if((vX != 0 || vZ != 0)) {
-            if(data.playerInfo.lastVelocity.hasNotPassed(5)) {
+            if(timeStamp - data.playerInfo.lastVelocityTimestamp < 400) {
                 if(!data.blockInfo.blocksNear
                         && !data.blockInfo.inWeb
                         && !data.playerInfo.onLadder
@@ -63,12 +56,6 @@ public class VelocityB extends Check {
                         && !data.lagInfo.lagging
                         && !data.playerInfo.serverPos
                         && !data.getPlayer().getAllowFlight()) {
-
-                    if(Atlas.getInstance().getBlockBoxManager().getBlockBox().isUsingItem(data.getPlayer())) {
-                        vX = vZ = 0;
-                        vl-= vl > 0 ? 1 : 0;
-                        return;
-                    }
 
                     float f4 = 0.91f;
 
@@ -86,37 +73,18 @@ public class VelocityB extends Check {
                     }
 
                     double pct = 100;
-                    double lVX = vX, lVZ = vZ;
 
-                    float[] motion = new float[2];
+                    forward = data.predictionService.moveForward;
+                    strafe = data.predictionService.moveStrafing;
 
-                    if(data.playerInfo.lastVelocity.hasNotPassed(2)) {
-                        Optional<float[]> optionalMotion = motions.stream()
-                                .min(Comparator.comparing(mot -> {
-                                    moveFlying(mot[1], mot[0], f5);
-                                    double vX = this.vX, vZ = this.vZ;
-                                    this.vX = lVX;
-                                    this.vZ = lVZ;
-
-                                    return MathUtils.getDelta(vX, data.playerInfo.deltaX)
-                                            + MathUtils.getDelta(vZ, data.playerInfo.deltaZ);
-                                }));
-
-                        if (optionalMotion.isPresent()) {
-                            motion = optionalMotion.get();
-
-                            debug("motion: " + motion[1] + ", " + motion[0]);
-                        } else {
-                            motion[0] = data.predictionService.moveForward;
-                            motion[1] = data.predictionService.moveStrafing;
-                        }
-                    } else {
-                        motion[0] = data.predictionService.moveForward;
-                        motion[1] = data.predictionService.moveStrafing;
-                        debug("motion: " + motion[1] + ", " + motion[1]);
+                    if(data.playerInfo.isAnimated) {
+                        forward*= 0.2f;
+                        strafe*= 0.2f;
                     }
 
-                    moveFlying(motion[1], motion[0], f5);
+                    debug("motion: " + strafe + ", " + forward);
+
+                    moveFlying(strafe, forward, f5);
 
                     double vXZ = MathUtils.hypot(vX, vZ);
                     pct = data.playerInfo.deltaXZ / vXZ * 100;
@@ -125,8 +93,9 @@ public class VelocityB extends Check {
                         if (vl++ > 15) flag("pct=" + MathUtils.round(pct, 3) + "%");
                     } else vl -= vl > 0 ? 0.5 : 0;
 
-                    debug("pct=" + pct + " key=" + data.predictionService.key
-                            + " sprint=" + data.playerInfo.sprinting + " ground=" + packet.isGround() + " vl=" + vl);
+                    debug("pct=" + pct + " key=" + data.predictionService.key + " ani="
+                            + data.playerInfo.isAnimated + " sprint=" + data.playerInfo.sprinting
+                            + " ground=" + packet.isGround() + " vl=" + vl);
 
                     //debug("vX=" + vX + " vZ=" + vZ);
                     //debug("dX=" + data.playerInfo.deltaX + " dZ=" + data.playerInfo.deltaZ + " item=" +);
@@ -134,7 +103,7 @@ public class VelocityB extends Check {
                     vX *= f4;
                     vZ *= f4;
 
-                    if(data.playerInfo.lastVelocity.hasPassed(4)) {
+                    if(timeStamp - velocityTS > 300) {
                         vX = vZ = 0;
                     }
                 } else vX = vZ = 0;

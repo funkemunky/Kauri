@@ -11,7 +11,7 @@ public class PlayerInformation {
             collidesVertically, collidesHorizontally, serverCanFly, inCreative, serverIsFlying, collided,
             onLadder, usingItem, wasOnIce, wasOnSlime, jumped, inAir, breakingBlock, worldLoaded,
             clientIsFlying, clientCanFly;
-    public boolean testFly, lastTestFly;
+    public boolean testFly, lastTestFly, isAnimated;
     public boolean generalCancel, flightCancel;
     public float deltaY, lDeltaY, deltaX, lDeltaX, deltaZ, lDeltaZ, deltaXZ, lDeltaXZ, fallDistance, jumpHeight;
     public float pDeltaY;

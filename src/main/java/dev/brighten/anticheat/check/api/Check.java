@@ -22,10 +22,18 @@ import dev.brighten.anticheat.check.impl.movement.velocity.VelocityC;
 import dev.brighten.anticheat.check.impl.packets.Timer;
 import dev.brighten.anticheat.check.impl.packets.badpackets.*;
 import dev.brighten.anticheat.data.ObjectData;
+import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.plugin.Plugin;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -116,21 +124,50 @@ public class Check {
     }
 
     public void punish() {
-        RunUtils.task(() -> {
-            if(executable && punishVl != -1 && vl > punishVl) {
-                Kauri.INSTANCE.loggerManager.addPunishment(data, this);
-                if(!Config.broadcastMessage.equalsIgnoreCase("off")) {
-                    Bukkit.broadcastMessage(Color.translate(Config.broadcastMessage
-                            .replace("%name%", data.getPlayer().getName())));
-                }
-                ConsoleCommandSender sender = Bukkit.getConsoleSender();
-                Config.punishCommands.
-                        forEach(cmd -> Bukkit.dispatchCommand(
-                                sender,
-                                cmd.replace("%name%", data.getPlayer().getName())));
-                vl = 0;
-            }
-        }, Kauri.INSTANCE);
+       Kauri.INSTANCE.executor.execute(() -> {
+           if(Bukkit.getPluginManager().isPluginEnabled("KauriLoader")) {
+
+               String license =
+                       Bukkit.getPluginManager().getPlugin("KauriLoader").getConfig().getString("license");
+
+               try {
+                   URL url = new URL("https://funkemunky.cc/download/verify?license="
+                           + URLEncoder.encode(license, "UTF-8") + "&downloader=Kauri");
+
+                   try {
+                       val connection = url.openConnection();
+
+                       BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+                       String line = reader.readLine();
+
+                       boolean valid = Boolean.parseBoolean(line);
+
+                       if(!valid) return;
+                   } catch (IOException e) {
+                       e.printStackTrace();
+                   }
+               } catch (MalformedURLException | UnsupportedEncodingException e) {
+                   e.printStackTrace();
+               }
+
+           } else return;
+           RunUtils.task(() -> {
+               if(executable && punishVl != -1 && vl > punishVl) {
+                   Kauri.INSTANCE.loggerManager.addPunishment(data, this);
+                   if(!Config.broadcastMessage.equalsIgnoreCase("off")) {
+                       Bukkit.broadcastMessage(Color.translate(Config.broadcastMessage
+                               .replace("%name%", data.getPlayer().getName())));
+                   }
+                   ConsoleCommandSender sender = Bukkit.getConsoleSender();
+                   Config.punishCommands.
+                           forEach(cmd -> Bukkit.dispatchCommand(
+                                   sender,
+                                   cmd.replace("%name%", data.getPlayer().getName())));
+                   vl = 0;
+               }
+           }, Kauri.INSTANCE);
+       });
     }
 
     public void debug(String information) {

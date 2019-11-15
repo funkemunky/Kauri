@@ -21,7 +21,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @CheckInfo(name = "Phase", description = "Prevents players from glitching through blocks",
-        checkType = CheckType.GLITCH, enabled = false, executable = false, punishVL = 50)
+        checkType = CheckType.GLITCH, enabled = true, developer = true, executable = false, punishVL = 50)
 public class Phase extends Check {
 
     private TickTimer lastOpenDoor = new TickTimer(5);

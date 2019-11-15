@@ -10,8 +10,10 @@ import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutAbilitiesPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutKeepAlivePacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.*;
+import dev.brighten.anticheat.commands.KauriCommand;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.MovementUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -25,10 +27,12 @@ import java.util.List;
 public class PredictionService {
 
     private ObjectData data;
-    public boolean fly, velocity, sneak, sprint, useSword, hit, dropItem, inWeb, isCollidedHorizontally,
+    public boolean fly, velocity, position, sneak, sprint, useSword, hit, dropItem, inWeb, isCollidedHorizontally,
             lastOnGround, onGround, lastSprint, fMath, fastMath, walkSpecial, lastVelocity, isCollidedVertically, 
             isCollided;
     public double posX, posY, posZ, lPosX, lPosY, lPosZ, rmotionX, rmotionY, rmotionZ, lmotionX, lmotionZ, lmotionY;
+    public double predX, predY, predZ;
+    private double velocityX, velocityY, velocityZ;
     public TickTimer lastUseItem = new TickTimer(10);
     public BoundingBox box;
     public float walkSpeed, yaw, pitch, moveStrafing, moveForward, aiMoveSpeed, distanceWalkedModified,
@@ -42,14 +46,20 @@ public class PredictionService {
     public void onSend(PacketSendEvent event) {
         switch(event.getType()) {
             case Packet.Server.POSITION: {
-                TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutKeepAlivePacket(233 + data.getPlayer().getEntityId() + 935));
+                TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutKeepAlivePacket(233).getObject());
                 break;
             }
             case Packet.Server.ENTITY_VELOCITY: {
                 WrappedOutVelocityPacket packet = new WrappedOutVelocityPacket(event.getPacket(), event.getPlayer());
 
                 if(packet.getId() == data.getPlayer().getEntityId()) {
-                    TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutKeepAlivePacket(233 + data.getPlayer().getEntityId() + 935));
+                    velocityX = packet.getX();
+                    velocityY = packet.getY();
+                    velocityZ = packet.getZ();
+
+                    dev.brighten.anticheat.utils.MiscUtils.testMessage("sent keepAlive");
+
+                    TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutKeepAlivePacket(255).getObject());
                 }
                 break;
             }
@@ -68,8 +78,12 @@ public class PredictionService {
         switch(e.getType()) {
             case Packet.Client.KEEP_ALIVE: {
                 WrappedInKeepAlivePacket packet = new WrappedInKeepAlivePacket(e.getPacket(), e.getPlayer());
-                if(packet.getTime() == (233 + e.getPlayer().getEntityId() + 935)) {
+                if(packet.getTime() == 255) {
                     velocity = true;
+                    dev.brighten.anticheat.utils.MiscUtils
+                            .testMessage("&evelX=" + velocityX + " velZ=" + velocityZ);
+                } else if(packet.getTime() == 233) {
+                    position = true;
                 }
                 break;
             }
@@ -163,6 +177,8 @@ public class PredictionService {
                     posY = 999999999;
                     posZ = 999999999;
                 }
+
+
                 onGround = packet.isGround();
 
                 boolean specialBlock = false;
@@ -171,10 +187,11 @@ public class PredictionService {
                 rmotionY = posY - lPosY;
                 rmotionZ = posZ - lPosZ;
 
+                dev.brighten.anticheat.utils.MiscUtils.testMessage(Color.Gray + rmotionX + ", " + rmotionZ);
                 fMath = fastMath; // if the Player uses Optifine FastMath
 
                 try {
-                    if(!walkSpecial && !velocity && !lastVelocity && checkConditions(lastSprint)) {
+                    if(!walkSpecial && !position && !velocity && !lastVelocity && checkConditions(lastSprint)) {
                         if (lastSprint && hit) { // If the Player Sprints and Hit a Player he get slowdown
                             lmotionX *= 0.6D;
                             lmotionZ *= 0.6D;
@@ -224,6 +241,7 @@ public class PredictionService {
                 hit = false;
                 lastVelocity = velocity;
                 velocity = false;
+                position = false;
 
                 lastOnGround = onGround;
                 lastSprint = sprint;
@@ -405,9 +423,12 @@ public class PredictionService {
 
                     final float var15 = sin(yaw * (float) Math.PI / 180.0F); // cos, sin = Math function of optifine
                     final float var16 = cos(yaw * (float) Math.PI / 180.0F);
-                    motionX += (double) (moveStrafing * var16 - moveForward * var15);
-                    motionZ += (double) (moveForward * var16 + moveStrafing * var15);
+                    motionX += (moveStrafing * var16 - moveForward * var15);
+                    motionZ += (moveForward * var16 + moveStrafing * var15);
                 }
+
+                predX = motionX;
+                predZ = motionZ;
 
                 final double diffX = rmotionX - motionX; // difference between the motion from the player and the
                 // calculated motion

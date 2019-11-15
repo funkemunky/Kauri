@@ -57,10 +57,6 @@ public class Kauri extends JavaPlugin{
     public void unload() {
         enabled = false;
         loggerManager.logsDatabase.saveDatabase();
-        //Clearing all fields in ObjectData to prevent work from GC.
-        MiscUtils.printToConsole("&7Shutting down threadPool and saving config...");
-        saveConfig(); //Saving config.
-
         MiscUtils.printToConsole("&7Unregistering Atlas and Bukkit listeners...");
         HandlerList.unregisterAll(this); //Unregistering Bukkit listeners.
         Atlas.getInstance().getEventManager().unregisterAll(this); //Unregistering Atlas listeners.

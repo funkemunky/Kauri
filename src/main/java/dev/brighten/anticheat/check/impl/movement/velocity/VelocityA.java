@@ -13,11 +13,13 @@ import dev.brighten.anticheat.check.api.Packet;
 public class VelocityA extends Check {
 
     private double vY;
+    private long velocityTS;
 
     @Packet
-    public void onVelocity(WrappedOutVelocityPacket packet) {
-        if(packet.getId() == data.getPlayer().getEntityId() && packet.getY() > 0 && data.playerInfo.clientGround) {
+    public void onVelocity(WrappedOutVelocityPacket packet, long timeStamp) {
+        if(packet.getId() == data.getPlayer().getEntityId() && packet.getY() > 0) {
             vY = (float) packet.getY();
+            velocityTS = timeStamp;
         }
     }
 

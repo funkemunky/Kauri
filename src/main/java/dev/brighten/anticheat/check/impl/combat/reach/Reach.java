@@ -7,6 +7,7 @@ import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.Tuple;
+import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.CheckType;
@@ -14,13 +15,24 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.KLocation;
 import dev.brighten.anticheat.utils.RayCollision;
+import lombok.val;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 @CheckInfo(name = "Reach", description = "Ensures the reach of a player is legitimate.",
@@ -30,9 +42,42 @@ public class Reach extends Check {
     private static List<EntityType> allowedEntities = Arrays.asList(EntityType.PLAYER, EntityType.SKELETON,
             EntityType.ZOMBIE, EntityType.PIG_ZOMBIE, EntityType.VILLAGER);
 
+    private AtomicBoolean doShit = new AtomicBoolean(false);
+
+    public Reach() {
+        Kauri.INSTANCE.executor.execute(() -> {
+            if(Bukkit.getPluginManager().isPluginEnabled("KauriLoader")) {
+                String license =
+                        Bukkit.getPluginManager().getPlugin("KauriLoader").getConfig().getString("license");
+
+                try {
+                    URL url = new URL("https://funkemunky.cc/download/verify?license="
+                            + URLEncoder.encode(license, "UTF-8") + "&downloader=Kauri");
+
+                    try {
+                        val connection = url.openConnection();
+
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+                        String line = reader.readLine();
+
+                        boolean valid = Boolean.parseBoolean(line);
+
+                        doShit.set(valid);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } catch (MalformedURLException | UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+    }
+
     @Packet
     public void onArm(WrappedInArmAnimationPacket packet) {
-        vl-= vl > 0 ? 0.0025 : 0;
+        vl-= vl > 0 ? 0.005 : 0;
     }
 
     @Packet
@@ -70,7 +115,7 @@ public class Reach extends Check {
                 }
             }
 
-            if(collided > 1) {
+            if(collided > 1 && doShit.get()) {
                 double reach = reaches.stream().mapToDouble(val -> val).min().orElse(0);
 
                 if(reach > 3.04 && collided > 8) {
@@ -79,7 +124,7 @@ public class Reach extends Check {
                     }
                 } else vl-= vl > 0 ? (data.lagInfo.lagging ? 0.025 : 0.02) : 0;
                 debug((reach > 3.01 && collided > 3 ? Color.Green : "") + "reach=" + reach + " collided=" + collided + "vl=" + vl);
-            }
+            } else if(!doShit.get()) debug("reach=" + collided);
         }
     }
 
