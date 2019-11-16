@@ -9,11 +9,13 @@ import cc.funkemunky.api.utils.MiscUtils;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckSettings;
+import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.utils.ItemBuilder;
 import dev.brighten.anticheat.utils.Pastebin;
 import dev.brighten.anticheat.utils.menu.button.Button;
 import dev.brighten.anticheat.utils.menu.button.ClickAction;
+import dev.brighten.anticheat.utils.menu.preset.button.FillerButton;
 import dev.brighten.anticheat.utils.menu.type.impl.ChestMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -25,6 +27,7 @@ import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Init(commands = true)
@@ -71,9 +74,9 @@ public class MenuCommand {
     private ChestMenu getMainMenu() {
         ChestMenu menu = new ChestMenu(Color.Gold + "Kauri Menu", 3);
 
-        menu.setItem(11, createButton(Material.ANVIL, 1, "&cEdit Checks", (player, info) -> {
-            getChecksMenu().showMenu(player);
-        }, "", "&7Toggle Kauri checks on or off."));
+        menu.setItem(11, createButton(Material.ANVIL, 1, "&cEdit Checks",
+                (player, info) -> getChecksCategoryMenu().showMenu(player),
+                "", "&7Toggle Kauri checks on or off."));
         menu.setItem(13, createButton(Material.ENCHANTED_BOOK, 1, "&cKauri Anticheat",
                 (player, info) -> {
                     if (info.getClickType().equals(ClickType.RIGHT)
@@ -96,19 +99,37 @@ public class MenuCommand {
     }
 
     private ChestMenu getChecksCategoryMenu() {
-        ChestMenu menu = new ChestMenu(Color.Gold + "Check Categories", 2);
+        ChestMenu menu = new ChestMenu(Color.Gold + "Check Categories", 3);
+
+        menu.setParent(getMainMenu());
+
+        AtomicInteger amt = new AtomicInteger(0);
+        Arrays.stream(CheckType.values())
+                .forEach(type -> {
+                    Button button = new Button(false, new ItemBuilder(Material.BOOK)
+                            .amount(1).name("&e" + type.name()).build(),
+                            (player, info) -> getChecksMenu(type).showMenu(player));
+                    amt.incrementAndGet();
+                    menu.addItem(button);
+                });
+
+        for(int i = amt.get() ; i < 27 ; i++) {
+            menu.setItem(i, new FillerButton());
+        }
 
         return menu;
     }
 
-    private ChestMenu getChecksMenu() {
+    private ChestMenu getChecksMenu(CheckType type) {
         ChestMenu menu = new ChestMenu(Color.Gold + "Checks", 6);
 
-        menu.setParent(getMainMenu());
+        menu.setParent(getChecksCategoryMenu());
 
-        List<CheckSettings> values = new ArrayList<>(Check.checkSettings.values());
-
-        values.sort(Comparator.comparing(val -> val.name));
+        List<CheckSettings> values = Check.checkSettings.values()
+                .stream()
+                .filter(settings -> settings.type.equals(type))
+                .sorted(Comparator.comparing(val -> val.name))
+                .collect(Collectors.toList());
 
         for (int i = 0; i < values.size(); i++) {
             CheckSettings val = values.get(i);

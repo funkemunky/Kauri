@@ -89,7 +89,7 @@ public class VelocityB extends Check {
                     double vXZ = MathUtils.hypot(vX, vZ);
                     pct = data.playerInfo.deltaXZ / vXZ * 100;
 
-                    if (pct < 99.4) {
+                    if (pct < 99.4 && !data.playerInfo.usingItem && !data.predictionService.useSword) {
                         if (vl++ > 15) flag("pct=" + MathUtils.round(pct, 3) + "%");
                     } else vl -= vl > 0 ? 0.5 : 0;
 

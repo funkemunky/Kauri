@@ -140,33 +140,6 @@ public class LoggerManager {
                 .filter(structSet -> structSet.getField("uuid").equals(uuid.toString()))
                 .collect(Collectors.toList());
 
-        if(Bukkit.getPluginManager().isPluginEnabled("KauriLoader")) {
-            String license =
-                    Bukkit.getPluginManager().getPlugin("KauriLoader").getConfig().getString("license");
-
-            try {
-                URL url = new URL("https://funkemunky.cc/download/verify?license="
-                        + URLEncoder.encode(license, "UTF-8") + "&downloader=Kauri");
-
-                try {
-                    val connection = url.openConnection();
-
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-
-                    String line = reader.readLine();
-
-                    boolean valid = Boolean.parseBoolean(line);
-
-                    if(!valid) return null;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } catch (MalformedURLException | UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-
-        } else return null;
-
         return sets.stream().map(set -> new Log(
                 set.getField("checkName"),
                 set.getField("info"),

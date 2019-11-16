@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 public class AutoclickerF extends Check {
 
     private long lastClick, lastMinimum, lastMaximum;
+    private double lastAvg;
     private Interval<Long> clickValues = new Interval<>(0, 60);
 
     @Packet
@@ -50,7 +51,7 @@ public class AutoclickerF extends Check {
             debug("(longshit) avg=" + MathUtils.round(disStats.getAverage(), 4)
                     + " min=" + disStats.getMin() + " max=" + disStats.getMax() + " count=" + disStats.getCount());
 
-            if(disStats.getMin() == lastMinimum) {
+            if(disStats.getMin() == lastMinimum && MathUtils.getDelta(avg, lastAvg) > 4) {
                 if(disStats.getMax() == lastMaximum) vl++;
                 if(vl++ > 4) {
                     flag("ur nigga ass using an autoclicker");
@@ -65,6 +66,7 @@ public class AutoclickerF extends Check {
 
             lastMaximum = disStats.getMax();
             lastMinimum = disStats.getMin();
+            lastAvg = disStats.getAverage();
             clickValues.clear();
             distinct.clear();
         } else clickValues.add(delta);

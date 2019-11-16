@@ -39,7 +39,7 @@ public class LogsGUI extends ChestMenu {
         updateLogs();
 
         setTitle(Color.Gray + player.getName() + "'s Violations (" + Color.White + "1/"
-                + Math.round(logs.size() / 45F) + Color.Gray + ")");
+                + (int)Math.ceil(logs.size() / 45f) + Color.Gray + ")");
 
         setButtons(1);
         buildInventory(true);
@@ -50,11 +50,11 @@ public class LogsGUI extends ChestMenu {
 
         this.player = player;
         currentPage.set(page);
-        setButtons(page);
         updateLogs();
+        setButtons(page);
 
         setTitle(Color.Gray + player.getName() + "'s Violations (" + Color.White + page
-                + "/" + Math.round(logs.size() / 45F) + Color.Gray + ")");
+                + "/" + (int)Math.ceil(logs.size() / 45f) + Color.Gray + ")");
 
         buildInventory(true);
     }
