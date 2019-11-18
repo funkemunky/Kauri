@@ -1,11 +1,14 @@
 package dev.brighten.anticheat.check.impl.movement.phase;
 
 import cc.funkemunky.api.reflection.MinecraftReflection;
-import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumAnimation;
-import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumParticle;
-import cc.funkemunky.api.utils.*;
+import cc.funkemunky.api.utils.BlockUtils;
+import cc.funkemunky.api.utils.BoundingBox;
+import cc.funkemunky.api.utils.Tuple;
 import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.check.api.*;
+import dev.brighten.anticheat.check.api.Check;
+import dev.brighten.anticheat.check.api.CheckInfo;
+import dev.brighten.anticheat.check.api.CheckType;
+import dev.brighten.anticheat.check.api.Event;
 import dev.brighten.anticheat.utils.RayCollision;
 import org.bukkit.Location;
 import org.bukkit.block.Block;

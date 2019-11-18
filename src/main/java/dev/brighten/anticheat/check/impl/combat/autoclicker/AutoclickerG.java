@@ -1,7 +1,6 @@
 package dev.brighten.anticheat.check.impl.combat.autoclicker;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
-import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.objects.Interval;
 import dev.brighten.anticheat.check.api.Check;
@@ -10,10 +9,7 @@ import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.MiscUtils;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.LongSummaryStatistics;
-import java.util.stream.Collectors;
 
 @CheckInfo(name = "Autoclicker (G)", description = "Checks for a consistent range of CPS.",
         checkType = CheckType.AUTOCLICKER, developer = true, executable = false)

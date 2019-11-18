@@ -16,14 +16,7 @@ import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.logs.objects.Punishment;
 import lombok.NoArgsConstructor;
-import lombok.val;
-import org.bukkit.Bukkit;
-import org.bukkit.plugin.Plugin;
 
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.util.*;
 import java.util.stream.Collectors;
 

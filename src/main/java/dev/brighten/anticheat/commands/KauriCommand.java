@@ -3,19 +3,13 @@ package dev.brighten.anticheat.commands;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.commands.ancmd.Command;
 import cc.funkemunky.api.commands.ancmd.CommandAdapter;
-import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
-import cc.funkemunky.api.utils.RunUtils;
 import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.data.ObjectData;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 @Init(commands = true)
 public class KauriCommand {

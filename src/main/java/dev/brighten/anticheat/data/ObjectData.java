@@ -4,14 +4,15 @@ import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.TickTimer;
 import cc.funkemunky.api.utils.math.RollingAverageLong;
 import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.data.classes.*;
+import dev.brighten.anticheat.data.classes.BlockInformation;
+import dev.brighten.anticheat.data.classes.CheckManager;
+import dev.brighten.anticheat.data.classes.PlayerInformation;
+import dev.brighten.anticheat.data.classes.PredictionService;
 import dev.brighten.anticheat.utils.PastLocation;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 public class ObjectData {

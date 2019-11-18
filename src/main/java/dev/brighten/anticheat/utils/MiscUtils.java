@@ -4,24 +4,25 @@ import cc.funkemunky.api.reflection.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedPacketPlayOutWorldParticle;
 import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumAnimation;
-import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumParticle;
+import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MathUtils;
-import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.commands.KauriCommand;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import java.text.SimpleDateFormat;
-import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.LongStream;
 
 public class MiscUtils {
 
-    public static double EXPANDER = Math.pow((double)2.0, (double)24.0);
+    public static double EXPANDER = Math.pow(2.0, 24.0);
     private final static Set<Class<?>> NUMBER_REFLECTED_PRIMITIVES;
+
+    public static String deltaSymbol = "\u0394";
+
     static {
         Set<Class<?>> s = new HashSet<>();
         s.add(byte.class);

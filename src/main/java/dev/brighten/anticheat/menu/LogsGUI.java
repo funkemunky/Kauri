@@ -9,13 +9,13 @@ import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.utils.ItemBuilder;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.menu.button.Button;
+import dev.brighten.anticheat.utils.menu.button.ClickAction;
 import dev.brighten.anticheat.utils.menu.preset.button.FillerButton;
 import dev.brighten.anticheat.utils.menu.type.impl.ChestMenu;
 import lombok.val;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -24,7 +24,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class LogsGUI extends ChestMenu {
 
@@ -100,29 +99,14 @@ public class LogsGUI extends ChestMenu {
                 (player, info) -> {
                     if (player.hasPermission("kauri.logs.share")) {
                         if(info.getClickType().isRightClick()) {
-                            if(player.hasPermission("kauri.logs.share")) {
+                            runFunction(info, "kauri.logs.share", () -> {
                                 close(player);
                                 player.sendMessage(Color.Green + "Logs: "
-                                        + LogCommand.getLogsFromUUID(LogsGUI.this.player.getUniqueId());
-                            } else {
-                                String oldName = info.getButton().getStack().getItemMeta().getDisplayName();
-                                List<String> oldLore = info.getButton().getStack().getItemMeta().getLore();
-                                ItemMeta meta = info.getButton().getStack().getItemMeta();
-
-                                meta.setDisplayName(Color.Red + "No permission");
-                                meta.setLore(new ArrayList<>());
-                                info.getButton().getStack().setItemMeta(meta);
-                                RunUtils.taskLater(() -> {
-                                    if(info.getButton() != null
-                                            && info.getButton().getStack().getItemMeta()
-                                            .getDisplayName().equals(Color.Red + "No permission")) {
-                                        ItemMeta newMeta = info.getButton().getStack().getItemMeta();
-                                        newMeta.setDisplayName(oldName);
-                                        newMeta.setLore(oldLore);
-                                        info.getButton().getStack().setItemMeta(newMeta);
-                                    }
-                                }, Kauri.INSTANCE, 20L);
-                            }
+                                        + LogCommand.getLogsFromUUID(LogsGUI.this.player.getUniqueId()));
+                            });
+                        } else if(info.getClickType().isLeftClick() && info.getClickType().isShiftClick()) {
+                            runFunction(info, "kauri.logs.clear",
+                                    () -> player.performCommand("kauri logs clear " + this.player.getName()));
                         }
                         //TODO Finish clear logs
                     }
@@ -144,11 +128,7 @@ public class LogsGUI extends ChestMenu {
         }
 
         //Setting all empty slots with a filler.
-        IntStream.range(0, 54).filter(index -> {
-            val optional = getButtonByIndex(index);
-
-            return !optional.isPresent() || optional.get().getStack().getType().equals(Material.AIR);
-        }).forEach(index -> setItem(index, new FillerButton()));
+        fill(new FillerButton());
     }
 
     private void updateLogs() {
@@ -181,6 +161,32 @@ public class LogsGUI extends ChestMenu {
         runUpdater();
 
         super.showMenu(player);
+    }
+    
+    private void runFunction(ClickAction.InformationPair info, String permission, Runnable function) {
+        if(shown == null) return;
+
+        if(shown.hasPermission(permission)) {
+            function.run();
+        } else {
+            String oldName = info.getButton().getStack().getItemMeta().getDisplayName();
+            List<String> oldLore = info.getButton().getStack().getItemMeta().getLore();
+            ItemMeta meta = info.getButton().getStack().getItemMeta();
+
+            meta.setDisplayName(Color.Red + "No permission");
+            meta.setLore(new ArrayList<>());
+            info.getButton().getStack().setItemMeta(meta);
+            RunUtils.taskLater(() -> {
+                if(info.getButton() != null
+                        && info.getButton().getStack().getItemMeta()
+                        .getDisplayName().equals(Color.Red + "No permission")) {
+                    ItemMeta newMeta = info.getButton().getStack().getItemMeta();
+                    newMeta.setDisplayName(oldName);
+                    newMeta.setLore(oldLore);
+                    info.getButton().getStack().setItemMeta(newMeta);
+                }
+            }, Kauri.INSTANCE, 20L);
+        }
     }
 
     @Override

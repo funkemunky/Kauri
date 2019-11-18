@@ -13,7 +13,7 @@ public class PacketListener implements AtlasListener {
 
     @Listen
     public void onEvent(PacketReceiveEvent event) {
-        if(!Kauri.INSTANCE.enabled) return;
+        if(!Kauri.INSTANCE.enabled || event.getPacket() == null) return;
 
         if(!Kauri.INSTANCE.dataManager.dataMap.containsKey(event.getPlayer().getUniqueId())) {
             return;
@@ -25,7 +25,7 @@ public class PacketListener implements AtlasListener {
 
     @Listen
     public void onEvent(PacketSendEvent event) {
-        if(!Kauri.INSTANCE.enabled) return;
+        if(!Kauri.INSTANCE.enabled || event.getPacket() == null) return;
 
         if(!Kauri.INSTANCE.dataManager.dataMap.containsKey(event.getPlayer().getUniqueId())) {
             return;

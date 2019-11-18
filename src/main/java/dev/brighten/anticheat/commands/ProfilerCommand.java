@@ -46,9 +46,7 @@ public class ProfilerCommand {
             menu.buildInventory(true);
 
             BukkitTask task = RunUtils.taskTimerAsync(() -> {
-                for(int i = 0 ; i < 54 ; i++) {
-                    menu.setItem(i, new FillerButton());
-                }
+               menu.fill(new FillerButton());
                 Map<String, Long> sorted = dev.brighten.anticheat.utils.MiscUtils
                         .sortByValue(Kauri.INSTANCE.profiler.total);
                 long total = Kauri.INSTANCE.profiler.total.keySet()

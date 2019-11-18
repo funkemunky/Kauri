@@ -30,6 +30,7 @@ public class ChatCheck implements AtlasListener {
 
     @Listen(priority = ListenerPriority.LOW)
     public void onPacketReceive(PacketReceiveEvent event) {
+        if(event.getPacket() == null) return;
         if(event.getType().equals(Packet.Client.CHAT)) {
             WrappedInChatPacket packet = new WrappedInChatPacket(event.getPacket(), event.getPlayer());
 

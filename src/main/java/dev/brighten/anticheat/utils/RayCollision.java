@@ -1,7 +1,6 @@
 package dev.brighten.anticheat.utils;
 
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedPacketPlayOutWorldParticle;
-import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumParticle;
+import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.Tuple;
 import org.bukkit.Location;
@@ -10,7 +9,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 public class RayCollision {

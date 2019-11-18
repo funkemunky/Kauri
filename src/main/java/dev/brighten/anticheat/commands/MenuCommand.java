@@ -113,9 +113,7 @@ public class MenuCommand {
                     menu.addItem(button);
                 });
 
-        for(int i = amt.get() ; i < 27 ; i++) {
-            menu.setItem(i, new FillerButton());
-        }
+        menu.fill(new FillerButton());
 
         return menu;
     }

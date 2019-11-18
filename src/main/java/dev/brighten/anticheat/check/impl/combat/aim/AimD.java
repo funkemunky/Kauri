@@ -1,71 +1,76 @@
 package dev.brighten.anticheat.check.impl.combat.aim;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.TickTimer;
+import cc.funkemunky.api.utils.objects.Interval;
+import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
-import dev.brighten.anticheat.processing.MovementProcessor;
 import dev.brighten.anticheat.utils.MiscUtils;
 
-@CheckInfo(name = "Aim (D)", description = "Designed to detect aimassists attempting to use cinematic smoothing.",
+@CheckInfo(name = "Aim (D)", description = "Designed to detect aimassists attempting that use cinematic smoothing.",
         checkType = CheckType.AIM, punishVL = 10)
 public class AimD extends Check {
 
-    private long lastGCD;
-    private boolean equal;
-    private int yawTicks, pitchTicks, sprintTicks;
-    private float lastPitch, lastYaw, verbose;
+    private float lastYawAccel;
+    private long lastDelta;
+    private EvictingList<Float> gcdList = new EvictingList<>(50);
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
-
-        if(data.playerInfo.deltaYaw == 0) {
-            yawTicks++;
-        } else yawTicks = 0;
-
-        if(data.playerInfo.deltaPitch == 0) {
-            pitchTicks++;
-        } else pitchTicks = 0;
-
-        if(!data.playerInfo.sprinting) {
-            sprintTicks++;
-        } else sprintTicks = 0;
-
         if(packet.isLook()) {
-            if(data.playerInfo.lastAttack.hasPassed(10) || sprintTicks > 4) {
-                verbose = 0;
-                return;
+            float deltaYaw = data.playerInfo.deltaYaw;
+            float accel = data.playerInfo.deltaYaw - data.playerInfo.lDeltaYaw;
+            float deltaAccel = accel - lastYawAccel;
+            float expand = (float)MiscUtils.EXPANDER;
+            float gcd = MiscUtils.gcd((long)(data.playerInfo.deltaYaw * expand),
+                    (long)(data.playerInfo.lDeltaYaw * expand)) / expand;
+            if(gcd >= 0.01) {
+                gcdList.add(gcd);
+            } else {
+                debug(Color.Red + "shit");
             }
 
-            float pitchDelta = MathUtils.getDelta(data.playerInfo.to.pitch, lastPitch);
-            long gcd = MiscUtils.gcd((long)(pitchDelta * MovementProcessor.offset),
-                    (long)(lastPitch * MovementProcessor.offset));
+            //Making sure to get shit within the std for a more accurate result.
+            float mode = MathUtils.getMode(gcdList);
 
-            int resetInteger = yawTicks > 2 ? (pitchTicks * yawTicks) : yawTicks;
+            long delta = getDelta(deltaYaw, mode);
+            float sensitivity = getSensitivityFromGCD(mode);
 
-            if(resetInteger > 3 && verbose > 0) {
-                verbose--;
-            }
+            debug("sens=" + Color.Green + MathUtils.floor(sensitivity / .5f * 100)
+                    + "%" + Color.Gray + " \u0394mouseX=" + delta);
 
-            if(data.playerInfo.cinematicModePitch && verbose > 0) {
-                verbose-= verbose > 0 ? 4 : 0;
-            }
-            if(gcd == lastGCD && Math.abs(data.playerInfo.to.pitch) < 75) {
-                verbose+=2;
-            } else verbose-= verbose > 0 ? 2 : 0;
+            debug("\u0394yaw=" + deltaYaw + " accel=" + accel
+                    + " \u0394accel=" + deltaAccel
+                    + " gcd=" + gcd + " mode=" + mode);
 
-            debug("verbose=" + verbose + " gcd=" + gcd + " lGCD=" + lastGCD);
-            if(data.playerInfo.deltaPitch == 0) {
-                if(verbose > 10) {
-                    vl++;
-                    flag("verbose=" + verbose + " g=" + gcd);
-                }
-                lastYaw = data.playerInfo.to.yaw;
-                lastPitch = data.playerInfo.to.pitch;
-                lastGCD = gcd;
-            }
+            lastYawAccel = accel;
         }
+    }
+    //TODO Condense. This is just for easy reading until I test everything.
+    private static int getDelta(float yawDelta, float gcd) {
+        float f2 = yawToF2(yawDelta);
+        float sens = getSensitivityFromGCD(gcd);
+        float f = sens * .6f + .2f;
+        float f1 = (float)Math.pow(f, 3) * 8;
+
+        return MathUtils.floor(f2 / f1);
+    }
+
+    //TODO Condense. This is just for easy reading until I test everything.
+    private static float getSensitivityFromGCD(float gcd) {
+        float stepOne = yawToF2(gcd) / 8;
+        float stepTwo = (float)Math.cbrt(stepOne);
+        float stepThree = stepTwo - .2f;
+        float stepFour = stepThree / .6f;
+        return stepFour;
+    }
+
+    private static float yawToF2(float yawDelta) {
+        return yawDelta / .15f;
     }
 }

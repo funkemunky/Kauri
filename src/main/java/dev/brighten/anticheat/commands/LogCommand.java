@@ -6,14 +6,13 @@ import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.logs.objects.Punishment;
 import dev.brighten.anticheat.menu.LogsGUI;
 import dev.brighten.anticheat.utils.Pastebin;
+import dev.brighten.anticheat.utils.menu.preset.ConfirmationMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
@@ -62,9 +61,22 @@ public class LogCommand {
                 return;
             }
 
-            cmd.getSender().sendMessage(Color.Gray + "Clearing logs from " + player.getName() + "...");
-            Kauri.INSTANCE.loggerManager.clearLogs(player.getUniqueId());
-            cmd.getSender().sendMessage(Color.Green + "Logs cleared!");
+            if(cmd.getPlayer() != null) {
+                ConfirmationMenu menu = new ConfirmationMenu(
+                        "Are you sure you want to clear " + player.getName() + "'s logs?",
+                        (pl, confirmed) -> {
+                            if(confirmed) {
+                                cmd.getSender().sendMessage(Color.Gray + "Clearing logs from " + player.getName() + "...");
+                                Kauri.INSTANCE.loggerManager.clearLogs(player.getUniqueId());
+                                cmd.getSender().sendMessage(Color.Green + "Logs cleared!");
+                            }
+                        });
+                menu.showMenu(cmd.getPlayer());
+            } else {
+                cmd.getSender().sendMessage(Color.Gray + "Clearing logs from " + player.getName() + "...");
+                Kauri.INSTANCE.loggerManager.clearLogs(player.getUniqueId());
+                cmd.getSender().sendMessage(Color.Green + "Logs cleared!");
+            }
         } else cmd.getSender().sendMessage(Color.Red + "You must provide the name of a player.");
     }
 
