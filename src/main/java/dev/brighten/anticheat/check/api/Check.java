@@ -157,6 +157,7 @@ public class Check {
         register(new AutoclickerD());
         register(new AutoclickerE());
         register(new AutoclickerF());
+        register(new AutoclickerG());
         register(new FlyA());
         register(new FlyB());
         register(new FlyC());

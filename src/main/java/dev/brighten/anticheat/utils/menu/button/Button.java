@@ -2,6 +2,7 @@ package dev.brighten.anticheat.utils.menu.button;
 
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import org.bukkit.inventory.ItemStack;
 
 /**
@@ -11,7 +12,9 @@ import org.bukkit.inventory.ItemStack;
 @Getter
 public class Button {
 
+    @Setter
     private boolean moveable;
+    @Setter
     private ItemStack stack;
     private ClickAction consumer;
 

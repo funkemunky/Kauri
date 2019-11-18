@@ -15,6 +15,8 @@ import lombok.val;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
@@ -89,12 +91,40 @@ public class LogsGUI extends ChestMenu {
                 .owner(player.getName())
                 .name(Color.Red + player.getName())
                 .lore("", "&6Punishments&8: &f" + punishments.size(), "",
-                        "&e&oRight Click &7&oto get an &f&ounlisted &7&opastebin link of the logs.").build(),
+                        (shown != null && shown.hasPermission("kauri.logs.share")
+                                ? "&c&o(No Permission) &e&o&mRight Click &7&o&mto get an &f&o&munlisted &7&o&mpastebin link of the logs."
+                                : "&e&oRight Click &7&oto get an &f&ounlisted &7&opastebin link of the logs."),
+                        (shown != null && shown.hasPermission("kauri.logs.clear")
+                                ? "&c&o(No Permission) &e&o&mShift Right Click &7&o&mto &f&o&mclear &7&o&mthe logs of " + player.getName()
+                                : "&e&oShift Right Click &7&oto &f&oclear &7&othe logs of " + player.getName())).build(),
                 (player, info) -> {
-                    if (player.hasPermission("kauri.logs.pastebin") && info.getClickType().isRightClick()) {
-                        close(player);
-                        player.sendMessage(Color.Green + "Logs: "
-                                + LogCommand.getLogsFromUUID(LogsGUI.this.player.getUniqueId()));
+                    if (player.hasPermission("kauri.logs.share")) {
+                        if(info.getClickType().isRightClick()) {
+                            if(player.hasPermission("kauri.logs.share")) {
+                                close(player);
+                                player.sendMessage(Color.Green + "Logs: "
+                                        + LogCommand.getLogsFromUUID(LogsGUI.this.player.getUniqueId());
+                            } else {
+                                String oldName = info.getButton().getStack().getItemMeta().getDisplayName();
+                                List<String> oldLore = info.getButton().getStack().getItemMeta().getLore();
+                                ItemMeta meta = info.getButton().getStack().getItemMeta();
+
+                                meta.setDisplayName(Color.Red + "No permission");
+                                meta.setLore(new ArrayList<>());
+                                info.getButton().getStack().setItemMeta(meta);
+                                RunUtils.taskLater(() -> {
+                                    if(info.getButton() != null
+                                            && info.getButton().getStack().getItemMeta()
+                                            .getDisplayName().equals(Color.Red + "No permission")) {
+                                        ItemMeta newMeta = info.getButton().getStack().getItemMeta();
+                                        newMeta.setDisplayName(oldName);
+                                        newMeta.setLore(oldLore);
+                                        info.getButton().getStack().setItemMeta(newMeta);
+                                    }
+                                }, Kauri.INSTANCE, 20L);
+                            }
+                        }
+                        //TODO Finish clear logs
                     }
                 });
 

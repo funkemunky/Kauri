@@ -27,7 +27,7 @@ public class AutoclickerF extends Check {
     public void onAnimation(WrappedInArmAnimationPacket packet, long timeStamp) {
         long delta = timeStamp - lastClick;
 
-        if(delta > 400 || data.lagInfo.lastPacketDrop.hasNotPassed(1)) {
+        if(delta > 400 || delta < 49) {
             lastClick = timeStamp;
             return;
         }
@@ -45,28 +45,22 @@ public class AutoclickerF extends Check {
                     .filter(l -> MathUtils.getDelta(l, avg) < std)
                     .collect(Collectors.toList());
 
-            LongSummaryStatistics disStats = MiscUtils.listToStream(distinct).summaryStatistics();
             LongSummaryStatistics devStats = MiscUtils.listToStream(withinDeviation).summaryStatistics();
 
-            debug("(longshit) avg=" + MathUtils.round(disStats.getAverage(), 4)
-                    + " min=" + disStats.getMin() + " max=" + disStats.getMax() + " count=" + disStats.getCount());
-
-            if(disStats.getMin() == lastMinimum && MathUtils.getDelta(avg, lastAvg) > 4) {
-                if(disStats.getMax() == lastMaximum) vl++;
+            if(devStats.getMin() == lastMinimum && MathUtils.getDelta(avg, lastAvg) > 4) {
+                if(devStats.getMax() == lastMaximum) vl++;
                 if(vl++ > 4) {
-                    flag("ur nigga ass using an autoclicker");
+                    flag("min=" + devStats.getMin() + " max=" + devStats.getMax() + " avg=" + MathUtils.round(devStats.getAverage(), 4));
                 }
                 debug(Color.Green + "Flagged");
             } else vl-= vl > 0 ? 2 : 0;
 
-            debug("avg=" + devStats.getAverage() + " max=" + devStats.getMax()
-                    + " min=" + devStats.getMin() + " count=" + devStats.getCount());
+            debug("totalAvg=" + avg + " avg=" + devStats.getAverage() + " max=" + devStats.getMax()
+                    + " min=" + devStats.getMin() + " count=" + devStats.getCount() + " vl=" + vl);
 
-            debug("vl=" + vl);
-
-            lastMaximum = disStats.getMax();
-            lastMinimum = disStats.getMin();
-            lastAvg = disStats.getAverage();
+            lastMaximum = devStats.getMax();
+            lastMinimum = devStats.getMin();
+            lastAvg = avg;
             clickValues.clear();
             distinct.clear();
         } else clickValues.add(delta);
