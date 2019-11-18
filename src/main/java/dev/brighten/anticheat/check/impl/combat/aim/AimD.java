@@ -27,27 +27,33 @@ public class AimD extends Check {
             float accel = data.playerInfo.deltaYaw - data.playerInfo.lDeltaYaw;
             float deltaAccel = accel - lastYawAccel;
             float expand = (float)MiscUtils.EXPANDER;
-            float gcd = MiscUtils.gcd((long)(data.playerInfo.deltaYaw * expand),
-                    (long)(data.playerInfo.lDeltaYaw * expand)) / expand;
+            float gcd = MiscUtils.gcd((long)(MathUtils.yawTo180F(data.playerInfo.deltaYaw) * expand),
+                    (long)(MathUtils.yawTo180F(data.playerInfo.lDeltaYaw) * expand)) / expand;
             if(gcd >= 0.01) {
                 gcdList.add(gcd);
             } else {
-                debug(Color.Red + "shit");
+                //debug(Color.Red + "shit");
             }
 
             //Making sure to get shit within the std for a more accurate result.
             float mode = MathUtils.getMode(gcdList);
 
-            long delta = getDelta(deltaYaw, mode);
+            int delta = getDelta(deltaYaw, mode);
             float sensitivity = getSensitivityFromGCD(mode);
 
-            debug("sens=" + Color.Green + MathUtils.floor(sensitivity / .5f * 100)
+            if(MathUtils.getDelta(delta, lastDelta) < 15 && delta > 20) {
+                vl++;
+                debug(Color.Green + "Flag: " + delta + ", " + lastDelta + ", " + vl);
+            } else vl = 0;
+
+            /*debug("sens=" + Color.Green + MathUtils.floor(sensitivity / .5f * 100)
                     + "%" + Color.Gray + " \u0394mouseX=" + delta);
 
             debug("\u0394yaw=" + deltaYaw + " accel=" + accel
                     + " \u0394accel=" + deltaAccel
-                    + " gcd=" + gcd + " mode=" + mode);
+                    + " gcd=" + gcd + " mode=" + mode);*/
 
+            lastDelta = delta;
             lastYawAccel = accel;
         }
     }
