@@ -78,6 +78,8 @@ public class PredictionService {
                 WrappedInKeepAlivePacket packet = new WrappedInKeepAlivePacket(e.getPacket(), e.getPlayer());
                 if(packet.getTime() == 255) {
                     velocity = true;
+                    data.playerInfo.lastVelocity.reset();
+                    data.playerInfo.lastVelocityTimestamp = e.getTimeStamp();
                     dev.brighten.anticheat.utils.MiscUtils
                             .testMessage("&evelX=" + velocityX + " velZ=" + velocityZ);
                 } else if(packet.getTime() == 233) {

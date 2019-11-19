@@ -116,20 +116,19 @@ public class Check {
     }
 
     public void punish() {
+        if(developer || !executable || punishVl == -1 || vl <= punishVl) return;
         RunUtils.task(() -> {
-            if(executable && punishVl != -1 && vl > punishVl) {
-                Kauri.INSTANCE.loggerManager.addPunishment(data, this);
-                if(!Config.broadcastMessage.equalsIgnoreCase("off")) {
-                    Bukkit.broadcastMessage(Color.translate(Config.broadcastMessage
-                            .replace("%name%", data.getPlayer().getName())));
-                }
-                ConsoleCommandSender sender = Bukkit.getConsoleSender();
-                Config.punishCommands.
-                        forEach(cmd -> Bukkit.dispatchCommand(
-                                sender,
-                                cmd.replace("%name%", data.getPlayer().getName())));
-                vl = 0;
+            Kauri.INSTANCE.loggerManager.addPunishment(data, this);
+            if(!Config.broadcastMessage.equalsIgnoreCase("off")) {
+                Bukkit.broadcastMessage(Color.translate(Config.broadcastMessage
+                        .replace("%name%", data.getPlayer().getName())));
             }
+            ConsoleCommandSender sender = Bukkit.getConsoleSender();
+            Config.punishCommands.
+                    forEach(cmd -> Bukkit.dispatchCommand(
+                            sender,
+                            cmd.replace("%name%", data.getPlayer().getName())));
+            vl = 0;
         }, Kauri.INSTANCE);
     }
 

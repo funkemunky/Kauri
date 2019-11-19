@@ -30,8 +30,8 @@ public class VelocityB extends Check {
     }
 
     @Packet
-    public void onUseEntity(WrappedInUseEntityPacket packet) {
-        if( data.playerInfo.lastVelocity.hasNotPassed(5)
+    public void onUseEntity(WrappedInUseEntityPacket packet, long timeStamp) {
+        if((timeStamp - data.playerInfo.lastVelocityTimestamp < 300)
                 && (data.predictionService.lastSprint || (
                         data.getPlayer().getItemInHand() != null
                         && data.getPlayer().getItemInHand().containsEnchantment(Enchantment.KNOCKBACK)))
@@ -91,7 +91,7 @@ public class VelocityB extends Check {
 
                     debug("pct=" + pct + " key=" + data.predictionService.key + " ani="
                             + data.playerInfo.isAnimated + " sprint=" + data.playerInfo.sprinting
-                            + " ground=" + packet.isGround() + " vl=" + vl);
+                            + " ground=" + data.playerInfo.lClientGround + " vl=" + vl);
 
                     //debug("vX=" + vX + " vZ=" + vZ);
                     //debug("dX=" + data.playerInfo.deltaX + " dZ=" + data.playerInfo.deltaZ + " item=" +);
@@ -99,7 +99,7 @@ public class VelocityB extends Check {
                     vX *= f4;
                     vZ *= f4;
 
-                    if(timeStamp - velocityTS > 300) {
+                    if(timeStamp - data.playerInfo.lastVelocityTimestamp > 300) {
                         vX = vZ = 0;
                     }
                 } else vX = vZ = 0;

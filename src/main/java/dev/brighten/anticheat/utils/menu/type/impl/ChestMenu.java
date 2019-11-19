@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import java.util.Iterator;
@@ -62,7 +63,9 @@ public class ChestMenu implements Menu {
 
     @Override
     public void fillRange(int startingIndex, int endingIndex, Button button) {
-        IntStream.range(startingIndex, endingIndex).forEach(i -> setItem(i, button));
+        IntStream.range(startingIndex, endingIndex)
+                .filter(i -> contents[i] == null || contents[i].getStack().getItemMeta().equals(Material.AIR))
+                .forEach(i -> setItem(i, button));
     }
 
     @Override

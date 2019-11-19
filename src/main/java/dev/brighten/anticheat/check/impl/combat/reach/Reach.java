@@ -14,6 +14,7 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.KLocation;
 import dev.brighten.anticheat.utils.RayCollision;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.Vector;
@@ -44,7 +45,7 @@ public class Reach extends Check {
                     .stream()
                     .filter(loc -> loc.timeStamp >= shit)
                     .map(kloc -> kloc.toLocation(data.getPlayer().getWorld())
-                    .add(0, data.getPlayer().getEyeHeight(), 0))
+                            .add(0, data.getPlayer().getEyeHeight(), 0))
                     .collect(Collectors.toList());
 
             List<BoundingBox> previousLocations = data.targetPastLocation
@@ -86,6 +87,7 @@ public class Reach extends Check {
     private static boolean checkParameters(ObjectData data, long timeStamp) {
         return timeStamp - data.playerInfo.lastAttackTimeStamp < 5
                 && data.target != null
+                && !MiscUtils.containsIgnoreCase(data.getPlayer().getGameMode().toString(), "gamemode")
                 && allowedEntities.contains(data.target.getType())
                 && !data.playerInfo.inCreative;
     }

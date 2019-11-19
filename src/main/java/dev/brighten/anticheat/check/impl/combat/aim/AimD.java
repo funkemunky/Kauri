@@ -4,79 +4,44 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.TickTimer;
-import cc.funkemunky.api.utils.objects.Interval;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.processing.MovementProcessor;
 import dev.brighten.anticheat.utils.MiscUtils;
 
+import java.math.RoundingMode;
+
 @CheckInfo(name = "Aim (D)", description = "Designed to detect aimassists attempting that use cinematic smoothing.",
-        checkType = CheckType.AIM, punishVL = 10)
+        checkType = CheckType.AIM, punishVL = 20, developer = true, executable = false)
 public class AimD extends Check {
 
-    private float lastYawAccel;
-    private long lastDelta;
-    private EvictingList<Float> gcdList = new EvictingList<>(50);
+    private int verbose;
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
         if(packet.isLook()) {
-            float deltaYaw = data.playerInfo.deltaYaw;
-            float accel = data.playerInfo.deltaYaw - data.playerInfo.lDeltaYaw;
-            float deltaAccel = accel - lastYawAccel;
-            float expand = (float)MiscUtils.EXPANDER;
-            float gcd = MiscUtils.gcd((long)(MathUtils.yawTo180F(data.playerInfo.deltaYaw) * expand),
-                    (long)(MathUtils.yawTo180F(data.playerInfo.lDeltaYaw) * expand)) / expand;
-            if(gcd >= 0.01) {
-                gcdList.add(gcd);
-            } else {
-                //debug(Color.Red + "shit");
+            boolean cinematic = data.playerInfo.cinematicModePitch || data.playerInfo.cinematicModeYaw;
+            boolean goodToGo = data.moveProcessor.yawGcdList.size() > 30;
+
+            if(!cinematic && goodToGo) {
+                long deltaX = MathUtils.getDelta(data.moveProcessor.deltaX, data.moveProcessor.lastDeltaX);
+                if(data.playerInfo.lastAttack.hasNotPassed(25)
+                        && data.playerInfo.lastVelocity.hasNotPassed(200)
+                        && (data.moveProcessor.deltaY == 0 || deltaX < 3)) {
+                    verbose++;
+                    if(verbose > 5) {
+                        vl++;
+                        flag("y=" + data.moveProcessor.deltaY
+                                + " sens=" + data.moveProcessor.sensitivityX
+                                + " deltaX=" + deltaX
+                                + " verbose=" + verbose);
+                    }
+                } else verbose = 0;
+                debug(data.moveProcessor.deltaY + ", " + data.moveProcessor.deltaX + " verbose=" + verbose);
             }
-
-            //Making sure to get shit within the std for a more accurate result.
-            float mode = MathUtils.getMode(gcdList);
-
-            int delta = getDelta(deltaYaw, mode);
-            float sensitivity = getSensitivityFromGCD(mode);
-
-            if(MathUtils.getDelta(delta, lastDelta) < 15 && delta > 20) {
-                vl++;
-                debug(Color.Green + "Flag: " + delta + ", " + lastDelta + ", " + vl);
-            } else vl = 0;
-
-            /*debug("sens=" + Color.Green + MathUtils.floor(sensitivity / .5f * 100)
-                    + "%" + Color.Gray + " \u0394mouseX=" + delta);
-
-            debug("\u0394yaw=" + deltaYaw + " accel=" + accel
-                    + " \u0394accel=" + deltaAccel
-                    + " gcd=" + gcd + " mode=" + mode);*/
-
-            lastDelta = delta;
-            lastYawAccel = accel;
         }
-    }
-    //TODO Condense. This is just for easy reading until I test everything.
-    private static int getDelta(float yawDelta, float gcd) {
-        float f2 = yawToF2(yawDelta);
-        float sens = getSensitivityFromGCD(gcd);
-        float f = sens * .6f + .2f;
-        float f1 = (float)Math.pow(f, 3) * 8;
-
-        return MathUtils.floor(f2 / f1);
-    }
-
-    //TODO Condense. This is just for easy reading until I test everything.
-    private static float getSensitivityFromGCD(float gcd) {
-        float stepOne = yawToF2(gcd) / 8;
-        float stepTwo = (float)Math.cbrt(stepOne);
-        float stepThree = stepTwo - .2f;
-        float stepFour = stepThree / .6f;
-        return stepFour;
-    }
-
-    private static float yawToF2(float yawDelta) {
-        return yawDelta / .15f;
     }
 }

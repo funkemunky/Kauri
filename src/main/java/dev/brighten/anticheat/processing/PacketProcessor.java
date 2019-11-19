@@ -9,6 +9,7 @@ import cc.funkemunky.api.utils.ReflectionsUtil;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.KLocation;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.LivingEntity;
 
 public class PacketProcessor {
@@ -57,7 +58,7 @@ public class PacketProcessor {
                     data.lagInfo.lastPacketDrop.reset();
                 }
                 data.lagInfo.lastFlying = currentTime;
-                MovementProcessor.process(data, packet, timeStamp);
+                data.moveProcessor.process(packet, timeStamp);
                 data.checkManager.runPacket(packet, timeStamp);
                 if(data.playerInfo.serverPos) data.playerInfo.serverPos = false;
                 break;
@@ -114,8 +115,8 @@ public class PacketProcessor {
                     data.playerInfo.serverPos = true;
                 }
                 else if(packet.getAction() == (short) 101) {
-                    data.playerInfo.lastVelocity.reset();
-                    data.playerInfo.lastVelocityTimestamp = timeStamp;
+                    //data.playerInfo.lastVelocity.reset();
+                    //data.playerInfo.lastVelocityTimestamp = timeStamp;
                 }
                 else if (packet.getAction() == (short) 69) {
                     data.lagInfo.lastTransPing = data.lagInfo.transPing;

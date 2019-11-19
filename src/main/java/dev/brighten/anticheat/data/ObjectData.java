@@ -8,6 +8,7 @@ import dev.brighten.anticheat.data.classes.BlockInformation;
 import dev.brighten.anticheat.data.classes.CheckManager;
 import dev.brighten.anticheat.data.classes.PlayerInformation;
 import dev.brighten.anticheat.data.classes.PredictionService;
+import dev.brighten.anticheat.processing.MovementProcessor;
 import dev.brighten.anticheat.utils.PastLocation;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
@@ -35,6 +36,7 @@ public class ObjectData {
     public BlockInformation blockInfo;
     public LagInformation lagInfo;
     public PredictionService predictionService;
+    public MovementProcessor moveProcessor;
     public int hashCode;
 
     public ObjectData(UUID uuid) {
@@ -53,6 +55,7 @@ public class ObjectData {
         checkManager = new CheckManager(this);
         checkManager.addChecks();
         predictionService = new PredictionService(this);
+        moveProcessor = new MovementProcessor(this);
 
     }
 
