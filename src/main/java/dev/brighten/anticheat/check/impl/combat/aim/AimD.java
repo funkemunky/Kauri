@@ -30,6 +30,7 @@ public class AimD extends Check {
                 long deltaX = MathUtils.getDelta(data.moveProcessor.deltaX, data.moveProcessor.lastDeltaX);
                 if(data.playerInfo.lastAttack.hasNotPassed(25)
                         && data.playerInfo.lastVelocity.hasNotPassed(200)
+                        && data.moveProcessor.deltaX > 0
                         && (data.moveProcessor.deltaY == 0 || deltaX < 3)) {
                     verbose++;
                     if(verbose > 5) {

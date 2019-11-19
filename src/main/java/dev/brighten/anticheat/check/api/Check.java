@@ -144,11 +144,6 @@ public class Check {
     public static void registerChecks() {
         register(new AutoclickerA());
         register(new AutoclickerB());
-        register(new AutoclickerC());
-        register(new AutoclickerD());
-        register(new AutoclickerE());
-        register(new AutoclickerF());
-        register(new AutoclickerG());
         register(new FlyA());
         register(new FlyB());
         register(new FlyC());

@@ -16,11 +16,11 @@ public class AimA extends Check {
             float yawAccel = MathUtils.getDelta(data.playerInfo.lDeltaYaw, data.playerInfo.deltaYaw);
             float pitchAccel = MathUtils.getDelta(data.playerInfo.lDeltaPitch, data.playerInfo.deltaPitch);
 
-            if(yawAccel < 1E-3 && pitchAccel < 1E-4 && data.playerInfo.deltaYaw > 1) {
-                if(vl++ > 25) {
+            if(yawAccel < 1E-3 && pitchAccel < 1E-4 && (data.moveProcessor.deltaX > 2 || data.moveProcessor.deltaY > 2)) {
+                if(vl++ > 20) {
                     flag("yawAccel=" + yawAccel + " pitchAccel=" + pitchAccel);
                 }
-            } else vl-= vl > 0 ? 5 : 0;
+            } else vl-= vl > 0 ? 2 : 0;
 
             debug("yaw=" + yawAccel + " pitch=" + pitchAccel + " vl=" + vl
                     + " yd=" + data.playerInfo.deltaYaw);

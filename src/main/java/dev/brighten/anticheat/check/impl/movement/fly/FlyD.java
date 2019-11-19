@@ -19,6 +19,7 @@ public class FlyD extends Check {
                     && data.playerInfo.halfBlockTicks == 0
                     && !data.playerInfo.flightCancel
                     && !data.playerInfo.clientGround
+                    && !data.lagInfo.lagging
                     && !data.playerInfo.wasOnSlime
                     && data.playerInfo.lastBlockPlace.hasPassed(10)
                     && timeStamp - data.playerInfo.lastVelocityTimestamp > 250L) {

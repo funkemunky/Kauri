@@ -17,7 +17,6 @@ import org.bukkit.enchantments.Enchantment;
 public class VelocityB extends Check {
 
     private double vX, vZ;
-    private long velocityTS;
     private float forward, strafe;
 
     @Packet
@@ -25,7 +24,6 @@ public class VelocityB extends Check {
         if(packet.getId() == data.getPlayer().getEntityId()) {
             vX = packet.getX();
             vZ = packet.getZ();
-            velocityTS = timeStamp;
         }
     }
 
@@ -85,7 +83,7 @@ public class VelocityB extends Check {
                     double vXZ = MathUtils.hypot(vX, vZ);
                     pct = data.playerInfo.deltaXZ / vXZ * 100;
 
-                    if (pct < 99.4 && !data.playerInfo.usingItem && !data.predictionService.useSword) {
+                    if (pct < 99.4 && !data.lagInfo.lagging && !data.playerInfo.usingItem && !data.predictionService.useSword) {
                         if (vl++ > 15) flag("pct=" + MathUtils.round(pct, 3) + "%");
                     } else vl -= vl > 0 ? 0.5 : 0;
 

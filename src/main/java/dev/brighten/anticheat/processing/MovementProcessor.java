@@ -27,8 +27,9 @@ public class MovementProcessor {
     public EvictingList<Float> yawGcdList = new EvictingList<>(50);
     public long deltaX, deltaY, lastDeltaX, lastDeltaY;
     public float sensitivityX, sensitivityY, yawMode, pitchMode;
-    public EvictingList<Float> pitchGcdList = new EvictingList<>(40);
+    public EvictingList<Float> pitchGcdList = new EvictingList<>(50);
     public TickTimer lastEquals = new TickTimer(6);
+    private TickTimer lastReset = new TickTimer(1);
 
     public static float offset = 16777216L;
 
@@ -91,8 +92,11 @@ public class MovementProcessor {
             if(yawGcdList.size() > 3 && pitchGcdList.size() > 3) {
 
                 //Making sure to get shit within the std for a more accurate result.
-                yawMode = MathUtils.getMode(yawGcdList);
-                pitchMode = MathUtils.getMode(pitchGcdList);
+                if(lastReset.hasPassed()) {
+                    yawMode = MathUtils.getMode(yawGcdList);
+                    pitchMode = MathUtils.getMode(pitchGcdList);
+                    lastReset.reset();
+                }
 
 
                 lastDeltaX = deltaX;
