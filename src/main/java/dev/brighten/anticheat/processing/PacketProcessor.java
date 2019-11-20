@@ -115,8 +115,8 @@ public class PacketProcessor {
                     data.playerInfo.serverPos = true;
                 }
                 else if(packet.getAction() == (short) 101) {
-                    //data.playerInfo.lastVelocity.reset();
-                    //data.playerInfo.lastVelocityTimestamp = timeStamp;
+                    data.playerInfo.lastVelocity.reset();
+                    data.playerInfo.lastVelocityTimestamp = timeStamp;
                 }
                 else if (packet.getAction() == (short) 69) {
                     data.lagInfo.lastTransPing = data.lagInfo.transPing;

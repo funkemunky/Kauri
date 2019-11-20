@@ -40,17 +40,15 @@ public class Reach extends Check {
     public void onUse(WrappedInFlyingPacket packet, long timeStamp) {
         if(checkParameters(data, timeStamp)) {
             long shit = timeStamp - 120;
-            List<Location> point = data.pastLocation
-                    .previousLocations
+            List<Location> point = data.pastLocation.getEstimatedLocation(0, Math.max(data.lagInfo.transPing, 150L))
                     .stream()
-                    .filter(loc -> loc.timeStamp >= shit)
                     .map(kloc -> kloc.toLocation(data.getPlayer().getWorld())
-                            .add(0, data.getPlayer().getEyeHeight(), 0))
+                    .add(0, data.getPlayer().getEyeHeight(), 0))
                     .collect(Collectors.toList());
 
             List<BoundingBox> previousLocations = data.targetPastLocation
-                    .getEstimatedLocation(data.lagInfo.transPing
-                            , 150L)
+                    .getEstimatedLocation(0
+                            , Math.max(150L, data.lagInfo.transPing))
                     .stream()
                     .map(loc -> getHitbox(loc, data.target.getType()))
                     .collect(Collectors.toList());
@@ -71,15 +69,15 @@ public class Reach extends Check {
                 }
             }
 
-            if(collided > 1) {
+            if(collided > 1 && data.lagInfo.lastPacketDrop.hasPassed(1)) {
                 double reach = reaches.stream().mapToDouble(val -> val).min().orElse(0);
 
-                if(reach > 3.04 && collided > 8) {
-                    if((vl+= (collided > 10 ? 1 : 0.5f)) > 4) {
+                if(reach > 3.02) {
+                    if((vl+= (collided > 4 ? 1 : 0.5f)) > 4) {
                         flag("reach=" + reach + " collided=" + collided);
                     }
                 } else vl-= vl > 0 ? (data.lagInfo.lagging ? 0.025 : 0.02) : 0;
-                debug((reach > 3.01 && collided > 3 ? Color.Green : "") + "reach=" + reach + " collided=" + collided + "vl=" + vl);
+                debug((reach > 3.02 ? Color.Green : "") + "reach=" + reach + " collided=" + collided + "vl=" + vl);
             }
         }
     }

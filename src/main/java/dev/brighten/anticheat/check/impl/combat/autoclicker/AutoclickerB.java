@@ -14,49 +14,37 @@ import dev.brighten.anticheat.check.api.Packet;
         checkType = CheckType.AUTOCLICKER)
 public class AutoclickerB extends Check {
 
-    private Interval<Long> delta = new Interval<>(0, 25);
-
-    private long lastTS;
-    private double lAvg, lStd, lRange, lRatio;
+    private Interval interval = new Interval(0, 100);
+    private long lastTimestamp;
+    private double lStd, lAvg;
 
     @Packet
-    public void onArmAnimation(WrappedInArmAnimationPacket packet, long timeStamp) {
+    public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
 
-        long deltaClick = timeStamp - lastTS;
+        long delta = timeStamp - lastTimestamp;
 
-        if(deltaClick > 2000L || deltaClick < 3) {
-            lastTS = timeStamp;
+        if(delta > 2000 || delta < 3) {
+            lastTimestamp = timeStamp;
             return;
         }
 
-        if(delta.size() > 20) {
-            delta.removeLast();
-        }
+        if(interval.size() >= 80) {
+            double avg = interval.average();
+            double std = interval.std();
 
-        delta.addFirst(deltaClick);
+            if(std < 40 && avg < 140) {
+                if(vl++ > 3) {
+                    flag("std=" + std + " avg=" + avg);
+                }
+                debug(Color.Green + "Flagged");
+            } else vl-= vl > 0 ? 0.5f : 0;
 
-        double std = delta.std();
-        double avg = delta.average();
-        double range = delta.max() - delta.min();
+            debug("std=" + std + " avg=" + avg + " vl=" + vl);
+            interval.clear();
+            lStd = std;
+            lAvg = avg;
+        } else interval.add(delta);
 
-        double ratio = avg / std;
-
-        if(MathUtils.getDelta(ratio, lRatio) < 0.3
-                && MathUtils.getDelta(std, lStd) > 2
-                && MathUtils.getDelta(avg, lAvg) > 1) {
-            vl++;
-            if(vl > 15) {
-                flag("std=" + MathUtils.round(std, 2) + " ratio=" + MathUtils.round(ratio, 2)
-                        + " avg=" + MathUtils.round(avg, 2));
-            }
-        } else vl-= vl > 0 ? 0.25 : 0;
-
-        debug("ratio=" + Color.Green + ratio + Color.Gray + "std=" + std + " avg=" + avg
-                + " range=" + range + " vl=" + vl);
-        lastTS = timeStamp;
-        lStd = std;
-        lAvg = avg;
-        lRange = range;
-        lRatio = ratio;
+        lastTimestamp = timeStamp;
     }
 }

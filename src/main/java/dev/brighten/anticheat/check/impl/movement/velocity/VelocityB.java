@@ -1,7 +1,6 @@
 package dev.brighten.anticheat.check.impl.movement.velocity;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.*;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.MathHelper;
 import cc.funkemunky.api.utils.MathUtils;
@@ -17,10 +16,13 @@ import org.bukkit.enchantments.Enchantment;
 public class VelocityB extends Check {
 
     private double vX, vZ;
+    private boolean useEntity, usingItem;
     private float forward, strafe;
+    private String lastKey;
+    private long velocityTS;
 
     @Packet
-    public void onVelocity(WrappedOutVelocityPacket packet, long timeStamp) {
+    public void onVelocity(WrappedOutVelocityPacket packet) {
         if(packet.getId() == data.getPlayer().getEntityId()) {
             vX = packet.getX();
             vZ = packet.getZ();
@@ -29,25 +31,55 @@ public class VelocityB extends Check {
 
     @Packet
     public void onUseEntity(WrappedInUseEntityPacket packet, long timeStamp) {
-        if((timeStamp - data.playerInfo.lastVelocityTimestamp < 300)
-                && (data.predictionService.lastSprint || (
+        if(!useEntity && (data.predictionService.lastSprint || (
                         data.getPlayer().getItemInHand() != null
                         && data.getPlayer().getItemInHand().containsEnchantment(Enchantment.KNOCKBACK)))
                 && packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) {
-            vX*= 0.6f;
-            vZ*= 0.6f;
+            useEntity = true;
         }
+        if(usingItem) usingItem = false;
+    }
+
+    @Packet
+    public void onTransaction(WrappedInTransactionPacket packet, long timeStamp) {
+        if(packet.getAction() == (short)101) {
+            velocityTS = timeStamp;
+        }
+    }
+
+    @Packet
+    public void onBlockPlace(WrappedInBlockPlacePacket packet) {
+        if(packet.getPosition().getX() == -1
+                && packet.getPosition().getZ() == -1
+                && packet.getItemStack() != null) {
+            usingItem = true;
+        }
+        /*debug("place: " + packet.getPosition().getX() + ", "
+                + packet.getPosition().getY() + ", " + packet.getPosition().getZ() + ", "
+                + (packet.getItemStack() != null));*/
+    }
+
+    @Packet
+    public void onPlace(WrappedInBlockDigPacket packet) {
+        if(usingItem) usingItem = false;
+        /*debug("dig: " + packet.getPosition().getX() + ", "
+                + packet.getPosition().getY() + ", " + packet.getPosition().getZ()
+                + " action=" + packet.getAction().name());*/
     }
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if((vX != 0 || vZ != 0)) {
-            if(timeStamp - data.playerInfo.lastVelocityTimestamp < 400) {
+            if(timeStamp - velocityTS < 400) {
+                if(useEntity) {
+                    vX*= 0.6;
+                    vZ*= 0.6;
+                }
                 if(!data.blockInfo.blocksNear
                         && !data.blockInfo.inWeb
+                        && data.predictionService.key.equals(lastKey)
                         && !data.playerInfo.onLadder
                         && !data.blockInfo.inLiquid
-                        && !data.lagInfo.lagging
                         && !data.playerInfo.serverPos
                         && !data.getPlayer().getAllowFlight()) {
 
@@ -66,12 +98,12 @@ public class VelocityB extends Check {
                         f5 = data.playerInfo.sprinting ? 0.026f : 0.02f;
                     }
 
-                    double pct = 100;
+                    double pct;
 
                     forward = data.predictionService.moveForward;
                     strafe = data.predictionService.moveStrafing;
 
-                    if(data.playerInfo.isAnimated) {
+                    if(usingItem) {
                         forward*= 0.2f;
                         strafe*= 0.2f;
                     }
@@ -83,13 +115,18 @@ public class VelocityB extends Check {
                     double vXZ = MathUtils.hypot(vX, vZ);
                     pct = data.playerInfo.deltaXZ / vXZ * 100;
 
-                    if (pct < 99.4 && !data.lagInfo.lagging && !data.playerInfo.usingItem && !data.predictionService.useSword) {
-                        if (vl++ > 15) flag("pct=" + MathUtils.round(pct, 3) + "%");
-                    } else vl -= vl > 0 ? 0.5 : 0;
+                    if (pct < 99.9
+                            && !data.playerInfo.usingItem && !data.predictionService.useSword) {
+                        if(data.lagInfo.lastPacketDrop.hasPassed(1)) {
+                            if (strafe == 0 && forward == 0 && !data.lagInfo.lagging) vl+= 2;
+                            if ((vl+= strafe == 0 ? 1 : 0.5) > 15) flag("pct=" + MathUtils.round(pct, 3) + "%");
+                        }
+                    } else vl -= vl > 0 ? data.lagInfo.lagging ? 0.2f : 0.1f : 0;
 
                     debug("pct=" + pct + " key=" + data.predictionService.key + " ani="
-                            + data.playerInfo.isAnimated + " sprint=" + data.playerInfo.sprinting
-                            + " ground=" + data.playerInfo.lClientGround + " vl=" + vl);
+                            + usingItem + " sprint=" + data.playerInfo.sprinting
+                            + " ground=" + data.playerInfo.lClientGround + ", " + data.playerInfo.clientGround
+                            + " vl=" + vl);
 
                     //debug("vX=" + vX + " vZ=" + vZ);
                     //debug("dX=" + data.playerInfo.deltaX + " dZ=" + data.playerInfo.deltaZ + " item=" +);
@@ -97,12 +134,14 @@ public class VelocityB extends Check {
                     vX *= f4;
                     vZ *= f4;
 
-                    if(timeStamp - data.playerInfo.lastVelocityTimestamp > 300) {
+                    if(timeStamp - velocityTS > 200) {
                         vX = vZ = 0;
                     }
                 } else vX = vZ = 0;
             }
         }
+        lastKey = data.predictionService.key;
+        useEntity = false;
     }
 
     private void moveFlying(float strafe, float forward, float friction) {
