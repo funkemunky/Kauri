@@ -42,12 +42,14 @@ public class AutoclickerB extends Check {
 
         double ratio = avg / std;
 
-        if(std > 40
-                && MathUtils.getDelta(ratio, lRatio) < 0.3
+        if(MathUtils.getDelta(ratio, lRatio) < 0.3
                 && MathUtils.getDelta(std, lStd) > 2
                 && MathUtils.getDelta(avg, lAvg) > 1) {
             vl++;
-            debug(Color.Green + "kachow: " + vl);
+            if(vl > 15) {
+                flag("std=" + MathUtils.round(std, 2) + " ratio=" + MathUtils.round(ratio, 2)
+                        + " avg=" + MathUtils.round(avg, 2));
+            }
         } else vl-= vl > 0 ? 0.25 : 0;
 
         debug("ratio=" + Color.Green + ratio + Color.Gray + "std=" + std + " avg=" + avg
