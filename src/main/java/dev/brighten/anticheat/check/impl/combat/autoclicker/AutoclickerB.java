@@ -18,7 +18,6 @@ public class AutoclickerB extends Check {
 
     private long lastTS;
     private double lAvg, lStd, lRange, lRatio;
-    private TickTimer lastRatioChange = new TickTimer(20), lastStdChange = new TickTimer(20);
 
     @Packet
     public void onArmAnimation(WrappedInArmAnimationPacket packet, long timeStamp) {
@@ -53,7 +52,7 @@ public class AutoclickerB extends Check {
         } else vl-= vl > 0 ? 0.25 : 0;
 
         debug("ratio=" + Color.Green + ratio + Color.Gray + "std=" + std + " avg=" + avg
-                + " range=" + range + " passed=" + lastRatioChange.getPassed());
+                + " range=" + range + " vl=" + vl);
         lastTS = timeStamp;
         lStd = std;
         lAvg = avg;
