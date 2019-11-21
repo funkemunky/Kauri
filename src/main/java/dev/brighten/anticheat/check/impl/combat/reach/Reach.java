@@ -3,6 +3,7 @@ package dev.brighten.anticheat.check.impl.combat.reach;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MiscUtils;
@@ -37,7 +38,7 @@ public class Reach extends Check {
     }
 
     @Packet
-    public void onUse(WrappedInFlyingPacket packet, long timeStamp) {
+    public void onUse(WrappedInUseEntityPacket packet, long timeStamp) {
         if(checkParameters(data, timeStamp)) {
             long shit = timeStamp - 120;
             List<Location> point = data.pastLocation.getEstimatedLocation(0, Math.max(data.lagInfo.transPing, 150L))
@@ -72,8 +73,8 @@ public class Reach extends Check {
             if(collided > 1 && data.lagInfo.lastPacketDrop.hasPassed(1)) {
                 double reach = reaches.stream().mapToDouble(val -> val).min().orElse(0);
 
-                if(reach > 3.02) {
-                    if((vl+= (collided > 4 ? 1 : 0.5f)) > 4) {
+                if(reach > 3.03 && collided > 2) {
+                    if((vl+= (collided > 5ilezi ? 1 : 0.5f)) > 4) {
                         flag("reach=" + reach + " collided=" + collided);
                     }
                 } else vl-= vl > 0 ? (data.lagInfo.lagging ? 0.025 : 0.02) : 0;

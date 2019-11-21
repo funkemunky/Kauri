@@ -261,8 +261,6 @@ public class MovementProcessor {
             data.playerInfo.airTicks = 0;
         }
 
-        data.playerInfo.isAnimated = MiscUtils.isAnimated(data.getPlayer());
-
         /* General Cancel Booleans */
         boolean hasLevi = data.getPlayer().getActivePotionEffects().size() > 0
                 && data.getPlayer().getActivePotionEffects()

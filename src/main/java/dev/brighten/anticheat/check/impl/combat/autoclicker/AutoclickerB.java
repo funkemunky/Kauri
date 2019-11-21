@@ -16,7 +16,7 @@ public class AutoclickerB extends Check {
 
     private Interval interval = new Interval(0, 100);
     private long lastTimestamp;
-    private double lStd, lAvg;
+    private double lStd, lAvg, lRatio;
 
     @Packet
     public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
@@ -28,21 +28,27 @@ public class AutoclickerB extends Check {
             return;
         }
 
-        if(interval.size() >= 80) {
+        if(interval.size() >= 20) {
             double avg = interval.average();
             double std = interval.std();
+            double ratio = avg / std;
 
-            if(std < 40 && avg < 140) {
-                if(vl++ > 3) {
+            boolean greater = (MathUtils.getDelta(avg, lAvg) > 10 && MathUtils.getDelta(std, lStd) < 3);
+            if((std < 40 && avg < 140)
+                    || (MathUtils.getDelta(ratio, lRatio) < 0.2)
+                    || (MathUtils.getDelta(std, avg) < 7)
+                    || greater) {
+                if((vl+= greater ? 2 : 1) > 3) {
                     flag("std=" + std + " avg=" + avg);
                 }
                 debug(Color.Green + "Flagged");
             } else vl-= vl > 0 ? 0.5f : 0;
 
-            debug("std=" + std + " avg=" + avg + " vl=" + vl);
+            debug("ratio=" + Color.Green + ratio + Color.Gray + " std=" + std + " avg=" + avg + " vl=" + vl);
             interval.clear();
             lStd = std;
             lAvg = avg;
+            lRatio = ratio;
         } else interval.add(delta);
 
         lastTimestamp = timeStamp;
