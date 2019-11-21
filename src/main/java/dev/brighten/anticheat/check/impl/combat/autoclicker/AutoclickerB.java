@@ -34,8 +34,7 @@ public class AutoclickerB extends Check {
             double ratio = avg / std;
 
             boolean greater = (MathUtils.getDelta(avg, lAvg) > 10 && MathUtils.getDelta(std, lStd) < 3);
-            if((std < 40 && avg < 140)
-                    || (MathUtils.getDelta(ratio, lRatio) < 0.2)
+            if((MathUtils.getDelta(ratio, lRatio) < 0.2 && MathUtils.getDelta(avg, lAvg) > 8)
                     || (MathUtils.getDelta(std, avg) < 7)
                     || greater) {
                 if((vl+= greater ? 2 : 1) > 3) {
