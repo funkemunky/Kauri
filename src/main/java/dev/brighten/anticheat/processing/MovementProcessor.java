@@ -16,9 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.block.Block;
 
 import java.math.RoundingMode;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
 
 @RequiredArgsConstructor
 public class MovementProcessor {
@@ -57,12 +54,6 @@ public class MovementProcessor {
             data.playerInfo.to.y = packet.getY();
             data.playerInfo.to.z = packet.getZ();
         }
-
-        if(data.playerInfo.testFly != data.playerInfo.lastTestFly)
-            data.playerInfo.lastToggleFlight.reset();
-
-        data.playerInfo.lastTestFly = data.playerInfo.testFly;
-        data.playerInfo.testFly = data.getPlayer().getAllowFlight();
 
         data.playerInfo.jumpHeight = MovementUtils.getJumpHeight(data.getPlayer());
 
@@ -112,8 +103,8 @@ public class MovementProcessor {
 
         //Fixes glitch when logging in.
         if(timeStamp - data.creation < 1000) {
-            data.playerInfo.serverCanFly = data.getPlayer().getAllowFlight();
-            data.playerInfo.serverIsFlying = data.getPlayer().isFlying();
+            data.playerInfo.canFly = data.getPlayer().getAllowFlight();
+            data.playerInfo.flying = data.getPlayer().isFlying();
         }
 
         if (data.playerInfo.breakingBlock) {
@@ -267,8 +258,8 @@ public class MovementProcessor {
                 .stream()
                 .anyMatch(effect -> effect.getType().toString().contains("LEVI"));
 
-        data.playerInfo.flightCancel = data.playerInfo.serverCanFly
-                || data.playerInfo.inCreative
+        data.playerInfo.flightCancel = data.playerInfo.canFly
+                || data.playerInfo.creative
                 || hasLevi
                 || data.playerInfo.webTicks > 0
                 || !data.playerInfo.worldLoaded
@@ -280,8 +271,8 @@ public class MovementProcessor {
                 || data.playerInfo.serverPos
                 || Kauri.INSTANCE.lastTickLag.hasNotPassed(5);
 
-        data.playerInfo.generalCancel = data.playerInfo.serverCanFly
-                || data.playerInfo.inCreative
+        data.playerInfo.generalCancel = data.playerInfo.canFly
+                || data.playerInfo.creative
                 || hasLevi
                 || !data.playerInfo.worldLoaded
                 || data.playerInfo.lastToggleFlight.hasNotPassed(40)

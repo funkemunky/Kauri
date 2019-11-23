@@ -9,7 +9,6 @@ import cc.funkemunky.api.utils.ReflectionsUtil;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.KLocation;
-import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.LivingEntity;
 
 public class PacketProcessor {
@@ -20,9 +19,9 @@ public class PacketProcessor {
             case Packet.Client.ABILITIES: {
                 WrappedInAbilitiesPacket packet = new WrappedInAbilitiesPacket(object, data.getPlayer());
 
-                data.playerInfo.serverIsFlying = packet.isFlying();
-                data.playerInfo.serverCanFly = packet.isAllowedFlight();
-                data.playerInfo.inCreative = packet.isCreativeMode();
+                data.playerInfo.flying = packet.isFlying();
+                data.playerInfo.canFly = packet.isAllowedFlight();
+                data.playerInfo.creative = packet.isCreativeMode();
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
             }
@@ -162,9 +161,9 @@ public class PacketProcessor {
             case Packet.Server.ABILITIES: {
                 WrappedOutAbilitiesPacket packet = new WrappedOutAbilitiesPacket(object, data.getPlayer());
 
-                data.playerInfo.serverCanFly = packet.isAllowedFlight();
-                data.playerInfo.inCreative = packet.isCreativeMode();
-                data.playerInfo.serverIsFlying = packet.isFlying();
+                data.playerInfo.canFly = packet.isAllowedFlight();
+                data.playerInfo.creative = packet.isCreativeMode();
+                data.playerInfo.flying = packet.isFlying();
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
             }

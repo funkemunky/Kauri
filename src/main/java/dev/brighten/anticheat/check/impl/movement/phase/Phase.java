@@ -30,7 +30,7 @@ public class Phase extends Check {
                 && data.playerInfo.deltaXZ != 0 || data.playerInfo.deltaY != 0
                 && Kauri.INSTANCE.enabled
                 && !e.getPlayer().getAllowFlight()
-                && !data.playerInfo.inCreative) {
+                && !data.playerInfo.creative) {
 
             if(data.playerInfo.worldLoaded) {
                 BoundingBox currentBox = data.box.shrink(0.06f,0,0.05f);

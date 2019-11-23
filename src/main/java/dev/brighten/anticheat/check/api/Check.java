@@ -5,7 +5,9 @@ import cc.funkemunky.api.reflections.types.WrappedClass;
 import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.impl.combat.aim.*;
-import dev.brighten.anticheat.check.impl.combat.autoclicker.*;
+import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerA;
+import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerB;
+import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerC;
 import dev.brighten.anticheat.check.impl.combat.hand.HandA;
 import dev.brighten.anticheat.check.impl.combat.hand.HandB;
 import dev.brighten.anticheat.check.impl.combat.hand.HandC;
@@ -145,6 +147,7 @@ public class Check {
     public static void registerChecks() {
         register(new AutoclickerA());
         register(new AutoclickerB());
+        register(new AutoclickerC());
         register(new FlyA());
         register(new FlyB());
         register(new FlyC());

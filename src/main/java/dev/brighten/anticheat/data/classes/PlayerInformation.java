@@ -7,9 +7,8 @@ import dev.brighten.anticheat.utils.MouseFilter;
 
 public class PlayerInformation {
     public boolean serverGround, lClientGround, clientGround, nearGround,
-            collidesVertically, collidesHorizontally, serverCanFly, inCreative, serverIsFlying, collided,
-            onLadder, usingItem, wasOnIce, wasOnSlime, jumped, inAir, breakingBlock, worldLoaded;
-    public boolean testFly, lastTestFly;
+            collidesVertically, collidesHorizontally, collided,
+            onLadder, usingItem, wasOnIce, wasOnSlime, jumped, inAir, worldLoaded;
     public boolean generalCancel, flightCancel;
     public float deltaY, lDeltaY, deltaX, lDeltaX, deltaZ, lDeltaZ, deltaXZ, lDeltaXZ, fallDistance, jumpHeight;
     public float pDeltaY;
@@ -35,7 +34,7 @@ public class PlayerInformation {
     public long lastAttackTimeStamp;
 
     //actions
-    public boolean sneaking, sprinting, ridingJump;
+    public boolean sneaking, sprinting, ridingJump, breakingBlock, flying, canFly, creative;
 
     //ticks
     public int liquidTicks, groundTicks, airTicks, halfBlockTicks, webTicks, climbTicks, slimeTicks, iceTicks,

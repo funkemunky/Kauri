@@ -86,7 +86,7 @@ public class Hitboxes extends Check {
                 && data.target != null
                 && Kauri.INSTANCE.lastTickLag.hasPassed(10)
                 && allowedEntities.contains(data.target.getType())
-                && !data.playerInfo.inCreative
+                && !data.playerInfo.creative
                 && data.playerInfo.lastTargetSwitch.hasPassed()
                 && !data.getPlayer().getGameMode().equals(GameMode.CREATIVE);
     }

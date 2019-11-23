@@ -3,7 +3,6 @@ package dev.brighten.anticheat.check.impl.combat.autoclicker;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.TickTimer;
 import cc.funkemunky.api.utils.objects.Interval;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -11,10 +10,10 @@ import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
 
 @CheckInfo(name = "Autoclicker (B)", description = "A test check atm.", developer = true, executable = false,
-        checkType = CheckType.AUTOCLICKER)
+        checkType = CheckType.AUTOCLICKER, punishVL = 40)
 public class AutoclickerB extends Check {
 
-    private Interval interval = new Interval(0, 100);
+    private Interval interval = new Interval(100);
     private long lastTimestamp;
     private double lStd, lAvg, lRatio;
 
@@ -37,7 +36,7 @@ public class AutoclickerB extends Check {
             if((MathUtils.getDelta(ratio, lRatio) < 0.2 && MathUtils.getDelta(avg, lAvg) > 8)
                     || (MathUtils.getDelta(std, avg) < 7)
                     || greater) {
-                if((vl+= greater ? 2 : 1) > 3) {
+                if((vl+= greater ? 2 : 1) > 5) {
                     flag("std=" + std + " avg=" + avg);
                 }
                 debug(Color.Green + "Flagged");

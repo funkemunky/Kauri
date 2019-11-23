@@ -3,7 +3,6 @@ package dev.brighten.anticheat.check.impl.combat.reach;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MiscUtils;
@@ -15,7 +14,6 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.KLocation;
 import dev.brighten.anticheat.utils.RayCollision;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.Vector;
@@ -88,7 +86,7 @@ public class Reach extends Check {
                 && data.target != null
                 && !MiscUtils.containsIgnoreCase(data.getPlayer().getGameMode().toString(), "gamemode")
                 && allowedEntities.contains(data.target.getType())
-                && !data.playerInfo.inCreative;
+                && !data.playerInfo.creative;
     }
 
     private static BoundingBox getHitbox(KLocation loc, EntityType type) {

@@ -2,15 +2,12 @@ package dev.brighten.anticheat.check.impl.combat.reach;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.utils.MathUtils;
-import com.sun.org.apache.bcel.internal.generic.CHECKCAST;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
 import org.bukkit.Location;
-import org.bukkit.util.Vector;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
