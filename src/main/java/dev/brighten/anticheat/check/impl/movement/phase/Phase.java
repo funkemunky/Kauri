@@ -37,7 +37,7 @@ public class Phase extends Check {
                 BoundingBox fromBox = new BoundingBox(eFrom.toVector(), eFrom.toVector())
                         .grow(0.24f,0,0.24f)
                         .add(0,0,0,
-                                0, (float)data.getPlayer().getEyeHeight(), 0);
+                                0, (float)data.getPlayer().getEyeHeight(), 0).shrink(0, 0.1f,0);
                 BoundingBox total = new BoundingBox(fromBox, currentBox);
 
                 List<BoundingBox> colliding = MinecraftReflection

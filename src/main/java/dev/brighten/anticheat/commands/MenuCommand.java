@@ -33,6 +33,12 @@ import java.util.stream.Collectors;
 @Init(commands = true)
 public class MenuCommand {
 
+    private ChestMenu main, categoryMenu;
+    public MenuCommand() {
+        main = getMainMenu();
+        categoryMenu = getChecksCategoryMenu();
+    }
+
     private static Button createButton(Material material, int amount, String name, ClickAction action, String... lore) {
         return new Button(false, MiscUtils.createItem(material, amount, name, lore), action);
     }
@@ -67,7 +73,7 @@ public class MenuCommand {
     @Command(name = "kauri.menu", description = "Open the Kauri menu.", display = "menu", usage = "/<command>",
             aliases = {"kauri.gui"}, playerOnly = true, permission = "kauri.menu")
     public void onCommand(CommandAdapter cmd) {
-        getMainMenu().showMenu(cmd.getPlayer());
+        main.showMenu(cmd.getPlayer());
         cmd.getPlayer().sendMessage(Color.Green + "Opened main menu.");
     }
 
@@ -101,7 +107,7 @@ public class MenuCommand {
     private ChestMenu getChecksCategoryMenu() {
         ChestMenu menu = new ChestMenu(Color.Gold + "Check Categories", 3);
 
-        menu.setParent(getMainMenu());
+        menu.setParent(main);
 
         AtomicInteger amt = new AtomicInteger(0);
         Arrays.stream(CheckType.values())
@@ -121,7 +127,7 @@ public class MenuCommand {
     private ChestMenu getChecksMenu(CheckType type) {
         ChestMenu menu = new ChestMenu(Color.Gold + "Checks", 6);
 
-        menu.setParent(getChecksCategoryMenu());
+        menu.setParent(categoryMenu);
 
         List<CheckSettings> values = Check.checkSettings.values()
                 .stream()
@@ -204,7 +210,7 @@ public class MenuCommand {
     private ChestMenu getRecentViolatorsMenu() {
         ChestMenu menu = new ChestMenu(Color.Gold + "Recent Violators", 6);
 
-        menu.setParent(getMainMenu());
+        menu.setParent(main);
 
         Map<UUID, List<Log>> logs = Kauri.INSTANCE.loggerManager.getLogsWithinTimeFrame(TimeUnit.DAYS.toMillis(1));
 
