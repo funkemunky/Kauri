@@ -11,6 +11,7 @@ import dev.brighten.anticheat.check.impl.combat.hand.HandB;
 import dev.brighten.anticheat.check.impl.combat.hand.HandC;
 import dev.brighten.anticheat.check.impl.combat.hitbox.Hitboxes;
 import dev.brighten.anticheat.check.impl.combat.reach.Reach;
+import dev.brighten.anticheat.check.impl.combat.reach.ReachB;
 import dev.brighten.anticheat.check.impl.movement.fly.*;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallA;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallB;
@@ -152,6 +153,7 @@ public class Check {
         register(new NoFallA());
         register(new NoFallB());
         register(new Reach());
+        register(new ReachB());
         register(new Hitboxes());
         register(new AimA());
         register(new AimB());

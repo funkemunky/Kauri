@@ -53,11 +53,10 @@ public class PacketProcessor {
             case Packet.Client.LOOK: {
                 WrappedInFlyingPacket packet = new WrappedInFlyingPacket(object, data.getPlayer());
 
-                long currentTime = System.currentTimeMillis();
-                if(currentTime - data.lagInfo.lastFlying <= 2) {
+                if(timeStamp - data.lagInfo.lastFlying <= 2) {
                     data.lagInfo.lastPacketDrop.reset();
                 }
-                data.lagInfo.lastFlying = currentTime;
+                data.lagInfo.lastFlying = timeStamp;
                 data.moveProcessor.process(packet, timeStamp);
                 data.checkManager.runPacket(packet, timeStamp);
                 if(data.playerInfo.serverPos) data.playerInfo.serverPos = false;
@@ -115,8 +114,8 @@ public class PacketProcessor {
                     data.playerInfo.serverPos = true;
                 }
                 else if(packet.getAction() == (short) 101) {
-                    //data.playerInfo.lastVelocity.reset();
-                    //data.playerInfo.lastVelocityTimestamp = timeStamp;
+                    data.playerInfo.lastVelocity.reset();
+                    data.playerInfo.lastVelocityTimestamp = timeStamp;
                 }
                 else if (packet.getAction() == (short) 69) {
                     data.lagInfo.lastTransPing = data.lagInfo.transPing;

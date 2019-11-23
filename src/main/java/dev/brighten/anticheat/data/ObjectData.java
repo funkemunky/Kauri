@@ -49,8 +49,8 @@ public class ObjectData {
         creation = System.currentTimeMillis();
         playerInfo = new PlayerInformation();
         blockInfo = new BlockInformation(this);
-        lagInfo = new LagInformation();
         pastLocation = new PastLocation();
+        lagInfo = new LagInformation();
         targetPastLocation = new PastLocation();
         checkManager = new CheckManager(this);
         checkManager.addChecks();
@@ -72,8 +72,9 @@ public class ObjectData {
         public boolean lagging;
         public TickTimer lastPacketDrop = new TickTimer(10), lastPingDrop = new TickTimer(40);
         public RollingAverageLong pingAverages = new RollingAverageLong(10, 0);
-        public long lastFlying;
+        public long lastFlying = 0;
     }
+
 
     public void onLogout() {
         Kauri.INSTANCE.dataManager.hasAlerts.remove(this);

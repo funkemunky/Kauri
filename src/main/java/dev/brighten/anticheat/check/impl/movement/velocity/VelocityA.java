@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.check.impl.movement.velocity;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Check;
@@ -16,9 +17,15 @@ public class VelocityA extends Check {
     private long velocityTS;
 
     @Packet
-    public void onVelocity(WrappedOutVelocityPacket packet, long timeStamp) {
+    public void onVelocity(WrappedOutVelocityPacket packet) {
         if(packet.getId() == data.getPlayer().getEntityId() && packet.getY() > 0) {
             vY = (float) packet.getY();
+        }
+    }
+    
+    @Packet
+    public void onTransaction(WrappedInTransactionPacket packet, long timeStamp) {
+        if(packet.getAction() == (short) 101) {
             velocityTS = timeStamp;
         }
     }
@@ -26,7 +33,7 @@ public class VelocityA extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(vY > 0
-                && (timeStamp - data.playerInfo.lastVelocityTimestamp) < 200
+                && (timeStamp - velocityTS) < 200
                 && !data.playerInfo.generalCancel
                 && !data.playerInfo.serverPos
                 && !data.lagInfo.lagging
@@ -35,7 +42,7 @@ public class VelocityA extends Check {
                 && !data.blockInfo.onClimbable
                 && data.playerInfo.blocksAboveTicks == 0) {
 
-            float pct = data.playerInfo.deltaY / (float) vY * 100F;
+            float pct = Math.max(0, data.playerInfo.lastVelocityTimestamp);
 
             if (pct < 99.999
                     && !data.playerInfo.lastBlockPlace.hasNotPassed(5)
