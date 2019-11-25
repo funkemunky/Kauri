@@ -100,6 +100,13 @@ public class PacketProcessor {
             case Packet.Client.KEEP_ALIVE: {
                 WrappedInKeepAlivePacket packet = new WrappedInKeepAlivePacket(object, data.getPlayer());
 
+                if(packet.getTime() == 101) {
+                    data.playerInfo.lastVelocity.reset();
+                    data.playerInfo.lastVelocityTimestamp = timeStamp;
+                } else if(packet.getTime() == 100) {
+                    data.playerInfo.lastServerPos = System.currentTimeMillis();
+                    data.playerInfo.serverPos = true;
+                }
                 data.lagInfo.lastPing = data.lagInfo.ping;
                 data.lagInfo.ping = System.currentTimeMillis() - data.lagInfo.lastKeepAlive;
                 data.checkManager.runPacket(packet, timeStamp);
@@ -108,15 +115,7 @@ public class PacketProcessor {
             case Packet.Client.TRANSACTION: {
                 WrappedInTransactionPacket packet = new WrappedInTransactionPacket(object, data.getPlayer());
 
-                if(packet.getAction() == (short) 100) {
-                    data.playerInfo.lastServerPos = System.currentTimeMillis();
-                    data.playerInfo.serverPos = true;
-                }
-                else if(packet.getAction() == (short) 101) {
-                    data.playerInfo.lastVelocity.reset();
-                    data.playerInfo.lastVelocityTimestamp = timeStamp;
-                }
-                else if (packet.getAction() == (short) 69) {
+                if (packet.getAction() == (short) 69) {
                     data.lagInfo.lastTransPing = data.lagInfo.transPing;
                     data.lagInfo.transPing = System.currentTimeMillis() - data.lagInfo.lastTrans;
 
@@ -171,7 +170,7 @@ public class PacketProcessor {
                 WrappedOutVelocityPacket packet = new WrappedOutVelocityPacket(object, data.getPlayer());
 
                 if(packet.getId() == data.getPlayer().getEntityId()) {
-                    TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutTransaction(0, (short)101, false).getObject());
+                    TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutKeepAlivePacket(101).getObject());
                 }
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
@@ -198,7 +197,7 @@ public class PacketProcessor {
                 data.playerInfo.posLocs.add(new KLocation(packet.getX(), packet.getY(), packet.getZ(), packet.getYaw(), packet.getPitch()));
                 data.playerInfo.lastServerPos = System.currentTimeMillis();
                 data.checkManager.runPacket(packet, timeStamp);
-                TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutTransaction(0, (short)100, false).getObject());
+                TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutKeepAlivePacket(100).getObject());
                 break;
             }
         }

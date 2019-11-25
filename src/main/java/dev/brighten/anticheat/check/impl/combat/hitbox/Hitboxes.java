@@ -48,7 +48,7 @@ public class Hitboxes extends Check {
         if (checkParameters(data)) {
 
             List<RayTrace> rayTrace = data.pastLocation
-                    .getEstimatedLocation(0,100L)
+                    .getEstimatedLocation(0,Math.max(100, Math.min(150L, data.lagInfo.transPing)))
                     .stream()
                     .map(loc ->
                             loc.toLocation(data.getPlayer().getWorld()).clone()

@@ -39,15 +39,15 @@ public class Reach extends Check {
     public void onUse(WrappedInFlyingPacket packet, long timeStamp) {
         if(checkParameters(data, timeStamp)) {
             long shit = timeStamp - 120;
-            List<Location> point = data.pastLocation.getEstimatedLocation(0, Math.max(data.lagInfo.transPing, 150L))
+            List<Location> point = data.pastLocation.getEstimatedLocation(0, Math.max(data.lagInfo.transPing + 50L, 150L))
                     .stream()
                     .map(kloc -> kloc.toLocation(data.getPlayer().getWorld())
                     .add(0, data.getPlayer().getEyeHeight(), 0))
                     .collect(Collectors.toList());
 
             List<BoundingBox> previousLocations = data.targetPastLocation
-                    .getEstimatedLocation(0
-                            , Math.max(150L, data.lagInfo.transPing))
+                    .getEstimatedLocation(data.lagInfo.transPing
+                            , 150L)
                     .stream()
                     .map(loc -> getHitbox(loc, data.target.getType()))
                     .collect(Collectors.toList());

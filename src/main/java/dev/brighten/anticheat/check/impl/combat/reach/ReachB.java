@@ -35,6 +35,12 @@ public class ReachB extends Check {
                 .summaryStatistics().getMin())
                 .summaryStatistics().getMin();
 
+        if(distance > 3.4f && !Double.isInfinite(distance)) {
+            if(vl++ > 5) {
+                flag("distance=" + distance);
+            }
+        } else vl-= vl > 0 ? 0.1f : 0;
+
         debug("distance=" + distance);
     }
 }

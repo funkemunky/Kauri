@@ -34,6 +34,7 @@ public class Kauri extends JavaPlugin{
     //Lag Information
     public double tps;
     public TickTimer lastTickLag;
+    public long lastTick;
 
     public ExecutorService executor;
     public ToggleableProfiler profiler;
@@ -150,6 +151,7 @@ public class Kauri extends JavaPlugin{
                     lastTimeStamp = currentTime;
                 }
                 lastTick = currentTime;
+                Kauri.INSTANCE.lastTick = currentTime;
             }
         }.runTaskTimer(this, 1L, 1L);
     }

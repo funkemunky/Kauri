@@ -91,7 +91,7 @@ public class LoggerManager {
                 logsDatabase = new FlatfileDatabase("logs");
             }
             MiscUtils.printToConsole("&7Loading database on second thread...");
-            logsDatabase.loadDatabase();
+            Kauri.INSTANCE.executor.execute(() -> logsDatabase.loadDatabase());
             save();
         }
     }

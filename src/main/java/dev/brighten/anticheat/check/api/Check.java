@@ -81,7 +81,7 @@ public class Check {
                 .replace("%p", String.valueOf(data.lagInfo.transPing))
                 .replace("%t", String.valueOf(MathUtils.round(Kauri.INSTANCE.tps, 2)));
         if(Kauri.INSTANCE.lastTickLag.hasPassed() && (data.lagInfo.lastPacketDrop.hasPassed(5)
-                || data.lagInfo.lastPingDrop.hasPassed())) {
+                || data.lagInfo.lastPingDrop.hasPassed()) && System.currentTimeMillis() - Kauri.INSTANCE.lastTick < 100L) {
             Kauri.INSTANCE.loggerManager.addLog(data, this, info);
 
             if(lastAlert.hasPassed(MathUtils.millisToTicks(Config.alertsDelay))) {
@@ -119,7 +119,7 @@ public class Check {
     }
 
     public void punish() {
-        if(developer || !executable || punishVl == -1 || vl <= punishVl) return;
+        if(developer || !executable || punishVl == -1 || vl <= punishVl || System.currentTimeMillis() - Kauri.INSTANCE.lastTick > 200L) return;
         RunUtils.task(() -> {
             Kauri.INSTANCE.loggerManager.addPunishment(data, this);
             if(!Config.broadcastMessage.equalsIgnoreCase("off")) {
@@ -153,6 +153,7 @@ public class Check {
         register(new FlyC());
         register(new FlyD());
         register(new FlyE());
+        register(new FlyF());
         register(new NoFallA());
         register(new NoFallB());
         register(new Reach());
@@ -162,7 +163,6 @@ public class Check {
         register(new AimB());
         register(new AimC());
         register(new AimD());
-        register(new AimE());
         register(new AimF());
         register(new AimG());
         register(new AimH());
