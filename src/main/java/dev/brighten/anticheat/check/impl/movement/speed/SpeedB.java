@@ -1,45 +1,41 @@
 package dev.brighten.anticheat.check.impl.movement.speed;
 
-import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 
-@CheckInfo(name = "Speed (B)", description = "Ensures horizontal acceleration is legit.", punishVL = 50)
+@CheckInfo(name = "Speed (B)", description = "Predicts the motion of a player accurately.", developer = true,
+        executable = false, punishVL = 150)
 public class SpeedB extends Check {
 
-    private double lMotionXZ, lPAccel;
+    private int moveTicks;
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if(!packet.isPos() ||
-                data.playerInfo.generalCancel
-                || timeStamp - data.playerInfo.lastVelocityTimestamp < 250L
-                || data.playerInfo.liquidTicks > 0
-                || data.playerInfo.webTicks > 0
-                || data.playerInfo.lastBlockPlace.hasNotPassed(10)
-                || Atlas.getInstance().getBlockBoxManager().getBlockBox().isUsingItem(data.getPlayer())
-                || data.blockInfo.blocksAbove
-                || data.blockInfo.blocksNear
-                || data.playerInfo.halfBlockTicks > 0) {
-            vl-= vl > 0 ? 0.25 : 0;
-            return;
-        }
+    public void onPacket(WrappedInFlyingPacket packet) {
+        if(packet.isPos() && data.playerInfo.deltaXZ > 0) {
 
-        double motionXZ = MathUtils.hypot(data.predictionService.rmotionX, data.predictionService.rmotionZ);
-        double pAccel = motionXZ - lMotionXZ;
-        if (data.playerInfo.airTicks > 1) {
-            double accel = data.playerInfo.deltaXZ - data.playerInfo.lDeltaXZ;
-            float delta = (float) MathUtils.getDelta(lPAccel, accel);
-            if(delta > 0.1) {
-                if(vl++ > 6) {
-                    flag("delta=" + delta);
-                }
-            } else vl-= vl > 0 ? 1 : 0;
-            debug("p=" + MathUtils.round(lPAccel, 5) + " a=" + MathUtils.round(accel, 5));
+            if(moveTicks < 40) {
+                moveTicks++; //jank way to prevent false positives until a player moves a bit but works.
+            } else {
+                double diff = data.predictionService.diff;
+
+                if(diff > 0.00001
+                        && !data.playerInfo.serverPos
+                        && !data.playerInfo.canFly
+                        && !data.playerInfo.collidesHorizontally
+                        && data.playerInfo.lastToggleFlight.hasPassed(20)) {
+                    vl+= diff > 0.6 ? 4 : 1;
+                    if(vl > 3) {
+                        flag("diff=" + MathUtils.round(diff, 4)
+                                + " xz=" + MathUtils.round(data.playerInfo.deltaXZ, 4));
+                    }
+                    debug(Color.Green + "Flag");
+                } else vl-= vl > 0 ? 0.25f : 0;
+
+                debug("diff=" + diff + " vl=" + vl);
+            }
         }
-        lPAccel = pAccel;
-        lMotionXZ = motionXZ;
     }
 }

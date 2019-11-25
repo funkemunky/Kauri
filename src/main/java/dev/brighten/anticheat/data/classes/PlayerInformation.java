@@ -45,5 +45,7 @@ public class PlayerInformation {
             lastBlockPlace = new TickTimer(10),
             lastToggleFlight = new TickTimer(10);
 
+    public float velocityX, velocityY, velocityZ;
+
     public KLocation from, to;
 }

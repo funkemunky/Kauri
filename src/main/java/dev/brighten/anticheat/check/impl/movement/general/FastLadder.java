@@ -1,4 +1,4 @@
-package dev.brighten.anticheat.check.impl.movement.fly;
+package dev.brighten.anticheat.check.impl.movement.general;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import dev.brighten.anticheat.check.api.Check;
@@ -6,9 +6,9 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
 
-@CheckInfo(name = "Fly (E)", description = "Checks for FastLadders",
-        checkType = CheckType.FLIGHT, executable = false, punishVL = 20)
-public class FlyE extends Check {
+@CheckInfo(name = "FastLadder", description = "Ensures players do not go faster than legitimate speeds on ladders.",
+        checkType = CheckType.GENERAL, executable = false, punishVL = 20)
+public class FastLadder extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {

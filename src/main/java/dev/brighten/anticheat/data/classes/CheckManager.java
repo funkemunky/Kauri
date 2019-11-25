@@ -76,8 +76,6 @@ public class CheckManager {
                     check.minVersion = settings.minVersion();
                     return check;
                 })
-                .filter(check -> check.minVersion.isOrAbove(ProtocolVersion.getGameVersion())
-                        && check.maxVersion.isOrBelow(ProtocolVersion.getGameVersion()))
                 .sequential()
                 .forEach(check -> checks.put(check.name, check));
 

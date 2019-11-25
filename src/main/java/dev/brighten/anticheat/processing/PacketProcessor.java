@@ -171,6 +171,9 @@ public class PacketProcessor {
 
                 if(packet.getId() == data.getPlayer().getEntityId()) {
                     TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutKeepAlivePacket(101).getObject());
+                    data.playerInfo.velocityX = (float) packet.getX();
+                    data.playerInfo.velocityY = (float) packet.getY();
+                    data.playerInfo.velocityZ = (float) packet.getZ();
                 }
                 data.checkManager.runPacket(packet, timeStamp);
                 break;

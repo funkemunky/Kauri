@@ -10,18 +10,24 @@ import dev.brighten.anticheat.check.api.Packet;
         checkType = CheckType.BADPACKETS, punishVL = 20, executable = false)
 public class NoFallA extends Check {
 
-    private int groundTicks, airTicks;
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
         if(!packet.isPos()) return;
 
-        boolean flag = packet.isGround() ? data.playerInfo.deltaY != 0 : data.playerInfo.deltaY == 0;
+        boolean flag = data.playerInfo.clientGround
+                ? data.playerInfo.deltaY != 0 && !data.playerInfo.serverGround
+                : data.playerInfo.deltaY == 0 && data.playerInfo.lDeltaY == 0;
 
-        groundTicks = packet.isGround() ? groundTicks + 1 : 0;
-        airTicks = !packet.isGround() ? airTicks + 1 : 0;
+        if(!data.playerInfo.flightCancel
+                && flag) {
+            vl+= data.lagInfo.lagging ? 1 : 3;
 
-        if(!data.playerInfo.flying && !data.playerInfo.canFly && flag && (groundTicks > 2 || airTicks > 3)) {
+            if(vl > 2) {
+                flag("ground=" + data.playerInfo.clientGround + " deltaY=" + data.playerInfo.deltaY);
+            }
+        } else vl-= vl > 0 ? 0.2f : 0;
 
-        }
+        debug("ground=" + data.playerInfo.clientGround
+                + " deltaY=" + data.playerInfo.deltaY + " vl=" + vl);
     }
 }

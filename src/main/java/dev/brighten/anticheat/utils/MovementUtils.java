@@ -36,4 +36,17 @@ public class MovementUtils {
         }
         return friction;
     }
+
+    public static float getTotalHeight(Player player, float initial) {
+        float total = initial;
+        float nextCalc = initial;
+        while (((nextCalc - 0.08f) * 0.98f) > 0) {
+            float calc = nextCalc - 0.08f;
+            calc*= 0.98f;
+            total+= calc;
+            nextCalc = calc;
+        }
+
+        return total;
+    }
 }

@@ -1,4 +1,4 @@
-package dev.brighten.anticheat.check.impl.movement.phase;
+package dev.brighten.anticheat.check.impl.movement.general;
 
 import cc.funkemunky.api.reflection.MinecraftReflection;
 import cc.funkemunky.api.utils.BlockUtils;
@@ -20,7 +20,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @CheckInfo(name = "Phase", description = "Prevents players from glitching through blocks. Stolen from Firefly (thanks Luke)",
-        checkType = CheckType.GLITCH, developer = true, executable = false, punishVL = 50)
+        checkType = CheckType.GENERAL, developer = true, executable = false, punishVL = 50)
 public class Phase extends Check {
 
     @Event

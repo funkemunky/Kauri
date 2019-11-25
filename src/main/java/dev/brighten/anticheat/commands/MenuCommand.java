@@ -81,7 +81,7 @@ public class MenuCommand {
         ChestMenu menu = new ChestMenu(Color.Gold + "Kauri Menu", 3);
 
         menu.setItem(11, createButton(Material.ANVIL, 1, "&cEdit Checks",
-                (player, info) -> getChecksCategoryMenu().showMenu(player),
+                (player, info) -> categoryMenu.showMenu(player),
                 "", "&7Toggle Kauri checks on or off."));
         menu.setItem(13, createButton(Material.ENCHANTED_BOOK, 1, "&cKauri Anticheat",
                 (player, info) -> {
@@ -114,7 +114,12 @@ public class MenuCommand {
                 .forEach(type -> {
                     Button button = new Button(false, new ItemBuilder(Material.BOOK)
                             .amount(1).name("&e" + type.name()).build(),
-                            (player, info) -> getChecksMenu(type).showMenu(player));
+                            (player, info) -> {
+                        menu.setParent(null);
+                        menu.close(player);
+                        getChecksMenu(type).showMenu(player);
+                        menu.setParent(main);
+                            });
                     amt.incrementAndGet();
                     menu.addItem(button);
                 });
