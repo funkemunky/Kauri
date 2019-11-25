@@ -2,6 +2,7 @@ package dev.brighten.anticheat.check.api;
 
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.reflections.types.WrappedClass;
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.impl.combat.aim.*;
@@ -25,6 +26,7 @@ import dev.brighten.anticheat.check.impl.movement.velocity.VelocityC;
 import dev.brighten.anticheat.check.impl.packets.Timer;
 import dev.brighten.anticheat.check.impl.packets.badpackets.*;
 import dev.brighten.anticheat.data.ObjectData;
+import lombok.NoArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 
@@ -33,19 +35,17 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+@NoArgsConstructor
 public class Check {
 
     public static Map<WrappedClass, CheckInfo> checkClasses = Collections.synchronizedMap(new HashMap<>());
     public static Map<WrappedClass, CheckSettings> checkSettings = Collections.synchronizedMap(new HashMap<>());
 
-    public Check() {
-
-    }
-
     public ObjectData data;
     public String name, description;
     public boolean enabled, executable, developer;
     public float vl, punishVl;
+    public ProtocolVersion minVersion, maxVersion;
     public CheckType checkType;
 
     private TickTimer lastAlert = new TickTimer(MathUtils.millisToTicks(Config.alertsDelay));
@@ -60,7 +60,9 @@ public class Check {
         MiscUtils.printToConsole("Registered: " + info.name());
         WrappedClass checkClass = new WrappedClass(check.getClass());
         String name = info.name();
-        CheckSettings settings = new CheckSettings(info.name(), info.description(), info.checkType(), info.punishVL());
+        CheckSettings settings = new CheckSettings(info.name(), info.description(), info.checkType(),
+                info.punishVL(), info.minVersion(), info.maxVersion());
+
         if(Kauri.INSTANCE.getConfig().get("checks." + name + ".enabled") != null) {
             settings.enabled = Kauri.INSTANCE.getConfig().getBoolean("checks." + name + ".enabled");
             settings.executable = Kauri.INSTANCE.getConfig().getBoolean("checks." + name + ".executable");
@@ -153,7 +155,6 @@ public class Check {
         register(new FlyC());
         register(new FlyD());
         register(new FlyE());
-        register(new FlyF());
         register(new NoFallA());
         register(new NoFallB());
         register(new Reach());

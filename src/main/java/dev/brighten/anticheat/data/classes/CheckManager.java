@@ -3,6 +3,7 @@ package dev.brighten.anticheat.data.classes;
 import cc.funkemunky.api.reflections.types.WrappedClass;
 import cc.funkemunky.api.reflections.types.WrappedMethod;
 import cc.funkemunky.api.tinyprotocol.api.NMSObject;
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.CheckSettings;
@@ -71,8 +72,12 @@ public class CheckManager {
                     check.description = settings.description();
                     check.punishVl = settings.punishVL();
                     check.checkType = settings.checkType();
+                    check.maxVersion = settings.maxVersion();
+                    check.minVersion = settings.minVersion();
                     return check;
                 })
+                .filter(check -> check.minVersion.isOrAbove(ProtocolVersion.getGameVersion())
+                        && check.maxVersion.isOrBelow(ProtocolVersion.getGameVersion()))
                 .sequential()
                 .forEach(check -> checks.put(check.name, check));
 
