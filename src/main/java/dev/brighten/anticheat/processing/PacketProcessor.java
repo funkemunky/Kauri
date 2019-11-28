@@ -109,7 +109,7 @@ public class PacketProcessor {
                     data.playerInfo.lastVelocity.reset();
                     data.playerInfo.lastVelocityTimestamp = timeStamp;
                 } else if(packet.getTime() == 100) {
-                    data.playerInfo.lastServerPos = System.currentTimeMillis();
+                    data.playerInfo.lastServerPos = timeStamp;
                     data.playerInfo.serverPos = true;
                 }
                 data.lagInfo.lastPing = data.lagInfo.ping;

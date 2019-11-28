@@ -15,7 +15,7 @@ public class FlyA extends Check {
     private boolean wasOnSlime, tookVelocity;
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
+    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(packet.isPos()) {
             if(data.playerInfo.clientGround && data.blockInfo.onSlime && data.playerInfo.deltaY <= 0) {
                 wasOnSlime = true;
@@ -31,7 +31,7 @@ public class FlyA extends Check {
                         MovementUtils.getJumpHeight(data.getPlayer())) + 0.1f;
             }
 
-            if(data.playerInfo.lastToggleFlight.hasNotPassed(10)) {
+            if(data.playerInfo.lastToggleFlight.hasNotPassed(10) || timeStamp - data.playerInfo.lastServerPos < 100L) {
                 totalHeight = 0;
             }
 
@@ -46,15 +46,20 @@ public class FlyA extends Check {
                 maxHeight = MovementUtils.getTotalHeight(data.getPlayer(), data.playerInfo.velocityY) + 0.1f;
             }
 
-            if(data.playerInfo.serverGround) {
+            if(data.playerInfo.clientGround) {
                 totalHeight = 0;
             } else if(data.playerInfo.deltaY > 0) totalHeight += data.playerInfo.deltaY;
 
             if(totalHeight > maxHeight
+                    && timeStamp - data.playerInfo.lastServerPos > 50L
+                    && !data.playerInfo.serverPos
+                    && !data.playerInfo.clientGround
                     && (!data.playerInfo.wasOnSlime || maxHeight >= 2)
                     && !data.playerInfo.flightCancel) {
                 vl++;
-                flag(totalHeight + ">-" + maxHeight);
+                if(vl > 1) {
+                    flag(totalHeight + ">-" + maxHeight);
+                }
             }
 
             debug("total=" + totalHeight + " max=" + maxHeight

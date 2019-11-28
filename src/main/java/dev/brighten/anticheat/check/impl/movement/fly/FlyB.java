@@ -12,7 +12,7 @@ import dev.brighten.anticheat.utils.MovementUtils;
 public class FlyB extends Check {
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
+    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(packet.isPos() && (data.playerInfo.deltaY != 0 || data.playerInfo.deltaXZ != 0)) {
             //We check if the player is in ground, since theoretically the y should be zero.
             float predicted = data.playerInfo.clientGround ? 0 : (data.playerInfo.lDeltaY - 0.08f) * .98f;
@@ -25,12 +25,15 @@ public class FlyB extends Check {
 
             if(!data.playerInfo.flightCancel
                     && !data.playerInfo.wasOnSlime
+                    && !data.playerInfo.serverPos
+                    && timeStamp - data.playerInfo.lastServerPos > 50L
+                    && timeStamp -  data.playerInfo.lastVelocityTimestamp > 200L
                     && !data.playerInfo.clientGround
                     && (data.playerInfo.blocksAboveTicks == 0 || data.playerInfo.deltaY >= 0)
                     && !data.playerInfo.collidesVertically
                     && MathUtils.getDelta(data.playerInfo.deltaY, predicted) > 0.0001) {
                 vl++;
-                if(!data.lagInfo.lagging || vl > 2) {
+                if(vl > (data.lagInfo.lagging ? 3 : 2)) {
                     flag("deltaY=" + data.playerInfo.deltaY + " predicted=" + predicted);
                 }
             } else vl-= vl > 0 ? 0.2f : 0;
