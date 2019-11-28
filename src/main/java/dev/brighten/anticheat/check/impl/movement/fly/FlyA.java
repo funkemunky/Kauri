@@ -17,16 +17,22 @@ public class FlyA extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if(packet.isPos()) {
-            if(data.playerInfo.wasOnSlime && data.playerInfo.deltaY < 0) {
+            if(data.playerInfo.clientGround && data.blockInfo.onSlime && data.playerInfo.deltaY <= 0) {
                 wasOnSlime = true;
-                slimeHeight = -data.playerInfo.deltaY;
-            } if(wasOnSlime && data.playerInfo.deltaY > 0) {
-                maxHeight = MovementUtils.getTotalHeight(data.getPlayer(), slimeHeight);
+                slimeHeight = 0;
+                slimeHeight -= data.playerInfo.lDeltaY;
+            } else if(wasOnSlime) {
+                maxHeight = Math.max(2f,
+                        MovementUtils.getTotalHeight(data.getPlayer(), slimeHeight)) * 1.25f;
                 wasOnSlime = false;
             } else if(!tookVelocity && data.playerInfo.serverGround) {
                 maxHeight = MovementUtils.getTotalHeight(
                         data.getPlayer(),
-                        MovementUtils.getJumpHeight(data.getPlayer()));
+                        MovementUtils.getJumpHeight(data.getPlayer())) + 0.1f;
+            }
+
+            if(data.playerInfo.lastToggleFlight.hasNotPassed(10)) {
+                totalHeight = 0;
             }
 
             if(data.playerInfo.lastVelocity.hasNotPassed(10)) {
@@ -36,18 +42,17 @@ public class FlyA extends Check {
             }
 
             if(tookVelocity) {
-                maxHeight = MovementUtils.getTotalHeight(data.getPlayer(), data.playerInfo.velocityY);
+                totalHeight = 0;
+                maxHeight = MovementUtils.getTotalHeight(data.getPlayer(), data.playerInfo.velocityY) + 0.1f;
             }
-
-            maxHeight+= 0.1f;
 
             if(data.playerInfo.serverGround) {
                 totalHeight = 0;
             } else if(data.playerInfo.deltaY > 0) totalHeight += data.playerInfo.deltaY;
 
             if(totalHeight > maxHeight
-                    && !data.blockInfo.inLiquid && !data.blockInfo.inWeb
-                    && !data.playerInfo.canFly && data.playerInfo.lastToggleFlight.hasPassed(20)) {
+                    && (!data.playerInfo.wasOnSlime || maxHeight >= 2)
+                    && !data.playerInfo.flightCancel) {
                 vl++;
                 flag(totalHeight + ">-" + maxHeight);
             }

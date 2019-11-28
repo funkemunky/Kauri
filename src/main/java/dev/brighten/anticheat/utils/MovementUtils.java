@@ -40,11 +40,15 @@ public class MovementUtils {
     public static float getTotalHeight(Player player, float initial) {
         float total = initial;
         float nextCalc = initial;
+        int test = 0;
         while (((nextCalc - 0.08f) * 0.98f) > 0) {
             float calc = nextCalc - 0.08f;
             calc*= 0.98f;
             total+= calc;
             nextCalc = calc;
+            if(test++ > 15) {
+                return total * 4;
+            }
         }
 
         return total;

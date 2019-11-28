@@ -38,7 +38,6 @@ public class Reach extends Check {
     @Packet
     public void onUse(WrappedInFlyingPacket packet, long timeStamp) {
         if(checkParameters(data, timeStamp)) {
-            long shit = timeStamp - 120;
             List<Location> point = data.pastLocation.getEstimatedLocation(0, Math.max(data.lagInfo.transPing + 50L, 150L))
                     .stream()
                     .map(kloc -> kloc.toLocation(data.getPlayer().getWorld())

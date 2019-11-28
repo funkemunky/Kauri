@@ -7,7 +7,7 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.MovementUtils;
 
 @CheckInfo(name = "Speed (A)", description = "A simple limiting speed check with a high verbose threshold.",
-        punishVL = 50)
+        punishVL = 40)
 public class SpeedA extends Check {
 
     private long moveTicks, keyTicks;

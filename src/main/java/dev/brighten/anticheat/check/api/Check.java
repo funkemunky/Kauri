@@ -16,9 +16,9 @@ import dev.brighten.anticheat.check.impl.combat.hitbox.Hitboxes;
 import dev.brighten.anticheat.check.impl.combat.reach.Reach;
 import dev.brighten.anticheat.check.impl.movement.fly.*;
 import dev.brighten.anticheat.check.impl.movement.general.FastLadder;
+import dev.brighten.anticheat.check.impl.movement.general.Phase;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallA;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallB;
-import dev.brighten.anticheat.check.impl.movement.general.Phase;
 import dev.brighten.anticheat.check.impl.movement.speed.*;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityA;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityB;
@@ -152,6 +152,7 @@ public class Check {
         register(new AutoclickerC());
         register(new FlyA());
         register(new FlyB());
+        register(new FlyC());
         register(new FastLadder());
         register(new NoFallA());
         register(new NoFallB());
@@ -167,7 +168,6 @@ public class Check {
         register(new AimI());
         register(new SpeedA());
         register(new SpeedB());
-        register(new Phase());
         register(new Timer());
         register(new BadPacketsA());
         register(new BadPacketsB());

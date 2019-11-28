@@ -24,7 +24,7 @@ public class BukkitCheckListeners implements Listener {
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
         if(data != null) {
-            runEvent(data, event);
+            data.checkManager.runEvent(event);
         }
     }
 
@@ -33,21 +33,7 @@ public class BukkitCheckListeners implements Listener {
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
         if(data != null) {
-            runEvent(data, event);
-        }
-    }
-
-    private static void runEvent(ObjectData data, Event event) {
-        FutureTask task = new FutureTask<>(() -> {
-           data.checkManager.runEvent(event);
-
-           return null;
-        });
-
-        try {
-            task.get(2, TimeUnit.SECONDS);
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            MiscUtils.printToConsole("Problem with lag on " + event.getEventName());
+            data.checkManager.runEvent(event);
         }
     }
 }

@@ -2,10 +2,7 @@ package dev.brighten.anticheat.processing;
 
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.BlockUtils;
-import cc.funkemunky.api.utils.BoundingBox;
-import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.TickTimer;
+import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
@@ -55,7 +52,12 @@ public class MovementProcessor {
             data.playerInfo.to.z = packet.getZ();
         }
 
-        data.playerInfo.jumpHeight = MovementUtils.getJumpHeight(data.getPlayer());
+        data.playerInfo.inVehicle = data.getPlayer().getVehicle() != null;
+        data.playerInfo.gliding = PlayerUtils.isGliding(data.getPlayer());
+        data.playerInfo.riptiding = Atlas.getInstance().getBlockBoxManager()
+                .getBlockBox().isRiptiding(data.getPlayer());
+
+        if(packet.isGround()) data.playerInfo.jumpHeight = MovementUtils.getJumpHeight(data.getPlayer());
 
         data.playerInfo.worldLoaded = Atlas.getInstance().getBlockBoxManager().getBlockBox()
                 .isChunkLoaded(data.playerInfo.to.toLocation(data.getPlayer().getWorld()));
@@ -70,11 +72,10 @@ public class MovementProcessor {
             data.playerInfo.to.yaw = packet.getYaw();
             data.playerInfo.to.pitch = packet.getPitch();
 
-            float expand = (float)MiscUtils.EXPANDER;
-            float yawGcd = MiscUtils.gcd((long)(MathUtils.yawTo180F(data.playerInfo.deltaYaw) * expand),
-                    (long)(MathUtils.yawTo180F(data.playerInfo.lDeltaYaw) * expand)) / expand;
-            float pitchGcd = MiscUtils.gcd((long)Math.abs(data.playerInfo.deltaPitch * expand),
-                    (long)Math.abs(data.playerInfo.lDeltaPitch * expand)) / expand;
+            float yawGcd = MiscUtils.gcd((long)(MathUtils.yawTo180F(data.playerInfo.deltaYaw) * offset),
+                    (long)(MathUtils.yawTo180F(data.playerInfo.lDeltaYaw) * offset)) / offset;
+            float pitchGcd = MiscUtils.gcd((long)Math.abs(data.playerInfo.deltaPitch * offset),
+                    (long)Math.abs(data.playerInfo.lDeltaPitch * offset)) / offset;
 
             //Adding gcd of yaw and pitch.
             if(data.playerInfo.yawGCD > 90000 && yawGcd > 0.01f && data.playerInfo.deltaYaw < 8) yawGcdList.add(yawGcd);
@@ -103,9 +104,13 @@ public class MovementProcessor {
 
         //Fixes glitch when logging in.
         if(timeStamp - data.creation < 1000) {
+            if(data.playerInfo.canFly != data.getPlayer().getAllowFlight()) {
+                data.playerInfo.lastToggleFlight.reset();
+            }
             data.playerInfo.canFly = data.getPlayer().getAllowFlight();
             data.playerInfo.flying = data.getPlayer().isFlying();
         }
+
 
         if (data.playerInfo.breakingBlock) {
             data.playerInfo.lastBrokenBlock.reset();
@@ -261,19 +266,25 @@ public class MovementProcessor {
         data.playerInfo.flightCancel = data.playerInfo.canFly
                 || data.playerInfo.creative
                 || hasLevi
+                || data.playerInfo.inVehicle
                 || data.playerInfo.webTicks > 0
                 || !data.playerInfo.worldLoaded
                 || block == null
+                || data.playerInfo.riptiding
+                || data.playerInfo.gliding
                 || data.playerInfo.lastToggleFlight.hasNotPassed(40)
                 || data.playerInfo.liquidTicks > 0
                 || data.playerInfo.climbTicks > 0
                 || timeStamp - data.creation < 2000
                 || data.playerInfo.serverPos
-                || Kauri.INSTANCE.lastTickLag.hasNotPassed(5);
+                || Kauri.INSTANCE.lastTickLag.hasNotPassed(2);
 
         data.playerInfo.generalCancel = data.playerInfo.canFly
                 || data.playerInfo.creative
                 || hasLevi
+                || data.playerInfo.riptiding
+                || data.playerInfo.gliding
+                || data.playerInfo.inVehicle
                 || !data.playerInfo.worldLoaded
                 || data.playerInfo.lastToggleFlight.hasNotPassed(40)
                 || timeStamp - data.creation < 2000

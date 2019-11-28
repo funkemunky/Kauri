@@ -31,12 +31,14 @@ public class AutoclickerB extends Check {
             double avg = interval.average();
             double std = interval.std();
             double ratio = avg / std;
+            double cps = 1000 / avg, lcps = 1000 / lAvg;
 
-            boolean greater = (MathUtils.getDelta(avg, lAvg) > 10 && MathUtils.getDelta(std, lStd) < 3);
+            boolean greater = (MathUtils.getDelta(cps, lcps) > 2 && MathUtils.getDelta(std, lStd) < 3);
             if((MathUtils.getDelta(ratio, lRatio) < 0.2 && MathUtils.getDelta(avg, lAvg) > 8)
                     || (MathUtils.getDelta(std, avg) < 7)
                     || greater) {
-                if((vl+= greater ? 2 : 1) > 5) {
+                vl++;
+                if(vl > 5) {
                     flag("std=" + std + " avg=" + avg);
                 }
                 debug(Color.Green + "Flagged");

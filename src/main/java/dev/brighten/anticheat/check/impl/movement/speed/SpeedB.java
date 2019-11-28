@@ -22,8 +22,7 @@ public class SpeedB extends Check {
                 double diff = data.predictionService.diff;
 
                 if(diff > 0.00001
-                        && !data.playerInfo.serverPos
-                        && !data.playerInfo.canFly
+                        && !data.playerInfo.flightCancel
                         && !data.playerInfo.collidesHorizontally
                         && data.playerInfo.lastToggleFlight.hasPassed(20)) {
                     vl+= diff > 0.6 ? 4 : 1;

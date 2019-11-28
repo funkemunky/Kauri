@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @CheckInfo(name = "Hitboxes", description = "Ensures the player is looking at the target when attacking.",
-        checkType = CheckType.HITBOX, punishVL = 20)
+        checkType = CheckType.HITBOX, punishVL = 15)
 public class Hitboxes extends Check {
 
     private static List<EntityType> allowedEntities = Arrays.asList(

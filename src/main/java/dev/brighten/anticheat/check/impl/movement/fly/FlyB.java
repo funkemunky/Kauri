@@ -24,12 +24,16 @@ public class FlyB extends Check {
             if(Math.abs(predicted) < 0.005) predicted = 0;
 
             if(!data.playerInfo.flightCancel
+                    && !data.playerInfo.wasOnSlime
                     && !data.playerInfo.clientGround
+                    && (data.playerInfo.blocksAboveTicks == 0 || data.playerInfo.deltaY >= 0)
                     && !data.playerInfo.collidesVertically
                     && MathUtils.getDelta(data.playerInfo.deltaY, predicted) > 0.0001) {
                 vl++;
-                flag("deltaY=" + data.playerInfo.deltaY + " predicted=" + predicted);
-            }
+                if(!data.lagInfo.lagging || vl > 2) {
+                    flag("deltaY=" + data.playerInfo.deltaY + " predicted=" + predicted);
+                }
+            } else vl-= vl > 0 ? 0.2f : 0;
 
             debug("deltaY=" + data.playerInfo.deltaY + " predicted=" + predicted
                     + " ground=" + data.playerInfo.clientGround);

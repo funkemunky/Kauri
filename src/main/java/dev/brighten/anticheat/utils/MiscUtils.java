@@ -18,7 +18,6 @@ import java.util.stream.LongStream;
 
 public class MiscUtils {
 
-    public static double EXPANDER = Math.pow(2.0, 24.0);
     private final static Set<Class<?>> NUMBER_REFLECTED_PRIMITIVES;
 
     public static String deltaSymbol = "\u0394";

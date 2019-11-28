@@ -20,6 +20,11 @@ public class PacketProcessor {
                 WrappedInAbilitiesPacket packet = new WrappedInAbilitiesPacket(object, data.getPlayer());
 
                 data.playerInfo.flying = packet.isFlying();
+
+                if(data.playerInfo.canFly != packet.isAllowedFlight()) {
+                    data.playerInfo.lastToggleFlight.reset();
+                }
+
                 data.playerInfo.canFly = packet.isAllowedFlight();
                 data.playerInfo.creative = packet.isCreativeMode();
                 data.checkManager.runPacket(packet, timeStamp);
@@ -159,6 +164,10 @@ public class PacketProcessor {
         switch(type) {
             case Packet.Server.ABILITIES: {
                 WrappedOutAbilitiesPacket packet = new WrappedOutAbilitiesPacket(object, data.getPlayer());
+
+                if(data.playerInfo.canFly != packet.isAllowedFlight()) {
+                    data.playerInfo.lastToggleFlight.reset();
+                }
 
                 data.playerInfo.canFly = packet.isAllowedFlight();
                 data.playerInfo.creative = packet.isCreativeMode();

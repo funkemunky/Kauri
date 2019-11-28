@@ -34,7 +34,8 @@ public class PlayerInformation {
     public long lastAttackTimeStamp;
 
     //actions
-    public boolean sneaking, sprinting, ridingJump, breakingBlock, flying, canFly, creative;
+    public boolean sneaking, sprinting, ridingJump, breakingBlock, flying, canFly, creative, inVehicle,
+            gliding, riptiding;
 
     //ticks
     public int liquidTicks, groundTicks, airTicks, halfBlockTicks, webTicks, climbTicks, slimeTicks, iceTicks,
@@ -44,6 +45,7 @@ public class PlayerInformation {
             lastTargetSwitch = new TickTimer(3),
             lastBlockPlace = new TickTimer(10),
             lastToggleFlight = new TickTimer(10);
+    public long lastToggleFlightStamp;
 
     public float velocityX, velocityY, velocityZ;
 
