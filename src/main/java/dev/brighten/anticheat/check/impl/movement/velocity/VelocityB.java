@@ -41,8 +41,8 @@ public class VelocityB extends Check {
     }
 
     @Packet
-    public void onTransaction(WrappedInTransactionPacket packet, long timeStamp) {
-        if(packet.getAction() == (short)101) {
+    public void onTransaction(WrappedInKeepAlivePacket packet, long timeStamp) {
+        if(packet.getTime() == (long)101) {
             velocityTS = timeStamp;
         }
     }

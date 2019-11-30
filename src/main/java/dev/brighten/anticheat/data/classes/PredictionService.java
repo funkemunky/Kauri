@@ -26,7 +26,7 @@ import java.util.List;
 public class PredictionService {
 
     private ObjectData data;
-    public boolean fly, velocity, position, sneak, sprint, useSword, hit, dropItem, inWeb, isCollidedHorizontally,
+    public boolean fly, velocity, position, sneak, sprint, lsprint, lsneak, useSword, hit, dropItem, inWeb, isCollidedHorizontally,
             lastOnGround, onGround, lastSprint, fMath, fastMath, walkSpecial, lastVelocity, isCollidedVertically, 
             isCollided;
     public double posX, posY, posZ, lPosX, lPosY, lPosZ, rmotionX, rmotionY, rmotionZ,
@@ -46,10 +46,6 @@ public class PredictionService {
 
     public void onSend(PacketSendEvent event) {
         switch(event.getType()) {
-            case Packet.Server.POSITION: {
-                TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutKeepAlivePacket(233).getObject());
-                break;
-            }
             case Packet.Server.ENTITY_VELOCITY: {
                 WrappedOutVelocityPacket packet = new WrappedOutVelocityPacket(event.getPacket(), event.getPlayer());
 
@@ -57,19 +53,13 @@ public class PredictionService {
                     velocityX = packet.getX();
                     velocityY = packet.getY();
                     velocityZ = packet.getZ();
-
-                    //dev.brighten.anticheat.utils.MiscUtils.testMessage("sent keepAlive");
-
-                    TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutKeepAlivePacket(255).getObject());
                 }
                 break;
             }
             case Packet.Server.ABILITIES: {
                 WrappedOutAbilitiesPacket packet = new WrappedOutAbilitiesPacket(event.getPacket(), event.getPlayer());
 
-                if(packet.isAllowedFlight()) {
-                    fly = true;
-                } else fly = false;
+                fly = packet.isAllowedFlight();
                 break;
             }
         }
@@ -77,26 +67,10 @@ public class PredictionService {
 
     public void onReceive(PacketReceiveEvent e) {
         switch(e.getType()) {
-            case Packet.Client.KEEP_ALIVE: {
-                WrappedInKeepAlivePacket packet = new WrappedInKeepAlivePacket(e.getPacket(), e.getPlayer());
-                if(packet.getTime() == 255) {
-                    velocity = true;
-                    //dev.brighten.anticheat.utils.MiscUtils
-                    //        .testMessage("&evelX=" + velocityX + " velZ=" + velocityZ);
-                } else if(packet.getTime() == 233) {
-                    position = true;
-                }
-                break;
-            }
             case Packet.Client.ABILITIES: {
                 WrappedInAbilitiesPacket packet = new WrappedInAbilitiesPacket(e.getPacket(), e.getPlayer());
 
-                if(packet.isAllowedFlight()) {
-                    fly = true;
-                } else {
-                    fly = false;
-                }
-
+                fly = packet.isAllowedFlight();
                 walkSpeed = packet.getWalkSpeed();
 
                 //Bukkit.broadcastMessage(packet.isAllowedFlight() + "");
@@ -205,6 +179,9 @@ public class PredictionService {
                     e2.printStackTrace();
                 }
 
+                lsneak = sneak;
+                lsprint = sprint;
+
                 if(dropItem) {
                     useSword = false;
                 }
@@ -290,7 +267,7 @@ public class PredictionService {
     private void calc() {
         boolean flag = true;
         precision = String.valueOf((int) Math.abs(posX > posZ ? posX : posX)).length();
-        precision = 15 - precision;
+        precision = 13 - precision;
         double preD = 1.2 * Math.pow(10, -Math.max(3, precision - 5));  // the motion deviates further and further from the coordinates 0 0 0. this value fix this
 
         double mx = rmotionX - lmotionX; // mx, mz is an Value to calculate the rotation and the Key of the Player
@@ -387,19 +364,17 @@ public class PredictionService {
                 float moveStrafing = moveS;
                 float moveForward = moveF;
 
-                if (sneak) {
-                    if (sprint)
-                        return;
-                    moveForward *= 0.3F;
-                    moveStrafing *= 0.3F;
-                }
-
 //				if (openInv) {
 //					if (sprint)
 //						return;
 //					if (sneak)
 //						return;
 //				}
+
+                if(sneak) {
+                    moveStrafing = (float)((double)moveStrafing * 0.3D);
+                    moveForward = (float)((double)moveForward * 0.3D);
+                }
 
                 if (blocking2) { // if the player blocks with a sword
                     moveForward *= 0.2F;
@@ -414,21 +389,20 @@ public class PredictionService {
                 float var5;
                 float var3 = MovementUtils.getFriction(data) * 0.91f;
 
-                float testMoveSpeed =  0.1f;
-                if (sprint)
-                    testMoveSpeed += 0.03000001F;
+                aiMoveSpeed = (float) (data.getPlayer().getWalkSpeed() / 2D);
+
+                if(sprint) {
+                    aiMoveSpeed+= aiMoveSpeed * 0.30000001192092896D;
+                }
 
                 if(data.getPlayer().hasPotionEffect(PotionEffectType.SPEED)) {
-                    testMoveSpeed += (PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.SPEED) * (0.20000000298023224D)) * testMoveSpeed;
+                    aiMoveSpeed += (PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.SPEED) * (0.20000000298023224D)) * aiMoveSpeed;
                 }
                 if(data.getPlayer().hasPotionEffect(PotionEffectType.SLOW)) {
-                    testMoveSpeed += (PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.SLOW) * (-0.15000000596046448D)) * testMoveSpeed;
+                    aiMoveSpeed += (PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.SLOW) * (-0.15000000596046448D)) * aiMoveSpeed;
                 }
-                
-                aiMoveSpeed = Atlas.getInstance().getBlockBoxManager().getBlockBox().getAiSpeed(data.getPlayer());
 
-                dev.brighten.anticheat.utils.MiscUtils.testMessage(aiMoveSpeed + ", " + testMoveSpeed);
-
+                dev.brighten.anticheat.utils.MiscUtils.testMessage("ai: " + aiMoveSpeed);
                 //aiMoveSpeed+= (data.getPlayer().getWalkSpeed() - 0.2) * 5 * 0.45;
 
                 //Bukkit.broadcastMessage(aiMoveSpeed + "");
@@ -474,7 +448,7 @@ public class PredictionService {
                 diff = new BigDecimal(diff).setScale(precision + 2, RoundingMode.HALF_UP).doubleValue();
                 diffString = new BigDecimal(diff).setScale(precision + 2, RoundingMode.HALF_UP).toPlainString();
 
-                dev.brighten.anticheat.utils.MiscUtils.testMessage("diff=" + diffString + ", " + diff);
+                dev.brighten.anticheat.utils.MiscUtils.testMessage("diff=" + diffString + ", " + diff + ", " + preD);
 
                 if (diff < preD) { // if the diff is small enough
                     //Bukkit.broadcastMessage(diffString + " loops " + loops + " key: " + key);

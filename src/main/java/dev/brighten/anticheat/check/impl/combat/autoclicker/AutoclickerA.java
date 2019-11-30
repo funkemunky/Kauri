@@ -19,7 +19,7 @@ public class AutoclickerA extends Check {
             if(ticks > 30) {
                 vl++;
                 punish();
-            } else if(ticks > 20) {
+            } else if(ticks >= 19) {
                 vl++;
                 flag("cps=" + ticks + " ping=%p tps=%t");
             } else vl-= vl > 0 ? 0.2 : 0;

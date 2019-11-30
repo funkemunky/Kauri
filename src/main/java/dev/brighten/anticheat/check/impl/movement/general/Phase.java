@@ -50,11 +50,8 @@ public class Phase extends Check {
                     List<BoundingBox> colliding = MinecraftReflection
                             .getCollidingBoxes(null, data.getPlayer().getWorld(), total);
 
-                    List<BoundingBox> phasedBlocks = colliding.stream()
+                    Optional<Block> optional = colliding.stream()
                             .filter(box -> !currentBox.collides(box) && fromBox.collides(box))
-                            .collect(Collectors.toList());
-                    Optional<Block> optional = phasedBlocks
-                            .stream()
                             .map(box -> box.getMinimum().midpoint(box.getMaximum())
                                     .toLocation(data.getPlayer().getWorld()).getBlock())
                             .filter(BlockUtils::isSolid).findFirst();

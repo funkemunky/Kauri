@@ -41,7 +41,7 @@ public class Reach extends Check {
             List<Location> point = data.pastLocation.getEstimatedLocation(0, Math.max(data.lagInfo.transPing + 50L, 150L))
                     .stream()
                     .map(kloc -> kloc.toLocation(data.getPlayer().getWorld())
-                    .add(0, data.getPlayer().getEyeHeight(), 0))
+                    .add(0, data.playerInfo.sneaking ? 1.54f : 1.62f, 0))
                     .collect(Collectors.toList());
 
             List<BoundingBox> previousLocations = data.targetPastLocation

@@ -9,9 +9,9 @@ import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
 import lombok.val;
 
-@CheckInfo(name = "Autoclicker (C)", description = "Checks if the autoclicker always stays within a specific range",
+@CheckInfo(name = "Autoclicker (D)", description = "Checks if the autoclicker clicks within a specific deviation.",
         checkType = CheckType.AUTOCLICKER, developer = true, punishVL = 20)
-public class AutoclickerC extends Check {
+public class AutoclickerD extends Check {
 
     private Interval interval = new Interval(22);
 
@@ -33,11 +33,11 @@ public class AutoclickerC extends Check {
             double avg = stats.getAverage();
             double std = interval.std();
 
-            double deltaAvg = MathUtils.getDelta(avg, lavg), deltaStd = MathUtils.getDelta(std, lstd);
-            if(deltaAvg < 5 && deltaStd > 4 && avg < 135) {
+            double deltaStd = MathUtils.getDelta(std, lstd);
+            if(deltaStd < 3 && avg < 125) {
                 vl++;
                 if(vl > 4) {
-                    flag("avg=" + deltaAvg + " std=" + deltaStd);
+                    flag("avg=" + avg + " std=" + deltaStd);
                 }
             } else vl-= vl > 0 ? 0.25 : 0;
             debug("vl=" + vl + " avg=" + MathUtils.round(avg, 3)

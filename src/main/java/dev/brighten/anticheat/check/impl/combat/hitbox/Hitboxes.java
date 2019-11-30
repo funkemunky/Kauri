@@ -52,7 +52,7 @@ public class Hitboxes extends Check {
                     .stream()
                     .map(loc ->
                             loc.toLocation(data.getPlayer().getWorld()).clone()
-                                    .add(0, data.getPlayer().getEyeHeight(), 0))
+                                    .add(0, data.playerInfo.sneaking ? 1.54f : 1.62f, 0))
                     .map(loc -> new RayTrace(loc.toVector(), loc.getDirection()))
                     .collect(Collectors.toList());
 

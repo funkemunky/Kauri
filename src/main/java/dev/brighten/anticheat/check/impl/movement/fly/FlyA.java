@@ -25,7 +25,7 @@ public class FlyA extends Check {
                 maxHeight = Math.max(2f,
                         MovementUtils.getTotalHeight(data.getPlayer(), slimeHeight)) * 1.25f;
                 wasOnSlime = false;
-            } else if(!tookVelocity && data.playerInfo.serverGround) {
+            } else if(!tookVelocity && data.playerInfo.clientGround) {
                 maxHeight = MovementUtils.getTotalHeight(
                         data.getPlayer(),
                         MovementUtils.getJumpHeight(data.getPlayer())) + 0.1f;
@@ -37,7 +37,7 @@ public class FlyA extends Check {
 
             if(data.playerInfo.lastVelocity.hasNotPassed(10)) {
                 tookVelocity = true;
-            } else if(data.playerInfo.serverGround) {
+            } else if(data.playerInfo.clientGround) {
                 tookVelocity = false;
             }
 
@@ -54,12 +54,11 @@ public class FlyA extends Check {
                     && timeStamp - data.playerInfo.lastServerPos > 50L
                     && !data.playerInfo.serverPos
                     && !data.playerInfo.clientGround
+                    && !data.playerInfo.serverGround
                     && (!data.playerInfo.wasOnSlime || maxHeight >= 2)
                     && !data.playerInfo.flightCancel) {
                 vl++;
-                if(vl > 1) {
-                    flag(totalHeight + ">-" + maxHeight);
-                }
+                flag(totalHeight + ">-" + maxHeight);
             }
 
             debug("total=" + totalHeight + " max=" + maxHeight

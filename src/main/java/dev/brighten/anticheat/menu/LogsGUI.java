@@ -95,7 +95,7 @@ public class LogsGUI extends ChestMenu {
                                 : "&e&oRight Click &7&oto get an &f&ounlisted &7&opastebin link of the logs."),
                         (shown != null && shown.hasPermission("kauri.logs.clear")
                                 ? "&c&o(No Permission) &e&o&mShift Right Click &7&o&mto &f&o&mclear &7&o&mthe logs of " + player.getName()
-                                : "&e&oShift Right Click &7&oto &f&oclear &7&othe logs of " + player.getName())).build(),
+                                : "&e&oShift Left Click &7&oto &f&oclear &7&othe logs of " + player.getName())).build(),
                 (player, info) -> {
                     if (player.hasPermission("kauri.logs.share")) {
                         if(info.getClickType().isRightClick()) {
@@ -152,6 +152,7 @@ public class LogsGUI extends ChestMenu {
     }
 
     private void cancelTask() {
+        if(updaterTask == null) return;
         updaterTask.cancel();
     }
 

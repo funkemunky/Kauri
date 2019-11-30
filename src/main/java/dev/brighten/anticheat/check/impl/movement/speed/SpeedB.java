@@ -25,15 +25,15 @@ public class SpeedB extends Check {
                         && !data.playerInfo.flightCancel
                         && !data.playerInfo.collidesHorizontally
                         && data.playerInfo.lastToggleFlight.hasPassed(20)) {
-                    vl+= diff > 0.6 ? 4 : 1;
-                    if(vl > 3) {
+                    vl++;
+                    if(diff > 0.6f || vl > 3) {
                         flag("diff=" + MathUtils.round(diff, 4)
                                 + " xz=" + MathUtils.round(data.playerInfo.deltaXZ, 4));
                     }
                     debug(Color.Green + "Flag");
                 } else vl-= vl > 0 ? 0.25f : 0;
 
-                debug("diff=" + diff + " vl=" + vl);
+                debug("diff=" + diff + " vl=" + vl + " sneak=" + data.playerInfo.sneaking + " sprinting=" + data.playerInfo.sprinting);
             }
         }
     }

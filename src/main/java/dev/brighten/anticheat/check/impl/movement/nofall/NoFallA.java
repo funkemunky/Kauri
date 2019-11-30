@@ -15,7 +15,7 @@ public class NoFallA extends Check {
         if(!packet.isPos()) return;
 
         boolean flag = data.playerInfo.clientGround
-                ? data.playerInfo.deltaY != 0 && !data.playerInfo.serverGround
+                ? data.playerInfo.deltaY != 0 && !data.playerInfo.serverGround && data.playerInfo.groundTicks > 1
                 : data.playerInfo.deltaY == 0 && data.playerInfo.lDeltaY == 0;
 
         if(!data.playerInfo.flightCancel

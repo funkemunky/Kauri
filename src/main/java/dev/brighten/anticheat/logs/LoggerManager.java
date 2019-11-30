@@ -130,7 +130,7 @@ public class LoggerManager {
         List<StructureSet> sets = logsDatabase.getDatabaseValues()
                 .stream()
                 .filter(structSet -> structSet.containsKey("type") && structSet.getField("type").equals("log"))
-                .filter(structSet -> structSet.getField("uuid").equals(uuid.toString()))
+                .filter(structSet -> structSet.containsKey("uuid") && structSet.getField("uuid").equals(uuid.toString()))
                 .collect(Collectors.toList());
 
         return sets.stream().map(set -> new Log(
@@ -150,9 +150,10 @@ public class LoggerManager {
     public void clearLogs(UUID uuid) {
         logsDatabase.getDatabaseValues()
                 .stream()
-                .filter(set -> set.getField("uuid").equals(uuid.toString()))
+                .filter(set -> !set.containsKey("uuid") || set.getField("uuid").equals(uuid.toString()))
                 .map(set -> set.id)
-                .forEach(logsDatabase::remove);
+                .forEach(id -> logsDatabase.remove(id));
+        logsDatabase.saveDatabase();
     }
     
     public List<Punishment> getPunishments(UUID uuid) {

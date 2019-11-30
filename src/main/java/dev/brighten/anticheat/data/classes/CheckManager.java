@@ -4,6 +4,7 @@ import cc.funkemunky.api.reflections.types.WrappedClass;
 import cc.funkemunky.api.reflections.types.WrappedMethod;
 import cc.funkemunky.api.tinyprotocol.api.NMSObject;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
+import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.CheckSettings;
@@ -29,8 +30,10 @@ public class CheckManager {
 
         val methods = checkMethods.get(object.getClass());
         methods.parallelStream().filter(entry -> entry.getValue().getMethod().isAnnotationPresent(Packet.class))
+                .sequential()
                 .forEach(entry -> {
                     Check check = checks.get(entry.getKey());
+                    Kauri.INSTANCE.profiler.start("check:" + check.name);
 
                     if(check.enabled) {
                         if(entry.getValue().getMethod().getParameterCount() > 1) {
@@ -39,6 +42,7 @@ public class CheckManager {
                             entry.getValue().invoke(check, object);
                         }
                     }
+                    Kauri.INSTANCE.profiler.stop("check:" + check.name);
                 });
     }
 
