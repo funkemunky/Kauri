@@ -7,7 +7,7 @@ import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
 
 @CheckInfo(name = "NoFall (A)", description = "Checks to make sure the ground packet from the client is legit",
-        checkType = CheckType.BADPACKETS, punishVL = 20, executable = false)
+        checkType = CheckType.NOFALL, punishVL = 20, executable = false)
 public class NoFallA extends Check {
 
     @Packet
@@ -16,7 +16,7 @@ public class NoFallA extends Check {
 
         boolean flag = data.playerInfo.clientGround
                 ? data.playerInfo.deltaY != 0 && !data.playerInfo.serverGround && data.playerInfo.groundTicks > 1
-                : data.playerInfo.deltaY == 0 && data.playerInfo.lDeltaY == 0;
+                : data.playerInfo.deltaY == 0 && data.playerInfo.lDeltaY == 0 && !data.blockInfo.blocksAbove;
 
         if(!data.playerInfo.flightCancel
                 && flag) {

@@ -7,7 +7,7 @@ import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
 
 @CheckInfo(name = "NoFall (B)", description = "Compares the server calculated ground to client calculated ground.",
-        checkType = CheckType.BADPACKETS)
+        checkType = CheckType.NOFALL, punishVL = 12)
 public class NoFallB extends Check {
 
     @Packet

@@ -276,8 +276,7 @@ public class MovementProcessor {
                 || data.playerInfo.liquidTicks > 0
                 || data.playerInfo.climbTicks > 0
                 || timeStamp - data.creation < 2000
-                || data.playerInfo.serverPos
-                || Kauri.INSTANCE.lastTickLag.hasNotPassed(2);
+                || data.playerInfo.serverPos;
 
         data.playerInfo.generalCancel = data.playerInfo.canFly
                 || data.playerInfo.creative

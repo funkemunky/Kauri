@@ -28,10 +28,13 @@ public class FlyA extends Check {
             } else if(!tookVelocity && data.playerInfo.clientGround) {
                 maxHeight = MovementUtils.getTotalHeight(
                         data.getPlayer(),
-                        MovementUtils.getJumpHeight(data.getPlayer())) + 0.1f;
+                        MovementUtils.getJumpHeight(data.getPlayer())) * 1.4f;
             }
 
-            if(data.playerInfo.lastToggleFlight.hasNotPassed(10) || timeStamp - data.playerInfo.lastServerPos < 100L) {
+            if(data.playerInfo.lastBlockPlace.hasNotPassed(5)) totalHeight = 0;
+
+            if(data.playerInfo.lastToggleFlight.hasNotPassed(10)
+                    || timeStamp - data.playerInfo.lastServerPos < 100L) {
                 totalHeight = 0;
             }
 
@@ -46,7 +49,7 @@ public class FlyA extends Check {
                 maxHeight = MovementUtils.getTotalHeight(data.getPlayer(), data.playerInfo.velocityY) + 0.1f;
             }
 
-            if(data.playerInfo.clientGround) {
+            if(data.playerInfo.clientGround || data.playerInfo.serverGround) {
                 totalHeight = 0;
             } else if(data.playerInfo.deltaY > 0) totalHeight += data.playerInfo.deltaY;
 

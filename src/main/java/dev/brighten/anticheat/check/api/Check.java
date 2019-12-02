@@ -155,8 +155,9 @@ public class Check {
         register(new FlyA());
         register(new FlyB());
         register(new FlyC());
+        register(new FlyD());
         register(new FastLadder());
-        register(new Phase());
+        //register(new Phase());
         register(new NoFallA());
         register(new NoFallB());
         register(new Reach());
@@ -184,6 +185,7 @@ public class Check {
         register(new BadPacketsJ());
         register(new BadPacketsK());
         register(new BadPacketsL());
+        register(new BadPacketsT());
         register(new VelocityA());
         register(new VelocityB());
         register(new VelocityC());

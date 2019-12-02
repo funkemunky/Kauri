@@ -13,15 +13,17 @@ import dev.brighten.anticheat.check.api.Packet;
         checkType = CheckType.BADPACKETS, punishVL = 175)
 public class Timer extends Check {
 
-    private long lastTS;
+    private long lastTS, lastElapsed;
+    private int ticks;
     private EvictingList<Long> times = new EvictingList<>(30);
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet, long timeStamp) {
         long elapsed = timeStamp - lastTS;
+        long deltaElapsed = Math.round((elapsed + lastElapsed) / 2D);
 
-        if(timeStamp - data.creation > 500 && !data.playerInfo.serverPos) {
-            if(elapsed > 4) times.add(elapsed);
+        if(timeStamp - data.creation > 500 && !data.playerInfo.serverPos && (ticks > 6 || ticks++ > 4)) {
+            if(elapsed > 4) times.add(deltaElapsed);
 
             double average = times.stream().mapToLong(val -> val).average().orElse(50.0);
             double ratio = 50 / average;
@@ -34,8 +36,9 @@ public class Timer extends Check {
                 if(vl++ > 80) flag("pct=" + MathUtils.round(pct, 2) + "%");
             } else vl-= vl > 0 ? 1.5 : 0;
 
-            debug("pct=" + pct + ", vl=" + vl);
+            debug("pct=" + pct + ", vl=" + vl+ " Delapsed=" + deltaElapsed);
         }
         lastTS = timeStamp;
+        lastElapsed = elapsed;
     }
 }

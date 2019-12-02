@@ -3,10 +3,7 @@ package dev.brighten.anticheat.check.impl.combat.reach;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.BoundingBox;
-import cc.funkemunky.api.utils.Color;
-import cc.funkemunky.api.utils.MiscUtils;
-import cc.funkemunky.api.utils.Tuple;
+import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.CheckType;
@@ -30,6 +27,8 @@ public class Reach extends Check {
     private static List<EntityType> allowedEntities = Arrays.asList(EntityType.PLAYER, EntityType.SKELETON,
             EntityType.ZOMBIE, EntityType.PIG_ZOMBIE, EntityType.VILLAGER);
 
+    private long lastTimestamp;
+
     @Packet
     public void onArm(WrappedInArmAnimationPacket packet) {
         vl-= vl > 0 ? 0.005 : 0;
@@ -38,7 +37,8 @@ public class Reach extends Check {
     @Packet
     public void onUse(WrappedInFlyingPacket packet, long timeStamp) {
         if(checkParameters(data, timeStamp)) {
-            List<Location> point = data.pastLocation.getEstimatedLocation(0, Math.max(data.lagInfo.transPing + 50L, 150L))
+            long delta = MathUtils.getDelta(50, timeStamp - lastTimestamp);
+            List<Location> point = data.pastLocation.getEstimatedLocation(0, Math.max(data.lagInfo.transPing + 50L, 150L) + delta)
                     .stream()
                     .map(kloc -> kloc.toLocation(data.getPlayer().getWorld())
                     .add(0, data.playerInfo.sneaking ? 1.54f : 1.62f, 0))
@@ -46,7 +46,7 @@ public class Reach extends Check {
 
             List<BoundingBox> previousLocations = data.targetPastLocation
                     .getEstimatedLocation(data.lagInfo.transPing
-                            , 150L)
+                            , 150L + delta)
                     .stream()
                     .map(loc -> getHitbox(loc, data.target.getType()))
                     .collect(Collectors.toList());
@@ -78,6 +78,7 @@ public class Reach extends Check {
                 debug((reach > 3.02 ? Color.Green : "") + "reach=" + reach + " collided=" + collided + "vl=" + vl);
             }
         }
+        lastTimestamp = timeStamp;
     }
 
     private static boolean checkParameters(ObjectData data, long timeStamp) {

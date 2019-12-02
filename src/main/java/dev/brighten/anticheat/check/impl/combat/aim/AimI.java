@@ -6,23 +6,32 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.CheckType;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.processing.MovementProcessor;
+import cc.funkemunky.api.utils.objects.Interval ;
 
 @CheckInfo(name = "Aim (I)", description = "Checks pitch accel", checkType = CheckType.AIM)
 public class AimI extends Check {
 
+    private Interval interval = new Interval(30);
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if(packet.isLook()) {
-            if(MathUtils.getDelta(data.playerInfo.deltaPitch, data.playerInfo.lDeltaPitch) < 1E-5
-                    && (data.playerInfo.deltaPitch > 0 || data.playerInfo.deltaYaw > 0.8)
-                    && data.playerInfo.lastAttack.hasNotPassed(20)
-                    && Math.abs(data.playerInfo.to.pitch) < 70) {
-                if(data.playerInfo.deltaYaw > 0.4 && vl++ > 10) {
-                    flag("shit=" + data.playerInfo.deltaPitch);
-                }
-            } else vl-= vl > 0 ? 2 : 0;
 
-            debug("cin=" + data.playerInfo.cinematicPitch + " pitch=" + data.playerInfo.to.pitch);
+            /*if(data.playerInfo.deltaYaw > 0 && data.playerInfo.lDeltaYaw > 0) {
+                if(interval.size() > 20) {
+                    debug("min=" + interval.min() + " avg=" + interval.average() + " std=" + interval.std());
+                    interval.clear();
+                } else interval.add(data.moveProcessor.deltaX);*/
+
+            if(data.playerInfo.deltaX > 100 && data.playerInfo.deltaYaw < 7) {
+                vl++;
+                if(vl > 20) {
+                    flag("youre shit nibba");
+                }
+            } else vl-= vl > 0 ? 0.05 : 0;
+            debug("sens=" + MovementProcessor.sensToPercent(data.moveProcessor.sensitivityX)
+                    + ", " + MovementProcessor.sensToPercent(data.moveProcessor.sensitivityY)
+                    + " deltaX=" + data.moveProcessor.deltaX + " deltaYaw=" + data.playerInfo.lDeltaYaw);
         }
     }
 
