@@ -1,5 +1,7 @@
 package dev.brighten.anticheat.data;
 
+import cc.funkemunky.api.Atlas;
+import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.TickTimer;
 import cc.funkemunky.api.utils.math.RollingAverageLong;
@@ -13,6 +15,7 @@ import dev.brighten.anticheat.utils.PastLocation;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 
 import java.util.UUID;
 
@@ -38,6 +41,7 @@ public class ObjectData {
     public PredictionService predictionService;
     public MovementProcessor moveProcessor;
     public int hashCode;
+    public ProtocolVersion playerVersion = ProtocolVersion.UNKNOWN;
 
     public ObjectData(UUID uuid) {
         this.uuid = uuid;
@@ -56,7 +60,9 @@ public class ObjectData {
         checkManager.addChecks();
         predictionService = new PredictionService(this);
         moveProcessor = new MovementProcessor(this);
-
+        Kauri.INSTANCE.executor.execute(() -> {
+            playerVersion = TinyProtocolHandler.getProtocolVersion(getPlayer());
+        });
     }
 
     public Player getPlayer() {

@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.menu;
 
+import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.handlers.ForgeHandler;
 import cc.funkemunky.api.handlers.ModData;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
@@ -39,7 +40,7 @@ public class PlayerInformationGUI extends ChestMenu {
         this.modData = ForgeHandler.getMods(data.getPlayer());
 
         addItems();
-        update();
+        update();;
     }
 
     public void addItems() {
@@ -68,7 +69,7 @@ public class PlayerInformationGUI extends ChestMenu {
         vioItem.owner(data.getPlayer().getName());
         vioItem.lore("",
                 halfLine,
-                "&eVersion&7: &f" + TinyProtocolHandler.getProtocolVersion(data.getPlayer()).name(),
+                "&eVersion&7: &f" + data.playerVersion.name(),
                 "&ePing/tPing&7: &f" + data.lagInfo.ping + "ms, " + data.lagInfo.transPing,
                 "&eLast Packet Drop&7: &f" + DurationFormatUtils
                         .formatDurationHMS(data.lagInfo.lastPacketDrop.getPassed() * 50),

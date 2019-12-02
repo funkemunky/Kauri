@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.check.api;
 
 import cc.funkemunky.api.Atlas;
+import cc.funkemunky.api.bungee.BungeeAPI;
 import cc.funkemunky.api.reflections.types.WrappedClass;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.utils.*;
@@ -122,20 +123,31 @@ public class Check {
     }
 
     public void punish() {
-        if(developer || !executable || punishVl == -1 || vl <= punishVl || System.currentTimeMillis() - Kauri.INSTANCE.lastTick > 200L) return;
-        RunUtils.task(() -> {
-            Kauri.INSTANCE.loggerManager.addPunishment(data, this);
+        if(developer || !executable || punishVl == -1 || vl <= punishVl
+                || System.currentTimeMillis() - Kauri.INSTANCE.lastTick > 200L) return;
+
+        Kauri.INSTANCE.loggerManager.addPunishment(data, this);
+        if(!Config.bungeePunishments) {
+            RunUtils.task(() -> {
+                if(!Config.broadcastMessage.equalsIgnoreCase("off")) {
+                    Bukkit.broadcastMessage(Color.translate(Config.broadcastMessage
+                            .replace("%name%", data.getPlayer().getName())));
+                }
+                ConsoleCommandSender sender = Bukkit.getConsoleSender();
+                Config.punishCommands.
+                        forEach(cmd -> Bukkit.dispatchCommand(
+                                sender,
+                                cmd.replace("%name%", data.getPlayer().getName())));
+                vl = 0;
+            }, Kauri.INSTANCE);
+        } else {
             if(!Config.broadcastMessage.equalsIgnoreCase("off")) {
-                Bukkit.broadcastMessage(Color.translate(Config.broadcastMessage
+                BungeeAPI.broadcastMessage(Color.translate(Config.broadcastMessage
                         .replace("%name%", data.getPlayer().getName())));
+                Config.punishCommands.
+                        forEach(cmd -> BungeeAPI.sendCommand(cmd.replace("%name%", data.getPlayer().getName())));
             }
-            ConsoleCommandSender sender = Bukkit.getConsoleSender();
-            Config.punishCommands.
-                    forEach(cmd -> Bukkit.dispatchCommand(
-                            sender,
-                            cmd.replace("%name%", data.getPlayer().getName())));
-            vl = 0;
-        }, Kauri.INSTANCE);
+        }
     }
 
     public void debug(String information) {

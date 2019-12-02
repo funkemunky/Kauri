@@ -20,6 +20,9 @@ public class Config {
             + "\n&e%name% &7was removed by &6Kauri &7because of an &fUnfair Advantage&7."
             + MiscUtils.line(Color.Dark_Gray);
 
+    @ConfigSetting(path = "punishments", name = "bungee")
+    static boolean bungeePunishments = false;
+
     @ConfigSetting(path = "alerts", name = "bungee", comment = "Sends alerts across servers.")
     public static boolean bungeeAlerts = false;
 
