@@ -1,0 +1,28 @@
+package dev.brighten.anticheat.check.impl.movement.fly;
+
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import dev.brighten.anticheat.check.api.Check;
+import dev.brighten.anticheat.check.api.CheckInfo;
+import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.api.check.CheckType;
+
+@CheckInfo(name = "Fly (C)", description = "Ensures a player does not fly in a vehicle.",
+        checkType = CheckType.FLIGHT, developer = true, punishVL = 10)
+public class FlyC extends Check {
+
+    @Packet
+    public void onPacket(WrappedInFlyingPacket packet) {
+        if(data.playerInfo.inVehicle
+                && !data.playerInfo.gliding
+                && !data.playerInfo.riptiding
+                && !data.playerInfo.serverGround) {
+            float vaccel = data.playerInfo.deltaY - data.playerInfo.lDeltaY;
+
+            if(vaccel > -0.02) {
+                if(vl++ > 2) {
+                    flag("v=" + vaccel + " deltaY=" + data.playerInfo.deltaY);
+                }
+            } else vl-= vl > 0 ? 0.25f : 0;
+        }
+    }
+}
