@@ -46,7 +46,7 @@ public class FlyA extends Check {
 
             if(tookVelocity) {
                 totalHeight = 0;
-                maxHeight = MovementUtils.getTotalHeight(data.getPlayer(), data.playerInfo.velocityY) + 0.1f;
+                maxHeight = MovementUtils.getTotalHeight(data.getPlayer(), data.playerInfo.velocityY) * 1.4f;
             }
 
             if(data.playerInfo.clientGround || data.playerInfo.serverGround) {

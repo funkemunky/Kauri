@@ -3,6 +3,8 @@ package dev.brighten.anticheat.check.impl.packets.badpackets;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInAbilitiesPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutAbilitiesPacket;
+import cc.funkemunky.api.utils.RunUtils;
+import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -35,9 +37,10 @@ public class BadPacketsD extends Check {
 
     @Packet
     public void flying(WrappedInFlyingPacket packet, long timeStamp) {
-        if(timeStamp - data.creation > 1000L) {
+        if(timeStamp - data.creation < 1000L) {
             serverAllowed = data.getPlayer().getAllowFlight();
             clientAllowed = data.getPlayer().getAllowFlight();
+            RunUtils.task(() -> data.getPlayer().setAllowFlight(false), Kauri.INSTANCE);
         } else {
             if(!serverAllowed && clientAllowed) {
                 if(vl++ > 1) {

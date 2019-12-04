@@ -6,6 +6,7 @@ import cc.funkemunky.api.tinyprotocol.packet.in.*;
 import cc.funkemunky.api.tinyprotocol.packet.out.*;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.ReflectionsUtil;
+import cc.funkemunky.api.utils.RunUtils;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.KLocation;
@@ -48,6 +49,7 @@ public class PacketProcessor {
 
                         data.target = (LivingEntity) packet.getEntity();
                     }
+                    data.predictionService.useSword = false;
                 }
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
@@ -61,6 +63,9 @@ public class PacketProcessor {
                 if(timeStamp - data.lagInfo.lastFlying <= 2) {
                     data.lagInfo.lastPacketDrop.reset();
                 }
+
+                if(timeStamp - data.creation > 10000L
+                        && timeStamp - data.lagInfo.lastTrans > 5000L) RunUtils.task(() -> data.getPlayer().kickPlayer("Lag?"));
                 data.lagInfo.lastFlying = timeStamp;
                 data.moveProcessor.process(packet, timeStamp);
                 data.checkManager.runPacket(packet, timeStamp);
@@ -117,6 +122,7 @@ public class PacketProcessor {
                 if (packet.getAction() == (short) 69) {
                     data.lagInfo.lastTransPing = data.lagInfo.transPing;
                     data.lagInfo.transPing = System.currentTimeMillis() - data.lagInfo.lastTrans;
+                    data.lagInfo.lastClientTrans = timeStamp;
 
                     //We use transPing for checking lag since the packet used is little known.
                     //AimE have not seen anyone create a spoof for it or even talk about the possibility of needing one.

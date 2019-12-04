@@ -14,7 +14,11 @@ public class FlyD extends Check {
     public void onFlying(WrappedInFlyingPacket packet) {
         if(packet.isPos() && !data.playerInfo.serverPos) {
             if(data.playerInfo.deltaY - data.playerInfo.lDeltaY > 0.001
-                    && data.playerInfo.airTicks > 1
+                    && data.playerInfo.airTicks > 2
+                    && !data.playerInfo.lClientGround
+                    && data.playerInfo.liquidTicks == 0
+                    && data.playerInfo.climbTicks == 0
+                    && data.playerInfo.blocksAboveTicks == 0
                     && !data.playerInfo.clientGround && !data.playerInfo.serverGround) {
                 vl++;
                 if(vl > 1 || !data.playerInfo.nearGround) {

@@ -72,7 +72,7 @@ public class ObjectData {
     }
 
     public class LagInformation {
-        public long lastKeepAlive, lastTrans;
+        public long lastKeepAlive, lastTrans, lastClientTrans;
         public long ping, averagePing, transPing, lastPing, lastTransPing;
         public boolean lagging;
         public TickTimer lastPacketDrop = new TickTimer(10), lastPingDrop = new TickTimer(40);

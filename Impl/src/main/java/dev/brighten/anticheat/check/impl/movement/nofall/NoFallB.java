@@ -13,7 +13,7 @@ public class NoFallB extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if(packet.isPos()) {
-            if(data.predictionService.onGround != data.playerInfo.clientGround && !data.playerInfo.generalCancel) {
+            if(data.playerInfo.lClientGround != data.playerInfo.clientGround && !data.playerInfo.generalCancel) {
                 if(vl++ > 5) {
                     flag("server=" + data.predictionService.onGround + " client=" + data.playerInfo.clientGround);
                 }

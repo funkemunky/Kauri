@@ -24,6 +24,7 @@ import dev.brighten.anticheat.check.impl.movement.speed.*;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityA;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityB;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityC;
+import dev.brighten.anticheat.check.impl.packets.Test;
 import dev.brighten.anticheat.check.impl.packets.Timer;
 import dev.brighten.anticheat.check.impl.packets.badpackets.*;
 import dev.brighten.anticheat.data.ObjectData;
@@ -105,7 +106,8 @@ public class Check implements KauriCheck {
                         .replace("%p", String.valueOf(data.lagInfo.transPing))
                         .replace("%t", String.valueOf(MathUtils.round(Kauri.INSTANCE.tps, 2)));
                 if (Kauri.INSTANCE.lastTickLag.hasPassed() && (data.lagInfo.lastPacketDrop.hasPassed(5)
-                        || data.lagInfo.lastPingDrop.hasPassed()) && System.currentTimeMillis() - Kauri.INSTANCE.lastTick < 100L) {
+                        || data.lagInfo.lastPingDrop.hasPassed(20))
+                        && System.currentTimeMillis() - Kauri.INSTANCE.lastTick < 100L) {
                     Kauri.INSTANCE.loggerManager.addLog(data, this, info);
 
                     if (lastAlert.hasPassed(MathUtils.millisToTicks(Config.alertsDelay))) {
@@ -192,6 +194,7 @@ public class Check implements KauriCheck {
         register(new FlyD());
         register(new FastLadder());
         //register(new Phase());
+        register(new Test());
         register(new NoFallA());
         register(new NoFallB());
         register(new Reach());

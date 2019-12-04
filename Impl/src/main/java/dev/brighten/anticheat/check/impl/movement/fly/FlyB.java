@@ -39,7 +39,7 @@ public class FlyB extends Check {
             } else vl-= vl > 0 ? 0.2f : 0;
 
             debug("deltaY=" + data.playerInfo.deltaY + " predicted=" + predicted
-                    + " ground=" + data.playerInfo.clientGround);
+                    + " ground=" + data.playerInfo.clientGround + " vl=" + vl);
         }
     }
 }

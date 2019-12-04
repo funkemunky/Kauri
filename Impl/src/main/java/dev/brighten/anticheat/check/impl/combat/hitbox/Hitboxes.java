@@ -97,10 +97,10 @@ public class Hitboxes extends Check {
         BoundingBox box = new BoundingBox(loc.toVector(), loc.toVector())
                 .grow((float)bounds.getX(), 0, (float)bounds.getZ())
                 .add(0,0,0,0,(float)bounds.getY(),0)
-                .grow(0.02f,0,0.02f);
+                .grow(0.02f,0.02f,0.02f);
 
         if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9)) {
-            return box.grow(0.1f,0,0.1f);
+            return box.grow(0.1f,0.1f,0.1f);
         }
 
         return box;
