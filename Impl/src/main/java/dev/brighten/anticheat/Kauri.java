@@ -15,17 +15,19 @@ import dev.brighten.anticheat.logs.LoggerManager;
 import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.processing.PacketProcessor;
 import dev.brighten.api.KauriAPI;
+import me.mat1337.loader.plugin.CustomJavaPlugin;
+import me.mat1337.loader.plugin.RemoteClassLoader;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.event.HandlerList;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
-public class Kauri extends JavaPlugin{
+public class Kauri extends CustomJavaPlugin {
 
     public static Kauri INSTANCE;
 
@@ -106,7 +108,7 @@ public class Kauri extends JavaPlugin{
 
         MiscUtils.printToConsole(Color.Gray + "Running scanner...");
         Atlas.getInstance().initializeScanner(getClass(),
-                this,
+                this, getClassLoader(), ((RemoteClassLoader)getClassLoader()).names.stream().filter(name -> name.endsWith(".class")).collect(Collectors.toSet()),
                 true,
                 true);
 
