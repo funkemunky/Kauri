@@ -23,8 +23,6 @@ public class AimI extends Check {
                 double range = summary.getMax() - summary.getMin();
                 float std = (float) interval.std(), avg = (float) summary.getAverage();
 
-                if(std < 10 && avg > 20)
-
                 debug("range=" + range + " std=" + std + " avg=" + avg);
                 interval.clear();
             } else interval.add(data.moveProcessor.deltaX);

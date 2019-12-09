@@ -11,10 +11,11 @@ import dev.brighten.api.check.CheckType;
 public class FlyD extends Check {
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
+    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(packet.isPos() && !data.playerInfo.serverPos) {
             if(data.playerInfo.deltaY - data.playerInfo.lDeltaY > 0.001
                     && data.playerInfo.airTicks > 2
+                    && timeStamp - data.playerInfo.lastVelocityTimestamp > 150L
                     && !data.playerInfo.lClientGround
                     && data.playerInfo.liquidTicks == 0
                     && data.playerInfo.climbTicks == 0
