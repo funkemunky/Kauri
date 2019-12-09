@@ -111,8 +111,18 @@ public class PacketProcessor {
             case Packet.Client.KEEP_ALIVE: {
                 WrappedInKeepAlivePacket packet = new WrappedInKeepAlivePacket(object, data.getPlayer());
 
-                data.lagInfo.lastPing = data.lagInfo.ping;
-                data.lagInfo.ping = System.currentTimeMillis() - data.lagInfo.lastKeepAlive;
+                if(packet.getTime() == 101) {
+                    data.playerInfo.lastVelocity.reset();
+                    data.playerInfo.lastVelocityTimestamp = timeStamp;
+                    data.predictionService.velocity = true;
+                } else if(packet.getTime() == 100) {
+                    data.playerInfo.lastServerPos = timeStamp;
+                    data.playerInfo.serverPos = true;
+                    data.predictionService.position = true;
+                } else {
+                    data.lagInfo.lastPing = data.lagInfo.ping;
+                    data.lagInfo.ping = System.currentTimeMillis() - data.lagInfo.lastKeepAlive;
+                }
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
             }
@@ -127,21 +137,14 @@ public class PacketProcessor {
                     //We use transPing for checking lag since the packet used is little known.
                     //AimE have not seen anyone create a spoof for it or even talk about the possibility of needing one.
                     //Large jumps in latency most of the intervalTime mean lag.
-                    if(MathUtils.getDelta(data.lagInfo.lastTransPing, data.lagInfo.transPing) > 40) {
+                    if (MathUtils.getDelta(data.lagInfo.lastTransPing, data.lagInfo.transPing) > 40) {
                         data.lagInfo.lastPingDrop.reset();
                     }
 
                     data.lagInfo.pingAverages.add(data.lagInfo.transPing);
                     data.lagInfo.averagePing = data.lagInfo.pingAverages.getAverage();
-                } else if(packet.getAction() == (short) 101) {
-                    data.playerInfo.lastVelocity.reset();
-                    data.playerInfo.lastVelocityTimestamp = timeStamp;
-                    data.predictionService.velocity = true;
-                } else if(packet.getAction() == (short) 100) {
-                    data.playerInfo.lastServerPos = timeStamp;
-                    data.playerInfo.serverPos = true;
-                    data.predictionService.position = true;
                 }
+
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
             }
@@ -187,7 +190,7 @@ public class PacketProcessor {
                 WrappedOutVelocityPacket packet = new WrappedOutVelocityPacket(object, data.getPlayer());
 
                 if(packet.getId() == data.getPlayer().getEntityId()) {
-                    TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutTransaction(0, (short)101, false).getObject());
+                    TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutKeepAlivePacket(101).getObject());
                     data.playerInfo.velocityX = (float) packet.getX();
                     data.playerInfo.velocityY = (float) packet.getY();
                     data.playerInfo.velocityZ = (float) packet.getZ();
@@ -217,7 +220,7 @@ public class PacketProcessor {
                 data.playerInfo.posLocs.add(new KLocation(packet.getX(), packet.getY(), packet.getZ(), packet.getYaw(), packet.getPitch()));
                 data.playerInfo.lastServerPos = System.currentTimeMillis();
                 data.checkManager.runPacket(packet, timeStamp);
-                TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutTransaction(0, (short) 100, false).getObject());
+                TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutKeepAlivePacket(100).getObject());
                 break;
             }
         }

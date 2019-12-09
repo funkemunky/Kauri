@@ -12,31 +12,29 @@ import dev.brighten.anticheat.check.api.Packet;
 public class SpeedB extends Check {
 
     private int moveTicks;
+    private double lastPredXZ;
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
         if(packet.isPos() && data.playerInfo.deltaXZ > 0) {
+            double predXZ = MathUtils
+                    .hypot(data.predictionService.predX, data.predictionService.predZ);
             if(moveTicks < 40) {
                 moveTicks++; //jank way to prevent false positives until a player moves a bit but works.
             } else {
-                double diff = data.predictionService.diff;
+                float pAccel = (float) Math.abs(predXZ - lastPredXZ), accel = Math.abs(data.playerInfo.deltaXZ - data.playerInfo.lDeltaXZ);
 
-                if(diff > 0.00001
-                        && data.playerInfo.deltaXZ > MathUtils
-                        .hypot(data.predictionService.predX, data.predictionService.predZ)
-                        && !data.playerInfo.flightCancel
-                        && data.playerInfo.blocksAboveTicks == 0
-                        && !data.playerInfo.collidesHorizontally
-                        && data.playerInfo.lastToggleFlight.hasPassed(20)) {
-                    vl++;
-                    if(diff > 0.6f || vl > 3) {
-                        flag("diff=" + MathUtils.round(diff, 4)
-                                + " xz=" + MathUtils.round(data.playerInfo.deltaXZ, 4));
+                if(MathUtils.getDelta(pAccel, accel) > 1E-5
+                        && !data.playerInfo.generalCancel
+                        && !data.blockInfo.onClimbable
+                        && !data.blockInfo.inLiquid
+                        && !data.playerInfo.collidesHorizontally) {
+                    if(vl++ > 2 || MathUtils.getDelta(pAccel, accel) > 0.4f) {
+                        flag("accel=" + accel + " p=" + pAccel);
                     }
-                    debug(Color.Green + "Flag");
                 } else vl-= vl > 0 ? 0.2f : 0;
-
-                debug("diff=" + diff + " vl=" + vl + " sneak=" + data.playerInfo.sneaking + " sprinting=" + data.playerInfo.sprinting);
+                debug("accel=" + accel + " pAccel=" + pAccel);
             }
+            lastPredXZ = predXZ;
         }
     }
 }

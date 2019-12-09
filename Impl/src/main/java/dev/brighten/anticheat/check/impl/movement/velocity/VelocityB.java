@@ -30,7 +30,7 @@ public class VelocityB extends Check {
     }
 
     @Packet
-    public void onUseEntity(WrappedInUseEntityPacket packet, long timeStamp) {
+    public void onUseEntity(WrappedInUseEntityPacket packet) {
         if(!useEntity && (data.predictionService.lastSprint || (
                         data.getPlayer().getItemInHand() != null
                         && data.getPlayer().getItemInHand().containsEnchantment(Enchantment.KNOCKBACK)))
@@ -41,8 +41,8 @@ public class VelocityB extends Check {
     }
 
     @Packet
-    public void onTransaction(WrappedInTransactionPacket packet, long timeStamp) {
-        if(packet.getAction() == (short)101) {
+    public void onTransaction(WrappedInKeepAlivePacket packet, long timeStamp) {
+        if(packet.getTime() == 101) {
             velocityTS = timeStamp;
         }
     }
