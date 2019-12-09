@@ -105,10 +105,7 @@ public class Kauri extends JavaPlugin {
         msgHandler = new MessageHandler(this);
 
         MiscUtils.printToConsole(Color.Gray + "Running scanner...");
-        Atlas.getInstance().initializeScanner(getClass(),
-                this,
-                true,
-                true);
+        Atlas.getInstance().initializeScanner(this, true, true);
 
         MiscUtils.printToConsole(Color.Gray + "Setting the language to " + Color.Yellow + Config.language);
         msgHandler.setCurrentLang(Config.language);
