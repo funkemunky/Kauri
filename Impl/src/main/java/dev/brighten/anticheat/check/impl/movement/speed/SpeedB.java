@@ -15,6 +15,7 @@ import dev.brighten.anticheat.utils.MovementUtils;
 public class SpeedB extends Check {
 
     private float deltaX, deltaZ;
+
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
         if(packet.isPos()) {
@@ -32,17 +33,19 @@ public class SpeedB extends Check {
             float f5;
 
             if (data.playerInfo.lClientGround) {
-                f5 = data.predictionService.aiMoveSpeed
+                f5 = Atlas.getInstance().getBlockBoxManager().getBlockBox().getAiSpeed(data.getPlayer())
                         * f;
             } else {
-                f5 = data.predictionService.sprint ? .026f : 0.02f;
+                f5 = data.predictionService.sprint ? .026f : .02f;
             }
 
-            moveFlying(data.predictionService.moveStrafing, data.predictionService.moveForward, f5);
+            moveFlying(data.predictionService.moveStrafing, 0.98f, f5);
 
             if(data.playerInfo.lDeltaY <= 0
                     && data.playerInfo.deltaY > 0
-                    && data.playerInfo.lClientGround && data.playerInfo.sprinting) {
+                    && !data.playerInfo.clientGround
+                    && data.playerInfo.lClientGround
+                    && data.playerInfo.sprinting) {
                 jump();
             }
 
@@ -50,11 +53,11 @@ public class SpeedB extends Check {
 
             if(data.playerInfo.deltaXZ > pDeltaXZ + 0.002f
                     && !data.playerInfo.generalCancel
-                    && pDeltaXZ > 0 && pDeltaXZ > 0.2f) {
-                if((vl+= data.playerInfo.deltaXZ - pDeltaXZ > 0.2f ? 4 : 1) > 3) {
+                    && pDeltaXZ > 0.2f) {
+                if((vl+= MathUtils.getDelta(data.playerInfo.deltaXZ, pDeltaXZ) > 0.2f ? 11 : 1) > 10) {
                     flag("your mom a hoe bitch");
                 }
-            } else vl-= vl > 0 ? 0.25f : 0;
+            } else vl-= vl > 0 ? 0.5f : 0;
 
             debug("pDeltaXZ=" + pDeltaXZ + " deltaXZ=" + data.playerInfo.deltaXZ);
 
