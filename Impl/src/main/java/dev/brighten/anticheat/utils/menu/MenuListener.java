@@ -7,6 +7,7 @@ import dev.brighten.anticheat.utils.menu.button.Button;
 import dev.brighten.anticheat.utils.menu.button.ClickAction;
 import dev.brighten.anticheat.utils.menu.type.BukkitInventoryHolder;
 import dev.brighten.anticheat.utils.menu.type.impl.ValueMenu;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -42,7 +43,7 @@ public class MenuListener implements Listener {
         final InventoryView inventoryView = event.getView();
         final Inventory inventory = inventoryView.getTopInventory();
 
-        if (inventory.getHolder() instanceof BukkitInventoryHolder) {
+        if (inventory.getHolder() instanceof BukkitInventoryHolder && ((Player) event.getWhoClicked()).isOnline()) {
             Menu menu = ((BukkitInventoryHolder) inventory.getHolder()).getMenu();
 
             event.setCancelled(true);

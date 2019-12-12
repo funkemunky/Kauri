@@ -111,6 +111,7 @@ public class MenuCommand {
 
         AtomicInteger amt = new AtomicInteger(0);
         Arrays.stream(CheckType.values())
+                .sorted(Comparator.comparing(Enum::name))
                 .forEach(type -> {
                     Button button = new Button(false, new ItemBuilder(Material.BOOK)
                             .amount(1).name("&e" + type.name()).build(),
