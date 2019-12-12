@@ -18,7 +18,7 @@ public class SpeedB extends Check {
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
-        if(packet.isPos()) {
+        if(packet.isPos() && (data.playerInfo.deltaXZ > 0 || data.playerInfo.deltaY != 0)) {
 
             if(Math.abs(deltaX) < 0.005) deltaX = 0;
             if(Math.abs(deltaZ) < 0.005) deltaZ = 0;
@@ -33,36 +33,51 @@ public class SpeedB extends Check {
             float f5;
 
             if (data.playerInfo.lClientGround) {
-                f5 = Atlas.getInstance().getBlockBoxManager().getBlockBox().getAiSpeed(data.getPlayer())
+                f5 = data.predictionService.aiMoveSpeed
                         * f;
             } else {
                 f5 = data.predictionService.sprint ? .026f : .02f;
             }
 
-            moveFlying(data.predictionService.moveStrafing, 0.98f, f5);
+            moveFlying(data.predictionService.moveStrafing, data.predictionService.moveForward, f5);
 
             if(data.playerInfo.lDeltaY <= 0
                     && data.playerInfo.deltaY > 0
+                    && (data.playerInfo.blocksAboveTicks > 0
+                    || MathUtils.getDelta(data.playerInfo.deltaY, data.playerInfo.jumpHeight) < 1E-4)
                     && !data.playerInfo.clientGround
                     && data.playerInfo.lClientGround
                     && data.playerInfo.sprinting) {
                 jump();
             }
 
-            double pDeltaXZ = MathUtils.hypot(deltaX, deltaZ);
+            double pDeltaXZ = MathUtils.hypot(deltaX, deltaZ)
+                    + (data.playerInfo.deltaYaw > 8 ? 0.007 : 0.002)
+                    + (data.lagInfo.lastPacketDrop.hasNotPassed(5) ? 0.01f : 0);
 
-            if(data.playerInfo.deltaXZ > pDeltaXZ + 0.002f
+            if(data.playerInfo.deltaXZ > pDeltaXZ
                     && !data.playerInfo.generalCancel
-                    && pDeltaXZ > 0.2f) {
+                    && data.playerInfo.lastVelocity.hasNotPassed(10)
+                    && pDeltaXZ > 0.1f) {
                 if((vl+= MathUtils.getDelta(data.playerInfo.deltaXZ, pDeltaXZ) > 0.2f ? 11 : 1) > 10) {
                     flag("your mom a hoe bitch");
                 }
+                debug(Color.Green + "Flag: " + vl);
             } else vl-= vl > 0 ? 0.5f : 0;
 
-            debug("pDeltaXZ=" + pDeltaXZ + " deltaXZ=" + data.playerInfo.deltaXZ);
+            debug("pDeltaXZ=" + MathUtils.trim(4, pDeltaXZ)
+                    + " deltaXZ=" + MathUtils.trim(4, data.playerInfo.deltaXZ)
+                    + " ground=" + data.playerInfo.clientGround
+                    + " forward=" + (data.predictionService.moveForward != 0)
+                    + " strafe=" + (data.predictionService.moveStrafing != 0));
 
             deltaX*= f4;
             deltaZ*= f4;
+
+            if(data.playerInfo.lastVelocity.hasNotPassed(5)) {
+                deltaX = data.playerInfo.deltaX;
+                deltaZ = data.playerInfo.deltaZ;
+            }
         } else deltaX = deltaZ = 0;
     }
 
