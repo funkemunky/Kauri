@@ -209,6 +209,7 @@ public class Check implements KauriCheck {
         register(new AimI());
         register(new SpeedA());
         register(new SpeedB());
+        register(new SpeedC());
         register(new Timer());
         register(new BadPacketsA());
         register(new BadPacketsB());
