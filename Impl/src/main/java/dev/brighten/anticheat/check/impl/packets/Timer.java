@@ -36,7 +36,7 @@ public class Timer extends Check {
                 if(vl++ > 80) flag("pct=" + MathUtils.round(pct, 2) + "%");
             } else vl-= vl > 0 ? 1.5 : 0;
 
-            debug("pct=" + pct + ", vl=" + vl+ " Delapsed=" + deltaElapsed);
+            debug("pct=" + pct + ", vl=" + vl+ " Delapsed=" + deltaElapsed + " elapsed=" + elapsed);
         }
         lastTS = timeStamp;
         lastElapsed = elapsed;

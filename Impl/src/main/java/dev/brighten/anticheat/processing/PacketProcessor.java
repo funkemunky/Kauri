@@ -218,7 +218,7 @@ public class PacketProcessor {
                 WrappedOutPositionPacket packet = new WrappedOutPositionPacket(object, data.getPlayer());
 
                 data.playerInfo.posLocs.add(new KLocation(packet.getX(), packet.getY(), packet.getZ(), packet.getYaw(), packet.getPitch()));
-                data.playerInfo.lastServerPos = System.currentTimeMillis();
+                data.playerInfo.lastServerPos = timeStamp + data.lagInfo.transPing;
                 data.checkManager.runPacket(packet, timeStamp);
                 TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutKeepAlivePacket(100).getObject());
                 break;

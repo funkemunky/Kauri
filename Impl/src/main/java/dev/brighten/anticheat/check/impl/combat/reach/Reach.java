@@ -3,6 +3,7 @@ package dev.brighten.anticheat.check.impl.combat.reach;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -11,6 +12,7 @@ import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.KLocation;
 import dev.brighten.anticheat.utils.RayCollision;
 import dev.brighten.api.check.CheckType;
+import lombok.val;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.Vector;
@@ -35,58 +37,42 @@ public class Reach extends Check {
     }
 
     @Packet
-    public void onUse(WrappedInFlyingPacket packet, long timeStamp) {
-        if(checkParameters(data, timeStamp)) {
-            long delta = MathUtils.getDelta(50, timeStamp - lastTimestamp);
-            List<Location> point = data.pastLocation.getEstimatedLocation(0, Math.max(data.lagInfo.transPing + 50L, 150L) + delta)
-                    .stream()
-                    .map(kloc -> kloc.toLocation(data.getPlayer().getWorld())
-                    .add(0, data.playerInfo.sneaking ? 1.54f : 1.62f, 0))
-                    .collect(Collectors.toList());
+    public void onUse(WrappedInUseEntityPacket packet, long timeStamp) {
+        //debug("timeStamp=" + timeStamp + "ms");
 
-            List<BoundingBox> previousLocations = data.targetPastLocation
-                    .getEstimatedLocation(data.lagInfo.transPing
-                            , 150L + delta)
-                    .stream()
-                    .map(loc -> getHitbox(loc, data.target.getType()))
-                    .collect(Collectors.toList());
+        if(data.target == null || data.playerInfo.lastAttack.hasPassed(1)) return;
 
-            List<Double> reaches = new ArrayList<>();
-            int collided = 0;
+        long delta = MathUtils.getDelta(50, timeStamp);
 
-            for (Location origin : point) {
-                RayCollision ray = new RayCollision(origin.toVector(), origin.getDirection());
+        val origins = data.pastLocation.getEstimatedLocation(0, Math.round(data.lagInfo.transPing / 2D))
+                .stream()
+                .map(loc -> loc.toLocation(data.getPlayer().getWorld()).add(0, data.playerInfo.sneaking ? 1.54f : 1.65f, 0))
+                .collect(Collectors.toList());
 
-                for (BoundingBox box : previousLocations) {
-                    Tuple<Double, Double> result = new Tuple<>(0D,0D);
+        val entityLoc = data.targetPastLocation
+                .getEstimatedLocation(data.lagInfo.transPing / 2, Math.round(data.lagInfo.transPing / 2D));
 
-                    if(RayCollision.intersect(ray, box, result)) {
-                        reaches.add(result.one);
-                        collided++;
-                    }
+        List<Double> distances = new ArrayList<>();
+
+        origins.forEach(origin -> {
+            RayCollision collision = new RayCollision(origin.toVector(), origin.getDirection());
+            entityLoc.forEach(loc -> {
+                Vector point = collision
+                        .collisionPoint(getHitbox(loc, data.target.getType()));
+
+                if(point != null) {
+                    distances.add(point.distance(origin.toVector()));
                 }
-            }
+            });
+        });
 
-            if(collided > 1 && data.lagInfo.lastPacketDrop.hasPassed(1)) {
-                double reach = reaches.stream().mapToDouble(val -> val).min().orElse(0);
 
-                if(reach > 3.03 && collided > 2) {
-                    if((vl+= (collided > 4 ? 1 : 0.5f)) > 4) {
-                        flag("reach=" + reach + " collided=" + collided);
-                    }
-                } else vl-= vl > 0 ? (data.lagInfo.lagging ? 0.025 : 0.02) : 0;
-                debug((reach > 3.02 ? Color.Green : "") + "reach=" + reach + " collided=" + collided + "vl=" + vl);
-            }
+        if(distances.size() > 0) {
+            val distance = distances.stream().mapToDouble(num -> num).min().orElse(0);
+            debug("distance=" + distance);
         }
-        lastTimestamp = timeStamp;
-    }
 
-    private static boolean checkParameters(ObjectData data, long timeStamp) {
-        return timeStamp - data.playerInfo.lastAttackTimeStamp < 5
-                && data.target != null
-                && !MiscUtils.containsIgnoreCase(data.getPlayer().getGameMode().toString(), "gamemode")
-                && allowedEntities.contains(data.target.getType())
-                && !data.playerInfo.creative;
+        lastTimestamp = timeStamp;
     }
 
     private static BoundingBox getHitbox(KLocation loc, EntityType type) {
