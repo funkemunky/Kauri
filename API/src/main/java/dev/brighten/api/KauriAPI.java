@@ -2,7 +2,6 @@ package dev.brighten.api;
 
 import dev.brighten.api.handlers.ExemptHandler;
 
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 

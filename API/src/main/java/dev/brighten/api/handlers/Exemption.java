@@ -2,9 +2,11 @@ package dev.brighten.api.handlers;
 
 import dev.brighten.api.check.KauriCheck;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 public class Exemption {
     public final UUID uuid;

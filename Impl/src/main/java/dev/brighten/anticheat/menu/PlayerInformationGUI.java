@@ -1,14 +1,11 @@
 package dev.brighten.anticheat.menu;
 
-import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.handlers.ForgeHandler;
 import cc.funkemunky.api.handlers.ModData;
-import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
 import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.commands.LogCommand;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.utils.ItemBuilder;

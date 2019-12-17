@@ -8,9 +8,12 @@ import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.commands.KauriCommand;
+import lombok.val;
+import org.bukkit.Location;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -57,6 +60,18 @@ public class MiscUtils {
 
         return !WrappedEnumAnimation.fromNMS(animation).equals(WrappedEnumAnimation.NONE);
     }
+
+    //Skidded from Luke.
+    public static double getAngle(Location loc1, Location loc2) {
+        if (loc1 == null || loc2 == null) return -1;
+        Vector playerRotation = new Vector(loc1.getYaw(), loc1.getPitch(), 0.0f);
+        loc1.setY(0);
+        loc2.setY(0);
+        val rot = MathUtils.getRotations(loc1, loc2);
+        Vector expectedRotation = new Vector(rot[0], rot[1], 0);
+        return MathUtils.yawTo180D(playerRotation.getX() - expectedRotation.getX());
+    }
+
 
     public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
         List<Map.Entry<K, V>> list = new ArrayList<>(map.entrySet());

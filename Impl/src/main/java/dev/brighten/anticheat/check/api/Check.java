@@ -7,10 +7,7 @@ import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.impl.combat.aim.*;
-import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerA;
-import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerB;
-import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerC;
-import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerD;
+import dev.brighten.anticheat.check.impl.combat.autoclicker.*;
 import dev.brighten.anticheat.check.impl.combat.hand.HandA;
 import dev.brighten.anticheat.check.impl.combat.hand.HandB;
 import dev.brighten.anticheat.check.impl.combat.hand.HandC;
@@ -20,7 +17,9 @@ import dev.brighten.anticheat.check.impl.movement.fly.*;
 import dev.brighten.anticheat.check.impl.movement.general.FastLadder;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallA;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallB;
-import dev.brighten.anticheat.check.impl.movement.speed.*;
+import dev.brighten.anticheat.check.impl.movement.speed.SpeedA;
+import dev.brighten.anticheat.check.impl.movement.speed.SpeedB;
+import dev.brighten.anticheat.check.impl.movement.speed.SpeedC;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityA;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityB;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityC;
@@ -29,7 +28,6 @@ import dev.brighten.anticheat.check.impl.packets.Timer;
 import dev.brighten.anticheat.check.impl.packets.badpackets.*;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.api.KauriAPI;
-import dev.brighten.api.handlers.ExemptHandler;
 import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.KauriCheck;
 import dev.brighten.api.listener.KauriFlagEvent;
@@ -65,6 +63,9 @@ public class Check implements KauriCheck {
     @Getter
     public CheckType checkType;
 
+    private boolean exempt;
+    private TickTimer lastExemptCheck = new TickTimer(20);
+
     private TickTimer lastAlert = new TickTimer(MathUtils.millisToTicks(Config.alertsDelay));
 
     private static void register(Check check) {
@@ -96,10 +97,10 @@ public class Check implements KauriCheck {
     }
 
     public void flag(String information) {
+        if(lastExemptCheck.hasPassed()) exempt = KauriAPI.INSTANCE.exemptHandler.isExempt(data.uuid, this);
+        if(exempt) return;
         Kauri.INSTANCE.executor.execute(() -> {
-            if(KauriAPI.INSTANCE.exemptHandler.isExempt(data.uuid, this)) return;
-
-            KauriFlagEvent event = new KauriFlagEvent(this);
+            KauriFlagEvent event = new KauriFlagEvent(data.getPlayer(), this);
 
             if(!event.isCancelled()) {
                 final String info = information
@@ -188,10 +189,12 @@ public class Check implements KauriCheck {
         register(new AutoclickerB());
         register(new AutoclickerC());
         register(new AutoclickerD());
+        register(new AutoclickerE());
         register(new FlyA());
         register(new FlyB());
         register(new FlyC());
         register(new FlyD());
+        register(new FlyE());
         register(new FastLadder());
         //register(new Phase());
         register(new Test());

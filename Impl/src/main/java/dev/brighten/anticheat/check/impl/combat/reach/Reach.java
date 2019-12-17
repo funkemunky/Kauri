@@ -1,19 +1,17 @@
 package dev.brighten.anticheat.check.impl.combat.reach;
 
-import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
-import cc.funkemunky.api.utils.*;
+import cc.funkemunky.api.utils.BoundingBox;
+import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.MiscUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
-import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.KLocation;
 import dev.brighten.anticheat.utils.RayCollision;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
-import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.Vector;
 
@@ -37,20 +35,18 @@ public class Reach extends Check {
     }
 
     @Packet
-    public void onUse(WrappedInUseEntityPacket packet, long timeStamp) {
+    public void onUse(WrappedInFlyingPacket packet, long timeStamp) {
         //debug("timeStamp=" + timeStamp + "ms");
 
-        if(data.target == null || data.playerInfo.lastAttack.hasPassed(1)) return;
-
-        long delta = MathUtils.getDelta(50, timeStamp);
+        if(data.target == null || timeStamp - data.playerInfo.lastAttackTimeStamp > 55) return;
 
         val origins = data.pastLocation.getEstimatedLocation(0, Math.round(data.lagInfo.transPing / 2D))
                 .stream()
-                .map(loc -> loc.toLocation(data.getPlayer().getWorld()).add(0, data.playerInfo.sneaking ? 1.54f : 1.65f, 0))
+                .map(loc -> loc.toLocation(data.getPlayer().getWorld()).add(0, data.playerInfo.sneaking ? 1.54f : 1.62f, 0))
                 .collect(Collectors.toList());
 
         val entityLoc = data.targetPastLocation
-                .getEstimatedLocation(data.lagInfo.transPing / 2, Math.round(data.lagInfo.transPing / 2D));
+                .getEstimatedLocation(data.lagInfo.transPing, Math.max(200L, Math.round(data.lagInfo.transPing / 2D)));
 
         List<Double> distances = new ArrayList<>();
 
@@ -69,6 +65,12 @@ public class Reach extends Check {
 
         if(distances.size() > 0) {
             val distance = distances.stream().mapToDouble(num -> num).min().orElse(0);
+
+            if(distance > 3.0001) {
+                if(vl++ > 2) {
+                    flag("distance=" + MathUtils.round(distance, 3));
+                }
+            } else vl-= vl > 0 ? 0.02f : 0;
             debug("distance=" + distance);
         }
 
@@ -82,10 +84,6 @@ public class Reach extends Check {
                 .grow((float)bounds.getX(), 0, (float)bounds.getZ())
                 .add(0,0,0,0,(float)bounds.getY(),0);
 
-        if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9)) {
-            return box.grow(0.1f,0,0.1f);
-        }
-
-        return box;
+        return box.grow(0.1f,0.1f,0.1f);
     }
 }

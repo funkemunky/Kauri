@@ -7,7 +7,6 @@ import dev.brighten.anticheat.utils.menu.button.Button;
 import dev.brighten.anticheat.utils.menu.button.ClickAction;
 import dev.brighten.anticheat.utils.menu.type.BukkitInventoryHolder;
 import dev.brighten.anticheat.utils.menu.type.impl.ValueMenu;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;

@@ -3,7 +3,6 @@ package dev.brighten.anticheat;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.config.MessageHandler;
 import cc.funkemunky.api.profiling.ToggleableProfiler;
-import cc.funkemunky.api.reflections.types.WrappedClass;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
@@ -62,10 +61,7 @@ public class Kauri extends JavaPlugin {
         enabled = false;
         loggerManager.logsDatabase.saveDatabase();
         MiscUtils.printToConsole("&7Unregistering Kauri API...");
-        WrappedClass wrapped = new WrappedClass(KauriAPI.class);
         kauriAPI.service.shutdown();
-        wrapped.getFields().forEach(field -> field.set(kauriAPI, null));
-        kauriAPI = null;
 
         MiscUtils.printToConsole("&7Unregistering Atlas and Bukkit listeners...");
         HandlerList.unregisterAll(this); //Unregistering Bukkit listeners.

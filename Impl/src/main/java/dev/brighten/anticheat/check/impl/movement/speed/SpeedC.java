@@ -18,12 +18,12 @@ public class SpeedC extends Check {
                 && !data.playerInfo.generalCancel
                 && timeStamp - data.playerInfo.lastVelocityTimestamp > 250L) {
             if(data.playerInfo.airTicks > 2) {
-                float accelX = MathUtils.getDelta(data.playerInfo.deltaX, data.playerInfo.lDeltaX);
-                float accelZ = MathUtils.getDelta(data.playerInfo.deltaZ, data.playerInfo.lDeltaZ);
+                float accelX = data.playerInfo.deltaX - data.playerInfo.lDeltaX;
+                float accelZ = data.playerInfo.deltaZ - data.playerInfo.lDeltaZ;
                 float hypot = MathUtils.hypot(accelX, accelZ);
 
-                if(hypot > 0.1 && data.playerInfo.lastBlockPlace.hasPassed(10)) {
-                    if(verbose++ > 4) {
+                if(hypot > 0.1 && (accelX > -0.07 || accelZ > -0.07) && data.playerInfo.lastBlockPlace.hasPassed(10)) {
+                    if(verbose++ > 2) {
                         vl++;
                         flag("x=" + accelX + " z=" + accelZ);
                     }

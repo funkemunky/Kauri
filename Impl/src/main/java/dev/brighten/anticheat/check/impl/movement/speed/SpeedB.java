@@ -1,109 +1,231 @@
 package dev.brighten.anticheat.check.impl.movement.speed;
 
-import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.Color;
-import cc.funkemunky.api.utils.MathHelper;
 import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.PlayerUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.MovementUtils;
+import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.potion.PotionEffectType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @CheckInfo(name = "Speed (B)", description = "Predicts the motion of a player accurately.", developer = true,
         executable = false, punishVL = 150)
 public class SpeedB extends Check {
 
-    private float deltaX, deltaZ;
+    public double previousDistance;
+    private double drag = 0.91;
+    private int fallTicks;
+    private int noSlowStreak;
+    private Enchantment DEPTH_STRIDER;
+    private double omniVl = 0;
 
-    @Packet
-    public void onPacket(WrappedInFlyingPacket packet) {
-        if(packet.isPos() && (data.playerInfo.deltaXZ > 0 || data.playerInfo.deltaY != 0)) {
+    public SpeedB() {
+        try {
+            DEPTH_STRIDER = Enchantment.DEPTH_STRIDER;
+        } catch(Throwable e) {
 
-            if(Math.abs(deltaX) < 0.005) deltaX = 0;
-            if(Math.abs(deltaZ) < 0.005) deltaZ = 0;
-
-            float f4 = 0.91F;
-
-            if (data.playerInfo.lClientGround) {
-                f4 = MovementUtils.getFriction(data) * 0.91F;
-            }
-
-            float f = 0.16277136F / (f4 * f4 * f4);
-            float f5;
-
-            if (data.playerInfo.lClientGround) {
-                f5 = data.predictionService.aiMoveSpeed
-                        * f;
-            } else {
-                f5 = data.predictionService.sprint ? .026f : .02f;
-            }
-
-            moveFlying(data.predictionService.moveStrafing, data.predictionService.moveForward, f5);
-
-            if(data.playerInfo.lDeltaY <= 0
-                    && data.playerInfo.deltaY > 0
-                    && (data.playerInfo.blocksAboveTicks > 0
-                    || MathUtils.getDelta(data.playerInfo.deltaY, data.playerInfo.jumpHeight) < 1E-4)
-                    && !data.playerInfo.clientGround
-                    && data.playerInfo.lClientGround
-                    && data.playerInfo.sprinting) {
-                jump();
-            }
-
-            double pDeltaXZ = MathUtils.hypot(deltaX, deltaZ)
-                    + (data.playerInfo.deltaYaw > 8 ? 0.007 : 0.002)
-                    + (data.lagInfo.lastPacketDrop.hasNotPassed(5) ? 0.01f : 0);
-
-            if(data.playerInfo.deltaXZ > pDeltaXZ
-                    && !data.playerInfo.generalCancel
-                    && data.playerInfo.lastVelocity.hasNotPassed(10)
-                    && pDeltaXZ > 0.1f) {
-                if((vl+= MathUtils.getDelta(data.playerInfo.deltaXZ, pDeltaXZ) > 0.2f ? 11 : 1) > 10) {
-                    flag("your mom a hoe bitch");
-                }
-                debug(Color.Green + "Flag: " + vl);
-            } else vl-= vl > 0 ? 0.5f : 0;
-
-            debug("pDeltaXZ=" + MathUtils.trim(4, pDeltaXZ)
-                    + " deltaXZ=" + MathUtils.trim(4, data.playerInfo.deltaXZ)
-                    + " ground=" + data.playerInfo.clientGround
-                    + " forward=" + (data.predictionService.moveForward != 0)
-                    + " strafe=" + (data.predictionService.moveStrafing != 0));
-
-            deltaX*= f4;
-            deltaZ*= f4;
-
-            if(data.playerInfo.lastVelocity.hasNotPassed(5)) {
-                deltaX = data.playerInfo.deltaX;
-                deltaZ = data.playerInfo.deltaZ;
-            }
-        } else deltaX = deltaZ = 0;
-    }
-
-    private void moveFlying(float strafe, float forward, float friction) {
-        float f = strafe * strafe + forward * forward;
-
-        if (f >= 1.0E-4F) {
-            f = MathHelper.sqrt_float(f);
-
-            if (f < 1.0F) {
-                f = 1.0F;
-            }
-
-            f = friction / f;
-            strafe = strafe * f;
-            forward = forward * f;
-            float f1 = MathHelper.sin(data.playerInfo.to.yaw * (float) Math.PI / 180.0F);
-            float f2 = MathHelper.cos(data.playerInfo.to.yaw * (float) Math.PI / 180.0F);
-            deltaX += (strafe * f2 - forward * f1);
-            deltaZ += (forward * f2 + strafe * f1);
         }
     }
 
-    private void jump() {
-        float f = data.playerInfo.to.yaw * 0.017453292F;
-        this.deltaX -= (double) (MathHelper.sin(f) * 0.2F);
-        this.deltaZ += (double) (MathHelper.cos(f) * 0.2F);
+
+    @Packet
+    public void onPacket(WrappedInFlyingPacket packet, long timeStamp) {
+        if (!packet.isPos()
+                || (data.playerInfo.deltaXZ == 0 && data.playerInfo.deltaY == 0)
+                || data.playerInfo.generalCancel
+                || data.playerInfo.gliding) return;
+        List<String> tags = new ArrayList<>();
+        double deltaY = data.playerInfo.deltaY;
+
+        double moveSpeed = Math.pow(data.getPlayer().getWalkSpeed() * 5, 2);
+        double drag = this.drag;
+        boolean onGround = data.playerInfo.clientGround || data.playerInfo.wasOnSlime;
+
+        if (deltaY < 0) fallTicks++;
+        else fallTicks = 0;
+
+        Material type = data.getPlayer().getWorld().getBlockAt(data.getPlayer().getLocation().getBlockX(), (int) (data.getPlayer().getLocation().getY() - 1.8), data.getPlayer().getLocation().getBlockZ()).getType();
+
+        if (onGround || data.playerInfo.jumped) {
+            tags.add("ground");
+            drag *= 0.91;
+            moveSpeed *= drag > 0.708 ? 1.3 : 0.23315;
+            moveSpeed *= 0.16277136 / Math.pow(drag, 3);
+
+            if (deltaY > 0) {
+                tags.add("ascend");
+                moveSpeed += 0.2;
+
+                if (data.playerInfo.jumped) {
+                    tags.add("hop");
+                    moveSpeed += 0.05;
+                    if (data.playerInfo.wasOnSlime) {
+                        tags.add("slimehop");
+                        moveSpeed += 0.1;
+                    }
+                }
+            } else if (deltaY < 0.0) {
+                tags.add("fall");
+                moveSpeed -= 0.1;
+                if (data.playerInfo.wasOnSlime) {
+                    tags.add("slimefall");
+                    moveSpeed += 0.1;
+                }
+            } else {
+                if (timeStamp - data.playerInfo.lastServerPos < 500L) {
+                    moveSpeed *= 2;
+                    tags.add("tp");
+                }
+
+                tags.add("hover");
+                moveSpeed += 0.05;
+                if (data.playerInfo.lastAttack.hasNotPassed(10)) {
+                    tags.add("attacked");
+                    moveSpeed += 0.2;
+                }
+            }
+        } else {
+            tags.add("air");
+            moveSpeed = data.playerInfo.sprinting ? 0.026 : 0.02;
+            drag = 0.91;
+
+            if (timeStamp - data.playerInfo.lastServerPos < 500L) {
+                moveSpeed *= 1.5;
+                tags.add("tp");
+            }
+
+            if (fallTicks == 1 && !data.blockInfo.inLiquid) {
+                double dy = Math.abs(deltaY);
+                if (dy > 0.08 || dy < 0.07) {
+                    tags.add("fallen");
+                    moveSpeed /= (dy * 150);
+                }
+            }
+
+            if (data.blockInfo.onSoulSand) {
+                moveSpeed += 0.1;
+                if (type == Material.ICE || type == Material.PACKED_ICE) {
+                    moveSpeed += 0.1;
+                    tags.add("souliceair");
+                } else tags.add("soulair");
+            }
+            if (data.playerInfo.wasOnSlime) {
+                tags.add("slimeair");
+                moveSpeed += 0.2;
+            }
+        }
+
+        if (data.blockInfo.inWater) {
+            tags.add("water");
+            moveSpeed *= 0.8;
+        }
+
+        if (data.getPlayer().getNoDamageTicks() == data.getPlayer().getMaximumNoDamageTicks()
+                && data.blockInfo.inLava) {
+            tags.add("lava");
+            moveSpeed *= 0.6;
+        }
+
+        double previousHorizontal = previousDistance;
+        double horizontalDistance = data.playerInfo.deltaXZ;
+        boolean underBlock = data.playerInfo.blocksAboveTicks > 0;
+
+        if (underBlock) {
+            tags.add("under");
+            moveSpeed += 2.6;
+        }
+
+        if (data.playerInfo.deltaY > 0.01 && data.playerInfo.deltaY < 0.02) {
+            tags.add("waterjump");
+            moveSpeed += 1;
+        }
+
+        if (data.getPlayer().getInventory().getBoots() != null && DEPTH_STRIDER != null) {
+            int lvl = data.getPlayer().getInventory().getBoots().getEnchantmentLevel(DEPTH_STRIDER);
+            if (lvl != 0) {
+                tags.add("depthstrider");
+                moveSpeed += lvl;
+            }
+        }
+
+        if (data.blockInfo.onSlime || data.blockInfo.onStairs) {
+            tags.add("weird");
+            moveSpeed += 0.2;
+        }
+
+        if (timeStamp - data.playerInfo.lastServerPos < 150L) moveSpeed += 1;
+
+        if(data.playerInfo.lastVelocity.hasNotPassed(20)) {
+            moveSpeed += MathUtils.hypot(data.playerInfo.velocityX , data.playerInfo.velocityZ) ;
+        }
+
+        int speed = PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.SPEED);
+
+        if (data.getPlayer().hasPotionEffect(PotionEffectType.SPEED)) {
+            tags.add("speed");
+            moveSpeed += (speed * .06);
+        }
+
+        int jump = PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.JUMP);
+
+        if (data.getPlayer().hasPotionEffect(PotionEffectType.JUMP)) {
+            tags.add("jump");
+            moveSpeed += (jump * .06);
+        }
+
+        if (moveSpeed > 0.046
+                && moveSpeed < 0.047
+                && MathUtils.trim(4, deltaY) == 0.0784) {
+            tags.add("fall");
+            moveSpeed += 1;
+        }
+
+        if (data.blockInfo.inWeb) {
+            tags.add("web");
+            moveSpeed -= 0.2;
+        }
+
+        if (data.blockInfo.onSoulSand) {
+            moveSpeed -= 0.05;
+            if (type == Material.ICE || type == Material.PACKED_ICE) {
+                moveSpeed -= 0.1;
+                tags.add("soulice");
+            } else tags.add("soul");
+        }
+
+        if (data.blockInfo.onSlime) {
+            tags.add("slime");
+            moveSpeed -= 0.07;
+        }
+
+        double dyf = MathUtils.trim(4, data.playerInfo.deltaY);
+        if (dyf > -0.0785 && dyf < 0) {
+            tags.add("first");
+            moveSpeed += 0.21;
+        }
+
+        double horizontalMove = (horizontalDistance - previousHorizontal) - moveSpeed;
+        if (horizontalDistance > 0.1) {
+            String joined = String.join(",", tags);
+            debug(horizontalMove + ": " + joined);
+
+            if(horizontalMove > 0 && timeStamp - data.playerInfo.lastServerPos > 150L) {
+                vl+= horizontalMove > 0.01 ? 4 : 1;
+                if(vl > 2) {
+                    flag("move=" + MathUtils.round(horizontalMove, 4) + " tags=" + joined);
+                }
+            } else vl-= vl > 0 ? 0.025f : 0;
+        }
+
+        debug((timeStamp - data.playerInfo.lastServerPos) + ", " + (timeStamp - data.playerInfo.lastVelocityTimestamp));
+
+        this.previousDistance = horizontalDistance * drag;
+        this.drag = MovementUtils.getFriction(data);
     }
 }

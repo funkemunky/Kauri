@@ -10,7 +10,7 @@ import cc.funkemunky.api.utils.RunUtils;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.KLocation;
-import org.bukkit.Bukkit;
+import lombok.val;
 import org.bukkit.entity.LivingEntity;
 
 public class PacketProcessor {
@@ -68,6 +68,19 @@ public class PacketProcessor {
                         && timeStamp - data.lagInfo.lastTrans > 5000L) RunUtils.task(() -> data.getPlayer().kickPlayer("Lag?"));
                 data.lagInfo.lastFlying = timeStamp;
                 data.moveProcessor.process(packet, timeStamp);
+
+                if(!data.playerInfo.posLocs.isEmpty()) {
+                    val optional = data.playerInfo.posLocs.stream()
+                            .filter(loc -> loc.toVector().setY(0)
+                                    .distance(data.playerInfo.to.toVector().setY(0)) <= 1E-6)
+                            .findFirst();
+
+                    if(optional.isPresent()) {
+                        data.playerInfo.serverPos = true;
+                        data.playerInfo.lastServerPos = timeStamp;
+                        data.playerInfo.posLocs.remove(optional.get());
+                    }
+                }
                 data.checkManager.runPacket(packet, timeStamp);
                 if(data.playerInfo.serverPos) data.playerInfo.serverPos = false;
                 break;
@@ -218,7 +231,6 @@ public class PacketProcessor {
                 WrappedOutPositionPacket packet = new WrappedOutPositionPacket(object, data.getPlayer());
 
                 data.playerInfo.posLocs.add(new KLocation(packet.getX(), packet.getY(), packet.getZ(), packet.getYaw(), packet.getPitch()));
-                data.playerInfo.lastServerPos = timeStamp + data.lagInfo.transPing;
                 data.checkManager.runPacket(packet, timeStamp);
                 TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutKeepAlivePacket(100).getObject());
                 break;

@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.data;
 
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.TickTimer;
@@ -14,7 +15,6 @@ import dev.brighten.anticheat.utils.PastLocation;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 
 import java.util.UUID;
 

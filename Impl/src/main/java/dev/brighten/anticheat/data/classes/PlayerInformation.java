@@ -27,6 +27,7 @@ public class PlayerInformation {
     //Server Position
     public long lastServerPos;
     public boolean serverPos;
+    public long isTeleport, isVelocity;
     public EvictingList<KLocation> posLocs = new EvictingList<>(5);
 
     //Attack
