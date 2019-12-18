@@ -9,7 +9,7 @@ import cc.funkemunky.api.utils.ReflectionsUtil;
 import cc.funkemunky.api.utils.RunUtils;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
-import dev.brighten.anticheat.utils.KLocation;
+import cc.funkemunky.api.utils.KLocation;
 import lombok.val;
 import org.bukkit.entity.LivingEntity;
 

@@ -2,13 +2,22 @@ package dev.brighten.anticheat.data.classes;
 
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.utils.BoundingBox;
+import cc.funkemunky.api.utils.Materials;
 import cc.funkemunky.api.utils.ReflectionsUtil;
+import cc.funkemunky.api.utils.world.Material2;
+import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.utils.CollisionHandler;
+import dev.brighten.anticheat.utils.Helper;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +26,7 @@ public class BlockInformation {
     private ObjectData objectData;
     public boolean onClimbable, onSlab, onStairs, onHalfBlock, inLiquid, inLava, inWater, inWeb, onSlime, onIce,
             onSoulSand, blocksAbove, collidesVertically, collidesHorizontally, blocksNear, inBlock;
+    public CollisionHandler handler;
 
     public BlockInformation(ObjectData objectData) {
         this.objectData = objectData;
@@ -25,50 +35,106 @@ public class BlockInformation {
     public void runCollisionCheck() {
         if(!Kauri.INSTANCE.enabled
                 || Kauri.INSTANCE.lastEnabled.hasNotPassed(6)) return;
-        CollisionHandler handler = new CollisionHandler(objectData);
+        List<Block> blocks = new ArrayList<>();
 
-        List<BoundingBox> boxes = Atlas.getInstance().getBlockBoxManager().getBlockBox().getCollidingBoxes(objectData.getPlayer().getWorld(), objectData.box.grow(1.5f,2,1.5f));
+        World world = objectData.getPlayer().getWorld();
 
-        //Running block checking;
-        boxes.parallelStream().forEach(box -> {
-            Block block = box.getMinimum().toLocation(objectData.getPlayer().getWorld()).getBlock();
+        
+        int startX = Location.locToBlock(objectData.playerInfo.to.x - 0.3 - objectData.playerInfo.deltaXZ);
+        int endX = Location.locToBlock(objectData.playerInfo.to.x + 0.3 + objectData.playerInfo.deltaXZ);
+        int startY = Location.locToBlock(objectData.playerInfo.to.y - 0.51 + objectData.playerInfo.deltaY);
+        int endY = Location.locToBlock(objectData.playerInfo.to.y + 1.99 + objectData.playerInfo.deltaY);
+        int startZ = Location.locToBlock(objectData.playerInfo.to.z - 0.3 - objectData.playerInfo.deltaXZ);
+        int endZ = Location.locToBlock(objectData.playerInfo.to.z + 0.3 + objectData.playerInfo.deltaXZ);
+        int it = 9 * 9;
+        start:
+        for (int chunkx = startX >> 4; chunkx <= endX >> 4; ++chunkx) {
+            int cx = chunkx << 4;
 
-            if(block != null) {
-                handler.onCollide(block, box, false);
+            for (int chunkz = startZ >> 4; chunkz <= endZ >> 4; ++chunkz) {
+                if (!objectData.playerInfo.worldLoaded) {
+                    continue;
+                }
+                Chunk chunk = world.getChunkAt(chunkx, chunkz);
+                if (chunk != null) {
+                    int cz = chunkz << 4;
+                    int xstart = startX < cx ? cx : startX;
+                    int xend = endX < cx + 16 ? endX : cx + 16;
+                    int zstart = startZ < cz ? cz : startZ;
+                    int zend = endZ < cz + 16 ? endZ : cz + 16;
+
+                    for (int x = xstart; x <= xend; ++x) {
+                        for (int z = zstart; z <= zend; ++z) {
+                            for (int y = startY < 0 ? 0 : startY; y <= endY; ++y) {
+                                if (it-- <= 0) {
+                                    break start;
+                                }
+                                Block block = chunk.getBlock(x & 15, y, z & 15);
+                                if (block.getType() != Material.AIR) {
+                                    blocks.add(block);
+                                }
+                            }
+                        }
+                    }
+                }
             }
-        });
-            //Running entity boundingBox check.
-        EntityProcessor.vehicles.computeIfAbsent(objectData.getPlayer().getWorld().getUID(), key -> {
-            List<Entity> emptyList = new ArrayList<>();
-            EntityProcessor.vehicles.put(key, emptyList);
-            return emptyList;
-        })
-                    .stream()
-                    .filter(entity -> entity.getLocation().distance(objectData.getPlayer().getLocation()) < 1.5)
-                    .map(entity -> ReflectionsUtil.toBoundingBox(ReflectionsUtil.getBoundingBox(entity)))
-                    .forEach(box -> handler.onCollide(null, box, true));
+        }
+        CollisionHandler handler = new CollisionHandler(blocks,
+                Atlas.getInstance().getEntities().getOrDefault(objectData.getPlayer().getUniqueId(), new ArrayList<>()),
+                objectData.playerInfo.to);
 
-        objectData.playerInfo.serverGround = handler.onGround;
-        objectData.playerInfo.nearGround = handler.nearGround;
-        objectData.playerInfo.collided =
-                (objectData.playerInfo.collidesHorizontally = handler.collidesHorizontally)
-                        || (objectData.playerInfo.collidesVertically = handler.collidesVertically);
-        onSlab = handler.onSlab;
-        onStairs = handler.onStairs;
-        onHalfBlock = handler.onHalfBlock;
-        inLiquid = handler.inLiquid;
-        inBlock = handler.inBlock;
-        inWeb = handler.inWeb;
-        onSlime = handler.onSlime;
-        onIce = handler.onIce;
-        onSoulSand = handler.onSoulSand;
-        inLava = handler.inLava;
-        inWater = handler.inWater;
-        blocksAbove = handler.blocksAbove;
-        collidesHorizontally = handler.collidesHorizontally;
-        collidesVertically = handler.collidesVertically;
-        blocksNear = handler.blocksNear;
+        handler.setSize(0.6f, 0.5f);
+        handler.setOffset(-0.49);
 
-        boxes.clear();
+        objectData.playerInfo.serverGround =
+                handler.isCollidedWith(Materials.SOLID) || handler.contains(EntityType.BOAT);
+        onSlab = handler.isCollidedWith(Materials.SLABS);
+        onStairs = handler.isCollidedWith(Materials.STAIRS);
+        onHalfBlock = onSlime || onStairs;
+
+        handler.setSingle(true);
+        onIce = handler.isCollidedWith(Materials.ICE);
+        onSoulSand = handler.isCollidedWith(Material.SOUL_SAND);
+        onSlime = handler.isCollidedWith(Material2.SLIME_BLOCK);
+        handler.setSingle(false);
+        handler.setOffset(0);
+
+        handler.setSize(0.6, 1.8);
+
+        inLava = handler.isCollidedWith(Materials.LAVA);
+        inWater = handler.isCollidedWith(Materials.WATER);
+        inLiquid = inLava || inWater;
+
+        inWeb = handler.isCollidedWith(Material.WEB);
+
+        handler.setSize(0.599, 1.8);
+
+        inBlock = handler.isCollidedWith(Materials.SOLID);
+
+        if(objectData.playerInfo.deltaY < 0) {
+            handler.setSize(2.0f, 0);
+        }
+        handler.setSingle(true);
+        onClimbable = handler.isCollidedWith(Materials.LADDER);
+        handler.setSingle(false);
+
+        handler.setSize(0.6, 2.1);
+        blocksAbove = handler.isCollidedWith(Materials.SOLID);
+
+        handler.setSize(1.5, 1.8);
+        blocksNear = handler.isCollidedWith(Materials.SOLID);
+
+        handler.setSize(0.6, 1.8);
+
+        SimpleCollisionBox box = Helper.getMovementHitbox(objectData.getPlayer());
+        box.expand(Math.abs(objectData.playerInfo.from.x - objectData.playerInfo.to.x) + 0.1,
+                -0.1,
+                Math.abs(objectData.playerInfo.from.z - objectData.playerInfo.to.z) + 0.1);
+        collidesHorizontally = !Helper.blockCollisions(handler.getBlocks(), box).isEmpty();
+        box = Helper.getMovementHitbox(objectData.getPlayer());
+        box.expand(0, 0.1, 0);
+        collidesVertically = !Helper.blockCollisions(handler.getBlocks(), box).isEmpty();
+
+        this.handler = handler;
     }
 }

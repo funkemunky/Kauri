@@ -2,6 +2,7 @@ package dev.brighten.anticheat.utils;
 
 import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
 import cc.funkemunky.api.utils.BoundingBox;
+import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.Tuple;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;

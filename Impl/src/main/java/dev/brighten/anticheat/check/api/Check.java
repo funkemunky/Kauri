@@ -23,7 +23,6 @@ import dev.brighten.anticheat.check.impl.movement.speed.SpeedC;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityA;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityB;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityC;
-import dev.brighten.anticheat.check.impl.packets.Test;
 import dev.brighten.anticheat.check.impl.packets.Timer;
 import dev.brighten.anticheat.check.impl.packets.badpackets.*;
 import dev.brighten.anticheat.data.ObjectData;
@@ -112,10 +111,6 @@ public class Check implements KauriCheck {
                     Kauri.INSTANCE.loggerManager.addLog(data, this, info);
 
                     if (lastAlert.hasPassed(MathUtils.millisToTicks(Config.alertsDelay))) {
-                /*String message = Color.translate("&8[&6K&8] &f" + this.data.getPlayer().getName()
-                                + " &7flagged &f" + name
-                                + " &8(&e" + info + "&8) &8[&c" + MathUtils.round(vl, 2) + "&8]"
-                        + (developer ? "&c&o(Experimental)" : ""));*/
                         String message = Color.translate(Kauri.INSTANCE.msgHandler.getLanguage()
                                 .msg("cheat-alert",
                                         "&8[&6K&8] &f%player% &7flagged &f%check% &8(&e%info%&8) &8(&c%vl%&8] %experimental%")
@@ -195,9 +190,8 @@ public class Check implements KauriCheck {
         register(new FlyC());
         register(new FlyD());
         register(new FlyE());
+        register(new FlyF());
         register(new FastLadder());
-        //register(new Phase());
-        register(new Test());
         register(new NoFallA());
         register(new NoFallB());
         register(new Reach());

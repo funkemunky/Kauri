@@ -8,7 +8,7 @@ import cc.funkemunky.api.utils.MiscUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
-import dev.brighten.anticheat.utils.KLocation;
+import cc.funkemunky.api.utils.KLocation;
 import dev.brighten.anticheat.utils.RayCollision;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
@@ -40,7 +40,7 @@ public class Reach extends Check {
 
         if(data.target == null || timeStamp - data.playerInfo.lastAttackTimeStamp > 55) return;
 
-        val origins = data.pastLocation.getEstimatedLocation(0, Math.round(data.lagInfo.transPing / 2D))
+        val origins = data.pastLocation.getEstimatedLocation(0, Math.max(60L, Math.round(data.lagInfo.transPing / 2D)))
                 .stream()
                 .map(loc -> loc.toLocation(data.getPlayer().getWorld()).add(0, data.playerInfo.sneaking ? 1.54f : 1.62f, 0))
                 .collect(Collectors.toList());
@@ -66,12 +66,12 @@ public class Reach extends Check {
         if(distances.size() > 0) {
             val distance = distances.stream().mapToDouble(num -> num).min().orElse(0);
 
-            if(distance > 3.0001) {
+            if(distance > 3.0001 && distances.size() > 6) {
                 if(vl++ > 2) {
-                    flag("distance=" + MathUtils.round(distance, 3));
+                    flag("distance=" + MathUtils.round(distance, 3) + " size=" + distances.size());
                 }
             } else vl-= vl > 0 ? 0.02f : 0;
-            debug("distance=" + distance);
+            debug("distance=" + distance + ", size=" + distances.size());
         }
 
         lastTimestamp = timeStamp;

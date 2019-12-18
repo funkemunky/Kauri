@@ -2,7 +2,8 @@ package dev.brighten.anticheat.data.classes;
 
 import cc.funkemunky.api.utils.TickTimer;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
-import dev.brighten.anticheat.utils.KLocation;
+import cc.funkemunky.api.utils.KLocation;
+import dev.brighten.anticheat.utils.CollisionHandler;
 import dev.brighten.anticheat.utils.MouseFilter;
 
 public class PlayerInformation {
@@ -29,6 +30,7 @@ public class PlayerInformation {
     public boolean serverPos;
     public long isTeleport, isVelocity;
     public EvictingList<KLocation> posLocs = new EvictingList<>(5);
+    public CollisionHandler handler;
 
     //Attack
     public TickTimer lastAttack = new TickTimer(5);

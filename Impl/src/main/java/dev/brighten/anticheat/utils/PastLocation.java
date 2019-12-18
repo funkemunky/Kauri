@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.utils;
 
+import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
 import org.bukkit.Location;
 

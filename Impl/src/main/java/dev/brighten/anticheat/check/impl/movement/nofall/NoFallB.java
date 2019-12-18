@@ -13,12 +13,12 @@ public class NoFallB extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if(packet.isPos()) {
-            if(data.playerInfo.lClientGround != data.playerInfo.clientGround && !data.playerInfo.generalCancel) {
+            if(data.playerInfo.serverGround != data.playerInfo.clientGround && !data.playerInfo.generalCancel) {
                 if(vl++ > 5) {
-                    flag("server=" + data.predictionService.onGround + " client=" + data.playerInfo.clientGround);
+                    flag("server=" + data.playerInfo.serverGround + " client=" + data.playerInfo.clientGround);
                 }
             } else vl-= vl > 0 ? 1 : 0;
-            debug("server=" + data.predictionService.onGround + " client=" + data.playerInfo.clientGround + " vl=" + vl);
+            debug("server=" + data.playerInfo.serverGround + " client=" + data.playerInfo.clientGround + " vl=" + vl);
         }
     }
 }

@@ -6,6 +6,7 @@ import cc.funkemunky.api.tinyprotocol.packet.out.WrappedPacketPlayOutWorldPartic
 import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumAnimation;
 import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
 import cc.funkemunky.api.utils.Color;
+import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.commands.KauriCommand;
 import lombok.val;
@@ -119,6 +120,7 @@ public class MiscUtils {
         String nums = String.valueOf(format((time / (double) max) * 100, 3));
         return line.toString() + "§f] §c" + nums + "%";
     }
+
     public static float getYawChangeToEntity(Player player, LivingEntity entity, KLocation from, KLocation to) {
         double deltaX = entity.getLocation().getX() - player.getLocation().getX();
         double deltaZ = entity.getLocation().getZ() - player.getLocation().getZ();

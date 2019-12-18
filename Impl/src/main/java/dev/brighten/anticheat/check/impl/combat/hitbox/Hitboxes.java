@@ -9,7 +9,7 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.data.ObjectData;
-import dev.brighten.anticheat.utils.KLocation;
+import cc.funkemunky.api.utils.KLocation;
 import dev.brighten.anticheat.utils.RayTrace;
 import dev.brighten.api.check.CheckType;
 import org.bukkit.GameMode;

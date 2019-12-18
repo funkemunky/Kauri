@@ -11,7 +11,8 @@ import lombok.val;
 import java.util.ArrayList;
 import java.util.List;
 
-@CheckInfo(name = "Autoclicker (E)", description = "Oscillation check. Credits to Abigail.", checkType = CheckType.AUTOCLICKER)
+@CheckInfo(name = "Autoclicker (E)", description = "Oscillation check. Credits to Abigail.",
+        checkType = CheckType.AUTOCLICKER, developer = true, punishVL = 10)
 public class AutoclickerE extends Check {
 
     private long ltimeStamp;
@@ -39,7 +40,7 @@ public class AutoclickerE extends Check {
                         .forEach(list::add);
                 double std = MathUtils.stdev(list);
 
-                if (std < 25) {
+                if (std < 20) {
                     verbose++;
                     if (verbose > 2) {
                         vl++;
