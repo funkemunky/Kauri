@@ -65,12 +65,6 @@
       <version>1.7</version>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>me.mat1337.loader</groupId>
-      <artifactId>loader</artifactId>
-      <version>dev</version>
-      <scope>provided</scope>
-    </dependency>
   </dependencies>
 </project>
 

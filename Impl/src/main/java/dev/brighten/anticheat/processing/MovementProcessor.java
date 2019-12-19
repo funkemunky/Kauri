@@ -1,17 +1,19 @@
 package dev.brighten.anticheat.processing;
 
 import cc.funkemunky.api.Atlas;
+import cc.funkemunky.api.reflection.MinecraftReflection;
+import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutKeepAlivePacket;
 import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
+import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
-import cc.funkemunky.api.utils.KLocation;
-import dev.brighten.anticheat.utils.CollisionHandler;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.MovementUtils;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.block.Block;
+import org.bukkit.GameMode;
 
 import java.math.RoundingMode;
 
@@ -53,15 +55,52 @@ public class MovementProcessor {
             data.playerInfo.to.z = packet.getZ();
         }
 
+        data.playerInfo.to.timeStamp = timeStamp;
+
         data.playerInfo.inVehicle = data.getPlayer().getVehicle() != null;
         data.playerInfo.gliding = PlayerUtils.isGliding(data.getPlayer());
         data.playerInfo.riptiding = Atlas.getInstance().getBlockBoxManager()
                 .getBlockBox().isRiptiding(data.getPlayer());
 
+        /* We only set the jumpheight on ground since there's no need to check for it while they're in the air.
+        * If we did check while it was in the air, there would be false positives in the checks that use it. */
         if(packet.isGround()) data.playerInfo.jumpHeight = MovementUtils.getJumpHeight(data.getPlayer());
 
-        data.playerInfo.worldLoaded = Atlas.getInstance().getBlockBoxManager().getBlockBox()
-                .isChunkLoaded(data.playerInfo.to.toLocation(data.getPlayer().getWorld()));
+        data.playerInfo.lworldLoaded = data.playerInfo.worldLoaded;
+
+        /* Here we is where we check if the world has loaded for the player. */
+        if(Atlas.getInstance().getBlockBoxManager().getBlockBox()
+                .isChunkLoaded(data.playerInfo.to.toLocation(data.getPlayer().getWorld()))) {
+            if(!data.playerInfo.lworldLoaded) {
+                if(data.playerInfo.loadedPacketReceived) {
+                    //Sending a keepAlive as confirmation the world was loaded on the player's side.
+                    //This prevents false positives caused by high latency or a lag spike.
+                    TinyProtocolHandler.sendPacket(data.getPlayer(),
+                            new WrappedOutKeepAlivePacket(201).getObject());
+                    data.playerInfo.lastLoadedPacketSend.reset();
+                    data.playerInfo.loadedPacketReceived = false;
+                } else if(data.playerInfo.lastLoadedPacketSend.hasPassed(80)) {
+                    //This is a check to prevent exploitation from clients.
+                    //If the keepAlive isn't received, it's likely the server would have kicked them first though.
+                    RunUtils.task(() -> data.getPlayer().kickPlayer(Kauri.INSTANCE.msgHandler.getLanguage()
+                            .msg("packet.notloaded", "World load packet not received. Lag?")));
+                }
+            }
+        } else if(data.playerInfo.lworldLoaded) {
+            if(data.playerInfo.loadedPacketReceived) {
+                //Sending a keepAlive as confirmation the world was loaded on the player's side.
+                //This prevents false positives caused by high latency or a lag spike.
+                TinyProtocolHandler.sendPacket(data.getPlayer(),
+                        new WrappedOutKeepAlivePacket(200).getObject());
+                data.playerInfo.lastLoadedPacketSend.reset();
+                data.playerInfo.loadedPacketReceived = false;
+            } else if(data.playerInfo.lastLoadedPacketSend.hasPassed(80)) {
+                //This is a check to prevent exploitation from clients.
+                //If the keepAlive isn't received, it's likely the server would have kicked them first though.
+                RunUtils.task(() -> data.getPlayer().kickPlayer(Kauri.INSTANCE.msgHandler.getLanguage()
+                        .msg("packet.notloaded", "World load packet not received. Lag?")));
+            }
+        }
 
         data.lagInfo.lagging = data.lagInfo.lastPacketDrop.hasNotPassed(3)
                 || !data.playerInfo.worldLoaded
@@ -103,32 +142,55 @@ public class MovementProcessor {
             }
         }
 
+        /* Velocity Handler */
+        if(timeStamp - data.playerInfo.lastVelocityTimestamp < 50L) {
+            data.playerInfo.takingVelocity = true;
+            data.playerInfo.mvx = data.playerInfo.velocityX;
+            data.playerInfo.mvy = data.playerInfo.velocityY;
+            data.playerInfo.mvz = data.playerInfo.velocityZ;
+        }
+
+        //We use a boolean since it allows for easier management of this handler, and it also isn't dependant on time
+        //If it was dependant on time, a player could be taking large amounts of velocity still and it would stop checking.
+        //That would most likely cause a false positive.
+        if(data.playerInfo.takingVelocity) {
+            float drag = data.playerInfo.serverGround ? MovementUtils.getFriction(data) : 0.91f;
+
+            data.playerInfo.mvx*= drag;
+            data.playerInfo.mvz*= drag;
+
+            if(!data.playerInfo.serverGround) {
+                data.playerInfo.mvy-= 0.08f;
+                data.playerInfo.mvy*= 0.98;
+                data.playerInfo.mvy = 0;
+            } else data.playerInfo.mvy = 0;
+
+            if(MathUtils.hypot(data.playerInfo.mvx, data.playerInfo.mvz) < data.playerInfo.deltaXZ - 0.001) {
+                data.playerInfo.takingVelocity = false;
+                data.playerInfo.mvx = data.playerInfo.mvz = 0;
+            }
+        }
+
         //Fixes glitch when logging in.
-        if(timeStamp - data.creation < 1000) {
+        //We use the NMS (bukkit) version since their state is likely saved in a player data file in the world.
+        //This should prevent false positives from ability inaccuracies.
+        if(timeStamp - data.creation < 500L) {
             if(data.playerInfo.canFly != data.getPlayer().getAllowFlight()) {
                 data.playerInfo.lastToggleFlight.reset();
             }
             data.playerInfo.canFly = data.getPlayer().getAllowFlight();
             data.playerInfo.flying = data.getPlayer().isFlying();
+            data.playerInfo.creative = data.getPlayer().getGameMode().equals(GameMode.CREATIVE);
         }
 
-
-        if (data.playerInfo.breakingBlock) {
-            data.playerInfo.lastBrokenBlock.reset();
-        }
-
-        data.playerInfo.to.timeStamp = timeStamp;
+        if (data.playerInfo.breakingBlock) data.playerInfo.lastBrokenBlock.reset();
 
         data.playerInfo.lClientGround = data.playerInfo.clientGround;
         data.playerInfo.clientGround = packet.isGround();
 
-        //Setting boundingBox
-        data.predictionService.box = new BoundingBox(data.playerInfo.from.toVector(), data.playerInfo.from.toVector())
-                .grow(0.3f, 0, 0.3f)
-                .add(0, 0, 0, 0, 1.8f, 0);;
-        data.box = new BoundingBox(data.playerInfo.to.toVector(), data.playerInfo.to.toVector())
-                .grow(0.3f, 0, 0.3f)
-                .add(0, 0, 0, 0, 1.8f, 0);
+        //We create a separate from BoundingBox for the predictionService since it should operate on pre-motion data.
+        data.predictionService.box = new SimpleCollisionBox(data.playerInfo.from.toVector(), 0.6, 1.8).toBoundingBox();
+        data.box = new SimpleCollisionBox(data.playerInfo.to.toVector(), 0.6, 1.8);
 
         data.blockInfo.runCollisionCheck(); //run b4 everything else for use below.
 
@@ -205,14 +267,16 @@ public class MovementProcessor {
 
         /* General Ticking */
 
-        Block block = data.playerInfo.worldLoaded ? data.playerInfo.to.toLocation(data.getPlayer().getWorld()).getBlock() : null;
+        if(data.playerInfo.worldLoaded) {
+            data.playerInfo.blockOnTo = data.playerInfo.to.toLocation(data.getPlayer().getWorld()).getBlock();
+            data.playerInfo.blockBelow = data.playerInfo.to.toLocation(data.getPlayer().getWorld())
+                    .subtract(0, 1, 0).getBlock();
 
-        if (block != null && BlockUtils.isClimbableBlock(block)) {
-            if (data.playerInfo.collidesHorizontally) {
-                data.blockInfo.onClimbable = true;
-            } else data.blockInfo.onClimbable = data.playerInfo.deltaY <= 0;
-            data.playerInfo.onLadder = true;
-        } else data.playerInfo.onLadder = data.blockInfo.onClimbable = false;
+            data.blockInfo.currentFriction = MinecraftReflection.getFriction(data.playerInfo.blockBelow);
+        } else data.playerInfo.blockOnTo = data.playerInfo.blockBelow = null;
+
+        data.playerInfo.onLadder = data.playerInfo.blockOnTo != null
+                && BlockUtils.isClimbableBlock(data.playerInfo.blockBelow);
 
         //Checking if user is in liquid.
         if (data.blockInfo.inLiquid) {
@@ -270,7 +334,7 @@ public class MovementProcessor {
                 || data.playerInfo.inVehicle
                 || data.playerInfo.webTicks > 0
                 || !data.playerInfo.worldLoaded
-                || block == null
+                || data.playerInfo.blockOnTo == null
                 || data.playerInfo.riptiding
                 || data.playerInfo.gliding
                 || data.playerInfo.lastToggleFlight.hasNotPassed(40)
@@ -288,7 +352,7 @@ public class MovementProcessor {
                 || !data.playerInfo.worldLoaded
                 || data.playerInfo.lastToggleFlight.hasNotPassed(40)
                 || timeStamp - data.creation < 2000
-                || block == null
+                || data.playerInfo.blockOnTo == null
                 || data.playerInfo.serverPos
                 || Kauri.INSTANCE.lastTickLag.hasNotPassed(5);
 

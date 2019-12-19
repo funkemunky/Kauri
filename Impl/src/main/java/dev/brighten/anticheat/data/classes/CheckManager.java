@@ -29,7 +29,6 @@ public class CheckManager {
 
         val methods = checkMethods.get(object.getClass());
         methods.parallelStream().filter(entry -> entry.getValue().getMethod().isAnnotationPresent(Packet.class))
-                .sequential()
                 .forEach(entry -> {
                     Check check = checks.get(entry.getKey());
                     Kauri.INSTANCE.profiler.start("check:" + check.name);

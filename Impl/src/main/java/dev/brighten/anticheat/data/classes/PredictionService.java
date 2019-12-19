@@ -4,8 +4,10 @@ import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.events.impl.PacketReceiveEvent;
 import cc.funkemunky.api.events.impl.PacketSendEvent;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
+import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.*;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutAbilitiesPacket;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutKeepAlivePacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.data.ObjectData;
@@ -23,16 +25,14 @@ import java.util.List;
 public class PredictionService {
 
     private ObjectData data;
-    public boolean fly, velocity, position, sneak, sprint, lsprint, lsneak, useSword, hit, dropItem, inWeb, isCollidedHorizontally,
-            lastOnGround, onGround, lastSprint, fMath, fastMath, walkSpecial, lastVelocity, isCollidedVertically, 
+    public boolean fly, velocity, position, sneak, sprint, useSword, hit, dropItem, inWeb, isCollidedHorizontally,
+            lastOnGround, onGround, lastSprint, fMath, fastMath, walkSpecial, lastVelocity, isCollidedVertically,
             isCollided;
-    public double posX, posY, posZ, lPosX, lPosY, lPosZ, rmotionX, rmotionY, rmotionZ,
-            lmotionX, lmotionZ, lmotionY, diff;
+    public double posX, posY, posZ, lPosX, lPosY, lPosZ, rmotionX, rmotionY, rmotionZ, lmotionX, lmotionZ, lmotionY;
     public double predX, predY, predZ;
     private double velocityX, velocityY, velocityZ;
     public TickTimer lastUseItem = new TickTimer(10);
     public BoundingBox box;
-    public int precision;
     public float walkSpeed, yaw, pitch, moveStrafing, moveForward, aiMoveSpeed, distanceWalkedModified,
             distanceWalkedOnStepModified, nextStepDistance, fallDistance;
     public String key = "Nothing";
@@ -43,6 +43,10 @@ public class PredictionService {
 
     public void onSend(PacketSendEvent event) {
         switch(event.getType()) {
+            case Packet.Server.POSITION: {
+                TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutKeepAlivePacket(233).getObject());
+                break;
+            }
             case Packet.Server.ENTITY_VELOCITY: {
                 WrappedOutVelocityPacket packet = new WrappedOutVelocityPacket(event.getPacket(), event.getPlayer());
 
@@ -50,13 +54,19 @@ public class PredictionService {
                     velocityX = packet.getX();
                     velocityY = packet.getY();
                     velocityZ = packet.getZ();
+
+                    dev.brighten.anticheat.utils.MiscUtils.testMessage("sent keepAlive");
+
+                    TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutKeepAlivePacket(255).getObject());
                 }
                 break;
             }
             case Packet.Server.ABILITIES: {
                 WrappedOutAbilitiesPacket packet = new WrappedOutAbilitiesPacket(event.getPacket(), event.getPlayer());
 
-                fly = packet.isAllowedFlight();
+                if(packet.isAllowedFlight()) {
+                    fly = true;
+                } else fly = false;
                 break;
             }
         }
@@ -64,10 +74,26 @@ public class PredictionService {
 
     public void onReceive(PacketReceiveEvent e) {
         switch(e.getType()) {
+            case Packet.Client.KEEP_ALIVE: {
+                WrappedInKeepAlivePacket packet = new WrappedInKeepAlivePacket(e.getPacket(), e.getPlayer());
+                if(packet.getTime() == 255) {
+                    velocity = true;
+                    dev.brighten.anticheat.utils.MiscUtils
+                            .testMessage("&evelX=" + velocityX + " velZ=" + velocityZ);
+                } else if(packet.getTime() == 233) {
+                    position = true;
+                }
+                break;
+            }
             case Packet.Client.ABILITIES: {
                 WrappedInAbilitiesPacket packet = new WrappedInAbilitiesPacket(e.getPacket(), e.getPlayer());
 
-                fly = packet.isAllowedFlight();
+                if(packet.isAllowedFlight()) {
+                    fly = true;
+                } else {
+                    fly = false;
+                }
+
                 walkSpeed = packet.getWalkSpeed();
 
                 //Bukkit.broadcastMessage(packet.isAllowedFlight() + "");
@@ -133,7 +159,7 @@ public class PredictionService {
             case Packet.Client.POSITION:
             case Packet.Client.FLYING: {
                 WrappedInFlyingPacket packet = new WrappedInFlyingPacket(e.getPacket(), e.getPlayer());
-                
+
                 inWeb = data.blockInfo.inWeb;
 
                 if(packet.isLook()) {
@@ -159,7 +185,7 @@ public class PredictionService {
                 rmotionY = posY - lPosY;
                 rmotionZ = posZ - lPosZ;
 
-                //dev.brighten.anticheat.utils.MiscUtils.testMessage(Color.Gray + rmotionX + ", " + rmotionZ);
+                dev.brighten.anticheat.utils.MiscUtils.testMessage(Color.Gray + rmotionX + ", " + rmotionZ);
                 fMath = fastMath; // if the Player uses Optifine FastMath
 
                 try {
@@ -176,9 +202,6 @@ public class PredictionService {
                     e2.printStackTrace();
                 }
 
-                lsneak = sneak;
-                lsprint = sprint;
-
                 if(dropItem) {
                     useSword = false;
                 }
@@ -186,42 +209,13 @@ public class PredictionService {
 
                 double multiplier = 0.9100000262260437D; // multiplier = is the value that the client multiplies every move
 
-                if(data.blockInfo.inWeb) {
-                    rmotionX *= 0.25f;
-                    rmotionZ *= 0.25f;
-                }
-                if(!data.blockInfo.inLiquid) {
+                rmotionX *= multiplier;
+                rmotionZ *= multiplier;
+
+                if (lastOnGround) {
+                    multiplier = 0.60000005239967D;
                     rmotionX *= multiplier;
                     rmotionZ *= multiplier;
-
-                    if (lastOnGround) {
-                        multiplier = 0.60000005239967D;
-                        rmotionX *= multiplier;
-                        rmotionZ *= multiplier;
-                    }
-                } else if(data.blockInfo.inLava) {
-                    rmotionX*= 0.5f;
-                    rmotionZ*= 0.5f;
-                } else if(data.blockInfo.inWater) {
-                    float f1 = 0.8f;
-                    float f2 = 0.02f;
-                    float f3 = PlayerUtils.getDepthStriderLevel(data.getPlayer());
-
-                    if(f3 > 0) {
-                        f3 = 3.0f;
-                    }
-
-                    if(!lastOnGround) {
-                        f3*= .5f;
-                    }
-
-                    if(f3 > 0) {
-                        f1+= (0.54600006F - f1) * f3 / 3.0F;
-                        f2 += (Atlas.getInstance().getBlockBoxManager().
-                                getBlockBox().getAiSpeed(data.getPlayer()) * 1.0F - f2) * f3 / 3.0F;
-                    }
-                    rmotionX *= f1;
-                    rmotionZ *= f1;
                 }
 
                 if (Math.abs(rmotionX) < 0.005D) // the client sets the motionX,Y and Z to 0 if its slower than 0.005D
@@ -263,8 +257,8 @@ public class PredictionService {
 
     private void calc() {
         boolean flag = true;
-        precision = String.valueOf((int) Math.abs(posX > posZ ? posX : posX)).length();
-        precision = 13 - precision;
+        int precision = String.valueOf((int) Math.abs(posX > posZ ? posX : posX)).length();
+        precision = 15 - precision;
         double preD = 1.2 * Math.pow(10, -Math.max(3, precision - 5));  // the motion deviates further and further from the coordinates 0 0 0. this value fix this
 
         double mx = rmotionX - lmotionX; // mx, mz is an Value to calculate the rotation and the Key of the Player
@@ -340,7 +334,7 @@ public class PredictionService {
 
         // 1337 is an value to see that nothing's changed
         String diffString = "-1337";
-        diff = -1337;
+        double diff = -1337;
         double closestdiff = 1337;
 
         int loops = 0; // how many tries the check needed to calculate the right motion (if i use for
@@ -361,17 +355,19 @@ public class PredictionService {
                 float moveStrafing = moveS;
                 float moveForward = moveF;
 
+                if (sneak) {
+                    if (sprint)
+                        return;
+                    moveForward *= 0.3F;
+                    moveStrafing *= 0.3F;
+                }
+
 //				if (openInv) {
 //					if (sprint)
 //						return;
 //					if (sneak)
 //						return;
 //				}
-
-                if(sneak) {
-                    moveStrafing = (float)((double)moveStrafing * 0.3D);
-                    moveForward = (float)((double)moveForward * 0.3D);
-                }
 
                 if (blocking2) { // if the player blocks with a sword
                     moveForward *= 0.2F;
@@ -386,11 +382,9 @@ public class PredictionService {
                 float var5;
                 float var3 = MovementUtils.getFriction(data) * 0.91f;
 
-                aiMoveSpeed = (float) (data.getPlayer().getWalkSpeed() / 2D);
-
-                if(sprint) {
-                    aiMoveSpeed+= aiMoveSpeed * 0.30000001192092896D;
-                }
+                aiMoveSpeed =  0.1f;
+                if (sprint)
+                    aiMoveSpeed += 0.03000001F;
 
                 if(data.getPlayer().hasPotionEffect(PotionEffectType.SPEED)) {
                     aiMoveSpeed += (PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.SPEED) * (0.20000000298023224D)) * aiMoveSpeed;
@@ -399,7 +393,8 @@ public class PredictionService {
                     aiMoveSpeed += (PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.SLOW) * (-0.15000000596046448D)) * aiMoveSpeed;
                 }
 
-                dev.brighten.anticheat.utils.MiscUtils.testMessage("ai: " + aiMoveSpeed);
+                //Bukkit.broadcastMessage(aiMoveSpeed + ", " + Atlas.getInstance().getBlockBoxManager().getBlockBox().getAiSpeed(data.getPlayer()));
+
                 //aiMoveSpeed+= (data.getPlayer().getWalkSpeed() - 0.2) * 5 * 0.45;
 
                 //Bukkit.broadcastMessage(aiMoveSpeed + "");
@@ -437,15 +432,11 @@ public class PredictionService {
                 // calculated motion
                 final double diffZ = rmotionZ - motionZ;
 
-               // moveEntity(motionX, rmotionY, motionZ);
-
                 diff = Math.hypot(diffX, diffZ);
 
                 // if the motion isn't correct this value can get out in flags
                 diff = new BigDecimal(diff).setScale(precision + 2, RoundingMode.HALF_UP).doubleValue();
                 diffString = new BigDecimal(diff).setScale(precision + 2, RoundingMode.HALF_UP).toPlainString();
-
-                dev.brighten.anticheat.utils.MiscUtils.testMessage("diff=" + diffString + ", " + diff + ", " + preD);
 
                 if (diff < preD) { // if the diff is small enough
                     //Bukkit.broadcastMessage(diffString + " loops " + loops + " key: " + key);
@@ -455,7 +446,7 @@ public class PredictionService {
                     fMath = fastMath; // saves the fastmath option if the player changed it
                     break found;
                 } else {
-                   // Bukkit.broadcastMessage(Color.Red + "(" + rmotionX + ", " + motionX + "); (" + rmotionZ + ", " + motionZ + ")");
+                    // Bukkit.broadcastMessage(Color.Red + "(" + rmotionX + ", " + motionX + "); (" + rmotionZ + ", " + motionZ + ")");
                 }
 
                 if (diff < closestdiff) {
@@ -465,9 +456,9 @@ public class PredictionService {
         }
 
         if(flag) {
-           // Bukkit.broadcastMessage(Color.Red + diffString + " loops " + loops + " key: " + key + " sneak: " + sneak + " jump: " + flagJumpp + " onground: " + onGround + ", " + data.playerInfo.serverGround);
+            // Bukkit.broadcastMessage(Color.Red + diffString + " loops " + loops + " key: " + key + " sneak: " + sneak + " jump: " + flagJumpp + " onground: " + onGround + ", " + data.playerInfo.serverGround);
         }
-       // Bukkit.broadcastMessage(data.playerInfo.deltaXZ + "");
+        // Bukkit.broadcastMessage(data.playerInfo.deltaXZ + "");
     }
 
     private void moveEntity(double x, double y, double z) {
@@ -624,10 +615,10 @@ public class PredictionService {
         this.posY = box.minY;
         this.posZ = (box.minZ + box.maxZ) / 2.0D;
     }
-    
+
     private void onCollideWithBlock(Block block1) {
         String material = block1.getType().toString();
-        
+
         if(material.contains("SLIME")) {
             if (!data.playerInfo.sneaking && Math.abs(rmotionY) < 0.1D)
             {
@@ -654,7 +645,7 @@ public class PredictionService {
             }
         }
     }
-    
+
     private List<BoundingBox> getBoxes(BoundingBox box) {
         return Atlas.getInstance().getBlockBoxManager().getBlockBox().getCollidingBoxes(data.getPlayer().getWorld(), box);
     }

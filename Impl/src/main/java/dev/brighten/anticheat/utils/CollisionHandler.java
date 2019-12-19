@@ -8,7 +8,6 @@ import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.world.BlockData;
 import cc.funkemunky.api.utils.world.CollisionBox;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
-import com.sun.javafx.util.Utils;
 import dev.brighten.anticheat.data.ObjectData;
 import lombok.Getter;
 import lombok.Setter;
