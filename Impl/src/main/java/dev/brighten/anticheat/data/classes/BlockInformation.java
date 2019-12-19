@@ -111,9 +111,7 @@ public class BlockInformation {
 
         inBlock = handler.isCollidedWith(Materials.SOLID);
 
-        if(objectData.playerInfo.deltaY < 0) {
-            handler.setSize(2.0f, 0);
-        }
+        handler.setSize(2.0f, 0);
         handler.setSingle(true);
         onClimbable = handler.isCollidedWith(Materials.LADDER);
         handler.setSingle(false);

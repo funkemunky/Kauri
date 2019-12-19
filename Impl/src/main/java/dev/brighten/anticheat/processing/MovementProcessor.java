@@ -207,13 +207,6 @@ public class MovementProcessor {
 
         Block block = data.playerInfo.worldLoaded ? data.playerInfo.to.toLocation(data.getPlayer().getWorld()).getBlock() : null;
 
-        if (block != null && BlockUtils.isClimbableBlock(block)) {
-            if (data.playerInfo.collidesHorizontally) {
-                data.blockInfo.onClimbable = true;
-            } else data.blockInfo.onClimbable = data.playerInfo.deltaY <= 0;
-            data.playerInfo.onLadder = true;
-        } else data.playerInfo.onLadder = data.blockInfo.onClimbable = false;
-
         //Checking if user is in liquid.
         if (data.blockInfo.inLiquid) {
             data.playerInfo.liquidTicks++;

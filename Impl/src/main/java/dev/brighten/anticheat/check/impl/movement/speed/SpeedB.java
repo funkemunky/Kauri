@@ -216,7 +216,7 @@ public class SpeedB extends Check {
             debug(horizontalMove + ": " + joined);
 
             if(horizontalMove > 0 && timeStamp - data.playerInfo.lastServerPos > 150L) {
-                vl+= horizontalMove > 0.01 ? 4 : 1;
+                vl+= horizontalMove > 0.05 ? 4 : 1;
                 if(vl > 2) {
                     flag("move=" + MathUtils.round(horizontalMove, 4) + " tags=" + joined);
                 }
