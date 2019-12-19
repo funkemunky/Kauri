@@ -15,7 +15,7 @@ public class Timer extends Check {
 
     private long lastTS, lastElapsed;
     private int ticks;
-    private EvictingList<Long> times = new EvictingList<>(30);
+    private EvictingList<Long> times = new EvictingList<>(50);
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet, long timeStamp) {
@@ -29,10 +29,11 @@ public class Timer extends Check {
             double ratio = 50 / average;
             double pct = ratio * 100;
 
-            if((pct > 101) && (timeStamp - data.playerInfo.lastServerPos > 150L)
+            if((pct > 100.1D) && (timeStamp - data.playerInfo.lastServerPos > 150L)
                     && MathUtils.getDelta(data.lagInfo.lastTransPing, data.lagInfo.transPing) < 30
                     && Kauri.INSTANCE.lastTickLag.hasPassed(5)
                     && Kauri.INSTANCE.tps > 18.5) {
+                //Maybe lower threshold? I do not think it needs that high of one.
                 if(vl++ > 80) flag("pct=" + MathUtils.round(pct, 2) + "%");
             } else vl-= vl > 0 ? 1.5 : 0;
 
