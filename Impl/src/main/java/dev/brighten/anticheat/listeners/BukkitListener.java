@@ -44,9 +44,7 @@ public class BukkitListener implements Listener {
                             new BoundingBox(event.getClickedBlock().getLocation().toVector(), event.getClickedBlock().getLocation().toVector())
                                     .add(0,0,0,0,1.5f,0).grow(0.1f,0,0.1f));
 
-            for (BoundingBox box : boxes) {
-                MiscUtils.createParticlesForBoundingBox(event.getPlayer(), box, WrappedEnumParticle.FLAME, 0.2f);
-            }
+            boxes.forEach(box -> MiscUtils.createParticlesForBoundingBox(event.getPlayer(), box, WrappedEnumParticle.FLAME, 0.2f));
             event.setCancelled(true);
         }
     }

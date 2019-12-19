@@ -18,6 +18,8 @@ import org.bukkit.util.Vector;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 
 public class MiscUtils {
@@ -44,7 +46,7 @@ public class MiscUtils {
             float fz = (float) (collision.originZ + (collision.directionZ * i));
             Object packet = new WrappedPacketPlayOutWorldParticle(particle, true, fx, fy, fz,
                     0F, 0F, 0F, 0, 0).getObject();
-            for (Player p : players) TinyProtocolHandler.sendPacket(p, packet);
+            players.forEach(p -> TinyProtocolHandler.sendPacket(p, packet));
         }
     }
 
@@ -78,19 +80,12 @@ public class MiscUtils {
         List<Map.Entry<K, V>> list = new ArrayList<>(map.entrySet());
         list.sort(Map.Entry.comparingByValue());
 
-        Map<K, V> result = new LinkedHashMap<>();
-        for (Map.Entry<K, V> entry : list) {
-            result.put(entry.getKey(), entry.getValue());
-        }
-
-        return result;
+        return list.stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> b, LinkedHashMap::new));
     }
 
     public static LongStream listToStream(Collection<Long> collection) {
         LongStream.Builder longBuilder = LongStream.builder();
-        for (Long aLong : collection) {
-            longBuilder.add(aLong);
-        }
+        collection.forEach(longBuilder::add);
         return longBuilder.build();
     }
 
@@ -102,23 +97,17 @@ public class MiscUtils {
 
     public static String drawUsage(long max, long time) {
         double chunk = max / 50;
-        StringBuilder line = new StringBuilder("[");
-        for (int i = 0; i < 50; i++) {
-            line.append((chunk * i < time ? "§c" : "§7") + "❘");
-        }
+        String line = IntStream.range(0, 50).mapToObj(i -> (chunk * i < time ? "§c" : "§7") + "❘").collect(Collectors.joining("", "[", ""));
         String zeros = "00";
         String nums = Integer.toString((int) ((time / (double) max) * 100));
-        return line.toString() + "§f] §c" + zeros.substring(0, 3 - nums.length()) + nums + "% §f❘";
+        return line + "§f] §c" + zeros.substring(0, 3 - nums.length()) + nums + "% §f❘";
     }
 
     public static String drawUsage(long max, double time) {
         double chunk = max / 50;
-        StringBuilder line = new StringBuilder("[");
-        for (int i = 0; i < 50; i++) {
-            line.append((chunk * i < time ? "§c" : "§7") + "❘");
-        }
+        String line = IntStream.range(0, 50).mapToObj(i -> (chunk * i < time ? "§c" : "§7") + "❘").collect(Collectors.joining("", "[", ""));
         String nums = String.valueOf(format((time / (double) max) * 100, 3));
-        return line.toString() + "§f] §c" + nums + "%";
+        return line + "§f] §c" + nums + "%";
     }
 
     public static float getYawChangeToEntity(Player player, LivingEntity entity, KLocation from, KLocation to) {

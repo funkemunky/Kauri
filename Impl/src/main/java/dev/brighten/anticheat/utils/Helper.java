@@ -45,40 +45,24 @@ public class Helper {
 	}
 
 	public static SimpleCollisionBox getCombatHitbox(Player player, ProtocolVersion version) {
-		if (version.isBelow(ProtocolVersion.V1_9))
-			return PlayerSizeHandler.instance.bounds(player).expand(.1, 0, .1);
-		return PlayerSizeHandler.instance.bounds(player);
+		return version.isBelow(ProtocolVersion.V1_9) ? PlayerSizeHandler.instance.bounds(player).expand(.1, 0, .1) : PlayerSizeHandler.instance.bounds(player);
 	}
 
 	private static Block getBlockAt(World world, int x, int y, int z) {
-		if (world.isChunkLoaded(x >> 4, z >> 4)) return world.getChunkAt(x >> 4, z >> 4).getBlock(x & 15, y, z & 15);
-		return null;
+		return world.isChunkLoaded(x >> 4, z >> 4) ? world.getChunkAt(x >> 4, z >> 4).getBlock(x & 15, y, z & 15) : null;
 	}
 
 
 	public static List<Block> blockCollisions(List<Block> blocks, SimpleCollisionBox box) {
-		List<Block> collisions = new LinkedList<>();
-		for (Block b : blocks)
-			if (BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion()).isCollided(box))
-				collisions.add(b);
-		return collisions;
+		return blocks.stream().filter(b -> BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion()).isCollided(box)).collect(Collectors.toCollection(LinkedList::new));
 	}
 
 	public static List<Block> blockCollisions(List<Block> blocks, SimpleCollisionBox box, int material) {
-		List<Block> collisions = new LinkedList<>();
-		for (Block b : blocks)
-			if (Materials.checkFlag(b.getType(), material))
-				if (BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion()).isCollided(box))
-					collisions.add(b);
-		return collisions;
+		return blocks.stream().filter(b -> Materials.checkFlag(b.getType(), material)).filter(b -> BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion()).isCollided(box)).collect(Collectors.toCollection(LinkedList::new));
 	}
 
 	public static <C extends CollisionBox> List<C> collisions(List<C> boxes, CollisionBox box) {
-		List<C> collisions = new LinkedList<>();
-		for (CollisionBox b : boxes)
-			if (b.isCollided(box))
-				collisions.add((C) b);
-		return collisions;
+		return boxes.stream().filter(b -> b.isCollided(box)).map(b -> b).collect(Collectors.toCollection(LinkedList::new));
 	}
 
 	public static List<Block> getBlocksNearby(CollisionHandler handler, SimpleCollisionBox collisionBox) {
@@ -128,16 +112,12 @@ public class Helper {
 	}
 
 	public static List<CollisionBox> toCollisions(List<Block> blocks) {
-		List<CollisionBox> collisions = new LinkedList<>();
-		for (Block b : blocks)
-			collisions.add(BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion()));
-		return collisions;
+		return blocks.stream().map(b -> BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion())).collect(Collectors.toCollection(LinkedList::new));
 	}
 
 	public static List<SimpleCollisionBox> toCollisionsDowncasted(List<Block> blocks) {
 		List<SimpleCollisionBox> collisions = new LinkedList<>();
-		for (Block b : blocks)
-			BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion()).downCast(collisions);
+		blocks.forEach(b -> BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion()).downCast(collisions));
 		return collisions;
 	}
 

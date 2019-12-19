@@ -27,10 +27,7 @@ public class RayTrace {
             return false;
         } else if (position.getY() < min.getY() || position.getY() > max.getY()) {
             return false;
-        } else if (position.getZ() < min.getZ() || position.getZ() > max.getZ()) {
-            return false;
-        }
-        return true;
+        } else return !(position.getZ() < min.getZ()) && !(position.getZ() > max.getZ());
     }
 
     //get a point on the raytrace at X blocks away
@@ -41,11 +38,7 @@ public class RayTrace {
     //checks if a position is on contained within the position
     public boolean isOnLine(Vector position) {
         double t = (position.getX() - origin.getX()) / direction.getX();
-        ;
-        if (position.getBlockY() == origin.getY() + (t * direction.getY()) && position.getBlockZ() == origin.getZ() + (t * direction.getZ())) {
-            return true;
-        }
-        return false;
+        return position.getBlockY() == origin.getY() + (t * direction.getY()) && position.getBlockZ() == origin.getZ() + (t * direction.getZ());
     }
 
     //get all postions on a raytrace
@@ -79,71 +72,39 @@ public class RayTrace {
     //intersection detection for current raytrace with return
     public Vector positionOfIntersection(Vector min, Vector max, double blocksAway, double accuracy) {
         List<Vector> positions = traverse(blocksAway, accuracy);
-        for (Vector position : positions) {
-            if (intersects(position, min, max)) {
-                return position;
-            }
-        }
-        return null;
+        return positions.stream().filter(position -> intersects(position, min, max)).findFirst().orElse(null);
     }
 
     //intersection detection for current raytrace
     public boolean intersects(Vector min, Vector max, double blocksAway, double accuracy) {
         List<Vector> positions = traverse(blocksAway, accuracy);
-        for (Vector position : positions) {
-            if (intersects(position, min, max)) {
-                return true;
-            }
-        }
-        return false;
+        return positions.stream().anyMatch(position -> intersects(position, min, max));
     }
 
     //bounding blockbox instead of vector
     public Vector positionOfIntersection(BoundingBox boundingBox, double blocksAway, double accuracy) {
         List<Vector> positions = traverse(blocksAway, accuracy);
-        for (Vector position : positions) {
-            if (intersects(position, boundingBox.getMinimum(), boundingBox.getMaximum())) {
-                return position;
-            }
-        }
-        return null;
+        return positions.stream().filter(position -> intersects(position, boundingBox.getMinimum(), boundingBox.getMaximum())).findFirst().orElse(null);
     }
 
     public Vector positionOfIntersection(BoundingBox boundingBox, double skip, double blocksAway, double accuracy) {
         List<Vector> positions = traverse(skip, blocksAway, accuracy);
-        for (Vector position : positions) {
-            if (intersects(position, boundingBox.getMinimum(), boundingBox.getMaximum())) {
-                return position;
-            }
-        }
-        return null;
+        return positions.stream().filter(position -> intersects(position, boundingBox.getMinimum(), boundingBox.getMaximum())).findFirst().orElse(null);
     }
 
     //bounding blockbox instead of vector
     public boolean intersects(BoundingBox boundingBox, double blocksAway, double accuracy) {
         List<Vector> positions = traverse(blocksAway, accuracy);
-        for (Vector position : positions) {
-            if (intersects(position, boundingBox.getMinimum(), boundingBox.getMaximum())) {
-                return true;
-            }
-        }
-        return false;
+        return positions.stream().anyMatch(position -> intersects(position, boundingBox.getMinimum(), boundingBox.getMaximum()));
     }
 
     public boolean intersects(BoundingBox boundingBox, double skip, double blocksAway, double accuracy) {
         List<Vector> positions = traverse(blocksAway, accuracy);
-        for (Vector position : positions) {
-            if (intersects(position, boundingBox.getMinimum(), boundingBox.getMaximum())) {
-                return true;
-            }
-        }
-        return false;
+        return positions.stream().anyMatch(position -> intersects(position, boundingBox.getMinimum(), boundingBox.getMaximum()));
     }
 
     //debug / effects
     public void highlight(World world, double blocksAway, double accuracy) {
-        for (Vector position : traverse(blocksAway, accuracy)) {
-            world.playEffect(position.toLocation(world), (ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_13) ? Effect.SMOKE : Effect.valueOf("COLOURED_DUST")), 0);
-        }
+        traverse(blocksAway, accuracy).forEach(position -> world.playEffect(position.toLocation(world), (ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_13) ? Effect.SMOKE : Effect.valueOf("COLOURED_DUST")), 0));
     }
 }

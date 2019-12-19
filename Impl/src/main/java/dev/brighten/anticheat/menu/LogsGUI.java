@@ -24,6 +24,7 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class LogsGUI extends ChestMenu {
 
@@ -67,9 +68,7 @@ public class LogsGUI extends ChestMenu {
 
         List<Log> subList = logs.subList(Math.min((page - 1) * 45, logs.size()), Math.min(page * 45, logs.size()));
 
-        for (int i = 0; i < subList.size(); i++) {
-            setItem(i, buttonFromLog(subList.get(i)));
-        }
+        IntStream.range(0, subList.size()).forEach(i -> setItem(i, buttonFromLog(subList.get(i))));
 
         //Setting the next page option if possible.
         if(Math.min(page * 45, logs.size()) < logs.size()) {

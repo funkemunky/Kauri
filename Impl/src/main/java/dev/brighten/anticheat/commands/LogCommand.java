@@ -17,6 +17,7 @@ import org.bukkit.OfflinePlayer;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Init(commands = true)
 public class LogCommand {
@@ -86,7 +87,7 @@ public class LogCommand {
 
         if(logs.size() == 0) return "No Logs";
 
-        StringBuilder body = new StringBuilder();
+        String body;
 
         SimpleDateFormat format = new SimpleDateFormat("MM/dd/YYYY hh:mm");
         format.setTimeZone(TimeZone.getTimeZone("US/Eastern"));
@@ -95,25 +96,23 @@ public class LogCommand {
 
         SortedMap<Long, String> eventsByStamp = new TreeMap<>(Comparator.comparing(key -> key, Comparator.naturalOrder()));
 
-        for (Log log : logs) {
+        logs.forEach(log -> {
             String built = "(" + format.format(new Date(log.timeStamp)) + "): " + pl.getName() + " failed "
                     + log.checkName + " at VL: [" + MathUtils.round(log.vl, 2)
                     + "] (tps=" + MathUtils.round(log.tps, 4) + " ping=" + log.ping + " info=[" + log.info + "])";
             eventsByStamp.put(log.timeStamp, built);
-        }
+        });
 
-        for (Punishment punishment : punishments) {
+        punishments.forEach(punishment -> {
             String built = "Punishment applied @ (" + format.format(new Date(punishment.timeStamp)) + ") from check "
                     + punishment.checkName;
             eventsByStamp.put(punishment.timeStamp, built);
-        }
+        });
 
-        for (Long key : eventsByStamp.keySet()) {
-            body.append(eventsByStamp.get(key)).append("\n");
-        }
+        body = eventsByStamp.keySet().stream().map(key -> eventsByStamp.get(key) + "\n").collect(Collectors.joining());
 
         try {
-            return Pastebin.makePaste(body.toString(), pl.getName() + "'s Log", Pastebin.Privacy.UNLISTED);
+            return Pastebin.makePaste(body, pl.getName() + "'s Log", Pastebin.Privacy.UNLISTED);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

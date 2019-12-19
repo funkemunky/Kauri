@@ -17,7 +17,7 @@ public class SpeedA extends Check {
         if(!packet.isPos() || data.playerInfo.generalCancel || data.playerInfo.lastVelocity.hasNotPassed(25))
             return;
 
-        float baseSpeed = MovementUtils.getBaseSpeed(data) + (!data.playerInfo.serverGround ? 0.09f : 0.06f);
+        float baseSpeed = MovementUtils.getBaseSpeed(data) + (!data.playerInfo.clientGround ? 0.09f : 0.06f);
 
         baseSpeed+= data.playerInfo.iceTicks > 0 ? 0.4 + (Math.min(120, data.playerInfo.iceTicks) * 0.01) : 0;
         baseSpeed+= data.playerInfo.blocksAboveTicks > 0 ? 0.35

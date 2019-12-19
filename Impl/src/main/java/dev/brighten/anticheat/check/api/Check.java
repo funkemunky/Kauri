@@ -175,9 +175,7 @@ public class Check implements KauriCheck {
         if(Kauri.INSTANCE.dataManager.debugging.size() == 0) return;
         Kauri.INSTANCE.dataManager.debugging.stream()
                 .filter(data -> data.debugged.equals(this.data.uuid) && data.debugging.equalsIgnoreCase(name))
-                .forEach(data -> {
-                    data.getPlayer().sendMessage(Color.translate("&8[&c&lDEBUG&8] &7" + information));
-                });
+                .forEach(data -> data.getPlayer().sendMessage(Color.translate("&8[&c&lDEBUG&8] &7" + information)));
     }
 
     public static void registerChecks() {
