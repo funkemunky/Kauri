@@ -163,7 +163,7 @@ public class PredictionService {
                 fMath = fastMath; // if the Player uses Optifine FastMath
 
                 try {
-                    if((rmotionX != 0 || rmotionZ != 0) && packet.isPos() && !velocity && !lastVelocity) {
+                    if(!walkSpecial && !position && !velocity && !lastVelocity && checkConditions(lastSprint)) {
                         if (lastSprint && hit) { // If the Player Sprints and Hit a Player he get slowdown
                             lmotionX *= 0.6D;
                             lmotionZ *= 0.6D;
@@ -656,13 +656,38 @@ public class PredictionService {
     }
     
     private List<BoundingBox> getBoxes(BoundingBox box) {
-        return Atlas.getInstance().getBlockBoxManager().getBlockBox()
-                .getCollidingBoxes(data.getPlayer().getWorld(), box);
+        return Atlas.getInstance().getBlockBoxManager().getBlockBox().getCollidingBoxes(data.getPlayer().getWorld(), box);
     }
 
     private boolean isSneakingLikeWallDurh() {
         double roundedX = Math.abs(MathUtils.round(posX, 1, RoundingMode.HALF_UP)), roundedZ = Math.abs(MathUtils.round(posZ, 1, RoundingMode.HALF_UP));
         return sneak && (MathUtils.approxEquals(5E-3, roundedX % 1, 0.3) || MathUtils.approxEquals(5E-3, roundedX % 1, 0.7)|| MathUtils.approxEquals(5E-3, roundedZ % 1, 0.3) || MathUtils.approxEquals(5E-3, roundedZ % 1, 0.7));
+    }
+
+    boolean checkConditions(final boolean lastTickSprint) {
+        if (lPosX == 0 && lPosY == 0 && lPosZ == 0) { // the position is 0 when a moveFlying or look packet was send
+            return false;
+        }
+
+        if (lastOnGround && !onGround) // if the Player jumps
+            return false;
+
+        if (rmotionX == 0 && rmotionZ == 0 && onGround)
+            return false;
+
+        if (Math.hypot(lmotionX, lmotionZ) > 11) // if something gots wrong this can be helpfull
+            return false;
+        if (Math.hypot(posX - lPosX, posZ - lPosZ) > 10)
+            return false;
+
+        if (data.playerInfo.liquidTicks > 0
+                || data.playerInfo.climbTicks > 0
+                || fly
+                || data.getPlayer().getGameMode().toString().contains("SPEC")) {
+            return false;
+        }
+
+        return true;
     }
 
     private void updateFallState(double y, boolean onGroundIn, Block blockIn, Location pos) {
