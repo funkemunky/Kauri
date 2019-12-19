@@ -38,7 +38,7 @@ public class SpeedD extends Check {
             float drag = 0.91f;
 
             if(data.playerInfo.lClientGround) {
-                drag*= data.blockInfo.currentFriction;
+                drag *= data.blockInfo.currentFriction;
             }
 
             float f = 0.16277136F / (float)Math.pow(drag, 3);
@@ -58,14 +58,21 @@ public class SpeedD extends Check {
             mx = moveFlying[0];
             mz = moveFlying[1];
 
-            if(data.playerInfo.lClientGround
+            /*if(data.playerInfo.lClientGround
                     && !data.playerInfo.clientGround
                     && (MathUtils.getDelta(data.playerInfo.jumpHeight, data.playerInfo.deltaY) < 0.01
                     || (data.blockInfo.blocksAbove && data.playerInfo.deltaY > 0 && data.playerInfo.lDeltaY <= 0))
                     && lsprint) {
                 float rot = data.playerInfo.to.yaw * 0.017453292F;
-                mx -= (double) (MathHelper.sin(rot) * 0.2F);
-                mz += (double) (MathHelper.cos(rot) * 0.2F);
+                mx -= (double) (MathHelper.sin(rot) * 0.20000000298023224D);
+                mz += (double) (MathHelper.cos(rot) * 0.20000000298023224D);
+            }*/
+
+            //^ That is not how the client handles rotations in EntityLivingBase#1373 in the client
+            if (data.playerInfo.serverGround && data.playerInfo.sprinting && data.playerInfo.deltaY > 0.4199D) {
+                float rot = data.playerInfo.to.yaw * 0.017453292F;
+                mx -= (double) (MathHelper.sin(rot) * 0.20000000298023224D);
+                mz += (double) (MathHelper.cos(rot) * 0.20000000298023224D);
             }
 
             float mxz = MathUtils.hypot(mx, mz);
@@ -94,7 +101,7 @@ public class SpeedD extends Check {
                 if(vl > 8 || data.playerInfo.deltaXZ - threshold > 0.7) {
                     flag(data.playerInfo.deltaXZ + ">-" + mxz);
                 }
-            } else vl-= vl > 0 ? 0.1 : 0;
+            } else vl-= vl > 0 ? 0.2 : 0;
 
             debug("p=" + mxz + " a=" + data.playerInfo.deltaXZ
                     + " key=" + data.predictionService.key
