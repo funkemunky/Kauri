@@ -20,6 +20,7 @@ import dev.brighten.anticheat.check.impl.movement.nofall.NoFallB;
 import dev.brighten.anticheat.check.impl.movement.speed.SpeedA;
 import dev.brighten.anticheat.check.impl.movement.speed.SpeedB;
 import dev.brighten.anticheat.check.impl.movement.speed.SpeedC;
+import dev.brighten.anticheat.check.impl.movement.speed.SpeedD;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityA;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityB;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityC;
@@ -101,6 +102,8 @@ public class Check implements KauriCheck {
         Kauri.INSTANCE.executor.execute(() -> {
             KauriFlagEvent event = new KauriFlagEvent(data.getPlayer(), this);
 
+            Atlas.getInstance().getEventManager().callEvent(event);
+
             if(!event.isCancelled()) {
                 final String info = information
                         .replace("%p", String.valueOf(data.lagInfo.transPing))
@@ -124,9 +127,7 @@ public class Check implements KauriCheck {
                         lastAlert.reset();
                     }
 
-                    if (punishVl != -1 && vl > punishVl) {
-                        punish();
-                    }
+                    punish();
 
                     if (Config.bungeeAlerts) {
                         try {
@@ -207,6 +208,7 @@ public class Check implements KauriCheck {
         register(new SpeedA());
         register(new SpeedB());
         register(new SpeedC());
+        register(new SpeedD());
         register(new Timer());
         register(new BadPacketsA());
         register(new BadPacketsB());

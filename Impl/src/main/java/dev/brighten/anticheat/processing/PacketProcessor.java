@@ -1,15 +1,16 @@
 package dev.brighten.anticheat.processing;
 
+import cc.funkemunky.api.reflection.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.*;
 import cc.funkemunky.api.tinyprotocol.packet.out.*;
+import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.ReflectionsUtil;
 import cc.funkemunky.api.utils.RunUtils;
+import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
-import cc.funkemunky.api.utils.KLocation;
 import lombok.val;
 import org.bukkit.entity.LivingEntity;
 
@@ -44,7 +45,8 @@ public class PacketProcessor {
                             //Resetting location to prevent false positives.
                             data.targetPastLocation.previousLocations.clear();
                             data.playerInfo.lastTargetSwitch.reset();
-                            data.targetBounds = ReflectionsUtil.toBoundingBox(ReflectionsUtil.getBoundingBox(data.target));
+                            data.targetBounds = new SimpleCollisionBox(MinecraftReflection
+                                    .getEntityBoundingBox(data.target));
                         }
 
                         data.target = (LivingEntity) packet.getEntity();
@@ -124,17 +126,34 @@ public class PacketProcessor {
             case Packet.Client.KEEP_ALIVE: {
                 WrappedInKeepAlivePacket packet = new WrappedInKeepAlivePacket(object, data.getPlayer());
 
-                if(packet.getTime() == 101) {
-                    data.playerInfo.lastVelocity.reset();
-                    data.playerInfo.lastVelocityTimestamp = timeStamp;
-                    data.predictionService.velocity = true;
-                } else if(packet.getTime() == 100) {
-                    data.playerInfo.lastServerPos = timeStamp;
-                    data.playerInfo.serverPos = true;
-                    data.predictionService.position = true;
-                } else {
-                    data.lagInfo.lastPing = data.lagInfo.ping;
-                    data.lagInfo.ping = System.currentTimeMillis() - data.lagInfo.lastKeepAlive;
+                switch(Math.toIntExact(packet.getTime())) {
+                    case 101: {
+                        data.playerInfo.lastVelocity.reset();
+                        data.playerInfo.lastVelocityTimestamp = timeStamp;
+                        data.predictionService.velocity = true;
+                        break;
+                    }
+                    case 100: {
+                        data.playerInfo.lastServerPos = timeStamp;
+                        data.playerInfo.serverPos = true;
+                        data.predictionService.position = true;
+                        break;
+                    }
+                    case 200: {
+                        data.playerInfo.worldLoaded = false;
+                        data.playerInfo.loadedPacketReceived = true;
+                        break;
+                    }
+                    case 201: {
+                        data.playerInfo.worldLoaded = true;
+                        data.playerInfo.loadedPacketReceived = true;
+                        break;
+                    }
+                    default: {
+                        data.lagInfo.lastPing = data.lagInfo.ping;
+                        data.lagInfo.ping = System.currentTimeMillis() - data.lagInfo.lastKeepAlive;
+                        break;
+                    }
                 }
                 data.checkManager.runPacket(packet, timeStamp);
                 break;

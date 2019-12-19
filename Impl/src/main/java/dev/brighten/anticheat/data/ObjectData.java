@@ -2,9 +2,9 @@ package dev.brighten.anticheat.data;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
-import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.TickTimer;
 import cc.funkemunky.api.utils.math.RollingAverageLong;
+import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.classes.BlockInformation;
 import dev.brighten.anticheat.data.classes.CheckManager;
@@ -31,7 +31,7 @@ public class ObjectData {
     public long creation, lagTicks, noLagTicks;
     public PastLocation pastLocation, targetPastLocation;
     public LivingEntity target;
-    public BoundingBox box, targetBounds;
+    public SimpleCollisionBox box, targetBounds;
     public ObjectData INSTANCE;
     public CheckManager checkManager;
     public PlayerInformation playerInfo;

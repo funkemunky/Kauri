@@ -22,7 +22,7 @@ public class SpeedC extends Check {
                 float accelZ = data.playerInfo.deltaZ - data.playerInfo.lDeltaZ;
                 float hypot = MathUtils.hypot(accelX, accelZ);
 
-                if(hypot > 0.12 && (accelX > -0.07 || accelZ > -0.07) && !data.blockInfo.onHalfBlock
+                if(hypot > 0.12 && (accelX > -0.07 || accelZ > -0.07)
                         && data.playerInfo.lastBlockPlace.hasPassed(10)) {
                     if(verbose++ > 2) {
                         vl++;

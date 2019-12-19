@@ -1,29 +1,21 @@
 package dev.brighten.anticheat.listeners;
 
 import cc.funkemunky.api.Atlas;
-import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MiscUtils;
-import cc.funkemunky.api.utils.world.BlockData;
-import cc.funkemunky.api.utils.world.types.ComplexCollisionBox;
-import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
-import lombok.val;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Collections;
 import java.util.List;
 
 @Init
@@ -47,11 +39,14 @@ public class BukkitListener implements Listener {
         if(event.getClickedBlock() == null || !event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) return;
 
         if(event.getItem() != null && event.getItem().isSimilar(MAGIC_WAND)) {
-            Block block = event.getClickedBlock();
+            List<BoundingBox> boxes = Atlas.getInstance().getBlockBoxManager().getBlockBox()
+                    .getCollidingBoxes(event.getPlayer().getWorld(),
+                            new BoundingBox(event.getClickedBlock().getLocation().toVector(), event.getClickedBlock().getLocation().toVector())
+                                    .add(0,0,0,0,1.5f,0).grow(0.1f,0,0.1f));
 
-            val box = BlockData.getData(block.getType()).getBox(block, ProtocolVersion.getGameVersion());
-
-            box.draw(WrappedEnumParticle.FLAME, Collections.singleton(event.getPlayer()));
+            for (BoundingBox box : boxes) {
+                MiscUtils.createParticlesForBoundingBox(event.getPlayer(), box, WrappedEnumParticle.FLAME, 0.2f);
+            }
             event.setCancelled(true);
         }
     }

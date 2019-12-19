@@ -1,6 +1,5 @@
 package dev.brighten.anticheat.utils.handlers;
 
-import cc.funkemunky.api.reflections.Reflections;
 import cc.funkemunky.api.reflections.types.WrappedClass;
 import cc.funkemunky.api.reflections.types.WrappedMethod;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
@@ -8,8 +7,6 @@ import lombok.SneakyThrows;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-
-import java.lang.reflect.Method;
 
 public class PlayerSizeHandlerModern implements PlayerSizeHandler {
 

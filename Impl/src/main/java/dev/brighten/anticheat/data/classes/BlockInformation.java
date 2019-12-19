@@ -1,14 +1,11 @@
 package dev.brighten.anticheat.data.classes;
 
 import cc.funkemunky.api.Atlas;
-import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.Materials;
-import cc.funkemunky.api.utils.ReflectionsUtil;
 import cc.funkemunky.api.utils.world.Material2;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
-import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.utils.CollisionHandler;
 import dev.brighten.anticheat.utils.Helper;
 import org.bukkit.Chunk;
@@ -16,7 +13,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
 import java.util.ArrayList;
@@ -26,6 +22,7 @@ public class BlockInformation {
     private ObjectData objectData;
     public boolean onClimbable, onSlab, onStairs, onHalfBlock, inLiquid, inLava, inWater, inWeb, onSlime, onIce,
             onSoulSand, blocksAbove, collidesVertically, collidesHorizontally, blocksNear, inBlock;
+    public float currentFriction;
     public CollisionHandler handler;
 
     public BlockInformation(ObjectData objectData) {
@@ -111,7 +108,9 @@ public class BlockInformation {
 
         inBlock = handler.isCollidedWith(Materials.SOLID);
 
-        handler.setSize(2.0f, 0);
+        if(objectData.playerInfo.deltaY < 0) {
+            handler.setSize(2.0f, 0);
+        }
         handler.setSingle(true);
         onClimbable = handler.isCollidedWith(Materials.LADDER);
         handler.setSingle(false);
