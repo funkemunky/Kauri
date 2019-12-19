@@ -63,7 +63,7 @@ public class FlyF extends Check {
         }
 
         float totalHeight = MovementUtils.getTotalHeight(data.getPlayer(), maxHeight);
-        if(data.playerInfo.deltaY > maxHeight) {
+        if(data.playerInfo.deltaY > maxHeight + 0.005) {
             vl++;
             flag("deltaY=" + data.playerInfo.deltaY + " maxHeight=" + maxHeight);
         } else if(totalDeltaY > totalHeight

@@ -12,13 +12,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @CheckInfo(name = "Autoclicker (E)", description = "Oscillation check. Credits to Abigail.",
-        checkType = CheckType.AUTOCLICKER, developer = true, punishVL = 10)
+        checkType = CheckType.AUTOCLICKER, punishVL = 10)
 public class AutoclickerE extends Check {
 
     private long ltimeStamp;
     private List<Long> delays = new ArrayList<>();
     private List<Long> samples = new ArrayList<>();
     private int verbose;
+    private double lavg;
 
     @Packet
     public void onClick(WrappedInArmAnimationPacket packet, long timeStamp) {
@@ -39,8 +40,9 @@ public class AutoclickerE extends Check {
                         .mapToDouble(v -> v)
                         .forEach(list::add);
                 double std = MathUtils.stdev(list);
+                double avg = delays.stream().mapToDouble(v -> v).summaryStatistics().getAverage();
 
-                if (std < 20) {
+                if (std < 20 && MathUtils.getDelta(avg, lavg) > 1) {
                     verbose++;
                     if (verbose > 2) {
                         vl++;
@@ -50,6 +52,7 @@ public class AutoclickerE extends Check {
 
                 debug("std=" + std + " verbose=" + verbose);
                 delays.clear();
+                lavg = avg;
             }
             samples.clear();
         }
