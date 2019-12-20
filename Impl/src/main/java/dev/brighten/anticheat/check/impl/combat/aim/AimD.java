@@ -40,9 +40,10 @@ public class AimD extends Check {
                         flag("avg=" + summary.getAverage() + " std=" + std);
                     }
                 } else verbose = 0;
-                debug("avg=" + summary.getAverage() + " range=" + range + "std=" + std + " vl=" + verbose);
-                lstd = std;
-                interval.clear();
+                debug("x= " + data.moveProcessor.deltaX
+                        + " y=" + data.moveProcessor.deltaY
+                        + " sens=" + data.moveProcessor.sensitivityX
+                        + " verbose=" + verbose);
             }
         }
     }

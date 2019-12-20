@@ -81,7 +81,7 @@ public class BlockInformation {
                 objectData.playerInfo.to);
 
         handler.setSize(0.6f, 0.5f);
-        handler.setOffset(-0.49);
+        handler.setOffset(-0.1);
 
         objectData.playerInfo.serverGround =
                 handler.isCollidedWith(Materials.SOLID) || handler.contains(EntityType.BOAT);
