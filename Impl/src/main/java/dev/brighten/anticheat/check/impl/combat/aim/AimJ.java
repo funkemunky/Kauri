@@ -7,7 +7,7 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.processing.MovementProcessor;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "Aim (J)", description = "Checks for strange mouse movements", checkType = CheckType.AIM)
+@CheckInfo(name = "Aim (J)", description = "Checks for strange mouse movements", checkType = CheckType.AIM, developer = true)
 public class AimJ extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
