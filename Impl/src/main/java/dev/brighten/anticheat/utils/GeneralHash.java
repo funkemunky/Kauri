@@ -1,12 +1,11 @@
 package dev.brighten.anticheat.utils;
 
-import javax.xml.bind.DatatypeConverter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class GeneralHash {
 
-    public static String getSHAHash(byte[] data, SHAType type) {
+    /*public static String getSHAHash(byte[] data, SHAType type) {
         String result = null;
         try {
             MessageDigest digest = MessageDigest.getInstance(type.equals(SHAType.SHA1) ? "SHA-1" :"SHA-256");
@@ -44,6 +43,6 @@ public class GeneralHash {
     }
 
     public enum SHAType {
-        SHA256, SHA1;
-    }
+        SHA256, SHA1
+    }*/
 }

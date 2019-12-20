@@ -64,9 +64,7 @@ public class PredictionService {
             case Packet.Server.ABILITIES: {
                 WrappedOutAbilitiesPacket packet = new WrappedOutAbilitiesPacket(event.getPacket(), event.getPlayer());
 
-                if(packet.isAllowedFlight()) {
-                    fly = true;
-                } else fly = false;
+                fly = packet.isAllowedFlight();
                 break;
             }
         }
@@ -88,11 +86,7 @@ public class PredictionService {
             case Packet.Client.ABILITIES: {
                 WrappedInAbilitiesPacket packet = new WrappedInAbilitiesPacket(e.getPacket(), e.getPlayer());
 
-                if(packet.isAllowedFlight()) {
-                    fly = true;
-                } else {
-                    fly = false;
-                }
+                fly = packet.isAllowedFlight();
 
                 walkSpeed = packet.getWalkSpeed();
 
@@ -343,10 +337,10 @@ public class PredictionService {
         double flagJumpp = -1;
         found: for (int fastLoop = 2; fastLoop > 0; fastLoop--) { // if the Player changes the optifine fastmath
             // function
-            fastMath = fastLoop == 2 ? fMath : !fMath;
+            fastMath = (fastLoop == 2) == fMath;
             for (int blockLoop = 2; blockLoop > 0; blockLoop--) { // if the Player blocks server side but not client
                 // side (minecraft glitch)
-                boolean blocking2 = blockLoop == 1 ? !useSword : useSword;
+                boolean blocking2 = (blockLoop == 1) != useSword;
                 if (data.playerInfo.usingItem)
                     blocking2 = true;
 
@@ -620,8 +614,7 @@ public class PredictionService {
         String material = block1.getType().toString();
 
         if(material.contains("SLIME")) {
-            if (!data.playerInfo.sneaking && Math.abs(rmotionY) < 0.1D)
-            {
+            if (!data.playerInfo.sneaking && Math.abs(rmotionY) < 0.1D) {
                 double d0 = 0.4D + Math.abs(rmotionY) * 0.2D;
                 rmotionX *= d0;
                 rmotionZ *= d0;
@@ -671,14 +664,10 @@ public class PredictionService {
         if (Math.hypot(posX - lPosX, posZ - lPosZ) > 10)
             return false;
 
-        if (data.playerInfo.liquidTicks > 0
-                || data.playerInfo.climbTicks > 0
-                || fly
-                || data.getPlayer().getGameMode().toString().contains("SPEC")) {
-            return false;
-        }
-
-        return true;
+        return data.playerInfo.liquidTicks <= 0
+                && data.playerInfo.climbTicks <= 0
+                && !fly
+                && !data.getPlayer().getGameMode().toString().contains("SPEC");
     }
 
     private void updateFallState(double y, boolean onGroundIn, Block blockIn, Location pos) {
@@ -710,18 +699,18 @@ public class PredictionService {
         }
 
         for (i = 0; i < 4096; ++i) {
-            SIN_TABLE_FAST[i] = (float) Math.sin((double) (((float) i + 0.5F) / 4096.0F * ((float) Math.PI * 2F)));
+            SIN_TABLE_FAST[i] = (float) Math.sin(((float) i + 0.5F) / 4096.0F * ((float) Math.PI * 2F));
         }
 
         for (i = 0; i < 360; i += 90) {
             SIN_TABLE_FAST[(int) ((float) i * 11.377778F) & 4095] = (float) Math
-                    .sin((double) ((float) i * 0.017453292F));
+                    .sin((float) i * 0.017453292F);
         }
     }
 
     // functions of minecraft MathHelper.java
     public static float sqrt_float(float p_76129_0_) {
-        return (float) Math.sqrt((double) p_76129_0_);
+        return (float) Math.sqrt(p_76129_0_);
     }
 
     public static float sqrt_double(double p_76133_0_) {

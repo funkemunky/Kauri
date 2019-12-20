@@ -82,10 +82,9 @@ public class CheckManager {
                 .sequential()
                 .forEach(check -> checks.put(check.name, check));
 
-        for (String name : checks.keySet()) {
-            Check check = checks.get(name);
+        checks.keySet().stream().map(name -> checks.get(name)).forEach(check -> {
             WrappedClass checkClass = new WrappedClass(check.getClass());
-
+            
             Arrays.stream(check.getClass().getDeclaredMethods())
                     .parallel()
                     .filter(method -> method.isAnnotationPresent(Packet.class)
@@ -101,6 +100,6 @@ public class CheckManager {
                                 check.name, method));
                         checkMethods.put(parameter, methods);
                     });
-        }
+        });
     }
 }

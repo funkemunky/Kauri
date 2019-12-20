@@ -55,14 +55,14 @@ public class BlockInformation {
                 Chunk chunk = world.getChunkAt(chunkx, chunkz);
                 if (chunk != null) {
                     int cz = chunkz << 4;
-                    int xstart = startX < cx ? cx : startX;
-                    int xend = endX < cx + 16 ? endX : cx + 16;
-                    int zstart = startZ < cz ? cz : startZ;
-                    int zend = endZ < cz + 16 ? endZ : cz + 16;
+                    int xstart = Math.max(startX, cx);
+                    int xend = Math.min(endX, cx + 16);
+                    int zstart = Math.max(startZ, cz);
+                    int zend = Math.min(endZ, cz + 16);
 
                     for (int x = xstart; x <= xend; ++x) {
                         for (int z = zstart; z <= zend; ++z) {
-                            for (int y = startY < 0 ? 0 : startY; y <= endY; ++y) {
+                            for (int y = Math.max(startY, 0); y <= endY; ++y) {
                                 if (it-- <= 0) {
                                     break start;
                                 }

@@ -22,6 +22,7 @@ import org.bukkit.scheduler.BukkitTask;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Init(commands = true)
 public class ProfilerCommand {
@@ -132,8 +133,7 @@ public class ProfilerCommand {
                     .mapToLong(key -> Kauri.INSTANCE.profiler.total.get(key))
                     .sum();
             List<Map.Entry<String, Long>> entries = new ArrayList<>(sorted.entrySet());
-            for (int i = size - Math.min(size - 10, 10); i < size; i++) {
-                Map.Entry<String, Long> entry = entries.get(i);
+            IntStream.range(size - Math.min(size - 10, 10), size).mapToObj(entries::get).forEach(entry -> {
                 String name = entry.getKey();
                 Long time = entry.getValue();
                 cmd.getSender().sendMessage(dev.brighten.anticheat.utils.MiscUtils.drawUsage(total, time)
@@ -143,7 +143,7 @@ public class ProfilerCommand {
                         .format(Kauri.INSTANCE.profiler.samples.getOrDefault(name, 0L) / 1000000D, 3)
                         + ", " + dev.brighten.anticheat.utils.MiscUtils
                         .format(Kauri.INSTANCE.profiler.stddev.getOrDefault(name, 0L) / 1000000D, 3));
-            }
+            });
             double totalMs = total / 1000000D;
             long totalTime = Kauri.INSTANCE.profiler.totalCalls * 50;
             cmd.getSender().sendMessage(dev.brighten.anticheat.utils.MiscUtils.drawUsage(total, dev.brighten.anticheat.utils.MiscUtils.format(totalMs / totalTime, 3))
@@ -176,9 +176,7 @@ public class ProfilerCommand {
         body.add("Total Calls: " + Kauri.INSTANCE.profiler.totalCalls);
         body.add("Current Ticks: " + Atlas.getInstance().getCurrentTicks());
         StringBuilder builder = new StringBuilder();
-        for (String aBody : body) {
-            builder.append(aBody).append(";");
-        }
+        body.forEach(aBody -> builder.append(aBody).append(";"));
 
         builder.deleteCharAt(body.size() - 1);
 

@@ -12,11 +12,6 @@ public class VanillaUtils {
 
         Block block = data.playerInfo.worldLoaded ? loc.getBlock() : null;
 
-        if(block != null) {
-            loc = null;
-            return BlockUtils.isClimbableBlock(block);
-        }
-        loc = null;
-        return false;
+        return block != null && BlockUtils.isClimbableBlock(block);
     }
 }

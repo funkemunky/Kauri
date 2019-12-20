@@ -43,7 +43,7 @@ public class PlayerSizeHandlerModern implements PlayerSizeHandler {
     public SimpleCollisionBox bounds(Player player) {
         Location l = player.getLocation();
         double width = (double) this.width.invoke(player)/2;
-        double height = (double) this.height.invoke(player);
+        double height = this.height.invoke(player);
         return new SimpleCollisionBox().offset(l.getX(), l.getY(), l.getZ()).expand(width,0,width).expandMax(0,height,0);
     }
 
@@ -51,7 +51,7 @@ public class PlayerSizeHandlerModern implements PlayerSizeHandler {
     @SneakyThrows
     public SimpleCollisionBox bounds(Player player, double x, double y, double z) {
         double width = (double) this.width.invoke(player)/2;
-        double height = (double) this.height.invoke(player);
+        double height = this.height.invoke(player);
         return new SimpleCollisionBox().offset(x,y,z).expand(width,0,width).expandMax(0,height,0);
     }
 

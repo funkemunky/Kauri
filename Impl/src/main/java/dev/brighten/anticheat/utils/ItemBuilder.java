@@ -12,7 +12,9 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.material.MaterialData;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This is a chainable builder for {@link ItemStack}s in {@link Bukkit} <br>
@@ -73,7 +75,7 @@ public class ItemBuilder {
     public ItemBuilder owner(String name) {
         final SkullMeta meta = (SkullMeta) is.getItemMeta();
         meta.setOwner(name);
-        is.setItemMeta((ItemMeta) meta);
+        is.setItemMeta(meta);
         return this;
     }
 
@@ -98,11 +100,8 @@ public class ItemBuilder {
 
     public ItemBuilder lore(String... lore) {
         ItemMeta meta = is.getItemMeta();
-        List<String> lores = new ArrayList<>();
-        for (final String s : lore) {
-            lores.add(ChatColor.translateAlternateColorCodes('&', s));
-        }
-        meta.setLore((List) lores);
+        List<String> lores = Arrays.stream(lore).map(s -> ChatColor.translateAlternateColorCodes('&', s)).collect(Collectors.toList());
+        meta.setLore(lores);
         is.setItemMeta(meta);
         return this;
     }
@@ -191,7 +190,7 @@ public class ItemBuilder {
      */
     public ItemBuilder clearLore() {
         ItemMeta meta = is.getItemMeta();
-        meta.setLore(new ArrayList<String>());
+        meta.setLore(new ArrayList<>());
         is.setItemMeta(meta);
         return this;
     }
@@ -203,9 +202,7 @@ public class ItemBuilder {
      * @since 1.0
      */
     public ItemBuilder clearEnchantments() {
-        for (Enchantment e : is.getEnchantments().keySet()) {
-            is.removeEnchantment(e);
-        }
+        is.getEnchantments().keySet().forEach(e -> is.removeEnchantment(e));
         return this;
     }
 

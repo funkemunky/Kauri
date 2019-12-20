@@ -14,7 +14,7 @@ import dev.brighten.anticheat.data.ObjectData;
 import lombok.val;
 import org.bukkit.entity.LivingEntity;
 
-public class PacketProcessor {
+public class    PacketProcessor {
 
     public void processClient(ObjectData data, Object object, String type, long timeStamp) {
         Kauri.INSTANCE.profiler.start("packet:client:" + getType(type));
