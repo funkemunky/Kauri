@@ -74,7 +74,7 @@ public class    PacketProcessor {
                 if(!data.playerInfo.posLocs.isEmpty()) {
                     val optional = data.playerInfo.posLocs.stream()
                             .filter(loc -> loc.toVector().setY(0)
-                                    .distance(data.playerInfo.to.toVector().setY(0)) <= 1E-6)
+                                    .distance(data.playerInfo.to.toVector().setY(0)) <= 1E-5 && MathUtils.getDelta(loc.y, data.playerInfo.to.y) < 1)
                             .findFirst();
 
                     if(optional.isPresent()) {
@@ -126,35 +126,27 @@ public class    PacketProcessor {
             case Packet.Client.KEEP_ALIVE: {
                 WrappedInKeepAlivePacket packet = new WrappedInKeepAlivePacket(object, data.getPlayer());
 
-                switch(Math.toIntExact(packet.getTime())) {
-                    case 101: {
-                        data.playerInfo.lastVelocity.reset();
-                        data.playerInfo.lastVelocityTimestamp = timeStamp;
-                        data.predictionService.velocity = true;
-                        break;
-                    }
-                    case 100: {
-                        data.playerInfo.lastServerPos = timeStamp;
-                        data.playerInfo.serverPos = true;
-                        data.predictionService.position = true;
-                        break;
-                    }
-                    case 200: {
-                        data.playerInfo.worldLoaded = false;
-                        data.playerInfo.loadedPacketReceived = true;
-                        break;
-                    }
-                    case 201: {
-                        data.playerInfo.worldLoaded = true;
-                        data.playerInfo.loadedPacketReceived = true;
-                        break;
-                    }
-                    default: {
-                        data.lagInfo.lastPing = data.lagInfo.ping;
-                        data.lagInfo.ping = System.currentTimeMillis() - data.lagInfo.lastKeepAlive;
-                        break;
-                    }
+                long time = packet.getTime();
+
+                if (time == 101) {
+                    data.playerInfo.lastVelocity.reset();
+                    data.playerInfo.lastVelocityTimestamp = timeStamp;
+                    data.predictionService.velocity = true;
+                } else if (time == 100) {
+                    data.playerInfo.lastServerPos = timeStamp;
+                    data.playerInfo.serverPos = true;
+                    data.predictionService.position = true;
+                } else if (time == 200) {
+                    data.playerInfo.worldLoaded = false;
+                    data.playerInfo.loadedPacketReceived = true;
+                } else if (time == 201) {
+                    data.playerInfo.worldLoaded = true;
+                    data.playerInfo.loadedPacketReceived = true;
+                } else {
+                    data.lagInfo.lastPing = data.lagInfo.ping;
+                    data.lagInfo.ping = System.currentTimeMillis() - data.lagInfo.lastKeepAlive;
                 }
+
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
             }

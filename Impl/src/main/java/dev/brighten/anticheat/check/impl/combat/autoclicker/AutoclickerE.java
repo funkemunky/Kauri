@@ -23,6 +23,11 @@ public class AutoclickerE extends Check {
 
     @Packet
     public void onClick(WrappedInArmAnimationPacket packet, long timeStamp) {
+        if(data.playerInfo.lastBrokenBlock.hasNotPassed(3)
+                || data.playerInfo.lastBlockPlace.hasNotPassed(1)) {
+            ltimeStamp = timeStamp;
+            return;
+        }
         long delta = timeStamp - ltimeStamp;
 
         if (delta < 400) samples.add(delta);

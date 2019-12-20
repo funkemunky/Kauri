@@ -63,43 +63,40 @@ public class SpeedD extends Check {
             mx = moveFlying[0];
             mz = moveFlying[1];
 
-            /*if(data.playerInfo.lClientGround
+            if(data.playerInfo.lClientGround
                     && !data.playerInfo.clientGround
                     && (MathUtils.getDelta(data.playerInfo.jumpHeight, data.playerInfo.deltaY) < 0.01
                     || (data.blockInfo.blocksAbove && data.playerInfo.deltaY > 0 && data.playerInfo.lDeltaY <= 0))
                     && lsprint) {
                 float rot = data.playerInfo.to.yaw * 0.017453292F;
-                mx -= (double) (MathHelper.sin(rot) * 0.20000000298023224D);
-                mz += (double) (MathHelper.cos(rot) * 0.20000000298023224D);
-            }*/
-
-            //^ That is not how the client handles rotations in EntityLivingBase#1373 in the client
-            if (data.playerInfo.serverGround && data.playerInfo.sprinting && data.playerInfo.deltaY > 0.4199D) {
-                float rot = data.playerInfo.to.yaw * 0.017453292F;
                 mx -= (MathHelper.sin(rot) * 0.20000000298023224F);
                 mz += (MathHelper.cos(rot) * 0.20000000298023224F);
             }
 
-            float mxz = MathUtils.hypot(mx, mz);
+            /*//^ That is not how the client handles rotations in EntityLivingBase#1373 in the client
+            if (data.playerInfo.serverGround && data.playerInfo.sprinting && data.playerInfo.deltaY > 0.4199D) {
+                float rot = data.playerInfo.to.yaw * 0.017453292F;
+                mx -= (MathHelper.sin(rot) * 0.20000000298023224F);
+                mz += (MathHelper.cos(rot) * 0.20000000298023224F);
+            }*/
+
 
             if(!lastKey.equals(data.predictionService.key)) {
                 lastKeyChange.reset();
             }
 
-            if(timestamp - data.creation < 1000L) {
+            if(data.playerInfo.wasOnSlime || data.playerInfo.generalCancel || timestamp - data.creation < 1000L) {
                 mx = data.playerInfo.deltaX;
                 mz = data.playerInfo.deltaZ;
             }
+
+            float mxz = MathUtils.hypot(mx, mz);
 
             float threshold = mxz
                     + (lastKeyChange.hasNotPassed() || lastKey.equals("Nothing") ? 0.1f : 0.005f);
 
-            if(data.playerInfo.wasOnSlime || data.playerInfo.generalCancel) {
-                mx = data.playerInfo.deltaX;
-                mz = data.playerInfo.deltaZ;
-            }
-
             if(data.playerInfo.deltaXZ > threshold
+                    && mxz > 0
                     && data.playerInfo.lastVelocity.hasPassed(3)
                     && !data.playerInfo.generalCancel) {
                 vl+= lastKeyChange.hasNotPassed(14) ? 0.2 : 1;

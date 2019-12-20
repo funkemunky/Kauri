@@ -22,7 +22,9 @@ public class AutoclickerB extends Check {
 
         long delta = timeStamp - lastTimestamp;
 
-        if(delta > 2000 || delta < 3 || data.playerInfo.lastBrokenBlock.hasNotPassed(5)) {
+        if(delta > 2000 || delta < 3
+                || data.playerInfo.lastBrokenBlock.hasNotPassed(5)
+                || data.playerInfo.lastBlockPlace.hasNotPassed(2)) {
             lastTimestamp = timeStamp;
             return;
         }

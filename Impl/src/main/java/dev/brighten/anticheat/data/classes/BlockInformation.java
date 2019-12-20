@@ -80,7 +80,7 @@ public class BlockInformation {
                 Atlas.getInstance().getEntities().getOrDefault(objectData.getPlayer().getUniqueId(), new ArrayList<>()),
                 objectData.playerInfo.to);
 
-        handler.setSize(0.6f, 0.5f);
+        handler.setSize(0.6f, 0.8f);
         handler.setOffset(-0.1);
 
         objectData.playerInfo.serverGround =
@@ -110,7 +110,7 @@ public class BlockInformation {
 
         if(objectData.playerInfo.deltaY < 0) {
             handler.setSize(2.0f, 0);
-        }
+        } else handler.setSize(0.61, 0);
         handler.setSingle(true);
         onClimbable = handler.isCollidedWith(Materials.LADDER);
         handler.setSingle(false);

@@ -194,8 +194,6 @@ public class MovementProcessor {
         data.predictionService.box = new SimpleCollisionBox(data.playerInfo.from.toVector(), 0.6, 1.8).toBoundingBox();
         data.box = new SimpleCollisionBox(data.playerInfo.to.toVector(), 0.6, 1.8);
 
-        data.blockInfo.runCollisionCheck(); //run b4 everything else for use below.
-
         //Setting the motion delta for use in checks to prevent repeated functions.
         data.playerInfo.lDeltaX = data.playerInfo.deltaX;
         data.playerInfo.lDeltaY = data.playerInfo.deltaY;
@@ -205,6 +203,16 @@ public class MovementProcessor {
         data.playerInfo.deltaZ = (float) (data.playerInfo.to.z - data.playerInfo.from.z);
         data.playerInfo.lDeltaXZ = data.playerInfo.deltaXZ;
         data.playerInfo.deltaXZ = MathUtils.hypot(data.playerInfo.deltaX, data.playerInfo.deltaZ);
+
+        if(data.playerInfo.worldLoaded) {
+            data.playerInfo.blockOnTo = data.playerInfo.to.toLocation(data.getPlayer().getWorld()).getBlock();
+            data.playerInfo.blockBelow = data.playerInfo.to.toLocation(data.getPlayer().getWorld())
+                    .subtract(0, 1, 0).getBlock();
+
+            data.blockInfo.currentFriction = MinecraftReflection.getFriction(data.playerInfo.blockBelow);
+        } else data.playerInfo.blockOnTo = data.playerInfo.blockBelow = null;
+
+        data.blockInfo.runCollisionCheck(); //run b4 everything else for use below.
 
         //Setting the angle delta for use in checks to prevent repeated functions.
         data.playerInfo.lDeltaYaw = data.playerInfo.deltaYaw;
@@ -268,14 +276,6 @@ public class MovementProcessor {
         }
 
         /* General Ticking */
-
-        if(data.playerInfo.worldLoaded) {
-            data.playerInfo.blockOnTo = data.playerInfo.to.toLocation(data.getPlayer().getWorld()).getBlock();
-            data.playerInfo.blockBelow = data.playerInfo.to.toLocation(data.getPlayer().getWorld())
-                    .subtract(0, 1, 0).getBlock();
-
-            data.blockInfo.currentFriction = MinecraftReflection.getFriction(data.playerInfo.blockBelow);
-        } else data.playerInfo.blockOnTo = data.playerInfo.blockBelow = null;
 
         data.playerInfo.onLadder = data.playerInfo.blockOnTo != null
                 && BlockUtils.isClimbableBlock(data.playerInfo.blockBelow);
