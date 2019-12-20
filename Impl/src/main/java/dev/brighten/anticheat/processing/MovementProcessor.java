@@ -79,11 +79,6 @@ public class MovementProcessor {
                             new WrappedOutKeepAlivePacket(201).getObject());
                     data.playerInfo.lastLoadedPacketSend.reset();
                     data.playerInfo.loadedPacketReceived = false;
-                } else if(data.playerInfo.lastLoadedPacketSend.hasPassed(80)) {
-                    //This is a check to prevent exploitation from clients.
-                    //If the keepAlive isn't received, it's likely the server would have kicked them first though.
-                    RunUtils.task(() -> data.getPlayer().kickPlayer(Kauri.INSTANCE.msgHandler.getLanguage()
-                            .msg("packet.notloaded", "World load packet not received. Lag?")));
                 }
             }
         } else if(data.playerInfo.lworldLoaded) {
@@ -94,11 +89,6 @@ public class MovementProcessor {
                         new WrappedOutKeepAlivePacket(200).getObject());
                 data.playerInfo.lastLoadedPacketSend.reset();
                 data.playerInfo.loadedPacketReceived = false;
-            } else if(data.playerInfo.lastLoadedPacketSend.hasPassed(80)) {
-                //This is a check to prevent exploitation from clients.
-                //If the keepAlive isn't received, it's likely the server would have kicked them first though.
-                RunUtils.task(() -> data.getPlayer().kickPlayer(Kauri.INSTANCE.msgHandler.getLanguage()
-                        .msg("packet.notloaded", "World load packet not received. Lag?")));
             }
         }
 

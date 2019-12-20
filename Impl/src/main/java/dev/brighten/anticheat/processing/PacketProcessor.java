@@ -45,7 +45,7 @@ public class    PacketProcessor {
                             //Resetting location to prevent false positives.
                             data.targetPastLocation.previousLocations.clear();
                             data.playerInfo.lastTargetSwitch.reset();
-                            data.targetBounds = new SimpleCollisionBox(MinecraftReflection
+                            data.targetBounds = new SimpleCollisionBox((Object)MinecraftReflection
                                     .getEntityBoundingBox(data.target));
                         }
 
