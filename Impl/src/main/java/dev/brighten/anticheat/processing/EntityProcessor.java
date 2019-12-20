@@ -19,13 +19,11 @@ public class EntityProcessor {
     public static BukkitTask task;
 
     private static void runEntityProcessor() {
-        for (UUID uuid : Atlas.getInstance().getEntities().keySet()) {
-            vehicles.put(uuid,
-                    Atlas.getInstance().getEntities().get(uuid)
-                            .stream()
-                            .filter(entity -> entity instanceof Vehicle)
-                            .collect(Collectors.toList()));
-        }
+        Atlas.getInstance().getEntities().keySet().forEach(uuid -> vehicles.put(uuid,
+                Atlas.getInstance().getEntities().get(uuid)
+                        .stream()
+                        .filter(entity -> entity instanceof Vehicle)
+                        .collect(Collectors.toList())));
     }
 
     public static void start() {

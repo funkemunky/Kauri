@@ -15,7 +15,7 @@ public class AimJ extends Check {
             double deltaX = Math.abs(data.moveProcessor.deltaX - data.moveProcessor.lastDeltaX);
             double deltaY = Math.abs(data.moveProcessor.deltaY - data.moveProcessor.lastDeltaY);
 
-            if (data.moveProcessor.deltaX >= 10 && data.moveProcessor.deltaX <= 20 && (data.moveProcessor.deltaY == 1 || data.moveProcessor.deltaY == 2) && deltaX >= 2.0 && deltaY == 0.0) {
+            if (data.moveProcessor.deltaX >= 10 && data.moveProcessor.deltaX <= 20 && data.moveProcessor.deltaY == 2 && deltaX >= 2.0 && deltaX <= 5.0 && deltaY == 0.0) {
                 flag("dx=" + data.moveProcessor.deltaX + ", dy=" + data.moveProcessor.deltaY + ", mDx=" + deltaX + ", mDy=" + deltaY);
             }
 
