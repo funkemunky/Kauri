@@ -13,6 +13,7 @@ import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.MovementUtils;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 
 import java.math.RoundingMode;
@@ -53,6 +54,8 @@ public class MovementProcessor {
             data.playerInfo.to.x = packet.getX();
             data.playerInfo.to.y = packet.getY();
             data.playerInfo.to.z = packet.getZ();
+
+            double deltaY = data.playerInfo.to.y - data.playerInfo.from.y;
         }
 
         data.playerInfo.to.timeStamp = timeStamp;

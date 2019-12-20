@@ -133,9 +133,7 @@ public class Kauri extends JavaPlugin {
         enabled = true;
         lastEnabled.reset();
 
-        for (World world : Bukkit.getWorlds()) {
-            EntityProcessor.vehicles.put(world.getUID(), new ArrayList<>());
-        }
+        Bukkit.getWorlds().forEach(world -> EntityProcessor.vehicles.put(world.getUID(), new ArrayList<>()));
     }
 
     private void runTpsTask() {

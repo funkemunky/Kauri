@@ -313,8 +313,8 @@ public class PredictionService {
             }
         }
 
-        moveF *= 0.98F;
-        moveS *= 0.98F;
+        moveF *= 0.9800000190734863F;
+        moveS *= 0.9800000190734863F;
 
         moveStrafing = moveS;
         moveForward = moveF;

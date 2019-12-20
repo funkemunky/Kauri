@@ -10,6 +10,7 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
+import org.bukkit.Bukkit;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -46,10 +47,19 @@ public class SpeedD extends Check {
 
             if (data.playerInfo.lClientGround) {
                 f5 = data.predictionService.aiMoveSpeed * f;
-            } else {
-                f5 = lsprint ? 0.026f : 0.02f;
-            }
 
+                //Credits to Toon for this
+                if (data.playerInfo.sprinting && f5 < 0.129F) {
+                    f5 *= 1.3;
+                }
+            } else {
+                f5 = lsprint ? 0.02600001f : 0.0200001f;
+
+                //Credits to Toon for this
+                if (data.playerInfo.sprinting && f5 < 0.026) {
+                    f5 += 0.006f;
+                }
+            }
 
             val moveFlying = moveFlying(
                     new float[]{data.predictionService.moveStrafing, data.predictionService.moveForward},
@@ -71,8 +81,8 @@ public class SpeedD extends Check {
             //^ That is not how the client handles rotations in EntityLivingBase#1373 in the client
             if (data.playerInfo.serverGround && data.playerInfo.sprinting && data.playerInfo.deltaY > 0.4199D) {
                 float rot = data.playerInfo.to.yaw * 0.017453292F;
-                mx -= (double) (MathHelper.sin(rot) * 0.20000000298023224D);
-                mz += (double) (MathHelper.cos(rot) * 0.20000000298023224D);
+                mx -= (MathHelper.sin(rot) * 0.20000000298023224F);
+                mz += (MathHelper.cos(rot) * 0.20000000298023224F);
             }
 
             float mxz = MathUtils.hypot(mx, mz);
@@ -103,10 +113,13 @@ public class SpeedD extends Check {
                 }
             } else vl-= vl > 0 ? 0.2 : 0;
 
-            debug("p=" + mxz + " a=" + data.playerInfo.deltaXZ
+            debug("p=" + mxz
+                    + " a=" + data.playerInfo.deltaXZ
                     + " key=" + data.predictionService.key
                     + " ground="  + data.playerInfo.lClientGround
-                    + " sp=" + lsprint + " vl=" + vl);
+                    + " sp=" + lsprint
+                    + " delta=" + (data.playerInfo.deltaXZ - mxz)
+                    + " vl=" + vl);
 
             lmx = mx;
             lmz = mz;

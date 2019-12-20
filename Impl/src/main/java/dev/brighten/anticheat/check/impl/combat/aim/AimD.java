@@ -36,7 +36,11 @@ public class AimD extends Check {
                                 + " verbose=" + verbose);
                     }
                 } else verbose = 0;
-                debug(data.moveProcessor.deltaY + ", " + data.moveProcessor.deltaX + " verbose=" + verbose);
+                debug("x= " + data.moveProcessor.deltaX
+                        + " y=" + data.moveProcessor.deltaY
+                        + " sens=" + data.moveProcessor.sensitivityX
+                        + " deltaX=" + deltaX
+                        + " verbose=" + verbose);
             }
         }
     }
