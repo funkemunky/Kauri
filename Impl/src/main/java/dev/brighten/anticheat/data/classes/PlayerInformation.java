@@ -56,7 +56,7 @@ public class PlayerInformation {
 
     public float velocityX, velocityY, velocityZ;
     public float mvx, mvy, mvz;
-    public boolean takingVelocity;
+    public boolean takingVelocity, sentpostofalse;
 
     public KLocation from, to;
 }

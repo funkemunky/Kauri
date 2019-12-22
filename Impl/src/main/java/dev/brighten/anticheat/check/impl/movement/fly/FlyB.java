@@ -17,7 +17,7 @@ public class FlyB extends Check {
             //We check if the player is in ground, since theoretically the y should be zero.
             float predicted = data.playerInfo.clientGround ? 0 : (data.playerInfo.lDeltaY - 0.08f) * .98f;
 
-            if(data.playerInfo.lClientGround || data.playerInfo.collidesVertically) {
+            if(data.playerInfo.lClientGround && !data.playerInfo.clientGround) {
                 predicted = Math.min(data.playerInfo.deltaY, MovementUtils.getJumpHeight(packet.getPlayer()));
             }
 
@@ -26,9 +26,9 @@ public class FlyB extends Check {
             if(!data.playerInfo.flightCancel
                     && !data.playerInfo.wasOnSlime
                     && !data.playerInfo.serverPos
-                    && timeStamp - data.playerInfo.lastServerPos > 50L
+                    && data.playerInfo.halfBlockTicks == 0
                     && timeStamp -  data.playerInfo.lastVelocityTimestamp > 200L
-                    && !data.playerInfo.clientGround
+                    && !data.playerInfo.serverGround
                     && (data.playerInfo.blocksAboveTicks == 0 || data.playerInfo.deltaY >= 0)
                     && !data.playerInfo.collidesVertically
                     && MathUtils.getDelta(data.playerInfo.deltaY, predicted) > 0.0001) {

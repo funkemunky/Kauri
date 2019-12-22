@@ -190,7 +190,6 @@ public class Check implements KauriCheck {
         register(new FlyC());
         register(new FlyD());
         register(new FlyE());
-        register(new FlyF());
         register(new FastLadder());
         register(new NoFallA());
         register(new NoFallB());

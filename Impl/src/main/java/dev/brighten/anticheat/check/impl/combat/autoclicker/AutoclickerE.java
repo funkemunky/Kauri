@@ -49,9 +49,9 @@ public class AutoclickerE extends Check {
                 double avg = summary.getAverage();
                 double range = summary.getMax() - summary.getMin();
 
-                if ((std < 20 || MathUtils.getDelta(std, lstd) < 0.3) && (MathUtils.getDelta(avg, lavg) > 5 || range > 31)) {
+                if ((std < 20 || MathUtils.getDelta(std, lstd) < 0.3 || range <= 3) && (MathUtils.getDelta(avg, lavg) > 5 || range > 31)) {
                     verbose++;
-                    if (verbose > 2) {
+                    if (verbose > 3) {
                         vl++;
                         flag("std=" + std);
                     }

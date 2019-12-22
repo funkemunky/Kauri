@@ -326,7 +326,7 @@ public class MovementProcessor {
                 || data.playerInfo.inVehicle
                 || data.playerInfo.webTicks > 0
                 || !data.playerInfo.worldLoaded
-                || data.playerInfo.blockOnTo == null
+                || (data.playerInfo.blockOnTo != null && BlockUtils.isSolid(data.playerInfo.blockOnTo))
                 || data.playerInfo.riptiding
                 || data.playerInfo.gliding
                 || data.playerInfo.lastToggleFlight.hasNotPassed(40)
@@ -344,7 +344,7 @@ public class MovementProcessor {
                 || !data.playerInfo.worldLoaded
                 || data.playerInfo.lastToggleFlight.hasNotPassed(40)
                 || timeStamp - data.creation < 2000
-                || data.playerInfo.blockOnTo == null
+                || (data.playerInfo.blockOnTo != null && BlockUtils.isSolid(data.playerInfo.blockOnTo))
                 || data.playerInfo.serverPos
                 || Kauri.INSTANCE.lastTickLag.hasNotPassed(5);
 

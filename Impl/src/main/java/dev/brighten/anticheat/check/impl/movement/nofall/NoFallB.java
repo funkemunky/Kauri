@@ -15,7 +15,8 @@ public class NoFallB extends Check {
         if(packet.isPos()) {
             if(data.playerInfo.serverGround != data.playerInfo.clientGround
                     && data.playerInfo.climbTicks == 0
-                    && !data.playerInfo.generalCancel && data.playerInfo.liquidTicks == 0) {
+                    && !data.playerInfo.generalCancel
+                    && data.playerInfo.liquidTicks == 0) {
                 if(vl++ > 5) {
                     flag("server=" + data.playerInfo.serverGround + " client=" + data.playerInfo.clientGround);
                 }

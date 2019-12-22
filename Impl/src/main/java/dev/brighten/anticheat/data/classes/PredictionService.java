@@ -55,7 +55,7 @@ public class PredictionService {
                     velocityY = packet.getY();
                     velocityZ = packet.getZ();
 
-                    dev.brighten.anticheat.utils.MiscUtils.testMessage("sent keepAlive");
+                   // dev.brighten.anticheat.utils.MiscUtils.testMessage("sent keepAlive");
 
                     TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutKeepAlivePacket(255).getObject());
                 }
@@ -76,8 +76,8 @@ public class PredictionService {
                 WrappedInKeepAlivePacket packet = new WrappedInKeepAlivePacket(e.getPacket(), e.getPlayer());
                 if(packet.getTime() == 255) {
                     velocity = true;
-                    dev.brighten.anticheat.utils.MiscUtils
-                            .testMessage("&evelX=" + velocityX + " velZ=" + velocityZ);
+                    //dev.brighten.anticheat.utils.MiscUtils
+                    //        .testMessage("&evelX=" + velocityX + " velZ=" + velocityZ);
                 } else if(packet.getTime() == 233) {
                     position = true;
                 }
@@ -179,7 +179,7 @@ public class PredictionService {
                 rmotionY = posY - lPosY;
                 rmotionZ = posZ - lPosZ;
 
-                dev.brighten.anticheat.utils.MiscUtils.testMessage(Color.Gray + rmotionX + ", " + rmotionZ);
+                //dev.brighten.anticheat.utils.MiscUtils.testMessage(Color.Gray + rmotionX + ", " + rmotionZ);
                 fMath = fastMath; // if the Player uses Optifine FastMath
 
                 try {

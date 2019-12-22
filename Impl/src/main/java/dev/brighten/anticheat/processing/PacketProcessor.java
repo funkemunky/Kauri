@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.processing;
 
+import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.reflection.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
@@ -11,8 +12,11 @@ import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.utils.MiscUtils;
 import lombok.val;
 import org.bukkit.entity.LivingEntity;
+
+import java.util.concurrent.TimeUnit;
 
 public class    PacketProcessor {
 
@@ -67,24 +71,36 @@ public class    PacketProcessor {
                 }
 
                 if(timeStamp - data.creation > 10000L
-                        && timeStamp - data.lagInfo.lastTrans > 5000L) RunUtils.task(() -> data.getPlayer().kickPlayer("Lag?"));
+                        && timeStamp - data.lagInfo.lastTrans > 5000L)
+                    RunUtils.task(() -> data.getPlayer().kickPlayer("Lag?"));
+
                 data.lagInfo.lastFlying = timeStamp;
+
+                if(data.playerInfo.serverPos && !data.playerInfo.sentpostofalse) {
+                    data.playerInfo.sentpostofalse = true;
+                    Atlas.getInstance().getSchedular().schedule(() -> {
+                        data.playerInfo.serverPos = data.playerInfo.sentpostofalse = false;
+                                MiscUtils.testMessage("set position to false");
+                    }, data.lagInfo.transPing, TimeUnit.MILLISECONDS);
+                }
+
                 data.moveProcessor.process(packet, timeStamp);
 
-                if(!data.playerInfo.posLocs.isEmpty()) {
+                if(data.playerInfo.posLocs.size() > 0) {
                     val optional = data.playerInfo.posLocs.stream()
                             .filter(loc -> loc.toVector().setY(0)
-                                    .distance(data.playerInfo.to.toVector().setY(0)) <= 1E-5 && MathUtils.getDelta(loc.y, data.playerInfo.to.y) < 1)
+                                    .distance(data.playerInfo.to.toVector().setY(0)) <= 1E-5
+                                    && MathUtils.getDelta(loc.y, data.playerInfo.to.y) < 1)
                             .findFirst();
 
                     if(optional.isPresent()) {
                         data.playerInfo.serverPos = true;
+                        MiscUtils.testMessage("set position to true (1)");
                         data.playerInfo.lastServerPos = timeStamp;
                         data.playerInfo.posLocs.remove(optional.get());
                     }
                 }
                 data.checkManager.runPacket(packet, timeStamp);
-                if(data.playerInfo.serverPos) data.playerInfo.serverPos = false;
                 break;
             }
             case Packet.Client.ENTITY_ACTION: {
@@ -136,6 +152,7 @@ public class    PacketProcessor {
                     data.playerInfo.lastServerPos = timeStamp;
                     data.playerInfo.serverPos = true;
                     data.predictionService.position = true;
+                    MiscUtils.testMessage("set position to true (2)");
                 } else if (time == 200) {
                     data.playerInfo.worldLoaded = false;
                     data.playerInfo.loadedPacketReceived = true;
