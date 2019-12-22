@@ -93,7 +93,8 @@ public class SpeedD extends Check {
             float mxz = MathUtils.hypot(mx, mz);
 
             float threshold = mxz
-                    + (lastKeyChange.hasNotPassed() || lastKey.equals("Nothing") ? 0.1f : 0.005f);
+                    + (data.playerInfo.halfBlockTicks > 0 ? 0.16f : 0)
+                    + (lastKeyChange.hasNotPassed() || lastKey.equals("Nothing") ? 0.1f : 0.03f);
 
             if(data.playerInfo.deltaXZ > threshold
                     && mxz > 0

@@ -19,7 +19,7 @@ public class AutoclickerE extends Check {
     private List<Long> delays = new ArrayList<>();
     private List<Long> samples = new ArrayList<>();
     private int verbose;
-    private double lavg;
+    private double lavg, lstd;
 
     @Packet
     public void onClick(WrappedInArmAnimationPacket packet, long timeStamp) {
@@ -45,9 +45,11 @@ public class AutoclickerE extends Check {
                         .mapToDouble(v -> v)
                         .forEach(list::add);
                 double std = MathUtils.stdev(list);
-                double avg = delays.stream().mapToDouble(v -> v).summaryStatistics().getAverage();
+                val summary = delays.stream().mapToDouble(v -> v).summaryStatistics();
+                double avg = summary.getAverage();
+                double range = summary.getMax() - summary.getMin();
 
-                if (std < 20 && MathUtils.getDelta(avg, lavg) > 1) {
+                if ((std < 20 || MathUtils.getDelta(std, lstd) < 0.3) && (MathUtils.getDelta(avg, lavg) > 5 || range > 31)) {
                     verbose++;
                     if (verbose > 2) {
                         vl++;
@@ -55,9 +57,10 @@ public class AutoclickerE extends Check {
                     }
                 } else verbose = 0;
 
-                debug("std=" + std + " verbose=" + verbose);
+                debug("std=" + std + " avg=" + avg + " range= " + range + " verbose=" + verbose);
                 delays.clear();
                 lavg = avg;
+                lstd = std;
             }
             samples.clear();
         }

@@ -15,6 +15,7 @@ import dev.brighten.anticheat.check.impl.combat.hitbox.Hitboxes;
 import dev.brighten.anticheat.check.impl.combat.reach.Reach;
 import dev.brighten.anticheat.check.impl.movement.fly.*;
 import dev.brighten.anticheat.check.impl.movement.general.FastLadder;
+import dev.brighten.anticheat.check.impl.movement.general.NoSlowdown;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallA;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallB;
 import dev.brighten.anticheat.check.impl.movement.speed.SpeedA;
@@ -209,6 +210,7 @@ public class Check implements KauriCheck {
         register(new SpeedC());
         register(new SpeedD());
         register(new Timer());
+        register(new NoSlowdown());
         register(new BadPacketsA());
         register(new BadPacketsB());
         register(new BadPacketsC());

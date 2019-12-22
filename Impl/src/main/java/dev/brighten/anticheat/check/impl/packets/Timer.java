@@ -15,7 +15,7 @@ public class Timer extends Check {
 
     private long lastTS, lastElapsed;
     private int ticks;
-    private EvictingList<Long> times = new EvictingList<>(50);
+    private EvictingList<Long> times = new EvictingList<>(30);
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet, long timeStamp) {

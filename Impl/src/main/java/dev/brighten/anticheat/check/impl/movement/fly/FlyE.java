@@ -19,7 +19,8 @@ public class FlyE extends Check {
                     && data.playerInfo.jumped
                     && !data.playerInfo.wasOnSlime
                     && !data.blockInfo.onHalfBlock
-                    && data.playerInfo.deltaY > maxHeight) {
+                    && data.playerInfo.deltaY > (data.playerInfo.lastVelocity.hasNotPassed(20)
+                    ? Math.max(data.playerInfo.velocityY, maxHeight) : maxHeight)) {
                 vl++;
                 flag("deltaY=" + data.playerInfo.deltaY + " maxHeight=" + maxHeight);
             }

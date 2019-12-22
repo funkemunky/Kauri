@@ -40,7 +40,7 @@ public class Reach extends Check {
 
         if(data.target == null || timeStamp - data.playerInfo.lastAttackTimeStamp > 55) return;
 
-        val origins = data.pastLocation.getEstimatedLocation(0, Math.max(60L, Math.round(data.lagInfo.transPing / 2D)))
+        val origins = data.pastLocation.getEstimatedLocation(0, Math.max(100L, Math.round(data.lagInfo.transPing / 2D)))
                 .stream()
                 .map(loc -> loc.toLocation(data.getPlayer().getWorld()).add(0, data.playerInfo.sneaking ? 1.54f : 1.62f, 0))
                 .collect(Collectors.toList());

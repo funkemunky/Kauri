@@ -29,21 +29,26 @@ public class AimD extends Check {
 
             interval.add(angle);
 
-            if(interval.size() > 4) {
+            if(interval.size() > 8) {
                 val summary = interval.getSummary();
                 val std = interval.std();
                 val range = summary.getMax() - summary.getMin();
 
-                if(MathUtils.getDelta(std, lstd) < 0.3 && data.moveProcessor.deltaX > 10) {
+                if(MathUtils.getDelta(std, lstd) < 1 && range > 12) {
                     if(verbose++ > 2) {
                         vl++;
                         flag("avg=" + summary.getAverage() + " std=" + std);
                     }
-                } else verbose = 0;
+                } else verbose-= verbose > 0 ? 0.5f : 0;
                 debug("x= " + data.moveProcessor.deltaX
                         + " y=" + data.moveProcessor.deltaY
+                        + " std=" + std
+                        + " range=" + range
                         + " sens=" + data.moveProcessor.sensitivityX
                         + " verbose=" + verbose);
+
+                interval.clear();
+                lstd = std;
             }
         }
     }

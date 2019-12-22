@@ -51,7 +51,9 @@ public class FlyF extends Check {
                 maxHeight = Math.max(maxHeight, (float)(cbox.yMax - data.playerInfo.from.y));
             }
 
-            if(delta >= 1 && !data.blockInfo.onStairs && MathUtils.getDelta(totalDeltaY, delta) < 1E-5 && totalDeltaY > 0) {
+            if(delta >= 1 && !data.blockInfo.onStairs
+                    && data.playerInfo.lastVelocity.hasPassed(20)
+                    && MathUtils.getDelta(totalDeltaY, delta) < 1E-5 && totalDeltaY > 0) {
                 vl++;
                 flag("totalY=" + totalDeltaY + " height=" + delta);
                 if(data.playerInfo.clientGround) {
@@ -63,12 +65,14 @@ public class FlyF extends Check {
         }
 
         float totalHeight = MovementUtils.getTotalHeight(data.getPlayer(), maxHeight);
-        if(data.playerInfo.deltaY > maxHeight + 0.005 && !data.blockInfo.onStairs) {
+        if(data.playerInfo.deltaY > maxHeight + 0.005 && !data.blockInfo.onStairs
+                && data.playerInfo.lastVelocity.hasPassed(20)) {
             vl++;
             flag("deltaY=" + data.playerInfo.deltaY + " maxHeight=" + maxHeight);
         } else if(totalDeltaY > totalHeight
                 || (totalDeltaY > maxHeight
                 && !data.blockInfo.onStairs
+                && data.playerInfo.lastVelocity.hasPassed(20)
                 && totalDeltaY - MovementUtils.getTotalHeight(data.getPlayer(), maxHeight) > 0.1f)) {
             vl++;
             flag("total=" + totalDeltaY + " predicted=" + totalHeight);
