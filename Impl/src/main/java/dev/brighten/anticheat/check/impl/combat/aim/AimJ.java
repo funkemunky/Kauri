@@ -38,7 +38,9 @@ public class AimJ extends Check {
                     + " dPitch=" + data.playerInfo.deltaPitch
                     + " vl=" + vl + " pos=" + data.playerInfo.serverPos);*/
 
-            if(data.moveProcessor.deltaY <= 1 && (data.moveProcessor.deltaX > 50 || deltaX < 10) && data.moveProcessor.deltaX > 20) {
+            if(data.moveProcessor.deltaY <= 1
+                    && (data.moveProcessor.deltaX > 50 || deltaX < 10)
+                    && data.moveProcessor.deltaX > 20) {
                 verbose++;
                 if(verbose > 9) {
                     vl++;

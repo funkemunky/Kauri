@@ -18,10 +18,7 @@ import dev.brighten.anticheat.check.impl.movement.general.FastLadder;
 import dev.brighten.anticheat.check.impl.movement.general.NoSlowdown;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallA;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallB;
-import dev.brighten.anticheat.check.impl.movement.speed.SpeedA;
-import dev.brighten.anticheat.check.impl.movement.speed.SpeedB;
-import dev.brighten.anticheat.check.impl.movement.speed.SpeedC;
-import dev.brighten.anticheat.check.impl.movement.speed.SpeedD;
+import dev.brighten.anticheat.check.impl.movement.speed.*;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityA;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityB;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityC;
@@ -190,6 +187,7 @@ public class Check implements KauriCheck {
         register(new FlyC());
         register(new FlyD());
         register(new FlyE());
+        register(new FlyF());
         register(new FastLadder());
         register(new NoFallA());
         register(new NoFallB());
@@ -208,6 +206,7 @@ public class Check implements KauriCheck {
         register(new SpeedB());
         register(new SpeedC());
         register(new SpeedD());
+        register(new SpeedE());
         register(new Timer());
         register(new NoSlowdown());
         register(new BadPacketsA());

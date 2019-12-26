@@ -29,8 +29,7 @@ public class PredictionService {
             lastOnGround, onGround, lastSprint, fMath, fastMath, walkSpecial, lastVelocity, isCollidedVertically,
             isCollided;
     public double posX, posY, posZ, lPosX, lPosY, lPosZ, rmotionX, rmotionY, rmotionZ, lmotionX, lmotionZ, lmotionY;
-    public double predX, predY, predZ;
-    private double velocityX, velocityY, velocityZ;
+    public double predX, predZ;
     public TickTimer lastUseItem = new TickTimer(10);
     public BoundingBox box;
     public float walkSpeed, yaw, pitch, moveStrafing, moveForward, aiMoveSpeed, distanceWalkedModified,
@@ -43,24 +42,6 @@ public class PredictionService {
 
     public void onSend(PacketSendEvent event) {
         switch(event.getType()) {
-            case Packet.Server.POSITION: {
-                TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutKeepAlivePacket(233).getObject());
-                break;
-            }
-            case Packet.Server.ENTITY_VELOCITY: {
-                WrappedOutVelocityPacket packet = new WrappedOutVelocityPacket(event.getPacket(), event.getPlayer());
-
-                if(packet.getId() == data.getPlayer().getEntityId()) {
-                    velocityX = packet.getX();
-                    velocityY = packet.getY();
-                    velocityZ = packet.getZ();
-
-                   // dev.brighten.anticheat.utils.MiscUtils.testMessage("sent keepAlive");
-
-                    TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutKeepAlivePacket(255).getObject());
-                }
-                break;
-            }
             case Packet.Server.ABILITIES: {
                 WrappedOutAbilitiesPacket packet = new WrappedOutAbilitiesPacket(event.getPacket(), event.getPlayer());
 
@@ -72,22 +53,10 @@ public class PredictionService {
 
     public void onReceive(PacketReceiveEvent e) {
         switch(e.getType()) {
-            case Packet.Client.KEEP_ALIVE: {
-                WrappedInKeepAlivePacket packet = new WrappedInKeepAlivePacket(e.getPacket(), e.getPlayer());
-                if(packet.getTime() == 255) {
-                    velocity = true;
-                    //dev.brighten.anticheat.utils.MiscUtils
-                    //        .testMessage("&evelX=" + velocityX + " velZ=" + velocityZ);
-                } else if(packet.getTime() == 233) {
-                    position = true;
-                }
-                break;
-            }
             case Packet.Client.ABILITIES: {
                 WrappedInAbilitiesPacket packet = new WrappedInAbilitiesPacket(e.getPacket(), e.getPlayer());
 
                 fly = packet.isAllowedFlight();
-
                 walkSpeed = packet.getWalkSpeed();
 
                 //Bukkit.broadcastMessage(packet.isAllowedFlight() + "");
@@ -426,7 +395,7 @@ public class PredictionService {
                 // calculated motion
                 final double diffZ = rmotionZ - motionZ;
 
-                diff = Math.hypot(diffX, diffZ);
+                diff = MathUtils.hypot(diffX, diffZ);
 
                 // if the motion isn't correct this value can get out in flags
                 diff = new BigDecimal(diff).setScale(precision + 2, RoundingMode.HALF_UP).doubleValue();
@@ -439,8 +408,6 @@ public class PredictionService {
 
                     fMath = fastMath; // saves the fastmath option if the player changed it
                     break found;
-                } else {
-                    // Bukkit.broadcastMessage(Color.Red + "(" + rmotionX + ", " + motionX + "); (" + rmotionZ + ", " + motionZ + ")");
                 }
 
                 if (diff < closestdiff) {
@@ -589,7 +556,7 @@ public class PredictionService {
             }
 
             //Collide with block function
-            if (block1 != null && this.onGround) {
+            if (this.onGround) {
                 onCollideWithBlock(block1);
             }
 
@@ -659,9 +626,9 @@ public class PredictionService {
         if (rmotionX == 0 && rmotionZ == 0 && onGround)
             return false;
 
-        if (Math.hypot(lmotionX, lmotionZ) > 11) // if something gots wrong this can be helpfull
+        if (MathUtils.hypot(lmotionX, lmotionZ) > 11) // if something gots wrong this can be helpfull
             return false;
-        if (Math.hypot(posX - lPosX, posZ - lPosZ) > 10)
+        if (MathUtils.hypot(posX - lPosX, posZ - lPosZ) > 10)
             return false;
 
         return data.playerInfo.liquidTicks <= 0
@@ -710,10 +677,10 @@ public class PredictionService {
 
     // functions of minecraft MathHelper.java
     public static float sqrt_float(float p_76129_0_) {
-        return (float) Math.sqrt(p_76129_0_);
+        return MathUtils.sqrt(p_76129_0_);
     }
 
     public static float sqrt_double(double p_76133_0_) {
-        return (float) Math.sqrt(p_76133_0_);
+        return (float) MathUtils.sqrt(p_76133_0_);
     }
 }

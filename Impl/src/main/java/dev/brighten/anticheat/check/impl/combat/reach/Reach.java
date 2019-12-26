@@ -37,7 +37,6 @@ public class Reach extends Check {
     @Packet
     public void onUse(WrappedInFlyingPacket packet, long timeStamp) {
         //debug("timeStamp=" + timeStamp + "ms");
-
         if(data.target == null || timeStamp - data.playerInfo.lastAttackTimeStamp > 55) return;
 
         val origins = data.pastLocation.getEstimatedLocation(0, Math.max(100L, Math.round(data.lagInfo.transPing / 2D)))

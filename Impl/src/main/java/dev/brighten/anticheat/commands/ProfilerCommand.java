@@ -21,6 +21,8 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.io.UnsupportedEncodingException;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -57,30 +59,33 @@ public class ProfilerCommand {
 
                 int size = sorted.size();
                 List<Map.Entry<String, Long>> entries = new ArrayList<>(sorted.entrySet());
-                List<Button> buttons = new ArrayList<>();
+                List<Tuple<Double, Button>> buttons = new ArrayList<>();
 
                 double samples = 0;
 
-                for (int i = size - Math.min(size - 10, 10); i < size; i++) {
+                for (int i = 0; i < size; i++) {
                     Map.Entry<String, Long> entry = entries.get(i);
                     String name = entry.getKey();
                     Long time = entry.getValue();
 
-                    buttons.add(new Button(false, new ItemBuilder(Material.REDSTONE)
+                    final double v = 1000000D * (name.contains("check:") ? 4 : 1);
+                    buttons.add(new Tuple<>(time / v, new Button(false, new ItemBuilder(Material.REDSTONE)
                             .amount(1)
                             .name(Color.Gold + entry.getKey()).lore("",
                                     "&7Weighted Usage: " + dev.brighten.anticheat.utils.MiscUtils.drawUsage(total, time),
-                                    "&7MS: &f" + dev.brighten.anticheat.utils.MiscUtils.format(time / 1000000D, 3),
+                                    "&7MS: &f" + dev.brighten.anticheat.utils.MiscUtils.format(time / v, 3),
                                     "&7Samples: &f" + dev.brighten.anticheat.utils.MiscUtils
                                             .format(Kauri.INSTANCE.profiler.samples
-                                                    .getOrDefault(name, 0L) / 1000000D, 3),
+                                                    .getOrDefault(name, 0L) / v, 3),
                                     "&7Deviaion: &f" + dev.brighten.anticheat.utils.MiscUtils
                                             .format(Kauri.INSTANCE.profiler.stddev
-                                                    .getOrDefault(name, 0L) / 1000000D, 3))
-                            .build()));
+                                                    .getOrDefault(name, 0L) / v, 3))
+                            .build())));
                     samples+= Kauri.INSTANCE.profiler.samples
-                            .getOrDefault(name, 0L) / 1000000D;
+                            .getOrDefault(name, 0L) / v;
                 }
+
+                buttons.sort(Comparator.comparing(tuple -> tuple.one, Comparator.reverseOrder()));
 
                 buttons = buttons.subList(Math.min(buttons.size(),
                         (finalPage - 1) * 45), Math.min(finalPage * 45, buttons.size()));
@@ -97,7 +102,7 @@ public class ProfilerCommand {
                         new ItemBuilder(Material.REDSTONE)
                                 .amount(1)
                                 .name(Color.Gold + "Total").lore("",
-                                "&7Usage: " + dev.brighten.anticheat.utils.MiscUtils.drawUsage(50, dev.brighten.anticheat.utils.MiscUtils.format(samples / 50, 3)),
+                                "&7Usage: " + dev.brighten.anticheat.utils.MiscUtils.drawUsage(50, dev.brighten.anticheat.utils.MiscUtils.format(samples, 3)),
                                 "&7Total: &f" + dev.brighten.anticheat.utils.MiscUtils.format(totalMs, 3),
                                 "&7Samples: &f" + dev.brighten.anticheat.utils.MiscUtils.format(samples, 3),
                                 "",
@@ -113,7 +118,7 @@ public class ProfilerCommand {
                         (player, info) -> Bukkit.dispatchCommand(player,
                                 "kauri profile testGUI " + (finalPage + 1))));
                 for (int i = 0; i < buttons.size(); i++) {
-                    menu.setItem(i, buttons.get(i));
+                    menu.setItem(i, buttons.get(i).two);
                 }
 
                 menu.buildInventory(false);
