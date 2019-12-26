@@ -39,7 +39,7 @@ public class AimJ extends Check {
                     + " vl=" + vl + " pos=" + data.playerInfo.serverPos);*/
 
             if(data.moveProcessor.deltaY <= 1
-                    && (data.moveProcessor.deltaX > 50 || deltaX < 10)
+                    && deltaX < 10
                     && data.moveProcessor.deltaX > 20) {
                 verbose++;
                 if(verbose > 9) {
@@ -47,7 +47,7 @@ public class AimJ extends Check {
                     flag("sens=" + sensX + " x=" + data.moveProcessor.deltaX
                             + " y=" + data.moveProcessor.deltaY + " vb=" + verbose + " deltaX=" + deltaX);
                 }
-            } else verbose = 0;
+            } else verbose-= verbose > 0 ? 2 : 0;
 
             debug("sx=" + sensX + " sy=" + sensY
                     + " deltaX=" + deltaX

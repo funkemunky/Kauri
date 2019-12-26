@@ -98,7 +98,7 @@ public class Check implements KauriCheck {
         if(lastExemptCheck.hasPassed()) exempt = KauriAPI.INSTANCE.exemptHandler.isExempt(data.uuid, this);
         if(exempt) return;
         Kauri.INSTANCE.executor.execute(() -> {
-            KauriFlagEvent event = new KauriFlagEvent(data.getPlayer(), this);
+            KauriFlagEvent event = new KauriFlagEvent(data.getPlayer(), this, information);
 
             Atlas.getInstance().getEventManager().callEvent(event);
 

@@ -115,7 +115,7 @@ public class VelocityB extends Check {
                     double vXZ = MathUtils.hypot(vX, vZ);
                     pct = data.playerInfo.deltaXZ / vXZ * 100;
 
-                    if (pct < 99.9
+                    if (pct < 99.8
                             && !data.playerInfo.usingItem && !data.predictionService.useSword) {
                         if(data.lagInfo.lastPacketDrop.hasPassed(1)) {
                             if (strafe == 0 && forward == 0 && !data.lagInfo.lagging) vl+= 2;

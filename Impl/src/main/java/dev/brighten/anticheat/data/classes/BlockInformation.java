@@ -37,12 +37,12 @@ public class BlockInformation {
         World world = objectData.getPlayer().getWorld();
 
         
-        int startX = Location.locToBlock(objectData.playerInfo.to.x - 0.3 - objectData.playerInfo.deltaXZ);
-        int endX = Location.locToBlock(objectData.playerInfo.to.x + 0.3 + objectData.playerInfo.deltaXZ);
-        int startY = Location.locToBlock(objectData.playerInfo.to.y - 0.51 + objectData.playerInfo.deltaY);
+        int startX = Location.locToBlock(objectData.playerInfo.to.x - 1 - objectData.playerInfo.deltaXZ);
+        int endX = Location.locToBlock(objectData.playerInfo.to.x + 1 + objectData.playerInfo.deltaXZ);
+        int startY = Location.locToBlock(objectData.playerInfo.to.y - 0.8 + objectData.playerInfo.deltaY);
         int endY = Location.locToBlock(objectData.playerInfo.to.y + 1.99 + objectData.playerInfo.deltaY);
-        int startZ = Location.locToBlock(objectData.playerInfo.to.z - 0.3 - objectData.playerInfo.deltaXZ);
-        int endZ = Location.locToBlock(objectData.playerInfo.to.z + 0.3 + objectData.playerInfo.deltaXZ);
+        int startZ = Location.locToBlock(objectData.playerInfo.to.z - 1 - objectData.playerInfo.deltaXZ);
+        int endZ = Location.locToBlock(objectData.playerInfo.to.z + 1 + objectData.playerInfo.deltaXZ);
         int it = 9 * 9;
         start:
         for (int chunkx = startX >> 4; chunkx <= endX >> 4; ++chunkx) {
