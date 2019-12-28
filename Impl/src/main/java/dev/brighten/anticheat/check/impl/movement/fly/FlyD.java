@@ -9,7 +9,7 @@ import dev.brighten.api.check.CheckType;
 @CheckInfo(name = "Fly (D)", description = "Checks if a player's acceleration is positive while in the air.",
         checkType = CheckType.FLIGHT, punishVL = 40)
 public class FlyD extends Check {
-
+    
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(packet.isPos()) {

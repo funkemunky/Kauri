@@ -393,7 +393,7 @@ public class MovementProcessor {
     //TODO Condense. This is just for easy reading until I test everything.
     private static float getSensitivityFromYawGCD(float gcd) {
         float stepOne = yawToF2(gcd) / 8;
-        float stepTwo = (float)Math.cbrt(stepOne);
+        float stepTwo = (float)MathUtils.cbrt(stepOne);
         float stepThree = stepTwo - .2f;
         return stepThree / .6f;
     }
@@ -401,7 +401,7 @@ public class MovementProcessor {
     //TODO Condense. This is just for easy reading until I test everything.
     private static float getSensitivityFromPitchGCD(float gcd) {
         float stepOne = pitchToF3(gcd) / 8;
-        float stepTwo = (float)Math.cbrt(stepOne);
+        float stepTwo = (float)MathUtils.cbrt(stepOne);
         float stepThree = stepTwo - .2f;
         return stepThree / .6f;
     }

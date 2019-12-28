@@ -25,7 +25,7 @@ import java.util.List;
 public class PredictionService {
 
     private ObjectData data;
-    public boolean fly, velocity, position, sneak, sprint, useSword, hit, dropItem, inWeb, isCollidedHorizontally,
+    public boolean fly, velocity, position, sneak, sprint, useSword, hit, dropItem, inWeb, isCollidedHorizontally, checkConditions,
             lastOnGround, onGround, lastSprint, fMath, fastMath, walkSpecial, lastVelocity, isCollidedVertically,
             isCollided;
     public double posX, posY, posZ, lPosX, lPosY, lPosZ, rmotionX, rmotionY, rmotionZ, lmotionX, lmotionZ, lmotionY;
@@ -152,7 +152,7 @@ public class PredictionService {
                 fMath = fastMath; // if the Player uses Optifine FastMath
 
                 try {
-                    if(!walkSpecial && !position && !velocity && !lastVelocity && checkConditions(lastSprint)) {
+                    if(!walkSpecial && !position && !velocity && !lastVelocity && (checkConditions = checkConditions(lastSprint))) {
                         if (lastSprint && hit) { // If the Player Sprints and Hit a Player he get slowdown
                             lmotionX *= 0.6D;
                             lmotionZ *= 0.6D;
@@ -172,13 +172,43 @@ public class PredictionService {
 
                 double multiplier = 0.9100000262260437D; // multiplier = is the value that the client multiplies every move
 
-                rmotionX *= multiplier;
-                rmotionZ *= multiplier;
+                if(data.blockInfo.inWeb) {
+                    rmotionX *= 0.25f;
+                    rmotionZ *= 0.25f;
+                }
 
-                if (lastOnGround) {
-                    multiplier = 0.60000005239967D;
+                if(!data.blockInfo.inLiquid) {
                     rmotionX *= multiplier;
                     rmotionZ *= multiplier;
+
+                    if (lastOnGround) {
+                        multiplier = 0.60000005239967D;
+                        rmotionX *= multiplier;
+                        rmotionZ *= multiplier;
+                    } else if (data.blockInfo.inLava) {
+                        rmotionX *= 0.5f;
+                        rmotionZ *= 0.5f;
+                    } else if (data.blockInfo.inWater) {
+                        float f1 = 0.8f;
+                        float f2 = 0.02f;
+                        float f3 = PlayerUtils.getDepthStriderLevel(data.getPlayer());
+
+                        if (f3 > 0) {
+                            f3 = 3.0f;
+                        }
+
+                        if (!lastOnGround) {
+                            f3 *= .5f;
+                        }
+
+                        if (f3 > 0) {
+                            f1 += (0.54600006F - f1) * f3 / 3.0F;
+                            f2 += (Atlas.getInstance().getBlockBoxManager().
+                                    getBlockBox().getAiSpeed(data.getPlayer()) * 1.0F - f2) * f3 / 3.0F;
+                        }
+                        rmotionX *= f1;
+                        rmotionZ *= f1;
+                    }
                 }
 
                 if (Math.abs(rmotionX) < 0.005D) // the client sets the motionX,Y and Z to 0 if its slower than 0.005D
@@ -343,11 +373,16 @@ public class PredictionService {
                 }
 
                 float var5;
-                float var3 = MovementUtils.getFriction(data) * 0.91f;
+                float var3 = 0.91f;
 
-                aiMoveSpeed =  0.1f;
-                if (sprint)
-                    aiMoveSpeed += 0.03000001F;
+                if(lastOnGround) {
+                    var3*= data.blockInfo.currentFriction;
+                }
+
+                aiMoveSpeed = data.getPlayer().getWalkSpeed() / 2F;
+                if (sprint) {
+                    aiMoveSpeed/=0.76923071005;
+                }
 
                 if(data.getPlayer().hasPotionEffect(PotionEffectType.SPEED)) {
                     aiMoveSpeed += (PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.SPEED) * (0.20000000298023224D)) * aiMoveSpeed;
@@ -395,7 +430,9 @@ public class PredictionService {
                 // calculated motion
                 final double diffZ = rmotionZ - motionZ;
 
-                diff = MathUtils.hypot(diffX, diffZ);
+                diff = Math.hypot(diffX, diffZ);
+
+                if(Double.isNaN(diff) || Double.isInfinite(diff)) return;
 
                 // if the motion isn't correct this value can get out in flags
                 diff = new BigDecimal(diff).setScale(precision + 2, RoundingMode.HALF_UP).doubleValue();
@@ -615,12 +652,12 @@ public class PredictionService {
         return sneak && (MathUtils.approxEquals(5E-3, roundedX % 1, 0.3) || MathUtils.approxEquals(5E-3, roundedX % 1, 0.7)|| MathUtils.approxEquals(5E-3, roundedZ % 1, 0.3) || MathUtils.approxEquals(5E-3, roundedZ % 1, 0.7));
     }
 
-    boolean checkConditions(final boolean lastTickSprint) {
+    public boolean checkConditions(final boolean lastTickSprint) {
         if (lPosX == 0 && lPosY == 0 && lPosZ == 0) { // the position is 0 when a moveFlying or look packet was send
             return false;
         }
 
-        if (lastOnGround && !onGround) // if the Player jumps
+        if (lastOnGround && !onGround && lastTickSprint) // if the Player jumps
             return false;
 
         if (rmotionX == 0 && rmotionZ == 0 && onGround)
@@ -677,10 +714,10 @@ public class PredictionService {
 
     // functions of minecraft MathHelper.java
     public static float sqrt_float(float p_76129_0_) {
-        return MathUtils.sqrt(p_76129_0_);
+        return (float) Math.sqrt(p_76129_0_);
     }
 
     public static float sqrt_double(double p_76133_0_) {
-        return (float) MathUtils.sqrt(p_76133_0_);
+        return (float) Math.sqrt(p_76133_0_);
     }
 }

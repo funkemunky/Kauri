@@ -45,7 +45,7 @@ public class Reach extends Check {
                 .collect(Collectors.toList());
 
         val entityLoc = data.targetPastLocation
-                .getEstimatedLocation(data.lagInfo.transPing, Math.max(200L, Math.round(data.lagInfo.transPing / 2D)));
+                .getEstimatedLocation(data.lagInfo.transPing / 2, Math.max(150L, Math.round(data.lagInfo.transPing / 2D)));
 
         List<Double> distances = new ArrayList<>();
 

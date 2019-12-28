@@ -25,6 +25,6 @@ public class AutoclickerA extends Check {
             } else vl-= vl > 0 ? 0.2 : 0;
             ticks = 0;
             lastClick = timeStamp;
-        } else if(data.playerInfo.lastBrokenBlock.hasPassed(5)) ticks++;
+        } else if(data.playerInfo.lastBrokenBlock.hasPassed(5) && !data.playerInfo.breakingBlock) ticks++;
     }
 }

@@ -179,7 +179,8 @@ public class LoggerManager {
 
         logsDatabase.getDatabaseValues()
                 .stream()
-                .filter(structSet -> structSet.containsKey("type") && structSet.getField("type").equals("log"))
+                .filter(structSet -> structSet.containsKey("type") && structSet.containsKey("timeStamp")
+                        && structSet.getField("type").equals("log"))
                 .filter(set -> {
                     long timeStamp = set.getField("timeStamp");
 

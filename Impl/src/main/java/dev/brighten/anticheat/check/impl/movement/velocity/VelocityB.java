@@ -90,7 +90,7 @@ public class VelocityB extends Check {
                     }
 
                     float f = 0.16277136F / (f4 * f4 * f4);
-                    float f5;
+                    double f5;
 
                     if (data.playerInfo.lClientGround) {
                         f5 = data.predictionService.aiMoveSpeed * f;
@@ -144,11 +144,11 @@ public class VelocityB extends Check {
         useEntity = false;
     }
 
-    private void moveFlying(float strafe, float forward, float friction) {
-        float f = strafe * strafe + forward * forward;
+    private void moveFlying(double strafe, double forward, double friction) {
+        double f = strafe * strafe + forward * forward;
 
         if (f >= 1.0E-4F) {
-            f = MathHelper.sqrt_float(f);
+            f = Math.sqrt(f);
 
             if (f < 1.0F) {
                 f = 1.0F;

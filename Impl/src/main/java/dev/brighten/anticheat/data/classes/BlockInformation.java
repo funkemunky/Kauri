@@ -36,7 +36,7 @@ public class BlockInformation {
 
         World world = objectData.getPlayer().getWorld();
 
-        
+
         int startX = Location.locToBlock(objectData.playerInfo.to.x - 1 - objectData.playerInfo.deltaXZ);
         int endX = Location.locToBlock(objectData.playerInfo.to.x + 1 + objectData.playerInfo.deltaXZ);
         int startY = Location.locToBlock(objectData.playerInfo.to.y - 0.8 + objectData.playerInfo.deltaY);
@@ -122,6 +122,10 @@ public class BlockInformation {
         blocksNear = handler.isCollidedWith(Materials.SOLID);
 
         handler.setSize(0.6, 1.8);
+
+        handler.setOffset(-0.8f);
+        handler.isCollidedWith(Materials.SOLID);
+        handler.setOffset(0);
 
         SimpleCollisionBox box = Helper.getMovementHitbox(objectData.getPlayer());
         box.expand(Math.abs(objectData.playerInfo.from.x - objectData.playerInfo.to.x) + 0.1,

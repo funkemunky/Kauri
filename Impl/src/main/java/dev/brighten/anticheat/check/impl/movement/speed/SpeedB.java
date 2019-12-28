@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.check.impl.movement.speed;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.PlayerUtils;
 import dev.brighten.anticheat.check.api.Check;
@@ -62,13 +63,13 @@ public class SpeedB extends Check {
 
         if (offsetDeque.size() == 5) {
             val account = account();
-            val maxOffset = 0.335 + account();
+            val maxOffset = 0.335 + account;
 
-            offsetDeque.forEach(offset -> {
+            for (double offset : offsetDeque) {
                 if (offset > maxOffset) {
                     streak.incrementAndGet();
                 }
-            });
+            }
 
             var maxStreak = 2;
 
@@ -76,16 +77,17 @@ public class SpeedB extends Check {
                 maxStreak++;
             }
 
+            float pct = (streak.get() * 100F) / maxStreak;
             if (streak.get() >= maxStreak) {
                 if (verbose++ > 2) {
                     vl++;
-                    flag( (streak.get() * 100) / maxStreak + "%");
+                    flag( pct + "%");
                 }
             } else if (streak.get() == 0) {
                 verbose = 0;
             }
 
-            debug(verbose + ": " + streak.get() + ", " + maxStreak + ","
+            debug(verbose + ": " + streak.get() + ", " + maxStreak + "," + pct + ","
                     + MathUtils.hypot(data.playerInfo.mvx, data.playerInfo.mvz) + ", " + account);
 
             offsetDeque.clear();

@@ -223,6 +223,7 @@ public class Check implements KauriCheck {
         register(new BadPacketsL());
         register(new BadPacketsM());
         register(new BadPacketsN());
+        register(new BadPacketsO());
         register(new VelocityA());
         register(new VelocityB());
         register(new VelocityC());

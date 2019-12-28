@@ -31,7 +31,6 @@ public class CheckManager {
         methods.parallelStream().filter(entry -> entry.getValue().getMethod().isAnnotationPresent(Packet.class))
                 .forEach(entry -> {
                     Check check = checks.get(entry.getKey());
-                    Kauri.INSTANCE.profiler.start("check:" + check.name);
 
                     if(check.enabled) {
                         if(entry.getValue().getMethod().getParameterCount() > 1) {
@@ -40,7 +39,6 @@ public class CheckManager {
                             entry.getValue().invoke(check, object);
                         }
                     }
-                    Kauri.INSTANCE.profiler.stop("check:" + check.name);
                 });
     }
 

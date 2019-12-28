@@ -47,7 +47,7 @@ public class VelocityA extends Check {
             if (pct < 99.999
                     && !data.playerInfo.lastBlockPlace.hasNotPassed(5)
                     && !data.blockInfo.blocksAbove
-                    && !data.playerInfo.collidesHorizontally) {
+                    && !data.blockInfo.collidesHorizontally) {
                 if (vl++ > 9) flag("pct=" + MathUtils.round(pct, 2) + "%");
             } else vl-= vl > 0 ? 0.5 : 0;
 

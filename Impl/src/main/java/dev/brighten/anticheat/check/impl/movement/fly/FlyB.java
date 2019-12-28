@@ -30,7 +30,7 @@ public class FlyB extends Check {
                     && timeStamp -  data.playerInfo.lastVelocityTimestamp > 200L
                     && !data.playerInfo.serverGround
                     && (data.playerInfo.blocksAboveTicks == 0 || data.playerInfo.deltaY >= 0)
-                    && !data.playerInfo.collidesVertically
+                    && !data.blockInfo.collidesVertically
                     && MathUtils.getDelta(data.playerInfo.deltaY, predicted) > 0.0001) {
                 vl++;
                 if(vl > (data.lagInfo.lagging ? 3 : 2)) {

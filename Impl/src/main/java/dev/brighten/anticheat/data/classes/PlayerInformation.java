@@ -9,7 +9,7 @@ import org.bukkit.block.Block;
 
 public class PlayerInformation {
     public boolean serverGround, lClientGround, clientGround, nearGround,
-            collidesVertically, collidesHorizontally, collided,
+            collided,
             onLadder, usingItem, wasOnIce, wasOnSlime, jumped, inAir, lworldLoaded, worldLoaded;
     public boolean generalCancel, flightCancel;
     public float deltaY, lDeltaY, deltaX, lDeltaX, deltaZ, lDeltaZ, deltaXZ, lDeltaXZ, fallDistance, jumpHeight;

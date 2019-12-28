@@ -13,7 +13,7 @@ public class NoFallB extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(packet.isPos()) {
-            if(data.playerInfo.serverGround != data.playerInfo.clientGround
+            if((data.playerInfo.serverGround && data.blockInfo.collidesVertically) != data.playerInfo.clientGround
                     && data.playerInfo.climbTicks == 0
                     && !data.playerInfo.generalCancel
                     && data.playerInfo.liquidTicks == 0) {
