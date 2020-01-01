@@ -24,7 +24,7 @@ public class SpeedC extends Check {
 
                 if(hypot > 0.12
                         && !data.blockInfo.blocksNear
-                        && data.playerInfo.halfBlockTicks == 0
+                        && data.playerInfo.halfBlockTicks.value() == 0
                         && (accelX > -0.07 || accelZ > -0.07)
                         && data.playerInfo.lastBlockPlace.hasPassed(10)) {
                     if(verbose++ > 2) {

@@ -15,7 +15,6 @@ import dev.brighten.anticheat.check.impl.combat.hitbox.Hitboxes;
 import dev.brighten.anticheat.check.impl.combat.reach.Reach;
 import dev.brighten.anticheat.check.impl.movement.fly.*;
 import dev.brighten.anticheat.check.impl.movement.general.FastLadder;
-import dev.brighten.anticheat.check.impl.movement.general.NoSlowdown;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallA;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallB;
 import dev.brighten.anticheat.check.impl.movement.speed.*;
@@ -94,16 +93,22 @@ public class Check implements KauriCheck {
         checkClasses.put(checkClass, info);
     }
 
-    public void flag(String information) {
+    public void flag(String information, Object... variables) {
         if(lastExemptCheck.hasPassed()) exempt = KauriAPI.INSTANCE.exemptHandler.isExempt(data.uuid, this);
         if(exempt) return;
+        for (int i = 0; i < variables.length; i++) {
+            Object var = variables[i];
+
+            information = information.replace("%" + (i + 1), String.valueOf(var));
+        }
+        String finalInformation = information;
         Kauri.INSTANCE.executor.execute(() -> {
-            KauriFlagEvent event = new KauriFlagEvent(data.getPlayer(), this, information);
+            KauriFlagEvent event = new KauriFlagEvent(data.getPlayer(), this, finalInformation);
 
             Atlas.getInstance().getEventManager().callEvent(event);
 
             if(!event.isCancelled()) {
-                final String info = information
+                final String info = finalInformation
                         .replace("%p", String.valueOf(data.lagInfo.transPing))
                         .replace("%t", String.valueOf(MathUtils.round(Kauri.INSTANCE.tps, 2)));
                 if (Kauri.INSTANCE.lastTickLag.hasPassed() && (data.lagInfo.lastPacketDrop.hasPassed(5)
@@ -208,7 +213,6 @@ public class Check implements KauriCheck {
         register(new SpeedD());
         register(new SpeedE());
         register(new Timer());
-        register(new NoSlowdown());
         register(new BadPacketsA());
         register(new BadPacketsB());
         register(new BadPacketsC());

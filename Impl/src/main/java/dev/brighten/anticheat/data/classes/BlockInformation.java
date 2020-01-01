@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.data.classes;
 
 import cc.funkemunky.api.Atlas;
+import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
 import cc.funkemunky.api.utils.Materials;
 import cc.funkemunky.api.utils.world.Material2;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
@@ -85,17 +86,18 @@ public class BlockInformation {
 
         objectData.playerInfo.serverGround =
                 handler.isCollidedWith(Materials.SOLID) || handler.contains(EntityType.BOAT);
+        handler.setOffset(-0.4f);
         onSlab = handler.isCollidedWith(Materials.SLABS);
         onStairs = handler.isCollidedWith(Materials.STAIRS);
-        onHalfBlock = onSlime || onStairs;
+        onHalfBlock = onSlab || onStairs;
 
         handler.setSingle(true);
         onIce = handler.isCollidedWith(Materials.ICE);
         onSoulSand = handler.isCollidedWith(Material.SOUL_SAND);
         onSlime = handler.isCollidedWith(Material2.SLIME_BLOCK);
         handler.setSingle(false);
-        handler.setOffset(0);
 
+        handler.setOffset(0);
         handler.setSize(0.6, 1.8);
 
         inLava = handler.isCollidedWith(Materials.LAVA);
@@ -121,6 +123,12 @@ public class BlockInformation {
         handler.setSize(1.5, 1.8);
         blocksNear = handler.isCollidedWith(Materials.SOLID);
 
+        if(objectData.boxDebuggers.size() > 0) {
+            handler.setSize(0.62, 1.81);
+            handler.setOffset(-0.01);
+
+            handler.getCollisionBoxes().forEach(cb -> cb.draw(WrappedEnumParticle.FLAME, objectData.boxDebuggers));
+        }
         handler.setSize(0.6, 1.8);
 
         handler.setOffset(-0.8f);

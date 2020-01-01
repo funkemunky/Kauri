@@ -67,7 +67,7 @@ public class Reach extends Check {
 
             if(distance > 3.0001 && distances.size() > 6) {
                 if(vl++ > 2) {
-                    flag("distance=" + MathUtils.round(distance, 3) + " size=" + distances.size());
+                    flag("distance=%1 size=%2", MathUtils.round(distance, 3), distances.size());
                 }
             } else vl-= vl > 0 ? 0.02f : 0;
             debug("distance=" + distance + ", size=" + distances.size());

@@ -40,7 +40,7 @@ public class VelocityA extends Check {
                 && data.playerInfo.worldLoaded
                 && !data.blockInfo.inWeb
                 && !data.blockInfo.onClimbable
-                && data.playerInfo.blocksAboveTicks == 0) {
+                && data.playerInfo.blocksAboveTicks.value() == 0) {
 
             float pct = Math.max(0, data.playerInfo.lastVelocityTimestamp);
 

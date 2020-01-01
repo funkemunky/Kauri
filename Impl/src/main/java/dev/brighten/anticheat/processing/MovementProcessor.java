@@ -83,15 +83,8 @@ public class MovementProcessor {
                     data.playerInfo.loadedPacketReceived = false;
                 }
             }
-        } else if(data.playerInfo.lworldLoaded) {
-            if(data.playerInfo.loadedPacketReceived) {
-                //Sending a keepAlive as confirmation the world was loaded on the player's side.
-                //This prevents false positives caused by high latency or a lag spike.
-                TinyProtocolHandler.sendPacket(data.getPlayer(),
-                        new WrappedOutKeepAlivePacket(200).getObject());
-                data.playerInfo.lastLoadedPacketSend.reset();
-                data.playerInfo.loadedPacketReceived = false;
-            }
+        } else {
+            data.playerInfo.worldLoaded = false;
         }
 
         data.lagInfo.lagging = data.lagInfo.lastPacketDrop.hasNotPassed(3)
@@ -236,8 +229,6 @@ public class MovementProcessor {
             data.playerInfo.pitchGCD = MiscUtils.gcd((long) (Math.abs(data.playerInfo.deltaPitch) * offset), (long) (Math.abs(data.playerInfo.lDeltaPitch) * offset));
         }
 
-        data.playerInfo.usingItem = data.getPlayer().isBlocking() ||  Atlas.getInstance().getBlockBoxManager().getBlockBox().isUsingItem(data.getPlayer());
-
         //Setting fallDistance
         if (!data.playerInfo.serverGround
                 && data.playerInfo.deltaY < 0
@@ -272,38 +263,38 @@ public class MovementProcessor {
 
         //Checking if user is in liquid.
         if (data.blockInfo.inLiquid) {
-            data.playerInfo.liquidTicks++;
-        } else data.playerInfo.liquidTicks -= data.playerInfo.liquidTicks > 0 ? 1 : 0;
+            data.playerInfo.liquidTicks.add();
+        } else data.playerInfo.liquidTicks.subtract();
 
         //Half block ticking (slabs, stairs, bed, cauldron, etc.)
         if (data.blockInfo.onHalfBlock) {
-            data.playerInfo.halfBlockTicks+= 2;
-        } else data.playerInfo.halfBlockTicks -= data.playerInfo.halfBlockTicks > 0 ? 1 : 0;
+            data.playerInfo.halfBlockTicks.add(2);
+        } else data.playerInfo.halfBlockTicks.subtract();
 
         //We dont check if theyre still on ice because this would be useless to checks that check a player in air too.
         if (data.playerInfo.wasOnIce) {
-            data.playerInfo.iceTicks++;
-        } else data.playerInfo.iceTicks -= data.playerInfo.iceTicks > 0 ? 1 : 0;
+            data.playerInfo.iceTicks.add();
+        } else data.playerInfo.iceTicks.subtract();
 
         if (data.blockInfo.inWeb) {
-            data.playerInfo.webTicks++;
-        } else data.playerInfo.webTicks -= data.playerInfo.webTicks > 0 ? 1 : 0;
+            data.playerInfo.webTicks.add();
+        } else data.playerInfo.webTicks.subtract();
 
         if (data.blockInfo.onClimbable) {
-            data.playerInfo.climbTicks++;
-        } else data.playerInfo.climbTicks -= data.playerInfo.climbTicks > 0 ? 1 : 0;
+            data.playerInfo.climbTicks.add();
+        } else data.playerInfo.climbTicks.subtract();
 
         if (data.playerInfo.wasOnSlime) {
-            data.playerInfo.slimeTicks++;
-        } else data.playerInfo.slimeTicks -= data.playerInfo.slimeTicks > 0 ? 1 : 0;
+            data.playerInfo.slimeTicks.add();
+        } else data.playerInfo.slimeTicks.subtract();
 
         if (data.blockInfo.onSoulSand) {
-            data.playerInfo.soulSandTicks++;
-        } else data.playerInfo.soulSandTicks -= data.playerInfo.soulSandTicks > 0 ? 1 : 0;
+            data.playerInfo.soulSandTicks.add();
+        } else data.playerInfo.soulSandTicks.subtract();
 
         if (data.blockInfo.blocksAbove) {
-            data.playerInfo.blocksAboveTicks++;
-        } else data.playerInfo.blocksAboveTicks -= data.playerInfo.blocksAboveTicks > 0 ? 1 : 0;
+            data.playerInfo.blocksAboveTicks.add();
+        } else data.playerInfo.blocksAboveTicks.subtract();
 
         //Player ground/air positioning ticks.
         if (!data.playerInfo.serverGround) {
@@ -324,14 +315,14 @@ public class MovementProcessor {
                 || data.playerInfo.creative
                 || hasLevi
                 || data.playerInfo.inVehicle
-                || data.playerInfo.webTicks > 0
+                || data.playerInfo.webTicks.value() > 0
                 || !data.playerInfo.worldLoaded
                 || (data.playerInfo.blockOnTo != null && BlockUtils.isSolid(data.playerInfo.blockOnTo))
                 || data.playerInfo.riptiding
                 || data.playerInfo.gliding
                 || data.playerInfo.lastToggleFlight.hasNotPassed(40)
-                || data.playerInfo.liquidTicks > 0
-                || data.playerInfo.climbTicks > 0
+                || data.playerInfo.liquidTicks.value() > 0
+                || data.playerInfo.climbTicks.value() > 0
                 || timeStamp - data.creation < 2000
                 || data.playerInfo.serverPos;
 

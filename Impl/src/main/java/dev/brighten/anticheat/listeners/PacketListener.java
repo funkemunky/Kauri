@@ -19,7 +19,6 @@ public class PacketListener implements AtlasListener {
             return;
         }
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
-        data.predictionService.onReceive(event);
         Kauri.INSTANCE.packetProcessor.processClient(data, event.getPacket(), event.getType(), event.getTimeStamp());
     }
 
@@ -31,7 +30,6 @@ public class PacketListener implements AtlasListener {
             return;
         }
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
-        data.predictionService.onSend(event);
         Kauri.INSTANCE.packetProcessor.processServer(data, event.getPacket(), event.getType(), event.getTimeStamp());
     }
 }

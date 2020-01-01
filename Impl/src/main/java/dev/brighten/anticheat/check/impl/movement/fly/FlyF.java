@@ -60,14 +60,13 @@ public class FlyF extends Check {
                 flagged = true;
             }
 
+            String joined = String.join(",", tags);
             if(flagged) {
                 if(vl > 7) {
-                    flag("y=" + data.playerInfo.deltaY + " tags=" + tags);
+                    flag("y=%1 tags=[%2]", data.playerInfo.deltaY, joined);
                 }
             } else vl-= vl > 0 ? 0.25f : 0;
-
-            String joined = String.join(",", tags);
-            debug("y=" + data.playerInfo.deltaY + "vl= " + vl + " tags=" + tags);
+            debug("y=" + data.playerInfo.deltaY + "vl= " + vl + " tags=" + joined);
         }
     }
 }

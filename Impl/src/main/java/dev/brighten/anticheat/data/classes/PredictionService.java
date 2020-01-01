@@ -32,7 +32,8 @@ public class PredictionService {
     public double predX, predZ;
     public TickTimer lastUseItem = new TickTimer(10);
     public BoundingBox box;
-    public float walkSpeed, yaw, pitch, moveStrafing, moveForward, aiMoveSpeed, distanceWalkedModified,
+    public double aiMoveSpeed;
+    public float walkSpeed, yaw, pitch, moveStrafing, moveForward, distanceWalkedModified,
             distanceWalkedOnStepModified, nextStepDistance, fallDistance;
     public String key = "Nothing";
 
@@ -40,212 +41,128 @@ public class PredictionService {
         this.data = data;
     }
 
-    public void onSend(PacketSendEvent event) {
-        switch(event.getType()) {
-            case Packet.Server.ABILITIES: {
-                WrappedOutAbilitiesPacket packet = new WrappedOutAbilitiesPacket(event.getPacket(), event.getPlayer());
+    public void onReceive(WrappedInFlyingPacket packet) {
 
-                fly = packet.isAllowedFlight();
-                break;
+        inWeb = data.blockInfo.inWeb;
+
+        if(packet.isLook()) {
+            yaw = packet.getYaw();
+        }
+
+        if(packet.isPos()) {
+            posX = packet.getX();
+            posY = packet.getY();
+            posZ = packet.getZ();
+        } else {
+            posX = 999999999;
+            posY = 999999999;
+            posZ = 999999999;
+        }
+
+
+        onGround = packet.isGround();
+
+        boolean specialBlock = false;
+
+        rmotionX = posX - lPosX;
+        rmotionY = posY - lPosY;
+        rmotionZ = posZ - lPosZ;
+
+        //dev.brighten.anticheat.utils.MiscUtils.testMessage(Color.Gray + rmotionX + ", " + rmotionZ);
+        fMath = fastMath; // if the Player uses Optifine FastMath
+
+        try {
+            if(!walkSpecial && !position && !velocity && !lastVelocity && (checkConditions = checkConditions(lastSprint))) {
+                if (lastSprint && hit) { // If the Player Sprints and Hit a Player he get slowdown
+                    lmotionX *= 0.6D;
+                    lmotionZ *= 0.6D;
+                }
+                calc();
+            }
+
+            specialBlock = checkSpecialBlock(); // If the Player Walks on a Special block like Ice, Slime, Soulsand
+        } catch (Exception e2) {
+            e2.printStackTrace();
+        }
+
+        if(dropItem) {
+            useSword = false;
+        }
+        dropItem = false;
+
+        double multiplier = 0.9100000262260437D; // multiplier = is the value that the client multiplies every move
+
+        if(data.blockInfo.inWeb) {
+            rmotionX *= 0.25f;
+            rmotionZ *= 0.25f;
+        }
+
+        if(!data.blockInfo.inLiquid) {
+            rmotionX *= multiplier;
+            rmotionZ *= multiplier;
+
+            if (lastOnGround) {
+                multiplier = 0.60000005239967D;
+                rmotionX *= multiplier;
+                rmotionZ *= multiplier;
+            } else if (data.blockInfo.inLava) {
+                rmotionX *= 0.5f;
+                rmotionZ *= 0.5f;
+            } else if (data.blockInfo.inWater) {
+                float f1 = 0.8f;
+                float f2 = 0.02f;
+                float f3 = PlayerUtils.getDepthStriderLevel(data.getPlayer());
+
+                if (f3 > 0) {
+                    f3 = 3.0f;
+                }
+
+                if (!lastOnGround) {
+                    f3 *= .5f;
+                }
+
+                if (f3 > 0) {
+                    f1 += (0.54600006F - f1) * f3 / 3.0F;
+                    f2 += (Atlas.getInstance().getBlockBoxManager().
+                            getBlockBox().getAiSpeed(data.getPlayer()) * 1.0F - f2) * f3 / 3.0F;
+                }
+                rmotionX *= f1;
+                rmotionZ *= f1;
             }
         }
-    }
 
-    public void onReceive(PacketReceiveEvent e) {
-        switch(e.getType()) {
-            case Packet.Client.ABILITIES: {
-                WrappedInAbilitiesPacket packet = new WrappedInAbilitiesPacket(e.getPacket(), e.getPlayer());
+        if (Math.abs(rmotionX) < 0.005D) // the client sets the motionX,Y and Z to 0 if its slower than 0.005D
+            // because he would never stand still
+            rmotionX = 0.0D;
+        if (Math.abs(rmotionY) < 0.005D)
+            rmotionY = 0.0D;
+        if (Math.abs(rmotionZ) < 0.005D)
+            rmotionZ = 0.0D;
 
-                fly = packet.isAllowedFlight();
-                walkSpeed = packet.getWalkSpeed();
+        // Saves the values for the next MovePacket
 
-                //Bukkit.broadcastMessage(packet.isAllowedFlight() + "");
-                break;
-            }
-            case Packet.Client.ENTITY_ACTION: {
-                WrappedInEntityActionPacket packet = new WrappedInEntityActionPacket(e.getPacket(), e.getPlayer());
+        lmotionX = rmotionX;
+        lmotionY = rmotionY;
+        lmotionZ = rmotionZ;
 
-                switch(packet.getAction()) {
-                    case START_SNEAKING:
-                        sneak = true;
-                        break;
-                    case STOP_SNEAKING:
-                        sneak = false;
-                        break;
-                    case START_SPRINTING:
-                        sprint = true;
-                        break;
-                    case STOP_SPRINTING:
-                        sprint = false;
-                        break;
-                }
+        lPosX = posX;
+        lPosY = posY;
+        lPosZ = posZ;
 
-                //Bukkit.broadcastMessage("Action: " + packet.getAction().toString());
-                break;
-            }
-            case Packet.Client.BLOCK_PLACE: {
-                WrappedInBlockPlacePacket packet = new WrappedInBlockPlacePacket(e.getPacket(), e.getPlayer());
+        hit = false;
+        lastVelocity = velocity;
+        velocity = false;
+        position = false;
 
-                if(packet.getItemStack() != null && packet.getPosition().getX() == -1 && packet.getPosition().getY() == -1 && packet.getPosition().getZ() == -1) {
-                    if(packet.getItemStack().getType().toString().contains("SWORD")) {
-                        useSword = true;
-                        lastUseItem.reset();
-                    }
-                    //Bukkit.broadcastMessage(packet.getPosition().getX() + ", " + packet.getPosition().getY() + ", " + packet.getPosition().getZ());
-                }
-                break;
-            }
-            case Packet.Client.USE_ENTITY: {
-                WrappedInUseEntityPacket packet = new WrappedInUseEntityPacket(e.getPacket(), e.getPlayer());
-
-                if(packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK) && packet.getEntity() instanceof Player) {
-                    hit = true;
-                }
-                break;
-            }
-            case Packet.Client.BLOCK_DIG: {
-                WrappedInBlockDigPacket packet = new WrappedInBlockDigPacket(e.getPacket(), e.getPlayer());
-
-                if(packet.getAction().equals(WrappedInBlockDigPacket.EnumPlayerDigType.RELEASE_USE_ITEM)) {
-                    useSword = false;
-                } else if(packet.getAction().toString().contains("DROP")) {
-                    dropItem = true;
-                }
-                break;
-            }
-            case Packet.Client.HELD_ITEM_SLOT: {
-                useSword = false;
-                break;
-            }
-            case Packet.Client.POSITION_LOOK:
-            case Packet.Client.LOOK:
-            case Packet.Client.POSITION:
-            case Packet.Client.FLYING: {
-                WrappedInFlyingPacket packet = new WrappedInFlyingPacket(e.getPacket(), e.getPlayer());
-
-                inWeb = data.blockInfo.inWeb;
-
-                if(packet.isLook()) {
-                    yaw = packet.getYaw();
-                }
-
-                if(packet.isPos()) {
-                    posX = packet.getX();
-                    posY = packet.getY();
-                    posZ = packet.getZ();
-                } else {
-                    posX = 999999999;
-                    posY = 999999999;
-                    posZ = 999999999;
-                }
-
-
-                onGround = packet.isGround();
-
-                boolean specialBlock = false;
-
-                rmotionX = posX - lPosX;
-                rmotionY = posY - lPosY;
-                rmotionZ = posZ - lPosZ;
-
-                //dev.brighten.anticheat.utils.MiscUtils.testMessage(Color.Gray + rmotionX + ", " + rmotionZ);
-                fMath = fastMath; // if the Player uses Optifine FastMath
-
-                try {
-                    if(!walkSpecial && !position && !velocity && !lastVelocity && (checkConditions = checkConditions(lastSprint))) {
-                        if (lastSprint && hit) { // If the Player Sprints and Hit a Player he get slowdown
-                            lmotionX *= 0.6D;
-                            lmotionZ *= 0.6D;
-                        }
-                        calc();
-                    }
-
-                    specialBlock = checkSpecialBlock(); // If the Player Walks on a Special block like Ice, Slime, Soulsand
-                } catch (Exception e2) {
-                    e2.printStackTrace();
-                }
-
-                if(dropItem) {
-                    useSword = false;
-                }
-                dropItem = false;
-
-                double multiplier = 0.9100000262260437D; // multiplier = is the value that the client multiplies every move
-
-                if(data.blockInfo.inWeb) {
-                    rmotionX *= 0.25f;
-                    rmotionZ *= 0.25f;
-                }
-
-                if(!data.blockInfo.inLiquid) {
-                    rmotionX *= multiplier;
-                    rmotionZ *= multiplier;
-
-                    if (lastOnGround) {
-                        multiplier = 0.60000005239967D;
-                        rmotionX *= multiplier;
-                        rmotionZ *= multiplier;
-                    } else if (data.blockInfo.inLava) {
-                        rmotionX *= 0.5f;
-                        rmotionZ *= 0.5f;
-                    } else if (data.blockInfo.inWater) {
-                        float f1 = 0.8f;
-                        float f2 = 0.02f;
-                        float f3 = PlayerUtils.getDepthStriderLevel(data.getPlayer());
-
-                        if (f3 > 0) {
-                            f3 = 3.0f;
-                        }
-
-                        if (!lastOnGround) {
-                            f3 *= .5f;
-                        }
-
-                        if (f3 > 0) {
-                            f1 += (0.54600006F - f1) * f3 / 3.0F;
-                            f2 += (Atlas.getInstance().getBlockBoxManager().
-                                    getBlockBox().getAiSpeed(data.getPlayer()) * 1.0F - f2) * f3 / 3.0F;
-                        }
-                        rmotionX *= f1;
-                        rmotionZ *= f1;
-                    }
-                }
-
-                if (Math.abs(rmotionX) < 0.005D) // the client sets the motionX,Y and Z to 0 if its slower than 0.005D
-                    // because he would never stand still
-                    rmotionX = 0.0D;
-                if (Math.abs(rmotionY) < 0.005D)
-                    rmotionY = 0.0D;
-                if (Math.abs(rmotionZ) < 0.005D)
-                    rmotionZ = 0.0D;
-
-                // Saves the values for the next MovePacket
-
-                lmotionX = rmotionX;
-                lmotionY = rmotionY;
-                lmotionZ = rmotionZ;
-
-                lPosX = posX;
-                lPosY = posY;
-                lPosZ = posZ;
-
-                hit = false;
-                lastVelocity = velocity;
-                velocity = false;
-                position = false;
-
-                lastOnGround = onGround;
-                lastSprint = sprint;
-                walkSpecial = specialBlock;
-                fastMath = fMath;
-                break;
-            }
-        }
+        lastOnGround = onGround;
+        lastSprint = sprint;
+        walkSpecial = specialBlock;
+        fastMath = fMath;
     }
 
     private boolean checkSpecialBlock() {
-        return (data.playerInfo.iceTicks > 0 || data.playerInfo.wasOnSlime
-                || data.playerInfo.soulSandTicks > 0 || data.playerInfo.climbTicks > 0) && (onGround || lastOnGround);
+        return (data.playerInfo.iceTicks.value() > 0 || data.playerInfo.wasOnSlime
+                || data.playerInfo.soulSandTicks.value() > 0 || data.playerInfo.climbTicks.value() > 0) && (onGround || lastOnGround);
     }
 
     private void calc() {
@@ -372,14 +289,14 @@ public class PredictionService {
                     jumpMovementFactor = 0.025999999F;
                 }
 
-                float var5;
+                double var5;
                 float var3 = 0.91f;
 
                 if(lastOnGround) {
                     var3*= data.blockInfo.currentFriction;
                 }
 
-                aiMoveSpeed = data.getPlayer().getWalkSpeed() / 2F;
+                aiMoveSpeed = data.getPlayer().getWalkSpeed() / 2D;
                 if (sprint) {
                     aiMoveSpeed/=0.76923071005;
                 }
@@ -408,9 +325,9 @@ public class PredictionService {
                 double motionX = lmotionX;
                 double motionZ = lmotionZ;
 
-                float var14 = moveStrafing * moveStrafing + moveForward * moveForward;
+                double var14 = moveStrafing * moveStrafing + moveForward * moveForward;
                 if (var14 >= 1.0E-4F) {
-                    var14 = sqrt_float(var14);
+                    var14 = sqrt_double(var14);
                     if (var14 < 1.0F)
                         var14 = 1.0F;
                     var14 = var5 / var14;
@@ -566,7 +483,7 @@ public class PredictionService {
             }
         }
 
-        this.updateFallState(y, this.onGround, block1, blockpos);
+        this.updateFallState(y, this.onGround);
 
         if (d3 != x) {
             this.rmotionX = 0.0D;
@@ -668,13 +585,13 @@ public class PredictionService {
         if (MathUtils.hypot(posX - lPosX, posZ - lPosZ) > 10)
             return false;
 
-        return data.playerInfo.liquidTicks <= 0
-                && data.playerInfo.climbTicks <= 0
+        return data.playerInfo.liquidTicks.value() == 0
+                && data.playerInfo.climbTicks.value() == 0
                 && !fly
                 && !data.getPlayer().getGameMode().toString().contains("SPEC");
     }
 
-    private void updateFallState(double y, boolean onGroundIn, Block blockIn, Location pos) {
+    private void updateFallState(double y, boolean onGroundIn) {
         if (onGroundIn) {
             if (this.fallDistance > 0.0F)
                 this.fallDistance = 0.0F;

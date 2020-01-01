@@ -1,28 +1,30 @@
 package dev.brighten.anticheat.check.impl.packets.badpackets;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInEntityActionPacket;
+import cc.funkemunky.api.utils.TickTimer;
+import cc.funkemunky.api.utils.math.cond.MaxInteger;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "BadPackets (B)", description = "Checks for block place packets before flying is sent.",
-        checkType = CheckType.BADPACKETS, punishVL = 20)
+@CheckInfo(name = "BadPackets (B)", description = "Checks for the spamming of sneak changes.",
+        checkType = CheckType.BADPACKETS, punishVL = 40)
 public class BadPacketsB extends Check {
 
-    private long lastFlying;
+    private TickTimer lastSneak = new TickTimer(0);
+    private MaxInteger ticks = new MaxInteger(Integer.MAX_VALUE);
     @Packet
-    public void onPlace(WrappedInBlockPlacePacket place, long timeStamp) {
-        long delta = timeStamp - lastFlying;
-        if(delta < 5 && !data.lagInfo.lagging) {
-            if(vl++ > 4) flag("sent place before flying packet.");
-        } else vl-= vl > 0 ? 2 : 0;
-        debug("delta=" + delta + "ms");
-    }
-
-    @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        lastFlying = timeStamp;
+    public void onPlace(WrappedInEntityActionPacket action) {
+        if(action.getAction().name().contains("SNEAK")) {
+            if(lastSneak.hasNotPassed()) {
+                ticks.add();
+                if(ticks.value() > 80) {
+                    vl++;
+                    flag("ticks=%1 ping=%p tps=%t", ticks.value());
+                }
+            } else ticks.subtract(ticks.value() > 40 ? 8 : 4);
+            lastSneak.reset();
+        }
     }
 }

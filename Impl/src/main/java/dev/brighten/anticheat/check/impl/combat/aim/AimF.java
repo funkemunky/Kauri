@@ -18,7 +18,7 @@ public class AimF extends Check {
                 && !data.playerInfo.serverPos
                 && Math.abs(data.playerInfo.deltaYaw) % 0.5 == 0) {
             if(vl++ > 4) {
-                flag("deltaYaw=" + data.playerInfo.deltaYaw);
+                flag("deltaYaw=%1", data.playerInfo.deltaYaw);
             }
         } else vl-= vl > 0 ? 0.25 : 0;
 

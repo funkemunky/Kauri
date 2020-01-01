@@ -41,7 +41,7 @@ public class AutoclickerB extends Check {
                     || greater) {
                 vl++;
                 if(vl > 5) {
-                    flag("std=" + std + " avg=" + avg);
+                    flag("std=%1 avg=%2", std, avg);
                 }
                 debug(Color.Green + "Flagged");
             } else vl-= vl > 0 ? 0.5f : 0;

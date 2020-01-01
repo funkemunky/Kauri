@@ -61,7 +61,7 @@ public class FlyA extends Check {
                     && (!data.playerInfo.wasOnSlime || maxHeight >= 2)
                     && !data.playerInfo.flightCancel) {
                 vl++;
-                flag(totalHeight + ">-" + maxHeight);
+                flag("%1>-%2; ping=%p tps=%t", totalHeight, maxHeight);
             }
 
             debug("total=" + totalHeight + " max=" + maxHeight

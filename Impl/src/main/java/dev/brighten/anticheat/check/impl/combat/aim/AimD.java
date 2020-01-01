@@ -37,7 +37,7 @@ public class AimD extends Check {
                 if(MathUtils.getDelta(std, lstd) < 1 && range > 12) {
                     if(verbose++ > 2) {
                         vl++;
-                        flag("avg=" + summary.getAverage() + " std=" + std);
+                        flag("avg=%1 std=%2", summary.getAverage(), std);
                     }
                 } else verbose-= verbose > 0 ? 0.5f : 0;
                 debug("x= " + data.moveProcessor.deltaX

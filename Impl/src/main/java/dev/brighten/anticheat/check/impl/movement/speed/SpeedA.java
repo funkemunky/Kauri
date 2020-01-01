@@ -11,6 +11,7 @@ import dev.brighten.anticheat.utils.MovementUtils;
 public class SpeedA extends Check {
 
     private long moveTicks, keyTicks;
+    private int verbose;
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
@@ -20,17 +21,19 @@ public class SpeedA extends Check {
         float baseSpeed = MovementUtils.getBaseSpeed(data) + (!data.playerInfo.clientGround ? 0.09f
                 : (data.playerInfo.groundTicks > 10 ? 0.04f : 0.06f));
 
-        baseSpeed+= data.playerInfo.iceTicks > 0 ? 0.4 + (Math.min(120, data.playerInfo.iceTicks) * 0.01) : 0;
-        baseSpeed+= data.playerInfo.blocksAboveTicks > 0 ? 0.35
-                + (Math.min(60, data.playerInfo.blocksAboveTicks) * 0.005) : 0;
-        baseSpeed+= data.playerInfo.halfBlockTicks > 0 ? 0.2
-                + (Math.min(40, data.playerInfo.halfBlockTicks)) * 0.005 : 0;
+        baseSpeed+= data.playerInfo.iceTicks.value() > 0 ? 0.4
+                + (Math.min(120, data.playerInfo.iceTicks.value()) * 0.01) : 0;
+        baseSpeed+= data.playerInfo.blocksAboveTicks.value() > 0 ? 0.35
+                + (data.playerInfo.blocksAboveTicks.value() * 0.005) : 0;
+        baseSpeed+= data.playerInfo.halfBlockTicks.value() > 0 ? 0.2
+                + data.playerInfo.halfBlockTicks.value() * 0.005 : 0;
         baseSpeed+= data.playerInfo.wasOnSlime ? 0.1 : 0;
 
         if(data.playerInfo.deltaXZ > baseSpeed) {
-            if(vl++ > 25 || data.playerInfo.deltaXZ - baseSpeed > 0.6f)
+            if((verbose+= data.playerInfo.deltaXZ - baseSpeed > 0.6f ? 4 : 1) > 25
+                    || data.playerInfo.deltaXZ - baseSpeed > 0.6f)
                 flag(data.playerInfo.deltaXZ + ">-" + baseSpeed);
-        } else vl-= vl > 0 ? 1 : 0;
+        } else verbose-= verbose > 0 ? 1 : 0;
 
         debug("deltaXZ=" + data.playerInfo.deltaXZ + " baseSpeed=" + baseSpeed + " vl=" + vl
                 + " onSlime=" + data.playerInfo.wasOnSlime);

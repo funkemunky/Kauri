@@ -7,6 +7,7 @@ import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.*;
 import cc.funkemunky.api.tinyprotocol.packet.out.*;
 import cc.funkemunky.api.utils.KLocation;
+import cc.funkemunky.api.utils.Materials;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
@@ -32,6 +33,9 @@ public class    PacketProcessor {
                     data.playerInfo.lastToggleFlight.reset();
                 }
 
+                data.predictionService.fly = packet.isAllowedFlight();
+                data.predictionService.walkSpeed = packet.getWalkSpeed();
+
                 data.playerInfo.canFly = packet.isAllowedFlight();
                 data.playerInfo.creative = packet.isCreativeMode();
                 data.checkManager.runPacket(packet, timeStamp);
@@ -55,7 +59,8 @@ public class    PacketProcessor {
 
                         data.target = (LivingEntity) packet.getEntity();
                     }
-                    data.predictionService.useSword = false;
+                    data.predictionService.hit = true;
+                    data.predictionService.useSword = data.playerInfo.usingItem = false;
                 }
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
@@ -75,6 +80,8 @@ public class    PacketProcessor {
                     RunUtils.task(() -> data.getPlayer().kickPlayer("Lag?"));
 
                 data.lagInfo.lastFlying = timeStamp;
+
+                data.predictionService.onReceive(packet); //Processing for prediction service.
 
                 if(data.playerInfo.serverPos && !data.playerInfo.sentpostofalse) {
                     data.playerInfo.sentpostofalse = true;
@@ -119,21 +126,40 @@ public class    PacketProcessor {
                         break;
                     }
                     case STOP_DESTROY_BLOCK:
-                    case ABORT_DESTROY_BLOCK:
-                    case DROP_ALL_ITEMS:
-                    case DROP_ITEM: {
+                    case ABORT_DESTROY_BLOCK: {
                         data.playerInfo.breakingBlock = false;
                         break;
                     }
+                    case RELEASE_USE_ITEM: {
+                        data.predictionService.useSword
+                                = data.playerInfo.usingItem
+                                = data.playerInfo.breakingBlock = false;
+                        break;
+                    }
+                    case DROP_ALL_ITEMS:
+                    case DROP_ITEM: {
+                        data.playerInfo.breakingBlock = data.playerInfo.usingItem = false;
+                        data.predictionService.dropItem = true;
+                        break;
+                    }
                 }
+
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
             }
             case Packet.Client.BLOCK_PLACE: {
                 WrappedInBlockPlacePacket packet = new WrappedInBlockPlacePacket(object, data.getPlayer());
 
-                if(packet.getItemStack() != null && packet.getItemStack().getType().isSolid()) {
-                    data.playerInfo.lastBlockPlace.reset();
+                if(packet.getItemStack() != null) {
+                    if(packet.getItemStack().getType().isBlock()) {
+                        data.playerInfo.lastBlockPlace.reset();
+                    } else if(packet.getPosition().getX() == -1
+                            && packet.getPosition().getY() == -1
+                            && packet.getPosition().getZ() == -1
+                            && Materials.isUsable(packet.getItemStack().getType())) {
+                        data.predictionService.useSword = data.playerInfo.usingItem = true;
+                        data.predictionService.lastUseItem.reset();
+                    }
                 }
 
                 data.checkManager.runPacket(packet, timeStamp);
@@ -153,9 +179,6 @@ public class    PacketProcessor {
                     data.playerInfo.serverPos = true;
                     data.predictionService.position = true;
                     MiscUtils.testMessage("set position to true (2)");
-                } else if (time == 200) {
-                    data.playerInfo.worldLoaded = false;
-                    data.playerInfo.loadedPacketReceived = true;
                 } else if (time == 201) {
                     data.playerInfo.worldLoaded = true;
                     data.playerInfo.loadedPacketReceived = true;
@@ -198,13 +221,19 @@ public class    PacketProcessor {
             case Packet.Client.HELD_ITEM_SLOT: {
                 WrappedInHeldItemSlotPacket packet = new WrappedInHeldItemSlotPacket(object, data.getPlayer());
 
+                data.predictionService.useSword = data.playerInfo.usingItem = false;
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
             }
             case Packet.Client.WINDOW_CLICK: {
                 WrappedInWindowClickPacket packet = new WrappedInWindowClickPacket(object, data.getPlayer());
 
+                data.predictionService.useSword = data.playerInfo.usingItem = false;
                 data.checkManager.runPacket(packet, timeStamp);
+                break;
+            }
+            case Packet.Client.CLOSE_WINDOW: {
+                data.predictionService.useSword = data.playerInfo.usingItem = false;
                 break;
             }
         }
@@ -224,6 +253,7 @@ public class    PacketProcessor {
                 data.playerInfo.canFly = packet.isAllowedFlight();
                 data.playerInfo.creative = packet.isCreativeMode();
                 data.playerInfo.flying = packet.isFlying();
+                data.predictionService.fly = packet.isAllowedFlight();
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
             }

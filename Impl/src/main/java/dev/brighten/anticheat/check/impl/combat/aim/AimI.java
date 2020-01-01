@@ -19,7 +19,7 @@ public class AimI extends Check {
                     && !data.playerInfo.serverPos) {
                 vl++;
                 if(vl > 1) {
-                    flag("yaw=" + data.playerInfo.deltaYaw);
+                    flag("yaw=%1", data.playerInfo.deltaYaw);
                 }
             } else vl-= vl > 0 ? 0.005 : 0;
             debug("yaw=" + data.moveProcessor.deltaX

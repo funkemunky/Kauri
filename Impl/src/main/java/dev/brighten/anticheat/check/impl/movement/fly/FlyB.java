@@ -26,15 +26,15 @@ public class FlyB extends Check {
             if(!data.playerInfo.flightCancel
                     && !data.playerInfo.wasOnSlime
                     && !data.playerInfo.serverPos
-                    && data.playerInfo.halfBlockTicks == 0
+                    && data.playerInfo.halfBlockTicks.value() == 0
                     && timeStamp -  data.playerInfo.lastVelocityTimestamp > 200L
                     && !data.playerInfo.serverGround
-                    && (data.playerInfo.blocksAboveTicks == 0 || data.playerInfo.deltaY >= 0)
+                    && (data.playerInfo.blocksAboveTicks.value() == 0 || data.playerInfo.deltaY >= 0)
                     && !data.blockInfo.collidesVertically
                     && MathUtils.getDelta(data.playerInfo.deltaY, predicted) > 0.0001) {
                 vl++;
                 if(vl > (data.lagInfo.lagging ? 3 : 2)) {
-                    flag("deltaY=" + data.playerInfo.deltaY + " predicted=" + predicted);
+                    flag("deltaY=%1 predicted=%2", data.playerInfo.deltaY, predicted);
                 }
             } else vl-= vl > 0 ? 0.2f : 0;
 

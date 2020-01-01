@@ -2,6 +2,7 @@ package dev.brighten.anticheat.data.classes;
 
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.TickTimer;
+import cc.funkemunky.api.utils.math.cond.MaxInteger;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.utils.CollisionHandler;
 import dev.brighten.anticheat.utils.MouseFilter;
@@ -43,8 +44,10 @@ public class PlayerInformation {
             gliding, riptiding;
 
     //ticks
-    public int liquidTicks, groundTicks, airTicks, halfBlockTicks, webTicks, climbTicks, slimeTicks, iceTicks,
-            blocksAboveTicks, soulSandTicks;
+    public int groundTicks, airTicks;
+    public MaxInteger liquidTicks = new MaxInteger(50), halfBlockTicks = new MaxInteger(40),
+            webTicks = new MaxInteger(40), climbTicks = new MaxInteger(40), slimeTicks = new MaxInteger(75),
+            iceTicks = new MaxInteger(45), blocksAboveTicks = new MaxInteger(50), soulSandTicks = new MaxInteger(40);
     public TickTimer lastBrokenBlock = new TickTimer(5),
             lastVelocity = new TickTimer(20),
             lastTargetSwitch = new TickTimer(3),

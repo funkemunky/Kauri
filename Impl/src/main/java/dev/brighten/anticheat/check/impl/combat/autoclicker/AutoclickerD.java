@@ -37,7 +37,7 @@ public class AutoclickerD extends Check {
             if(deltaStd < 3 && avg < 125 && MathUtils.getDelta(avg, lavg) > 1) {
                 vl++;
                 if(vl > 4) {
-                    flag("avg=" + avg + " std=" + deltaStd);
+                    flag("avg=%1 std=%2", avg, deltaStd);
                 }
             } else vl-= vl > 0 ? 0.25 : 0;
             debug("vl=" + vl + " avg=" + MathUtils.round(avg, 3)

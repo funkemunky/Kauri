@@ -21,7 +21,7 @@ public class AutoclickerA extends Check {
                 punish();
             } else if(ticks >= 19) {
                 vl++;
-                flag("cps=" + ticks + " ping=%p tps=%t");
+                flag("cps=%1 ping=%p tps=%t", ticks);
             } else vl-= vl > 0 ? 0.2 : 0;
             ticks = 0;
             lastClick = timeStamp;

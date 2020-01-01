@@ -15,8 +15,9 @@ import lombok.val;
 public class SpeedD extends Check {
 
     private int moveTicks;
+
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
+    public void onFlying(WrappedInFlyingPacket packet) {
         if(packet.isPos() && !data.playerInfo.serverPos) {
             if(data.playerInfo.clientGround && data.playerInfo.serverGround) {
                 moveTicks++;
@@ -25,6 +26,8 @@ public class SpeedD extends Check {
                 val baseSpeed = MovementUtils.getBaseSpeed(data);
 
                 if((accel > 0.1f || accel < -0.15f)
+                        && !data.playerInfo.generalCancel
+                        && data.playerInfo.halfBlockTicks.value() == 0
                         && (data.playerInfo.deltaXZ > baseSpeed || data.playerInfo.lDeltaXZ > baseSpeed)) {
                     debug(Color.Green + "Flag");
                     if(vl++ > 1) {

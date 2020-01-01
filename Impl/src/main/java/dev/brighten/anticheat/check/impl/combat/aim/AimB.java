@@ -24,7 +24,7 @@ public class AimB extends Check {
                     && (data.playerInfo.deltaPitch < 10 || MathUtils.getDelta(data.playerInfo.deltaPitch, data.playerInfo.lDeltaPitch) > 10)
                     && data.playerInfo.lastAttack.hasNotPassed(20)) {
                 if(vl++ > 20) {
-                    flag("offset=" + data.playerInfo.pitchGCD + " deltaPitch=" + data.playerInfo.deltaPitch);
+                    flag("offset=%1 deltaPitch=%2", data.playerInfo.pitchGCD, data.playerInfo.deltaPitch);
                 }
             } else vl-= vl > 0 ? 0.5 : 0;
             debug("gcd=" + data.playerInfo.pitchGCD

@@ -1,11 +1,17 @@
 package dev.brighten.anticheat.listeners;
 
 import cc.funkemunky.api.Atlas;
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.Init;
+import cc.funkemunky.api.utils.Materials;
 import cc.funkemunky.api.utils.MiscUtils;
+import cc.funkemunky.api.utils.world.BlockData;
+import cc.funkemunky.api.utils.world.CollisionBox;
 import dev.brighten.anticheat.Kauri;
+import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.utils.Helper;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -16,6 +22,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Collections;
 import java.util.List;
 
 @Init
@@ -31,6 +38,9 @@ public class BukkitListener implements Listener {
 
     @EventHandler
     public void onLeave(PlayerQuitEvent event) {
+        //Removing if the player has debug access so there aren't any null objects left to cause problems later.
+        if(event.getPlayer().hasPermission("kauri.debug"))
+            ObjectData.debugBoxes(false, event.getPlayer());
         Kauri.INSTANCE.dataManager.dataMap.remove(event.getPlayer().getUniqueId());
     }
 
@@ -39,12 +49,10 @@ public class BukkitListener implements Listener {
         if(event.getClickedBlock() == null || !event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) return;
 
         if(event.getItem() != null && event.getItem().isSimilar(MAGIC_WAND)) {
-            List<BoundingBox> boxes = Atlas.getInstance().getBlockBoxManager().getBlockBox()
-                    .getCollidingBoxes(event.getPlayer().getWorld(),
-                            new BoundingBox(event.getClickedBlock().getLocation().toVector(), event.getClickedBlock().getLocation().toVector())
-                                    .add(0,0,0,0,1.5f,0).grow(0.1f,0,0.1f));
+            BlockData data = BlockData.getData(event.getClickedBlock().getType());
+            CollisionBox box = data.getBox(event.getClickedBlock(), ProtocolVersion.getGameVersion());
 
-            boxes.forEach(box -> MiscUtils.createParticlesForBoundingBox(event.getPlayer(), box, WrappedEnumParticle.FLAME, 0.2f));
+            box.draw(WrappedEnumParticle.FLAME, Collections.singleton(event.getPlayer()));
             event.setCancelled(true);
         }
     }

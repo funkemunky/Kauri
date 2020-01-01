@@ -53,7 +53,7 @@ public class AutoclickerE extends Check {
                     verbose++;
                     if (verbose > 3) {
                         vl++;
-                        flag("std=" + std);
+                        flag("std=%1 avg=%2 range=%3 ping=%p tps=%t", std, avg, range);
                     }
                 } else verbose = 0;
 

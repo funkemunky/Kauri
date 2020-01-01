@@ -1,29 +1,44 @@
 package dev.brighten.anticheat.check.impl.packets.badpackets;
 
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockDigPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInEntityActionPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "BadPackets (C)", description = "Checks for block digb packets before flying is sent.",
+import java.util.ArrayList;
+import java.util.List;
+
+@CheckInfo(name = "BadPackets (C)", description = "Checks for players sneaking and sprinting at the same time.",
         checkType = CheckType.BADPACKETS, punishVL = 20)
 public class BadPacketsC extends Check {
 
-    private long lastFlying;
-
     @Packet
-    public void onPlace(WrappedInBlockDigPacket place, long timeStamp) {
-        long delta = timeStamp - lastFlying;
-        if(delta < 5 && !data.lagInfo.lagging) {
-            if(vl++ > 4) flag("sent dig before flying packet.");
-        } else vl-= vl > 0 ? 2 : 0;
-        debug("delta=" + delta + "ms");
-    }
+    public void onPlace(WrappedInFlyingPacket packet) {
+        List<String> tags = new ArrayList<>();
+        if(data.playerInfo.sprinting && data.playerInfo.sneaking) {
+            tags.add("sprint&sneak");
+            vl++;
+        }
 
-    @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        lastFlying = timeStamp;
+        if(data.playerInfo.sprinting && !packet.isPos()) {
+            tags.add("sprint-no-move");
+            vl++;
+        }
+
+        String joined = String.join(",", tags);
+
+        if(vl > 3) {
+            flag("sprint=%1 sneak=%2 pos=%3 tags=[%4]",
+                    data.playerInfo.sprinting,
+                    data.playerInfo.sneaking,
+                    packet.isPos(), joined);
+        }
+
+        debug("tags=" + joined + " sprint=" + data.playerInfo.sprinting
+                + " sneak=" + data.playerInfo.sneaking + " pos=" + packet.isPos() + " vl=" + vl);
     }
 }

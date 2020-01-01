@@ -14,9 +14,9 @@ public class NoFallB extends Check {
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(packet.isPos()) {
             if((data.playerInfo.serverGround && data.blockInfo.collidesVertically) != data.playerInfo.clientGround
-                    && data.playerInfo.climbTicks == 0
+                    && data.playerInfo.climbTicks.value() == 0
                     && !data.playerInfo.generalCancel
-                    && data.playerInfo.liquidTicks == 0) {
+                    && data.playerInfo.liquidTicks.value() == 0) {
                 if(vl++ > 5) {
                     flag("server=" + data.playerInfo.serverGround + " client=" + data.playerInfo.clientGround);
                 }

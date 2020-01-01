@@ -103,13 +103,13 @@ public class SpeedB extends Check {
 
         total += PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.SPEED)
                 * (data.playerInfo.serverGround ? 0.057f : 0.044f);
-        total += data.playerInfo.iceTicks > 0 
+        total += data.playerInfo.iceTicks.value() > 0
                 && (data.playerInfo.deltaY > 0.001 || data.playerInfo.groundTicks < 6) ? 0.23 : 0;
         total += (data.getPlayer().getWalkSpeed() - 0.2) * 1.65;
         total += (data.playerInfo.lastBlockPlace.hasNotPassed(7)) ? 0.1 : 0;
         total += data.playerInfo.wasOnSlime ? 0.1 : 0;
-        total += data.playerInfo.blocksAboveTicks> 0 ? data.playerInfo.iceTicks > 0 ? 0.4 : 0.2 : 0;
-        total += data.playerInfo.halfBlockTicks > 0 ? 0.12 : 0;
+        total += data.playerInfo.blocksAboveTicks.value() > 0 ? data.playerInfo.iceTicks.value() > 0 ? 0.4 : 0.2 : 0;
+        total += data.playerInfo.halfBlockTicks.value() > 0 ? 0.12 : 0;
         total += Math.max(0, MathUtils.hypot(data.playerInfo.mvx, data.playerInfo.mvz) - total);
         return total;
     }

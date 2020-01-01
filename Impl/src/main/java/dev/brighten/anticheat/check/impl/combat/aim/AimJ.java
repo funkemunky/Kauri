@@ -44,8 +44,8 @@ public class AimJ extends Check {
                 verbose++;
                 if(verbose > 9) {
                     vl++;
-                    flag("sens=" + sensX + " x=" + data.moveProcessor.deltaX
-                            + " y=" + data.moveProcessor.deltaY + " vb=" + verbose + " deltaX=" + deltaX);
+                    flag("sens=%1 x=%2 y=%3 vb=%4 deltaX=%5", sensX, data.moveProcessor.deltaX,
+                            data.moveProcessor.deltaY, verbose, deltaX);
                 }
             } else verbose-= verbose > 0 ? 2 : 0;
 

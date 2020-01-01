@@ -22,13 +22,16 @@ public class FlyE extends Check {
             if(!data.playerInfo.flightCancel
                     && data.playerInfo.jumped
                     && !data.playerInfo.wasOnSlime
+                    && !data.blockInfo.blocksAbove
                     && data.playerInfo.lastBlockPlace.hasPassed(10)
-                    && data.playerInfo.halfBlockTicks == 0
+                    && data.playerInfo.halfBlockTicks.value() == 0
                     && MathUtils.getDelta(data.playerInfo.deltaY, shit) > 0.01f
                     && MathUtils.getDelta(data.playerInfo.deltaY, maxHeight) > 0.01f) {
                 if(vl++ > 2 || data.playerInfo.deltaY > shit)
-                    flag("deltaY=" + data.playerInfo.deltaY + " maxHeight=" + maxHeight + " vel=" + shit);
+                    flag("deltaY=%1 maxHeight=%2 vel=%3", data.playerInfo.deltaY, maxHeight, shit);
             } else vl-= vl > 0 ? 0.05f : 0;
+
+            debug("deltaY=" + data.playerInfo.deltaY + " half=" + data.playerInfo.halfBlockTicks);
         }
     }
 }
