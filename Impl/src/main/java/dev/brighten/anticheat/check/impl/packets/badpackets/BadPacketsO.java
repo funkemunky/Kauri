@@ -12,23 +12,23 @@ import dev.brighten.api.check.CheckType;
         checkType = CheckType.BADPACKETS, punishVL = 10, developer = true)
 public class BadPacketsO extends Check {
 
-    private boolean attacked;
+    private boolean swung;
 
     @Packet
-    public void onFlying(WrappedInArmAnimationPacket packet, long timeStamp) {
-        if(attacked) {
+    public void onUse(WrappedInUseEntityPacket packet, long timeStamp) {
+        if(!swung) {
             vl++;
-            flag("ping=%p tps=%t");
+            flag("[did not swing] ping=%p tps=%t");
         } else vl-= vl > 0 ? 0.005f : 0;
     }
 
     @Packet
-    public void onWindow(WrappedInUseEntityPacket packet) {
-        attacked = true;
+    public void onArm(WrappedInArmAnimationPacket packet) {
+        swung = true;
     }
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        attacked = false;
+        swung = false;
     }
 }

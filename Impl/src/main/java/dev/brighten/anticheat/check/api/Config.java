@@ -31,4 +31,7 @@ public class Config {
 
     @ConfigSetting(path = "general", name = "language")
     public static String language = "english";
+
+    @ConfigSetting(path = "alerts", name = "dev", comment = "Alert for experimental checks.")
+    public static boolean alertDev = true;
 }

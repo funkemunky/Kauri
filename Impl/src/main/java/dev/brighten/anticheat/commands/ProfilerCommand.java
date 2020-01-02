@@ -102,7 +102,8 @@ public class ProfilerCommand {
                         new ItemBuilder(Material.REDSTONE)
                                 .amount(1)
                                 .name(Color.Gold + "Total").lore("",
-                                "&7Usage: " + dev.brighten.anticheat.utils.MiscUtils.drawUsage(50, dev.brighten.anticheat.utils.MiscUtils.format(samples, 3)),
+                                "&7Usage: " + dev.brighten.anticheat.utils.MiscUtils.drawUsage(50,
+                                        dev.brighten.anticheat.utils.MiscUtils.format(samples, 3)),
                                 "&7Total: &f" + dev.brighten.anticheat.utils.MiscUtils.format(totalMs, 3),
                                 "&7Samples: &f" + dev.brighten.anticheat.utils.MiscUtils.format(samples, 3),
                                 "",
@@ -151,11 +152,22 @@ public class ProfilerCommand {
             });
             double totalMs = total / 1000000D;
             long totalTime = Kauri.INSTANCE.profiler.totalCalls * 50;
-            cmd.getSender().sendMessage(dev.brighten.anticheat.utils.MiscUtils.drawUsage(total, dev.brighten.anticheat.utils.MiscUtils.format(totalMs / totalTime, 3))
+            cmd.getSender().sendMessage(dev.brighten.anticheat.utils.MiscUtils
+                    .drawUsage(total, dev.brighten.anticheat.utils.MiscUtils.format(totalMs / totalTime, 3))
                     + " §cTotal§7: " + dev.brighten.anticheat.utils.MiscUtils.format(totalMs, 3)
                     + " §f- §c" + dev.brighten.anticheat.utils.MiscUtils.format(totalMs / totalTime, 3) + "%");
             cmd.getSender().sendMessage("-------------------------------------------------");
         }
+    }
+
+    @Command(name = "kauri.profile.paste", display = "profile paste [type]",
+            description = "make a detailed profile with pastebin.", permission = "kauri.profile.paste")
+    public void onPaste(CommandAdapter cmd) {
+        ResultsType type = cmd.getArgs().length > 0 ? Arrays.stream(ResultsType.values())
+                .filter(rt -> rt.name().equalsIgnoreCase(cmd.getArgs()[1])).findFirst().orElse(ResultsType.TOTAL)
+                : ResultsType.TOTAL;
+
+        makePaste(cmd.getSender(), type);
     }
 
     private void makePaste(CommandSender sender, ResultsType type) {

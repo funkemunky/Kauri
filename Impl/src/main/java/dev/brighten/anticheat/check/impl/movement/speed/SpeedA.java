@@ -31,8 +31,10 @@ public class SpeedA extends Check {
 
         if(data.playerInfo.deltaXZ > baseSpeed) {
             if((verbose+= data.playerInfo.deltaXZ - baseSpeed > 0.6f ? 4 : 1) > 25
-                    || data.playerInfo.deltaXZ - baseSpeed > 0.6f)
+                    || data.playerInfo.deltaXZ - baseSpeed > 0.6f) {
+                vl++;
                 flag(data.playerInfo.deltaXZ + ">-" + baseSpeed);
+            }
         } else verbose-= verbose > 0 ? 1 : 0;
 
         debug("deltaXZ=" + data.playerInfo.deltaXZ + " baseSpeed=" + baseSpeed + " vl=" + vl

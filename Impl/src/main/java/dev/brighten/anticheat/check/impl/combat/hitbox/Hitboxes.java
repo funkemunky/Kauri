@@ -10,6 +10,7 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.utils.RayCollision;
 import dev.brighten.anticheat.utils.RayTrace;
 import dev.brighten.api.check.CheckType;
 import org.bukkit.GameMode;
@@ -47,20 +48,14 @@ public class Hitboxes extends Check {
 
         if (checkParameters(data)) {
 
-            List<RayTrace> rayTrace = data.pastLocation
+            List<RayCollision> rayTrace = data.pastLocation
                     .getEstimatedLocation(0,Math.max(100, Math.min(150L, data.lagInfo.transPing)))
                     .stream()
                     .map(loc ->
                             loc.toLocation(data.getPlayer().getWorld()).clone()
                                     .add(0, data.playerInfo.sneaking ? 1.54f : 1.62f, 0))
-                    .map(loc -> new RayTrace(loc.toVector(), loc.getDirection()))
+                    .map(loc -> new RayCollision(loc.toVector(), loc.getDirection()))
                     .collect(Collectors.toList());
-
-            List<Vector> vectors = new ArrayList<>();
-            rayTrace.parallelStream()
-                    .map(trace -> trace.traverse(3.2f, 0.1f))
-                    .sequential()
-                    .forEach(vectors::addAll);
 
             List<BoundingBox> entityLocations = data.targetPastLocation
                     .getEstimatedLocation(data.lagInfo.transPing, 150L)
@@ -68,16 +63,17 @@ public class Hitboxes extends Check {
                     .map(loc -> getHitbox(loc, data.target.getType()))
                     .collect(Collectors.toList());
 
-            List<Vector> collided = new ArrayList<>();
-            for (BoundingBox box : entityLocations) {
-                vectors.parallelStream().filter(box::collides).sequential().forEach(collided::add);
+            long collisions = 0;
+
+            for (RayCollision ray : rayTrace) {
+                collisions+= entityLocations.stream().filter(ray::isCollided).count();
             }
 
-            if (collided.size() == 0) {
+            if (collisions == 0) {
                 if(vl++ > 10)  flag("collided=0 ping=%p tps=%t");
             } else vl -= vl > 0 ? 0.5 : 0;
 
-            debug("collided=" + collided.size());
+            debug("collided=" + collisions);
         }
     }
 
