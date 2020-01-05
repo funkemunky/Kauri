@@ -27,7 +27,7 @@ public class Reach extends Check {
     private static List<EntityType> allowedEntities = Arrays.asList(EntityType.PLAYER, EntityType.SKELETON,
             EntityType.ZOMBIE, EntityType.PIG_ZOMBIE, EntityType.VILLAGER);
 
-    private long lastTimestamp;
+    private int verbose;
 
     @Packet
     public void onArm(WrappedInArmAnimationPacket packet) {
@@ -45,7 +45,7 @@ public class Reach extends Check {
                 .collect(Collectors.toList());
 
         val entityLoc = data.targetPastLocation
-                .getEstimatedLocation(data.lagInfo.transPing / 2, Math.max(150L, Math.round(data.lagInfo.transPing / 2D)));
+                .getEstimatedLocation(data.lagInfo.transPing, Math.max(250L, Math.round(data.lagInfo.transPing / 2D)));
 
         List<Double> distances = new ArrayList<>();
 
@@ -65,15 +65,15 @@ public class Reach extends Check {
         if(distances.size() > 0) {
             val distance = distances.stream().mapToDouble(num -> num).min().orElse(0);
 
-            if(distance > 3.0001 && distances.size() > 6) {
-                if(vl++ > 2) {
+            if(distance > 3.0001 && data.lagInfo.lastPacketDrop.hasPassed(7)) {
+                verbose++;
+                if(verbose > 1) {
+                    vl++;
                     flag("distance=%1 size=%2", MathUtils.round(distance, 3), distances.size());
                 }
-            } else vl-= vl > 0 ? 0.02f : 0;
-            debug("distance=" + distance + ", size=" + distances.size());
+            } else verbose-= verbose > 0 ? data.lagInfo.lagging ? 0.025f : 0.01f : 0;
+            debug("distance=" + distance + ", size=" + distances.size() + ", vl=" + verbose);
         }
-
-        lastTimestamp = timeStamp;
     }
 
     private static BoundingBox getHitbox(KLocation loc, EntityType type) {

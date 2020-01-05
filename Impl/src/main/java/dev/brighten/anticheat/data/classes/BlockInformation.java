@@ -45,31 +45,34 @@ public class BlockInformation {
         int startZ = Location.locToBlock(objectData.playerInfo.to.z - 1 - objectData.playerInfo.deltaXZ);
         int endZ = Location.locToBlock(objectData.playerInfo.to.z + 1 + objectData.playerInfo.deltaXZ);
         int it = 9 * 9;
-        start:
-        for (int chunkx = startX >> 4; chunkx <= endX >> 4; ++chunkx) {
-            int cx = chunkx << 4;
+        if(Atlas.getInstance().getBlockBoxManager().getBlockBox().isChunkLoaded(objectData.playerInfo.to.
+                toLocation(objectData.getPlayer().getWorld()))) {
+            start:
+            for (int chunkx = startX >> 4; chunkx <= endX >> 4; ++chunkx) {
+                int cx = chunkx << 4;
 
-            for (int chunkz = startZ >> 4; chunkz <= endZ >> 4; ++chunkz) {
-                if (!objectData.playerInfo.worldLoaded) {
-                    continue;
-                }
-                Chunk chunk = world.getChunkAt(chunkx, chunkz);
-                if (chunk != null) {
-                    int cz = chunkz << 4;
-                    int xstart = Math.max(startX, cx);
-                    int xend = Math.min(endX, cx + 16);
-                    int zstart = Math.max(startZ, cz);
-                    int zend = Math.min(endZ, cz + 16);
+                for (int chunkz = startZ >> 4; chunkz <= endZ >> 4; ++chunkz) {
+                    if (!objectData.playerInfo.worldLoaded) {
+                        continue;
+                    }
+                    Chunk chunk = world.getChunkAt(chunkx, chunkz);
+                    if (chunk != null) {
+                        int cz = chunkz << 4;
+                        int xstart = Math.max(startX, cx);
+                        int xend = Math.min(endX, cx + 16);
+                        int zstart = Math.max(startZ, cz);
+                        int zend = Math.min(endZ, cz + 16);
 
-                    for (int x = xstart; x <= xend; ++x) {
-                        for (int z = zstart; z <= zend; ++z) {
-                            for (int y = Math.max(startY, 0); y <= endY; ++y) {
-                                if (it-- <= 0) {
-                                    break start;
-                                }
-                                Block block = chunk.getBlock(x & 15, y, z & 15);
-                                if (block.getType() != Material.AIR) {
-                                    blocks.add(block);
+                        for (int x = xstart; x <= xend; ++x) {
+                            for (int z = zstart; z <= zend; ++z) {
+                                for (int y = Math.max(startY, 0); y <= endY; ++y) {
+                                    if (it-- <= 0) {
+                                        break start;
+                                    }
+                                    Block block = chunk.getBlock(x & 15, y, z & 15);
+                                    if (block.getType() != Material.AIR) {
+                                        blocks.add(block);
+                                    }
                                 }
                             }
                         }

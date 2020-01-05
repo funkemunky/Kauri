@@ -102,12 +102,12 @@ public class Check implements KauriCheck {
             information = information.replace("%" + (i + 1), String.valueOf(var));
         }
         String finalInformation = information;
+        KauriFlagEvent event = new KauriFlagEvent(data.getPlayer(), this, finalInformation);
+
+        event.setCancelled(!Config.alertDev);
+
+        Atlas.getInstance().getEventManager().callEvent(event);
         Kauri.INSTANCE.executor.execute(() -> {
-            KauriFlagEvent event = new KauriFlagEvent(data.getPlayer(), this, finalInformation);
-
-            event.setCancelled(!Config.alertDev);
-
-            Atlas.getInstance().getEventManager().callEvent(event);
 
             if(!event.isCancelled()) {
                 final String info = finalInformation
@@ -176,11 +176,17 @@ public class Check implements KauriCheck {
         }
     }
 
-    public void debug(String information) {
+    public void debug(String information, Object... variables) {
         if(Kauri.INSTANCE.dataManager.debugging.size() == 0) return;
+        for (int i = 0; i < variables.length; i++) {
+            Object var = variables[i];
+
+            information = information.replace("%" + (i + 1), String.valueOf(var));
+        }
+        String finalInformation = information;
         Kauri.INSTANCE.dataManager.debugging.stream()
                 .filter(data -> data.debugged.equals(this.data.uuid) && data.debugging.equalsIgnoreCase(name))
-                .forEach(data -> data.getPlayer().sendMessage(Color.translate("&8[&c&lDEBUG&8] &7" + information)));
+                .forEach(data -> data.getPlayer().sendMessage(Color.translate("&8[&c&lDEBUG&8] &7" + finalInformation)));
     }
 
     public static void registerChecks() {
@@ -209,6 +215,7 @@ public class Check implements KauriCheck {
         register(new AimH());
         register(new AimI());
         register(new AimJ());
+        register(new AimK());
         register(new AimL());
         register(new SpeedA());
         register(new SpeedB());

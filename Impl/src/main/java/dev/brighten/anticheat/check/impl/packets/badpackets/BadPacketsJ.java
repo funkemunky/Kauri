@@ -20,6 +20,7 @@ public class BadPacketsJ extends Check {
         if(packet.isPos() && !data.playerInfo.generalCancel) {
             if(data.playerInfo.sprinting
                     && data.playerInfo.clientGround
+                    && !data.predictionService.key.equals("Nothing")
                     && !data.predictionService.key.contains("W")) {
                 vl++;
                 if(vl > 40) {

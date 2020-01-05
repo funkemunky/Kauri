@@ -13,6 +13,7 @@ import dev.brighten.anticheat.data.DataManager;
 import dev.brighten.anticheat.logs.LoggerManager;
 import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.processing.PacketProcessor;
+import dev.brighten.anticheat.processing.vpn.VPNHandler;
 import dev.brighten.api.KauriAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -45,6 +46,7 @@ public class Kauri extends JavaPlugin {
 
     public MessageHandler msgHandler;
     public KauriAPI kauriAPI;
+    public VPNHandler vpnHandler;
 
     public void onEnable() {
         MiscUtils.printToConsole(Color.Red + "Starting Kauri " + getDescription().getVersion() + "...");
@@ -59,6 +61,7 @@ public class Kauri extends JavaPlugin {
 
     public void unload() {
         enabled = false;
+        MiscUtils.printToConsole("&7Saving logs to database...");
         loggerManager.logsDatabase.saveDatabase();
         MiscUtils.printToConsole("&7Unregistering Kauri API...");
         kauriAPI.service.shutdown();
@@ -71,14 +74,9 @@ public class Kauri extends JavaPlugin {
         Atlas.getInstance().getCommandManager().unregisterCommand("kauri");
         MiscUtils.printToConsole("&7Shutting down all Bukkit tasks...");
         Bukkit.getScheduler().cancelTasks(this); //Cancelling all Bukkit tasks for this plugin.
-
-        Kauri.INSTANCE.dataManager.dataMap.keySet().forEach(key -> Kauri.INSTANCE.dataManager.dataMap.remove(key));
         MiscUtils.printToConsole("&7Unloading DataManager...");
         //Clearing the dataManager.
         Kauri.INSTANCE.dataManager.dataMap.clear();
-        Kauri.INSTANCE.dataManager.dataMap = null;
-        Kauri.INSTANCE.dataManager = null;
-
 
 
         MiscUtils.printToConsole("&7Clearing checks and cached entity information...");
@@ -89,6 +87,7 @@ public class Kauri extends JavaPlugin {
         profiler.enabled = false;
         profiler = null;
         packetProcessor = null;
+        loggerManager = null;
         executor.shutdown(); //Shutting down threads.
     }
 
@@ -119,6 +118,8 @@ public class Kauri extends JavaPlugin {
 
         MiscUtils.printToConsole(Color.Gray + "Registering checks...");
         Check.registerChecks();
+
+        vpnHandler = new VPNHandler();
 
         MiscUtils.printToConsole(Color.Gray + "Running tps task...");
         runTpsTask();

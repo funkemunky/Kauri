@@ -17,6 +17,7 @@ import dev.brighten.anticheat.utils.menu.button.ClickAction;
 import dev.brighten.anticheat.utils.menu.preset.button.FillerButton;
 import dev.brighten.anticheat.utils.menu.type.impl.ChestMenu;
 import dev.brighten.api.check.CheckType;
+import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -113,8 +114,19 @@ public class MenuCommand {
         Arrays.stream(CheckType.values())
                 .sorted(Comparator.comparing(Enum::name))
                 .forEach(type -> {
-                    Button button = new Button(false, new ItemBuilder(Material.BOOK)
-                            .amount(1).name("&e" + type.name()).build(),
+
+                    AtomicInteger amount = new AtomicInteger(0);
+
+                    Check.checkSettings.values()
+                            .stream()
+                            .filter(ci-> ci.type.equals(type))
+                            .forEach(ci -> amount.incrementAndGet());
+                    Button button = new Button(false,
+                            new ItemBuilder(Material.BOOK)
+                                    .amount(amount.get())
+                                    .name("&e" + type.name())
+                                    .lore("", "&7Checks&8: &f" + amount, "", "&7&oClick to configure in this category.")
+                                    .build(),
                             (player, info) -> {
                         menu.setParent(null);
                         menu.close(player);

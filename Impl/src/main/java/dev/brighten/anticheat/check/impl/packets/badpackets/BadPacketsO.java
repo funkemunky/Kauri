@@ -16,10 +16,12 @@ public class BadPacketsO extends Check {
 
     @Packet
     public void onUse(WrappedInUseEntityPacket packet, long timeStamp) {
-        if(!swung) {
+        if(!swung && data.lagInfo.lastPacketDrop.hasPassed(4)) {
             vl++;
-            flag("[did not swing] ping=%p tps=%t");
-        } else vl-= vl > 0 ? 0.005f : 0;
+            if(vl > 4) {
+                flag("[did not swing] ping=%p tps=%t");
+            }
+        } else vl-= vl > 0 ? (data.lagInfo.lagging ? 0.5f : 0.025f) : 0;
     }
 
     @Packet

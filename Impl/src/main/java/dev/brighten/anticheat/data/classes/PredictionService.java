@@ -123,8 +123,6 @@ public class PredictionService {
 
                 if (f3 > 0) {
                     f1 += (0.54600006F - f1) * f3 / 3.0F;
-                    f2 += (Atlas.getInstance().getBlockBoxManager().
-                            getBlockBox().getAiSpeed(data.getPlayer()) * 1.0F - f2) * f3 / 3.0F;
                 }
                 rmotionX *= f1;
                 rmotionZ *= f1;
@@ -348,8 +346,6 @@ public class PredictionService {
                 final double diffZ = rmotionZ - motionZ;
 
                 diff = Math.hypot(diffX, diffZ);
-
-                if(Double.isNaN(diff) || Double.isInfinite(diff)) return;
 
                 // if the motion isn't correct this value can get out in flags
                 diff = new BigDecimal(diff).setScale(precision + 2, RoundingMode.HALF_UP).doubleValue();

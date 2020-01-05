@@ -18,27 +18,17 @@ public class BadPacketsC extends Check {
 
     @Packet
     public void onPlace(WrappedInFlyingPacket packet) {
-        List<String> tags = new ArrayList<>();
         if(data.playerInfo.sprinting && data.playerInfo.sneaking) {
-            tags.add("sprint&sneak");
             vl++;
+            if(vl > 3) {
+                flag("sprint=%1 sneak=%2 pos=%3",
+                        data.playerInfo.sprinting,
+                        data.playerInfo.sneaking,
+                        packet.isPos());
+            }
         }
 
-        if(data.playerInfo.sprinting && !packet.isPos()) {
-            tags.add("sprint-no-move");
-            vl++;
-        }
-
-        String joined = String.join(",", tags);
-
-        if(vl > 3) {
-            flag("sprint=%1 sneak=%2 pos=%3 tags=[%4]",
-                    data.playerInfo.sprinting,
-                    data.playerInfo.sneaking,
-                    packet.isPos(), joined);
-        }
-
-        debug("tags=" + joined + " sprint=" + data.playerInfo.sprinting
+        debug("sprint=" + data.playerInfo.sprinting
                 + " sneak=" + data.playerInfo.sneaking + " pos=" + packet.isPos() + " vl=" + vl);
     }
 }

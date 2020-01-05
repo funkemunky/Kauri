@@ -59,24 +59,35 @@ public class LogsGUI extends ChestMenu {
         buildInventory(true);
     }
 
-    private void setButtons(int page) {
-        if(page == 0 || getMenuDimension().getSize() <= 0) return;
+    private void setButtons(int page, String... filtered) {
+        if (page == 0 || getMenuDimension().getSize() <= 0) return;
 
-        if(updaterTask == null || !Bukkit.getScheduler().isCurrentlyRunning(updaterTask.getTaskId())) {
+        if (updaterTask == null || !Bukkit.getScheduler().isCurrentlyRunning(updaterTask.getTaskId())) {
             runUpdater();
         }
 
-        List<Log> subList = logs.subList(Math.min((page - 1) * 45, logs.size()), Math.min(page * 45, logs.size()));
+        List<Log> filteredLogs = (filtered.length > 0 ? logs.parallelStream()
+                .filter(log -> {
+                    for (String s : filtered) {
+                        if (s.equalsIgnoreCase(log.checkName)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }).sequential()
+                .sorted(Comparator.comparing(log -> log.timeStamp, Comparator.reverseOrder()))
+                .collect(Collectors.toList()) : logs).subList(Math.min((page - 1) * 45, logs.size()),
+                Math.min(page * 45, logs.size()));
 
-        IntStream.range(0, subList.size()).forEach(i -> setItem(i, buttonFromLog(subList.get(i))));
+        for (int i = 0; i < filteredLogs.size(); i++) setItem(i, buttonFromLog(filteredLogs.get(i)));
 
         //Setting the next page option if possible.
-        if(Math.min(page * 45, logs.size()) < logs.size()) {
+        if (Math.min(page * 45, filteredLogs.size()) < filteredLogs.size()) {
             Button next = new Button(false, new ItemBuilder(Material.BOOK)
                     .amount(1).name(Color.Red + "Next Page &7(&e" + (page + 1) + "&7)").build(),
                     (player, info) -> {
-                        if(info.getClickType().isLeftClick()) {
-                            setButtons(page + 1);
+                        if (info.getClickType().isLeftClick()) {
+                            setButtons(page + 1, filtered);
                             buildInventory(false);
                             currentPage.set(page + 1);
                         }
@@ -100,16 +111,16 @@ public class LogsGUI extends ChestMenu {
                                 : "&c&o(No Permission) &e&o&mShift Right Click &7&o&mto &f&o&mclear &7&o&mthe logs of " + player.getName())).build(),
                 (player, info) -> {
                     if (player.hasPermission("kauri.logs.share")) {
-                        if(info.getClickType().isRightClick()) {
+                        if (info.getClickType().isRightClick()) {
                             runFunction(info, "kauri.logs.share", () -> {
                                 close(player);
                                 player.sendMessage(Color.Green + "Logs: "
                                         + LogCommand.getLogsFromUUID(LogsGUI.this.player.getUniqueId()));
                             });
-                        } else if(info.getClickType().isLeftClick() && info.getClickType().isShiftClick()) {
+                        } else if (info.getClickType().isLeftClick() && info.getClickType().isShiftClick()) {
                             runFunction(info, "kauri.logs.clear",
                                     () -> player.performCommand("kauri logs clear " + this.player.getName()));
-                        } else if(info.getClickType().isLeftClick()) {
+                        } else if (info.getClickType().isLeftClick()) {
                             getSummary().showMenu(player);
                         }
                     }
@@ -118,17 +129,34 @@ public class LogsGUI extends ChestMenu {
         setItem(49, getPastebin);
 
         //Setting the previous page option if possible.
-        if(page > 1) {
+        if (page > 1) {
             Button back = new Button(false, new ItemBuilder(Material.BOOK)
                     .amount(1).name(Color.Red + "Previous Page &7(&e" + (page - 1) + "&7)").build(),
                     (player, info) -> {
-                        if(info.getClickType().isLeftClick()) {
-                            setButtons(page - 1);
+                        if (info.getClickType().isLeftClick()) {
+                            setButtons(page - 1, filtered);
                             currentPage.set(page - 1);
                             buildInventory(false);
                         }
                     });
             setItem(48, back);
+        }
+
+        if(filtered.length > 0) {
+            List<String> lore = new ArrayList<>(Arrays.asList("", "&eFilters:"));
+
+            for (String s : filtered) {
+                lore.add("&7- &f" + s);
+            }
+            Button stopFilter = new Button(false,
+                    new ItemBuilder(Material.REDSTONE).amount(1)
+                            .name(Color.Red + "Stop Filter").lore(lore).build(),
+                    (player, info) -> {
+                       setButtons(currentPage.get());
+                    });
+
+            setItem(47, stopFilter);
+            setItem(51, stopFilter);
         }
 
         //Setting all empty slots with a filler.
@@ -156,8 +184,11 @@ public class LogsGUI extends ChestMenu {
                                             list.stream()
                                                     .max(Comparator.comparing(log -> log.vl))
                                                     .map(log -> log.vl).orElse(0f),
-                                    "&7Type: &f" + Check.getCheckSettings(check).type).build());
-
+                                    "&7Type: &f" + Check.getCheckSettings(check).type.name(),
+                                    "", "&a&oLeft click &7&oto view vls from this check.").build(),
+                    (player, info) -> {
+                        setButtons(currentPage.get(), check);
+                    });
             summary.addItem(button);
         });
         return summary;
@@ -172,7 +203,7 @@ public class LogsGUI extends ChestMenu {
 
     private void runUpdater() {
         updaterTask = RunUtils.taskTimerAsync(() -> {
-            if(shown != null
+            if (shown != null
                     && shown.getOpenInventory() != null
                     && shown.getOpenInventory().getTopInventory() != null
                     && shown.getOpenInventory().getTopInventory().getTitle().equals(getTitle())) {
@@ -184,7 +215,7 @@ public class LogsGUI extends ChestMenu {
     }
 
     private void cancelTask() {
-        if(updaterTask == null) return;
+        if (updaterTask == null) return;
         updaterTask.cancel();
     }
 
@@ -195,11 +226,11 @@ public class LogsGUI extends ChestMenu {
 
         super.showMenu(player);
     }
-    
-    private void runFunction(ClickAction.InformationPair info, String permission, Runnable function) {
-        if(shown == null) return;
 
-        if(shown.hasPermission(permission)) {
+    private void runFunction(ClickAction.InformationPair info, String permission, Runnable function) {
+        if (shown == null) return;
+
+        if (shown.hasPermission(permission)) {
             function.run();
         } else {
             String oldName = info.getButton().getStack().getItemMeta().getDisplayName();
@@ -210,7 +241,7 @@ public class LogsGUI extends ChestMenu {
             meta.setLore(new ArrayList<>());
             info.getButton().getStack().setItemMeta(meta);
             RunUtils.taskLater(() -> {
-                if(info.getButton() != null
+                if (info.getButton() != null
                         && info.getButton().getStack().getItemMeta()
                         .getDisplayName().equals(Color.Red + "No permission")) {
                     ItemMeta newMeta = info.getButton().getStack().getItemMeta();

@@ -87,7 +87,6 @@ public class    PacketProcessor {
                     data.playerInfo.sentpostofalse = true;
                     Atlas.getInstance().getSchedular().schedule(() -> {
                         data.playerInfo.serverPos = data.playerInfo.sentpostofalse = false;
-                                MiscUtils.testMessage("set position to false");
                     }, data.lagInfo.transPing, TimeUnit.MILLISECONDS);
                 }
 
@@ -102,7 +101,6 @@ public class    PacketProcessor {
 
                     if(optional.isPresent()) {
                         data.playerInfo.serverPos = true;
-                        MiscUtils.testMessage("set position to true (1)");
                         data.playerInfo.lastServerPos = timeStamp;
                         data.playerInfo.posLocs.remove(optional.get());
                     }

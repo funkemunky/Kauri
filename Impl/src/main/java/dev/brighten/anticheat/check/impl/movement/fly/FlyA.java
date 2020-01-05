@@ -53,6 +53,8 @@ public class FlyA extends Check {
                 totalHeight = 0;
             } else if(data.playerInfo.deltaY > 0) totalHeight += data.playerInfo.deltaY;
 
+            maxHeight = Math.max(1.3f, maxHeight); //Fixes the occasional fuck up (usually on reload). Temporary.
+
             if(totalHeight > maxHeight
                     && timeStamp - data.playerInfo.lastServerPos > 50L
                     && !data.playerInfo.serverPos
