@@ -28,7 +28,7 @@ public class MovementProcessor {
     public TickTimer lastEquals = new TickTimer(6);
     private TickTimer lastReset = new TickTimer(1);
 
-    public static float offset = 16777216L;
+    public static float offset = 100000073L;
 
     public void process(WrappedInFlyingPacket packet, long timeStamp) {
         //We check if it's null and intialize the from and to as equal to prevent large deltas causing false positives since there
