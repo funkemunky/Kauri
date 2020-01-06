@@ -347,6 +347,8 @@ public class PredictionService {
 
                 diff = Math.hypot(diffX, diffZ);
 
+                if(Double.isNaN(diff) || Double.isInfinite(diff)) return;
+
                 // if the motion isn't correct this value can get out in flags
                 diff = new BigDecimal(diff).setScale(precision + 2, RoundingMode.HALF_UP).doubleValue();
                 diffString = new BigDecimal(diff).setScale(precision + 2, RoundingMode.HALF_UP).toPlainString();

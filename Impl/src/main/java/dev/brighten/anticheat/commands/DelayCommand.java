@@ -17,7 +17,7 @@ public class DelayCommand {
     private static Field field = new WrappedClass(Config.class).getFieldByName("alertsDelay").getField();
 
     @Command(name = "kauri.delay", description = "change the delay between alerts.", display = "delay [ms]",
-            permission = "kauri.delay", aliases = {"delay"}, usage = "/<command> <ms>")
+            permission = "kauri.command.delay", aliases = {"delay"}, usage = "/<command> <ms>")
     public void onCommand(CommandAdapter cmd) {
         if(cmd.getArgs().length > 0) {
             try {

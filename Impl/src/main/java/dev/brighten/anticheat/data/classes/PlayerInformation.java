@@ -61,5 +61,5 @@ public class PlayerInformation {
     public float mvx, mvy, mvz;
     public boolean takingVelocity, sentpostofalse;
 
-    public KLocation from, to;
+    public KLocation from = new KLocation(0,0,0), to = new KLocation(0,0,0);
 }

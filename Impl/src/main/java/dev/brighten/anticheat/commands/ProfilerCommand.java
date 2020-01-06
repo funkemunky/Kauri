@@ -154,7 +154,7 @@ public class ProfilerCommand {
     }
 
     @Command(name = "kauri.profile.paste", display = "profile paste [type]",
-            description = "make a detailed profile with pastebin.", permission = "kauri.profile.paste")
+            description = "make a detailed profile with pastebin.", permission = "kauri.command.profile.paste")
     public void onPaste(CommandAdapter cmd) {
         ResultsType type = cmd.getArgs().length > 0 ? Arrays.stream(ResultsType.values())
                 .filter(rt -> rt.name().equalsIgnoreCase(cmd.getArgs()[0])).findFirst().orElse(ResultsType.TOTAL)

@@ -108,7 +108,6 @@ public class Check implements KauriCheck {
 
         Atlas.getInstance().getEventManager().callEvent(event);
         Kauri.INSTANCE.executor.execute(() -> {
-
             if(!event.isCancelled()) {
                 final String info = finalInformation
                         .replace("%p", String.valueOf(data.lagInfo.transPing))
@@ -217,8 +216,6 @@ public class Check implements KauriCheck {
         register(new SpeedA());
         register(new SpeedB());
         register(new SpeedC());
-        register(new SpeedD());
-        register(new SpeedE());
         register(new Timer());
         register(new BadPacketsA());
         register(new BadPacketsB());

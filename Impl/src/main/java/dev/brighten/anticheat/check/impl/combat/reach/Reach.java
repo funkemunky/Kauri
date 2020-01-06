@@ -37,15 +37,15 @@ public class Reach extends Check {
     @Packet
     public void onUse(WrappedInFlyingPacket packet, long timeStamp) {
         //debug("timeStamp=" + timeStamp + "ms");
-        if(data.target == null || timeStamp - data.playerInfo.lastAttackTimeStamp > 55) return;
+        if(data.target == null || data.targetData == null || timeStamp - data.playerInfo.lastAttackTimeStamp > 55) return;
 
         val origins = data.pastLocation.getEstimatedLocation(0, Math.max(100L, Math.round(data.lagInfo.transPing / 2D)))
                 .stream()
                 .map(loc -> loc.toLocation(data.getPlayer().getWorld()).add(0, data.playerInfo.sneaking ? 1.54f : 1.62f, 0))
                 .collect(Collectors.toList());
 
-        val entityLoc = data.targetPastLocation
-                .getEstimatedLocation(data.lagInfo.transPing, Math.max(250L, Math.round(data.lagInfo.transPing / 2D)));
+        val entityLoc = data.targetData.pastLocation
+                .getEstimatedLocation(data.lagInfo.transPing, Math.max(200L, Math.round(data.lagInfo.transPing / 2D)));
 
         List<Double> distances = new ArrayList<>();
 
@@ -53,7 +53,7 @@ public class Reach extends Check {
             RayCollision collision = new RayCollision(origin.toVector(), origin.getDirection());
             entityLoc.forEach(loc -> {
                 Vector point = collision
-                        .collisionPoint(getHitbox(loc, data.target.getType()));
+                        .collisionPoint(getHitbox(loc));
 
                 if(point != null) {
                     distances.add(point.distance(origin.toVector()));
@@ -65,9 +65,9 @@ public class Reach extends Check {
         if(distances.size() > 0) {
             val distance = distances.stream().mapToDouble(num -> num).min().orElse(0);
 
-            if(distance > 3.01 && data.lagInfo.lastPacketDrop.hasPassed(7)) {
+            if(distance > 3.01 && distances.size() > 10 && data.lagInfo.lastPacketDrop.hasPassed(7)) {
                 verbose+= distances.size() > 6 ? 1 : 0.5f;
-                if(verbose > 1) {
+                if(verbose > 2) {
                     vl++;
                     flag("distance=%1 size=%2", MathUtils.round(distance, 3), distances.size());
                 }
@@ -76,13 +76,8 @@ public class Reach extends Check {
         }
     }
 
-    private static BoundingBox getHitbox(KLocation loc, EntityType type) {
-        Vector bounds = MiscUtils.entityDimensions.get(type);
-
-        BoundingBox box = new BoundingBox(loc.toVector(), loc.toVector())
-                .grow((float)bounds.getX(), 0, (float)bounds.getZ())
-                .add(0,0,0,0,(float)bounds.getY(),0);
-
-        return box.grow(0.1f,0.1f,0.1f);
+    private static BoundingBox getHitbox(KLocation loc) {
+        return new BoundingBox(loc.toVector(), loc.toVector()).grow(0.4f, 0.1f, 0.4f)
+                .add(0,0,0,0,1.8f,0);
     }
 }

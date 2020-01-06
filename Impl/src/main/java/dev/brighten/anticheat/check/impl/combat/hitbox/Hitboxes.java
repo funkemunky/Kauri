@@ -5,21 +5,21 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MiscUtils;
+import com.google.common.util.concurrent.AtomicDouble;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.RayCollision;
-import dev.brighten.anticheat.utils.RayTrace;
 import dev.brighten.api.check.CheckType;
 import org.bukkit.GameMode;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @CheckInfo(name = "Hitboxes", description = "Ensures the player is looking at the target when attacking.",
@@ -64,16 +64,27 @@ public class Hitboxes extends Check {
                     .collect(Collectors.toList());
 
             long collisions = 0;
+            AtomicDouble distance = new AtomicDouble(10);
 
             for (RayCollision ray : rayTrace) {
-                collisions+= entityLocations.stream().filter(ray::isCollided).count();
+                collisions+= entityLocations.stream().filter(bb -> {
+                    Vector point;
+                    if((point = ray.collisionPoint(bb)) != null) {
+                        double dist = point.distance(ray.getOrigin().toVector());
+
+                        distance.set(Math.min(dist, distance.get()));
+                        return dist < 3.4f;
+                    }
+                    return false;
+                }).count();
             }
 
             if (collisions == 0) {
-                if(vl++ > 10)  flag("collided=0 ping=%p tps=%t");
+                if(vl++ > 10)  flag("distance=%1 ping=%p tps=%t",
+                        distance.get() != -1 ? distance.get() : "[none collided]");
             } else vl -= vl > 0 ? 0.5 : 0;
 
-            debug("collided=" + collisions);
+            debug("collided=" + collisions + " distance=" + distance.get());
         }
     }
 

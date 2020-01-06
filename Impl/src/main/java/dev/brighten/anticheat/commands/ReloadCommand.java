@@ -9,7 +9,7 @@ import dev.brighten.anticheat.Kauri;
 @Init(commands = true)
 public class ReloadCommand {
 
-    @Command(name = "kauri.reload", description = "reload the plugin.", display = "reload", permission = "kauri.reload")
+    @Command(name = "kauri.reload", description = "reload the plugin.", display = "reload", permission = "kauri.command.reload")
     public void onCommand(CommandAdapter cmd) {
         cmd.getSender().sendMessage(Color.Red + "Reloading Kauri...");
         Kauri.INSTANCE.reloadConfig();

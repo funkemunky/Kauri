@@ -72,7 +72,7 @@ public class MenuCommand {
     }
 
     @Command(name = "kauri.menu", description = "Open the Kauri menu.", display = "menu", usage = "/<command>",
-            aliases = {"kauri.gui"}, playerOnly = true, permission = "kauri.menu")
+            aliases = {"kauri.gui"}, playerOnly = true, permission = "kauri.command.menu")
     public void onCommand(CommandAdapter cmd) {
         main.showMenu(cmd.getPlayer());
         cmd.getPlayer().sendMessage(Color.Green + "Opened main menu.");

@@ -25,7 +25,7 @@ public class KauriCommand {
     }
 
     @Command(name = "kauri.test", description = "Add yourself to test messaging.",
-            permission = "kauri.test", display = "test", playerOnly = true)
+            permission = "kauri.command.test", display = "test", playerOnly = true)
     public void onTest(CommandAdapter cmd) {
         if(testers.contains(cmd.getPlayer())) {
             if(testers.remove(cmd.getPlayer())) {
@@ -40,7 +40,7 @@ public class KauriCommand {
         }
     }
 
-   /* @Command(name = "kchecksum", permission = "kauri.admin.checksum")
+   /* @Command(name = "kchecksum", permission = "kauri.command.admin.checksum")
     public void onChecksum(CommandAdapter cmd) {
         Method c = J;
         String className = c.getName();

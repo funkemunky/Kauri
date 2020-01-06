@@ -16,7 +16,7 @@ import org.bukkit.entity.Player;
 public class LagCommand {
 
     @Command(name = "kauri.lag", description = "view important lag information", display = "lag",
-            aliases = {"lag", "klag"}, permission = "kauri.lag")
+            aliases = {"lag", "klag"}, permission = "kauri.command.lag")
     public void onCommand(CommandAdapter cmd) {
         cmd.getSender().sendMessage(MiscUtils.line(Color.Dark_Gray));
         cmd.getSender().sendMessage(Color.Gold + Color.Bold + "Server Lag Information");
@@ -36,7 +36,7 @@ public class LagCommand {
     }
 
     @Command(name = "kauri.lag.player", description = "view player lag", display = "lag player [player]",
-            aliases = {"lag.player", "klag.player"}, permission = "kauri.lag")
+            aliases = {"lag.player", "klag.player"}, permission = "kauri.command.lag")
     public void onLagPlayer(CommandAdapter cmd) {
         Player target;
         if(cmd.getArgs().length == 0) {

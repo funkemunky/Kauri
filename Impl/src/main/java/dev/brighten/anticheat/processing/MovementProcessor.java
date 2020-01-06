@@ -13,6 +13,7 @@ import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.MovementUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.bukkit.GameMode;
 
 import java.math.RoundingMode;
@@ -53,11 +54,26 @@ public class MovementProcessor {
             data.playerInfo.to.x = packet.getX();
             data.playerInfo.to.y = packet.getY();
             data.playerInfo.to.z = packet.getZ();
-
-            double deltaY = data.playerInfo.to.y - data.playerInfo.from.y;
         }
 
         data.playerInfo.to.timeStamp = timeStamp;
+
+        if(data.playerInfo.posLocs.size() > 0) {
+            val optional = data.playerInfo.posLocs.stream()
+                    .filter(loc -> loc.toVector().setY(0)
+                            .distance(data.playerInfo.to.toVector().setY(0)) <= 1E-5
+                            && MathUtils.getDelta(loc.y, data.playerInfo.to.y) < 1)
+                    .findFirst();
+
+            if(optional.isPresent()) {
+                data.playerInfo.serverPos = true;
+                data.playerInfo.lastServerPos = timeStamp;
+                data.playerInfo.posLocs.remove(optional.get());
+                MiscUtils.testMessage("teleported: " + data.getPlayer().getName());
+            }
+        } else if(data.playerInfo.serverPos) {
+            data.playerInfo.serverPos = false;
+        }
 
         data.playerInfo.inVehicle = data.getPlayer().getVehicle() != null;
         data.playerInfo.gliding = PlayerUtils.isGliding(data.getPlayer());

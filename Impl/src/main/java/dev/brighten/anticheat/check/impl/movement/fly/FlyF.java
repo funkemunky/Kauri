@@ -25,11 +25,13 @@ public class FlyF extends Check {
         data.blockInfo.handler.setSize(0.3, 1.8f);
         data.blockInfo.handler.setSingle(true);
         if(!inLiquid) {
-            data.blockInfo.handler.setOffset(-.1);
-            inLiquid = data.blockInfo.handler.isCollidedWith(Materials.WATER);
-            tags.add("above");
-            aboveTicks++;
-            data.blockInfo.handler.setOffset(0);
+            if(!data.playerInfo.serverGround) {
+                data.blockInfo.handler.setOffset(-.1);
+                inLiquid = data.blockInfo.handler.isCollidedWith(Materials.WATER);
+                tags.add("above");
+                aboveTicks++;
+                data.blockInfo.handler.setOffset(0);
+            }
         } else {
             aboveTicks = 0;
             tags.add("colliding");

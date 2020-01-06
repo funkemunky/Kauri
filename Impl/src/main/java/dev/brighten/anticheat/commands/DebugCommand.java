@@ -15,7 +15,7 @@ import java.util.UUID;
 @Init(commands = true)
 public class DebugCommand {
 
-    @Command(name = "kauri.debug", aliases = {"debug"}, permission = "kauri.debug",
+    @Command(name = "kauri.debug", aliases = {"debug"}, permission = "kauri.command.debug",
             usage = "/<command> <check> [player]", display = "debug", description = "debug a check", playerOnly = true)
     public void onCommand(CommandAdapter cmd) {
         if(cmd.getArgs().length > 0) {
@@ -42,7 +42,7 @@ public class DebugCommand {
                 .msg("error-invalid-args", "&cInvalid arguments! Check the help page."));
     }
 
-    @Command(name = "kauri.debug.none", aliases = {"debug.none"}, permission = "kauri.debug", usage = "/<command>",
+    @Command(name = "kauri.debug.none", aliases = {"debug.none"}, permission = "kauri.command.debug", usage = "/<command>",
             playerOnly = true, display = "debug none", description = "turn off debugging")
     public void onDebugOff(CommandAdapter cmd) {
         ObjectData data = Kauri.INSTANCE.dataManager.getData(cmd.getPlayer());
@@ -64,7 +64,7 @@ public class DebugCommand {
                 .msg("debug-off", "&aTurned off your debugging."));
     }
 
-    @Command(name = "kauri.debug.box", aliases = {"debug.box"}, permission = "kauri.debug", usage = "/<command>",
+    @Command(name = "kauri.debug.box", aliases = {"debug.box"}, permission = "kauri.command.debug", usage = "/<command>",
             playerOnly = true, display = "debug box [player...]", description = "debug the collisions of players.")
     public void onDebugBox(CommandAdapter cmd) {
         String[] debuggingPlayers;

@@ -34,7 +34,7 @@ public class ObjectData {
     public PastLocation pastLocation, targetPastLocation;
     public LivingEntity target;
     public SimpleCollisionBox box, targetBounds;
-    public ObjectData INSTANCE;
+    public ObjectData INSTANCE, targetData;
     public CheckManager checkManager;
     public PlayerInformation playerInfo;
     public BlockInformation blockInfo;
@@ -49,7 +49,7 @@ public class ObjectData {
         this.uuid = uuid;
         hashCode = uuid.hashCode();
         INSTANCE = this;
-        if(alerts = getPlayer().hasPermission("kauri.alerts")) {
+        if(alerts = getPlayer().hasPermission("kauri.command.alerts")) {
             Kauri.INSTANCE.dataManager.hasAlerts.add(this);
         }
         creation = System.currentTimeMillis();

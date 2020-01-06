@@ -13,7 +13,7 @@ public class FlyD extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(packet.isPos()) {
-            if(data.playerInfo.deltaY - data.playerInfo.lDeltaY > 0.001
+            if(data.playerInfo.deltaY - data.playerInfo.lDeltaY > 0.01f
                     && data.playerInfo.airTicks > 2
                     && timeStamp - data.playerInfo.lastVelocityTimestamp > 150L
                     && !data.playerInfo.lClientGround

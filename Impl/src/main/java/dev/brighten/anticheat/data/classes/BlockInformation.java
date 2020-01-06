@@ -45,14 +45,15 @@ public class BlockInformation {
         int startZ = Location.locToBlock(objectData.playerInfo.to.z - 1 - objectData.playerInfo.deltaXZ);
         int endZ = Location.locToBlock(objectData.playerInfo.to.z + 1 + objectData.playerInfo.deltaXZ);
         int it = 9 * 9;
-        if(Atlas.getInstance().getBlockBoxManager().getBlockBox().isChunkLoaded(objectData.playerInfo.to.
-                toLocation(objectData.getPlayer().getWorld()))) {
+        if(objectData.playerInfo.worldLoaded) {
             start:
             for (int chunkx = startX >> 4; chunkx <= endX >> 4; ++chunkx) {
                 int cx = chunkx << 4;
 
                 for (int chunkz = startZ >> 4; chunkz <= endZ >> 4; ++chunkz) {
-                    if (!objectData.playerInfo.worldLoaded) {
+                    if (Atlas.getInstance().getBlockBoxManager().getBlockBox()
+                            .isChunkLoaded(new Location(objectData.getPlayer().getWorld(),
+                                    chunkx & 15, 0, chunkz & 15))) {
                         continue;
                     }
                     Chunk chunk = world.getChunkAt(chunkx, chunkz);

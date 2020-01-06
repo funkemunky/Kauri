@@ -16,6 +16,7 @@ import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.MiscUtils;
 import lombok.val;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 
 import java.util.concurrent.TimeUnit;
 
@@ -53,10 +54,15 @@ public class    PacketProcessor {
                             //Resetting location to prevent false positives.
                             data.targetPastLocation.previousLocations.clear();
                             data.playerInfo.lastTargetSwitch.reset();
+                            if(packet.getEntity() instanceof Player) {
+                                data.targetData = Kauri.INSTANCE.dataManager.getData((Player)packet.getEntity());
+                            }
                             data.targetBounds = new SimpleCollisionBox((Object)MinecraftReflection
                                     .getEntityBoundingBox(data.target));
                         }
 
+                        if(data.target == null && packet.getEntity() instanceof Player)
+                            data.targetData = Kauri.INSTANCE.dataManager.getData((Player)packet.getEntity());
                         data.target = (LivingEntity) packet.getEntity();
                     }
                     data.predictionService.hit = true;
@@ -82,24 +88,7 @@ public class    PacketProcessor {
                 data.lagInfo.lastFlying = timeStamp;
 
                 data.predictionService.onReceive(packet); //Processing for prediction service.
-
-                if(data.playerInfo.posLocs.size() > 0) {
-                    val optional = data.playerInfo.posLocs.stream()
-                            .filter(loc -> loc.toVector().setY(0)
-                                    .distance(data.playerInfo.to.toVector().setY(0)) <= 1E-5
-                                    && MathUtils.getDelta(loc.y, data.playerInfo.to.y) < 1)
-                            .findFirst();
-
-                    if(optional.isPresent()) {
-                        data.playerInfo.serverPos = true;
-                        data.playerInfo.lastServerPos = timeStamp;
-                        data.playerInfo.posLocs.remove(optional.get());
-                    }
-                } else if(data.playerInfo.serverPos) {
-                    data.playerInfo.serverPos = false;
-                }
                 data.moveProcessor.process(packet, timeStamp);
-
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
             }

@@ -12,7 +12,7 @@ import java.util.Arrays;
 @Init(commands = true)
 public class WandCommand {
 
-    @Command(name = "kauri.wand", description = "view boundingBox debugs.", display = "wand", playerOnly = true, permission = "kauri.wand")
+    @Command(name = "kauri.wand", description = "view boundingBox debugs.", display = "wand", playerOnly = true, permission = "kauri.command.wand")
     public void onCommand(CommandAdapter cmd) {
         if(Arrays.stream(cmd.getPlayer().getInventory().getContents())
                 .anyMatch(item -> item == null || item.getType().equals(Material.AIR))) {

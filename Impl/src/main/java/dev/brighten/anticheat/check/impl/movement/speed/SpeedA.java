@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.check.impl.movement.speed;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.utils.math.cond.MaxInteger;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -11,7 +12,7 @@ import dev.brighten.anticheat.utils.MovementUtils;
 public class SpeedA extends Check {
 
     private long moveTicks, keyTicks;
-    private int verbose;
+    private MaxInteger verbose = new MaxInteger(40);
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
@@ -30,12 +31,12 @@ public class SpeedA extends Check {
         baseSpeed+= data.playerInfo.wasOnSlime ? 0.1 : 0;
 
         if(data.playerInfo.deltaXZ > baseSpeed) {
-            if((verbose+= data.playerInfo.deltaXZ - baseSpeed > 0.6f ? 4 : 1) > 25
+            if(verbose.add(data.playerInfo.deltaXZ - baseSpeed > 0.6f ? 4 : 1) > 25
                     || data.playerInfo.deltaXZ - baseSpeed > 0.6f) {
                 vl++;
                 flag(data.playerInfo.deltaXZ + ">-" + baseSpeed);
             }
-        } else verbose-= verbose > 0 ? 1 : 0;
+        } else verbose.subtract();
 
         debug("deltaXZ=" + data.playerInfo.deltaXZ + " baseSpeed=" + baseSpeed + " vl=" + vl
                 + " onSlime=" + data.playerInfo.wasOnSlime);

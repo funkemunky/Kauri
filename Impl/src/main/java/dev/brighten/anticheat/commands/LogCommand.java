@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public class LogCommand {
 
     @Command(name = "kauri.logs", description = "View the logs of a user.", display = "logs [player]",
-            usage = "/<command> [player]", aliases = {"logs"}, permission = "kauri.logs")
+            usage = "/<command> [player]", aliases = {"logs"}, permission = "kauri.command.logs")
     public void onCommand(CommandAdapter cmd) {
         Kauri.INSTANCE.executor.execute(() -> {
             if(cmd.getArgs().length == 0) {
@@ -51,7 +51,7 @@ public class LogCommand {
     }
 
     @Command(name = "kauri.logs.clear", display = "logs clear [player]", description = "Clear logs of a player",
-            usage = "/<command> [playerName]",  permission = "kauri.logs.clear")
+            usage = "/<command> [playerName]",  permission = "kauri.command.logs.clear")
     public void onLogsClear(CommandAdapter cmd) {
         if(cmd.getArgs().length > 0) {
             OfflinePlayer player = Bukkit.getOfflinePlayer(cmd.getArgs()[0]);
