@@ -7,8 +7,8 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.processing.MovementProcessor;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "Aim (I)", description = "Checks for bad client rotations.", checkType = CheckType.AIM)
-public class AimI extends Check {
+@CheckInfo(name = "Aim (E)", description = "Checks for bad client rotations.", checkType = CheckType.AIM)
+public class AimE extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {

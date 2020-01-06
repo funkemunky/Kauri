@@ -27,7 +27,7 @@ public class Reach extends Check {
     private static List<EntityType> allowedEntities = Arrays.asList(EntityType.PLAYER, EntityType.SKELETON,
             EntityType.ZOMBIE, EntityType.PIG_ZOMBIE, EntityType.VILLAGER);
 
-    private int verbose;
+    private float verbose;
 
     @Packet
     public void onArm(WrappedInArmAnimationPacket packet) {
@@ -65,13 +65,13 @@ public class Reach extends Check {
         if(distances.size() > 0) {
             val distance = distances.stream().mapToDouble(num -> num).min().orElse(0);
 
-            if(distance > 3.0001 && data.lagInfo.lastPacketDrop.hasPassed(7)) {
-                verbose++;
+            if(distance > 3.01 && data.lagInfo.lastPacketDrop.hasPassed(7)) {
+                verbose+= distances.size() > 6 ? 1 : 0.5f;
                 if(verbose > 1) {
                     vl++;
                     flag("distance=%1 size=%2", MathUtils.round(distance, 3), distances.size());
                 }
-            } else verbose-= verbose > 0 ? data.lagInfo.lagging ? 0.025f : 0.01f : 0;
+            } else verbose-= verbose > 0 ? data.lagInfo.lagging ? 0.05f : 0.02f : 0;
             debug("distance=" + distance + ", size=" + distances.size() + ", vl=" + verbose);
         }
     }

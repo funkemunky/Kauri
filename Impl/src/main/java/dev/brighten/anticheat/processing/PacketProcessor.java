@@ -83,15 +83,6 @@ public class    PacketProcessor {
 
                 data.predictionService.onReceive(packet); //Processing for prediction service.
 
-                if(data.playerInfo.serverPos && !data.playerInfo.sentpostofalse) {
-                    data.playerInfo.sentpostofalse = true;
-                    Atlas.getInstance().getSchedular().schedule(() -> {
-                        data.playerInfo.serverPos = data.playerInfo.sentpostofalse = false;
-                    }, data.lagInfo.transPing, TimeUnit.MILLISECONDS);
-                }
-
-                data.moveProcessor.process(packet, timeStamp);
-
                 if(data.playerInfo.posLocs.size() > 0) {
                     val optional = data.playerInfo.posLocs.stream()
                             .filter(loc -> loc.toVector().setY(0)
@@ -104,7 +95,11 @@ public class    PacketProcessor {
                         data.playerInfo.lastServerPos = timeStamp;
                         data.playerInfo.posLocs.remove(optional.get());
                     }
+                } else if(data.playerInfo.serverPos) {
+                    data.playerInfo.serverPos = false;
                 }
+                data.moveProcessor.process(packet, timeStamp);
+
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
             }
@@ -168,16 +163,7 @@ public class    PacketProcessor {
 
                 long time = packet.getTime();
 
-                if (time == 101) {
-                    data.playerInfo.lastVelocity.reset();
-                    data.playerInfo.lastVelocityTimestamp = timeStamp;
-                    data.predictionService.velocity = true;
-                } else if (time == 100) {
-                    data.playerInfo.lastServerPos = timeStamp;
-                    data.playerInfo.serverPos = true;
-                    data.predictionService.position = true;
-                    MiscUtils.testMessage("set position to true (2)");
-                } else if (time == 201) {
+                if (time == 201) {
                     data.playerInfo.worldLoaded = true;
                     data.playerInfo.loadedPacketReceived = true;
                 } else {
@@ -205,6 +191,10 @@ public class    PacketProcessor {
 
                     data.lagInfo.pingAverages.add(data.lagInfo.transPing);
                     data.lagInfo.averagePing = data.lagInfo.pingAverages.getAverage();
+                } else if(packet.getAction() == (short) 101) {
+                    data.playerInfo.lastVelocity.reset();
+                    data.playerInfo.lastVelocityTimestamp = timeStamp;
+                    data.predictionService.velocity = true;
                 }
 
                 data.checkManager.runPacket(packet, timeStamp);
@@ -259,10 +249,12 @@ public class    PacketProcessor {
                 WrappedOutVelocityPacket packet = new WrappedOutVelocityPacket(object, data.getPlayer());
 
                 if(packet.getId() == data.getPlayer().getEntityId()) {
-                    TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutKeepAlivePacket(101).getObject());
+                    TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutTransaction(0, (short)101, false).getObject());
                     data.playerInfo.velocityX = (float) packet.getX();
                     data.playerInfo.velocityY = (float) packet.getY();
                     data.playerInfo.velocityZ = (float) packet.getZ();
+                    data.playerInfo.lastVelocity.reset();
+                    data.playerInfo.lastVelocityTimestamp = timeStamp;
                 }
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
@@ -272,6 +264,7 @@ public class    PacketProcessor {
 
                 data.lagInfo.lastKeepAlive = System.currentTimeMillis();
                 data.checkManager.runPacket(packet, timeStamp);
+
                 TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutTransaction(0, (short)69, false).getObject());
                 break;
             }
