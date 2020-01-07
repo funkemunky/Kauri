@@ -24,7 +24,6 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class LogsGUI extends ChestMenu {
 
@@ -33,6 +32,7 @@ public class LogsGUI extends ChestMenu {
     private AtomicInteger currentPage = new AtomicInteger(1);
     private OfflinePlayer player;
     private Player shown;
+    private Set<String> filtered = new HashSet<>();
 
     public LogsGUI(OfflinePlayer player) {
         super("Violations", 6);
@@ -59,14 +59,14 @@ public class LogsGUI extends ChestMenu {
         buildInventory(true);
     }
 
-    private void setButtons(int page, String... filtered) {
-        if (page == 0 || getMenuDimension().getSize() <= 0) return;
+    private void setButtons(int page) {
+        if (getMenuDimension().getSize() <= 0) return;
 
         if (updaterTask == null || !Bukkit.getScheduler().isCurrentlyRunning(updaterTask.getTaskId())) {
             runUpdater();
         }
 
-        List<Log> filteredLogs = (filtered.length > 0 ? logs.parallelStream()
+        List<Log> filteredLogs = (filtered.size() > 0 ? logs.stream()
                 .filter(log -> {
                     for (String s : filtered) {
                         if (s.equalsIgnoreCase(log.checkName)) {
@@ -76,10 +76,17 @@ public class LogsGUI extends ChestMenu {
                     return false;
                 }).sequential()
                 .sorted(Comparator.comparing(log -> log.timeStamp, Comparator.reverseOrder()))
-                .collect(Collectors.toList()) : logs).subList(Math.min((page - 1) * 45, logs.size()),
-                Math.min(page * 45, logs.size()));
+                .collect(Collectors.toList()) : logs);
 
-        for (int i = 0; i < filteredLogs.size(); i++) setItem(i, buttonFromLog(filteredLogs.get(i)));
+        List<Log> subList = filteredLogs.subList(Math.min((page - 1) * 45, filteredLogs.size()),
+                Math.min(page * 45, filteredLogs.size()));
+        for (int i = 0; i < subList.size(); i++) setItem(i, buttonFromLog(subList.get(i)));
+
+        if(subList.size() < 45) {
+            for(int i = subList.size() ; i < 45 ; i++) {
+                setItem(i, new FillerButton());
+            }
+        }
 
         //Setting the next page option if possible.
         if (Math.min(page * 45, filteredLogs.size()) < filteredLogs.size()) {
@@ -87,13 +94,13 @@ public class LogsGUI extends ChestMenu {
                     .amount(1).name(Color.Red + "Next Page &7(&e" + (page + 1) + "&7)").build(),
                     (player, info) -> {
                         if (info.getClickType().isLeftClick()) {
-                            setButtons(page + 1, filtered);
+                            setButtons(page + 1);
                             buildInventory(false);
                             currentPage.set(page + 1);
                         }
                     });
             setItem(50, next);
-        }
+        } else setItem(50, new FillerButton());
 
         val punishments = Kauri.INSTANCE.loggerManager.getPunishments(player.getUniqueId());
 
@@ -134,29 +141,34 @@ public class LogsGUI extends ChestMenu {
                     .amount(1).name(Color.Red + "Previous Page &7(&e" + (page - 1) + "&7)").build(),
                     (player, info) -> {
                         if (info.getClickType().isLeftClick()) {
-                            setButtons(page - 1, filtered);
+                            setButtons(page - 1);
                             currentPage.set(page - 1);
                             buildInventory(false);
                         }
                     });
             setItem(48, back);
-        }
+        } else setItem(48, new FillerButton());
 
-        if(filtered.length > 0) {
-            List<String> lore = new ArrayList<>(Arrays.asList("", "&eFilters:"));
+        if(filtered.size() > 0) {
+            List<String> lore = new ArrayList<>(Arrays.asList("", Color.translate("&eFilters:")));
 
             for (String s : filtered) {
-                lore.add("&7- &f" + s);
+                lore.add(Color.translate("&7- &f" + s));
             }
             Button stopFilter = new Button(false,
                     new ItemBuilder(Material.REDSTONE).amount(1)
                             .name(Color.Red + "Stop Filter").lore(lore).build(),
                     (player, info) -> {
+                       filtered.clear();
                        setButtons(currentPage.get());
+                       buildInventory(false);
                     });
 
             setItem(47, stopFilter);
             setItem(51, stopFilter);
+        } else {
+            setItem(47, new FillerButton());
+            setItem(51, new FillerButton());
         }
 
         //Setting all empty slots with a filler.
@@ -167,6 +179,7 @@ public class LogsGUI extends ChestMenu {
         ChestMenu summary = new ChestMenu(player.getName() + "'s Summary", 6);
 
         summary.setParent(this);
+        summary.fill(new FillerButton());
         Map<String, List<Log>> sortedLogs = new HashMap<>();
 
         logs.forEach(log -> {
@@ -178,7 +191,8 @@ public class LogsGUI extends ChestMenu {
 
         sortedLogs.forEach((check, list) -> {
             Button button = new Button(false,
-                    new ItemBuilder(Material.PAPER).amount(1).name(Color.Gold + check)
+                    new ItemBuilder(Material.PAPER).amount(1).name((filtered.contains(check) ? Color.Red + Color.Italics : Color.Gold)
+                            + check)
                             .lore("", "&7Alerts: &f" + list.size(),
                                     "&7Highest VL: &f" +
                                             list.stream()
@@ -187,10 +201,59 @@ public class LogsGUI extends ChestMenu {
                                     "&7Type: &f" + Check.getCheckSettings(check).type.name(),
                                     "", "&a&oLeft click &7&oto view vls from this check.").build(),
                     (player, info) -> {
-                        setButtons(currentPage.get(), check);
+                        filtered.add(check);
+                        setButtons(1);
+                        currentPage.set(1);
+                        buildInventory(false);
+                        info.getMenu().close(player);
+                        getSummary().showMenu(player);
+                        info.getButton().getStack().setItemMeta(new ItemBuilder(info.getButton().getStack())
+                                .name((filtered.contains(check) ? Color.Red + Color.Italics : Color.Gold) + check)
+                                .build().getItemMeta());
+                        List<String> lore = new ArrayList<>(Arrays.asList("", Color.translate("&eFilters:")));
+
+                        for (String s : filtered) {
+                            lore.add(Color.translate("&7- &f" + s));
+                        }
+                        Button stopFilter = new Button(false,
+                                new ItemBuilder(Material.REDSTONE).amount(1)
+                                        .name(Color.Red + "Stop Filter").lore(lore).build(),
+                                (player2, info2) -> {
+                                    filtered.clear();
+                                    setButtons(1);
+                                    buildInventory(false);
+                                    info.getMenu().close(player2);
+                                    getSummary().showMenu(player2);
+                                });
+
+                        info.getMenu().setItem(53, stopFilter);
+                        info.getMenu().buildInventory(false);
                     });
             summary.addItem(button);
         });
+
+        if(filtered.size() > 0) {
+            List<String> lore = new ArrayList<>(Arrays.asList("", Color.translate("&eFilters:")));
+
+            for (String s : filtered) {
+                lore.add(Color.translate("&7- &f" + s));
+            }
+            Button stopFilter = new Button(false,
+                    new ItemBuilder(Material.REDSTONE).amount(1)
+                            .name(Color.Red + "Stop Filter").lore(lore).build(),
+                    (player, info) -> {
+                        filtered.clear();
+                        setButtons(1);
+                        buildInventory(false);
+                        info.getMenu().close(player);
+                        getSummary().showMenu(player);
+                    });
+
+            summary.setItem(53, stopFilter);
+        } else {
+            summary.setItem(53, new FillerButton());
+        }
+
         return summary;
     }
 

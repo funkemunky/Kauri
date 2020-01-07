@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.processing.vpn;
 
+import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.JsonMessage;
 import cc.funkemunky.api.utils.RunUtils;
 import dev.brighten.anticheat.Kauri;
@@ -27,12 +28,14 @@ public class VPNListener implements Listener {
                     Kauri.INSTANCE.dataManager.hasAlerts
                             .forEach(data -> {
                                 JsonMessage json = new JsonMessage();
-                                json.addText(message)
-                                        .addHoverText("&7IP: &f" + (!VPNConfig.hideIP &&
-                                                data.getPlayer().hasPermission("kauri.antivpn.ip")
-                                                ? response.getIp() : "HIDDEN"),
-                                                "&7ISP: &f" + response.getIsp())
-                                        .setClickEvent(JsonMessage.ClickableType.RunCommand, VPNConfig.alertCommand);
+                                json.addText(message.replace("%player%", player.getName()))
+                                        .addHoverText(Color.translate("&7IP: &f" + (!VPNConfig.hideIP &&
+                                                        data.getPlayer().hasPermission("kauri.antivpn.ip")
+                                                        ? response.getIp() : "HIDDEN")) + "\n" +
+                                                Color.translate("&7ISP: &f" + response.getIsp()))
+                                        .setClickEvent(JsonMessage.ClickableType.RunCommand, "/"
+                                                + VPNConfig.alertCommand.replace("%player%", player.getName()));
+                                json.sendToPlayer(data.getPlayer());
                             });
                 }
                 if(VPNConfig.kick) {

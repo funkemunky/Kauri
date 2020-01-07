@@ -73,20 +73,6 @@ public class RayCollision {
     public void draw(WrappedEnumParticle particle, Player... players) {
         MiscUtils.drawRay(this,particle, Arrays.asList(players));
     }
-    
-    public List<CollisionBox> getBlocksInRay(World world, double distance) {
-        for (double i = 0; i < distance; i += 0.2) {
-            val fx = (originX + (directionX * i));
-            val fy = (originY + (directionY * i));
-            val fz = (originZ + (directionZ * i));
-
-            Location location = new Location(world, fx, fy, fz);
-            Block block = location.getBlock();
-            CollisionBox data = BlockData.getData(block.getType()).getBox(block, ProtocolVersion.getGameVersion());
-
-            if(data.isCollided(this))
-        }
-    }
 
     public KLocation getOrigin() {
         return new KLocation(originX, originY, originZ, 0, 0);

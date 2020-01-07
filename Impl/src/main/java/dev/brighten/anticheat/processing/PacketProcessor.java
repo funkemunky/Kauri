@@ -105,11 +105,15 @@ public class    PacketProcessor {
                 switch(packet.getAction()) {
                     case START_DESTROY_BLOCK: {
                         data.playerInfo.breakingBlock = true;
+                        data.predictionService.useSword
+                                = data.playerInfo.usingItem = false;
                         break;
                     }
                     case STOP_DESTROY_BLOCK:
                     case ABORT_DESTROY_BLOCK: {
-                        data.playerInfo.breakingBlock = false;
+                        data.predictionService.useSword
+                                = data.playerInfo.usingItem
+                                = data.playerInfo.breakingBlock = false;
                         break;
                     }
                     case RELEASE_USE_ITEM: {
@@ -120,7 +124,9 @@ public class    PacketProcessor {
                     }
                     case DROP_ALL_ITEMS:
                     case DROP_ITEM: {
-                        data.playerInfo.breakingBlock = data.playerInfo.usingItem = false;
+                        data.predictionService.useSword
+                                = data.playerInfo.usingItem
+                                = data.playerInfo.breakingBlock = false;
                         data.predictionService.dropItem = true;
                         break;
                     }
@@ -152,13 +158,8 @@ public class    PacketProcessor {
 
                 long time = packet.getTime();
 
-                if (time == 201) {
-                    data.playerInfo.worldLoaded = true;
-                    data.playerInfo.loadedPacketReceived = true;
-                } else {
-                    data.lagInfo.lastPing = data.lagInfo.ping;
-                    data.lagInfo.ping = System.currentTimeMillis() - data.lagInfo.lastKeepAlive;
-                }
+                data.lagInfo.lastPing = data.lagInfo.ping;
+                data.lagInfo.ping = System.currentTimeMillis() - data.lagInfo.lastKeepAlive;
 
                 data.checkManager.runPacket(packet, timeStamp);
                 break;

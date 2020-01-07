@@ -2,6 +2,7 @@ package dev.brighten.anticheat.data.classes;
 
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
+import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.Materials;
 import cc.funkemunky.api.utils.world.Material2;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
@@ -24,7 +25,8 @@ public class BlockInformation {
     public boolean onClimbable, onSlab, onStairs, onHalfBlock, inLiquid, inLava, inWater, inWeb, onSlime, onIce,
             onSoulSand, blocksAbove, collidesVertically, collidesHorizontally, blocksNear, inBlock;
     public float currentFriction;
-    public CollisionHandler handler;
+    public CollisionHandler
+            handler = new CollisionHandler(new ArrayList<>(), new ArrayList<>(), new KLocation(0,0,0));
 
     public BlockInformation(ObjectData objectData) {
         this.objectData = objectData;
@@ -51,9 +53,7 @@ public class BlockInformation {
                 int cx = chunkx << 4;
 
                 for (int chunkz = startZ >> 4; chunkz <= endZ >> 4; ++chunkz) {
-                    if (Atlas.getInstance().getBlockBoxManager().getBlockBox()
-                            .isChunkLoaded(new Location(objectData.getPlayer().getWorld(),
-                                    chunkx & 15, 0, chunkz & 15))) {
+                    if (!world.isChunkLoaded(chunkx, chunkz)) {
                         continue;
                     }
                     Chunk chunk = world.getChunkAt(chunkx, chunkz);

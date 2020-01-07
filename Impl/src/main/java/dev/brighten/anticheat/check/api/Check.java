@@ -11,6 +11,7 @@ import dev.brighten.anticheat.check.impl.combat.autoclicker.*;
 import dev.brighten.anticheat.check.impl.combat.hand.HandA;
 import dev.brighten.anticheat.check.impl.combat.hand.HandB;
 import dev.brighten.anticheat.check.impl.combat.hand.HandC;
+import dev.brighten.anticheat.check.impl.combat.hand.HandD;
 import dev.brighten.anticheat.check.impl.combat.hitbox.Hitboxes;
 import dev.brighten.anticheat.check.impl.combat.reach.Reach;
 import dev.brighten.anticheat.check.impl.movement.fly.*;
@@ -194,6 +195,7 @@ public class Check implements KauriCheck {
         register(new AutoclickerC());
         register(new AutoclickerD());
         register(new AutoclickerE());
+        register(new AutoclickerF());
         register(new FlyA());
         register(new FlyB());
         register(new FlyC());
@@ -213,6 +215,7 @@ public class Check implements KauriCheck {
         register(new AimF());
         register(new AimG());
         register(new AimH());
+        register(new AimI());
         register(new SpeedA());
         register(new SpeedB());
         register(new SpeedC());
@@ -238,6 +241,7 @@ public class Check implements KauriCheck {
         register(new HandA());
         register(new HandB());
         register(new HandC());
+        register(new HandD());
     }
 
     public static boolean isCheck(String name) {

@@ -16,7 +16,8 @@ public class BadPacketsO extends Check {
 
     @Packet
     public void onUse(WrappedInUseEntityPacket packet, long timeStamp) {
-        if(!swung && data.lagInfo.lastPacketDrop.hasPassed(4)) {
+        if(packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)
+                && !swung && data.lagInfo.lastPacketDrop.hasPassed(4)) {
             vl++;
             if(vl > 4) {
                 flag("[did not swing] ping=%p tps=%t");

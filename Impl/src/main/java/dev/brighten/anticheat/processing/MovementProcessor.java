@@ -86,22 +86,8 @@ public class MovementProcessor {
 
         data.playerInfo.lworldLoaded = data.playerInfo.worldLoaded;
 
-        /* Here we is where we check if the world has loaded for the player. */
-        if(Atlas.getInstance().getBlockBoxManager().getBlockBox()
-                .isChunkLoaded(data.playerInfo.to.toLocation(data.getPlayer().getWorld()))) {
-            if(!data.playerInfo.lworldLoaded) {
-                if(data.playerInfo.loadedPacketReceived) {
-                    //Sending a keepAlive as confirmation the world was loaded on the player's side.
-                    //This prevents false positives caused by high latency or a lag spike.
-                    TinyProtocolHandler.sendPacket(data.getPlayer(),
-                            new WrappedOutKeepAlivePacket(201).getObject());
-                    data.playerInfo.lastLoadedPacketSend.reset();
-                    data.playerInfo.loadedPacketReceived = false;
-                }
-            }
-        } else {
-            data.playerInfo.worldLoaded = false;
-        }
+        data.playerInfo.worldLoaded = Atlas.getInstance().getBlockBoxManager().getBlockBox()
+                .isChunkLoaded(data.playerInfo.to.toLocation(data.getPlayer().getWorld()));
 
         data.lagInfo.lagging = data.lagInfo.lastPacketDrop.hasNotPassed(3)
                 || !data.playerInfo.worldLoaded
