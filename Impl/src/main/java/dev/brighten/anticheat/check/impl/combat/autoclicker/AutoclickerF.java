@@ -3,6 +3,7 @@ package dev.brighten.anticheat.check.impl.combat.autoclicker;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -15,7 +16,7 @@ public class AutoclickerF extends Check {
     private long lastArm;
     private double cps;
     private boolean blocked;
-    private int armTicks, placeTicks;
+    private int armTicks;
 
     @Packet
     public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
@@ -28,22 +29,21 @@ public class AutoclickerF extends Check {
     public void onFlying(WrappedInFlyingPacket packet) {
         if(blocked) {
             if(armTicks > 0) {
-                if(armTicks == placeTicks) {
+                if(armTicks == 1) {
                     if(cps > 6) vl++;
                     if(vl > 40) {
-                        flag("arm=%1 place=%2 cps=%3", armTicks, placeTicks, cps);
+                        flag("arm=%1 cps=%2 lagging=%3", armTicks, MathUtils.round(cps, 3), data.lagInfo.lagging);
                     }
                 } else vl = 0;
-                debug("cps=%1 arm=%2 place=%3 vl=%4", cps, armTicks, placeTicks, vl);
+                debug("cps=%1 arm=%2 lagging=%3 vl=%4", cps, armTicks, data.lagInfo.lagging, vl);
             }
             blocked = false;
-            placeTicks = armTicks = 0;
+            armTicks = 0;
         }
     }
 
     @Packet
     public void onPlace(WrappedInBlockPlacePacket packet) {
-        placeTicks++;
         blocked = true;
     }
 }

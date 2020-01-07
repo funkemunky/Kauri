@@ -10,6 +10,7 @@ import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckSettings;
 import dev.brighten.anticheat.logs.objects.Log;
+import dev.brighten.anticheat.menu.LogsGUI;
 import dev.brighten.anticheat.utils.ItemBuilder;
 import dev.brighten.anticheat.utils.Pastebin;
 import dev.brighten.anticheat.utils.menu.button.Button;
@@ -250,10 +251,14 @@ public class MenuCommand {
                     "&f&oShift-Left Click &7&oto view logs.");
             menu.addItem(new Button(false, builder.build(),
                     (target, info) -> {
-                if(info.getClickType().equals(ClickType.SHIFT_LEFT)) {
+                if(info.getClickType().equals(ClickType.SHIFT_LEFT)
+                        && target.hasPermission("kauri.command.logs")) {
+                    LogsGUI gui = new LogsGUI(Bukkit.getOfflinePlayer(uuid));
                     menu.setParent(null);
                     menu.close(target);
-                    Bukkit.dispatchCommand(target, "kauri logs " + player.getName());
+                    gui.setParent(info.getMenu());
+                    menu.setParent(main);
+                    gui.showMenu(target);
                 }
             }));
         }

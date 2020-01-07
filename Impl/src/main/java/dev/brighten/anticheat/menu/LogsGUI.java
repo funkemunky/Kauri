@@ -17,6 +17,7 @@ import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitTask;
@@ -179,7 +180,6 @@ public class LogsGUI extends ChestMenu {
         ChestMenu summary = new ChestMenu(player.getName() + "'s Summary", 6);
 
         summary.setParent(this);
-        summary.fill(new FillerButton());
         Map<String, List<Log>> sortedLogs = new HashMap<>();
 
         logs.forEach(log -> {
@@ -191,7 +191,8 @@ public class LogsGUI extends ChestMenu {
 
         sortedLogs.forEach((check, list) -> {
             Button button = new Button(false,
-                    new ItemBuilder(Material.PAPER).amount(1).name((filtered.contains(check) ? Color.Red + Color.Italics : Color.Gold)
+                    new ItemBuilder(filtered.contains(check) ? Material.EMPTY_MAP : Material.PAPER).amount(1)
+                            .name((filtered.contains(check) ? Color.Red + Color.Italics : Color.Gold)
                             + check)
                             .lore("", "&7Alerts: &f" + list.size(),
                                     "&7Highest VL: &f" +
@@ -199,17 +200,24 @@ public class LogsGUI extends ChestMenu {
                                                     .max(Comparator.comparing(log -> log.vl))
                                                     .map(log -> log.vl).orElse(0f),
                                     "&7Type: &f" + Check.getCheckSettings(check).type.name(),
-                                    "", "&a&oLeft click &7&oto view vls from this check.").build(),
+                                    "",
+                                    "&f&oLeft-Click &7&oto add check to vl filter.",
+                                    "&f&oRight-Click &7&oto remove check from vl filter.").build(),
                     (player, info) -> {
-                        filtered.add(check);
+                        if(info.getClickType().name().contains("LEFT")) filtered.add(check);
+                        else if(info.getClickType().name().contains("RIGHT")) filtered.remove(check);
+                        else return;
+
                         setButtons(1);
                         currentPage.set(1);
                         buildInventory(false);
-                        info.getMenu().close(player);
-                        getSummary().showMenu(player);
-                        info.getButton().getStack().setItemMeta(new ItemBuilder(info.getButton().getStack())
+                        info.getButton().setStack((filtered.contains(check)
+                                ? new ItemBuilder(info.getButton().getStack())
+                                        .enchantment(Enchantment.DURABILITY, 1)
+                                : new ItemBuilder(info.getButton().getStack()).clearEnchantments())
+                                .type(filtered.contains(check) ? Material.EMPTY_MAP : Material.PAPER)
                                 .name((filtered.contains(check) ? Color.Red + Color.Italics : Color.Gold) + check)
-                                .build().getItemMeta());
+                                .build());
                         List<String> lore = new ArrayList<>(Arrays.asList("", Color.translate("&eFilters:")));
 
                         for (String s : filtered) {
@@ -253,6 +261,8 @@ public class LogsGUI extends ChestMenu {
         } else {
             summary.setItem(53, new FillerButton());
         }
+
+        summary.fill(new FillerButton());
 
         return summary;
     }
