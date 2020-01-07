@@ -1,10 +1,16 @@
 package dev.brighten.anticheat.utils;
 
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.Tuple;
+import cc.funkemunky.api.utils.world.BlockData;
+import cc.funkemunky.api.utils.world.CollisionBox;
+import lombok.val;
 import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -66,6 +72,20 @@ public class RayCollision {
 
     public void draw(WrappedEnumParticle particle, Player... players) {
         MiscUtils.drawRay(this,particle, Arrays.asList(players));
+    }
+    
+    public List<CollisionBox> getBlocksInRay(World world, double distance) {
+        for (double i = 0; i < distance; i += 0.2) {
+            val fx = (originX + (directionX * i));
+            val fy = (originY + (directionY * i));
+            val fz = (originZ + (directionZ * i));
+
+            Location location = new Location(world, fx, fy, fz);
+            Block block = location.getBlock();
+            CollisionBox data = BlockData.getData(block.getType()).getBox(block, ProtocolVersion.getGameVersion());
+
+            if(data.isCollided(this))
+        }
     }
 
     public KLocation getOrigin() {
