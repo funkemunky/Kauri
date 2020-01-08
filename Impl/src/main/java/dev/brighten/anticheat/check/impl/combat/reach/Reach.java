@@ -39,13 +39,16 @@ public class Reach extends Check {
         //debug("timeStamp=" + timeStamp + "ms");
         if(data.target == null || data.targetData == null || timeStamp - data.playerInfo.lastAttackTimeStamp > 55) return;
 
-        val origins = data.pastLocation.getEstimatedLocation(0, Math.max(100L, Math.round(data.lagInfo.transPing / 2D)))
+        val origins = data.pastLocation.getPreviousRange(30L)
                 .stream()
-                .map(loc -> loc.toLocation(data.getPlayer().getWorld()).add(0, data.playerInfo.sneaking ? 1.54f : 1.62f, 0))
+                .map(loc -> {
+                    debug("%1ms", timeStamp - loc.timeStamp);
+                    return loc.toLocation(data.getPlayer().getWorld()).add(0, data.playerInfo.sneaking ? 1.54f : 1.62f, 0);
+                })
                 .collect(Collectors.toList());
 
         val entityLoc = data.targetData.pastLocation
-                .getEstimatedLocation(data.lagInfo.transPing, Math.max(200L, Math.round(data.lagInfo.transPing / 2D)));
+                .getEstimatedLocation(data.lagInfo.transPing, Math.max(220L, Math.round(data.lagInfo.transPing / 2D)));
 
         List<Double> distances = new ArrayList<>();
 
@@ -65,13 +68,16 @@ public class Reach extends Check {
         if(distances.size() > 0) {
             val distance = distances.stream().mapToDouble(num -> num).min().orElse(0);
 
-            if(distance > 3.01 && distances.size() > 10 && data.lagInfo.lastPacketDrop.hasPassed(7)) {
+            if(distance > 3.01 && distances.size() > 3
+                    && (data.playerInfo.deltaXZ == 0 && data.targetData.playerInfo.deltaXZ == 0
+                    || data.targetData.playerInfo.deltaXZ > 0 && data.playerInfo.deltaXZ > 0)
+                    && data.lagInfo.lastPacketDrop.hasPassed(1)) {
                 verbose+= distances.size() > 6 ? 1 : 0.5f;
-                if(verbose > 2) {
+                if(verbose > 3) {
                     vl++;
                     flag("distance=%1 size=%2", MathUtils.round(distance, 3), distances.size());
                 }
-            } else verbose-= verbose > 0 ? data.lagInfo.lagging ? 0.05f : 0.02f : 0;
+            } else verbose-= verbose > 0 ? data.lagInfo.lagging ? 0.025f : 0.01f : 0;
             debug("distance=" + distance + ", size=" + distances.size() + ", vl=" + verbose);
         }
     }

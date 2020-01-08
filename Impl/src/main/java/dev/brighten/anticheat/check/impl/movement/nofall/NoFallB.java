@@ -16,6 +16,8 @@ public class NoFallB extends Check {
             if(data.playerInfo.serverGround != data.playerInfo.clientGround
                     && data.playerInfo.climbTicks.value() == 0
                     && !data.playerInfo.generalCancel
+                    && data.playerInfo.lastBlockPlace.hasPassed(20)
+                    && data.playerInfo.lastVelocity.hasPassed(40)
                     && data.playerInfo.liquidTicks.value() == 0) {
                 if(vl++ > 5) {
                     flag("server=" + data.playerInfo.serverGround + " client=" + data.playerInfo.clientGround);

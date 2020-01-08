@@ -45,7 +45,7 @@ public class HandD extends Check {
                     distance = Math.min((float)to.toVector().distance(vec), 4f);
                 }
                 val boxes = collision
-                        .boxesOnRay(to.getWorld(), distance - 0.4f);
+                        .boxesOnRay(to.getWorld(), Math.max(0, distance - 1f));
 
                 if(boxes.size() > 0) {
                     collided++;

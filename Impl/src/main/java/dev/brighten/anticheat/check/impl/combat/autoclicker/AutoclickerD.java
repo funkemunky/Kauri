@@ -33,11 +33,12 @@ public class AutoclickerD extends Check {
             double avg = stats.getAverage();
             double std = interval.std();
 
-            double deltaStd = MathUtils.getDelta(std, lstd);
-            if(deltaStd < 3 && avg < 125 && MathUtils.getDelta(avg, lavg) > 1) {
+            double deltaStd = MathUtils.getDelta(std, lstd), deltaAvg = MathUtils.getDelta(avg, lavg);
+            if(deltaStd < 3 && avg < 125 && deltaAvg > 2) {
                 vl++;
                 if(vl > 4) {
-                    flag("avg=%1 std=%2", avg, deltaStd);
+                    flag("avg=%1 std=%2 deltaAvg=%3", MathUtils.round(avg, 4),
+                            MathUtils.round(deltaStd, 4), MathUtils.round(deltaAvg, 4));
                 }
             } else vl-= vl > 0 ? 0.25 : 0;
             debug("vl=" + vl + " avg=" + MathUtils.round(avg, 3)

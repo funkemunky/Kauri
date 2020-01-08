@@ -29,9 +29,9 @@ public class AutoclickerF extends Check {
     public void onFlying(WrappedInFlyingPacket packet) {
         if(blocked) {
             if(armTicks > 0) {
-                if(armTicks == 1) {
-                    if(cps > 6) vl++;
-                    if(vl > 40) {
+                if(armTicks == 1 && cps > 3) {
+                    if(cps > 8) vl++;
+                    if(vl > 15) {
                         flag("arm=%1 cps=%2 lagging=%3", armTicks, MathUtils.round(cps, 3), data.lagInfo.lagging);
                     }
                 } else vl = 0;

@@ -11,6 +11,8 @@ import dev.brighten.anticheat.data.classes.CheckManager;
 import dev.brighten.anticheat.data.classes.PlayerInformation;
 import dev.brighten.anticheat.data.classes.PredictionService;
 import dev.brighten.anticheat.processing.MovementProcessor;
+import dev.brighten.anticheat.processing.vpn.VPNHandler;
+import dev.brighten.anticheat.processing.vpn.VPNResponse;
 import dev.brighten.anticheat.utils.PastLocation;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
@@ -42,6 +44,7 @@ public class ObjectData {
     public PredictionService predictionService;
     public MovementProcessor moveProcessor;
     public int hashCode;
+    private VPNResponse vpnResult;
     public ProtocolVersion playerVersion = ProtocolVersion.UNKNOWN;
     public Set<Player> boxDebuggers = new HashSet<>();
 
@@ -114,5 +117,10 @@ public class ObjectData {
     public static void debugBoxes(boolean debugging, Player debugger, String... targets) {
         debugBoxes(debugging, debugger, (ObjectData[])Arrays.stream(targets).map(Bukkit::getPlayer)
                 .map(Kauri.INSTANCE.dataManager::getData).toArray(ObjectData[]::new));
+    }
+
+    public VPNResponse getVpnResult() {
+        if(vpnResult == null) return vpnResult = Kauri.INSTANCE.vpnHandler.getResponse(getPlayer());
+        else return vpnResult;
     }
 }

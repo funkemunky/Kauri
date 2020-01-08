@@ -67,16 +67,26 @@ public class LogCommand {
                         "Are you sure you want to clear " + player.getName() + "'s logs?",
                         (pl, confirmed) -> {
                             if(confirmed) {
-                                cmd.getSender().sendMessage(Color.Gray + "Clearing logs from " + player.getName() + "...");
-                                Kauri.INSTANCE.loggerManager.clearLogs(player.getUniqueId());
-                                cmd.getSender().sendMessage(Color.Green + "Logs cleared!");
+                                Kauri.INSTANCE.executor.execute(() -> {
+                                    cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                                            .msg("clearing-logs", "&7Clearing logs from %player%...")
+                                            .replace("%player%", player.getName()));
+                                    Kauri.INSTANCE.loggerManager.clearLogs(player.getUniqueId());
+                                    cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                                            .msg("clear-logs-success", "&aLogs cleared!"));
+                                });
                             }
                         });
                 menu.showMenu(cmd.getPlayer());
             } else {
-                cmd.getSender().sendMessage(Color.Gray + "Clearing logs from " + player.getName() + "...");
-                Kauri.INSTANCE.loggerManager.clearLogs(player.getUniqueId());
-                cmd.getSender().sendMessage(Color.Green + "Logs cleared!");
+                Kauri.INSTANCE.executor.execute(() -> {
+                    cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                            .msg("clearing-logs", "&7Clearing logs from %player%...")
+                            .replace("%player%", player.getName()));
+                    Kauri.INSTANCE.loggerManager.clearLogs(player.getUniqueId());
+                    cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                            .msg("clear-logs-success", "&aLogs cleared!"));
+                });
             }
         } else cmd.getSender().sendMessage(Color.Red + "You must provide the name of a player.");
     }

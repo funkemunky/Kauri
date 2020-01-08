@@ -1,6 +1,8 @@
 package dev.brighten.anticheat.processing;
 
 import cc.funkemunky.api.Atlas;
+import cc.funkemunky.api.events.impl.PacketReceiveEvent;
+import cc.funkemunky.api.events.impl.PacketSendEvent;
 import cc.funkemunky.api.reflection.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
@@ -22,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 public class    PacketProcessor {
 
-    public void processClient(ObjectData data, Object object, String type, long timeStamp) {
+    public void processClient(PacketReceiveEvent event, ObjectData data, Object object, String type, long timeStamp) {
         Kauri.INSTANCE.profiler.start("packet:client:" + getType(type));
         switch(type) {
             case Packet.Client.ABILITIES: {
@@ -218,7 +220,7 @@ public class    PacketProcessor {
         Kauri.INSTANCE.profiler.stop("packet:client:" + getType(type));
     }
 
-    public void processServer(ObjectData data, Object object, String type, long timeStamp) {
+    public void processServer(PacketSendEvent event, ObjectData data, Object object, String type, long timeStamp) {
         Kauri.INSTANCE.profiler.start("packet:server:" + type);
         switch(type) {
             case Packet.Server.ABILITIES: {
@@ -233,6 +235,14 @@ public class    PacketProcessor {
                 data.playerInfo.flying = packet.isFlying();
                 data.predictionService.fly = packet.isAllowedFlight();
                 data.checkManager.runPacket(packet, timeStamp);
+                break;
+            }
+            case Packet.Server.ENTITY_METADATA: {
+                WrappedOutEntityMetadata packet = new WrappedOutEntityMetadata(object, data.getPlayer());
+
+                if(!data.checkManager.runPacket(packet, timeStamp)) {
+                    event.setCancelled(true);
+                }
                 break;
             }
             case Packet.Server.ENTITY_VELOCITY: {

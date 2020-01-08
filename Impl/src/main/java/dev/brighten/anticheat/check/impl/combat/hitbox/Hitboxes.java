@@ -49,7 +49,7 @@ public class Hitboxes extends Check {
         if (checkParameters(data)) {
 
             List<RayCollision> rayTrace = data.pastLocation
-                    .getEstimatedLocation(0,Math.max(100, Math.min(150L, data.lagInfo.transPing)))
+                    .getPreviousRange(Math.max(150L, Math.round(data.lagInfo.transPing / 2D)))
                     .stream()
                     .map(loc ->
                             loc.toLocation(data.getPlayer().getWorld()).clone()
@@ -58,7 +58,7 @@ public class Hitboxes extends Check {
                     .collect(Collectors.toList());
 
             List<BoundingBox> entityLocations = data.targetPastLocation
-                    .getEstimatedLocation(data.lagInfo.transPing, 150L)
+                    .getEstimatedLocation(data.lagInfo.transPing, 200L)
                     .stream()
                     .map(loc -> getHitbox(loc, data.target.getType()))
                     .collect(Collectors.toList());

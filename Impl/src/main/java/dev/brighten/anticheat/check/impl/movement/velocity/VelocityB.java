@@ -1,6 +1,8 @@
 package dev.brighten.anticheat.check.impl.movement.velocity;
 
+import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.*;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutKeepAlivePacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.MathHelper;
 import cc.funkemunky.api.utils.MathUtils;
@@ -26,6 +28,7 @@ public class VelocityB extends Check {
         if(packet.getId() == data.getPlayer().getEntityId()) {
             vX = packet.getX();
             vZ = packet.getZ();
+            TinyProtocolHandler.sendPacket(packet.getPlayer(), new WrappedOutKeepAlivePacket(101).getObject());
         }
     }
 
@@ -119,9 +122,9 @@ public class VelocityB extends Check {
                             && !data.playerInfo.usingItem && !data.predictionService.useSword) {
                         if(data.lagInfo.lastPacketDrop.hasPassed(1)) {
                             if (strafe == 0 && forward == 0 && !data.lagInfo.lagging) vl+= 2;
-                            if ((vl+= strafe == 0 ? 1 : 0.5) > 15) flag("pct=" + MathUtils.round(pct, 3) + "%");
+                            if ((vl+= strafe == 0 ? 1 : 0.5) > (data.lagInfo.transPing > 150 ? 22 : 15)) flag("pct=" + MathUtils.round(pct, 3) + "%");
                         }
-                    } else vl -= vl > 0 ? data.lagInfo.lagging ? 0.25f : 0.2f : 0;
+                    } else vl -= vl > 0 ? data.lagInfo.lagging || data.lagInfo.transPing > 150 ? 0.5f : 0.2f : 0;
 
                     debug("pct=" + pct + " key=" + data.predictionService.key + " ani="
                             + usingItem + " sprint=" + data.playerInfo.sprinting

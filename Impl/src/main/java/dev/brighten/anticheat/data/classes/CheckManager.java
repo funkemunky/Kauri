@@ -14,6 +14,7 @@ import org.bukkit.event.Event;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CheckManager {
     private ObjectData objectData;
@@ -24,22 +25,36 @@ public class CheckManager {
         this.objectData = objectData;
     }
 
-    public void runPacket(NMSObject object, long timeStamp) {
-        if(!checkMethods.containsKey(object.getClass())) return;
+    public boolean runPacket(NMSObject object, long timeStamp) {
+        if(!checkMethods.containsKey(object.getClass())) return true;
 
         val methods = checkMethods.get(object.getClass());
+        AtomicBoolean okay = new AtomicBoolean(true);
         methods.parallelStream().filter(entry -> entry.getValue().getMethod().isAnnotationPresent(Packet.class))
                 .forEach(entry -> {
                     Check check = checks.get(entry.getKey());
 
                     if(check.enabled) {
                         if(entry.getValue().getMethod().getParameterCount() > 1) {
-                            entry.getValue().invoke(check, object, timeStamp);
+                            if(entry.getValue().getMethod().getGenericReturnType().equals(Void.TYPE))
+                                entry.getValue().invoke(check, object, timeStamp);
+                            else if(okay.get()
+                                    && entry.getValue().getMethod().getReturnType().equals(boolean.class)) {
+                                boolean cancel = entry.getValue().invoke(check, object, timeStamp);
+                                if(!cancel) okay.set(false);
+                            }
                         } else {
-                            entry.getValue().invoke(check, object);
+                            if(entry.getValue().getMethod().getGenericReturnType().equals(Void.TYPE))
+                                entry.getValue().invoke(check, object);
+                            else if(okay.get()
+                                    && entry.getValue().getMethod().getReturnType().equals(boolean.class)) {
+                                boolean cancel = entry.getValue().invoke(check, object);
+                                if(!cancel) okay.set(false);
+                            }
                         }
                     }
                 });
+        return okay.get();
     }
 
     public void runEvent(Event event) {

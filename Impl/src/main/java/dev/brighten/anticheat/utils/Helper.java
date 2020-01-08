@@ -68,7 +68,7 @@ public class Helper {
 	public static List<Block> getBlocksNearby(CollisionHandler handler, SimpleCollisionBox collisionBox) {
 		try {
 			return handler.getBlocks().stream().filter(b -> b.getType() != Material.AIR
-					&& BlockData.getData(b.getType()).getBox(b, handler.getData().playerVersion)
+					&& BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion())
 					.isCollided(collisionBox))
 					.collect(Collectors.toList());
 		} catch (NullPointerException e) {
@@ -98,7 +98,7 @@ public class Helper {
 	public static List<Block> getBlocksNearby(CollisionHandler handler, SimpleCollisionBox collisionBox, int mask) {
 		return handler.getBlocks().stream().filter(b -> b.getType() != Material.AIR
 				&& Materials.checkFlag(b.getType(), mask)
-				&& BlockData.getData(b.getType()).getBox(b, handler.getData().playerVersion)
+				&& BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion())
 				.isCollided(collisionBox))
 				.collect(Collectors.toList());
 	}

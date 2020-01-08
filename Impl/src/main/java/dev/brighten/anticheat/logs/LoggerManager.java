@@ -133,6 +133,8 @@ public class LoggerManager {
                 .filter(structSet -> structSet.containsKey("uuid") && structSet.getField("uuid").equals(uuid.toString()))
                 .collect(Collectors.toList());
 
+        if(sets.size() == 0) return new ArrayList<>();
+
         return sets.stream().map(set -> new Log(
                 set.getField("checkName"),
                 set.getField("info"),
@@ -149,7 +151,7 @@ public class LoggerManager {
 
     public void clearLogs(UUID uuid) {
         logsDatabase.getDatabaseValues()
-                .stream()
+                .parallelStream()
                 .filter(set -> !set.containsKey("uuid") || set.getField("uuid").equals(uuid.toString()))
                 .map(set -> set.id)
                 .forEach(id -> logsDatabase.remove(id));
