@@ -1,8 +1,8 @@
 package dev.brighten.anticheat.check.impl.combat.autoclicker;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
+import cc.funkemunky.api.tinyprotocol.packet.in.*;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutHeldItemSlot;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -15,14 +15,36 @@ public class AutoclickerF extends Check {
 
     private long lastArm;
     private double cps;
-    private boolean blocked;
-    private int armTicks;
+    private boolean blocked, blocking;
+    private int armTicks, slot;
 
     @Packet
     public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
         cps = 1000D / (timeStamp - lastArm);
         lastArm = timeStamp;
         armTicks++;
+    }
+
+    @Packet
+    public void onUse(WrappedInUseEntityPacket packet) {
+        if(packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK) && blocking) {
+            TinyProtocolHandler.sendPacket(packet.getPlayer(), new WrappedOutHeldItemSlot(slot == 8 ? 0 : Math.min(8, slot + 1)).getObject());
+            debug("unblocked");
+        }
+    }
+
+    @Packet
+    public void onDig(WrappedInBlockDigPacket packet) {
+        if(packet.getAction().name().contains("DROP")
+                || packet.getAction().equals(WrappedInBlockDigPacket.EnumPlayerDigType.RELEASE_USE_ITEM)) {
+            blocking = false;
+        }
+    }
+
+    @Packet
+    public void onHeld(WrappedInHeldItemSlotPacket packet) {
+        blocking = false;
+        slot = packet.getSlot();
     }
 
     @Packet
@@ -44,7 +66,7 @@ public class AutoclickerF extends Check {
 
     @Packet
     public void onPlace(WrappedInBlockPlacePacket packet) {
-        blocked = true;
+        blocked = blocking =  true;
     }
 }
 

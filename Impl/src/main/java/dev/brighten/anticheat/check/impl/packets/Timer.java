@@ -25,17 +25,14 @@ public class Timer extends Check {
         long elapsed = timeStamp - lastTS;
 
         if(timeStamp - data.creation > 500 && !data.playerInfo.serverPos) {
-            if(data.playerVersion.isOrBelow(ProtocolVersion.V1_9) || (elapsed > 40 || lagTicks.add() > 3)) {
-                times.add(elapsed);
-                lagTicks.subtract();
-            }
+            times.add(elapsed);
             val summary = times.stream().mapToLong(val -> val).summaryStatistics();
             double average = summary.getAverage();
             double ratio = 50 / average;
             long range = summary.getMax() - summary.getMin();
             double pct = ratio * 100;
 
-            if((pct > (data.playerVersion.isOrBelow(ProtocolVersion.V1_9) ? 100.1D : 110D)) && (timeStamp - data.playerInfo.lastServerPos > 150L)
+            if((pct > 100.2D) && (timeStamp - data.playerInfo.lastServerPos > 150L)
                     && MathUtils.getDelta(data.lagInfo.lastTransPing, data.lagInfo.transPing) < 30
                     && Kauri.INSTANCE.lastTickLag.hasPassed(5)
                     && (range < 200 || MathUtils.getDelta(range, lRange) < 75)

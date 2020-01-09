@@ -93,7 +93,8 @@ public class BlockInformation {
         handler.setOffset(-0.4f);
         onSlab = handler.isCollidedWith(Materials.SLABS);
         onStairs = handler.isCollidedWith(Materials.STAIRS);
-        onHalfBlock = onSlab || onStairs;
+        onHalfBlock = onSlab || onStairs
+                || handler.isCollidedWith(Material.CAKE_BLOCK, Material.SKULL, Material.BED_BLOCK, Material.SNOW);
 
         handler.setSingle(true);
         onIce = handler.isCollidedWith(Materials.ICE);

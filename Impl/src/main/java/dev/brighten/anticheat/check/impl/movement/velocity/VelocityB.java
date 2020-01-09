@@ -17,7 +17,7 @@ import org.bukkit.enchantments.Enchantment;
         punishVL = 28)
 public class VelocityB extends Check {
 
-    private double vX, vZ;
+    private double vX, vZ, svX, svZ;
     private boolean useEntity, usingItem;
     private float forward, strafe;
     private String lastKey;
@@ -26,9 +26,8 @@ public class VelocityB extends Check {
     @Packet
     public void onVelocity(WrappedOutVelocityPacket packet) {
         if(packet.getId() == data.getPlayer().getEntityId()) {
-            vX = packet.getX();
-            vZ = packet.getZ();
-            TinyProtocolHandler.sendPacket(packet.getPlayer(), new WrappedOutKeepAlivePacket(101).getObject());
+            svX = packet.getX();
+            svZ = packet.getZ();
         }
     }
 
@@ -44,9 +43,11 @@ public class VelocityB extends Check {
     }
 
     @Packet
-    public void onTransaction(WrappedInKeepAlivePacket packet, long timeStamp) {
-        if(packet.getTime() == 101) {
+    public void onTransaction(WrappedInTransactionPacket packet, long timeStamp) {
+        if(packet.getAction() == (short)101) {
             velocityTS = timeStamp;
+            vX = svX;
+            vZ = svZ;
         }
     }
 
@@ -122,9 +123,10 @@ public class VelocityB extends Check {
                             && !data.playerInfo.usingItem && !data.predictionService.useSword) {
                         if(data.lagInfo.lastPacketDrop.hasPassed(1)) {
                             if (strafe == 0 && forward == 0 && !data.lagInfo.lagging) vl+= 2;
-                            if ((vl+= strafe == 0 ? 1 : 0.5) > (data.lagInfo.transPing > 150 ? 22 : 15)) flag("pct=" + MathUtils.round(pct, 3) + "%");
+                            if ((vl+= strafe == 0 && forward > 0 ? 1 : 0.5)
+                                    > (data.lagInfo.transPing > 150 ? 22 : 15)) flag("pct=" + MathUtils.round(pct, 3) + "%");
                         }
-                    } else vl -= vl > 0 ? data.lagInfo.lagging || data.lagInfo.transPing > 150 ? 0.5f : 0.2f : 0;
+                    } else vl -= vl > 0 ? data.lagInfo.lagging || data.lagInfo.transPing > 150 ? 0.25f : 0.1f : 0;
 
                     debug("pct=" + pct + " key=" + data.predictionService.key + " ani="
                             + usingItem + " sprint=" + data.playerInfo.sprinting
@@ -137,7 +139,7 @@ public class VelocityB extends Check {
                     vX *= f4;
                     vZ *= f4;
 
-                    if(timeStamp - velocityTS > 200) {
+                    if(timeStamp - velocityTS > 170L) {
                         vX = vZ = 0;
                     }
                 } else vX = vZ = 0;
