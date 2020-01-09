@@ -3,7 +3,7 @@ package dev.brighten.anticheat.check.impl.combat.aim;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.TickTimer;
-import cc.funkemunky.api.utils.objects.Interval;
+import cc.funkemunky.api.utils.math.cond.MaxDouble;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -14,25 +14,37 @@ import lombok.val;
         checkType = CheckType.AIM, punishVL = 20, developer = true, executable = false)
 public class AimD extends Check {
 
-    private int verbose, zeroTicks;
-    private TickTimer lastYChange = new TickTimer(10);
+    private MaxDouble verbose = new MaxDouble(20);
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
         if (packet.isLook()) {
-            long deltaX = data.moveProcessor.deltaX, deltaY = data.moveProcessor.deltaY;
-            long dxx = Math.abs(deltaX - data.moveProcessor.lastDeltaX);
-
-            if(deltaY != data.moveProcessor.lastDeltaY) lastYChange.reset();
-
-            if(deltaY > 2 || deltaX < 25 || dxx > 14 || lastYChange.hasPassed()) {
-                verbose = 0;
-            } else if(verbose++ > 14) {
-                vl++;
-                flag("dx=%1 dy=%2 vb=%3", deltaX, deltaY, verbose);
+            float deltaYDiff = Math.abs(data.playerInfo.deltaYaw - data.playerInfo.lDeltaYaw),
+                    deltaPDiff = Math.abs(data.playerInfo.deltaPitch - data.playerInfo.lDeltaPitch),
+                    deltaYaw = Math.abs(data.playerInfo.deltaYaw),
+                    deltaPitch = Math.abs(data.playerInfo.deltaPitch);
+            if(deltaYaw > 0 || data.moveProcessor.deltaY > 0) {
+                if(deltaYaw > deltaYDiff
+                        && deltaYDiff > 0
+                        && data.moveProcessor.deltaY <= 3
+                        && deltaPDiff > deltaPitch * 2) {
+                    if(verbose.add() > 3) {
+                        vl++;
+                        flag("verbose=%1 deltaYaw=%2 deltaYDiff=%3 deltaPitch=%4 deltaPDiff=%5",
+                                MathUtils.round(verbose.value(), 3),
+                                MathUtils.round(deltaYaw, 4),
+                                MathUtils.round(deltaYDiff, 4),
+                                data.moveProcessor.deltaY,
+                                deltaPDiff);
+                    }
+                } else verbose.subtract(0.1);
+                debug("verbose=%1 deltaYaw=%2 deltaYDiff=%3 deltaPitch=%4 deltaPDiff=%5",
+                        MathUtils.round(verbose.value(), 3),
+                        MathUtils.round(deltaYaw, 4),
+                        MathUtils.round(deltaYDiff, 4),
+                        deltaPitch,
+                        deltaPDiff);
             }
-
-            debug("dx=%1 dy=%2 verbose=%3 yChange=%4", deltaX, deltaY, verbose, lastYChange.getPassed());
         }
     }
 }

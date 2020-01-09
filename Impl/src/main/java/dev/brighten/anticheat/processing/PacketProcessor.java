@@ -1,6 +1,5 @@
 package dev.brighten.anticheat.processing;
 
-import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.events.impl.PacketReceiveEvent;
 import cc.funkemunky.api.events.impl.PacketSendEvent;
 import cc.funkemunky.api.reflection.MinecraftReflection;
@@ -15,12 +14,8 @@ import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
-import dev.brighten.anticheat.utils.MiscUtils;
-import lombok.val;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-
-import java.util.concurrent.TimeUnit;
 
 public class    PacketProcessor {
 

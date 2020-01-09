@@ -17,9 +17,11 @@ import dev.brighten.anticheat.check.impl.combat.reach.Reach;
 import dev.brighten.anticheat.check.impl.movement.fly.*;
 import dev.brighten.anticheat.check.impl.movement.general.FastLadder;
 import dev.brighten.anticheat.check.impl.movement.general.HealthSpoof;
+import dev.brighten.anticheat.check.impl.movement.general.LiquidWalk;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallA;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallB;
-import dev.brighten.anticheat.check.impl.movement.speed.*;
+import dev.brighten.anticheat.check.impl.movement.speed.SpeedA;
+import dev.brighten.anticheat.check.impl.movement.speed.SpeedB;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityA;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityB;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityC;
@@ -78,7 +80,7 @@ public class Check implements KauriCheck {
         WrappedClass checkClass = new WrappedClass(check.getClass());
         String name = info.name();
         CheckSettings settings = new CheckSettings(info.name(), info.description(), info.checkType(),
-                info.punishVL(), info.minVersion(), info.maxVersion());
+                info.punishVL(), info.vlToFlag(), info.minVersion(), info.maxVersion());
 
         if(Kauri.INSTANCE.getConfig().get("checks." + name + ".enabled") != null) {
             settings.enabled = Kauri.INSTANCE.getConfig().getBoolean("checks." + name + ".enabled");
@@ -120,16 +122,28 @@ public class Check implements KauriCheck {
                     Kauri.INSTANCE.loggerManager.addLog(data, this, info);
 
                     if (lastAlert.hasPassed(MathUtils.millisToTicks(Config.alertsDelay))) {
-                        String message = Color.translate(Kauri.INSTANCE.msgHandler.getLanguage()
-                                .msg("cheat-alert",
-                                        "&8[&6K&8] &f%player% &7flagged &f%check% &8(&e%info%&8) &8(&c%vl%&8] %experimental%")
+                        JsonMessage jmsg = new JsonMessage();
+
+                        jmsg.addText(Color.translate(Kauri.INSTANCE.msgHandler.getLanguage().msg("cheat-alert",
+                                "&8[&6K&8] &f%player% &7flagged &f%check% &8(&e%info%&8)" +
+                                        " &8(&c%vl%&8] %experimental%")
                                 .replace("%player%", data.getPlayer().getName())
                                 .replace("%check%", name)
                                 .replace("%info%", info)
                                 .replace("%vl%", String.valueOf(MathUtils.round(vl, 2)))
-                                .replace("%experimental%", developer ? "&c&o(Experimental)" : ""));
+                                .replace("%experimental%", developer ? "&c&o(Experimental)" : "")))
+                                .addHoverText(Color.translate(Kauri.INSTANCE.msgHandler.getLanguage().msg(
+                                        "cheat-alert-hover",
+                                        "&7&oClick to teleport to player."))
+                                        .replace("%player%", data.getPlayer().getName())
+                                        .replace("%check%", name)
+                                        .replace("%info%", info)
+                                        .replace("%vl%", String.valueOf(MathUtils.round(vl, 2)))
+                                        .replace("%experimental%", developer ? "&c&o(Experimental)" : ""))
+                                .setClickEvent(JsonMessage.ClickableType.RunCommand, "/" + Config.alertCommand);
 
-                        Kauri.INSTANCE.dataManager.hasAlerts.forEach(data -> data.getPlayer().sendMessage(message));
+                        Kauri.INSTANCE.dataManager.hasAlerts.parallelStream()
+                                .forEach(data -> jmsg.sendToPlayer(data.getPlayer()));
                         lastAlert.reset();
                     }
 
@@ -197,12 +211,13 @@ public class Check implements KauriCheck {
         register(new AutoclickerD());
         register(new AutoclickerE());
         register(new AutoclickerF());
+        register(new AutoclickerG());
         register(new FlyA());
         register(new FlyB());
         register(new FlyC());
         register(new FlyD());
         register(new FlyE());
-        register(new FlyF());
+        register(new LiquidWalk());
         register(new FastLadder());
         register(new NoFallA());
         register(new NoFallB());
@@ -217,9 +232,10 @@ public class Check implements KauriCheck {
         register(new AimG());
         register(new AimH());
         register(new AimI());
+        register(new AimJ());
         register(new SpeedA());
         register(new SpeedB());
-        register(new SpeedC());
+        register(new SpeedB());
         register(new Timer());
         register(new BadPacketsA());
         register(new BadPacketsB());

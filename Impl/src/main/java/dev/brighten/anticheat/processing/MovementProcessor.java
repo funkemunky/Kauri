@@ -2,9 +2,7 @@ package dev.brighten.anticheat.processing;
 
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.reflection.MinecraftReflection;
-import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutKeepAlivePacket;
 import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;

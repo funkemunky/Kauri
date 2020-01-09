@@ -1,4 +1,4 @@
-package dev.brighten.anticheat.check.impl.movement.fly;
+package dev.brighten.anticheat.check.impl.movement.general;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.Materials;
@@ -10,9 +10,9 @@ import dev.brighten.api.check.CheckType;
 import java.util.ArrayList;
 import java.util.List;
 
-@CheckInfo(name = "Fly (F)", description = "Checks for liquid walk modules.", checkType = CheckType.FLIGHT,
+@CheckInfo(name = "LiquidWalk", description = "Checks for liquid walk modules.", checkType = CheckType.GENERAL,
         punishVL = 20, developer = true)
-public class FlyF extends Check {
+public class LiquidWalk extends Check {
 
     private long aboveTicks;
     @Packet

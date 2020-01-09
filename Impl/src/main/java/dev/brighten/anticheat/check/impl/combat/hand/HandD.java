@@ -2,13 +2,10 @@ package dev.brighten.anticheat.check.impl.combat.hand;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MiscUtils;
-import cc.funkemunky.api.utils.world.CollisionBox;
 import cc.funkemunky.api.utils.world.types.RayCollision;
-import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -17,8 +14,6 @@ import lombok.val;
 import lombok.var;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.Vector;
-
-import java.util.Collections;
 
 @CheckInfo(name = "Hand (D)", description = "Checks for block collisions on player hits.", checkType = CheckType.HAND,
         developer = true)
@@ -45,7 +40,7 @@ public class HandD extends Check {
                     distance = Math.min((float)to.toVector().distance(vec), 4f);
                 }
                 val boxes = collision
-                        .boxesOnRay(to.getWorld(), Math.max(0, distance - 1f));
+                        .boxesOnRay(to.getWorld(), distance < 1.5 ? Math.min(distance / 2, .25) : distance - 1);
 
                 if(boxes.size() > 0) {
                     collided++;
@@ -54,11 +49,11 @@ public class HandD extends Check {
                 size++;
             }
 
-            if(collided >= size && size > 0) {
+            if(collided >= size && data.playerInfo.lastBrokenBlock.hasPassed(10) && size > 0) {
                 if(vl++ > 5) {
                     flag("collided=%1/%2 total=%3 lagging=%4", collided, size, total, data.lagInfo.lagging);
                 }
-            } else vl-= vl > 0 ? 0.1f : 0;
+            } else vl-= vl > 0 ? 0.2f : 0;
             debug("collided=%1/%2 total=%3 lagging=%4 vl=%5", collided, size, total, data.lagInfo.lagging, vl);
         }
     }

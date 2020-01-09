@@ -19,7 +19,6 @@ import org.bukkit.util.Vector;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @CheckInfo(name = "Hitboxes", description = "Ensures the player is looking at the target when attacking.",

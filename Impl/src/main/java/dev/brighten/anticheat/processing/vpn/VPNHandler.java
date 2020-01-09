@@ -1,8 +1,6 @@
 package dev.brighten.anticheat.processing.vpn;
 
-import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.utils.MiscUtils;
-import cc.funkemunky.carbon.Carbon;
 import cc.funkemunky.carbon.db.Database;
 import cc.funkemunky.carbon.db.StructureSet;
 import cc.funkemunky.carbon.db.flatfile.FlatfileDatabase;

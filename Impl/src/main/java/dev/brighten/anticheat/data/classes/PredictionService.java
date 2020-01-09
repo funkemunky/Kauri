@@ -1,21 +1,12 @@
 package dev.brighten.anticheat.data.classes;
 
 import cc.funkemunky.api.Atlas;
-import cc.funkemunky.api.events.impl.PacketReceiveEvent;
-import cc.funkemunky.api.events.impl.PacketSendEvent;
-import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
-import cc.funkemunky.api.tinyprotocol.packet.in.*;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutAbilitiesPacket;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutKeepAlivePacket;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.data.ObjectData;
-import dev.brighten.anticheat.utils.MovementUtils;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;

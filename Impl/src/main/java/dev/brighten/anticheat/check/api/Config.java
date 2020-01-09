@@ -32,6 +32,15 @@ public class Config {
     @ConfigSetting(path = "general", name = "language")
     public static String language = "english";
 
+    @ConfigSetting(path = "alerts", name = "cancelCheats")
+    public static boolean cancelCheats = true;
+
+    @ConfigSetting(path = "alerts", name = "testMode")
+    public static boolean testMode = false;
+
+    @ConfigSetting(path = "alerts", name = "clickCommand")
+    public static String alertCommand = "teleport %player%";
+
     @ConfigSetting(path = "alerts", name = "dev", comment = "Alert for experimental checks.")
     public static boolean alertDev = true;
 }

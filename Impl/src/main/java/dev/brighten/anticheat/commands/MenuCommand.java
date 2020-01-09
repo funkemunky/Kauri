@@ -18,7 +18,6 @@ import dev.brighten.anticheat.utils.menu.button.ClickAction;
 import dev.brighten.anticheat.utils.menu.preset.button.FillerButton;
 import dev.brighten.anticheat.utils.menu.type.impl.ChestMenu;
 import dev.brighten.api.check.CheckType;
-import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;

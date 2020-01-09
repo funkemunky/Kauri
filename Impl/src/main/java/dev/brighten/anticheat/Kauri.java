@@ -16,7 +16,6 @@ import dev.brighten.anticheat.processing.PacketProcessor;
 import dev.brighten.anticheat.processing.vpn.VPNHandler;
 import dev.brighten.api.KauriAPI;
 import org.bukkit.Bukkit;
-import org.bukkit.World;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;

@@ -11,6 +11,6 @@ public class CheckSettings {
     public boolean enabled, executable;
     public final String name, description;
     public final CheckType type;
-    public final int punishVl;
+    public final int punishVl, vlToFlag;
     public final ProtocolVersion minVersion, maxVersion;
 }

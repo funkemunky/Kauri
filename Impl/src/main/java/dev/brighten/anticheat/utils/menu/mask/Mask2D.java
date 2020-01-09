@@ -3,10 +3,8 @@ package dev.brighten.anticheat.utils.menu.mask;
 import dev.brighten.anticheat.utils.menu.Menu;
 import dev.brighten.anticheat.utils.menu.button.Button;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**

@@ -1,8 +1,5 @@
 package dev.brighten.anticheat.utils;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
 public class GeneralHash {
 
     /*public static String getSHAHash(byte[] data, SHAType type) {

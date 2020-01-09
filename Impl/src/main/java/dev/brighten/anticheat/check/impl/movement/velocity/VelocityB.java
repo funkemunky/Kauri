@@ -1,8 +1,6 @@
 package dev.brighten.anticheat.check.impl.movement.velocity;
 
-import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.*;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutKeepAlivePacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.MathHelper;
 import cc.funkemunky.api.utils.MathUtils;
@@ -79,6 +77,9 @@ public class VelocityB extends Check {
                     vX*= 0.6;
                     vZ*= 0.6;
                 }
+
+                if(data.lagInfo.lastPacketDrop.hasNotPassed(1)
+                        && data.lagInfo.lastPingDrop.hasNotPassed(100)) vX = vZ = 0;
                 if(!data.blockInfo.blocksNear
                         && !data.blockInfo.inWeb
                         && data.predictionService.key.equals(lastKey)

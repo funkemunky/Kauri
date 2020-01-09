@@ -1,16 +1,10 @@
 package dev.brighten.anticheat.utils;
 
-import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.Tuple;
-import cc.funkemunky.api.utils.world.BlockData;
-import cc.funkemunky.api.utils.world.CollisionBox;
-import lombok.val;
 import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;

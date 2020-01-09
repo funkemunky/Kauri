@@ -1,6 +1,5 @@
 package dev.brighten.anticheat.check.impl.packets;
 
-import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.math.cond.MaxInteger;

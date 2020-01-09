@@ -1,15 +1,10 @@
 package dev.brighten.anticheat.check.impl.packets.badpackets;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
-import dev.brighten.anticheat.check.api.Event;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
-import org.bukkit.Location;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.util.Vector;
 
 @CheckInfo(name = "BadPackets (J)", description = "Checks for omni sprint.", checkType = CheckType.BADPACKETS,
         developer = true, punishVL = 100)

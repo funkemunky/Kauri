@@ -11,16 +11,13 @@ import dev.brighten.anticheat.data.classes.CheckManager;
 import dev.brighten.anticheat.data.classes.PlayerInformation;
 import dev.brighten.anticheat.data.classes.PredictionService;
 import dev.brighten.anticheat.processing.MovementProcessor;
-import dev.brighten.anticheat.processing.vpn.VPNHandler;
 import dev.brighten.anticheat.processing.vpn.VPNResponse;
 import dev.brighten.anticheat.utils.PastLocation;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import javax.annotation.Nullable;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class ObjectData {
 

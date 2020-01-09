@@ -1,17 +1,13 @@
 package dev.brighten.anticheat.listeners;
 
-import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
-import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.Init;
-import cc.funkemunky.api.utils.Materials;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.world.BlockData;
 import cc.funkemunky.api.utils.world.CollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
-import dev.brighten.anticheat.utils.Helper;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -23,7 +19,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collections;
-import java.util.List;
 
 @Init
 public class BukkitListener implements Listener {

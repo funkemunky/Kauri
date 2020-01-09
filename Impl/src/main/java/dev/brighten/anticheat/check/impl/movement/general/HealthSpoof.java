@@ -1,13 +1,8 @@
 package dev.brighten.anticheat.check.impl.movement.general;
 
-import cc.funkemunky.api.reflections.Reflections;
-import cc.funkemunky.api.reflections.types.WrappedClass;
-import cc.funkemunky.api.reflections.types.WrappedField;
-import cc.funkemunky.api.tinyprotocol.api.NMSObject;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutEntityMetadata;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutSpawnEntityPacket;
 import cc.funkemunky.api.tinyprotocol.packet.types.WrappedWatchableObject;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
