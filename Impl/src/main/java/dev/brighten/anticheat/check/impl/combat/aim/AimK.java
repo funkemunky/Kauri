@@ -27,7 +27,8 @@ public class AimK extends Check {
         float yawDifference = Math.abs(lastYawDelta - yawDelta),
                 pitchDifference = Math.abs(lastPitchDelta - pitchDelta);
 
-        if (yawDifference > 2.0f && pitchDifference == 0.0f
+        if (yawDifference > 2.0f && pitchDifference == lastPitchDifference
+                && pitchDifference == 0
                 && yawDifference == lastYawDifference) {
             if ((verbose += 20) > 22) {
                 vl++;

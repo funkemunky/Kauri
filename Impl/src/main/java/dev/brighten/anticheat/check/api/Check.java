@@ -5,6 +5,7 @@ import cc.funkemunky.api.bungee.BungeeAPI;
 import cc.funkemunky.api.reflections.types.WrappedClass;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.utils.*;
+import com.google.common.xml.XmlEscapers;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.impl.combat.aim.*;
 import dev.brighten.anticheat.check.impl.combat.autoclicker.*;
@@ -64,7 +65,7 @@ public class Check implements KauriCheck {
     @Getter
     public CheckType checkType;
 
-    private boolean exempt;
+    private boolean exempt, ;
     private TickTimer lastExemptCheck = new TickTimer(20);
 
     private TickTimer lastAlert = new TickTimer(MathUtils.millisToTicks(Config.alertsDelay));
@@ -142,7 +143,9 @@ public class Check implements KauriCheck {
                                         .replace("%experimental%", developer ? "&c&o(Experimental)" : ""))
                                 .setClickEvent(JsonMessage.ClickableType.RunCommand, "/" + Config.alertCommand);
 
-                        Kauri.INSTANCE.dataManager.hasAlerts.parallelStream()
+                        if(Config.testMode) jmsg.sendToPlayer(data.getPlayer());
+
+                            Kauri.INSTANCE.dataManager.hasAlerts.parallelStream()
                                 .forEach(data -> jmsg.sendToPlayer(data.getPlayer()));
                         lastAlert.reset();
                     }
