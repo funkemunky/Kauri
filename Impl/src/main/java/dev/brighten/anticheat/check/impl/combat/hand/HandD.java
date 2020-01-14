@@ -38,7 +38,16 @@ public class HandD extends Check {
                 var distance = 4f;
                 if(vec != null) {
                     distance = Math.min((float)to.toVector().distance(vec), 4f);
+                } else {
+                    size++;
+                    continue;
                 }
+
+                if(distance < 0.8) {
+                    size++;
+                    continue;
+                }
+
                 val boxes = collision
                         .boxesOnRay(to.getWorld(), distance < 1.5 ? Math.min(distance / 2, .25) : distance - 1);
 
@@ -49,7 +58,7 @@ public class HandD extends Check {
                 size++;
             }
 
-            if(collided >= size && data.playerInfo.lastBrokenBlock.hasPassed(10) && size > 0) {
+            if(collided >= size && data.playerInfo.lastBrokenBlock.hasPassed(10) && size > 1) {
                 if(vl++ > 5) {
                     flag("collided=%1/%2 total=%3 lagging=%4", collided, size, total, data.lagInfo.lagging);
                 }

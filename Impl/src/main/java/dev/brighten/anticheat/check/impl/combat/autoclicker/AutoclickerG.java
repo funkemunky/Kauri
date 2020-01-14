@@ -1,7 +1,9 @@
 package dev.brighten.anticheat.check.impl.combat.autoclicker;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockDigPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -13,18 +15,28 @@ public class AutoclickerG extends Check {
 
     private boolean sent;
     private int timesSent;
+    private long lastFlying;
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
+    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         sent = false;
         timesSent = 0;
         vl-= vl > 0 ? 0.0025f : 0;
+        lastFlying = timeStamp;
     }
 
     @Packet
-    public void onArm(WrappedInArmAnimationPacket packet) {
+    public void onFlying(WrappedInBlockDigPacket packet) {
+        sent = false;
+        timesSent = 0;
+    }
+
+    @Packet
+    public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
         timesSent++;
-        if(sent && data.lagInfo.lastPacketDrop.hasPassed(1)) {
+        if(sent && data.lagInfo.lastPacketDrop.hasPassed(1)
+                && data.playerInfo.lastBrokenBlock.hasPassed(2)
+                && MathUtils.getDelta(timeStamp - lastFlying, 50) < 20) {
             if(vl++ > 1) {
                 flag("sent=%1", timesSent);
             }

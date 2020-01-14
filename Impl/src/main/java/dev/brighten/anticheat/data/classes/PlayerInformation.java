@@ -14,7 +14,7 @@ public class PlayerInformation {
             onLadder, usingItem, wasOnIce, wasOnSlime, jumped, inAir, lworldLoaded, worldLoaded;
     public boolean generalCancel, flightCancel;
     public float deltaY, lDeltaY, deltaX, lDeltaX, deltaZ, lDeltaZ, deltaXZ, lDeltaXZ, fallDistance, jumpHeight;
-    public float pDeltaY;
+    public float headYaw, headPitch;
     public float deltaYaw, deltaPitch, lDeltaYaw, lDeltaPitch;
     public long lastVelocityTimestamp;
     public Block blockBelow, blockOnTo;
@@ -26,7 +26,7 @@ public class PlayerInformation {
     public MouseFilter yawSmooth = new MouseFilter(), pitchSmooth = new MouseFilter();
 
     //Gcd
-    public float yawGCD, pitchGCD, lastYawGCD, lastPitchGCD;
+    public double yawGCD, pitchGCD, lastYawGCD, lastPitchGCD;
 
     //Server Position
     public long lastServerPos;

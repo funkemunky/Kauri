@@ -7,13 +7,13 @@ import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.TickTimer;
+import cc.funkemunky.api.utils.objects.VariableValue;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.Config;
 import dev.brighten.anticheat.data.DataManager;
 import dev.brighten.anticheat.logs.LoggerManager;
 import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.processing.PacketProcessor;
-import dev.brighten.anticheat.processing.vpn.VPNHandler;
 import dev.brighten.api.KauriAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
@@ -45,7 +45,7 @@ public class Kauri extends JavaPlugin {
 
     public MessageHandler msgHandler;
     public KauriAPI kauriAPI;
-    public VPNHandler vpnHandler;
+    public boolean isPaper;
 
     public void onEnable() {
         MiscUtils.printToConsole(Color.Red + "Starting Kauri " + getDescription().getVersion() + "...");
@@ -55,13 +55,14 @@ public class Kauri extends JavaPlugin {
     }
 
     public void onDisable() {
-        unload();
+        unload(false);
     }
 
-    public void unload() {
+    public void unload(boolean saveAsync) {
         enabled = false;
         MiscUtils.printToConsole("&7Saving logs to database...");
-        loggerManager.logsDatabase.saveDatabase();
+        if(saveAsync) executor.execute(() -> loggerManager.logsDatabase.saveDatabase());
+        else executor.execute(() -> loggerManager.logsDatabase.saveDatabase());;
         MiscUtils.printToConsole("&7Unregistering Kauri API...");
         kauriAPI.service.shutdown();
 
@@ -100,6 +101,14 @@ public class Kauri extends JavaPlugin {
         MiscUtils.printToConsole(Color.Gray + "Loading messages...");
         msgHandler = new MessageHandler(this);
 
+        MiscUtils.printToConsole(Color.Gray + "Checking if using paper...");
+        try {
+            Class.forName("org.github.paperspigot.PaperSpigotConfig");
+            isPaper = true;
+        } catch(ClassNotFoundException e) {
+            isPaper = false;
+        }
+
         MiscUtils.printToConsole(Color.Gray + "Running scanner...");
         Atlas.getInstance().initializeScanner(this, true, true);
 
@@ -117,8 +126,6 @@ public class Kauri extends JavaPlugin {
 
         MiscUtils.printToConsole(Color.Gray + "Registering checks...");
         Check.registerChecks();
-
-        vpnHandler = new VPNHandler();
 
         MiscUtils.printToConsole(Color.Gray + "Running tps task...");
         runTpsTask();

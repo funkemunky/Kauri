@@ -12,12 +12,12 @@ import dev.brighten.api.check.CheckType;
         checkType = CheckType.AIM, punishVL = 100)
 public class AimC extends Check {
 
-    private float lastGcd;
+    private double lastGcd;
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if(!packet.isLook()) return;
 
-        float gcd = (data.playerInfo.yawGCD / MovementProcessor.offset);
+        double gcd = (data.playerInfo.yawGCD / MovementProcessor.offset);
 
         if(MathUtils.getDelta(gcd, lastGcd) > 1E-4) {
             vl++;

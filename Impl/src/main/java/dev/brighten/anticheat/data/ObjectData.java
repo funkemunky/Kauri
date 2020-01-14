@@ -4,6 +4,7 @@ import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.utils.TickTimer;
 import cc.funkemunky.api.utils.math.RollingAverageLong;
+import cc.funkemunky.api.utils.math.cond.MaxInteger;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.classes.BlockInformation;
@@ -11,7 +12,6 @@ import dev.brighten.anticheat.data.classes.CheckManager;
 import dev.brighten.anticheat.data.classes.PlayerInformation;
 import dev.brighten.anticheat.data.classes.PredictionService;
 import dev.brighten.anticheat.processing.MovementProcessor;
-import dev.brighten.anticheat.processing.vpn.VPNResponse;
 import dev.brighten.anticheat.utils.PastLocation;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
@@ -41,7 +41,6 @@ public class ObjectData {
     public PredictionService predictionService;
     public MovementProcessor moveProcessor;
     public int hashCode;
-    private VPNResponse vpnResult;
     public ProtocolVersion playerVersion = ProtocolVersion.UNKNOWN;
     public Set<Player> boxDebuggers = new HashSet<>();
 
@@ -77,8 +76,10 @@ public class ObjectData {
     public class LagInformation {
         public long lastKeepAlive, lastTrans, lastClientTrans;
         public long ping, averagePing, transPing, lastPing, lastTransPing;
+        public MaxInteger lagTicks = new MaxInteger(25);
         public boolean lagging;
-        public TickTimer lastPacketDrop = new TickTimer(10), lastPingDrop = new TickTimer(40);
+        public TickTimer lastPacketDrop = new TickTimer(10),
+                lastPingDrop = new TickTimer(40);
         public RollingAverageLong pingAverages = new RollingAverageLong(10, 0);
         public long lastFlying = 0;
     }
@@ -114,10 +115,5 @@ public class ObjectData {
     public static void debugBoxes(boolean debugging, Player debugger, String... targets) {
         debugBoxes(debugging, debugger, (ObjectData[])Arrays.stream(targets).map(Bukkit::getPlayer)
                 .map(Kauri.INSTANCE.dataManager::getData).toArray(ObjectData[]::new));
-    }
-
-    public VPNResponse getVpnResult() {
-        if(vpnResult == null) return vpnResult = Kauri.INSTANCE.vpnHandler.getResponse(getPlayer());
-        else return vpnResult;
     }
 }

@@ -4,6 +4,8 @@ import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.*;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutHeldItemSlot;
 import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.math.cond.MaxDouble;
+import cc.funkemunky.api.utils.math.cond.MaxInteger;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -17,6 +19,7 @@ public class AutoclickerF extends Check {
     private double cps;
     private boolean blocked, blocking;
     private int armTicks, slot;
+    private MaxDouble verbose = new MaxDouble(40);
 
     @Packet
     public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
@@ -27,9 +30,17 @@ public class AutoclickerF extends Check {
 
     @Packet
     public void onUse(WrappedInUseEntityPacket packet) {
-        if(packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK) && blocking) {
-            TinyProtocolHandler.sendPacket(packet.getPlayer(), new WrappedOutHeldItemSlot(slot == 8 ? 0 : Math.min(8, slot + 1)).getObject());
-            debug("unblocked");
+        if(packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) {
+            if(blocking) {
+                TinyProtocolHandler.sendPacket(packet.getPlayer(),
+                        new WrappedOutHeldItemSlot(slot == 8 ? 0 : Math.min(8, slot + 1))
+                        .getObject());
+                debug("unblocked");
+
+                if (verbose.add() > 10) {
+                    flag("t=%1 vb=%2", "block", MathUtils.round(verbose.value(), 2));
+                }
+            } else verbose.subtract(0.01);
         }
     }
 

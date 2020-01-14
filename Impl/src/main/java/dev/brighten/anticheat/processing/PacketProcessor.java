@@ -136,7 +136,10 @@ public class    PacketProcessor {
                 WrappedInBlockPlacePacket packet = new WrappedInBlockPlacePacket(object, data.getPlayer());
 
                 if(packet.getItemStack() != null) {
-                    if(packet.getItemStack().getType().isBlock()) {
+                    if(packet.getItemStack().getType().isBlock()
+                            && (packet.getPosition().getX() != -1
+                            || packet.getPosition().getY() != -1
+                            || packet.getPosition().getZ() != -1)) {
                         data.playerInfo.lastBlockPlace.reset();
                     } else if(packet.getPosition().getX() == -1
                             && packet.getPosition().getY() == -1
@@ -252,6 +255,13 @@ public class    PacketProcessor {
                     data.playerInfo.lastVelocityTimestamp = timeStamp;
                 }
                 data.checkManager.runPacket(packet, timeStamp);
+                break;
+            }
+            case Packet.Server.ENTITY_HEAD_ROTATION: {
+                WrappedOutEntityHeadRotation packet = new WrappedOutEntityHeadRotation(object, data.getPlayer());
+
+                data.playerInfo.headYaw = packet.getPlayer().getLocation().getYaw();
+                data.playerInfo.headPitch = packet.getPlayer().getLocation().getPitch();
                 break;
             }
             case Packet.Server.KEEP_ALIVE: {

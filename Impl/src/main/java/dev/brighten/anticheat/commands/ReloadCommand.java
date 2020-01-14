@@ -14,7 +14,7 @@ public class ReloadCommand {
         cmd.getSender().sendMessage(Color.Red + "Reloading Kauri...");
         Kauri.INSTANCE.reloadConfig();
         cmd.getSender().sendMessage(Color.Gray + "- Reloaded config.");
-        Kauri.INSTANCE.unload();
+        Kauri.INSTANCE.unload(true);
         cmd.getSender().sendMessage(Color.Gray + "- Unloaded Kauri.");
         Kauri.INSTANCE.load();
         cmd.getSender().sendMessage(Color.Gray + "- Loaded Kauri.");

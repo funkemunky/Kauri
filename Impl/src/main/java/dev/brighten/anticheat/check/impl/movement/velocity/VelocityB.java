@@ -127,7 +127,7 @@ public class VelocityB extends Check {
                             if ((vl+= strafe == 0 && forward > 0 ? 1 : 0.5)
                                     > (data.lagInfo.transPing > 150 ? 22 : 15)) flag("pct=" + MathUtils.round(pct, 3) + "%");
                         }
-                    } else vl -= vl > 0 ? data.lagInfo.lagging || data.lagInfo.transPing > 150 ? 0.25f : 0.1f : 0;
+                    } else vl -= vl > 0 ? data.lagInfo.lagging || data.lagInfo.transPing > 150 ? 0.5f : 0.2f : 0;
 
                     debug("pct=" + pct + " key=" + data.predictionService.key + " ani="
                             + usingItem + " sprint=" + data.playerInfo.sprinting

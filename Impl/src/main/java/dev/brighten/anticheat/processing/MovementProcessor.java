@@ -4,6 +4,7 @@ import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.reflection.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.*;
+import cc.funkemunky.api.utils.objects.VariableValue;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
@@ -20,14 +21,13 @@ import java.math.RoundingMode;
 public class MovementProcessor {
     private final ObjectData data;
 
-    public EvictingList<Float> yawGcdList = new EvictingList<>(50);
+    public EvictingList<Double> yawGcdList = new EvictingList<>(50), pitchGcdList = new EvictingList<>(50);
     public long deltaX, deltaY, lastDeltaX, lastDeltaY;
-    public float sensitivityX, sensitivityY, yawMode, pitchMode;
-    public EvictingList<Float> pitchGcdList = new EvictingList<>(50);
+    public double sensitivityX, sensitivityY, yawMode, pitchMode;
     public TickTimer lastEquals = new TickTimer(6);
     private TickTimer lastReset = new TickTimer(1);
 
-    public static float offset = 100000073L;
+    public static double offset = Math.pow(2, 24);
 
     public void process(WrappedInFlyingPacket packet, long timeStamp) {
         //We check if it's null and intialize the from and to as equal to prevent large deltas causing false positives since there
@@ -87,9 +87,10 @@ public class MovementProcessor {
         data.playerInfo.worldLoaded = Atlas.getInstance().getBlockBoxManager().getBlockBox()
                 .isChunkLoaded(data.playerInfo.to.toLocation(data.getPlayer().getWorld()));
 
-        data.lagInfo.lagging = data.lagInfo.lastPacketDrop.hasNotPassed(3)
+        data.lagInfo.lagging = data.lagInfo.lagTicks.subtract() > 0
                 || !data.playerInfo.worldLoaded
-                || Kauri.INSTANCE.lastTickLag.hasNotPassed(20);
+                || timeStamp - Kauri.INSTANCE.lastTick >
+                new VariableValue<>(110, 60, () -> Kauri.INSTANCE.isPaper).get();
 
         //We set the yaw and pitch like this to prevent inaccurate data input. Like above, it will return both pitch
         //and yaw as 0 if it isnt a look packet.
@@ -97,9 +98,9 @@ public class MovementProcessor {
             data.playerInfo.to.yaw = packet.getYaw();
             data.playerInfo.to.pitch = packet.getPitch();
 
-            float yawGcd = MiscUtils.gcd((long)(MathUtils.yawTo180F(data.playerInfo.deltaYaw) * offset),
+            double yawGcd = MiscUtils.gcd((long)(MathUtils.yawTo180F(data.playerInfo.deltaYaw) * offset),
                     (long)(MathUtils.yawTo180F(data.playerInfo.lDeltaYaw) * offset)) / offset;
-            float pitchGcd = MiscUtils.gcd((long)Math.abs(data.playerInfo.deltaPitch * offset),
+            double pitchGcd = MiscUtils.gcd((long)Math.abs(data.playerInfo.deltaPitch * offset),
                     (long)Math.abs(data.playerInfo.lDeltaPitch * offset)) / offset;
 
             //Adding gcd of yaw and pitch.
@@ -118,8 +119,8 @@ public class MovementProcessor {
 
                 lastDeltaX = deltaX;
                 lastDeltaY = deltaY;
-                deltaX = getDeltaX(data.playerInfo.deltaYaw, yawMode);
-                deltaY = getDeltaY(data.playerInfo.deltaPitch, pitchMode);
+                deltaX = getDeltaX(data.playerInfo.deltaYaw, (float)yawMode);
+                deltaY = getDeltaY(data.playerInfo.deltaPitch, (float)pitchMode);
                 sensitivityX = getSensitivityFromYawGCD(yawMode);
                 sensitivityY = getSensitivityFromPitchGCD(pitchMode);
 
@@ -206,8 +207,8 @@ public class MovementProcessor {
         if (packet.isLook()) {
             data.playerInfo.lCinematicYaw = data.playerInfo.cinematicYaw;
             data.playerInfo.lCinematicPitch = data.playerInfo.cinematicPitch;
-            data.playerInfo.cinematicYaw = findClosestCinematicYaw(data, data.playerInfo.to.yaw, data.playerInfo.from.yaw);
-            data.playerInfo.cinematicPitch = findClosestCinematicPitch(data, data.playerInfo.to.pitch, data.playerInfo.from.pitch);
+            data.playerInfo.cinematicYaw = findClosestCinematicYaw(data, data.playerInfo.from.yaw);
+            data.playerInfo.cinematicPitch = findClosestCinematicPitch(data, data.playerInfo.from.pitch);
 
             data.playerInfo.cDeltaYaw = MathUtils.getAngleDelta(data.playerInfo.cinematicYaw, data.playerInfo.lCinematicYaw);
             data.playerInfo.cDeltaPitch = MathUtils.getAngleDelta(data.playerInfo.cinematicPitch, data.playerInfo.lCinematicPitch);
@@ -347,85 +348,85 @@ public class MovementProcessor {
 
     /* Cinematic Yaw Methods */
 
-    private float findClosestCinematicYaw(ObjectData data, float yaw, float lastYaw) {
-        float value = sensitivityX;
+    private float findClosestCinematicYaw(ObjectData data, float lastYaw) {
+        double value = sensitivityX;
 
-        float f = value * 0.6f + .2f;
-        float f1 = (f * f * f) * 8f;
-        return data.playerInfo.yawSmooth.smooth(lastYaw, 0.05f * f1);
+        double f = value * 0.6f + .2f;
+        double f1 = (f * f * f) * 8f;
+        return data.playerInfo.yawSmooth.smooth(lastYaw, 0.05f * (float)f1);
     }
 
-    private float findClosestCinematicPitch(ObjectData data, float pitch, float lastPitch) {
-        float value = sensitivityY;
+    private float findClosestCinematicPitch(ObjectData data, float lastPitch) {
+        double value = sensitivityY;
 
-        float f = value * 0.6f + .2f;
-        float f1 = (f * f * f) * 8f;
-        return data.playerInfo.pitchSmooth.smooth(lastPitch, 0.05f * f1);
+        double f = value * 0.6f + .2f;
+        double f1 = (f * f * f) * 8f;
+        return data.playerInfo.pitchSmooth.smooth(lastPitch, 0.05f * (float)f1);
     }
 
-    private static int getDeltaX(float yawDelta, float gcd) {
-        float f2 = yawToF2(yawDelta);
+    private static int getDeltaX(double yawDelta, double gcd) {
+        double f2 = yawToF2(yawDelta);
 
         return MathUtils.floor(f2 / getF1FromYaw(gcd));
     }
 
-    private static int getDeltaY(float pitchDelta, float gcd) {
-        float f3 = pitchToF3(pitchDelta);
+    private static int getDeltaY(double pitchDelta, double gcd) {
+        double f3 = pitchToF3(pitchDelta);
 
         return MathUtils.floor(f3 / getF1FromPitch(gcd));
     }
 
-    public static int sensToPercent(float sensitivity) {
+    public static int sensToPercent(double sensitivity) {
         return (int) MathUtils.round(
                 sensitivity / .5f * 100, 0,
                 RoundingMode.HALF_UP);
     }
 
     //TODO Condense. This is just for easy reading until I test everything.
-    private static float getSensitivityFromYawGCD(float gcd) {
-        float stepOne = yawToF2(gcd) / 8;
-        float stepTwo = (float)Math.cbrt(stepOne);
-        float stepThree = stepTwo - .2f;
+    private static double getSensitivityFromYawGCD(double gcd) {
+        double stepOne = yawToF2(gcd) / 8;
+        double stepTwo = Math.cbrt(stepOne);
+        double stepThree = stepTwo - .2f;
         return stepThree / .6f;
     }
 
     //TODO Condense. This is just for easy reading until I test everything.
-    private static float getSensitivityFromPitchGCD(float gcd) {
-        float stepOne = pitchToF3(gcd) / 8;
-        float stepTwo = (float)Math.cbrt(stepOne);
-        float stepThree = stepTwo - .2f;
+    private static double getSensitivityFromPitchGCD(double gcd) {
+        double stepOne = pitchToF3(gcd) / 8;
+        double stepTwo = Math.cbrt(stepOne);
+        double stepThree = stepTwo - .2f;
         return stepThree / .6f;
     }
 
-    private static float getF1FromYaw(float gcd) {
-        float f = getFFromYaw(gcd);
+    private static double getF1FromYaw(double gcd) {
+        double f = getFFromYaw(gcd);
+
+        return Math.pow(f, 3) * 8;
+    }
+
+    private static double getFFromYaw(double gcd) {
+        double sens = getSensitivityFromYawGCD(gcd);
+        return sens * .6f + .2;
+    }
+
+    private static double getFFromPitch(double gcd) {
+        double sens = getSensitivityFromPitchGCD(gcd);
+        return sens * .6f + .2;
+    }
+
+    private static double getF1FromPitch(double gcd) {
+        double f = getFFromPitch(gcd);
 
         return (float)Math.pow(f, 3) * 8;
     }
 
-    private static float getFFromYaw(float gcd) {
-        float sens = getSensitivityFromYawGCD(gcd);
-        return sens * .6f + .2f;
+    private static double yawToF2(double yawDelta) {
+        return yawDelta / .15;
     }
 
-    private static float getFFromPitch(float gcd) {
-        float sens = getSensitivityFromPitchGCD(gcd);
-        return sens * .6f + .2f;
-    }
-
-    private static float getF1FromPitch(float gcd) {
-        float f = getFFromPitch(gcd);
-
-        return (float)Math.pow(f, 3) * 8;
-    }
-
-    private static float yawToF2(float yawDelta) {
-        return yawDelta / .15f;
-    }
-
-    private static float pitchToF3(float pitchDelta) {
+    private static double pitchToF3(double pitchDelta) {
         int b0 = pitchDelta >= 0 ? 1 : -1; //Checking for inverted mouse.
-        return pitchDelta / .15f / b0;
+        return pitchDelta / .15 / b0;
     }
 
 }
