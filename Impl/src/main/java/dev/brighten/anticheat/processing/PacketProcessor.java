@@ -11,6 +11,7 @@ import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.Materials;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.RunUtils;
+import cc.funkemunky.api.utils.objects.VariableValue;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
@@ -79,6 +80,9 @@ public class    PacketProcessor {
                 }
 
                 if(timeStamp - data.creation > 10000L
+                        && Kauri.INSTANCE.lastTickLag.hasPassed(20)
+                        && timeStamp - Kauri.INSTANCE.lastTick < new VariableValue<>(
+                                110L, 60L, () -> Kauri.INSTANCE.isPaper).get()
                         && timeStamp - data.lagInfo.lastTrans > 5000L)
                     RunUtils.task(() -> data.getPlayer().kickPlayer("Lag?"));
 
@@ -158,10 +162,12 @@ public class    PacketProcessor {
 
                 long time = packet.getTime();
 
-                data.lagInfo.lastPing = data.lagInfo.ping;
-                data.lagInfo.ping = System.currentTimeMillis() - data.lagInfo.lastKeepAlive;
+                if(time != 100) {
+                    data.lagInfo.lastPing = data.lagInfo.ping;
+                    data.lagInfo.ping = System.currentTimeMillis() - data.lagInfo.lastKeepAlive;
 
-                data.checkManager.runPacket(packet, timeStamp);
+                    data.checkManager.runPacket(packet, timeStamp);
+                }
                 break;
             }
             case Packet.Client.TRANSACTION: {
@@ -247,12 +253,13 @@ public class    PacketProcessor {
                 WrappedOutVelocityPacket packet = new WrappedOutVelocityPacket(object, data.getPlayer());
 
                 if(packet.getId() == data.getPlayer().getEntityId()) {
-                    TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutTransaction(0, (short)101, false).getObject());
+                    TinyProtocolHandler.sendPacket(data.getPlayer(),
+                            new WrappedOutTransaction(0, (short)101, false).getObject());
                     data.playerInfo.velocityX = (float) packet.getX();
                     data.playerInfo.velocityY = (float) packet.getY();
                     data.playerInfo.velocityZ = (float) packet.getZ();
                     data.playerInfo.lastVelocity.reset();
-                    data.playerInfo.lastVelocityTimestamp = timeStamp;
+                    data.playerInfo.lastVelocityTimestamp = timeStamp + data.lagInfo.transPing;
                 }
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
@@ -287,6 +294,7 @@ public class    PacketProcessor {
                 data.playerInfo.posLocs.add(new KLocation(packet.getX(), packet.getY(), packet.getZ(), packet.getYaw(), packet.getPitch()));
                 data.checkManager.runPacket(packet, timeStamp);
                 TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutKeepAlivePacket(100).getObject());
+                data.playerInfo.lastServerPos = timeStamp;
                 break;
             }
         }

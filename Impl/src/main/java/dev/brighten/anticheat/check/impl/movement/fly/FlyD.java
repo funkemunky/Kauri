@@ -19,7 +19,6 @@ public class FlyD extends Check {
                     && !data.playerInfo.lClientGround
                     && !data.playerInfo.flightCancel
                     && !data.playerInfo.clientGround
-
                     && !data.playerInfo.serverGround) {
                 vl++;
                 if(vl > 1 || !data.playerInfo.nearGround) {

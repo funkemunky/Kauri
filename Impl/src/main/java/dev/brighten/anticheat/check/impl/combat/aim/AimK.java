@@ -1,48 +1,45 @@
 package dev.brighten.anticheat.check.impl.combat.aim;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.utils.EvictingList;
+import dev.brighten.anticheat.utils.GraphUtil;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "Aim (K)", description = "Elevated's vape aimassist check.", checkType = CheckType.AIM,
-        punishVL = 200)
+@CheckInfo(name = "Aim (K)", description = "Graphical aim-check", checkType = CheckType.AIM)
 public class AimK extends Check {
 
-    private float lastYawDelta, lastPitchDelta, lastYawDifference, lastPitchDifference;
-    private int verbose;
+    private final EvictingList<Float> pitchSamples = new EvictingList<>(10), yawSamples = new EvictingList<>(10);
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if(!packet.isLook()) return;
+        if (packet.isLook() && !data.playerInfo.serverPos) {
+            float yawDelta = data.playerInfo.deltaYaw;
+            float pitchDelta = data.playerInfo.deltaPitch;
 
-        float outYaw = data.playerInfo.headYaw,
-                outPitch = data.playerInfo.headPitch;
+            if (yawDelta > 0.0 && pitchDelta > 0.0) {
+                this.pitchSamples.add(pitchDelta);
+                this.yawSamples.add(yawDelta);
 
-        float yawDelta = MathUtils.getAngleDelta(data.playerInfo.from.yaw, outYaw),
-                pitchDelta = MathUtils.getAngleDelta(data.playerInfo.from.pitch, outPitch);
+                GraphUtil.GraphResult pitchGraph = GraphUtil.getGraph(pitchSamples);
+                GraphUtil.GraphResult yawGraph = GraphUtil.getGraph(yawSamples);
 
-        float yawDifference = Math.abs(lastYawDelta - yawDelta),
-                pitchDifference = Math.abs(lastPitchDelta - pitchDelta);
+                if (pitchGraph.getPositives() == 0.0 || pitchGraph.getNegatives() == 0.0) {
+                    return;
+                }
 
-        if (yawDifference > 2.0f && pitchDifference == lastPitchDifference
-                && pitchDifference == 0
-                && yawDifference == lastYawDifference) {
-            if ((verbose += 20) > 22) {
-                vl++;
-                flag("y=%1 vb=%2", yawDifference, verbose);
+                double ratioPitch = (double) (pitchGraph.getNegatives() / pitchGraph.getPositives());
+                double ratioYaw = (double) (yawGraph.getNegatives() / yawGraph.getPositives());
+
+                if (ratioPitch == 0.0 || ratioYaw == 0.0) {
+                    vl++;
+                    this.flag("0 - 0");
+                }
+
+                debug("pitch=%1 yaw=%2", ratioPitch, ratioYaw);
             }
-        } else {
-            verbose = Math.max(verbose - 1, 0);
         }
-
-        lastYawDelta = yawDelta;
-        lastPitchDelta = pitchDelta;
-        lastYawDifference = yawDifference;
-        lastPitchDifference = pitchDifference;
-
-        debug("y=%1 p%2 vl=%3", yawDifference, pitchDifference, verbose);
     }
 }

@@ -53,13 +53,12 @@ public class PlayerInformation {
             lastTargetSwitch = new TickTimer(3),
             lastBlockPlace = new TickTimer(10),
             lastToggleFlight = new TickTimer(10),
-            lastLoadedPacketSend = new TickTimer(100);
-    public boolean loadedPacketReceived = true;
+            lastWorldUnload = new TickTimer(20);
     public long lastToggleFlightStamp;
 
     public float velocityX, velocityY, velocityZ;
     public float mvx, mvy, mvz;
-    public boolean takingVelocity, sentpostofalse;
+    public boolean takingVelocity;
 
     public KLocation from = new KLocation(0,0,0), to = new KLocation(0,0,0);
 }

@@ -58,9 +58,14 @@ public class MovementProcessor {
 
         if(data.playerInfo.posLocs.size() > 0) {
             val optional = data.playerInfo.posLocs.stream()
-                    .filter(loc -> loc.toVector().setY(0)
-                            .distance(data.playerInfo.to.toVector().setY(0)) <= 1E-5
-                            && MathUtils.getDelta(loc.y, data.playerInfo.to.y) < 1)
+                    .filter(loc -> {
+                        MiscUtils.testMessage(data.getPlayer().getName() + ": " + loc.toVector().setY(0)
+                                .distance(data.playerInfo.to.toVector().setY(0)) + ", "
+                                + MathUtils.getDelta(loc.y, data.playerInfo.to.y) );
+                        return loc.toVector().setY(0)
+                                .distance(data.playerInfo.to.toVector().setY(0)) <= 1E-5
+                                && MathUtils.getDelta(loc.y, data.playerInfo.to.y) < 1;
+                    })
                     .findFirst();
 
             if(optional.isPresent()) {
@@ -84,8 +89,9 @@ public class MovementProcessor {
 
         data.playerInfo.lworldLoaded = data.playerInfo.worldLoaded;
 
-        data.playerInfo.worldLoaded = Atlas.getInstance().getBlockBoxManager().getBlockBox()
-                .isChunkLoaded(data.playerInfo.to.toLocation(data.getPlayer().getWorld()));
+        if(!(data.playerInfo.worldLoaded = Atlas.getInstance().getBlockBoxManager().getBlockBox()
+                .isChunkLoaded(data.playerInfo.to.toLocation(data.getPlayer().getWorld()))))
+            data.playerInfo.lastWorldUnload.reset();
 
         data.lagInfo.lagging = data.lagInfo.lagTicks.subtract() > 0
                 || !data.playerInfo.worldLoaded
@@ -317,6 +323,7 @@ public class MovementProcessor {
                 || hasLevi
                 || data.playerInfo.inVehicle
                 || data.playerInfo.webTicks.value() > 0
+                || data.playerInfo.lastWorldUnload.hasNotPassed(10)
                 || !data.playerInfo.worldLoaded
                 || (data.playerInfo.blockOnTo != null && BlockUtils.isSolid(data.playerInfo.blockOnTo))
                 || data.playerInfo.riptiding
@@ -333,6 +340,7 @@ public class MovementProcessor {
                 || data.playerInfo.riptiding
                 || data.playerInfo.gliding
                 || data.playerInfo.inVehicle
+                || data.playerInfo.lastWorldUnload.hasNotPassed(10)
                 || !data.playerInfo.worldLoaded
                 || data.playerInfo.lastToggleFlight.hasNotPassed(40)
                 || timeStamp - data.creation < 2000
