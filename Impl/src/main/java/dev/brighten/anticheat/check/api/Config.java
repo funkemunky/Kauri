@@ -43,4 +43,7 @@ public class Config {
 
     @ConfigSetting(path = "alerts", name = "dev", comment = "Alert for experimental checks.")
     public static boolean alertDev = true;
+
+    @ConfigSetting(name = "bypassPerm")
+    public static boolean bypassPermission = true;
 }

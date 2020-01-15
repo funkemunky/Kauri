@@ -12,6 +12,7 @@ public @interface CheckInfo {
     String description() default "No description provided.";
     boolean enabled() default true;
     boolean executable() default true;
+    boolean cancellable() default false;
     boolean developer() default false;
     int punishVL() default -1;
     int vlToFlag() default -1;

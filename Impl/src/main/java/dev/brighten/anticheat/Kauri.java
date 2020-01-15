@@ -93,7 +93,7 @@ public class Kauri extends JavaPlugin {
 
     public void load() {
         MiscUtils.printToConsole(Color.Gray + "Starting thread pool...");
-        executor = Executors.newFixedThreadPool(3);
+        executor = Executors.newFixedThreadPool(4);
 
         MiscUtils.printToConsole(Color.Gray + "Loading config...");
         saveDefaultConfig();

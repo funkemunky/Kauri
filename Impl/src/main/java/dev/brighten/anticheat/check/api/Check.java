@@ -55,7 +55,7 @@ public class Check implements KauriCheck {
     public String name, description;
     @Getter
     @Setter
-    public boolean enabled, executable;
+    public boolean enabled, executable, cancellable;
     @Getter
     public boolean developer;
     @Getter
@@ -64,6 +64,8 @@ public class Check implements KauriCheck {
     public ProtocolVersion minVersion, maxVersion;
     @Getter
     public CheckType checkType;
+
+    public CancelType cancelMode;
 
     private boolean exempt, banned;
     private TickTimer lastExemptCheck = new TickTimer(20);
@@ -80,19 +82,26 @@ public class Check implements KauriCheck {
         MiscUtils.printToConsole("Registered: " + info.name());
         WrappedClass checkClass = new WrappedClass(check.getClass());
         String name = info.name();
-        CheckSettings settings = new CheckSettings(info.name(), info.description(), info.checkType(),
+
+        CancelType type = null;
+        if(check.getClass().isAnnotationPresent(Cancellable.class))
+            type = check.getClass().getAnnotation(Cancellable.class).cancelType();
+        CheckSettings settings = new CheckSettings(info.name(), info.description(), info.checkType(), type,
                 info.punishVL(), info.vlToFlag(), info.minVersion(), info.maxVersion());
 
         if(Kauri.INSTANCE.getConfig().get("checks." + name + ".enabled") != null) {
             settings.enabled = Kauri.INSTANCE.getConfig().getBoolean("checks." + name + ".enabled");
             settings.executable = Kauri.INSTANCE.getConfig().getBoolean("checks." + name + ".executable");
+            settings.cancellable = Kauri.INSTANCE.getConfig().getBoolean("checks." + name + ".cancellable");
         } else {
             Kauri.INSTANCE.getConfig().set("checks." + name + ".enabled", info.enabled());
             Kauri.INSTANCE.getConfig().set("checks." + name + ".executable", info.executable());
+            Kauri.INSTANCE.getConfig().set("checks." + name + ".cancellable", info.cancellable());
             Kauri.INSTANCE.saveConfig();
 
             settings.enabled = info.enabled();
             settings.executable = info.executable();
+            settings.cancellable = info.cancellable();
         }
 
         checkSettings.put(checkClass, settings);
@@ -111,6 +120,8 @@ public class Check implements KauriCheck {
         KauriFlagEvent event = new KauriFlagEvent(data.getPlayer(), this, finalInformation);
 
         event.setCancelled(!Config.alertDev);
+
+        if(cancellable && cancelMode != null) data.typesToCancel.add(cancelMode);
 
         Atlas.getInstance().getEventManager().callEvent(event);
         Kauri.INSTANCE.executor.execute(() -> {
@@ -207,7 +218,8 @@ public class Check implements KauriCheck {
         String finalInformation = information;
         Kauri.INSTANCE.dataManager.debugging.stream()
                 .filter(data -> data.debugged.equals(this.data.uuid) && data.debugging.equalsIgnoreCase(name))
-                .forEach(data -> data.getPlayer().sendMessage(Color.translate("&8[&c&lDEBUG&8] &7" + finalInformation)));
+                .forEach(data -> data.getPlayer()
+                        .sendMessage(Color.translate("&8[&c&lDEBUG&8] &7" + finalInformation)));
     }
 
     public static void registerChecks() {

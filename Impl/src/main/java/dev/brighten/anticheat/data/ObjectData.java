@@ -7,12 +7,14 @@ import cc.funkemunky.api.utils.math.RollingAverageLong;
 import cc.funkemunky.api.utils.math.cond.MaxInteger;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
+import dev.brighten.anticheat.check.api.CancelType;
 import dev.brighten.anticheat.data.classes.BlockInformation;
 import dev.brighten.anticheat.data.classes.CheckManager;
 import dev.brighten.anticheat.data.classes.PlayerInformation;
 import dev.brighten.anticheat.data.classes.PredictionService;
 import dev.brighten.anticheat.processing.MovementProcessor;
 import dev.brighten.anticheat.utils.PastLocation;
+import dev.brighten.api.check.CheckType;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -43,6 +45,7 @@ public class ObjectData {
     public int hashCode;
     public ProtocolVersion playerVersion = ProtocolVersion.UNKNOWN;
     public Set<Player> boxDebuggers = new HashSet<>();
+    public List<CancelType> typesToCancel = new ArrayList<>();
 
     public ObjectData(UUID uuid) {
         this.uuid = uuid;

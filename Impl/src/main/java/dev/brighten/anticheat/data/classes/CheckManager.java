@@ -3,10 +3,7 @@ package dev.brighten.anticheat.data.classes;
 import cc.funkemunky.api.reflections.types.WrappedClass;
 import cc.funkemunky.api.reflections.types.WrappedMethod;
 import cc.funkemunky.api.tinyprotocol.api.NMSObject;
-import dev.brighten.anticheat.check.api.Check;
-import dev.brighten.anticheat.check.api.CheckInfo;
-import dev.brighten.anticheat.check.api.CheckSettings;
-import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.data.ObjectData;
 import lombok.val;
 import org.bukkit.event.Event;
@@ -73,7 +70,7 @@ public class CheckManager {
     }
 
     public void addChecks() {
-        if(objectData.getPlayer().hasPermission("kauri.bypass")) return;
+        if(objectData.getPlayer().hasPermission("kauri.bypass") && Config.bypassPermission) return;
         Check.checkClasses.keySet().parallelStream()
                 .map(clazz -> {
                     CheckInfo settings = Check.checkClasses.get(clazz);
@@ -82,6 +79,8 @@ public class CheckManager {
                     CheckSettings checkSettings = Check.checkSettings.get(clazz);
                     check.enabled = checkSettings.enabled;
                     check.executable = checkSettings.executable;
+                    check.cancellable = checkSettings.cancellable;
+                    check.cancelMode = checkSettings.cancelMode;
                     check.developer = settings.developer();
                     check.name = settings.name();
                     check.description = settings.description();
