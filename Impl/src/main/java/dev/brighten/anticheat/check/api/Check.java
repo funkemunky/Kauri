@@ -94,6 +94,7 @@ public class Check implements KauriCheck {
             settings.enabled = info.enabled();
             settings.executable = info.executable();
         }
+
         checkSettings.put(checkClass, settings);
         checkClasses.put(checkClass, info);
     }
@@ -217,6 +218,7 @@ public class Check implements KauriCheck {
         register(new AutoclickerE());
         register(new AutoclickerF());
         register(new AutoclickerG());
+        register(new AutoclickerH());
         register(new FlyA());
         register(new FlyB());
         register(new FlyC());
