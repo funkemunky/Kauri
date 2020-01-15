@@ -65,7 +65,7 @@ public class Check implements KauriCheck {
     @Getter
     public CheckType checkType;
 
-    private boolean exempt, ;
+    private boolean exempt, banned;
     private TickTimer lastExemptCheck = new TickTimer(20);
 
     private TickTimer lastAlert = new TickTimer(MathUtils.millisToTicks(Config.alertsDelay));
@@ -170,8 +170,10 @@ public class Check implements KauriCheck {
         if(developer || !executable || punishVl == -1 || vl <= punishVl
                 || System.currentTimeMillis() - Kauri.INSTANCE.lastTick > 200L) return;
 
+        banned = true;
+
         Kauri.INSTANCE.loggerManager.addPunishment(data, this);
-        if(!Config.bungeePunishments) {
+        if(!banned && !Config.bungeePunishments) {
             RunUtils.task(() -> {
                 if(!Config.broadcastMessage.equalsIgnoreCase("off")) {
                     Bukkit.broadcastMessage(Color.translate(Config.broadcastMessage
