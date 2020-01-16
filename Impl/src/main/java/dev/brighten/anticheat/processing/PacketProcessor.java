@@ -18,10 +18,13 @@ import dev.brighten.anticheat.data.ObjectData;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-public class    PacketProcessor {
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+public class PacketProcessor {
 
     public void processClient(PacketReceiveEvent event, ObjectData data, Object object, String type, long timeStamp) {
-       Kauri.INSTANCE.executor.execute(() -> {
+       Kauri.INSTANCE.dataProcessor.runTask(() -> {
            Kauri.INSTANCE.profiler.start("packet:client:" + getType(type));
            switch(type) {
                case Packet.Client.ABILITIES: {
@@ -227,7 +230,7 @@ public class    PacketProcessor {
     }
 
     public void processServer(PacketSendEvent event, ObjectData data, Object object, String type, long timeStamp) {
-       Kauri.INSTANCE.executor.execute(() -> {
+       Kauri.INSTANCE.dataProcessor.runTask(() -> {
            Kauri.INSTANCE.profiler.start("packet:server:" + type);
            switch(type) {
                case Packet.Server.ABILITIES: {

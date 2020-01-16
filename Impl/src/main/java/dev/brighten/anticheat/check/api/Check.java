@@ -23,6 +23,7 @@ import dev.brighten.anticheat.check.impl.movement.nofall.NoFallA;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallB;
 import dev.brighten.anticheat.check.impl.movement.speed.SpeedA;
 import dev.brighten.anticheat.check.impl.movement.speed.SpeedB;
+import dev.brighten.anticheat.check.impl.movement.speed.SpeedC;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityA;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityB;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityC;
@@ -255,7 +256,7 @@ public class Check implements KauriCheck {
         register(new AimK());
         register(new SpeedA());
         register(new SpeedB());
-        register(new SpeedB());
+        register(new SpeedC());
         register(new Timer());
         register(new BadPacketsA());
         register(new BadPacketsB());

@@ -16,7 +16,7 @@ import org.bukkit.enchantments.Enchantment;
 public class VelocityB extends Check {
 
     private double vX, vZ, svX, svZ;
-    private boolean useEntity, usingItem;
+    private boolean useEntity;
     private float forward, strafe;
     private String lastKey;
     private long velocityTS;
@@ -37,7 +37,6 @@ public class VelocityB extends Check {
                 && packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) {
             useEntity = true;
         }
-        if(usingItem) usingItem = false;
     }
 
     @Packet
@@ -47,26 +46,6 @@ public class VelocityB extends Check {
             vX = svX;
             vZ = svZ;
         }
-    }
-
-    @Packet
-    public void onBlockPlace(WrappedInBlockPlacePacket packet) {
-        if(packet.getPosition().getX() == -1
-                && packet.getPosition().getZ() == -1
-                && packet.getItemStack() != null) {
-            usingItem = true;
-        }
-        /*debug("place: " + packet.getPosition().getX() + ", "
-                + packet.getPosition().getY() + ", " + packet.getPosition().getZ() + ", "
-                + (packet.getItemStack() != null));*/
-    }
-
-    @Packet
-    public void onPlace(WrappedInBlockDigPacket packet) {
-        if(usingItem) usingItem = false;
-        /*debug("dig: " + packet.getPosition().getX() + ", "
-                + packet.getPosition().getY() + ", " + packet.getPosition().getZ()
-                + " action=" + packet.getAction().name());*/
     }
 
     @Packet
@@ -108,7 +87,7 @@ public class VelocityB extends Check {
                     forward = data.predictionService.moveForward;
                     strafe = data.predictionService.moveStrafing;
 
-                    if(usingItem) {
+                    if(data.playerInfo.usingItem) {
                         forward*= 0.2f;
                         strafe*= 0.2f;
                     }
@@ -130,7 +109,7 @@ public class VelocityB extends Check {
                     } else vl -= vl > 0 ? data.lagInfo.lagging || data.lagInfo.transPing > 150 ? 0.5f : 0.2f : 0;
 
                     debug("pct=" + pct + " key=" + data.predictionService.key + " ani="
-                            + usingItem + " sprint=" + data.playerInfo.sprinting
+                            + data.playerInfo.usingItem + " sprint=" + data.playerInfo.sprinting
                             + " ground=" + data.playerInfo.lClientGround + ", " + data.playerInfo.clientGround
                             + " vl=" + vl);
 

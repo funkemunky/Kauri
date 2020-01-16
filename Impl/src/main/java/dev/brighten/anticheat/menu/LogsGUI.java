@@ -199,7 +199,8 @@ public class LogsGUI extends ChestMenu {
                                             list.stream()
                                                     .max(Comparator.comparing(log -> log.vl))
                                                     .map(log -> log.vl).orElse(0f),
-                                    "&7Type: &f" + Check.getCheckSettings(check).type.name(),
+                                    "&7Type: &f" + (Check.getCheckInfo(check) != null
+                                            ? Check.getCheckInfo(check).checkType().name() : "UNKNOWN"),
                                     "",
                                     "&f&oLeft-Click &7&oto add check to vl filter.",
                                     "&f&oRight-Click &7&oto remove check from vl filter.").build(),

@@ -41,13 +41,14 @@ public class AimJ extends Check {
                 && data.playerInfo.lDeltaYaw <= data.playerInfo.deltaYaw
                 && yawDif != 0
                 && yawDif < 3
-                && angle > 9000
+                && angle > 10000
         )
         {
 
             if (current > gcdLog.length) {
                 long maxDeviation = 0;
-                for (long l : gcdLog) if (deviation != 0 && l != 0) maxDeviation = Math.max(Math.max(l, deviation) % Math.min(l, deviation), maxDeviation);
+                for (long l : gcdLog) if (deviation != 0 && l != 0)
+                    maxDeviation = Math.max(Math.max(l, deviation) % Math.min(l, deviation), maxDeviation);
             }
             if (deviation > 0) {
                 if(verbose.add() > 2) {

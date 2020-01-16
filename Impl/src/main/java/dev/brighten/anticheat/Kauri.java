@@ -12,6 +12,7 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.Config;
 import dev.brighten.anticheat.data.DataManager;
 import dev.brighten.anticheat.logs.LoggerManager;
+import dev.brighten.anticheat.processing.DataProcessor;
 import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.processing.PacketProcessor;
 import dev.brighten.api.KauriAPI;
@@ -44,6 +45,7 @@ public class Kauri extends JavaPlugin {
     public TickTimer lastEnabled;
 
     public MessageHandler msgHandler;
+    public DataProcessor dataProcessor;
     public KauriAPI kauriAPI;
     public boolean isPaper;
 
@@ -86,6 +88,8 @@ public class Kauri extends JavaPlugin {
         Check.checkSettings.clear();
         profiler.enabled = false;
         profiler = null;
+        dataProcessor.shutdown();
+        dataProcessor = null;
         packetProcessor = null;
         loggerManager = null;
         executor.shutdown(); //Shutting down threads.
@@ -119,6 +123,7 @@ public class Kauri extends JavaPlugin {
         kauriAPI = new KauriAPI();
 
         MiscUtils.printToConsole(Color.Gray + "Registering processors...");
+        dataProcessor = new DataProcessor();
         packetProcessor = new PacketProcessor();
         dataManager = new DataManager();
         loggerManager = new LoggerManager(true);

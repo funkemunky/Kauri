@@ -72,7 +72,7 @@ public class Hitboxes extends Check {
                         double dist = point.distance(ray.getOrigin().toVector());
 
                         distance.set(Math.min(dist, distance.get()));
-                        return dist < 3.4f;
+                        return dist < 3.3f;
                     }
                     return false;
                 }).count();

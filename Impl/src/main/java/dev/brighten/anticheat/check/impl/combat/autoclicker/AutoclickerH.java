@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.check.impl.combat.autoclicker;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
+import cc.funkemunky.api.utils.math.cond.MaxInteger;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -15,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
         checkType = CheckType.AUTOCLICKER, punishVL = 10)
 public class AutoclickerH extends Check {
 
-    private int vl;
+    private MaxInteger verbose = new MaxInteger(100);
 
     private final EvictingList<Long> delays = new EvictingList<>(10);
     private final Deque<Integer> ratioDeque = new LinkedList<>();
@@ -45,16 +46,15 @@ public class AutoclickerH extends Check {
                         .forEach(i -> level.incrementAndGet());
 
                 if (level.get() == 50) {
-                    vl += 5;
+                    verbose.add(5);
 
-                    if (vl >= 10) {
-                        this.flag(level.get() + "lvl");
+                    if (verbose.value() >= 10) {
+                        vl++;
+                        flag("lvl=%1", level.get());
                     }
-                } else {
-                    vl = Math.max(vl - 2, 0);
-                }
+                } else verbose.subtract(2);
 
-                debug("size=%1", level.get());
+                debug("size=%1 verbose=%2", level.get(), verbose.value());
                 ratioDeque.clear();
             }
         }
