@@ -29,6 +29,7 @@ public class AutoclickerI extends Check {
                     }
                 } else {
                     verbose = 0;
+                    vl = Math.max(vl - 1, 0);
                 }
 
                 debug("ratio=%1 vl=%2", ratio, verbose);
