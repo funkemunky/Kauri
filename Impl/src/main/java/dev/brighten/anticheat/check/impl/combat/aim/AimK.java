@@ -11,7 +11,7 @@ import dev.brighten.api.check.CheckType;
 @CheckInfo(name = "Aim (K)", description = "Graphical aim-check", checkType = CheckType.AIM)
 public class AimK extends Check {
 
-    private final EvictingList<Float> pitchSamples = new EvictingList<>(10), yawSamples = new EvictingList<>(10);
+    private final EvictingList<Float> pitchSamples = new EvictingList<>(20), yawSamples = new EvictingList<>(20);
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
@@ -33,10 +33,12 @@ public class AimK extends Check {
                 double ratioPitch = (double) (pitchGraph.getNegatives() / pitchGraph.getPositives());
                 double ratioYaw = (double) (yawGraph.getNegatives() / yawGraph.getPositives());
 
-                if (ratioPitch == 0.0 || ratioYaw == 0.0) {
+                if (ratioPitch == 0 || ratioYaw == 0) {
                     vl++;
-                    this.flag("0 - 0");
-                }
+                    if(vl > 7) {
+                        this.flag(ratioPitch + ", " + ratioYaw);
+                    }
+                } else vl-= vl > 0 ? 0.2f : 0;
 
                 debug("pitch=%1 yaw=%2", ratioPitch, ratioYaw);
             }

@@ -26,6 +26,7 @@ public class AimD extends Check {
             if(deltaYaw > 0 || data.moveProcessor.deltaY > 0) {
                 if(deltaYaw > deltaYDiff
                         && deltaYDiff > 0
+                        && data.moveProcessor.deltaX > 4
                         && data.moveProcessor.deltaY <= 3
                         && deltaPDiff > deltaPitch * 2) {
                     if(verbose.add() > 3) {

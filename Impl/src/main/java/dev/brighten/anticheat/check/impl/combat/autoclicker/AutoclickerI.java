@@ -12,7 +12,7 @@ import dev.brighten.api.check.CheckType;
         checkType = CheckType.AUTOCLICKER, punishVL = 10)
 public class AutoclickerI extends Check {
 
-    private int ticks, cps, vl;
+    private int ticks, cps, verbose;
     private final EvictingList<Integer> cpsSamples = new EvictingList<>(10);
 
     @Packet
@@ -23,12 +23,15 @@ public class AutoclickerI extends Check {
                 double ratio = cpsAverage / cps;
 
                 if (ratio > 0.99) {
-                    if (++vl > 3) {
+                    if (++verbose > 3) {
+                        vl++;
                         this.flag(ratio + "r");
                     }
                 } else {
-                    vl = 0;
+                    verbose = 0;
                 }
+
+                debug("ratio=%1 vl=%2", ratio, verbose);
             }
             this.ticks = 0;
             this.cps = 0;

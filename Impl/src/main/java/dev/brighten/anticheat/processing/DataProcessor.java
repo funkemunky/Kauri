@@ -1,35 +1,40 @@
 package dev.brighten.anticheat.processing;
 
+import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.Tuple;
 
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DataProcessor {
 
-    private final Deque<Tuple<Runnable, Long>> tasks = new LinkedList<>();
-    private final ScheduledExecutorService processorTask = Executors.newSingleThreadScheduledExecutor();
+    private final Deque<Tuple<Runnable, Long>> tasks = new ConcurrentLinkedDeque<>();
+    private final ExecutorService processorTask = Executors.newSingleThreadExecutor();
+    private AtomicBoolean running = new AtomicBoolean(true);
 
     public DataProcessor() {
+        running.set(true);
         runProcessor();
     }
 
     private void runProcessor() {
-        processorTask.scheduleAtFixedRate(() -> {
-            Tuple<Runnable, Long> task;
-            while ((task = tasks.poll()) != null) {
-                task.one.run();
+        processorTask.submit(() -> {
+            if(running.get()) {
+                Tuple<Runnable, Long> task;
+                while ((task = tasks.poll()) != null) {
+                    task.one.run();
+                }
+                runProcessor();
             }
-        }, 500L, 100L, TimeUnit.NANOSECONDS);
+        });
     }
 
     public void shutdown() {
         tasks.clear();
-        processorTask.shutdownNow();
+        running.set(false);
+        processorTask.shutdown();
     }
 
     public void runTask(Runnable runnable) {

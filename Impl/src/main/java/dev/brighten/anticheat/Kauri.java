@@ -89,7 +89,6 @@ public class Kauri extends JavaPlugin {
         profiler.enabled = false;
         profiler = null;
         dataProcessor.shutdown();
-        dataProcessor = null;
         packetProcessor = null;
         loggerManager = null;
         executor.shutdown(); //Shutting down threads.

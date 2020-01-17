@@ -40,8 +40,8 @@ public class AutoclickerD extends Check {
 
                 double errorStd = MathUtils.stdev(errorList);
 
-                if(errorStd < 4 && errorList.size() > 15) {
-                    if(verbose.add(errorStd < 3 ? 6 : 3) > 22) {
+                if(errorStd < 4 && average > 4 && std > 30 && errorList.size() > 15) {
+                    if(verbose.add(errorStd < 3 ? 4 : 2) > 22) {
                         vl++;
                         flag("std=%1 error=%2 avg=%3",
                                 MathUtils.round(errorStd, 3),
