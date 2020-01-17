@@ -17,6 +17,7 @@ import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitTask;
@@ -32,6 +33,7 @@ public class LogsGUI extends ChestMenu {
     private AtomicInteger currentPage = new AtomicInteger(1);
     private OfflinePlayer player;
     private Player shown;
+    private Set<String> filtered = new HashSet<>();
 
     public LogsGUI(OfflinePlayer player) {
         super("Violations", 6);
@@ -59,31 +61,47 @@ public class LogsGUI extends ChestMenu {
     }
 
     private void setButtons(int page) {
-        if(page == 0 || getMenuDimension().getSize() <= 0) return;
+        if (getMenuDimension().getSize() <= 0) return;
 
-        if(updaterTask == null || !Bukkit.getScheduler().isCurrentlyRunning(updaterTask.getTaskId())) {
+        if (updaterTask == null || !Bukkit.getScheduler().isCurrentlyRunning(updaterTask.getTaskId())) {
             runUpdater();
         }
 
-        List<Log> subList = logs.subList(Math.min((page - 1) * 45, logs.size()), Math.min(page * 45, logs.size()));
+        List<Log> filteredLogs = (filtered.size() > 0 ? logs.stream()
+                .filter(log -> {
+                    for (String s : filtered) {
+                        if (s.equalsIgnoreCase(log.checkName)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }).sequential()
+                .sorted(Comparator.comparing(log -> log.timeStamp, Comparator.reverseOrder()))
+                .collect(Collectors.toList()) : logs);
 
-        for (int i = 0; i < subList.size(); i++) {
-            setItem(i, buttonFromLog(subList.get(i)));
+        List<Log> subList = filteredLogs.subList(Math.min((page - 1) * 45, filteredLogs.size()),
+                Math.min(page * 45, filteredLogs.size()));
+        for (int i = 0; i < subList.size(); i++) setItem(i, buttonFromLog(subList.get(i)));
+
+        if(subList.size() < 45) {
+            for(int i = subList.size() ; i < 45 ; i++) {
+                setItem(i, new FillerButton());
+            }
         }
 
         //Setting the next page option if possible.
-        if(Math.min(page * 45, logs.size()) < logs.size()) {
+        if (Math.min(page * 45, filteredLogs.size()) < filteredLogs.size()) {
             Button next = new Button(false, new ItemBuilder(Material.BOOK)
                     .amount(1).name(Color.Red + "Next Page &7(&e" + (page + 1) + "&7)").build(),
                     (player, info) -> {
-                        if(info.getClickType().isLeftClick()) {
+                        if (info.getClickType().isLeftClick()) {
                             setButtons(page + 1);
                             buildInventory(false);
                             currentPage.set(page + 1);
                         }
                     });
             setItem(50, next);
-        }
+        } else setItem(50, new FillerButton());
 
         val punishments = Kauri.INSTANCE.loggerManager.getPunishments(player.getUniqueId());
 
@@ -101,16 +119,16 @@ public class LogsGUI extends ChestMenu {
                                 : "&c&o(No Permission) &e&o&mShift Right Click &7&o&mto &f&o&mclear &7&o&mthe logs of " + player.getName())).build(),
                 (player, info) -> {
                     if (player.hasPermission("kauri.logs.share")) {
-                        if(info.getClickType().isRightClick()) {
+                        if (info.getClickType().isRightClick()) {
                             runFunction(info, "kauri.logs.share", () -> {
                                 close(player);
                                 player.sendMessage(Color.Green + "Logs: "
                                         + LogCommand.getLogsFromUUID(LogsGUI.this.player.getUniqueId()));
                             });
-                        } else if(info.getClickType().isLeftClick() && info.getClickType().isShiftClick()) {
+                        } else if (info.getClickType().isLeftClick() && info.getClickType().isShiftClick()) {
                             runFunction(info, "kauri.logs.clear",
                                     () -> player.performCommand("kauri logs clear " + this.player.getName()));
-                        } else if(info.getClickType().isLeftClick()) {
+                        } else if (info.getClickType().isLeftClick()) {
                             getSummary().showMenu(player);
                         }
                     }
@@ -119,17 +137,39 @@ public class LogsGUI extends ChestMenu {
         setItem(49, getPastebin);
 
         //Setting the previous page option if possible.
-        if(page > 1) {
+        if (page > 1) {
             Button back = new Button(false, new ItemBuilder(Material.BOOK)
                     .amount(1).name(Color.Red + "Previous Page &7(&e" + (page - 1) + "&7)").build(),
                     (player, info) -> {
-                        if(info.getClickType().isLeftClick()) {
+                        if (info.getClickType().isLeftClick()) {
                             setButtons(page - 1);
                             currentPage.set(page - 1);
                             buildInventory(false);
                         }
                     });
             setItem(48, back);
+        } else setItem(48, new FillerButton());
+
+        if(filtered.size() > 0) {
+            List<String> lore = new ArrayList<>(Arrays.asList("", Color.translate("&eFilters:")));
+
+            for (String s : filtered) {
+                lore.add(Color.translate("&7- &f" + s));
+            }
+            Button stopFilter = new Button(false,
+                    new ItemBuilder(Material.REDSTONE).amount(1)
+                            .name(Color.Red + "Stop Filter").lore(lore).build(),
+                    (player, info) -> {
+                       filtered.clear();
+                       setButtons(currentPage.get());
+                       buildInventory(false);
+                    });
+
+            setItem(47, stopFilter);
+            setItem(51, stopFilter);
+        } else {
+            setItem(47, new FillerButton());
+            setItem(51, new FillerButton());
         }
 
         //Setting all empty slots with a filler.
@@ -151,16 +191,80 @@ public class LogsGUI extends ChestMenu {
 
         sortedLogs.forEach((check, list) -> {
             Button button = new Button(false,
-                    new ItemBuilder(Material.PAPER).amount(1).name(Color.Gold + check)
+                    new ItemBuilder(filtered.contains(check) ? Material.EMPTY_MAP : Material.PAPER).amount(1)
+                            .name((filtered.contains(check) ? Color.Red + Color.Italics : Color.Gold)
+                            + check)
                             .lore("", "&7Alerts: &f" + list.size(),
                                     "&7Highest VL: &f" +
                                             list.stream()
                                                     .max(Comparator.comparing(log -> log.vl))
                                                     .map(log -> log.vl).orElse(0f),
-                                    "&7Type: &f" + Check.getCheckSettings(check).type).build());
+                                    "&7Type: &f" + (Check.getCheckInfo(check) != null
+                                            ? Check.getCheckInfo(check).checkType().name() : "UNKNOWN"),
+                                    "",
+                                    "&f&oLeft-Click &7&oto add check to vl filter.",
+                                    "&f&oRight-Click &7&oto remove check from vl filter.").build(),
+                    (player, info) -> {
+                        if(info.getClickType().name().contains("LEFT")) filtered.add(check);
+                        else if(info.getClickType().name().contains("RIGHT")) filtered.remove(check);
+                        else return;
 
+                        setButtons(1);
+                        currentPage.set(1);
+                        buildInventory(false);
+                        info.getButton().setStack((filtered.contains(check)
+                                ? new ItemBuilder(info.getButton().getStack())
+                                        .enchantment(Enchantment.DURABILITY, 1)
+                                : new ItemBuilder(info.getButton().getStack()).clearEnchantments())
+                                .type(filtered.contains(check) ? Material.EMPTY_MAP : Material.PAPER)
+                                .name((filtered.contains(check) ? Color.Red + Color.Italics : Color.Gold) + check)
+                                .build());
+                        List<String> lore = new ArrayList<>(Arrays.asList("", Color.translate("&eFilters:")));
+
+                        for (String s : filtered) {
+                            lore.add(Color.translate("&7- &f" + s));
+                        }
+                        Button stopFilter = new Button(false,
+                                new ItemBuilder(Material.REDSTONE).amount(1)
+                                        .name(Color.Red + "Stop Filter").lore(lore).build(),
+                                (player2, info2) -> {
+                                    filtered.clear();
+                                    setButtons(1);
+                                    buildInventory(false);
+                                    info.getMenu().close(player2);
+                                    getSummary().showMenu(player2);
+                                });
+
+                        info.getMenu().setItem(53, stopFilter);
+                        info.getMenu().buildInventory(false);
+                    });
             summary.addItem(button);
         });
+
+        if(filtered.size() > 0) {
+            List<String> lore = new ArrayList<>(Arrays.asList("", Color.translate("&eFilters:")));
+
+            for (String s : filtered) {
+                lore.add(Color.translate("&7- &f" + s));
+            }
+            Button stopFilter = new Button(false,
+                    new ItemBuilder(Material.REDSTONE).amount(1)
+                            .name(Color.Red + "Stop Filter").lore(lore).build(),
+                    (player, info) -> {
+                        filtered.clear();
+                        setButtons(1);
+                        buildInventory(false);
+                        info.getMenu().close(player);
+                        getSummary().showMenu(player);
+                    });
+
+            summary.setItem(53, stopFilter);
+        } else {
+            summary.setItem(53, new FillerButton());
+        }
+
+        summary.fill(new FillerButton());
+
         return summary;
     }
 
@@ -173,7 +277,7 @@ public class LogsGUI extends ChestMenu {
 
     private void runUpdater() {
         updaterTask = RunUtils.taskTimerAsync(() -> {
-            if(shown != null
+            if (shown != null
                     && shown.getOpenInventory() != null
                     && shown.getOpenInventory().getTopInventory() != null
                     && shown.getOpenInventory().getTopInventory().getTitle().equals(getTitle())) {
@@ -185,7 +289,7 @@ public class LogsGUI extends ChestMenu {
     }
 
     private void cancelTask() {
-        if(updaterTask == null) return;
+        if (updaterTask == null) return;
         updaterTask.cancel();
     }
 
@@ -196,11 +300,11 @@ public class LogsGUI extends ChestMenu {
 
         super.showMenu(player);
     }
-    
-    private void runFunction(ClickAction.InformationPair info, String permission, Runnable function) {
-        if(shown == null) return;
 
-        if(shown.hasPermission(permission)) {
+    private void runFunction(ClickAction.InformationPair info, String permission, Runnable function) {
+        if (shown == null) return;
+
+        if (shown.hasPermission(permission)) {
             function.run();
         } else {
             String oldName = info.getButton().getStack().getItemMeta().getDisplayName();
@@ -211,7 +315,7 @@ public class LogsGUI extends ChestMenu {
             meta.setLore(new ArrayList<>());
             info.getButton().getStack().setItemMeta(meta);
             RunUtils.taskLater(() -> {
-                if(info.getButton() != null
+                if (info.getButton() != null
                         && info.getButton().getStack().getItemMeta()
                         .getDisplayName().equals(Color.Red + "No permission")) {
                     ItemMeta newMeta = info.getButton().getStack().getItemMeta();

@@ -1,6 +1,8 @@
 package dev.brighten.anticheat.data.classes;
 
 import cc.funkemunky.api.Atlas;
+import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
+import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.Materials;
 import cc.funkemunky.api.utils.world.Material2;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
@@ -23,7 +25,8 @@ public class BlockInformation {
     public boolean onClimbable, onSlab, onStairs, onHalfBlock, inLiquid, inLava, inWater, inWeb, onSlime, onIce,
             onSoulSand, blocksAbove, collidesVertically, collidesHorizontally, blocksNear, inBlock;
     public float currentFriction;
-    public CollisionHandler handler;
+    public CollisionHandler
+            handler = new CollisionHandler(new ArrayList<>(), new ArrayList<>(), new KLocation(0,0,0));
 
     public BlockInformation(ObjectData objectData) {
         this.objectData = objectData;
@@ -36,39 +39,41 @@ public class BlockInformation {
 
         World world = objectData.getPlayer().getWorld();
 
-        
-        int startX = Location.locToBlock(objectData.playerInfo.to.x - 0.3 - objectData.playerInfo.deltaXZ);
-        int endX = Location.locToBlock(objectData.playerInfo.to.x + 0.3 + objectData.playerInfo.deltaXZ);
-        int startY = Location.locToBlock(objectData.playerInfo.to.y - 0.51 + objectData.playerInfo.deltaY);
+
+        int startX = Location.locToBlock(objectData.playerInfo.to.x - 1 - objectData.playerInfo.deltaXZ);
+        int endX = Location.locToBlock(objectData.playerInfo.to.x + 1 + objectData.playerInfo.deltaXZ);
+        int startY = Location.locToBlock(objectData.playerInfo.to.y - 0.8 + objectData.playerInfo.deltaY);
         int endY = Location.locToBlock(objectData.playerInfo.to.y + 1.99 + objectData.playerInfo.deltaY);
-        int startZ = Location.locToBlock(objectData.playerInfo.to.z - 0.3 - objectData.playerInfo.deltaXZ);
-        int endZ = Location.locToBlock(objectData.playerInfo.to.z + 0.3 + objectData.playerInfo.deltaXZ);
+        int startZ = Location.locToBlock(objectData.playerInfo.to.z - 1 - objectData.playerInfo.deltaXZ);
+        int endZ = Location.locToBlock(objectData.playerInfo.to.z + 1 + objectData.playerInfo.deltaXZ);
         int it = 9 * 9;
-        start:
-        for (int chunkx = startX >> 4; chunkx <= endX >> 4; ++chunkx) {
-            int cx = chunkx << 4;
+        if(objectData.playerInfo.worldLoaded) {
+            start:
+            for (int chunkx = startX >> 4; chunkx <= endX >> 4; ++chunkx) {
+                int cx = chunkx << 4;
 
-            for (int chunkz = startZ >> 4; chunkz <= endZ >> 4; ++chunkz) {
-                if (!objectData.playerInfo.worldLoaded) {
-                    continue;
-                }
-                Chunk chunk = world.getChunkAt(chunkx, chunkz);
-                if (chunk != null) {
-                    int cz = chunkz << 4;
-                    int xstart = startX < cx ? cx : startX;
-                    int xend = endX < cx + 16 ? endX : cx + 16;
-                    int zstart = startZ < cz ? cz : startZ;
-                    int zend = endZ < cz + 16 ? endZ : cz + 16;
+                for (int chunkz = startZ >> 4; chunkz <= endZ >> 4; ++chunkz) {
+                    if (!world.isChunkLoaded(chunkx, chunkz)) {
+                        continue;
+                    }
+                    Chunk chunk = world.getChunkAt(chunkx, chunkz);
+                    if (chunk != null) {
+                        int cz = chunkz << 4;
+                        int xstart = Math.max(startX, cx);
+                        int xend = Math.min(endX, cx + 16);
+                        int zstart = Math.max(startZ, cz);
+                        int zend = Math.min(endZ, cz + 16);
 
-                    for (int x = xstart; x <= xend; ++x) {
-                        for (int z = zstart; z <= zend; ++z) {
-                            for (int y = startY < 0 ? 0 : startY; y <= endY; ++y) {
-                                if (it-- <= 0) {
-                                    break start;
-                                }
-                                Block block = chunk.getBlock(x & 15, y, z & 15);
-                                if (block.getType() != Material.AIR) {
-                                    blocks.add(block);
+                        for (int x = xstart; x <= xend; ++x) {
+                            for (int z = zstart; z <= zend; ++z) {
+                                for (int y = Math.max(startY, 0); y <= endY; ++y) {
+                                    if (it-- <= 0) {
+                                        break start;
+                                    }
+                                    Block block = chunk.getBlock(x & 15, y, z & 15);
+                                    if (block.getType() != Material.AIR) {
+                                        blocks.add(block);
+                                    }
                                 }
                             }
                         }
@@ -80,22 +85,24 @@ public class BlockInformation {
                 Atlas.getInstance().getEntities().getOrDefault(objectData.getPlayer().getUniqueId(), new ArrayList<>()),
                 objectData.playerInfo.to);
 
-        handler.setSize(0.6f, 0.5f);
-        handler.setOffset(-0.49);
+        handler.setSize(0.6f, 0.8f);
+        handler.setOffset(-0.1);
 
         objectData.playerInfo.serverGround =
                 handler.isCollidedWith(Materials.SOLID) || handler.contains(EntityType.BOAT);
+        handler.setOffset(-0.4f);
         onSlab = handler.isCollidedWith(Materials.SLABS);
         onStairs = handler.isCollidedWith(Materials.STAIRS);
-        onHalfBlock = onSlime || onStairs;
+        onHalfBlock = onSlab || onStairs
+                || handler.isCollidedWith(Material.CAKE_BLOCK, Material.SKULL, Material.BED_BLOCK, Material.SNOW);
 
         handler.setSingle(true);
         onIce = handler.isCollidedWith(Materials.ICE);
         onSoulSand = handler.isCollidedWith(Material.SOUL_SAND);
         onSlime = handler.isCollidedWith(Material2.SLIME_BLOCK);
         handler.setSingle(false);
-        handler.setOffset(0);
 
+        handler.setOffset(0);
         handler.setSize(0.6, 1.8);
 
         inLava = handler.isCollidedWith(Materials.LAVA);
@@ -110,7 +117,7 @@ public class BlockInformation {
 
         if(objectData.playerInfo.deltaY < 0) {
             handler.setSize(2.0f, 0);
-        }
+        } else handler.setSize(0.61, 0);
         handler.setSingle(true);
         onClimbable = handler.isCollidedWith(Materials.LADDER);
         handler.setSingle(false);
@@ -121,7 +128,17 @@ public class BlockInformation {
         handler.setSize(1.5, 1.8);
         blocksNear = handler.isCollidedWith(Materials.SOLID);
 
+        if(objectData.boxDebuggers.size() > 0) {
+            handler.setSize(0.62, 1.81);
+            handler.setOffset(-0.01);
+
+            handler.getCollisionBoxes().forEach(cb -> cb.draw(WrappedEnumParticle.FLAME, objectData.boxDebuggers));
+        }
         handler.setSize(0.6, 1.8);
+
+        handler.setOffset(-0.8f);
+        handler.isCollidedWith(Materials.SOLID);
+        handler.setOffset(0);
 
         SimpleCollisionBox box = Helper.getMovementHitbox(objectData.getPlayer());
         box.expand(Math.abs(objectData.playerInfo.from.x - objectData.playerInfo.to.x) + 0.1,

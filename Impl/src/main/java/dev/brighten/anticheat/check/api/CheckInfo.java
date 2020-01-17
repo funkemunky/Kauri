@@ -12,8 +12,10 @@ public @interface CheckInfo {
     String description() default "No description provided.";
     boolean enabled() default true;
     boolean executable() default true;
+    boolean cancellable() default false;
     boolean developer() default false;
     int punishVL() default -1;
+    int vlToFlag() default -1;
     CheckType checkType() default CheckType.SPEED;
     ProtocolVersion minVersion() default ProtocolVersion.V1_7;
     ProtocolVersion maxVersion() default ProtocolVersion.V1_14;

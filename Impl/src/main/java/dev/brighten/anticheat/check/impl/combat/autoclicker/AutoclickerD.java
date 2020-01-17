@@ -2,52 +2,63 @@ package dev.brighten.anticheat.check.impl.combat.autoclicker;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.objects.Interval;
+import cc.funkemunky.api.utils.math.cond.MaxInteger;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.utils.EvictingList;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
 
-@CheckInfo(name = "Autoclicker (D)", description = "Checks if the autoclicker clicks within a specific deviation.",
+@CheckInfo(name = "Autoclicker (D)", description = "Compares the current click cps to the average.",
         checkType = CheckType.AUTOCLICKER, developer = true, punishVL = 20)
 public class AutoclickerD extends Check {
 
-    private Interval interval = new Interval(22);
-
-    private long lTimestamp;
-    private double lavg, lstd;
+    private EvictingList<Long> cpsCounts = new EvictingList<>(75);
+    private EvictingList<Double> errorList = new EvictingList<>(20);
+    private long ltimestamp;
+    private MaxInteger verbose = new MaxInteger(80);
 
     @Packet
     public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
-        long delta = timeStamp - lTimestamp;
+        long delta = timeStamp - ltimestamp;
 
-        if(delta > 2000 || delta < 3 || data.playerInfo.lastBrokenBlock.hasNotPassed(5)) {
-            lTimestamp = timeStamp;
+        if(delta > 300 || delta < 5) {
+            ltimestamp = timeStamp;
             return;
         }
 
-        if(interval.size() >= 20) {
-            val stats = interval.getSummary();
+        if(cpsCounts.size() > 50) {
+            try {
+                double average = cpsCounts.stream().mapToLong(v -> v).average().orElseThrow(Exception::new);
+                double std = Math.sqrt(cpsCounts.parallelStream().mapToDouble(v -> Math.pow(v - average, 2)).average()
+                        .orElseThrow(Exception::new));
 
-            double avg = stats.getAverage();
-            double std = interval.std();
+                double error = Math.abs((delta - average) / (std / Math.sqrt(cpsCounts.size())));
 
-            double deltaStd = MathUtils.getDelta(std, lstd);
-            if(deltaStd < 3 && avg < 125 && MathUtils.getDelta(avg, lavg) > 1) {
-                vl++;
-                if(vl > 4) {
-                    flag("avg=" + avg + " std=" + deltaStd);
-                }
-            } else vl-= vl > 0 ? 0.25 : 0;
-            debug("vl=" + vl + " avg=" + MathUtils.round(avg, 3)
-                    + " std=" + MathUtils.round(std, 3));
+                errorList.add(error);
 
+                double errorStd = MathUtils.stdev(errorList);
 
-            interval.clear();
-            lstd = std;
-            lavg = avg;
-        } else interval.add(delta);
-        lTimestamp = timeStamp;
+                if(errorStd < 4 && errorList.size() > 15) {
+                    if(verbose.add(errorStd < 3 ? 6 : 3) > 22) {
+                        vl++;
+                        flag("std=%1 error=%2 avg=%3",
+                                MathUtils.round(errorStd, 3),
+                                MathUtils.round(error, 3), MathUtils.round(average, 3));
+                    }
+                } else verbose.subtract();
+
+                debug("error=%3 avg=%1 std=%2 errorStd=%4",
+                        MathUtils.round(average, 3),
+                        MathUtils.round(std, 3),
+                        MathUtils.round(error, 4), MathUtils.round(errorStd, 4));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        cpsCounts.add(delta);
+        ltimestamp = timeStamp;
     }
 }

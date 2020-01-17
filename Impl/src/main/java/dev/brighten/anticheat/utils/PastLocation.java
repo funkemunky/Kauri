@@ -27,6 +27,14 @@ public class PastLocation {
                 .collect(Collectors.toList());
     }
 
+    public List<KLocation> getPreviousRange(long delta) {
+        long stamp = System.currentTimeMillis();
+
+        return this.previousLocations.stream()
+                .filter(loc -> stamp - loc.timeStamp < delta)
+                .collect(Collectors.toList());
+    }
+
     public void addLocation(Location location) {
         if (previousLocations.size() >= 20) {
             previousLocations.remove(0);

@@ -17,6 +17,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -75,6 +76,26 @@ public class CollisionHandler {
 		}
 
 		return false;
+	}
+
+	public List<CollisionBox> getCollisionBoxes() {
+		List<CollisionBox> collided = new ArrayList<>();
+		SimpleCollisionBox playerBox = new SimpleCollisionBox()
+				.offset(location.x, location.y, location.z)
+				.expandMin(0, shift, 0)
+				.expandMax(0, height, 0)
+				.expand(width / 2, 0, width / 2);
+
+		for (Block b : blocks) {
+			Location block = b.getLocation();
+
+			CollisionBox box;
+			if((box = BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion())).isCollided(playerBox)) {
+				collided.add(box);
+			}
+		}
+
+		return collided;
 	}
 
 	public boolean isCollidedWith(CollisionBox box) {

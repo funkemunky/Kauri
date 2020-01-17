@@ -6,7 +6,7 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "BadPackets (K)", description = "Checks for spamming off arm animation packets",
+@CheckInfo(name = "BadPackets (K)", description = "Checks for spamming of arm animation packets",
         checkType = CheckType.BADPACKETS, punishVL = 150)
 public class BadPacketsK extends Check {
 

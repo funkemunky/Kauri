@@ -22,7 +22,9 @@ public class AutoclickerB extends Check {
 
         long delta = timeStamp - lastTimestamp;
 
-        if(delta > 2000 || delta < 3 || data.playerInfo.lastBrokenBlock.hasNotPassed(5)) {
+        if(delta > 2000 || delta < 3
+                || data.playerInfo.lastBrokenBlock.hasNotPassed(5)
+                || data.playerInfo.lastBlockPlace.hasNotPassed(2)) {
             lastTimestamp = timeStamp;
             return;
         }
@@ -39,7 +41,7 @@ public class AutoclickerB extends Check {
                     || greater) {
                 vl++;
                 if(vl > 5) {
-                    flag("std=" + std + " avg=" + avg);
+                    flag("std=%1 avg=%2", std, avg);
                 }
                 debug(Color.Green + "Flagged");
             } else vl-= vl > 0 ? 0.5f : 0;

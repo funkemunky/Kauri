@@ -34,10 +34,10 @@ public class AutoclickerC extends Check {
             double std = interval.std();
 
             double deltaAvg = MathUtils.getDelta(avg, lavg), deltaStd = MathUtils.getDelta(std, lstd);
-            if(deltaAvg < 5 && deltaStd > 4 && avg < 135) {
+            if(deltaAvg < 5 && deltaStd > 4 && MathUtils.getDelta(deltaAvg, deltaStd) > 1.5f && avg < 135) {
                 vl++;
                 if(vl > 4) {
-                    flag("avg=" + deltaAvg + " std=" + deltaStd);
+                    flag("avg=%1 std=%2", deltaAvg, deltaStd);
                 }
             } else vl-= vl > 0 ? 0.25 : 0;
             debug("vl=" + vl + " avg=" + MathUtils.round(avg, 3)

@@ -2,36 +2,44 @@ package dev.brighten.anticheat.check.impl.movement.speed;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.TickTimer;
+import dev.brighten.anticheat.Kauri;
+import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "Speed (C)", description = "Checks for changing in air which should be impossible.",
-        checkType = CheckType.SPEED, punishVL = 20)
+@Cancellable
+@CheckInfo(name = "Speed (C)", description = "Horizontal prediction.",
+        checkType = CheckType.SPEED, punishVL = 150, vlToFlag = 10)
 public class SpeedC extends Check {
 
-    private float verbose;
+    private TickTimer lastFlag = new TickTimer(10);
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if(packet.isPos()
-                && !data.playerInfo.generalCancel
-                && timeStamp - data.playerInfo.lastVelocityTimestamp > 250L) {
-            if(data.playerInfo.airTicks > 2) {
-                float accelX = data.playerInfo.deltaX - data.playerInfo.lDeltaX;
-                float accelZ = data.playerInfo.deltaZ - data.playerInfo.lDeltaZ;
-                float hypot = MathUtils.hypot(accelX, accelZ);
+        if(!packet.isPos() || data.playerInfo.deltaXZ == 0) return;
 
-                if(hypot > 0.12 && (accelX > -0.07 || accelZ > -0.07)
-                        && data.playerInfo.lastBlockPlace.hasPassed(10)) {
-                    if(verbose++ > 2) {
-                        vl++;
-                        flag("x=" + accelX + " z=" + accelZ);
-                    }
-                } else verbose-= verbose > 0 ? 0.1 : 0;
+        if(!data.playerInfo.generalCancel && data.predictionService.checkConditions(data.playerInfo.sprinting)) {
+            double deltaXZ = MathUtils.hypot(
+                    data.playerInfo.to.x - data.playerInfo.from.x,
+                    data.playerInfo.to.z - data.playerInfo.from.z);
 
-                debug("x=" + accelX + " z=" + accelZ + " vl=" + vl);
-            }
+            double percent = deltaXZ / MathUtils.hypot(data.predictionService.predX, data.predictionService.predZ)
+                    * 100;
+
+            if(!data.playerInfo.clientGround && !data.playerInfo.lClientGround && data.playerInfo.sprinting) return;
+
+            if(MathUtils.getDelta(percent, 100) > 0.01 && percent > 30 && timeStamp - data.creation > 10000) {
+                vl++;
+                if(vl > 7) {
+                    flag("pct=%1%", MathUtils.round(percent, 4));
+                }
+                lastFlag.reset();
+            } else if(lastFlag.hasPassed()) vl-= vl > 0 ? 1 : 0;
+            else vl-= vl > 0 ? 0.5f : 0;
+
+            debug("pct=%1 deltaXZ=%2", percent, deltaXZ);
         }
     }
 }

@@ -38,7 +38,7 @@ public class PlayerInformationGUI extends ChestMenu {
         this.modData = ForgeHandler.getMods(data.getPlayer());
 
         addItems();
-        update();;
+        update();
     }
 
     public void addItems() {

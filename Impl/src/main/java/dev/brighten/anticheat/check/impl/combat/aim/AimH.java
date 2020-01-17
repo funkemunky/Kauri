@@ -18,7 +18,7 @@ public class AimH extends Check {
             String string = String.valueOf(absPitch);
             if((absPitch > 1 && string.length() < 3) && data.playerInfo.lastAttack.hasNotPassed(10)) {
                 if(vl++ > 4) {
-                    flag("deltaPitch=" + absPitch);
+                    flag("deltaPitch%1", absPitch);
                 }
             } else vl-= vl > 0 ? 0.5 : 0;
 

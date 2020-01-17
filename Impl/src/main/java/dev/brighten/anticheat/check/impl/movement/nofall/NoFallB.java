@@ -11,14 +11,20 @@ import dev.brighten.api.check.CheckType;
 public class NoFallB extends Check {
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
+    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(packet.isPos()) {
-            if(data.playerInfo.serverGround != data.playerInfo.clientGround && !data.playerInfo.generalCancel) {
+            if(data.playerInfo.serverGround != data.playerInfo.clientGround
+                    && data.playerInfo.climbTicks.value() == 0
+                    && !data.playerInfo.generalCancel
+                    && data.playerInfo.lastBlockPlace.hasPassed(20)
+                    && data.playerInfo.lastVelocity.hasPassed(40)
+                    && data.playerInfo.liquidTicks.value() == 0) {
                 if(vl++ > 5) {
                     flag("server=" + data.playerInfo.serverGround + " client=" + data.playerInfo.clientGround);
                 }
             } else vl-= vl > 0 ? 1 : 0;
-            debug("server=" + data.playerInfo.serverGround + " client=" + data.playerInfo.clientGround + " vl=" + vl);
+            debug("server=" + data.playerInfo.serverGround + " client=" + data.playerInfo.clientGround
+                    + " vl=" + vl + " loaded=" + data.playerInfo.worldLoaded);
         }
     }
 }

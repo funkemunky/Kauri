@@ -3,17 +3,14 @@ package dev.brighten.anticheat.data.classes;
 import cc.funkemunky.api.reflections.types.WrappedClass;
 import cc.funkemunky.api.reflections.types.WrappedMethod;
 import cc.funkemunky.api.tinyprotocol.api.NMSObject;
-import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.check.api.Check;
-import dev.brighten.anticheat.check.api.CheckInfo;
-import dev.brighten.anticheat.check.api.CheckSettings;
-import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.data.ObjectData;
 import lombok.val;
 import org.bukkit.event.Event;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CheckManager {
     private ObjectData objectData;
@@ -24,24 +21,36 @@ public class CheckManager {
         this.objectData = objectData;
     }
 
-    public void runPacket(NMSObject object, long timeStamp) {
-        if(!checkMethods.containsKey(object.getClass())) return;
+    public boolean runPacket(NMSObject object, long timeStamp) {
+        if(!checkMethods.containsKey(object.getClass())) return true;
 
         val methods = checkMethods.get(object.getClass());
+        AtomicBoolean okay = new AtomicBoolean(true);
         methods.parallelStream().filter(entry -> entry.getValue().getMethod().isAnnotationPresent(Packet.class))
                 .forEach(entry -> {
                     Check check = checks.get(entry.getKey());
-                    Kauri.INSTANCE.profiler.start("check:" + check.name);
 
                     if(check.enabled) {
                         if(entry.getValue().getMethod().getParameterCount() > 1) {
-                            entry.getValue().invoke(check, object, timeStamp);
+                            if(entry.getValue().getMethod().getGenericReturnType().equals(Void.TYPE))
+                                entry.getValue().invoke(check, object, timeStamp);
+                            else if(okay.get()
+                                    && entry.getValue().getMethod().getReturnType().equals(boolean.class)) {
+                                boolean cancel = entry.getValue().invoke(check, object, timeStamp);
+                                if(!cancel) okay.set(false);
+                            }
                         } else {
-                            entry.getValue().invoke(check, object);
+                            if(entry.getValue().getMethod().getGenericReturnType().equals(Void.TYPE))
+                                entry.getValue().invoke(check, object);
+                            else if(okay.get()
+                                    && entry.getValue().getMethod().getReturnType().equals(boolean.class)) {
+                                boolean cancel = entry.getValue().invoke(check, object);
+                                if(!cancel) okay.set(false);
+                            }
                         }
                     }
-                    Kauri.INSTANCE.profiler.stop("check:" + check.name);
                 });
+        return okay.get();
     }
 
     public void runEvent(Event event) {
@@ -61,7 +70,7 @@ public class CheckManager {
     }
 
     public void addChecks() {
-        if(objectData.getPlayer().hasPermission("kauri.bypass")) return;
+        if(objectData.getPlayer().hasPermission("kauri.bypass") && Config.bypassPermission) return;
         Check.checkClasses.keySet().parallelStream()
                 .map(clazz -> {
                     CheckInfo settings = Check.checkClasses.get(clazz);
@@ -70,6 +79,8 @@ public class CheckManager {
                     CheckSettings checkSettings = Check.checkSettings.get(clazz);
                     check.enabled = checkSettings.enabled;
                     check.executable = checkSettings.executable;
+                    check.cancellable = checkSettings.cancellable;
+                    check.cancelMode = checkSettings.cancelMode;
                     check.developer = settings.developer();
                     check.name = settings.name();
                     check.description = settings.description();
@@ -82,10 +93,9 @@ public class CheckManager {
                 .sequential()
                 .forEach(check -> checks.put(check.name, check));
 
-        for (String name : checks.keySet()) {
-            Check check = checks.get(name);
+        checks.keySet().stream().map(name -> checks.get(name)).forEach(check -> {
             WrappedClass checkClass = new WrappedClass(check.getClass());
-
+            
             Arrays.stream(check.getClass().getDeclaredMethods())
                     .parallel()
                     .filter(method -> method.isAnnotationPresent(Packet.class)
@@ -101,6 +111,6 @@ public class CheckManager {
                                 check.name, method));
                         checkMethods.put(parameter, methods);
                     });
-        }
+        });
     }
 }

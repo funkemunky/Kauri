@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.data;
 
 import cc.funkemunky.api.utils.RunUtils;
+import dev.brighten.anticheat.Kauri;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -19,12 +20,12 @@ public class DataManager {
             dataMap.values().stream().filter(data -> data.alerts).forEach(hasAlerts::add);
             debugging.clear();
             dataMap.values().stream().filter(data -> data.debugging != null).forEach(debugging::add);
-        }, 60L, 30L);
+        }, Kauri.INSTANCE, 60L, 30L);
 
         RunUtils.taskTimer(() -> dataMap.values().stream()
                         .filter(data -> data.target != null)
                         .forEach(data -> data.targetPastLocation.addLocation(data.target.getLocation())),
-                1L,
+                Kauri.INSTANCE, 1L,
                 1L);
     }
 

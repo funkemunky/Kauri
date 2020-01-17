@@ -23,12 +23,10 @@ public class FlyA extends Check {
                 slimeHeight -= data.playerInfo.lDeltaY;
             } else if(wasOnSlime) {
                 maxHeight = Math.max(2f,
-                        MovementUtils.getTotalHeight(data.getPlayer(), slimeHeight)) * 1.25f;
+                        MovementUtils.getTotalHeight(slimeHeight)) * 1.25f;
                 wasOnSlime = false;
             } else if(!tookVelocity && data.playerInfo.clientGround) {
-                maxHeight = MovementUtils.getTotalHeight(
-                        data.getPlayer(),
-                        MovementUtils.getJumpHeight(data.getPlayer())) * 1.4f;
+                maxHeight = MovementUtils.getTotalHeight(MovementUtils.getJumpHeight(data.getPlayer())) * 1.4f;
             }
 
             if(data.playerInfo.lastBlockPlace.hasNotPassed(5)) totalHeight = 0;
@@ -46,12 +44,14 @@ public class FlyA extends Check {
 
             if(tookVelocity) {
                 totalHeight = 0;
-                maxHeight = MovementUtils.getTotalHeight(data.getPlayer(), data.playerInfo.velocityY) * 1.4f;
+                maxHeight = MovementUtils.getTotalHeight(data.playerInfo.velocityY) * 1.4f;
             }
 
             if(data.playerInfo.clientGround || data.playerInfo.serverGround) {
                 totalHeight = 0;
             } else if(data.playerInfo.deltaY > 0) totalHeight += data.playerInfo.deltaY;
+
+            maxHeight = Math.max(1.3f, maxHeight); //Fixes the occasional fuck up (usually on reload). Temporary.
 
             if(totalHeight > maxHeight
                     && timeStamp - data.playerInfo.lastServerPos > 50L
@@ -61,7 +61,7 @@ public class FlyA extends Check {
                     && (!data.playerInfo.wasOnSlime || maxHeight >= 2)
                     && !data.playerInfo.flightCancel) {
                 vl++;
-                flag(totalHeight + ">-" + maxHeight);
+                flag("%1>-%2; ping=%p tps=%t", totalHeight, maxHeight);
             }
 
             debug("total=" + totalHeight + " max=" + maxHeight

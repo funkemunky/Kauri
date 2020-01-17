@@ -19,7 +19,7 @@ public class HandA extends Check {
 
         if(!data.lagInfo.lagging && delta < 10) {
             if(vl++ > 6) {
-                flag("delta=" + delta + "ms");
+                flag("delta=%1ms", delta);
             }
         } else vl-= vl > 0 ? 0.5f : 0;
         debug("delta=" + delta + "ms vl=" + vl);

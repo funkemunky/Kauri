@@ -8,9 +8,10 @@ import lombok.RequiredArgsConstructor;
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class CheckSettings {
-    public boolean enabled, executable;
+    public boolean enabled, executable, cancellable;
     public final String name, description;
     public final CheckType type;
-    public final int punishVl;
+    public final CancelType cancelMode;
+    public final int punishVl, vlToFlag;
     public final ProtocolVersion minVersion, maxVersion;
 }

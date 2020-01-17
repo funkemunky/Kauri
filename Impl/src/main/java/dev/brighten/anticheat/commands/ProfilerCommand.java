@@ -5,12 +5,14 @@ import cc.funkemunky.api.commands.ancmd.Command;
 import cc.funkemunky.api.commands.ancmd.CommandAdapter;
 import cc.funkemunky.api.profiling.ResultsType;
 import cc.funkemunky.api.utils.*;
+import com.google.common.util.concurrent.AtomicDouble;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.utils.ItemBuilder;
 import dev.brighten.anticheat.utils.Pastebin;
 import dev.brighten.anticheat.utils.menu.button.Button;
 import dev.brighten.anticheat.utils.menu.preset.button.FillerButton;
 import dev.brighten.anticheat.utils.menu.type.impl.ChestMenu;
+import lombok.val;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -22,6 +24,7 @@ import org.bukkit.scheduler.BukkitTask;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Init(commands = true)
 public class ProfilerCommand {
@@ -47,45 +50,38 @@ public class ProfilerCommand {
 
             BukkitTask task = RunUtils.taskTimerAsync(() -> {
                menu.fill(new FillerButton());
-                Map<String, Long> sorted = dev.brighten.anticheat.utils.MiscUtils
-                        .sortByValue(Kauri.INSTANCE.profiler.total);
-                long total = Kauri.INSTANCE.profiler.total.keySet()
+                final List<Tuple<Double, Button>> buttons = new ArrayList<>();
+
+                AtomicDouble samples = new AtomicDouble(0);
+
+                val map = Kauri.INSTANCE.profiler.results(ResultsType.TICK);
+
+                long total = map.keySet()
                         .stream()
-                        .mapToLong(key -> Kauri.INSTANCE.profiler.total.get(key))
+                        .mapToLong(key -> Math.round(map.get(key).two))
                         .sum();
 
-                int size = sorted.size();
-                List<Map.Entry<String, Long>> entries = new ArrayList<>(sorted.entrySet());
-                List<Button> buttons = new ArrayList<>();
-
-                double samples = 0;
-
-                for (int i = size - Math.min(size - 10, 10); i < size; i++) {
-                    Map.Entry<String, Long> entry = entries.get(i);
-                    String name = entry.getKey();
-                    Long time = entry.getValue();
-
-                    buttons.add(new Button(false, new ItemBuilder(Material.REDSTONE)
+                map.forEach((key, result) -> {
+                    Button button = new Button(false, new ItemBuilder(Material.REDSTONE)
                             .amount(1)
-                            .name(Color.Gold + entry.getKey()).lore("",
-                                    "&7Weighted Usage: " + dev.brighten.anticheat.utils.MiscUtils.drawUsage(total, time),
-                                    "&7MS: &f" + dev.brighten.anticheat.utils.MiscUtils.format(time / 1000000D, 3),
+                            .name(Color.Gold + key).lore("",
+                                    "&7Weighted Usage: " + dev.brighten.anticheat.utils.MiscUtils
+                                            .drawUsage(total, result.two),
+                                    "&7MS: &f" + dev.brighten.anticheat.utils.MiscUtils
+                                            .format(Kauri.INSTANCE.profiler.total.get(key) / 1000000D, 3),
                                     "&7Samples: &f" + dev.brighten.anticheat.utils.MiscUtils
-                                            .format(Kauri.INSTANCE.profiler.samples
-                                                    .getOrDefault(name, 0L) / 1000000D, 3),
-                                    "&7Deviaion: &f" + dev.brighten.anticheat.utils.MiscUtils
+                                            .format(result.two / 1000000D, 3),
+                                    "&7Deviation: &f" + dev.brighten.anticheat.utils.MiscUtils
                                             .format(Kauri.INSTANCE.profiler.stddev
-                                                    .getOrDefault(name, 0L) / 1000000D, 3))
-                            .build()));
-                    samples+= Kauri.INSTANCE.profiler.samples
-                            .getOrDefault(name, 0L) / 1000000D;
-                }
+                                                    .getOrDefault(key, 0L), 3) / 1000000D).build());
 
-                buttons = buttons.subList(Math.min(buttons.size(),
-                        (finalPage - 1) * 45), Math.min(finalPage * 45, buttons.size()));
+                    buttons.add(new Tuple<>(result.two, button));
+                    samples.addAndGet(result.two / 1000000D);
+                });
+
+                buttons.sort(Comparator.comparing(tuple -> tuple.one, Comparator.reverseOrder()));
 
                 double totalMs = total / 1000000D;
-                long totalTime = Kauri.INSTANCE.profiler.totalCalls * 50;
                 if(finalPage > 1) {
                     menu.setItem(48, new Button(false,
                             new ItemBuilder(Material.BOOK).amount(1).name("&cBack").build(),
@@ -96,9 +92,10 @@ public class ProfilerCommand {
                         new ItemBuilder(Material.REDSTONE)
                                 .amount(1)
                                 .name(Color.Gold + "Total").lore("",
-                                "&7Usage: " + dev.brighten.anticheat.utils.MiscUtils.drawUsage(50, dev.brighten.anticheat.utils.MiscUtils.format(samples / 50, 3)),
+                                "&7Usage: " + dev.brighten.anticheat.utils.MiscUtils.drawUsage(50,
+                                        dev.brighten.anticheat.utils.MiscUtils.format(samples.get(), 3)),
                                 "&7Total: &f" + dev.brighten.anticheat.utils.MiscUtils.format(totalMs, 3),
-                                "&7Samples: &f" + dev.brighten.anticheat.utils.MiscUtils.format(samples, 3),
+                                "&7Samples: &f" + dev.brighten.anticheat.utils.MiscUtils.format(samples.get(), 3),
                                 "",
                                 "&7&oRight click to reset data.")
                                 .build(),
@@ -111,12 +108,12 @@ public class ProfilerCommand {
                         new ItemBuilder(Material.BOOK).amount(1).name("&cNext").build(),
                         (player, info) -> Bukkit.dispatchCommand(player,
                                 "kauri profile testGUI " + (finalPage + 1))));
-                for (int i = 0; i < buttons.size(); i++) {
-                    menu.setItem(i, buttons.get(i));
+                for (int i = (finalPage - 1) * 45; i < Math.min(finalPage * 45, buttons.size()); i++) {
+                    menu.setItem(i, buttons.get(i).two);
                 }
 
                 menu.buildInventory(false);
-            }, Kauri.INSTANCE, 0L, 12L);
+            }, Kauri.INSTANCE, 0L, 4L);
 
             menu.setCloseHandler((player, menuConsumer) -> task.cancel());
 
@@ -132,25 +129,36 @@ public class ProfilerCommand {
                     .mapToLong(key -> Kauri.INSTANCE.profiler.total.get(key))
                     .sum();
             List<Map.Entry<String, Long>> entries = new ArrayList<>(sorted.entrySet());
-            for (int i = size - Math.min(size - 10, 10); i < size; i++) {
-                Map.Entry<String, Long> entry = entries.get(i);
+            IntStream.range(size - Math.min(size - 10, 10), size).mapToObj(entries::get).forEach(entry -> {
                 String name = entry.getKey();
                 Long time = entry.getValue();
                 cmd.getSender().sendMessage(dev.brighten.anticheat.utils.MiscUtils.drawUsage(total, time)
                         + " §c" + name
                         + "§7: " + dev.brighten.anticheat.utils.MiscUtils.format(time / 1000000D, 3)
                         + ", " + dev.brighten.anticheat.utils.MiscUtils
-                        .format(Kauri.INSTANCE.profiler.samples.getOrDefault(name, 0L) / 1000000D, 3)
+                        .format(Kauri.INSTANCE.profiler.samples
+                                .getOrDefault(name, new Tuple<>(0L, 0L)).one / 1000000D, 3)
                         + ", " + dev.brighten.anticheat.utils.MiscUtils
                         .format(Kauri.INSTANCE.profiler.stddev.getOrDefault(name, 0L) / 1000000D, 3));
-            }
+            });
             double totalMs = total / 1000000D;
             long totalTime = Kauri.INSTANCE.profiler.totalCalls * 50;
-            cmd.getSender().sendMessage(dev.brighten.anticheat.utils.MiscUtils.drawUsage(total, dev.brighten.anticheat.utils.MiscUtils.format(totalMs / totalTime, 3))
+            cmd.getSender().sendMessage(dev.brighten.anticheat.utils.MiscUtils
+                    .drawUsage(total, dev.brighten.anticheat.utils.MiscUtils.format(totalMs / totalTime, 3))
                     + " §cTotal§7: " + dev.brighten.anticheat.utils.MiscUtils.format(totalMs, 3)
                     + " §f- §c" + dev.brighten.anticheat.utils.MiscUtils.format(totalMs / totalTime, 3) + "%");
             cmd.getSender().sendMessage("-------------------------------------------------");
         }
+    }
+
+    @Command(name = "kauri.profile.paste", display = "profile paste [type]",
+            description = "make a detailed profile with pastebin.", permission = "kauri.command.profile.paste")
+    public void onPaste(CommandAdapter cmd) {
+        ResultsType type = cmd.getArgs().length > 0 ? Arrays.stream(ResultsType.values())
+                .filter(rt -> rt.name().equalsIgnoreCase(cmd.getArgs()[0])).findFirst().orElse(ResultsType.TOTAL)
+                : ResultsType.TOTAL;
+
+        makePaste(cmd.getSender(), type);
     }
 
     private void makePaste(CommandSender sender, ResultsType type) {
@@ -176,9 +184,7 @@ public class ProfilerCommand {
         body.add("Total Calls: " + Kauri.INSTANCE.profiler.totalCalls);
         body.add("Current Ticks: " + Atlas.getInstance().getCurrentTicks());
         StringBuilder builder = new StringBuilder();
-        for (String aBody : body) {
-            builder.append(aBody).append(";");
-        }
+        body.forEach(aBody -> builder.append(aBody).append(";"));
 
         builder.deleteCharAt(body.size() - 1);
 

@@ -20,11 +20,11 @@ public class AimB extends Check {
                     && (MathUtils.getDelta(
                             MathUtils.getDelta(data.playerInfo.cinematicPitch, data.playerInfo.lCinematicPitch),
                     data.playerInfo.deltaYaw) > 1.2)
+                    && !data.playerInfo.cinematicModeYaw
                     && !data.playerInfo.cinematicModePitch
-                    && (data.playerInfo.deltaPitch < 10 || MathUtils.getDelta(data.playerInfo.deltaPitch, data.playerInfo.lDeltaPitch) > 10)
-                    && data.playerInfo.lastAttack.hasNotPassed(20)) {
+                    && (data.playerInfo.deltaPitch < 10 || MathUtils.getDelta(data.playerInfo.deltaPitch, data.playerInfo.lDeltaPitch) > 10)) {
                 if(vl++ > 20) {
-                    flag("offset=" + data.playerInfo.pitchGCD + " deltaPitch=" + data.playerInfo.deltaPitch);
+                    flag("offset=%1 deltaPitch=%2", data.playerInfo.pitchGCD, data.playerInfo.deltaPitch);
                 }
             } else vl-= vl > 0 ? 0.5 : 0;
             debug("gcd=" + data.playerInfo.pitchGCD

@@ -98,12 +98,12 @@ public class ChestMenu implements Menu {
             holder.setInventory(Bukkit.createInventory(holder, dimension.getSize(), title));
         }
         holder.getInventory().clear();
-        for (int i = 0; i < contents.length; i++) {
+        IntStream.range(0, contents.length).forEach(i -> {
             Button button = contents[i];
             if (button != null) {
                 holder.getInventory().setItem(i, button.getStack());
             }
-        }
+        });
     }
 
     @Override

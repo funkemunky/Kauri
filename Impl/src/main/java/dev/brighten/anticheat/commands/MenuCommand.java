@@ -10,6 +10,7 @@ import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckSettings;
 import dev.brighten.anticheat.logs.objects.Log;
+import dev.brighten.anticheat.menu.LogsGUI;
 import dev.brighten.anticheat.utils.ItemBuilder;
 import dev.brighten.anticheat.utils.Pastebin;
 import dev.brighten.anticheat.utils.menu.button.Button;
@@ -71,7 +72,7 @@ public class MenuCommand {
     }
 
     @Command(name = "kauri.menu", description = "Open the Kauri menu.", display = "menu", usage = "/<command>",
-            aliases = {"kauri.gui"}, playerOnly = true, permission = "kauri.menu")
+            aliases = {"kauri.gui"}, playerOnly = true, permission = "kauri.command.menu")
     public void onCommand(CommandAdapter cmd) {
         main.showMenu(cmd.getPlayer());
         cmd.getPlayer().sendMessage(Color.Green + "Opened main menu.");
@@ -113,8 +114,19 @@ public class MenuCommand {
         Arrays.stream(CheckType.values())
                 .sorted(Comparator.comparing(Enum::name))
                 .forEach(type -> {
-                    Button button = new Button(false, new ItemBuilder(Material.BOOK)
-                            .amount(1).name("&e" + type.name()).build(),
+
+                    AtomicInteger amount = new AtomicInteger(0);
+
+                    Check.checkSettings.values()
+                            .stream()
+                            .filter(ci-> ci.type.equals(type))
+                            .forEach(ci -> amount.incrementAndGet());
+                    Button button = new Button(false,
+                            new ItemBuilder(Material.BOOK)
+                                    .amount(amount.get())
+                                    .name("&e" + type.name())
+                                    .lore("", "&7Checks&8: &f" + amount, "", "&7&oClick to configure in this category.")
+                                    .build(),
                             (player, info) -> {
                         menu.setParent(null);
                         menu.close(player);
@@ -238,10 +250,14 @@ public class MenuCommand {
                     "&f&oShift-Left Click &7&oto view logs.");
             menu.addItem(new Button(false, builder.build(),
                     (target, info) -> {
-                if(info.getClickType().equals(ClickType.SHIFT_LEFT)) {
+                if(info.getClickType().equals(ClickType.SHIFT_LEFT)
+                        && target.hasPermission("kauri.command.logs")) {
+                    LogsGUI gui = new LogsGUI(Bukkit.getOfflinePlayer(uuid));
                     menu.setParent(null);
                     menu.close(target);
-                    Bukkit.dispatchCommand(target, "kauri logs " + player.getName());
+                    gui.setParent(info.getMenu());
+                    menu.setParent(main);
+                    gui.showMenu(target);
                 }
             }));
         }

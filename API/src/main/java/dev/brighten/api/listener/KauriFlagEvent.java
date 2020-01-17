@@ -16,4 +16,5 @@ public class KauriFlagEvent extends AtlasEvent implements Cancellable {
     private boolean cancelled;
     public final Player player;
     public final KauriCheck check;
+    public final String information;
 }

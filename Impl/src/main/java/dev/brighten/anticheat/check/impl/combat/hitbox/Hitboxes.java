@@ -5,18 +5,18 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MiscUtils;
+import com.google.common.util.concurrent.AtomicDouble;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.data.ObjectData;
-import dev.brighten.anticheat.utils.RayTrace;
+import dev.brighten.anticheat.utils.RayCollision;
 import dev.brighten.api.check.CheckType;
 import org.bukkit.GameMode;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,37 +47,43 @@ public class Hitboxes extends Check {
 
         if (checkParameters(data)) {
 
-            List<RayTrace> rayTrace = data.pastLocation
-                    .getEstimatedLocation(0,Math.max(100, Math.min(150L, data.lagInfo.transPing)))
+            List<RayCollision> rayTrace = data.pastLocation
+                    .getPreviousRange(Math.max(150L, Math.round(data.lagInfo.transPing / 2D)))
                     .stream()
                     .map(loc ->
                             loc.toLocation(data.getPlayer().getWorld()).clone()
                                     .add(0, data.playerInfo.sneaking ? 1.54f : 1.62f, 0))
-                    .map(loc -> new RayTrace(loc.toVector(), loc.getDirection()))
+                    .map(loc -> new RayCollision(loc.toVector(), loc.getDirection()))
                     .collect(Collectors.toList());
 
-            List<Vector> vectors = new ArrayList<>();
-            rayTrace.parallelStream()
-                    .map(trace -> trace.traverse(3.2f, 0.1f))
-                    .sequential()
-                    .forEach(vectors::addAll);
-
             List<BoundingBox> entityLocations = data.targetPastLocation
-                    .getEstimatedLocation(data.lagInfo.transPing, 150L)
+                    .getEstimatedLocation(data.lagInfo.transPing, 200L)
                     .stream()
                     .map(loc -> getHitbox(loc, data.target.getType()))
                     .collect(Collectors.toList());
 
-            List<Vector> collided = new ArrayList<>();
-            for (BoundingBox box : entityLocations) {
-                vectors.parallelStream().filter(box::collides).sequential().forEach(collided::add);
+            long collisions = 0;
+            AtomicDouble distance = new AtomicDouble(10);
+
+            for (RayCollision ray : rayTrace) {
+                collisions+= entityLocations.stream().filter(bb -> {
+                    Vector point;
+                    if((point = ray.collisionPoint(bb)) != null) {
+                        double dist = point.distance(ray.getOrigin().toVector());
+
+                        distance.set(Math.min(dist, distance.get()));
+                        return dist < 3.3f;
+                    }
+                    return false;
+                }).count();
             }
 
-            if (collided.size() == 0) {
-                if(vl++ > 10)  flag("collided=0 ping=%p tps=%t");
+            if (collisions == 0) {
+                if(vl++ > 10)  flag("distance=%1 ping=%p tps=%t",
+                        distance.get() != -1 ? distance.get() : "[none collided]");
             } else vl -= vl > 0 ? 0.5 : 0;
 
-            debug("collided=" + collided.size());
+            debug("collided=" + collisions + " distance=" + distance.get());
         }
     }
 

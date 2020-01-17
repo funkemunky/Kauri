@@ -10,7 +10,7 @@ import dev.brighten.anticheat.data.ObjectData;
 public class AlertsCommand {
 
     @Command(name = "kauri.alerts", description = "toggle off cheat alerts.", aliases = {"alerts"},
-            display = "alerts", playerOnly = true, permission = "kauri.alerts")
+            display = "alerts", playerOnly = true, permission = "kauri.command.alerts")
     public void onCommand(CommandAdapter cmd) {
         ObjectData data = Kauri.INSTANCE.dataManager.getData(cmd.getPlayer());
 

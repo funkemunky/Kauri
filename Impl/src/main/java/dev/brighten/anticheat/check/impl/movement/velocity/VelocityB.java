@@ -15,8 +15,8 @@ import org.bukkit.enchantments.Enchantment;
         punishVL = 28)
 public class VelocityB extends Check {
 
-    private double vX, vZ;
-    private boolean useEntity, usingItem;
+    private double vX, vZ, svX, svZ;
+    private boolean useEntity;
     private float forward, strafe;
     private String lastKey;
     private long velocityTS;
@@ -24,8 +24,8 @@ public class VelocityB extends Check {
     @Packet
     public void onVelocity(WrappedOutVelocityPacket packet) {
         if(packet.getId() == data.getPlayer().getEntityId()) {
-            vX = packet.getX();
-            vZ = packet.getZ();
+            svX = packet.getX();
+            svZ = packet.getZ();
         }
     }
 
@@ -37,34 +37,15 @@ public class VelocityB extends Check {
                 && packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) {
             useEntity = true;
         }
-        if(usingItem) usingItem = false;
     }
 
     @Packet
-    public void onTransaction(WrappedInKeepAlivePacket packet, long timeStamp) {
-        if(packet.getTime() == 101) {
+    public void onTransaction(WrappedInTransactionPacket packet, long timeStamp) {
+        if(packet.getAction() == (short)101) {
             velocityTS = timeStamp;
+            vX = svX;
+            vZ = svZ;
         }
-    }
-
-    @Packet
-    public void onBlockPlace(WrappedInBlockPlacePacket packet) {
-        if(packet.getPosition().getX() == -1
-                && packet.getPosition().getZ() == -1
-                && packet.getItemStack() != null) {
-            usingItem = true;
-        }
-        /*debug("place: " + packet.getPosition().getX() + ", "
-                + packet.getPosition().getY() + ", " + packet.getPosition().getZ() + ", "
-                + (packet.getItemStack() != null));*/
-    }
-
-    @Packet
-    public void onPlace(WrappedInBlockDigPacket packet) {
-        if(usingItem) usingItem = false;
-        /*debug("dig: " + packet.getPosition().getX() + ", "
-                + packet.getPosition().getY() + ", " + packet.getPosition().getZ()
-                + " action=" + packet.getAction().name());*/
     }
 
     @Packet
@@ -75,6 +56,9 @@ public class VelocityB extends Check {
                     vX*= 0.6;
                     vZ*= 0.6;
                 }
+
+                if(data.lagInfo.lastPacketDrop.hasNotPassed(1)
+                        && data.lagInfo.lastPingDrop.hasNotPassed(100)) vX = vZ = 0;
                 if(!data.blockInfo.blocksNear
                         && !data.blockInfo.inWeb
                         && data.predictionService.key.equals(lastKey)
@@ -90,7 +74,7 @@ public class VelocityB extends Check {
                     }
 
                     float f = 0.16277136F / (f4 * f4 * f4);
-                    float f5;
+                    double f5;
 
                     if (data.playerInfo.lClientGround) {
                         f5 = data.predictionService.aiMoveSpeed * f;
@@ -103,7 +87,7 @@ public class VelocityB extends Check {
                     forward = data.predictionService.moveForward;
                     strafe = data.predictionService.moveStrafing;
 
-                    if(usingItem) {
+                    if(data.playerInfo.usingItem) {
                         forward*= 0.2f;
                         strafe*= 0.2f;
                     }
@@ -115,16 +99,17 @@ public class VelocityB extends Check {
                     double vXZ = MathUtils.hypot(vX, vZ);
                     pct = data.playerInfo.deltaXZ / vXZ * 100;
 
-                    if (pct < 99.9
+                    if (pct < 99.8
                             && !data.playerInfo.usingItem && !data.predictionService.useSword) {
                         if(data.lagInfo.lastPacketDrop.hasPassed(1)) {
                             if (strafe == 0 && forward == 0 && !data.lagInfo.lagging) vl+= 2;
-                            if ((vl+= strafe == 0 ? 1 : 0.5) > 15) flag("pct=" + MathUtils.round(pct, 3) + "%");
+                            if ((vl+= strafe == 0 && forward > 0 ? 1 : 0.5)
+                                    > (data.lagInfo.transPing > 150 ? 22 : 15)) flag("pct=" + MathUtils.round(pct, 3) + "%");
                         }
-                    } else vl -= vl > 0 ? data.lagInfo.lagging ? 0.25f : 0.2f : 0;
+                    } else vl -= vl > 0 ? data.lagInfo.lagging || data.lagInfo.transPing > 150 ? 0.5f : 0.2f : 0;
 
                     debug("pct=" + pct + " key=" + data.predictionService.key + " ani="
-                            + usingItem + " sprint=" + data.playerInfo.sprinting
+                            + data.playerInfo.usingItem + " sprint=" + data.playerInfo.sprinting
                             + " ground=" + data.playerInfo.lClientGround + ", " + data.playerInfo.clientGround
                             + " vl=" + vl);
 
@@ -134,7 +119,7 @@ public class VelocityB extends Check {
                     vX *= f4;
                     vZ *= f4;
 
-                    if(timeStamp - velocityTS > 200) {
+                    if(timeStamp - velocityTS > 170L) {
                         vX = vZ = 0;
                     }
                 } else vX = vZ = 0;
@@ -144,11 +129,11 @@ public class VelocityB extends Check {
         useEntity = false;
     }
 
-    private void moveFlying(float strafe, float forward, float friction) {
-        float f = strafe * strafe + forward * forward;
+    private void moveFlying(double strafe, double forward, double friction) {
+        double f = strafe * strafe + forward * forward;
 
         if (f >= 1.0E-4F) {
-            f = MathHelper.sqrt_float(f);
+            f = Math.sqrt(f);
 
             if (f < 1.0F) {
                 f = 1.0F;

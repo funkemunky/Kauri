@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.check.impl.combat.autoclicker;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
+import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -21,10 +22,14 @@ public class AutoclickerA extends Check {
                 punish();
             } else if(ticks >= 19) {
                 vl++;
-                flag("cps=" + ticks + " ping=%p tps=%t");
+                flag("cps=%1 ping=%p tps=%t", ticks);
             } else vl-= vl > 0 ? 0.2 : 0;
             ticks = 0;
             lastClick = timeStamp;
-        } else if(data.playerInfo.lastBrokenBlock.hasPassed(5)) ticks++;
+        } else if(data.playerInfo.lastBrokenBlock.hasPassed(5)
+                && !data.playerInfo.breakingBlock
+                && data.playerInfo.lastBlockPlace.hasPassed(1)
+                && data.lagInfo.lastPacketDrop.hasPassed(1)
+                && timeStamp - Kauri.INSTANCE.lastTick < 100L) ticks++;
     }
 }

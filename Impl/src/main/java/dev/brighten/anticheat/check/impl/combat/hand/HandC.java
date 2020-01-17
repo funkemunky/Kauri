@@ -19,7 +19,7 @@ public class HandC extends Check {
 
         if(!data.lagInfo.lagging && delta < 10) {
             if(vl++ > 3) {
-                flag("delta=" + delta + "ms");
+                flag("delta=%1ms", delta);
             }
         } else vl-= vl > 0 ? 0.5f : 0;
 

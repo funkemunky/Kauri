@@ -17,12 +17,13 @@ import org.bukkit.OfflinePlayer;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Init(commands = true)
 public class LogCommand {
 
     @Command(name = "kauri.logs", description = "View the logs of a user.", display = "logs [player]",
-            usage = "/<command> [player]", aliases = {"logs"}, permission = "kauri.logs")
+            usage = "/<command> [player]", aliases = {"logs"}, permission = "kauri.command.logs")
     public void onCommand(CommandAdapter cmd) {
         Kauri.INSTANCE.executor.execute(() -> {
             if(cmd.getArgs().length == 0) {
@@ -50,7 +51,7 @@ public class LogCommand {
     }
 
     @Command(name = "kauri.logs.clear", display = "logs clear [player]", description = "Clear logs of a player",
-            usage = "/<command> [playerName]",  permission = "kauri.logs.clear")
+            usage = "/<command> [playerName]",  permission = "kauri.command.logs.clear")
     public void onLogsClear(CommandAdapter cmd) {
         if(cmd.getArgs().length > 0) {
             OfflinePlayer player = Bukkit.getOfflinePlayer(cmd.getArgs()[0]);
@@ -66,16 +67,26 @@ public class LogCommand {
                         "Are you sure you want to clear " + player.getName() + "'s logs?",
                         (pl, confirmed) -> {
                             if(confirmed) {
-                                cmd.getSender().sendMessage(Color.Gray + "Clearing logs from " + player.getName() + "...");
-                                Kauri.INSTANCE.loggerManager.clearLogs(player.getUniqueId());
-                                cmd.getSender().sendMessage(Color.Green + "Logs cleared!");
+                                Kauri.INSTANCE.executor.execute(() -> {
+                                    cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                                            .msg("clearing-logs", "&7Clearing logs from %player%...")
+                                            .replace("%player%", player.getName()));
+                                    Kauri.INSTANCE.loggerManager.clearLogs(player.getUniqueId());
+                                    cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                                            .msg("clear-logs-success", "&aLogs cleared!"));
+                                });
                             }
                         });
                 menu.showMenu(cmd.getPlayer());
             } else {
-                cmd.getSender().sendMessage(Color.Gray + "Clearing logs from " + player.getName() + "...");
-                Kauri.INSTANCE.loggerManager.clearLogs(player.getUniqueId());
-                cmd.getSender().sendMessage(Color.Green + "Logs cleared!");
+                Kauri.INSTANCE.executor.execute(() -> {
+                    cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                            .msg("clearing-logs", "&7Clearing logs from %player%...")
+                            .replace("%player%", player.getName()));
+                    Kauri.INSTANCE.loggerManager.clearLogs(player.getUniqueId());
+                    cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                            .msg("clear-logs-success", "&aLogs cleared!"));
+                });
             }
         } else cmd.getSender().sendMessage(Color.Red + "You must provide the name of a player.");
     }
@@ -86,7 +97,7 @@ public class LogCommand {
 
         if(logs.size() == 0) return "No Logs";
 
-        StringBuilder body = new StringBuilder();
+        String body;
 
         SimpleDateFormat format = new SimpleDateFormat("MM/dd/YYYY hh:mm");
         format.setTimeZone(TimeZone.getTimeZone("US/Eastern"));
@@ -95,25 +106,23 @@ public class LogCommand {
 
         SortedMap<Long, String> eventsByStamp = new TreeMap<>(Comparator.comparing(key -> key, Comparator.naturalOrder()));
 
-        for (Log log : logs) {
+        logs.forEach(log -> {
             String built = "(" + format.format(new Date(log.timeStamp)) + "): " + pl.getName() + " failed "
                     + log.checkName + " at VL: [" + MathUtils.round(log.vl, 2)
                     + "] (tps=" + MathUtils.round(log.tps, 4) + " ping=" + log.ping + " info=[" + log.info + "])";
             eventsByStamp.put(log.timeStamp, built);
-        }
+        });
 
-        for (Punishment punishment : punishments) {
+        punishments.forEach(punishment -> {
             String built = "Punishment applied @ (" + format.format(new Date(punishment.timeStamp)) + ") from check "
                     + punishment.checkName;
             eventsByStamp.put(punishment.timeStamp, built);
-        }
+        });
 
-        for (Long key : eventsByStamp.keySet()) {
-            body.append(eventsByStamp.get(key)).append("\n");
-        }
+        body = eventsByStamp.keySet().stream().map(key -> eventsByStamp.get(key) + "\n").collect(Collectors.joining());
 
         try {
-            return Pastebin.makePaste(body.toString(), pl.getName() + "'s Log", Pastebin.Privacy.UNLISTED);
+            return Pastebin.makePaste(body, pl.getName() + "'s Log", Pastebin.Privacy.UNLISTED);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

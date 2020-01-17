@@ -1,31 +1,35 @@
 package dev.brighten.anticheat.check.impl.packets.badpackets;
 
-import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
-import dev.brighten.anticheat.check.api.Event;
+import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
-import org.bukkit.Location;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.util.Vector;
 
-@CheckInfo(name = "BadPackets (J)", description = "Checks for omni sprint.", checkType = CheckType.BADPACKETS)
+@CheckInfo(name = "BadPackets (J)", description = "Checks for omni sprint.", checkType = CheckType.BADPACKETS,
+        developer = true, punishVL = 100)
 public class BadPacketsJ extends Check {
 
-    @Event
-    public void onPacket(PlayerMoveEvent event) {
-        Location from = event.getFrom().clone();
-        Location to = event.getTo().clone();
-
-        double eyeHeight = event.getPlayer().getEyeHeight();
-
-        Vector dir = to.clone().add(0, eyeHeight, 0).toVector().subtract(from.clone().toVector());
-        float dirYaw = MathUtils.yawTo180F((float)(Math.atan2(dir.getX(), dir.getZ()) * 180 / Math.PI) - 90f);
-        float yaw = MathUtils.yawTo180F(to.getYaw());
-
-        float delta = MathUtils.getDelta(Math.abs(dirYaw), Math.abs(yaw));
-
-        debug("yaw=" + yaw + " dirYaw=" + dirYaw + " delta=" + delta);
+    @Packet
+    public void onFlying(WrappedInFlyingPacket packet) {
+        if(packet.isPos() && !data.playerInfo.generalCancel) {
+            if(data.playerInfo.sprinting
+                    && data.playerInfo.clientGround
+                    && !data.predictionService.key.equals("Nothing")
+                    && !data.predictionService.key.contains("W")) {
+                vl++;
+                if(vl > 40) {
+                    flag("key=%1 groundTicks=%2 lastVelocity=%3",
+                            data.predictionService.key,
+                            data.playerInfo.groundTicks,
+                            data.playerInfo.lastVelocity.getPassed());
+                }
+            } else vl-= vl > 0 ? 0.5f : 0;
+            debug("sprinting=" + data.playerInfo.sprinting
+                    + " ground=" + data.playerInfo.clientGround
+                    + " key=" + data.predictionService.key
+                    + " velocity=" + data.playerInfo.lastVelocity.getPassed() + " vl=" + vl);
+        } else vl-= vl > 0 ? 0.01f : 0;
     }
 
 }

@@ -3,10 +3,8 @@ package dev.brighten.anticheat.utils.menu.mask;
 import dev.brighten.anticheat.utils.menu.Menu;
 import dev.brighten.anticheat.utils.menu.button.Button;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -32,7 +30,7 @@ public class Mask2D implements Mask {
 
     @Override
     public Mask setMaskPattern(String... maskPattern) {
-        String concatPattern = Arrays.stream(maskPattern).collect(Collectors.joining());
+        String concatPattern = String.join("", maskPattern);
         for (char c : concatPattern.toCharArray()) {
             if (Character.isWhitespace(c)) {
                 continue;
@@ -59,11 +57,7 @@ public class Mask2D implements Mask {
 
         IntStream.range(0, maskPattern.length()).forEach(i -> {
             char ch = maskPattern.charAt(i);
-            if (ch == ' ' || ch == '_') {
-                menu.setItem(i, null);
-            } else {
-                menu.setItem(i, maskButtonKey.get(ch));
-            }
+            menu.setItem(i, ch == ' ' || ch == '_' ? null : maskButtonKey.get(ch));
         });
     }
 }
