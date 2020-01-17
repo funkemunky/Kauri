@@ -27,7 +27,7 @@ public class AutoclickerI extends Check {
                         this.flag(ratio + "r");
                     }
                 } else {
-                    vl = 0;
+                    vl = Math.max(vl - 1, 0);
                 }
             }
             this.ticks = 0;
