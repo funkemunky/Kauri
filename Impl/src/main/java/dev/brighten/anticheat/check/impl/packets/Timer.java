@@ -5,6 +5,7 @@ import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.math.cond.MaxInteger;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.Kauri;
+import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -13,17 +14,18 @@ import lombok.val;
 
 @CheckInfo(name = "Timer", description = "Checks the rate of packets coming in.",
         checkType = CheckType.BADPACKETS, punishVL = 175)
+@Cancellable
 public class Timer extends Check {
 
     private long lastTS, lRange;
     private EvictingList<Long> times = new EvictingList<>(35);
-    private MaxInteger lagTicks = new MaxInteger(10);
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet, long timeStamp) {
         long elapsed = timeStamp - lastTS;
 
-        if(timeStamp - data.creation > 500 && !data.playerInfo.serverPos) {
+        if(timeStamp - data.creation > 500 && !data.playerInfo.serverPos
+                && timeStamp - data.playerInfo.lastServerPos > 60L) {
             times.add(elapsed);
             val summary = times.stream().mapToLong(val -> val).summaryStatistics();
             double average = summary.getAverage();

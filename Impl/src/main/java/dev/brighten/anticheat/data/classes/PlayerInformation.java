@@ -56,9 +56,10 @@ public class PlayerInformation {
             lastWorldUnload = new TickTimer(20);
     public long lastToggleFlightStamp;
 
-    public float velocityX, velocityY, velocityZ;
-    public float mvx, mvy, mvz;
+    public double velocityX, velocityY, velocityZ;
+    public double mvx, mvy, mvz;
     public boolean takingVelocity;
 
-    public KLocation from = new KLocation(0,0,0), to = new KLocation(0,0,0);
+    public KLocation from = new KLocation(0,0,0), to = new KLocation(0,0,0),
+            groundLoc;
 }

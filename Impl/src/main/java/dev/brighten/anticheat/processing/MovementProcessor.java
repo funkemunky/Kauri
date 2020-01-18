@@ -2,6 +2,7 @@ package dev.brighten.anticheat.processing;
 
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.reflection.MinecraftReflection;
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.objects.VariableValue;
@@ -56,25 +57,25 @@ public class MovementProcessor {
 
         data.playerInfo.to.timeStamp = timeStamp;
 
-        if(data.playerInfo.posLocs.size() > 0) {
+        if (data.playerInfo.posLocs.size() > 0) {
             val optional = data.playerInfo.posLocs.stream()
                     .filter(loc -> {
                         MiscUtils.testMessage(data.getPlayer().getName() + ": " + loc.toVector().setY(0)
                                 .distance(data.playerInfo.to.toVector().setY(0)) + ", "
-                                + MathUtils.getDelta(loc.y, data.playerInfo.to.y) );
+                                + MathUtils.getDelta(loc.y, data.playerInfo.to.y));
                         return loc.toVector().setY(0)
                                 .distance(data.playerInfo.to.toVector().setY(0)) <= 1E-5
                                 && MathUtils.getDelta(loc.y, data.playerInfo.to.y) < 1;
                     })
                     .findFirst();
 
-            if(optional.isPresent()) {
+            if (optional.isPresent()) {
                 data.playerInfo.serverPos = true;
                 data.playerInfo.lastServerPos = timeStamp;
                 data.playerInfo.posLocs.remove(optional.get());
                 MiscUtils.testMessage("teleported: " + data.getPlayer().getName());
             }
-        } else if(data.playerInfo.serverPos) {
+        } else if (data.playerInfo.serverPos) {
             data.playerInfo.serverPos = false;
         }
 
@@ -84,19 +85,19 @@ public class MovementProcessor {
                 .getBlockBox().isRiptiding(data.getPlayer());
 
         /* We only set the jumpheight on ground since there's no need to check for it while they're in the air.
-        * If we did check while it was in the air, there would be false positives in the checks that use it. */
-        if(packet.isGround()) data.playerInfo.jumpHeight = MovementUtils.getJumpHeight(data.getPlayer());
+         * If we did check while it was in the air, there would be false positives in the checks that use it. */
+        if (packet.isGround()) data.playerInfo.jumpHeight = MovementUtils.getJumpHeight(data.getPlayer());
 
         data.playerInfo.lworldLoaded = data.playerInfo.worldLoaded;
 
-        if(!(data.playerInfo.worldLoaded = Atlas.getInstance().getBlockBoxManager().getBlockBox()
+        if (!(data.playerInfo.worldLoaded = Atlas.getInstance().getBlockBoxManager().getBlockBox()
                 .isChunkLoaded(data.playerInfo.to.toLocation(data.getPlayer().getWorld()))))
             data.playerInfo.lastWorldUnload.reset();
 
         data.lagInfo.lagging = data.lagInfo.lagTicks.subtract() > 0
                 || !data.playerInfo.worldLoaded
                 || timeStamp - Kauri.INSTANCE.lastTick >
-                new VariableValue<>(110, 60, () -> Kauri.INSTANCE.isPaper).get();
+                new VariableValue<>(110, 60, ProtocolVersion::isPaper).get();
 
         //We set the yaw and pitch like this to prevent inaccurate data input. Like above, it will return both pitch
         //and yaw as 0 if it isnt a look packet.
@@ -104,19 +105,20 @@ public class MovementProcessor {
             data.playerInfo.to.yaw = packet.getYaw();
             data.playerInfo.to.pitch = packet.getPitch();
 
-            double yawGcd = MiscUtils.gcd((long)(MathUtils.yawTo180F(data.playerInfo.deltaYaw) * offset),
-                    (long)(MathUtils.yawTo180F(data.playerInfo.lDeltaYaw) * offset)) / offset;
-            double pitchGcd = MiscUtils.gcd((long)Math.abs(data.playerInfo.deltaPitch * offset),
-                    (long)Math.abs(data.playerInfo.lDeltaPitch * offset)) / offset;
+            double yawGcd = MiscUtils.gcd((long) (MathUtils.yawTo180F(data.playerInfo.deltaYaw) * offset),
+                    (long) (MathUtils.yawTo180F(data.playerInfo.lDeltaYaw) * offset)) / offset;
+            double pitchGcd = MiscUtils.gcd((long) Math.abs(data.playerInfo.deltaPitch * offset),
+                    (long) Math.abs(data.playerInfo.lDeltaPitch * offset)) / offset;
 
             //Adding gcd of yaw and pitch.
-            if(data.playerInfo.yawGCD > 90000 && yawGcd > 0.01f && data.playerInfo.deltaYaw < 8) yawGcdList.add(yawGcd);
-            if(data.playerInfo.pitchGCD > 90000 && data.playerInfo.deltaPitch < 8) pitchGcdList.add(pitchGcd);
+            if (data.playerInfo.yawGCD > 90000 && yawGcd > 0.01f && data.playerInfo.deltaYaw < 8)
+                yawGcdList.add(yawGcd);
+            if (data.playerInfo.pitchGCD > 90000 && data.playerInfo.deltaPitch < 8) pitchGcdList.add(pitchGcd);
 
-            if(yawGcdList.size() > 3 && pitchGcdList.size() > 3) {
+            if (yawGcdList.size() > 3 && pitchGcdList.size() > 3) {
 
                 //Making sure to get shit within the std for a more accurate result.
-                if(lastReset.hasPassed()) {
+                if (lastReset.hasPassed()) {
                     yawMode = MathUtils.getMode(yawGcdList);
                     pitchMode = MathUtils.getMode(pitchGcdList);
                     lastReset.reset();
@@ -125,8 +127,8 @@ public class MovementProcessor {
 
                 lastDeltaX = deltaX;
                 lastDeltaY = deltaY;
-                deltaX = getDeltaX(data.playerInfo.deltaYaw, (float)yawMode);
-                deltaY = getDeltaY(data.playerInfo.deltaPitch, (float)pitchMode);
+                deltaX = getDeltaX(data.playerInfo.deltaYaw, (float) yawMode);
+                deltaY = getDeltaY(data.playerInfo.deltaPitch, (float) pitchMode);
                 sensitivityX = getSensitivityFromYawGCD(yawMode);
                 sensitivityY = getSensitivityFromPitchGCD(pitchMode);
 
@@ -135,7 +137,7 @@ public class MovementProcessor {
         }
 
         /* Velocity Handler */
-        if(timeStamp - data.playerInfo.lastVelocityTimestamp < 50L) {
+        if (timeStamp - data.playerInfo.lastVelocityTimestamp < 50L) {
             data.playerInfo.takingVelocity = true;
             data.playerInfo.mvx = data.playerInfo.velocityX;
             data.playerInfo.mvy = data.playerInfo.velocityY;
@@ -145,29 +147,34 @@ public class MovementProcessor {
         //We use a boolean since it allows for easier management of this handler, and it also isn't dependant on time
         //If it was dependant on time, a player could be taking large amounts of velocity still and it would stop checking.
         //That would most likely cause a false positive.
-        if(data.playerInfo.takingVelocity) {
+        if (data.playerInfo.takingVelocity) {
             float drag = data.playerInfo.serverGround ? MovementUtils.getFriction(data) : 0.91f;
 
-            data.playerInfo.mvx*= drag;
-            data.playerInfo.mvz*= drag;
+            data.playerInfo.mvx *= drag;
+            data.playerInfo.mvz *= drag;
 
-            if(!data.playerInfo.serverGround) {
-                data.playerInfo.mvy-= 0.08f;
-                data.playerInfo.mvy*= 0.98;
+            if (!data.playerInfo.serverGround) {
+                data.playerInfo.mvy -= 0.08f;
+                data.playerInfo.mvy *= 0.98;
                 data.playerInfo.mvy = 0;
             } else data.playerInfo.mvy = 0;
 
-            if(MathUtils.hypot(data.playerInfo.mvx, data.playerInfo.mvz) < data.playerInfo.deltaXZ - 0.001) {
+            if (MathUtils.hypot(data.playerInfo.mvx, data.playerInfo.mvz) < data.playerInfo.deltaXZ - 0.001) {
                 data.playerInfo.takingVelocity = false;
                 data.playerInfo.mvx = data.playerInfo.mvz = 0;
             }
         }
 
+        if (packet.isPos()) {
+            if (data.playerInfo.serverGround && data.playerInfo.groundTicks > 4)
+                data.playerInfo.groundLoc = data.playerInfo.to;
+        }
+
         //Fixes glitch when logging in.
         //We use the NMS (bukkit) version since their state is likely saved in a player data file in the world.
         //This should prevent false positives from ability inaccuracies.
-        if(timeStamp - data.creation < 500L) {
-            if(data.playerInfo.canFly != data.getPlayer().getAllowFlight()) {
+        if (timeStamp - data.creation < 500L) {
+            if (data.playerInfo.canFly != data.getPlayer().getAllowFlight()) {
                 data.playerInfo.lastToggleFlight.reset();
             }
             data.playerInfo.canFly = data.getPlayer().getAllowFlight();
@@ -194,7 +201,7 @@ public class MovementProcessor {
         data.playerInfo.lDeltaXZ = data.playerInfo.deltaXZ;
         data.playerInfo.deltaXZ = MathUtils.hypot(data.playerInfo.deltaX, data.playerInfo.deltaZ);
 
-        if(data.playerInfo.worldLoaded) {
+        if (data.playerInfo.worldLoaded) {
             data.playerInfo.blockOnTo = data.playerInfo.to.toLocation(data.getPlayer().getWorld()).getBlock();
             data.playerInfo.blockBelow = data.playerInfo.to.toLocation(data.getPlayer().getWorld())
                     .subtract(0, 1, 0).getBlock();
@@ -321,6 +328,7 @@ public class MovementProcessor {
         data.playerInfo.flightCancel = data.playerInfo.canFly
                 || data.playerInfo.creative
                 || hasLevi
+                || timeStamp - data.playerInfo.lastServerPos < 60L
                 || data.playerInfo.inVehicle
                 || data.playerInfo.webTicks.value() > 0
                 || data.playerInfo.lastWorldUnload.hasNotPassed(10)
@@ -337,6 +345,7 @@ public class MovementProcessor {
         data.playerInfo.generalCancel = data.playerInfo.canFly
                 || data.playerInfo.creative
                 || hasLevi
+                || timeStamp - data.playerInfo.lastServerPos < 60L
                 || data.playerInfo.riptiding
                 || data.playerInfo.gliding
                 || data.playerInfo.inVehicle

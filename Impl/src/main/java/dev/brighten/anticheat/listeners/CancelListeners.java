@@ -1,9 +1,11 @@
 package dev.brighten.anticheat.listeners;
 
 import cc.funkemunky.api.utils.Init;
+import cc.funkemunky.api.utils.objects.VariableValue;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.CancelType;
 import dev.brighten.anticheat.data.ObjectData;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -15,8 +17,14 @@ import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 @Init
 public class CancelListeners implements Listener {
+
+    private static Map<UUID, Location> fromLocs = new HashMap<>();
 
     /** Cancels for MOVEMENT **/
     @EventHandler(priority = EventPriority.MONITOR)
@@ -27,9 +35,12 @@ public class CancelListeners implements Listener {
             for (CancelType cancelType : data.typesToCancel) {
                 if(!cancelType.equals(CancelType.MOVEMENT)) continue;
 
-                event.setCancelled(true);
+                event.getPlayer().teleport(fromLocs.getOrDefault(event.getPlayer().getUniqueId(), event.getFrom()));
                 data.typesToCancel.remove(cancelType);
-                break;
+                return;
+            }
+            if(event.getPlayer().isOnGround()) {
+                fromLocs.put(event.getPlayer().getUniqueId(), event.getTo());
             }
         }
     }

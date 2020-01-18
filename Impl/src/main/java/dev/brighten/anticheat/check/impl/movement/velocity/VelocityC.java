@@ -4,6 +4,7 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInKeepAlivePacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.MathUtils;
+import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -11,6 +12,7 @@ import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Velocity (C)", description = "Checks for vertical velocity mods on first tick only.",
         checkType = CheckType.VELOCITY, punishVL = 7)
+@Cancellable
 public class VelocityC extends Check {
 
     private float velocityY;

@@ -20,6 +20,8 @@ public class AimB extends Check {
                     && (MathUtils.getDelta(
                             MathUtils.getDelta(data.playerInfo.cinematicPitch, data.playerInfo.lCinematicPitch),
                     data.playerInfo.deltaYaw) > 1.2)
+                    && (data.playerInfo.lastAttack.hasNotPassed(20)
+                    || data.playerInfo.lastBlockPlace.hasNotPassed(20))
                     && !data.playerInfo.cinematicModeYaw
                     && !data.playerInfo.cinematicModePitch
                     && (data.playerInfo.deltaPitch < 10 || MathUtils.getDelta(data.playerInfo.deltaPitch, data.playerInfo.lDeltaPitch) > 10)) {

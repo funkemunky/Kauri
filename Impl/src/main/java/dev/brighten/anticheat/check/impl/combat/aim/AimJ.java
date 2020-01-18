@@ -59,7 +59,7 @@ public class AimJ extends Check {
             }
         }
         verbose.subtract(0.001);
-        debug("y1=%1,y2=%2,a=%3,vb=%4", data.playerInfo.deltaYaw, yawDif, angle, verbose.value());
+        debug("y1=%1,y2=%2,a=%3,vb=%4,dev=%5", data.playerInfo.deltaYaw, yawDif, angle, verbose.value(), deviation);
     }
 
     public long getDeviation(float pitchChange) {

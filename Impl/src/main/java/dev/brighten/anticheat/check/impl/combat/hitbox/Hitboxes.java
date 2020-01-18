@@ -7,9 +7,7 @@ import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MiscUtils;
 import com.google.common.util.concurrent.AtomicDouble;
 import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.check.api.Check;
-import dev.brighten.anticheat.check.api.CheckInfo;
-import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.RayCollision;
 import dev.brighten.api.check.CheckType;
@@ -23,6 +21,7 @@ import java.util.stream.Collectors;
 
 @CheckInfo(name = "Hitboxes", description = "Ensures the player is looking at the target when attacking.",
         checkType = CheckType.HITBOX, punishVL = 15)
+@Cancellable(cancelType = CancelType.ATTACK)
 public class Hitboxes extends Check {
 
     private static List<EntityType> allowedEntities = Arrays.asList(

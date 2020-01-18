@@ -5,9 +5,7 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
-import dev.brighten.anticheat.check.api.Check;
-import dev.brighten.anticheat.check.api.CheckInfo;
-import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.utils.RayCollision;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
@@ -21,6 +19,7 @@ import java.util.stream.Collectors;
 
 @CheckInfo(name = "Reach", description = "Ensures the reach of a player is legitimate.",
         checkType = CheckType.HITBOX, punishVL = 10, executable = false)
+@Cancellable(cancelType = CancelType.ATTACK)
 public class Reach extends Check {
 
     private static List<EntityType> allowedEntities = Arrays.asList(EntityType.PLAYER, EntityType.SKELETON,
@@ -36,7 +35,8 @@ public class Reach extends Check {
     @Packet
     public void onUse(WrappedInFlyingPacket packet, long timeStamp) {
         //debug("timeStamp=" + timeStamp + "ms");
-        if(data.target == null || data.targetData == null || timeStamp - data.playerInfo.lastAttackTimeStamp > 55) return;
+        if(data.target == null || data.targetData == null || data.playerInfo.creative
+                || timeStamp - data.playerInfo.lastAttackTimeStamp > 55) return;
 
         val origins = data.pastLocation.getPreviousRange(30L)
                 .stream()

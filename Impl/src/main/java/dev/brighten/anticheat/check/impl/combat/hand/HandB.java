@@ -2,13 +2,12 @@ package dev.brighten.anticheat.check.impl.combat.hand;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockDigPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import dev.brighten.anticheat.check.api.Check;
-import dev.brighten.anticheat.check.api.CheckInfo;
-import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Hand (B)", description = "Checks for irregular block place packets.",
         checkType = CheckType.HAND, punishVL = 12, developer = true, executable = false)
+@Cancellable(cancelType = CancelType.INTERACT)
 public class HandB extends Check {
 
     private long lastFlying;

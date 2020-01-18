@@ -21,6 +21,7 @@ import dev.brighten.api.check.CheckType;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -158,13 +159,16 @@ public class MenuCommand {
 
             String enabled = "checks." + val.name + ".enabled";
             String executable = "checks." + val.name + ".executable";
+            String cancellable = "checks." + val.name + ".cancellable";
 
             List<String> lore = new ArrayList<>(Arrays.asList("&7",
                     "&eEnabled&7: &f" + val.enabled,
                     "&eExecutable&7: &f" + val.executable,
+                    "&eCancellable&7: &f" + val.cancellable,
                     "&eDescription&7: &f"));
 
             lore.addAll(Arrays.asList(splitIntoLine(val.description, 35)));
+
 
             Button button = createButton(
                     val.enabled ? (val.executable ? Material.MAP : Material.EMPTY_MAP) : Material.PAPER,
@@ -179,21 +183,20 @@ public class MenuCommand {
                                 Kauri.INSTANCE.getConfig().set(enabled, settings.enabled);
                                 Kauri.INSTANCE.saveConfig();
 
+                                ItemBuilder builder = new ItemBuilder(info.getButton().getStack());
                                 if (!settings.enabled) {
-                                    info.getButton().getStack().setType(Material.PAPER);
+                                    builder.type(Material.PAPER);
                                 } else {
-                                    info.getButton().getStack().setType(settings.executable ? Material.MAP : Material.EMPTY_MAP);
+                                    builder.type(settings.executable ? Material.MAP : Material.EMPTY_MAP);
                                 }
 
-                                ItemMeta meta = info.getButton().getStack().getItemMeta();
-                                List<String> loreList = meta.getLore();
-                                loreList.set(1, Color.translate("&eEnabled&7: &f" + settings.enabled));
-                                meta.setDisplayName(Color.translate((settings.enabled ? "&a" : "&c") + val.name));
-                                meta.setLore(loreList);
-                                info.getButton().getStack().setItemMeta(meta);
+                                lore.set(1, Color.translate("&eEnabled&7: &f" + settings.enabled));
+                                builder.name((settings.enabled ? "&a" : "&c") + val.name);
+                                info.getButton().setStack(builder.build());
                                 menu.buildInventory(false);
                                 Kauri.INSTANCE.dataManager.dataMap.values().parallelStream()
-                                        .forEach(data -> data.checkManager.checks.get(val.name).enabled = settings.enabled);
+                                        .forEach(data -> data.checkManager.checks.get(val.name)
+                                                .enabled = settings.enabled);
                                 break;
                             }
                             case RIGHT:
@@ -203,23 +206,54 @@ public class MenuCommand {
                                 Kauri.INSTANCE.getConfig().set(executable, settings.executable);
                                 Kauri.INSTANCE.saveConfig();
 
+                                ItemBuilder builder = new ItemBuilder(info.getButton().getStack());
                                 if (settings.enabled) {
-                                    info.getButton().getStack().setType(settings.executable ? Material.MAP : Material.EMPTY_MAP);
+                                    builder.type(settings.executable ? Material.MAP : Material.EMPTY_MAP);
                                 }
 
-                                ItemMeta meta = info.getButton().getStack().getItemMeta();
-                                List<String> loreList = meta.getLore();
-                                loreList.set(2, Color.translate("&eExecutable&7: &f" + settings.executable));
-                                meta.setLore(loreList);
-                                info.getButton().getStack().setItemMeta(meta);
+                                lore.set(2, Color.translate("&eExecutable&7: &f" + settings.executable));
+                                builder.lore(lore.toArray(new String[]{}));
+                                info.getButton().setStack(builder.build());
                                 menu.buildInventory(false);
                                 Kauri.INSTANCE.dataManager.dataMap.values().parallelStream()
-                                        .forEach(data -> data.checkManager.checks.get(settings.name).executable = settings.executable);
+                                        .forEach(data -> data.checkManager.checks.get(settings.name)
+                                                .executable = settings.executable);
+                                break;
+                            }
+                            case MIDDLE: {
+                                CheckSettings settings = Check.getCheckSettings(val.name);
+                                settings.cancellable = !settings.cancellable;
+                                Kauri.INSTANCE.getConfig().set(cancellable, settings.cancellable);
+                                Kauri.INSTANCE.saveConfig();
+
+                                ItemBuilder builder = new ItemBuilder(info.getButton().getStack());
+                                if (settings.enabled) {
+                                    builder.clearEnchantments();
+                                    if(settings.cancellable) {
+                                        builder.enchantment(Enchantment.DURABILITY, 1);
+                                    }
+                                }
+
+                                lore.set(3, Color.translate("&eCancellable&7: &f" + settings.cancellable));
+                                builder.lore(lore.toArray(new String[]{}));
+                                info.getButton().setStack(builder.build());
+                                menu.buildInventory(false);
+                                Kauri.INSTANCE.dataManager.dataMap.values().parallelStream()
+                                        .forEach(data -> data.checkManager.checks.get(settings.name)
+                                                .cancellable = settings.cancellable);
                                 break;
                             }
                         }
                     }, lore.toArray(new String[]{}));
 
+            if (val.enabled) {
+                ItemBuilder builder = new ItemBuilder(button.getStack());
+                builder.clearEnchantments();
+                if(val.cancellable) {
+                    builder.enchantment(Enchantment.DURABILITY, 1);
+                }
+                button.setStack(builder.build());
+            }
             menu.addItem(button);
         }
         return menu;

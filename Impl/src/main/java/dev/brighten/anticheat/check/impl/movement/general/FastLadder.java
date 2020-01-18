@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.check.impl.movement.general;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -8,6 +9,7 @@ import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "FastLadder", description = "Ensures players do not go faster than legitimate speeds on ladders.",
         checkType = CheckType.GENERAL, executable = false, punishVL = 20)
+@Cancellable
 public class FastLadder extends Check {
 
     @Packet

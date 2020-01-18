@@ -47,7 +47,6 @@ public class Kauri extends JavaPlugin {
     public MessageHandler msgHandler;
     public DataProcessor dataProcessor;
     public KauriAPI kauriAPI;
-    public boolean isPaper;
 
     public void onEnable() {
         MiscUtils.printToConsole(Color.Red + "Starting Kauri " + getDescription().getVersion() + "...");
@@ -67,6 +66,7 @@ public class Kauri extends JavaPlugin {
         else executor.execute(() -> loggerManager.logsDatabase.saveDatabase());;
         MiscUtils.printToConsole("&7Unregistering Kauri API...");
         kauriAPI.service.shutdown();
+        kauriAPI = null;
 
         MiscUtils.printToConsole("&7Unregistering Atlas and Bukkit listeners...");
         HandlerList.unregisterAll(this); //Unregistering Bukkit listeners.
@@ -96,21 +96,13 @@ public class Kauri extends JavaPlugin {
 
     public void load() {
         MiscUtils.printToConsole(Color.Gray + "Starting thread pool...");
-        executor = Executors.newFixedThreadPool(4);
+        executor = Executors.newFixedThreadPool(3);
 
         MiscUtils.printToConsole(Color.Gray + "Loading config...");
         saveDefaultConfig();
 
         MiscUtils.printToConsole(Color.Gray + "Loading messages...");
         msgHandler = new MessageHandler(this);
-
-        MiscUtils.printToConsole(Color.Gray + "Checking if using paper...");
-        try {
-            Class.forName("org.github.paperspigot.PaperSpigotConfig");
-            isPaper = true;
-        } catch(ClassNotFoundException e) {
-            isPaper = false;
-        }
 
         MiscUtils.printToConsole(Color.Gray + "Running scanner...");
         Atlas.getInstance().initializeScanner(this, true, true);

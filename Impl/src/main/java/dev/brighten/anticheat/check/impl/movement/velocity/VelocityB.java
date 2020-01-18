@@ -4,6 +4,7 @@ import cc.funkemunky.api.tinyprotocol.packet.in.*;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.MathHelper;
 import cc.funkemunky.api.utils.MathUtils;
+import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -12,7 +13,8 @@ import dev.brighten.api.check.CheckType;
 import org.bukkit.enchantments.Enchantment;
 
 @CheckInfo(name = "Velocity (B)", description = "A horizontally velocity check.", checkType = CheckType.VELOCITY,
-        punishVL = 28)
+        punishVL = 36)
+@Cancellable
 public class VelocityB extends Check {
 
     private double vX, vZ, svX, svZ;
@@ -52,7 +54,7 @@ public class VelocityB extends Check {
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if((vX != 0 || vZ != 0)) {
             if(timeStamp - velocityTS < 400) {
-                if(useEntity) {
+                if(data.playerInfo.sprinting && useEntity) {
                     vX*= 0.6;
                     vZ*= 0.6;
                 }
@@ -67,19 +69,19 @@ public class VelocityB extends Check {
                         && !data.playerInfo.serverPos
                         && !data.getPlayer().getAllowFlight()) {
 
-                    float f4 = 0.91f;
+                    double f4 = 0.91;
 
                     if (data.playerInfo.lClientGround) {
-                        f4 *= MovementUtils.getFriction(data);
+                        f4 *= data.blockInfo.currentFriction;
                     }
 
-                    float f = 0.16277136F / (f4 * f4 * f4);
+                    double f = 0.16277136 / (f4 * f4 * f4);
                     double f5;
 
                     if (data.playerInfo.lClientGround) {
                         f5 = data.predictionService.aiMoveSpeed * f;
                     } else {
-                        f5 = data.playerInfo.sprinting ? 0.026f : 0.02f;
+                        f5 = data.playerInfo.sprinting ? 0.026 : 0.02;
                     }
 
                     double pct;
@@ -88,8 +90,8 @@ public class VelocityB extends Check {
                     strafe = data.predictionService.moveStrafing;
 
                     if(data.playerInfo.usingItem) {
-                        forward*= 0.2f;
-                        strafe*= 0.2f;
+                        forward*= 0.2;
+                        strafe*= 0.2;
                     }
 
                     debug("motion: " + strafe + ", " + forward);

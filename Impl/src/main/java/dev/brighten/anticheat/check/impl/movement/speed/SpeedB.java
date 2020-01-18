@@ -2,6 +2,7 @@ package dev.brighten.anticheat.check.impl.movement.speed;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.MathUtils;
+import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -9,6 +10,7 @@ import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Speed (B)", description = "Checks for changing in air which should be impossible.",
         checkType = CheckType.SPEED, punishVL = 20)
+@Cancellable
 public class SpeedB extends Check {
 
     private float verbose;

@@ -2,16 +2,22 @@ package dev.brighten.anticheat.check.impl.movement.general;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.Materials;
+import cc.funkemunky.api.utils.PlayerUtils;
+import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.utils.MovementUtils;
 import dev.brighten.api.check.CheckType;
+import lombok.val;
+import lombok.var;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @CheckInfo(name = "LiquidWalk", description = "Checks for liquid walk modules.", checkType = CheckType.GENERAL,
         punishVL = 20, developer = true)
+@Cancellable
 public class LiquidWalk extends Check {
 
     private long aboveTicks;
@@ -41,30 +47,23 @@ public class LiquidWalk extends Check {
 
         if(inLiquid) {
             float absY = Math.abs(data.playerInfo.deltaY), labsY = Math.abs(data.playerInfo.lDeltaY);
-            if(absY < 0.001) {
-                vl++;
-                tags.add("low");
-                flagged = true;
-            }
-            if(absY == labsY) {
+            if(absY == labsY && !data.playerInfo.clientGround && !data.playerInfo.serverGround)
                 tags.add("equal");
-                vl++;
-                flagged = true;
-            }
-            if(aboveTicks > 5) {
-                vl++;
-                tags.add("aboveTicks");
-                flagged = true;
-            }
-            if(data.playerInfo.deltaY >= 0 && aboveTicks > 0) {
-                vl++;
-                tags.add("hover");
-                flagged = true;
+
+            if(aboveTicks > 5) tags.add("aboveTicks");
+
+            if(data.playerInfo.deltaY >= 0 && aboveTicks > 0) tags.add("hover");
+
+            var base = MovementUtils.getBaseSpeed(data) - 0.04f;
+
+            base+= 0.1f * PlayerUtils.getDepthStriderLevel(data.getPlayer());
+            if(data.playerInfo.deltaXZ > base && data.playerInfo.liquidTicks.value() > 8) {
+                tags.add("speed[" + data.playerInfo.deltaXZ + ">-" + base + "]");
             }
 
             String joined = String.join(",", tags);
-            if(flagged) {
-                if(vl > 7) {
+            if(tags.size() > 1) {
+                if(vl++ > 7) {
                     flag("y=%1 tags=[%2]", data.playerInfo.deltaY, joined);
                 }
             } else vl-= vl > 0 ? 0.25f : 0;

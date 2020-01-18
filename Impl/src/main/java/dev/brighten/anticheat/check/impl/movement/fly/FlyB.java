@@ -2,6 +2,7 @@ package dev.brighten.anticheat.check.impl.movement.fly;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.MathUtils;
+import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -9,6 +10,7 @@ import dev.brighten.anticheat.utils.MovementUtils;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Fly (B)", description = "Checks for improper acceleration.", checkType = CheckType.FLIGHT)
+@Cancellable
 public class FlyB extends Check {
 
     @Packet

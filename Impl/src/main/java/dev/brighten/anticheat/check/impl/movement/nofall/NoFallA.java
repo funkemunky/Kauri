@@ -21,7 +21,7 @@ public class NoFallA extends Check {
         if(!data.playerInfo.flightCancel
                 && !data.blockInfo.onSlime
                 && data.playerInfo.blocksAboveTicks.value() == 0
-                && timeStamp -  data.playerInfo.lastServerPos > 100L
+                && timeStamp - data.playerInfo.lastServerPos > 300L + data.lagInfo.transPing
                 && flag) {
             vl+= data.lagInfo.lagging || data.lagInfo.lastPacketDrop.hasNotPassed(3) ? 1 : 3;
 

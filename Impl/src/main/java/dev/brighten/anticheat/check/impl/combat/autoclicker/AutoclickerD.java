@@ -14,7 +14,7 @@ import lombok.val;
         checkType = CheckType.AUTOCLICKER, developer = true, punishVL = 20)
 public class AutoclickerD extends Check {
 
-    private EvictingList<Long> cpsCounts = new EvictingList<>(75);
+    private EvictingList<Long> cpsCounts = new EvictingList<>(50);
     private EvictingList<Double> errorList = new EvictingList<>(20);
     private long ltimestamp;
     private MaxInteger verbose = new MaxInteger(80);
@@ -40,19 +40,20 @@ public class AutoclickerD extends Check {
 
                 double errorStd = MathUtils.stdev(errorList);
 
-                if(errorStd < 4 && average > 4 && std > 30 && errorList.size() > 15) {
+                if(errorStd < 4 && average > 4 && errorList.size() > 15) {
                     if(verbose.add(errorStd < 3 ? 4 : 2) > 22) {
                         vl++;
-                        flag("std=%1 error=%2 avg=%3",
+                        flag("errorstd=%1 error=%2 avg=%3 std=%4",
                                 MathUtils.round(errorStd, 3),
-                                MathUtils.round(error, 3), MathUtils.round(average, 3));
+                                MathUtils.round(error, 3), MathUtils.round(average, 3),
+                                MathUtils.round(std, 4));
                     }
                 } else verbose.subtract();
 
-                debug("error=%3 avg=%1 std=%2 errorStd=%4",
+                debug("error=%3 avg=%1 std=%2 errorStd=%4 verbose=%5",
                         MathUtils.round(average, 3),
                         MathUtils.round(std, 3),
-                        MathUtils.round(error, 4), MathUtils.round(errorStd, 4));
+                        MathUtils.round(error, 4), MathUtils.round(errorStd, 4), verbose);
             } catch (Exception e) {
                 e.printStackTrace();
             }

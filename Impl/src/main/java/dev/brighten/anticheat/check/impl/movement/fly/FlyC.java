@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.check.impl.movement.fly;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -8,6 +9,7 @@ import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Fly (C)", description = "Ensures a player does not fly in a vehicle.",
         checkType = CheckType.FLIGHT, developer = true, punishVL = 10)
+@Cancellable
 public class FlyC extends Check {
 
     @Packet

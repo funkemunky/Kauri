@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DataProcessor {
 
-    private final Deque<Tuple<Runnable, Long>> tasks = new ConcurrentLinkedDeque<>();
+    private final Deque<Tuple<Runnable, Long>> tasks = new LinkedBlockingDeque<>();
     private final ExecutorService processorTask = Executors.newSingleThreadExecutor();
     private AtomicBoolean running = new AtomicBoolean(true);
 
@@ -40,5 +40,6 @@ public class DataProcessor {
     public void runTask(Runnable runnable) {
         long timeStamp = System.currentTimeMillis();
         tasks.addLast(new Tuple<>(runnable, timeStamp));
+        //processorTask.execute(runnable);
     }
 }

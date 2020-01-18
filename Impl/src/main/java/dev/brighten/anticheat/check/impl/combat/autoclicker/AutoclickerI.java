@@ -22,17 +22,17 @@ public class AutoclickerI extends Check {
                 double cpsAverage = cpsSamples.stream().mapToDouble(Integer::doubleValue).average().orElse(0.0);
                 double ratio = cpsAverage / cps;
 
-                if (ratio > 0.99) {
-                    if (++verbose > 3) {
+                if (ratio > 0.99 && cpsAverage > 7) {
+                    if (++verbose > 5) {
                         vl++;
-                        this.flag(ratio + "r");
+                        this.flag("r=%1 a=%2", ratio, cpsAverage);
                     }
                 } else {
                     verbose = 0;
                     vl = Math.max(vl - 1, 0);
                 }
 
-                debug("ratio=%1 vl=%2", ratio, verbose);
+                debug("ratio=%1 vl=%2 avg=%3", ratio, verbose, cpsAverage);
             }
             this.ticks = 0;
             this.cps = 0;
@@ -42,6 +42,8 @@ public class AutoclickerI extends Check {
 
     @Packet
     public void onClick(WrappedInArmAnimationPacket packet, long timeStamp) {
+        if(data.playerInfo.breakingBlock || data.playerInfo.lastBlockPlace.hasNotPassed(3)) return;
+
         this.cps++;
     }
 }

@@ -4,6 +4,7 @@ import cc.funkemunky.api.events.impl.PacketReceiveEvent;
 import cc.funkemunky.api.events.impl.PacketSendEvent;
 import cc.funkemunky.api.reflection.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.*;
 import cc.funkemunky.api.tinyprotocol.packet.out.*;
@@ -86,7 +87,7 @@ public class PacketProcessor {
                    if(timeStamp - data.creation > 10000L
                            && Kauri.INSTANCE.lastTickLag.hasPassed(20)
                            && timeStamp - Kauri.INSTANCE.lastTick < new VariableValue<>(
-                           110L, 60L, () -> Kauri.INSTANCE.isPaper).get()
+                           110L, 60L, ProtocolVersion::isPaper).get()
                            && timeStamp - data.lagInfo.lastTrans > 5000L)
                        RunUtils.task(() -> data.getPlayer().kickPlayer("Lag?"));
 

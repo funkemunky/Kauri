@@ -40,9 +40,11 @@ public class AutoclickerG extends Check {
 
     @Packet
     public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
+        if(data.playerInfo.lastBrokenBlock.hasNotPassed(2) || data.playerInfo.breakingBlock
+                || data.playerInfo.lastBlockPlace.hasNotPassed(2)) return;
+
         timesSent++;
         if(sent && data.lagInfo.lastPacketDrop.hasPassed(1)
-                && data.playerInfo.lastBrokenBlock.hasPassed(2)
                 && MathUtils.getDelta(timeStamp - lastFlying, 50) < 20) {
             if(vl++ > 1) {
                 flag("sent=%1", timesSent);

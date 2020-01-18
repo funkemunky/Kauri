@@ -22,6 +22,7 @@ import dev.brighten.anticheat.check.impl.movement.nofall.NoFallA;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallB;
 import dev.brighten.anticheat.check.impl.movement.speed.SpeedA;
 import dev.brighten.anticheat.check.impl.movement.speed.SpeedB;
+import dev.brighten.anticheat.check.impl.movement.speed.SpeedC;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityA;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityB;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityC;
@@ -88,20 +89,12 @@ public class Check implements KauriCheck {
         CheckSettings settings = new CheckSettings(info.name(), info.description(), info.checkType(), type,
                 info.punishVL(), info.vlToFlag(), info.minVersion(), info.maxVersion());
 
-        if(Kauri.INSTANCE.getConfig().get("checks." + name + ".enabled") != null) {
-            settings.enabled = Kauri.INSTANCE.getConfig().getBoolean("checks." + name + ".enabled");
-            settings.executable = Kauri.INSTANCE.getConfig().getBoolean("checks." + name + ".executable");
-            settings.cancellable = Kauri.INSTANCE.getConfig().getBoolean("checks." + name + ".cancellable");
-        } else {
-            Kauri.INSTANCE.getConfig().set("checks." + name + ".enabled", info.enabled());
-            Kauri.INSTANCE.getConfig().set("checks." + name + ".executable", info.executable());
-            Kauri.INSTANCE.getConfig().set("checks." + name + ".cancellable", info.cancellable());
-            Kauri.INSTANCE.saveConfig();
-
-            settings.enabled = info.enabled();
-            settings.executable = info.executable();
-            settings.cancellable = info.cancellable();
-        }
+        settings.enabled = new ConfigDefault<>(info.enabled(),
+                "checks." + name + ".enabled", Kauri.INSTANCE).get();
+        settings.executable = new ConfigDefault<>(info.executable(),
+                "checks." + name + ".executable", Kauri.INSTANCE).get();
+        settings.cancellable = new ConfigDefault<>(info.cancellable(),
+                "checks." + name + ".cancellable", Kauri.INSTANCE).get();
 
         checkSettings.put(checkClass, settings);
         checkClasses.put(checkClass, info);
@@ -120,7 +113,11 @@ public class Check implements KauriCheck {
 
         event.setCancelled(!Config.alertDev);
 
-        if(cancellable && cancelMode != null) data.typesToCancel.add(cancelMode);
+        if(cancellable && cancelMode != null) {
+            if(cancelMode.equals(CancelType.MOVEMENT)) {
+                data.typesToCancel.add(cancelMode);
+            } else for(int i = 0 ; i < 5 ; i++) data.typesToCancel.add(cancelMode);
+        }
 
         Atlas.getInstance().getEventManager().callEvent(event);
         Kauri.INSTANCE.executor.execute(() -> {
@@ -253,8 +250,10 @@ public class Check implements KauriCheck {
         register(new AimI());
         register(new AimJ());
         register(new AimK());
+        register(new AimL());
         register(new SpeedA());
         register(new SpeedB());
+        register(new SpeedC());
         register(new Timer());
         register(new BadPacketsA());
         register(new BadPacketsB());

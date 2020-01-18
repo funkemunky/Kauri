@@ -3,6 +3,7 @@ package dev.brighten.anticheat.check.impl.packets.badpackets;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInEntityActionPacket;
 import cc.funkemunky.api.utils.TickTimer;
 import cc.funkemunky.api.utils.math.cond.MaxInteger;
+import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -10,6 +11,7 @@ import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "BadPackets (B)", description = "Checks for the spamming of sneak changes.",
         checkType = CheckType.BADPACKETS, punishVL = 40)
+@Cancellable
 public class BadPacketsB extends Check {
 
     private TickTimer lastSneak = new TickTimer(0);

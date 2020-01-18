@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.check.impl.movement.fly;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -9,9 +10,10 @@ import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Fly (A)", description = "Sets a maximum height distance", punishVL = 5,
         checkType = CheckType.FLIGHT)
+@Cancellable
 public class FlyA extends Check {
 
-    private float maxHeight, slimeHeight, totalHeight;
+    private double maxHeight, slimeHeight, totalHeight;
     private boolean wasOnSlime, tookVelocity;
 
     @Packet
@@ -23,7 +25,7 @@ public class FlyA extends Check {
                 slimeHeight -= data.playerInfo.lDeltaY;
             } else if(wasOnSlime) {
                 maxHeight = Math.max(2f,
-                        MovementUtils.getTotalHeight(slimeHeight)) * 1.25f;
+                        MovementUtils.getTotalHeight((float)slimeHeight)) * 1.25f;
                 wasOnSlime = false;
             } else if(!tookVelocity && data.playerInfo.clientGround) {
                 maxHeight = MovementUtils.getTotalHeight(MovementUtils.getJumpHeight(data.getPlayer())) * 1.4f;
@@ -44,7 +46,7 @@ public class FlyA extends Check {
 
             if(tookVelocity) {
                 totalHeight = 0;
-                maxHeight = MovementUtils.getTotalHeight(data.playerInfo.velocityY) * 1.4f;
+                maxHeight = MovementUtils.getTotalHeight((float)data.playerInfo.velocityY) * 1.4f;
             }
 
             if(data.playerInfo.clientGround || data.playerInfo.serverGround) {
