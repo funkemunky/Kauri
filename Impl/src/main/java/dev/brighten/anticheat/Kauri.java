@@ -7,7 +7,6 @@ import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.TickTimer;
-import cc.funkemunky.api.utils.objects.VariableValue;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.Config;
 import dev.brighten.anticheat.data.DataManager;
@@ -19,11 +18,12 @@ import dev.brighten.api.KauriAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class Kauri extends JavaPlugin {
 
@@ -88,7 +88,6 @@ public class Kauri extends JavaPlugin {
         Check.checkSettings.clear();
         profiler.enabled = false;
         profiler = null;
-        dataProcessor.shutdown();
         packetProcessor = null;
         loggerManager = null;
         executor.shutdown(); //Shutting down threads.
@@ -143,24 +142,22 @@ public class Kauri extends JavaPlugin {
 
     private void runTpsTask() {
         lastTickLag = new TickTimer(6);
-        new BukkitRunnable() {
-            private int ticks;
-            private long lastTimeStamp, lastTick;
-            public void run() {
-                ticks++;
-                long currentTime = System.currentTimeMillis();
+        AtomicInteger ticks = new AtomicInteger();
+        AtomicLong lastTimeStamp = new AtomicLong(0);
+        RunUtils.taskTimer(() -> {
+            ticks.getAndIncrement();
+            long currentTime = System.currentTimeMillis();
 
-                if(currentTime - lastTick > 120) {
-                    lastTickLag.reset();
-                }
-                if(ticks >= 10) {
-                    ticks = 0;
-                    tps = 500D / (currentTime - lastTimeStamp) * 20;
-                    lastTimeStamp = currentTime;
-                }
-                lastTick = currentTime;
-                Kauri.INSTANCE.lastTick = currentTime;
+            if(currentTime - lastTick > 120) {
+                lastTickLag.reset();
             }
-        }.runTaskTimer(this, 1L, 1L);
+            if(ticks.get() >= 10) {
+                ticks.set(0);
+                tps = 500D / (currentTime - lastTimeStamp.get()) * 20;
+                lastTimeStamp.set(currentTime);
+            }
+            lastTick = currentTime;
+            Kauri.INSTANCE.lastTick = currentTime;
+        }, this, 1L, 1L);
     }
 }

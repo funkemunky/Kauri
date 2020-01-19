@@ -1,31 +1,26 @@
 package dev.brighten.anticheat.data.classes;
 
-import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.*;
+import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.data.ObjectData;
-import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.List;
 
 public class PredictionService {
 
     private ObjectData data;
-    public boolean fly, velocity, position, sneak, sprint, useSword, hit, dropItem, inWeb, isCollidedHorizontally, checkConditions,
-            lastOnGround, onGround, lastSprint, fMath, fastMath, walkSpecial, lastVelocity, isCollidedVertically,
-            isCollided;
+    public boolean fly, velocity, position, sneak, sprint, useSword, hit, dropItem, inWeb, checkConditions,
+            lastOnGround, onGround, lastSprint, fMath, fastMath, walkSpecial, lastVelocity;
     public double posX, posY, posZ, lPosX, lPosY, lPosZ, rmotionX, rmotionY, rmotionZ, lmotionX, lmotionZ, lmotionY;
     public double predX, predZ;
     public TickTimer lastUseItem = new TickTimer(10);
-    public BoundingBox box;
     public double aiMoveSpeed;
-    public float walkSpeed, yaw, pitch, moveStrafing, moveForward, distanceWalkedModified,
-            distanceWalkedOnStepModified, nextStepDistance, fallDistance;
+    public float walkSpeed, yaw, moveStrafing, moveForward;
+
     public String key = "Nothing";
 
     public PredictionService(ObjectData data) {
@@ -365,199 +360,6 @@ public class PredictionService {
         // Bukkit.broadcastMessage(data.playerInfo.deltaXZ + "");
     }
 
-    private void moveEntity(double x, double y, double z) {
-        if(!data.playerInfo.worldLoaded) return;
-        double d0 = this.posX;
-        double d1 = this.posY;
-        double d2 = this.posZ;
-
-        if (inWeb) {
-            inWeb = false;
-            x *= 0.25D;
-            y *= 0.05000000074505806D;
-            z *= 0.25D;
-            this.rmotionX = 0.0D;
-            this.rmotionY = 0.0D;
-            this.rmotionZ = 0.0D;
-        }
-
-        double d3 = x;
-        double d4 = y;
-        double d5 = z;
-        boolean flag = this.onGround && data.playerInfo.sneaking;
-
-
-        if (flag) {
-            double d6;
-
-            for (d6 = 0.05D; x != 0.0D && getBoxes(box.add((float)x, -1.0f, 0.0f)).isEmpty(); d3 = x) {
-                if (x < d6 && x >= -d6) {
-                    x = 0.0D;
-                } else if (x > 0.0D) {
-                    x -= d6;
-                } else {
-                    x += d6;
-                }
-            }
-
-            for (; z != 0.0D && getBoxes(box.add(0.0f, -1.0f, (float)z)).isEmpty(); d5 = z) {
-                if (z < d6 && z >= -d6) {
-                    z = 0.0D;
-                } else if (z > 0.0D) {
-                    z -= d6;
-                } else {
-                    z += d6;
-                }
-            }
-
-            for (; x != 0.0D && z != 0.0D && getBoxes(box.add((float)x, -1.0f, (float)z)).isEmpty(); d5 = z) {
-                if (x < d6 && x >= -d6) {
-                    x = 0.0D;
-                } else if (x > 0.0D) {
-                    x -= d6;
-                } else {
-                    x += d6;
-                }
-
-                d3 = x;
-
-                if (z < d6 && z >= -d6) {
-                    z = 0.0D;
-                } else if (z > 0.0D) {
-                    z -= d6;
-                } else {
-                    z += d6;
-                }
-            }
-        }
-
-        List<BoundingBox> list1 = getBoxes(box.addCoord((float)x, (float)y, (float)z));
-
-        for (BoundingBox axisalignedbb1 : list1) {
-            y = axisalignedbb1.calculateYOffset(box, y);
-        }
-
-        box = box.add(0, (float)y, 0);
-        boolean flag1 = this.onGround || d4 != y && d4 < 0.0D;
-
-        for (BoundingBox axisalignedbb2 : list1) {
-            x = axisalignedbb2.calculateXOffset(box, x);
-        }
-
-        box = box.add((float)x, 0, 0);
-
-        for (BoundingBox axisalignedbb13 : list1) {
-            z = axisalignedbb13.calculateZOffset(box, z);
-        }
-
-        box = box.add(0, 0, (float)z);
-
-        this.resetPositionToBB();
-        this.isCollidedHorizontally = d3 != x || d5 != z;
-        this.isCollidedVertically = d4 != y;
-        this.onGround = this.isCollidedVertically && d4 < 0.0D;
-        this.isCollided = this.isCollidedHorizontally || this.isCollidedVertically;
-        int i = MathHelper.floor_double(this.posX);
-        int j = MathHelper.floor_double(this.posY - 0.20000000298023224D);
-        int k = MathHelper.floor_double(this.posZ);
-        Location blockpos = new Location(data.getPlayer().getWorld(), i, j, k);
-        Block block1 = blockpos.getBlock();
-
-        if (block1.getType().toString().contains("AIR")) {
-            Block block = block1.getRelative(BlockFace.DOWN);
-
-            if(BlockUtils.isFence(block)) {
-                block1 = block;
-                blockpos = block.getLocation();
-            }
-        }
-
-        this.updateFallState(y, this.onGround);
-
-        if (d3 != x) {
-            this.rmotionX = 0.0D;
-        }
-
-        if (d5 != z) {
-            this.rmotionZ = 0.0D;
-        }
-
-        //Onlanded function
-        if (d4 != y) {
-            if(!data.playerInfo.sneaking && rmotionY < 0 && block1.getType().toString().contains("SLIME")) {
-                rmotionY = -rmotionY;
-            }
-        }
-
-        if (!flag && data.getPlayer().getVehicle() == null) {
-            double d12 = this.posX - d0;
-            double d13 = this.posY - d1;
-            double d14 = this.posZ - d2;
-
-            if (!BlockUtils.isClimbableBlock(block1)) {
-                d13 = 0.0D;
-            }
-
-            //Collide with block function
-            if (this.onGround) {
-                onCollideWithBlock(block1);
-            }
-
-            this.distanceWalkedModified = (float) ((double) this.distanceWalkedModified + (double) MathHelper.sqrt_double(d12 * d12 + d14 * d14) * 0.6D);
-            this.distanceWalkedOnStepModified = (float) ((double) this.distanceWalkedOnStepModified + (double) MathHelper.sqrt_double(d12 * d12 + d13 * d13 + d14 * d14) * 0.6D);
-
-            if (this.distanceWalkedOnStepModified > this.nextStepDistance && !block1.getType().toString().contains("AIR")) {
-                this.nextStepDistance = (int) this.distanceWalkedOnStepModified + 1;
-            }
-        }
-
-        this.doBlockCollisions();
-    }
-
-    private void resetPositionToBB() {
-        this.posX = (box.minX + box.maxX) / 2.0D;
-        this.posY = box.minY;
-        this.posZ = (box.minZ + box.maxZ) / 2.0D;
-    }
-
-    private void onCollideWithBlock(Block block1) {
-        String material = block1.getType().toString();
-
-        if(material.contains("SLIME")) {
-            if (!data.playerInfo.sneaking && Math.abs(rmotionY) < 0.1D) {
-                double d0 = 0.4D + Math.abs(rmotionY) * 0.2D;
-                rmotionX *= d0;
-                rmotionZ *= d0;
-            }
-        }
-    }
-
-    private void doBlockCollisions() {
-        Location blockpos = new Location(data.getPlayer().getWorld(), box.minX + 0.001D, box.minY + 0.001D, box.minZ + 0.001D);
-        Location blockpos1 = new Location(data.getPlayer().getWorld(), box.maxX - 0.001D, box.maxY - 0.001D, box.maxZ - 0.001D);
-
-        if (data.playerInfo.worldLoaded) {
-            for (int i = blockpos.getBlockX(); i <= blockpos1.getBlockX(); ++i) {
-                for (int j = blockpos.getBlockY(); j <= blockpos1.getBlockY(); ++j) {
-                    for (int k = blockpos.getBlockZ(); k <= blockpos1.getBlockZ(); ++k) {
-                        Block block = new Location(data.getPlayer().getWorld(), i, j, k).getBlock();
-
-                        onCollideWithBlock(block);
-                    }
-                }
-            }
-        }
-    }
-
-    private List<BoundingBox> getBoxes(BoundingBox box) {
-        return Atlas.getInstance().getBlockBoxManager().getBlockBox().getCollidingBoxes(data.getPlayer().getWorld(), box);
-    }
-
-    private boolean isSneakingLikeWallDurh() {
-        double roundedX = Math.abs(MathUtils.round(posX, 1, RoundingMode.HALF_UP)), roundedZ = Math.abs(MathUtils.round(posZ, 1, RoundingMode.HALF_UP));
-        return sneak && (MathUtils.approxEquals(5E-3, roundedX % 1, 0.3) || MathUtils.approxEquals(5E-3, roundedX % 1, 0.7)|| MathUtils.approxEquals(5E-3, roundedZ % 1, 0.3) || MathUtils.approxEquals(5E-3, roundedZ % 1, 0.7));
-    }
-
     public boolean checkConditions(final boolean lastTickSprint) {
         if (lPosX == 0 && lPosY == 0 && lPosZ == 0) { // the position is 0 when a moveFlying or look packet was send
             return false;
@@ -580,14 +382,6 @@ public class PredictionService {
                 && !data.getPlayer().getGameMode().toString().contains("SPEC");
     }
 
-    private void updateFallState(double y, boolean onGroundIn) {
-        if (onGroundIn) {
-            if (this.fallDistance > 0.0F)
-                this.fallDistance = 0.0F;
-        } else if (y < 0.0D) {
-            this.fallDistance = (float) ((double) this.fallDistance - y);
-        }
-    }
     private static final float[] SIN_TABLE_FAST = new float[4096];
     private static final float[] SIN_TABLE = new float[65536];
 

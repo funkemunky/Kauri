@@ -38,6 +38,8 @@ public class Reach extends Check {
         if(data.target == null || data.targetData == null || data.playerInfo.creative
                 || timeStamp - data.playerInfo.lastAttackTimeStamp > 55) return;
 
+        if(!data.targetData.getPlayer().getUniqueId().equals(data.target.getUniqueId())) return;
+
         val origins = data.pastLocation.getPreviousRange(30L)
                 .stream()
                 .map(loc -> {

@@ -23,11 +23,14 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.io.UnsupportedEncodingException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Init(commands = true)
 public class ProfilerCommand {
+
+    private Map<String, BukkitTask> taskMap = new HashMap<>();
 
     @Command(name = "kauri.profile", display = "profile", description = "run a profile on Kauri.",
             permission = {"kauri.profile"})
@@ -124,15 +127,13 @@ public class ProfilerCommand {
             Map<String, Long> sorted = dev.brighten.anticheat.utils.MiscUtils
                     .sortByValue(Kauri.INSTANCE.profiler.total);
             int size = sorted.size();
-            long total = Kauri.INSTANCE.profiler.total.keySet()
-                    .stream()
-                    .mapToLong(key -> Kauri.INSTANCE.profiler.total.get(key))
-                    .sum();
+            AtomicLong total = new AtomicLong();
             List<Map.Entry<String, Long>> entries = new ArrayList<>(sorted.entrySet());
             IntStream.range(size - Math.min(size - 10, 10), size).mapToObj(entries::get).forEach(entry -> {
                 String name = entry.getKey();
                 Long time = entry.getValue();
-                cmd.getSender().sendMessage(dev.brighten.anticheat.utils.MiscUtils.drawUsage(total, time)
+                total.addAndGet(time);
+                cmd.getSender().sendMessage(dev.brighten.anticheat.utils.MiscUtils.drawUsage(total.get(), time)
                         + " §c" + name
                         + "§7: " + dev.brighten.anticheat.utils.MiscUtils.format(time / 1000000D, 3)
                         + ", " + dev.brighten.anticheat.utils.MiscUtils
@@ -141,13 +142,60 @@ public class ProfilerCommand {
                         + ", " + dev.brighten.anticheat.utils.MiscUtils
                         .format(Kauri.INSTANCE.profiler.stddev.getOrDefault(name, 0L) / 1000000D, 3));
             });
-            double totalMs = total / 1000000D;
+            double totalMs = total.get() / 1000000D;
             long totalTime = Kauri.INSTANCE.profiler.totalCalls * 50;
             cmd.getSender().sendMessage(dev.brighten.anticheat.utils.MiscUtils
-                    .drawUsage(total, dev.brighten.anticheat.utils.MiscUtils.format(totalMs / totalTime, 3))
+                    .drawUsage(total.get(), dev.brighten.anticheat.utils.MiscUtils.format(totalMs / totalTime, 3))
                     + " §cTotal§7: " + dev.brighten.anticheat.utils.MiscUtils.format(totalMs, 3)
                     + " §f- §c" + dev.brighten.anticheat.utils.MiscUtils.format(totalMs / totalTime, 3) + "%");
             cmd.getSender().sendMessage("-------------------------------------------------");
+        }
+    }
+
+    @Command(name = "kauri.profile.chat", display = "profile chat", description = "send updated profiling in chat.",
+            permission = "kauri.command.profile")
+    public void onChatCmd(CommandAdapter cmd) {
+        if(taskMap.containsKey(cmd.getSender().getName())) {
+            taskMap.get(cmd.getSender().getName()).cancel();
+            taskMap.remove(cmd.getSender().getName());
+        } else {
+            val task = RunUtils.taskTimerAsync(() -> {
+                if(taskMap.containsKey(cmd.getSender().getName())) {
+                    cmd.getSender().sendMessage("-------------------------------------------------");
+                    Map<String, Long> sorted = dev.brighten.anticheat.utils.MiscUtils
+                            .sortByValue(Kauri.INSTANCE.profiler.total);
+                    val map = Kauri.INSTANCE.profiler.results(ResultsType.TICK);
+
+                    long total = map.keySet()
+                            .stream()
+                            .mapToLong(key -> Math.round(map.get(key).two))
+                            .sum();
+                    List<Map.Entry<String, Long>> entries = new ArrayList<>(sorted.entrySet());
+                    AtomicDouble samples = new AtomicDouble(0);
+                    map.keySet().stream().forEach(key -> {
+                        val entry = map.get(key);
+                        String name = key;
+                        double time = entry.two / 1000000D;
+                        samples.addAndGet(time);
+                        cmd.getSender().sendMessage(dev.brighten.anticheat.utils.MiscUtils.drawUsage(50,
+                                time)
+                                + " §c" + name
+                                + "§7: " + dev.brighten.anticheat.utils.MiscUtils.format(time / 1000000D, 3)
+                                + ", " + dev.brighten.anticheat.utils.MiscUtils
+                                .format(Kauri.INSTANCE.profiler.samples
+                                        .getOrDefault(name, new Tuple<>(0L, 0L)).one / 1000000D, 3)
+                                + ", " + dev.brighten.anticheat.utils.MiscUtils
+                                .format(Kauri.INSTANCE.profiler.stddev.getOrDefault(name, 0L) / 1000000D, 3));
+                    });
+                    double totalMs = total / 1000000D;
+                    cmd.getSender().sendMessage(dev.brighten.anticheat.utils.MiscUtils
+                            .drawUsage(50, dev.brighten.anticheat.utils.MiscUtils.format(totalMs, 3))
+                            + " §cTotal§7: " + dev.brighten.anticheat.utils.MiscUtils.format(totalMs, 3)
+                            + " §f- §c" + dev.brighten.anticheat.utils.MiscUtils.format(samples.get(), 3) + "%");
+                    cmd.getSender().sendMessage("-------------------------------------------------");
+                }
+            }, Kauri.INSTANCE, 30L, 3L);
+            taskMap.put(cmd.getSender().getName(), task);
         }
     }
 

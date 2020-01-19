@@ -15,10 +15,11 @@ import dev.brighten.anticheat.utils.MovementUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.bukkit.GameMode;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.math.RoundingMode;
 
-@RequiredArgsConstructor
 public class MovementProcessor {
     private final ObjectData data;
 
@@ -30,7 +31,20 @@ public class MovementProcessor {
 
     public static double offset = Math.pow(2, 24);
 
+    public PotionEffectType levitation = null;
+
+    public MovementProcessor(ObjectData data) {
+        this.data = data;
+
+        try {
+            levitation = PotionEffectType.getByName("LEVITATION");
+        } catch(Exception e) {
+
+        }
+    }
+
     public void process(WrappedInFlyingPacket packet, long timeStamp) {
+        Kauri.INSTANCE.profiler.start("moveprocessor:pos:" + packet.isPos());
         //We check if it's null and intialize the from and to as equal to prevent large deltas causing false positives since there
         //was no previous from (Ex: delta of 380 instead of 0.45 caused by jump jump in location from 0,0,0 to 380,0,0)
         if (data.playerInfo.from == null) {
@@ -73,10 +87,27 @@ public class MovementProcessor {
                 data.playerInfo.serverPos = true;
                 data.playerInfo.lastServerPos = timeStamp;
                 data.playerInfo.posLocs.remove(optional.get());
-                MiscUtils.testMessage("teleported: " + data.getPlayer().getName());
             }
         } else if (data.playerInfo.serverPos) {
             data.playerInfo.serverPos = false;
+        }
+
+        data.playerInfo.lClientGround = data.playerInfo.clientGround;
+        data.playerInfo.clientGround = packet.isGround();
+        //Setting the motion delta for use in checks to prevent repeated functions.
+        data.playerInfo.lDeltaX = data.playerInfo.deltaX;
+        data.playerInfo.lDeltaY = data.playerInfo.deltaY;
+        data.playerInfo.lDeltaZ = data.playerInfo.deltaZ;
+        data.playerInfo.deltaX = data.playerInfo.to.x - data.playerInfo.from.x;
+        data.playerInfo.deltaY = data.playerInfo.to.y - data.playerInfo.from.y;
+        data.playerInfo.deltaZ = data.playerInfo.to.z - data.playerInfo.from.z;
+        data.playerInfo.lDeltaXZ = data.playerInfo.deltaXZ;
+        data.playerInfo.deltaXZ = MathUtils.hypot(data.playerInfo.deltaX, data.playerInfo.deltaZ);
+        if(packet.isPos()) {
+            //We create a separate from BoundingBox for the predictionService since it should operate on pre-motion data.
+            data.box = new SimpleCollisionBox(data.playerInfo.to.toVector(), 0.6, 1.8);
+
+            data.blockInfo.runCollisionCheck(); //run b4 everything else for use below.
         }
 
         data.playerInfo.inVehicle = data.getPlayer().getVehicle() != null;
@@ -89,10 +120,6 @@ public class MovementProcessor {
         if (packet.isGround()) data.playerInfo.jumpHeight = MovementUtils.getJumpHeight(data.getPlayer());
 
         data.playerInfo.lworldLoaded = data.playerInfo.worldLoaded;
-
-        if (!(data.playerInfo.worldLoaded = Atlas.getInstance().getBlockBoxManager().getBlockBox()
-                .isChunkLoaded(data.playerInfo.to.toLocation(data.getPlayer().getWorld()))))
-            data.playerInfo.lastWorldUnload.reset();
 
         data.lagInfo.lagging = data.lagInfo.lagTicks.subtract() > 0
                 || !data.playerInfo.worldLoaded
@@ -184,23 +211,6 @@ public class MovementProcessor {
 
         if (data.playerInfo.breakingBlock) data.playerInfo.lastBrokenBlock.reset();
 
-        data.playerInfo.lClientGround = data.playerInfo.clientGround;
-        data.playerInfo.clientGround = packet.isGround();
-
-        //We create a separate from BoundingBox for the predictionService since it should operate on pre-motion data.
-        data.predictionService.box = new SimpleCollisionBox(data.playerInfo.from.toVector(), 0.6, 1.8).toBoundingBox();
-        data.box = new SimpleCollisionBox(data.playerInfo.to.toVector(), 0.6, 1.8);
-
-        //Setting the motion delta for use in checks to prevent repeated functions.
-        data.playerInfo.lDeltaX = data.playerInfo.deltaX;
-        data.playerInfo.lDeltaY = data.playerInfo.deltaY;
-        data.playerInfo.lDeltaZ = data.playerInfo.deltaZ;
-        data.playerInfo.deltaX = (float) (data.playerInfo.to.x - data.playerInfo.from.x);
-        data.playerInfo.deltaY = (float) (data.playerInfo.to.y - data.playerInfo.from.y);
-        data.playerInfo.deltaZ = (float) (data.playerInfo.to.z - data.playerInfo.from.z);
-        data.playerInfo.lDeltaXZ = data.playerInfo.deltaXZ;
-        data.playerInfo.deltaXZ = MathUtils.hypot(data.playerInfo.deltaX, data.playerInfo.deltaZ);
-
         if (data.playerInfo.worldLoaded) {
             data.playerInfo.blockOnTo = data.playerInfo.to.toLocation(data.getPlayer().getWorld()).getBlock();
             data.playerInfo.blockBelow = data.playerInfo.to.toLocation(data.getPlayer().getWorld())
@@ -209,8 +219,6 @@ public class MovementProcessor {
             data.blockInfo.currentFriction = MinecraftReflection.getFriction(data.playerInfo.blockBelow);
         } else data.playerInfo.blockOnTo = data.playerInfo.blockBelow = null;
 
-        data.blockInfo.runCollisionCheck(); //run b4 everything else for use below.
-
         //Setting the angle delta for use in checks to prevent repeated functions.
         data.playerInfo.lDeltaYaw = data.playerInfo.deltaYaw;
         data.playerInfo.lDeltaPitch = data.playerInfo.deltaPitch;
@@ -218,19 +226,12 @@ public class MovementProcessor {
         data.playerInfo.deltaPitch = data.playerInfo.to.pitch - data.playerInfo.from.pitch;
 
         if (packet.isLook()) {
-            data.playerInfo.lCinematicYaw = data.playerInfo.cinematicYaw;
-            data.playerInfo.lCinematicPitch = data.playerInfo.cinematicPitch;
-            data.playerInfo.cinematicYaw = findClosestCinematicYaw(data, data.playerInfo.from.yaw);
-            data.playerInfo.cinematicPitch = findClosestCinematicPitch(data, data.playerInfo.from.pitch);
 
-            data.playerInfo.cDeltaYaw = MathUtils.getAngleDelta(data.playerInfo.cinematicYaw, data.playerInfo.lCinematicYaw);
-            data.playerInfo.cDeltaPitch = MathUtils.getAngleDelta(data.playerInfo.cinematicPitch, data.playerInfo.lCinematicPitch);
+            data.playerInfo.cinematicModeYaw = data.playerInfo.yawGCD / MovementProcessor.offset < 0.005
+                    && MathUtils.getDelta(deltaX, lastDeltaX) < 5;
 
-            data.playerInfo.cinematicModeYaw = data.playerInfo.yawGCD < 1E6 && deltaX > 4 && lastDeltaX > 4
-                    && MathUtils.getDelta(deltaX, lastDeltaX) < Math.min(7, deltaX / (sensitivityX * 12f));
-
-            data.playerInfo.cinematicModePitch = data.playerInfo.pitchGCD < 1E6 && deltaY > 4 && lastDeltaY > 4
-                    && MathUtils.getDelta(deltaY, lastDeltaY) < Math.min(7, deltaY / (sensitivityY * 12f));
+            data.playerInfo.cinematicModePitch = data.playerInfo.pitchGCD / MovementProcessor.offset < 0.005
+                    && MathUtils.getDelta(deltaY, lastDeltaY) < 5;
 
             if (Float.isNaN(data.playerInfo.cinematicPitch) || Float.isNaN(data.playerInfo.cinematicYaw)) {
                 data.playerInfo.yawSmooth.reset();
@@ -238,9 +239,11 @@ public class MovementProcessor {
             }
 
             data.playerInfo.lastYawGCD = data.playerInfo.yawGCD;
-            data.playerInfo.yawGCD = MiscUtils.gcd((long) (data.playerInfo.deltaYaw * offset), (long) (data.playerInfo.lDeltaYaw * offset));
+            data.playerInfo.yawGCD = MiscUtils.gcd((long) (data.playerInfo.deltaYaw * offset),
+                    (long) (data.playerInfo.lDeltaYaw * offset));
             data.playerInfo.lastPitchGCD = data.playerInfo.pitchGCD;
-            data.playerInfo.pitchGCD = MiscUtils.gcd((long) (Math.abs(data.playerInfo.deltaPitch) * offset), (long) (Math.abs(data.playerInfo.lDeltaPitch) * offset));
+            data.playerInfo.pitchGCD = MiscUtils.gcd((long) (Math.abs(data.playerInfo.deltaPitch) * offset),
+                    (long) (Math.abs(data.playerInfo.lDeltaPitch) * offset));
         }
 
         //Setting fallDistance
@@ -269,11 +272,6 @@ public class MovementProcessor {
             data.playerInfo.wasOnIce = data.blockInfo.onIce;
             data.playerInfo.wasOnSlime = data.blockInfo.onSlime;
         }
-
-        /* General Ticking */
-
-        data.playerInfo.onLadder = data.playerInfo.blockOnTo != null
-                && BlockUtils.isClimbableBlock(data.playerInfo.blockBelow);
 
         //Checking if user is in liquid.
         if (data.blockInfo.inLiquid) {
@@ -320,27 +318,7 @@ public class MovementProcessor {
         }
 
         /* General Cancel Booleans */
-        boolean hasLevi = data.getPlayer().getActivePotionEffects().size() > 0
-                && data.getPlayer().getActivePotionEffects()
-                .stream()
-                .anyMatch(effect -> effect.getType().toString().contains("LEVI"));
-
-        data.playerInfo.flightCancel = data.playerInfo.canFly
-                || data.playerInfo.creative
-                || hasLevi
-                || timeStamp - data.playerInfo.lastServerPos < 60L
-                || data.playerInfo.inVehicle
-                || data.playerInfo.webTicks.value() > 0
-                || data.playerInfo.lastWorldUnload.hasNotPassed(10)
-                || !data.playerInfo.worldLoaded
-                || (data.playerInfo.blockOnTo != null && BlockUtils.isSolid(data.playerInfo.blockOnTo))
-                || data.playerInfo.riptiding
-                || data.playerInfo.gliding
-                || data.playerInfo.lastToggleFlight.hasNotPassed(40)
-                || data.playerInfo.liquidTicks.value() > 0
-                || data.playerInfo.climbTicks.value() > 0
-                || timeStamp - data.creation < 2000
-                || data.playerInfo.serverPos;
+        boolean hasLevi = levitation != null && data.getPlayer().hasPotionEffect(levitation);
 
         data.playerInfo.generalCancel = data.playerInfo.canFly
                 || data.playerInfo.creative
@@ -353,12 +331,17 @@ public class MovementProcessor {
                 || !data.playerInfo.worldLoaded
                 || data.playerInfo.lastToggleFlight.hasNotPassed(40)
                 || timeStamp - data.creation < 2000
-                || (data.playerInfo.blockOnTo != null && BlockUtils.isSolid(data.playerInfo.blockOnTo))
                 || data.playerInfo.serverPos
                 || Kauri.INSTANCE.lastTickLag.hasNotPassed(5);
 
+        data.playerInfo.flightCancel = data.playerInfo.generalCancel
+                || data.playerInfo.webTicks.value() > 0
+                || data.playerInfo.liquidTicks.value() > 0
+                || data.playerInfo.climbTicks.value() > 0;
+
         //Adding past location
         data.pastLocation.addLocation(data.playerInfo.to.clone());
+        Kauri.INSTANCE.profiler.stop("moveprocessor:pos:" + packet.isPos());
     }
 
 

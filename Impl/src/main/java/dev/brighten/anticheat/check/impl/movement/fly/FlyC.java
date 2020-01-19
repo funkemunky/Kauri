@@ -18,7 +18,7 @@ public class FlyC extends Check {
                 && !data.playerInfo.gliding
                 && !data.playerInfo.riptiding
                 && !data.playerInfo.serverGround) {
-            float vaccel = data.playerInfo.deltaY - data.playerInfo.lDeltaY;
+            double vaccel = data.playerInfo.deltaY - data.playerInfo.lDeltaY;
 
             if(vaccel > -0.02) {
                 if(vl++ > 2) {

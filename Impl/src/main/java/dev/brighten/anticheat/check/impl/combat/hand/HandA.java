@@ -20,7 +20,7 @@ public class HandA extends Check {
             if(vl++ > 6) {
                 flag("delta=%1ms", delta);
             }
-        } else vl-= vl > 0 ? 0.5f : 0;
+        } else vl-= vl > 0 ? 1f : 0;
         debug("delta=" + delta + "ms vl=" + vl);
     }
 

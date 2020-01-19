@@ -23,7 +23,7 @@ public class AutoclickerI extends Check {
                 double ratio = cpsAverage / cps;
 
                 if (ratio > 0.99 && cpsAverage > 7) {
-                    if (++verbose > 5) {
+                    if (++verbose > 4) {
                         vl++;
                         this.flag("r=%1 a=%2", ratio, cpsAverage);
                     }

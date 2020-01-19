@@ -39,41 +39,41 @@ public class BlockInformation {
 
         World world = objectData.getPlayer().getWorld();
 
-
-        int startX = Location.locToBlock(objectData.playerInfo.to.x - 1 - objectData.playerInfo.deltaXZ);
-        int endX = Location.locToBlock(objectData.playerInfo.to.x + 1 + objectData.playerInfo.deltaXZ);
-        int startY = Location.locToBlock(objectData.playerInfo.to.y - 0.8 + objectData.playerInfo.deltaY);
-        int endY = Location.locToBlock(objectData.playerInfo.to.y + 1.99 + objectData.playerInfo.deltaY);
-        int startZ = Location.locToBlock(objectData.playerInfo.to.z - 1 - objectData.playerInfo.deltaXZ);
-        int endZ = Location.locToBlock(objectData.playerInfo.to.z + 1 + objectData.playerInfo.deltaXZ);
+        int startX = Location.locToBlock(objectData.playerInfo.to.x - 1);
+        int endX = Location.locToBlock(objectData.playerInfo.to.x + 1);
+        int startY = Location.locToBlock(objectData.playerInfo.to.y - 0.8);
+        int endY = Location.locToBlock(objectData.playerInfo.to.y + 1.99);
+        int startZ = Location.locToBlock(objectData.playerInfo.to.z - 1);
+        int endZ = Location.locToBlock(objectData.playerInfo.to.z + 1);
         int it = 9 * 9;
-        if(objectData.playerInfo.worldLoaded) {
-            start:
-            for (int chunkx = startX >> 4; chunkx <= endX >> 4; ++chunkx) {
-                int cx = chunkx << 4;
+        objectData.playerInfo.worldLoaded = true;
+        start:
+        for (int chunkx = startX >> 4; chunkx <= endX >> 4; ++chunkx) {
+            int cx = chunkx << 4;
 
-                for (int chunkz = startZ >> 4; chunkz <= endZ >> 4; ++chunkz) {
-                    if (!world.isChunkLoaded(chunkx, chunkz)) {
-                        continue;
-                    }
-                    Chunk chunk = world.getChunkAt(chunkx, chunkz);
-                    if (chunk != null) {
-                        int cz = chunkz << 4;
-                        int xstart = Math.max(startX, cx);
-                        int xend = Math.min(endX, cx + 16);
-                        int zstart = Math.max(startZ, cz);
-                        int zend = Math.min(endZ, cz + 16);
+            for (int chunkz = startZ >> 4; chunkz <= endZ >> 4; ++chunkz) {
+                if (!world.isChunkLoaded(chunkx, chunkz)) {
+                    objectData.playerInfo.lastWorldUnload.reset();
+                    objectData.playerInfo.worldLoaded = false;
+                    continue;
+                }
+                Chunk chunk = world.getChunkAt(chunkx, chunkz);
+                if (chunk != null) {
+                    int cz = chunkz << 4;
+                    int xstart = Math.max(startX, cx);
+                    int xend = Math.min(endX, cx + 16);
+                    int zstart = Math.max(startZ, cz);
+                    int zend = Math.min(endZ, cz + 16);
 
-                        for (int x = xstart; x <= xend; ++x) {
-                            for (int z = zstart; z <= zend; ++z) {
-                                for (int y = Math.max(startY, 0); y <= endY; ++y) {
-                                    if (it-- <= 0) {
-                                        break start;
-                                    }
-                                    Block block = chunk.getBlock(x & 15, y, z & 15);
-                                    if (block.getType() != Material.AIR) {
-                                        blocks.add(block);
-                                    }
+                    for (int x = xstart; x <= xend; ++x) {
+                        for (int z = zstart; z <= zend; ++z) {
+                            for (int y = Math.max(startY, 0); y <= endY; ++y) {
+                                if (it-- <= 0) {
+                                    break start;
+                                }
+                                Block block = chunk.getBlock(x & 15, y, z & 15);
+                                if (block.getType() != Material.AIR) {
+                                    blocks.add(block);
                                 }
                             }
                         }
@@ -136,8 +136,6 @@ public class BlockInformation {
         }
         handler.setSize(0.6, 1.8);
 
-        handler.setOffset(-0.8f);
-        handler.isCollidedWith(Materials.SOLID);
         handler.setOffset(0);
 
         SimpleCollisionBox box = Helper.getMovementHitbox(objectData.getPlayer());

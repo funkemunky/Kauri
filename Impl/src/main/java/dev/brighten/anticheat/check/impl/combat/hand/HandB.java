@@ -20,7 +20,7 @@ public class HandB extends Check {
             if(vl++ > 6) {
                 flag("delta=%1ms action=%2", delta, packet.getAction().name());
             }
-        } else vl-= vl > 0 ? 0.5f : 0;
+        } else vl-= vl > 0 ? 1f : 0;
 
         debug("delta=" + delta  + "ms action=" + packet.getAction().name() + " vl=" + vl);
     }

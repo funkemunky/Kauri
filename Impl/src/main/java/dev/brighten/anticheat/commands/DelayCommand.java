@@ -14,7 +14,6 @@ import java.lang.reflect.Field;
 @Init(commands = true)
 public class DelayCommand {
 
-    private static Field field = new WrappedClass(Config.class).getFieldByName("alertsDelay").getField();
 
     @Command(name = "kauri.delay", description = "change the delay between alerts.", display = "delay [ms]",
             permission = "kauri.command.delay", aliases = {"delay"}, usage = "/<command> <ms>")
@@ -26,9 +25,7 @@ public class DelayCommand {
                         + Color.White + delay + "ms" + Color.Gray + "...");
 
                 Config.alertsDelay = delay;
-                ConfigSetting setting = field.getAnnotation(ConfigSetting.class);
-
-                Kauri.INSTANCE.getConfig().set(setting.path() + "." + setting.name(), delay);
+                Kauri.INSTANCE.getConfig().set("alerts.delay", delay);
                 Kauri.INSTANCE.saveConfig();
                 cmd.getSender().sendMessage(Color.Green + "Delay set!");
             } catch(NumberFormatException e) {

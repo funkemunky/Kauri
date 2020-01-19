@@ -16,6 +16,7 @@ import cc.funkemunky.api.utils.objects.VariableValue;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -25,7 +26,6 @@ import java.util.concurrent.Executors;
 public class PacketProcessor {
 
     public void processClient(PacketReceiveEvent event, ObjectData data, Object object, String type, long timeStamp) {
-       Kauri.INSTANCE.dataProcessor.runTask(() -> {
            Kauri.INSTANCE.profiler.start("packet:client:" + getType(type));
            switch(type) {
                case Packet.Client.ABILITIES: {
@@ -227,11 +227,9 @@ public class PacketProcessor {
                }
            }
            Kauri.INSTANCE.profiler.stop("packet:client:" + getType(type));
-       });
     }
 
     public void processServer(PacketSendEvent event, ObjectData data, Object object, String type, long timeStamp) {
-       Kauri.INSTANCE.dataProcessor.runTask(() -> {
            Kauri.INSTANCE.profiler.start("packet:server:" + type);
            switch(type) {
                case Packet.Server.ABILITIES: {
@@ -276,6 +274,7 @@ public class PacketProcessor {
 
                    data.playerInfo.headYaw = packet.getPlayer().getLocation().getYaw();
                    data.playerInfo.headPitch = packet.getPlayer().getLocation().getPitch();
+                   data.checkManager.runPacket(packet, timeStamp);
                    break;
                }
                case Packet.Server.KEEP_ALIVE: {
@@ -306,7 +305,6 @@ public class PacketProcessor {
                }
            }
            Kauri.INSTANCE.profiler.stop("packet:server:" + type);
-       });
     }
 
     private static String getType(String type) {

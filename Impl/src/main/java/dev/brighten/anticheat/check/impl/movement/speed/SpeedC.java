@@ -58,9 +58,9 @@ public class SpeedC extends Check {
 
         double velocityXZ = MathUtils.hypot(velocityX, velocityZ);
 
-        Material type = data.getPlayer().getWorld().getBlockAt(data.getPlayer().getLocation().getBlockX(),
-                (int) (data.getPlayer().getLocation().getY() - 1.8),
-                data.getPlayer().getLocation().getBlockZ()).getType();
+        if(data.playerInfo.blockBelow == null) return;
+
+        Material type = data.playerInfo.blockBelow.getType();
 
         if (onGround || data.playerInfo.jumped) {
             tags.add("ground");
@@ -231,7 +231,7 @@ public class SpeedC extends Check {
             debug("+%1,tags=%2", horizontalMove, String.join(",", tags));
 
             if (horizontalMove > 0) {
-                if(verbose.add(5) > 12 || horizontalMove > 0.1) {
+                if(verbose.add(5) > 12 || horizontalMove > 0.2) {
                     vl++;
                     flag("+%1,v=%2,tags=%3",
                             horizontalMove, data.playerInfo.velocityX, String.join(",", tags));

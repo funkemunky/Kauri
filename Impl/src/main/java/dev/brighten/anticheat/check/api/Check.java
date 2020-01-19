@@ -227,7 +227,6 @@ public class Check implements KauriCheck {
         register(new AutoclickerF());
         register(new AutoclickerG());
         register(new AutoclickerH());
-        register(new AutoclickerI());
         register(new FlyA());
         register(new FlyB());
         register(new FlyC());
@@ -250,7 +249,7 @@ public class Check implements KauriCheck {
         register(new AimI());
         register(new AimJ());
         register(new AimK());
-        register(new AimL());
+        //register(new AimL());
         register(new SpeedA());
         register(new SpeedB());
         register(new SpeedC());

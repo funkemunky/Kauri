@@ -22,7 +22,7 @@ public class AimL extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if (packet.isLook()) {
-            float yaw = packet.getYaw();;
+            float yaw = packet.getYaw();
             float pitch = packet.getPitch();
 
             float yawDelta = Math.abs(this.lastYaw - yaw);

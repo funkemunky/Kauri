@@ -31,7 +31,7 @@ public class CancelListeners implements Listener {
     public void onEvent(PlayerMoveEvent event) {
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
-        if(data.typesToCancel.size() > 0) {
+        if(data != null && data.typesToCancel.size() > 0) {
             for (CancelType cancelType : data.typesToCancel) {
                 if(!cancelType.equals(CancelType.MOVEMENT)) continue;
 
@@ -68,7 +68,7 @@ public class CancelListeners implements Listener {
     public void onEvent(BlockPlaceEvent event) {
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
-        if(data.typesToCancel.size() > 0) {
+        if(data != null && data.typesToCancel.size() > 0) {
             for (CancelType cancelType : data.typesToCancel) {
                 if(!cancelType.equals(CancelType.PLACE)) continue;
 
@@ -84,7 +84,7 @@ public class CancelListeners implements Listener {
     public void onEvent(BlockBreakEvent event) {
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
-        if(data.typesToCancel.size() > 0) {
+        if(data != null && data.typesToCancel.size() > 0) {
             for (CancelType cancelType : data.typesToCancel) {
                 if(!cancelType.equals(CancelType.BREAK)) continue;
 

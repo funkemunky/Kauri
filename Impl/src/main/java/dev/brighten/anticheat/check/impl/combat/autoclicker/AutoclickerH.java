@@ -13,7 +13,7 @@ import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @CheckInfo(name = "Autoclicker (H)", description = "Autoclicker check detecting based on graphs",
-        checkType = CheckType.AUTOCLICKER, punishVL = 10)
+        checkType = CheckType.AUTOCLICKER, punishVL = 10, developer = true)
 public class AutoclickerH extends Check {
 
     private MaxInteger verbose = new MaxInteger(100);

@@ -20,9 +20,9 @@ public class SpeedB extends Check {
                 && !data.playerInfo.generalCancel
                 && timeStamp - data.playerInfo.lastVelocityTimestamp > 250L) {
             if(data.playerInfo.airTicks > 2) {
-                float accelX = data.playerInfo.deltaX - data.playerInfo.lDeltaX;
-                float accelZ = data.playerInfo.deltaZ - data.playerInfo.lDeltaZ;
-                float hypot = MathUtils.hypot(accelX, accelZ);
+                double accelX = data.playerInfo.deltaX - data.playerInfo.lDeltaX;
+                double accelZ = data.playerInfo.deltaZ - data.playerInfo.lDeltaZ;
+                double hypot = MathUtils.hypot(accelX, accelZ);
 
                 if(hypot > 0.12
                         && !data.blockInfo.blocksNear

@@ -15,22 +15,14 @@ import dev.brighten.api.check.CheckType;
 @Cancellable
 public class VelocityC extends Check {
 
-    private float velocityY;
+    private double velocityY;
     private long lastVelocity;
-
-    @Packet
-    public void onVelocity(WrappedOutVelocityPacket packet, long timeStamp) {
-        if(data.getPlayer().getEntityId() == packet.getId()
-                && data.playerInfo.clientGround
-                && packet.getY() > 0) {
-            velocityY = (float) packet.getY();
-        }
-    }
 
     @Packet
     public void onKeepAlive(WrappedInKeepAlivePacket packet, long timeStamp) {
         if(packet.getTime() == 101L) {
             lastVelocity = timeStamp;
+            velocityY = data.playerInfo.velocityY;
         }
     }
 
@@ -43,7 +35,7 @@ public class VelocityC extends Check {
                 || (data.playerInfo.serverGround
                 && data.lagInfo.lastPacketDrop.hasPassed(2)
                 && timeStamp - lastVelocity < 52L))) {
-            float ratio = data.playerInfo.deltaY / velocityY,
+            double ratio = (data.playerInfo.to.y - data.playerInfo.from.y) / velocityY,
                     pct = MathUtils.round(ratio * 100, 4);
 
             if(!data.blockInfo.blocksAbove) {

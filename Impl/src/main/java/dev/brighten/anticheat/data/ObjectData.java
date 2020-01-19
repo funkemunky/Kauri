@@ -45,7 +45,7 @@ public class ObjectData {
     public int hashCode;
     public ProtocolVersion playerVersion = ProtocolVersion.UNKNOWN;
     public Set<Player> boxDebuggers = new HashSet<>();
-    public List<CancelType> typesToCancel = new ArrayList<>();
+    public List<CancelType> typesToCancel = Collections.synchronizedList(new ArrayList<>());
 
     public ObjectData(UUID uuid) {
         this.uuid = uuid;

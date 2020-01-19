@@ -46,7 +46,7 @@ public class LiquidWalk extends Check {
         data.blockInfo.handler.setSize(0.6, 1.8);
 
         if(inLiquid) {
-            float absY = Math.abs(data.playerInfo.deltaY), labsY = Math.abs(data.playerInfo.lDeltaY);
+            double absY = Math.abs(data.playerInfo.deltaY), labsY = Math.abs(data.playerInfo.lDeltaY);
             if(absY == labsY && !data.playerInfo.clientGround && !data.playerInfo.serverGround)
                 tags.add("equal");
 

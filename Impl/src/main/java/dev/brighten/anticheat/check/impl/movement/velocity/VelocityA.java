@@ -11,7 +11,7 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Velocity (A)", description = "Checks for vertical velocity modifications.",
-        checkType = CheckType.VELOCITY, punishVL = 20, developer = true, executable = false)
+        checkType = CheckType.VELOCITY, punishVL = 20, executable = false)
 @Cancellable
 public class VelocityA extends Check {
 
@@ -30,14 +30,13 @@ public class VelocityA extends Check {
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(vY > 0
                 && !data.playerInfo.generalCancel
-                && !data.playerInfo.serverPos
                 && !data.lagInfo.lagging
                 && data.playerInfo.worldLoaded
                 && !data.blockInfo.inWeb
                 && !data.blockInfo.onClimbable
                 && data.playerInfo.blocksAboveTicks.value() == 0) {
 
-            float pct = Math.max(0, data.playerInfo.lastVelocityTimestamp);
+            double pct = data.playerInfo.deltaY / vY * 100;
 
             if (pct < 99.999
                     && !data.playerInfo.lastBlockPlace.hasNotPassed(5)
@@ -48,6 +47,8 @@ public class VelocityA extends Check {
 
             vY-= 0.08;
             vY*= 0.98;
+
+            if(Math.abs(vY) < 0.005) vY = 0;
 
             debug("pct=" + pct + " vl=" + vl);
         }
