@@ -1,35 +1,35 @@
 package dev.brighten.anticheat.check.impl.combat.autoclicker;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.check.api.Check;
-import dev.brighten.anticheat.check.api.CheckInfo;
-import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Autoclicker (A)", description = "A fast click check.", checkType = CheckType.AUTOCLICKER,
         punishVL = 50)
+@Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerA extends Check {
 
-    private int ticks;
-    private long lastClick;
+    private int flyingTicks, cps;
 
     @Packet
-    public void onArmAnimation(WrappedInArmAnimationPacket packet, long timeStamp) {
-        if(timeStamp - lastClick > 1000L) {
-            if(ticks > 30) {
-                vl++;
-                punish();
-            } else if(ticks >= 19) {
-                vl++;
-                flag("cps=%1 ping=%p tps=%t", ticks);
-            } else vl-= vl > 0 ? 0.2 : 0;
-            ticks = 0;
-            lastClick = timeStamp;
-        } else if(data.playerInfo.lastBrokenBlock.hasPassed(5)
-                && !data.playerInfo.breakingBlock
-                && data.playerInfo.lastBlockPlace.hasPassed(1)
-                && data.lagInfo.lastPacketDrop.hasPassed(1)
-                && timeStamp - Kauri.INSTANCE.lastTick < 100L) ticks++;
+    public void onFlying(WrappedInFlyingPacket packet) {
+        flyingTicks++;
+        if(flyingTicks >= 20) {
+            if(cps >= 20) {
+                if(cps > 26) vl++;
+                flag("cps=%1", cps);
+            }
+            debug("cps=%1", cps);
+
+            flyingTicks = cps = 0;
+        }
+    }
+
+    @Packet
+    public void onArmAnimation(WrappedInArmAnimationPacket packet) {
+        if(!data.playerInfo.breakingBlock && data.playerInfo.lastBlockPlace.hasPassed(2))
+            cps++;
     }
 }

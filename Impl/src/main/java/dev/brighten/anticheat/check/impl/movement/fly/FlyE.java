@@ -26,6 +26,8 @@ public class FlyE extends Check {
             if(!data.playerInfo.flightCancel
                     && data.playerInfo.jumped
                     && !data.playerInfo.wasOnSlime
+                    && data.playerInfo.lClientGround
+                    && !data.playerInfo.serverGround
                     && !data.blockInfo.blocksAbove
                     && data.playerInfo.lastBlockPlace.hasPassed(10)
                     && data.playerInfo.halfBlockTicks.value() == 0

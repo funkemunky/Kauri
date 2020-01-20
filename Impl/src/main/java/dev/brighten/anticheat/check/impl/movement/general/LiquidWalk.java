@@ -23,7 +23,7 @@ public class LiquidWalk extends Check {
     private long aboveTicks;
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-
+        if(data.playerInfo.generalCancel) return;
         List<String> tags = new ArrayList<>();
 
         boolean inLiquid = data.blockInfo.inLiquid, flagged = false;
@@ -47,7 +47,7 @@ public class LiquidWalk extends Check {
 
         if(inLiquid) {
             double absY = Math.abs(data.playerInfo.deltaY), labsY = Math.abs(data.playerInfo.lDeltaY);
-            if(absY == labsY && !data.playerInfo.clientGround && !data.playerInfo.serverGround)
+            if(absY == labsY && !data.playerInfo.clientGround && !data.playerInfo.serverGround && data.playerInfo.deltaY > -0.05)
                 tags.add("equal");
 
             if(aboveTicks > 5) tags.add("aboveTicks");

@@ -13,7 +13,6 @@ import dev.brighten.anticheat.utils.MovementUtils;
 @Cancellable
 public class SpeedA extends Check {
 
-    private long moveTicks, keyTicks;
     private MaxInteger verbose = new MaxInteger(40);
 
     @Packet

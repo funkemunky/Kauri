@@ -1,9 +1,7 @@
 package dev.brighten.anticheat.check.impl.combat.autoclicker;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.utils.math.cond.MaxInteger;
-import dev.brighten.anticheat.check.api.Check;
-import dev.brighten.anticheat.check.api.CheckInfo;
-import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.utils.EvictingList;
 import dev.brighten.anticheat.utils.GraphUtil;
 import dev.brighten.api.check.CheckType;
@@ -14,6 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @CheckInfo(name = "Autoclicker (H)", description = "Autoclicker check detecting based on graphs",
         checkType = CheckType.AUTOCLICKER, punishVL = 10, developer = true)
+@Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerH extends Check {
 
     private MaxInteger verbose = new MaxInteger(100);

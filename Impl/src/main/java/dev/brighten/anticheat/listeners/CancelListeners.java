@@ -1,10 +1,16 @@
 package dev.brighten.anticheat.listeners;
 
+import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.Init;
+import cc.funkemunky.api.utils.KLocation;
+import cc.funkemunky.api.utils.Materials;
 import cc.funkemunky.api.utils.objects.VariableValue;
+import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.CancelType;
 import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.utils.CollisionHandler;
+import lombok.val;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,14 +23,13 @@ import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 @Init
 public class CancelListeners implements Listener {
-
-    private static Map<UUID, Location> fromLocs = new HashMap<>();
 
     /** Cancels for MOVEMENT **/
     @EventHandler(priority = EventPriority.MONITOR)
@@ -35,12 +40,11 @@ public class CancelListeners implements Listener {
             for (CancelType cancelType : data.typesToCancel) {
                 if(!cancelType.equals(CancelType.MOVEMENT)) continue;
 
-                event.getPlayer().teleport(fromLocs.getOrDefault(event.getPlayer().getUniqueId(), event.getFrom()));
+                val ground = BlockUtils.findGround(event.getTo().getWorld(), event.getTo());
+
+                event.getPlayer().teleport(ground);
                 data.typesToCancel.remove(cancelType);
                 return;
-            }
-            if(event.getPlayer().isOnGround()) {
-                fromLocs.put(event.getPlayer().getUniqueId(), event.getTo());
             }
         }
     }

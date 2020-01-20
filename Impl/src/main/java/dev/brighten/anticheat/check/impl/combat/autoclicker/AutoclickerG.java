@@ -5,13 +5,12 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockDigPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.MathUtils;
-import dev.brighten.anticheat.check.api.Check;
-import dev.brighten.anticheat.check.api.CheckInfo;
-import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Autoclicker (G)", description = "Checks for weird doubleclicking from internal autoclickers.",
         checkType = CheckType.AUTOCLICKER, punishVL = 10, developer = true)
+@Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerG extends Check {
 
     private boolean sent;

@@ -3,14 +3,13 @@ package dev.brighten.anticheat.check.impl.combat.autoclicker;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.objects.Interval;
-import dev.brighten.anticheat.check.api.Check;
-import dev.brighten.anticheat.check.api.CheckInfo;
-import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
 
 @CheckInfo(name = "Autoclicker (C)", description = "Checks if the autoclicker always stays within a specific range",
         checkType = CheckType.AUTOCLICKER, developer = true, punishVL = 20)
+@Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerC extends Check {
 
     private Interval interval = new Interval(22);

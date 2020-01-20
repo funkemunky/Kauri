@@ -4,13 +4,12 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.objects.Interval;
-import dev.brighten.anticheat.check.api.Check;
-import dev.brighten.anticheat.check.api.CheckInfo;
-import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Autoclicker (B)", description = "A test check atm.", developer = true, executable = false,
         checkType = CheckType.AUTOCLICKER, punishVL = 40)
+@Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerB extends Check {
 
     private Interval interval = new Interval(100);

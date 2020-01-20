@@ -18,7 +18,7 @@ import org.bukkit.enchantments.Enchantment;
 public class VelocityB extends Check {
 
     private double vX, vZ, svX, svZ;
-    private boolean useEntity;
+    private boolean useEntity, sprint;
     private float forward, strafe;
     private String lastKey;
     private long velocityTS;
@@ -52,9 +52,10 @@ public class VelocityB extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
+        if(!data.predictionService.key.equals(lastKey)) vX = vZ = 0;
         if((vX != 0 || vZ != 0)) {
             if(timeStamp - velocityTS < 400) {
-                if(data.playerInfo.sprinting && useEntity) {
+                if(sprint && useEntity) {
                     vX*= 0.6;
                     vZ*= 0.6;
                 }
@@ -129,6 +130,7 @@ public class VelocityB extends Check {
         }
         lastKey = data.predictionService.key;
         useEntity = false;
+        sprint = data.playerInfo.sprinting;
     }
 
     private void moveFlying(double strafe, double forward, double friction) {

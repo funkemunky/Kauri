@@ -16,7 +16,7 @@ public class HandA extends Check {
     public void onBlockPlace(WrappedInBlockPlacePacket place, long timeStamp) {
         long delta = timeStamp - lastFlying;
 
-        if(!data.lagInfo.lagging && delta < 10) {
+        if(!data.lagInfo.lagging && data.lagInfo.lastPacketDrop.hasPassed(5) && delta < 10) {
             if(vl++ > 6) {
                 flag("delta=%1ms", delta);
             }

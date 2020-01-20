@@ -14,7 +14,7 @@ public class BadPacketsC extends Check {
 
     @Packet
     public void onPlace(WrappedInFlyingPacket packet) {
-        if(data.playerInfo.sprinting && data.playerInfo.sneaking) {
+        if(data.playerInfo.sprinting && data.playerInfo.sneaking && !data.lagInfo.lagging) {
             vl++;
             if(vl > 3) {
                 flag("sprint=%1 sneak=%2 pos=%3",

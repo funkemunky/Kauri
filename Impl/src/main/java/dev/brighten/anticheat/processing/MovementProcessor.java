@@ -212,11 +212,12 @@ public class MovementProcessor {
         if (data.playerInfo.breakingBlock) data.playerInfo.lastBrokenBlock.reset();
 
         if (data.playerInfo.worldLoaded) {
-            data.playerInfo.blockOnTo = data.playerInfo.to.toLocation(data.getPlayer().getWorld()).getBlock();
-            data.playerInfo.blockBelow = data.playerInfo.to.toLocation(data.getPlayer().getWorld())
-                    .subtract(0, 1, 0).getBlock();
+            data.playerInfo.blockOnTo = BlockUtils.getBlock(data.playerInfo.to.toLocation(data.getPlayer().getWorld()));
+            data.playerInfo.blockBelow = BlockUtils.getBlock(data.playerInfo.to.toLocation(data.getPlayer().getWorld())
+                    .subtract(0, 1, 0));
 
-            data.blockInfo.currentFriction = MinecraftReflection.getFriction(data.playerInfo.blockBelow);
+            if(data.playerInfo.blockBelow != null)
+                data.blockInfo.currentFriction = MinecraftReflection.getFriction(data.playerInfo.blockBelow);
         } else data.playerInfo.blockOnTo = data.playerInfo.blockBelow = null;
 
         //Setting the angle delta for use in checks to prevent repeated functions.

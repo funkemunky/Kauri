@@ -118,9 +118,9 @@ public class MenuCommand {
 
                     AtomicInteger amount = new AtomicInteger(0);
 
-                    Check.checkSettings.values()
+                    Check.checkClasses.values()
                             .stream()
-                            .filter(ci-> ci.type.equals(type))
+                            .filter(ci-> ci.checkType().equals(type))
                             .forEach(ci -> amount.incrementAndGet());
                     Button button = new Button(false,
                             new ItemBuilder(Material.BOOK)

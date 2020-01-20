@@ -5,9 +5,7 @@ import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.Tuple;
 import cc.funkemunky.api.utils.math.cond.MaxDouble;
 import cc.funkemunky.api.utils.math.cond.MaxInteger;
-import dev.brighten.anticheat.check.api.Check;
-import dev.brighten.anticheat.check.api.CheckInfo;
-import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.utils.EvictingList;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
@@ -16,6 +14,7 @@ import java.util.stream.Collectors;
 
 @CheckInfo(name = "Autoclicker (D)", description = "Compares the current click cps to the average.",
         checkType = CheckType.AUTOCLICKER, developer = true, punishVL = 20)
+@Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerD extends Check {
 
     private EvictingList<Long> cpsCounts = new EvictingList<>(40);

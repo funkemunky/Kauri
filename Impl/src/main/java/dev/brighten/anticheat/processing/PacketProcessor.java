@@ -59,7 +59,7 @@ public class PacketProcessor {
                                data.playerInfo.lastTargetSwitch.reset();
                                if(packet.getEntity() instanceof Player) {
                                    data.targetData = Kauri.INSTANCE.dataManager.getData((Player)packet.getEntity());
-                               }
+                               } else data.targetData = null;
                                data.targetBounds = new SimpleCollisionBox((Object)MinecraftReflection
                                        .getEntityBoundingBox(data.target));
                            }

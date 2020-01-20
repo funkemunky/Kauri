@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.check.impl.movement.nofall;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -8,6 +9,7 @@ import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "NoFall (A)", description = "Checks to make sure the ground packet from the client is legit",
         checkType = CheckType.NOFALL, punishVL = 20, executable = false)
+@Cancellable
 public class NoFallA extends Check {
 
     @Packet

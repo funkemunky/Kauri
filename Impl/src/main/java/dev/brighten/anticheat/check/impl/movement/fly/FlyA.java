@@ -19,7 +19,7 @@ public class FlyA extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(packet.isPos()) {
-            if(data.playerInfo.clientGround && data.blockInfo.onSlime && data.playerInfo.deltaY <= 0) {
+            if(data.playerInfo.serverGround && data.blockInfo.onSlime && data.playerInfo.deltaY <= 0) {
                 wasOnSlime = true;
                 slimeHeight = 0;
                 slimeHeight -= data.playerInfo.lDeltaY;
@@ -27,7 +27,7 @@ public class FlyA extends Check {
                 maxHeight = Math.max(2f,
                         MovementUtils.getTotalHeight((float)slimeHeight)) * 1.25f;
                 wasOnSlime = false;
-            } else if(!tookVelocity && data.playerInfo.clientGround) {
+            } else if(!tookVelocity && data.playerInfo.serverGround) {
                 maxHeight = MovementUtils.getTotalHeight(MovementUtils.getJumpHeight(data.getPlayer())) * 1.4f;
             }
 
@@ -40,7 +40,7 @@ public class FlyA extends Check {
 
             if(data.playerInfo.lastVelocity.hasNotPassed(10)) {
                 tookVelocity = true;
-            } else if(data.playerInfo.clientGround) {
+            } else if(data.playerInfo.serverGround) {
                 tookVelocity = false;
             }
 
@@ -60,6 +60,7 @@ public class FlyA extends Check {
                     && !data.playerInfo.serverPos
                     && !data.playerInfo.clientGround
                     && !data.playerInfo.serverGround
+                    && !data.playerInfo.nearGround
                     && (!data.playerInfo.wasOnSlime || maxHeight >= 2)
                     && !data.playerInfo.flightCancel) {
                 vl++;

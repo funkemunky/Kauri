@@ -3,16 +3,16 @@ package dev.brighten.anticheat.check.impl.combat.autoclicker;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.*;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutHeldItemSlot;
+import cc.funkemunky.api.utils.Materials;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.math.cond.MaxDouble;
 import cc.funkemunky.api.utils.math.cond.MaxInteger;
-import dev.brighten.anticheat.check.api.Check;
-import dev.brighten.anticheat.check.api.CheckInfo;
-import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Autoclicker (F)", description = "Checks for common blocking patterns.",
         checkType = CheckType.AUTOCLICKER, developer = true, punishVL = 200)
+@Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerF extends Check {
 
     private long lastArm;
@@ -77,7 +77,8 @@ public class AutoclickerF extends Check {
 
     @Packet
     public void onPlace(WrappedInBlockPlacePacket packet) {
-        blocked = blocking =  true;
+        if(packet.getItemStack() == null || !Materials.isUsable(packet.getItemStack().getType())) return;
+        blocked = blocking = true;
     }
 }
 

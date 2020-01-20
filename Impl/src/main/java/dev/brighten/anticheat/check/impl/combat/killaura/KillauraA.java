@@ -1,10 +1,11 @@
-package dev.brighten.anticheat.check.impl.combat.hand;
+package dev.brighten.anticheat.check.impl.combat.killaura;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MiscUtils;
+import cc.funkemunky.api.utils.math.cond.MaxInteger;
 import cc.funkemunky.api.utils.world.types.RayCollision;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;
@@ -13,11 +14,12 @@ import lombok.var;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.Vector;
 
-@CheckInfo(name = "Hand (D)", description = "Checks for block collisions on player hits.", checkType = CheckType.HAND,
-        developer = true)
-@Cancellable(cancelType = CancelType.INTERACT)
-public class HandD extends Check {
+@CheckInfo(name = "Killaura (A)", description = "Checks for block collisions on player hits.",
+        checkType = CheckType.KILLAURA, developer = true)
+@Cancellable(cancelType = CancelType.ATTACK)
+public class KillauraA extends Check {
 
+    private MaxInteger verbose = new MaxInteger(10);
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if(data.target != null && !data.playerInfo.generalCancel
@@ -57,11 +59,12 @@ public class HandD extends Check {
                 size++;
             }
 
-            if(collided >= size && data.playerInfo.lastBrokenBlock.hasPassed(10) && size > 1) {
-                if(vl++ > 5) {
+            if(collided >= size && data.playerInfo.lastBrokenBlock.hasPassed(10)) {
+                if(verbose.add() > 5) {
+                    vl++;
                     flag("collided=%1/%2 total=%3 lagging=%4", collided, size, total, data.lagInfo.lagging);
                 }
-            } else vl-= vl > 0 ? 0.2f : 0;
+            } else verbose.subtract();
             debug("collided=%1/%2 total=%3 lagging=%4 vl=%5", collided, size, total, data.lagInfo.lagging, vl);
         }
     }

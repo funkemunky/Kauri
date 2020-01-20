@@ -68,7 +68,7 @@ public class SpeedC extends Check {
             moveSpeed *= drag > 0.708 ? 1.3 : 0.23315;
             moveSpeed *= 0.16277136 / Math.pow(drag, 3);
 
-            if (deltaY > 0) {
+            if (deltaY > 0 && MathUtils.getDelta(data.playerInfo.jumpHeight, deltaY) < 0.1) {
                 tags.add("ascend");
                 moveSpeed += 0.2;
 
@@ -154,11 +154,6 @@ public class SpeedC extends Check {
             moveSpeed += 2.6;
         }
 
-        if (data.playerInfo.deltaY > 0.01 && data.playerInfo.deltaY < 0.02) {
-            tags.add("waterjump");
-            moveSpeed += 1;
-        }
-
         val depth = PlayerUtils.getDepthStriderLevel(data.getPlayer());
         if (depth > 0 && data.playerInfo.liquidTicks.value() > 0) {
             tags.add("depthstrider");
@@ -221,7 +216,7 @@ public class SpeedC extends Check {
         }
 
         double dyf = MiscUtils.format(data.playerInfo.deltaY, 4);
-        if (dyf > -0.0785 && dyf < 0) {
+        if (dyf > -0.0785 && dyf < 0 && !data.playerInfo.serverGround) {
             tags.add("first");
             moveSpeed += 0.21;
         }
