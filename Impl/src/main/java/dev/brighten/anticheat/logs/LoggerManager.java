@@ -3,19 +3,15 @@ package dev.brighten.anticheat.logs;
 import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MiscUtils;
-import cc.funkemunky.api.utils.RunUtils;
-import cc.funkemunky.carbon.db.Database;
-import cc.funkemunky.carbon.db.StructureSet;
-import cc.funkemunky.carbon.db.flatfile.FlatfileDatabase;
-import cc.funkemunky.carbon.db.mongo.MongoDatabase;
-import cc.funkemunky.carbon.db.sql.MySQLDatabase;
-import cc.funkemunky.carbon.utils.Pair;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.logs.objects.Punishment;
+import dev.brighten.db.db.*;
+import dev.brighten.db.utils.Pair;
 import lombok.NoArgsConstructor;
+import lombok.val;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -74,25 +70,24 @@ public class LoggerManager {
         if(aLittleStupid) {
             if(mySQLEnabled) {
                 MiscUtils.printToConsole("&7Setting up SQL...");
-                MySQLDatabase.setCredentials(sqlIp, sqlUsername, sqlPassword);
-                logsDatabase = new MySQLDatabase("logs", sqlDatabase, sqlPort);
+                logsDatabase = new MySQLDatabase("logs");
+                logsDatabase.connect(sqlIp, String.valueOf(sqlPort), sqlDatabase,
+                        "true", sqlUsername, sqlPassword);
             } else if(mongoEnabled) {
                 MiscUtils.printToConsole("&7Setting up Mongo...");
+                logsDatabase = new MongoDatabase("logs");
                 if(mongoLoginDetails) {
-                    logsDatabase = new MongoDatabase("logs",
-                            MongoDatabase.initMongo(mongoDatabase, authDatabase, mongoIp, mongoPort,
-                                    mongoUsername, mongoPassword));
+                    logsDatabase.connect(mongoIp, String.valueOf(mongoPort),
+                            authDatabase, mongoUsername, mongoPassword, authDatabase);
                 } else {
-                    logsDatabase = new MongoDatabase("logs",
-                            MongoDatabase.initMongo(mongoDatabase, mongoIp, mongoPort));
+                    logsDatabase.connect(mongoIp, String.valueOf(mongoPort), mongoDatabase);
                 }
             } else {
                 MiscUtils.printToConsole("&7Setting up FlatfileDB...");
                 logsDatabase = new FlatfileDatabase("logs");
             }
-            MiscUtils.printToConsole("&7Loading database on second thread...");
-            Kauri.INSTANCE.executor.execute(() -> logsDatabase.loadDatabase());
-            save();
+            MiscUtils.printToConsole("&7Loading database...");
+            logsDatabase.loadMappings();
         }
     }
 
@@ -100,48 +95,49 @@ public class LoggerManager {
         Log log = new Log(check.name, info, check.vl, data.lagInfo.transPing,
                 System.currentTimeMillis(), Kauri.INSTANCE.tps);
 
-        StructureSet set = logsDatabase.createStructure(UUID.randomUUID().toString(),
-                new Pair<>("type", "log"),
+        StructureSet set = logsDatabase.create(UUID.randomUUID().toString());
+
+        Arrays.asList(new Pair<>("type", "log"),
                 new Pair<>("uuid", data.uuid.toString()),
                 new Pair<>("checkName", log.checkName),
                 new Pair<>("vl", log.vl),
                 new Pair<>("info", log.info),
                 new Pair<>("ping", log.ping),
                 new Pair<>("timeStamp", log.timeStamp),
-                new Pair<>("tps", log.tps));
+                new Pair<>("tps", log.tps)).forEach(pair -> set.input(pair.key, pair.value));
 
-        logsDatabase.updateObject(set);
+        set.save(logsDatabase);
     }
 
     public void addPunishment(ObjectData data, Check check) {
         Punishment punishment = new Punishment(data.uuid, check.name, System.currentTimeMillis());
-        
-        StructureSet set = logsDatabase.createStructure(UUID.randomUUID().toString(),
-                new Pair<>("type", "punishment"),
-                new Pair<>("uuid", data.uuid.toString()), 
+
+        StructureSet set = logsDatabase.create(UUID.randomUUID().toString());
+
+        Arrays.asList( new Pair<>("type", "punishment"),
+                new Pair<>("uuid", data.uuid.toString()),
                 new Pair<>("checkName", punishment.checkName),
-                new Pair<>("timeStamp", punishment.timeStamp));
+                new Pair<>("timeStamp", punishment.timeStamp))
+                .forEach(pair -> set.input(pair.key, pair.value));
         
-        logsDatabase.updateObject(set);
+        set.save(logsDatabase);
     }
 
     public List<Log> getLogs(UUID uuid) {
 
-        List<StructureSet> sets = logsDatabase.getDatabaseValues()
-                .stream()
-                .filter(structSet -> structSet.containsKey("type") && structSet.getField("type").equals("log"))
-                .filter(structSet -> structSet.containsKey("uuid") && structSet.getField("uuid").equals(uuid.toString()))
-                .collect(Collectors.toList());
+        List<StructureSet> sets = logsDatabase.get(structSet ->
+                structSet.contains("type") && structSet.getObject("type").equals("log")
+                        && structSet.contains("uuid") && structSet.getObject("uuid").equals(uuid.toString()));
 
         if(sets.size() == 0) return new ArrayList<>();
 
         return sets.stream().map(set -> new Log(
-                set.getField("checkName"),
-                set.getField("info"),
-                set.getFloat("vl"),
-                set.getField("ping"),
-                set.getLong("timeStamp"),
-                set.getDouble("tps")))
+                set.getObject("checkName"),
+                set.getObject("info"),
+                (float)(double)set.getObject("vl"),
+                set.getObject("ping"),
+                (long)set.getObject("timeStamp"),
+                (double)set.getObject("tps")))
                 .collect(Collectors.toList());
     }
 
@@ -150,27 +146,23 @@ public class LoggerManager {
     }
 
     public void clearLogs(UUID uuid) {
-        logsDatabase.getDatabaseValues()
-                .parallelStream()
-                .filter(set -> !set.containsKey("uuid") || set.getField("uuid").equals(uuid.toString()))
-                .map(set -> set.id)
-                .forEach(id -> logsDatabase.remove(id));
-        logsDatabase.saveDatabase();
+        val array = logsDatabase.get(set -> !set.contains("uuid") || set.getObject("uuid").equals(uuid.toString()))
+                .stream().map(StructureSet::getId).toArray(String[]::new);
+
+        logsDatabase.remove(array);
     }
     
     public List<Punishment> getPunishments(UUID uuid) {
-        List<StructureSet> structureSets = logsDatabase.getDatabaseValues()
-                .stream()
-                .filter(set -> set.getField("uuid") != null && set.getField("uuid").equals(uuid.toString())
-                        && set.containsKey("type") && set.getField("type").equals("punishment"))
-                .collect(Collectors.toList());
+        List<StructureSet> structureSets = logsDatabase
+                .get(set -> set.contains("uuid") && set.getObject("uuid").equals(uuid.toString())
+                        && set.contains("type") && set.getObject("type").equals("punishment"));
 
         return structureSets.stream()
                 .map(set ->
                         new Punishment(
                                 uuid,
-                                set.getField("checkName"),
-                                set.getField("timeStamp")))
+                                set.getObject("checkName"),
+                                set.getObject("timeStamp")))
                 .collect(Collectors.toList());
     }
 
@@ -179,25 +171,24 @@ public class LoggerManager {
 
         Map<UUID, List<Log>> logs = new HashMap<>();
 
-        logsDatabase.getDatabaseValues()
-                .stream()
-                .filter(structSet -> structSet.containsKey("type") && structSet.containsKey("timeStamp")
-                        && structSet.getField("type").equals("log"))
-                .filter(set -> {
-                    long timeStamp = set.getField("timeStamp");
+        logsDatabase.get(structSet -> {
+            if(structSet.contains("type") && structSet.getObject("type").equals("log")
+                    && structSet.contains("timeStamp")) {
+                long timeStamp = structSet.getObject("timeStamp");
 
-                    return (currentTime - timeStamp) < timeFrame;
-                }).forEach(set -> {
-            UUID uuid = UUID.fromString(set.getField("uuid"));
+                return (currentTime - timeStamp) < timeFrame;
+            } else return false;
+        }).forEach(set -> {
+            UUID uuid = UUID.fromString(set.getObject("uuid"));
             List<Log> logList = logs.getOrDefault(uuid, new ArrayList<>());
 
             logList.add(new Log(
-                    set.getField("checkName"),
-                    set.getField("info"),
-                    set.getFloat("vl"),
-                    set.getField("ping"),
-                    set.getLong("timeStamp"),
-                    set.getDouble("tps")));
+                    set.getObject("checkName"),
+                    set.getObject("info"),
+                    set.getObject("vl"),
+                    set.getObject("ping"),
+                    set.getObject("timeStamp"),
+                    set.getObject("tps")));
 
             logs.put(uuid, logList);
         });
@@ -208,7 +199,7 @@ public class LoggerManager {
     }
 
     private void save() {
-        RunUtils.taskTimerAsync(() -> logsDatabase.saveDatabase(), 2400, 2400);
+
     }
 
 }

@@ -6,7 +6,6 @@ import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutHeldItemSlot;
 import cc.funkemunky.api.utils.Materials;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.math.cond.MaxDouble;
-import cc.funkemunky.api.utils.math.cond.MaxInteger;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;
 

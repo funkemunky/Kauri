@@ -1,10 +1,10 @@
 package dev.brighten.anticheat.data.classes;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.*;
-import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
+import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.PlayerUtils;
+import cc.funkemunky.api.utils.TickTimer;
 import dev.brighten.anticheat.data.ObjectData;
-import org.bukkit.block.Block;
 import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;

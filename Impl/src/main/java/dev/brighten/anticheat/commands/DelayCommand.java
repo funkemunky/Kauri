@@ -2,14 +2,10 @@ package dev.brighten.anticheat.commands;
 
 import cc.funkemunky.api.commands.ancmd.Command;
 import cc.funkemunky.api.commands.ancmd.CommandAdapter;
-import cc.funkemunky.api.reflections.types.WrappedClass;
 import cc.funkemunky.api.utils.Color;
-import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.Init;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Config;
-
-import java.lang.reflect.Field;
 
 @Init(commands = true)
 public class DelayCommand {

@@ -25,4 +25,8 @@ public class Verbose {
     public void subtract(double amount) {
         vl.subtract(amount);
     }
+
+    public double value() {
+        return vl.value();
+    }
 }

@@ -1,9 +1,9 @@
 package dev.brighten.anticheat.check.impl.combat.autoclicker;
 
-import dev.brighten.anticheat.check.api.*;
-import dev.brighten.anticheat.utils.EvictingList;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import dev.brighten.anticheat.check.api.*;
+import dev.brighten.anticheat.utils.EvictingList;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Autoclicker (I)", description = "Click inconsistencies autoclicker check.",

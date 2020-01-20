@@ -2,7 +2,6 @@ package dev.brighten.anticheat.check.impl.combat.aim;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.math.cond.MaxDouble;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -44,7 +43,7 @@ public class AimK extends Check {
                     }
                 } else verbose.subtract(0.2);
 
-                debug("pitch=%1 yaw=%2 vl=%3", ratioPitch, ratioYaw, verbose);
+                debug("pitch=%1 yaw=%2 vl=%3", ratioPitch, ratioYaw, verbose.value());
             } else verbose.subtract(0.005);
         } else verbose.subtract(0.005);
     }

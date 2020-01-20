@@ -62,8 +62,6 @@ public class Kauri extends JavaPlugin {
     public void unload(boolean saveAsync) {
         enabled = false;
         MiscUtils.printToConsole("&7Saving logs to database...");
-        if(saveAsync) executor.execute(() -> loggerManager.logsDatabase.saveDatabase());
-        else executor.execute(() -> loggerManager.logsDatabase.saveDatabase());;
         MiscUtils.printToConsole("&7Unregistering Kauri API...");
         kauriAPI.service.shutdown();
         kauriAPI = null;

@@ -23,7 +23,6 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.inventory.ClickType;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;

@@ -285,7 +285,7 @@ public class LogsGUI extends ChestMenu {
                 setButtons(currentPage.get());
                 buildInventory(false);
             } else cancelTask();
-        }, Kauri.INSTANCE, 80L, 40L);
+        }, Kauri.INSTANCE, 80L, 200L);
     }
 
     private void cancelTask() {

@@ -9,7 +9,6 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.MovementUtils;
 import dev.brighten.api.check.CheckType;
-import lombok.val;
 import lombok.var;
 
 import java.util.ArrayList;

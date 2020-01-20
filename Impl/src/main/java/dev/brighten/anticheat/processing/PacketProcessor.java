@@ -16,12 +16,8 @@ import cc.funkemunky.api.utils.objects.VariableValue;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class PacketProcessor {
 

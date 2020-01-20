@@ -17,7 +17,6 @@ import org.bukkit.util.Vector;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 @CheckInfo(name = "Reach", description = "Ensures the reach of a player is legitimate.",
         checkType = CheckType.HITBOX, punishVL = 10, executable = false)

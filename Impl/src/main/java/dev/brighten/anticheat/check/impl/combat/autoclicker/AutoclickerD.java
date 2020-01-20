@@ -4,7 +4,6 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.Tuple;
 import cc.funkemunky.api.utils.math.cond.MaxDouble;
-import cc.funkemunky.api.utils.math.cond.MaxInteger;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.utils.EvictingList;
 import dev.brighten.api.check.CheckType;

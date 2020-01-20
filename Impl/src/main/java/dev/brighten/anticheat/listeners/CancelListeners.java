@@ -2,16 +2,10 @@ package dev.brighten.anticheat.listeners;
 
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.Init;
-import cc.funkemunky.api.utils.KLocation;
-import cc.funkemunky.api.utils.Materials;
-import cc.funkemunky.api.utils.objects.VariableValue;
-import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.CancelType;
 import dev.brighten.anticheat.data.ObjectData;
-import dev.brighten.anticheat.utils.CollisionHandler;
 import lombok.val;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -22,11 +16,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 @Init
 public class CancelListeners implements Listener {

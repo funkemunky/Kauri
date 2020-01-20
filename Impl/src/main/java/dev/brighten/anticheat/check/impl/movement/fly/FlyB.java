@@ -27,12 +27,10 @@ public class FlyB extends Check {
 
             if(!data.playerInfo.flightCancel
                     && !data.playerInfo.wasOnSlime
-                    && !data.playerInfo.serverPos
                     && data.playerInfo.halfBlockTicks.value() == 0
-                    && timeStamp -  data.playerInfo.lastVelocityTimestamp > 200L
+                    && timeStamp - data.playerInfo.lastVelocityTimestamp > 200L
                     && !data.playerInfo.serverGround
                     && (data.playerInfo.blocksAboveTicks.value() == 0 || data.playerInfo.deltaY >= 0)
-                    && !data.blockInfo.collidesVertically
                     && MathUtils.getDelta(data.playerInfo.deltaY, predicted) > 0.0001) {
                 vl++;
                 if(vl > (data.lagInfo.lagging ? 3 : 2)) {
@@ -41,7 +39,7 @@ public class FlyB extends Check {
             } else vl-= vl > 0 ? 0.2f : 0;
 
             debug("deltaY=" + data.playerInfo.deltaY + " predicted=" + predicted
-                    + " ground=" + data.playerInfo.clientGround + " vl=" + vl);
+                    + " ground=" + data.playerInfo.serverGround + " vl=" + vl);
         }
     }
 }
