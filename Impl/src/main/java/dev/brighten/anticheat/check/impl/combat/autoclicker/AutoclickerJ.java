@@ -7,8 +7,7 @@ import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "Autoclicker (J)", description = "Stolen FFX Autoclicker 6", checkType = CheckType.AUTOCLICKER,
-        developer = true)
+@CheckInfo(name = "Autoclicker (J)", description = "Stolen FFX Autoclicker 6", checkType = CheckType.AUTOCLICKER)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerJ extends Check {
 

@@ -14,6 +14,7 @@ public class KillauraB extends Check {
 
     @Packet
     public void use(WrappedInUseEntityPacket packet, long timeStamp) {
+        if(packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) return;
         long delta = timeStamp - lastFlying;
         if(delta < 2) {
             if(!data.lagInfo.lagging) {

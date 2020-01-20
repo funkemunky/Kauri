@@ -7,7 +7,7 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Autoclicker (I)", description = "Click inconsistencies autoclicker check.",
-        checkType = CheckType.AUTOCLICKER, punishVL = 10)
+        checkType = CheckType.AUTOCLICKER, punishVL = 10, developer = true)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerI extends Check {
 
@@ -41,7 +41,9 @@ public class AutoclickerI extends Check {
 
     @Packet
     public void onClick(WrappedInArmAnimationPacket packet, long timeStamp) {
-        if(data.playerInfo.breakingBlock || data.playerInfo.lastBlockPlace.hasNotPassed(3)) return;
+        if(data.playerInfo.breakingBlock
+                || data.playerInfo.lastBrokenBlock.hasNotPassed(4)
+                || data.playerInfo.lastBlockPlace.hasNotPassed(3)) return;
 
         this.cps++;
     }

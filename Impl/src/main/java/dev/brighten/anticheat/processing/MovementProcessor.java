@@ -10,21 +10,24 @@ import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.utils.GraphUtil;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.MovementUtils;
-import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.bukkit.GameMode;
-import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MovementProcessor {
     private final ObjectData data;
 
-    public EvictingList<Double> yawGcdList = new EvictingList<>(50), pitchGcdList = new EvictingList<>(50);
+    public EvictingList<Double> yawGcdList = new EvictingList<>(50),
+            pitchGcdList = new EvictingList<>(50);
     public long deltaX, deltaY, lastDeltaX, lastDeltaY;
+    private List<Float> yawList = new ArrayList<>(), pitchList = new ArrayList<>();
     public double sensitivityX, sensitivityY, yawMode, pitchMode;
     public TickTimer lastEquals = new TickTimer(6);
     private TickTimer lastReset = new TickTimer(1);
@@ -227,12 +230,28 @@ public class MovementProcessor {
         data.playerInfo.deltaPitch = data.playerInfo.to.pitch - data.playerInfo.from.pitch;
 
         if (packet.isLook()) {
+            if (this.yawList.size() == 20 && this.pitchList.size() == 20) {
+                // Get the negative/positive graph of the sample-lists
+                GraphUtil.GraphResult yawResults = GraphUtil.getGraph(yawList);
+                GraphUtil.GraphResult pitchResults = GraphUtil.getGraph(pitchList);
 
-            data.playerInfo.cinematicModeYaw = data.playerInfo.yawGCD / MovementProcessor.offset < 0.005
-                    && MathUtils.getDelta(deltaX, lastDeltaX) < 5;
+                // Negative values
+                int yawNegatives = yawResults.getNegatives();
+                int pitchNegatives = pitchResults.getNegatives();
 
-            data.playerInfo.cinematicModePitch = data.playerInfo.pitchGCD / MovementProcessor.offset < 0.005
-                    && MathUtils.getDelta(deltaY, lastDeltaY) < 5;
+                // Positive values
+                int yawPositives = yawResults.getPositives();
+                int pitchPositives = pitchResults.getPositives();
+
+                // Cinematic camera usually does this on *most* speeds and is accurate for the most part.
+                if (yawPositives > yawNegatives || pitchPositives > pitchNegatives) {
+                    data.playerInfo.cinematicMode = true;
+                } else data.playerInfo.cinematicMode = false;
+
+                // Clear the sample-lists
+                pitchList.clear();
+                yawList.clear();
+            }
 
             if (Float.isNaN(data.playerInfo.cinematicPitch) || Float.isNaN(data.playerInfo.cinematicYaw)) {
                 data.playerInfo.yawSmooth.reset();

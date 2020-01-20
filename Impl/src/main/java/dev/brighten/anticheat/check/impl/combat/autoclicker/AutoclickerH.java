@@ -24,6 +24,10 @@ public class AutoclickerH extends Check {
 
     @Packet
     public void onClick(WrappedInArmAnimationPacket packet, long timeStamp) {
+        if(data.playerInfo.breakingBlock || data.playerInfo.lastBlockPlace.hasNotPassed(4)) {
+            lastTime = timeStamp;
+            return;
+        }
         long delay = timeStamp - this.lastTime;
 
         if (delay > 0L && delay < 400L) {
@@ -40,20 +44,22 @@ public class AutoclickerH extends Check {
             this.ratioDeque.add(ratio);
 
             if (ratioDeque.size() == 50) {
+                double avg = 1000D / delays.stream().mapToLong(v -> v).average().orElse(0);
+
                 AtomicInteger level = new AtomicInteger();
                 ratioDeque.stream().filter(i -> i == 0 || i == 1)
                         .forEach(i -> level.incrementAndGet());
 
-                if (level.get() == 50) {
+                if (level.get() == 50 && avg > 7) {
                     verbose.add(4);
 
                     if (verbose.value() >= 10) {
                         vl++;
-                        flag("lvl=%1", level.get());
+                        flag("lvl=%1 avg=%2", level.get(), avg);
                     }
                 } else verbose.subtract(2);
 
-                debug("size=%1 verbose=%2", level.get(), verbose.value());
+                debug("size=%1 avg=%2 verbose=%3", level.get(), avg, verbose.value());
                 ratioDeque.clear();
             }
         }

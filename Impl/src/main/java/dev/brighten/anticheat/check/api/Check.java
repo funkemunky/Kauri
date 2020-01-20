@@ -118,7 +118,7 @@ public class Check implements KauriCheck {
         if(cancellable && cancelMode != null) {
             if(cancelMode.equals(CancelType.MOVEMENT)) {
                 data.typesToCancel.add(cancelMode);
-            } else for(int i = 0 ; i < 5 ; i++) data.typesToCancel.add(cancelMode);
+            } else for(int i = 0 ; i < 2 ; i++) data.typesToCancel.add(cancelMode);
         }
 
         Atlas.getInstance().getEventManager().callEvent(event);
@@ -254,6 +254,7 @@ public class Check implements KauriCheck {
         register(new AimJ());
         register(new AimK());
         register(new AimL());
+        //register(new AimNibba());
         register(new SpeedA());
         register(new SpeedB());
         register(new SpeedC());

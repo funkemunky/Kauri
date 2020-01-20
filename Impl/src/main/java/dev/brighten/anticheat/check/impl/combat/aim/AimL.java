@@ -56,7 +56,7 @@ public class AimL extends Check {
 
                     this.divisorDeque.stream().filter(div -> div == 0.0).forEach(div -> level.incrementAndGet());
 
-                    if (level.get() > 10 && data.playerInfo.lastAttack.hasNotPassed(20)) {
+                    if (level.get() > 14 && data.playerInfo.lastAttack.hasNotPassed(20)) {
                         vl++;
                         flag("level=%1", level.get());
                     }

@@ -12,6 +12,7 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.MiscUtils;
+import dev.brighten.anticheat.utils.Verbose;
 import lombok.val;
 import org.bukkit.Material;
 import org.bukkit.potion.PotionEffectType;
@@ -29,7 +30,7 @@ public class SpeedC extends Check {
     private int noSlowStreak;
     private double omniVl = 0;
     private double velocityX, velocityZ;
-    private MaxInteger verbose = new MaxInteger(40);
+    private Verbose verbose = new Verbose(20, 40);
     private TickTimer horizontalIdle = new TickTimer(20);
 
     @Packet
@@ -190,7 +191,7 @@ public class SpeedC extends Check {
             moveSpeed += 1;
         }
 
-        if (data.playerInfo.deltaY == 0) horizontalIdle.reset();
+        if (data.playerInfo.deltaY == 0 && !data.playerInfo.clientGround) horizontalIdle.reset();
 
         if (horizontalIdle.hasNotPassed(1)) {
             tags.add("idle");
@@ -210,7 +211,7 @@ public class SpeedC extends Check {
             } else tags.add("soul");
         }
 
-        if (data.playerInfo.slimeTicks.value() > 0) {
+        if (data.playerInfo.wasOnSlime) {
             tags.add("slime");
             moveSpeed -= 0.07;
         }
@@ -226,12 +227,12 @@ public class SpeedC extends Check {
             debug("+%1,tags=%2", horizontalMove, String.join(",", tags));
 
             if (horizontalMove > 0) {
-                if(verbose.add(5) > 12 || horizontalMove > 0.2) {
+                if(verbose.flag(1, 1) || horizontalMove > 0.4) {
                     vl++;
                     flag("+%1,v=%2,tags=%3",
                             horizontalMove, data.playerInfo.velocityX, String.join(",", tags));
                 }
-            } else verbose.subtract();
+            }
         }
 
         if(velocityXZ > 0) {

@@ -23,7 +23,7 @@ public class PlayerInformation {
     //Cinematic
     public float lCinematicYaw, lCinematicPitch;
     public float cinematicYaw, cinematicPitch, cDeltaYaw, cDeltaPitch;
-    public boolean cinematicModeYaw, cinematicModePitch;
+    public boolean cinematicMode, cinematicModePitch;
     public MouseFilter yawSmooth = new MouseFilter(), pitchSmooth = new MouseFilter();
 
     //Gcd

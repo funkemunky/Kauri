@@ -85,8 +85,8 @@ public class BlockInformation {
                 Atlas.getInstance().getEntities().getOrDefault(objectData.getPlayer().getUniqueId(), new ArrayList<>()),
                 objectData.playerInfo.to);
 
-        handler.setSize(0.6f, 0.8f);
-        handler.setOffset(-0.1);
+        handler.setSize(0.6f, 0.0f);
+        handler.setOffset(-0.01);
 
         objectData.playerInfo.serverGround =
                 handler.isCollidedWith(Materials.SOLID) || handler.contains(EntityType.BOAT);

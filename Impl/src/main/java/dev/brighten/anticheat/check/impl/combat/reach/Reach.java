@@ -17,7 +17,7 @@ import org.bukkit.util.Vector;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 @CheckInfo(name = "Reach", description = "Ensures the reach of a player is legitimate.",
         checkType = CheckType.HITBOX, punishVL = 10, executable = false)
@@ -36,7 +36,6 @@ public class Reach extends Check {
 
     @Packet
     public void onUse(WrappedInUseEntityPacket packet, long timeStamp) {
-        //debug("timeStamp=" + timeStamp + "ms");
         if(data.target == null || !allowedEntities.contains(data.target.getType())
                 || data.playerInfo.creative) return;
 
@@ -59,15 +58,13 @@ public class Reach extends Check {
             }
         });
 
-
-        if(distances.size() > 0) {
+        int size = distances.size();
+        if(size > 0) {
             val distance = distances.stream().mapToDouble(num -> num).min().orElse(0);
 
-            if(distance > 3.01 && (distances.size() > 4 || (distance > 3.1 && distances.size() > 3))
-                    && (data.playerInfo.deltaXZ == 0 && data.targetData.playerInfo.deltaXZ == 0
-                    || data.targetData.playerInfo.deltaXZ > 0 && data.playerInfo.deltaXZ > 0)
+            if(distance > 3.01 && (size > 4 || (distance > 3.1 && size > 3))
                     && data.lagInfo.lastPacketDrop.hasPassed(1)) {
-                verbose+= distances.size() > 6 ? 1 : 0.5f;
+                verbose+= size > 6 ? 1 : 0.5f;
                 if(verbose > 3) {
                     vl++;
                     flag("distance=%1 size=%2", MathUtils.round(distance, 3), distances.size());
