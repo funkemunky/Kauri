@@ -130,8 +130,7 @@ public class SpeedC extends Check {
         data.blockInfo.handler.setOffset(1);
         data.blockInfo.handler.setSize(0.6, 1);
 
-        if (data.blockInfo.inWater
-                && data.blockInfo.handler.isCollidedWith(Materials.WATER)) {
+        if (data.blockInfo.inWater) {
             tags.add("water");
             moveSpeed *= 0.8;
         }

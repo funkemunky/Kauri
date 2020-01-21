@@ -5,7 +5,7 @@ import cc.funkemunky.api.commands.ancmd.Command;
 import cc.funkemunky.api.commands.ancmd.CommandAdapter;
 import cc.funkemunky.api.profiling.ResultsType;
 import cc.funkemunky.api.utils.*;
-import com.google.common.util.concurrent.AtomicDouble;
+import dev.brighten.anticheat.utils.AtomicDouble;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.utils.ItemBuilder;
 import dev.brighten.anticheat.utils.Pastebin;
