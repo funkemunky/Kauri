@@ -209,6 +209,14 @@ public class ProfilerCommand {
         makePaste(cmd.getSender(), type);
     }
 
+    @Command(name = "kauri.profile.reset", display = "profile reset",
+            description = "reset the Kauri profiler.", permission = "kauri.command.profile.reset")
+    public void onReset(CommandAdapter cmd) {
+        Kauri.INSTANCE.profiler.reset();
+        cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                .msg("profile-reset", "&aReset the Kauri profiler!"));
+    }
+
     private void makePaste(CommandSender sender, ResultsType type) {
         List<String> body = new ArrayList<>();
         body.add(MiscUtils.lineNoStrike());

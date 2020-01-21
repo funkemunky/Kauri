@@ -19,16 +19,16 @@ public class LagCheck extends AtlasEvent {
         if(!enabled || !Kauri.INSTANCE.enabled) return;
 
         //We do this to ensure no one is abusing fake lag attempts.
+        long timeStamp = System.currentTimeMillis();
         Kauri.INSTANCE.dataManager.dataMap.values()
                 .parallelStream()
                 .forEach(data -> {
-                    if(data.lagInfo.lagging) {
+                    if(timeStamp - data.lagInfo.lastClientTrans > 10000L
+                            && timeStamp - data.playerInfo.to.timeStamp < 100L) {
                         data.lagTicks++;
 
-                        if(data.lagTicks > 400) {
-                            RunUtils.task(() ->
-                                    data.getPlayer().kickPlayer("Kicked for timing out. (Extreme lag?)"));
-                        }
+                        RunUtils.task(() ->
+                                data.getPlayer().kickPlayer("Kicked for timing out. (Extreme lag?)"));
                     } else {
                         data.noLagTicks++;
                         data.lagTicks = 0;

@@ -3,6 +3,7 @@ package dev.brighten.anticheat.data.classes;
 import cc.funkemunky.api.reflections.types.WrappedClass;
 import cc.funkemunky.api.reflections.types.WrappedMethod;
 import cc.funkemunky.api.tinyprotocol.api.NMSObject;
+import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.data.ObjectData;
 import lombok.val;
@@ -29,7 +30,7 @@ public class CheckManager {
         methods.parallelStream().filter(entry -> entry.getValue().getMethod().isAnnotationPresent(Packet.class))
                 .forEach(entry -> {
                     Check check = checks.get(entry.getKey());
-
+                    Kauri.INSTANCE.profiler.start("check:" + check.name + ":" + object.getPacketName());
                     if(check.enabled) {
                         if(entry.getValue().getMethod().getParameterCount() > 1) {
                             if(entry.getValue().getMethod().getGenericReturnType().equals(Void.TYPE))
@@ -49,6 +50,7 @@ public class CheckManager {
                             }
                         }
                     }
+                    Kauri.INSTANCE.profiler.stop("check:" + check.name + ":" + object.getPacketName());
                 });
         return okay.get();
     }

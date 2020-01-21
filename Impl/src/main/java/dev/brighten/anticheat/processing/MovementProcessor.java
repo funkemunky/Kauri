@@ -47,7 +47,6 @@ public class MovementProcessor {
     }
 
     public void process(WrappedInFlyingPacket packet, long timeStamp) {
-        Kauri.INSTANCE.profiler.start("moveprocessor:pos:" + packet.isPos());
         //We check if it's null and intialize the from and to as equal to prevent large deltas causing false positives since there
         //was no previous from (Ex: delta of 380 instead of 0.45 caused by jump jump in location from 0,0,0 to 380,0,0)
         if (data.playerInfo.from == null) {
@@ -361,7 +360,6 @@ public class MovementProcessor {
 
         //Adding past location
         data.pastLocation.addLocation(data.playerInfo.to.clone());
-        Kauri.INSTANCE.profiler.stop("moveprocessor:pos:" + packet.isPos());
     }
 
 
