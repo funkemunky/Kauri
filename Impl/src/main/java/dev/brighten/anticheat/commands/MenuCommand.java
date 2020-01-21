@@ -75,6 +75,7 @@ public class MenuCommand {
             aliases = {"kauri.gui"}, playerOnly = true, permission = "kauri.command.menu")
     public void onCommand(CommandAdapter cmd) {
         main.showMenu(cmd.getPlayer());
+        categoryMenu = getChecksCategoryMenu();
         cmd.getPlayer().sendMessage(Color.Green + "Opened main menu.");
     }
 
@@ -115,17 +116,31 @@ public class MenuCommand {
                 .sorted(Comparator.comparing(Enum::name))
                 .forEach(type -> {
 
-                    AtomicInteger amount = new AtomicInteger(0);
+                    AtomicInteger amount = new AtomicInteger(0),
+                            enabled = new AtomicInteger(0),
+                            executable = new AtomicInteger(0),
+                            cancellable = new AtomicInteger(0),
+                            totalCancellable = new AtomicInteger(0);
 
-                    Check.checkClasses.values()
+                    Check.checkSettings.values()
                             .stream()
-                            .filter(ci-> ci.checkType().equals(type))
-                            .forEach(ci -> amount.incrementAndGet());
+                            .filter(ci-> ci.type.equals(type))
+                            .forEach(test -> {
+                                amount.incrementAndGet();
+                                if(test.enabled) enabled.incrementAndGet();
+                                if(test.executable) executable.incrementAndGet();
+                                if(test.cancellable) cancellable.incrementAndGet();
+                                if(test.cancelMode != null) totalCancellable.incrementAndGet();
+                            });
+
                     Button button = new Button(false,
                             new ItemBuilder(Material.BOOK)
                                     .amount(amount.get())
                                     .name("&e" + type.name())
-                                    .lore("", "&7Checks&8: &f" + amount, "", "&7&oClick to configure in this category.")
+                                    .lore("", "&aEnabled&8: &f" + enabled + "&7/&f" + amount,
+                                            "&aExecutable&8: &f" + executable + "&7/&f" + amount,
+                                            "&aCancellable&8: &f" + cancellable + "&7/&f" + totalCancellable,
+                                            "", "&7&oClick to configure in this category.")
                                     .build(),
                             (player, info) -> {
                         menu.setParent(null);

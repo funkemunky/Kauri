@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 public class LoggerManager {
 
     public Database logsDatabase;
-    private List<StructureSet> setsToSave = Collections.synchronizedList(new ArrayList<>());
 
     /*My SQL */
     @ConfigSetting(path = "database.mysql", name = "enabled")
@@ -70,11 +69,6 @@ public class LoggerManager {
     @ConfigSetting(path = "database.mongo", name = "port")
     public static int mongoPort = 27017;
 
-    @ConfigSetting(path = "database", name = "saveInterval")
-    private static long saveTicks = 20 * 10L;
-
-    public BukkitTask saveTask;
-
     public LoggerManager(boolean aLittleStupid) {
         if(aLittleStupid) {
             if(mySQLEnabled) {
@@ -97,7 +91,6 @@ public class LoggerManager {
             }
             MiscUtils.printToConsole("&7Loading database...");
             logsDatabase.loadMappings();
-            runSaveTask();
         }
     }
 
@@ -116,7 +109,7 @@ public class LoggerManager {
                 new Pair<>("timeStamp", log.timeStamp),
                 new Pair<>("tps", log.tps)).forEach(pair -> set.input(pair.key, pair.value));
 
-        setsToSave.add(set);
+        set.save(logsDatabase);
     }
 
     public void addPunishment(ObjectData data, Check check) {
@@ -131,7 +124,6 @@ public class LoggerManager {
                 .forEach(pair -> set.input(pair.key, pair.value));
         
         set.save(logsDatabase);
-        setsToSave.add(set);
     }
 
     public List<Log> getLogs(UUID uuid) {
@@ -146,12 +138,16 @@ public class LoggerManager {
                 set.getObject("checkName"),
                 set.getObject("info"),
                 set.getObject("vl") instanceof Integer
-                        ? (int)set.getObject("vl") : (float)(double)set.getObject("vl"),
+                        ? (int)set.getObject("vl")
+                        : (set.getObject("vl") instanceof Double
+                        ? (float)(double)set.getObject("vl") : (float)set.getObject("vl")),
                 set.getObject("ping") instanceof Integer
                         ? (int)set.getObject("ping") : set.getObject("ping"),
                 (long)set.getObject("timeStamp"),
                 set.getObject("tps") instanceof Integer
-                        ? (int)set.getObject("tps") : (double)set.getObject("tps")))
+                        ? (int)set.getObject("tps")
+                        : set.getObject("tps") instanceof Double
+                        ? (double)set.getObject("tps") : (float)set.getObject("tps")))
                 .collect(Collectors.toList());
     }
 
@@ -209,21 +205,6 @@ public class LoggerManager {
         logs.values().forEach(list -> list.sort(Comparator.comparing(log -> currentTime - log.timeStamp)));
 
         return logs;
-    }
-
-    public void save() {
-        if(logsDatabase != null && setsToSave.size() > 0) {
-            for (StructureSet set : setsToSave) {
-                set.save(logsDatabase);
-                setsToSave.remove(set);
-            }
-        }
-    }
-
-    private void runSaveTask() {
-        //If already created and running, don't make another one.
-        if(saveTask != null && !saveTask.isCancelled()) return;
-        saveTask = RunUtils.taskTimerAsync(this::save, Kauri.INSTANCE, 120L, saveTicks);
     }
 
 }
