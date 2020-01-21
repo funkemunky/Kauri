@@ -1,5 +1,7 @@
 package dev.brighten.anticheat.utils.handlers;
 
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
+import cc.funkemunky.api.utils.PlayerUtils;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -29,12 +31,9 @@ public interface PlayerSizeHandler {
     static PlayerSizeHandler getInstance() {
         if (instance!=null)
             return instance;
-        try {
-            Method method = Entity.class.getMethod("getWidth");
-            return new PlayerSizeHandlerModern();
-        } catch (NoSuchMethodException e) {
-            return new PlayerSizeHandlerLegacy();
-        }
+        return ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_9)
+                ? new PlayerSizeHandlerModern()
+                : new PlayerSizeHandlerLegacy();
     }
 
 }

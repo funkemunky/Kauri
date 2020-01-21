@@ -8,12 +8,12 @@ public class PlayerSizeHandlerLegacy implements PlayerSizeHandler {
 
     @Override
     public double height(Player player) {
-        return .3;
+        return 1.8;
     }
 
     @Override
     public double width(Player player) {
-        return 1.75;
+        return 0.6;
     }
 
     @Override
@@ -23,10 +23,10 @@ public class PlayerSizeHandlerLegacy implements PlayerSizeHandler {
 
     public SimpleCollisionBox bounds(Player player) {
         Location l = player.getLocation();
-        return new SimpleCollisionBox().offset(l.getX(), l.getY(), l.getZ()).expand(.3,0,.3).expandMax(0,1.75,0);
+        return new SimpleCollisionBox().offset(l.getX(), l.getY(), l.getZ()).expand(.3,0,.3).expandMax(0,1.8,0);
     }
     public SimpleCollisionBox bounds(Player player, double x, double y, double z) {
-        return new SimpleCollisionBox().offset(x,y,z).expand(.3,0,.3).expandMax(0,1.75,0);
+        return new SimpleCollisionBox().offset(x,y,z).expand(.3,0,.3).expandMax(0,1.8,0);
     }
 
 }
