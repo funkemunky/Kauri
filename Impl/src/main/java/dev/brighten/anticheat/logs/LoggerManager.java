@@ -3,6 +3,7 @@ package dev.brighten.anticheat.logs;
 import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MiscUtils;
+import cc.funkemunky.api.utils.RunUtils;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.data.ObjectData;
@@ -12,8 +13,10 @@ import dev.brighten.db.db.*;
 import dev.brighten.db.utils.Pair;
 import lombok.NoArgsConstructor;
 import lombok.val;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Init
@@ -134,15 +137,18 @@ public class LoggerManager {
         return sets.stream().map(set -> new Log(
                 set.getObject("checkName"),
                 set.getObject("info"),
-                (float)(double)set.getObject("vl"),
-                set.getObject("ping"),
+                set.getObject("vl") instanceof Integer
+                        ? (int)set.getObject("vl")
+                        : (set.getObject("vl") instanceof Double
+                        ? (float)(double)set.getObject("vl") : (float)set.getObject("vl")),
+                set.getObject("ping") instanceof Integer
+                        ? (int)set.getObject("ping") : set.getObject("ping"),
                 (long)set.getObject("timeStamp"),
-                (double)set.getObject("tps")))
+                set.getObject("tps") instanceof Integer
+                        ? (int)set.getObject("tps")
+                        : set.getObject("tps") instanceof Double
+                        ? (double)set.getObject("tps") : (float)set.getObject("tps")))
                 .collect(Collectors.toList());
-    }
-
-    public void convertDeprecatedLogs() {
-
     }
 
     public void clearLogs(UUID uuid) {
@@ -185,10 +191,13 @@ public class LoggerManager {
             logList.add(new Log(
                     set.getObject("checkName"),
                     set.getObject("info"),
-                    set.getObject("vl"),
-                    set.getObject("ping"),
-                    set.getObject("timeStamp"),
-                    set.getObject("tps")));
+                    set.getObject("vl") instanceof Integer
+                            ? (int)set.getObject("vl") : (float)(double)set.getObject("vl"),
+                    set.getObject("ping") instanceof Integer
+                            ? (int)set.getObject("ping") : set.getObject("ping"),
+                    (long)set.getObject("timeStamp"),
+                    set.getObject("tps") instanceof Integer
+                            ? (int)set.getObject("tps") : (double)set.getObject("tps")));
 
             logs.put(uuid, logList);
         });
@@ -196,10 +205,6 @@ public class LoggerManager {
         logs.values().forEach(list -> list.sort(Comparator.comparing(log -> currentTime - log.timeStamp)));
 
         return logs;
-    }
-
-    private void save() {
-
     }
 
 }

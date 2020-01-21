@@ -5,8 +5,8 @@ import cc.funkemunky.api.commands.ancmd.Command;
 import cc.funkemunky.api.commands.ancmd.CommandAdapter;
 import cc.funkemunky.api.profiling.ResultsType;
 import cc.funkemunky.api.utils.*;
-import dev.brighten.anticheat.utils.AtomicDouble;
 import dev.brighten.anticheat.Kauri;
+import dev.brighten.anticheat.utils.AtomicDouble;
 import dev.brighten.anticheat.utils.ItemBuilder;
 import dev.brighten.anticheat.utils.Pastebin;
 import dev.brighten.anticheat.utils.menu.button.Button;
@@ -35,12 +35,12 @@ public class ProfilerCommand {
     @Command(name = "kauri.profile", display = "profile", description = "run a profile on Kauri.",
             permission = {"kauri.profile"})
     public void onCommand(CommandAdapter cmd) {
-        if(cmd.getSender() instanceof Player) {
+        if (cmd.getSender() instanceof Player) {
             int page = 1;
-            if(cmd.getArgs().length > 1) {
+            if (cmd.getArgs().length > 1) {
                 try {
                     page = Integer.parseInt(cmd.getArgs()[1]);
-                } catch(NumberFormatException e) {
+                } catch (NumberFormatException e) {
                     cmd.getSender().sendMessage(Color.Red + "The page number provided must be an integer.");
                     return;
                 }
@@ -52,7 +52,7 @@ public class ProfilerCommand {
             menu.buildInventory(true);
 
             BukkitTask task = RunUtils.taskTimerAsync(() -> {
-               menu.fill(new FillerButton());
+                menu.fill(new FillerButton());
                 final List<Tuple<Double, Button>> buttons = new ArrayList<>();
 
                 AtomicDouble samples = new AtomicDouble(0);
@@ -61,31 +61,34 @@ public class ProfilerCommand {
 
                 long total = map.keySet()
                         .stream()
+                        .filter(key -> !key.contains("check:"))
                         .mapToLong(key -> Math.round(map.get(key).two))
                         .sum();
 
                 map.forEach((key, result) -> {
-                    Button button = new Button(false, new ItemBuilder(Material.REDSTONE)
-                            .amount(1)
-                            .name(Color.Gold + key).lore("",
-                                    "&7Weighted Usage: " + dev.brighten.anticheat.utils.MiscUtils
-                                            .drawUsage(total, result.two),
-                                    "&7MS: &f" + dev.brighten.anticheat.utils.MiscUtils
-                                            .format(Kauri.INSTANCE.profiler.total.get(key) / 1000000D, 3),
-                                    "&7Samples: &f" + dev.brighten.anticheat.utils.MiscUtils
-                                            .format(result.two / 1000000D, 3),
-                                    "&7Deviation: &f" + dev.brighten.anticheat.utils.MiscUtils
-                                            .format(Kauri.INSTANCE.profiler.stddev
-                                                    .getOrDefault(key, 0L), 3) / 1000000D).build());
+                    if(!key.contains("check:")) {
+                        Button button = new Button(false, new ItemBuilder(Material.REDSTONE)
+                                .amount(1)
+                                .name(Color.Gold + key).lore("",
+                                        "&7Weighted Usage: " + dev.brighten.anticheat.utils.MiscUtils
+                                                .drawUsage(total, result.two),
+                                        "&7MS: &f" + dev.brighten.anticheat.utils.MiscUtils
+                                                .format(Kauri.INSTANCE.profiler.total.get(key) / 1000000D, 3),
+                                        "&7Samples: &f" + dev.brighten.anticheat.utils.MiscUtils
+                                                .format(result.two / 1000000D, 3),
+                                        "&7Deviation: &f" + dev.brighten.anticheat.utils.MiscUtils
+                                                .format(Kauri.INSTANCE.profiler.stddev
+                                                        .getOrDefault(key, 0L), 3) / 1000000D).build());
 
-                    buttons.add(new Tuple<>(result.two, button));
-                    samples.addAndGet(result.two / 1000000D);
+                        buttons.add(new Tuple<>(result.two, button));
+                        samples.addAndGet(result.two / 1000000D);
+                    }
                 });
 
                 buttons.sort(Comparator.comparing(tuple -> tuple.one, Comparator.reverseOrder()));
 
                 double totalMs = total / 1000000D;
-                if(finalPage > 1) {
+                if (finalPage > 1) {
                     menu.setItem(48, new Button(false,
                             new ItemBuilder(Material.BOOK).amount(1).name("&cBack").build(),
                             (player, info) -> Bukkit.dispatchCommand(player,
@@ -129,25 +132,31 @@ public class ProfilerCommand {
             int size = sorted.size();
             AtomicLong total = new AtomicLong();
             List<Map.Entry<String, Long>> entries = new ArrayList<>(sorted.entrySet());
-            IntStream.range(size - Math.min(size - 10, 10), size).mapToObj(entries::get).forEach(entry -> {
-                String name = entry.getKey();
-                Long time = entry.getValue();
-                total.addAndGet(time);
-                cmd.getSender().sendMessage(dev.brighten.anticheat.utils.MiscUtils.drawUsage(total.get(), time)
-                        + " §c" + name
-                        + "§7: " + dev.brighten.anticheat.utils.MiscUtils.format(time / 1000000D, 3)
-                        + ", " + dev.brighten.anticheat.utils.MiscUtils
-                        .format(Kauri.INSTANCE.profiler.samples
-                                .getOrDefault(name, new Tuple<>(0L, 0L)).one / 1000000D, 3)
-                        + ", " + dev.brighten.anticheat.utils.MiscUtils
-                        .format(Kauri.INSTANCE.profiler.stddev.getOrDefault(name, 0L) / 1000000D, 3));
-            });
+            IntStream.range(size - Math.min(size - 10, 10), size).mapToObj(entries::get)
+                    .filter(entry -> !entry.getKey().contains("check:"))
+                    .forEach(entry -> {
+                        String name = entry.getKey();
+                        Long time = entry.getValue();
+                        total.addAndGet(time);
+                        cmd.getSender().sendMessage(dev.brighten.anticheat.utils.MiscUtils
+                                .drawUsage(total.get(), time)
+                                + " §c" + name
+                                + "§7: " + dev.brighten.anticheat.utils.MiscUtils.format(time / 1000000D, 3)
+                                + ", " + dev.brighten.anticheat.utils.MiscUtils
+                                .format(Kauri.INSTANCE.profiler.samples
+                                        .getOrDefault(name, new Tuple<>(0L, 0L)).one / 1000000D, 3)
+                                + ", " + dev.brighten.anticheat.utils.MiscUtils
+                                .format(Kauri.INSTANCE.profiler.stddev
+                                        .getOrDefault(name, 0L) / 1000000D, 3));
+                    });
             double totalMs = total.get() / 1000000D;
             long totalTime = Kauri.INSTANCE.profiler.totalCalls * 50;
             cmd.getSender().sendMessage(dev.brighten.anticheat.utils.MiscUtils
-                    .drawUsage(total.get(), dev.brighten.anticheat.utils.MiscUtils.format(totalMs / totalTime, 3))
+                    .drawUsage(total.get(), dev.brighten.anticheat.utils.MiscUtils
+                            .format(totalMs / totalTime, 3))
                     + " §cTotal§7: " + dev.brighten.anticheat.utils.MiscUtils.format(totalMs, 3)
-                    + " §f- §c" + dev.brighten.anticheat.utils.MiscUtils.format(totalMs / totalTime, 3) + "%");
+                    + " §f- §c" + dev.brighten.anticheat.utils.MiscUtils
+                    .format(totalMs / totalTime, 3) + "%");
             cmd.getSender().sendMessage("-------------------------------------------------");
         }
     }
@@ -155,12 +164,12 @@ public class ProfilerCommand {
     @Command(name = "kauri.profile.chat", display = "profile chat", description = "send updated profiling in chat.",
             permission = "kauri.command.profile")
     public void onChatCmd(CommandAdapter cmd) {
-        if(taskMap.containsKey(cmd.getSender().getName())) {
+        if (taskMap.containsKey(cmd.getSender().getName())) {
             taskMap.get(cmd.getSender().getName()).cancel();
             taskMap.remove(cmd.getSender().getName());
         } else {
             val task = RunUtils.taskTimerAsync(() -> {
-                if(taskMap.containsKey(cmd.getSender().getName())) {
+                if (taskMap.containsKey(cmd.getSender().getName())) {
                     cmd.getSender().sendMessage("-------------------------------------------------");
                     Map<String, Long> sorted = dev.brighten.anticheat.utils.MiscUtils
                             .sortByValue(Kauri.INSTANCE.profiler.total);
@@ -172,7 +181,7 @@ public class ProfilerCommand {
                             .sum();
                     List<Map.Entry<String, Long>> entries = new ArrayList<>(sorted.entrySet());
                     AtomicDouble samples = new AtomicDouble(0);
-                    map.keySet().stream().forEach(key -> {
+                    map.keySet().stream().filter(key -> !key.contains("check:")).forEach(key -> {
                         val entry = map.get(key);
                         String name = key;
                         double time = entry.two / 1000000D;
@@ -231,7 +240,7 @@ public class ProfilerCommand {
             //Converting nanoseconds to millis to be more readable.
             double amount = results.get(key).two / 1000000D;
 
-            total+= amount;
+            total += amount;
             body.add(key + ": " + amount + "ms (" + results.get(key).one + " calls, std="
                     + Kauri.INSTANCE.profiler.stddev.get(key) + ")");
         }
