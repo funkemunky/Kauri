@@ -18,7 +18,7 @@ public class NoFallA extends Check {
 
         boolean flag = data.playerInfo.clientGround
                 ? data.playerInfo.deltaY != 0 && !data.playerInfo.serverGround
-                : data.playerInfo.deltaY == 0 && data.playerInfo.lDeltaY == 0 && !data.blockInfo.blocksAbove;
+                : data.playerInfo.deltaY == 0 && data.playerInfo.lDeltaY == 0;
 
         if(!data.playerInfo.flightCancel
                 && !data.blockInfo.onSlime
