@@ -31,9 +31,14 @@ public interface PlayerSizeHandler {
     static PlayerSizeHandler getInstance() {
         if (instance!=null)
             return instance;
-        return ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_9)
-                ? new PlayerSizeHandlerModern()
-                : new PlayerSizeHandlerLegacy();
+
+        try {
+            return ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_12)
+                    ? new PlayerSizeHandlerModern()
+                    : new PlayerSizeHandlerLegacy();
+        } catch(Exception e) {
+            return new PlayerSizeHandlerLegacy();
+        }
     }
 
 }
