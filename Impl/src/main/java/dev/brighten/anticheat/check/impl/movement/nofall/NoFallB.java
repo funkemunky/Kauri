@@ -13,11 +13,12 @@ import dev.brighten.api.check.CheckType;
 public class NoFallB extends Check {
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
+    public void onFlying(WrappedInFlyingPacket packet) {
         if(packet.isPos()) {
             if(data.playerInfo.serverGround != data.playerInfo.clientGround
                     && data.playerInfo.climbTicks.value() == 0
                     && !data.playerInfo.generalCancel
+                    && (data.playerInfo.deltaY != 0 || data.playerInfo.deltaXZ > 0)
                     && data.playerInfo.lastBlockPlace.hasPassed(20)
                     && data.playerInfo.lastVelocity.hasPassed(40)
                     && data.playerInfo.liquidTicks.value() == 0) {

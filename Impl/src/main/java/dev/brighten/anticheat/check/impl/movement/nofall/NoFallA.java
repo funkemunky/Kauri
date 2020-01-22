@@ -17,13 +17,14 @@ public class NoFallA extends Check {
         if(!packet.isPos()) return;
 
         boolean flag = data.playerInfo.clientGround
-                ? data.playerInfo.deltaY != 0 && !data.playerInfo.serverGround && data.playerInfo.groundTicks > 1
+                ? data.playerInfo.deltaY != 0 && !data.playerInfo.serverGround
                 : data.playerInfo.deltaY == 0 && data.playerInfo.lDeltaY == 0 && !data.blockInfo.blocksAbove;
 
         if(!data.playerInfo.flightCancel
                 && !data.blockInfo.onSlime
+                && (data.playerInfo.deltaY != 0 || data.playerInfo.deltaXZ > 0)
                 && data.playerInfo.blocksAboveTicks.value() == 0
-                && timeStamp - data.playerInfo.lastServerPos > 300L + data.lagInfo.transPing
+                && timeStamp - data.playerInfo.lastServerPos > 100L
                 && flag) {
             vl+= data.lagInfo.lagging || data.lagInfo.lastPacketDrop.hasNotPassed(3) ? 1 : 3;
 
