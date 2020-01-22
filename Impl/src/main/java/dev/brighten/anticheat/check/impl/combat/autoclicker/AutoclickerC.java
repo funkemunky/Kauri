@@ -12,7 +12,7 @@ import lombok.val;
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerC extends Check {
 
-    private Interval interval = new Interval(22);
+    private Interval interval = new Interval(10);
 
     private long lTimestamp;
     private double lavg, lstd;
@@ -26,19 +26,19 @@ public class AutoclickerC extends Check {
             return;
         }
 
-        if(interval.size() >= 20) {
+        if(interval.size() >= 10) {
             val stats = interval.getSummary();
 
             double avg = stats.getAverage();
             double std = interval.std();
 
             double deltaAvg = MathUtils.getDelta(avg, lavg), deltaStd = MathUtils.getDelta(std, lstd);
-            if(deltaAvg < 5 && deltaStd > 4 && MathUtils.getDelta(deltaAvg, deltaStd) > 1.5f && avg < 135) {
+            if(deltaAvg < 8 && std > 60) {
                 vl++;
                 if(vl > 4) {
                     flag("avg=%1 std=%2", deltaAvg, deltaStd);
                 }
-            } else vl-= vl > 0 ? 0.25 : 0;
+            } else vl-= vl > 0 ? 0.2 : 0;
             debug("vl=" + vl + " avg=" + MathUtils.round(avg, 3)
                     + " std=" + MathUtils.round(std, 3));
 

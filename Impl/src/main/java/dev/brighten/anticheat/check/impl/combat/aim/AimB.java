@@ -21,12 +21,13 @@ public class AimB extends Check {
                             MathUtils.getDelta(data.playerInfo.cinematicPitch, data.playerInfo.lCinematicPitch),
                     data.playerInfo.deltaYaw) > 1.2)
                     && !data.playerInfo.cinematicMode
+                    && data.moveProcessor.sensitivityX < 0.44
                     && (data.playerInfo.deltaPitch < 10 || MathUtils.getDelta(data.playerInfo.deltaPitch, data.playerInfo.lDeltaPitch) > 10)) {
-                if(vl++ > 20) {
+                if(vl++ > 35) {
                     flag("offset=%1 deltaPitch=%2", data.playerInfo.pitchGCD, data.playerInfo.deltaPitch);
                 }
             } else vl-= vl > 0 ? 0.5 : 0;
-            debug("gcd=" + data.playerInfo.pitchGCD
+            debug("gcd=" + data.playerInfo.pitchGCD + " cin=" + data.playerInfo.cinematicMode
                     + " deltaPitch=" + data.playerInfo.deltaPitch + " vl=" + vl);
         }
     }

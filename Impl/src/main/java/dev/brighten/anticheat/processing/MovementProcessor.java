@@ -229,6 +229,8 @@ public class MovementProcessor {
         data.playerInfo.deltaPitch = data.playerInfo.to.pitch - data.playerInfo.from.pitch;
 
         if (packet.isLook()) {
+            yawList.add(data.playerInfo.deltaYaw / MovementProcessor.sensToPercent(sensitivityX));
+            pitchList.add(data.playerInfo.deltaPitch / MovementProcessor.sensToPercent(sensitivityY));
             if (this.yawList.size() == 20 && this.pitchList.size() == 20) {
                 // Get the negative/positive graph of the sample-lists
                 GraphUtil.GraphResult yawResults = GraphUtil.getGraph(yawList);
@@ -245,7 +247,10 @@ public class MovementProcessor {
                 // Cinematic camera usually does this on *most* speeds and is accurate for the most part.
                 if (yawPositives > yawNegatives || pitchPositives > pitchNegatives) {
                     data.playerInfo.cinematicMode = true;
+                    MiscUtils.testMessage(data.getPlayer().getName());
                 } else data.playerInfo.cinematicMode = false;
+
+                MiscUtils.testMessage(yawPositives + ", " + pitchPositives);
 
                 // Clear the sample-lists
                 pitchList.clear();

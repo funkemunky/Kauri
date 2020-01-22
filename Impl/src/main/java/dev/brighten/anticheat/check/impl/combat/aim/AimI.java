@@ -25,7 +25,7 @@ public class AimI extends Check {
                         0,
                         data.playerInfo.to.yaw - data.playerInfo.from.yaw)));
 
-        if(angleMove > 100000 && data.playerInfo.deltaXZ > 0.1) {
+        if(angleMove > 100000 && data.moveProcessor.sensitivityX < 0.4 && data.playerInfo.deltaXZ > 0.1) {
             if(verbose++ > 1) {
                 vl++;
                 flag("angle=%1,deltaXZ=%2", angleMove, MathUtils.round(data.playerInfo.deltaXZ, 4));

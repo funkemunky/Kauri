@@ -42,7 +42,7 @@ public class BlockInformation {
         int startX = Location.locToBlock(objectData.playerInfo.to.x - 1);
         int endX = Location.locToBlock(objectData.playerInfo.to.x + 1);
         int startY = Location.locToBlock(objectData.playerInfo.to.y - 0.8);
-        int endY = Location.locToBlock(objectData.playerInfo.to.y + 1.99);
+        int endY = Location.locToBlock(objectData.playerInfo.to.y + 3);
         int startZ = Location.locToBlock(objectData.playerInfo.to.z - 1);
         int endZ = Location.locToBlock(objectData.playerInfo.to.z + 1);
         int it = 9 * 9;
@@ -122,7 +122,7 @@ public class BlockInformation {
         onClimbable = handler.isCollidedWith(Materials.LADDER);
         handler.setSingle(false);
 
-        handler.setSize(0.6, 2.1);
+        handler.setSize(0.6, 2.2);
         blocksAbove = handler.isCollidedWith(Materials.SOLID);
 
         handler.setSize(1.5, 1.8);

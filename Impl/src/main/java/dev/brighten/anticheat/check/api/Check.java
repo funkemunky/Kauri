@@ -14,6 +14,7 @@ import dev.brighten.anticheat.check.impl.combat.hand.HandC;
 import dev.brighten.anticheat.check.impl.combat.hitbox.Hitboxes;
 import dev.brighten.anticheat.check.impl.combat.killaura.KillauraA;
 import dev.brighten.anticheat.check.impl.combat.killaura.KillauraB;
+import dev.brighten.anticheat.check.impl.combat.killaura.KillauraC;
 import dev.brighten.anticheat.check.impl.combat.reach.Reach;
 import dev.brighten.anticheat.check.impl.movement.fly.*;
 import dev.brighten.anticheat.check.impl.movement.general.FastLadder;
@@ -151,7 +152,11 @@ public class Check implements KauriCheck {
                                         .replace("%info%", info)
                                         .replace("%vl%", String.valueOf(MathUtils.round(vl, 2)))
                                         .replace("%experimental%", developer ? "&c&o(Experimental)" : ""))
-                                .setClickEvent(JsonMessage.ClickableType.RunCommand, "/" + Config.alertCommand);
+                                .setClickEvent(JsonMessage.ClickableType.RunCommand, "/" + Config.alertCommand
+                                        .replace("%player%", data.getPlayer().getName())
+                                        .replace("%check%", name)
+                                        .replace("%info%", info)
+                                        .replace("%vl%", String.valueOf(MathUtils.round(vl, 2))));
 
                         if(Config.testMode) jmsg.sendToPlayer(data.getPlayer());
 
@@ -180,7 +185,6 @@ public class Check implements KauriCheck {
         if(developer || !executable || punishVl == -1 || vl <= punishVl
                 || System.currentTimeMillis() - Kauri.INSTANCE.lastTick > 200L) return;
 
-        banned = true;
 
         Kauri.INSTANCE.loggerManager.addPunishment(data, this);
         if(!banned && !Config.bungeePunishments) {
@@ -196,6 +200,7 @@ public class Check implements KauriCheck {
                                 cmd.replace("%name%", data.getPlayer().getName())));
                 vl = 0;
             }, Kauri.INSTANCE);
+            banned = true;
         } else {
             if(!Config.broadcastMessage.equalsIgnoreCase("off")) {
                 BungeeAPI.broadcastMessage(Color.translate(Config.broadcastMessage
@@ -261,6 +266,7 @@ public class Check implements KauriCheck {
         register(new SpeedD());
         register(new KillauraA());
         register(new KillauraB());
+        register(new KillauraC());
         register(new Timer());
         register(new BadPacketsA());
         register(new BadPacketsB());

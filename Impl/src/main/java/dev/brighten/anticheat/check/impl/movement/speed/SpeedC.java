@@ -132,14 +132,14 @@ public class SpeedC extends Check {
 
         if (data.blockInfo.inWater) {
             tags.add("water");
-            moveSpeed *= 0.8;
+            moveSpeed *= 0.9;
         }
 
         if (data.blockInfo.inLava
                 && data.getPlayer().getNoDamageTicks() == data.getPlayer().getMaximumNoDamageTicks()
                 && data.blockInfo.handler.isCollidedWith(Materials.LAVA)) {
             tags.add("lava");
-            moveSpeed *= 0.6;
+            moveSpeed *= 0.7;
         }
 
         data.blockInfo.handler.setOffset(0);

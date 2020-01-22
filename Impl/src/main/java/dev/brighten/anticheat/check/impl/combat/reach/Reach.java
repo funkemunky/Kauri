@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @CheckInfo(name = "Reach", description = "Ensures the reach of a player is legitimate.",
-        checkType = CheckType.HITBOX, punishVL = 10, executable = false)
+        checkType = CheckType.HITBOX, punishVL = 10)
 @Cancellable(cancelType = CancelType.ATTACK)
 public class Reach extends Check {
 

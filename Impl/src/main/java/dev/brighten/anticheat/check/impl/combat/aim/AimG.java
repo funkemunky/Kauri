@@ -18,7 +18,8 @@ public class AimG extends Check {
             float trimmed = MathUtils.trimFloat(4, Math.abs(data.playerInfo.deltaPitch));
 
             float shit1 = trimmed % 0.1f, shit2 = trimmed % 0.05f;
-            if(trimmed > 0 && (shit1 == 0 || shit2 == 0 || trimmed % 1f == 0)) {
+            if(trimmed > 0 && Math.abs(data.playerInfo.deltaPitch) < 100
+                    && (shit1 == 0 || shit2 == 0 || trimmed % 1f == 0)) {
                 if(verbose.add(1) > 10) {
                     vl++;
                     flag("deltaPitch=%1 trimmed=%2 vb=%3", data.playerInfo.deltaPitch,
