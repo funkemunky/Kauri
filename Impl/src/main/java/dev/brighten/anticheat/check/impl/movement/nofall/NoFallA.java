@@ -26,7 +26,8 @@ public class NoFallA extends Check {
                 && data.playerInfo.blocksAboveTicks.value() == 0
                 && timeStamp - data.playerInfo.lastServerPos > 100L
                 && flag) {
-            vl+= data.lagInfo.lagging || data.lagInfo.lastPacketDrop.hasNotPassed(3) ? 1 : 3;
+            vl+= data.lagInfo.lagging || data.lagInfo.lastPacketDrop.hasNotPassed(3)
+                    ? 1 : data.playerInfo.clientGround ? 2 : 3;
 
             if(vl > 2) {
                 flag("ground=" + data.playerInfo.clientGround + " deltaY=" + data.playerInfo.deltaY);
