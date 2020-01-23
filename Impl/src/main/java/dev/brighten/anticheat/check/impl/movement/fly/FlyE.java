@@ -29,7 +29,7 @@ public class FlyE extends Check {
                     && data.playerInfo.lClientGround
                     && !data.playerInfo.serverGround
                     && !data.blockInfo.blocksAbove
-                    && data.playerInfo.lastBlockPlace.hasPassed(10)
+                    && data.playerInfo.lastBlockPlace.hasPassed(20)
                     && data.playerInfo.halfBlockTicks.value() == 0
                     && MathUtils.getDelta(data.playerInfo.deltaY, shit) > 0.01f
                     && MathUtils.getDelta(data.playerInfo.deltaY, maxHeight) > 0.01f) {

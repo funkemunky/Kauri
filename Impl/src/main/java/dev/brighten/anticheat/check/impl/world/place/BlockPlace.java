@@ -17,6 +17,7 @@ import dev.brighten.db.utils.Pair;
 import lombok.val;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.util.Vector;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -26,7 +27,7 @@ import java.util.stream.Collectors;
         checkType = CheckType.BLOCK, developer = true, punishVL = 20)
 public class BlockPlace extends Check {
 
-    private static double maxDistance = 4.2;
+    private static double maxDistance = 4.5;
     @Packet
     public void onBlockPlace(WrappedInBlockPlacePacket packet) {
         if(!data.playerInfo.worldLoaded
@@ -34,12 +35,14 @@ public class BlockPlace extends Check {
                 || packet.getItemStack() == null
                 || !packet.getItemStack().getType().isBlock()) return;
 
+        val face = new Vector(
+                packet.getFace().getAdjacentX(), packet.getFace().getAdjacentY(), packet.getFace().getAdjacentZ());
         val placeLoc = new Location(packet.getPlayer().getWorld(),
                 packet.getPosition().getX(), packet.getPosition().getY(), packet.getPosition().getZ());
 
         Block block = BlockUtils.getBlock(placeLoc);
         if(block != null && BlockUtils.isSolid(block)) {
-            val pastLoc = data.pastLocation.getPreviousRange(100L).stream()
+            val pastLoc = data.pastLocation.getPreviousRange(175).stream()
                     .peek(loc -> loc.y+=data.playerInfo.sneaking ? 1.54 : 1.62)
                     .map(loc -> new RayCollision(loc.toVector(), MiscUtils.getDirection(loc)))
                     .collect(Collectors.toList());
@@ -52,13 +55,15 @@ public class BlockPlace extends Check {
                     .getData(block.getType()).getBox(block, ProtocolVersion.getGameVersion())
                     .downCast(boxes);
 
+            boxes.forEach(box -> box.expand(0.2, 0.2, 0.2));
+
             List<Double> distances = new ArrayList<>();
 
             for (RayCollision ray : pastLoc) {
-                ray.draw(WrappedEnumParticle.FLAME, Collections.singleton(data.getPlayer()));
+                //ray.draw(WrappedEnumParticle.FLAME, Collections.singleton(data.getPlayer()));
                 for (SimpleCollisionBox box : boxes) {
                     val point = ray.collisionPoint(box);
-                    box.draw(WrappedEnumParticle.FLAME, Collections.singleton(data.getPlayer()));
+                    //box.draw(WrappedEnumParticle.FLAME, Collections.singleton(data.getPlayer()));
 
                     if(point != null) {
                         distances.add(ray.getOrigin().toVector().distance(point));
