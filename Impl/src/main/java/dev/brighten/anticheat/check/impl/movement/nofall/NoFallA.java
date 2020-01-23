@@ -18,6 +18,7 @@ public class NoFallA extends Check {
 
         boolean flag = data.playerInfo.clientGround
                 ? data.playerInfo.deltaY != 0 && !data.playerInfo.serverGround
+                && data.playerInfo.lastBlockPlace.hasPassed(10)
                 : data.playerInfo.deltaY == 0 && data.playerInfo.lDeltaY == 0;
 
         if(!data.playerInfo.flightCancel
