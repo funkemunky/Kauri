@@ -14,10 +14,15 @@ import dev.brighten.anticheat.logs.LoggerManager;
 import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.processing.PacketProcessor;
 import dev.brighten.api.KauriAPI;
+import dev.brighten.db.utils.reflection.types.WrappedClass;
+import dev.brighten.db.utils.reflection.types.WrappedMethod;
+import lombok.val;
+import me.mat1337.loader.Loader;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -57,20 +62,23 @@ public class Kauri extends JavaPlugin {
         unload(false);
     }
 
-    public void unload(boolean saveAsync) {
-        enabled = false;
+    public void unload(boolean reload) {
+        enabled = reload;
         MiscUtils.printToConsole("&7Unregistering Kauri API...");
         kauriAPI.service.shutdown();
-        kauriAPI = null;
 
-        MiscUtils.printToConsole("&7Unregistering Atlas and Bukkit listeners...");
-        HandlerList.unregisterAll(this); //Unregistering Bukkit listeners.
-        Atlas.getInstance().getEventManager().unregisterAll(this); //Unregistering Atlas listeners.
-        MiscUtils.printToConsole("&7Unregistering commands...");
-        //Unregister all commands starting with the arg "Kauri"
-        Atlas.getInstance().getCommandManager().unregisterCommand("kauri");
-        MiscUtils.printToConsole("&7Shutting down all Bukkit tasks...");
-        Bukkit.getScheduler().cancelTasks(this); //Cancelling all Bukkit tasks for this plugin.
+        if(!reload) {
+            kauriAPI = null;
+            MiscUtils.printToConsole("&7Unregistering Atlas and Bukkit listeners...");
+            HandlerList.unregisterAll(this); //Unregistering Bukkit listeners.
+            Atlas.getInstance().getEventManager().unregisterAll(this); //Unregistering Atlas listeners.
+            MiscUtils.printToConsole("&7Unregistering commands...");
+            //Unregister all commands starting with the arg "Kauri"
+            Atlas.getInstance().getCommandManager().unregisterCommand("kauri");
+            MiscUtils.printToConsole("&7Shutting down all Bukkit tasks...");
+            Bukkit.getScheduler().cancelTasks(this); //Cancelling all Bukkit tasks for this plugin.
+        }
+
         MiscUtils.printToConsole("&7Unloading DataManager...");
         //Clearing the dataManager.
         Kauri.INSTANCE.dataManager.dataMap.clear();
@@ -81,60 +89,20 @@ public class Kauri extends JavaPlugin {
         //Clearing the checks.
         Check.checkClasses.clear();
         Check.checkSettings.clear();
-        profiler.enabled = false;
-        profiler = null;
-        packetProcessor = null;
-        loggerManager = null;
+        if(!reload) {
+            profiler.enabled = false;
+            profiler = null;
+            packetProcessor = null;
+            loggerManager = null;
+        }
         executor.shutdown(); //Shutting down threads.
     }
 
     public void load() {
-        MiscUtils.printToConsole(Color.Gray + "Starting thread pool...");
-        executor = Executors.newFixedThreadPool(3);
-
-        MiscUtils.printToConsole(Color.Gray + "Loading config...");
-        saveDefaultConfig();
-
-        MiscUtils.printToConsole(Color.Gray + "Loading messages...");
-        msgHandler = new MessageHandler(this);
-
-        MiscUtils.printToConsole(Color.Gray + "Running scanner...");
-        Atlas.getInstance().initializeScanner(this, true, true);
-
-        MiscUtils.printToConsole(Color.Gray + "Setting the language to " + Color.Yellow + Config.language);
-        msgHandler.setCurrentLang(Config.language);
-
-        MiscUtils.printToConsole(Color.Gray + "Loading API...");
-        kauriAPI = new KauriAPI();
-
-        MiscUtils.printToConsole(Color.Gray + "Registering processors...");
-        packetProcessor = new PacketProcessor();
-        dataManager = new DataManager();
-        loggerManager = new LoggerManager(true);
-        EntityProcessor.start();
-
-        MiscUtils.printToConsole(Color.Gray + "Registering checks...");
-        Check.registerChecks();
-
-        MiscUtils.printToConsole(Color.Gray + "Running tps task...");
-        runTpsTask();
-        profiler = new ToggleableProfiler();
-        profiler.enabled = true;
-
-        if(Bukkit.getOnlinePlayers().size() > 0) {
-            RunUtils.taskLater(() -> {
-                MiscUtils.printToConsole(Color.Gray + "Detected players! Creating data objects...");
-                Bukkit.getOnlinePlayers().forEach(dataManager::createData);
-            }, this, 6L);
-        }
-        lastEnabled = new TickTimer(20);
-        enabled = true;
-        lastEnabled.reset();
-
-        Bukkit.getWorlds().forEach(world -> EntityProcessor.vehicles.put(world.getUID(), new ArrayList<>()));
+        Load.load();
     }
 
-    private void runTpsTask() {
+    void runTpsTask() {
         lastTickLag = new TickTimer(6);
         AtomicInteger ticks = new AtomicInteger();
         AtomicLong lastTimeStamp = new AtomicLong(0);

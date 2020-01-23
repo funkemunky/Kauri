@@ -16,6 +16,8 @@ import cc.funkemunky.api.utils.objects.VariableValue;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.utils.MiscUtils;
+import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -143,10 +145,12 @@ public class PacketProcessor {
 
                    if(packet.getItemStack() != null) {
                        if(packet.getItemStack().getType().isBlock()
+                               && packet.getItemStack().getType().getId() != 0
                                && (packet.getPosition().getX() != -1
                                || packet.getPosition().getY() != -1
                                || packet.getPosition().getZ() != -1)) {
                            data.playerInfo.lastBlockPlace.reset();
+                           MiscUtils.testMessage(packet.getItemStack().getType().name());
                        } else if(packet.getPosition().getX() == -1
                                && packet.getPosition().getY() == -1
                                && packet.getPosition().getZ() == -1

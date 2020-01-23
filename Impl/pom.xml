@@ -72,6 +72,12 @@
             <version>1.7.10</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>me.mat1337.loader</groupId>
+            <artifactId>loader</artifactId>
+            <version>2.4.1</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
 

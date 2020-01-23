@@ -62,6 +62,7 @@ public class AutoclickerH extends Check {
                 debug("size=%1 avg=%2 verbose=%3", level.get(), avg, verbose.value());
                 ratioDeque.clear();
             }
+            debug("ratio=" + ratio);
         }
         this.lastTime = timeStamp;
     }

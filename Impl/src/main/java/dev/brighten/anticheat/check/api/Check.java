@@ -230,13 +230,14 @@ public class Check implements KauriCheck {
         register(new AutoclickerA());
         register(new AutoclickerB());
         register(new AutoclickerC());
-        register(new AutoclickerD());
+        //register(new AutoclickerD());
         register(new AutoclickerE());
         register(new AutoclickerF());
         register(new AutoclickerG());
         register(new AutoclickerH());
-        register(new AutoclickerI());
+        //register(new AutoclickerI());
         register(new AutoclickerJ());
+        //register(new AutoclickerK());
         register(new FlyA());
         register(new FlyB());
         register(new FlyC());

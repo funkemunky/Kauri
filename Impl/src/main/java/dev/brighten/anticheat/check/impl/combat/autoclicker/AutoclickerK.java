@@ -7,6 +7,7 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockDigPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;
+import lombok.val;
 
 import java.util.Deque;
 import java.util.LinkedList;
@@ -37,10 +38,13 @@ public class AutoclickerK extends Check {
 
             stdDeviation /= this.clickSamples.size();
 
-            if (Math.sqrt(stdDeviation) < 30.d) {
+            val std = Math.sqrt(stdDeviation);
+            if (std < 30.d) {
                 vl++;
                 this.flag("STD: " + stdDeviation);
             }
+
+            debug("std=" + std + " std2=" + stdDeviation);
 
             this.clickSamples.clear();
         }
