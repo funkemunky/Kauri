@@ -75,6 +75,18 @@ public class MiscUtils {
         return MathUtils.yawTo180D(playerRotation.getX() - expectedRotation.getX());
     }
 
+    /* Stolen from Bukkit */
+    public static Vector getDirection(KLocation loc) {
+        Vector vector = new Vector();
+        double rotX = (double)loc.yaw;
+        double rotY = (double)loc.pitch;
+        vector.setY(-Math.sin(Math.toRadians(rotY)));
+        double xz = Math.cos(Math.toRadians(rotY));
+        vector.setX(-xz * Math.sin(Math.toRadians(rotX)));
+        vector.setZ(xz * Math.cos(Math.toRadians(rotX)));
+        return vector;
+    }
+
 
     public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
         List<Map.Entry<K, V>> list = new ArrayList<>(map.entrySet());

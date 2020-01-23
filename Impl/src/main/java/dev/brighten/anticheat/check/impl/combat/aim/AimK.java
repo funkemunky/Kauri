@@ -10,7 +10,8 @@ import dev.brighten.anticheat.utils.GraphUtil;
 import dev.brighten.anticheat.utils.Verbose;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "Aim (K)", description = "Graphical aim-check", checkType = CheckType.AIM, developer = true)
+@CheckInfo(name = "Aim (K)", description = "Graphical aim-check", checkType = CheckType.AIM,
+        developer = true, punishVL = 60)
 public class AimK extends Check {
 
     private final EvictingList<Float> pitchSamples = new EvictingList<>(10),

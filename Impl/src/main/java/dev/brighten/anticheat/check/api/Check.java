@@ -31,6 +31,7 @@ import dev.brighten.anticheat.check.impl.movement.velocity.VelocityB;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityC;
 import dev.brighten.anticheat.check.impl.packets.Timer;
 import dev.brighten.anticheat.check.impl.packets.badpackets.*;
+import dev.brighten.anticheat.check.impl.world.place.BlockPlace;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.api.KauriAPI;
 import dev.brighten.api.check.CheckType;
@@ -288,6 +289,7 @@ public class Check implements KauriCheck {
         register(new HandB());
         register(new HandC());
         register(new HealthSpoof());
+        register(new BlockPlace());
     }
 
     public static boolean isCheck(String name) {

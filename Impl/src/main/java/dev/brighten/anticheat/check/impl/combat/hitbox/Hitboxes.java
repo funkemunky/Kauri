@@ -49,10 +49,9 @@ public class Hitboxes extends Check {
             List<RayCollision> rayTrace = data.pastLocation
                     .getPreviousRange(Math.max(110L, Math.round(data.lagInfo.transPing / 2D)))
                     .stream()
-                    .map(loc ->
-                            loc.toLocation(data.getPlayer().getWorld()).clone()
-                                    .add(0, data.playerInfo.sneaking ? 1.54f : 1.62f, 0))
-                    .map(loc -> new RayCollision(loc.toVector(), loc.getDirection()))
+                    .peek(loc -> loc.y+=data.playerInfo.sneaking ? 1.54 : 1.62)
+                    .map(loc -> new RayCollision(loc.toVector(),
+                            dev.brighten.anticheat.utils.MiscUtils.getDirection(loc)))
                     .collect(Collectors.toList());
 
             List<BoundingBox> entityLocations = data.targetPastLocation

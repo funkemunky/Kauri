@@ -13,6 +13,7 @@ import dev.brighten.anticheat.utils.menu.button.Button;
 import dev.brighten.anticheat.utils.menu.button.ClickAction;
 import dev.brighten.anticheat.utils.menu.preset.button.FillerButton;
 import dev.brighten.anticheat.utils.menu.type.impl.ChestMenu;
+import dev.brighten.db.utils.Pair;
 import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -189,58 +190,64 @@ public class LogsGUI extends ChestMenu {
             sortedLogs.put(log.checkName, list);
         });
 
-        sortedLogs.forEach((check, list) -> {
-            Button button = new Button(false,
-                    new ItemBuilder(filtered.contains(check) ? Material.EMPTY_MAP : Material.PAPER).amount(1)
-                            .name((filtered.contains(check) ? Color.Red + Color.Italics : Color.Gold)
-                            + check)
-                            .lore("", "&7Alerts: &f" + list.size(),
-                                    "&7Highest VL: &f" +
-                                            list.stream()
-                                                    .max(Comparator.comparing(log -> log.vl))
-                                                    .map(log -> log.vl).orElse(0f),
-                                    "&7Type: &f" + (Check.getCheckInfo(check) != null
-                                            ? Check.getCheckInfo(check).checkType().name() : "UNKNOWN"),
-                                    "",
-                                    "&f&oLeft-Click &7&oto add check to vl filter.",
-                                    "&f&oRight-Click &7&oto remove check from vl filter.").build(),
-                    (player, info) -> {
-                        if(info.getClickType().name().contains("LEFT")) filtered.add(check);
-                        else if(info.getClickType().name().contains("RIGHT")) filtered.remove(check);
-                        else return;
+        sortedLogs.keySet().stream()
+                .sorted(Comparator.comparing(key -> key))
+                .map(key -> new Pair<>(key, sortedLogs.get(key)))
+                .forEach(pair -> {
+                    String check = pair.key;
+                    val list = pair.value;
+                    Button button = new Button(false,
+                            new ItemBuilder(filtered.contains(check) ? Material.EMPTY_MAP : Material.PAPER).amount(1)
+                                    .name((filtered.contains(check) ? Color.Red + Color.Italics : Color.Gold)
+                                            + check)
+                                    .lore("", "&7Alerts: &f" + list.size(),
+                                            "&7Highest VL: &f" +
+                                                    list.stream()
+                                                            .max(Comparator.comparing(log -> log.vl))
+                                                            .map(log -> log.vl).orElse(0f),
+                                            "&7Type: &f" + (Check.getCheckInfo(check) != null
+                                                    ? Check.getCheckInfo(check).checkType().name() : "UNKNOWN"),
+                                            "",
+                                            "&f&oLeft-Click &7&oto add check to vl filter.",
+                                            "&f&oRight-Click &7&oto remove check from vl filter.").build(),
+                            (player, info) -> {
+                                if(info.getClickType().name().contains("LEFT")) filtered.add(check);
+                                else if(info.getClickType().name().contains("RIGHT")) filtered.remove(check);
+                                else return;
 
-                        setButtons(1);
-                        currentPage.set(1);
-                        buildInventory(false);
-                        info.getButton().setStack((filtered.contains(check)
-                                ? new ItemBuilder(info.getButton().getStack())
+                                setButtons(1);
+                                currentPage.set(1);
+                                buildInventory(false);
+                                info.getButton().setStack((filtered.contains(check)
+                                        ? new ItemBuilder(info.getButton().getStack())
                                         .enchantment(Enchantment.DURABILITY, 1)
-                                : new ItemBuilder(info.getButton().getStack()).clearEnchantments())
-                                .type(filtered.contains(check) ? Material.EMPTY_MAP : Material.PAPER)
-                                .name((filtered.contains(check) ? Color.Red + Color.Italics : Color.Gold) + check)
-                                .build());
-                        List<String> lore = new ArrayList<>(Arrays.asList("", Color.translate("&eFilters:")));
+                                        : new ItemBuilder(info.getButton().getStack()).clearEnchantments())
+                                        .type(filtered.contains(check) ? Material.EMPTY_MAP : Material.PAPER)
+                                        .name((filtered.contains(check)
+                                                ? Color.Red + Color.Italics : Color.Gold) + check)
+                                        .build());
+                                List<String> lore = new ArrayList<>(Arrays
+                                        .asList("", Color.translate("&eFilters:")));
 
-                        for (String s : filtered) {
-                            lore.add(Color.translate("&7- &f" + s));
-                        }
-                        Button stopFilter = new Button(false,
-                                new ItemBuilder(Material.REDSTONE).amount(1)
-                                        .name(Color.Red + "Stop Filter").lore(lore).build(),
-                                (player2, info2) -> {
-                                    filtered.clear();
-                                    setButtons(1);
-                                    buildInventory(false);
-                                    info.getMenu().close(player2);
-                                    getSummary().showMenu(player2);
-                                });
+                                for (String s : filtered) {
+                                    lore.add(Color.translate("&7- &f" + s));
+                                }
+                                Button stopFilter = new Button(false,
+                                        new ItemBuilder(Material.REDSTONE).amount(1)
+                                                .name(Color.Red + "Stop Filter").lore(lore).build(),
+                                        (player2, info2) -> {
+                                            filtered.clear();
+                                            setButtons(1);
+                                            buildInventory(false);
+                                            info.getMenu().close(player2);
+                                            getSummary().showMenu(player2);
+                                        });
 
-                        info.getMenu().setItem(53, stopFilter);
-                        info.getMenu().buildInventory(false);
-                    });
-            summary.addItem(button);
-        });
-
+                                info.getMenu().setItem(53, stopFilter);
+                                info.getMenu().buildInventory(false);
+                            });
+                    summary.addItem(button);
+                });
         if(filtered.size() > 0) {
             List<String> lore = new ArrayList<>(Arrays.asList("", Color.translate("&eFilters:")));
 

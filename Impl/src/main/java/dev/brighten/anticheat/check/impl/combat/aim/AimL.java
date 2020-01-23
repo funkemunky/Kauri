@@ -13,7 +13,8 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicInteger;
 
-@CheckInfo(name = "Aim (L)", description = "Elevated's rotation check thing.", checkType = CheckType.AIM)
+@CheckInfo(name = "Aim (L)", description = "Elevated's rotation check thing.",
+        checkType = CheckType.AIM, punishVL = 10)
 public class AimL extends Check {
 
     private float lastYaw, lastPitch, lastOutYawDelta, lastOutPitchDelta, lastPitchDelta, lastYawDelta;

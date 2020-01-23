@@ -10,7 +10,7 @@ import dev.brighten.api.check.CheckType;
 import org.bukkit.util.Vector;
 
 @CheckInfo(name = "Aim (J)", description = "Skidded from FFX.", checkType = CheckType.AIM,
-        punishVL = 20, developer = true)
+        punishVL = 20)
 public class AimJ extends Check {
 
     private float lastPitch = -1;
