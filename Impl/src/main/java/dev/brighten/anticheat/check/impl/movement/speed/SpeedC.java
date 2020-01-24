@@ -26,7 +26,7 @@ public class SpeedC extends Check {
     public double previousDistance;
     private double drag = 0.91;
     private int fallTicks;
-    private int noSlowStreak;
+    private int webTicks, liquidTicks;
     private double omniVl = 0;
     private double velocityX, velocityZ;
     private Verbose verbose = new Verbose(20, 40);
@@ -98,7 +98,7 @@ public class SpeedC extends Check {
             }
         } else {
             tags.add("air");
-            moveSpeed = 0.026;
+            moveSpeed = 0.028;
             drag = 0.91;
 
             if (timeStamp - data.playerInfo.lastServerPos < 500L) {
@@ -131,9 +131,11 @@ public class SpeedC extends Check {
         data.blockInfo.handler.setSize(0.6, 1);
 
         if (data.blockInfo.inWater) {
-            tags.add("water");
-            moveSpeed *= 0.9;
-        }
+            if(liquidTicks++ > 3) {
+                tags.add("water");
+                moveSpeed *= 0.9;
+            }
+        } else liquidTicks = 0;
 
         if (data.blockInfo.inLava
                 && data.getPlayer().getNoDamageTicks() == data.getPlayer().getMaximumNoDamageTicks()
@@ -196,12 +198,14 @@ public class SpeedC extends Check {
             moveSpeed += 0.5;
         }
 
-        if (data.blockInfo.inWeb && data.playerInfo.webTicks.value() > 0) {
-            tags.add("web");
-            moveSpeed -= 0.2;
-        }
+        if (data.blockInfo.inWeb) {
+            if(webTicks++ > 2) {
+                tags.add("web");
+                moveSpeed -= 0.2;
+            }
+        } else webTicks = 0;
 
-        if (data.playerInfo.soulSandTicks.value() > 0) {
+        if (data.playerInfo.soulSandTicks.value() > 0 && !tags.contains("air")) {
             moveSpeed -= 0.05;
             if (type == Material.ICE || type == Material.PACKED_ICE) {
                 moveSpeed -= 0.1;

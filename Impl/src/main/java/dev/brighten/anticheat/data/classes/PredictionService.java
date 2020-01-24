@@ -1,10 +1,12 @@
 package dev.brighten.anticheat.data.classes;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.utils.Materials;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.PlayerUtils;
 import cc.funkemunky.api.utils.TickTimer;
 import dev.brighten.anticheat.data.ObjectData;
+import org.bukkit.Material;
 import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;
@@ -58,7 +60,7 @@ public class PredictionService {
         fMath = fastMath; // if the Player uses Optifine FastMath
 
         try {
-            if(!walkSpecial && !position && !velocity && !lastVelocity && (checkConditions = checkConditions(lastSprint))) {
+            if(!position && !velocity && !lastVelocity && (checkConditions = checkConditions(lastSprint))) {
                 if (lastSprint && hit) { // If the Player Sprints and Hit a Player he get slowdown
                     lmotionX *= 0.6D;
                     lmotionZ *= 0.6D;
@@ -76,12 +78,17 @@ public class PredictionService {
         }
         dropItem = false;
 
-        double multiplier = 0.9100000262260437D; // multiplier = is the value that the client multiplies every move
-
         if(data.blockInfo.inWeb) {
-            rmotionX *= 0.25f;
-            rmotionZ *= 0.25f;
+            rmotionX *= 0.25;
+            rmotionZ *= 0.25;
         }
+
+        if(data.blockInfo.onSoulSand) {
+            rmotionX*= 0.4;
+            rmotionZ*= 0.4;
+        }
+
+        double multiplier = 0.9100000262260437D; // multiplier = is the value that the client multiplies every move
 
         if(!data.blockInfo.inLiquid) {
             rmotionX *= multiplier;

@@ -92,8 +92,8 @@ public class PacketProcessor {
 
                    data.lagInfo.lastFlying = timeStamp;
 
-                   data.predictionService.onReceive(packet); //Processing for prediction service.
                    data.moveProcessor.process(packet, timeStamp);
+                   data.predictionService.onReceive(packet); //Processing for prediction service.
                    data.checkManager.runPacket(packet, timeStamp);
                    break;
                }

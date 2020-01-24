@@ -22,6 +22,7 @@ public class NoFallA extends Check {
                 : data.playerInfo.deltaY == 0 && data.playerInfo.lDeltaY == 0;
 
         if(!data.playerInfo.flightCancel
+                && data.playerInfo.halfBlockTicks.value() == 0
                 && !data.blockInfo.onSlime
                 && (data.playerInfo.deltaY != 0 || data.playerInfo.deltaXZ > 0)
                 && data.playerInfo.blocksAboveTicks.value() == 0

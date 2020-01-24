@@ -46,7 +46,7 @@ public class PlayerInformation {
 
     //ticks
     public int groundTicks, airTicks;
-    public MaxInteger liquidTicks = new MaxInteger(50), halfBlockTicks = new MaxInteger(40),
+    public MaxInteger liquidTicks = new MaxInteger(50), halfBlockTicks = new MaxInteger(60),
             webTicks = new MaxInteger(40), climbTicks = new MaxInteger(40), slimeTicks = new MaxInteger(75),
             iceTicks = new MaxInteger(45), blocksAboveTicks = new MaxInteger(50), soulSandTicks = new MaxInteger(40);
     public TickTimer lastBrokenBlock = new TickTimer(5),

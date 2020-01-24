@@ -98,7 +98,11 @@ public class BlockInformation {
 
         handler.setSingle(true);
         onIce = handler.isCollidedWith(Materials.ICE);
+        handler.setOffset(-0.02);
+        handler.setSingle(false);
+        handler.setSize(0.602, 1.801);
         onSoulSand = handler.isCollidedWith(Material.SOUL_SAND);
+        inWeb = handler.isCollidedWith(Material.WEB);
         onSlime = handler.isCollidedWith(Material2.SLIME_BLOCK);
         handler.setSingle(false);
 
@@ -109,13 +113,11 @@ public class BlockInformation {
         inWater = handler.isCollidedWith(Materials.WATER);
         inLiquid = inLava || inWater;
 
-        inWeb = handler.isCollidedWith(Material.WEB);
-
         handler.setSize(0.599, 1.8);
 
         inBlock = handler.isCollidedWith(Materials.SOLID);
 
-        if(objectData.playerInfo.deltaY < 0) {
+        if(objectData.playerInfo.deltaY <= 0) {
             handler.setSize(2.0f, 0);
         } else handler.setSize(0.61, 0);
         handler.setSingle(true);

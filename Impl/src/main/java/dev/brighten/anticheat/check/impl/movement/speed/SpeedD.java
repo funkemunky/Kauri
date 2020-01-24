@@ -13,9 +13,10 @@ import dev.brighten.api.check.CheckType;
 public class SpeedD extends Check {
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
+    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(packet.isPos() && !data.playerInfo.generalCancel) {
             if(data.playerInfo.sprinting
+                    && timeStamp - data.playerInfo.lastServerPos > 150
                     && data.playerInfo.clientGround
                     && !data.predictionService.key.equals("Nothing")
                     && !data.predictionService.key.contains("W")) {

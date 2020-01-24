@@ -17,16 +17,20 @@ public class FlyB extends Check {
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(packet.isPos() && (data.playerInfo.deltaY != 0 || data.playerInfo.deltaXZ != 0)) {
             //We check if the player is in ground, since theoretically the y should be zero.
-            double predicted = data.playerInfo.clientGround ? 0 : (data.playerInfo.lDeltaY - 0.08f) * .98f;
+            double predicted = data.playerInfo.clientGround
+                    ? 0 : (data.playerInfo.lDeltaY - 0.08) * 0.9800000190734863D;
 
             if(data.playerInfo.lClientGround && !data.playerInfo.clientGround) {
                 predicted = Math.min(data.playerInfo.deltaY, MovementUtils.getJumpHeight(packet.getPlayer()));
             }
 
-            if(Math.abs(predicted) < 0.005) predicted = 0;
+            if(Math.abs(predicted) < 0.005) {
+                predicted = 0;
+            }
 
             if(!data.playerInfo.flightCancel
                     && !data.playerInfo.wasOnSlime
+                    && !data.blockInfo.collidesHorizontally
                     && data.playerInfo.halfBlockTicks.value() == 0
                     && timeStamp - data.playerInfo.lastVelocityTimestamp > 200L
                     && !data.playerInfo.serverGround

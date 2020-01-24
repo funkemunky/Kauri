@@ -118,7 +118,7 @@ public class Check implements KauriCheck {
         event.setCancelled(!Config.alertDev);
 
         if(cancellable && cancelMode != null) {
-            if(cancelMode.equals(CancelType.MOVEMENT)) {
+            if(!cancelMode.equals(CancelType.ATTACK)) {
                 data.typesToCancel.add(cancelMode);
             } else for(int i = 0 ; i < 2 ; i++) data.typesToCancel.add(cancelMode);
         }

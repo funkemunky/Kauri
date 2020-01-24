@@ -27,7 +27,7 @@ public class NoFallB extends Check {
                 }
             } else vl-= vl > 0 ? 1 : 0;
             debug("server=" + data.playerInfo.serverGround + " client=" + data.playerInfo.clientGround
-                    + " vl=" + vl + " loaded=" + data.playerInfo.worldLoaded);
+                    + " vl=" + vl + " loaded=" + data.playerInfo.worldLoaded + " cancel=" + data.playerInfo.generalCancel);
         }
     }
 }
