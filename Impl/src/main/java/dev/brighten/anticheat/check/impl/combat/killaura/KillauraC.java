@@ -23,12 +23,15 @@ public class KillauraC extends Check {
 
         long delta = timeStamp - lastArm;
 
-        if(delta > 90) {
+        if(delta > 90
+                && data.lagInfo.lastPacketDrop.hasPassed(10)
+                && !data.lagInfo.lagging) {
             vl++;
-            if(vl > 1) {
+            if(vl > 3) {
                 flag("ms:" + delta);
             }
-        } else vl-= vl > 0 ? 0.025f : 0;
+        } else vl-= vl > 0 ? data.lagInfo.lagging
+                || data.lagInfo.lastPacketDrop.hasNotPassed(20) ? 0.25f : 0.1f : 0;
 
         debug("ms=" + delta);
     }
