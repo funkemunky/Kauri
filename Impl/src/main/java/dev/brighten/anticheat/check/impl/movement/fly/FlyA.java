@@ -44,7 +44,7 @@ public class FlyA extends Check {
                 tookVelocity = false;
             }
 
-            if(tookVelocity) {
+            if(tookVelocity || data.blockInfo.inLiquid || data.blockInfo.onClimbable) {
                 totalHeight = 0;
                 maxHeight = MovementUtils.getTotalHeight((float)data.playerInfo.velocityY) * 1.4f;
             }

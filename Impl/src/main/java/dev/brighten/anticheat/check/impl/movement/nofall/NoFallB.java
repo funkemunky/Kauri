@@ -1,6 +1,8 @@
 package dev.brighten.anticheat.check.impl.movement.nofall;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.utils.BlockUtils;
+import cc.funkemunky.api.utils.Materials;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -18,6 +20,10 @@ public class NoFallB extends Check {
             if(data.playerInfo.serverGround != data.playerInfo.clientGround
                     && data.playerInfo.climbTicks.value() == 0
                     && !data.playerInfo.generalCancel
+                    && data.playerInfo.blockOnTo != null
+                    && !BlockUtils.isSolid(data.playerInfo.blockOnTo)
+                    && !Materials.checkFlag(data.playerInfo.blockOnTo.getType(), Materials.LADDER)
+                    && !data.blockInfo.onClimbable
                     && (data.playerInfo.deltaY != 0 || data.playerInfo.deltaXZ > 0)
                     && data.playerInfo.lastBlockPlace.hasPassed(20)
                     && data.playerInfo.lastVelocity.hasPassed(40)

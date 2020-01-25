@@ -131,7 +131,7 @@ public class SpeedC extends Check {
         data.blockInfo.handler.setSize(0.6, 1);
 
         if (data.blockInfo.inWater) {
-            if(liquidTicks++ > 3) {
+            if(liquidTicks++ > 5) {
                 tags.add("water");
                 moveSpeed *= 0.9;
             }

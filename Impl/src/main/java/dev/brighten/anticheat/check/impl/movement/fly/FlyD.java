@@ -19,6 +19,7 @@ public class FlyD extends Check {
                     && data.playerInfo.airTicks > 2
                     && timeStamp - data.playerInfo.lastVelocityTimestamp > 150L
                     && !data.playerInfo.lClientGround
+                    && data.playerInfo.climbTicks.value() == 0
                     && !data.playerInfo.flightCancel
                     && !data.playerInfo.clientGround
                     && !data.playerInfo.serverGround) {

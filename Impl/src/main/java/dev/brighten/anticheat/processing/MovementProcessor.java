@@ -317,7 +317,7 @@ public class MovementProcessor {
         } else data.playerInfo.webTicks.subtract();
 
         if (data.blockInfo.onClimbable) {
-            data.playerInfo.climbTicks.add();
+            data.playerInfo.climbTicks.add(2);
         } else data.playerInfo.climbTicks.subtract();
 
         if (data.playerInfo.wasOnSlime) {
