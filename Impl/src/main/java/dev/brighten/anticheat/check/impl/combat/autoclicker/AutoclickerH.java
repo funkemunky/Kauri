@@ -51,7 +51,7 @@ public class AutoclickerH extends Check {
                         .forEach(i -> level.incrementAndGet());
 
                 if (level.get() == 50 && avg > 7) {
-                    verbose.add(4);
+                    verbose.add(3);
 
                     if (verbose.value() >= 10) {
                         vl++;

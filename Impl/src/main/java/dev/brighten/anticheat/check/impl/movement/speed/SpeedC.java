@@ -229,11 +229,9 @@ public class SpeedC extends Check {
             debug("+%1,tags=%2", horizontalMove, String.join(",", tags));
 
             if (horizontalMove > 0) {
-                if(verbose.flag(1, 1) || horizontalMove > 0.4) {
-                    vl++;
-                    flag("+%1,v=%2,tags=%3",
-                            horizontalMove, data.playerInfo.velocityX, String.join(",", tags));
-                }
+                vl++;
+                flag("+%1,v=%2,tags=%3",
+                        horizontalMove, data.playerInfo.velocityX, String.join(",", tags));
             }
         }
 

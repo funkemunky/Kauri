@@ -15,16 +15,17 @@ public class FlyD extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(packet.isPos()) {
-            if(data.playerInfo.deltaY - data.playerInfo.lDeltaY > 0.01f
+            if(data.playerInfo.deltaY - data.playerInfo.lDeltaY > 0.001
                     && data.playerInfo.airTicks > 2
                     && timeStamp - data.playerInfo.lastVelocityTimestamp > 150L
-                    && !data.playerInfo.lClientGround
-                    && data.playerInfo.climbTicks.value() == 0
-                    && !data.playerInfo.flightCancel
+                    && !data.playerInfo.serverGround
                     && !data.playerInfo.clientGround
-                    && !data.playerInfo.serverGround) {
+                    && data.playerInfo.liquidTicks.value() == 0
+                    && data.playerInfo.halfBlockTicks.value() == 0
+                    && data.playerInfo.climbTicks.value() == 0
+                    && !data.playerInfo.flightCancel) {
                 vl++;
-                if(vl > 1 || !data.playerInfo.nearGround) {
+                if(vl > 1 || (!data.playerInfo.nearGround)) {
                     flag("deltaY=%1 lDeltaY=%2 airTicks=%3",
                             data.playerInfo.deltaY, data.playerInfo.lDeltaY, data.playerInfo.airTicks);
                 }

@@ -1,24 +1,29 @@
 package dev.brighten.anticheat.data.classes;
 
 import cc.funkemunky.api.Atlas;
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.Materials;
+import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.world.BlockData;
+import cc.funkemunky.api.utils.world.CollisionBox;
 import cc.funkemunky.api.utils.world.Material2;
+import cc.funkemunky.api.utils.world.types.ComplexCollisionBox;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.CollisionHandler;
 import dev.brighten.anticheat.utils.Helper;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import lombok.val;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class BlockInformation {
     private ObjectData objectData;
@@ -27,6 +32,7 @@ public class BlockInformation {
     public float currentFriction;
     public CollisionHandler
             handler = new CollisionHandler(new ArrayList<>(), new ArrayList<>(), new KLocation(0,0,0));
+    public List<Block> verticalCollisions, horizontalCollisions;
 
     public BlockInformation(ObjectData objectData) {
         this.objectData = objectData;
@@ -41,7 +47,7 @@ public class BlockInformation {
 
         int startX = Location.locToBlock(objectData.playerInfo.to.x - 1);
         int endX = Location.locToBlock(objectData.playerInfo.to.x + 1);
-        int startY = Location.locToBlock(objectData.playerInfo.to.y - 0.8);
+        int startY = Location.locToBlock(objectData.playerInfo.to.y - 1.5);
         int endY = Location.locToBlock(objectData.playerInfo.to.y + 3);
         int startZ = Location.locToBlock(objectData.playerInfo.to.z - 1);
         int endZ = Location.locToBlock(objectData.playerInfo.to.z + 1);
@@ -140,15 +146,52 @@ public class BlockInformation {
 
         handler.setOffset(0);
 
-        SimpleCollisionBox box = Helper.getMovementHitbox(objectData.getPlayer());
-        box.expand(Math.abs(objectData.playerInfo.from.x - objectData.playerInfo.to.x) + 0.1,
+        SimpleCollisionBox box = getBox().expand(
+                Math.abs(objectData.playerInfo.from.x - objectData.playerInfo.to.x) + 0.1,
                 -0.1,
                 Math.abs(objectData.playerInfo.from.z - objectData.playerInfo.to.z) + 0.1);
-        collidesHorizontally = !Helper.blockCollisions(handler.getBlocks(), box).isEmpty();
-        box = Helper.getMovementHitbox(objectData.getPlayer());
-        box.expand(0, 0.1, 0);
-        collidesVertically = !Helper.blockCollisions(handler.getBlocks(), box).isEmpty();
+        collidesHorizontally = !(horizontalCollisions = blockCollisions(handler.getBlocks(), box)).isEmpty();
+
+        box = getBox().expand(0, 0.1, 0);
+        collidesVertically = !(verticalCollisions = blockCollisions(handler.getBlocks(), box)).isEmpty();
+        
+        if(verticalCollisions.size() == 0) {
+            collidesVertically = !(verticalCollisions = Helper.blockCollisions(handler.getBlocks(),
+                    box.expand(Math.abs(objectData.playerInfo.from.x - objectData.playerInfo.to.x),
+                            0.8, Math.abs(objectData.playerInfo.from.z - objectData.playerInfo.to.z))).stream()
+                    .filter(block -> {
+                        val box2 = BlockData.getData(block.getType()).getBox(block, ProtocolVersion.getGameVersion());
+                        List<SimpleCollisionBox> list = new ArrayList<>();
+
+                        box2.downCast(list);
+
+                        for (SimpleCollisionBox simpleCollisionBox : list) {
+                            val shit = (simpleCollisionBox.yMax - objectData.playerInfo.from.y);
+                            val shit2 = (simpleCollisionBox.yMin - (objectData.playerInfo.from.y + 1.8));
+                            val shit3 = (simpleCollisionBox.yMax - objectData.playerInfo.to.y);
+                            val shit4 = (simpleCollisionBox.yMin - (objectData.playerInfo.to.y + 1.8));
+
+                            //Bukkit.broadcastMessage(shit + "," + shit2 + ", " + shit3 + ", " + shit4);
+                            if(shit == 0 || shit2 == 0 || shit3 == 0 || shit4 == 0) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }).collect(Collectors.toList())).isEmpty();
+        }
 
         this.handler = handler;
+    }
+
+    private SimpleCollisionBox getBox() {
+        return new SimpleCollisionBox(objectData.playerInfo.to.toVector(), objectData.playerInfo.to.toVector())
+                .expand(0.3, 0,0.3).expandMax(0, 1.8, 0);
+    }
+
+    private static List<Block> blockCollisions(List<Block> blocks, SimpleCollisionBox box) {
+        return blocks.stream()
+                .filter(b -> Helper.isCollided(box,
+                        BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion())))
+                .collect(Collectors.toCollection(LinkedList::new));
     }
 }

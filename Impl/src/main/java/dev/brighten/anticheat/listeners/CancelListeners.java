@@ -34,7 +34,7 @@ public class CancelListeners implements Listener {
                 ground.setYaw(event.getFrom().getYaw());
                 ground.setPitch(event.getFrom().getPitch());
 
-                event.getPlayer().teleport(ground);
+                event.getPlayer().teleport(ground.add(0,0.01,0));
                 data.typesToCancel.remove(cancelType);
                 return;
             }

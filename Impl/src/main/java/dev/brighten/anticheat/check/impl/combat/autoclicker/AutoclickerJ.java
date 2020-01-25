@@ -6,7 +6,8 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "Autoclicker (J)", description = "Stolen FFX Autoclicker 6", checkType = CheckType.AUTOCLICKER)
+@CheckInfo(name = "Autoclicker (J)", description = "Stolen FFX Autoclicker 6", checkType = CheckType.AUTOCLICKER,
+        developer = true)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerJ extends Check {
 
@@ -43,11 +44,11 @@ public class AutoclickerJ extends Check {
                 }
                 if (++this.clicks == 40) {
                     if (this.outliers == 0) {
-                        if ((vl += 1.4) >= 4.0) {
+                        if ((vl ++) >= 4.0) {
                             flag("o=%1", outliers);
                         }
-                    } else {
-                        vl -= 0.8;
+                    } else if(vl > 0) {
+                        vl --;
                     }
                     debug("outliers=" + outliers + " vl=" + vl);
                     this.outliers = 0;

@@ -20,6 +20,7 @@ import dev.brighten.anticheat.check.impl.movement.fly.*;
 import dev.brighten.anticheat.check.impl.movement.general.FastLadder;
 import dev.brighten.anticheat.check.impl.movement.general.HealthSpoof;
 import dev.brighten.anticheat.check.impl.movement.general.LiquidWalk;
+import dev.brighten.anticheat.check.impl.movement.general.Phase;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallA;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallB;
 import dev.brighten.anticheat.check.impl.movement.speed.SpeedA;
@@ -243,6 +244,7 @@ public class Check implements KauriCheck {
         register(new FlyC());
         register(new FlyD());
         register(new FlyE());
+        register(new FlyF());
         register(new LiquidWalk());
         register(new FastLadder());
         register(new NoFallA());
@@ -291,6 +293,7 @@ public class Check implements KauriCheck {
         register(new HandC());
         register(new HealthSpoof());
         register(new BlockPlace());
+        register(new Phase());
     }
 
     public static boolean isCheck(String name) {

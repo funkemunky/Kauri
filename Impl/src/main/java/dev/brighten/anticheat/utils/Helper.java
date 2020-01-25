@@ -52,20 +52,61 @@ public class Helper {
 		return world.isChunkLoaded(x >> 4, z >> 4) ? world.getChunkAt(x >> 4, z >> 4).getBlock(x & 15, y, z & 15) : null;
 	}
 
-
-	public static List<Block> blockCollisions(List<Block> blocks, SimpleCollisionBox box) {
-		return blocks.stream().filter(b -> BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion()).isCollided(box)).collect(Collectors.toCollection(LinkedList::new));
+	public static SimpleCollisionBox wrap(SimpleCollisionBox a, SimpleCollisionBox b) {
+		double minX = a.xMin < b.xMin ? a.xMin : b.xMin;
+		double minY = a.yMin < b.yMin ? a.yMin : b.yMin;
+		double minZ = a.zMin < b.zMin ? a.zMin : b.zMin;
+		double maxX = a.xMax > b.xMax ? a.xMax : b.xMax;
+		double maxY = a.yMax > b.yMax ? a.yMax : b.yMax;
+		double maxZ = a.zMax > b.zMax ? a.zMax : b.zMax;
+		return new SimpleCollisionBox(minX, minY, minZ, maxX, maxY, maxZ);
 	}
 
-	public static List<Block> blockCollisions(List<Block> blocks, SimpleCollisionBox box, int material) {
-		return blocks.stream().filter(b -> Materials.checkFlag(b.getType(), material)).filter(b -> BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion()).isCollided(box)).collect(Collectors.toCollection(LinkedList::new));
+	public static SimpleCollisionBox wrap(List<SimpleCollisionBox> box) {
+		if (!box.isEmpty()) {
+			SimpleCollisionBox wrap = box.get(0).copy();
+			for (int i = 1; i < box.size(); i++) {
+				SimpleCollisionBox a = box.get(i);
+				if (wrap.xMin > a.xMin) wrap.xMin = a.xMin;
+				if (wrap.yMin > a.yMin) wrap.yMin = a.yMin;
+				if (wrap.zMin > a.zMin) wrap.zMin = a.zMin;
+				if (wrap.xMax < a.xMax) wrap.xMax = a.xMax;
+				if (wrap.yMax < a.yMax) wrap.yMax = a.yMax;
+				if (wrap.zMax < a.zMax) wrap.zMax = a.zMax;
+			}
+			return wrap;
+		}
+		return null;
+	}
+
+	public static List<Block> blockCollisions(List<Block> blocks, CollisionBox box) {
+		return blocks.stream()
+				.filter(b -> BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion()).isCollided(box))
+				.collect(Collectors.toCollection(LinkedList::new));
+	}
+
+	public static boolean isCollided(SimpleCollisionBox toCheck, CollisionBox other) {
+		List<SimpleCollisionBox> downcasted = new ArrayList<>();
+
+		other.downCast(downcasted);
+
+		return downcasted.stream().anyMatch(box -> box.xMax >= toCheck.xMin && box.xMin <= toCheck.xMax
+				&& box.yMax >= toCheck.yMin && box.yMin <= toCheck.yMax && box.zMax >= toCheck.zMin
+				&& box.zMin <= toCheck.zMax);
+	}
+
+	public static List<Block> blockCollisions(List<Block> blocks, CollisionBox box, int material) {
+		return blocks.stream().filter(b -> Materials.checkFlag(b.getType(), material))
+				.filter(b -> BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion()).isCollided(box))
+				.collect(Collectors.toCollection(LinkedList::new));
 	}
 
 	public static <C extends CollisionBox> List<C> collisions(List<C> boxes, CollisionBox box) {
-		return boxes.stream().filter(b -> b.isCollided(box)).map(b -> b).collect(Collectors.toCollection(LinkedList::new));
+		return boxes.stream().filter(b -> b.isCollided(box))
+				.collect(Collectors.toCollection(LinkedList::new));
 	}
 
-	public static List<Block> getBlocksNearby(CollisionHandler handler, SimpleCollisionBox collisionBox) {
+	public static List<Block> getBlocksNearby(CollisionHandler handler, CollisionBox collisionBox) {
 		try {
 			return handler.getBlocks().stream().filter(b -> b.getType() != Material.AIR
 					&& BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion())
