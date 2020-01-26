@@ -1,70 +1,54 @@
 package dev.brighten.anticheat.check.impl.combat.autoclicker;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockDigPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;
-import lombok.val;
 
-import java.util.ArrayList;
-import java.util.List;
-
-@CheckInfo(name = "Autoclicker (E)", description = "Oscillation check. Credits to Abigail.",
-        checkType = CheckType.AUTOCLICKER, punishVL = 10)
+@CheckInfo(name = "Autoclicker (E)", description = "Checks for weird doubleclicking patterns.",
+        checkType = CheckType.AUTOCLICKER, punishVL = 10, developer = true)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerE extends Check {
 
-    private long ltimeStamp;
-    private List<Long> delays = new ArrayList<>();
-    private List<Long> samples = new ArrayList<>();
-    private int verbose;
-    private double lavg, lstd, lrange;
+    private boolean sent;
+    private int timesSent;
+    private long lastFlying;
 
     @Packet
-    public void onClick(WrappedInArmAnimationPacket packet, long timeStamp) {
-        if(data.playerInfo.lastBrokenBlock.hasNotPassed(3)
-                || data.playerInfo.lastBlockPlace.hasNotPassed(1)) {
-            ltimeStamp = timeStamp;
-            return;
-        }
-        long delta = timeStamp - ltimeStamp;
+    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
+        sent = false;
+        timesSent = 0;
+        vl-= vl > 0 ? 0.0025f : 0;
+        lastFlying = timeStamp;
+    }
 
-        if (delta < 400) samples.add(delta);
+    @Packet
+    public void onBlock(WrappedInBlockDigPacket packet) {
+        sent = false;
+        timesSent = 0;
+    }
 
-        if (samples.size() >= 10) {
-            val sampleSummary = samples.stream().mapToLong(v -> v).summaryStatistics();
+    @Packet
+    public void onBlockPlace(WrappedInBlockPlacePacket packet) {
+        sent = false;
+        timesSent = 0;
+    }
 
-            long osc = (sampleSummary.getMax() + sampleSummary.getMin()) / 2;
+    @Packet
+    public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
+        if(data.playerInfo.lastBrokenBlock.hasNotPassed(2) || data.playerInfo.breakingBlock
+                || data.playerInfo.lastBlockPlace.hasNotPassed(2)) return;
 
-            delays.add(osc);
-            if (delays.size() >= 5) {
-                List<Double> list = new ArrayList<>();
-
-                delays.stream()
-                        .mapToDouble(v -> v)
-                        .forEach(list::add);
-                double std = MathUtils.stdev(list);
-                val summary = delays.stream().mapToDouble(v -> v).summaryStatistics();
-                double avg = summary.getAverage();
-                double range = summary.getMax() - summary.getMin();
-
-                if ((std < 20 || MathUtils.getDelta(std, lstd) < 0.3 || range <= 3) && Math.abs(range - lrange) > 1
-                        && (MathUtils.getDelta(avg, lavg) > 5 || range > 31)) {
-                    verbose++;
-                    if (verbose > 3) {
-                        vl++;
-                        flag("std=%1 avg=%2 range=%3 ping=%p tps=%t", std, avg, range);
-                    }
-                } else verbose = 0;
-
-                debug("std=" + std + " avg=" + avg + " range= " + range + " verbose=" + verbose);
-                delays.clear();
-                lavg = avg;
-                lrange = range;
-                lstd = std;
+        timesSent++;
+        if(sent && data.lagInfo.lastPacketDrop.hasPassed(1)
+                && MathUtils.getDelta(timeStamp - lastFlying, 50) < 20) {
+            if(vl++ > 1) {
+                flag("sent=%1", timesSent);
             }
-            samples.clear();
-        }
-        ltimeStamp = timeStamp;
+            debug("sent=%1 vl=%2 lastDrop=%3", timesSent, vl, data.lagInfo.lastPacketDrop.getPassed());
+        } else sent = true;
     }
 }

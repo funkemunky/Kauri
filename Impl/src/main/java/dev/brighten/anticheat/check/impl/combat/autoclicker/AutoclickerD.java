@@ -2,77 +2,69 @@ package dev.brighten.anticheat.check.impl.combat.autoclicker;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.Tuple;
-import cc.funkemunky.api.utils.math.cond.MaxDouble;
 import dev.brighten.anticheat.check.api.*;
-import dev.brighten.anticheat.utils.EvictingList;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
 
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
 
-@CheckInfo(name = "Autoclicker (D)", description = "Compares the current click cps to the average.",
-        checkType = CheckType.AUTOCLICKER, developer = true, punishVL = 20)
+@CheckInfo(name = "Autoclicker (D)", description = "Oscillation check by Abigail.",
+        checkType = CheckType.AUTOCLICKER, punishVL = 10)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerD extends Check {
 
-    private EvictingList<Long> cpsCounts = new EvictingList<>(40);
-    private EvictingList<Tuple<Double, Double>> errorList = new EvictingList<>(25);
-    private long ltimestamp;
-    private double lerror;
-    private MaxDouble verbose = new MaxDouble(80);
+    private long ltimeStamp;
+    private List<Long> delays = new ArrayList<>();
+    private List<Long> samples = new ArrayList<>();
+    private int verbose;
+    private double lavg, lstd, lrange;
 
     @Packet
-    public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
-        long delta = timeStamp - ltimestamp;
-
-        if(delta > 300 || delta < 5 || data.playerInfo.breakingBlock
-                || data.playerInfo.lastBlockPlace.hasNotPassed(3)
-                || data.playerInfo.lastBrokenBlock.hasNotPassed(3)) {
-            ltimestamp = timeStamp;
+    public void onClick(WrappedInArmAnimationPacket packet, long timeStamp) {
+        if(data.playerInfo.lastBrokenBlock.hasNotPassed(3)
+                || data.playerInfo.lastBlockPlace.hasNotPassed(1)) {
+            ltimeStamp = timeStamp;
             return;
         }
+        long delta = timeStamp - ltimeStamp;
 
-        if(cpsCounts.size() > 20) {
-            try {
-                double average = cpsCounts.stream().mapToLong(v -> v).average().orElseThrow(Exception::new);
-                double std = Math.sqrt(cpsCounts.parallelStream().mapToDouble(v -> Math.pow(v - average, 2)).average()
-                        .orElseThrow(Exception::new));
+        if (delta < 400) samples.add(delta);
 
-                double error = Math.abs((delta - average) / (std / Math.sqrt(cpsCounts.size())));
+        if (samples.size() >= 10) {
+            val sampleSummary = samples.stream().mapToLong(v -> v).summaryStatistics();
 
-                errorList.add(new Tuple<>(error, average));
+            long osc = (sampleSummary.getMax() + sampleSummary.getMin()) / 2;
 
-                double errorStd = MathUtils.stdev(errorList.stream().map(v -> v.one).collect(Collectors.toList()));
-                val summary = errorList.stream().mapToDouble(v -> v.two).summaryStatistics();
+            delays.add(osc);
+            if (delays.size() >= 5) {
+                List<Double> list = new ArrayList<>();
 
-                double avgRange = summary.getMax() - summary.getMin();
+                delays.stream()
+                        .mapToDouble(v -> v)
+                        .forEach(list::add);
+                double std = MathUtils.stdev(list);
+                val summary = delays.stream().mapToDouble(v -> v).summaryStatistics();
+                double avg = summary.getAverage();
+                double range = summary.getMax() - summary.getMin();
 
-                if(errorStd < 3.6 && average > 4 && error > 2 && MathUtils.getDelta(error, lerror) > 2
-                        && average < 140 && avgRange < 14 && errorList.size() > 10) {
-                    if(verbose.add(2) > 22) {
+                if ((std < 20 || MathUtils.getDelta(std, lstd) < 0.3 || range <= 3) && Math.abs(range - lrange) > 1
+                        && (MathUtils.getDelta(avg, lavg) > 5 || range > 31)) {
+                    verbose++;
+                    if (verbose > 3) {
                         vl++;
-                        flag("errorstd=%1 error=%2 avg=%3 std=%4",
-                                MathUtils.round(errorStd, 3),
-                                MathUtils.round(error, 3), MathUtils.round(average, 3),
-                                MathUtils.round(std, 4));
+                        flag("std=%1 avg=%2 range=%3 ping=%p tps=%t", std, avg, range);
                     }
-                } else verbose.subtract(0.5);
+                } else verbose = 0;
 
-                debug("error=%3 avg=%1 std=%2 errorStd=%4 range=%5 verbose=%6",
-                        MathUtils.round(average, 2),
-                        MathUtils.round(std, 3),
-                        MathUtils.round(error, 2),
-                        MathUtils.round(errorStd, 3),
-                        MathUtils.round(avgRange, 2), verbose);
-
-                lerror = error;
-            } catch (Exception e) {
-                e.printStackTrace();
+                debug("std=" + std + " avg=" + avg + " range= " + range + " verbose=" + verbose);
+                delays.clear();
+                lavg = avg;
+                lrange = range;
+                lstd = std;
             }
+            samples.clear();
         }
-
-        cpsCounts.add(delta);
-        ltimestamp = timeStamp;
+        ltimeStamp = timeStamp;
     }
 }

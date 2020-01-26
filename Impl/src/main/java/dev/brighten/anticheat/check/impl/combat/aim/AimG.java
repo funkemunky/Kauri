@@ -2,33 +2,50 @@ package dev.brighten.anticheat.check.impl.combat.aim;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.math.cond.MaxDouble;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.utils.EvictingList;
+import dev.brighten.anticheat.utils.GraphUtil;
+import dev.brighten.anticheat.utils.Verbose;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "Aim (G)", description = "Checks for the rounding of pitch.", checkType = CheckType.AIM, punishVL = 50)
+@CheckInfo(name = "Aim (G)", description = "Graphical aim-check by Elevated.", checkType = CheckType.AIM,
+        developer = true, punishVL = 60)
 public class AimG extends Check {
 
-    private MaxDouble verbose = new MaxDouble(100);
+    private final EvictingList<Float> pitchSamples = new EvictingList<>(10),
+            yawSamples = new EvictingList<>(10);
+    private Verbose verbose = new Verbose(100, 30);
+
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if(packet.isLook() && Math.abs(data.playerInfo.deltaPitch) >= 0.5f) {
-            float trimmed = MathUtils.trimFloat(4, Math.abs(data.playerInfo.deltaPitch));
+        if (packet.isLook() && !data.playerInfo.serverPos) {
+            float yawDelta = MathUtils.getAngleDelta(data.playerInfo.to.yaw, data.playerInfo.from.yaw);
+            float pitchDelta = Math.abs(data.playerInfo.deltaPitch);
 
-            float shit1 = trimmed % 0.1f, shit2 = trimmed % 0.05f;
-            if(trimmed > 0 && Math.abs(data.playerInfo.deltaPitch) < 100
-                    && (shit1 == 0 || shit2 == 0 || trimmed % 1f == 0)) {
-                if(verbose.add(1) > 10) {
-                    vl++;
-                    flag("deltaPitch=%1 trimmed=%2 vb=%3", data.playerInfo.deltaPitch,
-                            trimmed, verbose.value());
-                }
-            } else verbose.subtract(0.25);
+            if (data.moveProcessor.deltaX > 1
+                    && data.moveProcessor.deltaY > 1
+                    && data.playerInfo.lastAttack.hasNotPassed(5)) {
+                this.pitchSamples.add(pitchDelta);
+                this.yawSamples.add(yawDelta);
 
-            debug("trimmed=" + trimmed + " dp=" + data.playerInfo.deltaPitch + " 1=" + shit1 + " 2=" + shit2
-                    + " verbose=" + verbose);
-        }
+                GraphUtil.GraphResult pitchGraph = GraphUtil.getGraph(pitchSamples);
+                GraphUtil.GraphResult yawGraph = GraphUtil.getGraph(yawSamples);
+
+                double ratioPitch = pitchGraph.getPositives() * pitchGraph.getNegatives();
+                double ratioYaw = yawGraph.getPositives() * yawGraph.getNegatives();
+
+                if ((ratioPitch == 0 || ratioYaw == 0) && (ratioPitch != ratioYaw)) {
+                    if(verbose.flag(1, 40)) {
+                        vl++;
+                        this.flag(pitchGraph.getPositives() + ", " + pitchGraph.getNegatives()
+                                + "," + yawGraph.getPositives() + ", " + yawGraph.getNegatives());
+                    }
+                } else verbose.subtract(0.2);
+
+                debug("pitch=%1 yaw=%2 vl=%3", ratioPitch, ratioYaw, verbose.value());
+            } else verbose.subtract(0.005);
+        } else verbose.subtract(0.005);
     }
 }

@@ -17,12 +17,8 @@ public class AimB extends Check {
                 && Math.abs(data.playerInfo.deltaPitch) > 1E-5
                 && Math.abs(data.playerInfo.to.pitch) < 78) {
             if(data.playerInfo.pitchGCD < 100000
-                    && (MathUtils.getDelta(
-                            MathUtils.getDelta(data.playerInfo.cinematicPitch, data.playerInfo.lCinematicPitch),
-                    data.playerInfo.deltaYaw) > 1.2)
                     && !data.playerInfo.cinematicMode
-                    && data.moveProcessor.sensitivityX < 0.44
-                    && (data.playerInfo.deltaPitch < 10 || MathUtils.getDelta(data.playerInfo.deltaPitch, data.playerInfo.lDeltaPitch) > 10)) {
+                    && data.moveProcessor.sensitivityX < 0.44) {
                 if(vl++ > 35) {
                     flag("offset=%1 deltaPitch=%2", data.playerInfo.pitchGCD, data.playerInfo.deltaPitch);
                 }

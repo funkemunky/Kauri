@@ -42,7 +42,7 @@ public class Reach extends Check {
                 .add(0, data.playerInfo.sneaking ? 1.54f : 1.62f, 0);
 
         val entityLoc = (data.targetData != null ? data.targetData.pastLocation : data.targetPastLocation)
-                .getEstimatedLocation(data.lagInfo.transPing, Math.max(220L, Math.round(data.lagInfo.transPing / 2D)));
+                .getEstimatedLocation(data.lagInfo.transPing, Math.max(275, Math.round(data.lagInfo.transPing / 2D)));
 
         List<Double> distances = new ArrayList<>();
 
@@ -61,14 +61,14 @@ public class Reach extends Check {
         if(size > 0) {
             val distance = distances.stream().mapToDouble(num -> num).min().orElse(0);
 
-            if(distance > 3.01 && (size > 4 || (distance > 3.1 && size > 3))
+            if(distance > 3.02 && size > 2
                     && data.lagInfo.lastPacketDrop.hasPassed(1)) {
-                verbose+= size > 6 ? 1 : 0.5f;
+                verbose+= size > 4 ? 1 : 0.5f;
                 if(verbose > 3) {
                     vl++;
                     flag("distance=%1 size=%2", MathUtils.round(distance, 3), distances.size());
                 }
-            } else verbose-= verbose > 0 ? data.lagInfo.lagging ? 0.025f : 0.02f : 0;
+            } else verbose-= verbose > 0 ? data.lagInfo.lagging ? 0.05f : 0.025f : 0;
             debug("distance=" + distance + ", size=" + distances.size() + ", vl=" + verbose);
         }
     }
@@ -85,10 +85,6 @@ public class Reach extends Check {
                 .expand(bounds.getX(), 0, bounds.getZ())
                 .expandMax(0, bounds.getY(),0);
 
-        if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9)) {
-            return box.expand(0.1f,0.1f,0.1f);
-        }
-
-        return box;
+        return box.expand(0.1f,0.1f,0.1f);
     }
 }

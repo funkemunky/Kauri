@@ -1,69 +1,60 @@
 package dev.brighten.anticheat.check.impl.combat.autoclicker;
+
+import cc.funkemunky.api.utils.math.cond.MaxDouble;
+import dev.brighten.anticheat.check.api.Check;
+import dev.brighten.anticheat.check.api.CheckInfo;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
-import cc.funkemunky.api.utils.math.cond.MaxInteger;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockDigPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import dev.brighten.anticheat.check.api.*;
-import dev.brighten.anticheat.utils.EvictingList;
-import dev.brighten.anticheat.utils.GraphUtil;
+import dev.brighten.anticheat.utils.Verbose;
 import dev.brighten.api.check.CheckType;
+import lombok.val;
 
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.concurrent.atomic.AtomicInteger;
 
-@CheckInfo(name = "Autoclicker (H)", description = "Autoclicker check detecting based on graphs",
-        checkType = CheckType.AUTOCLICKER, punishVL = 10, developer = true)
-@Cancellable(cancelType = CancelType.INTERACT)
+@CheckInfo(name = "Autoclicker (H)", description = "Checks for impossible deviations (Elevated/funkemunky).", checkType = CheckType.AUTOCLICKER)
 public class AutoclickerH extends Check {
 
-    private MaxInteger verbose = new MaxInteger(100);
+    private Deque<Long> clickSamples = new LinkedList<>();
 
-    private final EvictingList<Long> delays = new EvictingList<>(10);
-    private final Deque<Integer> ratioDeque = new LinkedList<>();
-
-    private long lastTime;
+    private long lastSwing;
+    private double stdDelta;
+    private MaxDouble verbose = new MaxDouble(10);
 
     @Packet
     public void onClick(WrappedInArmAnimationPacket packet, long timeStamp) {
-        if(data.playerInfo.breakingBlock || data.playerInfo.lastBlockPlace.hasNotPassed(4)) {
-            lastTime = timeStamp;
+        long now = System.currentTimeMillis();
+        long delay = now - this.lastSwing;
+
+        if (data.playerInfo.lastBrokenBlock.hasNotPassed(3) || data.playerInfo.lastBlockPlace.hasNotPassed(1))
             return;
-        }
-        long delay = timeStamp - this.lastTime;
 
-        if (delay > 0L && delay < 400L) {
-            delays.add(delay);
+        if (delay > 1L && delay < 300L && this.clickSamples.add(delay) && this.clickSamples.size() == 30) {
+            double average = this.clickSamples.stream().mapToDouble(Long::doubleValue).average().orElse(0.0);
 
-            GraphUtil.GraphResult graph = GraphUtil.getGraphLong(delays);
+            double stdDeviation = 0.0;
 
-            if (graph.getPositives() == 0) {
-                return;
+            for (Long click : this.clickSamples) {
+                stdDeviation += Math.pow(click.doubleValue() - average, 2);
             }
 
-            int ratio = graph.getNegatives() / graph.getPositives();
+            stdDeviation /= this.clickSamples.size();
 
-            this.ratioDeque.add(ratio);
+            val std = Math.sqrt(stdDeviation);
+            if (std < 25.d) {
+                if(verbose.add() > 4 || std < 16.d) {
+                    vl++;
+                    this.flag("STD: " + std);
+                }
+            } else verbose.subtract(0.5);
 
-            if (ratioDeque.size() == 50) {
-                double avg = 1000D / delays.stream().mapToLong(v -> v).average().orElse(0);
+            debug("std=%1 verbose=%2", std, verbose.value());
 
-                AtomicInteger level = new AtomicInteger();
-                ratioDeque.stream().filter(i -> i == 0 || i == 1)
-                        .forEach(i -> level.incrementAndGet());
-
-                if (level.get() == 50 && avg > 7) {
-                    verbose.add(3);
-
-                    if (verbose.value() >= 10) {
-                        vl++;
-                        flag("lvl=%1 avg=%2", level.get(), avg);
-                    }
-                } else verbose.subtract(2);
-
-                debug("size=%1 avg=%2 verbose=%3", level.get(), avg, verbose.value());
-                ratioDeque.clear();
-            }
-            debug("ratio=" + ratio);
+            this.clickSamples.clear();
         }
-        this.lastTime = timeStamp;
+
+        this.lastSwing = now;
     }
 }

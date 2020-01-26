@@ -7,8 +7,8 @@ import cc.funkemunky.api.utils.objects.Interval;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "Autoclicker (B)", description = "A test check atm.", developer = true, executable = false,
-        checkType = CheckType.AUTOCLICKER, punishVL = 40)
+@CheckInfo(name = "Autoclicker (B)", description = "Checks for a common ratio between consistency and click average.",
+        developer = true, executable = false, checkType = CheckType.AUTOCLICKER, punishVL = 40)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerB extends Check {
 

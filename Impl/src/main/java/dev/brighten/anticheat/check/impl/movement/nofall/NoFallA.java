@@ -29,7 +29,7 @@ public class NoFallA extends Check {
             lastLadder.reset();
 
         if(!data.playerInfo.flightCancel
-                && data.playerInfo.halfBlockTicks.value() == 0
+                && data.playerInfo.lastHalfBlock.hasPassed(4)
                 && !data.blockInfo.onSlime
                 && !data.blockInfo.onClimbable
                 && lastLadder.hasPassed()

@@ -22,7 +22,7 @@ public class DataManager {
             dataMap.values().stream().filter(data -> data.debugging != null).forEach(debugging::add);
         }, Kauri.INSTANCE, 60L, 30L);
 
-        RunUtils.taskTimer(() -> dataMap.values().stream()
+        RunUtils.taskTimerAsync(() -> dataMap.values().stream()
                         .filter(data -> data.target != null)
                         .forEach(data -> data.targetPastLocation.addLocation(data.target.getLocation())),
                 Kauri.INSTANCE, 1L,

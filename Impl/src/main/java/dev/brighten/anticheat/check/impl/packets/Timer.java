@@ -17,7 +17,7 @@ import lombok.val;
 public class Timer extends Check {
 
     private long lastTS, lRange;
-    private EvictingList<Long> times = new EvictingList<>(35);
+    private EvictingList<Long> times = new EvictingList<>(30);
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet, long timeStamp) {
@@ -38,7 +38,7 @@ public class Timer extends Check {
                     && (range < 200 || MathUtils.getDelta(range, lRange) < 75)
                     && Kauri.INSTANCE.tps > 18.5) {
                 //Maybe lower threshold? I do not think it needs that high of one.
-                if(vl++ > 80) flag("pct=" + MathUtils.round(pct, 2) + "%");
+                if(vl++ > 45) flag("pct=" + MathUtils.round(pct, 2) + "%");
             } else vl-= vl > 0 ? 1.5 : 0;
 
             debug("pct=" + pct + ", vl=" + vl + ", elapsed=" + elapsed + "ms, avg=" + average + ", range=" + range);

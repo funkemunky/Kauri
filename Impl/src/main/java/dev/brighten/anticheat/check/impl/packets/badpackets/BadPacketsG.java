@@ -1,22 +1,30 @@
 package dev.brighten.anticheat.check.impl.packets.badpackets;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockDigPacket;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "BadPackets (G)", description = "Checks for long distance crashers.", checkType = CheckType.BADPACKETS, punishVL = 1)
+@CheckInfo(name = "BadPackets (G)", description = "Looks for impossible dropping of items",
+        checkType = CheckType.BADPACKETS,
+        punishVL = 10)
 public class BadPacketsG extends Check {
 
+    private long lastItemDrop;
+    private int verbose;
     @Packet
-    public void onPacket(WrappedInFlyingPacket packet) {
-        if(packet.isPos() && !data.playerInfo.serverPos) {
-            if(Math.abs(packet.getY()) > Float.MAX_VALUE - 100) {
-                vl+= 2;
-                flag("y=" + packet.getY());
-            }
+    public void onPacket(WrappedInBlockDigPacket packet, long timeStamp) {
+        if(packet.getAction().equals(WrappedInBlockDigPacket.EnumPlayerDigType.DROP_ITEM)) {
+            long delta = timeStamp - lastItemDrop;
+
+            if(delta < 35) {
+                if(verbose++ > 5) {
+                    vl++;
+                    flag("delta=" + delta);
+                }
+            } else verbose-= verbose > 0 ? 1 : 0;
+            lastItemDrop = timeStamp;
         }
     }
-
 }

@@ -2,53 +2,60 @@ package dev.brighten.anticheat.check.impl.combat.autoclicker;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockDigPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "Autoclicker (G)", description = "Checks for weird doubleclicking from internal autoclickers.",
-        checkType = CheckType.AUTOCLICKER, punishVL = 10, developer = true)
+@CheckInfo(name = "Autoclicker (G)", description = "Stolen and modified FFX check (Autoclicker 6).", checkType = CheckType.AUTOCLICKER,
+        developer = true)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerG extends Check {
 
-    private boolean sent;
-    private int timesSent;
-    private long lastFlying;
+    private int clicks;
+    private int outliers;
+    private int flyingCount;
+    private boolean release;
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        sent = false;
-        timesSent = 0;
-        vl-= vl > 0 ? 0.0025f : 0;
-        lastFlying = timeStamp;
+    void check(WrappedInFlyingPacket packet) {
+        ++this.flyingCount;
     }
 
     @Packet
-    public void onBlock(WrappedInBlockDigPacket packet) {
-        sent = false;
-        timesSent = 0;
+    void check(WrappedInBlockDigPacket packet) {
+        if (packet.getAction() == WrappedInBlockDigPacket.EnumPlayerDigType.RELEASE_USE_ITEM) {
+            this.release = true;
+        }
     }
 
     @Packet
-    public void onBlockPlace(WrappedInBlockPlacePacket packet) {
-        sent = false;
-        timesSent = 0;
-    }
-
-    @Packet
-    public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
-        if(data.playerInfo.lastBrokenBlock.hasNotPassed(2) || data.playerInfo.breakingBlock
-                || data.playerInfo.lastBlockPlace.hasNotPassed(2)) return;
-
-        timesSent++;
-        if(sent && data.lagInfo.lastPacketDrop.hasPassed(1)
-                && MathUtils.getDelta(timeStamp - lastFlying, 50) < 20) {
-            if(vl++ > 1) {
-                flag("sent=%1", timesSent);
+    void check(WrappedInArmAnimationPacket packet) {
+        if (!data.playerInfo.breakingBlock && data.playerInfo.lastBlockPlace.hasPassed(4)) {
+            if (this.flyingCount < 10) {
+                if (this.release) {
+                    this.release = false;
+                    this.flyingCount = 0;
+                    return;
+                }
+                if (this.flyingCount > 3) {
+                    ++this.outliers;
+                } else if (this.flyingCount == 0) {
+                    return;
+                }
+                if (++this.clicks == 40) {
+                    if (this.outliers == 0) {
+                        if ((vl ++) >= 4.0) {
+                            flag("o=%1", outliers);
+                        }
+                    } else if(vl > 0) {
+                        vl --;
+                    }
+                    debug("outliers=" + outliers + " vl=" + vl);
+                    this.outliers = 0;
+                    this.clicks = 0;
+                }
             }
-            debug("sent=%1 vl=%2 lastDrop=%3", timesSent, vl, data.lagInfo.lastPacketDrop.getPassed());
-        } else sent = true;
+            this.flyingCount = 0;
+        }
     }
 }

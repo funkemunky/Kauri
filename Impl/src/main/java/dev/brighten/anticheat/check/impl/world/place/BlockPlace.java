@@ -33,6 +33,7 @@ public class BlockPlace extends Check {
         if(!data.playerInfo.worldLoaded
                 || data.playerInfo.creative
                 || packet.getItemStack() == null
+                || data.lagInfo.lastPacketDrop.hasNotPassed(10)
                 || !packet.getItemStack().getType().isBlock()) return;
 
         val face = new Vector(

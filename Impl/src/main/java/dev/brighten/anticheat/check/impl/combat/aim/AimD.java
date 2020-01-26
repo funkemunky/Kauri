@@ -8,42 +8,27 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "Aim (D)", description = "Designed to detect Vape's aimassist.",
-        checkType = CheckType.AIM, punishVL = 20, developer = true, executable = false)
+@CheckInfo(name = "Aim (D)", description = "Checks for the rounding of pitch.", checkType = CheckType.AIM, punishVL = 50)
 public class AimD extends Check {
 
-    private MaxDouble verbose = new MaxDouble(20);
-
+    private MaxDouble verbose = new MaxDouble(100);
     @Packet
-    public void onPacket(WrappedInFlyingPacket packet) {
-        if (packet.isLook()) {
-            float deltaYDiff = Math.abs(data.playerInfo.deltaYaw - data.playerInfo.lDeltaYaw),
-                    deltaPDiff = Math.abs(data.playerInfo.deltaPitch - data.playerInfo.lDeltaPitch),
-                    deltaYaw = Math.abs(data.playerInfo.deltaYaw),
-                    deltaPitch = Math.abs(data.playerInfo.deltaPitch);
-            if(deltaYaw > 0 || data.moveProcessor.deltaY > 0) {
-                if(deltaYaw > deltaYDiff
-                        && deltaYDiff > 0
-                        && data.moveProcessor.deltaX > 4
-                        && data.moveProcessor.deltaY <= 3
-                        && deltaPDiff > deltaPitch * 2) {
-                    if(verbose.add() > 3) {
-                        vl++;
-                        flag("verbose=%1 deltaYaw=%2 deltaYDiff=%3 deltaPitch=%4 deltaPDiff=%5",
-                                MathUtils.round(verbose.value(), 3),
-                                MathUtils.round(deltaYaw, 4),
-                                MathUtils.round(deltaYDiff, 4),
-                                data.moveProcessor.deltaY,
-                                deltaPDiff);
-                    }
-                } else verbose.subtract(0.1);
-                debug("verbose=%1 deltaYaw=%2 deltaYDiff=%3 deltaPitch=%4 deltaPDiff=%5",
-                        MathUtils.round(verbose.value(), 3),
-                        MathUtils.round(deltaYaw, 4),
-                        MathUtils.round(deltaYDiff, 4),
-                        deltaPitch,
-                        deltaPDiff);
-            }
+    public void onFlying(WrappedInFlyingPacket packet) {
+        if(packet.isLook() && Math.abs(data.playerInfo.deltaPitch) >= 0.5f) {
+            float trimmed = MathUtils.trimFloat(4, Math.abs(data.playerInfo.deltaPitch));
+
+            float shit1 = trimmed % 0.1f, shit2 = trimmed % 0.05f;
+            if(trimmed > 0 && Math.abs(data.playerInfo.deltaPitch) < 100
+                    && (shit1 == 0 || shit2 == 0 || trimmed % 1f == 0)) {
+                if(verbose.add(1) > 10) {
+                    vl++;
+                    flag("deltaPitch=%1 trimmed=%2 vb=%3", data.playerInfo.deltaPitch,
+                            trimmed, verbose.value());
+                }
+            } else verbose.subtract(0.25);
+
+            debug("trimmed=" + trimmed + " dp=" + data.playerInfo.deltaPitch + " 1=" + shit1 + " 2=" + shit2
+                    + " verbose=" + verbose);
         }
     }
 }

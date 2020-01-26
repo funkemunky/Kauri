@@ -1,83 +1,69 @@
 package dev.brighten.anticheat.check.impl.combat.autoclicker;
-
-import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
-import cc.funkemunky.api.tinyprotocol.packet.in.*;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutHeldItemSlot;
-import cc.funkemunky.api.utils.Materials;
-import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.math.cond.MaxDouble;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
+import cc.funkemunky.api.utils.math.cond.MaxInteger;
 import dev.brighten.anticheat.check.api.*;
+import dev.brighten.anticheat.utils.EvictingList;
+import dev.brighten.anticheat.utils.GraphUtil;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "Autoclicker (F)", description = "Checks for common blocking patterns.",
-        checkType = CheckType.AUTOCLICKER, developer = true, punishVL = 200)
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicInteger;
+
+@CheckInfo(name = "Autoclicker (F)", description = "Checks for consistency through graphical means (Elevated).",
+        checkType = CheckType.AUTOCLICKER, punishVL = 10, developer = true)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerF extends Check {
 
-    private long lastArm;
-    private double cps;
-    private boolean blocked, blocking;
-    private int armTicks, slot;
-    private MaxDouble verbose = new MaxDouble(40);
+    private MaxInteger verbose = new MaxInteger(100);
+
+    private final EvictingList<Long> delays = new EvictingList<>(10);
+    private final Deque<Integer> ratioDeque = new LinkedList<>();
+
+    private long lastTime;
 
     @Packet
-    public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
-        cps = 1000D / (timeStamp - lastArm);
-        lastArm = timeStamp;
-        armTicks++;
-    }
-
-    @Packet
-    public void onUse(WrappedInUseEntityPacket packet) {
-        if(packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) {
-            if(blocking) {
-                TinyProtocolHandler.sendPacket(packet.getPlayer(),
-                        new WrappedOutHeldItemSlot(slot == 8 ? 0 : Math.min(8, slot + 1))
-                        .getObject());
-                debug("unblocked");
-
-                if (verbose.add() > 10) {
-                    flag("t=%1 vb=%2", "block", MathUtils.round(verbose.value(), 2));
-                }
-            } else verbose.subtract(0.01);
+    public void onClick(WrappedInArmAnimationPacket packet, long timeStamp) {
+        if(data.playerInfo.breakingBlock || data.playerInfo.lastBlockPlace.hasNotPassed(4)) {
+            lastTime = timeStamp;
+            return;
         }
-    }
+        long delay = timeStamp - this.lastTime;
 
-    @Packet
-    public void onDig(WrappedInBlockDigPacket packet) {
-        if(packet.getAction().name().contains("DROP")
-                || packet.getAction().equals(WrappedInBlockDigPacket.EnumPlayerDigType.RELEASE_USE_ITEM)) {
-            blocking = false;
-        }
-    }
+        if (delay > 0L && delay < 400L) {
+            delays.add(delay);
 
-    @Packet
-    public void onHeld(WrappedInHeldItemSlotPacket packet) {
-        blocking = false;
-        slot = packet.getSlot();
-    }
+            GraphUtil.GraphResult graph = GraphUtil.getGraphLong(delays);
 
-    @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
-        if(blocked) {
-            if(armTicks > 0) {
-                if(armTicks == 1 && cps > 3) {
-                    if(cps > 8) vl++;
-                    if(vl > 15) {
-                        flag("arm=%1 cps=%2 lagging=%3", armTicks, MathUtils.round(cps, 3), data.lagInfo.lagging);
-                    }
-                } else vl = 0;
-                debug("cps=%1 arm=%2 lagging=%3 vl=%4", cps, armTicks, data.lagInfo.lagging, vl);
+            if (graph.getPositives() == 0) {
+                return;
             }
-            blocked = false;
-            armTicks = 0;
-        }
-    }
 
-    @Packet
-    public void onPlace(WrappedInBlockPlacePacket packet) {
-        if(packet.getItemStack() == null || !Materials.isUsable(packet.getItemStack().getType())) return;
-        blocked = blocking = true;
+            int ratio = graph.getNegatives() / graph.getPositives();
+
+            this.ratioDeque.add(ratio);
+
+            if (ratioDeque.size() == 50) {
+                double avg = 1000D / delays.stream().mapToLong(v -> v).average().orElse(0);
+
+                AtomicInteger level = new AtomicInteger();
+                ratioDeque.stream().filter(i -> i == 0 || i == 1)
+                        .forEach(i -> level.incrementAndGet());
+
+                if (level.get() == 50 && avg > 7) {
+                    verbose.add(3);
+
+                    if (verbose.value() >= 10) {
+                        vl++;
+                        flag("lvl=%1 avg=%2", level.get(), avg);
+                    }
+                } else verbose.subtract(2);
+
+                debug("size=%1 avg=%2 verbose=%3", level.get(), avg, verbose.value());
+                ratioDeque.clear();
+            }
+            debug("ratio=" + ratio);
+        }
+        this.lastTime = timeStamp;
     }
 }
-

@@ -27,8 +27,9 @@ public class SpeedA extends Check {
                 + (Math.min(120, data.playerInfo.iceTicks.value()) * 0.01) : 0;
         baseSpeed+= data.playerInfo.blocksAboveTicks.value() > 0 ? 0.35
                 + (data.playerInfo.blocksAboveTicks.value() * 0.005) : 0;
-        baseSpeed+= data.playerInfo.halfBlockTicks.value() > 0 ? 0.2
-                + data.playerInfo.halfBlockTicks.value() * 0.005 : 0;
+        baseSpeed+= data.playerInfo.lastHalfBlock.hasNotPassed(20)
+                ? 0.2 + (20 - data.playerInfo.lastHalfBlock.getPassed()) * 0.005
+                : 0;
         baseSpeed+= data.playerInfo.wasOnSlime ? 0.1 : 0;
 
         if(data.playerInfo.deltaXZ > baseSpeed) {

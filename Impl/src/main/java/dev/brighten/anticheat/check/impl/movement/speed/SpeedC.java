@@ -230,9 +230,11 @@ public class SpeedC extends Check {
 
             if (horizontalMove > 0) {
                 vl++;
-                flag("+%1,v=%2,tags=%3",
-                        horizontalMove, data.playerInfo.velocityX, String.join(",", tags));
-            }
+                if(horizontalMove > 0.4 || vl > 3) {
+                    flag("+%1,v=%2,tags=%3",
+                            horizontalMove, data.playerInfo.velocityX, String.join(",", tags));
+                }
+            } else vl-= vl > 0 ? 0.2 : 0;
         }
 
         if(velocityXZ > 0) {

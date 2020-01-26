@@ -92,7 +92,7 @@ public class BlockInformation {
                 objectData.playerInfo.to);
 
         handler.setSize(0.6f, 0.0f);
-        handler.setOffset(-0.01);
+        handler.setOffset(-0.1);
 
         objectData.playerInfo.serverGround =
                 handler.isCollidedWith(Materials.SOLID) || handler.contains(EntityType.BOAT);
@@ -107,10 +107,10 @@ public class BlockInformation {
         handler.setOffset(-0.02);
         handler.setSingle(false);
         handler.setSize(0.602, 1.801);
+        handler.setOffset(-0.1 + Math.min(0, objectData.playerInfo.deltaY));
         onSoulSand = handler.isCollidedWith(Material.SOUL_SAND);
         inWeb = handler.isCollidedWith(Material.WEB);
         onSlime = handler.isCollidedWith(Material2.SLIME_BLOCK);
-        handler.setSingle(false);
 
         handler.setOffset(0);
         handler.setSize(0.6, 1.8);
@@ -154,36 +154,11 @@ public class BlockInformation {
 
         box = getBox().expand(0, 0.1, 0);
         collidesVertically = !(verticalCollisions = blockCollisions(handler.getBlocks(), box)).isEmpty();
-        
-        if(verticalCollisions.size() == 0) {
-            collidesVertically = !(verticalCollisions = Helper.blockCollisions(handler.getBlocks(),
-                    box.expand(Math.abs(objectData.playerInfo.from.x - objectData.playerInfo.to.x),
-                            0.8, Math.abs(objectData.playerInfo.from.z - objectData.playerInfo.to.z))).stream()
-                    .filter(block -> {
-                        val box2 = BlockData.getData(block.getType()).getBox(block, ProtocolVersion.getGameVersion());
-                        List<SimpleCollisionBox> list = new ArrayList<>();
-
-                        box2.downCast(list);
-
-                        for (SimpleCollisionBox simpleCollisionBox : list) {
-                            val shit = (simpleCollisionBox.yMax - objectData.playerInfo.from.y);
-                            val shit2 = (simpleCollisionBox.yMin - (objectData.playerInfo.from.y + 1.8));
-                            val shit3 = (simpleCollisionBox.yMax - objectData.playerInfo.to.y);
-                            val shit4 = (simpleCollisionBox.yMin - (objectData.playerInfo.to.y + 1.8));
-
-                            //Bukkit.broadcastMessage(shit + "," + shit2 + ", " + shit3 + ", " + shit4);
-                            if(shit == 0 || shit2 == 0 || shit3 == 0 || shit4 == 0) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    }).collect(Collectors.toList())).isEmpty();
-        }
 
         this.handler = handler;
     }
 
-    private SimpleCollisionBox getBox() {
+    public SimpleCollisionBox getBox() {
         return new SimpleCollisionBox(objectData.playerInfo.to.toVector(), objectData.playerInfo.to.toVector())
                 .expand(0.3, 0,0.3).expandMax(0, 1.8, 0);
     }

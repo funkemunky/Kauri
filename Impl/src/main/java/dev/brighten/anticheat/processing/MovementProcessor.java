@@ -292,7 +292,7 @@ public class MovementProcessor {
         /* General Block Info */
 
         //Setting if players were on blocks when on ground so it can be used with checks that check air things.
-        if (data.playerInfo.serverGround) {
+        if (data.playerInfo.serverGround || data.playerInfo.clientGround || data.playerInfo.collided) {
             data.playerInfo.wasOnIce = data.blockInfo.onIce;
             data.playerInfo.wasOnSlime = data.blockInfo.onSlime;
         }
@@ -304,8 +304,8 @@ public class MovementProcessor {
 
         //Half block ticking (slabs, stairs, bed, cauldron, etc.)
         if (data.blockInfo.onHalfBlock) {
-            data.playerInfo.halfBlockTicks.add(3);
-        } else data.playerInfo.halfBlockTicks.subtract();
+            data.playerInfo.lastHalfBlock.reset();
+        }
 
         //We dont check if theyre still on ice because this would be useless to checks that check a player in air too.
         if (data.playerInfo.wasOnIce) {

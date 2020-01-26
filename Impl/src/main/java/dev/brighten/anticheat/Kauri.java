@@ -59,6 +59,7 @@ public class Kauri extends JavaPlugin {
     }
 
     public void unload(boolean reload) {
+        reload = false;
         enabled = reload;
         MiscUtils.printToConsole("&7Unregistering Kauri API...");
         kauriAPI.service.shutdown();

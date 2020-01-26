@@ -55,79 +55,76 @@ public class VelocityB extends Check {
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(!data.predictionService.key.equals(lastKey)) vX = vZ = 0;
         if((vX != 0 || vZ != 0)) {
-            if(timeStamp - velocityTS < 400) {
-                if(sprint && useEntity) {
-                    vX*= 0.6;
-                    vZ*= 0.6;
+            if(sprint && useEntity) {
+                vX*= 0.6;
+                vZ*= 0.6;
+            }
+
+            if(data.lagInfo.lastPacketDrop.hasNotPassed(1)
+                    && data.lagInfo.lastPingDrop.hasNotPassed(100)) vX = vZ = 0;
+            if(!data.blockInfo.blocksNear
+                    && !data.blockInfo.inWeb
+                    && !data.playerInfo.onLadder
+                    && !data.blockInfo.inLiquid
+                    && !data.playerInfo.serverPos
+                    && !data.getPlayer().getAllowFlight()) {
+
+                double f4 = 0.91;
+
+                if (data.playerInfo.lClientGround) {
+                    f4 *= data.blockInfo.currentFriction;
                 }
 
-                if(data.lagInfo.lastPacketDrop.hasNotPassed(1)
-                        && data.lagInfo.lastPingDrop.hasNotPassed(100)) vX = vZ = 0;
-                if(!data.blockInfo.blocksNear
-                        && !data.blockInfo.inWeb
-                        && data.predictionService.key.equals(lastKey)
-                        && !data.playerInfo.onLadder
-                        && !data.blockInfo.inLiquid
-                        && !data.playerInfo.serverPos
-                        && !data.getPlayer().getAllowFlight()) {
+                double f = 0.16277136 / (f4 * f4 * f4);
+                double f5;
 
-                    double f4 = 0.91;
+                if (data.playerInfo.lClientGround) {
+                    f5 = data.predictionService.aiMoveSpeed * f;
+                } else {
+                    f5 = data.playerInfo.sprinting ? 0.026 : 0.02;
+                }
 
-                    if (data.playerInfo.lClientGround) {
-                        f4 *= data.blockInfo.currentFriction;
+                double pct;
+
+                forward = data.predictionService.moveForward;
+                strafe = data.predictionService.moveStrafing;
+
+                if(data.playerInfo.usingItem) {
+                    forward*= 0.2;
+                    strafe*= 0.2;
+                }
+
+                debug("motion: " + strafe + ", " + forward);
+
+                moveFlying(strafe, forward, f5);
+
+                double vXZ = MathUtils.hypot(vX, vZ);
+                pct = data.playerInfo.deltaXZ / vXZ * 100;
+
+                if (pct < 99.8
+                        && !data.playerInfo.usingItem && !data.predictionService.useSword) {
+                    if(data.lagInfo.lastPacketDrop.hasPassed(1)) {
+                        if (strafe == 0 && forward == 0 && !data.lagInfo.lagging) vl+= 2;
+                        if ((vl+= strafe == 0 && forward > 0 ? 1 : 0.5)
+                                > (data.lagInfo.transPing > 150 ? 22 : 15)) flag("pct=" + MathUtils.round(pct, 3) + "%");
                     }
+                } else vl -= vl > 0 ? data.lagInfo.lagging || data.lagInfo.transPing > 150 ? 0.5f : 0.2f : 0;
 
-                    double f = 0.16277136 / (f4 * f4 * f4);
-                    double f5;
+                debug("pct=" + pct + " key=" + data.predictionService.key + " ani="
+                        + data.playerInfo.usingItem + " sprint=" + data.playerInfo.sprinting
+                        + " ground=" + data.playerInfo.lClientGround + ", " + data.playerInfo.clientGround
+                        + " vl=" + vl);
 
-                    if (data.playerInfo.lClientGround) {
-                        f5 = data.predictionService.aiMoveSpeed * f;
-                    } else {
-                        f5 = data.playerInfo.sprinting ? 0.026 : 0.02;
-                    }
+                //debug("vX=" + vX + " vZ=" + vZ);
+                //debug("dX=" + data.playerInfo.deltaX + " dZ=" + data.playerInfo.deltaZ + " item=" +);
 
-                    double pct;
+                vX *= f4;
+                vZ *= f4;
 
-                    forward = data.predictionService.moveForward;
-                    strafe = data.predictionService.moveStrafing;
-
-                    if(data.playerInfo.usingItem) {
-                        forward*= 0.2;
-                        strafe*= 0.2;
-                    }
-
-                    debug("motion: " + strafe + ", " + forward);
-
-                    moveFlying(strafe, forward, f5);
-
-                    double vXZ = MathUtils.hypot(vX, vZ);
-                    pct = data.playerInfo.deltaXZ / vXZ * 100;
-
-                    if (pct < 99.8
-                            && !data.playerInfo.usingItem && !data.predictionService.useSword) {
-                        if(data.lagInfo.lastPacketDrop.hasPassed(1)) {
-                            if (strafe == 0 && forward == 0 && !data.lagInfo.lagging) vl+= 2;
-                            if ((vl+= strafe == 0 && forward > 0 ? 1 : 0.5)
-                                    > (data.lagInfo.transPing > 150 ? 22 : 15)) flag("pct=" + MathUtils.round(pct, 3) + "%");
-                        }
-                    } else vl -= vl > 0 ? data.lagInfo.lagging || data.lagInfo.transPing > 150 ? 0.5f : 0.2f : 0;
-
-                    debug("pct=" + pct + " key=" + data.predictionService.key + " ani="
-                            + data.playerInfo.usingItem + " sprint=" + data.playerInfo.sprinting
-                            + " ground=" + data.playerInfo.lClientGround + ", " + data.playerInfo.clientGround
-                            + " vl=" + vl);
-
-                    //debug("vX=" + vX + " vZ=" + vZ);
-                    //debug("dX=" + data.playerInfo.deltaX + " dZ=" + data.playerInfo.deltaZ + " item=" +);
-
-                    vX *= f4;
-                    vZ *= f4;
-
-                    if(timeStamp - velocityTS > 170L) {
-                        vX = vZ = 0;
-                    }
-                } else vX = vZ = 0;
-            }
+                if(timeStamp - velocityTS > 350L) {
+                    vX = vZ = 0;
+                }
+            } else vX = vZ = 0;
         }
         lastKey = data.predictionService.key;
         useEntity = false;

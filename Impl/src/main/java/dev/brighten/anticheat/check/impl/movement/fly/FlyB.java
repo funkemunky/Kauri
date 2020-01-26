@@ -17,7 +17,7 @@ public class FlyB extends Check {
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(packet.isPos() && (data.playerInfo.deltaY != 0 || data.playerInfo.deltaXZ != 0)) {
             //We check if the player is in ground, since theoretically the y should be zero.
-            double predicted = data.playerInfo.clientGround
+            double predicted = data.playerInfo.serverGround
                     ? 0 : (data.playerInfo.lDeltaY - 0.08) * 0.9800000190734863D;
 
             if(data.playerInfo.lClientGround && !data.playerInfo.clientGround) {
@@ -29,17 +29,18 @@ public class FlyB extends Check {
             }
 
             if(!data.playerInfo.flightCancel
-                    && !data.playerInfo.wasOnSlime
-                    && !data.blockInfo.collidesVertically
-                    && data.playerInfo.halfBlockTicks.value() == 0
+                    && data.playerInfo.slimeTicks.value() == 0
+                    && !data.blockInfo.collidesHorizontally
+                    && data.playerInfo.lastHalfBlock.hasPassed(3)
                     && timeStamp - data.playerInfo.lastVelocityTimestamp > 200L
                     && !data.playerInfo.serverGround
-                    && !data.playerInfo.nearGround
                     && (data.playerInfo.blocksAboveTicks.value() == 0 || data.playerInfo.deltaY >= 0)
                     && MathUtils.getDelta(data.playerInfo.deltaY, predicted) > 0.0001) {
                 vl++;
-                flag("deltaY=%1 predicted=%2", data.playerInfo.deltaY, predicted);
-            }
+                if(vl > (data.lagInfo.lagging ? 3 : 2)) {
+                    flag("deltaY=%1 predicted=%2", data.playerInfo.deltaY, predicted);
+                }
+            } else vl-= vl > 0 ? 0.2f : 0;
 
             debug("deltaY=" + data.playerInfo.deltaY + " predicted=" + predicted
                     + " ground=" + data.playerInfo.clientGround + " vl=" + vl);

@@ -5,24 +5,74 @@ import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.processing.MovementProcessor;
+import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "Aim (H)", description = "Checks for rounded pitch deltas.",
-        checkType = CheckType.AIM, punishVL = 12)
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicInteger;
+
+@CheckInfo(name = "Aim (H)", description = "Elevated's rotation check thing meant to get Vape",
+        checkType = CheckType.AIM, punishVL = 10)
 public class AimH extends Check {
+
+    private float lastYaw, lastPitch, lastOutYawDelta, lastOutPitchDelta, lastPitchDelta, lastYawDelta;
+    private Deque<Long> divisorDeque = new LinkedList<>();
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if(packet.isLook()) {
-            float absPitch = Math.abs((float) MathUtils.trim(4, data.playerInfo.deltaPitch));
-            String string = String.valueOf(absPitch);
-            if((absPitch > 1 && string.length() < 3) && data.playerInfo.lastAttack.hasNotPassed(10)) {
-                if(vl++ > 4) {
-                    flag("deltaPitch%1", absPitch);
-                }
-            } else vl-= vl > 0 ? 0.5 : 0;
+        if (packet.isLook()) {
+            float yaw = packet.getYaw();
+            float pitch = packet.getPitch();
 
-            debug("deltaPitch=" + absPitch + " vl=" + vl + " length=" + string.length());
+            float yawDelta = Math.abs(this.lastYaw - yaw);
+            float pitchDelta = Math.abs(this.lastPitch - pitch);
+
+            float outYaw = data.playerInfo.headYaw;
+            float outPitch = data.playerInfo.headPitch;
+
+            float outYawDelta = MathUtils.getAngleDelta(this.lastYaw, outYaw);
+            float outPitchDelta = MathUtils.getAngleDelta(this.lastPitch, outPitch);
+
+            float outYawDifference = MathUtils.getAngleDelta(outYawDelta, this.lastOutYawDelta);
+
+            if (outYawDifference > 2.0F && yawDelta > 0.0F) {
+                long expandedOutPitch = (long) (outPitchDelta * MovementProcessor.offset);
+                long previousExpandedOutPitch = (long) (lastOutPitchDelta * MovementProcessor.offset);
+
+                long expandedPitch = (long) (pitchDelta * MovementProcessor.offset);
+                long previousExpandedPitch = (long) (lastPitchDelta * MovementProcessor.offset);
+
+                long pitchOutDivisor = MiscUtils.gcd(expandedOutPitch, previousExpandedOutPitch);
+                long pitchDivisor = MiscUtils.gcd(expandedPitch, previousExpandedPitch);
+
+                long divisorDiff = Math.abs(pitchOutDivisor - pitchDivisor);
+
+                this.divisorDeque.addLast(divisorDiff);
+
+                if (this.divisorDeque.size() == 20) {
+
+                    AtomicInteger level = new AtomicInteger();
+
+                    this.divisorDeque.stream().filter(div -> div == 0.0).forEach(div -> level.incrementAndGet());
+
+                    if (level.get() > 14 && data.playerInfo.lastAttack.hasNotPassed(20)) {
+                        vl++;
+                        flag("level=%1", level.get());
+                    }
+
+                    debug("level=%1", level.get());
+
+                    this.divisorDeque.clear();
+                }
+            }
+
+            this.lastOutYawDelta = outYawDelta;
+            this.lastOutPitchDelta = outPitchDelta;
+            this.lastYaw = yaw;
+            this.lastPitch = pitch;
+            this.lastPitchDelta = pitchDelta;
         }
     }
 }

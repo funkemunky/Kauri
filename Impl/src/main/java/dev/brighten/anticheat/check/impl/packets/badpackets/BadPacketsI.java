@@ -1,27 +1,20 @@
 package dev.brighten.anticheat.check.impl.packets.badpackets;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInWindowClickPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInAbilitiesPacket;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "BadPackets (I)", description = "Checks for clicking in inventory while moving.",
-        checkType = CheckType.BADPACKETS)
+@CheckInfo(name = "BadPackets (I)", checkType = CheckType.BADPACKETS,
+        description = "Checks if the player is sending isFlying while not have allowedFlight.", punishVL = 1)
 public class BadPacketsI extends Check {
 
     @Packet
-    public void windowClick(WrappedInWindowClickPacket packet, long timeStamp) {
-        if(data.playerInfo.deltaXZ > 0.1
-                && !data.playerInfo.serverPos
-                && timeStamp - data.playerInfo.lastVelocityTimestamp > 3000L
-                && data.playerInfo.serverGround
-                && !data.blockInfo.inLiquid
-                && !data.blockInfo.onIce
-                && !data.playerInfo.flying) {
-            if(vl++ > 4) {
-                flag("clicked in window while moving");
-            }
-        } else vl-= vl > 0 ? 0.5 : 0;
+    public void onFlying(WrappedInAbilitiesPacket packet) {
+        if(packet.isFlying() && !packet.isAllowedFlight() && !data.lagInfo.lagging) {
+            vl+= 2;
+            flag("isFlying=" + packet.isFlying() + " allowed=" + packet.isAllowedFlight());
+        }
     }
 }

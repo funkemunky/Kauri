@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.data.classes;
 
+import cc.funkemunky.api.events.AtlasEvent;
 import cc.funkemunky.api.reflections.types.WrappedClass;
 import cc.funkemunky.api.reflections.types.WrappedMethod;
 import cc.funkemunky.api.tinyprotocol.api.NMSObject;
@@ -54,6 +55,22 @@ public class CheckManager {
     }
 
     public void runEvent(Event event) {
+        if(!checkMethods.containsKey(event.getClass())) return;
+
+        val methods = checkMethods.get(event.getClass());
+
+        methods.parallelStream().filter(entry ->
+                entry.getValue().getMethod().isAnnotationPresent(dev.brighten.anticheat.check.api.Event.class))
+                .forEach(entry -> {
+                    Check check = checks.get(entry.getKey());
+
+                    if(check.enabled) {
+                        entry.getValue().invoke(check, event);
+                    }
+                });
+    }
+
+    public void runEvent(AtlasEvent event) {
         if(!checkMethods.containsKey(event.getClass())) return;
 
         val methods = checkMethods.get(event.getClass());
