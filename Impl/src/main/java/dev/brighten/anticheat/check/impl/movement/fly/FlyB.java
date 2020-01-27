@@ -29,12 +29,12 @@ public class FlyB extends Check {
             }
 
             if(!data.playerInfo.flightCancel
-                    && data.playerInfo.slimeTicks.value() == 0
+                    && data.playerInfo.slimeTimer.hasPassed(20)
                     && !data.blockInfo.collidesHorizontally
                     && data.playerInfo.lastHalfBlock.hasPassed(3)
                     && timeStamp - data.playerInfo.lastVelocityTimestamp > 200L
                     && !data.playerInfo.serverGround
-                    && (data.playerInfo.blocksAboveTicks.value() == 0 || data.playerInfo.deltaY >= 0)
+                    && (data.playerInfo.blockAboveTimer.hasPassed(5) || data.playerInfo.deltaY >= 0)
                     && MathUtils.getDelta(data.playerInfo.deltaY, predicted) > 0.0001) {
                 vl++;
                 if(vl > (data.lagInfo.lagging ? 3 : 2)) {

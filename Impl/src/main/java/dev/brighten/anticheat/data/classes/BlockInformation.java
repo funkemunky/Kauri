@@ -3,6 +3,7 @@ package dev.brighten.anticheat.data.classes;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
+import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.Materials;
 import cc.funkemunky.api.utils.MathUtils;
@@ -45,12 +46,16 @@ public class BlockInformation {
 
         World world = objectData.getPlayer().getWorld();
 
-        int startX = Location.locToBlock(objectData.playerInfo.to.x - 1);
-        int endX = Location.locToBlock(objectData.playerInfo.to.x + 1);
-        int startY = Location.locToBlock(objectData.playerInfo.to.y - 1.5);
-        int endY = Location.locToBlock(objectData.playerInfo.to.y + 3);
-        int startZ = Location.locToBlock(objectData.playerInfo.to.z - 1);
-        int endZ = Location.locToBlock(objectData.playerInfo.to.z + 1);
+        val dx =  Math.abs(objectData.playerInfo.deltaX);
+        val dy = Math.abs(objectData.playerInfo.deltaY);
+        val dz = Math.abs(objectData.playerInfo.deltaZ);
+
+        int startX = Location.locToBlock(objectData.playerInfo.to.x - (0.3 + dx));
+        int endX = Location.locToBlock(objectData.playerInfo.to.x + (0.3 + dx));
+        int startY = Location.locToBlock(objectData.playerInfo.to.y - (1 + dy));
+        int endY = Location.locToBlock(objectData.playerInfo.to.y + (1 + dy));
+        int startZ = Location.locToBlock(objectData.playerInfo.to.z - (0.3 + dz));
+        int endZ = Location.locToBlock(objectData.playerInfo.to.z + (0.3 + dz));
         int it = 9 * 9;
         objectData.playerInfo.worldLoaded = true;
         start:
@@ -106,8 +111,8 @@ public class BlockInformation {
         onIce = handler.isCollidedWith(Materials.ICE);
         handler.setOffset(-0.02);
         handler.setSingle(false);
-        handler.setSize(0.602, 1.801);
-        handler.setOffset(-0.1 + Math.min(0, objectData.playerInfo.deltaY));
+        handler.setSize(0.602, 1.802);
+        handler.setOffset(-0.1);
         onSoulSand = handler.isCollidedWith(Material.SOUL_SAND);
         inWeb = handler.isCollidedWith(Material.WEB);
         onSlime = handler.isCollidedWith(Material2.SLIME_BLOCK);
@@ -124,11 +129,14 @@ public class BlockInformation {
         inBlock = handler.isCollidedWith(Materials.SOLID);
 
         if(objectData.playerInfo.deltaY <= 0) {
-            handler.setSize(2.0f, 0);
-        } else handler.setSize(0.61, 0);
-        handler.setSingle(true);
-        onClimbable = handler.isCollidedWith(Materials.LADDER);
-        handler.setSingle(false);
+            onClimbable = objectData.playerInfo.blockOnTo != null
+                    && BlockUtils.isClimbableBlock(objectData.playerInfo.blockOnTo);
+        } else {
+            handler.setSize(0.61, 0);
+            handler.setSingle(true);
+            onClimbable = handler.isCollidedWith(Materials.LADDER);
+            handler.setSingle(false);
+        }
 
         handler.setSize(0.6, 2.2);
         blocksAbove = handler.isCollidedWith(Materials.SOLID);

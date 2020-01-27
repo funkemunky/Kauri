@@ -19,7 +19,6 @@ import dev.brighten.anticheat.check.impl.combat.reach.Reach;
 import dev.brighten.anticheat.check.impl.movement.fly.*;
 import dev.brighten.anticheat.check.impl.movement.general.FastLadder;
 import dev.brighten.anticheat.check.impl.movement.general.HealthSpoof;
-import dev.brighten.anticheat.check.impl.movement.general.LiquidWalk;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallA;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallB;
 import dev.brighten.anticheat.check.impl.movement.speed.*;
@@ -69,7 +68,7 @@ public class Check implements KauriCheck {
 
     public CancelType cancelMode;
 
-    private boolean exempt, banned;
+    public boolean exempt, banExempt;
     private TickTimer lastExemptCheck = new TickTimer(20);
 
     private TickTimer lastAlert = new TickTimer(MathUtils.millisToTicks(Config.alertsDelay));
@@ -181,12 +180,12 @@ public class Check implements KauriCheck {
     }
 
     public void punish() {
-        if(developer || !executable || punishVl == -1 || vl <= punishVl
+        if(banExempt || developer || !executable || punishVl == -1 || vl <= punishVl
                 || System.currentTimeMillis() - Kauri.INSTANCE.lastTick > 200L) return;
 
 
         Kauri.INSTANCE.loggerManager.addPunishment(data, this);
-        if(!banned && !Config.bungeePunishments) {
+        if(!data.banned && !Config.bungeePunishments) {
             RunUtils.task(() -> {
                 if(!Config.broadcastMessage.equalsIgnoreCase("off")) {
                     Bukkit.broadcastMessage(Color.translate(Config.broadcastMessage
@@ -199,7 +198,7 @@ public class Check implements KauriCheck {
                                 cmd.replace("%name%", data.getPlayer().getName())));
                 vl = 0;
             }, Kauri.INSTANCE);
-            banned = true;
+            data.banned = true;
         } else {
             if(!Config.broadcastMessage.equalsIgnoreCase("off")) {
                 BungeeAPI.broadcastMessage(Color.translate(Config.broadcastMessage
@@ -240,7 +239,6 @@ public class Check implements KauriCheck {
         register(new FlyE());
         register(new FlyF());
         register(new FlyF());
-        register(new LiquidWalk());
         register(new FastLadder());
         register(new NoFallA());
         register(new NoFallB());

@@ -42,6 +42,7 @@ public class ObjectData {
     public PredictionService predictionService;
     public MovementProcessor moveProcessor;
     public int hashCode;
+    public boolean banned;
     public ProtocolVersion playerVersion = ProtocolVersion.UNKNOWN;
     public Set<Player> boxDebuggers = new HashSet<>();
     public List<CancelType> typesToCancel = Collections.synchronizedList(new ArrayList<>());

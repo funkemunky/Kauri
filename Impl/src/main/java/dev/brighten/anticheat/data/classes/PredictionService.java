@@ -1,12 +1,10 @@
 package dev.brighten.anticheat.data.classes;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.Materials;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.PlayerUtils;
 import cc.funkemunky.api.utils.TickTimer;
 import dev.brighten.anticheat.data.ObjectData;
-import org.bukkit.Material;
 import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;
@@ -152,8 +150,10 @@ public class PredictionService {
     }
 
     private boolean checkSpecialBlock() {
-        return (data.playerInfo.iceTicks.value() > 0 || data.playerInfo.wasOnSlime
-                || data.playerInfo.soulSandTicks.value() > 0 || data.playerInfo.climbTicks.value() > 0) && (onGround || lastOnGround);
+        return (data.playerInfo.iceTimer.hasNotPassed(20)
+                || data.playerInfo.soulSandTimer.hasNotPassed(20)
+                || data.playerInfo.climbTimer.hasNotPassed(20) || data.playerInfo.wasOnSlime)
+                && (onGround || lastOnGround);
     }
 
     private void calc() {
@@ -383,10 +383,10 @@ public class PredictionService {
         if (MathUtils.hypot(posX - lPosX, posZ - lPosZ) > 10)
             return false;
 
-        return data.playerInfo.liquidTicks.value() == 0
-                && data.playerInfo.climbTicks.value() == 0
+        return data.playerInfo.liquidTimer.hasPassed(20)
+                && data.playerInfo.climbTimer.hasPassed(20)
                 && !fly
-                && !data.getPlayer().getGameMode().toString().contains("SPEC");
+                && !data.playerInfo.creative;
     }
 
     private static final float[] SIN_TABLE_FAST = new float[4096];

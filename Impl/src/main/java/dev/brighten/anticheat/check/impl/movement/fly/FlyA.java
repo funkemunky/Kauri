@@ -13,29 +13,24 @@ import dev.brighten.api.check.CheckType;
 @Cancellable
 public class FlyA extends Check {
 
-    private double maxHeight, slimeHeight, totalHeight;
+    private double maxHeight, groundY;
+    private float slimeHeight;
     private boolean wasOnSlime, tookVelocity;
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(packet.isPos()) {
-            if(data.playerInfo.serverGround && data.blockInfo.onSlime && data.playerInfo.deltaY <= 0) {
+            if(data.blockInfo.onSlime
+                    && data.playerInfo.lDeltaY < -.4) {
                 wasOnSlime = true;
-                slimeHeight = 0;
-                slimeHeight -= data.playerInfo.lDeltaY;
-            } else if(wasOnSlime) {
-                maxHeight = Math.max(2f,
-                        MovementUtils.getTotalHeight((float)slimeHeight)) * 1.35f;
+                slimeHeight = -1 * (float)data.playerInfo.lDeltaY;
+
+                groundY = data.playerInfo.to.y;
+                maxHeight = Math.max(maxHeight, MovementUtils.getTotalHeight(slimeHeight) * 1.5f);
+            }else if(!tookVelocity && data.playerInfo.serverGround) {
+                groundY = data.playerInfo.to.y;
                 wasOnSlime = false;
-            } else if(!tookVelocity && data.playerInfo.serverGround) {
-                maxHeight = MovementUtils.getTotalHeight(MovementUtils.getJumpHeight(data.getPlayer())) * 1.5f;
-            }
-
-            if(data.playerInfo.lastBlockPlace.hasNotPassed(5)) totalHeight = 0;
-
-            if(data.playerInfo.lastToggleFlight.hasNotPassed(10)
-                    || timeStamp - data.playerInfo.lastServerPos < 100L) {
-                totalHeight = 0;
+                maxHeight = MovementUtils.getTotalHeight(data.playerInfo.jumpHeight) * 1.5f;
             }
 
             if(data.playerInfo.lastVelocity.hasNotPassed(10)) {
@@ -45,23 +40,26 @@ public class FlyA extends Check {
             }
 
             if(tookVelocity || data.blockInfo.inLiquid || data.blockInfo.onClimbable) {
-                totalHeight = 0;
+                groundY = data.playerInfo.to.y;
                 maxHeight = MovementUtils.getTotalHeight((float)data.playerInfo.velocityY) * 1.4f;
             }
 
-            if(data.playerInfo.clientGround || data.playerInfo.serverGround) {
-                totalHeight = 0;
-            } else if(data.playerInfo.deltaY > 0) totalHeight += data.playerInfo.deltaY;
+            if(data.playerInfo.clientGround || data.playerInfo.serverGround
+                    || data.playerInfo.lastBlockPlace.hasNotPassed(5)
+                    || data.playerInfo.lastToggleFlight.hasNotPassed(10)
+                    || timeStamp - data.playerInfo.lastServerPos < 100L) {
+                groundY = data.playerInfo.to.y;
+            }
 
             maxHeight = Math.max(1.3f, maxHeight); //Fixes the occasional fuck up (usually on reload). Temporary.
 
+            double totalHeight = data.playerInfo.to.y - groundY;
             if(totalHeight > maxHeight
                     && timeStamp - data.playerInfo.lastServerPos > 50L
                     && !data.playerInfo.serverPos
                     && !data.playerInfo.clientGround
                     && !data.playerInfo.serverGround
                     && !data.playerInfo.nearGround
-                    && (!data.playerInfo.wasOnSlime || maxHeight >= 2)
                     && !data.playerInfo.flightCancel) {
                 vl++;
                 flag("%1>-%2; ping=%p tps=%t", totalHeight, maxHeight);
