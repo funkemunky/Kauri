@@ -28,9 +28,7 @@ import dev.brighten.anticheat.check.impl.movement.velocity.VelocityB;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityC;
 import dev.brighten.anticheat.check.impl.packets.Timer;
 import dev.brighten.anticheat.check.impl.packets.badpackets.*;
-import dev.brighten.anticheat.check.impl.packets.exploits.BookEnchant;
-import dev.brighten.anticheat.check.impl.packets.exploits.BookOp;
-import dev.brighten.anticheat.check.impl.packets.exploits.PacketSpam;
+import dev.brighten.anticheat.check.impl.packets.exploits.*;
 import dev.brighten.anticheat.check.impl.world.place.BlockPlace;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.api.KauriAPI;
@@ -287,6 +285,8 @@ public class Check implements KauriCheck {
         register(new BookOp());
         register(new BookEnchant());
         register(new PacketSpam());
+        register(new SignOp());
+        register(new SignCrash());
     }
 
     public static boolean isCheck(String name) {

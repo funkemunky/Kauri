@@ -29,7 +29,7 @@ public class AimE extends Check {
             if(delta < 7000
                     && data.playerInfo.yawGCD < 1E6
                     && (data.moveProcessor.deltaX > 30 || data.moveProcessor.deltaY > 30)
-                    && data.playerInfo.deltaYaw > 1 && Math.abs(data.playerInfo.deltaPitch) > 1) {
+                    && data.playerInfo.deltaYaw > 2 && Math.abs(data.playerInfo.deltaPitch) > 2) {
                 if(verbose.flag(data.moveProcessor.deltaX > 40 && data.moveProcessor.deltaY > 40
                         ? 1 : 0.5, 10)) {
                     vl++;

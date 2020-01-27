@@ -10,6 +10,7 @@ import cc.funkemunky.api.utils.TickTimer;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.Config;
 import dev.brighten.anticheat.data.DataManager;
+import dev.brighten.anticheat.listeners.PacketListener;
 import dev.brighten.anticheat.logs.LoggerManager;
 import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.processing.PacketProcessor;
@@ -25,6 +26,8 @@ public class Load {
     public static void load() {
         MiscUtils.printToConsole(Color.Gray + "Starting thread pool...");
         Kauri.INSTANCE.executor = Executors.newFixedThreadPool(3);
+        if(PacketListener.packetThread.isShutdown())
+            PacketListener.packetThread = Executors.newSingleThreadScheduledExecutor();
 
         MiscUtils.printToConsole(Color.Gray + "Loading config...");
         Kauri.INSTANCE.saveDefaultConfig();

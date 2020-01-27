@@ -10,6 +10,7 @@ import cc.funkemunky.api.utils.TickTimer;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.Config;
 import dev.brighten.anticheat.data.DataManager;
+import dev.brighten.anticheat.listeners.PacketListener;
 import dev.brighten.anticheat.logs.LoggerManager;
 import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.processing.PacketProcessor;
@@ -64,6 +65,8 @@ public class Kauri extends JavaPlugin {
         MiscUtils.printToConsole("&7Unregistering Kauri API...");
         kauriAPI.service.shutdown();
 
+        PacketListener.packetThread.shutdown();
+
         if(!reload) {
             kauriAPI = null;
             MiscUtils.printToConsole("&7Unregistering Atlas and Bukkit listeners...");
@@ -93,6 +96,22 @@ public class Kauri extends JavaPlugin {
             loggerManager = null;
         }
         executor.shutdown(); //Shutting down threads.
+    }
+
+    public void reload() {
+        Kauri.INSTANCE.reloadConfig();
+        Atlas.getInstance().initializeScanner(this, false, false);
+
+        dataManager.dataMap.clear();
+        EntityProcessor.vehicles.clear();
+
+        Check.checkClasses.clear();
+        Check.checkSettings.clear();
+        Check.registerChecks();
+
+        loggerManager = new LoggerManager(true);
+
+        Bukkit.getOnlinePlayers().forEach(dataManager::createData);
     }
 
     public void load() {

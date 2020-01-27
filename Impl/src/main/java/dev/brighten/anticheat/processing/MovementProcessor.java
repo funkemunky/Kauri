@@ -19,13 +19,14 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MovementProcessor {
     private final ObjectData data;
 
-    public EvictingList<Double> yawGcdList = new EvictingList<>(50),
-            pitchGcdList = new EvictingList<>(50);
+    public List<Double> yawGcdList = Collections.synchronizedList(new EvictingList<>(50));
+    public List<Double> pitchGcdList = Collections.synchronizedList(new EvictingList<>(50));
     public long deltaX, deltaY, lastDeltaX, lastDeltaY;
     private List<Float> yawList = new ArrayList<>(), pitchList = new ArrayList<>();
     public double sensitivityX, sensitivityY, yawMode, pitchMode;

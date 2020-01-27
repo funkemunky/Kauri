@@ -9,9 +9,13 @@ import cc.funkemunky.api.utils.Init;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 @Init
 public class PacketListener implements AtlasListener {
 
+    public static ExecutorService packetThread = Executors.newSingleThreadScheduledExecutor();
     @Listen(priority = ListenerPriority.LOW)
     public void onEvent(PacketReceiveEvent event) {
         if(event.isCancelled() || !Kauri.INSTANCE.enabled || event.getPacket() == null) return;
@@ -21,7 +25,7 @@ public class PacketListener implements AtlasListener {
         }
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
-        Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.packetProcessor.processClient(event,
+        packetThread.execute(() -> Kauri.INSTANCE.packetProcessor.processClient(event,
                 data, event.getPacket(), event.getType(), event.getTimeStamp()));
     }
 
@@ -34,7 +38,7 @@ public class PacketListener implements AtlasListener {
         }
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
-        Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.packetProcessor.processServer(event,
+        packetThread.execute(() -> Kauri.INSTANCE.packetProcessor.processServer(event,
                 data, event.getPacket(), event.getType(), event.getTimeStamp()));
     }
 }

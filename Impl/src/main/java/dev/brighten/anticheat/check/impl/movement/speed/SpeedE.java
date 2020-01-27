@@ -22,7 +22,7 @@ public class SpeedE extends Check {
                 && timeStamp - data.playerInfo.lastServerPos > 100
                 && !data.playerInfo.inVehicle
                 && !data.playerInfo.gliding
-                && timeStamp - data.creation > 500
+                && timeStamp - data.creation > 4000
                 && !data.playerInfo.riptiding) {
             var max = MovementUtils.getBaseSpeed(data) * 2.5;
 
