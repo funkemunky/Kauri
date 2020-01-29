@@ -50,12 +50,12 @@ public class BlockInformation {
         val dy = Math.abs(objectData.playerInfo.deltaY);
         val dz = Math.abs(objectData.playerInfo.deltaZ);
 
-        int startX = Location.locToBlock(objectData.playerInfo.to.x - (0.3 + dx));
-        int endX = Location.locToBlock(objectData.playerInfo.to.x + (0.3 + dx));
+        int startX = Location.locToBlock(objectData.playerInfo.to.x - (1 + dx));
+        int endX = Location.locToBlock(objectData.playerInfo.to.x + (1 + dx));
         int startY = Location.locToBlock(objectData.playerInfo.to.y - (1 + dy));
-        int endY = Location.locToBlock(objectData.playerInfo.to.y + (1 + dy));
-        int startZ = Location.locToBlock(objectData.playerInfo.to.z - (0.3 + dz));
-        int endZ = Location.locToBlock(objectData.playerInfo.to.z + (0.3 + dz));
+        int endY = Location.locToBlock(objectData.playerInfo.to.y + (3 + dy));
+        int startZ = Location.locToBlock(objectData.playerInfo.to.z - (1 + dz));
+        int endZ = Location.locToBlock(objectData.playerInfo.to.z + (1 + dz));
         int it = 9 * 9;
         objectData.playerInfo.worldLoaded = true;
         start:
@@ -97,7 +97,7 @@ public class BlockInformation {
                 objectData.playerInfo.to);
 
         handler.setSize(0.6f, 0.0f);
-        handler.setOffset(-0.1);
+        handler.setOffset(-0.02);
 
         objectData.playerInfo.serverGround =
                 handler.isCollidedWith(Materials.SOLID) || handler.contains(EntityType.BOAT);
@@ -138,7 +138,7 @@ public class BlockInformation {
             handler.setSingle(false);
         }
 
-        handler.setSize(0.6, 2.2);
+        handler.setSize(0.6, 2.4);
         blocksAbove = handler.isCollidedWith(Materials.SOLID);
 
         handler.setSize(1.5, 1.8);

@@ -16,7 +16,6 @@ import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.processing.PacketProcessor;
 import dev.brighten.api.KauriAPI;
 import org.bukkit.Bukkit;
-import org.bukkit.event.HandlerList;
 
 import java.util.ArrayList;
 import java.util.concurrent.Executors;

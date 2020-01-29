@@ -16,7 +16,6 @@ import lombok.val;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Init
@@ -24,6 +23,10 @@ import java.util.stream.Collectors;
 public class LoggerManager {
 
     public Database logsDatabase;
+
+    public Map<UUID, List<Log>> cache = new HashMap<>();
+
+    public BukkitTask cacheUpdater;
 
     /*My SQL */
     @ConfigSetting(path = "database.mysql", name = "enabled")
@@ -91,6 +94,31 @@ public class LoggerManager {
             }
             MiscUtils.printToConsole("&7Loading database...");
             logsDatabase.loadMappings();
+
+            cacheUpdater = RunUtils.taskTimerAsync(() -> {
+                cache.keySet().forEach(uuid -> {
+                    List<StructureSet> sets = logsDatabase.get(structSet ->
+                            structSet.contains("type") && structSet.getObject("type").equals("log")
+                                    && structSet.contains("uuid") && structSet.getObject("uuid"
+                            ).equals(uuid.toString()));
+
+                    cache.put(uuid, sets.parallelStream().map(set -> new Log(
+                            set.getObject("checkName"),
+                            set.getObject("info"),
+                            set.getObject("vl") instanceof Integer
+                                    ? (int)set.getObject("vl")
+                                    : (set.getObject("vl") instanceof Double
+                                    ? (float)(double)set.getObject("vl") : (float)set.getObject("vl")),
+                            set.getObject("ping") instanceof Integer
+                                    ? (int)set.getObject("ping") : set.getObject("ping"),
+                            (long)set.getObject("timeStamp"),
+                            set.getObject("tps") instanceof Integer
+                                    ? (int)set.getObject("tps")
+                                    : set.getObject("tps") instanceof Double
+                                    ? (double)set.getObject("tps") : (float)set.getObject("tps")))
+                            .collect(Collectors.toList()));
+                });
+            }, 20 * 30, 20 * 20);
         }
     }
 
@@ -127,28 +155,33 @@ public class LoggerManager {
     }
 
     public List<Log> getLogs(UUID uuid) {
+        return cache.computeIfAbsent(uuid, key -> {
+            List<StructureSet> sets = logsDatabase.get(structSet ->
+                    structSet.contains("type") && structSet.getObject("type").equals("log")
+                            && structSet.contains("uuid") && structSet.getObject("uuid").equals(uuid.toString()));
 
-        List<StructureSet> sets = logsDatabase.get(structSet ->
-                structSet.contains("type") && structSet.getObject("type").equals("log")
-                        && structSet.contains("uuid") && structSet.getObject("uuid").equals(uuid.toString()));
-
-        if(sets.size() == 0) return new ArrayList<>();
-
-        return sets.stream().map(set -> new Log(
-                set.getObject("checkName"),
-                set.getObject("info"),
-                set.getObject("vl") instanceof Integer
-                        ? (int)set.getObject("vl")
-                        : (set.getObject("vl") instanceof Double
-                        ? (float)(double)set.getObject("vl") : (float)set.getObject("vl")),
-                set.getObject("ping") instanceof Integer
-                        ? (int)set.getObject("ping") : set.getObject("ping"),
-                (long)set.getObject("timeStamp"),
-                set.getObject("tps") instanceof Integer
-                        ? (int)set.getObject("tps")
-                        : set.getObject("tps") instanceof Double
-                        ? (double)set.getObject("tps") : (float)set.getObject("tps")))
-                .collect(Collectors.toList());
+            List<Log> toReturn;
+            if(sets.size() == 0) toReturn = new ArrayList<>();
+            else {
+                toReturn = sets.stream().map(set -> new Log(
+                        set.getObject("checkName"),
+                        set.getObject("info"),
+                        set.getObject("vl") instanceof Integer
+                                ? (int)set.getObject("vl")
+                                : (set.getObject("vl") instanceof Double
+                                ? (float)(double)set.getObject("vl") : (float)set.getObject("vl")),
+                        set.getObject("ping") instanceof Integer
+                                ? (int)set.getObject("ping") : set.getObject("ping"),
+                        (long)set.getObject("timeStamp"),
+                        set.getObject("tps") instanceof Integer
+                                ? (int)set.getObject("tps")
+                                : set.getObject("tps") instanceof Double
+                                ? (double)set.getObject("tps") : (float)set.getObject("tps")))
+                        .collect(Collectors.toList());
+            }
+            cache.put(uuid, toReturn);
+            return toReturn;
+        });
     }
 
     public void clearLogs(UUID uuid) {

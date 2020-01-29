@@ -3,7 +3,11 @@ package dev.brighten.anticheat.check.api;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.bungee.BungeeAPI;
 import cc.funkemunky.api.reflections.types.WrappedClass;
+import cc.funkemunky.api.reflections.types.WrappedMethod;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
+import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
+import cc.funkemunky.api.tinyprotocol.api.packets.channelhandler.TinyProtocol1_7;
+import cc.funkemunky.api.tinyprotocol.api.packets.channelhandler.TinyProtocol1_8;
 import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.impl.combat.aim.*;
@@ -19,6 +23,7 @@ import dev.brighten.anticheat.check.impl.combat.reach.Reach;
 import dev.brighten.anticheat.check.impl.movement.fly.*;
 import dev.brighten.anticheat.check.impl.movement.general.FastLadder;
 import dev.brighten.anticheat.check.impl.movement.general.HealthSpoof;
+import dev.brighten.anticheat.check.impl.movement.general.Phase;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallA;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallB;
 import dev.brighten.anticheat.check.impl.movement.speed.*;
@@ -37,8 +42,10 @@ import dev.brighten.api.listener.KauriFlagEvent;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.entity.Player;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -50,6 +57,11 @@ public class Check implements KauriCheck {
 
     public static Map<WrappedClass, CheckInfo> checkClasses = Collections.synchronizedMap(new HashMap<>());
     public static Map<WrappedClass, CheckSettings> checkSettings = Collections.synchronizedMap(new HashMap<>());
+
+    private static WrappedClass protocolClass = ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_8)
+            ? new WrappedClass(TinyProtocol1_7.class) : new WrappedClass(TinyProtocol1_8.class);
+    private static WrappedMethod getChannel = protocolClass.getMethod("getChannel", Player.class);
+
 
     public ObjectData data;
     @Getter
@@ -144,12 +156,15 @@ public class Check implements KauriCheck {
                                 .replace("%experimental%", developer ? "&c&o(Experimental)" : "")))
                                 .addHoverText(Color.translate(Kauri.INSTANCE.msgHandler.getLanguage().msg(
                                         "cheat-alert-hover",
-                                        "&7&oClick to teleport to player."))
+                                        "&eDescription&8: &f%desc%\n&r\n&7&oClick to teleport to player.")
+                                        .replace("%desc%", String.join("\n",
+                                                dev.brighten.anticheat.utils.MiscUtils
+                                                        .splitIntoLine(description, 20)))
                                         .replace("%player%", data.getPlayer().getName())
                                         .replace("%check%", name)
                                         .replace("%info%", info)
                                         .replace("%vl%", String.valueOf(MathUtils.round(vl, 2)))
-                                        .replace("%experimental%", developer ? "&c&o(Experimental)" : ""))
+                                        .replace("%experimental%", developer ? "&c&o(Experimental)" : "")))
                                 .setClickEvent(JsonMessage.ClickableType.RunCommand, "/" + Config.alertCommand
                                         .replace("%player%", data.getPlayer().getName())
                                         .replace("%check%", name)
@@ -252,6 +267,7 @@ public class Check implements KauriCheck {
         register(new AimF());
         register(new AimG());
         register(new AimH());
+        register(new AimI());
         register(new SpeedA());
         register(new SpeedB());
         register(new SpeedC());
@@ -260,6 +276,7 @@ public class Check implements KauriCheck {
         register(new KillauraA());
         register(new KillauraB());
         register(new KillauraC());
+        register(new Phase());
         register(new Timer());
         register(new BadPacketsA());
         register(new BadPacketsB());
@@ -278,13 +295,14 @@ public class Check implements KauriCheck {
         register(new HandA());
         register(new HandB());
         register(new HandC());
-        register(new HealthSpoof());
+        //register(new HealthSpoof());
         register(new BlockPlace());
-        register(new BookOp());
-        register(new BookEnchant());
-        register(new PacketSpam());
-        register(new SignOp());
-        register(new SignCrash());
+        //register(new BookOp());
+        //register(new BookEnchant());
+        //register(new PacketSpam());
+        //register(new SignOp());
+        //register(new SignCrash());
+        //register(new LargeMove());
     }
 
     public static boolean isCheck(String name) {
@@ -299,5 +317,13 @@ public class Check implements KauriCheck {
     public static CheckSettings getCheckSettings(String name) {
         return checkSettings.values().stream().filter(val -> val.name.equalsIgnoreCase(name))
                 .findFirst().orElse(null);
+    }
+
+    public void kickPlayer() {
+        /*val channel = getChannel.invoke(TinyProtocolHandler.getInstance(), data.getPlayer());
+
+        val wrapped = new WrappedClass(channel.getClass());
+
+        wrapped.getMethod("close").invoke(channel);*/
     }
 }

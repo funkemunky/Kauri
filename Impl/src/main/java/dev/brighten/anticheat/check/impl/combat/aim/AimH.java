@@ -13,7 +13,7 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicInteger;
 
-@CheckInfo(name = "Aim (H)", description = "Elevated's rotation check thing meant to get Vape",
+@CheckInfo(name = "Aim (H)", description = "Designed to detect poor randomization.",
         checkType = CheckType.AIM, punishVL = 10)
 public class AimH extends Check {
 

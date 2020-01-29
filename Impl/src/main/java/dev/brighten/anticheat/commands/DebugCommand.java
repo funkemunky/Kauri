@@ -7,8 +7,12 @@ import cc.funkemunky.api.utils.Init;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.utils.Pastebin;
+import lombok.val;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -29,14 +33,36 @@ public class DebugCommand {
                     ? Bukkit.getOfflinePlayer(cmd.getArgs()[1]).getUniqueId() : cmd.getPlayer().getUniqueId();
 
             if(target != null) {
-                if(Check.isCheck(cmd.getArgs()[0].replace("_", " "))) {
-                    data.debugging = cmd.getArgs()[0].replace("_", " ");
-                    data.debugged = target;
+                if(cmd.getArgs()[0].equalsIgnoreCase("sniff")) {
+                    Player targetPl;
+                    if((targetPl = Bukkit.getPlayer(target)) != null) {
+                        val targetData = Kauri.INSTANCE.dataManager.getData(targetPl);
+                        if(!targetData.sniffing) {
+                            cmd.getSender().sendMessage("Sniffing + " + targetPl.getName());
+                            targetData.sniffing = true;
+                        } else {
+                            cmd.getSender().sendMessage("Stopped sniff. Pasting...");
+                            targetData.sniffing = false;
+                            try {
+                                cmd.getSender().sendMessage("Paste: " + Pastebin.makePaste(
+                                        String.join("\n", targetData.sniffedPackets.stream().toArray(String[]::new)),
+                                        "Sniffed from " + targetPl.getName(), Pastebin.Privacy.UNLISTED));
+                            } catch (UnsupportedEncodingException e) {
+                                e.printStackTrace();
+                            }
+                            targetData.sniffedPackets.clear();
+                        }
+                    }
+                } else {
+                    if(Check.isCheck(cmd.getArgs()[0].replace("_", " "))) {
+                        data.debugging = cmd.getArgs()[0].replace("_", " ");
+                        data.debugged = target;
 
-                    cmd.getPlayer().sendMessage(Color.Green + "You are now debugging " + data.debugging
-                            + " on target " + Bukkit.getOfflinePlayer(target).getName() + "!");
-                } else cmd.getPlayer()
-                        .sendMessage(Color.Red + "The argument input \"" + cmd.getArgs()[0] + "\" is not a check.");
+                        cmd.getPlayer().sendMessage(Color.Green + "You are now debugging " + data.debugging
+                                + " on target " + Bukkit.getOfflinePlayer(target).getName() + "!");
+                    } else cmd.getPlayer()
+                            .sendMessage(Color.Red + "The argument input \"" + cmd.getArgs()[0] + "\" is not a check.");
+                }
             } else cmd.getPlayer().sendMessage(Color.Red + "Could not find a target to debug.");
         } else cmd.getPlayer().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
                 .msg("error-invalid-args", "&cInvalid arguments! Check the help page."));

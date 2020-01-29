@@ -2,6 +2,9 @@ package dev.brighten.anticheat.data;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutKeepAlivePacket;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
+import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.TickTimer;
 import cc.funkemunky.api.utils.math.RollingAverageLong;
 import cc.funkemunky.api.utils.math.cond.MaxInteger;
@@ -17,6 +20,7 @@ import dev.brighten.anticheat.utils.PastLocation;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
@@ -24,7 +28,7 @@ public class ObjectData {
 
     public UUID uuid;
     private Player player;
-    public boolean alerts;
+    public boolean alerts, sniffing;
 
     //Debugging
     public String debugging;
@@ -46,6 +50,8 @@ public class ObjectData {
     public ProtocolVersion playerVersion = ProtocolVersion.UNKNOWN;
     public Set<Player> boxDebuggers = new HashSet<>();
     public List<CancelType> typesToCancel = Collections.synchronizedList(new ArrayList<>());
+    public List<String> sniffedPackets = new ArrayList<>();
+    public BukkitTask task;
 
     public ObjectData(UUID uuid) {
         this.uuid = uuid;
@@ -67,6 +73,17 @@ public class ObjectData {
         Kauri.INSTANCE.executor.execute(() -> {
             playerVersion = TinyProtocolHandler.getProtocolVersion(getPlayer());
         });
+
+        if(Kauri.INSTANCE.isNewer) {
+            task = RunUtils.taskTimerAsync(() -> {
+                if(getPlayer() == null) {
+                    task.cancel();
+                    return;
+                }
+
+                TinyProtocolHandler.sendPacket(getPlayer(), new WrappedOutTransaction(0, (short) 69, false));
+            }, 5L, 40L);
+        }
     }
 
     public Player getPlayer() {

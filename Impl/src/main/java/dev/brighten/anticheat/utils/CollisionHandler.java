@@ -90,7 +90,6 @@ public class CollisionHandler {
 		for (Block b : blocks) {
 			Location block = b.getLocation();
 
-			Bukkit.broadcastMessage(block.getBlock().getType().name());
 			CollisionBox box;
 			if((box = BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion())).isCollided(playerBox)) {
 				collided.add(box);

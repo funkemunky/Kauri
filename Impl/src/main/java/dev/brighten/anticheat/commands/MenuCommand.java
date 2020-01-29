@@ -44,33 +44,6 @@ public class MenuCommand {
         return new Button(false, MiscUtils.createItem(material, amount, name, lore), action);
     }
 
-    private static String[] splitIntoLine(String input, int maxCharInLine) {
-
-        StringTokenizer tok = new StringTokenizer(input, " ");
-        StringBuilder output = new StringBuilder(input.length());
-        int lineLen = 0;
-        while (tok.hasMoreTokens()) {
-            String word = tok.nextToken();
-
-            while (word.length() > maxCharInLine) {
-                output.append(word.substring(0, maxCharInLine - lineLen) + "\n");
-                word = word.substring(maxCharInLine - lineLen);
-                lineLen = 0;
-            }
-
-            if (lineLen + word.length() > maxCharInLine) {
-                output.append("\n");
-                lineLen = 0;
-            }
-            output.append("&f" + word + " ");
-
-            lineLen += word.length() + 1;
-        }
-        // output.split();
-        // return output.toString();
-        return output.toString().split("\n");
-    }
-
     @Command(name = "kauri.menu", description = "Open the Kauri menu.", display = "menu", usage = "/<command>",
             aliases = {"kauri.gui"}, playerOnly = true, permission = "kauri.command.menu")
     public void onCommand(CommandAdapter cmd) {
@@ -181,7 +154,8 @@ public class MenuCommand {
                     "&eCancellable&7: &f" + val.cancellable,
                     "&eDescription&7: &f"));
 
-            lore.addAll(Arrays.asList(splitIntoLine(val.description, 35)));
+            lore.addAll(Arrays.asList(dev.brighten.anticheat.utils.MiscUtils
+                    .splitIntoLine(val.description, 35)));
 
 
             Button button = createButton(

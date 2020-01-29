@@ -4,12 +4,12 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
-import cc.funkemunky.api.utils.MathHelper;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.utils.MovementUtils;
 import dev.brighten.api.check.CheckType;
 import org.bukkit.enchantments.Enchantment;
 
@@ -29,6 +29,7 @@ public class VelocityB extends Check {
         if(packet.getId() == data.getPlayer().getEntityId()) {
             svX = packet.getX();
             svZ = packet.getZ();
+            vX = vZ = 0;
         }
     }
 
@@ -48,13 +49,15 @@ public class VelocityB extends Check {
             velocityTS = timeStamp;
             vX = svX;
             vZ = svZ;
+            debug("set velocity");
         }
     }
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(!data.predictionService.key.equals(lastKey)) vX = vZ = 0;
-        if((vX != 0 || vZ != 0)) {
+        if((MathUtils.hypot(vX, vZ) > MovementUtils.getBaseSpeed(data))
+                && timeStamp - velocityTS < 500L) {
             if(sprint && useEntity) {
                 vX*= 0.6;
                 vZ*= 0.6;
@@ -65,6 +68,8 @@ public class VelocityB extends Check {
             if(!data.blockInfo.blocksNear
                     && !data.blockInfo.inWeb
                     && !data.playerInfo.onLadder
+                    && timeStamp - data.playerInfo.lastServerPos > 100L
+                    && data.predictionService.key.equals(lastKey)
                     && !data.blockInfo.inLiquid
                     && !data.playerInfo.serverPos
                     && !data.getPlayer().getAllowFlight()) {
@@ -101,7 +106,8 @@ public class VelocityB extends Check {
                 double vXZ = MathUtils.hypot(vX, vZ);
                 pct = data.playerInfo.deltaXZ / vXZ * 100;
 
-                if (pct < 99.8
+                if (pct < (data.predictionService.key.equals("W")
+                        || data.predictionService.key.equals("Nothing") ? 99 : 88)
                         && !data.playerInfo.usingItem && !data.predictionService.useSword) {
                     if(data.lagInfo.lastPacketDrop.hasPassed(1)) {
                         if (strafe == 0 && forward == 0 && !data.lagInfo.lagging) vl+= 2;
@@ -144,8 +150,8 @@ public class VelocityB extends Check {
             f = friction / f;
             strafe = strafe * f;
             forward = forward * f;
-            float f1 = MathHelper.sin(data.playerInfo.to.yaw * (float) Math.PI / 180.0F);
-            float f2 = MathHelper.cos(data.playerInfo.to.yaw * (float) Math.PI / 180.0F);
+            double f1 = Math.sin(data.playerInfo.to.yaw * Math.PI / 180.0F);
+            double f2 = Math.cos(data.playerInfo.to.yaw * Math.PI / 180.0F);
             vX += (strafe * f2 - forward * f1);
             vZ += (forward * f2 + strafe * f1);
         }

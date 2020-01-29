@@ -38,7 +38,8 @@ public class MovementUtils {
     }
 
     public static double getBaseSpeed(ObjectData data) {
-        return (0.25 + PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.SPEED) * 0.2) * 1.6;
+        return (0.284 + PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.SPEED)
+                * (data.playerInfo.clientGround ? 0.052 : 0.028));
     }
 
     public static float getFriction(ObjectData data) {

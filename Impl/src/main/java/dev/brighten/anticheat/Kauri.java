@@ -3,12 +3,12 @@ package dev.brighten.anticheat;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.config.MessageHandler;
 import cc.funkemunky.api.profiling.ToggleableProfiler;
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.TickTimer;
 import dev.brighten.anticheat.check.api.Check;
-import dev.brighten.anticheat.check.api.Config;
 import dev.brighten.anticheat.data.DataManager;
 import dev.brighten.anticheat.listeners.PacketListener;
 import dev.brighten.anticheat.logs.LoggerManager;
@@ -19,10 +19,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -47,6 +44,8 @@ public class Kauri extends JavaPlugin {
 
     public MessageHandler msgHandler;
     public KauriAPI kauriAPI;
+
+    public boolean isNewer;
 
     public void onEnable() {
         MiscUtils.printToConsole(Color.Red + "Starting Kauri " + getDescription().getVersion() + "...");
@@ -115,6 +114,7 @@ public class Kauri extends JavaPlugin {
     }
 
     public void load() {
+        isNewer = ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_13);
         Load.load();
     }
 

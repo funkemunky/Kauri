@@ -152,9 +152,11 @@ public class MovementProcessor {
                     (long) Math.abs(data.playerInfo.lDeltaPitch * offset)) / offset;
 
             //Adding gcd of yaw and pitch.
-            if (data.playerInfo.yawGCD > 90000 && yawGcd > 0.01f && data.playerInfo.deltaYaw < 8)
+            if (data.playerInfo.yawGCD > 90000 && data.playerInfo.yawGCD < 2E7
+                    && yawGcd > 0.01f && data.playerInfo.deltaYaw < 8)
                 yawGcdList.add(yawGcd);
-            if (data.playerInfo.pitchGCD > 90000 && data.playerInfo.deltaPitch < 8) pitchGcdList.add(pitchGcd);
+            if (data.playerInfo.pitchGCD > 90000 && data.playerInfo.pitchGCD < 2E7
+                    && Math.abs(data.playerInfo.deltaPitch) < 8) pitchGcdList.add(pitchGcd);
 
             if (yawGcdList.size() > 3 && pitchGcdList.size() > 3) {
 

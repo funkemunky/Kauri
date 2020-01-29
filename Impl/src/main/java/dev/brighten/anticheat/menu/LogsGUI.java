@@ -62,121 +62,119 @@ public class LogsGUI extends ChestMenu {
     }
 
     private void setButtons(int page) {
-       Kauri.INSTANCE.executor.execute(() -> {
-           if (getMenuDimension().getSize() <= 0) return;
+        if (getMenuDimension().getSize() <= 0) return;
 
-           if (updaterTask == null || !Bukkit.getScheduler().isCurrentlyRunning(updaterTask.getTaskId())) {
-               runUpdater();
-           }
+        if (updaterTask == null || !Bukkit.getScheduler().isCurrentlyRunning(updaterTask.getTaskId())) {
+            runUpdater();
+        }
 
-           List<Log> filteredLogs = (filtered.size() > 0 ? logs.stream()
-                   .filter(log -> {
-                       for (String s : filtered) {
-                           if (s.equalsIgnoreCase(log.checkName)) {
-                               return true;
-                           }
-                       }
-                       return false;
-                   }).sequential()
-                   .sorted(Comparator.comparing(log -> log.timeStamp, Comparator.reverseOrder()))
-                   .collect(Collectors.toList()) : logs);
+        List<Log> filteredLogs = (filtered.size() > 0 ? logs.stream()
+                .filter(log -> {
+                    for (String s : filtered) {
+                        if (s.equalsIgnoreCase(log.checkName)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }).sequential()
+                .sorted(Comparator.comparing(log -> log.timeStamp, Comparator.reverseOrder()))
+                .collect(Collectors.toList()) : logs);
 
-           List<Log> subList = filteredLogs.subList(Math.min((page - 1) * 45, filteredLogs.size()),
-                   Math.min(page * 45, filteredLogs.size()));
-           for (int i = 0; i < subList.size(); i++) setItem(i, buttonFromLog(subList.get(i)));
+        List<Log> subList = filteredLogs.subList(Math.min((page - 1) * 45, filteredLogs.size()),
+                Math.min(page * 45, filteredLogs.size()));
+        for (int i = 0; i < subList.size(); i++) setItem(i, buttonFromLog(subList.get(i)));
 
-           if(subList.size() < 45) {
-               for(int i = subList.size() ; i < 45 ; i++) {
-                   setItem(i, new FillerButton());
-               }
-           }
+        if(subList.size() < 45) {
+            for(int i = subList.size() ; i < 45 ; i++) {
+                setItem(i, new FillerButton());
+            }
+        }
 
-           //Setting the next page option if possible.
-           if (Math.min(page * 45, filteredLogs.size()) < filteredLogs.size()) {
-               Button next = new Button(false, new ItemBuilder(Material.BOOK)
-                       .amount(1).name(Color.Red + "Next Page &7(&e" + (page + 1) + "&7)").build(),
-                       (player, info) -> {
-                           if (info.getClickType().isLeftClick()) {
-                               setButtons(page + 1);
-                               buildInventory(false);
-                               currentPage.set(page + 1);
-                           }
-                       });
-               setItem(50, next);
-           } else setItem(50, new FillerButton());
+        //Setting the next page option if possible.
+        if (Math.min(page * 45, filteredLogs.size()) < filteredLogs.size()) {
+            Button next = new Button(false, new ItemBuilder(Material.BOOK)
+                    .amount(1).name(Color.Red + "Next Page &7(&e" + (page + 1) + "&7)").build(),
+                    (player, info) -> {
+                        if (info.getClickType().isLeftClick()) {
+                            setButtons(page + 1);
+                            buildInventory(false);
+                            currentPage.set(page + 1);
+                        }
+                    });
+            setItem(50, next);
+        } else setItem(50, new FillerButton());
 
-           val punishments = Kauri.INSTANCE.loggerManager.getPunishments(player.getUniqueId());
+        val punishments = Kauri.INSTANCE.loggerManager.getPunishments(player.getUniqueId());
 
-           Button getPastebin = new Button(false, new ItemBuilder(Material.SKULL_ITEM).amount(1)
-                   .durability(3)
-                   .owner(player.getName())
-                   .name(Color.Red + player.getName())
-                   .lore("", "&7Page: &f" + page, "", "&6Punishments&8: &f" + punishments.size(), "",
-                           "&e&oLeft click &7&oto view a summary of logs.",
-                           (shown == null || shown.hasPermission("kauri.logs.share")
-                                   ? "&e&oRight Click &7&oto get an &f&ounlisted &7&opastebin link of the logs."
-                                   : "&c&o(No Permission) &e&o&mRight Click &7&o&mto get an &f&o&munlisted &7&o&mpastebin link of the logs."),
-                           (shown == null || shown.hasPermission("kauri.logs.clear")
-                                   ? "&e&oShift Left Click &7&oto &f&oclear &7&othe logs of " + player.getName()
-                                   : "&c&o(No Permission) &e&o&mShift Right Click &7&o&mto &f&o&mclear &7&o&mthe logs of " + player.getName())).build(),
-                   (player, info) -> {
-                       if (player.hasPermission("kauri.logs.share")) {
-                           if (info.getClickType().isRightClick()) {
-                               runFunction(info, "kauri.logs.share", () -> {
-                                   close(player);
-                                   player.sendMessage(Color.Green + "Logs: "
-                                           + LogCommand.getLogsFromUUID(LogsGUI.this.player.getUniqueId()));
-                               });
-                           } else if (info.getClickType().isLeftClick() && info.getClickType().isShiftClick()) {
-                               runFunction(info, "kauri.logs.clear",
-                                       () -> player.performCommand("kauri logs clear " + this.player.getName()));
-                           } else if (info.getClickType().isLeftClick()) {
-                               getSummary().showMenu(player);
-                           }
-                       }
-                   });
+        Button getPastebin = new Button(false, new ItemBuilder(Material.SKULL_ITEM).amount(1)
+                .durability(3)
+                .owner(player.getName())
+                .name(Color.Red + player.getName())
+                .lore("", "&7Page: &f" + page, "", "&6Punishments&8: &f" + punishments.size(), "",
+                        "&e&oLeft click &7&oto view a summary of logs.",
+                        (shown == null || shown.hasPermission("kauri.logs.share")
+                                ? "&e&oRight Click &7&oto get an &f&ounlisted &7&opastebin link of the logs."
+                                : "&c&o(No Permission) &e&o&mRight Click &7&o&mto get an &f&o&munlisted &7&o&mpastebin link of the logs."),
+                        (shown == null || shown.hasPermission("kauri.logs.clear")
+                                ? "&e&oShift Left Click &7&oto &f&oclear &7&othe logs of " + player.getName()
+                                : "&c&o(No Permission) &e&o&mShift Right Click &7&o&mto &f&o&mclear &7&o&mthe logs of " + player.getName())).build(),
+                (player, info) -> {
+                    if (player.hasPermission("kauri.logs.share")) {
+                        if (info.getClickType().isRightClick()) {
+                            runFunction(info, "kauri.logs.share", () -> {
+                                close(player);
+                                player.sendMessage(Color.Green + "Logs: "
+                                        + LogCommand.getLogsFromUUID(LogsGUI.this.player.getUniqueId()));
+                            });
+                        } else if (info.getClickType().isLeftClick() && info.getClickType().isShiftClick()) {
+                            runFunction(info, "kauri.logs.clear",
+                                    () -> player.performCommand("kauri logs clear " + this.player.getName()));
+                        } else if (info.getClickType().isLeftClick()) {
+                            getSummary().showMenu(player);
+                        }
+                    }
+                });
 
-           setItem(49, getPastebin);
+        setItem(49, getPastebin);
 
-           //Setting the previous page option if possible.
-           if (page > 1) {
-               Button back = new Button(false, new ItemBuilder(Material.BOOK)
-                       .amount(1).name(Color.Red + "Previous Page &7(&e" + (page - 1) + "&7)").build(),
-                       (player, info) -> {
-                           if (info.getClickType().isLeftClick()) {
-                               setButtons(page - 1);
-                               currentPage.set(page - 1);
-                               buildInventory(false);
-                           }
-                       });
-               setItem(48, back);
-           } else setItem(48, new FillerButton());
+        //Setting the previous page option if possible.
+        if (page > 1) {
+            Button back = new Button(false, new ItemBuilder(Material.BOOK)
+                    .amount(1).name(Color.Red + "Previous Page &7(&e" + (page - 1) + "&7)").build(),
+                    (player, info) -> {
+                        if (info.getClickType().isLeftClick()) {
+                            setButtons(page - 1);
+                            currentPage.set(page - 1);
+                            buildInventory(false);
+                        }
+                    });
+            setItem(48, back);
+        } else setItem(48, new FillerButton());
 
-           if(filtered.size() > 0) {
-               List<String> lore = new ArrayList<>(Arrays.asList("", Color.translate("&eFilters:")));
+        if(filtered.size() > 0) {
+            List<String> lore = new ArrayList<>(Arrays.asList("", Color.translate("&eFilters:")));
 
-               for (String s : filtered) {
-                   lore.add(Color.translate("&7- &f" + s));
-               }
-               Button stopFilter = new Button(false,
-                       new ItemBuilder(Material.REDSTONE).amount(1)
-                               .name(Color.Red + "Stop Filter").lore(lore).build(),
-                       (player, info) -> {
-                           filtered.clear();
-                           setButtons(currentPage.get());
-                           buildInventory(false);
-                       });
+            for (String s : filtered) {
+                lore.add(Color.translate("&7- &f" + s));
+            }
+            Button stopFilter = new Button(false,
+                    new ItemBuilder(Material.REDSTONE).amount(1)
+                            .name(Color.Red + "Stop Filter").lore(lore).build(),
+                    (player, info) -> {
+                        filtered.clear();
+                        setButtons(currentPage.get());
+                        buildInventory(false);
+                    });
 
-               setItem(47, stopFilter);
-               setItem(51, stopFilter);
-           } else {
-               setItem(47, new FillerButton());
-               setItem(51, new FillerButton());
-           }
+            setItem(47, stopFilter);
+            setItem(51, stopFilter);
+        } else {
+            setItem(47, new FillerButton());
+            setItem(51, new FillerButton());
+        }
 
-           //Setting all empty slots with a filler.
-           fill(new FillerButton());
-       });
+        //Setting all empty slots with a filler.
+        fill(new FillerButton());
     }
 
     private ChestMenu getSummary() {

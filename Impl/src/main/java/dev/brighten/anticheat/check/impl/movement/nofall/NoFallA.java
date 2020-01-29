@@ -1,8 +1,6 @@
 package dev.brighten.anticheat.check.impl.movement.nofall;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.Materials;
-import cc.funkemunky.api.utils.TickTimer;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;

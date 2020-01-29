@@ -3,7 +3,6 @@ package dev.brighten.anticheat.check.impl.combat.killaura;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import dev.brighten.anticheat.check.api.*;
-import dev.brighten.anticheat.utils.Verbose;
 import dev.brighten.api.check.CheckType;
 
 @Cancellable(cancelType = CancelType.ATTACK)
