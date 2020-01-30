@@ -217,7 +217,7 @@ public class PacketProcessor {
 
                     data.checkManager.runPacket(packet, timeStamp);
                 }
-
+                Bukkit.broadcastMessage("Keep alerve receved");
                 if(data.sniffing) {
                     data.sniffedPackets.add(event.getType() + ":@:" + packet.getTime()
                             + ":@:" + event.getTimeStamp());
@@ -287,8 +287,6 @@ public class PacketProcessor {
                     } else {
                         tabComplete = new WrappedOutTabComplete("gay", "homo");
                     }
-
-                    TinyProtocolHandler.sendPacket(event.getPlayer(), tabComplete.getObject());
                 }
                 break;
             }
@@ -377,6 +375,8 @@ public class PacketProcessor {
 
                 data.lagInfo.lastKeepAlive = System.currentTimeMillis();
                 data.checkManager.runPacket(packet, timeStamp);
+
+                Bukkit.broadcastMessage("Keep alerve suernt");
 
                 TinyProtocolHandler.sendPacket(data.getPlayer(),
                         new WrappedOutTransaction(0, (short) 69, false).getObject());

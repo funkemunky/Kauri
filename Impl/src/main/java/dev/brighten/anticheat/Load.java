@@ -55,7 +55,7 @@ public class Load {
         MiscUtils.printToConsole(Color.Gray + "Running tps task...");
         Kauri.INSTANCE.runTpsTask();
         Kauri.INSTANCE.profiler = new ToggleableProfiler();
-        Kauri.INSTANCE.profiler.setEnabled(true);
+        Kauri.INSTANCE.profiler.enabled = true;
 
         if(Bukkit.getOnlinePlayers().size() > 0) {
             RunUtils.taskLater(() -> {

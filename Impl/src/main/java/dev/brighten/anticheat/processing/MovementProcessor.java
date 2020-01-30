@@ -107,12 +107,15 @@ public class MovementProcessor {
         data.playerInfo.lDeltaXZ = data.playerInfo.deltaXZ;
         data.playerInfo.deltaXZ = MathUtils.hypot(data.playerInfo.deltaX, data.playerInfo.deltaZ);
 
-        data.playerInfo.blockOnTo = BlockUtils.getBlock(data.playerInfo.to.toLocation(data.getPlayer().getWorld()));
-        data.playerInfo.blockBelow = BlockUtils.getBlock(data.playerInfo.to.toLocation(data.getPlayer().getWorld())
-                .subtract(0, 1, 0));
+        if (Atlas.getInstance().getBlockBoxManager().getBlockBox()
+                .isChunkLoaded(data.playerInfo.to.toLocation(data.getPlayer().getWorld()))) {
+            data.playerInfo.blockOnTo = BlockUtils.getBlock(data.playerInfo.to.toLocation(data.getPlayer().getWorld()));
+            data.playerInfo.blockBelow = BlockUtils.getBlock(data.playerInfo.to.toLocation(data.getPlayer().getWorld())
+                    .subtract(0, 1, 0));
 
-        if(data.playerInfo.blockBelow != null)
-            data.blockInfo.currentFriction = MinecraftReflection.getFriction(data.playerInfo.blockBelow);
+            if(data.playerInfo.blockBelow != null)
+                data.blockInfo.currentFriction = MinecraftReflection.getFriction(data.playerInfo.blockBelow);
+        } else data.playerInfo.blockOnTo = data.playerInfo.blockBelow = null;
 
         if(packet.isPos()) {
             //We create a separate from BoundingBox for the predictionService since it should operate on pre-motion data.
