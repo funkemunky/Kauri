@@ -15,10 +15,12 @@ public class FlyF extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(packet.isPos()) {
-            float jumpHeight = data.playerInfo.jumpHeight;
+            double jumpHeight = data.playerInfo.jumpHeight;
 
             if(data.playerInfo.deltaY > jumpHeight * 1.5
                     && !data.playerInfo.canFly
+                    && !data.playerInfo.creative
+                    && !data.playerInfo.wasOnSlime
                     && timeStamp - data.playerInfo.lastServerPos > 100
                     && !data.playerInfo.inVehicle
                     && timeStamp - data.creation > 4000

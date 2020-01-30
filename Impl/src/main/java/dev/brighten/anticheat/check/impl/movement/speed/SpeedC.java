@@ -11,7 +11,7 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.MiscUtils;
-import dev.brighten.anticheat.utils.Verbose;
+import dev.brighten.anticheat.utils.MovementUtils;
 import lombok.val;
 import org.bukkit.Material;
 import org.bukkit.potion.PotionEffectType;
@@ -27,9 +27,8 @@ public class SpeedC extends Check {
     private double drag = 0.91;
     private int fallTicks;
     private int webTicks, liquidTicks;
-    private double omniVl = 0;
     private double velocityX, velocityZ;
-    private Verbose verbose = new Verbose(20, 40);
+    private boolean lSprint;
     private TickTimer horizontalIdle = new TickTimer(20);
 
     @Packet
@@ -65,7 +64,7 @@ public class SpeedC extends Check {
         if (onGround || data.playerInfo.jumped) {
             tags.add("ground");
             drag *= 0.91;
-            moveSpeed *= drag > 0.708 ? 1.3 : 0.23315;
+            moveSpeed *= drag > 0.708 ? 1.3 : data.predictionService.aiMoveSpeed * 1.5f;
             moveSpeed *= 0.16277136 / Math.pow(drag, 3);
 
             if (deltaY > 0 && MathUtils.getDelta(data.playerInfo.jumpHeight, deltaY) < 0.1) {
@@ -98,10 +97,10 @@ public class SpeedC extends Check {
             }
         } else {
             tags.add("air");
-            moveSpeed = 0.028;
+            moveSpeed = 0.021 + (data.playerInfo.sprinting ? 0.006 : 0);
             drag = 0.91;
 
-            if (timeStamp - data.playerInfo.lastServerPos < 500L) {
+            if (timeStamp - data.playerInfo.lastServerPos < 100L) {
                 moveSpeed *= 1.5;
                 tags.add("tp");
             }
@@ -131,11 +130,8 @@ public class SpeedC extends Check {
         data.blockInfo.handler.setSize(0.6, 1);
 
         if (data.blockInfo.inWater) {
-            if(liquidTicks++ > 5) {
-                tags.add("water");
-                moveSpeed *= 0.9;
-            }
-        } else liquidTicks = 0;
+            tags.add("water");
+        }
 
         if (data.blockInfo.inLava
                 && data.getPlayer().getNoDamageTicks() == data.getPlayer().getMaximumNoDamageTicks()
@@ -144,19 +140,23 @@ public class SpeedC extends Check {
             moveSpeed *= 0.7;
         }
 
+        if(data.playerInfo.usingItem) {
+            moveSpeed*= 0.2;
+        }
+
         data.blockInfo.handler.setOffset(0);
 
         double previousHorizontal = previousDistance;
         double horizontalDistance = data.playerInfo.deltaXZ;
-        boolean underBlock = data.playerInfo.blocksAboveTicks.value() > 0;
+        boolean underBlock = data.playerInfo.blockAboveTimer.hasNotPassed(6);
 
         if (underBlock) {
             tags.add("under");
             moveSpeed += 2.6;
         }
 
-        val depth = PlayerUtils.getDepthStriderLevel(data.getPlayer());
-        if (depth > 0 && data.playerInfo.liquidTicks.value() > 0) {
+        val depth = MovementUtils.getDepthStriderLevel(data.getPlayer());
+        if (depth > 0 && data.playerInfo.liquidTimer.hasNotPassed(4)) {
             tags.add("depthstrider");
             moveSpeed += depth;
         }
@@ -170,12 +170,12 @@ public class SpeedC extends Check {
 
         moveSpeed += velocityXZ * (data.playerInfo.lastVelocity.hasNotPassed(20) ? 2 : 1);
 
-        int speed = PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.SPEED);
+        /*int speed = PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.SPEED);
 
         if (speed > 0) {
             tags.add("speed");
             moveSpeed += (speed * .06);
-        }
+        }*/
 
         int jump = PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.JUMP);
 
@@ -193,7 +193,8 @@ public class SpeedC extends Check {
 
         if (data.playerInfo.deltaY == 0 && !data.playerInfo.clientGround) horizontalIdle.reset();
 
-        if (horizontalIdle.hasNotPassed(1)) {
+        if (horizontalIdle.hasNotPassed(1)
+                && !data.blockInfo.inLiquid && !data.blockInfo.inWeb) {
             tags.add("idle");
             moveSpeed += 0.5;
         }
@@ -205,7 +206,7 @@ public class SpeedC extends Check {
             }
         } else webTicks = 0;
 
-        if (data.playerInfo.soulSandTicks.value() > 0 && !tags.contains("air")) {
+        if (data.playerInfo.soulSandTimer.hasNotPassed(0) && !tags.contains("air")) {
             moveSpeed -= 0.05;
             if (type == Material.ICE || type == Material.PACKED_ICE) {
                 moveSpeed -= 0.1;
@@ -213,7 +214,7 @@ public class SpeedC extends Check {
             } else tags.add("soul");
         }
 
-        if (data.playerInfo.wasOnSlime) {
+        if (data.playerInfo.slimeTimer.hasNotPassed(0)) {
             tags.add("slime");
             moveSpeed -= 0.07;
         }
@@ -246,6 +247,6 @@ public class SpeedC extends Check {
         }
 
         this.previousDistance = horizontalDistance * drag;
-        this.drag = data.blockInfo.currentFriction;
+        this.drag = data.blockInfo.inWater ? 0.8 : data.blockInfo.currentFriction;
     }
 }

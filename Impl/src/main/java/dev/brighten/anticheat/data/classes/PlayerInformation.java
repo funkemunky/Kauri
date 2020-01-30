@@ -21,9 +21,8 @@ public class PlayerInformation {
     public Block blockBelow, blockOnTo;
 
     //Cinematic
-    public float lCinematicYaw, lCinematicPitch;
-    public float cinematicYaw, cinematicPitch, cDeltaYaw, cDeltaPitch;
-    public boolean cinematicMode, cinematicModePitch;
+    public float cinematicYaw, cinematicPitch;
+    public boolean cinematicMode;
     public MouseFilter yawSmooth = new MouseFilter(), pitchSmooth = new MouseFilter();
 
     //Gcd
@@ -32,7 +31,6 @@ public class PlayerInformation {
     //Server Position
     public long lastServerPos;
     public boolean serverPos;
-    public long isTeleport, isVelocity;
     public EvictingList<KLocation> posLocs = new EvictingList<>(5);
     public CollisionHandler handler;
 
@@ -46,9 +44,10 @@ public class PlayerInformation {
 
     //ticks
     public int groundTicks, airTicks;
-    public MaxInteger liquidTicks = new MaxInteger(50),
-            webTicks = new MaxInteger(40), climbTicks = new MaxInteger(40), slimeTicks = new MaxInteger(75),
-            iceTicks = new MaxInteger(45), blocksAboveTicks = new MaxInteger(50), soulSandTicks = new MaxInteger(40);
+    public TickTimer liquidTimer = new TickTimer(50),
+            webTimer = new TickTimer(40), climbTimer = new TickTimer(40),
+            slimeTimer = new TickTimer(75), iceTimer = new TickTimer(45),
+            blockAboveTimer = new TickTimer(50), soulSandTimer = new TickTimer(40);
     public TickTimer lastBrokenBlock = new TickTimer(5),
             lastVelocity = new TickTimer(20),
             lastTargetSwitch = new TickTimer(3),
@@ -56,7 +55,6 @@ public class PlayerInformation {
             lastToggleFlight = new TickTimer(10),
             lastWorldUnload = new TickTimer(20),
             lastHalfBlock = new TickTimer(20);
-    public long lastToggleFlightStamp;
 
     public double velocityX, velocityY, velocityZ;
     public double mvx, mvy, mvz;

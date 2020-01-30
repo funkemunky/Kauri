@@ -20,13 +20,13 @@ public class SpeedA extends Check {
         if(!packet.isPos() || data.playerInfo.generalCancel || data.playerInfo.lastVelocity.hasNotPassed(25))
             return;
 
-        float baseSpeed = MovementUtils.getBaseSpeed(data) + (!data.playerInfo.clientGround ? 0.09f
-                : (data.playerInfo.groundTicks > 10 ? 0.04f : 0.06f));
+        double baseSpeed = MovementUtils.getBaseSpeed(data) + (!data.playerInfo.clientGround ? -0.06f
+                : (data.playerInfo.groundTicks > 10 ? -.04 : -.02f));
 
-        baseSpeed+= data.playerInfo.iceTicks.value() > 0 ? 0.4
-                + (Math.min(120, data.playerInfo.iceTicks.value()) * 0.01) : 0;
-        baseSpeed+= data.playerInfo.blocksAboveTicks.value() > 0 ? 0.35
-                + (data.playerInfo.blocksAboveTicks.value() * 0.005) : 0;
+        baseSpeed+= data.playerInfo.iceTimer.hasNotPassed(70) ? 0.4
+                + (Math.min(60, 60 - data.playerInfo.iceTimer.getPassed()) * 0.015) : 0;
+        baseSpeed+= data.playerInfo.blockAboveTimer.hasNotPassed(20) ? 0.35
+                + ((20 - data.playerInfo.blockAboveTimer.getPassed()) * 0.005) : 0;
         baseSpeed+= data.playerInfo.lastHalfBlock.hasNotPassed(20)
                 ? 0.2 + (20 - data.playerInfo.lastHalfBlock.getPassed()) * 0.005
                 : 0;
@@ -40,7 +40,6 @@ public class SpeedA extends Check {
             }
         } else verbose.subtract();
 
-        debug("deltaXZ=" + data.playerInfo.deltaXZ + " baseSpeed=" + baseSpeed + " vl=" + vl
-                + " onSlime=" + data.playerInfo.wasOnSlime);
+        debug("deltaXZ=%1 base=%2 vb=%3", data.playerInfo.deltaXZ, baseSpeed, verbose);
     }
 }

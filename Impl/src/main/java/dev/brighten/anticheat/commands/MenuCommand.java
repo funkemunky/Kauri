@@ -202,6 +202,9 @@ public class MenuCommand {
                                     builder.type(Material.PAPER);
                                 } else {
                                     builder.type(settings.executable ? Material.MAP : Material.EMPTY_MAP);
+                                    if(settings.cancellable) {
+                                        builder.enchantment(Enchantment.DURABILITY, 1);
+                                    }
                                 }
 
                                 lore.set(1, Color.translate("&eEnabled&7: &f" + settings.enabled));
@@ -258,6 +261,7 @@ public class MenuCommand {
                                 break;
                             }
                         }
+                        ((ChestMenu)info.getMenu()).setParent(categoryMenu = getChecksCategoryMenu());
                     }, lore.toArray(new String[]{}));
 
             if (val.enabled) {
