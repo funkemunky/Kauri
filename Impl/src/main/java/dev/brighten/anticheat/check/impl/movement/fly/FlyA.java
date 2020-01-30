@@ -45,9 +45,8 @@ public class FlyA extends Check {
             }
 
             if(data.playerInfo.clientGround || data.playerInfo.serverGround
-                    || data.playerInfo.lastBlockPlace.hasNotPassed(5)
-                    || data.playerInfo.lastToggleFlight.hasNotPassed(10)
-                    || timeStamp - data.playerInfo.lastServerPos < 100L) {
+                    || data.playerInfo.flightCancel
+                    || data.playerInfo.lastBlockPlace.hasNotPassed(5)) {
                 groundY = data.playerInfo.to.y;
             }
 
@@ -55,8 +54,6 @@ public class FlyA extends Check {
 
             double totalHeight = data.playerInfo.to.y - groundY;
             if(totalHeight > maxHeight
-                    && timeStamp - data.playerInfo.lastServerPos > 50L
-                    && !data.playerInfo.serverPos
                     && !data.playerInfo.clientGround
                     && !data.playerInfo.serverGround
                     && !data.playerInfo.nearGround
