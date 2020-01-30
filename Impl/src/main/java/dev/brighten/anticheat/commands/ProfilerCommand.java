@@ -167,7 +167,14 @@ public class ProfilerCommand {
         if (taskMap.containsKey(cmd.getSender().getName())) {
             taskMap.get(cmd.getSender().getName()).cancel();
             taskMap.remove(cmd.getSender().getName());
+            cmd.getSender().sendMessage(Color.Red + "Removed from profiler task.");
         } else {
+            ResultsType type;
+            if(cmd.getArgs().length > 0) {
+                type = Arrays.stream(ResultsType.values())
+                        .filter(t -> t.name().equalsIgnoreCase(cmd.getArgs()[0])).findFirst().orElse(ResultsType.TICK);
+            } else type = ResultsType.TICK;
+            cmd.getSender().sendMessage(Color.Green + "Added to profiler task using ResultsType: " + type.name());
             val task = RunUtils.taskTimerAsync(() -> {
                 if (taskMap.containsKey(cmd.getSender().getName())) {
                     cmd.getSender().sendMessage("-------------------------------------------------");

@@ -89,7 +89,7 @@ public class Kauri extends JavaPlugin {
         Check.checkClasses.clear();
         Check.checkSettings.clear();
         if(!reload) {
-            profiler.enabled = false;
+            profiler.setEnabled(false);
             profiler = null;
             packetProcessor = null;
             loggerManager = null;

@@ -135,7 +135,7 @@ public class MiscUtils {
     }
 
     public static String drawUsage(long max, long time) {
-        double chunk = max / 50;
+        double chunk = max / 50.;
         String line = IntStream.range(0, 50).mapToObj(i -> (chunk * i < time ? "§c" : "§7") + "❘").collect(Collectors.joining("", "[", ""));
         String zeros = "00";
         String nums = Integer.toString((int) ((time / (double) max) * 100));
@@ -143,7 +143,7 @@ public class MiscUtils {
     }
 
     public static String drawUsage(long max, double time) {
-        double chunk = max / 50;
+        double chunk = max / 50.;
         String line = IntStream.range(0, 50).mapToObj(i -> (chunk * i < time ? "§c" : "§7") + "❘").collect(Collectors.joining("", "[", ""));
         String nums = String.valueOf(format((time / (double) max) * 100, 3));
         return line + "§f] §c" + nums + "%";
