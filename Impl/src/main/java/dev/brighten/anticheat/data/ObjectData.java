@@ -104,6 +104,7 @@ public class ObjectData {
         public long lastFlying = 0;
     }
 
+
     public void onLogout() {
         Kauri.INSTANCE.dataManager.hasAlerts.remove(this);
         Kauri.INSTANCE.dataManager.debugging.remove(this);
