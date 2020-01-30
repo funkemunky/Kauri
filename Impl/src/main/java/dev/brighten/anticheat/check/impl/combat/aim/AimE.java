@@ -2,12 +2,17 @@ package dev.brighten.anticheat.check.impl.combat.aim;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.Color;
+import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.math.cond.MaxDouble;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.Verbose;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
+
+import java.util.Deque;
+import java.util.LinkedList;
 
 @CheckInfo(name = "Aim (E)", description = "Patches auras that attempt to use Minecraft code for rotations.",
         checkType = CheckType.AIM, punishVL = 25)

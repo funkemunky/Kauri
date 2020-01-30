@@ -29,7 +29,7 @@ public class CancelListeners implements Listener {
             for (CancelType cancelType : data.typesToCancel) {
                 if(!cancelType.equals(CancelType.MOVEMENT)) continue;
 
-                val ground = BlockUtils.findGround(event.getFrom().getWorld(), event.getFrom()).clone();
+                val ground = BlockUtils.findGround(event.getTo().getWorld(), event.getTo()).clone();
 
                 ground.setYaw(event.getFrom().getYaw());
                 ground.setPitch(event.getFrom().getPitch());

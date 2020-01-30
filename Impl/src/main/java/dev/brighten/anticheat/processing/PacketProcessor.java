@@ -17,18 +17,10 @@ import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.MiscUtils;
-import dev.brighten.anticheat.utils.menu.type.impl.ValueMenu;
-import dev.brighten.db.utils.security.GeneralUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitTask;
-
-import java.io.IOException;
 
 public class PacketProcessor {
-
-    private BukkitTask task;
 
     public void processClient(PacketReceiveEvent event, ObjectData data, Object object, String type, long timeStamp) {
         Kauri.INSTANCE.profiler.start("packet:client:" + getType(type));
@@ -48,12 +40,6 @@ public class PacketProcessor {
                 data.playerInfo.canFly = packet.isAllowedFlight();
                 data.playerInfo.creative = packet.isCreativeMode();
                 data.checkManager.runPacket(packet, timeStamp);
-                if(data.sniffing) {
-                    data.sniffedPackets.add(event.getType() + ":@:"
-                            + packet.getWalkSpeed() + ";" + packet.getFlySpeed() + ";" + packet.isAllowedFlight()
-                            + ";" + packet.isCreativeMode() + "; " + packet.isInvulnerable() + ";" + packet.isFlying()
-                            + ":@:" + event.getTimeStamp());
-                }
                 break;
             }
             case Packet.Client.USE_ENTITY: {
@@ -84,10 +70,6 @@ public class PacketProcessor {
                     data.predictionService.useSword = data.playerInfo.usingItem = false;
                 }
                 data.checkManager.runPacket(packet, timeStamp);
-                if(data.sniffing) {
-                    data.sniffedPackets.add(event.getType() + ":@:" + packet.getId() + ";" + packet.getAction().name()
-                            + ":@:" + event.getTimeStamp());
-                }
                 break;
             }
             case Packet.Client.FLYING:
@@ -104,8 +86,7 @@ public class PacketProcessor {
                         && Kauri.INSTANCE.lastTickLag.hasPassed(20)
                         && timeStamp - Kauri.INSTANCE.lastTick < new VariableValue<>(
                         110L, 60L, ProtocolVersion::isPaper).get()
-                        && timeStamp - data.lagInfo.lastTrans
-                        > new VariableValue<>(20000L, 5000L, () -> Kauri.INSTANCE.isNewer).get())
+                        && timeStamp - data.lagInfo.lastTrans > 5000L)
                     RunUtils.task(() -> data.getPlayer().kickPlayer("Lag?"));
 
                 data.lagInfo.lastFlying = timeStamp;
@@ -113,12 +94,6 @@ public class PacketProcessor {
                 data.moveProcessor.process(packet, timeStamp);
                 data.predictionService.onReceive(packet); //Processing for prediction service.
                 data.checkManager.runPacket(packet, timeStamp);
-                if(data.sniffing) {
-                    data.sniffedPackets.add(event.getType() + ":@:"
-                            + packet.getX() + ";" + packet.getY() + ";" + packet.getZ() + ";"
-                            + packet.getYaw() + ";" + packet.getPitch() + ";" + packet.isGround()
-                            +  ":@:" + event.getTimeStamp());
-                }
                 break;
             }
             case Packet.Client.ENTITY_ACTION: {
@@ -126,10 +101,6 @@ public class PacketProcessor {
 
                 ActionProcessor.process(data, packet);
                 data.checkManager.runPacket(packet, timeStamp);
-                if(data.sniffing) {
-                    data.sniffedPackets.add(event.getType() + ":@:" + packet.getAction().name()
-                            + ":@:" + event.getTimeStamp());
-                }
                 break;
             }
             case Packet.Client.BLOCK_DIG: {
@@ -164,13 +135,7 @@ public class PacketProcessor {
                         break;
                     }
                 }
-                if(data.sniffing) {
-                    data.sniffedPackets.add(event.getType() + ":@:" +
-                            packet.getAction().name() + ";" + packet.getDirection().name() + ";"
-                            + "(" + packet.getPosition().getX() + ","
-                            + packet.getPosition().getY() + "," + packet.getPosition().getZ() + ")"
-                            + ":@:" + event.getTimeStamp());
-                }
+
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
             }
@@ -193,15 +158,6 @@ public class PacketProcessor {
                         data.predictionService.lastUseItem.reset();
                     }
                 }
-                if(data.sniffing) {
-                    data.sniffedPackets.add(event.getType() + ":@:" +
-                            (packet.getItemStack() != null ? packet.getItemStack().toString() : "NULL")
-                            + ";(" + packet.getPosition().getX() + ","
-                            + packet.getPosition().getY() + "," + packet.getPosition().getZ() + ");"
-                            + packet.getFace().name() + ";"
-                            + packet.getVecX() + "," + packet.getVecY() + "," + packet.getVecZ()
-                            + ":@:" + event.getTimeStamp());
-                }
 
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
@@ -216,11 +172,6 @@ public class PacketProcessor {
                     data.lagInfo.ping = System.currentTimeMillis() - data.lagInfo.lastKeepAlive;
 
                     data.checkManager.runPacket(packet, timeStamp);
-                }
-                Bukkit.broadcastMessage("Keep alerve receved");
-                if(data.sniffing) {
-                    data.sniffedPackets.add(event.getType() + ":@:" + packet.getTime()
-                            + ":@:" + event.getTimeStamp());
                 }
                 break;
             }
@@ -244,25 +195,16 @@ public class PacketProcessor {
                 } else if (packet.getAction() == (short) 101) {
                     data.playerInfo.lastVelocity.reset();
                     data.playerInfo.lastVelocityTimestamp = timeStamp;
-                    data.predictionService.rmotionX = data.playerInfo.velocityX;
-                    data.predictionService.rmotionZ = data.playerInfo.velocityZ;
                     data.predictionService.velocity = true;
-                } else if(packet.getAction() == (short) 100)
+                }
 
                 data.checkManager.runPacket(packet, timeStamp);
-                if(data.sniffing) {
-                    data.sniffedPackets.add(event.getType() + ":@:" + packet.getAction() + ";" + packet.getId()
-                            + ":@:" + event.getTimeStamp());
-                }
                 break;
             }
             case Packet.Client.ARM_ANIMATION: {
                 WrappedInArmAnimationPacket packet = new WrappedInArmAnimationPacket(object, data.getPlayer());
 
                 data.checkManager.runPacket(packet, timeStamp);
-                if(data.sniffing) {
-                    data.sniffedPackets.add(event.getType() + ":@:" + event.getTimeStamp());
-                }
                 break;
             }
             case Packet.Client.HELD_ITEM_SLOT: {
@@ -270,24 +212,6 @@ public class PacketProcessor {
 
                 data.predictionService.useSword = data.playerInfo.usingItem = false;
                 data.checkManager.runPacket(packet, timeStamp);
-                if(data.sniffing) {
-                    data.sniffedPackets.add(event.getType() + ":@:" +
-                           packet.getSlot()
-                            + ":@:" + event.getTimeStamp());
-                }
-                break;
-            }
-            case Packet.Client.TAB_COMPLETE: {
-                WrappedInTabComplete packet = new WrappedInTabComplete(event.getPacket(), event.getPlayer());
-
-                if(packet.getMessage().startsWith("/yourmom")) {
-                    WrappedOutTabComplete tabComplete;
-                    if(ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_13)) {
-                        tabComplete = new WrappedOutTabComplete(0, packet.getMessage(), "gay", "homo");
-                    } else {
-                        tabComplete = new WrappedOutTabComplete("gay", "homo");
-                    }
-                }
                 break;
             }
             case Packet.Client.WINDOW_CLICK: {
@@ -295,27 +219,10 @@ public class PacketProcessor {
 
                 data.predictionService.useSword = data.playerInfo.usingItem = false;
                 data.checkManager.runPacket(packet, timeStamp);
-
-                if(data.sniffing) {
-                    data.sniffedPackets.add(event.getType() + ":@:" +
-                            packet.getAction().name() + ";" + packet.getButton() + ";" + packet.getId()
-                            + ";" + (packet.getItem() != null ? packet.getItem().toString() : "NULL")
-                            + ";" + packet.getMode() + ";" + packet.getCounter()
-                            + ":@:" + event.getTimeStamp());
-                }
                 break;
             }
             case Packet.Client.CLOSE_WINDOW: {
                 data.predictionService.useSword = data.playerInfo.usingItem = false;
-                if(data.sniffing) {
-                    data.sniffedPackets.add(event.getType() + ":@:" + event.getTimeStamp());
-                }
-                break;
-            }
-            default: {
-                if(data.sniffing) {
-                    data.sniffedPackets.add(event.getType() + ":@:" + event.getTimeStamp());
-                }
                 break;
             }
         }
@@ -376,10 +283,7 @@ public class PacketProcessor {
                 data.lagInfo.lastKeepAlive = System.currentTimeMillis();
                 data.checkManager.runPacket(packet, timeStamp);
 
-                Bukkit.broadcastMessage("Keep alerve suernt");
-
-                TinyProtocolHandler.sendPacket(data.getPlayer(),
-                        new WrappedOutTransaction(0, (short) 69, false).getObject());
+                TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutTransaction(0, (short) 69, false).getObject());
                 break;
             }
             case Packet.Server.TRANSACTION: {
@@ -390,13 +294,12 @@ public class PacketProcessor {
                 }
                 break;
             }
-            /* NOTE: Keepalives or transactions cause kicks. My bet is it is the transaction */
             case Packet.Server.POSITION: {
                 WrappedOutPositionPacket packet = new WrappedOutPositionPacket(object, data.getPlayer());
 
-                data.playerInfo.posLocs.add(new KLocation(packet.getX(), packet.getY(), packet.getZ(),
-                        packet.getYaw(), packet.getPitch()));
+                data.playerInfo.posLocs.add(new KLocation(packet.getX(), packet.getY(), packet.getZ(), packet.getYaw(), packet.getPitch()));
                 data.checkManager.runPacket(packet, timeStamp);
+                TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutKeepAlivePacket(100).getObject());
                 data.playerInfo.lastServerPos = timeStamp;
                 break;
             }

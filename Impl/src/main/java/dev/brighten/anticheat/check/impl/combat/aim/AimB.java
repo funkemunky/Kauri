@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.check.impl.combat.aim;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -16,7 +17,6 @@ public class AimB extends Check {
                 && Math.abs(data.playerInfo.deltaPitch) > 1E-5
                 && Math.abs(data.playerInfo.to.pitch) < 78) {
             if(data.playerInfo.pitchGCD < 100000
-                    && data.playerInfo.lastAttack.hasNotPassed(10)
                     && !data.playerInfo.cinematicMode
                     && data.moveProcessor.sensitivityX < 0.44) {
                 if(vl++ > 35) {

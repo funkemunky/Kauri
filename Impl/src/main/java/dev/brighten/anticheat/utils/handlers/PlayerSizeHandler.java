@@ -1,9 +1,13 @@
 package dev.brighten.anticheat.utils.handlers;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
+import cc.funkemunky.api.utils.PlayerUtils;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+
+import java.lang.reflect.Method;
 
 public interface PlayerSizeHandler {
 

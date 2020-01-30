@@ -1,10 +1,13 @@
 package dev.brighten.anticheat.check.impl.combat.autoclicker;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.utils.math.cond.MaxDouble;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
-import dev.brighten.anticheat.check.api.Packet;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockDigPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import dev.brighten.anticheat.check.api.*;
+import dev.brighten.anticheat.utils.Verbose;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
 
@@ -40,8 +43,8 @@ public class AutoclickerH extends Check {
             stdDeviation /= this.clickSamples.size();
 
             val std = Math.sqrt(stdDeviation);
-            if (std < 20.d) {
-                if(verbose.add() > 4 || std < 13.d) {
+            if (std < 25.d) {
+                if(verbose.add() > 4 || std < 16.d) {
                     vl++;
                     this.flag("STD: " + std);
                 }

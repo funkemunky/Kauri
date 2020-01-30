@@ -8,6 +8,7 @@ import cc.funkemunky.api.events.impl.PacketSendEvent;
 import cc.funkemunky.api.utils.Init;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
+import org.bukkit.event.EventPriority;
 
 @Init
 public class AtlasCheckListeners implements AtlasListener {

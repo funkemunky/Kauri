@@ -2,6 +2,7 @@ package dev.brighten.anticheat.data.classes;
 
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.TickTimer;
+import cc.funkemunky.api.utils.math.cond.MaxInteger;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.utils.CollisionHandler;
 import dev.brighten.anticheat.utils.MouseFilter;

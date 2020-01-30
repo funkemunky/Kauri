@@ -41,13 +41,13 @@ public class VelocityA extends Check {
                     && !data.playerInfo.lastBlockPlace.hasNotPassed(5)
                     && !data.blockInfo.blocksAbove
                     && !data.blockInfo.collidesHorizontally) {
-                if (vl++ > 20) flag("pct=" + MathUtils.round(pct, 2) + "%");
+                if (vl++ > 9) flag("pct=" + MathUtils.round(pct, 2) + "%");
             } else vl-= vl > 0 ? 0.5 : 0;
 
             vY-= 0.08;
             vY*= 0.98;
 
-            if(Math.abs(vY) < 0.005 || data.playerInfo.serverGround) vY = 0;
+            if(Math.abs(vY) < 0.005) vY = 0;
 
             debug("pct=" + pct + " vl=" + vl);
         }

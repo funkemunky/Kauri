@@ -1,23 +1,13 @@
 package dev.brighten.anticheat.check.impl.movement.fly;
 
-import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.world.BlockData;
-import cc.funkemunky.api.utils.world.CollisionBox;
-import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.MovementUtils;
 import dev.brighten.api.check.CheckType;
-import lombok.val;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @CheckInfo(name = "Fly (B)", description = "Checks for improper acceleration.", checkType = CheckType.FLIGHT)
 @Cancellable
@@ -27,7 +17,7 @@ public class FlyB extends Check {
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(packet.isPos() && (data.playerInfo.deltaY != 0 || data.playerInfo.deltaXZ != 0)) {
             //We check if the player is in ground, since theoretically the y should be zero.
-            double predicted = data.playerInfo.clientGround
+            double predicted = data.playerInfo.serverGround
                     ? 0 : (data.playerInfo.lDeltaY - 0.08) * 0.9800000190734863D;
 
             if(data.playerInfo.lClientGround && !data.playerInfo.clientGround) {
@@ -40,10 +30,9 @@ public class FlyB extends Check {
 
             if(!data.playerInfo.flightCancel
                     && data.playerInfo.slimeTimer.hasPassed(20)
-                    && data.playerInfo.blockAboveTimer.hasPassed(6)
                     && !data.blockInfo.collidesHorizontally
                     && data.playerInfo.lastHalfBlock.hasPassed(3)
-                    && data.playerInfo.lastVelocity.hasPassed(10)
+                    && timeStamp - data.playerInfo.lastVelocityTimestamp > 200L
                     && !data.playerInfo.serverGround
                     && (data.playerInfo.blockAboveTimer.hasPassed(5) || data.playerInfo.deltaY >= 0)
                     && MathUtils.getDelta(data.playerInfo.deltaY, predicted) > 0.0001) {

@@ -2,23 +2,24 @@ package dev.brighten.anticheat.check.impl.world.place;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
+import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.world.BlockData;
+import cc.funkemunky.api.utils.world.CollisionBox;
+import cc.funkemunky.api.utils.world.types.ComplexCollisionBox;
 import cc.funkemunky.api.utils.world.types.RayCollision;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.api.check.CheckType;
+import dev.brighten.db.utils.Pair;
 import lombok.val;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Cancellable(cancelType = CancelType.PLACE)
@@ -32,9 +33,8 @@ public class BlockPlace extends Check {
         if(!data.playerInfo.worldLoaded
                 || data.playerInfo.creative
                 || packet.getItemStack() == null
-                || !packet.getItemStack().getType().isBlock()
-                || packet.getItemStack().getType().equals(Material.AIR)
-                || data.lagInfo.lastPacketDrop.hasNotPassed(10)) return;
+                || data.lagInfo.lastPacketDrop.hasNotPassed(10)
+                || !packet.getItemStack().getType().isBlock()) return;
 
         val face = new Vector(
                 packet.getFace().getAdjacentX(), packet.getFace().getAdjacentY(), packet.getFace().getAdjacentZ());
