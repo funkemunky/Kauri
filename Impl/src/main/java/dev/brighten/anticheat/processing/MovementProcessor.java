@@ -106,17 +106,6 @@ public class MovementProcessor {
         data.playerInfo.deltaZ = data.playerInfo.to.z - data.playerInfo.from.z;
         data.playerInfo.lDeltaXZ = data.playerInfo.deltaXZ;
         data.playerInfo.deltaXZ = MathUtils.hypot(data.playerInfo.deltaX, data.playerInfo.deltaZ);
-
-        if (Atlas.getInstance().getBlockBoxManager().getBlockBox()
-                .isChunkLoaded(data.playerInfo.to.toLocation(data.getPlayer().getWorld()))) {
-            data.playerInfo.blockOnTo = BlockUtils.getBlock(data.playerInfo.to.toLocation(data.getPlayer().getWorld()));
-            data.playerInfo.blockBelow = BlockUtils.getBlock(data.playerInfo.to.toLocation(data.getPlayer().getWorld())
-                    .subtract(0, 1, 0));
-
-            if(data.playerInfo.blockBelow != null)
-                data.blockInfo.currentFriction = MinecraftReflection.getFriction(data.playerInfo.blockBelow);
-        } else data.playerInfo.blockOnTo = data.playerInfo.blockBelow = null;
-
         if(packet.isPos()) {
             //We create a separate from BoundingBox for the predictionService since it should operate on pre-motion data.
             data.box = new SimpleCollisionBox(data.playerInfo.to.toVector(), 0.6, 1.8);
@@ -225,6 +214,15 @@ public class MovementProcessor {
 
         if (data.playerInfo.breakingBlock) data.playerInfo.lastBrokenBlock.reset();
 
+        if (data.playerInfo.worldLoaded) {
+            data.playerInfo.blockOnTo = BlockUtils.getBlock(data.playerInfo.to.toLocation(data.getPlayer().getWorld()));
+            data.playerInfo.blockBelow = BlockUtils.getBlock(data.playerInfo.to.toLocation(data.getPlayer().getWorld())
+                    .subtract(0, 1, 0));
+
+            if(data.playerInfo.blockBelow != null)
+                data.blockInfo.currentFriction = MinecraftReflection.getFriction(data.playerInfo.blockBelow);
+        } else data.playerInfo.blockOnTo = data.playerInfo.blockBelow = null;
+
         //Setting the angle delta for use in checks to prevent repeated functions.
         data.playerInfo.lDeltaYaw = data.playerInfo.deltaYaw;
         data.playerInfo.lDeltaPitch = data.playerInfo.deltaPitch;
@@ -301,23 +299,39 @@ public class MovementProcessor {
         }
 
         //Checking if user is in liquid.
-        if (data.blockInfo.inLiquid) data.playerInfo.liquidTimer.reset();
+        if (data.blockInfo.inLiquid) {
+            data.playerInfo.liquidTicks.add();
+        } else data.playerInfo.liquidTicks.subtract();
 
         //Half block ticking (slabs, stairs, bed, cauldron, etc.)
-        if (data.blockInfo.onHalfBlock) data.playerInfo.lastHalfBlock.reset();
+        if (data.blockInfo.onHalfBlock) {
+            data.playerInfo.lastHalfBlock.reset();
+        }
 
         //We dont check if theyre still on ice because this would be useless to checks that check a player in air too.
-        if (data.blockInfo.onIce) data.playerInfo.iceTimer.reset();
+        if (data.playerInfo.wasOnIce) {
+            data.playerInfo.iceTicks.add();
+        } else data.playerInfo.iceTicks.subtract();
 
-        if (data.blockInfo.inWeb) data.playerInfo.webTimer.reset();
+        if (data.blockInfo.inWeb) {
+            data.playerInfo.webTicks.add();
+        } else data.playerInfo.webTicks.subtract();
 
-        if (data.blockInfo.onClimbable) data.playerInfo.climbTimer.reset();
+        if (data.blockInfo.onClimbable) {
+            data.playerInfo.climbTicks.add(2);
+        } else data.playerInfo.climbTicks.subtract();
 
-        if (data.blockInfo.onSlime) data.playerInfo.slimeTimer.reset();
+        if (data.playerInfo.wasOnSlime) {
+            data.playerInfo.slimeTicks.add();
+        } else data.playerInfo.slimeTicks.subtract();
 
-        if (data.blockInfo.onSoulSand) data.playerInfo.soulSandTimer.reset();
+        if (data.blockInfo.onSoulSand) {
+            data.playerInfo.soulSandTicks.add();
+        } else data.playerInfo.soulSandTicks.subtract();
 
-        if (data.blockInfo.blocksAbove)data.playerInfo.blockAboveTimer.reset();
+        if (data.blockInfo.blocksAbove) {
+            data.playerInfo.blocksAboveTicks.add();
+        } else data.playerInfo.blocksAboveTicks.subtract();
 
         //Player ground/air positioning ticks.
         if (!data.playerInfo.serverGround) {
@@ -334,7 +348,7 @@ public class MovementProcessor {
         data.playerInfo.generalCancel = data.playerInfo.canFly
                 || data.playerInfo.creative
                 || hasLevi
-                || timeStamp - data.playerInfo.lastServerPos < 80L
+                || timeStamp - data.playerInfo.lastServerPos < 60L
                 || data.playerInfo.riptiding
                 || data.playerInfo.gliding
                 || data.playerInfo.inVehicle
@@ -342,13 +356,13 @@ public class MovementProcessor {
                 || !data.playerInfo.worldLoaded
                 || data.playerInfo.lastToggleFlight.hasNotPassed(40)
                 || timeStamp - data.creation < 2000
+                || data.playerInfo.serverPos
                 || Kauri.INSTANCE.lastTickLag.hasNotPassed(5);
 
         data.playerInfo.flightCancel = data.playerInfo.generalCancel
-                || data.playerInfo.webTimer.hasNotPassed(4)
-                || data.playerInfo.liquidTimer.hasNotPassed(4)
-                || data.playerInfo.climbTimer.hasNotPassed(4)
-                || data.playerInfo.lastHalfBlock.hasNotPassed(2);
+                || data.playerInfo.webTicks.value() > 0
+                || data.playerInfo.liquidTicks.value() > 0
+                || data.playerInfo.climbTicks.value() > 0;
 
         //Adding past location
         data.pastLocation.addLocation(data.playerInfo.to.clone());

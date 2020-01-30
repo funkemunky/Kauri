@@ -11,7 +11,6 @@ import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.data.ObjectData;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -90,7 +89,6 @@ public class CollisionHandler {
 		for (Block b : blocks) {
 			Location block = b.getLocation();
 
-			Bukkit.broadcastMessage(block.getBlock().getType().name());
 			CollisionBox box;
 			if((box = BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion())).isCollided(playerBox)) {
 				collided.add(box);
@@ -118,7 +116,8 @@ public class CollisionHandler {
 				.expand(width / 2, 0, width / 2);
 
 		for (Block b : blocks) {
-			if (MiscUtils.contains(materials, b.getType())) {
+			Location block = b.getLocation();
+			if (MiscUtils.contains(materials, b.getType()) && (!single || (block.getBlockX() == MathUtils.floor(location.x) && block.getBlockZ() == MathUtils.floor(location.z)))) {
 				if (BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion()).isCollided(playerBox))
 					return true;
 			}

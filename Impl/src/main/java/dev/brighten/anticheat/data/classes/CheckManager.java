@@ -105,7 +105,6 @@ public class CheckManager {
                     check.checkType = settings.checkType();
                     check.maxVersion = settings.maxVersion();
                     check.minVersion = settings.minVersion();
-                    check.banExempt = objectData.getPlayer().hasPermission("kauri.bypass.ban");
                     return check;
                 })
                 .sequential()

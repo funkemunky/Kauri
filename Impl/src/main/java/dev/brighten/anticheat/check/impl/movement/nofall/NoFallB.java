@@ -17,13 +17,17 @@ public class NoFallB extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if(packet.isPos()) {
-            boolean serverGround = data.playerInfo.serverGround
-                    && (data.playerInfo.clientGround || data.playerInfo.deltaY == 0);
-            if(serverGround != data.playerInfo.clientGround
+            if(data.playerInfo.serverGround != data.playerInfo.clientGround
+                    && data.playerInfo.climbTicks.value() == 0
+                    && !data.playerInfo.generalCancel
+                    && data.playerInfo.blockOnTo != null
+                    && !BlockUtils.isSolid(data.playerInfo.blockOnTo)
+                    && !Materials.checkFlag(data.playerInfo.blockOnTo.getType(), Materials.LADDER)
+                    && !data.blockInfo.onClimbable
                     && (data.playerInfo.deltaY != 0 || data.playerInfo.deltaXZ > 0)
                     && data.playerInfo.lastBlockPlace.hasPassed(20)
-                    && data.playerInfo.lastVelocity.hasPassed(10)
-                    && !data.playerInfo.flightCancel) {
+                    && data.playerInfo.lastVelocity.hasPassed(40)
+                    && data.playerInfo.liquidTicks.value() == 0) {
                 if(vl++ > 5) {
                     flag("server=" + data.playerInfo.serverGround + " client=" + data.playerInfo.clientGround);
                 }

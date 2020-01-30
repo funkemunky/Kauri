@@ -33,7 +33,7 @@ public class VelocityA extends Check {
                 && data.playerInfo.worldLoaded
                 && !data.blockInfo.inWeb
                 && !data.blockInfo.onClimbable
-                && data.playerInfo.blockAboveTimer.hasPassed(6)) {
+                && data.playerInfo.blocksAboveTicks.value() == 0) {
 
             double pct = data.playerInfo.deltaY / vY * 100;
 
