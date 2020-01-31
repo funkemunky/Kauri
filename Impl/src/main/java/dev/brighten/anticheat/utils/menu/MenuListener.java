@@ -3,6 +3,7 @@ package dev.brighten.anticheat.utils.menu;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
 import dev.brighten.anticheat.Kauri;
+import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.menu.button.Button;
 import dev.brighten.anticheat.utils.menu.button.ClickAction;
 import dev.brighten.anticheat.utils.menu.type.BukkitInventoryHolder;
@@ -35,6 +36,8 @@ public class MenuListener implements Listener {
 
     public static Map<AnvilInventory, ValueMenu> anvils = new HashMap<>();
 
+    private static Material air = MiscUtils.m(0);
+
     @EventHandler(priority = EventPriority.LOW)
     private void onInventoryClick(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player)) return;
@@ -49,7 +52,7 @@ public class MenuListener implements Listener {
 
             if (menu != null) {
                 final ItemStack stack = event.getCurrentItem();
-                if ((stack == null || stack.getType() == Material.AIR))
+                if ((stack == null || stack.getType() == air))
                     return;
 
                 int slot = event.getSlot();

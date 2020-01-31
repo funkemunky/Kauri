@@ -108,7 +108,7 @@ public class Helper {
 
 	public static List<Block> getBlocksNearby(CollisionHandler handler, CollisionBox collisionBox) {
 		try {
-			return handler.getBlocks().stream().filter(b -> b.getType() != Material.AIR
+			return handler.getBlocks().stream().filter(b -> b.getTypeId() != 0
 					&& BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion())
 					.isCollided(collisionBox))
 					.collect(Collectors.toList());
@@ -130,14 +130,14 @@ public class Helper {
 			for (int y = y1; y <= y2; y++)
 				for (int z = z1; z <= z2; z++)
 					if ((block = getBlockAt(world, x, y, z)) != null
-							&& block.getType()!=Material.AIR)
+							&& block.getTypeId() != 0)
 						if (Materials.checkFlag(block.getType(),mask))
 							blocks.add(block);
 		return blocks;
 	}
 
 	public static List<Block> getBlocksNearby(CollisionHandler handler, SimpleCollisionBox collisionBox, int mask) {
-		return handler.getBlocks().stream().filter(b -> b.getType() != Material.AIR
+		return handler.getBlocks().stream().filter(b -> b.getTypeId() != 0
 				&& Materials.checkFlag(b.getType(), mask)
 				&& BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion())
 				.isCollided(collisionBox))

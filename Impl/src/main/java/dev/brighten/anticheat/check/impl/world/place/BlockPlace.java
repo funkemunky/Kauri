@@ -27,13 +27,14 @@ import java.util.stream.Collectors;
 public class BlockPlace extends Check {
 
     private static double maxDistance = 4.5;
+    private static Material air = MiscUtils.m(0);
     @Packet
     public void onBlockPlace(WrappedInBlockPlacePacket packet) {
         if(!data.playerInfo.worldLoaded
                 || data.playerInfo.creative
                 || packet.getItemStack() == null
                 || !packet.getItemStack().getType().isBlock()
-                || packet.getItemStack().getType().equals(Material.AIR)
+                || packet.getItemStack().getType().equals(air)
                 || data.lagInfo.lastPacketDrop.hasNotPassed(10)) return;
 
         val face = new Vector(

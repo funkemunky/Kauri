@@ -6,18 +6,18 @@ import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.Materials;
-import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.world.BlockData;
-import cc.funkemunky.api.utils.world.CollisionBox;
 import cc.funkemunky.api.utils.world.Material2;
-import cc.funkemunky.api.utils.world.types.ComplexCollisionBox;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.CollisionHandler;
 import dev.brighten.anticheat.utils.Helper;
+import dev.brighten.anticheat.utils.MiscUtils;
 import lombok.val;
-import org.bukkit.*;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 
@@ -83,7 +83,7 @@ public class BlockInformation {
                                     break start;
                                 }
                                 Block block = chunk.getBlock(x & 15, y, z & 15);
-                                if (block.getType() != Material.AIR) {
+                                if (block.getType() != MiscUtils.m(0)) {
                                     blocks.add(block);
                                 }
                             }
@@ -105,7 +105,7 @@ public class BlockInformation {
         onSlab = handler.isCollidedWith(Materials.SLABS);
         onStairs = handler.isCollidedWith(Materials.STAIRS);
         onHalfBlock = onSlab || onStairs
-                || handler.isCollidedWith(Material.CAKE_BLOCK, Material.SKULL, Material.BED_BLOCK, Material.SNOW);
+                || handler.isCollidedWith(MiscUtils.m(82), MiscUtils.m(144), MiscUtils.m(26), MiscUtils.m(78));
 
         handler.setSingle(true);
         onIce = handler.isCollidedWith(Materials.ICE);
@@ -113,8 +113,8 @@ public class BlockInformation {
         handler.setSingle(false);
         handler.setSize(0.602, 1.802);
         handler.setOffset(-0.1);
-        onSoulSand = handler.isCollidedWith(Material.SOUL_SAND);
-        inWeb = handler.isCollidedWith(Material.WEB);
+        onSoulSand = handler.isCollidedWith(MiscUtils.m(88));
+        inWeb = handler.isCollidedWith(MiscUtils.m(30));
         onSlime = handler.isCollidedWith(Material2.SLIME_BLOCK);
 
         handler.setOffset(0);
@@ -177,4 +177,5 @@ public class BlockInformation {
                         BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion())))
                 .collect(Collectors.toCollection(LinkedList::new));
     }
+
 }

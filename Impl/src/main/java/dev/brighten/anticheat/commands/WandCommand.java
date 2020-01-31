@@ -15,7 +15,7 @@ public class WandCommand {
     @Command(name = "kauri.wand", description = "view boundingBox debugs.", display = "wand", playerOnly = true, permission = "kauri.command.wand")
     public void onCommand(CommandAdapter cmd) {
         if(Arrays.stream(cmd.getPlayer().getInventory().getContents())
-                .anyMatch(item -> item == null || item.getType().equals(Material.AIR))) {
+                .anyMatch(item -> item == null || item.getTypeId() == 0)) {
             cmd.getPlayer().getInventory().addItem(BukkitListener.MAGIC_WAND);
             cmd.getPlayer().updateInventory();
         } else {

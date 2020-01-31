@@ -67,7 +67,8 @@ public class ProfilerCommand {
 
                 map.forEach((key, result) -> {
                     if(!key.contains("check:")) {
-                        Button button = new Button(false, new ItemBuilder(Material.REDSTONE)
+                        Button button = new Button(false, new ItemBuilder(dev.brighten.anticheat.utils.MiscUtils
+                            .m(331))
                                 .amount(1)
                                 .name(Color.Gold + key).lore("",
                                         "&7Weighted Usage: " + dev.brighten.anticheat.utils.MiscUtils
@@ -90,12 +91,14 @@ public class ProfilerCommand {
                 double totalMs = total / 1000000D;
                 if (finalPage > 1) {
                     menu.setItem(48, new Button(false,
-                            new ItemBuilder(Material.BOOK).amount(1).name("&cBack").build(),
+                            new ItemBuilder(dev.brighten.anticheat.utils.MiscUtils
+                            .m(340)).amount(1).name("&cBack").build(),
                             (player, info) -> Bukkit.dispatchCommand(player,
                                     "kauri profile testGUI " + (finalPage - 1))));
                 }
                 menu.setItem(49, new Button(false,
-                        new ItemBuilder(Material.REDSTONE)
+                        new ItemBuilder(dev.brighten.anticheat.utils.MiscUtils
+                            .m(331))
                                 .amount(1)
                                 .name(Color.Gold + "Total").lore("",
                                 "&7Usage: " + dev.brighten.anticheat.utils.MiscUtils.drawUsage(50,
@@ -111,7 +114,8 @@ public class ProfilerCommand {
                             }
                         }));
                 menu.setItem(50, new Button(false,
-                        new ItemBuilder(Material.BOOK).amount(1).name("&cNext").build(),
+                        new ItemBuilder(dev.brighten.anticheat.utils.MiscUtils
+                            .m(340)).amount(1).name("&cNext").build(),
                         (player, info) -> Bukkit.dispatchCommand(player,
                                 "kauri profile testGUI " + (finalPage + 1))));
                 for (int i = (finalPage - 1) * 45; i < Math.min(finalPage * 45, buttons.size()); i++) {
