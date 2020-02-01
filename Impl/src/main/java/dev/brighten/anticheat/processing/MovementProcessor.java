@@ -1,7 +1,7 @@
 package dev.brighten.anticheat.processing;
 
 import cc.funkemunky.api.Atlas;
-import cc.funkemunky.api.reflections.impl.MinecraftReflection;
+import cc.funkemunky.api.reflection.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.*;

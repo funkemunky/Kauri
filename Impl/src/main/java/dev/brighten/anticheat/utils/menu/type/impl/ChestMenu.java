@@ -64,7 +64,7 @@ public class ChestMenu implements Menu {
     @Override
     public void fillRange(int startingIndex, int endingIndex, Button button) {
         IntStream.range(startingIndex, endingIndex)
-                .filter(i -> contents[i] == null || contents[i].getStack().getTypeId() == 0)
+                .filter(i -> contents[i] == null || contents[i].getStack().getItemMeta().equals(Material.AIR))
                 .forEach(i -> setItem(i, button));
     }
 

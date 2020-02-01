@@ -214,7 +214,7 @@ public class ItemBuilder {
      * @since 1.1
      */
     public ItemBuilder color(Color color) {
-        if (is.getItemMeta() instanceof LeatherArmorMeta) {
+        if (is.getType() == Material.LEATHER_BOOTS || is.getType() == Material.LEATHER_CHESTPLATE || is.getType() == Material.LEATHER_HELMET || is.getType() == Material.LEATHER_LEGGINGS) {
             LeatherArmorMeta meta = (LeatherArmorMeta) is.getItemMeta();
             meta.setColor(color);
             is.setItemMeta(meta);

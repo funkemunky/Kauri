@@ -23,8 +23,7 @@ import java.util.Collections;
 @Init
 public class BukkitListener implements Listener {
 
-    public static ItemStack MAGIC_WAND = MiscUtils.createItem(dev.brighten.anticheat.utils.MiscUtils.m(369),
-            1, "&6Magic Wand");
+    public static ItemStack MAGIC_WAND = MiscUtils.createItem(Material.BLAZE_ROD, 1, "&6Magic Wand");
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onJoin(PlayerJoinEvent event) {

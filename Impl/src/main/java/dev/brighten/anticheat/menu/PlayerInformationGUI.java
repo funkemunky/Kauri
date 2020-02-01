@@ -59,7 +59,7 @@ public class PlayerInformationGUI extends ChestMenu {
     }
 
     private ItemStack playerSkull() {
-        ItemBuilder vioItem = new ItemBuilder(dev.brighten.anticheat.utils.MiscUtils.m(397));
+        ItemBuilder vioItem = new ItemBuilder(Material.SKULL_ITEM);
 
         vioItem.amount(1);
         vioItem.durability(3);
@@ -77,7 +77,7 @@ public class PlayerInformationGUI extends ChestMenu {
 
     private ItemStack forgeItem() {
         modData = ForgeHandler.getMods(data.getPlayer());
-        ItemBuilder forgeItem = new ItemBuilder(dev.brighten.anticheat.utils.MiscUtils.m(145));
+        ItemBuilder forgeItem = new ItemBuilder(Material.ANVIL);
 
         forgeItem.amount(1);
         forgeItem.name(Color.Gold + "Forge Information");
@@ -103,7 +103,7 @@ public class PlayerInformationGUI extends ChestMenu {
     }
 
     private ItemStack violationsButton() {
-        ItemBuilder violationsItem = new ItemBuilder(dev.brighten.anticheat.utils.MiscUtils.m(403));
+        ItemBuilder violationsItem = new ItemBuilder(Material.ENCHANTED_BOOK);
 
         List<Log> logs = Kauri.INSTANCE.loggerManager.getLogs(data.getPlayer().getUniqueId());
 
@@ -126,7 +126,7 @@ public class PlayerInformationGUI extends ChestMenu {
         subMenu.setParent(this);
 
         modData.getMods().forEach(string -> {
-            ItemBuilder builder = new ItemBuilder(dev.brighten.anticheat.utils.MiscUtils.m(340));
+            ItemBuilder builder = new ItemBuilder(Material.BOOK);
 
             builder.amount(1);
             builder.name(Color.Gold + string);

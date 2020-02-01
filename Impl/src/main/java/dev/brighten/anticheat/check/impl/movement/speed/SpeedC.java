@@ -115,7 +115,7 @@ public class SpeedC extends Check {
 
             if (data.blockInfo.onSoulSand) {
                 moveSpeed += 0.1;
-                if (Materials.checkFlag(type, Materials.ICE)) {
+                if (type == Material.ICE || type == Material.PACKED_ICE) {
                     moveSpeed += 0.1;
                     tags.add("souliceair");
                 } else tags.add("soulair");
@@ -208,7 +208,7 @@ public class SpeedC extends Check {
 
         if (data.playerInfo.soulSandTimer.hasNotPassed(0) && !tags.contains("air")) {
             moveSpeed -= 0.05;
-            if (Materials.checkFlag(type, Materials.ICE)) {
+            if (type == Material.ICE || type == Material.PACKED_ICE) {
                 moveSpeed -= 0.1;
                 tags.add("soulice");
             } else tags.add("soul");

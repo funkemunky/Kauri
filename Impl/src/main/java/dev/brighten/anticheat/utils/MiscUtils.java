@@ -1,6 +1,6 @@
 package dev.brighten.anticheat.utils;
 
-import cc.funkemunky.api.reflections.impl.MinecraftReflection;
+import cc.funkemunky.api.reflection.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedPacketPlayOutWorldParticle;
 import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumAnimation;
@@ -11,7 +11,6 @@ import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.commands.KauriCommand;
 import lombok.val;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -206,9 +205,5 @@ public class MiscUtils {
         Date date = new Date(timeStamp);
 
         return format.format(date);
-    }
-
-    public static Material m(int id) {
-        return Material.getMaterial(id);
     }
 }

@@ -92,8 +92,7 @@ public class LogsGUI extends ChestMenu {
 
         //Setting the next page option if possible.
         if (Math.min(page * 45, filteredLogs.size()) < filteredLogs.size()) {
-            Button next = new Button(false, new ItemBuilder(dev.brighten.anticheat.utils.MiscUtils
-                            .m(340))
+            Button next = new Button(false, new ItemBuilder(Material.BOOK)
                     .amount(1).name(Color.Red + "Next Page &7(&e" + (page + 1) + "&7)").build(),
                     (player, info) -> {
                         if (info.getClickType().isLeftClick()) {
@@ -107,8 +106,7 @@ public class LogsGUI extends ChestMenu {
 
         val punishments = Kauri.INSTANCE.loggerManager.getPunishments(player.getUniqueId());
 
-        Button getPastebin = new Button(false, new ItemBuilder(dev.brighten.anticheat.utils.MiscUtils
-                            .m(397)).amount(1)
+        Button getPastebin = new Button(false, new ItemBuilder(Material.SKULL_ITEM).amount(1)
                 .durability(3)
                 .owner(player.getName())
                 .name(Color.Red + player.getName())
@@ -141,8 +139,7 @@ public class LogsGUI extends ChestMenu {
 
         //Setting the previous page option if possible.
         if (page > 1) {
-            Button back = new Button(false, new ItemBuilder(dev.brighten.anticheat.utils.MiscUtils
-                            .m(340))
+            Button back = new Button(false, new ItemBuilder(Material.BOOK)
                     .amount(1).name(Color.Red + "Previous Page &7(&e" + (page - 1) + "&7)").build(),
                     (player, info) -> {
                         if (info.getClickType().isLeftClick()) {
@@ -161,8 +158,7 @@ public class LogsGUI extends ChestMenu {
                 lore.add(Color.translate("&7- &f" + s));
             }
             Button stopFilter = new Button(false,
-                    new ItemBuilder(dev.brighten.anticheat.utils.MiscUtils
-                            .m(331)).amount(1)
+                    new ItemBuilder(Material.REDSTONE).amount(1)
                             .name(Color.Red + "Stop Filter").lore(lore).build(),
                     (player, info) -> {
                         filtered.clear();
@@ -201,9 +197,7 @@ public class LogsGUI extends ChestMenu {
                     String check = pair.key;
                     val list = pair.value;
                     Button button = new Button(false,
-                            new ItemBuilder(filtered.contains(check) ? dev.brighten.anticheat.utils.MiscUtils
-                            .m(395) : dev.brighten.anticheat.utils.MiscUtils
-                            .m(339)).amount(1)
+                            new ItemBuilder(filtered.contains(check) ? Material.EMPTY_MAP : Material.PAPER).amount(1)
                                     .name((filtered.contains(check) ? Color.Red + Color.Italics : Color.Gold)
                                             + check)
                                     .lore("", "&7Alerts: &f" + list.size(),
@@ -228,9 +222,7 @@ public class LogsGUI extends ChestMenu {
                                         ? new ItemBuilder(info.getButton().getStack())
                                         .enchantment(Enchantment.DURABILITY, 1)
                                         : new ItemBuilder(info.getButton().getStack()).clearEnchantments())
-                                        .type(filtered.contains(check) ? dev.brighten.anticheat.utils.MiscUtils
-                            .m(395) : dev.brighten.anticheat.utils.MiscUtils
-                            .m(339))
+                                        .type(filtered.contains(check) ? Material.EMPTY_MAP : Material.PAPER)
                                         .name((filtered.contains(check)
                                                 ? Color.Red + Color.Italics : Color.Gold) + check)
                                         .build());
@@ -241,8 +233,7 @@ public class LogsGUI extends ChestMenu {
                                     lore.add(Color.translate("&7- &f" + s));
                                 }
                                 Button stopFilter = new Button(false,
-                                        new ItemBuilder(dev.brighten.anticheat.utils.MiscUtils
-                            .m(331)).amount(1)
+                                        new ItemBuilder(Material.REDSTONE).amount(1)
                                                 .name(Color.Red + "Stop Filter").lore(lore).build(),
                                         (player2, info2) -> {
                                             filtered.clear();
@@ -264,8 +255,7 @@ public class LogsGUI extends ChestMenu {
                 lore.add(Color.translate("&7- &f" + s));
             }
             Button stopFilter = new Button(false,
-                    new ItemBuilder(dev.brighten.anticheat.utils.MiscUtils
-                            .m(331)).amount(1)
+                    new ItemBuilder(Material.REDSTONE).amount(1)
                             .name(Color.Red + "Stop Filter").lore(lore).build(),
                     (player, info) -> {
                         filtered.clear();
@@ -350,8 +340,7 @@ public class LogsGUI extends ChestMenu {
     }
 
     private Button buttonFromLog(Log log) {
-        return new Button(false, new ItemBuilder(dev.brighten.anticheat.utils.MiscUtils
-                            .m(339))
+        return new Button(false, new ItemBuilder(Material.PAPER)
                 .amount(1).name(Color.Gold + log.checkName)
                 .lore("", "&eTime&8: &f" + MiscUtils.timeStampToDate(log.timeStamp),
                         "&eData&8: &f" + log.info,
