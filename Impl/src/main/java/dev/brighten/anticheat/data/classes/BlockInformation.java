@@ -6,18 +6,17 @@ import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.Materials;
-import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.XMaterial;
 import cc.funkemunky.api.utils.world.BlockData;
-import cc.funkemunky.api.utils.world.CollisionBox;
-import cc.funkemunky.api.utils.world.Material2;
-import cc.funkemunky.api.utils.world.types.ComplexCollisionBox;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.CollisionHandler;
 import dev.brighten.anticheat.utils.Helper;
 import lombok.val;
-import org.bukkit.*;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 
@@ -50,12 +49,13 @@ public class BlockInformation {
         val dy = Math.abs(objectData.playerInfo.deltaY);
         val dz = Math.abs(objectData.playerInfo.deltaZ);
 
-        int startX = Location.locToBlock(objectData.playerInfo.to.x - (1 + dx));
-        int endX = Location.locToBlock(objectData.playerInfo.to.x + (1 + dx));
-        int startY = Location.locToBlock(objectData.playerInfo.to.y - (1 + dy));
-        int endY = Location.locToBlock(objectData.playerInfo.to.y + (3 + dy));
-        int startZ = Location.locToBlock(objectData.playerInfo.to.z - (1 + dz));
-        int endZ = Location.locToBlock(objectData.playerInfo.to.z + (1 + dz));
+        int startX = Location.locToBlock(objectData.playerInfo.to.x - (1 + Math.min(3, dx)));
+        int endX = Location.locToBlock(objectData.playerInfo.to.x + (1 + Math.min(3, dx)));
+        int startY = Location.locToBlock(objectData.playerInfo.to.y - (1 + Math.min(3, dy)));
+        int endY = Location.locToBlock(objectData.playerInfo.to.y + (3 + Math.min(3, dy)));
+        int startZ = Location.locToBlock(objectData.playerInfo.to.z - (1 + Math.min(3, dz)));
+        int endZ = Location.locToBlock(objectData.playerInfo.to.z + (1 + Math.min(3, dz)));
+
         int it = 9 * 9;
         objectData.playerInfo.worldLoaded = true;
         start:
@@ -83,7 +83,7 @@ public class BlockInformation {
                                     break start;
                                 }
                                 Block block = chunk.getBlock(x & 15, y, z & 15);
-                                if (block.getType() != Material.AIR) {
+                                if (block.getType() != XMaterial.AIR.parseMaterial()) {
                                     blocks.add(block);
                                 }
                             }
@@ -92,20 +92,26 @@ public class BlockInformation {
                 }
             }
         }
+
         CollisionHandler handler = new CollisionHandler(blocks,
                 Atlas.getInstance().getEntities().getOrDefault(objectData.getPlayer().getUniqueId(), new ArrayList<>()),
                 objectData.playerInfo.to);
+
+        //Bukkit.broadcastMessage("chigga4");
 
         handler.setSize(0.6f, 0.0f);
         handler.setOffset(-0.02);
 
         objectData.playerInfo.serverGround =
                 handler.isCollidedWith(Materials.SOLID) || handler.contains(EntityType.BOAT);
+        //Bukkit.broadcastMessage("chigga5");
         handler.setOffset(-0.4f);
         onSlab = handler.isCollidedWith(Materials.SLABS);
         onStairs = handler.isCollidedWith(Materials.STAIRS);
         onHalfBlock = onSlab || onStairs
-                || handler.isCollidedWith(Material.CAKE_BLOCK, Material.SKULL, Material.BED_BLOCK, Material.SNOW);
+                || handler.isCollidedWith(XMaterial.CAKE.parseMaterial(), XMaterial.SKELETON_SKULL.parseMaterial(),
+                XMaterial.SNOW.parseMaterial(), XMaterial.WITHER_SKELETON_SKULL.parseMaterial(),
+                XMaterial.SKELETON_WALL_SKULL.parseMaterial(), XMaterial.WITHER_SKELETON_WALL_SKULL.parseMaterial());
 
         handler.setSingle(true);
         onIce = handler.isCollidedWith(Materials.ICE);
@@ -113,9 +119,9 @@ public class BlockInformation {
         handler.setSingle(false);
         handler.setSize(0.602, 1.802);
         handler.setOffset(-0.1);
-        onSoulSand = handler.isCollidedWith(Material.SOUL_SAND);
-        inWeb = handler.isCollidedWith(Material.WEB);
-        onSlime = handler.isCollidedWith(Material2.SLIME_BLOCK);
+        onSoulSand = handler.isCollidedWith(XMaterial.SOUL_SAND.parseMaterial());
+        inWeb = handler.isCollidedWith(XMaterial.COBWEB.parseMaterial());
+        onSlime = handler.isCollidedWith(XMaterial.SLIME_BLOCK.parseMaterial());
 
         handler.setOffset(0);
         handler.setSize(0.6, 1.8);

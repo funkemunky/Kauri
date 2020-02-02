@@ -5,6 +5,7 @@ import cc.funkemunky.api.handlers.ModData;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
+import cc.funkemunky.api.utils.XMaterial;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.logs.objects.Log;
@@ -13,7 +14,6 @@ import dev.brighten.anticheat.utils.menu.button.Button;
 import dev.brighten.anticheat.utils.menu.type.impl.ChestMenu;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
@@ -59,7 +59,7 @@ public class PlayerInformationGUI extends ChestMenu {
     }
 
     private ItemStack playerSkull() {
-        ItemBuilder vioItem = new ItemBuilder(Material.SKULL_ITEM);
+        ItemBuilder vioItem = new ItemBuilder(XMaterial.SKELETON_SKULL.parseMaterial());
 
         vioItem.amount(1);
         vioItem.durability(3);
@@ -77,7 +77,7 @@ public class PlayerInformationGUI extends ChestMenu {
 
     private ItemStack forgeItem() {
         modData = ForgeHandler.getMods(data.getPlayer());
-        ItemBuilder forgeItem = new ItemBuilder(Material.ANVIL);
+        ItemBuilder forgeItem = new ItemBuilder(XMaterial.ANVIL.parseMaterial());
 
         forgeItem.amount(1);
         forgeItem.name(Color.Gold + "Forge Information");
@@ -103,7 +103,7 @@ public class PlayerInformationGUI extends ChestMenu {
     }
 
     private ItemStack violationsButton() {
-        ItemBuilder violationsItem = new ItemBuilder(Material.ENCHANTED_BOOK);
+        ItemBuilder violationsItem = new ItemBuilder(XMaterial.ENCHANTED_BOOK.parseMaterial());
 
         List<Log> logs = Kauri.INSTANCE.loggerManager.getLogs(data.getPlayer().getUniqueId());
 
@@ -126,7 +126,7 @@ public class PlayerInformationGUI extends ChestMenu {
         subMenu.setParent(this);
 
         modData.getMods().forEach(string -> {
-            ItemBuilder builder = new ItemBuilder(Material.BOOK);
+            ItemBuilder builder = new ItemBuilder(XMaterial.BOOK.parseMaterial());
 
             builder.amount(1);
             builder.name(Color.Gold + string);

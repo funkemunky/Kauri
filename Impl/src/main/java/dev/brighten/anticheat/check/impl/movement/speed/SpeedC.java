@@ -2,15 +2,12 @@ package dev.brighten.anticheat.check.impl.movement.speed;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
-import cc.funkemunky.api.utils.Materials;
-import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.PlayerUtils;
-import cc.funkemunky.api.utils.TickTimer;
+import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
-import dev.brighten.anticheat.utils.MiscUtils;
+import dev.brighten.anticheat.utils.Helper;
 import dev.brighten.anticheat.utils.MovementUtils;
 import lombok.val;
 import org.bukkit.Material;
@@ -30,6 +27,7 @@ public class SpeedC extends Check {
     private double velocityX, velocityZ;
     private boolean lSprint;
     private TickTimer horizontalIdle = new TickTimer(20);
+    private static Material ice = XMaterial.ICE.parseMaterial(), packed_ice = XMaterial.PACKED_ICE.parseMaterial();
 
     @Packet
     public void onTrans(WrappedInTransactionPacket packet) {
@@ -115,7 +113,7 @@ public class SpeedC extends Check {
 
             if (data.blockInfo.onSoulSand) {
                 moveSpeed += 0.1;
-                if (type == Material.ICE || type == Material.PACKED_ICE) {
+                if (type == ice || type == packed_ice) {
                     moveSpeed += 0.1;
                     tags.add("souliceair");
                 } else tags.add("soulair");
@@ -186,7 +184,7 @@ public class SpeedC extends Check {
 
         if (moveSpeed > 0.046
                 && moveSpeed < 0.047
-                && MiscUtils.format(deltaY, 4) == 0.0784) {
+                && Helper.format(deltaY, 4) == 0.0784) {
             tags.add("fall");
             moveSpeed += 1;
         }
@@ -208,7 +206,7 @@ public class SpeedC extends Check {
 
         if (data.playerInfo.soulSandTimer.hasNotPassed(0) && !tags.contains("air")) {
             moveSpeed -= 0.05;
-            if (type == Material.ICE || type == Material.PACKED_ICE) {
+            if (type == ice || type == packed_ice) {
                 moveSpeed -= 0.1;
                 tags.add("soulice");
             } else tags.add("soul");
@@ -219,7 +217,7 @@ public class SpeedC extends Check {
             moveSpeed -= 0.07;
         }
 
-        double dyf = MiscUtils.format(data.playerInfo.deltaY, 4);
+        double dyf = Helper.format(data.playerInfo.deltaY, 4);
         if (dyf > -0.0785 && dyf < 0 && !data.playerInfo.serverGround) {
             tags.add("first");
             moveSpeed += 0.21;

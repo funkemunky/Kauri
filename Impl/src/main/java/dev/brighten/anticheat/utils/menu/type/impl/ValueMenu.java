@@ -1,10 +1,10 @@
 package dev.brighten.anticheat.utils.menu.type.impl;
 
+import cc.funkemunky.api.utils.XMaterial;
 import dev.brighten.anticheat.utils.ItemBuilder;
 import dev.brighten.anticheat.utils.menu.MenuListener;
 import dev.brighten.anticheat.utils.menu.button.Button;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.AnvilInventory;
@@ -19,11 +19,12 @@ public class ValueMenu<T> extends ChestMenu {
         super("&7Value Menu", 1);
 
         Button valButton = new Button(false,
-                new ItemBuilder(Material.BOOK).name("&eEnter Value").amount(1).build(),
+                new ItemBuilder(XMaterial.BOOK.parseMaterial()).name("&eEnter Value").amount(1).build(),
                 (player, info) -> {
                     AnvilInventory anvil = (AnvilInventory) Bukkit.createInventory(null, InventoryType.ANVIL, "Enter Value");
 
-                    anvil.setItem(0, new ItemBuilder(Material.STAINED_GLASS_PANE).amount(1).name("  ").build());
+                    anvil.setItem(0, new ItemBuilder(XMaterial.WHITE_STAINED_GLASS_PANE.parseMaterial()).amount(1)
+                            .name("  ").build());
 
                     player.openInventory(anvil);
                     MenuListener.anvils.put(anvil, this);

@@ -4,8 +4,8 @@ import cc.funkemunky.api.commands.ancmd.Command;
 import cc.funkemunky.api.commands.ancmd.CommandAdapter;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
+import cc.funkemunky.api.utils.XMaterial;
 import dev.brighten.anticheat.listeners.BukkitListener;
-import org.bukkit.Material;
 
 import java.util.Arrays;
 
@@ -15,7 +15,7 @@ public class WandCommand {
     @Command(name = "kauri.wand", description = "view boundingBox debugs.", display = "wand", playerOnly = true, permission = "kauri.command.wand")
     public void onCommand(CommandAdapter cmd) {
         if(Arrays.stream(cmd.getPlayer().getInventory().getContents())
-                .anyMatch(item -> item == null || item.getType().equals(Material.AIR))) {
+                .anyMatch(item -> item == null || item.getType().equals(XMaterial.AIR.parseMaterial()))) {
             cmd.getPlayer().getInventory().addItem(BukkitListener.MAGIC_WAND);
             cmd.getPlayer().updateInventory();
         } else {

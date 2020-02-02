@@ -4,15 +4,14 @@ import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.XMaterial;
 import cc.funkemunky.api.utils.world.BlockData;
 import cc.funkemunky.api.utils.world.types.RayCollision;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.check.api.*;
-import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
@@ -33,7 +32,7 @@ public class BlockPlace extends Check {
                 || data.playerInfo.creative
                 || packet.getItemStack() == null
                 || !packet.getItemStack().getType().isBlock()
-                || packet.getItemStack().getType().equals(Material.AIR)
+                || packet.getItemStack().getType().equals(XMaterial.AIR.parseMaterial())
                 || data.lagInfo.lastPacketDrop.hasNotPassed(10)) return;
 
         val face = new Vector(
@@ -45,7 +44,7 @@ public class BlockPlace extends Check {
         if(block != null && BlockUtils.isSolid(block)) {
             val pastLoc = data.pastLocation.getPreviousRange(175).stream()
                     .peek(loc -> loc.y+=data.playerInfo.sneaking ? 1.54 : 1.62)
-                    .map(loc -> new RayCollision(loc.toVector(), MiscUtils.getDirection(loc)))
+                    .map(loc -> new RayCollision(loc.toVector(), MathUtils.getDirection(loc)))
                     .collect(Collectors.toList());
 
             if(pastLoc.size() == 0 || data.lagInfo.lastPacketDrop.hasNotPassed(3)) return;

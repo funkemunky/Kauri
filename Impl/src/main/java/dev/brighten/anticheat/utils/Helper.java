@@ -3,11 +3,11 @@ package dev.brighten.anticheat.utils;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.utils.Materials;
+import cc.funkemunky.api.utils.XMaterial;
 import cc.funkemunky.api.utils.world.BlockData;
 import cc.funkemunky.api.utils.world.CollisionBox;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.utils.handlers.PlayerSizeHandler;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Helper {
 
@@ -108,7 +109,7 @@ public class Helper {
 
 	public static List<Block> getBlocksNearby(CollisionHandler handler, CollisionBox collisionBox) {
 		try {
-			return handler.getBlocks().stream().filter(b -> b.getType() != Material.AIR
+			return handler.getBlocks().stream().filter(b -> b.getType() != XMaterial.AIR.parseMaterial()
 					&& BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion())
 					.isCollided(collisionBox))
 					.collect(Collectors.toList());
@@ -130,18 +131,41 @@ public class Helper {
 			for (int y = y1; y <= y2; y++)
 				for (int z = z1; z <= z2; z++)
 					if ((block = getBlockAt(world, x, y, z)) != null
-							&& block.getType()!=Material.AIR)
+							&& block.getType()!= XMaterial.AIR.parseMaterial())
 						if (Materials.checkFlag(block.getType(),mask))
 							blocks.add(block);
 		return blocks;
 	}
 
 	public static List<Block> getBlocksNearby(CollisionHandler handler, SimpleCollisionBox collisionBox, int mask) {
-		return handler.getBlocks().stream().filter(b -> b.getType() != Material.AIR
+		return handler.getBlocks().stream().filter(b -> b.getType() != XMaterial.AIR.parseMaterial()
 				&& Materials.checkFlag(b.getType(), mask)
 				&& BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion())
 				.isCollided(collisionBox))
 				.collect(Collectors.toList());
+	}
+
+	private static final int[] decimalPlaces = {0, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000};
+
+	public static double format(double d, int dec) {
+		return (long) (d * decimalPlaces[dec] + 0.5) / (double) decimalPlaces[dec];
+	}
+
+	public static String drawUsage(long max, long time) {
+		double chunk = max / 50.;
+		String line = IntStream.range(0, 50).mapToObj(i -> (chunk * i < time ? "§c" : "§7") + "❘")
+				.collect(Collectors.joining("", "[", ""));
+		String zeros = "00";
+		String nums = Integer.toString((int) ((time / (double) max) * 100));
+		return line + "§f] §c" + zeros.substring(0, 3 - nums.length()) + nums + "% §f❘";
+	}
+
+	public static String drawUsage(long max, double time) {
+		double chunk = max / 50.;
+		String line = IntStream.range(0, 50).mapToObj(i -> (chunk * i < time ? "§c" : "§7") + "❘")
+				.collect(Collectors.joining("", "[", ""));
+		String nums = String.valueOf(format((time / (double) max) * 100, 3));
+		return line + "§f] §c" + nums + "%";
 	}
 
 	public static List<Block> getBlocks(CollisionHandler handler, SimpleCollisionBox collisionBox) {

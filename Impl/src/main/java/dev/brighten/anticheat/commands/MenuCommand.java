@@ -2,10 +2,7 @@ package dev.brighten.anticheat.commands;
 
 import cc.funkemunky.api.commands.ancmd.Command;
 import cc.funkemunky.api.commands.ancmd.CommandAdapter;
-import cc.funkemunky.api.utils.Color;
-import cc.funkemunky.api.utils.Init;
-import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.MiscUtils;
+import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckSettings;
@@ -55,10 +52,10 @@ public class MenuCommand {
     private ChestMenu getMainMenu() {
         ChestMenu menu = new ChestMenu(Color.Gold + "Kauri Menu", 3);
 
-        menu.setItem(11, createButton(Material.ANVIL, 1, "&cEdit Checks",
+        menu.setItem(11, createButton(XMaterial.ANVIL.parseMaterial(), 1, "&cEdit Checks",
                 (player, info) -> categoryMenu.showMenu(player),
                 "", "&7Toggle Kauri checks on or off."));
-        menu.setItem(13, createButton(Material.ENCHANTED_BOOK, 1, "&cKauri Anticheat",
+        menu.setItem(13, createButton(XMaterial.ENCHANTED_BOOK.parseMaterial(), 1, "&cKauri Anticheat",
                 (player, info) -> {
                     if (info.getClickType().equals(ClickType.RIGHT)
                             || info.getClickType().equals(ClickType.SHIFT_RIGHT)) {
@@ -72,7 +69,7 @@ public class MenuCommand {
                 },
                 "", "&7You are using &6Kauri Anticheat v" +
                         Kauri.INSTANCE.getDescription().getVersion(), "&e&oRight Click &7&oclick to get support."));
-        menu.setItem(15, createButton(Material.PAPER, 1, "&cView Recent Violators",
+        menu.setItem(15, createButton(XMaterial.PAPER.parseMaterial(), 1, "&cView Recent Violators",
                 (player, info) -> {
             getRecentViolatorsMenu().showMenu(player);
         }, "", "&7View players who flagged checks recently."));
@@ -107,8 +104,8 @@ public class MenuCommand {
                             });
 
                     Button button = new Button(false,
-                            new ItemBuilder(Material.BOOK)
-                                    .amount(amount.get())
+                            new ItemBuilder(XMaterial.BOOK.parseMaterial())
+                                    .amount(Math.max(1, amount.get()))
                                     .name("&e" + type.name())
                                     .lore("", "&aEnabled&8: &f" + enabled + "&7/&f" + amount,
                                             "&aExecutable&8: &f" + executable + "&7/&f" + amount,
@@ -159,7 +156,9 @@ public class MenuCommand {
 
 
             Button button = createButton(
-                    val.enabled ? (val.executable ? Material.MAP : Material.EMPTY_MAP) : Material.PAPER,
+                    val.enabled ? (val.executable ? XMaterial.FILLED_MAP.parseMaterial()
+                            : XMaterial.MAP.parseMaterial())
+                            : XMaterial.PAPER.parseMaterial(),
                     1,
                     (val.enabled ? "&a" : "&c") + val.name,
                     (player, info) -> {
@@ -173,9 +172,10 @@ public class MenuCommand {
 
                                 ItemBuilder builder = new ItemBuilder(info.getButton().getStack());
                                 if (!settings.enabled) {
-                                    builder.type(Material.PAPER);
+                                    builder.type(XMaterial.PAPER.parseMaterial());
                                 } else {
-                                    builder.type(settings.executable ? Material.MAP : Material.EMPTY_MAP);
+                                    builder.type(settings.executable ? XMaterial.FILLED_MAP.parseMaterial()
+                                            : XMaterial.MAP.parseMaterial());
                                     if(settings.cancellable) {
                                         builder.enchantment(Enchantment.DURABILITY, 1);
                                     }
@@ -199,7 +199,8 @@ public class MenuCommand {
 
                                 ItemBuilder builder = new ItemBuilder(info.getButton().getStack());
                                 if (settings.enabled) {
-                                    builder.type(settings.executable ? Material.MAP : Material.EMPTY_MAP);
+                                    builder.type(settings.executable ? XMaterial.FILLED_MAP.parseMaterial()
+                                            : XMaterial.MAP.parseMaterial());
                                 }
 
                                 lore.set(2, Color.translate("&eExecutable&7: &f" + settings.executable));
@@ -265,7 +266,7 @@ public class MenuCommand {
             OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
             Log vl = logs.get(uuid).get(0);
 
-            ItemBuilder builder = new ItemBuilder(Material.SKULL_ITEM);
+            ItemBuilder builder = new ItemBuilder(XMaterial.SKELETON_SKULL.parseMaterial());
 
             builder.amount(1);
             builder.durability(3);

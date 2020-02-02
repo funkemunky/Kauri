@@ -1,14 +1,11 @@
 package dev.brighten.anticheat.menu;
 
-import cc.funkemunky.api.utils.Color;
-import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.RunUtils;
+import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.commands.LogCommand;
 import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.utils.ItemBuilder;
-import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.menu.button.Button;
 import dev.brighten.anticheat.utils.menu.button.ClickAction;
 import dev.brighten.anticheat.utils.menu.preset.button.FillerButton;
@@ -92,7 +89,7 @@ public class LogsGUI extends ChestMenu {
 
         //Setting the next page option if possible.
         if (Math.min(page * 45, filteredLogs.size()) < filteredLogs.size()) {
-            Button next = new Button(false, new ItemBuilder(Material.BOOK)
+            Button next = new Button(false, new ItemBuilder(XMaterial.BOOK.parseMaterial())
                     .amount(1).name(Color.Red + "Next Page &7(&e" + (page + 1) + "&7)").build(),
                     (player, info) -> {
                         if (info.getClickType().isLeftClick()) {
@@ -106,7 +103,8 @@ public class LogsGUI extends ChestMenu {
 
         val punishments = Kauri.INSTANCE.loggerManager.getPunishments(player.getUniqueId());
 
-        Button getPastebin = new Button(false, new ItemBuilder(Material.SKULL_ITEM).amount(1)
+        Button getPastebin = new Button(false, new ItemBuilder(XMaterial.SKELETON_SKULL.parseMaterial())
+                .amount(1)
                 .durability(3)
                 .owner(player.getName())
                 .name(Color.Red + player.getName())
@@ -139,7 +137,7 @@ public class LogsGUI extends ChestMenu {
 
         //Setting the previous page option if possible.
         if (page > 1) {
-            Button back = new Button(false, new ItemBuilder(Material.BOOK)
+            Button back = new Button(false, new ItemBuilder(XMaterial.BOOK.parseMaterial())
                     .amount(1).name(Color.Red + "Previous Page &7(&e" + (page - 1) + "&7)").build(),
                     (player, info) -> {
                         if (info.getClickType().isLeftClick()) {
@@ -158,7 +156,7 @@ public class LogsGUI extends ChestMenu {
                 lore.add(Color.translate("&7- &f" + s));
             }
             Button stopFilter = new Button(false,
-                    new ItemBuilder(Material.REDSTONE).amount(1)
+                    new ItemBuilder(XMaterial.REDSTONE.parseMaterial()).amount(1)
                             .name(Color.Red + "Stop Filter").lore(lore).build(),
                     (player, info) -> {
                         filtered.clear();
@@ -197,7 +195,8 @@ public class LogsGUI extends ChestMenu {
                     String check = pair.key;
                     val list = pair.value;
                     Button button = new Button(false,
-                            new ItemBuilder(filtered.contains(check) ? Material.EMPTY_MAP : Material.PAPER).amount(1)
+                            new ItemBuilder(filtered.contains(check) ? XMaterial.MAP.parseMaterial() :
+                                    XMaterial.PAPER.parseMaterial()).amount(1)
                                     .name((filtered.contains(check) ? Color.Red + Color.Italics : Color.Gold)
                                             + check)
                                     .lore("", "&7Alerts: &f" + list.size(),
@@ -222,7 +221,8 @@ public class LogsGUI extends ChestMenu {
                                         ? new ItemBuilder(info.getButton().getStack())
                                         .enchantment(Enchantment.DURABILITY, 1)
                                         : new ItemBuilder(info.getButton().getStack()).clearEnchantments())
-                                        .type(filtered.contains(check) ? Material.EMPTY_MAP : Material.PAPER)
+                                        .type(filtered.contains(check) ? XMaterial.MAP.parseMaterial()
+                                                : XMaterial.PAPER.parseMaterial())
                                         .name((filtered.contains(check)
                                                 ? Color.Red + Color.Italics : Color.Gold) + check)
                                         .build());
@@ -233,7 +233,7 @@ public class LogsGUI extends ChestMenu {
                                     lore.add(Color.translate("&7- &f" + s));
                                 }
                                 Button stopFilter = new Button(false,
-                                        new ItemBuilder(Material.REDSTONE).amount(1)
+                                        new ItemBuilder(XMaterial.REDSTONE.parseMaterial()).amount(1)
                                                 .name(Color.Red + "Stop Filter").lore(lore).build(),
                                         (player2, info2) -> {
                                             filtered.clear();
@@ -255,7 +255,7 @@ public class LogsGUI extends ChestMenu {
                 lore.add(Color.translate("&7- &f" + s));
             }
             Button stopFilter = new Button(false,
-                    new ItemBuilder(Material.REDSTONE).amount(1)
+                    new ItemBuilder(XMaterial.REDSTONE.parseMaterial()).amount(1)
                             .name(Color.Red + "Stop Filter").lore(lore).build(),
                     (player, info) -> {
                         filtered.clear();
@@ -287,7 +287,8 @@ public class LogsGUI extends ChestMenu {
             if (shown != null
                     && shown.getOpenInventory() != null
                     && shown.getOpenInventory().getTopInventory() != null
-                    && shown.getOpenInventory().getTopInventory().getTitle().equals(getTitle())) {
+                    && getHolder() != null
+                    && shown.getOpenInventory().getTopInventory() == getHolder().getInventory()) {
                 updateLogs();
                 setButtons(currentPage.get());
                 buildInventory(false);
@@ -340,9 +341,9 @@ public class LogsGUI extends ChestMenu {
     }
 
     private Button buttonFromLog(Log log) {
-        return new Button(false, new ItemBuilder(Material.PAPER)
+        return new Button(false, new ItemBuilder(XMaterial.PAPER.parseMaterial())
                 .amount(1).name(Color.Gold + log.checkName)
-                .lore("", "&eTime&8: &f" + MiscUtils.timeStampToDate(log.timeStamp),
+                .lore("", "&eTime&8: &f" + dev.brighten.anticheat.utils.MiscUtils.timeStampToDate(log.timeStamp),
                         "&eData&8: &f" + log.info,
                         "&eViolation Level&8: &f" + MathUtils.round(log.vl, 3),
                         "&ePing&8: &f" + log.ping,

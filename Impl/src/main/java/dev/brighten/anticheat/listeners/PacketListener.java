@@ -16,26 +16,21 @@ import java.util.concurrent.Executors;
 public class PacketListener implements AtlasListener {
 
     public static ExecutorService packetThread = Executors.newSingleThreadScheduledExecutor();
-    @Listen(priority = ListenerPriority.LOW)
+    @Listen(ignoreCancelled = true, priority = ListenerPriority.LOW)
     public void onEvent(PacketReceiveEvent event) {
-        if(event.isCancelled() || !Kauri.INSTANCE.enabled || event.getPacket() == null) return;
-
-        if(!Kauri.INSTANCE.dataManager.dataMap.containsKey(event.getPlayer().getUniqueId())) {
-            return;
-        }
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
         packetThread.execute(() -> Kauri.INSTANCE.packetProcessor.processClient(event,
                 data, event.getPacket(), event.getType(), event.getTimeStamp()));
     }
 
-    @Listen(priority = ListenerPriority.LOW)
+    @Listen(ignoreCancelled = true,priority = ListenerPriority.LOW)
     public void onEvent(PacketSendEvent event) {
         if(event.isCancelled() || !Kauri.INSTANCE.enabled || event.getPacket() == null) return;
 
-        if(!Kauri.INSTANCE.dataManager.dataMap.containsKey(event.getPlayer().getUniqueId())) {
+        if(!Kauri.INSTANCE.dataManager.dataMap.containsKey(event.getPlayer().getUniqueId()))
             return;
-        }
+
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
         packetThread.execute(() -> Kauri.INSTANCE.packetProcessor.processServer(event,

@@ -25,29 +25,27 @@ public class LogCommand {
     @Command(name = "kauri.logs", description = "View the logs of a user.", display = "logs [player]",
             usage = "/<command> [player]", aliases = {"logs"}, permission = "kauri.command.logs")
     public void onCommand(CommandAdapter cmd) {
-        Kauri.INSTANCE.executor.execute(() -> {
-            if(cmd.getArgs().length == 0) {
-                if(cmd.getPlayer() != null) {
-                    LogsGUI gui = new LogsGUI(cmd.getPlayer());
-                    gui.showMenu(cmd.getPlayer());
-                    cmd.getSender().sendMessage(Color.Green + "Opened menu.");
-                } else cmd.getSender().sendMessage(Color.Red + "You cannot view your own logs since you are not a player.");
-            } else {
-                OfflinePlayer player = Bukkit.getOfflinePlayer(cmd.getArgs()[0]);
+        if(cmd.getArgs().length == 0) {
+            if(cmd.getPlayer() != null) {
+                LogsGUI gui = new LogsGUI(cmd.getPlayer());
+                gui.showMenu(cmd.getPlayer());
+                cmd.getSender().sendMessage(Color.Green + "Opened menu.");
+            } else cmd.getSender().sendMessage(Color.Red + "You cannot view your own logs since you are not a player.");
+        } else {
+            OfflinePlayer player = Bukkit.getOfflinePlayer(cmd.getArgs()[0]);
 
-                if(player == null) {
-                    cmd.getSender().sendMessage(Color.Red + "Somehow, out of hundreds of millions of Minecraft"
-                            + " accounts, you found one that doesn't exist.");
-                    return;
-                }
-
-                if(cmd.getPlayer() != null) {
-                    LogsGUI gui = new LogsGUI(player);
-                    gui.showMenu(cmd.getPlayer());
-                    cmd.getSender().sendMessage(Color.Green + "Opened menu.");
-                } else cmd.getSender().sendMessage(Color.Green + "Logs: " + getLogsFromUUID(Bukkit.getOfflinePlayer(cmd.getArgs()[0]).getUniqueId()));
+            if(player == null) {
+                cmd.getSender().sendMessage(Color.Red + "Somehow, out of hundreds of millions of Minecraft"
+                        + " accounts, you found one that doesn't exist.");
+                return;
             }
-        });
+
+            if(cmd.getPlayer() != null) {
+                LogsGUI gui = new LogsGUI(player);
+                gui.showMenu(cmd.getPlayer());
+                cmd.getSender().sendMessage(Color.Green + "Opened menu.");
+            } else cmd.getSender().sendMessage(Color.Green + "Logs: " + getLogsFromUUID(Bukkit.getOfflinePlayer(cmd.getArgs()[0]).getUniqueId()));
+        }
     }
 
     @Command(name = "kauri.logs.clear", display = "logs clear [player]", description = "Clear logs of a player",

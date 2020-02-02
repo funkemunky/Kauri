@@ -7,6 +7,7 @@ import cc.funkemunky.api.profiling.ResultsType;
 import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.utils.AtomicDouble;
+import dev.brighten.anticheat.utils.Helper;
 import dev.brighten.anticheat.utils.ItemBuilder;
 import dev.brighten.anticheat.utils.Pastebin;
 import dev.brighten.anticheat.utils.menu.button.Button;
@@ -15,7 +16,6 @@ import dev.brighten.anticheat.utils.menu.type.impl.ChestMenu;
 import lombok.val;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -67,16 +67,16 @@ public class ProfilerCommand {
 
                 map.forEach((key, result) -> {
                     if(!key.contains("check:")) {
-                        Button button = new Button(false, new ItemBuilder(Material.REDSTONE)
+                        Button button = new Button(false, new ItemBuilder(XMaterial.REDSTONE.parseMaterial())
                                 .amount(1)
                                 .name(Color.Gold + key).lore("",
-                                        "&7Weighted Usage: " + dev.brighten.anticheat.utils.MiscUtils
+                                        "&7Weighted Usage: " + Helper
                                                 .drawUsage(total, result.two),
-                                        "&7MS: &f" + dev.brighten.anticheat.utils.MiscUtils
+                                        "&7MS: &f" + Helper
                                                 .format(Kauri.INSTANCE.profiler.total.get(key) / 1000000D, 3),
-                                        "&7Samples: &f" + dev.brighten.anticheat.utils.MiscUtils
+                                        "&7Samples: &f" + Helper
                                                 .format(result.two / 1000000D, 3),
-                                        "&7Deviation: &f" + dev.brighten.anticheat.utils.MiscUtils
+                                        "&7Deviation: &f" + Helper
                                                 .format(Kauri.INSTANCE.profiler.stddev
                                                         .getOrDefault(key, 0L), 3) / 1000000D).build());
 
@@ -90,18 +90,18 @@ public class ProfilerCommand {
                 double totalMs = total / 1000000D;
                 if (finalPage > 1) {
                     menu.setItem(48, new Button(false,
-                            new ItemBuilder(Material.BOOK).amount(1).name("&cBack").build(),
+                            new ItemBuilder(XMaterial.BOOK.parseMaterial()).amount(1).name("&cBack").build(),
                             (player, info) -> Bukkit.dispatchCommand(player,
                                     "kauri profile testGUI " + (finalPage - 1))));
                 }
                 menu.setItem(49, new Button(false,
-                        new ItemBuilder(Material.REDSTONE)
+                        new ItemBuilder(XMaterial.REDSTONE.parseMaterial())
                                 .amount(1)
                                 .name(Color.Gold + "Total").lore("",
-                                "&7Usage: " + dev.brighten.anticheat.utils.MiscUtils.drawUsage(50,
-                                        dev.brighten.anticheat.utils.MiscUtils.format(samples.get(), 3)),
-                                "&7Total: &f" + dev.brighten.anticheat.utils.MiscUtils.format(totalMs, 3),
-                                "&7Samples: &f" + dev.brighten.anticheat.utils.MiscUtils.format(samples.get(), 3),
+                                "&7Usage: " + Helper.drawUsage(50,
+                                        Helper.format(samples.get(), 3)),
+                                "&7Total: &f" + Helper.format(totalMs, 3),
+                                "&7Samples: &f" + Helper.format(samples.get(), 3),
                                 "",
                                 "&7&oRight click to reset data.")
                                 .build(),
@@ -111,7 +111,7 @@ public class ProfilerCommand {
                             }
                         }));
                 menu.setItem(50, new Button(false,
-                        new ItemBuilder(Material.BOOK).amount(1).name("&cNext").build(),
+                        new ItemBuilder(XMaterial.BOOK.parseMaterial()).amount(1).name("&cNext").build(),
                         (player, info) -> Bukkit.dispatchCommand(player,
                                 "kauri profile testGUI " + (finalPage + 1))));
                 for (int i = (finalPage - 1) * 45; i < Math.min(finalPage * 45, buttons.size()); i++) {
@@ -138,24 +138,24 @@ public class ProfilerCommand {
                         String name = entry.getKey();
                         Long time = entry.getValue();
                         total.addAndGet(time);
-                        cmd.getSender().sendMessage(dev.brighten.anticheat.utils.MiscUtils
+                        cmd.getSender().sendMessage(Helper
                                 .drawUsage(total.get(), time)
                                 + " §c" + name
-                                + "§7: " + dev.brighten.anticheat.utils.MiscUtils.format(time / 1000000D, 3)
-                                + ", " + dev.brighten.anticheat.utils.MiscUtils
+                                + "§7: " + Helper.format(time / 1000000D, 3)
+                                + ", " + Helper
                                 .format(Kauri.INSTANCE.profiler.samples
                                         .getOrDefault(name, new Tuple<>(0L, 0L)).one / 1000000D, 3)
-                                + ", " + dev.brighten.anticheat.utils.MiscUtils
+                                + ", " + Helper
                                 .format(Kauri.INSTANCE.profiler.stddev
                                         .getOrDefault(name, 0L) / 1000000D, 3));
                     });
             double totalMs = total.get() / 1000000D;
             long totalTime = Kauri.INSTANCE.profiler.totalCalls * 50;
-            cmd.getSender().sendMessage(dev.brighten.anticheat.utils.MiscUtils
-                    .drawUsage(total.get(), dev.brighten.anticheat.utils.MiscUtils
+            cmd.getSender().sendMessage(Helper
+                    .drawUsage(total.get(), Helper
                             .format(totalMs / totalTime, 3))
-                    + " §cTotal§7: " + dev.brighten.anticheat.utils.MiscUtils.format(totalMs, 3)
-                    + " §f- §c" + dev.brighten.anticheat.utils.MiscUtils
+                    + " §cTotal§7: " + Helper.format(totalMs, 3)
+                    + " §f- §c" + Helper
                     .format(totalMs / totalTime, 3) + "%");
             cmd.getSender().sendMessage("-------------------------------------------------");
         }
@@ -193,21 +193,21 @@ public class ProfilerCommand {
                         String name = key;
                         double time = entry.two / 1000000D;
                         samples.addAndGet(time);
-                        cmd.getSender().sendMessage(dev.brighten.anticheat.utils.MiscUtils.drawUsage(50,
+                        cmd.getSender().sendMessage(Helper.drawUsage(50,
                                 time)
                                 + " §c" + name
-                                + "§7: " + dev.brighten.anticheat.utils.MiscUtils.format(time / 1000000D, 3)
-                                + ", " + dev.brighten.anticheat.utils.MiscUtils
+                                + "§7: " + Helper.format(time / 1000000D, 3)
+                                + ", " + Helper
                                 .format(Kauri.INSTANCE.profiler.samples
                                         .getOrDefault(name, new Tuple<>(0L, 0L)).one / 1000000D, 3)
-                                + ", " + dev.brighten.anticheat.utils.MiscUtils
+                                + ", " + Helper
                                 .format(Kauri.INSTANCE.profiler.stddev.getOrDefault(name, 0L) / 1000000D, 3));
                     });
                     double totalMs = total / 1000000D;
-                    cmd.getSender().sendMessage(dev.brighten.anticheat.utils.MiscUtils
-                            .drawUsage(50, dev.brighten.anticheat.utils.MiscUtils.format(totalMs, 3))
-                            + " §cTotal§7: " + dev.brighten.anticheat.utils.MiscUtils.format(totalMs, 3)
-                            + " §f- §c" + dev.brighten.anticheat.utils.MiscUtils.format(samples.get(), 3) + "%");
+                    cmd.getSender().sendMessage(Helper
+                            .drawUsage(50, Helper.format(totalMs, 3))
+                            + " §cTotal§7: " + Helper.format(totalMs, 3)
+                            + " §f- §c" + Helper.format(samples.get(), 3) + "%");
                     cmd.getSender().sendMessage("-------------------------------------------------");
                 }
             }, Kauri.INSTANCE, 30L, 3L);

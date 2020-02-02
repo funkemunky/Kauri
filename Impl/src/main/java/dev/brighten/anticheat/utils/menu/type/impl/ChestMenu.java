@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.utils.menu.type.impl;
 
+import cc.funkemunky.api.utils.XMaterial;
 import dev.brighten.anticheat.utils.menu.Menu;
 import dev.brighten.anticheat.utils.menu.button.Button;
 import dev.brighten.anticheat.utils.menu.type.BukkitInventoryHolder;
@@ -8,7 +9,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import java.util.Iterator;
@@ -27,6 +27,7 @@ public class ChestMenu implements Menu {
     private final MenuDimension dimension;
     @Setter
     private Menu parent;
+    @Getter
     private BukkitInventoryHolder holder;
     public Button[] contents;
     private CloseHandler closeHandler;
@@ -64,7 +65,8 @@ public class ChestMenu implements Menu {
     @Override
     public void fillRange(int startingIndex, int endingIndex, Button button) {
         IntStream.range(startingIndex, endingIndex)
-                .filter(i -> contents[i] == null || contents[i].getStack().getItemMeta().equals(Material.AIR))
+                .filter(i -> contents[i] == null || contents[i].getStack().getType()
+                        .equals(XMaterial.AIR.parseMaterial()))
                 .forEach(i -> setItem(i, button));
     }
 

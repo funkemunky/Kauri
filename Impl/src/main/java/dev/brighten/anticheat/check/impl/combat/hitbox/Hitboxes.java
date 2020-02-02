@@ -4,6 +4,7 @@ import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.KLocation;
+import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.MiscUtils;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.*;
@@ -51,7 +52,7 @@ public class Hitboxes extends Check {
                     .stream()
                     .peek(loc -> loc.y+=data.playerInfo.sneaking ? 1.54 : 1.62)
                     .map(loc -> new RayCollision(loc.toVector(),
-                            dev.brighten.anticheat.utils.MiscUtils.getDirection(loc)))
+                            MathUtils.getDirection(loc)))
                     .collect(Collectors.toList());
 
             List<BoundingBox> entityLocations = data.targetPastLocation

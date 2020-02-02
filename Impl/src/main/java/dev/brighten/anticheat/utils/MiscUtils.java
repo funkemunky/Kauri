@@ -1,6 +1,6 @@
 package dev.brighten.anticheat.utils;
 
-import cc.funkemunky.api.reflection.MinecraftReflection;
+import cc.funkemunky.api.reflections.impl.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedPacketPlayOutWorldParticle;
 import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumAnimation;
@@ -19,7 +19,6 @@ import org.bukkit.util.Vector;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 
 public class MiscUtils {
@@ -102,18 +101,6 @@ public class MiscUtils {
         return MathUtils.yawTo180D(playerRotation.getX() - expectedRotation.getX());
     }
 
-    /* Stolen from Bukkit */
-    public static Vector getDirection(KLocation loc) {
-        Vector vector = new Vector();
-        double rotX = (double)loc.yaw;
-        double rotY = (double)loc.pitch;
-        vector.setY(-Math.sin(Math.toRadians(rotY)));
-        double xz = Math.cos(Math.toRadians(rotY));
-        vector.setX(-xz * Math.sin(Math.toRadians(rotX)));
-        vector.setZ(xz * Math.cos(Math.toRadians(rotX)));
-        return vector;
-    }
-
 
     public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
         List<Map.Entry<K, V>> list = new ArrayList<>(map.entrySet());
@@ -126,27 +113,6 @@ public class MiscUtils {
         LongStream.Builder longBuilder = LongStream.builder();
         collection.forEach(longBuilder::add);
         return longBuilder.build();
-    }
-
-    private static final int[] decimalPlaces = {0, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000};
-
-    public static double format(double d, int dec) {
-        return (long) (d * decimalPlaces[dec] + 0.5) / (double) decimalPlaces[dec];
-    }
-
-    public static String drawUsage(long max, long time) {
-        double chunk = max / 50.;
-        String line = IntStream.range(0, 50).mapToObj(i -> (chunk * i < time ? "§c" : "§7") + "❘").collect(Collectors.joining("", "[", ""));
-        String zeros = "00";
-        String nums = Integer.toString((int) ((time / (double) max) * 100));
-        return line + "§f] §c" + zeros.substring(0, 3 - nums.length()) + nums + "% §f❘";
-    }
-
-    public static String drawUsage(long max, double time) {
-        double chunk = max / 50.;
-        String line = IntStream.range(0, 50).mapToObj(i -> (chunk * i < time ? "§c" : "§7") + "❘").collect(Collectors.joining("", "[", ""));
-        String nums = String.valueOf(format((time / (double) max) * 100, 3));
-        return line + "§f] §c" + nums + "%";
     }
 
     public static float getYawChangeToEntity(Player player, LivingEntity entity, KLocation from, KLocation to) {

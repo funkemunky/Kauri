@@ -2,6 +2,8 @@ package dev.brighten.anticheat.utils.menu;
 
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
+import cc.funkemunky.api.utils.MiscUtils;
+import cc.funkemunky.api.utils.XMaterial;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.utils.menu.button.Button;
 import dev.brighten.anticheat.utils.menu.button.ClickAction;
@@ -49,7 +51,7 @@ public class MenuListener implements Listener {
 
             if (menu != null) {
                 final ItemStack stack = event.getCurrentItem();
-                if ((stack == null || stack.getType() == Material.AIR))
+                if ((stack == null || stack.getType() == XMaterial.AIR.parseMaterial()))
                     return;
 
                 int slot = event.getSlot();
@@ -111,13 +113,6 @@ public class MenuListener implements Listener {
 
             anvils.get(anvil).consumer.accept(event.getPlayer(), Color.translate(anvil.getName()));
             anvils.remove(anvil);
-        }
-    }
-
-    @EventHandler
-    public void onClickMenu(InventoryClickEvent e) {
-        if (e.getClickedInventory() != null && e.getClickedInventory().getTitle().contains("&9&l ")) {
-            e.setCancelled(true);
         }
     }
 }

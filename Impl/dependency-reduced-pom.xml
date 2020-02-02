@@ -43,14 +43,20 @@
   <dependencies>
     <dependency>
       <groupId>org.github.spigot</groupId>
-      <artifactId>1.12.2</artifactId>
-      <version>1.12.2</version>
+      <artifactId>1.8.8</artifactId>
+      <version>1.8.8</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.github.spigot</groupId>
-      <artifactId>1.8.8</artifactId>
-      <version>1.8.8</version>
+      <artifactId>1.13.2</artifactId>
+      <version>1.13.2</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.github.spigot</groupId>
+      <artifactId>1.12.2</artifactId>
+      <version>1.12.2</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

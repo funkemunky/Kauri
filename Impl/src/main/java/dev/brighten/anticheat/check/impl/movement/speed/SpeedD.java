@@ -33,6 +33,7 @@ public class SpeedD extends Check {
                     + " key=" + data.predictionService.key
                     + " velocity=" + data.playerInfo.lastVelocity.getPassed() + " vl=" + vl);
         } else vl-= vl > 0 ? 0.01f : 0;
+        //debug("general=" + data.playerInfo.generalCancel);
     }
 
 }

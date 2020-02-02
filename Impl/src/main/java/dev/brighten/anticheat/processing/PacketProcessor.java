@@ -2,7 +2,7 @@ package dev.brighten.anticheat.processing;
 
 import cc.funkemunky.api.events.impl.PacketReceiveEvent;
 import cc.funkemunky.api.events.impl.PacketSendEvent;
-import cc.funkemunky.api.reflection.MinecraftReflection;
+import cc.funkemunky.api.reflections.impl.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
@@ -17,14 +17,9 @@ import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.MiscUtils;
-import dev.brighten.anticheat.utils.menu.type.impl.ValueMenu;
-import dev.brighten.db.utils.security.GeneralUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
-
-import java.io.IOException;
 
 public class PacketProcessor {
 
@@ -108,10 +103,19 @@ public class PacketProcessor {
                         > new VariableValue<>(20000L, 5000L, () -> Kauri.INSTANCE.isNewer).get())
                     RunUtils.task(() -> data.getPlayer().kickPlayer("Lag?"));
 
+                //if(event.getType().contains("Position")
+                //        || event.getType().contains("Look")
+                //        || event.getType().equalsIgnoreCase(Packet.Client.FLYING)) Bukkit.broadcastMessage(event.getType() + ":3");
+
                 data.lagInfo.lastFlying = timeStamp;
 
                 data.moveProcessor.process(packet, timeStamp);
+
+                //if(event.getType().contains("Position")
+                //        || event.getType().contains("Look")
+                //        || event.getType().equalsIgnoreCase(Packet.Client.FLYING)) Bukkit.broadcastMessage(event.getType() + ":4");
                 data.predictionService.onReceive(packet); //Processing for prediction service.
+;
                 data.checkManager.runPacket(packet, timeStamp);
                 if(data.sniffing) {
                     data.sniffedPackets.add(event.getType() + ":@:"
@@ -326,6 +330,7 @@ public class PacketProcessor {
 
     public void processServer(PacketSendEvent event, ObjectData data, Object object, String type, long timeStamp) {
         Kauri.INSTANCE.profiler.start("packet:server:" + type);
+
         switch (type) {
             case Packet.Server.ABILITIES: {
                 WrappedOutAbilitiesPacket packet = new WrappedOutAbilitiesPacket(object, data.getPlayer());

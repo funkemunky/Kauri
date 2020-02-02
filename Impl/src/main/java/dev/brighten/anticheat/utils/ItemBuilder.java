@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.utils;
 
+import cc.funkemunky.api.utils.XMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -214,7 +215,10 @@ public class ItemBuilder {
      * @since 1.1
      */
     public ItemBuilder color(Color color) {
-        if (is.getType() == Material.LEATHER_BOOTS || is.getType() == Material.LEATHER_CHESTPLATE || is.getType() == Material.LEATHER_HELMET || is.getType() == Material.LEATHER_LEGGINGS) {
+        if (is.getType() == XMaterial.LEATHER_BOOTS.parseMaterial()
+                || is.getType() == XMaterial.LEATHER_CHESTPLATE .parseMaterial()
+                || is.getType() == XMaterial.LEATHER_HELMET.parseMaterial()
+                || is.getType() == XMaterial.LEATHER_LEGGINGS.parseMaterial()) {
             LeatherArmorMeta meta = (LeatherArmorMeta) is.getItemMeta();
             meta.setColor(color);
             is.setItemMeta(meta);
