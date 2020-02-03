@@ -395,6 +395,16 @@ public class PacketProcessor {
                 }
                 break;
             }
+            case Packet.Server.COMMANDS: {
+                System.out.println("command");
+                break;
+            }
+            case Packet.Server.TAB_COMPLETE: {
+                WrappedOutTabComplete packet = new WrappedOutTabComplete(object, data.getPlayer());
+
+                System.out.println(packet.id + ": " + String.join(", ", packet.suggestions));
+                break;
+            }
             /* NOTE: Keepalives or transactions cause kicks. My bet is it is the transaction */
             case Packet.Server.POSITION: {
                 WrappedOutPositionPacket packet = new WrappedOutPositionPacket(object, data.getPlayer());

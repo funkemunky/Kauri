@@ -5,7 +5,6 @@ import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.commands.LogCommand;
 import dev.brighten.anticheat.logs.objects.Log;
-import dev.brighten.anticheat.utils.ItemBuilder;
 import dev.brighten.anticheat.utils.menu.button.Button;
 import dev.brighten.anticheat.utils.menu.button.ClickAction;
 import dev.brighten.anticheat.utils.menu.preset.button.FillerButton;
@@ -13,7 +12,6 @@ import dev.brighten.anticheat.utils.menu.type.impl.ChestMenu;
 import dev.brighten.db.utils.Pair;
 import lombok.val;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -103,7 +101,7 @@ public class LogsGUI extends ChestMenu {
 
         val punishments = Kauri.INSTANCE.loggerManager.getPunishments(player.getUniqueId());
 
-        Button getPastebin = new Button(false, new ItemBuilder(XMaterial.SKELETON_SKULL.parseMaterial())
+        Button getPastebin = new Button(false, new ItemBuilder(XMaterial.SKULL_ITEM.parseMaterial())
                 .amount(1)
                 .durability(3)
                 .owner(player.getName())

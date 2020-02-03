@@ -6,15 +6,15 @@ import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.Materials;
 import cc.funkemunky.api.utils.TickTimer;
 import cc.funkemunky.api.utils.Tuple;
+import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import cc.funkemunky.api.utils.world.BlockData;
+import cc.funkemunky.api.utils.world.types.RayCollision;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Event;
 import dev.brighten.anticheat.check.api.Packet;
-import dev.brighten.anticheat.utils.EvictingList;
 import dev.brighten.anticheat.utils.Helper;
-import dev.brighten.anticheat.utils.RayCollision;
 import dev.brighten.api.check.CheckType;
 import org.bukkit.block.Block;
 import org.bukkit.event.block.Action;
@@ -88,7 +88,7 @@ public class Phase extends Check {
             RayCollision ray = new RayCollision(oldPos, rayDir);
             Tuple<Double, Double> pair = new Tuple<>(0d, 0d);
             for (SimpleCollisionBox box : downcasted) {
-                if (RayCollision.intersect(ray, box.toBoundingBox(), pair)) {
+                if (RayCollision.intersect(ray, box, pair)) {
                     if (pair.one <= dist) {
                         if (!data.playerInfo.wasOnSlime && dist >= 1) {
                             vl++;

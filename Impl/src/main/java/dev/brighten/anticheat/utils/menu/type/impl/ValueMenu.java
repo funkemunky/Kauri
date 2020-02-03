@@ -1,7 +1,7 @@
 package dev.brighten.anticheat.utils.menu.type.impl;
 
+import cc.funkemunky.api.utils.ItemBuilder;
 import cc.funkemunky.api.utils.XMaterial;
-import dev.brighten.anticheat.utils.ItemBuilder;
 import dev.brighten.anticheat.utils.menu.MenuListener;
 import dev.brighten.anticheat.utils.menu.button.Button;
 import org.bukkit.Bukkit;

@@ -2,14 +2,10 @@ package dev.brighten.anticheat.menu;
 
 import cc.funkemunky.api.handlers.ForgeHandler;
 import cc.funkemunky.api.handlers.ModData;
-import cc.funkemunky.api.utils.Color;
-import cc.funkemunky.api.utils.MiscUtils;
-import cc.funkemunky.api.utils.RunUtils;
-import cc.funkemunky.api.utils.XMaterial;
+import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.logs.objects.Log;
-import dev.brighten.anticheat.utils.ItemBuilder;
 import dev.brighten.anticheat.utils.menu.button.Button;
 import dev.brighten.anticheat.utils.menu.type.impl.ChestMenu;
 import org.apache.commons.lang.time.DurationFormatUtils;
@@ -59,7 +55,7 @@ public class PlayerInformationGUI extends ChestMenu {
     }
 
     private ItemStack playerSkull() {
-        ItemBuilder vioItem = new ItemBuilder(XMaterial.SKELETON_SKULL.parseMaterial());
+        ItemBuilder vioItem = new ItemBuilder(XMaterial.SKULL_ITEM.parseMaterial());
 
         vioItem.amount(1);
         vioItem.durability(3);

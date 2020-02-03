@@ -5,6 +5,7 @@ import cc.funkemunky.api.commands.ancmd.CommandAdapter;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.RunUtils;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.logs.objects.Punishment;
@@ -25,27 +26,42 @@ public class LogCommand {
     @Command(name = "kauri.logs", description = "View the logs of a user.", display = "logs [player]",
             usage = "/<command> [player]", aliases = {"logs"}, permission = "kauri.command.logs")
     public void onCommand(CommandAdapter cmd) {
-        if(cmd.getArgs().length == 0) {
-            if(cmd.getPlayer() != null) {
-                LogsGUI gui = new LogsGUI(cmd.getPlayer());
-                gui.showMenu(cmd.getPlayer());
-                cmd.getSender().sendMessage(Color.Green + "Opened menu.");
-            } else cmd.getSender().sendMessage(Color.Red + "You cannot view your own logs since you are not a player.");
-        } else {
-            OfflinePlayer player = Bukkit.getOfflinePlayer(cmd.getArgs()[0]);
+        Kauri.INSTANCE.executor.execute(() -> {
+            if(cmd.getArgs().length == 0) {
+                if(cmd.getPlayer() != null) {
+                    LogsGUI gui = new LogsGUI(cmd.getPlayer());
+                    RunUtils.task(() -> {
+                        gui.showMenu(cmd.getPlayer());
+                        cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                                .msg("opened-menu", "&aOpened menu."));
+                        cmd.getSender().sendMessage(Color.Green + "Opened menu.");
+                    }, Kauri.INSTANCE);
+                } else cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                        .msg("no-console-logs",
+                                "&cYou cannot view your own logs since you are not a player."));
+            } else {
+                OfflinePlayer player = Bukkit.getOfflinePlayer(cmd.getArgs()[0]);
 
-            if(player == null) {
-                cmd.getSender().sendMessage(Color.Red + "Somehow, out of hundreds of millions of Minecraft"
-                        + " accounts, you found one that doesn't exist.");
-                return;
+                if(player == null) {
+                    cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                            .msg("offline-player-not-found", "&cSomehow, out of hundreds of millions of"
+                                    + "Minecraft accounts, you found one that doesn't exist."));
+                    return;
+                }
+
+                if(cmd.getPlayer() != null) {
+                    LogsGUI gui = new LogsGUI(player);
+                    RunUtils.task(() -> {
+                        gui.showMenu(cmd.getPlayer());
+                        cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                                .msg("opened-menu", "&aOpened menu."));
+                    }, Kauri.INSTANCE);
+                } else cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                        .msg("logs-pastebin",
+                                "&aLogs: %pastebin%".replace("%pastebin%",
+                                        getLogsFromUUID(player.getUniqueId()))));
             }
-
-            if(cmd.getPlayer() != null) {
-                LogsGUI gui = new LogsGUI(player);
-                gui.showMenu(cmd.getPlayer());
-                cmd.getSender().sendMessage(Color.Green + "Opened menu.");
-            } else cmd.getSender().sendMessage(Color.Green + "Logs: " + getLogsFromUUID(Bukkit.getOfflinePlayer(cmd.getArgs()[0]).getUniqueId()));
-        }
+        });
     }
 
     @Command(name = "kauri.logs.clear", display = "logs clear [player]", description = "Clear logs of a player",
@@ -55,14 +71,15 @@ public class LogCommand {
             OfflinePlayer player = Bukkit.getOfflinePlayer(cmd.getArgs()[0]);
 
             if(player == null) {
-                cmd.getSender().sendMessage(Color.Red + "Somehow, out of hundreds of millions of Minecraft"
-                        + " accounts, you found one that doesn't exist.");
+                cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                        .msg("offline-player-not-found", "&cSomehow, out of hundreds of millions of"
+                                + "Minecraft accounts, you found one that doesn't exist."));
                 return;
             }
 
             if(cmd.getPlayer() != null) {
                 ConfirmationMenu menu = new ConfirmationMenu(
-                        "Are you sure you want to clear " + player.getName() + "'s logs?",
+                        "Clear " + player.getName() + "'s logs?",
                         (pl, confirmed) -> {
                             if(confirmed) {
                                 Kauri.INSTANCE.executor.execute(() -> {
@@ -110,7 +127,6 @@ public class LogCommand {
                     + "] (tps=" + MathUtils.round(log.tps, 4) + " ping=" + log.ping + " info=[" + log.info + "])";
             eventsByStamp.put(log.timeStamp, built);
         });
-
         punishments.forEach(punishment -> {
             String built = "Punishment applied @ (" + format.format(new Date(punishment.timeStamp)) + ") from check "
                     + punishment.checkName;

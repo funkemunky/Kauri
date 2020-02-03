@@ -2,13 +2,13 @@ package dev.brighten.anticheat.commands;
 
 import cc.funkemunky.api.commands.ancmd.Command;
 import cc.funkemunky.api.commands.ancmd.CommandAdapter;
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckSettings;
 import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.menu.LogsGUI;
-import dev.brighten.anticheat.utils.ItemBuilder;
 import dev.brighten.anticheat.utils.Pastebin;
 import dev.brighten.anticheat.utils.menu.button.Button;
 import dev.brighten.anticheat.utils.menu.button.ClickAction;
@@ -257,16 +257,19 @@ public class MenuCommand {
 
         menu.setParent(main);
 
-        Map<UUID, List<Log>> logs = Kauri.INSTANCE.loggerManager.getLogsWithinTimeFrame(TimeUnit.DAYS.toMillis(1));
+        Map<UUID, List<Log>> logs = Kauri.INSTANCE.loggerManager
+                .getLogsWithinTimeFrame(TimeUnit.DAYS.toMillis(1));
 
-        List<UUID> sortedIds = logs.keySet().stream().sorted(Comparator.comparing(key -> logs.get(key).get(0).timeStamp)).collect(Collectors.toList());
+        List<UUID> sortedIds = logs.keySet().stream()
+                .sorted(Comparator.comparing(key -> logs.get(key).get(0).timeStamp))
+                .collect(Collectors.toList());
 
         for (int i = 0; i < Math.min(45, sortedIds.size()); i++) {
             UUID uuid = sortedIds.get(i);
             OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
             Log vl = logs.get(uuid).get(0);
 
-            ItemBuilder builder = new ItemBuilder(XMaterial.SKELETON_SKULL.parseMaterial());
+            ItemBuilder builder = new ItemBuilder(XMaterial.SKULL_ITEM.parseMaterial());
 
             builder.amount(1);
             builder.durability(3);

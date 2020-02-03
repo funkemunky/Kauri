@@ -1,8 +1,8 @@
 package dev.brighten.anticheat.check.impl.combat.autoclicker;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.utils.math.cond.MaxInteger;
+import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.check.api.*;
-import dev.brighten.anticheat.utils.EvictingList;
 import dev.brighten.anticheat.utils.GraphUtil;
 import dev.brighten.api.check.CheckType;
 

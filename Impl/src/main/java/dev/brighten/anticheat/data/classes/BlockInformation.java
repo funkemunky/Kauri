@@ -109,7 +109,7 @@ public class BlockInformation {
         onSlab = handler.isCollidedWith(Materials.SLABS);
         onStairs = handler.isCollidedWith(Materials.STAIRS);
         onHalfBlock = onSlab || onStairs
-                || handler.isCollidedWith(XMaterial.CAKE.parseMaterial(), XMaterial.SKELETON_SKULL.parseMaterial(),
+                || handler.isCollidedWith(XMaterial.CAKE.parseMaterial(), XMaterial.SKULL_ITEM.parseMaterial(),
                 XMaterial.SNOW.parseMaterial(), XMaterial.WITHER_SKELETON_SKULL.parseMaterial(),
                 XMaterial.SKELETON_WALL_SKULL.parseMaterial(), XMaterial.WITHER_SKELETON_WALL_SKULL.parseMaterial());
 

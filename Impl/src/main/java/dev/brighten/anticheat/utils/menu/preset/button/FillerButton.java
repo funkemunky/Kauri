@@ -1,7 +1,7 @@
 package dev.brighten.anticheat.utils.menu.preset.button;
 
+import cc.funkemunky.api.utils.ItemBuilder;
 import cc.funkemunky.api.utils.XMaterial;
-import dev.brighten.anticheat.utils.ItemBuilder;
 import dev.brighten.anticheat.utils.menu.button.Button;
 
 public class FillerButton extends Button {

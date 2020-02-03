@@ -3,6 +3,7 @@ package dev.brighten.anticheat.commands;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.commands.ancmd.Command;
 import cc.funkemunky.api.commands.ancmd.CommandAdapter;
+import cc.funkemunky.api.reflections.types.WrappedClass;
 import cc.funkemunky.api.utils.Init;
 import dev.brighten.anticheat.Kauri;
 import org.bukkit.entity.Player;
@@ -38,6 +39,12 @@ public class KauriCommand {
             cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
                     .msg("testers-added", "&aYou have been added to the test messaging list for developers."));
         }
+    }
+
+    @Command(name = "kauri.updatecmds")
+    public void onUpdate(CommandAdapter cmd) {
+        new WrappedClass(cmd.getPlayer().getClass()).getMethod("updateCommands").invoke(cmd.getPlayer());
+        cmd.getSender().sendMessage("updated");
     }
 
    /* @Command(name = "kchecksum", permission = "kauri.command.admin.checksum")

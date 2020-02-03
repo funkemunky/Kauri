@@ -1,10 +1,7 @@
 package dev.brighten.anticheat.utils;
 
 import cc.funkemunky.api.reflections.impl.MinecraftReflection;
-import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedPacketPlayOutWorldParticle;
 import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumAnimation;
-import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
@@ -63,17 +60,6 @@ public class MiscUtils {
         // output.split();
         // return output.toString();
         return output.toString().split("\n");
-    }
-
-    public static void drawRay(RayCollision collision, WrappedEnumParticle particle, Collection<? extends Player> players) {
-        for (double i = 0; i < 8; i += 0.2) {
-            float fx = (float) (collision.originX + (collision.directionX * i));
-            float fy = (float) (collision.originY + (collision.directionY * i));
-            float fz = (float) (collision.originZ + (collision.directionZ * i));
-            Object packet = new WrappedPacketPlayOutWorldParticle(particle, true, fx, fy, fz,
-                    0F, 0F, 0F, 0, 0).getObject();
-            players.forEach(p -> TinyProtocolHandler.sendPacket(p, packet));
-        }
     }
 
     public static void testMessage(String message) {

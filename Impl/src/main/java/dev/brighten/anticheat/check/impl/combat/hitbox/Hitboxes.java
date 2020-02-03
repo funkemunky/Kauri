@@ -1,16 +1,15 @@
 package dev.brighten.anticheat.check.impl.combat.hitbox;
 
-import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.MiscUtils;
+import cc.funkemunky.api.utils.world.types.RayCollision;
+import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.AtomicDouble;
-import dev.brighten.anticheat.utils.RayCollision;
 import dev.brighten.api.check.CheckType;
 import org.bukkit.GameMode;
 import org.bukkit.entity.EntityType;
@@ -55,7 +54,7 @@ public class Hitboxes extends Check {
                             MathUtils.getDirection(loc)))
                     .collect(Collectors.toList());
 
-            List<BoundingBox> entityLocations = data.targetPastLocation
+            List<SimpleCollisionBox> entityLocations = data.targetPastLocation
                     .getEstimatedLocation(data.lagInfo.transPing, 180L)
                     .stream()
                     .map(loc -> getHitbox(loc, data.target.getType()))
@@ -96,18 +95,11 @@ public class Hitboxes extends Check {
                 && !data.getPlayer().getGameMode().equals(GameMode.CREATIVE);
     }
 
-    private static BoundingBox getHitbox(KLocation loc, EntityType type) {
+    private static SimpleCollisionBox getHitbox(KLocation loc, EntityType type) {
         Vector bounds = MiscUtils.entityDimensions.get(type);
 
-        BoundingBox box = new BoundingBox(loc.toVector(), loc.toVector())
-                .grow((float)bounds.getX(), 0, (float)bounds.getZ())
-                .add(0,0,0,0,(float)bounds.getY(),0)
-                .grow(0.02f,0.02f,0.02f);
-
-        if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9)) {
-            return box.grow(0.1f,0.1f,0.1f);
-        }
-
-        return box;
+        return new SimpleCollisionBox(loc.toVector(), loc.toVector())
+                .expand(bounds.getX(), 0, bounds.getZ())
+                .expand(0, bounds.getY(), 0).expand(0.1f,0.1f,0.1f);
     }
 }
