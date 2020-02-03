@@ -7,6 +7,7 @@ import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.TickTimer;
 import cc.funkemunky.api.utils.math.RollingAverageLong;
 import cc.funkemunky.api.utils.math.cond.MaxInteger;
+import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.CancelType;
@@ -48,7 +49,7 @@ public class ObjectData {
     public boolean banned;
     public ProtocolVersion playerVersion = ProtocolVersion.UNKNOWN;
     public Set<Player> boxDebuggers = new HashSet<>();
-    public List<CancelType> typesToCancel = Collections.synchronizedList(new ArrayList<>());
+    public List<CancelType> typesToCancel = Collections.synchronizedList(new EvictingList<>(10));
     public List<String> sniffedPackets = new ArrayList<>();
     public BukkitTask task;
 

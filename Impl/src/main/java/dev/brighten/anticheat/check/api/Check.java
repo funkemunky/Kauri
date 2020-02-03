@@ -254,6 +254,7 @@ public class Check implements KauriCheck {
         register(new FlyE());
         register(new FlyF());
         register(new FlyF());
+        register(new FlyG());
         register(new FastLadder());
         register(new NoFallA());
         register(new NoFallB());
@@ -267,7 +268,6 @@ public class Check implements KauriCheck {
         register(new AimF());
         register(new AimG());
         register(new AimH());
-        register(new AimI());
         register(new SpeedA());
         register(new SpeedB());
         register(new SpeedC());
