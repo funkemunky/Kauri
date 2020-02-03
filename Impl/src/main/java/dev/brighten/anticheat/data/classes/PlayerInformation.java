@@ -12,8 +12,9 @@ public class PlayerInformation {
             collided,
             onLadder, usingItem, wasOnIce, wasOnSlime, jumped, inAir, lworldLoaded, worldLoaded;
     public boolean generalCancel, flightCancel;
-    public float fallDistance, jumpHeight;
-    public double deltaY, lDeltaY, deltaX, lDeltaX, deltaZ, lDeltaZ, deltaXZ, lDeltaXZ;
+    public float fallDistance;
+    public double deltaY, lDeltaY, deltaX, lDeltaX, deltaZ, lDeltaZ, deltaXZ, lDeltaXZ,
+            jumpHeight, totalHeight;
     public float headYaw, headPitch;
     public float deltaYaw, deltaPitch, lDeltaYaw, lDeltaPitch;
     public long lastVelocityTimestamp;

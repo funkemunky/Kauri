@@ -5,6 +5,7 @@ import cc.funkemunky.api.bungee.BungeeAPI;
 import cc.funkemunky.api.reflections.types.WrappedClass;
 import cc.funkemunky.api.reflections.types.WrappedMethod;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
+import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.api.packets.channelhandler.TinyProtocol1_7;
 import cc.funkemunky.api.tinyprotocol.api.packets.channelhandler.TinyProtocol1_8;
 import cc.funkemunky.api.utils.*;
@@ -41,6 +42,7 @@ import dev.brighten.api.listener.KauriFlagEvent;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -252,6 +254,7 @@ public class Check implements KauriCheck {
         register(new FlyE());
         register(new FlyF());
         register(new FlyF());
+        register(new FlyG());
         register(new FastLadder());
         register(new NoFallA());
         register(new NoFallB());
@@ -265,7 +268,6 @@ public class Check implements KauriCheck {
         register(new AimF());
         register(new AimG());
         register(new AimH());
-        register(new AimI());
         register(new SpeedA());
         register(new SpeedB());
         register(new SpeedC());
@@ -318,10 +320,10 @@ public class Check implements KauriCheck {
     }
 
     public void kickPlayer() {
-        /*val channel = getChannel.invoke(TinyProtocolHandler.getInstance(), data.getPlayer());
+        val channel = getChannel.invoke(TinyProtocolHandler.getInstance(), data.getPlayer());
 
         val wrapped = new WrappedClass(channel.getClass());
 
-        wrapped.getMethod("close").invoke(channel);*/
+        wrapped.getMethod("close").invoke(channel);
     }
 }

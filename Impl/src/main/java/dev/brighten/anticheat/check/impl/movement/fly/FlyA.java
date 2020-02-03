@@ -26,11 +26,11 @@ public class FlyA extends Check {
                 slimeHeight = -1 * (float)data.playerInfo.lDeltaY;
 
                 groundY = data.playerInfo.to.y;
-                maxHeight = Math.max(maxHeight, MovementUtils.getTotalHeight(slimeHeight) * 1.5f);
-            }else if(!tookVelocity && data.playerInfo.serverGround) {
+                maxHeight = Math.max(maxHeight, MovementUtils.getTotalHeight(slimeHeight) * 1.5);
+            } else if(!tookVelocity && data.playerInfo.serverGround) {
                 groundY = data.playerInfo.to.y;
                 wasOnSlime = false;
-                maxHeight = MovementUtils.getTotalHeight(data.playerInfo.jumpHeight) * 1.5f;
+                maxHeight = data.playerInfo.totalHeight * 1.5;
             }
 
             if(data.playerInfo.lastVelocity.hasNotPassed(10)) {
@@ -41,7 +41,7 @@ public class FlyA extends Check {
 
             if(tookVelocity || data.blockInfo.inLiquid || data.blockInfo.onClimbable) {
                 groundY = data.playerInfo.to.y;
-                maxHeight = MovementUtils.getTotalHeight((float)data.playerInfo.velocityY) * 1.4f;
+                maxHeight = data.playerInfo.totalHeight * 1.4;
             }
 
             if(data.playerInfo.clientGround || data.playerInfo.serverGround
@@ -50,7 +50,7 @@ public class FlyA extends Check {
                 groundY = data.playerInfo.to.y;
             }
 
-            maxHeight = Math.max(1.3f, maxHeight); //Fixes the occasional fuck up (usually on reload). Temporary.
+            maxHeight = Math.max(1.3, maxHeight); //Fixes the occasional fuck up (usually on reload). Temporary.
 
             double totalHeight = data.playerInfo.to.y - groundY;
             if(totalHeight > maxHeight
