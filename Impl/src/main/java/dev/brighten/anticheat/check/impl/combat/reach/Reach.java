@@ -61,7 +61,7 @@ public class Reach extends Check {
             val distance = distances.stream().mapToDouble(num -> num).min().orElse(0);
 
             if(distance > 3.02 && size > 2
-                    && data.lagInfo.lastPacketDrop.hasPassed(1)) {
+                    && data.lagInfo.lastPacketDrop.hasPassed(2)) {
                 verbose+= size > 4 ? 1 : 0.5f;
                 if(verbose > 3) {
                     vl++;

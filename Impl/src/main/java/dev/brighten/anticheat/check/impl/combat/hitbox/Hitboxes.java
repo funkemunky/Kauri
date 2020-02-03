@@ -34,15 +34,8 @@ public class Hitboxes extends Check {
             EntityType.CREEPER,
             EntityType.ENDERMAN);
 
-    private long lastTimeStamp;
-
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if (timeStamp - lastTimeStamp <= 4) {
-            lastTimeStamp = timeStamp;
-            return;
-        }
-        lastTimeStamp = timeStamp;
+    public void onFlying(WrappedInFlyingPacket packet) {
 
         if (checkParameters(data)) {
 
@@ -76,7 +69,7 @@ public class Hitboxes extends Check {
                 }).count();
             }
 
-            if (collisions == 0) {
+            if (collisions == 0 && data.lagInfo.lastPacketDrop.hasPassed(4)) {
                 if(vl++ > 10)  flag("distance=%1 ping=%p tps=%t",
                         distance.get() != -1 ? distance.get() : "[none collided]");
             } else vl -= vl > 0 ? 0.5 : 0;
