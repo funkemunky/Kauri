@@ -37,6 +37,16 @@ public class AimH extends Check {
 
             float outYawDifference = MathUtils.getAngleDelta(outYawDelta, this.lastOutYawDelta);
 
+            if(lastYawDelta == yawDelta && lastPitchDelta == pitchDelta) {
+                this.lastOutYawDelta = outYawDelta;
+                this.lastOutPitchDelta = outPitchDelta;
+                this.lastYaw = yaw;
+                this.lastPitch = pitch;
+                this.lastPitchDelta = pitchDelta;
+                return;
+            }
+
+
             if (outYawDifference > 2.0F && yawDelta > 0.0F) {
                 long expandedOutPitch = (long) (outPitchDelta * MovementProcessor.offset);
                 long previousExpandedOutPitch = (long) (lastOutPitchDelta * MovementProcessor.offset);

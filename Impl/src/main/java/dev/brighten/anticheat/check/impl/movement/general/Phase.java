@@ -54,10 +54,10 @@ public class Phase extends Check {
                 || lastOpen.hasNotPassed(14)) return;
 
 
-        if(!data.playerInfo.serverPos) {
+        if(timeStamp - data.playerInfo.lastServerPos > 50) {
             SimpleCollisionBox currentHitbox = Helper.getMovementHitbox(data.getPlayer());
             SimpleCollisionBox newHitbox = Helper.getMovementHitbox(data.getPlayer(), packet.getX(), packet.getY(), packet.getZ());
-            currentHitbox.expand(-0.0425); newHitbox.expand(-0.0425); // reduce falseflag chances
+            currentHitbox.expand(-0.0625); newHitbox.expand(-0.0625); // reduce falseflag chances
             SimpleCollisionBox wrapped = Helper.wrap(currentHitbox, newHitbox);
 
             List<Block> all = Helper.getBlocks(data.blockInfo.handler, wrapped);

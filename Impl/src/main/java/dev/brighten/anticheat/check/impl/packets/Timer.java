@@ -17,14 +17,14 @@ import lombok.val;
 public class Timer extends Check {
 
     private long lastTS, lRange;
-    private EvictingList<Long> times = new EvictingList<>(30);
+    private EvictingList<Long> times = new EvictingList<>(45);
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet, long timeStamp) {
         long elapsed = timeStamp - lastTS;
 
-        if(timeStamp - data.creation > 500 && !data.playerInfo.serverPos
-                && timeStamp - data.playerInfo.lastServerPos > 60L) {
+        if(timeStamp - data.creation > 2000
+                && timeStamp - data.playerInfo.lastServerPos > 80L) {
             times.add(elapsed);
             val summary = times.stream().mapToLong(val -> val).summaryStatistics();
             double average = summary.getAverage();
@@ -32,8 +32,8 @@ public class Timer extends Check {
             long range = summary.getMax() - summary.getMin();
             double pct = ratio * 100;
 
-            if((pct > 100.2D) && (timeStamp - data.playerInfo.lastServerPos > 150L)
-                    && MathUtils.getDelta(data.lagInfo.lastTransPing, data.lagInfo.transPing) < 30
+            if((pct > 100.8D)
+                    && data.lagInfo.lastPingDrop.hasNotPassed(20)
                     && Kauri.INSTANCE.lastTickLag.hasPassed(5)
                     && (range < 200 || MathUtils.getDelta(range, lRange) < 75)
                     && Kauri.INSTANCE.tps > 18.5) {

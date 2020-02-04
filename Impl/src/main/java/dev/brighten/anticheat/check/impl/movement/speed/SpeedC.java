@@ -227,7 +227,7 @@ public class SpeedC extends Check {
         if (horizontalDistance > 0.1) {
             debug("+%1,tags=%2", horizontalMove, String.join(",", tags));
 
-            if (horizontalMove > 0) {
+            if (horizontalMove > 0 && data.playerInfo.lastVelocity.hasPassed(10)) {
                 vl++;
                 if(horizontalMove > 0.4 || vl > 3) {
                     flag("+%1,v=%2,tags=%3",

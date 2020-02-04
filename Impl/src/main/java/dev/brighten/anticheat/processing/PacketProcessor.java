@@ -251,7 +251,7 @@ public class PacketProcessor {
                     data.predictionService.rmotionX = data.playerInfo.velocityX;
                     data.predictionService.rmotionZ = data.playerInfo.velocityZ;
                     data.predictionService.velocity = true;
-                } else if(packet.getAction() == (short) 100)
+                }
 
                 data.checkManager.runPacket(packet, timeStamp);
                 if(data.sniffing) {
