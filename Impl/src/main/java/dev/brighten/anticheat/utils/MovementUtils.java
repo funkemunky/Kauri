@@ -1,10 +1,10 @@
 package dev.brighten.anticheat.utils;
 
-import cc.funkemunky.api.utils.KLocation;
-import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.PlayerUtils;
+import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.data.ObjectData;
 import lombok.val;
+import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
@@ -21,6 +21,15 @@ public class MovementUtils {
         }
 
         return baseHeight;
+    }
+
+    public static boolean isOnLadder(ObjectData data) {
+        int i = MathHelper.floor_double(data.playerInfo.to.x);
+        int j = MathHelper.floor_double(data.box.yMin);
+        int k = MathHelper.floor_double(data.playerInfo.to.z);
+        Block block = BlockUtils.getBlock(new Location(data.getPlayer().getWorld(), i, j, k));
+
+        return Materials.checkFlag(block.getType(), Materials.LADDER);
     }
 
     public static int getDepthStriderLevel(Player player) {

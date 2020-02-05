@@ -302,6 +302,11 @@ public class MovementProcessor {
             data.playerInfo.wasOnSlime = data.blockInfo.onSlime;
         }
 
+        if((data.playerInfo.onLadder = MovementUtils.isOnLadder(data))
+                && (data.playerInfo.deltaY <= 0 || data.blockInfo.collidesHorizontally)) {
+            data.playerInfo.isClimbing = true;
+        }
+
         //Checking if user is in liquid.
         if (data.blockInfo.inLiquid) data.playerInfo.liquidTimer.reset();
 

@@ -1,14 +1,22 @@
 package dev.brighten.anticheat.data.classes;
 
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.PlayerUtils;
-import cc.funkemunky.api.utils.TickTimer;
+import cc.funkemunky.api.utils.*;
+import cc.funkemunky.api.utils.world.BlockData;
+import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.utils.Helper;
+import org.bukkit.Bukkit;
+import org.bukkit.block.Block;
 import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class PredictionService {
 
@@ -19,6 +27,7 @@ public class PredictionService {
     public double predX, predZ;
     public TickTimer lastUseItem = new TickTimer(10);
     public double aiMoveSpeed;
+    public boolean collidedHorizontally, collidedVertically, flag;
     public float walkSpeed, yaw, moveStrafing, moveForward;
 
     public String key = "Nothing";
@@ -157,7 +166,7 @@ public class PredictionService {
     }
 
     private void calc() {
-        boolean flag = true;
+        flag = true;
         int precision = String.valueOf((int) Math.abs(posX > posZ ? posX : posX)).length();
         precision = 15 - precision;
         double preD = 1.2 * Math.pow(10, -Math.max(3, precision - 5));  // the motion deviates further and further from the coordinates 0 0 0. this value fix this
@@ -241,7 +250,7 @@ public class PredictionService {
         int loops = 0; // how many tries the check needed to calculate the right motion (if i use for
         // loops)
 
-        double flagJumpp = -1;
+        double flagJump = -1;
         found: for (int fastLoop = 2; fastLoop > 0; fastLoop--) { // if the Player changes the optifine fastmath
             // function
             fastMath = (fastLoop == 2) == fMath;
@@ -313,8 +322,7 @@ public class PredictionService {
                     var5 = jumpMovementFactor;
                 }
 
-                double motionX = lmotionX;
-                double motionZ = lmotionZ;
+                double motionX = lmotionX, motionY = lmotionY, motionZ = lmotionZ;
 
                 double var14 = moveStrafing * moveStrafing + moveForward * moveForward;
                 if (var14 >= 1.0E-4F) {
@@ -330,6 +338,108 @@ public class PredictionService {
                     motionX += (moveStrafing * var16 - moveForward * var15);
                     motionZ += (moveForward * var16 + moveStrafing * var15);
                 }
+
+                if(data.playerInfo.onLadder) {
+                    float f6 = 0.15F;
+                    motionX = MathHelper.clamp_double(motionX, -f6, f6);
+                    motionZ = MathHelper.clamp_double(motionZ, -f6, f6);
+
+                    motionY = Math.max(-0.15, motionY);
+
+                    if (data.playerInfo.sneaking) motionY = Math.max(0, motionY);
+                }
+
+                double d3 = motionX;
+                double d4 = motionY;
+                double d5 = motionZ;
+
+                //moveEntity
+
+                /*SimpleCollisionBox box;
+                if(data.playerInfo.sneaking) {
+                    double d6;
+
+                    box = data.box.copy().expand(motionX, -1., 0);
+                    for (d6 = 0.05D; motionX != 0.0D && blockCollisions(data.blockInfo.handler.getBlocks(), box).isEmpty();
+                         d3 = motionX) {
+                        if (motionX < d6 && motionX >= -d6) {
+                            motionX = 0.0D;
+                        } else if (motionX > 0.0D) {
+                            motionX -= d6;
+                        } else {
+                            motionX += d6;
+                        }
+                    }
+
+                    box = data.box.copy().expand(0., -1., motionZ);
+
+                    for (; motionZ != 0.0D && blockCollisions(data.blockInfo.handler.getBlocks(), box).isEmpty(); d5 = motionZ) {
+                        if (motionZ < d6 && motionZ >= -d6) {
+                            motionZ = 0.0D;
+                        } else if (motionZ > 0.0D) {
+                            motionZ -= d6;
+                        } else {
+                            motionZ += d6;
+                        }
+                    }
+
+                    box = data.box.copy().expand(motionX, -1.0D, motionZ);
+                    for (; motionX != 0.0D && motionZ != 0.0D && blockCollisions(data.blockInfo.handler.getBlocks(), box).isEmpty(); d5 = motionZ) {
+                        if (motionX < d6 && motionX >= -d6) {
+                            motionX = 0.0D;
+                        } else if (motionX > 0.0D) {
+                            motionX -= d6;
+                        } else {
+                            motionX += d6;
+                        }
+
+                        d3 = motionX;
+
+                        if (motionZ < d6 && motionZ >= -d6) {
+                            motionZ = 0.0D;
+                        } else if (motionZ > 0.0D) {
+                            motionZ -= d6;
+                        } else {
+                            motionZ += d6;
+                        }
+                    }
+                }
+
+                box = data.box.copy();
+
+                List<SimpleCollisionBox> boxes = new ArrayList<>();
+
+                blockCollisions(data.blockInfo.handler.getBlocks(),
+                        data.box.copy().addCoord(motionX, motionY, motionZ)).stream()
+                        .map(block -> BlockData.getData(block.getType())
+                                .getBox(block, ProtocolVersion.getGameVersion()))
+                        .forEach(blockBox -> blockBox.downCast(boxes));
+
+                System.out.println("size=" + boxes.size());
+
+                double x = 0, y = 0, z = 0;
+                for (SimpleCollisionBox axisalignedbb1 : boxes) {
+                    y = axisalignedbb1.copy().calculateYOffset(box, data.playerInfo.deltaY);
+                }
+
+                box.offset(0.0D, y, 0.0D);
+
+                for (SimpleCollisionBox axisalignedbb2 : boxes) {
+                    x = axisalignedbb2.copy().calculateXOffset(box, motionX);
+                }
+
+                box.offset(x,0,0);
+
+                for (SimpleCollisionBox axisalignedbb13 : boxes) {
+                    z = axisalignedbb13.copy().calculateZOffset(box, motionZ);
+                }
+
+                box.offset(0,0, z);
+
+                Bukkit.broadcastMessage(x + ", " + y + ", " + z);
+
+                collidedHorizontally= d3 != motionX || d5 != motionZ;
+                collidedVertically = d4 != motionY;*/
 
                 predX = motionX;
                 predZ = motionZ;
@@ -347,24 +457,20 @@ public class PredictionService {
                 diffString = new BigDecimal(diff).setScale(precision + 2, RoundingMode.HALF_UP).toPlainString();
 
                 if (diff < preD) { // if the diff is small enough
-                    //Bukkit.broadcastMessage(diffString + " loops " + loops + " key: " + key);
                     flag = false;
                     //Bukkit.broadcastMessage(Color.Green + "(" + rmotionX + ", " + motionX + "); (" + rmotionZ + ", " + motionZ + ")");
 
+                    //Bukkit.broadcastMessage(diffString + " loops " + loops + " key: " + key);
                     fMath = fastMath; // saves the fastmath option if the player changed it
                     break found;
                 }
+                //Bukkit.broadcastMessage(diffString + " loops " + loops + " key: " + key);
 
                 if (diff < closestdiff) {
                     closestdiff = diff;
                 }
             }
         }
-
-        if(flag) {
-            // Bukkit.broadcastMessage(Color.Red + diffString + " loops " + loops + " key: " + key + " sneak: " + sneak + " jump: " + flagJumpp + " onground: " + onGround + ", " + data.playerInfo.serverGround);
-        }
-        // Bukkit.broadcastMessage(data.playerInfo.deltaXZ + "");
     }
 
     public boolean checkConditions(final boolean lastTickSprint) {
@@ -426,5 +532,12 @@ public class PredictionService {
 
     public static float sqrt_double(double p_76133_0_) {
         return (float) Math.sqrt(p_76133_0_);
+    }
+
+    private static List<Block> blockCollisions(List<Block> blocks, SimpleCollisionBox box) {
+        return blocks.stream()
+                .filter(b -> Helper.isCollided(box,
+                        BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion())))
+                .collect(Collectors.toCollection(LinkedList::new));
     }
 }

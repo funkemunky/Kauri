@@ -19,10 +19,12 @@ import dev.brighten.anticheat.check.impl.combat.hitbox.Hitboxes;
 import dev.brighten.anticheat.check.impl.combat.killaura.KillauraA;
 import dev.brighten.anticheat.check.impl.combat.killaura.KillauraB;
 import dev.brighten.anticheat.check.impl.combat.killaura.KillauraC;
+import dev.brighten.anticheat.check.impl.combat.killaura.KillauraD;
 import dev.brighten.anticheat.check.impl.combat.reach.Reach;
 import dev.brighten.anticheat.check.impl.movement.fly.*;
 import dev.brighten.anticheat.check.impl.movement.general.FastLadder;
 import dev.brighten.anticheat.check.impl.movement.general.HealthSpoof;
+import dev.brighten.anticheat.check.impl.movement.general.Motion;
 import dev.brighten.anticheat.check.impl.movement.general.Phase;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallA;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallB;
@@ -276,6 +278,7 @@ public class Check implements KauriCheck {
         register(new KillauraA());
         register(new KillauraB());
         register(new KillauraC());
+        register(new KillauraD());
         register(new Phase());
         register(new Timer());
         register(new BadPacketsA());
@@ -303,6 +306,7 @@ public class Check implements KauriCheck {
         register(new SignOp());
         register(new SignCrash());
         register(new LargeMove());
+        register(new Motion());
     }
 
     public static boolean isCheck(String name) {

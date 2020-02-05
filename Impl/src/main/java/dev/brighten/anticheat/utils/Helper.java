@@ -102,6 +102,7 @@ public class Helper {
 				.collect(Collectors.toCollection(LinkedList::new));
 	}
 
+
 	public static <C extends CollisionBox> List<C> collisions(List<C> boxes, CollisionBox box) {
 		return boxes.stream().filter(b -> b.isCollided(box))
 				.collect(Collectors.toCollection(LinkedList::new));
