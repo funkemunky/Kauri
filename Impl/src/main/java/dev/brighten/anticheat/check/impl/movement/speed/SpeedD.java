@@ -18,6 +18,7 @@ public class SpeedD extends Check {
             if(data.playerInfo.sprinting
                     && timeStamp - data.playerInfo.lastServerPos > 150
                     && data.playerInfo.clientGround
+                    && !data.blockInfo.collidesHorizontally
                     && !data.predictionService.key.equals("Nothing")
                     && !data.predictionService.key.contains("W")) {
                 vl++;

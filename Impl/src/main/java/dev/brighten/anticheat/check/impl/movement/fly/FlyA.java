@@ -46,7 +46,7 @@ public class FlyA extends Check {
 
             if(data.playerInfo.clientGround || data.playerInfo.serverGround
                     || data.playerInfo.flightCancel
-                    || data.playerInfo.lastBlockPlace.hasNotPassed(5)) {
+                    || data.playerInfo.lastBlockPlace.hasNotPassed(7)) {
                 groundY = data.playerInfo.to.y;
             }
 

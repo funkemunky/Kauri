@@ -42,7 +42,9 @@ public class KillauraD extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if(data.target == null || data.playerInfo.lastAttack.hasPassed(0)) return;
+        if(data.target == null
+                || data.targetPastLocation.previousLocations.size() <= 5
+                || data.playerInfo.lastAttack.hasPassed(0)) return;
 
         KLocation entityLoc = data.targetPastLocation.getPreviousLocation(data.lagInfo.transPing).clone();
 
@@ -59,8 +61,6 @@ public class KillauraD extends Check {
         if((point = collision.collisionPoint(entityBox)) != null) {
             collisions.add(point);
             differences.add(data.playerInfo.deltaYaw + Math.abs(data.playerInfo.deltaPitch));
-
-            MiscUtils.drawPoint(point, WrappedEnumParticle.FLAME, Collections.singleton(data.getPlayer()));
 
             if(collisions.size() >= 40) {
                 Vector mid = entityLoc.toVector();

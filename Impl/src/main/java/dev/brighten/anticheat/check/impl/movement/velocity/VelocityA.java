@@ -50,6 +50,6 @@ public class VelocityA extends Check {
             if(Math.abs(vY) < 0.005 || data.playerInfo.serverGround) vY = 0;
 
             debug("pct=" + pct + " vl=" + vl);
-        }
+        } else vY = 0;
     }
 }

@@ -2,10 +2,7 @@ package dev.brighten.anticheat.check.impl.movement.general;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
-import cc.funkemunky.api.utils.KLocation;
-import cc.funkemunky.api.utils.Materials;
-import cc.funkemunky.api.utils.TickTimer;
-import cc.funkemunky.api.utils.Tuple;
+import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import cc.funkemunky.api.utils.world.BlockData;
 import cc.funkemunky.api.utils.world.types.RayCollision;
@@ -16,15 +13,18 @@ import dev.brighten.anticheat.check.api.Event;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.Helper;
 import dev.brighten.api.check.CheckType;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.util.Vector;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @CheckInfo(name = "Phase", description = "a phase check made by the one and only LukeK.",
         checkType = CheckType.GENERAL, punishVL = 20,
@@ -37,6 +37,10 @@ public class Phase extends Check {
 
     private int setbackTicks = 0;
     private KLocation setback;
+
+    private List<Material> negative = Stream.of(XMaterial.LADDER, XMaterial.VINE)
+            .map(XMaterial::parseMaterial)
+            .collect(Collectors.toList());
 
     @Event
     public void onEvent(PlayerInteractEvent event) {
