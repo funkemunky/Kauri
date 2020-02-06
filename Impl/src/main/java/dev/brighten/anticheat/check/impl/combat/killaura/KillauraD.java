@@ -29,6 +29,7 @@ public class KillauraD extends Check {
 
     private List<Vector> collisions = new ArrayList<>();
     private List<Float> differences = new ArrayList<>();
+    private double verbose;
 
     private static List<EntityType> allowedEntities = Arrays.asList(
             EntityType.ZOMBIE,
@@ -82,9 +83,11 @@ public class KillauraD extends Check {
                 val yawAvg = yawSummary.getAverage();
 
                 if(std < (yawAvg > 9 ? 3.5 : 2.4) && range > 1 && yawRange > 11) {
-                    vl++;
-                    flag("avg=%1 std=%2 range=%3", summary.getAverage(), std, range);
-                }
+                    if(verbose++ > 2) {
+                        vl++;
+                        flag("avg=%1 std=%2 range=%3", summary.getAverage(), std, range);
+                    }
+                } else verbose-= verbose > 0 ? 0.05 : 0;
                 debug("avg=%1 std=%2 range=%3 yawRange=%4 yawAvg=%5",
                         summary.getAverage(), std, range, yawRange, yawAvg);
                 collisions.clear();

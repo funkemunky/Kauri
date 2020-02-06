@@ -163,7 +163,7 @@ public class BlockInformation {
 
         SimpleCollisionBox box = getBox().expand(
                 Math.abs(objectData.playerInfo.from.x - objectData.playerInfo.to.x) + 0.1,
-                -0.1,
+                -0.01,
                 Math.abs(objectData.playerInfo.from.z - objectData.playerInfo.to.z) + 0.1);
         collidesHorizontally = !(horizontalCollisions = blockCollisions(handler.getBlocks(), box)).isEmpty();
 

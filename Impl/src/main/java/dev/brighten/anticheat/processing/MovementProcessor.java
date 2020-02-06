@@ -74,16 +74,14 @@ public class MovementProcessor {
 
         data.playerInfo.to.timeStamp = timeStamp;
 
+        if(deltaY > -0.0981 && deltaY < -0.0979)
+            cc.funkemunky.api.utils.MiscUtils.printToConsole(data.getPlayer().getName() + ": " + deltaY);
+
         if (data.playerInfo.posLocs.size() > 0) {
             val optional = data.playerInfo.posLocs.stream()
-                    .filter(loc -> {
-                        MiscUtils.testMessage(data.getPlayer().getName() + ": " + loc.toVector().setY(0)
-                                .distance(data.playerInfo.to.toVector().setY(0)) + ", "
-                                + MathUtils.getDelta(loc.y, data.playerInfo.to.y));
-                        return loc.toVector().setY(0)
-                                .distance(data.playerInfo.to.toVector().setY(0)) <= 1E-5
-                                && MathUtils.getDelta(loc.y, data.playerInfo.to.y) < 1;
-                    })
+                    .filter(loc -> loc.toVector().setY(0)
+                            .distance(data.playerInfo.to.toVector().setY(0)) <= 1E-8
+                            && MathUtils.getDelta(loc.y, data.playerInfo.to.y) < 4)
                     .findFirst();
 
             if (optional.isPresent()) {
@@ -341,6 +339,9 @@ public class MovementProcessor {
         data.playerInfo.generalCancel = data.playerInfo.canFly
                 || data.playerInfo.creative
                 || hasLevi
+                || (data.playerInfo.deltaY > -0.0981
+                && data.playerInfo.deltaY < -0.0979
+                && data.playerInfo.deltaXZ < 0.5)
                 || timeStamp - data.playerInfo.lastServerPos < 80L
                 || data.playerInfo.riptiding
                 || data.playerInfo.gliding

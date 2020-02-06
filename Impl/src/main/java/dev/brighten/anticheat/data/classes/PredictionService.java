@@ -1,5 +1,7 @@
 package dev.brighten.anticheat.data.classes;
 
+import cc.funkemunky.api.Atlas;
+import cc.funkemunky.api.reflections.impl.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.*;
@@ -7,6 +9,8 @@ import cc.funkemunky.api.utils.world.BlockData;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.Helper;
+import dev.brighten.anticheat.utils.MiscUtils;
+import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.potion.PotionEffectType;
@@ -72,7 +76,13 @@ public class PredictionService {
                     lmotionX *= 0.6D;
                     lmotionZ *= 0.6D;
                 }
-                calc();
+                double mx = rmotionX - lmotionX; // mx, mz is an Value to calculate the rotation and the Key of the Player
+                double mz = rmotionZ - lmotionZ;
+
+                calcKey(mx, mz);
+
+                MiscUtils.testMessage("key: " + key);
+                calc(true);
             }
 
             specialBlock = checkSpecialBlock(); // If the Player Walks on a Special block like Ice, Slime, Soulsand
@@ -165,16 +175,20 @@ public class PredictionService {
                 && (onGround || lastOnGround);
     }
 
-    private void calc() {
-        flag = true;
-        int precision = String.valueOf((int) Math.abs(posX > posZ ? posX : posX)).length();
-        precision = 15 - precision;
-        double preD = 1.2 * Math.pow(10, -Math.max(3, precision - 5));  // the motion deviates further and further from the coordinates 0 0 0. this value fix this
-
-        double mx = rmotionX - lmotionX; // mx, mz is an Value to calculate the rotation and the Key of the Player
-        double mz = rmotionZ - lmotionZ;
-
+    private float getMotionYaw(double mx, double mz) {
         float motionYaw = (float) (Math.atan2(mz, mx) * 180.0D / Math.PI) - 90.0F; // is the rotationYaw from the Motion
+        // of the Player
+
+        motionYaw -= yaw;
+
+        while (motionYaw > 360.0F)
+            motionYaw -= 360.0F;
+        while (motionYaw < 0.0F)
+            motionYaw += 360.0F;
+
+        return motionYaw;
+    }
+    private void calcKey(float motionYaw, double mx, double mz) {
         // of the Player
 
         int direction = 6;
@@ -191,6 +205,10 @@ public class PredictionService {
         float moveS = 0.0F; // is like the ClientSide moveStrafing moveForward
         float moveF = 0.0F;
         String key = "Nothing";
+
+        int precision = String.valueOf((int) Math.abs(posX > posZ ? posX : posX)).length();
+        precision = 15 - precision;
+        double preD = 1.2 * Math.pow(10, -Math.max(3, precision - 5));
 
         if (Math.abs(Math.abs(mx) + Math.abs(mz)) > preD) {
             direction = (int) new BigDecimal(motionYaw).setScale(1, RoundingMode.HALF_UP).doubleValue();
@@ -235,6 +253,75 @@ public class PredictionService {
         moveStrafing = moveS;
         moveForward = moveF;
         this.key = key;
+    }
+
+    private void calcKey(double mx, double mz) {
+        float motionYaw = getMotionYaw(mx, mz);
+
+        int direction = 6;
+
+        MiscUtils.testMessage("yaw= " + motionYaw + " mx=" + mx + " mz=" + mz);
+
+        motionYaw /= 45.0F; // converts the rotationYaw of the Motion to integers to get keys
+
+        float moveS = 0.0F; // is like the ClientSide moveStrafing moveForward
+        float moveF = 0.0F;
+        String key = "Nothing";
+
+        int precision = String.valueOf((int) Math.abs(posX > posZ ? posX : posX)).length();
+        precision = 15 - precision;
+        double preD = 1.2 * Math.pow(10, -Math.max(3, precision - 5));
+
+        if (Math.abs(Math.abs(mx) + Math.abs(mz)) > preD) {
+            direction = (int) new BigDecimal(motionYaw).setScale(1, RoundingMode.HALF_UP).doubleValue();
+
+            if (direction == 1) {
+                moveF = 1F;
+                moveS = -1F;
+                key = "W + D";
+            } else if (direction == 2) {
+                moveS = -1F;
+                key = "D";
+            } else if (direction == 3) {
+                moveF = -1F;
+                moveS = -1F;
+                key = "S + D";
+            } else if (direction == 4) {
+                moveF = -1F;
+                key = "S";
+            } else if (direction == 5) {
+                moveF = -1F;
+                moveS = 1F;
+                key = "S + A";
+            } else if (direction == 6) {
+                moveS = 1F;
+                key = "A";
+            } else if (direction == 7) {
+                moveF = 1F;
+                moveS = 1F;
+                key = "W + A";
+            } else if (direction == 8) {
+                moveF = 1F;
+                key = "W";
+            } else if (direction == 0) {
+                moveF = 1F;
+                key = "W";
+            }
+        }
+
+        moveF *= 0.9800000190734863F;
+        moveS *= 0.9800000190734863F;
+
+        moveStrafing = moveS;
+        moveForward = moveF;
+        this.key = key;
+    }
+
+    private void calc(boolean checkCollisions) {
+        flag = true;
+        int precision = String.valueOf((int) Math.abs(posX > posZ ? posX : posX)).length();
+        precision = 15 - precision;
+        double preD = 1.2 * Math.pow(10, -Math.max(3, precision - 5));  // the motion deviates further and further from the coordinates 0 0 0. this value fix this
 
 //		if (openInv) { // i don't have an Event for it
 //			moveF = 0.0F;
@@ -262,14 +349,12 @@ public class PredictionService {
 
                 loops++;
 
-                float moveStrafing = moveS;
-                float moveForward = moveF;
+                float moveStrafing = this.moveStrafing;
+                float moveForward = this.moveForward;
 
                 if (sneak) {
-                    if (sprint)
-                        return;
-                    moveForward *= 0.3F;
-                    moveStrafing *= 0.3F;
+                    moveForward *= 0.3;
+                    moveStrafing *= 0.3;
                 }
 
 //				if (openInv) {
@@ -298,7 +383,8 @@ public class PredictionService {
 
                 aiMoveSpeed = data.getPlayer().getWalkSpeed() / 2D;
                 if (sprint) {
-                    aiMoveSpeed/=0.76923071005;
+                    //aiMoveSpeed/=0.76923071005;
+                    aiMoveSpeed/=0.7692307779;
                 }
 
                 if(data.getPlayer().hasPotionEffect(PotionEffectType.SPEED)) {
@@ -339,112 +425,60 @@ public class PredictionService {
                     motionZ += (moveForward * var16 + moveStrafing * var15);
                 }
 
-                if(data.playerInfo.onLadder) {
-                    float f6 = 0.15F;
-                    motionX = MathHelper.clamp_double(motionX, -f6, f6);
-                    motionZ = MathHelper.clamp_double(motionZ, -f6, f6);
+                if(checkCollisions) {
+                    if(data.playerInfo.onLadder) {
+                        float f6 = 0.15F;
+                        motionX = MathHelper.clamp_double(motionX, -f6, f6);
+                        motionZ = MathHelper.clamp_double(motionZ, -f6, f6);
 
-                    motionY = Math.max(-0.15, motionY);
+                        motionY = Math.max(-0.15, motionY);
 
-                    if (data.playerInfo.sneaking) motionY = Math.max(0, motionY);
-                }
-
-                double d3 = motionX;
-                double d4 = motionY;
-                double d5 = motionZ;
-
-                //moveEntity
-
-                SimpleCollisionBox box;
-                if(data.playerInfo.sneaking) {
-                    double d6;
-
-                    box = data.box.copy().expand(motionX, -1., 0);
-                    for (d6 = 0.05D; motionX != 0.0D && blockCollisions(data.blockInfo.handler.getBlocks(), box).isEmpty();
-                         d3 = motionX) {
-                        if (motionX < d6 && motionX >= -d6) {
-                            motionX = 0.0D;
-                        } else if (motionX > 0.0D) {
-                            motionX -= d6;
-                        } else {
-                            motionX += d6;
-                        }
+                        if (data.playerInfo.sneaking) motionY = Math.max(0, motionY);
                     }
 
-                    box = data.box.copy().expand(0., -1., motionZ);
+                    double d3 = motionX;
+                    double d4 = motionY;
+                    double d5 = motionZ;
 
-                    for (; motionZ != 0.0D && blockCollisions(data.blockInfo.handler.getBlocks(), box).isEmpty(); d5 = motionZ) {
-                        if (motionZ < d6 && motionZ >= -d6) {
-                            motionZ = 0.0D;
-                        } else if (motionZ > 0.0D) {
-                            motionZ -= d6;
-                        } else {
-                            motionZ += d6;
-                        }
+                    //moveEntity
+
+                    SimpleCollisionBox box = data.box.copy();
+
+                    List<SimpleCollisionBox> boxes = new ArrayList<>();
+
+                    blockCollisions(data.blockInfo.handler.getBlocks(),
+                            data.box.copy().addCoord(motionX, motionY, motionZ)).stream()
+                            .map(block -> BlockData.getData(block.getType())
+                                    .getBox(block, ProtocolVersion.getGameVersion()))
+                            .forEach(blockBox -> blockBox.downCast(boxes));
+
+                    //System.out.println("size=" + boxes.size());
+
+                    double x = 0, y = 0, z = 0;
+                    for (SimpleCollisionBox axisalignedbb1 : boxes) {
+                        motionY = axisalignedbb1.copy().calculateYOffset(box, data.playerInfo.deltaY);
                     }
 
-                    box = data.box.copy().expand(motionX, -1.0D, motionZ);
-                    for (; motionX != 0.0D && motionZ != 0.0D && blockCollisions(data.blockInfo.handler.getBlocks(), box).isEmpty(); d5 = motionZ) {
-                        if (motionX < d6 && motionX >= -d6) {
-                            motionX = 0.0D;
-                        } else if (motionX > 0.0D) {
-                            motionX -= d6;
-                        } else {
-                            motionX += d6;
-                        }
+                    //box.offset(0.0D, y, 0.0D);
 
-                        d3 = motionX;
-
-                        if (motionZ < d6 && motionZ >= -d6) {
-                            motionZ = 0.0D;
-                        } else if (motionZ > 0.0D) {
-                            motionZ -= d6;
-                        } else {
-                            motionZ += d6;
-                        }
+                    for (SimpleCollisionBox axisalignedbb2 : boxes) {
+                        motionX = axisalignedbb2.copy().calculateXOffset(box, motionX);
                     }
+
+                    //box.offset(x,0,0);
+
+                    for (SimpleCollisionBox axisalignedbb13 : boxes) {
+                        motionZ = axisalignedbb13.copy().calculateZOffset(box, motionZ);
+                    }
+
+                    //box.offset(0,0, z);
+
+                    //Bukkit.broadcastMessage(x + ", " + y + ", " + z);
+
+                    collidedHorizontally= d3 != motionX || d5 != motionZ;
+                    collidedVertically = d4 != motionY;
+
                 }
-
-                box = data.box.copy();
-
-                List<SimpleCollisionBox> boxes = new ArrayList<>();
-
-                blockCollisions(data.blockInfo.handler.getBlocks(),
-                        data.box.copy().addCoord(motionX, motionY, motionZ)).stream()
-                        .map(block -> BlockData.getData(block.getType())
-                                .getBox(block, ProtocolVersion.getGameVersion()))
-                        .forEach(blockBox -> blockBox.downCast(boxes));
-
-                System.out.println("size=" + boxes.size());
-
-                double x = 0, y = 0, z = 0;
-                for (SimpleCollisionBox axisalignedbb1 : boxes) {
-                    y = axisalignedbb1.copy().calculateYOffset(box, data.playerInfo.deltaY);
-                }
-
-                //box.offset(0.0D, y, 0.0D);
-
-                for (SimpleCollisionBox axisalignedbb2 : boxes) {
-                    x = axisalignedbb2.copy().calculateXOffset(box, motionX);
-                }
-
-                //box.offset(x,0,0);
-
-                for (SimpleCollisionBox axisalignedbb13 : boxes) {
-                    z = axisalignedbb13.copy().calculateZOffset(box, motionZ);
-                }
-
-                //box.offset(0,0, z);
-
-                //Bukkit.broadcastMessage(x + ", " + y + ", " + z);
-
-                motionX = x;
-                motionY = y;
-                motionZ = z;
-
-                collidedHorizontally= d3 != motionX || d5 != motionZ;
-                collidedVertically = d4 != motionY;
-
                 predX = motionX;
                 predZ = motionZ;
 
@@ -464,11 +498,11 @@ public class PredictionService {
                     flag = false;
                     //Bukkit.broadcastMessage(Color.Green + "(" + rmotionX + ", " + motionX + "); (" + rmotionZ + ", " + motionZ + ")");
 
-                    //Bukkit.broadcastMessage(diffString + " loops " + loops + " key: " + key);
+                    //MiscUtils.testMessage(Color.Green + diffString + " loops " + loops + " key: " + key + " sneak=" + sneak + " move=" + moveForward + " ai=" + aiMoveSpeed);
                     fMath = fastMath; // saves the fastmath option if the player changed it
                     break found;
                 }
-                //Bukkit.broadcastMessage(diffString + " loops " + loops + " key: " + key);
+                //MiscUtils.testMessage(Color.Red + diffString + " loops " + loops + " key: " + key + " sneak=" + sneak + " move=" + moveForward + " ai=" + aiMoveSpeed);
 
                 if (diff < closestdiff) {
                     closestdiff = diff;

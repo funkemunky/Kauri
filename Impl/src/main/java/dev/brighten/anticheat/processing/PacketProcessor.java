@@ -130,6 +130,8 @@ public class PacketProcessor {
 
                 ActionProcessor.process(data, packet);
                 data.checkManager.runPacket(packet, timeStamp);
+
+                MiscUtils.testMessage(data.getPlayer().getName() + ": " + packet.getAction());
                 if(data.sniffing) {
                     data.sniffedPackets.add(event.getType() + ":@:" + packet.getAction().name()
                             + ":@:" + event.getTimeStamp());

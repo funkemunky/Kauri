@@ -148,32 +148,34 @@ public class Check implements KauriCheck {
                     if (lastAlert.hasPassed(MathUtils.millisToTicks(Config.alertsDelay))) {
                         JsonMessage jmsg = new JsonMessage();
 
-                        jmsg.addText(Color.translate(Kauri.INSTANCE.msgHandler.getLanguage().msg("cheat-alert",
+                        String text = Color.translate(Kauri.INSTANCE.msgHandler.getLanguage().msg("cheat-alert",
                                 "&8[&6K&8] &f%player% &7flagged &f%check% &8(&e%info%&8)" +
                                         " &8(&c%vl%&8] %experimental%")
                                 .replace("%player%", data.getPlayer().getName())
                                 .replace("%check%", name)
                                 .replace("%info%", info)
                                 .replace("%vl%", String.valueOf(MathUtils.round(vl, 2)))
+                                .replace("%experimental%", developer ? "&c&o(Experimental)" : ""));
+                        jmsg.addText(text).addHoverText(Color.translate(Kauri.INSTANCE.msgHandler.getLanguage().msg(
+                                "cheat-alert-hover",
+                                "&eDescription&8: &f%desc%\n&r\n&7&oClick to teleport to player.")
+                                .replace("%desc%", String.join("\n",
+                                        dev.brighten.anticheat.utils.MiscUtils
+                                                .splitIntoLine(description, 20)))
+                                .replace("%player%", data.getPlayer().getName())
+                                .replace("%check%", name)
+                                .replace("%info%", info)
+                                .replace("%vl%", String.valueOf(MathUtils.round(vl, 2)))
                                 .replace("%experimental%", developer ? "&c&o(Experimental)" : "")))
-                                .addHoverText(Color.translate(Kauri.INSTANCE.msgHandler.getLanguage().msg(
-                                        "cheat-alert-hover",
-                                        "&eDescription&8: &f%desc%\n&r\n&7&oClick to teleport to player.")
-                                        .replace("%desc%", String.join("\n",
-                                                dev.brighten.anticheat.utils.MiscUtils
-                                                        .splitIntoLine(description, 20)))
-                                        .replace("%player%", data.getPlayer().getName())
-                                        .replace("%check%", name)
-                                        .replace("%info%", info)
-                                        .replace("%vl%", String.valueOf(MathUtils.round(vl, 2)))
-                                        .replace("%experimental%", developer ? "&c&o(Experimental)" : "")))
                                 .setClickEvent(JsonMessage.ClickableType.RunCommand, "/" + Config.alertCommand
                                         .replace("%player%", data.getPlayer().getName())
                                         .replace("%check%", name)
                                         .replace("%info%", info)
                                         .replace("%vl%", String.valueOf(MathUtils.round(vl, 2))));
 
-                        if(Config.testMode) jmsg.sendToPlayer(data.getPlayer());
+                        if(Config.testMode && !data.alerts) jmsg.sendToPlayer(data.getPlayer());
+
+                        if(Config.alertsConsole) MiscUtils.printToConsole(text);
 
                             Kauri.INSTANCE.dataManager.hasAlerts.parallelStream()
                                 .forEach(data -> jmsg.sendToPlayer(data.getPlayer()));

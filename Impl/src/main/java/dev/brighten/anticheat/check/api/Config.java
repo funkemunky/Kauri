@@ -29,6 +29,9 @@ public class Config {
     @ConfigSetting(path = "alerts", name = "delay", comment = "The delay between alerts sending.")
     public static long alertsDelay = 500;
 
+    @ConfigSetting(path = "alerts", name = "toConsole", comment = "Send alert messages to console.")
+    public static boolean alertsConsole = true;
+
     @ConfigSetting(path = "general", name = "language")
     public static String language = "english";
 

@@ -16,10 +16,12 @@ public class Motion extends Check {
             double deltaX = MathUtils.getDelta(data.predictionService.predX, data.playerInfo.deltaX),
                     deltaZ = MathUtils.getDelta(data.predictionService.predZ, data.playerInfo.deltaZ);
 
-            if(data.predictionService.flag) {
-                //vl++;
-                //flag("deltaX=" + deltaX + " deltaZ=" + deltaZ);
-            }
+            if(data.predictionService.flag && !data.playerInfo.generalCancel && !data.blockInfo.collidesHorizontally) {
+                vl++;
+                if(vl > 20) {
+                    flag("deltaX=" + deltaX + " deltaZ=" + deltaZ);
+                }
+            } else vl-= vl > 0 ? 3 : 0;
             debug("deltaX=" + deltaX + " deltaZ=" + deltaZ + " key=" + data.predictionService.key
                     + " collided=" + data.predictionService.collidedHorizontally);
         }
