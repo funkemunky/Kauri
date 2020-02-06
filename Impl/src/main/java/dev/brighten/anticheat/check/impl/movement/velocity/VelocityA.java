@@ -52,6 +52,6 @@ public class VelocityA extends Check {
                     || data.blockInfo.collidesVertically) vY = 0;
 
             debug("pct=" + pct + " vl=" + vl);
-        }
+        } else vY = 0;
     }
 }

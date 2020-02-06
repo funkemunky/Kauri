@@ -74,17 +74,15 @@ public class ObjectData {
             playerVersion = TinyProtocolHandler.getProtocolVersion(getPlayer());
         });
 
-        if(Kauri.INSTANCE.isNewer) {
-            task = RunUtils.taskTimerAsync(() -> {
-                if(getPlayer() == null) {
-                    task.cancel();
-                    return;
-                }
+        task = RunUtils.taskTimerAsync(() -> {
+            if(getPlayer() == null) {
+                task.cancel();
+                return;
+            }
 
-                TinyProtocolHandler.sendPacket(getPlayer(), new WrappedOutTransaction(0, (short) 69, false)
-                        .getObject());
-            }, 5L, 40L);
-        }
+            TinyProtocolHandler.sendPacket(getPlayer(), new WrappedOutTransaction(0, (short) 69, false)
+                    .getObject());
+        }, 5L, 20L);
     }
 
     public Player getPlayer() {

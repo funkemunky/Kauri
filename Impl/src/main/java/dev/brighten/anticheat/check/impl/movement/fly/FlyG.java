@@ -16,13 +16,18 @@ public class FlyG extends Check {
     private double totalY;
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if(data.playerInfo.flightCancel) {
+        if(data.playerInfo.generalCancel) {
             totalY = 0;
             return;
         }
-        if(data.playerInfo.serverGround || data.playerInfo.deltaY <= 0) {
+        if(data.playerInfo.clientGround || data.playerInfo.deltaY <= 0) {
             if(totalY > 0) {
                 if(data.playerInfo.blockAboveTimer.hasPassed(5)
+                        && !data.blockInfo.onStairs
+                        && data.playerInfo.liquidTimer.hasPassed(10)
+                        && data.playerInfo.climbTimer.hasPassed(10)
+                        && data.playerInfo.lastBlockPlace.hasPassed(10)
+                        && data.playerInfo.lastHalfBlock.hasPassed(3)
                         && data.playerInfo.lastVelocity.hasPassed(20)) {
                     double delta = MathUtils.getDelta(totalY, data.playerInfo.totalHeight);
 
@@ -37,6 +42,6 @@ public class FlyG extends Check {
                 }
             }
             totalY = 0;
-        } else totalY+= data.playerInfo.deltaY;
+        } else if(data.playerInfo.deltaY > 0) totalY+= data.playerInfo.deltaY;
     }
 }
