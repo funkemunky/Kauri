@@ -20,7 +20,8 @@ public class Motion extends Check {
                 //vl++;
                 //flag("deltaX=" + deltaX + " deltaZ=" + deltaZ);
             }
-            debug("deltaX=" + deltaX + " deltaZ=" + deltaZ + " collided=" + data.predictionService.collidedHorizontally);
+            debug("deltaX=" + deltaX + " deltaZ=" + deltaZ + " key=" + data.predictionService.key
+                    + " collided=" + data.predictionService.collidedHorizontally);
         }
     }
 }

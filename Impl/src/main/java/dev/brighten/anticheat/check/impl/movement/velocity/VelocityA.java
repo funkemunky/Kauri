@@ -32,6 +32,7 @@ public class VelocityA extends Check {
                 && !data.lagInfo.lagging
                 && data.playerInfo.worldLoaded
                 && !data.blockInfo.inWeb
+
                 && !data.blockInfo.onClimbable
                 && data.playerInfo.blockAboveTimer.hasPassed(6)) {
 
@@ -39,15 +40,16 @@ public class VelocityA extends Check {
 
             if (pct < 99.999
                     && !data.playerInfo.lastBlockPlace.hasNotPassed(5)
-                    && !data.blockInfo.blocksAbove
-                    && !data.blockInfo.collidesHorizontally) {
+                    && !data.blockInfo.blocksAbove) {
                 if (vl++ > 20) flag("pct=" + MathUtils.round(pct, 2) + "%");
             } else vl-= vl > 0 ? 0.5 : 0;
 
             vY-= 0.08;
             vY*= 0.98;
 
-            if(Math.abs(vY) < 0.005 || data.playerInfo.serverGround) vY = 0;
+            if(vY < 0.005 || data.playerInfo.serverGround
+                    || data.blockInfo.collidesHorizontally
+                    || data.blockInfo.collidesVertically) vY = 0;
 
             debug("pct=" + pct + " vl=" + vl);
         }

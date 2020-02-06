@@ -248,7 +248,7 @@ public class Check implements KauriCheck {
         register(new AutoclickerE());
         register(new AutoclickerF());
         register(new AutoclickerG());
-        register(new AutoclickerH());
+        register(new AutoclickerE());
         register(new FlyA());
         register(new FlyB());
         register(new FlyC());
@@ -292,6 +292,7 @@ public class Check implements KauriCheck {
         register(new BadPacketsI());
         register(new BadPacketsJ());
         register(new BadPacketsK());
+        register(new BadPacketsL());
         register(new VelocityA());
         register(new VelocityB());
         register(new VelocityC());

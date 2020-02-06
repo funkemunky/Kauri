@@ -11,7 +11,7 @@ import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @CheckInfo(name = "Autoclicker (F)", description = "Checks for consistency through graphical means (Elevated).",
-        checkType = CheckType.AUTOCLICKER, punishVL = 10, developer = true)
+        checkType = CheckType.AUTOCLICKER, punishVL = 50, developer = true)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerF extends Check {
 

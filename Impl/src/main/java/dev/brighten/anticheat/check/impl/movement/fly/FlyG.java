@@ -2,6 +2,7 @@ package dev.brighten.anticheat.check.impl.movement.fly;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.MathUtils;
+import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -9,6 +10,7 @@ import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Fly (G)", description = "Checks if the player stops abruptly without reason.",
         checkType = CheckType.FLIGHT, developer = true)
+@Cancellable
 public class FlyG extends Check {
 
     private double totalY;

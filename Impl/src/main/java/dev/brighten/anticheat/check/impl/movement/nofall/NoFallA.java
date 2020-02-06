@@ -27,7 +27,9 @@ public class NoFallA extends Check {
                 && (data.playerInfo.deltaY != 0 || data.playerInfo.deltaXZ > 0)
                 && data.playerInfo.blockAboveTimer.hasPassed(10)
                 && flag) {
-            vl+= data.lagInfo.lagging || data.lagInfo.lastPacketDrop.hasNotPassed(3)
+            vl+= data.lagInfo.lagging
+                    || data.lagInfo.lastPacketDrop.hasNotPassed(1)
+                    || data.playerInfo.nearGround
                     ? 1 : data.playerInfo.clientGround ? 2 : 3;
 
             if(vl > 2) {

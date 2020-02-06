@@ -86,7 +86,7 @@ public class VelocityB extends Check {
                 if (data.playerInfo.lClientGround) {
                     f5 = data.predictionService.aiMoveSpeed * f;
                 } else {
-                    f5 = data.playerInfo.sprinting ? 0.026 : 0.02;
+                    f5 = sprint ? 0.026 : 0.02;
                 }
 
                 double pct;
@@ -99,27 +99,24 @@ public class VelocityB extends Check {
                     strafe*= 0.2;
                 }
 
-                debug("motion: " + strafe + ", " + forward);
+                //debug("motion: " + strafe + ", " + forward);
 
                 moveFlying(strafe, forward, f5);
 
-                double vXZ = MathUtils.hypot(vX, vZ);
-                pct = data.playerInfo.deltaXZ / vXZ * 100;
+                double ratio = MathUtils.hypot(data.playerInfo.deltaX / vX, data.playerInfo.deltaZ / vZ);
+                pct = ratio * 100;
 
                 if (pct < (data.predictionService.key.equals("W")
-                        || data.predictionService.key.equals("Nothing") ? 99 : 88)
+                        || data.predictionService.key.equals("Nothing") ? 99 : 90)
                         && !data.playerInfo.usingItem && !data.predictionService.useSword) {
-                    if(data.lagInfo.lastPacketDrop.hasPassed(1)) {
-                        if (strafe == 0 && forward == 0 && !data.lagInfo.lagging) vl+= 2;
-                        if ((vl+= strafe == 0 && forward > 0 ? 1 : 0.5)
-                                > (data.lagInfo.transPing > 150 ? 22 : 15)) flag("pct=" + MathUtils.round(pct, 3) + "%");
-                    }
+                    if (strafe == 0 && forward == 0 && !data.lagInfo.lagging) vl+= 2;
+                    if (vl++ > (data.lagInfo.transPing > 150 ? 22 : 15))
+                        flag("pct=" + MathUtils.round(pct, 3) + "%");
                 } else vl -= vl > 0 ? data.lagInfo.lagging || data.lagInfo.transPing > 150 ? 0.5f : 0.2f : 0;
 
                 debug("pct=" + pct + " key=" + data.predictionService.key + " ani="
                         + data.playerInfo.usingItem + " sprint=" + data.playerInfo.sprinting
-                        + " ground=" + data.playerInfo.lClientGround + ", " + data.playerInfo.clientGround
-                        + " vl=" + vl);
+                        + " ground=" + data.playerInfo.lClientGround + " vl=" + vl);
 
                 //debug("vX=" + vX + " vZ=" + vZ);
                 //debug("dX=" + data.playerInfo.deltaX + " dZ=" + data.playerInfo.deltaZ + " item=" +);

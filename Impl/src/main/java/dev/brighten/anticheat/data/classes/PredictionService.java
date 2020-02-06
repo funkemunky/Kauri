@@ -355,7 +355,7 @@ public class PredictionService {
 
                 //moveEntity
 
-                /*SimpleCollisionBox box;
+                SimpleCollisionBox box;
                 if(data.playerInfo.sneaking) {
                     double d6;
 
@@ -422,24 +422,28 @@ public class PredictionService {
                     y = axisalignedbb1.copy().calculateYOffset(box, data.playerInfo.deltaY);
                 }
 
-                box.offset(0.0D, y, 0.0D);
+                //box.offset(0.0D, y, 0.0D);
 
                 for (SimpleCollisionBox axisalignedbb2 : boxes) {
                     x = axisalignedbb2.copy().calculateXOffset(box, motionX);
                 }
 
-                box.offset(x,0,0);
+                //box.offset(x,0,0);
 
                 for (SimpleCollisionBox axisalignedbb13 : boxes) {
                     z = axisalignedbb13.copy().calculateZOffset(box, motionZ);
                 }
 
-                box.offset(0,0, z);
+                //box.offset(0,0, z);
 
-                Bukkit.broadcastMessage(x + ", " + y + ", " + z);
+                //Bukkit.broadcastMessage(x + ", " + y + ", " + z);
+
+                motionX = x;
+                motionY = y;
+                motionZ = z;
 
                 collidedHorizontally= d3 != motionX || d5 != motionZ;
-                collidedVertically = d4 != motionY;*/
+                collidedVertically = d4 != motionY;
 
                 predX = motionX;
                 predZ = motionZ;

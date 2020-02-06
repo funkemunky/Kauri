@@ -31,8 +31,8 @@ public class SpeedE extends Check {
                     || data.playerInfo.lastHalfBlock.hasNotPassed(5)) {
                 max+= 0.4;
             }
-            if(max < 1) max = Math.sqrt(max) * 1.5;
-            else max*= 3;
+            if(max < 1) max = Math.sqrt(max) * 2;
+            else max*= 4;
 
             if(data.playerInfo.lastVelocity.hasNotPassed(80))
                 max = Math.max(max, MathUtils.hypot(data.playerInfo.velocityX, data.playerInfo.velocityZ) * 1.5);

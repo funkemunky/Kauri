@@ -44,12 +44,10 @@ public class AutoclickerG extends Check {
                 }
                 if (++this.clicks == 40) {
                     if (this.outliers == 0) {
-                        if ((vl ++) >= 4.0) {
+                        if ((vl++) >= 7.0) {
                             flag("o=%1", outliers);
                         }
-                    } else if(vl > 0) {
-                        vl --;
-                    }
+                    } else vl-= vl > 0 ? 1.5 : 0;
                     debug("outliers=" + outliers + " vl=" + vl);
                     this.outliers = 0;
                     this.clicks = 0;

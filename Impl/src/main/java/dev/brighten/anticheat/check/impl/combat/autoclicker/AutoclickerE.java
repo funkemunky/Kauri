@@ -1,54 +1,57 @@
 package dev.brighten.anticheat.check.impl.combat.autoclicker;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockDigPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.MathUtils;
-import dev.brighten.anticheat.check.api.*;
+import cc.funkemunky.api.utils.math.cond.MaxDouble;
+import dev.brighten.anticheat.check.api.Check;
+import dev.brighten.anticheat.check.api.CheckInfo;
+import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
+import lombok.val;
 
-@CheckInfo(name = "Autoclicker (E)", description = "Checks for weird doubleclicking patterns.",
-        checkType = CheckType.AUTOCLICKER, punishVL = 10, developer = true)
-@Cancellable(cancelType = CancelType.INTERACT)
+import java.util.Deque;
+import java.util.LinkedList;
+
+@CheckInfo(name = "Autoclicker (E)", description = "Checks for impossible deviations (Elevated/funkemunky).", checkType = CheckType.AUTOCLICKER)
 public class AutoclickerE extends Check {
 
-    private boolean sent;
-    private int timesSent;
-    private long lastFlying;
+    private Deque<Long> clickSamples = new LinkedList<>();
+
+    private long lastSwing;
+    private double stdDelta;
+    private MaxDouble verbose = new MaxDouble(10);
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        sent = false;
-        timesSent = 0;
-        vl-= vl > 0 ? 0.0025f : 0;
-        lastFlying = timeStamp;
-    }
+    public void onClick(WrappedInArmAnimationPacket packet, long timeStamp) {
+        long now = System.currentTimeMillis();
+        long delay = now - this.lastSwing;
 
-    @Packet
-    public void onBlock(WrappedInBlockDigPacket packet) {
-        sent = false;
-        timesSent = 0;
-    }
+        if (data.playerInfo.lastBrokenBlock.hasNotPassed(3) || data.playerInfo.lastBlockPlace.hasNotPassed(1))
+            return;
 
-    @Packet
-    public void onBlockPlace(WrappedInBlockPlacePacket packet) {
-        sent = false;
-        timesSent = 0;
-    }
+        if (delay > 1L && delay < 300L && this.clickSamples.add(delay) && this.clickSamples.size() == 30) {
+            double average = this.clickSamples.stream().mapToDouble(Long::doubleValue).average().orElse(0.0);
 
-    @Packet
-    public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
-        if(data.playerInfo.lastBrokenBlock.hasNotPassed(2) || data.playerInfo.breakingBlock
-                || data.playerInfo.lastBlockPlace.hasNotPassed(2)) return;
+            double stdDeviation = 0.0;
 
-        timesSent++;
-        if(sent && data.lagInfo.lastPacketDrop.hasPassed(1)
-                && MathUtils.getDelta(timeStamp - lastFlying, 50) < 20) {
-            if(vl++ > 1) {
-                flag("sent=%1", timesSent);
+            for (Long click : this.clickSamples) {
+                stdDeviation += Math.pow(click.doubleValue() - average, 2);
             }
-            debug("sent=%1 vl=%2 lastDrop=%3", timesSent, vl, data.lagInfo.lastPacketDrop.getPassed());
-        } else sent = true;
+
+            stdDeviation /= this.clickSamples.size();
+
+            val std = Math.sqrt(stdDeviation);
+            if (std < 20.d) {
+                if(verbose.add() > 4 || std < 13.d) {
+                    vl++;
+                    this.flag("STD: " + std);
+                }
+            } else verbose.subtract(0.5);
+
+            debug("std=%1 verbose=%2", std, verbose.value());
+
+            this.clickSamples.clear();
+        }
+
+        this.lastSwing = now;
     }
 }

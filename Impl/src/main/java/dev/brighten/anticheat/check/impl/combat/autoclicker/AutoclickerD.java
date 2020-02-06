@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @CheckInfo(name = "Autoclicker (D)", description = "Oscillation check by Abigail.",
-        checkType = CheckType.AUTOCLICKER, punishVL = 10)
+        checkType = CheckType.AUTOCLICKER, punishVL = 15, vlToFlag = 4)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerD extends Check {
 

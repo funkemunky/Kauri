@@ -18,7 +18,7 @@ public class AutoclickerC extends Check {
     private double cps;
     private boolean blocked, blocking;
     private int armTicks, slot;
-    private MaxDouble verbose = new MaxDouble(40);
+    private MaxDouble verbose = new MaxDouble(40), verbose2 = new MaxDouble(40);
 
     @Packet
     public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
@@ -62,11 +62,12 @@ public class AutoclickerC extends Check {
         if(blocked) {
             if(armTicks > 0) {
                 if(armTicks == 1 && cps > 3) {
-                    if(cps > 8) vl++;
-                    if(vl > 15) {
-                        flag("arm=%1 cps=%2 lagging=%3", armTicks, MathUtils.round(cps, 3), data.lagInfo.lagging);
+                    if(cps > 7) verbose.add();
+                    if(verbose.value() > 15) {
+                        flag("arm=%1 cps=%2 lagging=%3", armTicks,
+                                MathUtils.round(cps, 3), data.lagInfo.lagging);
                     }
-                } else vl = 0;
+                } else verbose.subtract(20);
                 debug("cps=%1 arm=%2 lagging=%3 vl=%4", cps, armTicks, data.lagInfo.lagging, vl);
             }
             blocked = false;
