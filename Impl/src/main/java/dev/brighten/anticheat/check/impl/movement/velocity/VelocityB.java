@@ -63,17 +63,18 @@ public class VelocityB extends Check {
                 vZ*= 0.6;
             }
 
-            if(!data.predictionService.key.equals(lastKey)) maxThreshold = 80;
+            if(!data.predictionService.key.equals(lastKey)
+                    || data.lagInfo.lastPacketDrop.hasNotPassed(1)
+                    || data.lagInfo.lastPingDrop.hasNotPassed(100)) maxThreshold = 80;
 
-            if(data.lagInfo.lastPacketDrop.hasNotPassed(1)
-                    && data.lagInfo.lastPingDrop.hasNotPassed(100)) maxThreshold = 70;
             if(!data.blockInfo.blocksNear
                     && !data.blockInfo.inWeb
                     && !data.playerInfo.onLadder
                     && timeStamp - data.playerInfo.lastServerPos > 100L
                     && !data.blockInfo.inLiquid
                     && !data.playerInfo.serverPos
-                    && !data.getPlayer().getAllowFlight()) {
+                    && !data.playerInfo.canFly
+                    && !data.playerInfo.creative) {
 
                 double f4 = 0.91;
 

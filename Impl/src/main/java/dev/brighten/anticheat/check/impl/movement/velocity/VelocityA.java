@@ -32,7 +32,7 @@ public class VelocityA extends Check {
                 && !data.lagInfo.lagging
                 && data.playerInfo.worldLoaded
                 && !data.blockInfo.inWeb
-
+                && data.lagInfo.lastPacketDrop.hasPassed(5)
                 && !data.blockInfo.onClimbable
                 && data.playerInfo.blockAboveTimer.hasPassed(6)) {
 
@@ -47,8 +47,7 @@ public class VelocityA extends Check {
             vY-= 0.08;
             vY*= 0.98;
 
-            if(vY < 0.005 || data.playerInfo.serverGround
-                    || data.blockInfo.collidesHorizontally
+            if(vY < 0.005 || data.blockInfo.collidesHorizontally
                     || data.blockInfo.collidesVertically) vY = 0;
 
             debug("pct=" + pct + " vl=" + vl);
