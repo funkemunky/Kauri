@@ -18,10 +18,11 @@ public class Motion extends Check {
 
             if(data.predictionService.flag && !data.playerInfo.generalCancel && !data.blockInfo.collidesHorizontally) {
                 vl++;
-                if(vl > 20) {
-                    flag("deltaX=" + deltaX + " deltaZ=" + deltaZ);
+                if(vl > 24) {
+                    flag("deltaX=%1 deltaZ=%2",
+                            MathUtils.round(deltaX, 3), MathUtils.round(deltaZ, 3));
                 }
-            } else vl-= vl > 0 ? 3 : 0;
+            } else vl-= vl > 0 ? 2 : 0;
             debug("deltaX=" + deltaX + " deltaZ=" + deltaZ + " key=" + data.predictionService.key
                     + " collided=" + data.predictionService.collidedHorizontally);
         }

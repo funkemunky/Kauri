@@ -22,6 +22,7 @@ public class VelocityB extends Check {
     private boolean useEntity, sprint;
     private float forward, strafe;
     private String lastKey;
+    private double maxThreshold;
     private long velocityTS;
 
     @Packet
@@ -49,27 +50,27 @@ public class VelocityB extends Check {
             velocityTS = timeStamp;
             vX = svX;
             vZ = svZ;
+            maxThreshold = 99;
             debug("set velocity");
         }
     }
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if(!data.predictionService.key.equals(lastKey)) vX = vZ = 0;
-        if((MathUtils.hypot(vX, vZ) > MovementUtils.getBaseSpeed(data))
-                && timeStamp - velocityTS < 500L) {
+        if(vX != 0 || vZ != 0) {
             if(sprint && useEntity) {
                 vX*= 0.6;
                 vZ*= 0.6;
             }
 
+            if(!data.predictionService.key.equals(lastKey)) maxThreshold = 80;
+
             if(data.lagInfo.lastPacketDrop.hasNotPassed(1)
-                    && data.lagInfo.lastPingDrop.hasNotPassed(100)) vX = vZ = 0;
+                    && data.lagInfo.lastPingDrop.hasNotPassed(100)) maxThreshold = 70;
             if(!data.blockInfo.blocksNear
                     && !data.blockInfo.inWeb
                     && !data.playerInfo.onLadder
                     && timeStamp - data.playerInfo.lastServerPos > 100L
-                    && data.predictionService.key.equals(lastKey)
                     && !data.blockInfo.inLiquid
                     && !data.playerInfo.serverPos
                     && !data.getPlayer().getAllowFlight()) {
@@ -103,11 +104,14 @@ public class VelocityB extends Check {
 
                 moveFlying(strafe, forward, f5);
 
-                double ratio = MathUtils.hypot(data.playerInfo.deltaX / vX, data.playerInfo.deltaZ / vZ);
+                double vXZ = MathUtils.hypot(vX, vZ);
+
+                double ratio = data.playerInfo.deltaXZ / vXZ;
+                //double ratio = MathUtils.hypot(data.playerInfo.deltaX / vX, data.playerInfo.deltaZ / vZ);
                 pct = ratio * 100;
 
-                if (pct < (data.predictionService.key.equals("W")
-                        || data.predictionService.key.equals("Nothing") ? 99 : 90)
+                if (pct < (Math.min(maxThreshold, data.predictionService.key.equals("W")
+                        || data.predictionService.key.equals("Nothing") ? 99 : 90))
                         && !data.playerInfo.usingItem && !data.predictionService.useSword) {
                     if (strafe == 0 && forward == 0 && !data.lagInfo.lagging) vl+= 2;
                     if (vl++ > (data.lagInfo.transPing > 150 ? 22 : 15))

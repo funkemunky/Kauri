@@ -63,6 +63,7 @@ public class Kauri extends JavaPlugin {
         enabled = reload;
         MiscUtils.printToConsole("&7Unregistering Kauri API...");
         kauriAPI.service.shutdown();
+        loggerManager.loggingThread.shutdown();
 
         PacketListener.packetThread.shutdown();
 

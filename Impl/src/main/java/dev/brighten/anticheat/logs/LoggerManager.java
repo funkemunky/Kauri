@@ -16,6 +16,8 @@ import lombok.val;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 @Init
@@ -25,6 +27,8 @@ public class LoggerManager {
     public Database logsDatabase;
 
     public Map<UUID, List<Log>> cache = new HashMap<>();
+
+    public ExecutorService loggingThread;
 
     public BukkitTask cacheUpdater;
 
@@ -74,6 +78,7 @@ public class LoggerManager {
 
     public LoggerManager(boolean aLittleStupid) {
         if(aLittleStupid) {
+            loggingThread = Executors.newSingleThreadScheduledExecutor();
             if(mySQLEnabled) {
                 MiscUtils.printToConsole("&7Setting up SQL...");
                 logsDatabase = new MySQLDatabase("logs");
@@ -137,7 +142,7 @@ public class LoggerManager {
                 new Pair<>("timeStamp", log.timeStamp),
                 new Pair<>("tps", log.tps)).forEach(pair -> set.input(pair.key, pair.value));
 
-        set.save(logsDatabase);
+        loggingThread.execute(() -> set.save(logsDatabase));
     }
 
     public void addPunishment(ObjectData data, Check check) {
@@ -151,7 +156,7 @@ public class LoggerManager {
                 new Pair<>("timeStamp", punishment.timeStamp))
                 .forEach(pair -> set.input(pair.key, pair.value));
         
-        set.save(logsDatabase);
+        loggingThread.execute(() -> set.save(logsDatabase));
     }
 
     public List<Log> getLogs(UUID uuid) {
@@ -189,6 +194,7 @@ public class LoggerManager {
                 .stream().map(StructureSet::getId).toArray(String[]::new);
 
         logsDatabase.remove(array);
+        cache.remove(uuid);
     }
     
     public List<Punishment> getPunishments(UUID uuid) {

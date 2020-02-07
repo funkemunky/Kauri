@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.check.impl.movement.speed;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.math.cond.MaxInteger;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
@@ -36,7 +37,9 @@ public class SpeedA extends Check {
             if(verbose.add(data.playerInfo.deltaXZ - baseSpeed > 0.6f ? 4 : 1) > 25
                     || data.playerInfo.deltaXZ - baseSpeed > 0.6f) {
                 vl+= data.playerInfo.deltaXZ - baseSpeed > 0.6f ? 50 : 1;
-                flag(data.playerInfo.deltaXZ + ">-" + baseSpeed);
+                flag("%1>-%2",
+                        MathUtils.round(data.playerInfo.deltaXZ, 3),
+                        MathUtils.round(baseSpeed, 3));
             }
         } else verbose.subtract();
 

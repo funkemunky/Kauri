@@ -230,8 +230,8 @@ public class SpeedC extends Check {
             if (horizontalMove > 0 && data.playerInfo.lastVelocity.hasPassed(10)) {
                 vl++;
                 if(horizontalMove > 0.4 || vl > 3) {
-                    flag("+%1,v=%2,tags=%3",
-                            horizontalMove, data.playerInfo.velocityX, String.join(",", tags));
+                    flag("+%1,tags=%2",
+                            MathUtils.round(horizontalMove, 5), String.join(",", tags));
                 }
             } else vl-= vl > 0 ? 0.2 : 0;
         }
