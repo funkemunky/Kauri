@@ -250,13 +250,11 @@ public class Check implements KauriCheck {
         register(new AutoclickerE());
         register(new AutoclickerF());
         register(new AutoclickerG());
-        register(new AutoclickerE());
         register(new FlyA());
         register(new FlyB());
         register(new FlyC());
         register(new FlyD());
         register(new FlyE());
-        register(new FlyF());
         register(new FlyF());
         register(new FlyG());
         register(new FastLadder());
@@ -281,7 +279,7 @@ public class Check implements KauriCheck {
         register(new KillauraB());
         register(new KillauraC());
         register(new KillauraD());
-        register(new Phase());
+        //register(new Phase());
         register(new Timer());
         register(new BadPacketsA());
         register(new BadPacketsB());
@@ -294,7 +292,7 @@ public class Check implements KauriCheck {
         register(new BadPacketsI());
         register(new BadPacketsJ());
         register(new BadPacketsK());
-        register(new BadPacketsL());
+        //register(new BadPacketsL());
         register(new VelocityA());
         register(new VelocityB());
         register(new VelocityC());
@@ -302,7 +300,7 @@ public class Check implements KauriCheck {
         register(new HandB());
         register(new HandC());
         register(new HealthSpoof());
-        register(new BlockPlace());
+        //register(new BlockPlace());
         register(new BookOp());
         register(new BookEnchant());
         register(new PacketSpam());

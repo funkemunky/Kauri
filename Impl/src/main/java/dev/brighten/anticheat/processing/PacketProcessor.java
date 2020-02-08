@@ -17,6 +17,7 @@ import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.MiscUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
@@ -115,7 +116,7 @@ public class PacketProcessor {
                 //        || event.getType().contains("Look")
                 //        || event.getType().equalsIgnoreCase(Packet.Client.FLYING)) Bukkit.broadcastMessage(event.getType() + ":4");
                 data.predictionService.onReceive(packet); //Processing for prediction service.
-;
+
                 data.checkManager.runPacket(packet, timeStamp);
                 if(data.sniffing) {
                     data.sniffedPackets.add(event.getType() + ":@:"
@@ -183,18 +184,18 @@ public class PacketProcessor {
             case Packet.Client.BLOCK_PLACE: {
                 WrappedInBlockPlacePacket packet = new WrappedInBlockPlacePacket(object, data.getPlayer());
 
-                if (packet.getItemStack() != null) {
-                    if (packet.getItemStack().getType().isBlock()
-                            && packet.getItemStack().getType().getId() != 0
+                if (event.getPlayer().getItemInHand() != null) {
+                    if (event.getPlayer().getItemInHand().getType().isBlock()
+                            && event.getPlayer().getItemInHand().getType().getId() != 0
                             && (packet.getPosition().getX() != -1
                             || packet.getPosition().getY() != -1
                             || packet.getPosition().getZ() != -1)) {
                         data.playerInfo.lastBlockPlace.reset();
-                        MiscUtils.testMessage(packet.getItemStack().getType().name());
+                        MiscUtils.testMessage(event.getPlayer().getItemInHand().getType().name());
                     } else if (packet.getPosition().getX() == -1
                             && packet.getPosition().getY() == -1
                             && packet.getPosition().getZ() == -1
-                            && Materials.isUsable(packet.getItemStack().getType())) {
+                            && Materials.isUsable(event.getPlayer().getItemInHand().getType())) {
                         data.predictionService.useSword = data.playerInfo.usingItem = true;
                         data.predictionService.lastUseItem.reset();
                     }
@@ -247,6 +248,9 @@ public class PacketProcessor {
 
                     data.lagInfo.pingAverages.add(data.lagInfo.transPing);
                     data.lagInfo.averagePing = data.lagInfo.pingAverages.getAverage();
+
+                    TinyProtocolHandler.sendPacket(data.getPlayer(),
+                            new WrappedOutTransaction(0, (short) 69, false).getObject());
                 } else if (packet.getAction() == (short) 101) {
                     data.playerInfo.lastVelocity.reset();
                     data.playerInfo.lastVelocityTimestamp = timeStamp;

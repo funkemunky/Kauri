@@ -24,6 +24,7 @@ public class Timer extends Check {
         long elapsed = timeStamp - lastTS;
 
         if(timeStamp - data.creation > 2000
+                && data.lagInfo.lastPacketDrop.hasPassed(1)
                 && timeStamp - data.playerInfo.lastServerPos > 80L) {
             times.add(elapsed);
             val summary = times.stream().mapToLong(val -> val).summaryStatistics();

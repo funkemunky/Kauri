@@ -27,6 +27,7 @@ public class Reach extends Check {
 
     private float verbose;
 
+
     @Packet
     public void onArm(WrappedInArmAnimationPacket packet) {
         vl-= vl > 0 ? 0.005 : 0;
@@ -41,7 +42,7 @@ public class Reach extends Check {
                 .add(0, data.playerInfo.sneaking ? 1.54f : 1.62f, 0);
 
         val entityLoc = (data.targetData != null ? data.targetData.pastLocation : data.targetPastLocation)
-                .getEstimatedLocation(data.lagInfo.transPing, Math.max(275, Math.round(data.lagInfo.transPing / 2D)));
+                .getEstimatedLocation(data.lagInfo.transPing, Math.max(200, Math.round(data.lagInfo.transPing / 2D)));
 
         List<Double> distances = new ArrayList<>();
 

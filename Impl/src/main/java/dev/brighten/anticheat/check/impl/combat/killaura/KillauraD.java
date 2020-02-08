@@ -82,12 +82,12 @@ public class KillauraD extends Check {
 
                 val yawAvg = yawSummary.getAverage();
 
-                if(std < (yawAvg > 9 ? 3.5 : 2.4) && range > 1 && yawRange > 11) {
+                if(std < (yawAvg > 9 ? 2.7 : 1.8) && range > 1 && yawRange > 11) {
                     if(verbose++ > 2) {
                         vl++;
                         flag("avg=%1 std=%2 range=%3", summary.getAverage(), std, range);
                     }
-                } else verbose-= verbose > 0 ? 0.05 : 0;
+                } else verbose-= verbose > 0 ? 0.1 : 0;
                 debug("avg=%1 std=%2 range=%3 yawRange=%4 yawAvg=%5",
                         summary.getAverage(), std, range, yawRange, yawAvg);
                 collisions.clear();

@@ -70,18 +70,20 @@ public class ObjectData {
         checkManager.addChecks();
         predictionService = new PredictionService(this);
         moveProcessor = new MovementProcessor(this);
-        Kauri.INSTANCE.executor.execute(() -> {
-            playerVersion = TinyProtocolHandler.getProtocolVersion(getPlayer());
-        });
+        Kauri.INSTANCE.executor.execute(() -> playerVersion = TinyProtocolHandler.getProtocolVersion(getPlayer()));
 
+        TinyProtocolHandler.sendPacket(getPlayer(), new WrappedOutTransaction(0, (short) 69, false)
+                .getObject());
         task = RunUtils.taskTimerAsync(() -> {
             if(getPlayer() == null) {
                 task.cancel();
                 return;
             }
 
-            TinyProtocolHandler.sendPacket(getPlayer(), new WrappedOutTransaction(0, (short) 69, false)
-                    .getObject());
+            if(System.currentTimeMillis() - lagInfo.lastTrans > 2000) {
+                TinyProtocolHandler.sendPacket(getPlayer(), new WrappedOutTransaction(0, (short) 69, false)
+                        .getObject());
+            }
         }, 5L, 20L);
     }
 
