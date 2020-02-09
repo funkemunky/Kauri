@@ -22,7 +22,7 @@ public class Motion extends Check {
                     flag("deltaX=%1 deltaZ=%2",
                             MathUtils.round(deltaX, 3), MathUtils.round(deltaZ, 3));
                 }
-            } else vl-= vl > 0 ? 2 : 0;
+            } else vl-= vl > 0 ? 1.25 : 0;
             debug("deltaX=" + deltaX + " deltaZ=" + deltaZ + " key=" + data.predictionService.key
                     + " collided=" + data.predictionService.collidedHorizontally);
         }

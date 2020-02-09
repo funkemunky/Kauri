@@ -80,10 +80,8 @@ public class ObjectData {
                 return;
             }
 
-            if(System.currentTimeMillis() - lagInfo.lastTrans > 2000) {
-                TinyProtocolHandler.sendPacket(getPlayer(), new WrappedOutTransaction(0, (short) 69, false)
-                        .getObject());
-            }
+            TinyProtocolHandler.sendPacket(getPlayer(), new WrappedOutTransaction(0, (short) 69, false)
+                    .getObject());
         }, 5L, 20L);
     }
 

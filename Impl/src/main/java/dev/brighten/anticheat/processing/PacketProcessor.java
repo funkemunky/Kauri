@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.processing;
 
+import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.events.impl.PacketReceiveEvent;
 import cc.funkemunky.api.events.impl.PacketSendEvent;
 import cc.funkemunky.api.reflections.impl.MinecraftReflection;
@@ -239,6 +240,7 @@ public class PacketProcessor {
                     data.lagInfo.transPing = System.currentTimeMillis() - data.lagInfo.lastTrans;
                     data.lagInfo.lastClientTrans = timeStamp;
 
+
                     //We use transPing for checking lag since the packet used is little known.
                     //AimE have not seen anyone create a spoof for it or even talk about the possibility of needing one.
                     //Large jumps in latency most of the intervalTime mean lag.
@@ -249,8 +251,6 @@ public class PacketProcessor {
                     data.lagInfo.pingAverages.add(data.lagInfo.transPing);
                     data.lagInfo.averagePing = data.lagInfo.pingAverages.getAverage();
 
-                    TinyProtocolHandler.sendPacket(data.getPlayer(),
-                            new WrappedOutTransaction(0, (short) 69, false).getObject());
                 } else if (packet.getAction() == (short) 101) {
                     data.playerInfo.lastVelocity.reset();
                     data.playerInfo.lastVelocityTimestamp = timeStamp;
