@@ -1,7 +1,7 @@
 package dev.brighten.anticheat.utils;
 
 import cc.funkemunky.api.reflections.impl.MinecraftReflection;
-import cc.funkemunky.api.tinyprotocol.packet.types.WrappedEnumAnimation;
+import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumAnimation;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;

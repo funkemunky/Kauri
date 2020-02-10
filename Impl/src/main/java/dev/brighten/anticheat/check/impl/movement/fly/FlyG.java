@@ -14,9 +14,11 @@ import dev.brighten.api.check.CheckType;
 public class FlyG extends Check {
 
     private double totalY;
+    private boolean cancelled;
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(data.playerInfo.generalCancel) {
+            cancelled = true;
             totalY = 0;
             return;
         }
@@ -24,6 +26,7 @@ public class FlyG extends Check {
             if(totalY > 0) {
                 if(data.playerInfo.blockAboveTimer.hasPassed(5)
                         && !data.blockInfo.onStairs
+                        && !cancelled
                         && data.playerInfo.liquidTimer.hasPassed(10)
                         && data.playerInfo.climbTimer.hasPassed(10)
                         && data.playerInfo.lastBlockPlace.hasPassed(20)
@@ -42,6 +45,7 @@ public class FlyG extends Check {
                 }
             }
             totalY = 0;
-        } else if(data.playerInfo.deltaY > 0) totalY+= data.playerInfo.deltaY;
+        } else if(data.playerInfo.deltaY > 0 && !cancelled) totalY+= data.playerInfo.deltaY;
+        if(data.playerInfo.clientGround) cancelled = false;
     }
 }

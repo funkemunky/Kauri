@@ -30,6 +30,7 @@ public class NoFallA extends Check {
             vl+= data.lagInfo.lagging
                     || data.lagInfo.lastPacketDrop.hasNotPassed(1)
                     || data.playerInfo.nearGround
+                    || data.blockInfo.blocksNear
                     ? 1 : data.playerInfo.clientGround ? 2 : 3;
 
             if(vl > 2) {

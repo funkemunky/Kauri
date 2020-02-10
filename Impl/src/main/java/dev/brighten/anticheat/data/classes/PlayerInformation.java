@@ -14,7 +14,7 @@ public class PlayerInformation {
     public boolean generalCancel, flightCancel;
     public float fallDistance;
     public double deltaY, lDeltaY, deltaX, lDeltaX, deltaZ, lDeltaZ, deltaXZ, lDeltaXZ,
-            jumpHeight, totalHeight;
+            jumpHeight, totalHeight, baseSpeed;
     public float headYaw, headPitch;
     public float deltaYaw, deltaPitch, lDeltaYaw, lDeltaPitch;
     public long lastVelocityTimestamp;
@@ -40,7 +40,7 @@ public class PlayerInformation {
 
     //actions
     public boolean sneaking, sprinting, ridingJump, breakingBlock, flying, canFly, creative, inVehicle,
-            gliding, riptiding;
+            gliding, riptiding, inventoryOpen;
 
     //ticks
     public int groundTicks, airTicks;

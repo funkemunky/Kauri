@@ -333,6 +333,7 @@ public class MovementProcessor {
             data.playerInfo.airTicks = 0;
         }
 
+        data.playerInfo.baseSpeed = MovementUtils.getBaseSpeed(data);
         /* General Cancel Booleans */
         boolean hasLevi = levitation != null && data.getPlayer().hasPotionEffect(levitation);
 

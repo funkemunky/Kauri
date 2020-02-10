@@ -23,7 +23,7 @@ public class SpeedE extends Check {
                 && !data.playerInfo.gliding
                 && timeStamp - data.creation > 4000
                 && !data.playerInfo.riptiding) {
-            var max = MovementUtils.getBaseSpeed(data);
+            var max = data.playerInfo.baseSpeed;
 
             if(data.playerInfo.blockAboveTimer.hasNotPassed(5)
                     || data.playerInfo.iceTimer.hasNotPassed(4)

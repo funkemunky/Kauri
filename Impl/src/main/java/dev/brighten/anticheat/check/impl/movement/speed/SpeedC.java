@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Cancellable
-@CheckInfo(name = "Speed (C)", description = "Firefly SpeedH check.", developer = true)
+@CheckInfo(name = "Speed (C)", description = "Speed check by DeprecatedLuke, improved by funkemunky.", developer = true)
 public class SpeedC extends Check {
 
     public double previousDistance;
@@ -140,6 +140,7 @@ public class SpeedC extends Check {
 
         if(data.playerInfo.usingItem) {
             moveSpeed*= 0.2;
+            tags.add("usingItem");
         }
 
         data.blockInfo.handler.setOffset(0);

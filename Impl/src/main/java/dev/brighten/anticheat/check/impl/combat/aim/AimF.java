@@ -9,7 +9,7 @@ import dev.brighten.anticheat.processing.MovementProcessor;
 import dev.brighten.api.check.CheckType;
 import org.bukkit.util.Vector;
 
-@CheckInfo(name = "Aim (F)", description = "Skidded from FFX.", checkType = CheckType.AIM,
+@CheckInfo(name = "Aim (F)", description = "An angle deviation check made by DeprecatedLuke.", checkType = CheckType.AIM,
         punishVL = 20)
 public class AimF extends Check {
 

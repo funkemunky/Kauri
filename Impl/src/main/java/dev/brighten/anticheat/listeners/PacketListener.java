@@ -3,8 +3,11 @@ package dev.brighten.anticheat.listeners;
 import cc.funkemunky.api.events.AtlasListener;
 import cc.funkemunky.api.events.Listen;
 import cc.funkemunky.api.events.ListenerPriority;
+import cc.funkemunky.api.events.impl.PacketHandshakeEvent;
 import cc.funkemunky.api.events.impl.PacketReceiveEvent;
 import cc.funkemunky.api.events.impl.PacketSendEvent;
+import cc.funkemunky.api.tinyprotocol.api.Packet;
+import cc.funkemunky.api.tinyprotocol.packet.login.WrappedHandshakingInSetProtocol;
 import cc.funkemunky.api.utils.Init;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
@@ -22,6 +25,16 @@ public class PacketListener implements AtlasListener {
 
         packetThread.execute(() -> Kauri.INSTANCE.packetProcessor.processClient(event,
                 data, event.getPacket(), event.getType(), event.getTimeStamp()));
+    }
+
+    @Listen(priority = ListenerPriority.LOW)
+    public void onEvent(PacketHandshakeEvent event) {
+        if(event.getPacketType().equals(Packet.Login.HANDSHAKE)) {
+            WrappedHandshakingInSetProtocol packet = new WrappedHandshakingInSetProtocol(event.getPacket());
+
+            System.out.println(packet.hostname + ":" + packet.port + ": "
+                    + packet.enumProtocol.name() + ": " + packet.a);
+        }
     }
 
     @Listen(ignoreCancelled = true,priority = ListenerPriority.LOW)

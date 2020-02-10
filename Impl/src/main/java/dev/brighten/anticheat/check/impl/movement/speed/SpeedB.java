@@ -17,8 +17,7 @@ public class SpeedB extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(packet.isPos()
-                && !data.playerInfo.generalCancel
-                && timeStamp - data.playerInfo.lastVelocityTimestamp > 250L) {
+                && !data.playerInfo.generalCancel) {
             if(data.playerInfo.airTicks > 2) {
                 double accelX = data.playerInfo.deltaX - data.playerInfo.lDeltaX;
                 double accelZ = data.playerInfo.deltaZ - data.playerInfo.lDeltaZ;
@@ -26,6 +25,7 @@ public class SpeedB extends Check {
 
                 if(hypot > 0.12
                         && !data.blockInfo.blocksNear
+                        && data.playerInfo.lastVelocity.hasPassed(8)
                         && !data.blockInfo.inLiquid
                         && data.playerInfo.lastHalfBlock.hasPassed(4)
                         && (accelX > -0.07 || accelZ > -0.07)

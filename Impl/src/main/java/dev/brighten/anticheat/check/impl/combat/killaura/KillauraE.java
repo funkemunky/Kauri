@@ -14,13 +14,21 @@ import org.bukkit.entity.EntityType;
 public class KillauraE extends Check {
 
     private boolean attacked;
+    private float lmoveForward;
     private double lastDeltaXZ, verbose;
+    private TickTimer lastKeyChange = new TickTimer(4);
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
+        if(lmoveForward != data.predictionService.moveForward) lastKeyChange.reset();
         if(attacked) {
             if(data.target != null
                     && data.target.getType().equals(EntityType.PLAYER)
+                    && data.playerInfo.lastVelocity.hasPassed(4)
+                    && data.predictionService.moveForward > 0
+                    && data.playerInfo.deltaXZ > 0.1
+                    && data.playerInfo.sprinting
+                    && lastKeyChange.hasPassed(3)
                     && data.playerInfo.deltaXZ >= lastDeltaXZ) {
                 if(data.lagInfo.lastPingDrop.hasPassed(5) && verbose++ > 3) {
                     vl++;
@@ -31,6 +39,7 @@ public class KillauraE extends Check {
             debug("deltaXZ=" + data.playerInfo.deltaXZ + " ldxz=" + lastDeltaXZ);
             attacked = false;
         } else lastDeltaXZ = data.playerInfo.deltaXZ;
+        lmoveForward = data.predictionService.moveForward;
     }
 
     @Packet

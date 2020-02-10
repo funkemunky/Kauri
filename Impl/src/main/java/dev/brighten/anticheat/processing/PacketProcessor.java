@@ -232,6 +232,22 @@ public class PacketProcessor {
                 }
                 break;
             }
+            case Packet.Client.CLIENT_COMMAND: {
+                WrappedInClientCommandPacket packet = new WrappedInClientCommandPacket(object, data.getPlayer());
+
+                if(packet.getCommand()
+                        .equals(WrappedInClientCommandPacket.EnumClientCommand.OPEN_INVENTORY_ACHIEVEMENT)) {
+                    data.playerInfo.inventoryOpen = true;
+                }
+
+                data.checkManager.runPacket(packet, timeStamp);
+
+                if(data.sniffing) {
+                    data.sniffedPackets.add(event.getType() + ":@:" + packet.getCommand().name()
+                            + ":@:" + event.getTimeStamp());
+                }
+                break;
+            }
             case Packet.Client.TRANSACTION: {
                 WrappedInTransactionPacket packet = new WrappedInTransactionPacket(object, data.getPlayer());
 
@@ -319,6 +335,7 @@ public class PacketProcessor {
             }
             case Packet.Client.CLOSE_WINDOW: {
                 data.predictionService.useSword = data.playerInfo.usingItem = false;
+                data.playerInfo.inventoryOpen = false;
                 if(data.sniffing) {
                     data.sniffedPackets.add(event.getType() + ":@:" + event.getTimeStamp());
                 }
@@ -358,6 +375,10 @@ public class PacketProcessor {
                 if (!data.checkManager.runPacket(packet, timeStamp)) {
                     event.setCancelled(true);
                 }
+                break;
+            }
+            case Packet.Server.CLOSE_WINDOW: {
+                data.playerInfo.inventoryOpen = false;
                 break;
             }
             case Packet.Server.ENTITY_VELOCITY: {

@@ -70,6 +70,7 @@ public class VelocityB extends Check {
             if(!data.blockInfo.blocksNear
                     && !data.blockInfo.inWeb
                     && !data.playerInfo.onLadder
+                    && timeStamp - data.creation > 3000L
                     && timeStamp - data.playerInfo.lastServerPos > 100L
                     && !data.blockInfo.inLiquid
                     && !data.playerInfo.serverPos
