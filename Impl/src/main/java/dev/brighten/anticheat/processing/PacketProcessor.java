@@ -260,9 +260,8 @@ public class PacketProcessor {
                     //We use transPing for checking lag since the packet used is little known.
                     //AimE have not seen anyone create a spoof for it or even talk about the possibility of needing one.
                     //Large jumps in latency most of the intervalTime mean lag.
-                    if (MathUtils.getDelta(data.lagInfo.lastTransPing, data.lagInfo.transPing) > 40) {
+                    if (MathUtils.getDelta(data.lagInfo.lastTransPing, data.lagInfo.transPing) > 25)
                         data.lagInfo.lastPingDrop.reset();
-                    }
 
                     data.lagInfo.pingAverages.add(data.lagInfo.transPing);
                     data.lagInfo.averagePing = data.lagInfo.pingAverages.getAverage();
@@ -366,7 +365,17 @@ public class PacketProcessor {
                 data.playerInfo.creative = packet.isCreativeMode();
                 data.playerInfo.flying = packet.isFlying();
                 data.predictionService.fly = packet.isAllowedFlight();
-                data.checkManager.runPacket(packet, timeStamp);
+                if(!data.checkManager.runPacket(packet, timeStamp)) {
+                    event.setCancelled(true);
+                }
+                break;
+            }
+            case Packet.Server.HELD_ITEM: {
+                WrappedOutHeldItemSlot packet = new WrappedOutHeldItemSlot(object, data.getPlayer());
+
+                if(!data.checkManager.runPacket(packet, timeStamp)) {
+                    event.setCancelled(true);
+                }
                 break;
             }
             case Packet.Server.ENTITY_METADATA: {
@@ -378,7 +387,20 @@ public class PacketProcessor {
                 break;
             }
             case Packet.Server.CLOSE_WINDOW: {
+                WrappedOutCloseWindowPacket packet = new WrappedOutCloseWindowPacket(object, data.getPlayer());
                 data.playerInfo.inventoryOpen = false;
+                data.playerInfo.inventoryId = 0;
+
+                if(!data.checkManager.runPacket(packet, timeStamp)) {
+                    event.setCancelled(true);
+                }
+                break;
+            }
+            case Packet.Server.OPEN_WINDOW: {
+                WrappedOutOpenWindow packet = new WrappedOutOpenWindow(object, data.getPlayer());
+
+                data.playerInfo.inventoryOpen = true;
+                data.playerInfo.inventoryId = packet.getId();
                 break;
             }
             case Packet.Server.ENTITY_VELOCITY: {

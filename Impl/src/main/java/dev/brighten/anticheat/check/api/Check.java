@@ -8,6 +8,7 @@ import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.api.packets.channelhandler.TinyProtocol1_7;
 import cc.funkemunky.api.tinyprotocol.api.packets.channelhandler.TinyProtocol1_8;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutCloseWindowPacket;
 import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.impl.combat.aim.*;
@@ -32,6 +33,9 @@ import dev.brighten.anticheat.check.impl.movement.velocity.VelocityC;
 import dev.brighten.anticheat.check.impl.packets.Timer;
 import dev.brighten.anticheat.check.impl.packets.badpackets.*;
 import dev.brighten.anticheat.check.impl.packets.exploits.*;
+import dev.brighten.anticheat.check.impl.packets.inventory.InventoryA;
+import dev.brighten.anticheat.check.impl.packets.inventory.InventoryB;
+import dev.brighten.anticheat.check.impl.packets.inventory.InventoryC;
 import dev.brighten.anticheat.check.impl.world.place.BlockPlace;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.api.KauriAPI;
@@ -126,9 +130,21 @@ public class Check implements KauriCheck {
         event.setCancelled(!Config.alertDev);
 
         if(cancellable && cancelMode != null && data.lagInfo.lastPacketDrop.hasPassed(8)) {
-            if(!cancelMode.equals(CancelType.ATTACK)) {
-                data.typesToCancel.add(cancelMode);
-            } else for(int i = 0 ; i < 2 ; i++) data.typesToCancel.add(cancelMode);
+            switch(cancelMode) {
+                case ATTACK: {
+                    for(int i = 0 ; i < 2 ; i++) data.typesToCancel.add(cancelMode);
+                    break;
+                }
+                case INVENTORY: {
+                    TinyProtocolHandler.sendPacket(data.getPlayer(),
+                            new WrappedOutCloseWindowPacket(data.playerInfo.inventoryId));
+                    break;
+                }
+                default: {
+                    data.typesToCancel.add(cancelMode);
+                    break;
+                }
+            }
         }
 
         Atlas.getInstance().getEventManager().callEvent(event);
@@ -306,6 +322,9 @@ public class Check implements KauriCheck {
         register(new SignCrash());
         register(new LargeMove());
         register(new Motion());
+        register(new InventoryA());
+        register(new InventoryB());
+        register(new InventoryC());
     }
 
     public static boolean isCheck(String name) {

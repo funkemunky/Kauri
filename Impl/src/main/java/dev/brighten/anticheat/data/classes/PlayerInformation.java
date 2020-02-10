@@ -41,6 +41,7 @@ public class PlayerInformation {
     //actions
     public boolean sneaking, sprinting, ridingJump, breakingBlock, flying, canFly, creative, inVehicle,
             gliding, riptiding, inventoryOpen;
+    public int inventoryId = 0;
 
     //ticks
     public int groundTicks, airTicks;

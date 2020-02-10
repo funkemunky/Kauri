@@ -28,5 +28,6 @@ public class BadPacketsB extends Check {
             } else ticks.subtract(ticks.value() > 40 ? 8 : 4);
             lastSneak.reset();
         }
+        debug(action.getAction().name());
     }
 }

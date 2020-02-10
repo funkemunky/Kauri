@@ -11,6 +11,7 @@ import cc.funkemunky.api.tinyprotocol.packet.login.WrappedHandshakingInSetProtoc
 import cc.funkemunky.api.utils.Init;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
+import org.bukkit.Bukkit;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -21,25 +22,17 @@ public class PacketListener implements AtlasListener {
     public static ExecutorService packetThread = Executors.newSingleThreadScheduledExecutor();
     @Listen(ignoreCancelled = true, priority = ListenerPriority.LOW)
     public void onEvent(PacketReceiveEvent event) {
+        if(event.getPlayer() == null) return;
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
         packetThread.execute(() -> Kauri.INSTANCE.packetProcessor.processClient(event,
                 data, event.getPacket(), event.getType(), event.getTimeStamp()));
     }
 
-    @Listen(priority = ListenerPriority.LOW)
-    public void onEvent(PacketHandshakeEvent event) {
-        if(event.getPacketType().equals(Packet.Login.HANDSHAKE)) {
-            WrappedHandshakingInSetProtocol packet = new WrappedHandshakingInSetProtocol(event.getPacket());
-
-            System.out.println(packet.hostname + ":" + packet.port + ": "
-                    + packet.enumProtocol.name() + ": " + packet.a);
-        }
-    }
-
     @Listen(ignoreCancelled = true,priority = ListenerPriority.LOW)
     public void onEvent(PacketSendEvent event) {
-        if(event.isCancelled() || !Kauri.INSTANCE.enabled || event.getPacket() == null) return;
+        if(event.isCancelled() || event.getPlayer() == null
+                || !Kauri.INSTANCE.enabled || event.getPacket() == null) return;
 
         if(!Kauri.INSTANCE.dataManager.dataMap.containsKey(event.getPlayer().getUniqueId()))
             return;
