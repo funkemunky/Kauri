@@ -7,7 +7,7 @@ import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Inventory (A)", description = "Checks if user clicks while window is open.",
-        checkType = CheckType.INVENTORY, punishVL = 10)
+        checkType = CheckType.INVENTORY, punishVL = 10, cancellable = true)
 @Cancellable(cancelType = CancelType.INVENTORY)
 public class InventoryA extends Check {
 
@@ -15,7 +15,7 @@ public class InventoryA extends Check {
     public void onWindow(WrappedInWindowClickPacket packet) {
         if(packet.getId() == 0 && !data.playerInfo.inventoryOpen) {
             vl++;
-            flag("id=%1", packet.getId());
+            if(vl > 2) flag("id=%1", packet.getId());
         }
     }
 }
