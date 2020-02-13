@@ -27,10 +27,14 @@ public class FlyG extends Check {
                 if(data.playerInfo.blockAboveTimer.hasPassed(5)
                         && !data.blockInfo.onStairs
                         && !cancelled
+                        && totalY > 0.1
+                        && !data.playerInfo.wasOnSlime
+                        && data.playerInfo.slimeTimer.hasPassed(10)
+                        && data.playerInfo.webTimer.hasPassed(10)
                         && data.playerInfo.liquidTimer.hasPassed(10)
                         && data.playerInfo.climbTimer.hasPassed(10)
                         && data.playerInfo.lastBlockPlace.hasPassed(20)
-                        && data.playerInfo.lastHalfBlock.hasPassed(3)
+                        && (data.playerInfo.lastHalfBlock.hasPassed(3) || totalY > 1)
                         && data.playerInfo.lastVelocity.hasPassed(20)) {
                     double delta = MathUtils.getDelta(totalY, data.playerInfo.totalHeight);
 

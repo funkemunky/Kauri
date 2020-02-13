@@ -12,6 +12,7 @@ import dev.brighten.anticheat.utils.Helper;
 import dev.brighten.anticheat.utils.MiscUtils;
 import lombok.val;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.potion.PotionEffectType;
 
@@ -31,7 +32,7 @@ public class PredictionService {
     public double predX, predZ;
     public TickTimer lastUseItem = new TickTimer(10);
     public double aiMoveSpeed;
-    public boolean collidedHorizontally, collidedVertically, flag;
+    public boolean collidedHorizontally, collidedVertically, flag, isBelowSpecial;
     public float walkSpeed, yaw, moveStrafing, moveForward;
 
     public String key = "Nothing";
@@ -67,6 +68,14 @@ public class PredictionService {
         rmotionY = posY - lPosY;
         rmotionZ = posZ - lPosZ;
 
+        Block blockBelow = BlockUtils.getBlock(new Location(data.getPlayer().getWorld(), MathHelper.floor_double(posX),
+                MathHelper.floor_double(posY -  0.20000000298023224D), MathHelper.floor_double(posZ)));
+
+        if(blockBelow != null) {
+            isBelowSpecial = XMaterial.SLIME_BLOCK.parseMaterial().equals(blockBelow.getType())
+                    || XMaterial.SOUL_SAND.parseMaterial().equals(blockBelow.getType());
+        }
+
         //dev.brighten.anticheat.utils.MiscUtils.testMessage(Color.Gray + rmotionX + ", " + rmotionZ);
         fMath = fastMath; // if the Player uses Optifine FastMath
 
@@ -81,7 +90,7 @@ public class PredictionService {
 
                 calcKey(mx, mz);
 
-                MiscUtils.testMessage("key: " + key);
+                //MiscUtils.testMessage("key: " + key);
                 calc(true);
             }
 
@@ -95,27 +104,42 @@ public class PredictionService {
         }
         dropItem = false;
 
+        if(blockBelow != null
+                && onGround) {
+            if(XMaterial.SLIME_BLOCK.parseMaterial().equals(blockBelow.getType())) {
+                if(Math.abs(data.playerInfo.deltaY) < 0.1 && !data.playerInfo.sneaking) {
+                    double shit = 0.4081 + Math.abs(data.playerInfo.deltaY) * 0.20000000298023224D;
+
+                    rmotionZ *= shit;
+                    rmotionX *= shit;
+                    MiscUtils.testMessage("slime: " + shit + ", " + data.blockInfo.currentFriction);
+                }
+            } else if(XMaterial.SOUL_SAND.parseMaterial().equals(blockBelow.getType())) {
+                double shit = 0.4;
+                rmotionX *= shit;
+                rmotionZ *= shit;
+                MiscUtils.testMessage("soulsand: " + shit + ", " + data.blockInfo.currentFriction);
+            }
+        }
+
         if(data.blockInfo.inWeb) {
             rmotionX *= 0.25;
             rmotionZ *= 0.25;
         }
 
-        if(data.blockInfo.onSoulSand) {
-            rmotionX*= 0.4;
-            rmotionZ*= 0.4;
-        }
-
         double multiplier = 0.9100000262260437D; // multiplier = is the value that the client multiplies every move
 
         if(!data.blockInfo.inLiquid) {
+            if (lastOnGround) {
+               // multiplier = 0.60000005239967D;
+                multiplier*= data.blockInfo.currentFriction;
+
+               //MiscUtils.testMessage("friction: " + data.blockInfo.currentFriction);
+            }
             rmotionX *= multiplier;
             rmotionZ *= multiplier;
-
-            if (lastOnGround) {
-                multiplier = 0.60000005239967D;
-                rmotionX *= multiplier;
-                rmotionZ *= multiplier;
-            } else if (data.blockInfo.inLava) {
+        } else {
+            if (data.blockInfo.inLava) {
                 rmotionX *= 0.5f;
                 rmotionZ *= 0.5f;
             } else if (data.blockInfo.inWater) {
@@ -260,7 +284,7 @@ public class PredictionService {
 
         int direction = 6;
 
-        MiscUtils.testMessage("yaw= " + motionYaw + " mx=" + mx + " mz=" + mz);
+        //MiscUtils.testMessage("yaw= " + motionYaw + " mx=" + mx + " mz=" + mz);
 
         motionYaw /= 45.0F; // converts the rotationYaw of the Motion to integers to get keys
 
@@ -320,7 +344,7 @@ public class PredictionService {
     private void calc(boolean checkCollisions) {
         flag = true;
         int precision = String.valueOf((int) Math.abs(posX > posZ ? posX : posX)).length();
-        precision = 15 - precision;
+        precision = 15 - precision - (isBelowSpecial ? 6 : 0);
         double preD = 1.2 * Math.pow(10, -Math.max(3, precision - 5));  // the motion deviates further and further from the coordinates 0 0 0. this value fix this
 
 //		if (openInv) { // i don't have an Event for it
@@ -425,7 +449,7 @@ public class PredictionService {
                     motionZ += (moveForward * var16 + moveStrafing * var15);
                 }
 
-                if(checkCollisions) {
+                /*if(checkCollisions) {
                     if(data.playerInfo.onLadder) {
                         float f6 = 0.15F;
                         motionX = MathHelper.clamp_double(motionX, -f6, f6);
@@ -477,8 +501,9 @@ public class PredictionService {
 
                     collidedHorizontally= d3 != motionX || d5 != motionZ;
                     collidedVertically = d4 != motionY;
+                }*/
 
-                }
+
                 predX = motionX;
                 predZ = motionZ;
 
@@ -496,13 +521,14 @@ public class PredictionService {
 
                 if (diff < preD) { // if the diff is small enough
                     flag = false;
-                    //Bukkit.broadcastMessage(Color.Green + "(" + rmotionX + ", " + motionX + "); (" + rmotionZ + ", " + motionZ + ")");
+                    MiscUtils.testMessage(Color.Green + "(" + rmotionX + ", " + motionX + "); (" + rmotionZ + ", " + motionZ + ")");
 
-                    //MiscUtils.testMessage(Color.Green + diffString + " loops " + loops + " key: " + key + " sneak=" + sneak + " move=" + moveForward + " ai=" + aiMoveSpeed);
+                    MiscUtils.testMessage(Color.Green + diffString + " loops " + loops + " key: " + key + " sneak=" + sneak + " move=" + moveForward + " ai=" + aiMoveSpeed);
                     fMath = fastMath; // saves the fastmath option if the player changed it
                     break found;
                 }
-                //MiscUtils.testMessage(Color.Red + diffString + " loops " + loops + " key: " + key + " sneak=" + sneak + " move=" + moveForward + " ai=" + aiMoveSpeed);
+                MiscUtils.testMessage(Color.Red + "(" + rmotionX + ", " + motionX + "); (" + rmotionZ + ", " + motionZ + ")");
+                MiscUtils.testMessage(Color.Red + diffString + " loops " + loops + " key: " + key + " sneak=" + sneak + " move=" + moveForward + " ai=" + aiMoveSpeed);
 
                 if (diff < closestdiff) {
                     closestdiff = diff;
@@ -527,9 +553,7 @@ public class PredictionService {
         if (MathUtils.hypot(posX - lPosX, posZ - lPosZ) > 10)
             return false;
 
-        return data.playerInfo.liquidTimer.hasPassed(20)
-                && data.playerInfo.climbTimer.hasPassed(20)
-                && !fly
+        return !fly
                 && !data.playerInfo.creative;
     }
 

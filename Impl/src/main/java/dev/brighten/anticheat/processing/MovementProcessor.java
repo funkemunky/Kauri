@@ -251,7 +251,9 @@ public class MovementProcessor {
                 if (yawPositives > yawNegatives || pitchPositives > pitchNegatives) {
                     data.playerInfo.cinematicMode = true;
                     MiscUtils.testMessage(data.getPlayer().getName());
-                } else data.playerInfo.cinematicMode = false;
+                } else data.playerInfo.cinematicMode = MathUtils.getDelta(deltaX, lastDeltaX) < 3
+                        && MathUtils.getDelta(deltaY, lastDeltaY) < 3
+                        && (deltaX > 15 || deltaY > 15);
 
                 MiscUtils.testMessage(yawPositives + ", " + pitchPositives);
 

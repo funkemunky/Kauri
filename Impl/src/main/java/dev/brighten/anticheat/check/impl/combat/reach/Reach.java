@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.check.impl.combat.reach;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
@@ -34,9 +35,9 @@ public class Reach extends Check {
     }
 
     @Packet
-    public void onUse(WrappedInUseEntityPacket packet, long timeStamp) {
-        if(data.target == null || !allowedEntities.contains(data.target.getType())
-                || data.playerInfo.creative) return;
+    public void onUse(WrappedInFlyingPacket packet, long timeStamp) {
+        if(data.playerInfo.lastAttack.hasPassed(0) || data.target == null
+                || !allowedEntities.contains(data.target.getType()) || data.playerInfo.creative) return;
 
         val origin = data.playerInfo.to.toLocation(data.getPlayer().getWorld())
                 .add(0, data.playerInfo.sneaking ? 1.54f : 1.62f, 0);

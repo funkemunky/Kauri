@@ -16,7 +16,10 @@ public class Motion extends Check {
             double deltaX = MathUtils.getDelta(data.predictionService.predX, data.playerInfo.deltaX),
                     deltaZ = MathUtils.getDelta(data.predictionService.predZ, data.playerInfo.deltaZ);
 
-            if(data.predictionService.flag && !data.playerInfo.generalCancel && !data.blockInfo.collidesHorizontally) {
+            if(data.predictionService.flag
+                    && data.playerInfo.soulSandTimer.hasPassed(10)
+                    && !data.playerInfo.generalCancel
+                    && !data.blockInfo.collidesHorizontally) {
                 vl++;
                 if(vl > 24) {
                     flag("deltaX=%1 deltaZ=%2",
