@@ -10,6 +10,8 @@ import dev.brighten.api.check.CheckType;
 @Cancellable(cancelType = CancelType.MOVEMENT)
 public class InventoryC extends Check {
 
+    private int verbose;
+
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if(packet.isPos()
@@ -20,9 +22,11 @@ public class InventoryC extends Check {
                 && data.playerInfo.lastVelocity.hasPassed(5)
                 && !data.blockInfo.collidesHorizontally
                 && (data.predictionService.moveStrafing != 0 || data.predictionService.moveForward != 0)) {
-            vl++;
-            flag("key=[%1], dxz=%2", data.predictionService.key,
-                    MathUtils.round(data.playerInfo.deltaXZ, 2));
-        }
+            if(verbose++ > 3) {
+                vl++;
+                flag("key=[%1], dxz=%2", data.predictionService.key,
+                        MathUtils.round(data.playerInfo.deltaXZ, 2));
+            }
+        } else verbose = 0;
     }
 }

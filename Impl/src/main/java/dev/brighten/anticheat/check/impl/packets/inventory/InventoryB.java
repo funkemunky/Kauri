@@ -27,14 +27,6 @@ public class InventoryB extends Check {
         }
     }
 
-    @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
-        if(packet.isLook() && !data.playerInfo.serverPos && data.playerInfo.inventoryOpen) {
-            vl++;
-            flag("id=%1;type=%2", data.playerInfo.inventoryId, "look");
-        }
-    }
-
     //TODO Test for false positives
     @Packet
     public void onChat(WrappedInChatPacket packet) {

@@ -14,7 +14,7 @@ import dev.brighten.api.check.CheckType;
 import org.bukkit.enchantments.Enchantment;
 
 @CheckInfo(name = "Velocity (B)", description = "A horizontally velocity check.", checkType = CheckType.VELOCITY,
-        punishVL = 36)
+        punishVL = 70)
 @Cancellable
 public class VelocityB extends Check {
 
@@ -63,9 +63,10 @@ public class VelocityB extends Check {
                 vZ*= 0.6;
             }
 
-            if(!data.predictionService.key.equals(lastKey)
-                    || data.lagInfo.lastPacketDrop.hasNotPassed(1)
+            if(data.lagInfo.lastPacketDrop.hasNotPassed(1)
                     || data.lagInfo.lastPingDrop.hasNotPassed(100)) maxThreshold = 80;
+
+            if(!data.predictionService.key.equals(lastKey)) maxThreshold = 60;
 
             if(!data.blockInfo.blocksNear
                     && !data.blockInfo.inWeb
@@ -116,7 +117,7 @@ public class VelocityB extends Check {
                         || data.predictionService.key.equals("Nothing") ? 99 : 90))
                         && !data.playerInfo.usingItem && !data.predictionService.useSword) {
                     if (strafe == 0 && forward == 0 && !data.lagInfo.lagging) vl+= 2;
-                    if (vl++ > (data.lagInfo.transPing > 150 ? 22 : 15))
+                    if (vl++ > (data.lagInfo.transPing > 150 ? 35 : 25))
                         flag("pct=" + MathUtils.round(pct, 3) + "%");
                 } else vl -= vl > 0 ? data.lagInfo.lagging || data.lagInfo.transPing > 150 ? 0.5f : 0.2f : 0;
 

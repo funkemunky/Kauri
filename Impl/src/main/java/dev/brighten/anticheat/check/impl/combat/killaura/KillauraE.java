@@ -24,9 +24,8 @@ public class KillauraE extends Check {
         if(attacked) {
             if(data.target != null
                     && data.target.getType().equals(EntityType.PLAYER)
-                    && data.playerInfo.lastVelocity.hasPassed(4)
+                    && data.playerInfo.lastVelocity.hasPassed(7)
                     && data.predictionService.moveForward > 0
-                    && data.playerInfo.deltaXZ > 0.1
                     && data.playerInfo.sprinting
                     && lastKeyChange.hasPassed(3)
                     && data.playerInfo.deltaXZ >= lastDeltaXZ) {
@@ -35,7 +34,7 @@ public class KillauraE extends Check {
                     flag("dxz=%1 ldxz=%2", MathUtils.round(data.playerInfo.deltaXZ, 2),
                             MathUtils.round(lastDeltaXZ, 2));
                 }
-            } else verbose-= verbose > 0 ? 0.05 : 0;
+            } else verbose-= verbose > 0 ? 0.2 : 0;
             debug("deltaXZ=" + data.playerInfo.deltaXZ + " ldxz=" + lastDeltaXZ);
             attacked = false;
         } else lastDeltaXZ = data.playerInfo.deltaXZ;
