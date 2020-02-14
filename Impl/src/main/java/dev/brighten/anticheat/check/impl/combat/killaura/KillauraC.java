@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.check.impl.combat.killaura;
 
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import dev.brighten.anticheat.check.api.*;
@@ -22,7 +23,7 @@ public class KillauraC extends Check {
 
         long delta = timeStamp - lastArm;
 
-        if(delta > 90
+        if(delta > (data.playerVersion.isOrBelow(ProtocolVersion.V1_8_9) ? 90 : 200)
                 && data.lagInfo.lastPacketDrop.hasPassed(10)
                 && !data.lagInfo.lagging) {
             vl++;

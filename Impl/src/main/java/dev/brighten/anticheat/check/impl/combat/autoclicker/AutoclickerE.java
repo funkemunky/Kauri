@@ -40,8 +40,8 @@ public class AutoclickerE extends Check {
             stdDeviation /= this.clickSamples.size();
 
             val std = Math.sqrt(stdDeviation);
-            if (std < 20.d) {
-                if(verbose.add() > 4 || std < 13.d) {
+            if (std < 15.d) {
+                if(verbose.add() > 4 || std < 9.d) {
                     vl++;
                     this.flag("STD: " + std);
                 }

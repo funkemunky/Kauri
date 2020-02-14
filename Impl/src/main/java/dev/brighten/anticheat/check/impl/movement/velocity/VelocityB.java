@@ -109,7 +109,7 @@ public class VelocityB extends Check {
 
                 double vXZ = MathUtils.hypot(vX, vZ);
 
-                double ratio = data.playerInfo.deltaXZ / vXZ;
+                double ratio = (data.playerInfo.deltaX / vX + data.playerInfo.deltaZ / vZ) / 2;
                 //double ratio = MathUtils.hypot(data.playerInfo.deltaX / vX, data.playerInfo.deltaZ / vZ);
                 pct = ratio * 100;
 

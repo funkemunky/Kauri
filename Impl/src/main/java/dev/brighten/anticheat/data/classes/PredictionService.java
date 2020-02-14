@@ -163,13 +163,15 @@ public class PredictionService {
             }
         }
 
-        if (Math.abs(rmotionX) < 0.005D) // the client sets the motionX,Y and Z to 0 if its slower than 0.005D
-            // because he would never stand still
-            rmotionX = 0.0D;
-        if (Math.abs(rmotionY) < 0.005D)
-            rmotionY = 0.0D;
-        if (Math.abs(rmotionZ) < 0.005D)
-            rmotionZ = 0.0D;
+        if(ProtocolVersion.getGameVersion().isOrBelow(ProtocolVersion.V1_8_9)) {
+            if (Math.abs(rmotionX) < 0.005D) // the client sets the motionX,Y and Z to 0 if its slower than 0.005D
+                // because he would never stand still
+                rmotionX = 0.0D;
+            if (Math.abs(rmotionY) < 0.005D)
+                rmotionY = 0.0D;
+            if (Math.abs(rmotionZ) < 0.005D)
+                rmotionZ = 0.0D;
+        }
 
         // Saves the values for the next MovePacket
 

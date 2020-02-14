@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.utils;
 
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.data.ObjectData;
 import lombok.val;
@@ -63,9 +64,13 @@ public class MovementUtils {
     }
 
     public static float getTotalHeight(float initial) {
+        return getTotalHeight(ProtocolVersion.V1_8_9, initial);
+    }
+
+    public static float getTotalHeight(ProtocolVersion version, float initial) {
         float nextCalc = initial, total = initial;
         int count = 0;
-        while ((nextCalc = (nextCalc - 0.08f) * 0.98f) > 0.005) {
+        while ((nextCalc = (nextCalc - 0.08f) * 0.98f) > (version.isOrBelow(ProtocolVersion.V1_8_9) ?  0.005 : 0)) {
             total+= nextCalc;
             if(count++ > 15) {
                 return total * 4;

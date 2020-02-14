@@ -17,7 +17,7 @@ public class FlyG extends Check {
     private boolean cancelled;
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if(data.playerInfo.generalCancel) {
+        if(data.playerInfo.generalCancel || data.playerInfo.onLadder) {
             cancelled = true;
             totalY = 0;
             return;
@@ -40,7 +40,8 @@ public class FlyG extends Check {
 
                     if(delta >= 1E-7) {
                         vl++;
-                        flag("delta=%1 predicted=%2 jumpHeight=%3", delta,
+                        flag("delta=%1 totalHeight=%2 predicted=%3 jumpHeight=%4", delta,
+                                MathUtils.round(totalY, 3),
                                 MathUtils.round(data.playerInfo.totalHeight, 3),
                                 MathUtils.round(data.playerInfo.jumpHeight, 3));
                     }

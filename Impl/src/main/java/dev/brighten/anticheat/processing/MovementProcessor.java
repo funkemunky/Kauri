@@ -128,7 +128,8 @@ public class MovementProcessor {
          * If we did check while it was in the air, there would be false positives in the checks that use it. */
         if (packet.isGround()) {
             data.playerInfo.jumpHeight = MovementUtils.getJumpHeight(data.getPlayer());
-            data.playerInfo.totalHeight = MovementUtils.getTotalHeight((float)data.playerInfo.jumpHeight);
+            data.playerInfo.totalHeight = MovementUtils.getTotalHeight(data.playerVersion,
+                    (float)data.playerInfo.jumpHeight);
         }
 
         data.playerInfo.lworldLoaded = data.playerInfo.worldLoaded;
@@ -358,6 +359,7 @@ public class MovementProcessor {
         data.playerInfo.flightCancel = data.playerInfo.generalCancel
                 || data.playerInfo.webTimer.hasNotPassed(4)
                 || data.playerInfo.liquidTimer.hasNotPassed(4)
+                || data.playerInfo.onLadder
                 || data.playerInfo.climbTimer.hasNotPassed(4)
                 || data.playerInfo.lastHalfBlock.hasNotPassed(2);
 

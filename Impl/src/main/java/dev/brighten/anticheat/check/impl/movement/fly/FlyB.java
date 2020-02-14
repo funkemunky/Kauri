@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.check.impl.movement.fly;
 
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Cancellable;
@@ -24,7 +25,7 @@ public class FlyB extends Check {
                 predicted = Math.min(data.playerInfo.deltaY, MovementUtils.getJumpHeight(packet.getPlayer()));
             }
 
-            if(Math.abs(predicted) < 0.005) {
+            if(data.playerVersion.isOrBelow(ProtocolVersion.V1_8_9) && Math.abs(predicted) < 0.005) {
                 predicted = 0;
             }
 

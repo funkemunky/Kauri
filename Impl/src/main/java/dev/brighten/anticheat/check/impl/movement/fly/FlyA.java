@@ -26,7 +26,7 @@ public class FlyA extends Check {
                 slimeHeight = -1 * (float)data.playerInfo.lDeltaY;
 
                 groundY = data.playerInfo.to.y;
-                maxHeight = Math.max(maxHeight, MovementUtils.getTotalHeight(slimeHeight) * 1.5);
+                maxHeight = Math.max(maxHeight, MovementUtils.getTotalHeight(data.playerVersion, slimeHeight) * 1.5);
             } else if(!tookVelocity && data.playerInfo.serverGround) {
                 groundY = data.playerInfo.to.y;
                 wasOnSlime = false;
