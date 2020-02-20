@@ -1,4 +1,4 @@
-package dev.brighten.anticheat.check.impl.movement.velocity;
+package dev.brighten.anticheat.premium.impl;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;

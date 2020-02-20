@@ -3,14 +3,26 @@ package dev.brighten.anticheat.check.impl.movement.fly;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.Tuple;
+import cc.funkemunky.api.utils.world.BlockData;
+import cc.funkemunky.api.utils.world.CollisionBox;
+import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.utils.Helper;
 import dev.brighten.anticheat.utils.MovementUtils;
 import dev.brighten.api.check.CheckType;
+import lombok.val;
+import org.bukkit.block.Block;
 
-@CheckInfo(name = "Fly (B)", description = "Checks for improper acceleration.", checkType = CheckType.FLIGHT)
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@CheckInfo(name = "Fly (B)", description = "Checks for improper acceleration.", checkType = CheckType.FLIGHT,
+        developer = true)
 @Cancellable
 public class FlyB extends Check {
 
@@ -18,28 +30,56 @@ public class FlyB extends Check {
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(packet.isPos() && (data.playerInfo.deltaY != 0 || data.playerInfo.deltaXZ != 0)) {
             //We check if the player is in ground, since theoretically the y should be zero.
-            double predicted = data.playerInfo.clientGround
-                    ? 0 : (data.playerInfo.lDeltaY - 0.08) * 0.9800000190734863D;
+            double predicted = (data.playerInfo.lDeltaY - 0.08) * 0.9800000190734863D;
 
             if(data.playerInfo.lClientGround && !data.playerInfo.clientGround) {
                 predicted = Math.min(data.playerInfo.deltaY, MovementUtils.getJumpHeight(packet.getPlayer()));
+            }
+
+            for (Block block : Helper.blockCollisions(data.blockInfo.handler.getBlocks(),
+                    data.box.copy().expand(0.2,0,0.2).expandMin(0, -0.5f + Math.min(0, data.playerInfo.deltaY), 0))) {
+                CollisionBox box = BlockData.getData(block.getType())
+                        .getBox(block, ProtocolVersion.getGameVersion());
+
+                List<SimpleCollisionBox> sBoxes = new ArrayList<>();
+                box.downCast(sBoxes);
+
+                for (SimpleCollisionBox sBox : sBoxes) {
+                    double minDelta = sBox.yMax - data.playerInfo.from.y, maxDelta = sBox.yMin - (data.playerInfo.from.y + 1.8);
+
+                    //TODO Check to see if the difference needs to go lower because it could bug being this lenient.
+                    if(MathUtils.getDelta(data.playerInfo.deltaY, minDelta) < 1E-7) {
+                        predicted = minDelta;
+                        break;
+                    } else if(MathUtils.getDelta(data.playerInfo.deltaY, maxDelta) < 1E-7) {
+                        predicted = maxDelta;
+                        break;
+                    }
+                }
+            }
+
+            //Basically, this bug would only occur if the client's movement is less than a certain amount.
+            //If it is, it won't send any position packet. Usually this only occurs when the magnitude
+            //of motionY is less than 0.005 and it rounds it to 0.
+            //The easiest way I found to produce this oddity is by putting myself in a corner and just jumping.
+            if(Math.abs(data.playerInfo.deltaY - -0.078)  < 0.01
+                    && Math.abs(data.playerInfo.deltaY - data.playerInfo.lDeltaY) > 0.11) {
+                predicted = -0.08;
+                predicted*= 0.9800000190734863D;
             }
 
             if(data.playerVersion.isOrBelow(ProtocolVersion.V1_8_9) && Math.abs(predicted) < 0.005) {
                 predicted = 0;
             }
 
+            double deltaPredict =  MathUtils.getDelta(data.playerInfo.deltaY, predicted);
+            //TODO Check if collidingHorizontally is no longer a problem.
             if(!data.playerInfo.flightCancel
                     && data.playerInfo.slimeTimer.hasPassed(20)
-                    && data.playerInfo.blockAboveTimer.hasPassed(6)
-                    && !data.blockInfo.collidesHorizontally
-                    && data.playerInfo.lastHalfBlock.hasPassed(3)
                     && data.playerInfo.lastVelocity.hasPassed(10)
-                    && !data.playerInfo.serverGround
-                    && (data.playerInfo.blockAboveTimer.hasPassed(5) || data.playerInfo.deltaY >= 0)
-                    && MathUtils.getDelta(data.playerInfo.deltaY, predicted) > 0.0001) {
+                    && deltaPredict > 0.0001) {
                 vl++;
-                if(vl > (data.lagInfo.lagging ? 3 : 2)) {
+                if(vl > (data.lagInfo.lastPacketDrop.hasPassed(5) ? 0 : 2)) {
                     flag("deltaY=%1 predicted=%2", data.playerInfo.deltaY, predicted);
                 }
             } else vl-= vl > 0 ? 0.2f : 0;

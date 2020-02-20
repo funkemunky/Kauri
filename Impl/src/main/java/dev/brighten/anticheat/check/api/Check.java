@@ -16,27 +16,21 @@ import dev.brighten.anticheat.check.impl.combat.autoclicker.*;
 import dev.brighten.anticheat.check.impl.combat.hand.HandA;
 import dev.brighten.anticheat.check.impl.combat.hand.HandB;
 import dev.brighten.anticheat.check.impl.combat.hand.HandC;
+import dev.brighten.anticheat.check.impl.combat.hand.HandD;
 import dev.brighten.anticheat.check.impl.combat.hitbox.Hitboxes;
 import dev.brighten.anticheat.check.impl.combat.killaura.*;
-import dev.brighten.anticheat.check.impl.combat.reach.Reach;
 import dev.brighten.anticheat.check.impl.movement.fly.*;
 import dev.brighten.anticheat.check.impl.movement.general.FastLadder;
 import dev.brighten.anticheat.check.impl.movement.general.HealthSpoof;
-import dev.brighten.anticheat.check.impl.movement.general.Motion;
 import dev.brighten.anticheat.check.impl.movement.general.Phase;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallA;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallB;
 import dev.brighten.anticheat.check.impl.movement.speed.*;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityA;
-import dev.brighten.anticheat.check.impl.movement.velocity.VelocityB;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityC;
 import dev.brighten.anticheat.check.impl.packets.Timer;
 import dev.brighten.anticheat.check.impl.packets.badpackets.*;
 import dev.brighten.anticheat.check.impl.packets.exploits.*;
-import dev.brighten.anticheat.check.impl.packets.inventory.InventoryA;
-import dev.brighten.anticheat.check.impl.packets.inventory.InventoryB;
-import dev.brighten.anticheat.check.impl.packets.inventory.InventoryC;
-import dev.brighten.anticheat.check.impl.world.place.BlockPlace;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.api.KauriAPI;
 import dev.brighten.api.check.CheckType;
@@ -88,7 +82,7 @@ public class Check implements KauriCheck {
 
     private TickTimer lastAlert = new TickTimer(MathUtils.millisToTicks(Config.alertsDelay));
 
-    private static void register(Check check) {
+    public static void register(Check check) {
         if(!check.getClass().isAnnotationPresent(CheckInfo.class)) {
             MiscUtils.printToConsole("Could not register "  + check.getClass().getSimpleName()
                     + " because @CheckInfo was not present.");
@@ -259,10 +253,7 @@ public class Check implements KauriCheck {
         register(new AutoclickerA());
         register(new AutoclickerB());
         register(new AutoclickerC());
-        register(new AutoclickerD());
-        register(new AutoclickerE());
         register(new AutoclickerF());
-        register(new AutoclickerG());
         register(new FlyA());
         register(new FlyB());
         register(new FlyC());
@@ -273,15 +264,12 @@ public class Check implements KauriCheck {
         register(new FastLadder());
         register(new NoFallA());
         register(new NoFallB());
-        register(new Reach());
         register(new Hitboxes());
         register(new AimA());
-        register(new AimB());
         register(new AimC());
         register(new AimD());
         register(new AimE());
         register(new AimF());
-        register(new AimG());
         register(new AimH());
         register(new SpeedA());
         register(new SpeedB());
@@ -293,7 +281,7 @@ public class Check implements KauriCheck {
         register(new KillauraC());
         register(new KillauraD());
         register(new KillauraE());
-        //register(new Phase());
+        register(new Phase());
         register(new Timer());
         register(new BadPacketsA());
         register(new BadPacketsB());
@@ -306,25 +294,21 @@ public class Check implements KauriCheck {
         register(new BadPacketsI());
         register(new BadPacketsJ());
         register(new BadPacketsK());
-        //register(new BadPacketsL());
+        register(new BadPacketsL());
+        register(new BadPacketsM());
         register(new VelocityA());
-        register(new VelocityB());
         register(new VelocityC());
         register(new HandA());
         register(new HandB());
         register(new HandC());
+        register(new HandD());
         register(new HealthSpoof());
-        //register(new BlockPlace());
         register(new BookOp());
         register(new BookEnchant());
         register(new PacketSpam());
         register(new SignOp());
         register(new SignCrash());
         register(new LargeMove());
-        register(new Motion());
-        register(new InventoryA());
-        register(new InventoryB());
-        register(new InventoryC());
     }
 
     public static boolean isCheck(String name) {

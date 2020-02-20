@@ -1,4 +1,4 @@
-package dev.brighten.anticheat.check.impl.packets.inventory;
+package dev.brighten.anticheat.premium.impl;
 
 import cc.funkemunky.api.tinyprotocol.api.NMSObject;
 import cc.funkemunky.api.tinyprotocol.packet.in.*;

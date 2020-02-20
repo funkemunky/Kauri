@@ -1,4 +1,4 @@
-package dev.brighten.anticheat.check.impl.combat.autoclicker;
+package dev.brighten.anticheat.premium.impl;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockDigPacket;
@@ -17,19 +17,19 @@ public class AutoclickerG extends Check {
     private boolean release;
 
     @Packet
-    void check(WrappedInFlyingPacket packet) {
+    public void check(WrappedInFlyingPacket packet) {
         ++this.flyingCount;
     }
 
     @Packet
-    void check(WrappedInBlockDigPacket packet) {
+    public void check(WrappedInBlockDigPacket packet) {
         if (packet.getAction() == WrappedInBlockDigPacket.EnumPlayerDigType.RELEASE_USE_ITEM) {
             this.release = true;
         }
     }
 
     @Packet
-    void check(WrappedInArmAnimationPacket packet) {
+    public void check(WrappedInArmAnimationPacket packet) {
         if (!data.playerInfo.breakingBlock
                 && data.playerInfo.lastBrokenBlock.hasPassed(5)
                 && data.playerInfo.lastBlockPlace.hasPassed(4)) {

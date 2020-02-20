@@ -51,7 +51,7 @@ public class Phase extends Check {
     }
 
     @Packet
-    void check(WrappedInFlyingPacket packet, long timeStamp) {
+    public void check(WrappedInFlyingPacket packet, long timeStamp) {
         if (!packet.isPos()) return;
 
         if ((data.playerInfo.deltaY > -0.0981 && data.playerInfo.deltaY < -0.0979 && data.playerInfo.deltaXZ < 0.5)

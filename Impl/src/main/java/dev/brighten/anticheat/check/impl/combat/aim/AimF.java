@@ -20,7 +20,7 @@ public class AimF extends Check {
     private MaxDouble verbose = new MaxDouble(40);
 
     @Packet
-    void check(WrappedInFlyingPacket packet) {
+    public void check(WrappedInFlyingPacket packet) {
         if (!packet.isLook()) return;
 
         Vector first = new Vector(data.playerInfo.deltaYaw, 0, data.playerInfo.deltaPitch);

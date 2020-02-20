@@ -32,13 +32,12 @@ public class Timer extends Check {
             long range = summary.getMax() - summary.getMin();
             double pct = ratio * 100;
 
-            if((pct > 100.8D)
+            if((pct > 100.4D)
                     && data.lagInfo.lastPingDrop.hasNotPassed(30)
                     && Kauri.INSTANCE.lastTickLag.hasPassed(5)
-                    && (range < 200 || MathUtils.getDelta(range, lRange) < 75)
                     && Kauri.INSTANCE.tps > 18.5) {
                 //Maybe lower threshold? I do not think it needs that high of one.
-                if(vl++ > 45) flag("pct=" + MathUtils.round(pct, 2) + "%");
+                if(vl++ > 65) flag("pct=" + MathUtils.round(pct, 2) + "%");
             } else vl-= vl > 0 ? 1.5 : 0;
 
             debug("pct=" + pct + ", vl=" + vl + ", elapsed=" + elapsed + "ms, avg=" + average + ", range=" + range);

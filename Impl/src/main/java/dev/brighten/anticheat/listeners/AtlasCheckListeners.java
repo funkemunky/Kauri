@@ -14,6 +14,7 @@ public class AtlasCheckListeners implements AtlasListener {
 
     @Listen(priority = ListenerPriority.NORMAL)
     public void onPacket(PacketReceiveEvent event) {
+        if(event.getPlayer() == null) return;
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
         if(data != null) {

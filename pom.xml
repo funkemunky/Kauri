@@ -11,6 +11,7 @@
     <modules>
         <module>API</module>
         <module>Impl</module>
+        <module>Premium</module>
     </modules>
 
     <repositories>

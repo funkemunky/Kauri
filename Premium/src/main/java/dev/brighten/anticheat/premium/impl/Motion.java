@@ -1,4 +1,4 @@
-package dev.brighten.anticheat.check.impl.movement.general;
+package dev.brighten.anticheat.premium.impl;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.MathUtils;
@@ -19,6 +19,7 @@ public class Motion extends Check {
             if(data.predictionService.flag
                     && data.playerInfo.soulSandTimer.hasPassed(10)
                     && !data.playerInfo.generalCancel
+                    && data.lagInfo.lastPingDrop.hasPassed(40)
                     && !data.blockInfo.collidesHorizontally) {
                 vl++;
                 if(vl > 24) {

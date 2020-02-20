@@ -79,7 +79,7 @@ public interface Menu extends Iterable<Button> {
      * @throws IndexOutOfBoundsException If the index is out of bounds this is thrown
      */
 
-    void checkBounds(int index) throws IndexOutOfBoundsException;
+    public void checkBounds(int index) throws IndexOutOfBoundsException;
 
     /**
      * Gets the {@link Button} at the specified index

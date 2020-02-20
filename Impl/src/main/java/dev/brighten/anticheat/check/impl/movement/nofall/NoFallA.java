@@ -39,7 +39,7 @@ public class NoFallA extends Check {
             }
         } else vl-= vl > 0 ? 0.2f : 0;
 
-        debug("ground=" + data.playerInfo.clientGround
+        debug("ground=" + data.playerInfo.clientGround + " collides=" + data.blockInfo.collidesVertically
                 + " deltaY=" + data.playerInfo.deltaY + " vl=" + vl);
     }
 }

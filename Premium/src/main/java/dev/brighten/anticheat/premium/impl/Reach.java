@@ -1,4 +1,4 @@
-package dev.brighten.anticheat.check.impl.combat.reach;
+package dev.brighten.anticheat.premium.impl;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
@@ -29,12 +29,6 @@ public class Reach extends Check {
             EntityType.ZOMBIE, EntityType.PIG_ZOMBIE, EntityType.VILLAGER);
 
     private float verbose;
-
-
-    @Packet
-    public void onArm(WrappedInArmAnimationPacket packet) {
-        vl-= vl > 0 ? 0.005 : 0;
-    }
 
     @Packet
     public void onUse(WrappedInFlyingPacket packet, long timeStamp) {

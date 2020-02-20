@@ -138,11 +138,6 @@ public class SpeedC extends Check {
             moveSpeed *= 0.7;
         }
 
-        if(data.playerInfo.usingItem) {
-            moveSpeed*= 0.2;
-            tags.add("usingItem");
-        }
-
         data.blockInfo.handler.setOffset(0);
 
         double previousHorizontal = previousDistance;
