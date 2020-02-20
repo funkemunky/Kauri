@@ -21,8 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@CheckInfo(name = "Fly (B)", description = "Checks for improper acceleration.", checkType = CheckType.FLIGHT,
-        developer = true)
+@CheckInfo(name = "Fly (B)", description = "Checks for improper acceleration.", checkType = CheckType.FLIGHT)
 @Cancellable
 public class FlyB extends Check {
 
@@ -47,7 +46,6 @@ public class FlyB extends Check {
                 for (SimpleCollisionBox sBox : sBoxes) {
                     double minDelta = sBox.yMax - data.playerInfo.from.y, maxDelta = sBox.yMin - (data.playerInfo.from.y + 1.8);
 
-                    //TODO Check to see if the difference needs to go lower because it could bug being this lenient.
                     if(MathUtils.getDelta(data.playerInfo.deltaY, minDelta) < 1E-7) {
                         predicted = minDelta;
                         break;
@@ -73,13 +71,13 @@ public class FlyB extends Check {
             }
 
             double deltaPredict =  MathUtils.getDelta(data.playerInfo.deltaY, predicted);
-            //TODO Check if collidingHorizontally is no longer a problem.
+
             if(!data.playerInfo.flightCancel
                     && data.playerInfo.slimeTimer.hasPassed(20)
                     && data.playerInfo.lastVelocity.hasPassed(10)
                     && deltaPredict > 0.0001) {
                 vl++;
-                if(vl > (data.lagInfo.lastPacketDrop.hasPassed(5) ? 0 : 2)) {
+                if(vl > (data.lagInfo.lastPacketDrop.hasPassed(5) ? 1 : 3)) {
                     flag("deltaY=%1 predicted=%2", data.playerInfo.deltaY, predicted);
                 }
             } else vl-= vl > 0 ? 0.2f : 0;
