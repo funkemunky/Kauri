@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 public class BlockInformation {
     private ObjectData objectData;
     public boolean onClimbable, onSlab, onStairs, onHalfBlock, inLiquid, inLava, inWater, inWeb, onSlime, onIce,
-            onSoulSand, blocksAbove, collidesVertically, collidesHorizontally, blocksNear, inBlock;
+            onSoulSand, blocksAbove, collidesVertically, collidesHorizontally, blocksNear, inBlock, miscNear;
     public float currentFriction;
     public CollisionHandler
             handler = new CollisionHandler(new ArrayList<>(), new ArrayList<>(), new KLocation(0,0,0));
@@ -108,11 +108,18 @@ public class BlockInformation {
         handler.setOffset(-0.4f);
         onSlab = handler.isCollidedWith(Materials.SLABS);
         onStairs = handler.isCollidedWith(Materials.STAIRS);
-        onHalfBlock = onSlab || onStairs
-                || handler.isCollidedWith(XMaterial.CAKE.parseMaterial(), XMaterial.SKULL_ITEM.parseMaterial(),
-                XMaterial.SNOW.parseMaterial(), XMaterial.WITHER_SKELETON_SKULL.parseMaterial(),
-                XMaterial.SKELETON_WALL_SKULL.parseMaterial(), XMaterial.WITHER_SKELETON_WALL_SKULL.parseMaterial());
+        onHalfBlock = onSlab || onStairs;
 
+        handler.setOffset(-0.6f);
+        handler.setSize(0.8, 1);
+        miscNear = handler.isCollidedWith(XMaterial.CAKE.parseMaterial(),
+                XMaterial.SKULL_ITEM.parseMaterial(), XMaterial.SNOW.parseMaterial(),
+                XMaterial.WITHER_SKELETON_SKULL.parseMaterial(), XMaterial.SKELETON_WALL_SKULL.parseMaterial(),
+                XMaterial.WITHER_SKELETON_WALL_SKULL.parseMaterial());
+
+        if(!onHalfBlock) onHalfBlock = miscNear;
+
+        handler.setSize(0.6, 1.8);
         handler.setSingle(true);
         onIce = handler.isCollidedWith(Materials.ICE);
         handler.setOffset(-0.02);

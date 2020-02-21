@@ -38,7 +38,7 @@ public class Phase extends Check {
     private int setbackTicks = 0;
     private KLocation setback;
 
-    private List<Material> negative = Stream.of(XMaterial.LADDER, XMaterial.VINE)
+    private static List<Material> negative = Stream.of(XMaterial.LADDER, XMaterial.VINE)
             .map(XMaterial::parseMaterial)
             .collect(Collectors.toList());
 
@@ -58,7 +58,7 @@ public class Phase extends Check {
                 || lastOpen.hasNotPassed(14)) return;
 
 
-        if(timeStamp - data.playerInfo.lastServerPos > 50) {
+        if(timeStamp - data.playerInfo.lastServerPos > 10L) {
             SimpleCollisionBox currentHitbox = Helper.getMovementHitbox(data.getPlayer());
             SimpleCollisionBox newHitbox = Helper.getMovementHitbox(data.getPlayer(), packet.getX(), packet.getY(), packet.getZ());
             currentHitbox.expand(-0.0625); newHitbox.expand(-0.0625); // reduce falseflag chances
@@ -71,7 +71,9 @@ public class Phase extends Check {
             boolean flagged = false;
             for (Block b : newBlocks) {
                 if (!currentBlocks.contains(b)) {
-                    if (Materials.checkFlag(b.getType(), Materials.SOLID) && !Materials.checkFlag(b.getType(), Materials.STAIRS)) {
+                    if (Materials.checkFlag(b.getType(), Materials.SOLID)
+                            && !negative.contains(b.getType())
+                            && !Materials.checkFlag(b.getType(), Materials.STAIRS)) {
                         vl++;
                         flag("t=%1", b.getType().name());
                         if (debug)

@@ -31,13 +31,14 @@ public class AutoclickerC extends Check {
     public void onUse(WrappedInUseEntityPacket packet) {
         if(packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) {
             if(blocking) {
-                TinyProtocolHandler.sendPacket(packet.getPlayer(),
-                        new WrappedOutHeldItemSlot(slot == 8 ? 0 : Math.min(8, slot + 1))
-                        .getObject());
                 debug("unblocked");
 
                 if (verbose.add() > 10) {
                     flag("t=%1 vb=%2", "block", MathUtils.round(verbose.value(), 2));
+                } else if(verbose.value() > 5) {
+                    TinyProtocolHandler.sendPacket(packet.getPlayer(),
+                            new WrappedOutHeldItemSlot(slot == 8 ? 0 : Math.min(8, slot + 1))
+                                    .getObject());
                 }
             } else verbose.subtract(0.01);
         }

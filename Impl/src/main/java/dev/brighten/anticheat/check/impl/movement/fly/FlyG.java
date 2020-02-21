@@ -22,7 +22,7 @@ public class FlyG extends Check {
             totalY = 0;
             return;
         }
-        if(data.playerInfo.clientGround || data.playerInfo.deltaY <= 0) {
+        if(data.playerInfo.clientGround) {
             if(totalY > 0) {
                 if(data.playerInfo.blockAboveTimer.hasPassed(5)
                         && !data.blockInfo.onStairs
@@ -34,13 +34,15 @@ public class FlyG extends Check {
                         && data.playerInfo.liquidTimer.hasPassed(10)
                         && data.playerInfo.climbTimer.hasPassed(10)
                         && data.playerInfo.lastBlockPlace.hasPassed(20)
-                        && (data.playerInfo.lastHalfBlock.hasPassed(3) || totalY > 1)
+                        && (data.playerInfo.lastHalfBlock.hasPassed(7) || totalY > 1)
+                        && totalY > 0.5
                         && data.playerInfo.lastVelocity.hasPassed(20)) {
                     double delta = MathUtils.getDelta(totalY, data.playerInfo.totalHeight);
 
                     if(delta >= 1E-7) {
                         vl++;
-                        flag("delta=%1 totalHeight=%2 predicted=%3 jumpHeight=%4", delta,
+                        flag("delta=%1 totalHeight=%2 predicted=%3 jumpHeight=%4",
+                                MathUtils.round(delta, 3),
                                 MathUtils.round(totalY, 3),
                                 MathUtils.round(data.playerInfo.totalHeight, 3),
                                 MathUtils.round(data.playerInfo.jumpHeight, 3));

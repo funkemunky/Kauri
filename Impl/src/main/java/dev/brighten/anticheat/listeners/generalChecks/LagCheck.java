@@ -8,7 +8,6 @@ import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.RunUtils;
 import dev.brighten.anticheat.Kauri;
 
-@Init
 public class LagCheck extends AtlasEvent {
 
     @ConfigSetting(path = "general", name = "lagCheck")

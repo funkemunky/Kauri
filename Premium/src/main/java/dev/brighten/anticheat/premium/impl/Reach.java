@@ -35,16 +35,16 @@ public class Reach extends Check {
         if(data.playerInfo.lastAttack.hasPassed(0) || data.target == null
                 || !allowedEntities.contains(data.target.getType()) || data.playerInfo.creative) return;
 
-        val origins = data.pastLocation.getEstimatedLocation(0L, Math.min(data.lagInfo.transPing, 100))
-                .stream().map(KLocation::clone)
-                .peek(loc -> loc.y+= data.playerInfo.sneaking ? 1.54f : 1.62f).collect(Collectors.toList());
+        val originList = Arrays.asList(data.playerInfo.to.clone(), data.playerInfo.from.clone());
+
 
         val entityLoc = (data.targetData != null ? data.targetData.pastLocation : data.targetPastLocation)
                 .getEstimatedLocation(data.lagInfo.transPing, Math.max(225L, Math.round(data.lagInfo.transPing / 2D)));
 
         List<Double> distances = new ArrayList<>();
 
-        for (KLocation origin : origins) {
+        for (KLocation origin : originList) {
+            origin.y+= data.playerInfo.sneaking ? 1.54f : 1.62f;
             RayCollision collision = new RayCollision(origin.toVector(), MathUtils.getDirection(origin));
             entityLoc.forEach(loc -> {
                 Vector point = collision
@@ -60,15 +60,15 @@ public class Reach extends Check {
         if(size > 0) {
             val distance = distances.stream().mapToDouble(num -> num).min().orElse(0) - 0.02;
 
-            if(distance > 3.04 && size > 2
+            if(distance > 3.06 && size > 2
                     && data.lagInfo.lastPacketDrop.hasPassed(2)) {
-                verbose+= size > 4 ? 1 : 0.5f;
-                if(verbose > 3) {
+                verbose+= size > 4 ? 1 : 0.5;
+                if(verbose > 5) {
                     vl++;
                     flag("distance=%1 size=%2 origin=%3", MathUtils.round(distance, 3),
-                            distances.size(), origins.size());
+                            distances.size(), entityLoc.size());
                 }
-            } else verbose-= verbose > 0 ? data.lagInfo.lagging ? 0.05f : 0.025f : 0;
+            } else verbose-= verbose > 0 ? data.lagInfo.lagging ? 0.1f : 0.02f : 0;
             debug("distance=" + distance + ", size=" + distances.size() + ", vl=" + verbose);
         }
     }

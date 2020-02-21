@@ -7,7 +7,8 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "Motion", description = "motion check kind of thing.", checkType = CheckType.GENERAL, developer = true)
+@CheckInfo(name = "Motion", description = "motion check kind of thing.", checkType = CheckType.GENERAL,
+        developer = true, enabled = false)
 public class Motion extends Check {
 
     @Packet

@@ -119,7 +119,7 @@ public class Kauri extends JavaPlugin {
         Load.load();
     }
 
-    void runTpsTask() {
+    public void runTpsTask() {
         lastTickLag = new TickTimer(6);
         AtomicInteger ticks = new AtomicInteger();
         AtomicLong lastTimeStamp = new AtomicLong(0);

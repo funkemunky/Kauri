@@ -36,7 +36,9 @@ public class FlyB extends Check {
             }
 
             for (Block block : Helper.blockCollisions(data.blockInfo.handler.getBlocks(),
-                    data.box.copy().expand(0.2,0,0.2).expandMin(0, -0.5f + Math.min(0, data.playerInfo.deltaY), 0))) {
+                    data.box.copy().expand(0.2 + Math.abs(data.playerInfo.deltaX),0,
+                            0.2 + Math.abs(data.playerInfo.deltaZ))
+                            .expandMin(0, -0.5f + Math.min(0, data.playerInfo.deltaY), 0))) {
                 CollisionBox box = BlockData.getData(block.getType())
                         .getBox(block, ProtocolVersion.getGameVersion());
 

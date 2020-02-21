@@ -4,6 +4,7 @@ import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
 import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
 import cc.funkemunky.api.utils.*;
+import cc.funkemunky.api.utils.math.cond.MaxDouble;
 import cc.funkemunky.api.utils.world.BlockData;
 import cc.funkemunky.api.utils.world.CollisionBox;
 import cc.funkemunky.api.utils.world.types.RayCollision;
@@ -15,7 +16,6 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @CheckInfo(name = "Hand (D)", description = "Checks if a player places a block without looking.",
@@ -23,6 +23,7 @@ import java.util.List;
 @Cancellable(cancelType = CancelType.INTERACT)
 public class HandD extends Check {
 
+    private MaxDouble verbose = new MaxDouble(20);
     @Packet
     public void onPlace(WrappedInBlockPlacePacket packet) {
         val pos = packet.getPosition();
@@ -49,20 +50,25 @@ public class HandD extends Check {
 
             RayCollision collision = new RayCollision(origin.toVector(), MathUtils.getDirection(origin));
 
-            collision.draw(WrappedEnumParticle.CRIT, Collections.singletonList(packet.getPlayer()));
             boolean collided = false;
 
             for (SimpleCollisionBox box : boxes) {
                 box.expand(0.1,0.1,0.1);
 
-                box.draw(WrappedEnumParticle.FLAME, Collections.singletonList(packet.getPlayer()));
                 if(collision.isCollided(box)) {
                     collided = true;
                     break;
                 }
             }
 
-            debug("collided=%1", collided);
+            if(!collided) {
+                if(verbose.add() > 4) {
+                    vl++;
+                    flag("type=%1", block.getType().name());
+                }
+            } else verbose.subtract(0.5);
+
+            debug("collided=%1 verbose=%2", collided, verbose.value());
         }
     }
 }

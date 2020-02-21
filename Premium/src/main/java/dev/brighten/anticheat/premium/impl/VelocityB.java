@@ -109,14 +109,13 @@ public class VelocityB extends Check {
 
                 double vXZ = MathUtils.hypot(vX, vZ);
 
-                double ratio = (data.playerInfo.deltaX / vX + data.playerInfo.deltaZ / vZ) / 2;
+                double ratio = data.playerInfo.deltaXZ / vXZ;
                 //double ratio = MathUtils.hypot(data.playerInfo.deltaX / vX, data.playerInfo.deltaZ / vZ);
                 pct = ratio * 100;
 
                 if (pct < (Math.min(maxThreshold, data.predictionService.key.equals("W")
                         || data.predictionService.key.equals("Nothing") ? 99 : 90))
                         && !data.playerInfo.usingItem && !data.predictionService.useSword) {
-                    if (strafe == 0 && forward == 0 && !data.lagInfo.lagging) vl+= 2;
                     if (vl++ > (data.lagInfo.transPing > 150 ? 35 : 25))
                         flag("pct=" + MathUtils.round(pct, 3) + "%");
                 } else vl -= vl > 0 ? data.lagInfo.lagging || data.lagInfo.transPing > 150 ? 0.5f : 0.2f : 0;

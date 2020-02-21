@@ -25,7 +25,7 @@ public class Timer extends Check {
 
         if(timeStamp - data.creation > 2000
                 && timeStamp - data.playerInfo.lastServerPos > 80L) {
-            times.add(elapsed);
+            if(elapsed > 3)  times.add(elapsed);
             val summary = times.stream().mapToLong(val -> val).summaryStatistics();
             double average = summary.getAverage();
             double ratio = 50 / average;
