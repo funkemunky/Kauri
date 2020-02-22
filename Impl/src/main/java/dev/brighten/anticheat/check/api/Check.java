@@ -268,7 +268,6 @@ public class Check implements KauriCheck {
         register(new AimA());
         register(new AimC());
         register(new AimD());
-        register(new AimE());
         register(new AimF());
         register(new AimH());
         register(new SpeedA());

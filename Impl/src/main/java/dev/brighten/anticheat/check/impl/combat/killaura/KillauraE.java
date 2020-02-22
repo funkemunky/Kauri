@@ -26,9 +26,8 @@ public class KillauraE extends Check {
                     && data.target.getType().equals(EntityType.PLAYER)
                     && data.playerInfo.lastVelocity.hasPassed(7)
                     && data.predictionService.moveForward > 0
-                    && data.playerInfo.sprinting
-                    && lastKeyChange.hasPassed(3)
-                    && data.playerInfo.deltaXZ >= lastDeltaXZ) {
+                    && data.playerInfo.deltaXZ > data.playerInfo.baseSpeed - 0.005
+                    && data.playerInfo.deltaXZ >= lastDeltaXZ * 0.99) {
                 if(data.lagInfo.lastPingDrop.hasPassed(5) && verbose++ > 3) {
                     vl++;
                     flag("dxz=%1 ldxz=%2", MathUtils.round(data.playerInfo.deltaXZ, 2),
