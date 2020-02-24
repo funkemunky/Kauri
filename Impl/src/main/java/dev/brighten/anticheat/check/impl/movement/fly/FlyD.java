@@ -8,15 +8,16 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Fly (D)", description = "Checks if a player's acceleration is positive while in the air.",
-        checkType = CheckType.FLIGHT, punishVL = 40)
+        checkType = CheckType.FLIGHT, punishVL = 40, developer = true, enabled = false)
 @Cancellable
 public class FlyD extends Check {
     
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(packet.isPos()) {
-            if(data.playerInfo.deltaY - data.playerInfo.lDeltaY > 0.01f
+            if(data.playerInfo.deltaY > data.playerInfo.lDeltaY + 0.01
                     && data.playerInfo.airTicks > 2
+                    && timeStamp - data.playerInfo.lastServerPos > 100L
                     && timeStamp - data.playerInfo.lastVelocityTimestamp > 150L
                     && !data.playerInfo.lClientGround
                     && data.playerInfo.liquidTimer.hasPassed(2)
@@ -25,11 +26,12 @@ public class FlyD extends Check {
                     && !data.playerInfo.clientGround
                     && !data.playerInfo.serverGround) {
                 vl++;
-                if(vl > 1 || !data.playerInfo.nearGround) {
+                if(vl > 1) {
                     flag("deltaY=%1 lDeltaY=%2 airTicks=%3",
                             data.playerInfo.deltaY, data.playerInfo.lDeltaY, data.playerInfo.airTicks);
                 }
             } else vl-= vl > 0 ? 0.025f : 0;
+            debug("serverPos=" + (timeStamp - data.playerInfo.lastServerPos));
         }
     }
 

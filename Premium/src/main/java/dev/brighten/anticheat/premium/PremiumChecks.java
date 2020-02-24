@@ -15,12 +15,11 @@ public class PremiumChecks {
         Check.register(new Reach());
         Check.register(new Motion());
         Check.register(new AimB());
-        Check.register(new AimG());
         Check.register(new AutoclickerD());
         Check.register(new AutoclickerE());
         Check.register(new AutoclickerG());
         Check.register(new InventoryA());
         Check.register(new InventoryB());
-        Check.register(new InventoryC());
+        Check.register(new InventoryB());
     }
 }

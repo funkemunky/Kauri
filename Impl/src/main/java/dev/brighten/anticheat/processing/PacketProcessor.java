@@ -159,15 +159,13 @@ public class PacketProcessor {
                     }
                     case RELEASE_USE_ITEM: {
                         data.predictionService.useSword
-                                = data.playerInfo.usingItem
-                                = data.playerInfo.breakingBlock = false;
+                                = data.playerInfo.usingItem = false;
                         break;
                     }
                     case DROP_ALL_ITEMS:
                     case DROP_ITEM: {
                         data.predictionService.useSword
-                                = data.playerInfo.usingItem
-                                = data.playerInfo.breakingBlock = false;
+                                = data.playerInfo.usingItem = false;
                         data.predictionService.dropItem = true;
                         break;
                     }

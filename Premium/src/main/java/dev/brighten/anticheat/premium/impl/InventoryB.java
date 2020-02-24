@@ -1,58 +1,32 @@
 package dev.brighten.anticheat.premium.impl;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.*;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutHeldItemSlot;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "Inventory (B)", description = "Checks if player sends impossible packets while inventory is open.",
-        checkType = CheckType.INVENTORY, punishVL = 10, vlToFlag = 4)
-@Cancellable(cancelType = CancelType.INVENTORY)
+@CheckInfo(name = "Inventory (B)", description = "Checks if a player moves while their inventory is open",
+        checkType = CheckType.INVENTORY, punishVL = 40, developer = true, enabled = false)
+@Cancellable(cancelType = CancelType.MOVEMENT)
 public class InventoryB extends Check {
 
-    @Packet
-    public void onPlace(WrappedInBlockPlacePacket packet) {
-        if(data.playerInfo.inventoryOpen) {
-            vl++;
-            flag("id=%1;type=%2", data.playerInfo.inventoryId, "place");
-        }
-    }
-
-    @Packet
-    public void onDig(WrappedInBlockDigPacket packet) {
-        if(data.playerInfo.inventoryOpen) {
-            vl++;
-            flag("id=%1;type=%2", data.playerInfo.inventoryId, "dig");
-        }
-    }
-
-    //TODO Test for false positives
-    @Packet
-    public void onChat(WrappedInChatPacket packet) {
-        if(data.playerInfo.inventoryOpen) {
-            vl++;
-            flag("id=%1;type=%2", data.playerInfo.inventoryId, "chat");
-        }
-    }
-
-    private boolean serverSlot;
-    @Packet
-    public void onServerItem(WrappedOutHeldItemSlot packet) {
-        serverSlot = true;
-    }
-
-    //TODO Test for false positives
-    @Packet
-    public void onItem(WrappedInHeldItemSlotPacket packet) {
-        if(!serverSlot && data.playerInfo.inventoryOpen) {
-            vl++;
-            flag("id=%1;type=%2", data.playerInfo.inventoryId, "item-slot");
-        }
-        serverSlot = false;
-    }
+    private int verbose;
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        vl-= vl > 0 ? 0.005 : 0;
+        if(packet.isPos()
+                && !data.playerInfo.serverPos
+                && data.playerInfo.inventoryOpen
+                && !data.blockInfo.inLava
+                && !data.blockInfo.inWeb
+                && data.playerInfo.lastVelocity.hasPassed(5)
+                && !data.blockInfo.collidesHorizontally
+                && (data.predictionService.moveStrafing != 0 || data.predictionService.moveForward != 0)) {
+            if(verbose++ > 3) {
+                vl++;
+                flag("key=[%1], dxz=%2", data.predictionService.key,
+                        MathUtils.round(data.playerInfo.deltaXZ, 2));
+            }
+        } else verbose = 0;
     }
 }

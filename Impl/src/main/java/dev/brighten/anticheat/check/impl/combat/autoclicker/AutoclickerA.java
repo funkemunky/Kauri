@@ -16,7 +16,7 @@ public class AutoclickerA extends Check {
     public void onFlying(WrappedInFlyingPacket packet) {
         flyingTicks++;
         if(flyingTicks >= 20) {
-            if(cps >= 20) {
+            if(cps > 20) {
                 if(cps > 26) vl++;
                 flag("cps=%1", cps);
             }
@@ -32,5 +32,7 @@ public class AutoclickerA extends Check {
                 && data.playerInfo.lastBrokenBlock.hasPassed(5)
                 && data.playerInfo.lastBlockPlace.hasPassed(2))
             cps++;
+        debug("breaking=%1 lastBroken=%2", data.playerInfo.breakingBlock,
+                data.playerInfo.lastBrokenBlock.getPassed());
     }
 }

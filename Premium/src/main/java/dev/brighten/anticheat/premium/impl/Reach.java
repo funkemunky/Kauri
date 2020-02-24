@@ -31,12 +31,16 @@ public class Reach extends Check {
     private float verbose;
 
     @Packet
+    public void onArm(WrappedInArmAnimationPacket packet) {
+        verbose-= verbose > 0 ? 0.005: 0;
+    }
+
+    @Packet
     public void onUse(WrappedInFlyingPacket packet, long timeStamp) {
         if(data.playerInfo.lastAttack.hasPassed(0) || data.target == null
                 || !allowedEntities.contains(data.target.getType()) || data.playerInfo.creative) return;
 
         val originList = Arrays.asList(data.playerInfo.to.clone(), data.playerInfo.from.clone());
-
 
         val entityLoc = (data.targetData != null ? data.targetData.pastLocation : data.targetPastLocation)
                 .getEstimatedLocation(data.lagInfo.transPing, Math.max(225L, Math.round(data.lagInfo.transPing / 2D)));

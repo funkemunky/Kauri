@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @CheckInfo(name = "NoFall (A)", description = "Checks to make sure the ground packet from the client is legit",
-        checkType = CheckType.NOFALL, punishVL = 20, executable = false)
+        checkType = CheckType.NOFALL, punishVL = 20, executable = false, enabled = false)
 @Cancellable
 public class NoFallA extends Check {
 
@@ -56,6 +56,7 @@ public class NoFallA extends Check {
         if(!data.playerInfo.flightCancel
                 && data.playerInfo.lastHalfBlock.hasPassed(4)
                 && !data.blockInfo.onSlime
+                && data.playerInfo.lastBlockPlace.hasPassed(8)
                 && data.playerInfo.lastVelocity.hasPassed(4)
                 && (data.playerInfo.deltaY != 0 || data.playerInfo.deltaXZ > 0)
                 && data.playerInfo.blockAboveTimer.hasPassed(10)

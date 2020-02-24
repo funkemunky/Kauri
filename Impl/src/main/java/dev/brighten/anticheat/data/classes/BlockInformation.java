@@ -113,6 +113,7 @@ public class BlockInformation {
         handler.setOffset(-0.6f);
         handler.setSize(0.8, 1);
         miscNear = handler.isCollidedWith(XMaterial.CAKE.parseMaterial(),
+                XMaterial.BREWING_STAND.parseMaterial(), XMaterial.FLOWER_POT.parseMaterial(),
                 XMaterial.SKULL_ITEM.parseMaterial(), XMaterial.SNOW.parseMaterial(),
                 XMaterial.WITHER_SKELETON_SKULL.parseMaterial(), XMaterial.SKELETON_WALL_SKULL.parseMaterial(),
                 XMaterial.WITHER_SKELETON_WALL_SKULL.parseMaterial());

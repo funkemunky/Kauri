@@ -151,8 +151,10 @@ public class MenuCommand {
                     "&eCancellable&7: &f" + val.cancellable,
                     "&eDescription&7: &f"));
 
-            lore.addAll(Arrays.asList(dev.brighten.anticheat.utils.MiscUtils
-                    .splitIntoLine(val.description, 35)));
+            List<String> description = Arrays.asList(dev.brighten.anticheat.utils.MiscUtils
+                    .splitIntoLine(val.description, 35));
+
+            lore.addAll(description);
 
 
             Button button = createButton(
@@ -181,7 +183,13 @@ public class MenuCommand {
                                     }
                                 }
 
-                                lore.set(1, Color.translate("&eEnabled&7: &f" + settings.enabled));
+                                List<String> lore2 = new ArrayList<>(Arrays.asList("&7",
+                                        "&eEnabled&7: &f" + val.enabled,
+                                        "&eExecutable&7: &f" + val.executable,
+                                        "&eCancellable&7: &f" + val.cancellable,
+                                        "&eDescription&7: &f"));
+                                lore2.addAll(description);
+                                builder.lore(lore2.stream().map(Color::translate).toArray(String[]::new));
                                 builder.name((settings.enabled ? "&a" : "&c") + val.name);
                                 info.getButton().setStack(builder.build());
                                 menu.buildInventory(false);
@@ -203,8 +211,13 @@ public class MenuCommand {
                                             : XMaterial.MAP.parseMaterial());
                                 }
 
-                                lore.set(2, Color.translate("&eExecutable&7: &f" + settings.executable));
-                                builder.lore(lore.toArray(new String[]{}));
+                                List<String> lore2 = new ArrayList<>(Arrays.asList("&7",
+                                        "&eEnabled&7: &f" + val.enabled,
+                                        "&eExecutable&7: &f" + val.executable,
+                                        "&eCancellable&7: &f" + val.cancellable,
+                                        "&eDescription&7: &f"));
+                                lore2.addAll(description);
+                                builder.lore(lore2.stream().map(Color::translate).toArray(String[]::new));
                                 info.getButton().setStack(builder.build());
                                 menu.buildInventory(false);
                                 Kauri.INSTANCE.dataManager.dataMap.values().parallelStream()
@@ -226,8 +239,13 @@ public class MenuCommand {
                                     }
                                 }
 
-                                lore.set(3, Color.translate("&eCancellable&7: &f" + settings.cancellable));
-                                builder.lore(lore.toArray(new String[]{}));
+                                List<String> lore2 = new ArrayList<>(Arrays.asList("&7",
+                                        "&eEnabled&7: &f" + val.enabled,
+                                        "&eExecutable&7: &f" + val.executable,
+                                        "&eCancellable&7: &f" + val.cancellable,
+                                        "&eDescription&7: &f"));
+                                lore2.addAll(description);
+                                builder.lore(lore2.stream().map(Color::translate).toArray(String[]::new));
                                 info.getButton().setStack(builder.build());
                                 menu.buildInventory(false);
                                 Kauri.INSTANCE.dataManager.dataMap.values().parallelStream()

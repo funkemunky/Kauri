@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @CheckInfo(name = "Hand (D)", description = "Checks if a player places a block without looking.",
-        checkType = CheckType.HAND, vlToFlag = 3, punishVL = 40, developer = true)
+        checkType = CheckType.HAND, vlToFlag = 3, punishVL = 40, developer = true, enabled = false)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class HandD extends Check {
 

@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.premium.impl;
 
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
@@ -57,6 +58,9 @@ public class VelocityB extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
+        if(Math.abs(vX) < 0.005) vX = 0;
+        if(Math.abs(vZ) < 0.005) vZ = 0;
+
         if(vX != 0 || vZ != 0) {
             if(sprint && useEntity) {
                 vX*= 0.6;

@@ -2,6 +2,7 @@ package dev.brighten.anticheat.processing;
 
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.reflections.impl.MinecraftReflection;
+import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.*;
@@ -128,6 +129,9 @@ public class MovementProcessor {
          * If we did check while it was in the air, there would be false positives in the checks that use it. */
         if (packet.isGround()) {
             data.playerInfo.jumpHeight = MovementUtils.getJumpHeight(data.getPlayer());
+        }
+
+        if(data.playerInfo.clientGround || data.playerInfo.lClientGround) {
             data.playerInfo.totalHeight = MovementUtils.getTotalHeight(data.playerVersion,
                     (float)data.playerInfo.jumpHeight);
         }
@@ -138,6 +142,11 @@ public class MovementProcessor {
                 || !data.playerInfo.worldLoaded
                 || timeStamp - Kauri.INSTANCE.lastTick >
                 new VariableValue<>(110, 60, ProtocolVersion::isPaper).get();
+
+        if(data.playerInfo.insideBlock = (data.playerInfo.blockOnTo != null && data.playerInfo.blockOnTo.getType()
+                .equals(XMaterial.AIR.parseMaterial()))) {
+            data.playerInfo.lastInsideBlock.reset();
+        }
 
         //We set the yaw and pitch like this to prevent inaccurate data input. Like above, it will return both pitch
         //and yaw as 0 if it isnt a look packet.
@@ -229,7 +238,7 @@ public class MovementProcessor {
         //Setting the angle delta for use in checks to prevent repeated functions.
         data.playerInfo.lDeltaYaw = data.playerInfo.deltaYaw;
         data.playerInfo.lDeltaPitch = data.playerInfo.deltaPitch;
-        data.playerInfo.deltaYaw = MathUtils.getAngleDelta(data.playerInfo.to.yaw, data.playerInfo.from.yaw);
+        data.playerInfo.deltaYaw = MathUtils.getDelta(data.playerInfo.to.yaw, data.playerInfo.from.yaw);
         data.playerInfo.deltaPitch = data.playerInfo.to.pitch - data.playerInfo.from.pitch;
 
         if (packet.isLook()) {
@@ -325,7 +334,7 @@ public class MovementProcessor {
 
         if (data.blockInfo.onSoulSand) data.playerInfo.soulSandTimer.reset();
 
-        if (data.blockInfo.blocksAbove)data.playerInfo.blockAboveTimer.reset();
+        if (data.blockInfo.blocksAbove) data.playerInfo.blockAboveTimer.reset();
 
         //Player ground/air positioning ticks.
         if (!data.playerInfo.serverGround) {
@@ -358,7 +367,7 @@ public class MovementProcessor {
 
         data.playerInfo.flightCancel = data.playerInfo.generalCancel
                 || data.playerInfo.webTimer.hasNotPassed(4)
-                || data.playerInfo.liquidTimer.hasNotPassed(4)
+                || data.playerInfo.liquidTimer.hasNotPassed(6)
                 || data.playerInfo.onLadder
                 || data.playerInfo.climbTimer.hasNotPassed(4)
                 || data.playerInfo.lastHalfBlock.hasNotPassed(2);

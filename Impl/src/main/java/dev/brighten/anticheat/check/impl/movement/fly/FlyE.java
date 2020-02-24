@@ -28,7 +28,7 @@ public class FlyE extends Check {
                     && !data.playerInfo.wasOnSlime
                     && data.playerInfo.lClientGround
                     && !data.playerInfo.serverGround
-                    && !data.blockInfo.blocksAbove
+                    && data.playerInfo.blockAboveTimer.hasPassed(6)
                     && data.playerInfo.lastBlockPlace.hasPassed(20)
                     && data.playerInfo.lastHalfBlock.hasPassed(4)
                     && MathUtils.getDelta(data.playerInfo.deltaY, shit) > 0.01f
@@ -39,7 +39,8 @@ public class FlyE extends Check {
                 }
             } else verbose.subtract(0.05);
 
-            debug("deltaY=" + data.playerInfo.deltaY);
+            debug("deltaY=%1 above=%2", data.playerInfo.deltaY,
+                    data.playerInfo.blockAboveTimer.getPassed());
         }
         vl-= vl > 0 ? 0.002f : 0;
     }

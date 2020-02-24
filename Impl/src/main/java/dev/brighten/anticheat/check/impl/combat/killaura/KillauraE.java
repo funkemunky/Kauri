@@ -9,7 +9,7 @@ import dev.brighten.api.check.CheckType;
 import org.bukkit.entity.EntityType;
 
 @CheckInfo(name = "Killaura (E)", description = "Checks if a user is sprinting while attacking a player.",
-        checkType = CheckType.KILLAURA, punishVL = 20, developer = true)
+        checkType = CheckType.KILLAURA, punishVL = 20, developer = true, enabled = false)
 @Cancellable(cancelType = CancelType.ATTACK)
 public class KillauraE extends Check {
 

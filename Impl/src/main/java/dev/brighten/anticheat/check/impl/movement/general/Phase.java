@@ -28,7 +28,7 @@ import java.util.stream.Stream;
 
 @CheckInfo(name = "Phase", description = "a phase check made by the one and only LukeK.",
         checkType = CheckType.GENERAL, punishVL = 20,
-        developer = true)
+        developer = true, enabled = false)
 public class Phase extends Check {
 
     private static boolean debug = false;

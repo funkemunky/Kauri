@@ -346,7 +346,7 @@ public class PredictionService {
     private void calc(boolean checkCollisions) {
         flag = true;
         int precision = String.valueOf((int) Math.abs(posX > posZ ? posX : posX)).length();
-        precision = 15 - precision - (isBelowSpecial ? 6 : 0);
+        precision = 10 - precision - (isBelowSpecial ? 4 : 0);
         double preD = 1.2 * Math.pow(10, -Math.max(3, precision - 5));  // the motion deviates further and further from the coordinates 0 0 0. this value fix this
 
 //		if (openInv) { // i don't have an Event for it

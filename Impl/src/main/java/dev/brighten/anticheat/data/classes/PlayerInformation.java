@@ -9,7 +9,7 @@ import org.bukkit.block.Block;
 
 public class PlayerInformation {
     public boolean serverGround, lClientGround, clientGround, nearGround,
-            collided,
+            collided, insideBlock,
             onLadder, isClimbing, usingItem, wasOnIce, wasOnSlime, jumped, inAir, lworldLoaded, worldLoaded;
     public boolean generalCancel, flightCancel;
     public float fallDistance;
@@ -55,6 +55,7 @@ public class PlayerInformation {
             lastBlockPlace = new TickTimer(10),
             lastToggleFlight = new TickTimer(10),
             lastWorldUnload = new TickTimer(20),
+            lastInsideBlock = new TickTimer(5),
             lastHalfBlock = new TickTimer(20);
 
     public double velocityX, velocityY, velocityZ;

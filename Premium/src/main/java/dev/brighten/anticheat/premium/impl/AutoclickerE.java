@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.premium.impl;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.utils.math.cond.MaxDouble;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -11,7 +12,8 @@ import lombok.val;
 import java.util.Deque;
 import java.util.LinkedList;
 
-@CheckInfo(name = "Autoclicker (E)", description = "Checks for impossible deviations (Elevated/funkemunky).", checkType = CheckType.AUTOCLICKER)
+@CheckInfo(name = "Autoclicker (E)", description = "Checks for impossible deviations (Elevated/funkemunky).",
+        checkType = CheckType.AUTOCLICKER)
 public class AutoclickerE extends Check {
 
     private Deque<Long> clickSamples = new LinkedList<>();
@@ -21,9 +23,8 @@ public class AutoclickerE extends Check {
     private MaxDouble verbose = new MaxDouble(10);
 
     @Packet
-    public void onClick(WrappedInArmAnimationPacket packet, long timeStamp) {
-        long now = System.currentTimeMillis();
-        long delay = now - this.lastSwing;
+    public void onClick(WrappedInUseEntityPacket packet, long timeStamp) {
+        long delay = timeStamp - this.lastSwing;
 
         if (data.playerInfo.lastBrokenBlock.hasNotPassed(3) || data.playerInfo.lastBlockPlace.hasNotPassed(1))
             return;
@@ -52,6 +53,6 @@ public class AutoclickerE extends Check {
             this.clickSamples.clear();
         }
 
-        this.lastSwing = now;
+        this.lastSwing = timeStamp;
     }
 }

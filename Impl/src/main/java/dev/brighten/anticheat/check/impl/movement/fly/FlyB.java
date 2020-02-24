@@ -68,13 +68,15 @@ public class FlyB extends Check {
                 predicted*= 0.9800000190734863D;
             }
 
-            if(data.playerVersion.isOrBelow(ProtocolVersion.V1_8_9) && Math.abs(predicted) < 0.005) {
+            if((data.playerInfo.clientGround && predicted > -0.08 && predicted < -0.077)
+                    || (data.playerVersion.isOrBelow(ProtocolVersion.V1_8_9) && Math.abs(predicted) < 0.005)) {
                 predicted = 0;
             }
 
             double deltaPredict =  MathUtils.getDelta(data.playerInfo.deltaY, predicted);
 
             if(!data.playerInfo.flightCancel
+                    && (!data.blockInfo.blocksAbove || data.playerInfo.deltaY >= 0)
                     && data.playerInfo.slimeTimer.hasPassed(20)
                     && data.playerInfo.lastVelocity.hasPassed(10)
                     && deltaPredict > 0.0001) {

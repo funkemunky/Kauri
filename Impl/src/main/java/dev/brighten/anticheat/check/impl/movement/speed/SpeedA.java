@@ -33,6 +33,9 @@ public class SpeedA extends Check {
                 : 0;
         baseSpeed+= data.playerInfo.wasOnSlime ? 0.1 : 0;
 
+        if(data.playerInfo.lastBlockPlace.hasNotPassed(10))
+            baseSpeed+= 0.2;
+
         if(data.playerInfo.deltaXZ > baseSpeed) {
             if(verbose.add(data.playerInfo.deltaXZ - baseSpeed > 0.6f ? 4 : 1) > 25
                     || data.playerInfo.deltaXZ - baseSpeed > 0.6f) {

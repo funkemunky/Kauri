@@ -193,7 +193,7 @@ public class SpeedC extends Check {
             moveSpeed += 0.5;
         }
 
-        if (data.blockInfo.inWeb) {
+        if (data.blockInfo.inWeb && data.playerInfo.lastBrokenBlock.hasPassed(3)) {
             if(webTicks++ > 2) {
                 tags.add("web");
                 moveSpeed -= 0.2;
@@ -206,6 +206,12 @@ public class SpeedC extends Check {
                 moveSpeed -= 0.1;
                 tags.add("soulice");
             } else tags.add("soul");
+        }
+
+        if(data.playerInfo.lastBlockPlace.hasNotPassed(6)) {
+            moveSpeed+= 0.13;
+        } else if(data.playerInfo.lastBlockPlace.hasNotPassed(8)) {
+            moveSpeed+= 0.05;
         }
 
         if (data.playerInfo.slimeTimer.hasNotPassed(0)) {
@@ -225,7 +231,7 @@ public class SpeedC extends Check {
 
             if (horizontalMove > 0 && data.playerInfo.lastVelocity.hasPassed(10)) {
                 vl++;
-                if(horizontalMove > 0.4 || vl > 3) {
+                if(horizontalMove > 0.51 || vl > 3) {
                     flag("+%1,tags=%2",
                             MathUtils.round(horizontalMove, 5), String.join(",", tags));
                 }

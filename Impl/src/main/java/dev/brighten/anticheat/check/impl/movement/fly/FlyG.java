@@ -9,7 +9,7 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Fly (G)", description = "Checks if the player stops abruptly without reason.",
-        checkType = CheckType.FLIGHT, developer = true)
+        checkType = CheckType.FLIGHT, developer = true, enabled = false)
 @Cancellable
 public class FlyG extends Check {
 
@@ -22,7 +22,7 @@ public class FlyG extends Check {
             totalY = 0;
             return;
         }
-        if(data.playerInfo.clientGround) {
+        if(data.playerInfo.clientGround || data.playerInfo.deltaY <= 0) {
             if(totalY > 0) {
                 if(data.playerInfo.blockAboveTimer.hasPassed(5)
                         && !data.blockInfo.onStairs
@@ -31,7 +31,7 @@ public class FlyG extends Check {
                         && !data.playerInfo.wasOnSlime
                         && data.playerInfo.slimeTimer.hasPassed(10)
                         && data.playerInfo.webTimer.hasPassed(10)
-                        && data.playerInfo.liquidTimer.hasPassed(10)
+                        && data.playerInfo.liquidTimer.hasPassed(30)
                         && data.playerInfo.climbTimer.hasPassed(10)
                         && data.playerInfo.lastBlockPlace.hasPassed(20)
                         && (data.playerInfo.lastHalfBlock.hasPassed(7) || totalY > 1)
@@ -39,7 +39,8 @@ public class FlyG extends Check {
                         && data.playerInfo.lastVelocity.hasPassed(20)) {
                     double delta = MathUtils.getDelta(totalY, data.playerInfo.totalHeight);
 
-                    if(delta >= 1E-7) {
+                    if(delta >= (data.playerInfo.lastHalfBlock.hasNotPassed(10)
+                            || data.playerInfo.lastInsideBlock.hasNotPassed(10) ? 0.02 : 1E-7)) {
                         vl++;
                         flag("delta=%1 totalHeight=%2 predicted=%3 jumpHeight=%4",
                                 MathUtils.round(delta, 3),

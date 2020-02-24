@@ -33,9 +33,9 @@ public class AutoclickerC extends Check {
             if(blocking) {
                 debug("unblocked");
 
-                if (verbose.add() > 10) {
+                if (verbose.add() > 14) {
                     flag("t=%1 vb=%2", "block", MathUtils.round(verbose.value(), 2));
-                } else if(verbose.value() > 5) {
+                } else if(verbose.value() > 8) {
                     TinyProtocolHandler.sendPacket(packet.getPlayer(),
                             new WrappedOutHeldItemSlot(slot == 8 ? 0 : Math.min(8, slot + 1))
                                     .getObject());
