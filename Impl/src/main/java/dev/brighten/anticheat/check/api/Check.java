@@ -283,7 +283,7 @@ public class Check implements KauriCheck {
         register(new Phase());
         register(new Timer());
         register(new BadPacketsA());
-        register(new BadPacketsB());
+        //register(new BadPacketsB());
         register(new BadPacketsC());
         register(new BadPacketsD());
         register(new BadPacketsE());

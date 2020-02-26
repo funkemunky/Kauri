@@ -25,7 +25,7 @@ public class AutoclickerF extends Check {
     @Packet
     public void onClick(WrappedInArmAnimationPacket packet, long timeStamp) {
         if(data.playerInfo.breakingBlock
-                || data.playerInfo.lastBrokenBlock.hasNotPassed(5)
+                || data.playerInfo.lookingAtBlock
                 || data.playerInfo.lastBlockPlace.hasNotPassed(4)) {
             lastTime = timeStamp;
             return;

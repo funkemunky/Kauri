@@ -8,6 +8,7 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.objects.VariableValue;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
+import cc.funkemunky.api.utils.world.types.RayCollision;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
@@ -283,6 +284,16 @@ public class MovementProcessor {
             data.playerInfo.lastPitchGCD = data.playerInfo.pitchGCD;
             data.playerInfo.pitchGCD = MiscUtils.gcd((long) (Math.abs(data.playerInfo.deltaPitch) * offset),
                     (long) (Math.abs(data.playerInfo.lDeltaPitch) * offset));
+
+            val origin = data.playerInfo.to.clone();
+
+            origin.y+= 1.8;
+            RayCollision collision = new RayCollision(origin.toVector(), MathUtils.getDirection(origin));
+
+            List<SimpleCollisionBox> boxes = new ArrayList<>();
+            collision.boxesOnRay(data.getPlayer().getWorld(), 4).forEach(box -> box.downCast(boxes));
+
+            data.playerInfo.lookingAtBlock = boxes.size() > 0;
         }
 
         //Setting fallDistance

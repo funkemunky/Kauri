@@ -31,7 +31,7 @@ public class AutoclickerG extends Check {
     @Packet
     public void check(WrappedInArmAnimationPacket packet) {
         if (!data.playerInfo.breakingBlock
-                && data.playerInfo.lastBrokenBlock.hasPassed(5)
+                && !data.playerInfo.lookingAtBlock
                 && data.playerInfo.lastBlockPlace.hasPassed(4)) {
             if (this.flyingCount < 10) {
                 if (this.release) {

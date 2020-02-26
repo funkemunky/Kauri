@@ -208,10 +208,10 @@ public class SpeedC extends Check {
             } else tags.add("soul");
         }
 
-        if(data.playerInfo.lastBlockPlace.hasNotPassed(6)) {
-            moveSpeed+= 0.13;
-        } else if(data.playerInfo.lastBlockPlace.hasNotPassed(8)) {
-            moveSpeed+= 0.05;
+        if(data.playerInfo.lastBlockPlace.hasNotPassed(8)) {
+            moveSpeed+= 0.24;
+        } else if(data.playerInfo.lastBlockPlace.hasNotPassed(12)) {
+            moveSpeed+= 0.1;
         }
 
         if (data.playerInfo.slimeTimer.hasNotPassed(0)) {
@@ -227,7 +227,8 @@ public class SpeedC extends Check {
 
         double horizontalMove = (horizontalDistance - previousHorizontal) - moveSpeed;
         if (horizontalDistance > 0.1) {
-            debug("+%1,tags=%2", horizontalMove, String.join(",", tags));
+            debug("+%1,tags=%2,place=%3", horizontalMove, String.join(",", tags),
+                    data.playerInfo.lastBlockPlace.getPassed());
 
             if (horizontalMove > 0 && data.playerInfo.lastVelocity.hasPassed(10)) {
                 vl++;

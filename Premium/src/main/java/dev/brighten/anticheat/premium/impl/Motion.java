@@ -20,6 +20,7 @@ public class Motion extends Check {
             if(data.predictionService.flag
                     && data.playerInfo.soulSandTimer.hasPassed(10)
                     && !data.playerInfo.generalCancel
+                    && data.playerInfo.deltaXZ > 0
                     && data.lagInfo.lastPingDrop.hasPassed(40)
                     && !data.blockInfo.collidesHorizontally) {
                 vl++;

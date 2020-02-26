@@ -72,8 +72,7 @@ public class ObjectData {
         moveProcessor = new MovementProcessor(this);
         Kauri.INSTANCE.executor.execute(() -> playerVersion = TinyProtocolHandler.getProtocolVersion(getPlayer()));
 
-        TinyProtocolHandler.sendPacket(getPlayer(), new WrappedOutTransaction(0, (short) 69, false)
-                .getObject());
+        if(task != null) task.cancel();
         task = RunUtils.taskTimerAsync(() -> {
             if(getPlayer() == null) {
                 task.cancel();
@@ -82,7 +81,7 @@ public class ObjectData {
 
             TinyProtocolHandler.sendPacket(getPlayer(), new WrappedOutTransaction(0, (short) 69, false)
                     .getObject());
-        }, 5L, 20L);
+        }, 5L, 40L);
     }
 
     public Player getPlayer() {
@@ -106,6 +105,7 @@ public class ObjectData {
     public void onLogout() {
         Kauri.INSTANCE.dataManager.hasAlerts.remove(this);
         Kauri.INSTANCE.dataManager.debugging.remove(this);
+        task.cancel();
     }
 
     public static void debugBoxes(boolean debugging, Player debugger) {

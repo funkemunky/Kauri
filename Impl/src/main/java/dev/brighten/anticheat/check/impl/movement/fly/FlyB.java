@@ -69,7 +69,7 @@ public class FlyB extends Check {
             }
 
             if((data.playerInfo.clientGround && predicted > -0.08 && predicted < -0.077)
-                    || (data.playerVersion.isOrBelow(ProtocolVersion.V1_8_9) && Math.abs(predicted) < 0.005)) {
+                    || Math.abs(predicted) < 0.005) {
                 predicted = 0;
             }
 
@@ -78,6 +78,8 @@ public class FlyB extends Check {
             if(!data.playerInfo.flightCancel
                     && (!data.blockInfo.blocksAbove || data.playerInfo.deltaY >= 0)
                     && data.playerInfo.slimeTimer.hasPassed(20)
+                    && data.playerInfo.lastBlockPlace.hasPassed(5)
+                    && data.playerVersion.isOrBelow(ProtocolVersion.V1_8_9)
                     && data.playerInfo.lastVelocity.hasPassed(10)
                     && deltaPredict > 0.0001) {
                 vl++;

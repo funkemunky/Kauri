@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.check.impl.movement.fly;
 
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Cancellable;
@@ -40,7 +41,9 @@ public class FlyG extends Check {
                     double delta = MathUtils.getDelta(totalY, data.playerInfo.totalHeight);
 
                     if(delta >= (data.playerInfo.lastHalfBlock.hasNotPassed(10)
-                            || data.playerInfo.lastInsideBlock.hasNotPassed(10) ? 0.02 : 1E-7)) {
+                            || data.playerInfo.lastInsideBlock.hasNotPassed(20)
+                            || data.blockInfo.blocksNear
+                            ? 0.02 : 1E-7) + (data.playerVersion.isOrAbove(ProtocolVersion.V1_9) ? 0.005 : 0)) {
                         vl++;
                         flag("delta=%1 totalHeight=%2 predicted=%3 jumpHeight=%4",
                                 MathUtils.round(delta, 3),

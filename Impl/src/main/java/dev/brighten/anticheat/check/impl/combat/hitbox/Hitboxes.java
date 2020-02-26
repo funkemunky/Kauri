@@ -36,11 +36,10 @@ public class Hitboxes extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-
         if (checkParameters(data)) {
 
             List<RayCollision> rayTrace = data.pastLocation
-                    .getPreviousRange(Math.max(60L, Math.round(data.lagInfo.ping / 2D)))
+                    .getPreviousRange(100L)
                     .stream()
                     .peek(loc -> loc.y+=data.playerInfo.sneaking ? 1.54 : 1.62)
                     .map(loc -> new RayCollision(loc.toVector(),
@@ -63,7 +62,7 @@ public class Hitboxes extends Check {
                         double dist = point.distance(ray.getOrigin().toVector());
 
                         distance.set(Math.min(dist, distance.get()));
-                        return dist < 3.35f;
+                        return dist < 3.4f;
                     }
                     return false;
                 }).count();
@@ -89,10 +88,17 @@ public class Hitboxes extends Check {
     }
 
     private static SimpleCollisionBox getHitbox(KLocation loc, EntityType type) {
-        Vector bounds = MiscUtils.entityDimensions.get(type);
+        if(type.equals(EntityType.PLAYER)) {
+            return new SimpleCollisionBox(loc.toVector(), loc.toVector()).expand(0.42,0.12,0.42)
+                    .expandMax(0,1.8,0);
+        } else {
+            Vector bounds = MiscUtils.entityDimensions.get(type);
 
-        return new SimpleCollisionBox(loc.toVector(), loc.toVector())
-                .expand(bounds.getX(), 0, bounds.getZ())
-                .expand(0, bounds.getY(), 0).expand(0.1f,0.1f,0.1f);
+            SimpleCollisionBox box = new SimpleCollisionBox(loc.toVector(), loc.toVector())
+                    .expand(bounds.getX(), 0, bounds.getZ())
+                    .expandMax(0, bounds.getY(),0);
+
+            return box.expand(0.12,0.12,0.12);
+        }
     }
 }

@@ -60,7 +60,7 @@ public class PlayerInformation {
 
     public double velocityX, velocityY, velocityZ;
     public double mvx, mvy, mvz;
-    public boolean takingVelocity;
+    public boolean takingVelocity, lookingAtBlock;
 
     public KLocation from = new KLocation(0,0,0), to = new KLocation(0,0,0),
             groundLoc;

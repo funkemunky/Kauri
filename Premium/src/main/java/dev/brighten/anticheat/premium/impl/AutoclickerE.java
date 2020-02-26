@@ -23,10 +23,12 @@ public class AutoclickerE extends Check {
     private MaxDouble verbose = new MaxDouble(10);
 
     @Packet
-    public void onClick(WrappedInUseEntityPacket packet, long timeStamp) {
+    public void onClick(WrappedInArmAnimationPacket packet, long timeStamp) {
         long delay = timeStamp - this.lastSwing;
 
-        if (data.playerInfo.lastBrokenBlock.hasNotPassed(3) || data.playerInfo.lastBlockPlace.hasNotPassed(1))
+        if (data.playerInfo.lookingAtBlock
+                || data.playerInfo.breakingBlock
+                || data.playerInfo.lastBlockPlace.hasNotPassed(1))
             return;
 
         if (delay > 1L && delay < 300L && this.clickSamples.add(delay) && this.clickSamples.size() == 30) {

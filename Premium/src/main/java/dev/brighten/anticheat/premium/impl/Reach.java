@@ -78,13 +78,13 @@ public class Reach extends Check {
     }
 
     private static SimpleCollisionBox getHitbox(KLocation loc) {
-        return new SimpleCollisionBox(loc.toVector(), loc.toVector()).expand(0.4f, 0.1f, 0.4f)
+        return new SimpleCollisionBox(loc.toVector(), loc.toVector()).expand(0.42f, 0.12f, 0.42f)
                 .expandMax(0,1.8,0);
     }
 
     private static SimpleCollisionBox getHitbox(KLocation loc, EntityType type) {
         if(type.equals(EntityType.PLAYER)) {
-            return new SimpleCollisionBox(loc.toVector(), loc.toVector()).expand(0.4,0,0.4)
+            return new SimpleCollisionBox(loc.toVector(), loc.toVector()).expand(0.42,0.12,0.42)
                     .expandMax(0,1.8,0);
         } else {
             Vector bounds = MiscUtils.entityDimensions.get(type);
@@ -93,7 +93,7 @@ public class Reach extends Check {
                     .expand(bounds.getX(), 0, bounds.getZ())
                     .expandMax(0, bounds.getY(),0);
 
-            return box.expand(0.1,0.1,0.1);
+            return box.expand(0.12,0.12,0.12);
         }
     }
 }

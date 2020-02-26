@@ -19,11 +19,12 @@ public class KillauraC extends Check {
 
     @Packet
     public void onUse(WrappedInUseEntityPacket packet, long timeStamp) {
-        if(!packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) return;
+        if(!packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)
+                || data.playerVersion.isOrAbove(ProtocolVersion.V1_9)) return;
 
         long delta = timeStamp - lastArm;
 
-        if(delta > (data.playerVersion.isOrBelow(ProtocolVersion.V1_8_9) ? 90 : 200)
+        if(delta > 90
                 && data.lagInfo.lastPacketDrop.hasPassed(10)
                 && !data.lagInfo.lagging) {
             vl++;
