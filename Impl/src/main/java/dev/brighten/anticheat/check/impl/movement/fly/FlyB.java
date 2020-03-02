@@ -33,8 +33,8 @@ public class FlyB extends Check {
             }
 
             for (Block block : Helper.blockCollisions(data.blockInfo.handler.getBlocks(),
-                    data.box.copy().expand(0.2 + Math.abs(data.playerInfo.deltaX),0,
-                            0.2 + Math.abs(data.playerInfo.deltaZ))
+                    data.box.copy().expand(0.25 + Math.abs(data.playerInfo.deltaX),0.5,
+                            0.25 + Math.abs(data.playerInfo.deltaZ))
                             .expandMin(0, -0.5f + Math.min(0, data.playerInfo.deltaY), 0))) {
                 CollisionBox box = BlockData.getData(block.getType())
                         .getBox(block, ProtocolVersion.getGameVersion());
@@ -60,6 +60,7 @@ public class FlyB extends Check {
             //of motionY is less than 0.005 and it rounds it to 0.
             //The easiest way I found to produce this oddity is by putting myself in a corner and just jumping.
             if(Math.abs(data.playerInfo.deltaY - -0.078)  < 0.01
+                    && MathUtils.getDelta(data.playerInfo.deltaY, predicted) > 0.0001
                     && Math.abs(data.playerInfo.deltaY - data.playerInfo.lDeltaY) > 0.11) {
                 predicted = -0.08;
                 predicted*= 0.9800000190734863D;

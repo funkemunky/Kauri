@@ -26,9 +26,9 @@ public class PredictionService {
             lastOnGround, onGround, lastSprint, fMath, fastMath, walkSpecial, lastVelocity;
     public double posX, posY, posZ, lPosX, lPosY, lPosZ, rmotionX, rmotionY, rmotionZ, lmotionX, lmotionZ, lmotionY;
     public double predX, predZ;
-    public float aiMoveSpeed;
+    public double aiMoveSpeed;
     public boolean flag, isBelowSpecial;
-    public float walkSpeed, yaw, moveStrafing, moveForward;
+    public float walkSpeed = 0.1f, yaw, moveStrafing, moveForward;
 
     public String key = "Nothing";
 
@@ -395,19 +395,17 @@ public class PredictionService {
                     jumpMovementFactor = 0.025999999F;
                 }
 
-                double var5;
+                float var5;
                 float var3 = 0.91f;
 
                 if(lastOnGround) {
                     var3*= data.blockInfo.currentFriction;
                 }
 
-                aiMoveSpeed = 0.1f;
+                aiMoveSpeed = walkSpeed;
 
-                if(data.getPlayer().getWalkSpeed() > 0.2) aiMoveSpeed = (data.getPlayer().getWalkSpeed()) / 2;
                 if (sprint) {
-                    //aiMoveSpeed/=0.76923071005;
-                    aiMoveSpeed+= aiMoveSpeed * 0.3;
+                    aiMoveSpeed+= aiMoveSpeed * 0.30000001192092896D;
                 }
 
                 if(data.getPlayer().hasPotionEffect(PotionEffectType.SPEED)) {
@@ -420,14 +418,14 @@ public class PredictionService {
                 float var4 = 0.16277136F / (var3 * var3 * var3);
 
                 if (lastOnGround) {
-                    var5 = aiMoveSpeed * var4;
+                    var5 = (float)(aiMoveSpeed * var4);
                 } else {
                     var5 = jumpMovementFactor;
                 }
 
-                double motionX = lmotionX, motionY = lmotionY, motionZ = lmotionZ;
+                double motionX = lmotionX, motionZ = lmotionZ;
 
-                double var14 = moveStrafing * moveStrafing + moveForward * moveForward;
+                float var14 = moveStrafing * moveStrafing + moveForward * moveForward;
                 if (var14 >= 1.0E-4F) {
                     var14 = sqrt_double(var14);
                     if (var14 < 1.0F)
