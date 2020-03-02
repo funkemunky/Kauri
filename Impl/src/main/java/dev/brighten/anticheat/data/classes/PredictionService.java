@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.data.classes;
 
+import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.*;
@@ -25,7 +26,7 @@ public class PredictionService {
             lastOnGround, onGround, lastSprint, fMath, fastMath, walkSpecial, lastVelocity;
     public double posX, posY, posZ, lPosX, lPosY, lPosZ, rmotionX, rmotionY, rmotionZ, lmotionX, lmotionZ, lmotionY;
     public double predX, predZ;
-    public double aiMoveSpeed;
+    public float aiMoveSpeed;
     public boolean flag, isBelowSpecial;
     public float walkSpeed, yaw, moveStrafing, moveForward;
 
@@ -74,7 +75,7 @@ public class PredictionService {
         fMath = fastMath; // if the Player uses Optifine FastMath
 
         try {
-            if(!position && !velocity && !lastVelocity && (checkConditions = checkConditions(lastSprint))) {
+            if(!position && !velocity && (checkConditions = checkConditions(lastSprint))) {
                 if (lastSprint && hit) { // If the Player Sprints and Hit a Player he get slowdown
                     lmotionX *= 0.6D;
                     lmotionZ *= 0.6D;
@@ -401,10 +402,12 @@ public class PredictionService {
                     var3*= data.blockInfo.currentFriction;
                 }
 
-                aiMoveSpeed = data.getPlayer().getWalkSpeed() / 2D;
+                aiMoveSpeed = 0.1f;
+
+                if(data.getPlayer().getWalkSpeed() > 0.2) aiMoveSpeed = (data.getPlayer().getWalkSpeed()) / 2;
                 if (sprint) {
                     //aiMoveSpeed/=0.76923071005;
-                    aiMoveSpeed/=0.7692307779;
+                    aiMoveSpeed+= aiMoveSpeed * 0.3;
                 }
 
                 if(data.getPlayer().hasPotionEffect(PotionEffectType.SPEED)) {
@@ -518,7 +521,9 @@ public class PredictionService {
                     break found;
                 }
                 MiscUtils.testMessage(Color.Red + "(" + rmotionX + ", " + motionX + "); (" + rmotionZ + ", " + motionZ + ")");
-                MiscUtils.testMessage(Color.Red + diffString + " loops " + loops + " key: " + key + " sneak=" + sneak + " move=" + moveForward + " ai=" + aiMoveSpeed);
+                MiscUtils.testMessage(Color.Red + diffString + " loops " + loops + " key: " + key + " sneak=" + sneak
+                        + " move=" + moveForward + " ai=" + aiMoveSpeed + " shit=" + Atlas.getInstance()
+                        .getBlockBoxManager().getBlockBox().getMovementFactor(data.getPlayer()));
 
                 if (diff < closestdiff) {
                     closestdiff = diff;
