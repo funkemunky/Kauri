@@ -56,7 +56,8 @@ public class PlayerInformation {
             lastToggleFlight = new TickTimer(10),
             lastWorldUnload = new TickTimer(20),
             lastInsideBlock = new TickTimer(5),
-            lastHalfBlock = new TickTimer(20);
+            lastHalfBlock = new TickTimer(20),
+            lastPlaceLiquid = new TickTimer(20);
 
     public double velocityX, velocityY, velocityZ;
     public double mvx, mvy, mvz;

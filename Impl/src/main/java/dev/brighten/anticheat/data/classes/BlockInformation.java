@@ -134,8 +134,9 @@ public class BlockInformation {
         handler.setOffset(0);
         handler.setSize(0.6, 1.8);
 
-        inLava = handler.isCollidedWith(Materials.LAVA);
-        inWater = handler.isCollidedWith(Materials.WATER);
+        inLava = handler.isCollidedWith(XMaterial.LAVA.parseMaterial(),
+                XMaterial.STATIONARY_LAVA.parseMaterial());
+        inWater = handler.isCollidedWith(XMaterial.WATER.parseMaterial(), XMaterial.STATIONARY_WATER.parseMaterial());
         inLiquid = inLava || inWater;
 
         handler.setSize(0.599, 1.8);

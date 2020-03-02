@@ -15,13 +15,8 @@ import lombok.var;
 public class SpeedE extends Check {
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if(packet.isPos() && !data.playerInfo.creative
-                && !data.playerInfo.canFly
-                && timeStamp - data.playerInfo.lastServerPos > 100
-                && !data.playerInfo.inVehicle
-                && !data.playerInfo.gliding
-                && timeStamp - data.creation > 4000
+    public void onFlying(WrappedInFlyingPacket packet) {
+        if(packet.isPos() && !data.playerInfo.generalCancel
                 && !data.playerInfo.riptiding) {
             var max = data.playerInfo.baseSpeed;
 
@@ -31,6 +26,7 @@ public class SpeedE extends Check {
                     || data.playerInfo.lastHalfBlock.hasNotPassed(5)) {
                 max+= 0.4;
             }
+
             if(max < 1) max = Math.sqrt(max) * 2;
             else max*= 4;
 

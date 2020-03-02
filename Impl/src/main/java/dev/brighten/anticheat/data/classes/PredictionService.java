@@ -80,7 +80,7 @@ public class PredictionService {
         fMath = fastMath; // if the Player uses Optifine FastMath
 
         try {
-            if(!position && !velocity && (checkConditions = checkConditions(lastSprint))) {
+            if(!position && !velocity && !lastVelocity && (checkConditions = checkConditions(lastSprint))) {
                 if (lastSprint && hit) { // If the Player Sprints and Hit a Player he get slowdown
                     lmotionX *= 0.6D;
                     lmotionZ *= 0.6D;
@@ -419,12 +419,6 @@ public class PredictionService {
                 if(data.getPlayer().hasPotionEffect(PotionEffectType.SLOW)) {
                     aiMoveSpeed += (PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.SLOW) * (-0.15000000596046448D)) * aiMoveSpeed;
                 }
-
-                //Bukkit.broadcastMessage(aiMoveSpeed + ", " + Atlas.getInstance().getBlockBoxManager().getBlockBox().getAiSpeed(data.getPlayer()));
-
-                //aiMoveSpeed+= (data.getPlayer().getWalkSpeed() - 0.2) * 5 * 0.45;
-
-                //Bukkit.broadcastMessage(aiMoveSpeed + "");
 
                 float var4 = 0.16277136F / (var3 * var3 * var3);
 

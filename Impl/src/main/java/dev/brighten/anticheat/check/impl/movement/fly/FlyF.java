@@ -19,6 +19,7 @@ public class FlyF extends Check {
 
             if(data.playerInfo.deltaY > jumpHeight * 1.5
                     && !data.playerInfo.canFly
+                    && !data.playerInfo.generalCancel
                     && !data.playerInfo.creative
                     && !data.playerInfo.wasOnSlime
                     && timeStamp - data.playerInfo.lastServerPos > 100

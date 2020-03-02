@@ -61,8 +61,7 @@ public class PacketProcessor {
                     data.playerInfo.lastAttackTimeStamp = timeStamp;
 
                     if (packet.getEntity() instanceof LivingEntity) {
-                        if (data.target != null && !data.target.getUniqueId()
-                                .equals(packet.getEntity().getUniqueId())) {
+                        if (data.target != null && !data.target.equals(packet.getEntity())) {
                             //Resetting location to prevent false positives.
                             data.targetPastLocation.previousLocations.clear();
                             data.playerInfo.lastTargetSwitch.reset();
@@ -184,6 +183,9 @@ public class PacketProcessor {
                 WrappedInBlockPlacePacket packet = new WrappedInBlockPlacePacket(object, data.getPlayer());
 
                 if (event.getPlayer().getItemInHand() != null) {
+                    if(event.getPlayer().getItemInHand().getType().name().contains("BUCKET")) {
+                        data.playerInfo.lastPlaceLiquid.reset();
+                    }
                     if (event.getPlayer().getItemInHand().getType().isBlock()
                             && event.getPlayer().getItemInHand().getType().getId() != 0
                             && (packet.getPosition().getX() != -1
@@ -264,7 +266,7 @@ public class PacketProcessor {
                     data.lagInfo.pingAverages.add(data.lagInfo.transPing);
                     data.lagInfo.averagePing = data.lagInfo.pingAverages.getAverage();
 
-                } else if (packet.getAction() == (short) 101) {
+                } else if(packet.getAction() == (short)101) {
                     data.playerInfo.lastVelocity.reset();
                     data.playerInfo.lastVelocityTimestamp = timeStamp;
                     data.predictionService.rmotionX = data.playerInfo.velocityX;
@@ -366,6 +368,12 @@ public class PacketProcessor {
                 if(!data.checkManager.runPacket(packet, timeStamp)) {
                     event.setCancelled(true);
                 }
+                break;
+            }
+            case Packet.Server.RESPAWN: {
+                WrappedOutRespawnPacket packet = new WrappedOutRespawnPacket(object, data.getPlayer());
+
+                data.playerInfo.lastServerPos = timeStamp + data.lagInfo.ping;
                 break;
             }
             case Packet.Server.HELD_ITEM: {

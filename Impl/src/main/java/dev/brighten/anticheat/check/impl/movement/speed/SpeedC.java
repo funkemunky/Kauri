@@ -44,13 +44,12 @@ public class SpeedC extends Check {
                 || data.playerInfo.generalCancel) return;
 
         List<String> tags = new ArrayList<>();
-        double deltaY = data.playerInfo.to.y - data.playerInfo.from.y;
 
         double moveSpeed = Math.pow(data.getPlayer().getWalkSpeed() * 5, 2);
         double drag = this.drag;
         boolean onGround = packet.isGround() || data.blockInfo.onSlime;
 
-        if (deltaY < 0) fallTicks++;
+        if (data.playerInfo.deltaY < 0) fallTicks++;
         else fallTicks = 0;
 
         double velocityXZ = MathUtils.hypot(velocityX, velocityZ);
@@ -65,7 +64,8 @@ public class SpeedC extends Check {
             moveSpeed *= drag > 0.708 ? 1.3 : data.predictionService.aiMoveSpeed * 1.5f;
             moveSpeed *= 0.16277136 / Math.pow(drag, 3);
 
-            if (deltaY > 0 && MathUtils.getDelta(data.playerInfo.jumpHeight, deltaY) < 0.1) {
+            if (data.playerInfo.deltaY > 0
+                    && MathUtils.getDelta(data.playerInfo.jumpHeight, data.playerInfo.deltaY) < 0.1) {
                 tags.add("ascend");
                 moveSpeed += 0.2;
 
@@ -77,7 +77,7 @@ public class SpeedC extends Check {
                         moveSpeed += 0.1;
                     }
                 }
-            } else if (deltaY < 0.0) {
+            } else if (data.playerInfo.deltaY < 0.0) {
                 tags.add("fall");
                 moveSpeed -= 0.1;
                 if (data.playerInfo.wasOnSlime) {
@@ -104,7 +104,7 @@ public class SpeedC extends Check {
             }
 
             if (fallTicks == 1 && data.blockInfo.inLava) {
-                double dy = Math.abs(deltaY);
+                double dy = Math.abs(data.playerInfo.deltaY);
                 if (dy > 0.08 || dy < 0.07) {
                     tags.add("fallen");
                     moveSpeed /= (dy * 150);
@@ -180,8 +180,8 @@ public class SpeedC extends Check {
 
         if (moveSpeed > 0.046
                 && moveSpeed < 0.047
-                && Helper.format(deltaY, 4) == 0.0784) {
-            tags.add("fall");
+                && Helper.format(data.playerInfo.deltaY, 4) == 0.0784) {
+            tags.add("fall-2");
             moveSpeed += 1;
         }
 
@@ -227,10 +227,11 @@ public class SpeedC extends Check {
 
         double horizontalMove = (horizontalDistance - previousHorizontal) - moveSpeed;
         if (horizontalDistance > 0.1) {
-            debug("+%1,tags=%2,place=%3", horizontalMove, String.join(",", tags),
-                    data.playerInfo.lastBlockPlace.getPassed());
+            debug("+%1,tags=%2,place=%3,dy=%4", horizontalMove, String.join(",", tags),
+                    data.playerInfo.lastBlockPlace.getPassed(), Helper.format(data.playerInfo.deltaY, 4));
 
-            if (horizontalMove > 0 && data.playerInfo.lastVelocity.hasPassed(10)) {
+            if (horizontalMove > 0 && data.playerInfo.lastVelocity.hasPassed(10)
+                    && data.playerInfo.lastVelocity.hasPassed(10)) {
                 vl++;
                 if(horizontalMove > 0.51 || vl > 3) {
                     flag("+%1,tags=%2",

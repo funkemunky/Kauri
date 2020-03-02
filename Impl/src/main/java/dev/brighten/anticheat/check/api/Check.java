@@ -18,6 +18,7 @@ import dev.brighten.anticheat.check.impl.combat.hand.HandB;
 import dev.brighten.anticheat.check.impl.combat.hand.HandC;
 import dev.brighten.anticheat.check.impl.combat.hand.HandD;
 import dev.brighten.anticheat.check.impl.combat.hitbox.Hitboxes;
+import dev.brighten.anticheat.check.impl.combat.hitbox.ReachA;
 import dev.brighten.anticheat.check.impl.combat.killaura.*;
 import dev.brighten.anticheat.check.impl.movement.fly.*;
 import dev.brighten.anticheat.check.impl.movement.general.FastLadder;
@@ -266,6 +267,7 @@ public class Check implements KauriCheck {
         register(new NoFallB());
         register(new Hitboxes());
         register(new AimA());
+        register(new AimB());
         register(new AimC());
         register(new AimD());
         register(new AimF());
@@ -296,10 +298,10 @@ public class Check implements KauriCheck {
         register(new BadPacketsL());
         register(new BadPacketsM());
         register(new VelocityA());
-        register(new VelocityC());
         register(new HandA());
         register(new HandB());
         register(new HandC());
+        register(new ReachA());
         register(new HandD());
         register(new HealthSpoof());
         register(new BookOp());

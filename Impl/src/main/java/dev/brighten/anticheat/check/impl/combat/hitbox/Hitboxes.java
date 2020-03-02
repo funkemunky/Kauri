@@ -18,6 +18,7 @@ import org.bukkit.util.Vector;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @CheckInfo(name = "Hitboxes", description = "Checks if the player attacks outside a player's hitbox.",
         checkType = CheckType.HITBOX, punishVL = 15)
@@ -38,16 +39,14 @@ public class Hitboxes extends Check {
     public void onFlying(WrappedInFlyingPacket packet) {
         if (checkParameters(data)) {
 
-            List<RayCollision> rayTrace = data.pastLocation
-                    .getPreviousRange(100L)
-                    .stream()
+            List<RayCollision> rayTrace = Stream.of(data.playerInfo.to.clone(), data.playerInfo.from.clone())
                     .peek(loc -> loc.y+=data.playerInfo.sneaking ? 1.54 : 1.62)
                     .map(loc -> new RayCollision(loc.toVector(),
                             MathUtils.getDirection(loc)))
                     .collect(Collectors.toList());
 
             List<SimpleCollisionBox> entityLocations = data.targetPastLocation
-                    .getEstimatedLocation(data.lagInfo.ping, 160L)
+                    .getEstimatedLocation(data.lagInfo.ping, 225L)
                     .stream()
                     .map(loc -> getHitbox(loc, data.target.getType()))
                     .collect(Collectors.toList());
@@ -80,6 +79,7 @@ public class Hitboxes extends Check {
     private static boolean checkParameters(ObjectData data) {
         return data.playerInfo.lastAttack.hasNotPassed(0)
                 && data.target != null
+                && data.targetPastLocation.previousLocations.size() > 8
                 && Kauri.INSTANCE.lastTickLag.hasPassed(10)
                 && allowedEntities.contains(data.target.getType())
                 && !data.playerInfo.creative

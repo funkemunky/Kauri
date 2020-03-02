@@ -11,19 +11,22 @@ import dev.brighten.api.check.CheckType;
 public class AutoclickerA extends Check {
 
     private int flyingTicks, cps;
+    private long lastFlying;
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
-        flyingTicks++;
+    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
+        if(timeStamp - lastFlying > 1) flyingTicks++;
+        else cps-= cps > 0 ? 1 : 0;
         if(flyingTicks >= 20) {
-            if(cps >= 20) {
-                if(cps > 26) vl++;
+            if(cps > 22) {
+                if(cps > 28) vl++;
                 flag("cps=%1", cps);
             }
             debug("cps=%1", cps);
 
             flyingTicks = cps = 0;
         }
+        lastFlying = timeStamp;
     }
 
     @Packet

@@ -36,7 +36,7 @@ public class Kauri extends JavaPlugin {
     public TickTimer lastTickLag;
     public long lastTick;
 
-    public ExecutorService executor;
+    public ExecutorService executor, loggingThread;
     public ToggleableProfiler profiler;
 
     public boolean enabled = false;
@@ -63,8 +63,7 @@ public class Kauri extends JavaPlugin {
         enabled = reload;
         MiscUtils.printToConsole("&7Unregistering Kauri API...");
         kauriAPI.service.shutdown();
-        loggerManager.loggingThread.shutdown();
-
+        loggingThread.shutdown();
         PacketListener.packetThread.shutdown();
 
         if(!reload) {

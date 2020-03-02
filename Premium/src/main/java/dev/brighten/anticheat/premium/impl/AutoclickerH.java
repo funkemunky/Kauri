@@ -1,0 +1,53 @@
+package dev.brighten.anticheat.premium.impl;
+
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import dev.brighten.anticheat.check.api.Check;
+import dev.brighten.anticheat.check.api.CheckInfo;
+import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.utils.GraphUtil;
+import dev.brighten.api.check.CheckType;
+import lombok.val;
+
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.List;
+
+@CheckInfo(name = "Autoclicker (H)", description = "Meant to detect Vape and other autoclickers. By Elevated.",
+        checkType = CheckType.AUTOCLICKER, punishVL = 8)
+public class AutoclickerH extends Check {
+
+    private double ticks, cps, buffer;
+    private Deque<Double> clickSamples = new LinkedList<>();
+
+    @Packet
+    public void onFlying(WrappedInFlyingPacket packet) {
+        if (++ticks == 20) {
+            if (cps > 9 && clickSamples.add(cps) && clickSamples.size() == 10) {
+                final GraphUtil.GraphResult results = GraphUtil.getGraph(clickSamples);
+
+                val negatives = results.getNegatives();
+                if (negatives == 1) {
+                    if (++buffer > 2) {
+                        vl++;
+                        flag("cps=%1 buffer=%2", cps, buffer);
+                    }
+                } else {
+                    buffer = 0;
+                }
+                this.clickSamples.clear();
+                debug("cps=%1 negatives=%2 buffer=%3", cps, negatives, buffer);
+            }
+            this.cps = 0;
+            this.ticks = 0;
+        }
+    }
+
+    @Packet
+    public void onArm(WrappedInArmAnimationPacket packet) {
+        if(data.playerInfo.breakingBlock
+                || data.playerInfo.lookingAtBlock
+                || data.playerInfo.lastBlockPlace.hasNotPassed(2)) return;
+        ++cps;
+    }
+}

@@ -13,7 +13,9 @@ public class BadPacketsJ extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if(data.playerInfo.creative && !data.lagInfo.lagging && data.lagInfo.lastPacketDrop.hasPassed(1)
+        if(data.playerInfo.creative && !data.lagInfo.lagging
+                && !data.playerInfo.serverPos
+                && data.lagInfo.lastPacketDrop.hasPassed(1)
                 && !data.getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
             vl++;
             flag("inCreative=%1 gamemode=%2",

@@ -5,6 +5,7 @@ import cc.funkemunky.api.reflections.impl.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
 import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.objects.VariableValue;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
@@ -16,6 +17,7 @@ import dev.brighten.anticheat.utils.GraphUtil;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.MovementUtils;
 import lombok.val;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.potion.PotionEffectType;
 
@@ -29,7 +31,7 @@ public class MovementProcessor {
 
     public List<Double> yawGcdList = Collections.synchronizedList(new EvictingList<>(50));
     public List<Double> pitchGcdList = Collections.synchronizedList(new EvictingList<>(50));
-    public long deltaX, deltaY, lastDeltaX, lastDeltaY;
+    public long deltaX, deltaY, lastDeltaX, lastDeltaY, lastCinematic;
     private List<Float> yawList = new ArrayList<>(), pitchList = new ArrayList<>();
     public double sensitivityX, sensitivityY, yawMode, pitchMode;
     public TickTimer lastEquals = new TickTimer(6);
@@ -89,6 +91,7 @@ public class MovementProcessor {
             if (optional.isPresent()) {
                 data.playerInfo.serverPos = true;
                 data.playerInfo.lastServerPos = timeStamp;
+                data.playerInfo.inventoryOpen = false;
                 data.playerInfo.posLocs.remove(optional.get());
             }
         } else if (data.playerInfo.serverPos) {
@@ -260,11 +263,10 @@ public class MovementProcessor {
 
                 // Cinematic camera usually does this on *most* speeds and is accurate for the most part.
                 if (yawPositives > yawNegatives || pitchPositives > pitchNegatives) {
-                    data.playerInfo.cinematicMode = true;
-                    MiscUtils.testMessage(data.getPlayer().getName());
-                } else data.playerInfo.cinematicMode = MathUtils.getDelta(deltaX, lastDeltaX) < 3
-                        && MathUtils.getDelta(deltaY, lastDeltaY) < 3
-                        && (deltaX > 15 || deltaY > 15);
+                    lastCinematic = timeStamp;
+                }
+
+                data.playerInfo.cinematicMode = timeStamp - lastCinematic < 400L;
 
                 MiscUtils.testMessage(yawPositives + ", " + pitchPositives);
 
@@ -287,11 +289,11 @@ public class MovementProcessor {
 
             val origin = data.playerInfo.to.clone();
 
-            origin.y+= 1.8;
+            origin.y+= data.playerInfo.sneaking ? 1.54 : 1.62;
             RayCollision collision = new RayCollision(origin.toVector(), MathUtils.getDirection(origin));
 
             List<SimpleCollisionBox> boxes = new ArrayList<>();
-            collision.boxesOnRay(data.getPlayer().getWorld(), 4).forEach(box -> box.downCast(boxes));
+            collision.boxesOnRay(data.getPlayer().getWorld(), data.playerInfo.creative ? 7.5 : 5.5).forEach(box -> box.downCast(boxes));
 
             data.playerInfo.lookingAtBlock = boxes.size() > 0;
         }
@@ -369,6 +371,7 @@ public class MovementProcessor {
                 || timeStamp - data.playerInfo.lastServerPos < 80L
                 || data.playerInfo.riptiding
                 || data.playerInfo.gliding
+                || data.playerInfo.lastPlaceLiquid.hasPassed(5)
                 || data.playerInfo.inVehicle
                 || data.playerInfo.lastWorldUnload.hasNotPassed(10)
                 || !data.playerInfo.worldLoaded
@@ -378,6 +381,7 @@ public class MovementProcessor {
 
         data.playerInfo.flightCancel = data.playerInfo.generalCancel
                 || data.playerInfo.webTimer.hasNotPassed(4)
+                || data.playerInfo.lastPlaceLiquid.hasPassed(15)
                 || data.playerInfo.liquidTimer.hasNotPassed(6)
                 || data.playerInfo.onLadder
                 || data.playerInfo.climbTimer.hasNotPassed(4)

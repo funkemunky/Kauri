@@ -14,7 +14,7 @@ public class KillauraB extends Check {
 
     @Packet
     public void use(WrappedInUseEntityPacket packet, long timeStamp) {
-        if(packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) return;
+        if(!packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) return;
         long delta = timeStamp - lastFlying;
         if(delta < 2) {
             if(!data.lagInfo.lagging) {
@@ -22,8 +22,8 @@ public class KillauraB extends Check {
                     flag("delta=" + delta);
                 }
             } vl-= vl > 0 ? 0.1 : 0;
-            debug("lagging=" + data.lagInfo.lagging + " vl=" + vl + " delta=" + delta);
         } else vl-= vl > 0 ? 1 : 0;
+        debug("lagging=" + data.lagInfo.lagging + " vl=" + vl + " delta=" + delta);
     }
 
     @Packet

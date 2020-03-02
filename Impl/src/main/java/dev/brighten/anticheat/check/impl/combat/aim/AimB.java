@@ -1,4 +1,4 @@
-package dev.brighten.anticheat.premium.impl;
+package dev.brighten.anticheat.check.impl.combat.aim;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.MathUtils;

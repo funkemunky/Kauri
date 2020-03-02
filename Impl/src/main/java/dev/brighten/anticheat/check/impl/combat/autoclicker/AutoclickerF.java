@@ -52,7 +52,7 @@ public class AutoclickerF extends Check {
                 ratioDeque.stream().filter(i -> i == 0 || i == 1)
                         .forEach(i -> level.incrementAndGet());
 
-                if (level.get() == 50 && avg > 7) {
+                if (level.get() == 50 && avg > 8) {
                     verbose.add(3);
 
                     if (verbose.value() >= 10) {

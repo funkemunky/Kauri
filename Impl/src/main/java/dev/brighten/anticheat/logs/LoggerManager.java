@@ -28,8 +28,6 @@ public class LoggerManager {
 
     public Map<UUID, List<Log>> cache = new HashMap<>();
 
-    public ExecutorService loggingThread;
-
     public BukkitTask cacheUpdater;
 
     /*My SQL */
@@ -78,7 +76,6 @@ public class LoggerManager {
 
     public LoggerManager(boolean aLittleStupid) {
         if(aLittleStupid) {
-            loggingThread = Executors.newSingleThreadScheduledExecutor();
             if(mySQLEnabled) {
                 MiscUtils.printToConsole("&7Setting up SQL...");
                 logsDatabase = new MySQLDatabase("logs");
@@ -133,6 +130,11 @@ public class LoggerManager {
 
         StructureSet set = logsDatabase.create(UUID.randomUUID().toString());
 
+        List<Log> logs = cache.getOrDefault(data.uuid, new ArrayList<>());
+
+        logs.add(log);
+        cache.put(data.uuid, logs);
+
         Arrays.asList(new Pair<>("type", "log"),
                 new Pair<>("uuid", data.uuid.toString()),
                 new Pair<>("checkName", log.checkName),
@@ -142,7 +144,7 @@ public class LoggerManager {
                 new Pair<>("timeStamp", log.timeStamp),
                 new Pair<>("tps", log.tps)).forEach(pair -> set.input(pair.key, pair.value));
 
-        loggingThread.execute(() -> set.save(logsDatabase));
+        Kauri.INSTANCE.loggingThread.execute(() -> set.save(logsDatabase));
     }
 
     public void addPunishment(ObjectData data, Check check) {
@@ -156,7 +158,7 @@ public class LoggerManager {
                 new Pair<>("timeStamp", punishment.timeStamp))
                 .forEach(pair -> set.input(pair.key, pair.value));
         
-        loggingThread.execute(() -> set.save(logsDatabase));
+        Kauri.INSTANCE.loggingThread.execute(() -> set.save(logsDatabase));
     }
 
     public List<Log> getLogs(UUID uuid) {

@@ -39,7 +39,8 @@ public class FlyA extends Check {
                 tookVelocity = false;
             }
 
-            if(tookVelocity || data.blockInfo.inLiquid || data.blockInfo.onClimbable) {
+            if(tookVelocity || data.blockInfo.inLiquid || data.playerInfo.lastPlaceLiquid.hasNotPassed(10)
+                    || data.blockInfo.onClimbable) {
                 groundY = data.playerInfo.to.y;
                 maxHeight = data.playerInfo.totalHeight * 1.4;
             }

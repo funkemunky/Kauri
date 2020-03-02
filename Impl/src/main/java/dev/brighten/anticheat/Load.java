@@ -25,8 +25,7 @@ public class Load {
     public static void load() {
         MiscUtils.printToConsole(Color.Gray + "Starting thread pool...");
         Kauri.INSTANCE.executor = Executors.newFixedThreadPool(3);
-        if(PacketListener.packetThread.isShutdown())
-            PacketListener.packetThread = Executors.newSingleThreadScheduledExecutor();
+        Kauri.INSTANCE.loggingThread = Executors.newSingleThreadScheduledExecutor();
 
         MiscUtils.printToConsole(Color.Gray + "Loading config...");
         Kauri.INSTANCE.saveDefaultConfig();
