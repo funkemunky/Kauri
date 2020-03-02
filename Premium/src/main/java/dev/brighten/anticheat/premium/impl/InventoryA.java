@@ -1,7 +1,5 @@
 package dev.brighten.anticheat.premium.impl;
 
-import cc.funkemunky.api.tinyprotocol.api.NMSObject;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInWindowClickPacket;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;

@@ -57,7 +57,8 @@ public class PlayerInformation {
             lastWorldUnload = new TickTimer(20),
             lastInsideBlock = new TickTimer(5),
             lastHalfBlock = new TickTimer(20),
-            lastPlaceLiquid = new TickTimer(20);
+            lastPlaceLiquid = new TickTimer(20),
+            lastUseItem = new TickTimer(15);
 
     public double velocityX, velocityY, velocityZ;
     public double mvx, mvy, mvz;

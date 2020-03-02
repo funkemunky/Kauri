@@ -2,11 +2,10 @@ package dev.brighten.anticheat.check.impl.combat.hand;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
-import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
-import cc.funkemunky.api.utils.*;
+import cc.funkemunky.api.utils.BlockUtils;
+import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.math.cond.MaxDouble;
 import cc.funkemunky.api.utils.world.BlockData;
-import cc.funkemunky.api.utils.world.CollisionBox;
 import cc.funkemunky.api.utils.world.types.RayCollision;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.check.api.*;

@@ -30,7 +30,7 @@ public class Motion extends Check {
                 }
             } else vl-= vl > 0 ? 1.25 : 0;
             debug("deltaX=" + deltaX + " deltaZ=" + deltaZ + " key=" + data.predictionService.key
-                    + " collided=" + data.predictionService.collidedHorizontally);
+                    + " collided=" + data.blockInfo.collidesHorizontally);
         }
     }
 }

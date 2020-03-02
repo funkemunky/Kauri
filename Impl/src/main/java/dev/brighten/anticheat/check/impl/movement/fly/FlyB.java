@@ -3,7 +3,6 @@ package dev.brighten.anticheat.check.impl.movement.fly;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.Tuple;
 import cc.funkemunky.api.utils.world.BlockData;
 import cc.funkemunky.api.utils.world.CollisionBox;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
@@ -14,12 +13,10 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.Helper;
 import dev.brighten.anticheat.utils.MovementUtils;
 import dev.brighten.api.check.CheckType;
-import lombok.val;
 import org.bukkit.block.Block;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @CheckInfo(name = "Fly (B)", description = "Checks for improper acceleration.", checkType = CheckType.FLIGHT)
 @Cancellable
@@ -76,6 +73,7 @@ public class FlyB extends Check {
             double deltaPredict =  MathUtils.getDelta(data.playerInfo.deltaY, predicted);
 
             if(!data.playerInfo.flightCancel
+                    && !(data.playerInfo.blockOnTo != null && data.playerInfo.blockOnTo.getType().isSolid())
                     && (!data.blockInfo.blocksAbove || data.playerInfo.deltaY >= 0)
                     && data.playerInfo.slimeTimer.hasPassed(20)
                     && data.playerInfo.lastBlockPlace.hasPassed(5)

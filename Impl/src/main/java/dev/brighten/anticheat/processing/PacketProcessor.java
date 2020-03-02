@@ -1,6 +1,5 @@
 package dev.brighten.anticheat.processing;
 
-import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.events.impl.PacketReceiveEvent;
 import cc.funkemunky.api.events.impl.PacketSendEvent;
 import cc.funkemunky.api.reflections.impl.MinecraftReflection;
@@ -18,7 +17,7 @@ import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.MiscUtils;
-import org.bukkit.Bukkit;
+import lombok.val;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
@@ -61,7 +60,7 @@ public class PacketProcessor {
                     data.playerInfo.lastAttackTimeStamp = timeStamp;
 
                     if (packet.getEntity() instanceof LivingEntity) {
-                        if (data.target != null && !data.target.equals(packet.getEntity())) {
+                        if (data.target != null && data.target.getEntityId() != packet.getId()) {
                             //Resetting location to prevent false positives.
                             data.targetPastLocation.previousLocations.clear();
                             data.playerInfo.lastTargetSwitch.reset();
@@ -186,19 +185,16 @@ public class PacketProcessor {
                     if(event.getPlayer().getItemInHand().getType().name().contains("BUCKET")) {
                         data.playerInfo.lastPlaceLiquid.reset();
                     }
-                    if (event.getPlayer().getItemInHand().getType().isBlock()
-                            && event.getPlayer().getItemInHand().getType().getId() != 0
-                            && (packet.getPosition().getX() != -1
-                            || packet.getPosition().getY() != -1
-                            || packet.getPosition().getZ() != -1)) {
-                        data.playerInfo.lastBlockPlace.reset();
-                        MiscUtils.testMessage(event.getPlayer().getItemInHand().getType().name());
-                    } else if (packet.getPosition().getX() == -1
-                            && packet.getPosition().getY() == -1
-                            && packet.getPosition().getZ() == -1
-                            && Materials.isUsable(event.getPlayer().getItemInHand().getType())) {
-                        data.predictionService.useSword = data.playerInfo.usingItem = true;
-                        data.predictionService.lastUseItem.reset();
+                    val pos = packet.getPosition();
+                    val stack = packet.getItemStack();
+                    if(pos.getX() == -1 && pos.getY() == 255 && pos.getZ() == -1 && stack != null) {
+                        if(stack.getType().isBlock() && stack.getTypeId() != 0) {
+                            data.playerInfo.lastBlockPlace.reset();
+                            MiscUtils.testMessage(event.getPlayer().getItemInHand().getType().name());
+                        } else if(Materials.isUsable(stack.getType())) {
+                            data.predictionService.useSword = data.playerInfo.usingItem = true;
+                            data.playerInfo.lastUseItem.reset();
+                        }
                     }
                 }
                 if(data.sniffing) {

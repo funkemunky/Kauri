@@ -12,7 +12,10 @@ import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutCloseWindowPacket;
 import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.impl.combat.aim.*;
-import dev.brighten.anticheat.check.impl.combat.autoclicker.*;
+import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerA;
+import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerB;
+import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerC;
+import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerF;
 import dev.brighten.anticheat.check.impl.combat.hand.HandA;
 import dev.brighten.anticheat.check.impl.combat.hand.HandB;
 import dev.brighten.anticheat.check.impl.combat.hand.HandC;
@@ -28,7 +31,6 @@ import dev.brighten.anticheat.check.impl.movement.nofall.NoFallA;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallB;
 import dev.brighten.anticheat.check.impl.movement.speed.*;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityA;
-import dev.brighten.anticheat.check.impl.movement.velocity.VelocityC;
 import dev.brighten.anticheat.check.impl.packets.Timer;
 import dev.brighten.anticheat.check.impl.packets.badpackets.*;
 import dev.brighten.anticheat.check.impl.packets.exploits.*;
@@ -310,6 +312,7 @@ public class Check implements KauriCheck {
         register(new SignOp());
         register(new SignCrash());
         register(new LargeMove());
+        register(new Test());
     }
 
     public static boolean isCheck(String name) {

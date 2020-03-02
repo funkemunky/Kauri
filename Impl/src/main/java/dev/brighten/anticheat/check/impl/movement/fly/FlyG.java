@@ -29,6 +29,7 @@ public class FlyG extends Check {
                         && !data.blockInfo.onStairs
                         && !cancelled
                         && totalY > 0.1
+                        && !(data.playerInfo.blockOnTo != null && data.playerInfo.blockOnTo.getType().isSolid())
                         && !data.playerInfo.wasOnSlime
                         && data.playerInfo.slimeTimer.hasPassed(10)
                         && data.playerInfo.webTimer.hasPassed(10)

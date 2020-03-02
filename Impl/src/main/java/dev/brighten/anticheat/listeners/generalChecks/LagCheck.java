@@ -4,7 +4,6 @@ import cc.funkemunky.api.events.AtlasEvent;
 import cc.funkemunky.api.events.Listen;
 import cc.funkemunky.api.events.impl.TickEvent;
 import cc.funkemunky.api.utils.ConfigSetting;
-import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.RunUtils;
 import dev.brighten.anticheat.Kauri;
 

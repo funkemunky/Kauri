@@ -2,10 +2,8 @@ package dev.brighten.anticheat.processing;
 
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.reflections.impl.MinecraftReflection;
-import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
 import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.objects.VariableValue;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
@@ -17,7 +15,6 @@ import dev.brighten.anticheat.utils.GraphUtil;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.MovementUtils;
 import lombok.val;
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.potion.PotionEffectType;
 
@@ -367,11 +364,11 @@ public class MovementProcessor {
                 || hasLevi
                 || (data.playerInfo.deltaY > -0.0981
                 && data.playerInfo.deltaY < -0.0979
-                && data.playerInfo.deltaXZ < 0.5)
+                && data.playerInfo.deltaXZ < 0.1)
                 || timeStamp - data.playerInfo.lastServerPos < 80L
                 || data.playerInfo.riptiding
                 || data.playerInfo.gliding
-                || data.playerInfo.lastPlaceLiquid.hasPassed(5)
+                || data.playerInfo.lastPlaceLiquid.hasNotPassed(5)
                 || data.playerInfo.inVehicle
                 || data.playerInfo.lastWorldUnload.hasNotPassed(10)
                 || !data.playerInfo.worldLoaded
@@ -381,7 +378,7 @@ public class MovementProcessor {
 
         data.playerInfo.flightCancel = data.playerInfo.generalCancel
                 || data.playerInfo.webTimer.hasNotPassed(4)
-                || data.playerInfo.lastPlaceLiquid.hasPassed(15)
+                || data.playerInfo.lastPlaceLiquid.hasNotPassed(15)
                 || data.playerInfo.liquidTimer.hasNotPassed(6)
                 || data.playerInfo.onLadder
                 || data.playerInfo.climbTimer.hasNotPassed(4)

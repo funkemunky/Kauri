@@ -21,8 +21,6 @@ public class FlyE extends Check {
     public void onPacket(WrappedInFlyingPacket packet) {
         if(packet.isPos()) {
             float maxHeight = MovementUtils.getJumpHeight(data.getPlayer());
-            val shit = (data.playerInfo.lastVelocity.hasNotPassed(2)
-                    ? data.playerInfo.velocityY : maxHeight);
             if(!data.playerInfo.flightCancel
                     && data.playerInfo.jumped
                     && !data.playerInfo.wasOnSlime
@@ -31,11 +29,11 @@ public class FlyE extends Check {
                     && data.playerInfo.blockAboveTimer.hasPassed(6)
                     && data.playerInfo.lastBlockPlace.hasPassed(20)
                     && data.playerInfo.lastHalfBlock.hasPassed(4)
-                    && MathUtils.getDelta(data.playerInfo.deltaY, shit) > 0.01f
+                    && data.playerInfo.lastVelocity.hasPassed(4)
                     && MathUtils.getDelta(data.playerInfo.deltaY, maxHeight) > 0.01f) {
-                if(verbose.add() > 2 || data.playerInfo.deltaY > shit) {
+                if(verbose.add() > 2) {
                     vl++;
-                    flag("deltaY=%1 maxHeight=%2 vel=%3", data.playerInfo.deltaY, maxHeight, shit);
+                    flag("deltaY=%1 maxHeight=%2", data.playerInfo.deltaY, maxHeight);
                 }
             } else verbose.subtract(0.05);
 

@@ -6,7 +6,6 @@ import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
-import dev.brighten.anticheat.utils.MovementUtils;
 import lombok.var;
 
 @CheckInfo(name = "Speed (E)", description = "Ensures a user doesn't go faster than the absolute maximum speed.",
@@ -33,7 +32,7 @@ public class SpeedE extends Check {
             if(data.playerInfo.lastVelocity.hasNotPassed(80))
                 max = Math.max(max, MathUtils.hypot(data.playerInfo.velocityX, data.playerInfo.velocityZ) * 1.5);
 
-            if(data.playerInfo.deltaXZ > max) {
+            if(data.playerInfo.deltaXZ > max && data.playerInfo.lastVelocity.hasPassed(20)) {
                 vl++;
                 flag("deltaXZ=%1 max=%2",
                         MathUtils.round(data.playerInfo.deltaXZ, 3), MathUtils.round(max, 3));

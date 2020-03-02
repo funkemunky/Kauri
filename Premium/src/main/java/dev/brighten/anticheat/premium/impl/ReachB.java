@@ -59,7 +59,8 @@ public class ReachB extends Check {
             if(distance > 3.001) {
                 if(buffer++ > 3) {
                     vl++;
-                    flag("distance=%1 buffer=%2", MathUtils.round(distance, 2), buffer);
+                    flag("distance=%1 buffer=%2", MathUtils.round(distance, 3),
+                            MathUtils.round(buffer, 1));
                 }
             } else buffer-= buffer > 0 ? 0.05 : 0;
 

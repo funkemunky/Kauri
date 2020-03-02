@@ -1,7 +1,5 @@
 package dev.brighten.anticheat.data.classes;
 
-import cc.funkemunky.api.Atlas;
-import cc.funkemunky.api.reflections.impl.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.*;
@@ -10,15 +8,12 @@ import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.Helper;
 import dev.brighten.anticheat.utils.MiscUtils;
-import lombok.val;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,9 +25,8 @@ public class PredictionService {
             lastOnGround, onGround, lastSprint, fMath, fastMath, walkSpecial, lastVelocity;
     public double posX, posY, posZ, lPosX, lPosY, lPosZ, rmotionX, rmotionY, rmotionZ, lmotionX, lmotionZ, lmotionY;
     public double predX, predZ;
-    public TickTimer lastUseItem = new TickTimer(10);
     public double aiMoveSpeed;
-    public boolean collidedHorizontally, collidedVertically, flag, isBelowSpecial;
+    public boolean flag, isBelowSpecial;
     public float walkSpeed, yaw, moveStrafing, moveForward;
 
     public String key = "Nothing";
@@ -144,7 +138,7 @@ public class PredictionService {
                 rmotionZ *= 0.5f;
             } else if (data.blockInfo.inWater) {
                 float f1 = 0.8f;
-                float f2 = 0.02f;
+                //float f2 = 0.02f;
                 float f3 = PlayerUtils.getDepthStriderLevel(data.getPlayer());
 
                 if (f3 > 0) {
@@ -533,7 +527,7 @@ public class PredictionService {
         }
     }
 
-    public boolean checkConditions(final boolean lastTickSprint) {
+    private boolean checkConditions(final boolean lastTickSprint) {
         if (lPosX == 0 && lPosY == 0 && lPosZ == 0) { // the position is 0 when a moveFlying or look packet was send
             return false;
         }
@@ -556,12 +550,12 @@ public class PredictionService {
     private static final float[] SIN_TABLE_FAST = new float[4096];
     private static final float[] SIN_TABLE = new float[65536];
 
-    public float sin(float p_76126_0_) {
+    private float sin(float p_76126_0_) {
         return fastMath ? SIN_TABLE_FAST[(int) (p_76126_0_ * 651.8986F) & 4095]
                 : SIN_TABLE[(int) (p_76126_0_ * 10430.378F) & 65535];
     }
 
-    public float cos(float p_76134_0_) {
+    private float cos(float p_76134_0_) {
         return fastMath ? SIN_TABLE_FAST[(int) ((p_76134_0_ + ((float) Math.PI / 2F)) * 651.8986F) & 4095]
                 : SIN_TABLE[(int) (p_76134_0_ * 10430.378F + 16384.0F) & 65535];
     }
@@ -584,11 +578,11 @@ public class PredictionService {
     }
 
     // functions of minecraft MathHelper.java
-    public static float sqrt_float(float p_76129_0_) {
+    private static float sqrt_float(float p_76129_0_) {
         return (float) Math.sqrt(p_76129_0_);
     }
 
-    public static float sqrt_double(double p_76133_0_) {
+    private static float sqrt_double(double p_76133_0_) {
         return (float) Math.sqrt(p_76133_0_);
     }
 

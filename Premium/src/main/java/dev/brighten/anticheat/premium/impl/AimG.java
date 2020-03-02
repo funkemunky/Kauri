@@ -21,12 +21,12 @@ public class AimG extends Check {
         val deltaX = Math.abs(data.moveProcessor.deltaX - data.moveProcessor.lastDeltaX);
         val deltaY = Math.abs(data.moveProcessor.deltaY - data.moveProcessor.lastDeltaY);
 
-        if(deltaY <= 2 && deltaX > 0 && deltaX <= 6 && data.moveProcessor.deltaX > 15) {
+        if(deltaY <= 2 && deltaX > 0 && deltaX <= 6 && data.moveProcessor.deltaX > 25 && !data.playerInfo.cinematicMode) {
             if(verbose.flag(1, 7)) {
                 vl++;
                 flag("deltaX=%1 deltaY=%2 vb=%3", deltaX, deltaY, verbose.value());
             }
             debug(Color.Green + "Flag");
-        } else debug("deltaX=%1 deltaY=%2", deltaX, deltaY);
+        } debug("deltaX=%1 deltaY=%2", deltaX, deltaY);
     }
 }

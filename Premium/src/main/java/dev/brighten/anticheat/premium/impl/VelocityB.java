@@ -6,6 +6,7 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.math.cond.MaxDouble;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -21,8 +22,8 @@ public class VelocityB extends Check {
 
     private double vX, vZ, vY, svX, svZ;
     private boolean useEntity, sprint, tookVelocity;
-    private float forward, strafe;
     private String lastKey;
+    private MaxDouble verbose = new MaxDouble(50);
     private double maxThreshold;
     private long velocityTS;
 
@@ -83,7 +84,7 @@ public class VelocityB extends Check {
                     f4 *= data.blockInfo.currentFriction;
                 }
 
-                if(!lastKey.equals(data.predictionService.key)) maxThreshold = 80;
+                if(!lastKey.equals(data.predictionService.key)) maxThreshold = 90;
 
                 double f = 0.16277136 / (f4 * f4 * f4);
                 double f5;
@@ -96,8 +97,8 @@ public class VelocityB extends Check {
 
                 double pct;
 
-                forward = data.predictionService.moveForward;
-                strafe = data.predictionService.moveStrafing;
+                float forward = data.predictionService.moveForward;
+                float strafe = data.predictionService.moveStrafing;
 
                 if(data.playerInfo.usingItem) {
                     forward*= 0.2;
@@ -114,15 +115,17 @@ public class VelocityB extends Check {
                 //double ratio = MathUtils.hypot(data.playerInfo.deltaX / vX, data.playerInfo.deltaZ / vZ);
                 pct = ratio * 100;
 
-                if (pct < maxThreshold
-                        && !data.playerInfo.usingItem && !data.predictionService.useSword) {
-                    if (vl++ > (data.lagInfo.transPing > 150 ? 45 : 32))
-                        flag("pct=" + MathUtils.round(pct, 3) + "%");
-                } else vl -= maxThreshold == 10 ? 0.01 : (vl > 0 ? data.lagInfo.lagging ? 0.35f : 0.25f : 0);
+                if (pct < maxThreshold && data.playerInfo.lastUseItem.hasPassed(4)) {
+                    if(verbose.add() > (data.lagInfo.transPing > 150 ? 45 : 32)) {
+                        vl++;
+                        flag("pct=%1%", MathUtils.round(pct, 3));
+                    }
+                } else vl -= maxThreshold == 10 ? 0.01 : (vl > 0 ? data.lagInfo.lagging ? 0.35f : 0.2f : 0);
 
                 debug("pct=" + pct + " key=" + data.predictionService.key + " ani="
                         + data.playerInfo.usingItem + " sprint=" + data.playerInfo.sprinting
-                        + " ground=" + data.playerInfo.lClientGround + " vl=" + vl);
+                        + " ground=" + data.playerInfo.lClientGround + " vl=" + vl
+                        + " lastUse=" + data.playerInfo.lastUseItem.getPassed());
 
                 //debug("vX=" + vX + " vZ=" + vZ);
                 //debug("dX=" + data.playerInfo.deltaX + " dZ=" + data.playerInfo.deltaZ + " item=" +);

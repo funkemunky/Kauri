@@ -4,7 +4,6 @@ import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.Priority;
 import dev.brighten.anticheat.check.api.Check;
-import dev.brighten.anticheat.check.impl.combat.aim.AimB;
 import dev.brighten.anticheat.premium.impl.*;
 
 @Init(priority = Priority.LOWEST)
