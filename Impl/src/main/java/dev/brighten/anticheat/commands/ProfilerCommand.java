@@ -4,6 +4,7 @@ import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.commands.ancmd.Command;
 import cc.funkemunky.api.commands.ancmd.CommandAdapter;
 import cc.funkemunky.api.profiling.ResultsType;
+import cc.funkemunky.api.profiling.Timing;
 import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.utils.AtomicDouble;
@@ -66,18 +67,18 @@ public class ProfilerCommand {
 
                 map.forEach((key, result) -> {
                     if(!key.contains("check:")) {
+                        Timing timing = Kauri.INSTANCE.profiler.getTimingsMap().get(key);
                         Button button = new Button(false, new ItemBuilder(XMaterial.REDSTONE.parseMaterial())
                                 .amount(1)
                                 .name(Color.Gold + key).lore("",
                                         "&7Weighted Usage: " + Helper
                                                 .drawUsage(total, result.two),
                                         "&7MS: &f" + Helper
-                                                .format(Kauri.INSTANCE.profiler.total.get(key) / 1000000D, 3),
+                                                .format(timing.total / 1000000D, 3),
                                         "&7Samples: &f" + Helper
                                                 .format(result.two / 1000000D, 3),
                                         "&7Deviation: &f" + Helper
-                                                .format(Kauri.INSTANCE.profiler.stddev
-                                                        .getOrDefault(key, 0L), 3) / 1000000D).build());
+                                                .format(timing.stdDev / 1000000D, 3)).build());
 
                         buttons.add(new Tuple<>(result.two, button));
                         samples.addAndGet(result.two / 1000000D);
@@ -126,8 +127,13 @@ public class ProfilerCommand {
 
         } else {
             cmd.getSender().sendMessage("-------------------------------------------------");
-            Map<String, Long> sorted = dev.brighten.anticheat.utils.MiscUtils
-                    .sortByValue(Kauri.INSTANCE.profiler.total);
+            Map<String, Long> sorted, toSort = new HashMap<>();
+
+            Kauri.INSTANCE.profiler.getTimingsMap().forEach((name, timings) -> {
+                toSort.put(name, timings.total);
+            });
+
+            sorted = dev.brighten.anticheat.utils.MiscUtils.sortByValue(toSort);
             int size = sorted.size();
             AtomicLong total = new AtomicLong();
             List<Map.Entry<String, Long>> entries = new ArrayList<>(sorted.entrySet());
@@ -136,17 +142,16 @@ public class ProfilerCommand {
                     .forEach(entry -> {
                         String name = entry.getKey();
                         Long time = entry.getValue();
+                        Timing timing = Kauri.INSTANCE.profiler.getTimingsMap().get(name);
                         total.addAndGet(time);
                         cmd.getSender().sendMessage(Helper
                                 .drawUsage(total.get(), time)
                                 + " §c" + name
                                 + "§7: " + Helper.format(time / 1000000D, 3)
                                 + ", " + Helper
-                                .format(Kauri.INSTANCE.profiler.samples
-                                        .getOrDefault(name, new Tuple<>(0L, 0L)).one / 1000000D, 3)
+                                .format(timing.call / 1000000D, 3)
                                 + ", " + Helper
-                                .format(Kauri.INSTANCE.profiler.stddev
-                                        .getOrDefault(name, 0L) / 1000000D, 3));
+                                .format(timing.stdDev / 1000000D, 3));
                     });
             double totalMs = total.get() / 1000000D;
             long totalTime = Kauri.INSTANCE.profiler.totalCalls * 50;
@@ -177,8 +182,13 @@ public class ProfilerCommand {
             val task = RunUtils.taskTimerAsync(() -> {
                 if (taskMap.containsKey(cmd.getSender().getName())) {
                     cmd.getSender().sendMessage("-------------------------------------------------");
-                    Map<String, Long> sorted = dev.brighten.anticheat.utils.MiscUtils
-                            .sortByValue(Kauri.INSTANCE.profiler.total);
+                    Map<String, Long> sorted, toSort = new HashMap<>();
+
+                    Kauri.INSTANCE.profiler.getTimingsMap().forEach((name, timings) -> {
+                        toSort.put(name, timings.total);
+                    });
+
+                    sorted = dev.brighten.anticheat.utils.MiscUtils.sortByValue(toSort);
                     val map = Kauri.INSTANCE.profiler.results(ResultsType.TICK);
 
                     long total = map.keySet()
@@ -189,18 +199,17 @@ public class ProfilerCommand {
                     AtomicDouble samples = new AtomicDouble(0);
                     map.keySet().stream().filter(key -> !key.contains("check:")).forEach(key -> {
                         val entry = map.get(key);
-                        String name = key;
+                        Timing timing = Kauri.INSTANCE.profiler.getTimingsMap().get(key);
                         double time = entry.two / 1000000D;
                         samples.addAndGet(time);
                         cmd.getSender().sendMessage(Helper.drawUsage(50,
                                 time)
-                                + " §c" + name
+                                + " §c" + key
                                 + "§7: " + Helper.format(time / 1000000D, 3)
                                 + ", " + Helper
-                                .format(Kauri.INSTANCE.profiler.samples
-                                        .getOrDefault(name, new Tuple<>(0L, 0L)).one / 1000000D, 3)
+                                .format(timing.call / 1000000D, 3)
                                 + ", " + Helper
-                                .format(Kauri.INSTANCE.profiler.stddev.getOrDefault(name, 0L) / 1000000D, 3));
+                                .format(timing.stdDev / 1000000D, 3));
                     });
                     double totalMs = total / 1000000D;
                     cmd.getSender().sendMessage(Helper
@@ -246,9 +255,10 @@ public class ProfilerCommand {
             //Converting nanoseconds to millis to be more readable.
             double amount = results.get(key).two / 1000000D;
 
+            Timing timing = Kauri.INSTANCE.profiler.getTimingsMap().get(key);
             total += amount;
             body.add(key + ": " + amount + "ms (" + results.get(key).one + " calls, std="
-                    + Kauri.INSTANCE.profiler.stddev.get(key) + ")");
+                    + timing.stdDev + ")");
         }
         body.add(" ");
         body.add("Total: " + total + "ms");

@@ -21,7 +21,7 @@ import dev.brighten.anticheat.check.impl.combat.hand.HandB;
 import dev.brighten.anticheat.check.impl.combat.hand.HandC;
 import dev.brighten.anticheat.check.impl.combat.hand.HandD;
 import dev.brighten.anticheat.check.impl.combat.hitbox.Hitboxes;
-import dev.brighten.anticheat.check.impl.combat.hitbox.ReachA;
+import dev.brighten.anticheat.check.impl.combat.reach.ReachA;
 import dev.brighten.anticheat.check.impl.combat.killaura.*;
 import dev.brighten.anticheat.check.impl.movement.fly.*;
 import dev.brighten.anticheat.check.impl.movement.general.FastLadder;
@@ -312,7 +312,6 @@ public class Check implements KauriCheck {
         register(new SignOp());
         register(new SignCrash());
         register(new LargeMove());
-        register(new Test());
     }
 
     public static boolean isCheck(String name) {

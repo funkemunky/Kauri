@@ -10,7 +10,7 @@ import dev.brighten.api.check.CheckType;
 import lombok.val;
 
 @CheckInfo(name = "Aim (G)", description = "A simple check to detect Vape's aimassist.",
-        checkType = CheckType.AIM, developer = true, punishVL = 30)
+        checkType = CheckType.AIM, developer = true, enabled = false, punishVL = 30)
 public class AimG extends Check {
 
     private Verbose verbose = new Verbose(50, 6);
@@ -27,6 +27,6 @@ public class AimG extends Check {
                 flag("deltaX=%1 deltaY=%2 vb=%3", deltaX, deltaY, verbose.value());
             }
             debug(Color.Green + "Flag");
-        } debug("deltaX=%1 deltaY=%2", deltaX, deltaY);
+        } debug("deltaX=%1 deltaY=%2 vb=%3", deltaX, deltaY, verbose.value());
     }
 }

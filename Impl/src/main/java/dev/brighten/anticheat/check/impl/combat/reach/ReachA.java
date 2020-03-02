@@ -1,4 +1,4 @@
-package dev.brighten.anticheat.check.impl.combat.hitbox;
+package dev.brighten.anticheat.check.impl.combat.reach;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;

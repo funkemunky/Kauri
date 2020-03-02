@@ -103,17 +103,9 @@ public class PacketProcessor {
                         > new VariableValue<>(20000L, 5000L, () -> Kauri.INSTANCE.isNewer).get())
                     RunUtils.task(() -> data.getPlayer().kickPlayer("Lag?"));
 
-                //if(event.getType().contains("Position")
-                //        || event.getType().contains("Look")
-                //        || event.getType().equalsIgnoreCase(Packet.Client.FLYING)) Bukkit.broadcastMessage(event.getType() + ":3");
-
                 data.lagInfo.lastFlying = timeStamp;
 
                 data.moveProcessor.process(packet, timeStamp);
-
-                //if(event.getType().contains("Position")
-                //        || event.getType().contains("Look")
-                //        || event.getType().equalsIgnoreCase(Packet.Client.FLYING)) Bukkit.broadcastMessage(event.getType() + ":4");
                 data.predictionService.onReceive(packet); //Processing for prediction service.
 
                 data.checkManager.runPacket(packet, timeStamp);
