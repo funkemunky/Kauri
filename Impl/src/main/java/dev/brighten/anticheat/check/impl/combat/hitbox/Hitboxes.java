@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.check.impl.combat.hitbox;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.MiscUtils;
@@ -11,6 +12,7 @@ import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.AtomicDouble;
 import dev.brighten.api.check.CheckType;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.Vector;
@@ -39,14 +41,16 @@ public class Hitboxes extends Check {
     public void onFlying(WrappedInFlyingPacket packet) {
         if (checkParameters(data)) {
 
-            List<RayCollision> rayTrace = Stream.of(data.playerInfo.to.clone(), data.playerInfo.from.clone())
-                    .peek(loc -> loc.y+=data.playerInfo.sneaking ? 1.54 : 1.62)
-                    .map(loc -> new RayCollision(loc.toVector(),
-                            MathUtils.getDirection(loc)))
+            List<RayCollision> rayTrace = data.pastLocation.getPreviousRange(100L).stream()
+                    .map(loc -> {
+                        loc.y+=data.playerInfo.sneaking ? 1.54 : 1.62;
+                        return new RayCollision(loc.toVector(),
+                                MathUtils.getDirection(loc));
+                    })
                     .collect(Collectors.toList());
 
             List<SimpleCollisionBox> entityLocations = data.targetPastLocation
-                    .getEstimatedLocation(data.lagInfo.ping, 225L)
+                    .getEstimatedLocation(data.lagInfo.transPing, 175L)
                     .stream()
                     .map(loc -> getHitbox(loc, data.target.getType()))
                     .collect(Collectors.toList());
@@ -72,7 +76,7 @@ public class Hitboxes extends Check {
                         distance.get() != -1 ? distance.get() : "[none collided]");
             } else vl -= vl > 0 ? 0.5 : 0;
 
-            debug("collided=" + collisions + " distance=" + distance.get());
+            debug("collided=" + collisions + " distance=" + distance.get() + " type=" + data.target.getType());
         }
     }
 
@@ -89,16 +93,11 @@ public class Hitboxes extends Check {
 
     private static SimpleCollisionBox getHitbox(KLocation loc, EntityType type) {
         if(type.equals(EntityType.PLAYER)) {
-            return new SimpleCollisionBox(loc.toVector(), loc.toVector()).expand(0.42,0.12,0.42)
-                    .expandMax(0,1.8,0);
+            return new SimpleCollisionBox(loc.toVector(), 0.64, 1.92);
         } else {
             Vector bounds = MiscUtils.entityDimensions.get(type);
 
-            SimpleCollisionBox box = new SimpleCollisionBox(loc.toVector(), loc.toVector())
-                    .expand(bounds.getX(), 0, bounds.getZ())
-                    .expandMax(0, bounds.getY(),0);
-
-            return box.expand(0.12,0.12,0.12);
+            return new SimpleCollisionBox(loc.toVector(), bounds.getX() + bounds.getZ(), bounds.getY());
         }
     }
 }

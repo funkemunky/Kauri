@@ -1,4 +1,4 @@
-package dev.brighten.anticheat.premium.impl;
+package dev.brighten.anticheat.premium.impl.autoclicker;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
@@ -49,5 +49,6 @@ public class AutoclickerH extends Check {
                 || data.playerInfo.lookingAtBlock
                 || data.playerInfo.lastBlockPlace.hasNotPassed(2)) return;
         ++cps;
+        vl-= vl > 0 ? 0.0025f : 0;
     }
 }

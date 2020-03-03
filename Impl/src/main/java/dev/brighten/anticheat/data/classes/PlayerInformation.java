@@ -29,7 +29,7 @@ public class PlayerInformation {
     public double yawGCD, pitchGCD, lastYawGCD, lastPitchGCD;
 
     //Server Position
-    public long lastServerPos;
+    public long lastServerPos, lastRespawn;
     public boolean serverPos;
     public EvictingList<KLocation> posLocs = new EvictingList<>(5);
     public CollisionHandler handler;
@@ -58,7 +58,8 @@ public class PlayerInformation {
             lastInsideBlock = new TickTimer(5),
             lastHalfBlock = new TickTimer(20),
             lastPlaceLiquid = new TickTimer(20),
-            lastUseItem = new TickTimer(15);
+            lastUseItem = new TickTimer(15),
+            lastRespawnTimer = new TickTimer(20);
 
     public double velocityX, velocityY, velocityZ;
     public double mvx, mvy, mvz;

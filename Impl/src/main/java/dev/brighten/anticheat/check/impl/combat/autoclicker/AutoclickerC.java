@@ -1,15 +1,17 @@
 package dev.brighten.anticheat.check.impl.combat.autoclicker;
 
+import cc.funkemunky.api.reflections.impl.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.*;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutHeldItemSlot;
+import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumAnimation;
 import cc.funkemunky.api.utils.Materials;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.math.cond.MaxDouble;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "Autoclicker (C)", description = "Checks for common blocking patterns.",
+@CheckInfo(name = "Autoclicker (C)", description = "Checks for blatant blocking patterns.",
         checkType = CheckType.AUTOCLICKER, developer = true, punishVL = 200)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerC extends Check {
@@ -30,8 +32,8 @@ public class AutoclickerC extends Check {
     @Packet
     public void onUse(WrappedInUseEntityPacket packet) {
         if(packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) {
-            if(blocking) {
-                debug("unblocked");
+            if(blocking && !MinecraftReflection.getItemAnimation(packet.getPlayer().getItemInHand())
+                    .equals(WrappedEnumAnimation.NONE)) {
 
                 if (verbose.add() > 14) {
                     flag("t=%1 vb=%2", "block", MathUtils.round(verbose.value(), 2));
@@ -39,6 +41,7 @@ public class AutoclickerC extends Check {
                     TinyProtocolHandler.sendPacket(packet.getPlayer(),
                             new WrappedOutHeldItemSlot(slot == 8 ? 0 : Math.min(8, slot + 1))
                                     .getObject());
+                    debug("unblocked");
                 }
             } else verbose.subtract(0.01);
         }

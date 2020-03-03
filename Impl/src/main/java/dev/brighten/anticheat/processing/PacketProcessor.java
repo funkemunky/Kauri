@@ -67,8 +67,6 @@ public class PacketProcessor {
                             if (packet.getEntity() instanceof Player) {
                                 data.targetData = Kauri.INSTANCE.dataManager.getData((Player) packet.getEntity());
                             } else data.targetData = null;
-                            data.targetBounds = new SimpleCollisionBox((Object) MinecraftReflection
-                                    .getEntityBoundingBox(data.target));
                         }
 
                         if (data.target == null && packet.getEntity() instanceof Player)
@@ -180,12 +178,14 @@ public class PacketProcessor {
                     val pos = packet.getPosition();
                     val stack = packet.getItemStack();
                     if(pos.getX() == -1 && pos.getY() == 255 && pos.getZ() == -1 && stack != null) {
+                         if(Materials.isUsable(stack.getType())) {
+                            data.predictionService.useSword = data.playerInfo.usingItem = true;
+                            data.playerInfo.lastUseItem.reset();
+                        }
+                    } else if(stack != null) {
                         if(stack.getType().isBlock() && stack.getTypeId() != 0) {
                             data.playerInfo.lastBlockPlace.reset();
                             MiscUtils.testMessage(event.getPlayer().getItemInHand().getType().name());
-                        } else if(Materials.isUsable(stack.getType())) {
-                            data.predictionService.useSword = data.playerInfo.usingItem = true;
-                            data.playerInfo.lastUseItem.reset();
                         }
                     }
                 }
@@ -260,6 +260,9 @@ public class PacketProcessor {
                     data.predictionService.rmotionX = data.playerInfo.velocityX;
                     data.predictionService.rmotionZ = data.playerInfo.velocityZ;
                     data.predictionService.velocity = true;
+                } else if(packet.getAction() == (short)154) {
+                    data.playerInfo.lastRespawn = timeStamp;
+                    data.playerInfo.lastRespawnTimer.reset();
                 }
 
                 data.checkManager.runPacket(packet, timeStamp);
@@ -361,7 +364,12 @@ public class PacketProcessor {
             case Packet.Server.RESPAWN: {
                 WrappedOutRespawnPacket packet = new WrappedOutRespawnPacket(object, data.getPlayer());
 
-                data.playerInfo.lastServerPos = timeStamp + data.lagInfo.ping;
+                data.playerInfo.lastRespawn = timeStamp;
+                data.playerInfo.lastRespawnTimer.reset();
+                TinyProtocolHandler.sendPacket(event.getPlayer(),
+                        new WrappedOutTransaction(0, (short) 154, false).getObject());
+
+                data.checkManager.runPacket(packet, timeStamp);
                 break;
             }
             case Packet.Server.HELD_ITEM: {

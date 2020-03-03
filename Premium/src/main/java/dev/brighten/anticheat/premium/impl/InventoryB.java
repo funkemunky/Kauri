@@ -1,6 +1,8 @@
 package dev.brighten.anticheat.premium.impl;
 
+import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutCloseWindowPacket;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;
@@ -26,6 +28,8 @@ public class InventoryB extends Check {
                 vl++;
                 flag("key=[%1], dxz=%2", data.predictionService.key,
                         MathUtils.round(data.playerInfo.deltaXZ, 2));
+                if(cancellable) TinyProtocolHandler.sendPacket(packet.getPlayer(),
+                        new WrappedOutCloseWindowPacket(data.playerInfo.inventoryId).getObject());
             }
         } else verbose = 0;
     }

@@ -19,7 +19,7 @@ public class NoFallB extends Check {
                     && (data.playerInfo.clientGround || data.playerInfo.deltaY == 0);
             if(serverGround != data.playerInfo.clientGround
                     && (data.playerInfo.deltaY != 0 || data.playerInfo.deltaXZ > 0)
-                    && data.playerInfo.lastBlockPlace.hasPassed(20)
+                    && data.playerInfo.lastBlockPlace.hasPassed(15)
                     && data.playerInfo.lastVelocity.hasPassed(10)
                     && !data.playerInfo.flightCancel) {
                 if(vl++ > 5) {

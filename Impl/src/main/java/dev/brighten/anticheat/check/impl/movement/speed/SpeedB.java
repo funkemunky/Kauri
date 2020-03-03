@@ -18,7 +18,7 @@ public class SpeedB extends Check {
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(packet.isPos()
                 && !data.playerInfo.generalCancel) {
-            if(data.playerInfo.airTicks > 2) {
+            if(data.playerInfo.airTicks > 2 && !data.playerInfo.lClientGround && !data.playerInfo.clientGround) {
                 double accelX = data.playerInfo.deltaX - data.playerInfo.lDeltaX;
                 double accelZ = data.playerInfo.deltaZ - data.playerInfo.lDeltaZ;
                 double hypot = MathUtils.hypot(accelX, accelZ);
@@ -27,9 +27,9 @@ public class SpeedB extends Check {
                         && !data.blockInfo.blocksNear
                         && data.playerInfo.lastVelocity.hasPassed(8)
                         && !data.blockInfo.inLiquid
-                        && data.playerInfo.lastHalfBlock.hasPassed(4)
+                        && data.playerInfo.lastHalfBlock.hasPassed(10)
                         && (accelX > -0.07 || accelZ > -0.07)
-                        && data.playerInfo.lastBlockPlace.hasPassed(10)) {
+                        && data.playerInfo.lastBlockPlace.hasPassed(7)) {
                     if(verbose++ > 2) {
                         vl++;
                         flag("x=%1 z=%2",

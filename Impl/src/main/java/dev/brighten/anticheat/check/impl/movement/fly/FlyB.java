@@ -18,7 +18,8 @@ import org.bukkit.block.Block;
 import java.util.ArrayList;
 import java.util.List;
 
-@CheckInfo(name = "Fly (B)", description = "Checks for improper acceleration.", checkType = CheckType.FLIGHT)
+@CheckInfo(name = "Fly (B)", description = "Checks for improper acceleration.", checkType = CheckType.FLIGHT,
+        vlToFlag = 3)
 @Cancellable
 public class FlyB extends Check {
 
@@ -77,7 +78,7 @@ public class FlyB extends Check {
                     && !(data.playerInfo.blockOnTo != null && data.playerInfo.blockOnTo.getType().isSolid())
                     && (!data.blockInfo.blocksAbove || data.playerInfo.deltaY >= 0)
                     && data.playerInfo.slimeTimer.hasPassed(20)
-                    && data.playerInfo.lastBlockPlace.hasPassed(5)
+                    && data.playerInfo.lastBlockPlace.hasPassed(8)
                     && data.playerVersion.isOrBelow(ProtocolVersion.V1_8_9)
                     && data.playerInfo.lastVelocity.hasPassed(10)
                     && deltaPredict > 0.0001) {

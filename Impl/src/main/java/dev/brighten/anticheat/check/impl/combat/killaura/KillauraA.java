@@ -70,7 +70,7 @@ public class KillauraA extends Check {
     }
 
     private static BoundingBox getHitbox(KLocation loc, EntityType type) {
-        Vector bounds = MiscUtils.entityDimensions.get(type);
+        Vector bounds = MiscUtils.entityDimensions.get(type).clone();
 
         BoundingBox box = new BoundingBox(loc.toVector(), loc.toVector())
                 .grow((float)bounds.getX(), 0, (float)bounds.getZ())

@@ -1,8 +1,7 @@
-package dev.brighten.anticheat.premium.impl;
+package dev.brighten.anticheat.premium.impl.hitboxes;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
-import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.world.types.RayCollision;
@@ -11,7 +10,6 @@ import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.api.check.CheckType;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -20,7 +18,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @CheckInfo(name = "Reach (B)", description = "Ensures the reach of a player is legitimate.",
-        checkType = CheckType.HITBOX, punishVL = 10)
+        checkType = CheckType.HITBOX, punishVL = 10, developer = true)
 @Cancellable(cancelType = CancelType.ATTACK)
 public class ReachB extends Check {
 
@@ -41,7 +39,7 @@ public class ReachB extends Check {
                     .collect(Collectors.toList());
 
             List<SimpleCollisionBox> entityLocs = targetData.pastLocation
-                    .getEstimatedLocation(data.lagInfo.ping, 250L).stream()
+                    .getEstimatedLocation(data.lagInfo.ping, 200L).stream()
                     .map(ReachB::getHitbox).collect(Collectors.toList());
 
             double distance = 69;
@@ -57,7 +55,7 @@ public class ReachB extends Check {
             }
 
             if(distance > 3.001) {
-                if(buffer++ > 3) {
+                if(++buffer > 3) {
                     vl++;
                     flag("distance=%1 buffer=%2", MathUtils.round(distance, 3),
                             MathUtils.round(buffer, 1));

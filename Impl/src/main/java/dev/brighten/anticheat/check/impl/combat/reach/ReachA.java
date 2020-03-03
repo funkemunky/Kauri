@@ -55,14 +55,15 @@ public class ReachA extends Check {
 
     @Packet
     public void onUse(WrappedInUseEntityPacket packet, long timeStamp) {
-        if(packet.getEntity() instanceof LivingEntity) {
+        if(packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)
+                && packet.getEntity() instanceof LivingEntity) {
             lastUse = timeStamp;
             target = (LivingEntity) packet.getEntity();
         }
     }
 
     private Vector getHitbox(EntityType type) {
-        Vector vec = MiscUtils.entityDimensions.get(type);
+        Vector vec = MiscUtils.entityDimensions.get(type).clone();
 
         if(vec == null) vec = new Vector(5, 0, 5);
 

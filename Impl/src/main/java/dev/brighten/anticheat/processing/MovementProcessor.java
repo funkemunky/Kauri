@@ -372,6 +372,7 @@ public class MovementProcessor {
                 || data.playerInfo.inVehicle
                 || data.playerInfo.lastWorldUnload.hasNotPassed(10)
                 || !data.playerInfo.worldLoaded
+                || timeStamp - data.playerInfo.lastRespawn < 1000L
                 || data.playerInfo.lastToggleFlight.hasNotPassed(40)
                 || timeStamp - data.creation < 2000
                 || Kauri.INSTANCE.lastTickLag.hasNotPassed(5);

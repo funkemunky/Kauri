@@ -12,10 +12,7 @@ import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutCloseWindowPacket;
 import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.impl.combat.aim.*;
-import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerA;
-import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerB;
-import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerC;
-import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerF;
+import dev.brighten.anticheat.check.impl.combat.autoclicker.*;
 import dev.brighten.anticheat.check.impl.combat.hand.HandA;
 import dev.brighten.anticheat.check.impl.combat.hand.HandB;
 import dev.brighten.anticheat.check.impl.combat.hand.HandC;
@@ -257,6 +254,7 @@ public class Check implements KauriCheck {
         register(new AutoclickerB());
         register(new AutoclickerC());
         register(new AutoclickerF());
+        register(new AutoclickerG());
         register(new FlyA());
         register(new FlyB());
         register(new FlyC());
@@ -264,6 +262,7 @@ public class Check implements KauriCheck {
         register(new FlyE());
         register(new FlyF());
         register(new FlyG());
+        register(new FlyH());
         register(new FastLadder());
         register(new NoFallA());
         register(new NoFallB());

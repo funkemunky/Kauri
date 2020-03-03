@@ -1,6 +1,8 @@
 package dev.brighten.anticheat.premium.impl;
 
+import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInWindowClickPacket;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutCloseWindowPacket;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;
 
@@ -14,6 +16,8 @@ public class InventoryA extends Check {
         if(packet.getId() == 0 && !data.playerInfo.inventoryOpen) {
             vl++;
             if(vl > 2) flag("id=%1", packet.getId());
+            if(cancellable) TinyProtocolHandler.sendPacket(packet.getPlayer(),
+                    new WrappedOutCloseWindowPacket(data.playerInfo.inventoryId).getObject());
         }
     }
 }
