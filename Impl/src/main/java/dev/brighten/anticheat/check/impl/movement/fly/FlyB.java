@@ -78,6 +78,7 @@ public class FlyB extends Check {
                     && !(data.playerInfo.blockOnTo != null && data.playerInfo.blockOnTo.getType().isSolid())
                     && (!data.blockInfo.blocksAbove || data.playerInfo.deltaY >= 0)
                     && data.playerInfo.slimeTimer.hasPassed(20)
+                    && timeStamp - data.playerInfo.lastServerPos > 100L
                     && data.playerInfo.lastBlockPlace.hasPassed(8)
                     && data.playerVersion.isOrBelow(ProtocolVersion.V1_8_9)
                     && data.playerInfo.lastVelocity.hasPassed(10)

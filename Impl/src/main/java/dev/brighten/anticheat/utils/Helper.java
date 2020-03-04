@@ -6,18 +6,22 @@ import cc.funkemunky.api.utils.Materials;
 import cc.funkemunky.api.utils.XMaterial;
 import cc.funkemunky.api.utils.world.BlockData;
 import cc.funkemunky.api.utils.world.CollisionBox;
+import cc.funkemunky.api.utils.world.types.RayCollision;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.utils.handlers.PlayerSizeHandler;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class Helper {
 
@@ -185,6 +189,26 @@ public class Helper {
 		List<SimpleCollisionBox> collisions = new LinkedList<>();
 		blocks.forEach(b -> BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion()).downCast(collisions));
 		return collisions;
+	}
+
+	public static List<CollisionBox> getCollisionsOnRay(RayCollision collision, World world, double distance, double resolution) {
+		int amount = Math.round((float)(distance / resolution));
+		Location[] locs = new Location[Math.max(2, amount)]; //We do a max to prevent NegativeArraySizeException.
+		for (int i = 0; i < locs.length; i++) {
+			double ix = i / 2d;
+
+			double fx = (collision.originX + (collision.directionX * ix));
+			double fy = (collision.originY + (collision.directionY * ix));
+			double fz = (collision.originZ + (collision.directionZ * ix));
+
+			locs[i] = new Location(world, fx, fy, fz);
+		}
+		return Arrays.stream(locs).parallel()
+				.filter(loc -> loc.getWorld().isChunkLoaded(loc.getBlockX() >> 4, loc.getBlockZ() >> 4))
+				.map(Location::getBlock)
+				.filter(block -> block.getType().isSolid())
+				.map(block -> BlockData.getData(block.getType()).getBox(block, ProtocolVersion.getGameVersion()))
+				.filter(collision::isCollided).collect(Collectors.toList());
 	}
 
 	public static CollisionBox toCollisions(Block b) {

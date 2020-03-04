@@ -10,6 +10,7 @@ import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.api.check.CheckType;
+import lombok.val;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -45,6 +46,7 @@ public class ReachB extends Check {
             double distance = 69;
             for (RayCollision ray : origin) {
                 for (SimpleCollisionBox box : entityLocs) {
+                    val check = RayCollision.distance(ray, box);
                     distance = Math.min(distance, RayCollision.distance(ray, box));
                 }
             }

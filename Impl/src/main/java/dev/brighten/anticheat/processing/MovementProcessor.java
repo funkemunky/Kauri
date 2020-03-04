@@ -7,6 +7,7 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.objects.VariableValue;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
+import cc.funkemunky.api.utils.world.CollisionBox;
 import cc.funkemunky.api.utils.world.types.RayCollision;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
@@ -289,8 +290,9 @@ public class MovementProcessor {
             origin.y+= data.playerInfo.sneaking ? 1.54 : 1.62;
             RayCollision collision = new RayCollision(origin.toVector(), MathUtils.getDirection(origin));
 
-            List<SimpleCollisionBox> boxes = new ArrayList<>();
-            collision.boxesOnRay(data.getPlayer().getWorld(), data.playerInfo.creative ? 7.5 : 5.5).forEach(box -> box.downCast(boxes));
+            List<CollisionBox> boxes = dev.brighten.anticheat.utils.Helper
+                    .getCollisionsOnRay(collision, data.getPlayer().getWorld(),
+                            data.playerInfo.creative ? 6.5 : 4.5, 0.25);
 
             data.playerInfo.lookingAtBlock = boxes.size() > 0;
         }
@@ -372,7 +374,7 @@ public class MovementProcessor {
                 || data.playerInfo.inVehicle
                 || data.playerInfo.lastWorldUnload.hasNotPassed(10)
                 || !data.playerInfo.worldLoaded
-                || timeStamp - data.playerInfo.lastRespawn < 1000L
+                || timeStamp - data.playerInfo.lastRespawn < 2500L
                 || data.playerInfo.lastToggleFlight.hasNotPassed(40)
                 || timeStamp - data.creation < 2000
                 || Kauri.INSTANCE.lastTickLag.hasNotPassed(5);
