@@ -68,10 +68,11 @@ public class ObjectData {
         targetPastLocation = new PastLocation();
         checkManager = new CheckManager(this);
         checkManager.addChecks();
+
         predictionService = new PredictionService(this);
         moveProcessor = new MovementProcessor(this);
-        Kauri.INSTANCE.executor.execute(() -> playerVersion = TinyProtocolHandler.getProtocolVersion(getPlayer()));
 
+        Kauri.INSTANCE.executor.execute(() -> playerVersion = TinyProtocolHandler.getProtocolVersion(getPlayer()));
         if(task != null) task.cancel();
         task = RunUtils.taskTimerAsync(() -> {
             if(getPlayer() == null) {

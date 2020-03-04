@@ -99,8 +99,8 @@ public class BlockInformation {
 
         //Bukkit.broadcastMessage("chigga4");
 
-        handler.setSize(0.6f, 0.0f);
-        handler.setOffset(-0.02);
+        handler.setSize(0.6f, 0.1f);
+        handler.setOffset(-0.1);
 
         objectData.playerInfo.serverGround =
                 handler.isCollidedWith(Materials.SOLID) || handler.contains(EntityType.BOAT);

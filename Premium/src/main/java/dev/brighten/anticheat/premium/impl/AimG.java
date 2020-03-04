@@ -16,12 +16,12 @@ public class AimG extends Check {
     private Verbose verbose = new Verbose(50, 6);
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if(!packet.isLook()) return;
+        if(!packet.isLook() || data.playerInfo.cinematicMode) return;
 
         val deltaX = Math.abs(data.moveProcessor.deltaX - data.moveProcessor.lastDeltaX);
         val deltaY = Math.abs(data.moveProcessor.deltaY - data.moveProcessor.lastDeltaY);
 
-        if(deltaY <= 2 && deltaX > 0 && deltaX <= 6 && data.moveProcessor.deltaX > 25 && !data.playerInfo.cinematicMode) {
+        if(deltaY <= 2 && deltaX > 0 && deltaX <= 6 && data.moveProcessor.deltaX > 25) {
             if(verbose.flag(1, 7)) {
                 vl++;
                 flag("deltaX=%1 deltaY=%2 vb=%3", deltaX, deltaY, verbose.value());

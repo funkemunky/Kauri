@@ -7,6 +7,7 @@ import cc.funkemunky.api.tinyprotocol.api.NMSObject;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.data.ObjectData;
 import lombok.val;
+import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 
 import java.util.*;
@@ -87,7 +88,7 @@ public class CheckManager {
 
     public void addChecks() {
         if(objectData.getPlayer().hasPermission("kauri.bypass") && Config.bypassPermission) return;
-        Check.checkClasses.keySet().parallelStream()
+        Check.checkClasses.keySet().stream()
                 .map(clazz -> {
                     CheckInfo settings = Check.checkClasses.get(clazz);
                     Check check = clazz.getConstructor().newInstance();
