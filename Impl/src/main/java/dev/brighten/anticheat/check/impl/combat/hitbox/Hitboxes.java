@@ -42,7 +42,8 @@ public class Hitboxes extends Check {
         if (checkParameters(data)) {
 
             List<RayCollision> rayTrace = data.pastLocation.getPreviousRange(100L).stream()
-                    .map(loc -> {
+                    .map(l -> {
+                        KLocation loc = l.clone();
                         loc.y+=data.playerInfo.sneaking ? 1.54 : 1.62;
                         return new RayCollision(loc.toVector(),
                                 MathUtils.getDirection(loc));

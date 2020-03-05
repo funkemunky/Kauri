@@ -4,6 +4,7 @@ import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.reflections.impl.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
 import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.objects.VariableValue;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
@@ -14,9 +15,12 @@ import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.GraphUtil;
 import dev.brighten.anticheat.utils.MiscUtils;
+import dev.brighten.anticheat.utils.MouseFilter;
 import dev.brighten.anticheat.utils.MovementUtils;
 import lombok.val;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.potion.PotionEffectType;
 
 import java.math.RoundingMode;
@@ -30,8 +34,9 @@ public class MovementProcessor {
     public List<Double> yawGcdList = Collections.synchronizedList(new EvictingList<>(50));
     public List<Double> pitchGcdList = Collections.synchronizedList(new EvictingList<>(50));
     public long deltaX, deltaY, lastDeltaX, lastDeltaY, lastCinematic;
-    private List<Float> yawList = new ArrayList<>(), pitchList = new ArrayList<>();
     public double sensitivityX, sensitivityY, yawMode, pitchMode;
+    private MouseFilter mxaxis = new MouseFilter(), myaxis = new MouseFilter();
+    private float smoothCamFilterX, smoothCamFilterY, smoothCamYaw, smoothCamPitch;
     public TickTimer lastEquals = new TickTimer(6);
     private TickTimer lastReset = new TickTimer(1);
 
@@ -42,10 +47,12 @@ public class MovementProcessor {
     public MovementProcessor(ObjectData data) {
         this.data = data;
 
-        try {
-            levitation = PotionEffectType.getByName("LEVITATION");
-        } catch(Exception e) {
+        if(ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_8)) {
+            try {
+                levitation = PotionEffectType.getByName("LEVITATION");
+            } catch(Exception e) {
 
+            }
         }
     }
 
@@ -113,31 +120,26 @@ public class MovementProcessor {
                 .subtract(0, 1, 0));
 
         if(data.playerInfo.blockBelow != null)
-            data.blockInfo.currentFriction = MinecraftReflection.getFriction(data.playerInfo.blockBelow);
-
+            data.blockInfo.currentFriction = ReflectionsUtil.getFriction(data.playerInfo.blockBelow);
         if(packet.isPos()) {
             //We create a separate from BoundingBox for the predictionService since it should operate on pre-motion data.
             data.box = new SimpleCollisionBox(data.playerInfo.to.toVector(), 0.6, 1.8);
 
             data.blockInfo.runCollisionCheck(); //run b4 everything else for use below.
         }
-
         data.playerInfo.inVehicle = data.getPlayer().getVehicle() != null;
         data.playerInfo.gliding = PlayerUtils.isGliding(data.getPlayer());
         data.playerInfo.riptiding = Atlas.getInstance().getBlockBoxManager()
                 .getBlockBox().isRiptiding(data.getPlayer());
-
         /* We only set the jumpheight on ground since there's no need to check for it while they're in the air.
          * If we did check while it was in the air, there would be false positives in the checks that use it. */
         if (packet.isGround()) {
             data.playerInfo.jumpHeight = MovementUtils.getJumpHeight(data.getPlayer());
         }
-
         if(data.playerInfo.clientGround || data.playerInfo.lClientGround) {
             data.playerInfo.totalHeight = MovementUtils.getTotalHeight(data.playerVersion,
                     (float)data.playerInfo.jumpHeight);
         }
-
         data.playerInfo.lworldLoaded = data.playerInfo.worldLoaded;
 
         data.lagInfo.lagging = data.lagInfo.lagTicks.subtract() > 0
@@ -184,6 +186,35 @@ public class MovementProcessor {
                 deltaY = getDeltaY(data.playerInfo.deltaPitch, (float) pitchMode);
                 sensitivityX = getSensitivityFromYawGCD(yawMode);
                 sensitivityY = getSensitivityFromPitchGCD(pitchMode);
+
+                if((data.playerInfo.pitchGCD < 1E5 || data.playerInfo.yawGCD < 1E5) && smoothCamFilterY < 1E6
+                        && smoothCamFilterX < 1E6 && timeStamp - data.creation > 1000L) {
+                    float f = (float)sensitivityX * 0.6f + .2f;
+                    float f1 = f * f * f * 8;
+                    float f2 = deltaX * f1;
+                    float f3 = deltaY * f1;
+
+                    smoothCamFilterX = mxaxis.smooth(smoothCamYaw, .05f * f1);
+                    smoothCamFilterY = myaxis.smooth(smoothCamPitch, .05f * f1);
+                    smoothCamYaw = f2;
+                    smoothCamPitch = f3;
+                    f2 = smoothCamFilterX * 0.5f;
+                    f3 = smoothCamFilterY * 0.5f;
+
+                    float pyaw = data.playerInfo.from.yaw + f2 * .15f;
+                    float ppitch = data.playerInfo.from.pitch + f3 * .15f;
+
+                    if(data.playerInfo.cinematicMode =
+                            (MathUtils.getDelta(pyaw, data.playerInfo.from.yaw) < (Math.abs(deltaX) > 50 ? 3 : 1)
+                            && MathUtils.getDelta(ppitch, data.playerInfo.to.pitch) < (Math.abs(deltaY) > 30 ? 2 : 1)))
+                        lastCinematic = timeStamp;
+
+                    //MiscUtils.testMessage("pyaw=" + pyaw + " ppitch=" + ppitch + " yaw=" + data.playerInfo.to.yaw + " pitch=" + data.playerInfo.to.pitch);
+                } else {
+                    mxaxis.reset();
+                    myaxis.reset();
+                    data.playerInfo.cinematicMode = false;
+                }
 
                 if (sensToPercent(sensitivityY) == sensToPercent(sensitivityY)) lastEquals.reset();
             }
@@ -244,40 +275,6 @@ public class MovementProcessor {
         data.playerInfo.deltaPitch = data.playerInfo.to.pitch - data.playerInfo.from.pitch;
 
         if (packet.isLook()) {
-            yawList.add(data.playerInfo.deltaYaw / MovementProcessor.sensToPercent(sensitivityX));
-            pitchList.add(data.playerInfo.deltaPitch / MovementProcessor.sensToPercent(sensitivityY));
-            if (this.yawList.size() == 20 && this.pitchList.size() == 20) {
-                // Get the negative/positive graph of the sample-lists
-                GraphUtil.GraphResult yawResults = GraphUtil.getGraph(yawList);
-                GraphUtil.GraphResult pitchResults = GraphUtil.getGraph(pitchList);
-
-                // Negative values
-                int yawNegatives = yawResults.getNegatives();
-                int pitchNegatives = pitchResults.getNegatives();
-
-                // Positive values
-                int yawPositives = yawResults.getPositives();
-                int pitchPositives = pitchResults.getPositives();
-
-                // Cinematic camera usually does this on *most* speeds and is accurate for the most part.
-                if (yawPositives > yawNegatives || pitchPositives > pitchNegatives) {
-                    lastCinematic = timeStamp;
-                }
-
-                data.playerInfo.cinematicMode = timeStamp - lastCinematic < 400L;
-
-                MiscUtils.testMessage(yawPositives + ", " + pitchPositives);
-
-                // Clear the sample-lists
-                pitchList.clear();
-                yawList.clear();
-            }
-
-            if (Float.isNaN(data.playerInfo.cinematicPitch) || Float.isNaN(data.playerInfo.cinematicYaw)) {
-                data.playerInfo.yawSmooth.reset();
-                data.playerInfo.pitchSmooth.reset();
-            }
-
             data.playerInfo.lastYawGCD = data.playerInfo.yawGCD;
             data.playerInfo.yawGCD = MiscUtils.gcd((long) (data.playerInfo.deltaYaw * offset),
                     (long) (data.playerInfo.lDeltaYaw * offset));
@@ -288,8 +285,9 @@ public class MovementProcessor {
             val origin = data.playerInfo.to.clone();
 
             origin.y+= data.playerInfo.sneaking ? 1.54 : 1.62;
-            RayCollision collision = new RayCollision(origin.toVector(), MathUtils.getDirection(origin));
 
+            RayCollision collision = new RayCollision(origin.toVector(), MathUtils.getDirection(origin));
+;
             List<CollisionBox> boxes = dev.brighten.anticheat.utils.Helper
                     .getCollisionsOnRay(collision, data.getPlayer().getWorld(),
                             data.playerInfo.creative ? 6.5 : 4.5, 0.25);

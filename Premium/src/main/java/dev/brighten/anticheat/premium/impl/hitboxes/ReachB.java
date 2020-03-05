@@ -35,23 +35,31 @@ public class ReachB extends Check {
             if(targetData == null || data.playerInfo.creative) return;
 
             List<RayCollision> origin = Stream.of(data.playerInfo.from.clone(), data.playerInfo.to.clone())
-                    .peek(loc -> loc.y+= data.playerInfo.sneaking ? 1.54 : 1.62)
-                    .map(loc -> new RayCollision(loc.toVector(), MathUtils.getDirection(loc)))
+                    .map(loc -> {
+                        loc.y+= data.playerInfo.sneaking ? 1.54 : 1.62;
+                        return new RayCollision(loc.toVector(), MathUtils.getDirection(loc));
+                    })
                     .collect(Collectors.toList());
 
             List<SimpleCollisionBox> entityLocs = targetData.pastLocation
-                    .getEstimatedLocation(data.lagInfo.ping, 200L).stream()
+                    .getEstimatedLocation(data.lagInfo.transPing, 150L).stream()
                     .map(ReachB::getHitbox).collect(Collectors.toList());
 
             double distance = 69;
+            int misses = 0;
             for (RayCollision ray : origin) {
                 for (SimpleCollisionBox box : entityLocs) {
                     val check = RayCollision.distance(ray, box);
-                    distance = Math.min(distance, RayCollision.distance(ray, box));
+
+                    if(check == -1) {
+                        misses++;
+                        continue;
+                    }
+                    distance = Math.min(distance, check);
                 }
             }
 
-            if(distance == -1 || distance == 69) {
+            if(misses > 0 || distance == 69) {
                 buffer-= buffer > 0 ? 0.01 : 0;
                 return;
             }
