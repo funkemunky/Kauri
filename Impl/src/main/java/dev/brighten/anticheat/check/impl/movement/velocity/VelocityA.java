@@ -42,7 +42,7 @@ public class VelocityA extends Check {
                     && !data.playerInfo.lastBlockPlace.hasNotPassed(5)
                     && !data.blockInfo.blocksAbove) {
                 if (vl++ > 20) flag("pct=" + MathUtils.round(pct, 2) + "%");
-            } else vl-= vl > 0 ? 0.5 : 0;
+            } else vl-= vl > 0 ? 0.25f : 0;
 
             vY-= 0.08;
             vY*= 0.98;

@@ -45,6 +45,7 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import java.io.IOException;
+import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -89,7 +90,7 @@ public class Check implements KauriCheck {
             return;
         }
         CheckInfo info = check.getClass().getAnnotation(CheckInfo.class);
-        MiscUtils.printToConsole("Registered: " + info.name());
+        MiscUtils.printToConsole("Registering... " + info.name());
         WrappedClass checkClass = new WrappedClass(check.getClass());
         String name = info.name();
 
@@ -99,15 +100,28 @@ public class Check implements KauriCheck {
         CheckSettings settings = new CheckSettings(info.name(), info.description(), info.checkType(), type,
                 info.punishVL(), info.vlToFlag(), info.minVersion(), info.maxVersion());
 
+        String path = "checks." + name;
         settings.enabled = new ConfigDefault<>(info.enabled(),
-                "checks." + name + ".enabled", Kauri.INSTANCE).get();
+                path + ".enabled", Kauri.INSTANCE).get();
         settings.executable = new ConfigDefault<>(info.executable(),
-                "checks." + name + ".executable", Kauri.INSTANCE).get();
+                path + ".executable", Kauri.INSTANCE).get();
         settings.cancellable = new ConfigDefault<>(info.cancellable(),
-                "checks." + name + ".cancellable", Kauri.INSTANCE).get();
+                path + ".cancellable", Kauri.INSTANCE).get();
+
+        final String spath = path + ".settings.";
+        checkClass.getFields(field -> Modifier.isStatic(field.getModifiers())
+                && field.isAnnotationPresent(Setting.class))
+                .forEach(field -> {
+                    Setting setting = field.getAnnotation(Setting.class);
+
+                    MiscUtils.printToConsole("Found setting " + setting.name() + "! Processing...");
+                    field.set(null, new ConfigDefault<>(field.get(null),
+                            spath + setting.name(), Kauri.INSTANCE).get());
+                });
 
         checkSettings.put(checkClass, settings);
         checkClasses.put(checkClass, info);
+        MiscUtils.printToConsole("Registered check " + info.name());
     }
 
     public void flag(String information, Object... variables) {
@@ -205,33 +219,35 @@ public class Check implements KauriCheck {
         });
     }
 
-    public void punish() {
+    private void punish() {
         if(banExempt || developer || !executable || punishVl == -1 || vl <= punishVl
                 || System.currentTimeMillis() - Kauri.INSTANCE.lastTick > 200L) return;
 
 
         Kauri.INSTANCE.loggerManager.addPunishment(data, this);
-        if(!data.banned && !Config.bungeePunishments) {
-            RunUtils.task(() -> {
+        if(!data.banned) {
+            if(!Config.bungeePunishments) {
+                RunUtils.task(() -> {
+                    if(!Config.broadcastMessage.equalsIgnoreCase("off")) {
+                        Bukkit.broadcastMessage(Color.translate(Config.broadcastMessage
+                                .replace("%name%", data.getPlayer().getName())));
+                    }
+                    ConsoleCommandSender sender = Bukkit.getConsoleSender();
+                    Config.punishCommands.
+                            forEach(cmd -> Bukkit.dispatchCommand(
+                                    sender,
+                                    cmd.replace("%name%", data.getPlayer().getName())));
+                    vl = 0;
+                }, Kauri.INSTANCE);
+            } else {
                 if(!Config.broadcastMessage.equalsIgnoreCase("off")) {
-                    Bukkit.broadcastMessage(Color.translate(Config.broadcastMessage
+                    BungeeAPI.broadcastMessage(Color.translate(Config.broadcastMessage
                             .replace("%name%", data.getPlayer().getName())));
+                    Config.punishCommands.
+                            forEach(cmd -> BungeeAPI.sendCommand(cmd.replace("%name%", data.getPlayer().getName())));
                 }
-                ConsoleCommandSender sender = Bukkit.getConsoleSender();
-                Config.punishCommands.
-                        forEach(cmd -> Bukkit.dispatchCommand(
-                                sender,
-                                cmd.replace("%name%", data.getPlayer().getName())));
-                vl = 0;
-            }, Kauri.INSTANCE);
-            data.banned = true;
-        } else {
-            if(!Config.broadcastMessage.equalsIgnoreCase("off")) {
-                BungeeAPI.broadcastMessage(Color.translate(Config.broadcastMessage
-                        .replace("%name%", data.getPlayer().getName())));
-                Config.punishCommands.
-                        forEach(cmd -> BungeeAPI.sendCommand(cmd.replace("%name%", data.getPlayer().getName())));
             }
+            data.banned = true;
         }
     }
 
@@ -286,7 +302,7 @@ public class Check implements KauriCheck {
         register(new Phase());
         register(new Timer());
         register(new BadPacketsA());
-        //register(new BadPacketsB());
+        register(new BadPacketsB());
         register(new BadPacketsC());
         register(new BadPacketsD());
         register(new BadPacketsE());

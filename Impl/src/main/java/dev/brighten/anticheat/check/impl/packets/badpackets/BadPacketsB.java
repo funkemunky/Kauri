@@ -14,19 +14,19 @@ import dev.brighten.api.check.CheckType;
 @Cancellable
 public class BadPacketsB extends Check {
 
-    private TickTimer lastSneak = new TickTimer(0);
+    private long lastSneak;
     private MaxInteger ticks = new MaxInteger(Integer.MAX_VALUE);
     @Packet
-    public void onPlace(WrappedInEntityActionPacket action) {
+    public void onPlace(WrappedInEntityActionPacket action, long timeStamp) {
         if(action.getAction().name().contains("SNEAK")) {
-            if(lastSneak.hasNotPassed()) {
+            if(timeStamp - lastSneak <= 10) {
                 ticks.add();
                 if(ticks.value() > 80) {
                     vl++;
                     flag("ticks=%1 ping=%p tps=%t", ticks.value());
                 }
             } else ticks.subtract(ticks.value() > 40 ? 8 : 4);
-            lastSneak.reset();
+            lastSneak = timeStamp;
         }
         debug(action.getAction().name());
     }
