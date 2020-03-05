@@ -290,7 +290,7 @@ public class MovementProcessor {
 ;
             List<CollisionBox> boxes = dev.brighten.anticheat.utils.Helper
                     .getCollisionsOnRay(collision, data.getPlayer().getWorld(),
-                            data.playerInfo.creative ? 6.5 : 4.5, 0.25);
+                            data.playerInfo.creative ? 6.5 : 4.5, 0.5);
 
             data.playerInfo.lookingAtBlock = boxes.size() > 0;
         }
