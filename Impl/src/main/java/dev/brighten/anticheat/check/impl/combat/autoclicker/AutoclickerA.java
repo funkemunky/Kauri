@@ -13,13 +13,19 @@ public class AutoclickerA extends Check {
     private int flyingTicks, cps;
     private long lastFlying;
 
+    @Setting(name = "cpsToFlag")
+    private static int cpsToFlag = 22;
+
+    @Setting(name = "cpsToBan")
+    private static int cpsToBan = 28;
+
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(timeStamp - lastFlying > 1) flyingTicks++;
         else cps-= cps > 0 ? 1 : 0;
         if(flyingTicks >= 20) {
-            if(cps > 22) {
-                if(cps > 28) vl++;
+            if(cps > cpsToFlag) {
+                if(cps > cpsToBan) vl++;
                 flag("cps=%1", cps);
             }
             debug("cps=%1", cps);

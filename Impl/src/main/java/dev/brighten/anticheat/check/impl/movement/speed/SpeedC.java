@@ -160,6 +160,12 @@ public class SpeedC extends Check {
             moveSpeed += 0.2;
         }
 
+        //TODO Test this for false positives.
+        if(data.playerInfo.sneaking) {
+            tags.add("sneaking");
+            moveSpeed*= 0.42;
+        }
+
         if (timeStamp - data.playerInfo.lastServerPos < 180L) moveSpeed += 1;
 
         moveSpeed += velocityXZ * (data.playerInfo.lastVelocity.hasNotPassed(20) ? 2 : 1);

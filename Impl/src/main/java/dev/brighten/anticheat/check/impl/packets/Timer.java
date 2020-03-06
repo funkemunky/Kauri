@@ -33,7 +33,7 @@ public class Timer extends Check {
             double pct = ratio * 100;
 
             if((pct > 100.4D)
-                    && data.lagInfo.lastPingDrop.hasNotPassed(30)
+                    && data.lagInfo.lastPingDrop.hasPassed(30)
                     && Kauri.INSTANCE.lastTickLag.hasPassed(5)
                     && Kauri.INSTANCE.tps > 18.5) {
                 //Maybe lower threshold? I do not think it needs that high of one.

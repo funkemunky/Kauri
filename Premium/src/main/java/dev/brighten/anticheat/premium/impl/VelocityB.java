@@ -62,7 +62,7 @@ public class VelocityB extends Check {
             svX = svZ = vY = 0;
             tookVelocity = false;
         }
-        if(vX != 0 || vZ != 0) {
+        if((vX != 0 || vZ != 0) && !tookVelocity) {
             if(sprint && useEntity) {
                 vX*= 0.6;
                 vZ*= 0.6;

@@ -17,13 +17,14 @@ public class KillauraB extends Check {
         if(!packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) return;
         long delta = timeStamp - lastFlying;
         if(delta < 2) {
-            if(!data.lagInfo.lagging) {
+            if(data.lagInfo.lastPacketDrop.hasPassed(2)) {
                 if(vl++ > 15) {
                     flag("delta=" + delta);
                 }
             } vl-= vl > 0 ? 0.1 : 0;
         } else vl-= vl > 0 ? 1 : 0;
-        debug("lagging=" + data.lagInfo.lagging + " vl=" + vl + " delta=" + delta);
+        debug("lagging=" + data.lagInfo.lastPacketDrop.hasNotPassed(2)
+                + " vl=" + vl + " delta=" + delta);
     }
 
     @Packet

@@ -5,10 +5,7 @@ import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.Priority;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.premium.impl.*;
-import dev.brighten.anticheat.premium.impl.autoclicker.AutoclickerD;
-import dev.brighten.anticheat.premium.impl.autoclicker.AutoclickerE;
-import dev.brighten.anticheat.premium.impl.autoclicker.AutoclickerH;
-import dev.brighten.anticheat.premium.impl.autoclicker.AutoclickerI;
+import dev.brighten.anticheat.premium.impl.autoclicker.*;
 import dev.brighten.anticheat.premium.impl.hitboxes.ReachB;
 
 @Init(priority = Priority.LOWEST)
@@ -26,5 +23,6 @@ public class PremiumChecks {
         Check.register(new InventoryB());
         Check.register(new AutoclickerH());
         Check.register(new AutoclickerI());
+        Check.register(new AutoclickerJ());
     }
 }

@@ -30,7 +30,9 @@ public class ReachA extends Check {
 
         List<KLocation> origins = Arrays.asList(data.playerInfo.to.clone(), data.playerInfo.from.clone());
         List<Tuple<KLocation, Vector>> targetBoxes = data.targetPastLocation
-                .getEstimatedLocation(data.lagInfo.transPing, 225L).stream()
+                .getEstimatedLocation(data.lagInfo.transPing,
+                        225L + (data.lagInfo.transPing - data.lagInfo.lastTransPing))
+                .stream()
                 .map(loc -> new Tuple<>(loc, getHitbox(target.getType())))
                 .collect(Collectors.toList());
 
