@@ -7,7 +7,6 @@ import cc.funkemunky.api.tinyprotocol.api.NMSObject;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.data.ObjectData;
 import lombok.val;
-import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 
 import java.util.*;

@@ -4,27 +4,22 @@ import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.reflections.impl.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
 import cc.funkemunky.api.utils.*;
+import cc.funkemunky.api.utils.handlers.PlayerSizeHandler;
 import cc.funkemunky.api.utils.objects.VariableValue;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import cc.funkemunky.api.utils.world.CollisionBox;
 import cc.funkemunky.api.utils.world.types.RayCollision;
-import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
-import dev.brighten.anticheat.utils.GraphUtil;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.MouseFilter;
 import dev.brighten.anticheat.utils.MovementUtils;
 import lombok.val;
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.Material;
 import org.bukkit.potion.PotionEffectType;
 
 import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -120,10 +115,11 @@ public class MovementProcessor {
                 .subtract(0, 1, 0));
 
         if(data.playerInfo.blockBelow != null)
-            data.blockInfo.currentFriction = ReflectionsUtil.getFriction(data.playerInfo.blockBelow);
+            data.blockInfo.currentFriction = MinecraftReflection.getFriction(data.playerInfo.blockBelow);
         if(packet.isPos()) {
             //We create a separate from BoundingBox for the predictionService since it should operate on pre-motion data.
-            data.box = new SimpleCollisionBox(data.playerInfo.to.toVector(), 0.6, 1.8);
+            data.box = PlayerSizeHandler.instance.bounds(data.getPlayer(),
+                    data.playerInfo.to.x, data.playerInfo.to.y, data.playerInfo.to.z);
 
             data.blockInfo.runCollisionCheck(); //run b4 everything else for use below.
         }
@@ -139,6 +135,9 @@ public class MovementProcessor {
                     (float)data.playerInfo.jumpHeight);
         }
         data.playerInfo.lworldLoaded = data.playerInfo.worldLoaded;
+
+        if(data.getPlayer().getItemInHand() != null)
+        data.playerInfo.animation = MinecraftReflection.getItemAnimation(data.getPlayer().getItemInHand());
 
         data.lagInfo.lagging = data.lagInfo.lagTicks.subtract() > 0
                 || !data.playerInfo.worldLoaded

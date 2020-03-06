@@ -1,7 +1,6 @@
 package dev.brighten.anticheat.check.impl.packets.badpackets;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInEntityActionPacket;
-import cc.funkemunky.api.utils.TickTimer;
 import cc.funkemunky.api.utils.math.cond.MaxInteger;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;

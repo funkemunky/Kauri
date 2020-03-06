@@ -2,16 +2,15 @@ package dev.brighten.anticheat.premium.impl;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
+import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumAnimation;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.math.cond.MaxDouble;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
-import dev.brighten.anticheat.utils.MovementUtils;
 import dev.brighten.api.check.CheckType;
 import org.bukkit.enchantments.Enchantment;
 
@@ -84,7 +83,9 @@ public class VelocityB extends Check {
                     f4 *= data.blockInfo.currentFriction;
                 }
 
-                if(!lastKey.equals(data.predictionService.key)) maxThreshold = 80;
+                if(!lastKey.equals(data.predictionService.key)) maxThreshold = 75;
+
+                if(data.lagInfo.lastPingDrop.hasNotPassed(20)) maxThreshold = 60;
 
                 double f = 0.16277136 / (f4 * f4 * f4);
                 double f5;
@@ -100,7 +101,7 @@ public class VelocityB extends Check {
                 float forward = data.predictionService.moveForward;
                 float strafe = data.predictionService.moveStrafing;
 
-                if(data.playerInfo.usingItem) {
+                if(data.playerInfo.usingItem && !data.playerInfo.animation.equals(WrappedEnumAnimation.NONE)) {
                     forward*= 0.2;
                     strafe*= 0.2;
                 }
@@ -116,12 +117,12 @@ public class VelocityB extends Check {
                 pct = ratio * 100;
 
                 if (pct < maxThreshold && data.playerInfo.lastUseItem.hasPassed(4)) {
-                    if(verbose.add() > (data.lagInfo.transPing > 150 ? 45 : 32)) {
+                    if(verbose.add() > 36) {
                         vl++;
                         flag("pct=%1% buffer=%2", MathUtils.round(pct, 3),
                                 MathUtils.round(verbose.value(), 1));
                     }
-                } else verbose.subtract(maxThreshold == 10 ? 0.01 : (data.lagInfo.lagging ? 0.35f : 0.2f));
+                } else verbose.subtract(maxThreshold <= 75 ? 0.05 : (data.lagInfo.lagging ? 0.35f : 0.2f));
 
                 debug("pct=" + pct + " key=" + data.predictionService.key + " ani="
                         + data.playerInfo.usingItem + " sprint=" + data.playerInfo.sprinting

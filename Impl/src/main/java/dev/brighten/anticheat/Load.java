@@ -4,7 +4,6 @@ import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.config.MessageHandler;
 import cc.funkemunky.api.profiling.ToggleableProfiler;
 import cc.funkemunky.api.utils.Color;
-import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.TickTimer;
 import dev.brighten.anticheat.check.api.Check;
@@ -22,42 +21,43 @@ import java.util.concurrent.Executors;
 public class Load {
 
     public static void load() {
-        MiscUtils.printToConsole(Color.Gray + "Starting thread pool...");
+        register("Starting thread pool...");
         Kauri.INSTANCE.executor = Executors.newFixedThreadPool(3);
         Kauri.INSTANCE.loggingThread = Executors.newSingleThreadScheduledExecutor();
 
-        MiscUtils.printToConsole(Color.Gray + "Loading config...");
+        register("Loading config...");
         Kauri.INSTANCE.saveDefaultConfig();
 
-        MiscUtils.printToConsole(Color.Gray + "Loading messages...");
+        register("Loading messages...");
         Kauri.INSTANCE.msgHandler = new MessageHandler(Kauri.INSTANCE);
 
-        MiscUtils.printToConsole(Color.Gray + "Running scanner...");
+        register("Running scanner...");
         Atlas.getInstance().initializeScanner(Kauri.INSTANCE, true, true);
 
-        MiscUtils.printToConsole(Color.Gray + "Setting the language to " + Color.Yellow + Config.language);
+        register("Setting the language to " + Color.Yellow + Config.language);
         Kauri.INSTANCE.msgHandler.setCurrentLang(Config.language);
 
-        MiscUtils.printToConsole(Color.Gray + "Loading API...");
+        register("Loading API...");
         Kauri.INSTANCE.kauriAPI = new KauriAPI();
 
-        MiscUtils.printToConsole(Color.Gray + "Registering processors...");
+        register("Registering processors...");
         Kauri.INSTANCE.packetProcessor = new PacketProcessor();
         Kauri.INSTANCE.dataManager = new DataManager();
         Kauri.INSTANCE.loggerManager = new LoggerManager(true);
         EntityProcessor.start();
 
-        MiscUtils.printToConsole(Color.Gray + "Registering checks...");
+        register("Registering checks...");
         Check.registerChecks();
 
-        MiscUtils.printToConsole(Color.Gray + "Running tps task...");
+        register("Running tps task...");
         Kauri.INSTANCE.runTpsTask();
+        register("Starting profiler...");
         Kauri.INSTANCE.profiler = new ToggleableProfiler();
         Kauri.INSTANCE.profiler.setEnabled(true);
 
         if(Bukkit.getOnlinePlayers().size() > 0) {
             RunUtils.taskLater(() -> {
-                MiscUtils.printToConsole(Color.Gray + "Detected players! Creating data objects...");
+                print(Color.Gray + "Detected players! Creating data objects...");
                 Bukkit.getOnlinePlayers().forEach(Kauri.INSTANCE.dataManager::createData);
             }, Kauri.INSTANCE, 6L);
         }
@@ -66,5 +66,13 @@ public class Load {
         Kauri.INSTANCE.lastEnabled.reset();
 
         Bukkit.getWorlds().forEach(world -> EntityProcessor.vehicles.put(world.getUID(), new ArrayList<>()));
+    }
+
+    private static void print(String string) {
+        print(string);
+    }
+
+    private static void register(String string) {
+        print(Color.Gray + string);
     }
 }

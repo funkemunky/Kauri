@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.data.classes;
 
+import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumAnimation;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.TickTimer;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
@@ -64,6 +65,8 @@ public class PlayerInformation {
     public double velocityX, velocityY, velocityZ;
     public double mvx, mvy, mvz;
     public boolean takingVelocity, lookingAtBlock;
+
+    public WrappedEnumAnimation animation = WrappedEnumAnimation.NONE;
 
     public KLocation from = new KLocation(0,0,0), to = new KLocation(0,0,0),
             groundLoc;

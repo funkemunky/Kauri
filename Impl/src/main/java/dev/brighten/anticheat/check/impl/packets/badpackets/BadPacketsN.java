@@ -16,6 +16,7 @@ public class BadPacketsN extends Check {
         if(packet.isPos()) {
             if(data.playerInfo.to.toVector().distance(data.playerInfo.from.toVector()) == 0
                     && timeStamp - data.creation > 1000L
+                    && data.lagInfo.lastPingDrop.hasPassed(40)
                     && data.playerInfo.lastRespawnTimer.hasPassed(20)
                     && timeStamp - data.playerInfo.lastServerPos > 100L
                     && !lastNonFlying) {
