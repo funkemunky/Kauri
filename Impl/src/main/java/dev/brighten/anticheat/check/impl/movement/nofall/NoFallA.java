@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @CheckInfo(name = "NoFall (A)", description = "Checks to make sure the ground packet from the client is legit",
-        checkType = CheckType.NOFALL, punishVL = 20, executable = false, enabled = false)
+        checkType = CheckType.NOFALL, punishVL = 20, executable = false)
 @Cancellable
 public class NoFallA extends Check {
 

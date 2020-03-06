@@ -115,7 +115,7 @@ public class MovementProcessor {
                 .subtract(0, 1, 0));
 
         if(data.playerInfo.blockBelow != null)
-            data.blockInfo.currentFriction = MinecraftReflection.getFriction(data.playerInfo.blockBelow);
+            data.blockInfo.currentFriction = ReflectionsUtil.getFriction(data.playerInfo.blockBelow);
         if(packet.isPos()) {
             //We create a separate from BoundingBox for the predictionService since it should operate on pre-motion data.
             data.box = PlayerSizeHandler.instance.bounds(data.getPlayer(),
@@ -137,7 +137,8 @@ public class MovementProcessor {
         data.playerInfo.lworldLoaded = data.playerInfo.worldLoaded;
 
         if(data.getPlayer().getItemInHand() != null)
-        data.playerInfo.animation = MinecraftReflection.getItemAnimation(data.getPlayer().getItemInHand());
+        if(ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_8))
+            data.playerInfo.animation = MinecraftReflection.getItemAnimation(data.getPlayer().getItemInHand());
 
         data.lagInfo.lagging = data.lagInfo.lagTicks.subtract() > 0
                 || !data.playerInfo.worldLoaded

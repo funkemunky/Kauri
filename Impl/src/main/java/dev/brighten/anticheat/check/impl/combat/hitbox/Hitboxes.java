@@ -48,7 +48,8 @@ public class Hitboxes extends Check {
                     .collect(Collectors.toList());
 
             List<SimpleCollisionBox> entityLocations = data.targetPastLocation
-                    .getEstimatedLocation(data.lagInfo.transPing, 175L)
+                    .getEstimatedLocation(data.lagInfo.ping,
+                            175L + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
                     .stream()
                     .map(loc -> getHitbox(loc, data.target.getType()))
                     .collect(Collectors.toList());

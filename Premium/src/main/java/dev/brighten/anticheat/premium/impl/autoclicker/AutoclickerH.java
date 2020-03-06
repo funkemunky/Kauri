@@ -10,8 +10,10 @@ import dev.brighten.anticheat.utils.GraphUtil;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
 
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.List;
 
 @CheckInfo(name = "Autoclicker (H)", description = "Meant to detect Vape and other autoclickers. By Elevated.",
         checkType = CheckType.AUTOCLICKER, punishVL = 8)

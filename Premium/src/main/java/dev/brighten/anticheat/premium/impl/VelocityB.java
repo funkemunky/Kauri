@@ -56,7 +56,7 @@ public class VelocityB extends Check {
             velocityTS = timeStamp;
             vX = svX;
             vZ = svZ;
-            maxThreshold = data.playerVersion.isAbove(ProtocolVersion.V1_8_9) ? 80 : 99;
+            maxThreshold = 75;
             debug("set velocity");
             svX = svZ = vY = 0;
             tookVelocity = false;
@@ -83,9 +83,9 @@ public class VelocityB extends Check {
                     f4 *= data.blockInfo.currentFriction;
                 }
 
-                if(!lastKey.equals(data.predictionService.key)) maxThreshold = 75;
+                if(!lastKey.equals(data.predictionService.key)) maxThreshold = 60;
 
-                if(data.lagInfo.lastPingDrop.hasNotPassed(20)) maxThreshold = 60;
+                if(data.lagInfo.lastPingDrop.hasNotPassed(20)) maxThreshold = 50;
 
                 double f = 0.16277136 / (f4 * f4 * f4);
                 double f5;
