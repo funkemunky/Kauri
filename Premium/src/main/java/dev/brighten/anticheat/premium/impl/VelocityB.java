@@ -84,7 +84,7 @@ public class VelocityB extends Check {
                     f4 *= data.blockInfo.currentFriction;
                 }
 
-                if(!lastKey.equals(data.predictionService.key)) maxThreshold = 90;
+                if(!lastKey.equals(data.predictionService.key)) maxThreshold = 80;
 
                 double f = 0.16277136 / (f4 * f4 * f4);
                 double f5;

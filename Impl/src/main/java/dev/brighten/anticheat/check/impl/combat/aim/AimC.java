@@ -13,7 +13,8 @@ public class AimC extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if(packet.isLook() && data.moveProcessor.deltaX > 0) {
-            if(data.playerInfo.deltaYaw > 320
+            float deltaYaw = Math.abs(data.playerInfo.to.yaw - data.playerInfo.from.yaw);
+            if(deltaYaw > 320
                     && data.playerInfo.lDeltaYaw > 0
                     && data.moveProcessor.sensitivityX < 0.65
                     && data.playerInfo.lDeltaYaw < 30

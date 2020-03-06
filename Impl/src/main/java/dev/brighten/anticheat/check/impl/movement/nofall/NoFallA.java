@@ -24,7 +24,6 @@ public class NoFallA extends Check {
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet, long timeStamp) {
-        if(!packet.isPos()) return;
 
         boolean flag = data.playerInfo.clientGround
                 ? data.playerInfo.deltaY != 0 && !data.playerInfo.serverGround
