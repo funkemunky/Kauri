@@ -4,6 +4,7 @@ import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.config.MessageHandler;
 import cc.funkemunky.api.profiling.ToggleableProfiler;
 import cc.funkemunky.api.utils.Color;
+import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.TickTimer;
 import dev.brighten.anticheat.check.api.Check;
@@ -57,7 +58,7 @@ public class Load {
 
         if(Bukkit.getOnlinePlayers().size() > 0) {
             RunUtils.taskLater(() -> {
-                print(Color.Gray + "Detected players! Creating data objects...");
+                MiscUtils.printToConsole(Color.Gray + "Detected players! Creating data objects...");
                 Bukkit.getOnlinePlayers().forEach(Kauri.INSTANCE.dataManager::createData);
             }, Kauri.INSTANCE, 6L);
         }
@@ -68,11 +69,7 @@ public class Load {
         Bukkit.getWorlds().forEach(world -> EntityProcessor.vehicles.put(world.getUID(), new ArrayList<>()));
     }
 
-    private static void print(String string) {
-        print(string);
-    }
-
     private static void register(String string) {
-        print(Color.Gray + string);
+        MiscUtils.printToConsole(Color.Gray + string);
     }
 }
