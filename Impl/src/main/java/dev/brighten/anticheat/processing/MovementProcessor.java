@@ -133,10 +133,8 @@ public class MovementProcessor {
                 .getBlockBox().isRiptiding(data.getPlayer());
         /* We only set the jumpheight on ground since there's no need to check for it while they're in the air.
          * If we did check while it was in the air, there would be false positives in the checks that use it. */
-        if (packet.isGround()) {
+        if (packet.isGround() || data.playerInfo.serverGround || data.playerInfo.lClientGround) {
             data.playerInfo.jumpHeight = MovementUtils.getJumpHeight(data.getPlayer());
-        }
-        if(data.playerInfo.clientGround || data.playerInfo.lClientGround) {
             data.playerInfo.totalHeight = MovementUtils.getTotalHeight(data.playerVersion,
                     (float)data.playerInfo.jumpHeight);
         }

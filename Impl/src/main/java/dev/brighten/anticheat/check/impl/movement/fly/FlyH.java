@@ -19,13 +19,13 @@ public class FlyH extends Check {
             double delta = Math.abs(data.playerInfo.deltaY - data.playerInfo.lDeltaY);
 
             if(!data.playerInfo.flightCancel
-                    && delta > 0.16
+                    && delta > 0.185
                     && data.playerInfo.lastVelocity.hasPassed(2)
                     && data.playerInfo.lastHalfBlock.hasPassed(10)
                     && data.playerInfo.blockAboveTimer.hasPassed(10)
                     && verbose.flag(1, 4)) {
                 vl++;
-                flag("%1>-0.16", MathUtils.round(delta, 3));
+                flag("%1>-0.185", MathUtils.round(delta, 3));
             }
             debug("delta=%1 ground=%2", delta, packet.isGround());
         }
