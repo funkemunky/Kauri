@@ -239,7 +239,7 @@ public class SpeedC extends Check {
             if (horizontalMove > 0 && data.playerInfo.lastVelocity.hasPassed(10)
                     && data.playerInfo.lastVelocity.hasPassed(10)) {
                 vl++;
-                if(horizontalMove > 0.51 || vl > 3) {
+                if(horizontalMove > 0.51 || vl > 7) {
                     flag("+%1,tags=%2",
                             MathUtils.round(horizontalMove, 5), String.join(",", tags));
                 }

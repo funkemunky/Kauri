@@ -85,7 +85,7 @@ public class FlyB extends Check {
                     && data.playerInfo.lastVelocity.hasPassed(10)
                     && deltaPredict > 0.0001) {
                 vl++;
-                if(vl > (data.lagInfo.lastPacketDrop.hasPassed(5) ? 1 : 3)) {
+                if(vl > (data.lagInfo.lastPacketDrop.hasPassed(5) ? 2.5 : 4)) {
                     flag("deltaY=%1 predicted=%2", data.playerInfo.deltaY, predicted);
                 }
             } else vl-= vl > 0 ? 0.2f : 0;
