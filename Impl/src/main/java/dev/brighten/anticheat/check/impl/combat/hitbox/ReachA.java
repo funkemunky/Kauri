@@ -1,4 +1,4 @@
-package dev.brighten.anticheat.check.impl.combat.reach;
+package dev.brighten.anticheat.check.impl.combat.hitbox;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
@@ -31,7 +31,7 @@ public class ReachA extends Check {
         List<KLocation> origins = Arrays.asList(data.playerInfo.to.clone(), data.playerInfo.from.clone());
         List<Tuple<KLocation, Vector>> targetBoxes = data.targetPastLocation
                 .getEstimatedLocation(data.lagInfo.transPing,
-                        225L + (data.lagInfo.transPing - data.lagInfo.lastTransPing))
+                        225L + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
                 .stream()
                 .map(loc -> new Tuple<>(loc, getHitbox(target.getType())))
                 .collect(Collectors.toList());

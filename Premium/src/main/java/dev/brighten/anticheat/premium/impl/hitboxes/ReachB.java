@@ -43,7 +43,7 @@ public class ReachB extends Check {
 
             List<SimpleCollisionBox> entityLocs = targetData.pastLocation
                     .getEstimatedLocation(data.lagInfo.ping,
-                            200L + (data.lagInfo.transPing - data.lagInfo.lastTransPing))
+                            200L + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
                     .stream()
                     .map(ReachB::getHitbox).collect(Collectors.toList());
 

@@ -19,7 +19,7 @@ import dev.brighten.anticheat.check.impl.combat.hand.HandC;
 import dev.brighten.anticheat.check.impl.combat.hand.HandD;
 import dev.brighten.anticheat.check.impl.combat.hitbox.Hitboxes;
 import dev.brighten.anticheat.check.impl.combat.killaura.*;
-import dev.brighten.anticheat.check.impl.combat.reach.ReachA;
+import dev.brighten.anticheat.check.impl.combat.hitbox.ReachA;
 import dev.brighten.anticheat.check.impl.movement.fly.*;
 import dev.brighten.anticheat.check.impl.movement.general.FastLadder;
 import dev.brighten.anticheat.check.impl.movement.general.HealthSpoof;
