@@ -25,9 +25,9 @@ public class FlyH extends Check {
                     && data.playerInfo.blockAboveTimer.hasPassed(10)
                     && verbose.flag(1, 4)) {
                 vl++;
-                flag("%1>-0.185", MathUtils.round(delta, 3));
+                flag("%v>-0.185", MathUtils.round(delta, 3));
             }
-            debug("delta=%1 ground=%2", delta, packet.isGround());
+            debug("delta=%v ground=%v", delta, packet.isGround());
         }
     }
 }

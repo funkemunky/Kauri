@@ -1,34 +1,32 @@
 package dev.brighten.anticheat.check.impl.movement.fly;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.utils.Helper;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Fly (F)", description = "Ensures a user doesn't fly faster than the maximum threshold.",
-        checkType = CheckType.FLIGHT, punishVL = 3)
+        checkType = CheckType.FLIGHT, punishVL = 5, enabled = false)
 @Cancellable
 public class FlyF extends Check {
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
+    public void onFlying(WrappedInFlyingPacket packet) {
         if(packet.isPos()) {
-            double jumpHeight = data.playerInfo.jumpHeight;
+            double threshold = Math.max(0.8, data.playerInfo.jumpHeight * 2);
 
-            if(data.playerInfo.deltaY > jumpHeight * 1.5
+            if(data.playerInfo.deltaY > threshold
                     && !data.playerInfo.canFly
-                    && !data.playerInfo.generalCancel
+                    && !data.playerInfo.flightCancel
                     && !data.playerInfo.creative
-                    && !data.playerInfo.wasOnSlime
-                    && timeStamp - data.playerInfo.lastServerPos > 100
-                    && !data.playerInfo.inVehicle
-                    && timeStamp - data.creation > 4000
-                    && !data.playerInfo.riptiding
-                    && !data.playerInfo.gliding) {
+                    && !data.playerInfo.wasOnSlime) {
                 vl++;
-                flag("deltaY=" + data.playerInfo.deltaY);
+                flag("deltaY=%v;threshold=%v",
+                        Helper.format(data.playerInfo.deltaY, 2), Helper.format(threshold, 2));
             }
         }
     }

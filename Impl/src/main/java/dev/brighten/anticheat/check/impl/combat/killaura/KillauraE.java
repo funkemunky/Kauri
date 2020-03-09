@@ -30,7 +30,7 @@ public class KillauraE extends Check {
                     && data.playerInfo.deltaXZ >= lastDeltaXZ * 0.99) {
                 if(data.lagInfo.lastPingDrop.hasPassed(5) && verbose++ > 3) {
                     vl++;
-                    flag("dxz=%1 ldxz=%2", MathUtils.round(data.playerInfo.deltaXZ, 2),
+                    flag("dxz=%v ldxz=%v", MathUtils.round(data.playerInfo.deltaXZ, 2),
                             MathUtils.round(lastDeltaXZ, 2));
                 }
             } else verbose-= verbose > 0 ? 0.2 : 0;

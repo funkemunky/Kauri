@@ -36,7 +36,7 @@ public class AutoclickerC extends Check {
                     .equals(WrappedEnumAnimation.NONE)) {
 
                 if (verbose.add() > 14) {
-                    flag("t=%1 vb=%2", "block", MathUtils.round(verbose.value(), 2));
+                    flag("t=%v vb=%v", "block", MathUtils.round(verbose.value(), 2));
                 } else if(verbose.value() > 8) {
                     TinyProtocolHandler.sendPacket(packet.getPlayer(),
                             new WrappedOutHeldItemSlot(slot == 8 ? 0 : Math.min(8, slot + 1))
@@ -68,11 +68,11 @@ public class AutoclickerC extends Check {
                 if(armTicks == 1 && cps > 3) {
                     if(cps > 7) verbose.add();
                     if(verbose.value() > 15) {
-                        flag("arm=%1 cps=%2 lagging=%3", armTicks,
+                        flag("arm=%v cps=%v lagging=%v", armTicks,
                                 MathUtils.round(cps, 3), data.lagInfo.lagging);
                     }
                 } else verbose.subtract(20);
-                debug("cps=%1 arm=%2 lagging=%3 vl=%4", cps, armTicks, data.lagInfo.lagging, vl);
+                debug("cps=%v arm=%v lagging=%v vl=%v", cps, armTicks, data.lagInfo.lagging, vl);
             }
             blocked = false;
             armTicks = 0;

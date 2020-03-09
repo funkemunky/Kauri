@@ -29,7 +29,7 @@ public class BadPacketsC extends Check {
         if(delta <= 8 && data.lagInfo.lastPingDrop.hasPassed(20)) {
             if(verbose.add() > 7) {
                 vl++;
-                flag("delta=%1 ping=%p", delta);
+                flag("delta=%v ping=%p", delta);
             }
         } else verbose.subtract(0.25);
     }

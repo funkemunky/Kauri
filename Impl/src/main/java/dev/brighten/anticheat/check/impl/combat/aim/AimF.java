@@ -53,13 +53,13 @@ public class AimF extends Check {
             if (deviation > 0) {
                 if(verbose.add() > 2) {
                     vl++;
-                    flag("y1=%1,y2=%2,a=%3", data.playerInfo.deltaYaw, yawDif, angle);
+                    flag("y1=%v,y2=%v,a=%v", data.playerInfo.deltaYaw, yawDif, angle);
                 }
                 reset();
             }
         }
         verbose.subtract(0.001);
-        debug("y1=%1,y2=%2,a=%3,vb=%4,dev=%5", data.playerInfo.deltaYaw, yawDif, angle, verbose.value(), deviation);
+        debug("y1=%v,y2=%v,a=%v,vb=%v,dev=%v", data.playerInfo.deltaYaw, yawDif, angle, verbose.value(), deviation);
     }
 
     public long getDeviation(float pitchChange) {

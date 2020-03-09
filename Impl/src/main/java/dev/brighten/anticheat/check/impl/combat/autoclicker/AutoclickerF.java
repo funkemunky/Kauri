@@ -57,11 +57,11 @@ public class AutoclickerF extends Check {
 
                     if (verbose.value() >= 10) {
                         vl++;
-                        flag("lvl=%1 avg=%2", level.get(), avg);
+                        flag("lvl=%v avg=%v", level.get(), avg);
                     }
                 } else verbose.subtract(2);
 
-                debug("size=%1 avg=%2 verbose=%3", level.get(), avg, verbose.value());
+                debug("size=%v avg=%v verbose=%v", level.get(), avg, verbose.value());
                 ratioDeque.clear();
             }
             debug("ratio=" + ratio);

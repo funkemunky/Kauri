@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.premium.impl.hitboxes;
 
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.utils.KLocation;
@@ -42,7 +43,7 @@ public class ReachB extends Check {
                     .collect(Collectors.toList());
 
             List<SimpleCollisionBox> entityLocs = targetData.pastLocation
-                    .getEstimatedLocation(data.lagInfo.ping,
+                    .getEstimatedLocation(data.lagInfo.transPing,
                             200L + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
                     .stream()
                     .map(ReachB::getHitbox).collect(Collectors.toList());
@@ -67,14 +68,14 @@ public class ReachB extends Check {
             }
 
             if(distance > 3.001) {
-                if(++buffer > 3) {
+                if(++buffer > 4) {
                     vl++;
-                    flag("distance=%1 buffer=%2", MathUtils.round(distance, 3),
+                    flag("distance=%v buffer=%v", MathUtils.round(distance, 3),
                             MathUtils.round(buffer, 1));
                 }
             } else buffer-= buffer > 0 ? 0.05 : 0;
 
-            debug("distance=%1 buffer=%2", distance, buffer);
+            debug("distance=%v buffer=%v", distance, buffer);
         }
     }
 
@@ -82,6 +83,11 @@ public class ReachB extends Check {
     public void onUse(WrappedInUseEntityPacket packet, long timeStamp) {
         lastUse = timeStamp;
         entity = packet.getEntity();
+    }
+
+    @Packet
+    public void onArm9(WrappedInArmAnimationPacket packet) {
+        buffer-= buffer > 0 ? 0.001 : 0;
     }
 
     private static SimpleCollisionBox getHitbox(KLocation loc) {

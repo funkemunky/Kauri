@@ -62,6 +62,14 @@ public class MiscUtils {
         return output.toString().split("\n");
     }
 
+    public static boolean isInteger(String string) {
+        try {
+            Integer.parseInt(string);
+            return true;
+        } catch(NumberFormatException e) {
+            return false;
+        }
+    }
     public static void testMessage(String message) {
         KauriCommand.getTesters().forEach(pl -> pl.sendMessage(Color.translate(message)));
     }

@@ -72,7 +72,6 @@ public class PacketProcessor {
                         data.target = (LivingEntity) packet.getEntity();
                     }
                     data.predictionService.hit = true;
-                    data.predictionService.useSword = data.playerInfo.usingItem = false;
                 }
                 data.checkManager.runPacket(packet, timeStamp);
                 if(data.sniffing) {
@@ -175,11 +174,10 @@ public class PacketProcessor {
                     }
                     val pos = packet.getPosition();
                     val stack = packet.getItemStack();
+
                     if(pos.getX() == -1 && pos.getY() == 255 && pos.getZ() == -1 && stack != null) {
-                         if(Materials.isUsable(stack.getType())) {
-                            data.predictionService.useSword = data.playerInfo.usingItem = true;
-                            data.playerInfo.lastUseItem.reset();
-                        }
+                        data.predictionService.useSword = data.playerInfo.usingItem = true;
+                        data.playerInfo.lastUseItem.reset();
                     } else if(stack != null) {
                         if(stack.getType().isBlock() && stack.getTypeId() != 0) {
                             data.playerInfo.lastBlockPlace.reset();

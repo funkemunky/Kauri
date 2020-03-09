@@ -62,10 +62,10 @@ public class KillauraA extends Check {
             if(collided >= size && data.playerInfo.lastBrokenBlock.hasPassed(10)) {
                 if(verbose.add() > 5) {
                     vl++;
-                    flag("collided=%1/%2 total=%3 lagging=%4", collided, size, total, data.lagInfo.lagging);
+                    flag("collided=%v/%v total=%v lagging=%v", collided, size, total, data.lagInfo.lagging);
                 }
             } else verbose.subtract();
-            debug("collided=%1/%2 total=%3 lagging=%4 vl=%5", collided, size, total, data.lagInfo.lagging, vl);
+            debug("collided=%v/%v total=%v lagging=%v vl=%v", collided, size, total, data.lagInfo.lagging, vl);
         }
     }
 

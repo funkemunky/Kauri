@@ -22,7 +22,7 @@ public class BadPacketsE extends Check {
         if(attackTicks++ > 3 && lastSwing.hasNotPassed(3)
                 && !data.lagInfo.lagging && data.lagInfo.lastPacketDrop.hasPassed(5)) {
             vl++;
-            flag("has not swung since %1 ticks", lastSwing.getPassed());
+            flag("has not swung since %v ticks", lastSwing.getPassed());
         }
     }
 

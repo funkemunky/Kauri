@@ -27,7 +27,7 @@ public class FlyD extends Check {
                     && !data.playerInfo.serverGround) {
                 vl++;
                 if(vl > 1) {
-                    flag("deltaY=%1 lDeltaY=%2 airTicks=%3",
+                    flag("deltaY=%v lDeltaY=%v airTicks=%v",
                             data.playerInfo.deltaY, data.playerInfo.lDeltaY, data.playerInfo.airTicks);
                 }
             } else vl-= vl > 0 ? 0.025f : 0;

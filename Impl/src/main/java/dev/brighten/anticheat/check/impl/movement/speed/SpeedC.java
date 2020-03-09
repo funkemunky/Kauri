@@ -233,14 +233,14 @@ public class SpeedC extends Check {
 
         double horizontalMove = (horizontalDistance - previousHorizontal) - moveSpeed;
         if (horizontalDistance > 0.1) {
-            debug("+%1,tags=%2,place=%3,dy=%4", horizontalMove, String.join(",", tags),
+            debug("+%v,tags=%v,place=%v,dy=%v", horizontalMove, String.join(",", tags),
                     data.playerInfo.lastBlockPlace.getPassed(), Helper.format(data.playerInfo.deltaY, 4));
 
             if (horizontalMove > 0 && data.playerInfo.lastVelocity.hasPassed(10)
                     && data.playerInfo.lastVelocity.hasPassed(10)) {
                 vl++;
-                if(horizontalMove > 0.51 || vl > 7) {
-                    flag("+%1,tags=%2",
+                if(horizontalMove > 0.54 || vl > 7) {
+                    flag("+%v,tags=%v",
                             MathUtils.round(horizontalMove, 5), String.join(",", tags));
                 }
             } else vl-= vl > 0 ? 0.2 : 0;

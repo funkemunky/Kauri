@@ -75,11 +75,13 @@ public class PredictionService {
         fMath = fastMath; // if the Player uses Optifine FastMath
 
         try {
-            if(!position && !velocity && (checkConditions = checkConditions(lastSprint))) {
+            if(!position && !velocity && MathUtils.getDelta(data.playerInfo.deltaY, data.playerInfo.velocityY) > 0.0001
+                    && (checkConditions = checkConditions(lastSprint))) {
                 if (lastSprint && hit) { // If the Player Sprints and Hit a Player he get slowdown
                     lmotionX *= 0.6D;
                     lmotionZ *= 0.6D;
                 }
+
                 double mx = rmotionX - lmotionX; // mx, mz is an Value to calculate the rotation and the Key of the Player
                 double mz = rmotionZ - lmotionZ;
 

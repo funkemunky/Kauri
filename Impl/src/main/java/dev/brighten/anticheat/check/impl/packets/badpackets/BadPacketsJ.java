@@ -18,9 +18,9 @@ public class BadPacketsJ extends Check {
                 && data.lagInfo.lastPacketDrop.hasPassed(1)
                 && !data.getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
             vl++;
-            flag("inCreative=%1 gamemode=%2",
+            flag("inCreative=%v gamemode=%v",
                     data.playerInfo.creative, data.getPlayer().getGameMode().name());
         }
-        debug("inCreative=%1 gamemode=%2", data.playerInfo.creative, data.getPlayer().getGameMode().name());
+        debug("inCreative=%v gamemode=%v", data.playerInfo.creative, data.getPlayer().getGameMode().name());
     }
 }

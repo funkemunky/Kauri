@@ -20,7 +20,7 @@ public class AimA extends Check {
                     && (data.playerInfo.deltaPitch > 0 || yawAccel > 0)
                     && (data.moveProcessor.deltaX > 2 || data.moveProcessor.deltaY > 2)) {
                 if(vl++ > 20) {
-                    flag("yawAccel=%1 pitchAccel=%2", yawAccel, pitchAccel);
+                    flag("yawAccel=%v pitchAccel=%v", yawAccel, pitchAccel);
                 }
             } else vl-= vl > 0 ? 2 : 0;
 

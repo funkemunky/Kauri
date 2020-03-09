@@ -23,9 +23,7 @@ import dev.brighten.anticheat.check.impl.combat.hitbox.ReachA;
 import dev.brighten.anticheat.check.impl.movement.fly.*;
 import dev.brighten.anticheat.check.impl.movement.general.FastLadder;
 import dev.brighten.anticheat.check.impl.movement.general.HealthSpoof;
-import dev.brighten.anticheat.check.impl.movement.general.Phase;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallA;
-import dev.brighten.anticheat.check.impl.movement.nofall.NoFallB;
 import dev.brighten.anticheat.check.impl.movement.speed.*;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityA;
 import dev.brighten.anticheat.check.impl.packets.Timer;
@@ -127,12 +125,45 @@ public class Check implements KauriCheck {
     public void flag(String information, Object... variables) {
         if(lastExemptCheck.hasPassed()) exempt = KauriAPI.INSTANCE.exemptHandler.isExempt(data.uuid, this);
         if(exempt) return;
-        for (int i = 0; i < variables.length; i++) {
-            Object var = variables[i];
+        if(information.contains("%v")) {
+            String[] splitInfo = information.split("%v");
 
-            information = information.replace("%" + (i + 1), String.valueOf(var));
+            for (int i = 0; i < splitInfo.length; i++) {
+                String split = splitInfo[i];
+
+                if(variables.length > i) {
+                    if ((variables[i] instanceof Double || variables[i] instanceof Float)
+                            && splitInfo.length > i + 1 && splitInfo[i + 1].startsWith(".")) {
+                        String split2 = splitInfo[i + 1];
+
+                        if (split2.length() >= 2) {
+                            int parsed = -1;
+                            for (int l = split2.length(); l > 1; l--) {
+                                try {
+                                    parsed = Integer.parseInt(split2.substring(1, l));
+                                    break;
+                                } catch (NumberFormatException ignored) {
+                                }
+                            }
+
+                            if (parsed < 0) {
+                                splitInfo[i] = split + variables[i];
+                            } else if(variables[i] instanceof Float) {
+                                splitInfo[i + 1] = split2.replace("." + parsed, "");
+                                float var = (float) variables[i];
+                                splitInfo[i] = split + MathUtils.round(var, parsed);
+                            } else if(variables[i] instanceof Double) {
+                                splitInfo[i + 1] = split2.replace("." + parsed, "");
+                                double var = (double) variables[i];
+                                splitInfo[i] = split + MathUtils.round(var, parsed);
+                            }
+                        }
+                    } else splitInfo[i] = split + variables[i];
+                }
+            }
+            information = String.join("", splitInfo);
         }
-        String finalInformation = information;
+        final String finalInformation = information;
         KauriFlagEvent event = new KauriFlagEvent(data.getPlayer(), this, finalInformation);
 
         event.setCancelled(!Config.alertDev);
@@ -253,12 +284,45 @@ public class Check implements KauriCheck {
 
     public void debug(String information, Object... variables) {
         if(Kauri.INSTANCE.dataManager.debugging.size() == 0) return;
-        for (int i = 0; i < variables.length; i++) {
-            Object var = variables[i];
+        if(information.contains("%v")) {
+            String[] splitInfo = information.split("%v");
 
-            information = information.replace("%" + (i + 1), String.valueOf(var));
+            for (int i = 0; i < splitInfo.length; i++) {
+                String split = splitInfo[i];
+
+                if(variables.length > i) {
+                    if ((variables[i] instanceof Double || variables[i] instanceof Float)
+                            && splitInfo.length > i + 1 && splitInfo[i + 1].startsWith(".")) {
+                        String split2 = splitInfo[i + 1];
+
+                        if (split2.length() >= 2) {
+                            int parsed = -1;
+                            for (int l = split2.length(); l > 1; l--) {
+                                try {
+                                    parsed = Integer.parseInt(split2.substring(1, l));
+                                    break;
+                                } catch (NumberFormatException ignored) {
+                                }
+                            }
+
+                            if (parsed < 0) {
+                                splitInfo[i] = split + variables[i];
+                            } else if(variables[i] instanceof Float) {
+                                splitInfo[i + 1] = split2.replace("." + parsed, "");
+                                float var = (float) variables[i];
+                                splitInfo[i] = split + MathUtils.round(var, parsed);
+                            } else if(variables[i] instanceof Double) {
+                                splitInfo[i + 1] = split2.replace("." + parsed, "");
+                                double var = (double) variables[i];
+                                splitInfo[i] = split + MathUtils.round(var, parsed);
+                            }
+                        }
+                    } else splitInfo[i] = split + variables[i];
+                }
+            }
+            information = String.join("", splitInfo);
         }
-        String finalInformation = information;
+        final String finalInformation = information;
         Kauri.INSTANCE.dataManager.debugging.stream()
                 .filter(data -> data.debugged.equals(this.data.uuid) && data.debugging.equalsIgnoreCase(name))
                 .forEach(data -> data.getPlayer()
@@ -269,7 +333,7 @@ public class Check implements KauriCheck {
         register(new AutoclickerA());
         register(new AutoclickerB());
         register(new AutoclickerC());
-        register(new AutoclickerF());
+        //register(new AutoclickerF());
         register(new AutoclickerG());
         register(new FlyA());
         register(new FlyB());
@@ -281,7 +345,7 @@ public class Check implements KauriCheck {
         register(new FlyH());
         register(new FastLadder());
         register(new NoFallA());
-        register(new NoFallB());
+        //register(new NoFallB());
         register(new Hitboxes());
         register(new AimA());
         register(new AimB());
@@ -291,15 +355,15 @@ public class Check implements KauriCheck {
         register(new AimH());
         register(new SpeedA());
         register(new SpeedB());
-        register(new SpeedC());
-        register(new SpeedD());
-        register(new SpeedE());
+        //register(new SpeedC());
+        //register(new SpeedD());
+        //register(new SpeedE());
         register(new KillauraA());
         register(new KillauraB());
         register(new KillauraC());
         register(new KillauraD());
         register(new KillauraE());
-        register(new Phase());
+        //register(new Phase());
         register(new Timer());
         register(new BadPacketsA());
         register(new BadPacketsB());
@@ -314,7 +378,7 @@ public class Check implements KauriCheck {
         register(new BadPacketsK());
         register(new BadPacketsL());
         register(new BadPacketsM());
-        register(new BadPacketsN());
+        //register(new BadPacketsN());
         register(new VelocityA());
         register(new HandA());
         register(new HandB());
@@ -327,7 +391,8 @@ public class Check implements KauriCheck {
         register(new PacketSpam());
         register(new SignOp());
         register(new SignCrash());
-        register(new LargeMove());
+        //register(new Test());
+       // register(new LargeMove());
     }
 
     public static boolean isCheck(String name) {

@@ -32,11 +32,11 @@ public class FlyE extends Check {
                     && MathUtils.getDelta(data.playerInfo.deltaY, maxHeight) > 0.01f) {
                 if(verbose.add() > 2) {
                     vl++;
-                    flag("deltaY=%1 maxHeight=%2", data.playerInfo.deltaY, maxHeight);
+                    flag("deltaY=%v maxHeight=%v", data.playerInfo.deltaY, maxHeight);
                 }
             } else verbose.subtract(0.05);
 
-            debug("deltaY=%1 above=%2", data.playerInfo.deltaY,
+            debug("deltaY=%v above=%v", data.playerInfo.deltaY,
                     data.playerInfo.blockAboveTimer.getPassed());
         }
         vl-= vl > 0 ? 0.002f : 0;

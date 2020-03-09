@@ -32,13 +32,13 @@ public class AutoclickerH extends Check {
                 if (negatives == 1) {
                     if (++buffer > 2) {
                         vl++;
-                        flag("cps=%1 buffer=%2", cps, buffer);
+                        flag("cps=%v buffer=%v", cps, buffer);
                     }
                 } else {
                     buffer = 0;
                 }
                 this.clickSamples.clear();
-                debug("cps=%1 negatives=%2 buffer=%3", cps, negatives, MathUtils.round(buffer, 1));
+                debug("cps=%v negatives=%v buffer=%v", cps, negatives, MathUtils.round(buffer, 1));
             }
             this.cps = 0;
             this.ticks = 0;

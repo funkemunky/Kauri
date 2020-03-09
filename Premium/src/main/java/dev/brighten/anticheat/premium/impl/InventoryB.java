@@ -26,7 +26,7 @@ public class InventoryB extends Check {
                 && (data.predictionService.moveStrafing != 0 || data.predictionService.moveForward != 0)) {
             if(verbose++ > 3) {
                 vl++;
-                flag("key=[%1], dxz=%2", data.predictionService.key,
+                flag("key=[%v], dxz=%v", data.predictionService.key,
                         MathUtils.round(data.playerInfo.deltaXZ, 2));
                 if(cancellable) TinyProtocolHandler.sendPacket(packet.getPlayer(),
                         new WrappedOutCloseWindowPacket(data.playerInfo.inventoryId).getObject());

@@ -22,9 +22,7 @@ public class PlayerInformation {
     public Block blockBelow, blockOnTo;
 
     //Cinematic
-    public float cinematicYaw, cinematicPitch;
     public boolean cinematicMode;
-    public MouseFilter yawSmooth = new MouseFilter(), pitchSmooth = new MouseFilter();
 
     //Gcd
     public double yawGCD, pitchGCD, lastYawGCD, lastPitchGCD;
@@ -33,7 +31,6 @@ public class PlayerInformation {
     public long lastServerPos, lastRespawn;
     public boolean serverPos;
     public EvictingList<KLocation> posLocs = new EvictingList<>(5);
-    public CollisionHandler handler;
 
     //Attack
     public TickTimer lastAttack = new TickTimer(5);
@@ -63,8 +60,7 @@ public class PlayerInformation {
             lastRespawnTimer = new TickTimer(20);
 
     public double velocityX, velocityY, velocityZ;
-    public double mvx, mvy, mvz;
-    public boolean takingVelocity, lookingAtBlock;
+    public boolean lookingAtBlock;
 
     public WrappedEnumAnimation animation = WrappedEnumAnimation.NONE;
 

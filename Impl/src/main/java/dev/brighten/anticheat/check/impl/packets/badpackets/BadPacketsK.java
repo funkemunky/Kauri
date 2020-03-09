@@ -17,7 +17,7 @@ public class BadPacketsK extends Check {
     public void onHeld(WrappedInHeldItemSlotPacket packet) {
         if(lastSlot != -1 && lastSlot == packet.getSlot()) {
             vl++;
-            flag("current=%1;last=%2", packet.getSlot(), lastSlot);
+            flag("current=%v;last=%v", packet.getSlot(), lastSlot);
         }
         lastSlot = packet.getSlot();
     }

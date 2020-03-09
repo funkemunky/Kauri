@@ -34,7 +34,7 @@ public class SpeedE extends Check {
 
             if(data.playerInfo.deltaXZ > max && data.playerInfo.lastVelocity.hasPassed(20)) {
                 vl++;
-                flag("deltaXZ=%1 max=%2",
+                flag("deltaXZ=%v max=%v",
                         MathUtils.round(data.playerInfo.deltaXZ, 3), MathUtils.round(max, 3));
             }
         }

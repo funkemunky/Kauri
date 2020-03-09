@@ -46,7 +46,6 @@ public class AimH extends Check {
                 return;
             }
 
-
             if (outYawDifference > 2.0F && yawDelta > 0.0F) {
                 long expandedOutPitch = (long) (outPitchDelta * MovementProcessor.offset);
                 long previousExpandedOutPitch = (long) (lastOutPitchDelta * MovementProcessor.offset);
@@ -69,10 +68,10 @@ public class AimH extends Check {
 
                     if (level.get() > 14 && data.playerInfo.lastAttack.hasNotPassed(20)) {
                         vl++;
-                        flag("level=%1", level.get());
+                        flag("level=%v", level.get());
                     }
 
-                    debug("level=%1", level.get());
+                    debug("level=%v", level.get());
 
                     this.divisorDeque.clear();
                 }

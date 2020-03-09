@@ -71,7 +71,7 @@ public class Hitboxes extends Check {
             }
 
             if (collisions == 0 && data.lagInfo.lastPacketDrop.hasPassed(4)) {
-                if(vl++ > 10)  flag("distance=%1 ping=%p tps=%t",
+                if(vl++ > 10)  flag("distance=%v ping=%p tps=%t",
                         distance.get() != -1 ? distance.get() : "[none collided]");
             } else vl -= vl > 0 ? 0.5 : 0;
 

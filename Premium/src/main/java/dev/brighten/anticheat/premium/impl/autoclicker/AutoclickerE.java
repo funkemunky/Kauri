@@ -43,14 +43,13 @@ public class AutoclickerE extends Check {
 
             val std = Math.sqrt(stdDeviation);
             if (std < 15.d) {
-                if(std < 9.d) verbose.add(2.5);
-                if(verbose.add() > 4) {
+                if(verbose.add(std < 9. ? 2 : 1) > 4) {
                     vl++;
                     this.flag("STD: " + std);
                 }
-            } else verbose.subtract(0.5);
+            } else verbose.subtract(1.5);
 
-            debug("std=%1 verbose=%2", std, verbose.value());
+            debug("std=%v verbose=%v", std, verbose.value());
 
             this.clickSamples.clear();
         }

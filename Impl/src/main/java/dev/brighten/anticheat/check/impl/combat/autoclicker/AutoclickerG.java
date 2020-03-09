@@ -3,18 +3,18 @@ package dev.brighten.anticheat.check.impl.combat.autoclicker;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockDigPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "Autoclicker (G)", description = "Stolen and modified FFX check (Autoclicker 6).", checkType = CheckType.AUTOCLICKER,
-        developer = true)
+@CheckInfo(name = "Autoclicker (G)", description = "Checks for outliers in clicks. (FFX Autoclicker 6).",
+        checkType = CheckType.AUTOCLICKER, developer = true, enabled = false)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerG extends Check {
 
-    private int clicks;
-    private int outliers;
-    private int flyingCount;
+    private int clicks, outliers, flyingCount;
     private boolean release;
+    private double buffer;
 
     @Packet
     public void check(WrappedInFlyingPacket packet) {
@@ -46,10 +46,11 @@ public class AutoclickerG extends Check {
                 }
                 if (++this.clicks == 40) {
                     if (this.outliers == 0) {
-                        if ((vl++) >= 7.0) {
-                            flag("o=%1", outliers);
+                        if (++buffer >= 7.0) {
+                            vl++;
+                            flag("o=%v buffer=%v", outliers, MathUtils.round(buffer, 1));
                         }
-                    } else vl-= vl > 0 ? 1.5 : 0;
+                    } else buffer-= buffer > 0 ? 1.5 : 0;
                     debug("outliers=" + outliers + " vl=" + vl);
                     this.outliers = 0;
                     this.clicks = 0;

@@ -74,7 +74,7 @@ public class Phase extends Check {
                             && !negative.contains(b.getType())
                             && !Materials.checkFlag(b.getType(), Materials.STAIRS)) {
                         vl++;
-                        flag("t=%1", b.getType().name());
+                        flag("t=%v", b.getType().name());
                         if (debug)
                             BlockData.getData(b.getType()).getBox(b, data.playerVersion)
                                     .draw(WrappedEnumParticle.FLAME, Collections.singleton(data.getPlayer()));
@@ -108,7 +108,7 @@ public class Phase extends Check {
                         if (pair.one <= dist) {
                             if (!data.playerInfo.wasOnSlime && dist >= 1) {
                                 vl++;
-                                flag("d=%1", dist);
+                                flag("d=%v", dist);
                             }
                             if(setbackTicks <= 0) {
                                 if(data.playerInfo.deltaXZ > 1.2) {

@@ -22,7 +22,7 @@ public class BadPacketsB extends Check {
                 ticks.add();
                 if(ticks.value() > 80) {
                     vl++;
-                    flag("ticks=%1 ping=%p tps=%t", ticks.value());
+                    flag("ticks=%v ping=%p tps=%t", ticks.value());
                 }
             } else ticks.subtract(ticks.value() > 40 ? 8 : 4);
             lastSneak = timeStamp;

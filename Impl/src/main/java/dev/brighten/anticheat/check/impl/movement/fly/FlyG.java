@@ -46,14 +46,14 @@ public class FlyG extends Check {
                             || data.blockInfo.blocksNear
                             ? 0.02 : 1E-7) + (data.playerVersion.isOrAbove(ProtocolVersion.V1_9) ? 0.005 : 0)) {
                         vl++;
-                        flag("delta=%1 totalHeight=%2 predicted=%3 jumpHeight=%4",
+                        flag("delta=%v totalHeight=%v predicted=%v jumpHeight=%v",
                                 MathUtils.round(delta, 3),
                                 MathUtils.round(totalY, 3),
                                 MathUtils.round(data.playerInfo.totalHeight, 3),
                                 MathUtils.round(data.playerInfo.jumpHeight, 3));
                     }
 
-                    debug("delta=%1", delta);
+                    debug("delta=%v", delta);
                 }
             }
             totalY = 0;

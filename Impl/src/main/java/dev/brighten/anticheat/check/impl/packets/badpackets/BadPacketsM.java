@@ -15,7 +15,7 @@ public class BadPacketsM extends Check {
     public void onFlying(WrappedInFlyingPacket packet) {
         if(packet.isLook() && Math.abs(packet.getPitch()) > 90) {
             vl++;
-            flag("pitch=%1", MathUtils.round(packet.getPitch(), 2));
+            flag("pitch=%v", MathUtils.round(packet.getPitch(), 2));
         }
     }
 }

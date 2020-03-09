@@ -52,11 +52,11 @@ public class VelocityB extends Check {
         if(Math.abs(vX) < 0.005) vX = 0;
         if(Math.abs(vZ) < 0.005) vZ = 0;
 
-        if(tookVelocity && MathUtils.getDelta(data.playerInfo.deltaY, vY) < 0.01) {
+        if(tookVelocity && MathUtils.getDelta(data.playerInfo.deltaY, vY) < 0.0001) {
             velocityTS = timeStamp;
             vX = svX;
             vZ = svZ;
-            maxThreshold = 75;
+            maxThreshold = 99;
             debug("set velocity");
             svX = svZ = vY = 0;
             tookVelocity = false;
@@ -83,7 +83,7 @@ public class VelocityB extends Check {
                     f4 *= data.blockInfo.currentFriction;
                 }
 
-                if(!lastKey.equals(data.predictionService.key)) maxThreshold = 60;
+                if(!lastKey.equals(data.predictionService.key)) maxThreshold = 80;
 
                 if(data.lagInfo.lastPingDrop.hasNotPassed(20)) maxThreshold = 50;
 
@@ -101,7 +101,7 @@ public class VelocityB extends Check {
                 float forward = data.predictionService.moveForward;
                 float strafe = data.predictionService.moveStrafing;
 
-                if(data.playerInfo.usingItem && !data.playerInfo.animation.equals(WrappedEnumAnimation.NONE)) {
+                if(data.playerInfo.usingItem) {
                     forward*= 0.2;
                     strafe*= 0.2;
                 }
@@ -119,12 +119,13 @@ public class VelocityB extends Check {
                 if (pct < maxThreshold && data.playerInfo.lastUseItem.hasPassed(4)) {
                     if(verbose.add() > 36) {
                         vl++;
-                        flag("pct=%1% buffer=%2", MathUtils.round(pct, 3),
+                        flag("pct=%v% buffer=%v", MathUtils.round(pct, 3),
                                 MathUtils.round(verbose.value(), 1));
                     }
-                } else verbose.subtract(maxThreshold <= 75 ? 0.05 : (data.lagInfo.lagging ? 0.35f : 0.2f));
+                } else verbose.subtract(maxThreshold <= 80 ? 0.05 : (data.lagInfo.lagging ? 0.35f : 0.2f));
 
-                debug("pct=" + pct + " key=" + data.predictionService.key + " ani="
+                debug("pct=" + MathUtils.round(pct, 2) + "/" + maxThreshold
+                        + " key=" + data.predictionService.key + " ani="
                         + data.playerInfo.usingItem + " sprint=" + data.playerInfo.sprinting
                         + " ground=" + data.playerInfo.lClientGround + " vl=" + verbose.value()
                         + " lastUse=" + data.playerInfo.lastUseItem.getPassed());

@@ -24,9 +24,9 @@ public class AimG extends Check {
         if(deltaY <= 2 && deltaX > 0 && deltaX <= 6 && data.moveProcessor.deltaX > 25) {
             if(verbose.flag(1, 7)) {
                 vl++;
-                flag("deltaX=%1 deltaY=%2 vb=%3", deltaX, deltaY, verbose.value());
+                flag("deltaX=%v deltaY=%v vb=%v", deltaX, deltaY, verbose.value());
             }
             debug(Color.Green + "Flag");
-        } debug("deltaX=%1 deltaY=%2 vb=%3", deltaX, deltaY, verbose.value());
+        } debug("deltaX=%v deltaY=%v vb=%v", deltaX, deltaY, verbose.value());
     }
 }

@@ -23,7 +23,7 @@ public class SpeedD extends Check {
                     && !data.predictionService.key.contains("W")) {
                 vl++;
                 if(vl > 40) {
-                    flag("key=%1 groundTicks=%2 lastVelocity=%3",
+                    flag("key=%v groundTicks=%v lastVelocity=%v",
                             data.predictionService.key,
                             data.playerInfo.groundTicks,
                             data.playerInfo.lastVelocity.getPassed());

@@ -62,7 +62,7 @@ public class FlyA extends Check {
                 && !data.playerInfo.nearGround
                 && !data.playerInfo.flightCancel) {
             vl++;
-            flag("%1>-%2; ping=%p tps=%t", totalHeight, maxHeight);
+            flag("%v>-%v; ping=%p tps=%t", totalHeight, maxHeight);
         }
 
         debug("total=" + totalHeight + " max=" + maxHeight

@@ -48,11 +48,11 @@ public class ReachA extends Check {
         if(distance > 3.01 && distance != 69) {
             if(++buffer > 3) {
                 vl++;
-                flag("distance=%1 buffer=%2", MathUtils.round(distance, 3), buffer);
+                flag("distance=%v buffer=%v", MathUtils.round(distance, 3), buffer);
             }
         } else buffer = 0;
 
-        debug("distance=%1 boxes=%2 buffer=%3", distance, targetBoxes.size(), buffer);
+        debug("distance=%v boxes=%v buffer=%v", distance, targetBoxes.size(), buffer);
     }
 
     @Packet

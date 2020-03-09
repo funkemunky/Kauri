@@ -1,7 +1,6 @@
 package dev.brighten.anticheat.processing;
 
 import cc.funkemunky.api.Atlas;
-import cc.funkemunky.api.reflections.impl.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.*;
@@ -29,7 +28,7 @@ public class MovementProcessor {
     public List<Double> yawGcdList = Collections.synchronizedList(new EvictingList<>(50));
     public List<Double> pitchGcdList = Collections.synchronizedList(new EvictingList<>(50));
     public long deltaX, deltaY, lastDeltaX, lastDeltaY, lastCinematic;
-    public double sensitivityX, sensitivityY, yawMode, pitchMode;
+    public double sensitivityX, sensitivityY, yawMode, pitchMode, sensXPercent, sensYPercent;
     private MouseFilter mxaxis = new MouseFilter(), myaxis = new MouseFilter();
     private float smoothCamFilterX, smoothCamFilterY, smoothCamYaw, smoothCamPitch;
     public TickTimer lastEquals = new TickTimer(6);
@@ -123,6 +122,10 @@ public class MovementProcessor {
 
             data.blockInfo.runCollisionCheck(); //run b4 everything else for use below.
         }
+
+        if(MathUtils.getDelta(deltaY, -0.098) < 0.001 && data.playerInfo.deltaXZ <= 0.3) {
+            data.playerInfo.worldLoaded = false;
+        }
         data.playerInfo.inVehicle = data.getPlayer().getVehicle() != null;
         data.playerInfo.gliding = PlayerUtils.isGliding(data.getPlayer());
         data.playerInfo.riptiding = Atlas.getInstance().getBlockBoxManager()
@@ -136,10 +139,6 @@ public class MovementProcessor {
         }
         data.playerInfo.lworldLoaded = data.playerInfo.worldLoaded;
 
-        if(data.getPlayer().getItemInHand() != null)
-        if(ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_8))
-            data.playerInfo.animation = MinecraftReflection.getItemAnimation(data.getPlayer().getItemInHand());
-
         data.lagInfo.lagging = data.lagInfo.lagTicks.subtract() > 0
                 || !data.playerInfo.worldLoaded
                 || timeStamp - Kauri.INSTANCE.lastTick >
@@ -152,14 +151,36 @@ public class MovementProcessor {
 
         //We set the yaw and pitch like this to prevent inaccurate data input. Like above, it will return both pitch
         //and yaw as 0 if it isnt a look packet.
-        if (packet.isLook()) {
+        if(packet.isLook()) {
             data.playerInfo.to.yaw = packet.getYaw();
             data.playerInfo.to.pitch = packet.getPitch();
+        }
+        //Setting the angle delta for use in checks to prevent repeated functions.
+        data.playerInfo.lDeltaYaw = data.playerInfo.deltaYaw;
+        data.playerInfo.lDeltaPitch = data.playerInfo.deltaPitch;
+        data.playerInfo.deltaYaw = MathUtils.getDelta(data.playerInfo.to.yaw, data.playerInfo.from.yaw);
+        data.playerInfo.deltaPitch = data.playerInfo.to.pitch - data.playerInfo.from.pitch;
+        if (packet.isLook()) {
+            data.playerInfo.lastYawGCD = data.playerInfo.yawGCD;
+            data.playerInfo.yawGCD = MiscUtils.gcd((long) (data.playerInfo.deltaYaw * offset),
+                    (long) (data.playerInfo.lDeltaYaw * offset));
+            data.playerInfo.lastPitchGCD = data.playerInfo.pitchGCD;
+            data.playerInfo.pitchGCD = MiscUtils.gcd((long) (Math.abs(data.playerInfo.deltaPitch) * offset),
+                    (long) (Math.abs(data.playerInfo.lDeltaPitch) * offset));
 
-            double yawGcd = MiscUtils.gcd((long) (MathUtils.yawTo180F(data.playerInfo.deltaYaw) * offset),
-                    (long) (MathUtils.yawTo180F(data.playerInfo.lDeltaYaw) * offset)) / offset;
-            double pitchGcd = MiscUtils.gcd((long) Math.abs(data.playerInfo.deltaPitch * offset),
-                    (long) Math.abs(data.playerInfo.lDeltaPitch * offset)) / offset;
+            val origin = data.playerInfo.to.clone();
+
+            origin.y+= data.playerInfo.sneaking ? 1.54 : 1.62;
+
+            RayCollision collision = new RayCollision(origin.toVector(), MathUtils.getDirection(origin));
+
+            List<CollisionBox> boxes = collision.boxesOnRay(data.getPlayer().getWorld(),
+                    data.playerInfo.creative ? 5 : 4);
+
+            data.playerInfo.lookingAtBlock = boxes.size() > 0;
+
+            double yawGcd = data.playerInfo.yawGCD / offset;
+            double pitchGcd = data.playerInfo.pitchGCD / offset;
 
             //Adding gcd of yaw and pitch.
             if (data.playerInfo.yawGCD > 90000 && data.playerInfo.yawGCD < 2E7
@@ -182,8 +203,8 @@ public class MovementProcessor {
                 lastDeltaY = deltaY;
                 deltaX = getDeltaX(data.playerInfo.deltaYaw, (float) yawMode);
                 deltaY = getDeltaY(data.playerInfo.deltaPitch, (float) pitchMode);
-                sensitivityX = getSensitivityFromYawGCD(yawMode);
-                sensitivityY = getSensitivityFromPitchGCD(pitchMode);
+                sensXPercent = sensToPercent(sensitivityX = getSensitivityFromYawGCD(yawMode));
+                sensYPercent = sensToPercent(sensitivityY = getSensitivityFromPitchGCD(pitchMode));
 
                 if((data.playerInfo.pitchGCD < 1E5 || data.playerInfo.yawGCD < 1E5) && smoothCamFilterY < 1E6
                         && smoothCamFilterX < 1E6 && timeStamp - data.creation > 1000L) {
@@ -213,37 +234,6 @@ public class MovementProcessor {
                     myaxis.reset();
                     data.playerInfo.cinematicMode = false;
                 }
-
-                if (sensToPercent(sensitivityY) == sensToPercent(sensitivityY)) lastEquals.reset();
-            }
-        }
-
-        /* Velocity Handler */
-        if (timeStamp - data.playerInfo.lastVelocityTimestamp < 50L) {
-            data.playerInfo.takingVelocity = true;
-            data.playerInfo.mvx = data.playerInfo.velocityX;
-            data.playerInfo.mvy = data.playerInfo.velocityY;
-            data.playerInfo.mvz = data.playerInfo.velocityZ;
-        }
-
-        //We use a boolean since it allows for easier management of this handler, and it also isn't dependant on time
-        //If it was dependant on time, a player could be taking large amounts of velocity still and it would stop checking.
-        //That would most likely cause a false positive.
-        if (data.playerInfo.takingVelocity) {
-            float drag = data.playerInfo.serverGround ? MovementUtils.getFriction(data) : 0.91f;
-
-            data.playerInfo.mvx *= drag;
-            data.playerInfo.mvz *= drag;
-
-            if (!data.playerInfo.serverGround) {
-                data.playerInfo.mvy -= 0.08f;
-                data.playerInfo.mvy *= 0.98;
-                data.playerInfo.mvy = 0;
-            } else data.playerInfo.mvy = 0;
-
-            if (MathUtils.hypot(data.playerInfo.mvx, data.playerInfo.mvz) < data.playerInfo.deltaXZ - 0.001) {
-                data.playerInfo.takingVelocity = false;
-                data.playerInfo.mvx = data.playerInfo.mvz = 0;
             }
         }
 
@@ -265,33 +255,6 @@ public class MovementProcessor {
         }
 
         if (data.playerInfo.breakingBlock) data.playerInfo.lastBrokenBlock.reset();
-
-        //Setting the angle delta for use in checks to prevent repeated functions.
-        data.playerInfo.lDeltaYaw = data.playerInfo.deltaYaw;
-        data.playerInfo.lDeltaPitch = data.playerInfo.deltaPitch;
-        data.playerInfo.deltaYaw = MathUtils.getDelta(data.playerInfo.to.yaw, data.playerInfo.from.yaw);
-        data.playerInfo.deltaPitch = data.playerInfo.to.pitch - data.playerInfo.from.pitch;
-
-        if (packet.isLook()) {
-            data.playerInfo.lastYawGCD = data.playerInfo.yawGCD;
-            data.playerInfo.yawGCD = MiscUtils.gcd((long) (data.playerInfo.deltaYaw * offset),
-                    (long) (data.playerInfo.lDeltaYaw * offset));
-            data.playerInfo.lastPitchGCD = data.playerInfo.pitchGCD;
-            data.playerInfo.pitchGCD = MiscUtils.gcd((long) (Math.abs(data.playerInfo.deltaPitch) * offset),
-                    (long) (Math.abs(data.playerInfo.lDeltaPitch) * offset));
-
-            val origin = data.playerInfo.to.clone();
-
-            origin.y+= data.playerInfo.sneaking ? 1.54 : 1.62;
-
-            RayCollision collision = new RayCollision(origin.toVector(), MathUtils.getDirection(origin));
-;
-            List<CollisionBox> boxes = dev.brighten.anticheat.utils.Helper
-                    .getCollisionsOnRay(collision, data.getPlayer().getWorld(),
-                            data.playerInfo.creative ? 6.5 : 4.5, 0.5);
-
-            data.playerInfo.lookingAtBlock = boxes.size() > 0;
-        }
 
         //Setting fallDistance
         if (!data.playerInfo.serverGround
@@ -327,21 +290,14 @@ public class MovementProcessor {
 
         //Checking if user is in liquid.
         if (data.blockInfo.inLiquid) data.playerInfo.liquidTimer.reset();
-
         //Half block ticking (slabs, stairs, bed, cauldron, etc.)
         if (data.blockInfo.onHalfBlock) data.playerInfo.lastHalfBlock.reset();
-
         //We dont check if theyre still on ice because this would be useless to checks that check a player in air too.
         if (data.blockInfo.onIce) data.playerInfo.iceTimer.reset();
-
         if (data.blockInfo.inWeb) data.playerInfo.webTimer.reset();
-
         if (data.blockInfo.onClimbable) data.playerInfo.climbTimer.reset();
-
         if (data.blockInfo.onSlime) data.playerInfo.slimeTimer.reset();
-
         if (data.blockInfo.onSoulSand) data.playerInfo.soulSandTimer.reset();
-
         if (data.blockInfo.blocksAbove) data.playerInfo.blockAboveTimer.reset();
 
         //Player ground/air positioning ticks.
@@ -362,8 +318,8 @@ public class MovementProcessor {
                 || hasLevi
                 || (data.playerInfo.deltaY > -0.0981
                 && data.playerInfo.deltaY < -0.0979
-                && data.playerInfo.deltaXZ < 0.1)
-                || timeStamp - data.playerInfo.lastServerPos < 80L
+                && data.playerInfo.deltaXZ < 0.2)
+                || timeStamp - data.playerInfo.lastServerPos < 200L
                 || data.playerInfo.riptiding
                 || data.playerInfo.gliding
                 || data.playerInfo.lastPlaceLiquid.hasNotPassed(5)
@@ -372,7 +328,7 @@ public class MovementProcessor {
                 || !data.playerInfo.worldLoaded
                 || timeStamp - data.playerInfo.lastRespawn < 2500L
                 || data.playerInfo.lastToggleFlight.hasNotPassed(40)
-                || timeStamp - data.creation < 2000
+                || timeStamp - data.creation < 4000
                 || Kauri.INSTANCE.lastTickLag.hasNotPassed(5);
 
         data.playerInfo.flightCancel = data.playerInfo.generalCancel
@@ -386,27 +342,6 @@ public class MovementProcessor {
         //Adding past location
         data.pastLocation.addLocation(data.playerInfo.to.clone());
     }
-
-
-
-    /* Cinematic Yaw Methods */
-
-    private float findClosestCinematicYaw(ObjectData data, float lastYaw) {
-        double value = sensitivityX;
-
-        double f = value * 0.6f + .2f;
-        double f1 = (f * f * f) * 8f;
-        return data.playerInfo.yawSmooth.smooth(lastYaw, 0.05f * (float)f1);
-    }
-
-    private float findClosestCinematicPitch(ObjectData data, float lastPitch) {
-        double value = sensitivityY;
-
-        double f = value * 0.6f + .2f;
-        double f1 = (f * f * f) * 8f;
-        return data.playerInfo.pitchSmooth.smooth(lastPitch, 0.05f * (float)f1);
-    }
-
     private static int getDeltaX(double yawDelta, double gcd) {
         double f2 = yawToF2(yawDelta);
 

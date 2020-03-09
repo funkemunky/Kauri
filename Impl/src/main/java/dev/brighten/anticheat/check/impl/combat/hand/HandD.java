@@ -63,11 +63,11 @@ public class HandD extends Check {
             if(!collided) {
                 if(verbose.add() > 4) {
                     vl++;
-                    flag("type=%1", block.getType().name());
+                    flag("type=%v", block.getType().name());
                 }
             } else verbose.subtract(0.5);
 
-            debug("collided=%1 verbose=%2", collided, verbose.value());
+            debug("collided=%v verbose=%v", collided, verbose.value());
         }
     }
 }

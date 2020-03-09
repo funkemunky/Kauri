@@ -18,7 +18,7 @@ public class HandB extends Check {
 
         if(!data.lagInfo.lagging && data.lagInfo.lastPacketDrop.hasPassed(5) && delta < 10) {
             if(vl++ > 6) {
-                flag("delta=%1ms action=%2", delta, packet.getAction().name());
+                flag("delta=%vms action=%v", delta, packet.getAction().name());
             }
         } else vl-= vl > 0 ? 1f : 0;
 

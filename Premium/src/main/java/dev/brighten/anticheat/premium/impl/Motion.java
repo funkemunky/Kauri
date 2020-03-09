@@ -25,7 +25,7 @@ public class Motion extends Check {
                     && !data.blockInfo.collidesHorizontally) {
                 vl++;
                 if(vl > 24) {
-                    flag("deltaX=%1 deltaZ=%2",
+                    flag("deltaX=%v deltaZ=%v",
                             MathUtils.round(deltaX, 3), MathUtils.round(deltaZ, 3));
                 }
             } else vl-= vl > 0 ? 1.25 : 0;

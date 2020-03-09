@@ -18,7 +18,7 @@ public class AimI extends Check {
     @Packet
     public void onPacket(WrappedInUseEntityPacket packet) {
         if(looked) {
-            debug("vl=%1", ++vl);
+            debug("vl=%v", ++vl);
         } else vl = 0;
     }
 }

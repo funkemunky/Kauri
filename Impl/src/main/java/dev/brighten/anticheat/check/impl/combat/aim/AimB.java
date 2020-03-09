@@ -20,7 +20,7 @@ public class AimB extends Check {
                     && !data.playerInfo.cinematicMode
                     && data.moveProcessor.sensitivityX < 0.44) {
                 if(vl++ > 35) {
-                    flag("offset=%1 deltaPitch=%2", data.playerInfo.pitchGCD, data.playerInfo.deltaPitch);
+                    flag("offset=%v deltaPitch=%v", data.playerInfo.pitchGCD, data.playerInfo.deltaPitch);
                 }
             } else vl-= vl > 0 ? 0.5 : 0;
             debug("gcd=" + data.playerInfo.pitchGCD + " cin=" + data.playerInfo.cinematicMode

@@ -21,12 +21,12 @@ public class AimC extends Check {
                     && !data.playerInfo.serverPos) {
                 vl++;
                 if(vl > 1) {
-                    flag("yaw=%1", data.playerInfo.deltaYaw);
+                    flag("yaw=%v", data.playerInfo.deltaYaw);
                 }
             } else vl-= vl > 0 ? 0.005 : 0;
-            debug("deltaX=%1 yaw=%2 lyaw=%3 sens=%4 vl=%5",
+            debug("deltaX=%v yaw=%v lyaw=%v sens=%v vl=%v",
                     data.moveProcessor.deltaX, data.playerInfo.to.yaw, data.playerInfo.from.yaw,
-                    MovementProcessor.sensToPercent(data.moveProcessor.sensitivityX), vl);
+                    data.moveProcessor.sensXPercent, vl);
         }
     }
 }

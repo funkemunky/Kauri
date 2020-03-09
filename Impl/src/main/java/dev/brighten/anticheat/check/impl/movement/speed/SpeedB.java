@@ -32,7 +32,7 @@ public class SpeedB extends Check {
                         && data.playerInfo.lastBlockPlace.hasPassed(7)) {
                     if(verbose++ > 2) {
                         vl++;
-                        flag("x=%1 z=%2",
+                        flag("x=%v z=%v",
                                 MathUtils.round(accelX, 3), MathUtils.round(accelZ, 3));
                     }
                 } else verbose-= verbose > 0 ? 0.1 : 0;

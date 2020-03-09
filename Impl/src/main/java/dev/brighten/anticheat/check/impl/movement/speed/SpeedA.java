@@ -38,13 +38,13 @@ public class SpeedA extends Check {
         if(data.playerInfo.deltaXZ > baseSpeed) {
             if(verbose.add(data.playerInfo.deltaXZ - baseSpeed > 0.6f ? 4 : 1) > 25
                     || data.playerInfo.deltaXZ - baseSpeed > 0.6f) {
-                vl+= data.playerInfo.deltaXZ - baseSpeed > 0.6f ? 50 : 1;
-                flag("%1>-%2",
+                vl++;
+                flag("%v>-%v",
                         MathUtils.round(data.playerInfo.deltaXZ, 3),
                         MathUtils.round(baseSpeed, 3));
             }
         } else verbose.subtract();
 
-        debug("deltaXZ=%1 base=%2 vb=%3", data.playerInfo.deltaXZ, baseSpeed, verbose);
+        debug("deltaXZ=%v base=%v vb=%v", data.playerInfo.deltaXZ, baseSpeed, verbose);
     }
 }

@@ -22,7 +22,7 @@ public class FlyC extends Check {
 
             if(vaccel > -0.02) {
                 if(vl++ > 2) {
-                    flag("v=%1 deltaY=%2", vaccel, data.playerInfo.deltaY);
+                    flag("v=%v deltaY=%v", vaccel, data.playerInfo.deltaY);
                 }
             } else vl-= vl > 0 ? 0.25f : 0;
         }

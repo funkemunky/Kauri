@@ -47,21 +47,17 @@ public class AutoclickerD extends Check {
                 double std = MathUtils.stdev(list);
                 val summary = delays.stream().mapToDouble(v -> v).summaryStatistics();
                 double avg = summary.getAverage();
-                double range = summary.getMax() - summary.getMin();
 
-                if ((std < 20 || MathUtils.getDelta(std, lstd) < 0.3 || range <= 3) && Math.abs(range - lrange) > 1
-                        && (MathUtils.getDelta(avg, lavg) > 5 || range > 31)) {
-                    verbose++;
-                    if (verbose > 3) {
+                if (std < 18 && (MathUtils.getDelta(avg, lavg) > 5 || MathUtils.getDelta(std, lstd) < 0.4 || std < 3)) {
+                    if (++verbose > 4) {
                         vl++;
-                        flag("std=%1 avg=%2 range=%3 ping=%p tps=%t", std, avg, range);
+                        flag("std=%v.2 avg=%v.2 ping=%p tps=%t", std, avg);
                     }
                 } else verbose = 0;
 
-                debug("std=" + std + " avg=" + avg + " range= " + range + " verbose=" + verbose);
+                debug("std=%v.2 avg=%v.2 verbose=%v", std, avg, verbose);
                 delays.clear();
                 lavg = avg;
-                lrange = range;
                 lstd = std;
             }
             samples.clear();

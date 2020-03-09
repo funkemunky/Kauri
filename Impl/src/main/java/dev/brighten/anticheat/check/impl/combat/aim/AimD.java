@@ -22,7 +22,7 @@ public class AimD extends Check {
                     && (shit1 == 0 || shit2 == 0 || trimmed % 1f == 0)) {
                 if(verbose.add(1) > 10) {
                     vl++;
-                    flag("deltaPitch=%1 trimmed=%2 vb=%3", data.playerInfo.deltaPitch,
+                    flag("deltaPitch=%v trimmed=%v vb=%v", data.playerInfo.deltaPitch,
                             trimmed, verbose.value());
                 }
             } else verbose.subtract(0.25);
