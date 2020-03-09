@@ -46,7 +46,7 @@ public class AutoclickerI extends Check {
 
             val std = Math.sqrt(stdDeviation);
             val deltaStd = Math.abs(std - lstd);
-            if (deltaStd < 2) {
+            if (deltaStd < 2.5) {
                 if(verbose.add(std < 15 ? 2 : 1) > 4) {
                     vl++;
                     this.flag("std=%v.2 delta=%v.2 buffer=%v.1", std, deltaStd, verbose.value());
