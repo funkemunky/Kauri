@@ -24,6 +24,5 @@ public class PremiumChecks {
         //Check.register(new InventoryB());
         Check.register(new AutoclickerH());
         Check.register(new AutoclickerI());
-        Check.register(new AutoclickerJ());
     }
 }
