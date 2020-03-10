@@ -43,7 +43,7 @@ public class ReachB extends Check {
                     .collect(Collectors.toList());
 
             List<SimpleCollisionBox> entityLocs = targetData.pastLocation
-                    .getEstimatedLocation(data.lagInfo.transPing,
+                    .getEstimatedLocation(data.lagInfo.ping,
                             200L + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
                     .stream()
                     .map(ReachB::getHitbox).collect(Collectors.toList());
@@ -62,20 +62,19 @@ public class ReachB extends Check {
                 }
             }
 
-            if(misses > 0 || distance == 69) {
+            if(misses > 1 || distance == 69) {
                 buffer-= buffer > 0 ? 0.01 : 0;
                 return;
             }
 
-            if(distance > 3.001) {
+            if(distance > 3.02 && Kauri.INSTANCE.tps > 19 && Kauri.INSTANCE.lastTickLag.hasPassed(40)) {
                 if(++buffer > 4) {
                     vl++;
-                    flag("distance=%v buffer=%v", MathUtils.round(distance, 3),
-                            MathUtils.round(buffer, 1));
+                    flag("distance=%v.3 buffer=%v.1", distance, buffer);
                 }
             } else buffer-= buffer > 0 ? 0.05 : 0;
 
-            debug("distance=%v buffer=%v", distance, buffer);
+            debug("distance=%v.3 buffer=%v.1 ticklag=%v", distance, buffer, Kauri.INSTANCE.lastTickLag.getPassed());
         }
     }
 

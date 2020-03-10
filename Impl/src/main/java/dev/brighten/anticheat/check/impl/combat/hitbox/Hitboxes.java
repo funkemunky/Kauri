@@ -61,7 +61,7 @@ public class Hitboxes extends Check {
                 collisions+= entityLocations.stream().filter(bb -> {
                     Vector point;
                     if((point = ray.collisionPoint(bb)) != null) {
-                        double dist = point.distance(ray.getOrigin().toVector());
+                        double dist = point.distance(ray.getOrigin());
 
                         distance.set(Math.min(dist, distance.get()));
                         return dist < 3.4f;

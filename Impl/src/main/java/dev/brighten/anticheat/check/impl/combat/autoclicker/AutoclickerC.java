@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.check.impl.combat.autoclicker;
 
 import cc.funkemunky.api.reflections.impl.MinecraftReflection;
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.*;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutHeldItemSlot;
@@ -12,7 +13,7 @@ import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Autoclicker (C)", description = "Checks for blatant blocking patterns.",
-        checkType = CheckType.AUTOCLICKER, developer = true, punishVL = 200)
+        checkType = CheckType.AUTOCLICKER, developer = true, punishVL = 200, maxVersion = ProtocolVersion.V1_8_9)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerC extends Check {
 

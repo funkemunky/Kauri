@@ -83,7 +83,7 @@ public class VelocityB extends Check {
                     f4 *= data.blockInfo.currentFriction;
                 }
 
-                if(!lastKey.equals(data.predictionService.key)) maxThreshold = 80;
+                if(!lastKey.equals(data.predictionService.key)) maxThreshold = 70;
 
                 if(data.lagInfo.lastPingDrop.hasNotPassed(20)) maxThreshold = 50;
 
