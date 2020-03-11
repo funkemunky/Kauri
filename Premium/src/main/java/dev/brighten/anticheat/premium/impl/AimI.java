@@ -6,7 +6,7 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 
-@CheckInfo(name = "Aim (I)", description = "Analysis aim patterns.")
+@CheckInfo(name = "Aim (I)", description = "Analysis of aim patterns.")
 public class AimI extends Check {
 
     private boolean looked;
