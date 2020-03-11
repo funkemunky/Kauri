@@ -15,7 +15,7 @@ import dev.brighten.api.check.CheckType;
 import org.bukkit.enchantments.Enchantment;
 
 @CheckInfo(name = "Velocity (B)", description = "A horizontally velocity check.", checkType = CheckType.VELOCITY,
-        punishVL = 70)
+        punishVL = 70, developer = true)
 @Cancellable
 public class VelocityB extends Check {
 
