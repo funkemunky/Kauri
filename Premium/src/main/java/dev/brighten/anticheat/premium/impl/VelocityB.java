@@ -83,9 +83,9 @@ public class VelocityB extends Check {
                     f4 *= data.blockInfo.currentFriction;
                 }
 
-                if(!lastKey.equals(data.predictionService.key)) maxThreshold = 70;
+                if(!lastKey.equals(data.predictionService.key)) maxThreshold-= maxThreshold > 20 ? 30 : 0;
 
-                if(data.lagInfo.lastPingDrop.hasNotPassed(20)) maxThreshold = 50;
+                if(data.lagInfo.lastPingDrop.hasNotPassed(20) && maxThreshold > 50) maxThreshold = 80;
 
                 double f = 0.16277136 / (f4 * f4 * f4);
                 double f5;
@@ -122,7 +122,7 @@ public class VelocityB extends Check {
                         flag("pct=%v% buffer=%v", MathUtils.round(pct, 3),
                                 MathUtils.round(verbose.value(), 1));
                     }
-                } else verbose.subtract(maxThreshold <= 80 ? 0.05 : (data.lagInfo.lagging ? 0.35f : 0.2f));
+                } else verbose.subtract(maxThreshold <= 50 ? 0.05 : (data.lagInfo.lagging ? 0.35f : 0.2f));
 
                 debug("pct=" + MathUtils.round(pct, 2) + "/" + maxThreshold
                         + " key=" + data.predictionService.key + " ani="

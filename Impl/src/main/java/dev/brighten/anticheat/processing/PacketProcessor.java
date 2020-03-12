@@ -175,7 +175,9 @@ public class PacketProcessor {
                     val pos = packet.getPosition();
                     val stack = packet.getItemStack();
 
-                    if(pos.getX() == -1 && pos.getY() == 255 && pos.getZ() == -1 && stack != null) {
+                    if(pos.getX() == -1 && pos.getY() ==
+                            (ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_8) ? 255 : -1)
+                            && pos.getZ() == -1 && stack != null) {
                         data.predictionService.useSword = data.playerInfo.usingItem = true;
                         data.playerInfo.lastUseItem.reset();
                     } else if(stack != null) {

@@ -393,7 +393,7 @@ public class Check implements KauriCheck {
         register(new SignOp());
         register(new SignCrash());
         //register(new Test());
-       // register(new LargeMove());
+        register(new LargeMove());
     }
 
     public static boolean isCheck(String name) {

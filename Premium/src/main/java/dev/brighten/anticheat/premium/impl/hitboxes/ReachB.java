@@ -67,7 +67,7 @@ public class ReachB extends Check {
                 return;
             }
 
-            if(distance > 3.02 && Kauri.INSTANCE.tps > 19 && Kauri.INSTANCE.lastTickLag.hasPassed(40)) {
+            if(distance > 3.001 && Kauri.INSTANCE.tps > 19 && Kauri.INSTANCE.lastTickLag.hasPassed(40)) {
                 if(++buffer > 4) {
                     vl++;
                     flag("distance=%v.3 buffer=%v.1", distance, buffer);

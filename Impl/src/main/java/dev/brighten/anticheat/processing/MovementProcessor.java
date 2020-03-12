@@ -318,8 +318,8 @@ public class MovementProcessor {
                 || hasLevi
                 || (data.playerInfo.deltaY > -0.0981
                 && data.playerInfo.deltaY < -0.0979
-                && data.playerInfo.deltaXZ < 0.2)
-                || timeStamp - data.playerInfo.lastServerPos < 200L
+                && data.playerInfo.deltaXZ < 0.01)
+                || timeStamp - data.playerInfo.lastServerPos < 50L
                 || data.playerInfo.riptiding
                 || data.playerInfo.gliding
                 || data.playerInfo.lastPlaceLiquid.hasNotPassed(5)
