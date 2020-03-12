@@ -1,5 +1,9 @@
 package dev.brighten.anticheat.check.impl.combat.autoclicker;
+import cc.funkemunky.api.tinyprotocol.api.NMSObject;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockDigPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.utils.math.cond.MaxInteger;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.check.api.*;
@@ -15,57 +19,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerF extends Check {
 
-    private MaxInteger verbose = new MaxInteger(100);
-
-    private final EvictingList<Long> delays = new EvictingList<>(10);
-    private final Deque<Integer> ratioDeque = new LinkedList<>();
-
-    private long lastTime;
-
     @Packet
-    public void onClick(WrappedInArmAnimationPacket packet, long timeStamp) {
-        if(data.playerInfo.breakingBlock
-                || data.playerInfo.lookingAtBlock
-                || data.playerInfo.lastBlockPlace.hasNotPassed(4)) {
-            lastTime = timeStamp;
-            return;
+    public void onWrapped(NMSObject object) {
+        if(object instanceof WrappedInArmAnimationPacket) {
+            debug("arm");
+        } else if(object instanceof WrappedInUseEntityPacket) {
+            debug("entity");
+        } else if(object instanceof WrappedInBlockPlacePacket) {
+            debug("place");
+        } else if(object instanceof WrappedInBlockDigPacket) {
+            debug("dig");
         }
-        long delay = timeStamp - this.lastTime;
-
-        if (delay > 0L && delay < 400L) {
-            delays.add(delay);
-
-            GraphUtil.GraphResult graph = GraphUtil.getGraphLong(delays);
-
-            if (graph.getPositives() == 0) {
-                return;
-            }
-
-            int ratio = graph.getNegatives() / graph.getPositives();
-
-            this.ratioDeque.add(ratio);
-
-            if (ratioDeque.size() == 50) {
-                double avg = 1000D / delays.stream().mapToLong(v -> v).average().orElse(0);
-
-                AtomicInteger level = new AtomicInteger();
-                ratioDeque.stream().filter(i -> i == 0 || i == 1)
-                        .forEach(i -> level.incrementAndGet());
-
-                if (level.get() == 50 && avg > 8) {
-                    verbose.add(3);
-
-                    if (verbose.value() >= 10) {
-                        vl++;
-                        flag("lvl=%v avg=%v", level.get(), avg);
-                    }
-                } else verbose.subtract(2);
-
-                debug("size=%v avg=%v verbose=%v", level.get(), avg, verbose.value());
-                ratioDeque.clear();
-            }
-            debug("ratio=" + ratio);
-        }
-        this.lastTime = timeStamp;
     }
+
 }

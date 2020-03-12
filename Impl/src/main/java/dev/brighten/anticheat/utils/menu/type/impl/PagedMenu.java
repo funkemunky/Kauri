@@ -4,23 +4,18 @@ import cc.funkemunky.api.utils.XMaterial;
 import dev.brighten.anticheat.utils.menu.Menu;
 import dev.brighten.anticheat.utils.menu.button.Button;
 import dev.brighten.anticheat.utils.menu.type.BukkitInventoryHolder;
-import dev.brighten.anticheat.utils.menu.util.ArrayIterator;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.Iterator;
-import java.util.Optional;
+import java.awt.*;
+import java.util.*;
+import java.util.List;
 import java.util.stream.IntStream;
 
-/**
- * @author Missionary (missionarymc@gmail.com)
- * @since 3/28/2018
- */
-public class ChestMenu implements Menu {
-
+public class PagedMenu implements Menu {
     @Getter
     @Setter
     String title;
@@ -28,17 +23,19 @@ public class ChestMenu implements Menu {
     @Setter
     private Menu parent;
     @Getter
+    @Setter
+    private int currentPage;
+    @Getter
     BukkitInventoryHolder holder;
-    public Button[] contents;
+    public List<Button> contents;
     private CloseHandler closeHandler;
-
-    public ChestMenu(@NonNull String title, int size) {
+    public PagedMenu(@NonNull String title, int size) {
         this.title = title.length() > 32 ? title.substring(0, 32) : title;
         if (size <= 0 || size > 6) {
             throw new IndexOutOfBoundsException("A menu can only have between 1 & 6 for a size (rows)");
         }
         this.dimension = new MenuDimension(size, 9);
-        this.contents = new Button[size * 9];
+        this.contents = new ArrayList<>();
     }
 
     @Override
@@ -54,7 +51,7 @@ public class ChestMenu implements Menu {
     @Override
     public void setItem(int index, Button button) {
         checkBounds(index);
-        contents[index] = button;
+        contents.add(index, button);
     }
 
     @Override
@@ -65,15 +62,15 @@ public class ChestMenu implements Menu {
     @Override
     public void fillRange(int startingIndex, int endingIndex, Button button) {
         IntStream.range(startingIndex, endingIndex)
-                .filter(i -> contents[i] == null || contents[i].getStack().getType()
+                .filter(i -> contents.get(i) == null || contents.get(i).getStack().getType()
                         .equals(XMaterial.AIR.parseMaterial()))
                 .forEach(i -> setItem(i, button));
     }
 
     @Override
     public int getFirstEmptySlot() {
-        for (int i = 0; i < contents.length; i++) {
-            Button button = contents[i];
+        for (int i = 0; i < contents.size(); i++) {
+            Button button = contents.get(i);
             if (button == null) {
                 return i;
             }
@@ -90,7 +87,9 @@ public class ChestMenu implements Menu {
 
     @Override
     public Optional<Button> getButtonByIndex(int index) {
-        return Optional.ofNullable(contents[index]);
+        if(index >= contents.size() - 1) return Optional.empty();
+
+        return Optional.ofNullable(contents.get(index));
     }
 
     @Override
@@ -100,12 +99,15 @@ public class ChestMenu implements Menu {
             holder.setInventory(Bukkit.createInventory(holder, dimension.getSize(), title));
         }
         holder.getInventory().clear();
-        IntStream.range(0, contents.length).forEach(i -> {
-            Button button = contents[i];
-            if (button != null) {
-                holder.getInventory().setItem(i, button.getStack());
-            }
-        });
+        int size = (dimension.getRows() - 1) * dimension.getColumns();
+        IntStream.range(Math.min(contents.size(), size * (currentPage - 1)),
+                Math.min(contents.size(), size * currentPage))
+                .forEach(i -> {
+                    Button button = contents.get(i);
+                    if (button != null) {
+                        holder.getInventory().setItem(i, button.getStack());
+                    }
+                });
     }
 
     @Override
@@ -143,6 +145,6 @@ public class ChestMenu implements Menu {
 
     @Override
     public Iterator<Button> iterator() {
-        return new ArrayIterator<>(contents);
+        return contents.iterator();
     }
 }

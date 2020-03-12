@@ -20,6 +20,7 @@ public class FlyH extends Check {
 
             if(!data.playerInfo.flightCancel
                     && delta > 0.185
+                    && (!data.playerInfo.lClientGround || !data.playerInfo.clientGround)
                     && data.playerInfo.lastVelocity.hasPassed(2)
                     && data.playerInfo.lastHalfBlock.hasPassed(10)
                     && data.playerInfo.blockAboveTimer.hasPassed(10)

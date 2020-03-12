@@ -334,7 +334,7 @@ public class Check implements KauriCheck {
         register(new AutoclickerA());
         register(new AutoclickerB());
         register(new AutoclickerC());
-        //register(new AutoclickerF());
+        register(new AutoclickerF());
         register(new AutoclickerG());
         register(new FlyA());
         register(new FlyB());
