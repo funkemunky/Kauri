@@ -92,7 +92,7 @@ public class Hitboxes extends Check {
 
     private static SimpleCollisionBox getHitbox(KLocation loc, EntityType type) {
         if(type.equals(EntityType.PLAYER)) {
-            return new SimpleCollisionBox(loc.toVector(), 0.84, 1.9);
+            return new SimpleCollisionBox(loc.toVector(), 0.9, 1.9);
         } else {
             Vector bounds = MiscUtils.entityDimensions.get(type);
 

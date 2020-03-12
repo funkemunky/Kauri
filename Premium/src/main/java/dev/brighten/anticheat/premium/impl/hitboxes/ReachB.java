@@ -44,7 +44,7 @@ public class ReachB extends Check {
 
             List<SimpleCollisionBox> entityLocs = targetData.pastLocation
                     .getEstimatedLocation(data.lagInfo.ping,
-                            200L + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
+                            150L + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
                     .stream()
                     .map(ReachB::getHitbox).collect(Collectors.toList());
 
@@ -62,7 +62,7 @@ public class ReachB extends Check {
                 }
             }
 
-            if(misses > 1 || distance == 69) {
+            if(misses > 0 || distance == 69) {
                 buffer-= buffer > 0 ? 0.01 : 0;
                 return;
             }
@@ -90,7 +90,7 @@ public class ReachB extends Check {
     }
 
     private static SimpleCollisionBox getHitbox(KLocation loc) {
-        return new SimpleCollisionBox(loc.toVector(), loc.toVector()).expand(0.4f, 0.1f, 0.4f)
+        return new SimpleCollisionBox(loc.toVector(), loc.toVector()).expand(0.45f, 0.1f, 0.45f)
                 .expandMax(0,1.8,0);
     }
 }

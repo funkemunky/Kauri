@@ -75,7 +75,7 @@ public class PredictionService {
         fMath = fastMath; // if the Player uses Optifine FastMath
 
         try {
-            if(!position && !velocity && MathUtils.getDelta(data.playerInfo.deltaY, data.playerInfo.velocityY) > 0.0001
+            if(!position && !velocity
                     && (checkConditions = checkConditions(lastSprint))) {
                 if (lastSprint && hit) { // If the Player Sprints and Hit a Player he get slowdown
                     lmotionX *= 0.6D;
