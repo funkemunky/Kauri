@@ -100,7 +100,9 @@ public class PacketProcessor {
 
                 data.lagInfo.lastFlying = timeStamp;
 
+                Kauri.INSTANCE.profiler.start("data:moveprocessor");
                 data.moveProcessor.process(packet, timeStamp);
+                Kauri.INSTANCE.profiler.stop("data:moveprocessor");
                 data.predictionService.onReceive(packet); //Processing for prediction service.
 
                 data.checkManager.runPacket(packet, timeStamp);

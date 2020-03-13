@@ -11,6 +11,7 @@ import cc.funkemunky.api.utils.world.CollisionBox;
 import cc.funkemunky.api.utils.world.types.RayCollision;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.utils.Helper;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.MouseFilter;
 import dev.brighten.anticheat.utils.MovementUtils;
@@ -25,14 +26,13 @@ import java.util.List;
 public class MovementProcessor {
     private final ObjectData data;
 
-    public List<Double> yawGcdList = Collections.synchronizedList(new EvictingList<>(50));
-    public List<Double> pitchGcdList = Collections.synchronizedList(new EvictingList<>(50));
+    private List<Double> yawGcdList = new EvictingList<>(40),
+            pitchGcdList = new EvictingList<>(40);
     public long deltaX, deltaY, lastDeltaX, lastDeltaY, lastCinematic;
     public double sensitivityX, sensitivityY, yawMode, pitchMode, sensXPercent, sensYPercent;
     private MouseFilter mxaxis = new MouseFilter(), myaxis = new MouseFilter();
     private float smoothCamFilterX, smoothCamFilterY, smoothCamYaw, smoothCamPitch;
-    public TickTimer lastEquals = new TickTimer(6);
-    private TickTimer lastReset = new TickTimer(1);
+    private TickTimer lastReset = new TickTimer(5);
 
     public static double offset = Math.pow(2, 24);
 
@@ -76,10 +76,6 @@ public class MovementProcessor {
         }
 
         data.playerInfo.to.timeStamp = timeStamp;
-
-        if(deltaY > -0.0981 && deltaY < -0.0979)
-            cc.funkemunky.api.utils.MiscUtils.printToConsole(data.getPlayer().getName() + ": " + deltaY);
-
         if (data.playerInfo.posLocs.size() > 0) {
             val optional = data.playerInfo.posLocs.stream()
                     .filter(loc -> loc.toVector().setY(0)
@@ -96,7 +92,6 @@ public class MovementProcessor {
         } else if (data.playerInfo.serverPos) {
             data.playerInfo.serverPos = false;
         }
-
         data.playerInfo.lClientGround = data.playerInfo.clientGround;
         data.playerInfo.clientGround = packet.isGround();
         //Setting the motion delta for use in checks to prevent repeated functions.
@@ -174,11 +169,10 @@ public class MovementProcessor {
 
             RayCollision collision = new RayCollision(origin.toVector(), MathUtils.getDirection(origin));
 
-            List<CollisionBox> boxes = collision.boxesOnRay(data.getPlayer().getWorld(),
-                    data.playerInfo.creative ? 5 : 4);
+            List<CollisionBox> boxes = Helper.getCollisionsOnRay(collision, data.getPlayer().getWorld(),
+                    data.playerInfo.creative ? 5 : 4, 1);
 
             data.playerInfo.lookingAtBlock = boxes.size() > 0;
-
             double yawGcd = data.playerInfo.yawGCD / offset;
             double pitchGcd = data.playerInfo.pitchGCD / offset;
 
@@ -196,6 +190,8 @@ public class MovementProcessor {
                     yawMode = MathUtils.getMode(yawGcdList);
                     pitchMode = MathUtils.getMode(pitchGcdList);
                     lastReset.reset();
+                    sensXPercent = sensToPercent(sensitivityX = getSensitivityFromYawGCD(yawMode));
+                    sensYPercent = sensToPercent(sensitivityY = getSensitivityFromPitchGCD(pitchMode));
                 }
 
 
@@ -203,8 +199,6 @@ public class MovementProcessor {
                 lastDeltaY = deltaY;
                 deltaX = getDeltaX(data.playerInfo.deltaYaw, (float) yawMode);
                 deltaY = getDeltaY(data.playerInfo.deltaPitch, (float) pitchMode);
-                sensXPercent = sensToPercent(sensitivityX = getSensitivityFromYawGCD(yawMode));
-                sensYPercent = sensToPercent(sensitivityY = getSensitivityFromPitchGCD(pitchMode));
 
                 if((data.playerInfo.pitchGCD < 1E5 || data.playerInfo.yawGCD < 1E5) && smoothCamFilterY < 1E6
                         && smoothCamFilterX < 1E6 && timeStamp - data.creation > 1000L) {

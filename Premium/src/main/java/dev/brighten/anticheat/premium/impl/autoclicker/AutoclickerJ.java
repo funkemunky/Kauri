@@ -24,6 +24,7 @@ public class AutoclickerJ extends Check {
     public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
         long delta = timeStamp - lastClick;
 
+        if(delta > 5 && delta < 1000)
         cpsList.add(delta);
 
         if(cpsList.size() >= 20) {

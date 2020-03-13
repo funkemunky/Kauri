@@ -19,21 +19,21 @@ import org.bukkit.enchantments.Enchantment;
 @Cancellable
 public class VelocityB extends Check {
 
-    private double vX, vZ, vY, svX, svZ;
-    private boolean useEntity, sprint, tookVelocity;
-    private String lastKey;
+    private double vX, vZ, vY, pvX, pvZ;
+    private boolean useEntity, tookVelocity;
     private MaxDouble verbose = new MaxDouble(50);
     private double maxThreshold;
-    private long velocityTS;
+    private long lastVelocity;
+    private static double[] moveValues = new double[] {-0.98, 0, 0.98};
 
     @Packet
-    public void onVelocity(WrappedOutVelocityPacket packet) {
+    public void onVelocity(WrappedOutVelocityPacket packet, long timeStamp) {
         if(packet.getId() == data.getPlayer().getEntityId()) {
-            svX = packet.getX();
-            svZ = packet.getZ();
-            vY = packet.getY();
-            vX = vZ = 0;
             tookVelocity = true;
+            vX = packet.getX();
+            vY = packet.getY();
+            vZ = packet.getZ();
+            lastVelocity = timeStamp;
         }
     }
 
@@ -49,101 +49,49 @@ public class VelocityB extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if(Math.abs(vX) < 0.005) vX = 0;
-        if(Math.abs(vZ) < 0.005) vZ = 0;
-
-        if(tookVelocity && MathUtils.getDelta(data.playerInfo.deltaY, vY) < 0.0001) {
-            velocityTS = timeStamp;
-            vX = svX;
-            vZ = svZ;
-            maxThreshold = 99;
-            debug("set velocity");
-            svX = svZ = vY = 0;
+        if(tookVelocity
+                && timeStamp - lastVelocity > data.lagInfo.ping
+                && Math.abs(data.playerInfo.deltaY - vY) < 0.00001) {
+            vX = pvX;
+            vZ = pvZ;
             tookVelocity = false;
         }
-        if((vX != 0 || vZ != 0) && !tookVelocity) {
-            if(sprint && useEntity) {
-                vX*= 0.6;
-                vZ*= 0.6;
+
+        if(pvX != 0 || pvZ != 0) {
+            double vX = pvX;
+            double vZ = pvZ;
+            double vXZ = 0;
+            boolean found = false;
+            for (double forward : moveValues) {
+                for(double strafe : moveValues) {
+                    moveFlying(strafe, forward, 0.026);
+
+                    vXZ = MathUtils.hypot(pvX, pvZ);
+
+                    if(MathUtils.getDelta(vXZ, data.playerInfo.deltaXZ) < 1E-8) {
+                        found = true;
+                        break;
+                    }
+                    pvX = vX;
+                    pvZ = vZ;
+                }
             }
 
-            if(!data.blockInfo.blocksNear
-                    && !data.blockInfo.inWeb
-                    && !data.playerInfo.onLadder
-                    && timeStamp - data.creation > 3000L
-                    && timeStamp - data.playerInfo.lastServerPos > 100L
-                    && !data.blockInfo.inLiquid
-                    && !data.playerInfo.serverPos
-                    && !data.playerInfo.canFly
-                    && !data.playerInfo.creative) {
+            if(!found) {
+                moveFlying(data.predictionService.moveStrafing, data.predictionService.moveForward, 0.026);
+                vXZ = MathUtils.hypot(pvX, pvZ);
+            }
 
-                double f4 = 0.91;
+            double ratio = data.playerInfo.deltaXZ / vXZ;
 
-                if (data.playerInfo.lClientGround) {
-                    f4 *= data.blockInfo.currentFriction;
-                }
+            debug("ratio=%v.3", ratio);
+            pvX *= 0.91;
+            pvZ *= 0.91;
 
-                if(!lastKey.equals(data.predictionService.key)) maxThreshold-= maxThreshold > 20 ? 30 : 0;
-
-                if(data.lagInfo.lastPingDrop.hasNotPassed(20) && maxThreshold > 50) maxThreshold = 80;
-
-                double f = 0.16277136 / (f4 * f4 * f4);
-                double f5;
-
-                if (data.playerInfo.lClientGround) {
-                    f5 = data.predictionService.aiMoveSpeed * f;
-                } else {
-                    f5 = sprint ? 0.026 : 0.02;
-                }
-
-                double pct;
-
-                float forward = data.predictionService.moveForward;
-                float strafe = data.predictionService.moveStrafing;
-
-                if(data.playerInfo.usingItem) {
-                    forward*= 0.2;
-                    strafe*= 0.2;
-                }
-
-                //debug("motion: " + strafe + ", " + forward);
-
-                moveFlying(strafe, forward, f5);
-
-                double vXZ = MathUtils.hypot(vX, vZ);
-
-                double ratio = data.playerInfo.deltaXZ / vXZ;
-                //double ratio = MathUtils.hypot(data.playerInfo.deltaX / vX, data.playerInfo.deltaZ / vZ);
-                pct = ratio * 100;
-
-                if (pct < maxThreshold && data.playerInfo.lastUseItem.hasPassed(4)) {
-                    if(verbose.add() > 36) {
-                        vl++;
-                        flag("pct=%v% buffer=%v", MathUtils.round(pct, 3),
-                                MathUtils.round(verbose.value(), 1));
-                    }
-                } else verbose.subtract(maxThreshold <= 50 ? 0.05 : (data.lagInfo.lagging ? 0.35f : 0.2f));
-
-                debug("pct=" + MathUtils.round(pct, 2) + "/" + maxThreshold
-                        + " key=" + data.predictionService.key + " ani="
-                        + data.playerInfo.usingItem + " sprint=" + data.playerInfo.sprinting
-                        + " ground=" + data.playerInfo.lClientGround + " vl=" + verbose.value()
-                        + " lastUse=" + data.playerInfo.lastUseItem.getPassed());
-
-                //debug("vX=" + vX + " vZ=" + vZ);
-                //debug("dX=" + data.playerInfo.deltaX + " dZ=" + data.playerInfo.deltaZ + " item=" +);
-
-                vX *= f4;
-                vZ *= f4;
-
-                if(timeStamp - velocityTS > 350L) {
-                    vX = vZ = 0;
-                }
-            } else vX = vZ = 0;
+            if(Math.abs(pvX) < 0.005) pvX = 0;
+            if(Math.abs(pvZ) < 0.005) pvZ = 0;
+            if(data.playerInfo.clientGround) pvX = pvZ = 0;
         }
-        lastKey = data.predictionService.key;
-        useEntity = false;
-        sprint = data.playerInfo.sprinting;
     }
 
     private void moveFlying(double strafe, double forward, double friction) {
@@ -161,8 +109,8 @@ public class VelocityB extends Check {
             forward = forward * f;
             double f1 = Math.sin(data.playerInfo.to.yaw * Math.PI / 180.0F);
             double f2 = Math.cos(data.playerInfo.to.yaw * Math.PI / 180.0F);
-            vX += (strafe * f2 - forward * f1);
-            vZ += (forward * f2 + strafe * f1);
+            pvX += (strafe * f2 - forward * f1);
+            pvZ += (forward * f2 + strafe * f1);
         }
     }
 }

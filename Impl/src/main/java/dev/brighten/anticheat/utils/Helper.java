@@ -202,12 +202,21 @@ public class Helper {
 
 			locs[i] = new Location(world, fx, fy, fz);
 		}
-		return Arrays.stream(locs).parallel()
-				.filter(loc -> loc.getWorld().isChunkLoaded(loc.getBlockX() >> 4, loc.getBlockZ() >> 4))
-				.map(Location::getBlock)
-				.filter(block -> block.getType().isSolid())
-				.map(block -> BlockData.getData(block.getType()).getBox(block, ProtocolVersion.getGameVersion()))
-				.filter(collision::isCollided).collect(Collectors.toList());
+		return Arrays.stream(locs)
+				.map(loc -> {
+					if(!loc.getWorld().isChunkLoaded(loc.getBlockX() >> 4, loc.getBlockZ() >> 4)) return null;
+					Block block = loc.getBlock();
+
+					if(block.getType().isSolid()) {
+						return BlockData.getData(block.getType()).getBox(block, ProtocolVersion.getGameVersion());
+					}
+					return null;
+				})
+				.filter(box -> {
+					if(box == null) return false;
+
+					return collision.isCollided(box);
+				}).collect(Collectors.toList());
 	}
 
 	public static CollisionBox toCollisions(Block b) {
