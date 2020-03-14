@@ -53,6 +53,7 @@ public class MovementProcessor {
     public void process(WrappedInFlyingPacket packet, long timeStamp) {
         //We check if it's null and intialize the from and to as equal to prevent large deltas causing false positives since there
         //was no previous from (Ex: delta of 380 instead of 0.45 caused by jump jump in location from 0,0,0 to 380,0,0)
+        Kauri.INSTANCE.profiler.start("data:moveprocessor:setting:one");
         if (data.playerInfo.from == null) {
             data.playerInfo.from
                     = data.playerInfo.to
@@ -76,6 +77,8 @@ public class MovementProcessor {
         }
 
         data.playerInfo.to.timeStamp = timeStamp;
+        Kauri.INSTANCE.profiler.stop("data:moveprocessor:setting:one");
+        Kauri.INSTANCE.profiler.start("data:moveprocessor:pos");
         if (data.playerInfo.posLocs.size() > 0) {
             val optional = data.playerInfo.posLocs.stream()
                     .filter(loc -> loc.toVector().setY(0)
@@ -92,6 +95,8 @@ public class MovementProcessor {
         } else if (data.playerInfo.serverPos) {
             data.playerInfo.serverPos = false;
         }
+        Kauri.INSTANCE.profiler.stop("data:moveprocessor:pos");
+        Kauri.INSTANCE.profiler.start("data:moveprocessor:setting:two");
         data.playerInfo.lClientGround = data.playerInfo.clientGround;
         data.playerInfo.clientGround = packet.isGround();
         //Setting the motion delta for use in checks to prevent repeated functions.
@@ -110,17 +115,21 @@ public class MovementProcessor {
 
         if(data.playerInfo.blockBelow != null)
             data.blockInfo.currentFriction = ReflectionsUtil.getFriction(data.playerInfo.blockBelow);
+        Kauri.INSTANCE.profiler.stop("data:moveprocessor:setting:two");
         if(packet.isPos()) {
+            Kauri.INSTANCE.profiler.start("data:moveprocessor:collision");
             //We create a separate from BoundingBox for the predictionService since it should operate on pre-motion data.
             data.box = PlayerSizeHandler.instance.bounds(data.getPlayer(),
                     data.playerInfo.to.x, data.playerInfo.to.y, data.playerInfo.to.z);
 
             data.blockInfo.runCollisionCheck(); //run b4 everything else for use below.
+            Kauri.INSTANCE.profiler.stop("data:moveprocessor:collision");
         }
 
         if(MathUtils.getDelta(deltaY, -0.098) < 0.001 && data.playerInfo.deltaXZ <= 0.3) {
             data.playerInfo.worldLoaded = false;
         }
+        Kauri.INSTANCE.profiler.start("data:moveprocessor:setting:three");
         data.playerInfo.inVehicle = data.getPlayer().getVehicle() != null;
         data.playerInfo.gliding = PlayerUtils.isGliding(data.getPlayer());
         data.playerInfo.riptiding = Atlas.getInstance().getBlockBoxManager()
@@ -155,7 +164,9 @@ public class MovementProcessor {
         data.playerInfo.lDeltaPitch = data.playerInfo.deltaPitch;
         data.playerInfo.deltaYaw = MathUtils.getDelta(data.playerInfo.to.yaw, data.playerInfo.from.yaw);
         data.playerInfo.deltaPitch = data.playerInfo.to.pitch - data.playerInfo.from.pitch;
+        Kauri.INSTANCE.profiler.stop("data:moveprocessor:setting:three");
         if (packet.isLook()) {
+            Kauri.INSTANCE.profiler.start("data:moveprocessor:yawstuffs");
             data.playerInfo.lastYawGCD = data.playerInfo.yawGCD;
             data.playerInfo.yawGCD = MiscUtils.gcd((long) (data.playerInfo.deltaYaw * offset),
                     (long) (data.playerInfo.lDeltaYaw * offset));
@@ -167,12 +178,14 @@ public class MovementProcessor {
 
             origin.y+= data.playerInfo.sneaking ? 1.54 : 1.62;
 
+            Kauri.INSTANCE.profiler.start("data:moveprocessor:yawstuffs:raycollision");
             RayCollision collision = new RayCollision(origin.toVector(), MathUtils.getDirection(origin));
 
             List<CollisionBox> boxes = Helper.getCollisionsOnRay(collision, data.getPlayer().getWorld(),
                     data.playerInfo.creative ? 5 : 4, 1);
 
             data.playerInfo.lookingAtBlock = boxes.size() > 0;
+            Kauri.INSTANCE.profiler.stop("data:moveprocessor:yawstuffs:raycollision");
             double yawGcd = data.playerInfo.yawGCD / offset;
             double pitchGcd = data.playerInfo.pitchGCD / offset;
 
@@ -229,6 +242,7 @@ public class MovementProcessor {
                     data.playerInfo.cinematicMode = false;
                 }
             }
+            Kauri.INSTANCE.profiler.stop("data:moveprocessor:yawstuffs");
         }
 
         if (packet.isPos()) {
