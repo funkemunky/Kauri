@@ -13,6 +13,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import java.io.Closeable;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -72,6 +73,22 @@ public class MiscUtils {
     }
     public static void testMessage(String message) {
         KauriCommand.getTesters().forEach(pl -> pl.sendMessage(Color.translate(message)));
+    }
+
+    public static void close(Closeable... closeables) {
+        try {
+            for (Closeable closeable : closeables) if (closeable != null) closeable.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void close(AutoCloseable... closeables) {
+        try {
+            for (AutoCloseable closeable : closeables) if (closeable != null) closeable.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static boolean isAnimated(HumanEntity entity) {

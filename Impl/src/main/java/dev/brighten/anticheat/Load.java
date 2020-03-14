@@ -44,7 +44,7 @@ public class Load {
         register("Registering processors...");
         Kauri.INSTANCE.packetProcessor = new PacketProcessor();
         Kauri.INSTANCE.dataManager = new DataManager();
-        Kauri.INSTANCE.loggerManager = new LoggerManager(true);
+        Kauri.INSTANCE.loggerManager = new LoggerManager();
         EntityProcessor.start();
 
         register("Registering checks...");

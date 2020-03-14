@@ -61,7 +61,7 @@ public class SpeedC extends Check {
         if (onGround || data.playerInfo.jumped) {
             tags.add("ground");
             drag *= 0.91;
-            moveSpeed *= drag > 0.708 ? 1.3 : data.predictionService.aiMoveSpeed * 1.5f;
+            moveSpeed *= drag > 0.708 ? 1.3 : data.predictionService.aiMoveSpeed * 1.1f;
             moveSpeed *= 0.16277136 / Math.pow(drag, 3);
 
             if (data.playerInfo.deltaY > 0
@@ -89,13 +89,18 @@ public class SpeedC extends Check {
                     moveSpeed *= 2;
                 }
 
-                tags.add("hover");
-                moveSpeed += 0.05;
+                if(!data.playerInfo.lClientGround && data.playerInfo.clientGround) {
+                    tags.add("hover-land");
+                    moveSpeed += 0.1;
+                } else {
+                    tags.add("hover");
+                    moveSpeed+= 0.05;
+                }
                 if (data.playerInfo.lastAttack.hasNotPassed(10)) moveSpeed += 0.2;
             }
         } else {
             tags.add("air");
-            moveSpeed = 0.021 + (data.playerInfo.sprinting ? 0.006 : 0);
+            moveSpeed = 0.027;
             drag = 0.91;
 
             if (timeStamp - data.playerInfo.lastServerPos < 100L) {
@@ -158,12 +163,6 @@ public class SpeedC extends Check {
         if (data.blockInfo.onHalfBlock || data.blockInfo.onStairs || data.blockInfo.onSlab) {
             tags.add("weird");
             moveSpeed += 0.2;
-        }
-
-        //TODO Test this for false positives.
-        if(data.playerInfo.sneaking) {
-            tags.add("sneaking");
-            moveSpeed*= 0.42;
         }
 
         if (timeStamp - data.playerInfo.lastServerPos < 180L) moveSpeed += 1;
@@ -233,9 +232,6 @@ public class SpeedC extends Check {
 
         double horizontalMove = (horizontalDistance - previousHorizontal) - moveSpeed;
         if (horizontalDistance > 0.1) {
-            debug("+%v,tags=%v,place=%v,dy=%v", horizontalMove, String.join(",", tags),
-                    data.playerInfo.lastBlockPlace.getPassed(), Helper.format(data.playerInfo.deltaY, 4));
-
             if (horizontalMove > 0 && data.playerInfo.lastVelocity.hasPassed(10)
                     && data.playerInfo.lastVelocity.hasPassed(10)) {
                 vl++;
@@ -245,6 +241,10 @@ public class SpeedC extends Check {
                 }
             } else vl-= vl > 0 ? 0.2 : 0;
         }
+
+        debug("+%v.4,tags=%v,place=%v,dy=%v.3", horizontalMove, String.join(",", tags),
+                data.playerInfo.lastBlockPlace.getPassed(), Helper.format(data.playerInfo.deltaY, 4));
+
 
         if(velocityXZ > 0) {
             velocityX*= (drag * (onGround ? data.blockInfo.currentFriction : 1));

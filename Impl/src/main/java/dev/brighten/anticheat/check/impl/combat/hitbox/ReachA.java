@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@CheckInfo(name = "Reach (A)", checkType = CheckType.HITBOX, punishVL = 5, description = "A simple distance check.")
+@CheckInfo(name = "Reach (A)", checkType = CheckType.HITBOX, punishVL = 12, description = "A simple distance check.")
 @Cancellable(cancelType = CancelType.ATTACK)
 public class ReachA extends Check {
 
@@ -26,7 +26,7 @@ public class ReachA extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if(timeStamp - lastUse > 1 || data.playerInfo.creative || data.targetPastLocation.previousLocations.size() < 8) return;
+        if(timeStamp - lastUse > 10 || data.playerInfo.creative || data.targetPastLocation.previousLocations.size() < 8) return;
 
         List<KLocation> origins = Arrays.asList(data.playerInfo.to.clone(), data.playerInfo.from.clone());
         List<Tuple<KLocation, Vector>> targetBoxes = data.targetPastLocation

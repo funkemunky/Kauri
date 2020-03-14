@@ -226,12 +226,15 @@ public class Check implements KauriCheck {
                                         .replace("%info%", info)
                                         .replace("%vl%", String.valueOf(MathUtils.round(vl, 2))));
 
-                        if(Config.testMode && !data.alerts) jmsg.sendToPlayer(data.getPlayer());
+                        if(Config.testMode && (developer ? !data.devAlerts : !data.alerts))
+                            jmsg.sendToPlayer(data.getPlayer());
 
                         if(Config.alertsConsole) MiscUtils.printToConsole(text);
-
-                            Kauri.INSTANCE.dataManager.hasAlerts.parallelStream()
-                                .forEach(data -> jmsg.sendToPlayer(data.getPlayer()));
+                            if(!developer)
+                                Kauri.INSTANCE.dataManager.hasAlerts
+                                        .forEach(data -> jmsg.sendToPlayer(data.getPlayer()));
+                            else Kauri.INSTANCE.dataManager.devAlerts
+                                    .forEach(data -> jmsg.sendToPlayer(data.getPlayer()));
                         lastAlert.reset();
                     }
 
@@ -332,7 +335,7 @@ public class Check implements KauriCheck {
 
     public static void registerChecks() {
         register(new AutoclickerA());
-        register(new AutoclickerB());
+        //register(new AutoclickerB());
         register(new AutoclickerC());
         register(new AutoclickerF());
         register(new AutoclickerG());
@@ -342,11 +345,11 @@ public class Check implements KauriCheck {
         register(new FlyD());
         register(new FlyE());
         register(new FlyF());
-        register(new FlyG());
+        //register(new FlyG());
         //register(new FlyH());
         register(new FastLadder());
         register(new NoFallA());
-        register(new NoFallB());
+        //register(new NoFallB());
         register(new Hitboxes());
         register(new AimA());
         register(new AimB());
@@ -356,7 +359,7 @@ public class Check implements KauriCheck {
         register(new AimH());
         register(new SpeedA());
         register(new SpeedB());
-        //register(new SpeedC());
+        register(new SpeedC());
         //register(new SpeedD());
         //register(new SpeedE());
         register(new KillauraA());
@@ -393,7 +396,7 @@ public class Check implements KauriCheck {
         register(new SignOp());
         register(new SignCrash());
         //register(new Test());
-       // register(new LargeMove());
+        //register(new LargeMove());
     }
 
     public static boolean isCheck(String name) {

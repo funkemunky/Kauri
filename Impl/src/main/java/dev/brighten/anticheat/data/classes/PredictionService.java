@@ -75,7 +75,7 @@ public class PredictionService {
         fMath = fastMath; // if the Player uses Optifine FastMath
 
         try {
-            if(!position && !velocity && MathUtils.getDelta(data.playerInfo.deltaY, data.playerInfo.velocityY) > 0.0001
+            if(!position && !velocity
                     && (checkConditions = checkConditions(lastSprint))) {
                 if (lastSprint && hit) { // If the Player Sprints and Hit a Player he get slowdown
                     lmotionX *= 0.6D;
@@ -555,12 +555,12 @@ public class PredictionService {
     private static final float[] SIN_TABLE_FAST = new float[4096];
     private static final float[] SIN_TABLE = new float[65536];
 
-    private float sin(float p_76126_0_) {
+    public float sin(float p_76126_0_) {
         return fastMath ? SIN_TABLE_FAST[(int) (p_76126_0_ * 651.8986F) & 4095]
                 : SIN_TABLE[(int) (p_76126_0_ * 10430.378F) & 65535];
     }
 
-    private float cos(float p_76134_0_) {
+    public float cos(float p_76134_0_) {
         return fastMath ? SIN_TABLE_FAST[(int) ((p_76134_0_ + ((float) Math.PI / 2F)) * 651.8986F) & 4095]
                 : SIN_TABLE[(int) (p_76134_0_ * 10430.378F + 16384.0F) & 65535];
     }
@@ -587,7 +587,7 @@ public class PredictionService {
         return (float) Math.sqrt(p_76129_0_);
     }
 
-    private static float sqrt_double(double p_76133_0_) {
+    public static float sqrt_double(double p_76133_0_) {
         return (float) Math.sqrt(p_76133_0_);
     }
 

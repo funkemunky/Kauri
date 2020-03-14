@@ -7,10 +7,13 @@ import dev.brighten.db.utils.json.JSONObject;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @AllArgsConstructor
 @NoArgsConstructor
 public class Log {
 
+    public UUID uuid;
     public String checkName, info;
     public float vl;
     public long ping, timeStamp;

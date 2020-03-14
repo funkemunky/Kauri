@@ -32,7 +32,7 @@ public class BlockInformation {
     public float currentFriction;
     public CollisionHandler
             handler = new CollisionHandler(new ArrayList<>(), new ArrayList<>(), new KLocation(0,0,0));
-    public List<Block> verticalCollisions, horizontalCollisions;
+    public List<Block> verticalCollisions, horizontalCollisions, blocks = new ArrayList<>();
 
     public BlockInformation(ObjectData objectData) {
         this.objectData = objectData;
@@ -41,57 +41,32 @@ public class BlockInformation {
     public void runCollisionCheck() {
         if(!Kauri.INSTANCE.enabled
                 || Kauri.INSTANCE.lastEnabled.hasNotPassed(6)) return;
-        List<Block> blocks = new ArrayList<>();
+        blocks.clear();
 
-        World world = objectData.getPlayer().getWorld();
+        val dy = objectData.playerInfo.deltaY;
+        val dh = objectData.playerInfo.deltaXZ;
 
-        val dx =  Math.abs(objectData.playerInfo.deltaX);
-        val dy = Math.abs(objectData.playerInfo.deltaY);
-        val dz = Math.abs(objectData.playerInfo.deltaZ);
+        int startX = Location.locToBlock(objectData.playerInfo.to.x - 0.3 - dh);
+        int endX = Location.locToBlock(objectData.playerInfo.to.x + 0.3 + dh);
+        int startY = Location.locToBlock(objectData.playerInfo.to.y - 0.51 - dy);
+        int endY = Location.locToBlock(objectData.playerInfo.to.y + 1.99 + dy);
+        int startZ = Location.locToBlock(objectData.playerInfo.to.z - 0.3 - dh);
+        int endZ = Location.locToBlock(objectData.playerInfo.to.z + 0.3 + dh);
 
-        int startX = Location.locToBlock(objectData.playerInfo.to.x - (1 + Math.min(3, dx)));
-        int endX = Location.locToBlock(objectData.playerInfo.to.x + (1 + Math.min(3, dx)));
-        int startY = Location.locToBlock(objectData.playerInfo.to.y - (1 + Math.min(3, dy)));
-        int endY = Location.locToBlock(objectData.playerInfo.to.y + (3 + Math.min(3, dy)));
-        int startZ = Location.locToBlock(objectData.playerInfo.to.z - (1 + Math.min(3, dz)));
-        int endZ = Location.locToBlock(objectData.playerInfo.to.z + (1 + Math.min(3, dz)));
-
-        int it = 9 * 9;
         objectData.playerInfo.worldLoaded = true;
-        start:
-        for (int chunkx = startX >> 4; chunkx <= endX >> 4; ++chunkx) {
-            int cx = chunkx << 4;
+        for(int x = startX ; x < endX ; x++) {
+            for(int y = startY ; y < endY ; y++) {
+                for(int z = startZ ; z < endZ ; z++) {
+                    Location loc = new Location(objectData.getPlayer().getWorld(), x, y, z);
 
-            for (int chunkz = startZ >> 4; chunkz <= endZ >> 4; ++chunkz) {
-                if (!world.isChunkLoaded(chunkx, chunkz)) {
-                    objectData.playerInfo.lastWorldUnload.reset();
-                    objectData.playerInfo.worldLoaded = false;
-                    continue;
-                }
-                Chunk chunk = world.getChunkAt(chunkx, chunkz);
-                if (chunk != null) {
-                    int cz = chunkz << 4;
-                    int xstart = Math.max(startX, cx);
-                    int xend = Math.min(endX, cx + 16);
-                    int zstart = Math.max(startZ, cz);
-                    int zend = Math.min(endZ, cz + 16);
-
-                    for (int x = xstart; x <= xend; ++x) {
-                        for (int z = zstart; z <= zend; ++z) {
-                            for (int y = Math.max(startY, 0); y <= endY; ++y) {
-                                if (it-- <= 0) {
-                                    break start;
-                                }
-                                Block block = chunk.getBlock(x & 15, y, z & 15);
-                                if (block.getType() != XMaterial.AIR.parseMaterial()) {
-                                    blocks.add(block);
-                                }
-                            }
-                        }
-                    }
+                    if(loc.getWorld().isChunkLoaded(loc.getBlockX() >> 4, loc.getBlockZ() >> 4)) {
+                        blocks.add(loc.getBlock());
+                    } else objectData.playerInfo.worldLoaded = false;
                 }
             }
         }
+
+        if(!objectData.playerInfo.worldLoaded) return;
 
         CollisionHandler handler = new CollisionHandler(blocks,
                 Atlas.getInstance().getEntities().getOrDefault(objectData.getPlayer().getUniqueId(), new ArrayList<>()),
