@@ -226,12 +226,15 @@ public class Check implements KauriCheck {
                                         .replace("%info%", info)
                                         .replace("%vl%", String.valueOf(MathUtils.round(vl, 2))));
 
-                        if(Config.testMode && !data.alerts) jmsg.sendToPlayer(data.getPlayer());
+                        if(Config.testMode && (developer ? !data.devAlerts : !data.alerts))
+                            jmsg.sendToPlayer(data.getPlayer());
 
                         if(Config.alertsConsole) MiscUtils.printToConsole(text);
-
-                            Kauri.INSTANCE.dataManager.hasAlerts.parallelStream()
-                                .forEach(data -> jmsg.sendToPlayer(data.getPlayer()));
+                            if(!developer)
+                                Kauri.INSTANCE.dataManager.hasAlerts
+                                        .forEach(data -> jmsg.sendToPlayer(data.getPlayer()));
+                            else Kauri.INSTANCE.dataManager.devAlerts
+                                    .forEach(data -> jmsg.sendToPlayer(data.getPlayer()));
                         lastAlert.reset();
                     }
 

@@ -108,7 +108,7 @@ public class Kauri extends JavaPlugin {
         Check.checkSettings.clear();
         Check.registerChecks();
 
-        loggerManager = new LoggerManager(true);
+        loggerManager = new LoggerManager();
 
         Bukkit.getOnlinePlayers().forEach(dataManager::createData);
     }

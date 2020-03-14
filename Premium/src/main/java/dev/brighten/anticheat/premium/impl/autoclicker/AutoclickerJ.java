@@ -41,7 +41,8 @@ public class AutoclickerJ extends Check {
 
             double std = totalStd / 40;
 
-            if(max < 6000 && MathUtils.getDelta(average, lavg) > 0.4 && MathUtils.getDelta(std, max) > 1000) {
+            if(max < 6000 && std > 400
+                    && MathUtils.getDelta(average, lavg) > 0.4 && MathUtils.getDelta(std, max) > 1000) {
                 if(buffer++ > 30) {
                     vl++;
                     flag("kurt=%v.3 avg=%v.3 std-%v.3 buffer=%v.1", max, average, std, buffer);

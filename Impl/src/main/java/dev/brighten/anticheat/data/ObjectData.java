@@ -15,6 +15,7 @@ import dev.brighten.anticheat.data.classes.BlockInformation;
 import dev.brighten.anticheat.data.classes.CheckManager;
 import dev.brighten.anticheat.data.classes.PlayerInformation;
 import dev.brighten.anticheat.data.classes.PredictionService;
+import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.processing.MovementProcessor;
 import dev.brighten.anticheat.utils.PastLocation;
 import org.bukkit.Bukkit;
@@ -28,7 +29,7 @@ public class ObjectData {
 
     public UUID uuid;
     private Player player;
-    public boolean alerts, sniffing;
+    public boolean alerts, devAlerts, sniffing;
 
     //Debugging
     public String debugging;
@@ -47,6 +48,7 @@ public class ObjectData {
     public MovementProcessor moveProcessor;
     public int hashCode;
     public boolean banned;
+    public List<Log> logs = new ArrayList<>();
     public ProtocolVersion playerVersion = ProtocolVersion.UNKNOWN;
     public Set<Player> boxDebuggers = new HashSet<>();
     public List<CancelType> typesToCancel = Collections.synchronizedList(new EvictingList<>(10));
@@ -59,6 +61,9 @@ public class ObjectData {
         INSTANCE = this;
         if(alerts = getPlayer().hasPermission("kauri.command.alerts")) {
             Kauri.INSTANCE.dataManager.hasAlerts.add(this);
+        }
+        if(devAlerts = getPlayer().hasPermission("kauri.command.alerts.dev")) {
+            Kauri.INSTANCE.dataManager.devAlerts.add(this);
         }
         creation = System.currentTimeMillis();
         playerInfo = new PlayerInformation();

@@ -12,7 +12,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class DataManager {
     public Map<UUID, ObjectData> dataMap = new ConcurrentHashMap<>();
-    public List<ObjectData> hasAlerts = new CopyOnWriteArrayList<>(), debugging = new CopyOnWriteArrayList<>();
+    public List<ObjectData> hasAlerts = new CopyOnWriteArrayList<>(), devAlerts = new CopyOnWriteArrayList<>(),
+            debugging = new CopyOnWriteArrayList<>();
 
     public DataManager() {
         RunUtils.taskTimerAsync(() -> {
