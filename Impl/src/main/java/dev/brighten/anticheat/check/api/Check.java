@@ -349,7 +349,7 @@ public class Check implements KauriCheck {
         //register(new FlyH());
         register(new FastLadder());
         register(new NoFallA());
-        //register(new NoFallB());
+        register(new NoFallB());
         register(new Hitboxes());
         register(new AimA());
         register(new AimB());

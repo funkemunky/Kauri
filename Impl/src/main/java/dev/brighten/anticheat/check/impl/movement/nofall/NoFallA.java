@@ -55,6 +55,7 @@ public class NoFallA extends Check {
         if(!data.playerInfo.flightCancel
                 && data.playerInfo.lastHalfBlock.hasPassed(4)
                 && !data.blockInfo.onSlime
+                && !data.blockInfo.blocksAbove
                 && data.playerInfo.lastBlockPlace.hasPassed(8)
                 && data.playerInfo.lastVelocity.hasPassed(4)
                 && (data.playerInfo.deltaY != 0 || data.playerInfo.deltaXZ > 0)

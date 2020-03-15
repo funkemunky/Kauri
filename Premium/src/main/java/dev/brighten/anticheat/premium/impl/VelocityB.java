@@ -20,9 +20,8 @@ import org.bukkit.enchantments.Enchantment;
 public class VelocityB extends Check {
 
     private double vX, vZ, vY, pvX, pvZ;
-    private boolean useEntity, tookVelocity;
-    private MaxDouble verbose = new MaxDouble(50);
-    private double maxThreshold;
+    private boolean useEntity, tookVelocity, sprint;
+    private double buffer;
     private long lastVelocity;
     private static double[] moveValues = new double[] {-0.98, 0, 0.98};
 
@@ -50,48 +49,98 @@ public class VelocityB extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(tookVelocity
-                && timeStamp - lastVelocity > data.lagInfo.ping
-                && Math.abs(data.playerInfo.deltaY - vY) < 0.00001) {
-            vX = pvX;
-            vZ = pvZ;
+                && timeStamp - lastVelocity > data.lagInfo.ping / 1.35
+                && Math.abs(data.playerInfo.deltaY - vY) < 0.001) {
+            pvX = vX;
+            pvZ = vZ;
             tookVelocity = false;
         }
 
         if(pvX != 0 || pvZ != 0) {
+            boolean found = false;
+
+            double drag = 0.91;
+
+            if(data.playerInfo.lClientGround) {
+                drag*= data.blockInfo.currentFriction;
+            }
+
+            if(useEntity && sprint) {
+                pvX*= 0.6;
+                pvZ*= 0.6;
+            }
+            double f = 0.16277136 / (drag * drag * drag);
+            double f5;
+
+            if (data.playerInfo.lClientGround) {
+                f5 = data.predictionService.aiMoveSpeed * f;
+            } else {
+                f5 = sprint ? 0.026 : 0.02;
+            }
+
             double vX = pvX;
             double vZ = pvZ;
             double vXZ = 0;
-            boolean found = false;
+
+            double moveStrafe = 0, moveForward = 0;
             for (double forward : moveValues) {
                 for(double strafe : moveValues) {
-                    moveFlying(strafe, forward, 0.026);
+                    double s2 = strafe;
+                    double f2 = forward;
+                    if(data.playerInfo.usingItem) {
+                        s2*= 0.2;
+                        f2*= 0.2;
+                    }
+                    moveFlying(s2, f2, f5);
 
-                    vXZ = MathUtils.hypot(pvX, pvZ);
+                    double deltaX = Math.abs(pvX - data.playerInfo.deltaX);
+                    double deltaZ = Math.abs(pvZ - data.playerInfo.deltaZ);
 
-                    if(MathUtils.getDelta(vXZ, data.playerInfo.deltaXZ) < 1E-8) {
+                    pvX = vX;
+                    pvZ = vZ;
+                    if(deltaX <= 0.005 - (data.playerInfo.usingItem ? 0.0045 : 0)
+                            && deltaZ <= 0.005 - (data.playerInfo.usingItem ? 0.0045 : 0)) {
+                        moveForward = f2;
+                        moveStrafe = s2;
                         found = true;
                         break;
                     }
-                    pvX = vX;
-                    pvZ = vZ;
+
                 }
             }
 
             if(!found) {
-                moveFlying(data.predictionService.moveStrafing, data.predictionService.moveForward, 0.026);
-                vXZ = MathUtils.hypot(pvX, pvZ);
+                moveStrafe = data.predictionService.moveStrafing;
+                moveForward = data.predictionService.moveForward;
+                if(data.playerInfo.usingItem) {
+                    moveStrafe*= 0.2;
+                    moveForward*= 0.2;
+                }
             }
+
+            moveFlying(moveStrafe, moveForward, f5);
+
+            vXZ = MathUtils.hypot(pvX, pvZ);
 
             double ratio = data.playerInfo.deltaXZ / vXZ;
 
-            debug("ratio=%v.3", ratio);
-            pvX *= 0.91;
-            pvZ *= 0.91;
+            if(ratio < 0.993 && !data.blockInfo.blocksNear) {
+                if(++buffer > 12) {
+                    vl++;
+                    flag("pct=%v.2% buffer=%v.1", ratio * 100, buffer);
+                }
+            } else buffer-= buffer > 0 ? 0.2 : 0;
+            debug("ratio=%v.3 buffer=%v.1 strafe=%v.2 forward=%v.2 lastUse=%v found=%v",
+                    ratio, buffer, moveStrafe, moveForward, data.playerInfo.lastUseItem.getPassed(), found);
+            pvX *= drag;
+            pvZ *= drag;
 
             if(Math.abs(pvX) < 0.005) pvX = 0;
             if(Math.abs(pvZ) < 0.005) pvZ = 0;
             if(data.playerInfo.clientGround) pvX = pvZ = 0;
         }
+        sprint = data.playerInfo.sprinting;
+        useEntity = false;
     }
 
     private void moveFlying(double strafe, double forward, double friction) {

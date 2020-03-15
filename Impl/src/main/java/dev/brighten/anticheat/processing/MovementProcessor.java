@@ -110,6 +110,7 @@ public class MovementProcessor {
 
         if(data.playerInfo.blockBelow != null)
             data.blockInfo.currentFriction = ReflectionsUtil.getFriction(data.playerInfo.blockBelow);
+
         if(packet.isPos()) {
             //We create a separate from BoundingBox for the predictionService since it should operate on pre-motion data.
             data.box = PlayerSizeHandler.instance.bounds(data.getPlayer(),

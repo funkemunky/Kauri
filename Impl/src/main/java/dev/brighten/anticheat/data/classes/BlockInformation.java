@@ -43,15 +43,18 @@ public class BlockInformation {
                 || Kauri.INSTANCE.lastEnabled.hasNotPassed(6)) return;
         blocks.clear();
 
-        val dy = objectData.playerInfo.deltaY;
-        val dh = objectData.playerInfo.deltaXZ;
+        double dy = objectData.playerInfo.deltaY;
+        double dh = objectData.playerInfo.deltaXZ;
 
-        int startX = Location.locToBlock(objectData.playerInfo.to.x - 0.3 - dh);
-        int endX = Location.locToBlock(objectData.playerInfo.to.x + 0.3 + dh);
-        int startY = Location.locToBlock(objectData.playerInfo.to.y - 0.51 - dy);
-        int endY = Location.locToBlock(objectData.playerInfo.to.y + 2.5 + dy);
-        int startZ = Location.locToBlock(objectData.playerInfo.to.z - 0.3 - dh);
-        int endZ = Location.locToBlock(objectData.playerInfo.to.z + 0.3 + dh);
+        if(dy > 2) dy = 2;
+        if(dh > 2) dh = 2;
+
+        int startX = Location.locToBlock(objectData.playerInfo.to.x - 1 - dh);
+        int endX = Location.locToBlock(objectData.playerInfo.to.x + 1 + dh);
+        int startY = Location.locToBlock(objectData.playerInfo.to.y - 1 - dy);
+        int endY = Location.locToBlock(objectData.playerInfo.to.y + 2.6 + dy);
+        int startZ = Location.locToBlock(objectData.playerInfo.to.z - 1 - dh);
+        int endZ = Location.locToBlock(objectData.playerInfo.to.z + 1 + dh);
 
         objectData.playerInfo.worldLoaded = true;
         for(int x = startX ; x < endX ; x++) {
