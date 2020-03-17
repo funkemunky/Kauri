@@ -30,7 +30,8 @@ public class CheckManager {
         methods.parallelStream()
                 .forEach(entry -> {
                     Check check = checks.get(entry.getKey());
-                    if(check.enabled) {
+                    if(check.enabled && objectData.playerVersion.isOrBelow(check.maxVersion)
+                            && objectData.playerVersion.isOrAbove(check.minVersion)) {
                         if(entry.getValue().getMethod().getParameterCount() > 1)
                             entry.getValue().invoke(check, object, timeStamp);
                         else entry.getValue().invoke(check, object);
@@ -89,6 +90,7 @@ public class CheckManager {
                     check.punishVl = settings.punishVL();
                     check.checkType = settings.checkType();
                     check.maxVersion = settings.maxVersion();
+                    check.vlToFlag = settings.vlToFlag();
                     check.minVersion = settings.minVersion();
                     check.banExempt = objectData.getPlayer().hasPermission("kauri.bypass.ban");
                     return check;

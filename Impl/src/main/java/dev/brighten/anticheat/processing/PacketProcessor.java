@@ -7,10 +7,7 @@ import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.*;
 import cc.funkemunky.api.tinyprotocol.packet.out.*;
-import cc.funkemunky.api.utils.KLocation;
-import cc.funkemunky.api.utils.Materials;
-import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.RunUtils;
+import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.objects.VariableValue;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
@@ -19,6 +16,8 @@ import lombok.val;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 public class PacketProcessor {
 
@@ -177,9 +176,8 @@ public class PacketProcessor {
                     val pos = packet.getPosition();
                     val stack = packet.getItemStack();
 
-                    if(pos.getX() == -1 && pos.getY() ==
-                            (ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_8) ? 255 : -1)
-                            && pos.getZ() == -1 && stack != null) {
+                    if(pos.getX() == -1 && (pos.getY() == 255 || pos.getY() == -1)
+                            && pos.getZ() == -1 && stack != null && !stack.getType().isEdible()) {
                         data.predictionService.useSword = data.playerInfo.usingItem = true;
                         data.playerInfo.lastUseItem.reset();
                     } else if(stack != null) {
@@ -207,15 +205,24 @@ public class PacketProcessor {
 
                 long time = packet.getTime();
 
-                if (time != 100) {
+                if(time == data.playerInfo.velocityKeepalive) {
+                    data.playerInfo.lastVelocity.reset();
+                    data.playerInfo.lastVelocityTimestamp = timeStamp;
+                    data.predictionService.rmotionX = data.playerInfo.velocityX;
+                    data.predictionService.rmotionZ = data.playerInfo.velocityZ;
+                    data.predictionService.velocity = true;
+                } else if(time == data.playerInfo.teleportKeepalive) {
+                    data.playerInfo.lastRespawn = timeStamp;
+                    data.playerInfo.lastRespawnTimer.reset();
+                } else {
                     data.lagInfo.lastPing = data.lagInfo.ping;
                     data.lagInfo.ping = System.currentTimeMillis() - data.lagInfo.lastKeepAlive;
 
-                    data.checkManager.runPacket(packet, timeStamp);
                 }
 
+                data.checkManager.runPacket(packet, timeStamp);
                 if(data.sniffing) {
-                    data.sniffedPackets.add(event.getType() + ":@:" + packet.getTime()
+                    data.sniffedPackets.add(event.getType() + ":@:" +time
                             + ":@:" + event.getTimeStamp());
                 }
                 break;
@@ -254,15 +261,6 @@ public class PacketProcessor {
                     data.lagInfo.pingAverages.add(data.lagInfo.transPing);
                     data.lagInfo.averagePing = data.lagInfo.pingAverages.getAverage();
 
-                } else if(packet.getAction() == (short)101) {
-                    data.playerInfo.lastVelocity.reset();
-                    data.playerInfo.lastVelocityTimestamp = timeStamp;
-                    data.predictionService.rmotionX = data.playerInfo.velocityX;
-                    data.predictionService.rmotionZ = data.playerInfo.velocityZ;
-                    data.predictionService.velocity = true;
-                } else if(packet.getAction() == (short)154) {
-                    data.playerInfo.lastRespawn = timeStamp;
-                    data.playerInfo.lastRespawnTimer.reset();
                 }
 
                 data.checkManager.runPacket(packet, timeStamp);
@@ -275,6 +273,7 @@ public class PacketProcessor {
             case Packet.Client.ARM_ANIMATION: {
                 WrappedInArmAnimationPacket packet = new WrappedInArmAnimationPacket(object, data.getPlayer());
 
+                data.clickProcessor.onArm(packet, timeStamp);
                 data.checkManager.runPacket(packet, timeStamp);
                 if(data.sniffing) {
                     data.sniffedPackets.add(event.getType() + ":@:" + event.getTimeStamp());
@@ -366,8 +365,9 @@ public class PacketProcessor {
 
                 data.playerInfo.lastRespawn = timeStamp;
                 data.playerInfo.lastRespawnTimer.reset();
-                TinyProtocolHandler.sendPacket(event.getPlayer(),
-                        new WrappedOutTransaction(0, (short) 154, false).getObject());
+                TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutKeepAlivePacket(
+                        data.playerInfo.teleportKeepalive = 200 + ThreadLocalRandom.current()
+                                .nextInt(20, 200)).getObject());
 
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
@@ -409,8 +409,9 @@ public class PacketProcessor {
                 WrappedOutVelocityPacket packet = new WrappedOutVelocityPacket(object, data.getPlayer());
 
                 if (packet.getId() == data.getPlayer().getEntityId()) {
-                    TinyProtocolHandler.sendPacket(data.getPlayer(),
-                            new WrappedOutTransaction(0, (short) 101, false).getObject());
+                    TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutKeepAlivePacket(
+                            data.playerInfo.velocityKeepalive = (255 + ThreadLocalRandom.current()
+                                    .nextInt(20, 200))).getObject());
                     data.playerInfo.velocityX = (float) packet.getX();
                     data.playerInfo.velocityY = (float) packet.getY();
                     data.playerInfo.velocityZ = (float) packet.getZ();

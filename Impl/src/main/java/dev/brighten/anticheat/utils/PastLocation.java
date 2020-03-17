@@ -13,17 +13,15 @@ public class PastLocation {
     public List<KLocation> previousLocations = new CopyOnWriteArrayList<>();
 
     public KLocation getPreviousLocation(long time) {
-        long timeStamp = System.currentTimeMillis() - time;
         return (this.previousLocations.stream()
-                .min(Comparator.comparing((loc) -> MathUtils.getDelta(timeStamp, loc.timeStamp)))
+                .min(Comparator.comparing(loc -> Math.abs(time - loc.timeStamp)))
                 .orElse(this.previousLocations.get(0)));
     }
 
     public List<KLocation> getEstimatedLocation(long time, long delta) {
-        long prevTimeStamp = System.currentTimeMillis() - time;
         return this.previousLocations
                 .stream()
-                .filter(loc -> MathUtils.getDelta(prevTimeStamp, loc.timeStamp) < delta)
+                .filter(loc -> time - loc.timeStamp < delta)
                 .collect(Collectors.toList());
     }
 

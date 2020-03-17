@@ -41,6 +41,9 @@ public class PlayerInformation {
             gliding, riptiding, inventoryOpen;
     public int inventoryId = 0;
 
+    //Keepalives
+    public int velocityKeepalive, teleportKeepalive;
+
     //ticks
     public int groundTicks, airTicks;
     public TickTimer liquidTimer = new TickTimer(50),

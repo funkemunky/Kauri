@@ -8,7 +8,7 @@ import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Autoclicker (G)", description = "Checks for outliers in clicks. (FFX Autoclicker 6).",
-        checkType = CheckType.AUTOCLICKER, developer = true, enabled = false)
+        checkType = CheckType.AUTOCLICKER, vlToFlag = 3, enabled = false)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerG extends Check {
 
@@ -47,7 +47,8 @@ public class AutoclickerG extends Check {
                 if (++this.clicks == 40) {
                     if (this.outliers == 0) {
                         if (++buffer >= 7.0) {
-                            vl++;
+                            if(data.clickProcessor.getStd() > 23)
+                                vl++;
                             flag("o=%v buffer=%v", outliers, MathUtils.round(buffer, 1));
                         }
                     } else buffer-= buffer > 0 ? 1.5 : 0;

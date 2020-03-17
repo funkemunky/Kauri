@@ -70,7 +70,7 @@ public class Check implements KauriCheck {
     public boolean developer;
     @Getter
     @Setter
-    public float vl, punishVl;
+    public float vl, punishVl, vlToFlag;
     public ProtocolVersion minVersion, maxVersion;
     @Getter
     public CheckType checkType;
@@ -226,11 +226,11 @@ public class Check implements KauriCheck {
                                         .replace("%info%", info)
                                         .replace("%vl%", String.valueOf(MathUtils.round(vl, 2))));
 
-                        if(Config.testMode && (developer ? !data.devAlerts : !data.alerts))
+                        if(Config.testMode && (developer || vl < vlToFlag ? !data.devAlerts : !data.alerts))
                             jmsg.sendToPlayer(data.getPlayer());
 
                         if(Config.alertsConsole) MiscUtils.printToConsole(text);
-                            if(!developer)
+                            if(!developer && vl > vlToFlag)
                                 Kauri.INSTANCE.dataManager.hasAlerts
                                         .forEach(data -> jmsg.sendToPlayer(data.getPlayer()));
                             else Kauri.INSTANCE.dataManager.devAlerts
@@ -337,7 +337,6 @@ public class Check implements KauriCheck {
         register(new AutoclickerA());
         //register(new AutoclickerB());
         register(new AutoclickerC());
-        register(new AutoclickerF());
         register(new AutoclickerG());
         register(new FlyA());
         register(new FlyB());

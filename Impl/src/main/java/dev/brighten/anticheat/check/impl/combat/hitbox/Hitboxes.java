@@ -35,10 +35,10 @@ public class Hitboxes extends Check {
             EntityType.ENDERMAN);
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
+    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if (checkParameters(data)) {
 
-            List<RayCollision> rayTrace = data.pastLocation.getPreviousRange(100L).stream()
+            List<RayCollision> rayTrace = data.pastLocation.getEstimatedLocation(timeStamp, 100L).stream()
                     .map(l -> {
                         KLocation loc = l.clone();
                         loc.y+=data.playerInfo.sneaking ? 1.54 : 1.62;
@@ -48,8 +48,9 @@ public class Hitboxes extends Check {
                     .collect(Collectors.toList());
 
             List<SimpleCollisionBox> entityLocations = data.targetPastLocation
-                    .getEstimatedLocation(data.lagInfo.ping,
-                            175L + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
+                    .getEstimatedLocation(timeStamp,
+                            data.lagInfo.ping + 150L
+                                    + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
                     .stream()
                     .map(loc -> getHitbox(loc, data.target.getType()))
                     .collect(Collectors.toList());

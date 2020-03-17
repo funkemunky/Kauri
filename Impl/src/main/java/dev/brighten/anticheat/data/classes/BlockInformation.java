@@ -49,12 +49,12 @@ public class BlockInformation {
         if(dy > 2) dy = 2;
         if(dh > 2) dh = 2;
 
-        int startX = Location.locToBlock(objectData.playerInfo.to.x - 1 - dh);
-        int endX = Location.locToBlock(objectData.playerInfo.to.x + 1 + dh);
+        int startX = Location.locToBlock(objectData.playerInfo.to.x - 1.5 - dh);
+        int endX = Location.locToBlock(objectData.playerInfo.to.x + 1.5 + dh);
         int startY = Location.locToBlock(objectData.playerInfo.to.y - 1 - dy);
-        int endY = Location.locToBlock(objectData.playerInfo.to.y + 2.6 + dy);
-        int startZ = Location.locToBlock(objectData.playerInfo.to.z - 1 - dh);
-        int endZ = Location.locToBlock(objectData.playerInfo.to.z + 1 + dh);
+        int endY = Location.locToBlock(objectData.playerInfo.to.y + 3 + dy);
+        int startZ = Location.locToBlock(objectData.playerInfo.to.z - 1.5 - dh);
+        int endZ = Location.locToBlock(objectData.playerInfo.to.z + 1.5 + dh);
 
         objectData.playerInfo.worldLoaded = true;
         for(int x = startX ; x < endX ; x++) {

@@ -26,12 +26,12 @@ public class ReachA extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if(timeStamp - lastUse > 10 || data.playerInfo.creative || data.targetPastLocation.previousLocations.size() < 8) return;
+        if(timeStamp - lastUse > 3 || data.playerInfo.creative || data.targetPastLocation.previousLocations.size() < 10) return;
 
         List<KLocation> origins = Arrays.asList(data.playerInfo.to.clone(), data.playerInfo.from.clone());
         List<Tuple<KLocation, Vector>> targetBoxes = data.targetPastLocation
-                .getEstimatedLocation(data.lagInfo.transPing,
-                        150L + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
+                .getEstimatedLocation(timeStamp,
+                        data.lagInfo.ping + 120L + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
                 .stream()
                 .map(loc -> new Tuple<>(loc, getHitbox(target.getType())))
                 .collect(Collectors.toList());
@@ -45,12 +45,12 @@ public class ReachA extends Check {
             }
         }
 
-        if(distance > 3.2 && distance != 69) {
-            if(++buffer > 3) {
+        if(distance > 3.1 && distance != 69) {
+            if(++buffer > 6) {
                 vl++;
                 flag("distance=%v buffer=%v", MathUtils.round(distance, 3), buffer);
             }
-        } else buffer = 0;
+        } else buffer-= buffer > 0 ? 1 : 0;
 
         debug("distance=%v boxes=%v buffer=%v", distance, targetBoxes.size(), buffer);
     }

@@ -219,11 +219,6 @@ public class SpeedC extends Check {
             moveSpeed+= 0.1;
         }
 
-        if (data.playerInfo.slimeTimer.hasNotPassed(0)) {
-            tags.add("slime");
-            moveSpeed -= 0.07;
-        }
-
         double dyf = Helper.format(data.playerInfo.deltaY, 4);
         if (dyf > -0.0785 && dyf < 0 && !data.playerInfo.serverGround) {
             tags.add("first");

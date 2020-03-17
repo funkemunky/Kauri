@@ -17,7 +17,7 @@ import lombok.val;
 public class Timer extends Check {
 
     private long lastTS, lRange;
-    private EvictingList<Long> times = new EvictingList<>(20);
+    private EvictingList<Long> times = new EvictingList<>(25);
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet, long timeStamp) {

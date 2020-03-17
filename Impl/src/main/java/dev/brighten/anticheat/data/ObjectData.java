@@ -16,6 +16,7 @@ import dev.brighten.anticheat.data.classes.CheckManager;
 import dev.brighten.anticheat.data.classes.PlayerInformation;
 import dev.brighten.anticheat.data.classes.PredictionService;
 import dev.brighten.anticheat.logs.objects.Log;
+import dev.brighten.anticheat.processing.ClickProcessor;
 import dev.brighten.anticheat.processing.MovementProcessor;
 import dev.brighten.anticheat.utils.PastLocation;
 import org.bukkit.Bukkit;
@@ -46,6 +47,7 @@ public class ObjectData {
     public LagInformation lagInfo;
     public PredictionService predictionService;
     public MovementProcessor moveProcessor;
+    public ClickProcessor clickProcessor;
     public int hashCode;
     public boolean banned;
     public List<Log> logs = new ArrayList<>();
@@ -68,6 +70,7 @@ public class ObjectData {
         creation = System.currentTimeMillis();
         playerInfo = new PlayerInformation();
         blockInfo = new BlockInformation(this);
+        clickProcessor = new ClickProcessor(this);
         pastLocation = new PastLocation();
         lagInfo = new LagInformation();
         targetPastLocation = new PastLocation();

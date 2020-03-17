@@ -171,7 +171,7 @@ public class MovementProcessor {
             RayCollision collision = new RayCollision(origin.toVector(), MathUtils.getDirection(origin));
 
             List<CollisionBox> boxes = Helper.getCollisionsOnRay(collision, data.getPlayer().getWorld(),
-                    data.playerInfo.creative ? 5 : 4, 1);
+                    data.playerInfo.creative ? 5 : 4, 0.5);
 
             data.playerInfo.lookingAtBlock = boxes.size() > 0;
             double yawGcd = data.playerInfo.yawGCD / offset;
@@ -335,7 +335,8 @@ public class MovementProcessor {
                 || data.playerInfo.lastHalfBlock.hasNotPassed(2);
 
         //Adding past location
-        data.pastLocation.addLocation(data.playerInfo.to.clone());
+        if(timeStamp - data.playerInfo.lastServerPos > 100L)
+            data.pastLocation.addLocation(data.playerInfo.to.clone());
     }
     private static int getDeltaX(double yawDelta, double gcd) {
         double f2 = yawToF2(yawDelta);

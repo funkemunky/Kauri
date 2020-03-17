@@ -2,6 +2,7 @@ package dev.brighten.anticheat.premium.impl;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInKeepAlivePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumAnimation;
@@ -47,14 +48,17 @@ public class VelocityB extends Check {
     }
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if(tookVelocity
-                && timeStamp - lastVelocity > data.lagInfo.ping / 1.35
-                && Math.abs(data.playerInfo.deltaY - vY) < 0.001) {
+    public void onKeepalive(WrappedInKeepAlivePacket packet) {
+        if(data.playerInfo.velocityKeepalive == packet.getTime()) {
             pvX = vX;
             pvZ = vZ;
+            vY = -1;
             tookVelocity = false;
         }
+    }
+
+    @Packet
+    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
 
         if(pvX != 0 || pvZ != 0) {
             boolean found = false;
@@ -124,8 +128,12 @@ public class VelocityB extends Check {
 
             double ratio = data.playerInfo.deltaXZ / vXZ;
 
-            if(ratio < 0.993 && !data.blockInfo.blocksNear) {
-                if(++buffer > 12) {
+            if(ratio < (data.playerVersion.isOrAbove(ProtocolVersion.V1_9)
+                    || data.playerInfo.lastUseItem.hasNotPassed(15) ? 0.8 : 0.993)
+                    && (timeStamp - data.creation > 3000L)
+                    && data.playerInfo.lastUseItem.hasPassed(6)
+                    && !data.blockInfo.blocksNear) {
+                if((buffer+= found || ratio > 0.95 ? 0.5 : 1) > 12) {
                     vl++;
                     flag("pct=%v.2% buffer=%v.1", ratio * 100, buffer);
                 }
@@ -134,6 +142,8 @@ public class VelocityB extends Check {
                     ratio, buffer, moveStrafe, moveForward, data.playerInfo.lastUseItem.getPassed(), found);
             pvX *= drag;
             pvZ *= drag;
+
+            if(timeStamp - lastVelocity > 250L) pvX = pvZ = 0;
 
             if(Math.abs(pvX) < 0.005) pvX = 0;
             if(Math.abs(pvZ) < 0.005) pvZ = 0;

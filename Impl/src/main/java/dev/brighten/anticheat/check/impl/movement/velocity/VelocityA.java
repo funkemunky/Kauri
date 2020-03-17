@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.check.impl.movement.velocity;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInKeepAlivePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Cancellable;
@@ -18,8 +19,8 @@ public class VelocityA extends Check {
     private long velocityTS;
     
     @Packet
-    public void onTransaction(WrappedInTransactionPacket packet, long timeStamp) {
-        if(packet.getAction() == (short) 101) {
+    public void onTransaction(WrappedInKeepAlivePacket packet, long timeStamp) {
+        if(packet.getTime() == data.playerInfo.velocityKeepalive) {
             velocityTS = timeStamp;
             vY = data.playerInfo.velocityY;
         }

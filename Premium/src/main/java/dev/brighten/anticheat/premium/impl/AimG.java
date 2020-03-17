@@ -37,7 +37,7 @@ public class AimG extends Check {
 
             if(ydis <= 3 && xdis < 12 && summary.getAverage() > 22) {
                 vl++;
-                flag("ydis=%v xdis=%v", ydis, xdis);
+                flag("ydis=%v xdis=%v avg=%v.2", ydis, xdis, summary.getAverage());
             }
             debug("xdis=%v ydis=%v xavg=%v.2 xstd=%v.2", xdis, ydis, summary.getAverage(), ldeltaX.std());
 
