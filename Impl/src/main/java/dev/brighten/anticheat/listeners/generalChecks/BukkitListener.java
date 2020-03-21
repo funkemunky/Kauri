@@ -1,14 +1,15 @@
-package dev.brighten.anticheat.listeners;
+package dev.brighten.anticheat.listeners.generalChecks;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
-import cc.funkemunky.api.utils.Init;
-import cc.funkemunky.api.utils.MiscUtils;
-import cc.funkemunky.api.utils.XMaterial;
+import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.world.BlockData;
 import cc.funkemunky.api.utils.world.CollisionBox;
+import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
+import lombok.val;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -17,8 +18,11 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 @Init
 public class BukkitListener implements Listener {
@@ -48,7 +52,24 @@ public class BukkitListener implements Listener {
 
         if(event.getItem() != null && event.getItem().isSimilar(MAGIC_WAND)) {
             BlockData data = BlockData.getData(event.getClickedBlock().getType());
+
             CollisionBox box = data.getBox(event.getClickedBlock(), ProtocolVersion.getGameVersion());
+
+            Bukkit.dispatchCommand(event.getPlayer(), "kauri block "
+                    + event.getClickedBlock().getType().name());
+
+            List<SimpleCollisionBox> downcasted = new ArrayList<>();
+
+            box.downCast(downcasted);
+
+            for (SimpleCollisionBox sbox : downcasted) {
+                val max = sbox.max().subtract(event.getClickedBlock().getLocation().toVector());
+                val min = sbox.min().subtract(event.getClickedBlock().getLocation().toVector());
+
+                Vector subbed = max.subtract(min);
+
+                event.getPlayer().sendMessage("x=" + subbed.getX() + " y=" + subbed.getY() + " z=" + subbed.getZ());
+            }
 
             box.draw(WrappedEnumParticle.FLAME, Collections.singleton(event.getPlayer()));
             event.setCancelled(true);

@@ -12,6 +12,7 @@
         <module>API</module>
         <module>Impl</module>
         <module>Premium</module>
+        <module>Checks</module>
     </modules>
 
     <repositories>
@@ -46,6 +47,12 @@
             <groupId>cc.funkemunky.utils</groupId>
             <artifactId>Atlas</artifactId>
             <version>1.8.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.github.spigot</groupId>
+            <artifactId>1.8.8</artifactId>
+            <version>1.8.8</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

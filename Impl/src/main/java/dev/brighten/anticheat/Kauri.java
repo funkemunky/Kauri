@@ -19,6 +19,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -46,6 +48,8 @@ public class Kauri extends JavaPlugin {
     public KauriAPI kauriAPI;
 
     public boolean isNewer;
+
+    public List<Runnable> onReload = new ArrayList<>();
 
     public void onEnable() {
         MiscUtils.printToConsole(Color.Red + "Starting Kauri " + getDescription().getVersion() + "...");
@@ -82,7 +86,6 @@ public class Kauri extends JavaPlugin {
         //Clearing the dataManager.
         Kauri.INSTANCE.dataManager.dataMap.clear();
 
-
         MiscUtils.printToConsole("&7Clearing checks and cached entity information...");
         EntityProcessor.vehicles.clear(); //Clearing all registered vehicles.
         //Clearing the checks.
@@ -99,16 +102,20 @@ public class Kauri extends JavaPlugin {
 
     public void reload() {
         Kauri.INSTANCE.reloadConfig();
-        Atlas.getInstance().initializeScanner(this, false, false);
-
-        dataManager.dataMap.clear();
-        EntityProcessor.vehicles.clear();
 
         Check.checkClasses.clear();
         Check.checkSettings.clear();
-        Check.registerChecks();
+        dataManager.dataMap.clear();
+        EntityProcessor.vehicles.clear();
+
+        Atlas.getInstance().initializeScanner(this, false, false);
 
         loggerManager = new LoggerManager();
+
+        for (Runnable runnable : onReload) {
+            runnable.run();
+            onReload.remove(runnable);
+        }
 
         Bukkit.getOnlinePlayers().forEach(dataManager::createData);
     }
@@ -137,5 +144,9 @@ public class Kauri extends JavaPlugin {
             lastTick = currentTime;
             Kauri.INSTANCE.lastTick = currentTime;
         }, this, 1L, 1L);
+    }
+
+    public void onReload(Runnable runnable) {
+        onReload.add(runnable);
     }
 }

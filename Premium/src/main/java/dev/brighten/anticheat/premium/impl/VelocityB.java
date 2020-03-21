@@ -131,6 +131,7 @@ public class VelocityB extends Check {
             if(ratio < (data.playerVersion.isOrAbove(ProtocolVersion.V1_9)
                     || data.playerInfo.lastUseItem.hasNotPassed(15) ? 0.8 : 0.993)
                     && (timeStamp - data.creation > 3000L)
+                    && data.lagInfo.lastPacketDrop.hasPassed(1)
                     && data.playerInfo.lastUseItem.hasPassed(6)
                     && !data.blockInfo.blocksNear) {
                 if((buffer+= found || ratio > 0.95 ? 0.5 : 1) > 12) {

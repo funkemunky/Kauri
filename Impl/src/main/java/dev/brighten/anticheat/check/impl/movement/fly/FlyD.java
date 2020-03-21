@@ -26,72 +26,78 @@ public class FlyD extends Check {
     private double py;
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
+    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         /** PRE MOTION CALCULATION **/
-        /* y=0 calculations */
-        if((ProtocolVersion.getGameVersion().isOrBelow(ProtocolVersion.V1_8_9) && Math.abs(py) < 0.005)
-                || data.playerInfo.serverPos
-                || data.playerInfo.lastRespawnTimer.hasNotPassed(0))
-            py = 0;
-        /* end y=0 calculations */
-
-        //Setting velocity stuff.
-        if(data.playerInfo.lastVelocity.hasNotPassed(0))
-            py = data.playerInfo.velocityY;
-        //End setting velocity stuff.
-
-        /** MOTION CALCULATION **/
         boolean didBox = false;
-        if(data.playerInfo.lClientGround
-                && !data.playerInfo.clientGround
-                && data.playerInfo.deltaY > 0) {
-            py = MovementUtils.getJumpHeight(data.getPlayer());
+        if(!packet.isPos()) py = 0;
+        else {
+            /* y=0 calculations */
+            if ((ProtocolVersion.getGameVersion().isOrBelow(ProtocolVersion.V1_8_9) && Math.abs(py) < 0.005))
+                py = 0;
+            /* end y=0 calculations */
 
-            if(Math.abs(data.playerInfo.deltaY - py) > 1E-6) {
-                double test = py - 0.015625;
+            /** MOTION CALCULATION **/
+            if (data.playerInfo.lClientGround
+                    && !data.playerInfo.clientGround
+                    && data.playerInfo.deltaY > 0) {
+                py = MovementUtils.getJumpHeight(data.getPlayer());
 
-                if(Math.abs(data.playerInfo.deltaY - py) > Math.abs(test - data.playerInfo.deltaY) + 1E-5) {
-                    py = test;
-                    didBox = true;
+                if (Math.abs(data.playerInfo.deltaY - py) > 1E-6) {
+                    double test = py - 0.015625;
+
+                    if (Math.abs(data.playerInfo.deltaY - py) > Math.abs(test - data.playerInfo.deltaY) + 1E-5) {
+                        py = test;
+                        didBox = true;
+                    }
                 }
             }
-        }
 
-        /** POSITION ALCULATION **/
-        /* collision algorithm */
-        double dh = data.playerInfo.deltaXZ , dy = data.playerInfo.deltaY;
-        for (Block block : Helper.blockCollisions(data.blockInfo.handler.getBlocks(),
-                data.box.copy().expand(0.5 + dh, 0.5 + Math.abs(dy), 0.5 + dh))) {
-            CollisionBox box = BlockData.getData(block.getType())
-                    .getBox(block, ProtocolVersion.getGameVersion());
+            /** POSITION ALCULATION **/
+            /* collision algorithm */
+            double dh = Math.min(data.playerInfo.deltaXZ, 1), dy = data.playerInfo.deltaY;
+            for (Block block : Helper.blockCollisions(data.blockInfo.handler.getBlocks(),
+                    data.box.copy().expand(1 + dh, 0.35 + Math.min(1, Math.abs(dy)), 1 + dh))) {
+                CollisionBox box = BlockData.getData(block.getType())
+                        .getBox(block, ProtocolVersion.getGameVersion());
 
-            List<SimpleCollisionBox> sBoxes = new ArrayList<>();
-            box.downCast(sBoxes);
+                List<SimpleCollisionBox> sBoxes = new ArrayList<>();
+                box.downCast(sBoxes);
 
-            for (SimpleCollisionBox sBox : sBoxes) {
-                double minDelta = sBox.yMax - data.playerInfo.from.y,
-                        maxDelta = sBox.yMin - (data.playerInfo.from.y + 1.8);
+                for (SimpleCollisionBox sBox : sBoxes) {
+                    double minDelta = sBox.yMax - data.playerInfo.from.y,
+                            maxDelta = sBox.yMin - (data.playerInfo.from.y + 1.8);
 
-                double mind = MathUtils.getDelta(data.playerInfo.deltaY, minDelta),
-                        maxd = MathUtils.getDelta(data.playerInfo.deltaY, maxDelta);
+                    double mind = MathUtils.getDelta(data.playerInfo.deltaY, minDelta),
+                            maxd = MathUtils.getDelta(data.playerInfo.deltaY, maxDelta);
 
-                if(packet.isPos() && (py != 0 || data.playerInfo.deltaXZ > 0))
-                debug("mind=%v maxd=%v", mind, maxd);
-                if(mind < 1E-7) {
-                    py = minDelta;
-                    didBox = false;
-                    break;
-                } else if(maxd < 1E-7) {
-                    py = maxDelta;
-                    didBox = false;
-                    break;
+                    if (packet.isPos() && (py != 0 || data.playerInfo.deltaXZ > 0))
+                        debug("mind=%v maxd=%v md=%v", mind, maxd, maxDelta);
+                    if (mind < 1E-7) {
+                        py = minDelta;
+                        didBox = false;
+                        break;
+                    } else if (maxd < 1E-7) {
+                        py = maxDelta;
+                        didBox = false;
+                        break;
+                    }
                 }
             }
+            /* end collision algorithm */
+
         }
-        /* end collision algorithm */
+        //Set prediction y to current delta calculations
+        if (data.playerInfo.lastVelocity.hasNotPassed(5)
+                || data.playerInfo.serverPos
+                || data.playerInfo.blockAboveTimer.hasNotPassed(1)
+                || data.playerInfo.lastRespawnTimer.hasNotPassed(0))
+            py = data.playerInfo.deltaY;
+        //End Set prediction y to current delta calculations
 
         //flag check
         if(!data.playerInfo.flightCancel && packet.isPos()
+                && data.playerInfo.lastVelocity.hasPassed(8)
+                && data.playerInfo.lastBlockPlace.hasPassed(6)
                 && Math.abs(data.playerInfo.deltaY - py) > 0.001) {
             vl++;
             flag("dy=%v.4 py=%v.4", data.playerInfo.deltaY, py);
@@ -99,6 +105,7 @@ public class FlyD extends Check {
         //debugging
         if(packet.isPos() && (py != 0 || data.playerInfo.deltaXZ > 0))
         debug("deltaY=%v predicted=%v", data.playerInfo.deltaY, py);
+        else debug("flying");
 
         /** POST-MOTION ALCULATION **/
 

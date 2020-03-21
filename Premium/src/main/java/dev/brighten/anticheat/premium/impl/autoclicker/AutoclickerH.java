@@ -16,7 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @CheckInfo(name = "Autoclicker (H)", description = "Meant to detect Vape and other autoclickers. By Elevated.",
-        checkType = CheckType.AUTOCLICKER, punishVL = 8)
+        checkType = CheckType.AUTOCLICKER, punishVL = 11, vlToFlag = 1)
 public class AutoclickerH extends Check {
 
     private double ticks, cps, buffer;
@@ -31,7 +31,7 @@ public class AutoclickerH extends Check {
                 val negatives = results.getNegatives();
                 if (negatives == 1) {
                     if (++buffer > 2) {
-                        vl++;
+                        if(buffer > 3) vl++;
                         flag("cps=%v buffer=%v", cps, buffer);
                     }
                 } else {

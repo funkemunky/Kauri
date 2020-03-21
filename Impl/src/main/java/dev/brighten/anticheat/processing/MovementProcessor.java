@@ -356,20 +356,30 @@ public class MovementProcessor {
                 RoundingMode.HALF_UP);
     }
 
-    //TODO Condense. This is just for easy reading until I test everything.
-    private static double getSensitivityFromYawGCD(double gcd) {
+    //Noncondensed
+    /*private static double getSensitivityFromYawGCD(double gcd) {
         double stepOne = yawToF2(gcd) / 8;
         double stepTwo = Math.cbrt(stepOne);
         double stepThree = stepTwo - .2f;
         return stepThree / .6f;
+    }*/
+
+    //Condensed
+    private static double getSensitivityFromYawGCD(double gcd) {
+        return (Math.cbrt(yawToF2(gcd) / 8) - .2) / .6;
     }
 
-    //TODO Condense. This is just for easy reading until I test everything.
-    private static double getSensitivityFromPitchGCD(double gcd) {
+    //Noncondensed
+    /*private static double getSensitivityFromPitchGCD(double gcd) {
         double stepOne = pitchToF3(gcd) / 8;
         double stepTwo = Math.cbrt(stepOne);
         double stepThree = stepTwo - .2f;
         return stepThree / .6f;
+    }*/
+
+    //Condensed
+    private static double getSensitivityFromPitchGCD(double gcd) {
+        return (Math.cbrt(pitchToF3(gcd) / 8) - .2) / .6;
     }
 
     private static double getF1FromYaw(double gcd) {

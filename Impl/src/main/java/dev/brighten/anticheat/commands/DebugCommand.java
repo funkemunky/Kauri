@@ -2,18 +2,25 @@ package dev.brighten.anticheat.commands;
 
 import cc.funkemunky.api.commands.ancmd.Command;
 import cc.funkemunky.api.commands.ancmd.CommandAdapter;
+import cc.funkemunky.api.reflections.types.WrappedClass;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
+import cc.funkemunky.api.utils.Materials;
+import cc.funkemunky.api.utils.XMaterial;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.Pastebin;
 import lombok.val;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.UUID;
 
 @Init(commands = true)
@@ -66,6 +73,51 @@ public class DebugCommand {
             } else cmd.getPlayer().sendMessage(Color.Red + "Could not find a target to debug.");
         } else cmd.getPlayer().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
                 .msg("error-invalid-args", "&cInvalid arguments! Check the help page."));
+    }
+
+    @Command(name = "kauri.block", description = "Check the material type information.",
+            display = "block [id,name]", permission = "kauri.command.block")
+    public void onBlock(CommandAdapter cmd) {
+        Material material;
+        if(cmd.getArgs().length > 0) {
+            if(MiscUtils.isInteger(cmd.getArgs()[0])) {
+                material = Material.getMaterial(Integer.parseInt(cmd.getArgs()[0]));
+            } else material = Arrays.stream(Material.values())
+                    .filter(mat -> mat.name().equalsIgnoreCase(cmd.getArgs()[0])).findFirst()
+                    .orElse((XMaterial.AIR.parseMaterial()));
+        } else if(cmd.getSender() instanceof Player) {
+            if(cmd.getPlayer().getItemInHand() != null) {
+                material = cmd.getPlayer().getItemInHand().getType();
+            } else {
+                cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                        .msg("block-no-item-in-hand",
+                                "&cPlease hold an item in your hand or use the proper arguments."));
+                return;
+            }
+        } else {
+            cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                    .msg("error-invalid-args", "&cInvalid arguments! Check the help page."));
+            return;
+        }
+
+        if(material != null) {
+            cmd.getSender().sendMessage(cc.funkemunky.api.utils.MiscUtils.line(Color.Dark_Gray));
+            cmd.getSender().sendMessage(Color.Gold + Color.Bold + material.name() + Color.Gray + ":");
+            cmd.getSender().sendMessage("");
+            cmd.getSender().sendMessage(Color.translate("&eBitmask&7: &f" + Materials.getBitmask(material)));
+            WrappedClass wrapped = new WrappedClass(Materials.class);
+
+            wrapped.getFields(field -> field.getType().equals(int.class) && Modifier.isStatic(field.getModifiers()))
+                    .stream().sorted(Comparator.comparing(field -> field.getField().getName()))
+                    .forEach(field -> {
+                        int bitMask = field.get(null);
+
+                        cmd.getSender().sendMessage(Color.translate("&e" + field.getField().getName()
+                                + "&7: &f" + Materials.checkFlag(material, bitMask)));
+                    });
+            cmd.getSender().sendMessage(cc.funkemunky.api.utils.MiscUtils.line(Color.Dark_Gray));
+        } else cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                .msg("block-no-material", "&cNo material was found. Please check your arguments."));
     }
 
     @Command(name = "kauri.debug.none", aliases = {"debug.none"}, permission = "kauri.command.debug", usage = "/<command>",
