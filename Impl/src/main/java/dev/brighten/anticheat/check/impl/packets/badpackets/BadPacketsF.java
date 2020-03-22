@@ -1,25 +1,31 @@
 package dev.brighten.anticheat.check.impl.packets.badpackets;
 
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInHeldItemSlotPacket;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutAbilitiesPacket;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "BadPackets (F)", description = "Checks for boxer crashers.", checkType = CheckType.BADPACKETS, punishVL = 60)
+@CheckInfo(name = "BadPackets (F)", description = "Checks if a client ignores sending a position packet.",
+        checkType = CheckType.BADPACKETS, punishVL = 4)
 public class BadPacketsF extends Check {
 
-    private long lastHeldItem;
+    private int packets;
+
     @Packet
-    public void onPacket(WrappedInHeldItemSlotPacket wrapper, long timeStamp) {
+    public void onFlying(WrappedInFlyingPacket packet) {
+        if(packet.isPos()) {
+            packets = 0;
+        } else if(packets++ > 20) {
+            vl++;
+            flag("packets=%v", packets);
+        }
+    }
 
-        long delta = timeStamp - lastHeldItem;
-
-        if(delta < 5) {
-            if(vl++ > 50) {
-                flag("delta=" + delta);
-            }
-        } else vl-= vl > 0 ? 1 : 0;
-        lastHeldItem = timeStamp;
+    @Packet
+    public void onAbilities(WrappedOutAbilitiesPacket packet) {
+        packets = 0;
     }
 }

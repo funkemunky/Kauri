@@ -14,6 +14,7 @@ public class AimB extends Check {
     public void onFlying(WrappedInFlyingPacket packet) {
         if(packet.isLook()
                 && Math.abs(data.playerInfo.deltaPitch) > 1E-5
+                && Math.abs(data.playerInfo.deltaPitch) < 20
                 && Math.abs(data.playerInfo.to.pitch) < 78) {
             if(data.playerInfo.pitchGCD < 100000
                     && data.playerInfo.lastAttack.hasNotPassed(10)

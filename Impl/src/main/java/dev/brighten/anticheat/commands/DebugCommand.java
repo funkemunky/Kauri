@@ -152,12 +152,12 @@ public class DebugCommand {
             debuggingPlayers = new String[] {cmd.getPlayer().getName()};
         } else {
             ObjectData.debugBoxes(true, cmd.getPlayer(),
-                    (debuggingPlayers = Arrays.copyOfRange(cmd.getArgs(), 1, cmd.getArgs().length - 1)));
-        }
+                    debuggingPlayers = cmd.getArgs());
+    }
 
         cmd.getPlayer().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
                 .msg("debug-boxes", "&aYou are now debugging the collisions of %players%.")
-        .replace("%players%", String.join(",", debuggingPlayers)));
+        .replace("%players%", String.join(", ", debuggingPlayers)));
 
     }
 
