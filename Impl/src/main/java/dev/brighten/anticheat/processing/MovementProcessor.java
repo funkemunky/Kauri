@@ -33,7 +33,7 @@ public class MovementProcessor {
     private MouseFilter mxaxis = new MouseFilter(), myaxis = new MouseFilter();
     private float smoothCamFilterX, smoothCamFilterY, smoothCamYaw, smoothCamPitch;
     private TickTimer lastReset = new TickTimer(5);
-
+    private GameMode lastGamemode;
     public static double offset = Math.pow(2, 24);
 
     public PotionEffectType levitation = null;
@@ -108,6 +108,9 @@ public class MovementProcessor {
         data.playerInfo.blockOnTo = BlockUtils.getBlock(data.playerInfo.to.toLocation(data.getPlayer().getWorld()));
         data.playerInfo.blockBelow = BlockUtils.getBlock(data.playerInfo.to.toLocation(data.getPlayer().getWorld())
                 .subtract(0, 1, 0));
+
+        if(!data.getPlayer().getGameMode().equals(lastGamemode)) data.playerInfo.lastGamemodeTimer.reset();
+        lastGamemode = data.getPlayer().getGameMode();
 
         if(data.playerInfo.blockBelow != null)
             data.blockInfo.currentFriction = ReflectionsUtil.getFriction(data.playerInfo.blockBelow);
@@ -357,20 +360,30 @@ public class MovementProcessor {
                 RoundingMode.HALF_UP);
     }
 
-    //TODO Condense. This is just for easy reading until I test everything.
-    private static double getSensitivityFromYawGCD(double gcd) {
+    //Noncondensed
+    /*private static double getSensitivityFromYawGCD(double gcd) {
         double stepOne = yawToF2(gcd) / 8;
         double stepTwo = Math.cbrt(stepOne);
         double stepThree = stepTwo - .2f;
         return stepThree / .6f;
+    }*/
+
+    //Condensed
+    private static double getSensitivityFromYawGCD(double gcd) {
+        return (Math.cbrt(yawToF2(gcd) / 8) - .2) / .6;
     }
 
-    //TODO Condense. This is just for easy reading until I test everything.
-    private static double getSensitivityFromPitchGCD(double gcd) {
+    //Noncondensed
+    /*private static double getSensitivityFromPitchGCD(double gcd) {
         double stepOne = pitchToF3(gcd) / 8;
         double stepTwo = Math.cbrt(stepOne);
         double stepThree = stepTwo - .2f;
         return stepThree / .6f;
+    }*/
+
+    //Condensed
+    private static double getSensitivityFromPitchGCD(double gcd) {
+        return (Math.cbrt(pitchToF3(gcd) / 8) - .2) / .6;
     }
 
     private static double getF1FromYaw(double gcd) {

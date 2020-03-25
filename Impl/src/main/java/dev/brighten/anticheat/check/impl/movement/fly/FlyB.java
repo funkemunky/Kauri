@@ -33,7 +33,7 @@ public class FlyB extends Check {
                 predicted = Math.min(data.playerInfo.deltaY, MovementUtils.getJumpHeight(packet.getPlayer()));
             }
 
-            for (Block block : Helper.blockCollisions(data.blockInfo.handler.getBlocks(),
+            for (Block block : Helper.blockCollisions(new ArrayList<>(data.blockInfo.handler.getBlocks()),
                     data.box.copy().expand(0.25 + Math.abs(data.playerInfo.deltaX),0.5,
                             0.25 + Math.abs(data.playerInfo.deltaZ))
                             .expandMin(0, -0.5f + Math.min(0, data.playerInfo.deltaY), 0))) {
@@ -68,7 +68,7 @@ public class FlyB extends Check {
             }
 
             if((data.playerInfo.clientGround && predicted > -0.08 && predicted < -0.077)
-                    || Math.abs(predicted) < 0.005) {
+                    || (Math.abs(predicted) < 0.005) && data.playerVersion.isOrBelow(ProtocolVersion.V1_8_9)) {
                 predicted = 0;
             }
 
@@ -81,11 +81,9 @@ public class FlyB extends Check {
                     && timeStamp - data.playerInfo.lastServerPos > 100L
                     && data.playerInfo.liquidTimer.hasPassed(8)
                     && data.playerInfo.lastBlockPlace.hasPassed(8)
-                    && data.playerVersion.isOrBelow(ProtocolVersion.V1_8_9)
                     && data.playerInfo.lastVelocity.hasPassed(10)
                     && deltaPredict > 0.0001) {
-                vl++;
-                if(vl > (data.lagInfo.lastPacketDrop.hasPassed(5) ? 2.5 : 4)) {
+                if(++vl > (data.lagInfo.lastPacketDrop.hasPassed(5) ? 2.5 : 4)) {
                     flag("deltaY=%v predicted=%v", data.playerInfo.deltaY, predicted);
                 }
             } else vl-= vl > 0 ? 0.2f : 0;

@@ -17,7 +17,7 @@ import lombok.val;
 public class Timer extends Check {
 
     private long lastTS, lRange;
-    private EvictingList<Long> times = new EvictingList<>(25);
+    private EvictingList<Long> times = new EvictingList<>(20);
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet, long timeStamp) {
@@ -25,7 +25,7 @@ public class Timer extends Check {
 
         if(timeStamp - data.creation > 2000
                 && timeStamp - data.playerInfo.lastServerPos > 80L) {
-            if(elapsed > 3)  times.add(elapsed);
+            times.add(elapsed);
             val summary = times.stream().mapToLong(val -> val).summaryStatistics();
             double average = summary.getAverage();
             double ratio = 50 / average;

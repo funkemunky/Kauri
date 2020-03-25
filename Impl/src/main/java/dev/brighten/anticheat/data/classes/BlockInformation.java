@@ -125,10 +125,8 @@ public class BlockInformation {
             onClimbable = objectData.playerInfo.blockOnTo != null
                     && BlockUtils.isClimbableBlock(objectData.playerInfo.blockOnTo);
         } else {
-            handler.setSize(0.61, 0);
-            handler.setSingle(true);
+            handler.setSize(0.64, 1.8);
             onClimbable = handler.isCollidedWith(Materials.LADDER);
-            handler.setSingle(false);
         }
 
         handler.setSize(0.6, 2.4);

@@ -5,7 +5,7 @@ import cc.funkemunky.api.commands.ancmd.CommandAdapter;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.XMaterial;
-import dev.brighten.anticheat.listeners.BukkitListener;
+import dev.brighten.anticheat.listeners.generalChecks.BukkitListener;
 
 import java.util.Arrays;
 

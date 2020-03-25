@@ -61,6 +61,7 @@ public class PlayerInformation {
             lastPlaceLiquid = new TickTimer(20),
             lastUseItem = new TickTimer(15),
             lastTeleportTimer = new TickTimer(10),
+            lastGamemodeTimer = new TickTimer(10),
             lastRespawnTimer = new TickTimer(20);
 
     public double velocityX, velocityY, velocityZ;

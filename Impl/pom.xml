@@ -83,6 +83,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+            <version>3.6.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>org.github.spigot</groupId>
             <artifactId>1.13.2</artifactId>
             <version>1.13.2</version>

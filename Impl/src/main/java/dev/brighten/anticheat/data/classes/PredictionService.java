@@ -9,6 +9,7 @@ import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.Helper;
 import dev.brighten.anticheat.utils.MiscUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.potion.PotionEffectType;
@@ -75,8 +76,11 @@ public class PredictionService {
         fMath = fastMath; // if the Player uses Optifine FastMath
 
         try {
-            if(!position && !velocity
-                    && (checkConditions = checkConditions(lastSprint))) {
+            if(Math.abs(data.playerInfo.velocityY - data.playerInfo.deltaY) < 0.0001) {
+                lmotionX = data.playerInfo.velocityX;
+                lmotionZ = data.playerInfo.velocityZ;
+            }
+            if(!position && (checkConditions = checkConditions(lastSprint))) {
                 if (lastSprint && hit) { // If the Player Sprints and Hit a Player he get slowdown
                     lmotionX *= 0.6D;
                     lmotionZ *= 0.6D;
@@ -338,6 +342,12 @@ public class PredictionService {
         moveStrafing = moveS;
         moveForward = moveF;
         this.key = key;
+
+        /*if(data.getPlayer().getName().equals("Dogeritoz")) {
+            Bukkit.broadcastMessage("key=" + key + " mx=" + MathUtils.round(mx, 6)
+                    + " mz=" + MathUtils.round(mz, 6) + " myaw=" + MathUtils.round(motionYaw, 4)
+                    + " velocity=" + velocity + " vx=" + data.playerInfo.velocityX + " vz=" + data.playerInfo.velocityZ);
+        }*/
     }
 
     private void calc(boolean checkCollisions) {

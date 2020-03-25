@@ -52,7 +52,7 @@ public class ReachB extends Check {
             List<SimpleCollisionBox> entityLocs = (targetData.playerVersion.isOrBelow(ProtocolVersion.V1_8_9)
                     ? targetData.pastLocation : data.targetPastLocation)
                     .getEstimatedLocation(timeStamp,
-                            data.lagInfo.ping + 220L + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
+                            data.lagInfo.ping + 180L + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
                     .stream()
                     .map(ReachB::getHitbox).collect(Collectors.toList());
 
@@ -85,7 +85,7 @@ public class ReachB extends Check {
                     vl++;
                     flag("distance=%v.3 buffer=%v.1", distance, buffer);
                 }
-            } else buffer-= buffer > 0 ? 0.05 : 0;
+            } else buffer-= buffer > 0 ? 0.02 : 0;
 
             debug("distance=%v.3 buffer=%v.1 ticklag=%v collided=%v",
                     distance, buffer, Kauri.INSTANCE.lastTickLag.getPassed(), collided);

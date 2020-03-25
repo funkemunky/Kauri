@@ -11,7 +11,7 @@ import dev.brighten.anticheat.utils.MovementUtils;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Fly (E)", description = "Checks for invalid jump heights.",
-        checkType = CheckType.FLIGHT, punishVL = 5, vlToFlag = 2)
+        checkType = CheckType.FLIGHT, punishVL = 7, vlToFlag = 2)
 @Cancellable
 public class FlyE extends Check {
 

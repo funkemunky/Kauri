@@ -4,106 +4,47 @@ import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInKeepAlivePacket;
 import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.world.BlockData;
-import cc.funkemunky.api.utils.world.CollisionBox;
-import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.Helper;
 import dev.brighten.anticheat.utils.MovementUtils;
+import dev.brighten.anticheat.utils.Verbose;
 import dev.brighten.api.check.CheckType;
-import org.bukkit.block.Block;
 
-import java.util.ArrayList;
-import java.util.List;
-
-@CheckInfo(name = "Fly (D)", description = "Completely predicts the vertical axis of movement.",
-        checkType = CheckType.FLIGHT, punishVL = 40, vlToFlag = 5, developer = true, enabled = false)
+@CheckInfo(name = "Fly (D)", description = "Ensures a user doesn't fly faster than the maximum threshold.",
+        checkType = CheckType.FLIGHT, punishVL = 10)
 @Cancellable
 public class FlyD extends Check {
+    private Verbose verbose = new Verbose(30, 5);
 
-    private double py;
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        /** PRE MOTION CALCULATION **/
-        /* y=0 calculations */
-        if((ProtocolVersion.getGameVersion().isOrBelow(ProtocolVersion.V1_8_9) && Math.abs(py) < 0.005)
-                || data.playerInfo.lastTeleportTimer.hasNotPassed(1)
-                || data.playerInfo.lastRespawnTimer.hasNotPassed(1))
-            py = data.playerInfo.deltaY;
-        /* end y=0 calculations */
+        if(packet.isPos()) {
+            double threshold = Math.max(0.8, data.playerInfo.jumpHeight * 2);
 
-        /** MOTION CALCULATION **/
-        boolean didBox = false;
-        if(data.playerInfo.lClientGround
-                && !data.playerInfo.clientGround) {
-            py = data.playerInfo.deltaY > 0 ? MovementUtils.getJumpHeight(data.getPlayer()) : data.playerInfo.deltaY;
+            if(data.playerInfo.deltaY > threshold
+                    && !data.playerInfo.canFly
+                    && !data.playerInfo.flightCancel
+                    && !data.playerInfo.creative
+                    && !data.playerInfo.wasOnSlime) {
+                vl++;
+                flag("deltaY=%v;threshold=%v type=deltaY",
+                        Helper.format(data.playerInfo.deltaY, 2), Helper.format(threshold, 2));
+            }
 
-            if(Math.abs(data.playerInfo.deltaY - py) > 1E-6) {
-                double test = py - 0.015625;
-
-                if(Math.abs(data.playerInfo.deltaY - py) > Math.abs(test - data.playerInfo.deltaY) + 1E-5) {
-                    py = test;
-                    didBox = true;
-                }
+            double delta = Math.abs(data.playerInfo.deltaY - data.playerInfo.lDeltaY);
+            if(!data.playerInfo.flightCancel
+                    && delta > 0.185
+                    && (!data.playerInfo.lClientGround || !data.playerInfo.clientGround)
+                    && data.playerInfo.lastVelocity.hasPassed(2)
+                    && data.playerInfo.lastHalfBlock.hasPassed(10)
+                    && data.playerInfo.blockAboveTimer.hasPassed(10)
+                    && verbose.flag(1, 4)) {
+                vl++;
+                flag("%v>-0.185 type=accel", MathUtils.round(delta, 3));
             }
         }
-
-        /** POSITION ALCULATION **/
-        /* collision algorithm */
-        double dh = data.playerInfo.deltaXZ , dy = data.playerInfo.deltaY;
-        for (Block block : Helper.blockCollisions(data.blockInfo.handler.getBlocks(),
-                data.box.copy().expand(0.5 + dh, 0.5 + Math.abs(dy), 0.5 + dh))) {
-            CollisionBox box = BlockData.getData(block.getType())
-                    .getBox(block, ProtocolVersion.getGameVersion());
-
-            List<SimpleCollisionBox> sBoxes = new ArrayList<>();
-            box.downCast(sBoxes);
-
-            for (SimpleCollisionBox sBox : sBoxes) {
-                double minDelta = sBox.yMax - data.playerInfo.from.y,
-                        maxDelta = sBox.yMin - (data.playerInfo.from.y + 1.8);
-
-                double mind = MathUtils.getDelta(data.playerInfo.deltaY, minDelta),
-                        maxd = MathUtils.getDelta(data.playerInfo.deltaY, maxDelta);
-
-                if(packet.isPos() && (py != 0 || data.playerInfo.deltaXZ > 0))
-                debug("mind=%v maxd=%v", mind, maxd);
-                if(mind < 1E-7) {
-                    py = minDelta;
-                    didBox = false;
-                    break;
-                } else if(maxd < 1E-7) {
-                    py = maxDelta;
-                    didBox = false;
-                    break;
-                }
-            }
-        }
-        /* end collision algorithm */
-
-        //Setting velocity stuff.
-        if(data.playerInfo.lastVelocity.hasNotPassed(3))
-            py = data.playerInfo.deltaY;
-        //End setting velocity stuff.
-
-        //flag check
-        if(!data.playerInfo.flightCancel && packet.isPos()
-                && Math.abs(data.playerInfo.deltaY - py) > 0.001) {
-            vl++;
-            flag("dy=%v.4 py=%v.4", data.playerInfo.deltaY, py);
-        } else vl-= vl > 0 ? 0.005 : 0;
-        //debugging
-        if(packet.isPos() && (py != 0 || data.playerInfo.deltaXZ > 0))
-        debug("deltaY=%v predicted=%v", data.playerInfo.deltaY, py);
-
-        /** POST-MOTION ALCULATION **/
-
-        if(didBox) py = MovementUtils.getJumpHeight(data.getPlayer());
-        //Deceleration algorithim
-        py = (py - 0.08) * 0.98;
     }
-
 }

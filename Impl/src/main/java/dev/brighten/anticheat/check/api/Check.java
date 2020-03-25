@@ -345,7 +345,7 @@ public class Check implements KauriCheck {
         register(new FlyC());
         register(new FlyD());
         register(new FlyE());
-        register(new FlyF());
+        register(new FlyD());
         //register(new FlyG());
         //register(new FlyH());
         register(new FastLadder());
@@ -357,7 +357,6 @@ public class Check implements KauriCheck {
         register(new AimC());
         register(new AimD());
         register(new AimF());
-        register(new AimH());
         register(new SpeedA());
         register(new SpeedB());
         register(new SpeedC());
@@ -396,7 +395,7 @@ public class Check implements KauriCheck {
         register(new SignOp());
         register(new SignCrash());
         //register(new Test());
-        //register(new LargeMove());
+        register(new LargeMove());
     }
 
     public static boolean isCheck(String name) {

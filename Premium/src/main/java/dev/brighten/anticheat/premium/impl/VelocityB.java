@@ -39,27 +39,21 @@ public class VelocityB extends Check {
 
     @Packet
     public void onUseEntity(WrappedInUseEntityPacket packet) {
-        if(!useEntity && (data.predictionService.lastSprint || (
-                        data.getPlayer().getItemInHand() != null
-                        && data.getPlayer().getItemInHand().containsEnchantment(Enchantment.KNOCKBACK)))
+        if(!useEntity
                 && packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) {
             useEntity = true;
         }
     }
 
     @Packet
-    public void onKeepalive(WrappedInKeepAlivePacket packet) {
-        if(data.playerInfo.velocityKeepalive == packet.getTime()) {
+    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
+        if(tookVelocity
+                && MathUtils.getDelta(data.playerInfo.deltaY, vY) < 0.00001) {
             pvX = vX;
             pvZ = vZ;
             vY = -1;
             tookVelocity = false;
         }
-    }
-
-    @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-
         if(pvX != 0 || pvZ != 0) {
             boolean found = false;
 
@@ -69,7 +63,8 @@ public class VelocityB extends Check {
                 drag*= data.blockInfo.currentFriction;
             }
 
-            if(useEntity && sprint) {
+            if(useEntity && (sprint || (data.getPlayer().getItemInHand() != null
+                    && data.getPlayer().getItemInHand().containsEnchantment(Enchantment.KNOCKBACK)))) {
                 pvX*= 0.6;
                 pvZ*= 0.6;
             }
@@ -128,10 +123,9 @@ public class VelocityB extends Check {
 
             double ratio = data.playerInfo.deltaXZ / vXZ;
 
-            if(ratio < (data.playerVersion.isOrAbove(ProtocolVersion.V1_9)
-                    || data.playerInfo.lastUseItem.hasNotPassed(15) ? 0.8 : 0.993)
-                    && (timeStamp - data.creation > 3000L)
-                    && data.playerInfo.lastUseItem.hasPassed(6)
+            if(ratio < (data.playerVersion.isOrAbove(ProtocolVersion.V1_9)? 0.8 : 0.993)
+                    && timeStamp - data.creation > 3000L
+                    && data.lagInfo.lastPacketDrop.hasPassed(1)
                     && !data.blockInfo.blocksNear) {
                 if((buffer+= found || ratio > 0.95 ? 0.5 : 1) > 12) {
                     vl++;
@@ -143,11 +137,10 @@ public class VelocityB extends Check {
             pvX *= drag;
             pvZ *= drag;
 
-            if(timeStamp - lastVelocity > 250L) pvX = pvZ = 0;
+            if(timeStamp - lastVelocity > 400L) pvX = pvZ = 0;
 
             if(Math.abs(pvX) < 0.005) pvX = 0;
             if(Math.abs(pvZ) < 0.005) pvZ = 0;
-            if(data.playerInfo.clientGround) pvX = pvZ = 0;
         }
         sprint = data.playerInfo.sprinting;
         useEntity = false;

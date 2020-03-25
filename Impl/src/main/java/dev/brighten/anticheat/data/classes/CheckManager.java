@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class CheckManager {
     private ObjectData objectData;
     public Map<String, Check> checks = new HashMap<>();
-    public Map<Class<?>, List<Map.Entry<String, WrappedMethod>>> checkMethods = new ConcurrentHashMap<>();
+    private Map<Class<?>, List<WrappedCheck>> checkMethods = new HashMap<>();
 
     public CheckManager(ObjectData objectData) {
         this.objectData = objectData;
@@ -28,13 +28,23 @@ public class CheckManager {
         val methods = checkMethods.get(object.getClass());
         AtomicBoolean okay = new AtomicBoolean(true);
         methods.parallelStream()
-                .forEach(entry -> {
-                    Check check = checks.get(entry.getKey());
-                    if(check.enabled && objectData.playerVersion.isOrBelow(check.maxVersion)
-                            && objectData.playerVersion.isOrAbove(check.minVersion)) {
-                        if(entry.getValue().getMethod().getParameterCount() > 1)
-                            entry.getValue().invoke(check, object, timeStamp);
-                        else entry.getValue().invoke(check, object);
+                .forEach(wrapped -> {
+                    if(wrapped.isPacket && wrapped.check.enabled && wrapped.isCompatible()) {
+                        if(wrapped.isBoolean) {
+                            if(wrapped.oneParam) {
+                                boolean returned = wrapped.method.invoke(wrapped.check, object);
+
+                                if(!returned) okay.set(false);
+                            }
+                            else {
+                                boolean returned = wrapped.method.invoke(wrapped.check, object, timeStamp);
+
+                                if(!returned) okay.set(false);
+                            }
+                        } else {
+                            if(wrapped.oneParam) wrapped.method.invoke(wrapped.check, object);
+                            else wrapped.method.invoke(wrapped.check, object, timeStamp);
+                        }
                     }
                 });
         return okay.get();
@@ -45,13 +55,10 @@ public class CheckManager {
 
         val methods = checkMethods.get(event.getClass());
 
-        methods.parallelStream().filter(entry ->
-                entry.getValue().getMethod().isAnnotationPresent(dev.brighten.anticheat.check.api.Event.class))
-                .forEach(entry -> {
-                    Check check = checks.get(entry.getKey());
-
-                    if(check.enabled) {
-                        entry.getValue().invoke(check, event);
+        methods.parallelStream()
+                .forEach(wrapped -> {
+                    if(wrapped.isPacket && wrapped.check.enabled) {
+                        wrapped.method.invoke(wrapped.check, event);
                     }
                 });
     }
@@ -61,13 +68,10 @@ public class CheckManager {
 
         val methods = checkMethods.get(event.getClass());
 
-        methods.parallelStream().filter(entry ->
-                entry.getValue().getMethod().isAnnotationPresent(dev.brighten.anticheat.check.api.Event.class))
-                .forEach(entry -> {
-                    Check check = checks.get(entry.getKey());
-
-                    if(check.enabled) {
-                        entry.getValue().invoke(check, event);
+        methods.parallelStream()
+                .forEach(wrapped -> {
+                    if(wrapped.isPacket && wrapped.check.enabled) {
+                        wrapped.method.invoke(wrapped.check, event);
                     }
                 });
     }
@@ -98,22 +102,20 @@ public class CheckManager {
                 .sequential()
                 .forEach(check -> checks.put(check.name, check));
 
-        checks.keySet().stream().map(name -> checks.get(name)).forEach(check -> {
+        checks.keySet().parallelStream().map(name -> checks.get(name)).forEach(check -> {
             WrappedClass checkClass = new WrappedClass(check.getClass());
             
             Arrays.stream(check.getClass().getDeclaredMethods())
-                    .parallel()
                     .filter(method -> method.isAnnotationPresent(Packet.class)
                             || method.isAnnotationPresent(dev.brighten.anticheat.check.api.Event.class))
                     .map(method -> new WrappedMethod(checkClass, method))
                     .forEach(method -> {
                         Class<?> parameter = method.getParameters().get(0);
-                        List<Map.Entry<String, WrappedMethod>> methods = checkMethods.getOrDefault(
+                        List<WrappedCheck> methods = checkMethods.getOrDefault(
                                 parameter,
                                 new ArrayList<>());
 
-                        methods.add(new AbstractMap.SimpleEntry<>(
-                                check.name, method));
+                        methods.add(new WrappedCheck(check, method));
                         checkMethods.put(parameter, methods);
                     });
         });

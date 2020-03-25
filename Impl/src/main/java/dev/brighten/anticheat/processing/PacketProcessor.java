@@ -181,7 +181,7 @@ public class PacketProcessor {
                         data.predictionService.useSword = data.playerInfo.usingItem = true;
                         data.playerInfo.lastUseItem.reset();
                     } else if(stack != null) {
-                        if(stack.getType().isBlock() && stack.getTypeId() != 0) {
+                        if(stack.getType().isBlock() && stack.getType().getId() != 0) {
                             data.playerInfo.lastBlockPlace.reset();
                             MiscUtils.testMessage(event.getPlayer().getItemInHand().getType().name());
                         }

@@ -42,12 +42,6 @@
   </build>
   <dependencies>
     <dependency>
-      <groupId>org.github.spigot</groupId>
-      <artifactId>1.8.8</artifactId>
-      <version>1.8.8</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>cc.funkemunky.utils</groupId>
       <artifactId>lombok</artifactId>
       <version>1.18.0</version>
@@ -57,6 +51,12 @@
       <groupId>cc.funkemunky.utils</groupId>
       <artifactId>Atlas</artifactId>
       <version>1.8.2</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.github.spigot</groupId>
+      <artifactId>1.8.8</artifactId>
+      <version>1.8.8</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
