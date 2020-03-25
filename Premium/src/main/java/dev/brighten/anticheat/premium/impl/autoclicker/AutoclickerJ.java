@@ -17,19 +17,19 @@ public class AutoclickerJ extends Check {
 
     @Packet
     public void onArm(WrappedInArmAnimationPacket packet) {
-        val click = data.clickProcessor;
-        if(click.getNosqrtKurtosis() < 6000 && click.getNosqrtStd() > 400
-                && MathUtils.getDelta(click.getAverage(), lavg) > 0.5
-                && MathUtils.getDelta(click.getNosqrtStd(), click.getNosqrtKurtosis()) > 1000) {
-            if(buffer++ > 30) {
+        if(data.playerInfo.breakingBlock || data.playerInfo.lastBlockPlace.hasNotPassed(1)) return;
+
+        double threshold = data.clickProcessor.getStd() * 2;
+
+        if(data.clickProcessor.getKurtosis() < 0 && data.clickProcessor.getSkew() > 0.02) {
+            if(++buffer > 5) {
                 vl++;
-                flag("kurt=%v.3 avg=%v.3 std-%v.3 buffer=%v.1",
-                        click.getNosqrtKurtosis(), click.getAverage(), click.getNosqrtStd(), buffer);
+                flag("kurtosis=%v.4 std=%v.4 avg=%v.3",
+                        data.clickProcessor.getKurtosis(), data.clickProcessor.getStd(),
+                        data.clickProcessor.getAverage());
             }
         } else buffer-= buffer > 0 ? 0.5 : 0;
-
-        lavg = click.getAverage();
-        debug("kurt=%v.3 avg=%v.3 std-%v.3 buffer=%v.1",
-                click.getNosqrtKurtosis(), click.getAverage(), click.getNosqrtStd(), buffer);
+        debug("kurtosis=%v.4 std=%v.4 avg=%v.3",
+                data.clickProcessor.getKurtosis(), data.clickProcessor.getStd(), data.clickProcessor.getSkew());
     }
 }

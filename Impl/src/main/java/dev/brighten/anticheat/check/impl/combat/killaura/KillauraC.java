@@ -12,6 +12,7 @@ import dev.brighten.api.check.CheckType;
 public class KillauraC extends Check {
 
     private long lastArm;
+
     @Packet
     public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
         lastArm = timeStamp;

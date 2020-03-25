@@ -22,6 +22,8 @@ import dev.brighten.anticheat.utils.PastLocation;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
@@ -53,6 +55,7 @@ public class ObjectData {
     public List<Log> logs = new ArrayList<>();
     public ProtocolVersion playerVersion = ProtocolVersion.UNKNOWN;
     public Set<Player> boxDebuggers = new HashSet<>();
+    public Map<Long, PotionEffect> effectsToAdd = new HashMap<>();
     public List<CancelType> typesToCancel = Collections.synchronizedList(new EvictingList<>(10));
     public List<String> sniffedPackets = new ArrayList<>();
     public BukkitTask task;

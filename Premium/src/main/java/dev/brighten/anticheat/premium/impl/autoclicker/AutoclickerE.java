@@ -11,8 +11,8 @@ import lombok.val;
 import java.util.Deque;
 import java.util.LinkedList;
 
-@CheckInfo(name = "Autoclicker (E)", description = "Checks for impossible deviations (Elevated/funkemunky).",
-        checkType = CheckType.AUTOCLICKER)
+@CheckInfo(name = "Autoclicker (E)", description = "Checks for hard to get deviations (Elevated/funkemunky).",
+        checkType = CheckType.AUTOCLICKER, developer = true)
 public class AutoclickerE extends Check {
 
     private Deque<Long> clickSamples = new LinkedList<>();

@@ -5,6 +5,10 @@ import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.data.ObjectData;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
+import org.apache.commons.math3.stat.descriptive.moment.Kurtosis;
+import org.apache.commons.math3.stat.descriptive.moment.Skewness;
+import org.apache.commons.math3.stat.descriptive.moment.Variance;
 
 import java.util.LongSummaryStatistics;
 
@@ -12,7 +16,7 @@ import java.util.LongSummaryStatistics;
 public class ClickProcessor {
     public EvictingList<Long> cpsList = new EvictingList<>(20);
     @Getter
-    private double std, nosqrtStd, average, nosqrtKurtosis, kurtosis;
+    private double std, nosqrtStd, average, nosqrtKurtosis, kurtosis, skew, variance;
     @Getter
     private long min, max, sum;
     private long lastTimestamp;
@@ -38,7 +42,10 @@ public class ClickProcessor {
                 max = Math.max(max, Math.pow(val- average, 2));
             }
 
-            kurtosis = Math.sqrt(max);
+            val array = cpsList.stream().mapToDouble(l -> l).toArray();
+            kurtosis = new Kurtosis().evaluate(array);
+            skew = new Skewness().evaluate(array);
+            variance = new Variance().evaluate(array);
             std = Math.sqrt(totalStd / summary.getCount());
             nosqrtStd = totalStd / summary.getCount();
             nosqrtKurtosis = max;

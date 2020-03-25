@@ -18,8 +18,8 @@ public class PremiumChecks {
         Check.register(new Motion());
         Check.register(new AimG());
         Check.register(new AimI());
-        //Check.register(new AutoclickerD());
-        //Check.register(new AutoclickerE());
+        Check.register(new AutoclickerD());
+        Check.register(new AutoclickerE());
         //Check.register(new InventoryA());
         //Check.register(new InventoryB());
         Check.register(new AutoclickerH());
