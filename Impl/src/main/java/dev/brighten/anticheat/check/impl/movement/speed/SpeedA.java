@@ -20,8 +20,8 @@ public class SpeedA extends Check {
         if(!packet.isPos() || data.playerInfo.generalCancel || data.playerInfo.lastVelocity.hasNotPassed(25))
             return;
 
-        double baseSpeed = data.playerInfo.baseSpeed  + (!data.playerInfo.clientGround ? 0.06f
-                : (data.playerInfo.groundTicks > 10 ? 0.02 : 0.04));
+        double baseSpeed = data.playerInfo.baseSpeed + (!data.playerInfo.clientGround ? 0.06f
+                : (data.playerInfo.groundTicks > 10 ? 0.02 : 0.03));
 
         baseSpeed+= data.playerInfo.iceTimer.hasNotPassed(70) ? 0.4
                 + (Math.min(60, 60 - data.playerInfo.iceTimer.getPassed()) * 0.015) : 0;
@@ -36,8 +36,8 @@ public class SpeedA extends Check {
             baseSpeed+= 0.2;
 
         if(data.playerInfo.deltaXZ > baseSpeed) {
-            if(verbose.add(data.playerInfo.deltaXZ - baseSpeed > 0.6f ? 4 : 1) > 25
-                    || data.playerInfo.deltaXZ - baseSpeed > 0.6f) {
+            if(verbose.add(data.playerInfo.deltaXZ - baseSpeed > 0.45f ? 4 : 1) > 25
+                    || data.playerInfo.deltaXZ - baseSpeed > 0.45f) {
                 vl++;
                 flag("%v>-%v",
                         MathUtils.round(data.playerInfo.deltaXZ, 3),

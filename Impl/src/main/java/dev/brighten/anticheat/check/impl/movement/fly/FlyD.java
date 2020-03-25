@@ -2,6 +2,7 @@ package dev.brighten.anticheat.check.impl.movement.fly;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInKeepAlivePacket;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.world.BlockData;
 import cc.funkemunky.api.utils.world.CollisionBox;
@@ -24,28 +25,21 @@ import java.util.List;
 public class FlyD extends Check {
 
     private double py;
-
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         /** PRE MOTION CALCULATION **/
         /* y=0 calculations */
         if((ProtocolVersion.getGameVersion().isOrBelow(ProtocolVersion.V1_8_9) && Math.abs(py) < 0.005)
-                || data.playerInfo.serverPos
-                || data.playerInfo.lastRespawnTimer.hasNotPassed(0))
-            py = 0;
+                || data.playerInfo.lastTeleportTimer.hasNotPassed(1)
+                || data.playerInfo.lastRespawnTimer.hasNotPassed(1))
+            py = data.playerInfo.deltaY;
         /* end y=0 calculations */
-
-        //Setting velocity stuff.
-        if(data.playerInfo.lastVelocity.hasNotPassed(0))
-            py = data.playerInfo.velocityY;
-        //End setting velocity stuff.
 
         /** MOTION CALCULATION **/
         boolean didBox = false;
         if(data.playerInfo.lClientGround
-                && !data.playerInfo.clientGround
-                && data.playerInfo.deltaY > 0) {
-            py = MovementUtils.getJumpHeight(data.getPlayer());
+                && !data.playerInfo.clientGround) {
+            py = data.playerInfo.deltaY > 0 ? MovementUtils.getJumpHeight(data.getPlayer()) : data.playerInfo.deltaY;
 
             if(Math.abs(data.playerInfo.deltaY - py) > 1E-6) {
                 double test = py - 0.015625;
@@ -89,6 +83,11 @@ public class FlyD extends Check {
             }
         }
         /* end collision algorithm */
+
+        //Setting velocity stuff.
+        if(data.playerInfo.lastVelocity.hasNotPassed(3))
+            py = data.playerInfo.deltaY;
+        //End setting velocity stuff.
 
         //flag check
         if(!data.playerInfo.flightCancel && packet.isPos()

@@ -77,7 +77,7 @@ public class BlockInformation {
 
         //Bukkit.broadcastMessage("chigga4");
 
-        handler.setSize(0.6f, 0.1f);
+        handler.setSize(0.6f, 0f);
         handler.setOffset(-0.1);
 
         objectData.playerInfo.serverGround =
@@ -132,6 +132,7 @@ public class BlockInformation {
         }
 
         handler.setSize(0.6, 2.4);
+        handler.setOffset(1.25);
         blocksAbove = handler.isCollidedWith(Materials.SOLID);
 
         handler.setSize(1.5, 1.78);

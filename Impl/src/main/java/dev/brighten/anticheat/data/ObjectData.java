@@ -11,6 +11,7 @@ import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.CancelType;
+import dev.brighten.anticheat.check.api.Config;
 import dev.brighten.anticheat.data.classes.BlockInformation;
 import dev.brighten.anticheat.data.classes.CheckManager;
 import dev.brighten.anticheat.data.classes.PlayerInformation;
@@ -61,11 +62,12 @@ public class ObjectData {
         this.uuid = uuid;
         hashCode = uuid.hashCode();
         INSTANCE = this;
-        if(alerts = getPlayer().hasPermission("kauri.command.alerts")) {
-            Kauri.INSTANCE.dataManager.hasAlerts.add(this);
-        }
-        if(devAlerts = getPlayer().hasPermission("kauri.command.alerts.dev")) {
-            Kauri.INSTANCE.dataManager.devAlerts.add(this);
+
+        if(!Config.testMode) {
+            if(alerts = getPlayer().hasPermission("kauri.command.alerts"))
+                Kauri.INSTANCE.dataManager.hasAlerts.add(this);
+            if(devAlerts = getPlayer().hasPermission("kauri.command.alerts.dev"))
+                Kauri.INSTANCE.dataManager.devAlerts.add(this);
         }
         creation = System.currentTimeMillis();
         playerInfo = new PlayerInformation();

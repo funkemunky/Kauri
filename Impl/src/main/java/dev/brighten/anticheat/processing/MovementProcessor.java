@@ -86,6 +86,7 @@ public class MovementProcessor {
             if (optional.isPresent()) {
                 data.playerInfo.serverPos = true;
                 data.playerInfo.lastServerPos = timeStamp;
+                data.playerInfo.lastTeleportTimer.reset();
                 data.playerInfo.inventoryOpen = false;
                 data.playerInfo.posLocs.remove(optional.get());
             }
