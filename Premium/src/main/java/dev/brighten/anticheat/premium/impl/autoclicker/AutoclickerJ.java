@@ -8,28 +8,33 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
+import org.apache.commons.math3.fitting.leastsquares.EvaluationRmsChecker;
 
 @CheckInfo(name = "Autoclicker (J)", description = "Checks the kurtosis of a player's click pattern.",
         checkType = CheckType.AUTOCLICKER, developer = true, maxVersion = ProtocolVersion.V1_8_9)
 public class AutoclickerJ extends Check {
 
-    private double buffer, lavg;
+    private double buffer;
 
     @Packet
     public void onArm(WrappedInArmAnimationPacket packet) {
         if(data.playerInfo.breakingBlock || data.playerInfo.lastBlockPlace.hasNotPassed(1)) return;
 
-        double threshold = data.clickProcessor.getStd() * 2;
-
-        if(data.clickProcessor.getKurtosis() < 0 && data.clickProcessor.getSkew() > 0.02) {
-            if(++buffer > 5) {
+        if(data.clickProcessor.getKurtosis() < 0 && data.clickProcessor.getStd() > 24
+                && data.clickProcessor.getVariance() < 2400
+                && Math.abs(data.clickProcessor.getSkew()) > 0.2) {
+            if((buffer+= data.clickProcessor.getSkew() > 0.3
+                    ? 1 : 0.5) > 10) {
                 vl++;
-                flag("kurtosis=%v.4 std=%v.4 avg=%v.3",
-                        data.clickProcessor.getKurtosis(), data.clickProcessor.getStd(),
-                        data.clickProcessor.getAverage());
+                flag("k=%v.4 avg=%v.3 s=%v.3 v=%v.3 b=%v.1",
+                        data.clickProcessor.getKurtosis(), data.clickProcessor.getAverage(),
+                        data.clickProcessor.getSkew(), data.clickProcessor.getVariance(), buffer);
             }
-        } else buffer-= buffer > 0 ? 0.5 : 0;
-        debug("kurtosis=%v.4 std=%v.4 avg=%v.3",
-                data.clickProcessor.getKurtosis(), data.clickProcessor.getStd(), data.clickProcessor.getSkew());
+        } else buffer-= buffer > 0 ? 1 : 0;
+        debug("kurtosis=%v.4 std=%v.4 avg=%v.3 skew=%v.3 variance=%v.3 buffer=%v.1",
+                data.clickProcessor.getKurtosis(), data.clickProcessor.getStd(), data.clickProcessor.getAverage(),
+                data.clickProcessor.getSkew(),
+                data.clickProcessor.getVariance(),
+                buffer);
     }
 }

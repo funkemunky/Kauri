@@ -64,13 +64,15 @@ public class LoggerManager {
 
         Map<UUID, List<Log>> logs = new HashMap<>();
 
+        getLogs(null, null, 0, Integer.MAX_VALUE,
+                currentTime - timeFrame, currentTime)
+                .forEach(log -> {
+                    List<Log> logsList = logs.getOrDefault(log.uuid, new ArrayList<>());
 
-        Kauri.INSTANCE.dataManager.dataMap.keySet().forEach(uuid -> {
-            List<Log> logsList = getLogs(uuid, null, 0, Integer.MAX_VALUE,
-                    currentTime - timeFrame, currentTime);
+                    logsList.add(log);
 
-            logs.put(uuid, logsList);
-        });
+                    logs.put(log.uuid, logsList);
+                });
 
         return logs;
     }

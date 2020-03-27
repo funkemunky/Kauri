@@ -14,7 +14,7 @@ import java.util.LongSummaryStatistics;
 
 @RequiredArgsConstructor
 public class ClickProcessor {
-    public EvictingList<Long> cpsList = new EvictingList<>(20);
+    public EvictingList<Long> cpsList = new EvictingList<>(40);
     @Getter
     private double std, nosqrtStd, average, nosqrtKurtosis, kurtosis, skew, variance;
     @Getter

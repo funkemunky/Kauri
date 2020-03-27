@@ -41,6 +41,16 @@ public class PastLocation {
         previousLocations.add(new KLocation(location));
     }
 
+    public KLocation getLast() {
+        if(previousLocations.size() == 0) return null;
+        return previousLocations.get(previousLocations.size() - 1);
+    }
+
+    public KLocation getFirst() {
+        if(previousLocations.size() == 0) return null;
+        return previousLocations.get(0);
+    }
+
     public void addLocation(KLocation location) {
         if (previousLocations.size() >= 20) {
             previousLocations.remove(0);

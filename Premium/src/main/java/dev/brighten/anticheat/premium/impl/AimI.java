@@ -5,8 +5,9 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "Aim (I)", developer = true, punishVL = 20,
+@CheckInfo(name = "Aim (I)", developer = true, punishVL = 20, checkType = CheckType.AIM,
         description = "Checks for minecraft rotation exploits by clients. " +
                 "By FlyCode with help from Itz_Lucky and funkemunky.")
 public class AimI extends Check {

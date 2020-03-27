@@ -32,6 +32,7 @@ import dev.brighten.anticheat.check.impl.movement.velocity.VelocityA;
 import dev.brighten.anticheat.check.impl.packets.Timer;
 import dev.brighten.anticheat.check.impl.packets.badpackets.*;
 import dev.brighten.anticheat.check.impl.packets.exploits.*;
+import dev.brighten.anticheat.check.impl.combat.hand.HandE;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.api.KauriAPI;
 import dev.brighten.api.check.CheckType;
@@ -316,11 +317,15 @@ public class Check implements KauriCheck {
                             } else if(variables[i] instanceof Float) {
                                 splitInfo[i + 1] = split2.replace("." + parsed, "");
                                 float var = (float) variables[i];
+                                if(!Float.isNaN(var) && !Float.isInfinite(var))
                                 splitInfo[i] = split + MathUtils.round(var, parsed);
+                                else splitInfo[i] = split + var;
                             } else if(variables[i] instanceof Double) {
                                 splitInfo[i + 1] = split2.replace("." + parsed, "");
                                 double var = (double) variables[i];
+                                if(!Double.isNaN(var) && !Double.isInfinite(var))
                                 splitInfo[i] = split + MathUtils.round(var, parsed);
+                                else splitInfo[i] = split + var;
                             }
                         }
                     } else splitInfo[i] = split + variables[i];
@@ -396,6 +401,7 @@ public class Check implements KauriCheck {
         register(new SignCrash());
         //register(new Test());
         register(new LargeMove());
+        register(new HandE());
     }
 
     public static boolean isCheck(String name) {

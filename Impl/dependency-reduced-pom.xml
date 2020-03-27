@@ -33,7 +33,7 @@
               <goal>shade</goal>
             </goals>
             <configuration>
-              <minimizeJar>false</minimizeJar>
+              <minimizeJar>true</minimizeJar>
             </configuration>
           </execution>
         </executions>
@@ -95,7 +95,7 @@
     <dependency>
       <groupId>cc.funkemunky.utils</groupId>
       <artifactId>Atlas</artifactId>
-      <version>1.8.2</version>
+      <version>1.8.2-PRE-2</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>

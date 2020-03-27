@@ -34,12 +34,13 @@ public class OmniSprint extends Check {
 
             if (delta > 0.22 //This is the delta if greater would be derived from walking on their direction's x axis or backwards.
                     && data.playerInfo.serverGround
+                    && data.playerInfo.deltaXZ > 0.1
                     && data.playerInfo.sprinting) {
                 if (++vl > 7) {
                     flag(delta + ">-0.22");
                 }
             } else vl-= vl > 0 ? 0.5 : 0;
             debug("vb=%v.1 move=%v dir=%v delta=%v.3", vl, movement.toString(), direction.toString(), delta);
-        }
+        } else vl-= vl > 0 ? 0.005 : 0;
     }
 }

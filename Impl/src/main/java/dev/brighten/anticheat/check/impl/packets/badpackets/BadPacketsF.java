@@ -19,7 +19,7 @@ public class BadPacketsF extends Check {
     public void onFlying(WrappedInFlyingPacket packet) {
         if(packet.isPos()) {
             packets = 0;
-        } else if(packets++ > 20) {
+        } else if(packets++ > 30) {
             vl++;
             flag("packets=%v", packets);
         }
