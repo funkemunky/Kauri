@@ -127,11 +127,11 @@ public class VelocityB extends Check {
                     && timeStamp - data.creation > 3000L
                     && data.lagInfo.lastPacketDrop.hasPassed(1)
                     && !data.blockInfo.blocksNear) {
-                if((buffer+= found || ratio > 0.95 ? 0.5 : 1) > 12) {
+                if((buffer+= found || ratio > 0.95 ? 0.5 : 1) > 20) {
                     vl++;
                     flag("pct=%v.2% buffer=%v.1", ratio * 100, buffer);
                 }
-            } else buffer-= buffer > 0 ? 0.2 : 0;
+            } else buffer-= buffer > 0 ? 0.25 : 0;
             debug("ratio=%v.3 buffer=%v.1 strafe=%v.2 forward=%v.2 lastUse=%v found=%v",
                     ratio, buffer, moveStrafe, moveForward, data.playerInfo.lastUseItem.getPassed(), found);
             pvX *= drag;

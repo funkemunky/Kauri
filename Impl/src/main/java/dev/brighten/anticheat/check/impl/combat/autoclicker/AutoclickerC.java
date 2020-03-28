@@ -33,7 +33,8 @@ public class AutoclickerC extends Check {
     @Packet
     public void onUse(WrappedInUseEntityPacket packet) {
         if(packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) {
-            if(blocking && !MinecraftReflection.getItemAnimation(packet.getPlayer().getItemInHand())
+            if(blocking && packet.getPlayer().getItemInHand() != null
+                    && !MinecraftReflection.getItemAnimation(packet.getPlayer().getItemInHand())
                     .equals(WrappedEnumAnimation.NONE)) {
 
                 if (verbose.add() > 14) {

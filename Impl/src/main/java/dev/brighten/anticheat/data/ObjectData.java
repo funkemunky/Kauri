@@ -72,8 +72,8 @@ public class ObjectData {
             if(devAlerts = getPlayer().hasPermission("kauri.command.alerts.dev"))
                 Kauri.INSTANCE.dataManager.devAlerts.add(this);
         }
-        creation = System.currentTimeMillis();
         playerInfo = new PlayerInformation();
+        creation = playerInfo.lastRespawn = System.currentTimeMillis();
         blockInfo = new BlockInformation(this);
         clickProcessor = new ClickProcessor(this);
         pastLocation = new PastLocation();

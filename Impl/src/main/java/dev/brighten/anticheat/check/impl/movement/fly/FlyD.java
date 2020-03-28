@@ -34,9 +34,9 @@ public class FlyD extends Check {
                         Helper.format(data.playerInfo.deltaY, 2), Helper.format(threshold, 2));
             }
 
-            double delta = Math.abs(data.playerInfo.deltaY - data.playerInfo.lDeltaY);
+            double delta = data.playerInfo.deltaY - data.playerInfo.lDeltaY;
             if(!data.playerInfo.flightCancel
-                    && delta > 0.185
+                    && Math.abs(delta) > 0.185
                     && (!data.playerInfo.lClientGround || !data.playerInfo.clientGround)
                     && data.playerInfo.lastVelocity.hasPassed(2)
                     && data.playerInfo.lastHalfBlock.hasPassed(10)
@@ -44,6 +44,16 @@ public class FlyD extends Check {
                     && verbose.flag(1, 4)) {
                 vl++;
                 flag("%v>-0.185 type=accel", MathUtils.round(delta, 3));
+            }
+
+            if(!data.playerInfo.flightCancel
+                    && delta > 0.01
+                    && data.playerInfo.lastVelocity.hasPassed(2)
+                    && !data.playerInfo.nearGround
+                    && !data.playerInfo.clientGround
+                    && !data.playerInfo.lClientGround) {
+                vl++;
+                flag("deltaY=%v.2", delta);
             }
         }
     }

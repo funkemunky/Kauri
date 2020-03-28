@@ -21,10 +21,10 @@ public class KillauraA extends Check {
 
     private MaxInteger verbose = new MaxInteger(10);
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
+    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(data.target != null && !data.playerInfo.generalCancel
                 && data.playerInfo.lastAttack.hasNotPassed(0)) {
-            val locs = data.pastLocation.getEstimatedLocation(0, 50L);
+            val locs = data.pastLocation.getEstimatedLocation(timeStamp, 0, 50L);
 
             int size = 0;
             int collided = 0;

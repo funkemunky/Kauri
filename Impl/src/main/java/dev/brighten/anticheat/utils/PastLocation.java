@@ -18,10 +18,10 @@ public class PastLocation {
                 .orElse(this.previousLocations.get(0)));
     }
 
-    public List<KLocation> getEstimatedLocation(long time, long delta) {
+    public List<KLocation> getEstimatedLocation(long time, long ping, long delta) {
         return this.previousLocations
                 .stream()
-                .filter(loc -> time - loc.timeStamp < delta)
+                .filter(loc -> time - loc.timeStamp - ping < delta)
                 .collect(Collectors.toList());
     }
 

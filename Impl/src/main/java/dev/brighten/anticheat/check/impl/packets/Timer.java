@@ -32,16 +32,19 @@ public class Timer extends Check {
             long range = summary.getMax() - summary.getMin();
             double pct = ratio * 100;
 
-            if((pct > 100.4D)
-                    && data.lagInfo.lastPingDrop.hasPassed(30)
-                    && Kauri.INSTANCE.lastTickLag.hasPassed(5)
-                    && Kauri.INSTANCE.tps > 18.5) {
-                //Maybe lower threshold? I do not think it needs that high of one.
-                if(vl++ > 65) flag("pct=" + MathUtils.round(pct, 2) + "%");
-            } else vl-= vl > 0 ? 1.5 : 0;
+            if(!Double.isNaN(pct) && !Double.isInfinite(pct)) {
 
-            debug("pct=" + pct + ", vl=" + vl + ", elapsed=" + elapsed + "ms, avg=" + average + ", range=" + range);
+                if ((pct > 100.4D)
+                        && data.lagInfo.lastPingDrop.hasPassed(30)
+                        && Kauri.INSTANCE.lastTickLag.hasPassed(5)
+                        && Kauri.INSTANCE.tps > 18.5) {
+                    //Maybe lower threshold? I do not think it needs that high of one.
+                    if (vl++ > 65) flag("pct=%v.2", pct);
+                } else vl -= vl > 0 ? 1.5 : 0;
+
+                debug("pct=%v.2 vl=%v.1 elapsed=%vms avg=%v.2 range=%v.2", pct, vl, elapsed, average, range);
             lRange = range;
+            }
         }
         lastTS = timeStamp;
     }

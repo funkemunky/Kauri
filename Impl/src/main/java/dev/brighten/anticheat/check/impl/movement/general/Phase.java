@@ -57,7 +57,8 @@ public class Phase extends Check {
                 || lastOpen.hasNotPassed(14)) return;
 
 
-        if(timeStamp - data.playerInfo.lastServerPos > 10L) {
+        if(timeStamp - data.playerInfo.lastServerPos > 20L
+                && timeStamp - data.playerInfo.lastRespawn > 20L) {
             SimpleCollisionBox currentHitbox = Helper.getMovementHitbox(data.getPlayer());
             SimpleCollisionBox newHitbox = Helper.getMovementHitbox(data.getPlayer(), packet.getX(), packet.getY(), packet.getZ());
             currentHitbox.expand(-0.0625); newHitbox.expand(-0.0625); // reduce falseflag chances
