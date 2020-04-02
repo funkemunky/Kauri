@@ -76,7 +76,7 @@ public class PredictionService {
         fMath = fastMath; // if the Player uses Optifine FastMath
 
         try {
-            if(Math.abs(data.playerInfo.velocityY - data.playerInfo.deltaY) < 0.0001) {
+            if(velocity) {
                 lmotionX = data.playerInfo.velocityX;
                 lmotionZ = data.playerInfo.velocityZ;
             }

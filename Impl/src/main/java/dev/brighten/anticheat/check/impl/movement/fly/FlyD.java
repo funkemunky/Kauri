@@ -20,7 +20,7 @@ public class FlyD extends Check {
     private Verbose verbose = new Verbose(30, 5);
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
+    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(packet.isPos()) {
             double threshold = Math.max(0.8, data.playerInfo.jumpHeight * 2);
 
@@ -48,7 +48,7 @@ public class FlyD extends Check {
 
             if(!data.playerInfo.flightCancel
                     && delta > 0.01
-                    && data.playerInfo.lastVelocity.hasPassed(2)
+                    && data.playerInfo.lastVelocity.hasPassed(10)
                     && !data.playerInfo.nearGround
                     && !data.playerInfo.clientGround
                     && !data.playerInfo.lClientGround) {

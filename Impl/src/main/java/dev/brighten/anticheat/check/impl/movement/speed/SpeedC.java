@@ -227,8 +227,7 @@ public class SpeedC extends Check {
 
         double horizontalMove = (horizontalDistance - previousHorizontal) - moveSpeed;
         if (horizontalDistance > 0.1) {
-            if (horizontalMove > 0 && data.playerInfo.lastVelocity.hasPassed(10)
-                    && data.playerInfo.lastVelocity.hasPassed(10)) {
+            if (horizontalMove > 0 && data.playerInfo.lastVelocity.hasPassed(10)) {
                 vl++;
                 if(horizontalMove > 0.54 || vl > 7) {
                     flag("+%v,tags=%v",

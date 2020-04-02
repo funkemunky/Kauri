@@ -21,10 +21,7 @@ import dev.brighten.anticheat.check.impl.combat.hitbox.Hitboxes;
 import dev.brighten.anticheat.check.impl.combat.killaura.*;
 import dev.brighten.anticheat.check.impl.combat.hitbox.ReachA;
 import dev.brighten.anticheat.check.impl.movement.fly.*;
-import dev.brighten.anticheat.check.impl.movement.general.FastLadder;
-import dev.brighten.anticheat.check.impl.movement.general.HealthSpoof;
-import dev.brighten.anticheat.check.impl.movement.general.OmniSprint;
-import dev.brighten.anticheat.check.impl.movement.general.Phase;
+import dev.brighten.anticheat.check.impl.movement.general.*;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallA;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallB;
 import dev.brighten.anticheat.check.impl.movement.speed.*;
@@ -350,7 +347,6 @@ public class Check implements KauriCheck {
         register(new FlyC());
         register(new FlyD());
         register(new FlyE());
-        register(new FlyD());
         //register(new FlyG());
         //register(new FlyH());
         register(new FastLadder());
@@ -372,6 +368,7 @@ public class Check implements KauriCheck {
         register(new KillauraE());
         register(new Phase());
         register(new OmniSprint());
+        register(new Inertia());
         register(new Timer());
         register(new BadPacketsA());
         register(new BadPacketsB());
@@ -386,7 +383,7 @@ public class Check implements KauriCheck {
         register(new BadPacketsK());
         register(new BadPacketsL());
         register(new BadPacketsM());
-        //register(new BadPacketsN());
+        register(new BadPacketsN());
         register(new VelocityA());
         register(new HandA());
         register(new HandB());

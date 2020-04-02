@@ -325,7 +325,6 @@ public class MovementProcessor {
                 || data.playerInfo.gliding
                 || data.playerInfo.lastPlaceLiquid.hasNotPassed(5)
                 || data.playerInfo.inVehicle
-                || data.playerInfo.lastWorldUnload.hasNotPassed(10)
                 || !data.playerInfo.worldLoaded
                 || timeStamp - data.playerInfo.lastRespawn < 2500L
                 || data.playerInfo.lastToggleFlight.hasNotPassed(40)

@@ -4,6 +4,7 @@ import cc.funkemunky.api.events.AtlasEvent;
 import cc.funkemunky.api.reflections.types.WrappedClass;
 import cc.funkemunky.api.reflections.types.WrappedMethod;
 import cc.funkemunky.api.tinyprotocol.api.NMSObject;
+import cc.funkemunky.api.utils.MiscUtils;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.data.ObjectData;
 import lombok.val;
@@ -15,8 +16,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CheckManager {
     private ObjectData objectData;
-    public Map<String, Check> checks = new HashMap<>();
-    private Map<Class<?>, List<WrappedCheck>> checkMethods = new HashMap<>();
+    public Map<String, Check> checks = new ConcurrentHashMap<>();
+    private Map<Class<?>, List<WrappedCheck>> checkMethods = new ConcurrentHashMap<>();
 
     public CheckManager(ObjectData objectData) {
         this.objectData = objectData;
@@ -102,7 +103,7 @@ public class CheckManager {
                 .sequential()
                 .forEach(check -> checks.put(check.name, check));
 
-        checks.keySet().parallelStream().map(name -> checks.get(name)).forEach(check -> {
+        checks.keySet().stream().map(name -> checks.get(name)).forEach(check -> {
             WrappedClass checkClass = new WrappedClass(check.getClass());
             
             Arrays.stream(check.getClass().getDeclaredMethods())

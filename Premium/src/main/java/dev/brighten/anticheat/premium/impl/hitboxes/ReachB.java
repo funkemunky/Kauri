@@ -53,7 +53,7 @@ public class ReachB extends Check {
                     ? targetData.pastLocation : data.targetPastLocation)
                     .getEstimatedLocation(timeStamp,
                             data.lagInfo.ping,
-                            180L + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
+                            220L + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
                     .stream()
                     .map(ReachB::getHitbox).collect(Collectors.toList());
 
