@@ -49,7 +49,7 @@ public class Hitboxes extends Check {
 
             List<SimpleCollisionBox> entityLocations = data.targetPastLocation
                     .getEstimatedLocation(timeStamp,
-                            data.lagInfo.ping, 150L
+                            data.lagInfo.ping, 200L
                                     + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
                     .stream()
                     .map(loc -> getHitbox(loc, data.target.getType()))

@@ -32,7 +32,7 @@ public class ReachA extends Check {
         List<Tuple<KLocation, Vector>> targetBoxes = data.targetPastLocation
                 .getEstimatedLocation(timeStamp,
                         data.lagInfo.ping,
-                        150L + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
+                        100L + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
                 .stream()
                 .map(loc -> new Tuple<>(loc, getHitbox(target.getType())))
                 .collect(Collectors.toList());
@@ -46,12 +46,12 @@ public class ReachA extends Check {
             }
         }
 
-        if(distance > 3.1 && distance != 69) {
+        if(distance > 3.02 && distance != 69 && data.lagInfo.lastPingDrop.hasPassed(10)) {
             if(++buffer > 6) {
                 vl++;
                 flag("distance=%v buffer=%v", MathUtils.round(distance, 3), buffer);
             }
-        } else buffer-= buffer > 0 ? 1 : 0;
+        } else buffer-= buffer > 0 ? 0.2 : 0;
 
         debug("distance=%v boxes=%v buffer=%v", distance, targetBoxes.size(), buffer);
     }
@@ -69,6 +69,8 @@ public class ReachA extends Check {
         Vector vec = MiscUtils.entityDimensions.get(type).clone();
 
         if(vec == null) vec = new Vector(5, 0, 5);
+
+
 
         return vec.setY(0);
     }

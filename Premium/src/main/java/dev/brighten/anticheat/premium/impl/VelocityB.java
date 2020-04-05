@@ -2,12 +2,10 @@ package dev.brighten.anticheat.premium.impl;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInKeepAlivePacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
-import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumAnimation;
 import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.math.cond.MaxDouble;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -33,6 +31,7 @@ public class VelocityB extends Check {
             vX = packet.getX();
             vY = packet.getY();
             vZ = packet.getZ();
+            pvX = pvZ = 0;
             lastVelocity = timeStamp;
         }
     }
@@ -46,15 +45,18 @@ public class VelocityB extends Check {
     }
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if(tookVelocity
-                && MathUtils.getDelta(data.playerInfo.deltaY, vY) < 0.00001) {
+    public void onTransaction(WrappedInTransactionPacket packet, long timeStamp) {
+        if(packet.getAction() == (short) 101) {
             pvX = vX;
             pvZ = vZ;
             vY = -1;
             tookVelocity = false;
         }
-        if(pvX != 0 || pvZ != 0) {
+    }
+
+    @Packet
+    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
+        if((pvX != 0 || pvZ != 0) && !tookVelocity) {
             boolean found = false;
 
             double drag = 0.91;
@@ -137,7 +139,7 @@ public class VelocityB extends Check {
             pvX *= drag;
             pvZ *= drag;
 
-            if(timeStamp - lastVelocity > 400L) pvX = pvZ = 0;
+            if(timeStamp - lastVelocity > 350L || data.playerInfo.clientGround) pvX = pvZ = 0;
 
             if(Math.abs(pvX) < 0.005) pvX = 0;
             if(Math.abs(pvZ) < 0.005) pvZ = 0;

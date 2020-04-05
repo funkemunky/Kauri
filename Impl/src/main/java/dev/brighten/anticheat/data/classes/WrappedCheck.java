@@ -5,7 +5,6 @@ import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.Event;
 import dev.brighten.anticheat.check.api.Packet;
-import dev.brighten.anticheat.data.ObjectData;
 
 import java.util.List;
 

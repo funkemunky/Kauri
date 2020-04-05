@@ -33,17 +33,20 @@ public class AutoclickerC extends Check {
     @Packet
     public void onUse(WrappedInUseEntityPacket packet) {
         if(packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) {
-            if(blocking && packet.getPlayer().getItemInHand() != null
-                    && !MinecraftReflection.getItemAnimation(packet.getPlayer().getItemInHand())
-                    .equals(WrappedEnumAnimation.NONE)) {
+            if(blocking && packet.getPlayer().getItemInHand() != null) {
 
-                if (verbose.add() > 14) {
-                    flag("t=%v vb=%v", "block", MathUtils.round(verbose.value(), 2));
-                } else if(verbose.value() > 8) {
-                    TinyProtocolHandler.sendPacket(packet.getPlayer(),
-                            new WrappedOutHeldItemSlot(slot == 8 ? 0 : Math.min(8, slot + 1))
-                                    .getObject());
-                    debug("unblocked");
+                WrappedEnumAnimation animation =
+                        MinecraftReflection.getItemAnimation(packet.getPlayer().getItemInHand());
+
+                if(animation != null && animation.equals(WrappedEnumAnimation.NONE)) {
+                    if (verbose.add() > 14) {
+                        flag("t=%v vb=%v", "block", MathUtils.round(verbose.value(), 2));
+                    } else if (verbose.value() > 8) {
+                        TinyProtocolHandler.sendPacket(packet.getPlayer(),
+                                new WrappedOutHeldItemSlot(slot == 8 ? 0 : Math.min(8, slot + 1))
+                                        .getObject());
+                        debug("unblocked");
+                    }
                 }
             } else verbose.subtract(0.01);
         }

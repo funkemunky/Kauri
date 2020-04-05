@@ -14,7 +14,7 @@ public @interface CheckInfo {
     boolean executable() default true;
     boolean cancellable() default false;
     boolean developer() default false;
-    int punishVL() default -1;
+    int punishVL() default 100;
     int vlToFlag() default -1;
     CheckType checkType() default CheckType.SPEED;
     ProtocolVersion minVersion() default ProtocolVersion.V1_7;

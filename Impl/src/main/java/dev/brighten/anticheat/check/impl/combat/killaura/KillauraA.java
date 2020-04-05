@@ -59,7 +59,7 @@ public class KillauraA extends Check {
                 size++;
             }
 
-            if(collided >= size && data.playerInfo.lastBrokenBlock.hasPassed(10)) {
+            if(collided >= size && size > 0 && data.playerInfo.lastBrokenBlock.hasPassed(10)) {
                 if(verbose.add() > 5) {
                     vl++;
                     flag("collided=%v/%v total=%v lagging=%v", collided, size, total, data.lagInfo.lagging);

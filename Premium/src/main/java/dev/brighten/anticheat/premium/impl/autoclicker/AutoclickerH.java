@@ -10,10 +10,8 @@ import dev.brighten.anticheat.utils.GraphUtil;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
 
-import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.List;
 
 @CheckInfo(name = "Autoclicker (H)", description = "Meant to detect Vape and other autoclickers. By Elevated.",
         checkType = CheckType.AUTOCLICKER, punishVL = 11, vlToFlag = 1)
@@ -30,8 +28,8 @@ public class AutoclickerH extends Check {
 
                 val negatives = results.getNegatives();
                 if (negatives == 1) {
-                    if (++buffer > 2) {
-                        if(buffer > 3) vl++;
+                    if (++buffer > 3) {
+                        vl++;
                         flag("cps=%v buffer=%v", cps, buffer);
                     }
                 } else {

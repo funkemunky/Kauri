@@ -1,8 +1,6 @@
 package dev.brighten.anticheat.premium.impl;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.Color;
-import cc.funkemunky.api.utils.objects.Interval;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -12,9 +10,6 @@ import dev.brighten.anticheat.utils.Verbose;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
 
-import java.util.Deque;
-import java.util.DoubleSummaryStatistics;
-import java.util.LinkedList;
 import java.util.LongSummaryStatistics;
 
 @CheckInfo(name = "Aim (G)", description = "A simple check to detect Vape's aimassist.",

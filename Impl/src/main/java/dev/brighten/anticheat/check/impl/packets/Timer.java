@@ -1,7 +1,6 @@
 package dev.brighten.anticheat.check.impl.packets;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Cancellable;
@@ -25,7 +24,8 @@ public class Timer extends Check {
 
         if(timeStamp - data.creation > 2000
                 && timeStamp - data.playerInfo.lastServerPos > 80L) {
-            times.add(elapsed);
+            if(Kauri.INSTANCE.lastTickLag.hasPassed(0)
+                    && data.lagInfo.lastPingDrop.hasPassed(10)) times.add(elapsed);
             val summary = times.stream().mapToLong(val -> val).summaryStatistics();
             double average = summary.getAverage();
             double ratio = 50 / average;

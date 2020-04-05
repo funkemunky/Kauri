@@ -2,7 +2,9 @@ package dev.brighten.anticheat.listeners.generalChecks;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
-import cc.funkemunky.api.utils.*;
+import cc.funkemunky.api.utils.Init;
+import cc.funkemunky.api.utils.MiscUtils;
+import cc.funkemunky.api.utils.XMaterial;
 import cc.funkemunky.api.utils.world.BlockData;
 import cc.funkemunky.api.utils.world.CollisionBox;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;

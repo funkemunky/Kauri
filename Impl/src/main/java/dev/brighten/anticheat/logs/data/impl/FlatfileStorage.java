@@ -9,7 +9,6 @@ import dev.brighten.anticheat.logs.objects.Punishment;
 import dev.brighten.db.db.FlatfileDatabase;
 import dev.brighten.db.db.StructureSet;
 import dev.brighten.db.utils.Pair;
-import dev.brighten.dev.depends.org.bson.Document;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;

@@ -4,8 +4,6 @@ import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumAnimation;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.TickTimer;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
-import dev.brighten.anticheat.utils.CollisionHandler;
-import dev.brighten.anticheat.utils.MouseFilter;
 import org.bukkit.block.Block;
 
 public class PlayerInformation {

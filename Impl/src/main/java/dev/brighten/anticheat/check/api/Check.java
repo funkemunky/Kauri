@@ -12,24 +12,31 @@ import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutCloseWindowPacket;
 import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.impl.combat.aim.*;
-import dev.brighten.anticheat.check.impl.combat.autoclicker.*;
+import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerA;
+import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerC;
+import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerG;
 import dev.brighten.anticheat.check.impl.combat.hand.HandA;
 import dev.brighten.anticheat.check.impl.combat.hand.HandB;
 import dev.brighten.anticheat.check.impl.combat.hand.HandC;
 import dev.brighten.anticheat.check.impl.combat.hand.HandD;
 import dev.brighten.anticheat.check.impl.combat.hitbox.Hitboxes;
-import dev.brighten.anticheat.check.impl.combat.killaura.*;
 import dev.brighten.anticheat.check.impl.combat.hitbox.ReachA;
-import dev.brighten.anticheat.check.impl.movement.fly.*;
-import dev.brighten.anticheat.check.impl.movement.general.*;
+import dev.brighten.anticheat.check.impl.combat.killaura.*;
+import dev.brighten.anticheat.check.impl.movement.fly.FlyA;
+import dev.brighten.anticheat.check.impl.movement.fly.FlyB;
+import dev.brighten.anticheat.check.impl.movement.fly.FlyC;
+import dev.brighten.anticheat.check.impl.movement.fly.FlyE;
+import dev.brighten.anticheat.check.impl.movement.general.FastLadder;
+import dev.brighten.anticheat.check.impl.movement.general.HealthSpoof;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallA;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallB;
-import dev.brighten.anticheat.check.impl.movement.speed.*;
+import dev.brighten.anticheat.check.impl.movement.speed.SpeedA;
+import dev.brighten.anticheat.check.impl.movement.speed.SpeedB;
+import dev.brighten.anticheat.check.impl.movement.speed.SpeedC;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityA;
 import dev.brighten.anticheat.check.impl.packets.Timer;
 import dev.brighten.anticheat.check.impl.packets.badpackets.*;
 import dev.brighten.anticheat.check.impl.packets.exploits.*;
-import dev.brighten.anticheat.check.impl.combat.hand.HandE;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.api.KauriAPI;
 import dev.brighten.api.check.CheckType;
@@ -45,15 +52,14 @@ import org.bukkit.entity.Player;
 
 import java.io.IOException;
 import java.lang.reflect.Modifier;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @NoArgsConstructor
 public class Check implements KauriCheck {
 
-    public static Map<WrappedClass, CheckInfo> checkClasses = Collections.synchronizedMap(new HashMap<>());
-    public static Map<WrappedClass, CheckSettings> checkSettings = Collections.synchronizedMap(new HashMap<>());
+    public static Map<WrappedClass, CheckInfo> checkClasses = new ConcurrentHashMap<>();
+    public static Map<WrappedClass, CheckSettings> checkSettings = new ConcurrentHashMap<>();
 
     private static WrappedClass protocolClass = ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_8)
             ? new WrappedClass(TinyProtocol1_7.class) : new WrappedClass(TinyProtocol1_8.class);
@@ -261,12 +267,21 @@ public class Check implements KauriCheck {
 
         Kauri.INSTANCE.loggerManager.addPunishment(data, this);
         if(!data.banned) {
+            if(!Config.broadcastMessage.equalsIgnoreCase("off")) {
+                if (!Config.bungeeBroadcast) {
+                    RunUtils.task(() -> {
+                        if (!Config.broadcastMessage.equalsIgnoreCase("off")) {
+                            Bukkit.broadcastMessage(Color.translate(Config.broadcastMessage
+                                    .replace("%name%", data.getPlayer().getName())));
+                        }
+                    }, Kauri.INSTANCE);
+                } else {
+                    BungeeAPI.broadcastMessage(Color.translate(Config.broadcastMessage
+                            .replace("%name%", data.getPlayer().getName())));
+                }
+            }
             if(!Config.bungeePunishments) {
                 RunUtils.task(() -> {
-                    if(!Config.broadcastMessage.equalsIgnoreCase("off")) {
-                        Bukkit.broadcastMessage(Color.translate(Config.broadcastMessage
-                                .replace("%name%", data.getPlayer().getName())));
-                    }
                     ConsoleCommandSender sender = Bukkit.getConsoleSender();
                     Config.punishCommands.
                             forEach(cmd -> Bukkit.dispatchCommand(
@@ -275,12 +290,8 @@ public class Check implements KauriCheck {
                     vl = 0;
                 }, Kauri.INSTANCE);
             } else {
-                if(!Config.broadcastMessage.equalsIgnoreCase("off")) {
-                    BungeeAPI.broadcastMessage(Color.translate(Config.broadcastMessage
-                            .replace("%name%", data.getPlayer().getName())));
-                    Config.punishCommands.
-                            forEach(cmd -> BungeeAPI.sendCommand(cmd.replace("%name%", data.getPlayer().getName())));
-                }
+                Config.punishCommands.
+                        forEach(cmd -> BungeeAPI.sendCommand(cmd.replace("%name%", data.getPlayer().getName())));
             }
             data.banned = true;
         }
@@ -345,7 +356,7 @@ public class Check implements KauriCheck {
         register(new FlyA());
         register(new FlyB());
         register(new FlyC());
-        register(new FlyD());
+        //register(new FlyD());
         register(new FlyE());
         //register(new FlyG());
         //register(new FlyH());
@@ -366,9 +377,9 @@ public class Check implements KauriCheck {
         register(new KillauraC());
         register(new KillauraD());
         register(new KillauraE());
-        register(new Phase());
-        register(new OmniSprint());
-        register(new Inertia());
+        //register(new Phase());
+        //register(new OmniSprint());
+        //register(new Inertia());
         register(new Timer());
         register(new BadPacketsA());
         register(new BadPacketsB());
@@ -383,7 +394,7 @@ public class Check implements KauriCheck {
         register(new BadPacketsK());
         register(new BadPacketsL());
         register(new BadPacketsM());
-        register(new BadPacketsN());
+        //register(new BadPacketsN());
         register(new VelocityA());
         register(new HandA());
         register(new HandB());
@@ -398,7 +409,7 @@ public class Check implements KauriCheck {
         register(new SignCrash());
         //register(new Test());
         register(new LargeMove());
-        register(new HandE());
+        //register(new HandE());
     }
 
     public static boolean isCheck(String name) {

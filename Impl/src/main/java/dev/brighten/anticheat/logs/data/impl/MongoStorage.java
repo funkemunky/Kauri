@@ -5,7 +5,6 @@ import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.logs.data.DataStorage;
 import dev.brighten.anticheat.logs.data.config.MongoConfig;
-import dev.brighten.anticheat.logs.data.sql.Query;
 import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.logs.objects.Punishment;
 import dev.brighten.db.depends.com.mongodb.BasicDBObject;
@@ -17,7 +16,6 @@ import dev.brighten.db.depends.com.mongodb.client.model.Aggregates;
 import dev.brighten.db.depends.com.mongodb.client.model.Filters;
 import dev.brighten.dev.depends.org.bson.Document;
 import dev.brighten.dev.depends.org.bson.conversions.Bson;
-import lombok.val;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;

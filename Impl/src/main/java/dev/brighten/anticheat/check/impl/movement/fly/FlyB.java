@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @CheckInfo(name = "Fly (B)", description = "Checks for improper acceleration.", checkType = CheckType.FLIGHT,
-        vlToFlag = 3)
+        vlToFlag = 4, punishVL = 30)
 @Cancellable
 public class FlyB extends Check {
 
@@ -68,13 +68,14 @@ public class FlyB extends Check {
             }
 
             if((data.playerInfo.clientGround && predicted > -0.08 && predicted < -0.077)
-                    || (Math.abs(predicted) < 0.005) && data.playerVersion.isOrBelow(ProtocolVersion.V1_8_9)) {
+                    || (Math.abs(predicted) < 0.005 && data.playerVersion.isOrBelow(ProtocolVersion.V1_8_9))) {
                 predicted = 0;
             }
 
             double deltaPredict =  MathUtils.getDelta(data.playerInfo.deltaY, predicted);
 
             if(!data.playerInfo.flightCancel
+                    && (MathUtils.getDelta(-0.098, data.playerInfo.deltaY) > 0.001 || data.playerInfo.deltaXZ > 0.3)
                     && !(data.playerInfo.blockOnTo != null && data.playerInfo.blockOnTo.getType().isSolid())
                     && (!data.blockInfo.blocksAbove || data.playerInfo.deltaY >= 0)
                     && data.playerInfo.slimeTimer.hasPassed(20)
@@ -84,7 +85,7 @@ public class FlyB extends Check {
                     && data.playerInfo.lastVelocity.hasPassed(10)
                     && deltaPredict > 0.0001) {
                 if(++vl > (data.lagInfo.lastPacketDrop.hasPassed(5) ? 2.5 : 4)) {
-                    flag("deltaY=%v predicted=%v", data.playerInfo.deltaY, predicted);
+                    flag("dY=%v.3 p=%v.3 dx=%v.3", data.playerInfo.deltaY, predicted, data.playerInfo.deltaXZ);
                 }
             } else vl-= vl > 0 ? 0.2f : 0;
 

@@ -1,7 +1,6 @@
 package dev.brighten.anticheat.utils;
 
 import cc.funkemunky.api.utils.KLocation;
-import cc.funkemunky.api.utils.MathUtils;
 import org.bukkit.Location;
 
 import java.util.Comparator;
@@ -21,7 +20,7 @@ public class PastLocation {
     public List<KLocation> getEstimatedLocation(long time, long ping, long delta) {
         return this.previousLocations
                 .stream()
-                .filter(loc -> time - loc.timeStamp - ping < delta)
+                .filter(loc -> time - loc.timeStamp > 0 && time - loc.timeStamp < ping + delta)
                 .collect(Collectors.toList());
     }
 

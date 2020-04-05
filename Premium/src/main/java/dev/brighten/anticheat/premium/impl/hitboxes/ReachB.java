@@ -1,6 +1,5 @@
 package dev.brighten.anticheat.premium.impl.hitboxes;
 
-import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
@@ -18,7 +17,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -49,9 +47,7 @@ public class ReachB extends Check {
                     })
                     .collect(Collectors.toList());
 
-            List<SimpleCollisionBox> entityLocs = (targetData.playerVersion.isOrBelow(ProtocolVersion.V1_8_9)
-                    ? targetData.pastLocation : data.targetPastLocation)
-                    .getEstimatedLocation(timeStamp,
+            List<SimpleCollisionBox> entityLocs = data.targetPastLocation.getEstimatedLocation(timeStamp,
                             data.lagInfo.ping,
                             220L + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
                     .stream()
@@ -60,9 +56,9 @@ public class ReachB extends Check {
             double distance = 69;
             int misses = 0, collided = 0;
             for (RayCollision ray : origin) {
-                if(debug) ray.draw(WrappedEnumParticle.CRIT, Collections.singleton(data.getPlayer()));
+                if(debug) ray.draw(WrappedEnumParticle.CRIT, Bukkit.getOnlinePlayers());
                 for (SimpleCollisionBox box : entityLocs) {
-                    if(debug) box.draw(WrappedEnumParticle.FLAME, Collections.singleton(data.getPlayer()));
+                    if(debug) box.draw(WrappedEnumParticle.FLAME, Bukkit.getOnlinePlayers());
                     val check = RayCollision.distance(ray, box);
 
                     if(check == -1) {
@@ -73,22 +69,24 @@ public class ReachB extends Check {
                 }
             }
 
-
             if(distance == 69) {
                 buffer-= buffer > 0 ? 0.01 : 0;
                 return;
             }
 
-            val subtraction = 0.031 + Math.min(0.2, targetData.playerInfo.deltaXZ / 2.4);
+            val subtraction = 0.0325 + Math.min(0.2, targetData.playerInfo.deltaXZ / 2.6);
             distance-= subtraction;
 
-            if(distance > 3.02 && collided > 4
-                    && Kauri.INSTANCE.tps > 19 && Kauri.INSTANCE.lastTickLag.hasPassed(40)) {
-                if(++buffer > 4) {
-                    vl++;
-                    flag("distance=%v.3 buffer=%v.1", distance, buffer);
-                }
-            } else buffer-= buffer > 0 ? 0.02 : 0;
+            if(collided > 2 && data.lagInfo.lastPingDrop.hasPassed(10)) {
+                if(distance > 3.02
+                        && Kauri.INSTANCE.tps > 19 &&
+                        Kauri.INSTANCE.lastTickLag.hasPassed(40)) {
+                    if(++buffer > 4) {
+                        vl++;
+                        flag("distance=%v.3 buffer=%v.1 misses=%v", distance, buffer, misses);
+                    }
+                } else buffer-= buffer > 0 ? 0.02 : 0;
+            }
 
             debug("distance=%v.3 buffer=%v.1 ticklag=%v collided=%v subtraction=%v.4",
                     distance, buffer, Kauri.INSTANCE.lastTickLag.getPassed(), collided, subtraction);

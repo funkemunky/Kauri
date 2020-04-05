@@ -1,15 +1,12 @@
 package dev.brighten.anticheat.check.impl.movement.fly;
 
-import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInKeepAlivePacket;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.Helper;
-import dev.brighten.anticheat.utils.MovementUtils;
 import dev.brighten.anticheat.utils.Verbose;
 import dev.brighten.api.check.CheckType;
 

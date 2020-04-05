@@ -11,7 +11,6 @@ import dev.brighten.api.check.CheckType;
 public class AutoclickerA extends Check {
 
     private int flyingTicks, cps;
-    private long lastFlying;
 
     @Setting(name = "cpsToFlag")
     private static int cpsToFlag = 22;
@@ -21,8 +20,7 @@ public class AutoclickerA extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if(timeStamp - lastFlying > 1) flyingTicks++;
-        else cps-= cps > 0 ? 1 : 0;
+        flyingTicks++;
         if(flyingTicks >= 20) {
             if(cps > cpsToFlag) {
                 if(cps > cpsToBan) vl++;
@@ -32,7 +30,6 @@ public class AutoclickerA extends Check {
 
             flyingTicks = cps = 0;
         }
-        lastFlying = timeStamp;
     }
 
     @Packet
