@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @CheckInfo(name = "Reach (B)", description = "Ensures the reach of a player is legitimate.",
-        checkType = CheckType.HITBOX, punishVL = 10, developer = true)
+        checkType = CheckType.HITBOX, punishVL = 15)
 @Cancellable(cancelType = CancelType.ATTACK)
 public class ReachB extends Check {
 
@@ -77,7 +77,8 @@ public class ReachB extends Check {
             val subtraction = 0.0325 + Math.min(0.2, targetData.playerInfo.deltaXZ / 2.6);
             distance-= subtraction;
 
-            if(collided > 2 && data.lagInfo.lastPingDrop.hasPassed(10)) {
+            if(collided > 2 && data.lagInfo.lastPacketDrop.hasPassed(0)
+                    && data.lagInfo.lastPingDrop.hasPassed(10)) {
                 if(distance > 3.02
                         && Kauri.INSTANCE.tps > 19 &&
                         Kauri.INSTANCE.lastTickLag.hasPassed(40)) {

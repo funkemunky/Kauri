@@ -46,12 +46,14 @@ public class ReachA extends Check {
             }
         }
 
-        if(distance > 3.02 && distance != 69 && data.lagInfo.lastPingDrop.hasPassed(10)) {
-            if(++buffer > 6) {
-                vl++;
-                flag("distance=%v buffer=%v", MathUtils.round(distance, 3), buffer);
-            }
-        } else buffer-= buffer > 0 ? 0.2 : 0;
+        if(data.lagInfo.lastPacketDrop.hasPassed(2)) {
+            if (distance > 3.02 && distance != 69) {
+                if (++buffer > 6) {
+                    vl++;
+                    flag("distance=%v buffer=%v", MathUtils.round(distance, 3), buffer);
+                }
+            } else buffer -= buffer > 0 ? 0.2 : 0;
+        }
 
         debug("distance=%v boxes=%v buffer=%v", distance, targetBoxes.size(), buffer);
     }
