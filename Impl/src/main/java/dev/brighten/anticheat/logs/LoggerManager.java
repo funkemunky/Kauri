@@ -65,7 +65,7 @@ public class LoggerManager {
         Map<UUID, List<Log>> logs = new HashMap<>();
 
         getLogs(null, null, 0, Integer.MAX_VALUE,
-                currentTime - timeFrame, currentTime)
+                currentTime - timeFrame, currentTime + 100)
                 .forEach(log -> {
                     List<Log> logsList = logs.getOrDefault(log.uuid, new ArrayList<>());
 

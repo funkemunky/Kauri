@@ -23,7 +23,7 @@ public class Load {
 
     public static void load() {
         register("Starting thread pool...");
-        Kauri.INSTANCE.executor = Executors.newFixedThreadPool(3);
+        Kauri.INSTANCE.executor = Executors.newFixedThreadPool(2);
         Kauri.INSTANCE.loggingThread = Executors.newSingleThreadScheduledExecutor();
 
         register("Loading config...");

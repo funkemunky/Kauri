@@ -71,7 +71,10 @@ public class MenuCommand {
                         Kauri.INSTANCE.getDescription().getVersion(), "&e&oRight Click &7&oclick to get support."));
         menu.setItem(15, createButton(XMaterial.PAPER.parseMaterial(), 1, "&cView Recent Violators",
                 (player, info) -> {
-            getRecentViolatorsMenu().showMenu(player);
+            Kauri.INSTANCE.executor.execute(() -> {
+                player.sendMessage(Color.Gray + "Loading menu...");
+                getRecentViolatorsMenu().showMenu(player);
+            });
         }, "", "&7View players who flagged checks recently."));
         return menu;
     }
@@ -272,46 +275,50 @@ public class MenuCommand {
 
     private ChestMenu getRecentViolatorsMenu() {
         ChestMenu menu = new ChestMenu(Color.Gold + "Recent Violators", 6);
-
         menu.setParent(main);
+        try {
+            Map<UUID, List<Log>> logs = Kauri.INSTANCE.loggerManager
+                    .getLogsWithinTimeFrame(TimeUnit.DAYS.toMillis(1));
 
-        Map<UUID, List<Log>> logs = Kauri.INSTANCE.loggerManager
-                .getLogsWithinTimeFrame(TimeUnit.DAYS.toMillis(1));
+            List<UUID> sortedIds = logs.keySet().stream()
+                    .sorted(Comparator.comparing(key -> {
+                        val logsList =  logs.get(key);
+                        return logsList.get(logsList.size() - 1).timeStamp;
+                    }))
+                    .collect(Collectors.toList());
 
-        List<UUID> sortedIds = logs.keySet().stream()
-                .sorted(Comparator.comparing(key -> {
-                    val logsList =  logs.get(key);
-                    return logsList.get(logsList.size() - 1).timeStamp;
-                }))
-                .collect(Collectors.toList());
+            for (int i = 0; i < Math.min(45, sortedIds.size()); i++) {
+                UUID uuid = sortedIds.get(i);
+                OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
+                Log vl = logs.get(uuid).get(0);
 
-        for (int i = 0; i < Math.min(45, sortedIds.size()); i++) {
-            UUID uuid = sortedIds.get(i);
-            OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-            Log vl = logs.get(uuid).get(0);
+                ItemBuilder builder = new ItemBuilder(XMaterial.SKULL_ITEM.parseMaterial());
 
-            ItemBuilder builder = new ItemBuilder(XMaterial.SKULL_ITEM.parseMaterial());
-
-            builder.amount(1);
-            builder.durability(3);
-            builder.owner(player.getName());
-            builder.name(Color.Green + player.getName());
-            builder.lore("", "&eCheck&7: &f" + vl.checkName, "&eVL&7: &f" + vl.vl, "&ePing&7: &f" + vl.ping,
-                    "&eTPS&7: &f" + MathUtils.round(vl.tps, 2), "",
-                    "&f&oShift-Left Click &7&oto view logs.");
-            menu.addItem(new Button(false, builder.build(),
-                    (target, info) -> {
-                if(info.getClickType().equals(ClickType.SHIFT_LEFT)
-                        && target.hasPermission("kauri.command.logs")) {
-                    LogsGUI gui = new LogsGUI(Bukkit.getOfflinePlayer(uuid));
-                    menu.setParent(null);
-                    menu.close(target);
-                    gui.setParent(info.getMenu());
-                    menu.setParent(main);
-                    gui.showMenu(target);
-                }
-            }));
+                builder.amount(1);
+                builder.durability(3);
+                builder.owner(player.getName());
+                builder.name(Color.Green + player.getName());
+                builder.lore("", "&eCheck&7: &f" + vl.checkName, "&eVL&7: &f" + vl.vl, "&ePing&7: &f" + vl.ping,
+                        "&eTPS&7: &f" + MathUtils.round(vl.tps, 2), "",
+                        "&f&oShift-Left Click &7&oto view logs.");
+                menu.addItem(new Button(false, builder.build(),
+                        (target, info) -> {
+                            if(info.getClickType().equals(ClickType.SHIFT_LEFT)
+                                    && target.hasPermission("kauri.command.logs")) {
+                                LogsGUI gui = new LogsGUI(Bukkit.getOfflinePlayer(uuid));
+                                menu.setParent(null);
+                                menu.close(target);
+                                gui.setParent(info.getMenu());
+                                menu.setParent(main);
+                                gui.showMenu(target);
+                            }
+                        }));
+            }
+            return menu;
+        } catch(Exception e) {
+            e.printStackTrace();
         }
+
         return menu;
     }
 

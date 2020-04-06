@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.logs.data.impl;
 
 import cc.funkemunky.api.utils.RunUtils;
+import cc.funkemunky.api.utils.objects.QuadFunction;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.logs.data.DataStorage;
@@ -8,6 +9,9 @@ import dev.brighten.anticheat.logs.data.sql.MySQL;
 import dev.brighten.anticheat.logs.data.sql.Query;
 import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.logs.objects.Punishment;
+import lombok.val;
+import lombok.var;
+import org.bukkit.Bukkit;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -31,6 +35,18 @@ public class MySQLStorage implements DataStorage {
                 "`UUID` VARCHAR(64) NOT NULL," +
                 "`TIME` LONG NOT NULL," +
                 "`CHECK` VARCHAR(32) NOT NULL)").execute();
+        Kauri.INSTANCE.loggingThread.execute(() -> {
+            Query.prepare("DROP INDEX `UUID` on `VIOLATIONS`");
+            Query.prepare("CREATE INDEX `UUID` ON `VIOLATIONS` (UUID)").execute();
+        });
+        Kauri.INSTANCE.loggingThread.execute(() -> {
+            Query.prepare("DROP INDEX `UUID` ON `PUNISHMENTS`").execute();
+            Query.prepare("CREATE INDEX `UUID` ON `PUNISHMENTS` (UUID)").execute();
+        });
+        Kauri.INSTANCE.loggingThread.execute(() -> {
+            Query.prepare("DROP INDEX `TIME` ON `VIOLATIONS`").execute();
+            Query.prepare("CREATE INDEX `TIME` ON `VIOLATIONS` (`TIME`)").execute();
+        });
 
         RunUtils.taskTimerAsync(() -> {
             if(logs.size() > 0) {
@@ -59,14 +75,28 @@ public class MySQLStorage implements DataStorage {
     public List<Log> getLogs(UUID uuid, Check check, int arrayMin, int arrayMax, long timeFrom, long timeTo) {
         List<Log> logs = new ArrayList<>();
 
-        Query.prepare("SELECT `TIME`, `VL`, `CHECK`, `PING`, `TPS`, `INFO` " +
-                "FROM `VIOLATIONS` WHERE `UUID` = ?"+ (check != null ? " AND WHERE `CHECK` = " + check.name : "")
-                + " AND `TIME` BETWEEN ? AND ? ORDER BY `TIME` DESC LIMIT ?,?")
-                .append(uuid.toString()).append(timeFrom).append(timeTo).append(arrayMin).append(arrayMax)
-        .execute(rs ->
-            logs.add(new Log(uuid, rs.getString("CHECK"), rs.getString("INFO"),
-                    rs.getFloat("VL"), (long)rs.getInt("PING"),
-                    rs.getLong("TIME"), rs.getDouble("TPS"))));
+        if(uuid != null) {
+            Query.prepare("SELECT `TIME`, `VL`, `CHECK`, `PING`, `TPS`, `INFO` " +
+                    "FROM `VIOLATIONS` WHERE `UUID` = ?"+ (check != null ? " AND WHERE `CHECK` = " + check.name : "")
+                    + " AND `TIME` BETWEEN ? AND ? ORDER BY `TIME` DESC LIMIT ?,?")
+                    .append(uuid.toString()).append(timeFrom).append(timeTo).append(arrayMin).append(arrayMax)
+                    .execute(rs ->
+                            logs.add(new Log(uuid,
+                                    rs.getString("CHECK"), rs.getString("INFO"),
+                                    rs.getFloat("VL"), (long)rs.getInt("PING"),
+                                    rs.getLong("TIME"), rs.getDouble("TPS"))));
+        } else {
+            Query.prepare("SELECT `UUID`, `TIME`, `VL`, `CHECK`, `PING`, `TPS`, `INFO` " +
+                    "FROM `VIOLATIONS`" + (check != null ? " WHERE `CHECK` = " + check.name + " AND" : " WHERE")
+                    + " `TIME` BETWEEN ? AND ? ORDER BY `TIME` DESC LIMIT ?,?")
+                    .append(timeFrom).append(timeTo).append(arrayMin).append(arrayMax)
+                    .execute(rs -> {
+                        logs.add(new Log(UUID.fromString(rs.getString("UUID")),
+                                rs.getString("CHECK"), rs.getString("INFO"),
+                                rs.getFloat("VL"), (long)rs.getInt("PING"),
+                                rs.getLong("TIME"), rs.getDouble("TPS")));
+                    });
+        }
 
         return logs;
     }
@@ -75,11 +105,20 @@ public class MySQLStorage implements DataStorage {
     public List<Punishment> getPunishments(UUID uuid, int arrayMin, int arrayMax, long timeFrom, long timeTo) {
         List<Punishment> punishments = new ArrayList<>();
 
-        Query.prepare("SELECT `TIME`, `CHECK` FROM `PUNISHMENTS` " +
-                "WHERE `UUID` = ? AND TIME BETWEEN ? AND ? ORDER BY `TIME` DESC LIMIT ?,?")
-                .append(uuid.toString()).append(timeFrom).append(timeTo).append(arrayMin).append(arrayMax)
-                .execute(rs -> punishments
-                        .add(new Punishment(uuid, rs.getString("CHECK"), rs.getLong("TIME"))));
+        if(uuid != null) {
+            Query.prepare("SELECT `TIME`, `CHECK` FROM `PUNISHMENTS` " +
+                    "WHERE `UUID` = ? AND TIME BETWEEN ? AND ? ORDER BY `TIME` DESC LIMIT ?,?")
+                    .append(uuid.toString()).append(timeFrom).append(timeTo).append(arrayMin).append(arrayMax)
+                    .execute(rs -> punishments
+                            .add(new Punishment(uuid, rs.getString("CHECK"), rs.getLong("TIME"))));
+        } else {
+            Query.prepare("SELECT `UUID`, `TIME`, `CHECK` FROM `PUNISHMENTS` " +
+                    "WHERE TIME BETWEEN ? AND ? ORDER BY `TIME` DESC LIMIT ?,?")
+                    .append(timeFrom).append(timeTo).append(arrayMin).append(arrayMax)
+                    .execute(rs -> punishments
+                            .add(new Punishment(UUID.fromString(rs.getString("UUID")),
+                                    rs.getString("CHECK"), rs.getLong("TIME"))));
+        }
 
         return punishments;
     }

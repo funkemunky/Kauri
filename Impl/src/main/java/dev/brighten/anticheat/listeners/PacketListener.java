@@ -15,7 +15,7 @@ import java.util.concurrent.Executors;
 @Init
 public class PacketListener implements AtlasListener {
 
-    public static ExecutorService packetThread = Executors.newSingleThreadScheduledExecutor();
+    public static ExecutorService packetThread = Executors.newFixedThreadPool(3);
     @Listen(ignoreCancelled = true, priority = ListenerPriority.LOW)
     public void onEvent(PacketReceiveEvent event) {
         if(event.getPlayer() == null) return;

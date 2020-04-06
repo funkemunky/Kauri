@@ -17,7 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Cancellable
-@CheckInfo(name = "Speed (C)", description = "Speed check by DeprecatedLuke, improved by funkemunky.", developer = true)
+@CheckInfo(name = "Speed (C)", description = "Speed check by DeprecatedLuke, improved by funkemunky.",
+        developer = true)
 public class SpeedC extends Check {
 
     public double previousDistance;

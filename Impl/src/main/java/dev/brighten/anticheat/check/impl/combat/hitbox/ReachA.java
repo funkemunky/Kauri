@@ -22,7 +22,7 @@ public class ReachA extends Check {
 
     private long lastUse;
     private LivingEntity target;
-    private int buffer;
+    private double buffer;
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
@@ -46,14 +46,14 @@ public class ReachA extends Check {
             }
         }
 
-        if(data.lagInfo.lastPacketDrop.hasPassed(2)) {
+        if(data.lagInfo.lastPacketDrop.hasPassed(5)) {
             if (distance > 3.02 && distance != 69) {
                 if (++buffer > 6) {
                     vl++;
                     flag("distance=%v buffer=%v", MathUtils.round(distance, 3), buffer);
                 }
             } else buffer -= buffer > 0 ? 0.2 : 0;
-        }
+        } else buffer-= buffer > 0 ? 0.02 : 0;
 
         debug("distance=%v boxes=%v buffer=%v", distance, targetBoxes.size(), buffer);
     }
@@ -72,8 +72,6 @@ public class ReachA extends Check {
 
         if(vec == null) vec = new Vector(5, 0, 5);
 
-
-
-        return vec.setY(0);
+        return vec.setY(0).add(new Vector(0.1, 0, 0.1));
     }
 }
