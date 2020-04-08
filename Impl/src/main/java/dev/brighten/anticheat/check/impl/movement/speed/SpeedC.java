@@ -18,7 +18,7 @@ import java.util.List;
 
 @Cancellable
 @CheckInfo(name = "Speed (C)", description = "Speed check by DeprecatedLuke, improved by funkemunky.",
-        developer = true)
+        developer = true, punishVL = 20, vlToFlag = 2)
 public class SpeedC extends Check {
 
     public double previousDistance;

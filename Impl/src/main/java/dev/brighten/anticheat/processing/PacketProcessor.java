@@ -178,7 +178,8 @@ public class PacketProcessor {
                     val stack = packet.getItemStack();
 
                     if(pos.getX() == -1 && (pos.getY() == 255 || pos.getY() == -1)
-                            && pos.getZ() == -1 && stack != null && !stack.getType().isEdible()) {
+                            && pos.getZ() == -1 && stack != null
+                            && stack.getType().name().contains("SWORD")) {
                         data.predictionService.useSword = data.playerInfo.usingItem = true;
                         data.playerInfo.lastUseItem.reset();
                     } else if(stack != null) {

@@ -20,7 +20,7 @@ public class FlyC extends Check {
                 && !data.playerInfo.serverGround) {
             double vaccel = data.playerInfo.deltaY - data.playerInfo.lDeltaY;
 
-            if(vaccel > -0.02) {
+            if(vaccel > 0.1) {
                 if(vl++ > 2) {
                     flag("v=%v deltaY=%v", vaccel, data.playerInfo.deltaY);
                 }

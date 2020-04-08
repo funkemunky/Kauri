@@ -9,7 +9,7 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 
 @CheckInfo(name = "Speed (A)", description = "A simple limiting speed check with a high verbose threshold.",
-        punishVL = 40, vlToFlag = 2)
+        punishVL = 34, vlToFlag = 2)
 @Cancellable
 public class SpeedA extends Check {
 

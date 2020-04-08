@@ -19,6 +19,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 
 import java.io.UnsupportedEncodingException;
@@ -278,9 +279,10 @@ public class MenuCommand {
         menu.setParent(main);
         try {
             Map<UUID, List<Log>> logs = Kauri.INSTANCE.loggerManager
-                    .getLogsWithinTimeFrame(TimeUnit.DAYS.toMillis(1));
+                    .getLogsWithinTimeFrame(TimeUnit.HOURS.toMillis(2));
 
             List<UUID> sortedIds = logs.keySet().stream()
+                    .filter(uuid -> Bukkit.getPlayer(uuid) != null)
                     .sorted(Comparator.comparing(key -> {
                         val logsList =  logs.get(key);
                         return logsList.get(logsList.size() - 1).timeStamp;
@@ -289,7 +291,7 @@ public class MenuCommand {
 
             for (int i = 0; i < Math.min(45, sortedIds.size()); i++) {
                 UUID uuid = sortedIds.get(i);
-                OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
+                Player player = Bukkit.getPlayer(uuid);
                 Log vl = logs.get(uuid).get(0);
 
                 ItemBuilder builder = new ItemBuilder(XMaterial.SKULL_ITEM.parseMaterial());

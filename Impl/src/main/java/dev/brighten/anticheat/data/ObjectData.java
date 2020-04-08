@@ -8,6 +8,7 @@ import cc.funkemunky.api.utils.TickTimer;
 import cc.funkemunky.api.utils.math.RollingAverageLong;
 import cc.funkemunky.api.utils.math.cond.MaxInteger;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
+import cc.funkemunky.api.utils.world.types.NoCollisionBox;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.CancelType;
@@ -26,6 +27,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitTask;
 
+import javax.xml.crypto.dsig.SignatureMethod;
 import java.util.*;
 
 public class ObjectData {
@@ -41,7 +43,7 @@ public class ObjectData {
     public long creation, lagTicks, noLagTicks;
     public PastLocation pastLocation, targetPastLocation;
     public LivingEntity target;
-    public SimpleCollisionBox box, targetBounds;
+    public SimpleCollisionBox box = new SimpleCollisionBox(), targetBounds = new SimpleCollisionBox();
     public ObjectData INSTANCE, targetData;
     public CheckManager checkManager;
     public PlayerInformation playerInfo;

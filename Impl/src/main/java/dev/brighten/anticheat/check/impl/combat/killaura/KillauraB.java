@@ -6,7 +6,7 @@ import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Killaura (B)", description = "Detects when clients sent use packets at same time as flying packets.",
-        checkType = CheckType.KILLAURA, punishVL = 22)
+        checkType = CheckType.KILLAURA, punishVL = 17)
 @Cancellable(cancelType = CancelType.ATTACK)
 public class KillauraB extends Check {
 

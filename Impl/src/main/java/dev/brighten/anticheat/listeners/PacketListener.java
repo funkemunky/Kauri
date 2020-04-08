@@ -15,11 +15,13 @@ import java.util.concurrent.Executors;
 @Init
 public class PacketListener implements AtlasListener {
 
-    public static ExecutorService packetThread = Executors.newFixedThreadPool(3);
+    public static ExecutorService packetThread = Executors.newSingleThreadExecutor();
     @Listen(ignoreCancelled = true, priority = ListenerPriority.LOW)
     public void onEvent(PacketReceiveEvent event) {
         if(event.getPlayer() == null) return;
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
+
+        if(data == null) return;
 
         packetThread.execute(() -> Kauri.INSTANCE.packetProcessor.processClient(event,
                 data, event.getPacket(), event.getType(), event.getTimeStamp()));
@@ -34,6 +36,8 @@ public class PacketListener implements AtlasListener {
             return;
 
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
+
+        if(data == null) return;
 
         packetThread.execute(() -> Kauri.INSTANCE.packetProcessor.processServer(event,
                 data, event.getPacket(), event.getType(), event.getTimeStamp()));

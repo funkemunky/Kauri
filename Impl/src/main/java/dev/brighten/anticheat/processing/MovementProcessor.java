@@ -6,6 +6,7 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.handlers.PlayerSizeHandler;
 import cc.funkemunky.api.utils.objects.VariableValue;
+import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingList;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import cc.funkemunky.api.utils.world.CollisionBox;
 import cc.funkemunky.api.utils.world.types.RayCollision;
@@ -20,13 +21,14 @@ import org.bukkit.GameMode;
 import org.bukkit.potion.PotionEffectType;
 
 import java.math.RoundingMode;
+import java.util.Deque;
 import java.util.List;
 
 public class MovementProcessor {
     private final ObjectData data;
 
-    private List<Double> yawGcdList = new EvictingList<>(40),
-            pitchGcdList = new EvictingList<>(40);
+    private Deque<Double> yawGcdList = new ConcurrentEvictingList<>(40),
+            pitchGcdList = new ConcurrentEvictingList<>(40);
     public long deltaX, deltaY, lastDeltaX, lastDeltaY, lastCinematic;
     public double sensitivityX, sensitivityY, yawMode, pitchMode, sensXPercent, sensYPercent;
     private MouseFilter mxaxis = new MouseFilter(), myaxis = new MouseFilter();
@@ -119,7 +121,7 @@ public class MovementProcessor {
             data.box = PlayerSizeHandler.instance.bounds(data.getPlayer(),
                     data.playerInfo.to.x, data.playerInfo.to.y, data.playerInfo.to.z);
 
-            data.blockInfo.runCollisionCheck(); //run b4 everything else for use below.
+            if(timeStamp - data.creation > 400L) data.blockInfo.runCollisionCheck(); //run b4 everything else for use below.
         }
 
         if(MathUtils.getDelta(deltaY, -0.098) < 0.001 && data.playerInfo.deltaXZ <= 0.3) {

@@ -6,7 +6,7 @@ import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Autoclicker (A)", description = "A fast click check.", checkType = CheckType.AUTOCLICKER,
-        punishVL = 50)
+        punishVL = 2)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerA extends Check {
 

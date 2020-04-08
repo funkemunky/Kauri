@@ -15,10 +15,7 @@ import dev.brighten.anticheat.check.impl.combat.aim.*;
 import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerA;
 import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerC;
 import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerG;
-import dev.brighten.anticheat.check.impl.combat.hand.HandA;
-import dev.brighten.anticheat.check.impl.combat.hand.HandB;
-import dev.brighten.anticheat.check.impl.combat.hand.HandC;
-import dev.brighten.anticheat.check.impl.combat.hand.HandD;
+import dev.brighten.anticheat.check.impl.combat.hand.*;
 import dev.brighten.anticheat.check.impl.combat.hitbox.Hitboxes;
 import dev.brighten.anticheat.check.impl.combat.hitbox.ReachA;
 import dev.brighten.anticheat.check.impl.combat.killaura.*;
@@ -355,7 +352,7 @@ public class Check implements KauriCheck {
         register(new AutoclickerG());
         register(new FlyA());
         register(new FlyB());
-        register(new FlyC());
+        //register(new FlyC());
         //register(new FlyD());
         register(new FlyE());
         //register(new FlyG());
@@ -364,6 +361,7 @@ public class Check implements KauriCheck {
         register(new NoFallA());
         register(new NoFallB());
         register(new Hitboxes());
+        register(new ReachA());
         register(new AimA());
         register(new AimB());
         register(new AimC());
@@ -399,8 +397,8 @@ public class Check implements KauriCheck {
         register(new HandA());
         register(new HandB());
         register(new HandC());
-        register(new ReachA());
         register(new HandD());
+        register(new HandE());
         register(new HealthSpoof());
         register(new BookOp());
         register(new BookEnchant());
@@ -409,7 +407,6 @@ public class Check implements KauriCheck {
         register(new SignCrash());
         //register(new Test());
         register(new LargeMove());
-        //register(new HandE());
     }
 
     public static boolean isCheck(String name) {

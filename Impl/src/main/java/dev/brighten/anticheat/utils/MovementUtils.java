@@ -25,12 +25,16 @@ public class MovementUtils {
     }
 
     public static boolean isOnLadder(ObjectData data) {
-        int i = MathHelper.floor_double(data.playerInfo.to.x);
-        int j = MathHelper.floor_double(data.box.yMin);
-        int k = MathHelper.floor_double(data.playerInfo.to.z);
-        Block block = BlockUtils.getBlock(new Location(data.getPlayer().getWorld(), i, j, k));
+        try {
+            int i = MathHelper.floor_double(data.playerInfo.to.x);
+            int j = MathHelper.floor_double(data.box.yMin);
+            int k = MathHelper.floor_double(data.playerInfo.to.z);
+            Block block = BlockUtils.getBlock(new Location(data.getPlayer().getWorld(), i, j, k));
 
-        return Materials.checkFlag(block.getType(), Materials.LADDER);
+            return Materials.checkFlag(block.getType(), Materials.LADDER);
+        } catch(NullPointerException e) {
+            return false;
+        }
     }
 
     public static int getDepthStriderLevel(Player player) {
@@ -82,7 +86,9 @@ public class MovementUtils {
 
     static {
         try {
-            DEPTH = Enchantment.getByName("DEPTH_STRIDER");
+            if(ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_8)) {
+                DEPTH = Enchantment.getByName("DEPTH_STRIDER");
+            }
         } catch(Exception e) {
             DEPTH = null;
         }

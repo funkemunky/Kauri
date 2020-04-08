@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@CheckInfo(name = "Reach (A)", checkType = CheckType.HITBOX, punishVL = 12, description = "A simple distance check.")
+@CheckInfo(name = "Reach (A)", checkType = CheckType.HITBOX, punishVL = 8, description = "A simple distance check.")
 @Cancellable(cancelType = CancelType.ATTACK)
 public class ReachA extends Check {
 
@@ -32,7 +32,7 @@ public class ReachA extends Check {
         List<Tuple<KLocation, Vector>> targetBoxes = data.targetPastLocation
                 .getEstimatedLocation(timeStamp,
                         data.lagInfo.ping,
-                        100L + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
+                        150L + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
                 .stream()
                 .map(loc -> new Tuple<>(loc, getHitbox(target.getType())))
                 .collect(Collectors.toList());
@@ -52,7 +52,7 @@ public class ReachA extends Check {
                     vl++;
                     flag("distance=%v buffer=%v", MathUtils.round(distance, 3), buffer);
                 }
-            } else buffer -= buffer > 0 ? 0.2 : 0;
+            } else buffer -= buffer > 0 ? 0.1 : 0;
         } else buffer-= buffer > 0 ? 0.02 : 0;
 
         debug("distance=%v boxes=%v buffer=%v", distance, targetBoxes.size(), buffer);

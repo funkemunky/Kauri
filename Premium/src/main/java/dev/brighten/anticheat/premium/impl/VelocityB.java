@@ -61,6 +61,11 @@ public class VelocityB extends Check {
 
             double drag = 0.91;
 
+            if(data.blockInfo.blocksNear || data.blockInfo.inLiquid) {
+                pvX = pvZ = 0;
+                return;
+            }
+
             if(data.playerInfo.lClientGround) {
                 drag*= data.blockInfo.currentFriction;
             }
@@ -127,13 +132,14 @@ public class VelocityB extends Check {
 
             if(ratio < (data.playerVersion.isOrAbove(ProtocolVersion.V1_9)? 0.8 : 0.993)
                     && timeStamp - data.creation > 3000L
-                    && data.lagInfo.lastPacketDrop.hasPassed(1)
+                    && data.lagInfo.lastPacketDrop.hasPassed(2)
                     && !data.blockInfo.blocksNear) {
-                if((buffer+= found || ratio > 0.95 ? 0.5 : 1) > 20) {
+                if(++buffer > 25) {
                     vl++;
-                    flag("pct=%v.2% buffer=%v.1", ratio * 100, buffer);
+                    flag("pct=%v.2% buffer=%v.1 forward=%v.2 strafe=%v.2",
+                            ratio * 100, buffer, moveStrafe, moveForward);
                 }
-            } else buffer-= buffer > 0 ? 0.25 : 0;
+            } else buffer-= buffer > 0 ? data.lagInfo.lastPacketDrop.hasNotPassed(20) ? 0.5 : 0.25 : 0;
             debug("ratio=%v.3 buffer=%v.1 strafe=%v.2 forward=%v.2 lastUse=%v found=%v",
                     ratio, buffer, moveStrafe, moveForward, data.playerInfo.lastUseItem.getPassed(), found);
             pvX *= drag;

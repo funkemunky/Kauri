@@ -71,6 +71,7 @@ public class MiscUtils {
             return false;
         }
     }
+
     public static void testMessage(String message) {
         KauriCommand.getTesters().forEach(pl -> pl.sendMessage(Color.translate(message)));
     }
