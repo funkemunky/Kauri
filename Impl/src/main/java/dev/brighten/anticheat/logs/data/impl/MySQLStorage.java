@@ -1,7 +1,6 @@
 package dev.brighten.anticheat.logs.data.impl;
 
 import cc.funkemunky.api.utils.RunUtils;
-import cc.funkemunky.api.utils.objects.QuadFunction;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.logs.data.DataStorage;
@@ -9,9 +8,6 @@ import dev.brighten.anticheat.logs.data.sql.MySQL;
 import dev.brighten.anticheat.logs.data.sql.Query;
 import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.logs.objects.Punishment;
-import lombok.val;
-import lombok.var;
-import org.bukkit.Bukkit;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;

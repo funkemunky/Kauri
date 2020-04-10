@@ -12,6 +12,8 @@ import dev.brighten.anticheat.data.ObjectData;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 @Init(commands = true)
 public class LagCommand {
 
@@ -23,6 +25,9 @@ public class LagCommand {
         cmd.getSender().sendMessage("");
         cmd.getSender().sendMessage(Color.translate("&eTPS&8: &f" +
                 MathUtils.round(Kauri.INSTANCE.tps, 2)));
+        AtomicLong chunkCount = new AtomicLong(0);
+        Bukkit.getWorlds().forEach(world -> chunkCount.addAndGet(world.getLoadedChunks().length));
+        cmd.getSender().sendMessage(Color.translate("&eChunks&8: &f" + chunkCount.get()));
         double totalMem =  MathUtils.round(Runtime.getRuntime().totalMemory() / 1E9, 2);
         double freeMem = MathUtils.round(Runtime.getRuntime().freeMemory() / 1E9, 2);
         double allocated = MathUtils.round(Runtime.getRuntime().maxMemory() / 1E9, 2);

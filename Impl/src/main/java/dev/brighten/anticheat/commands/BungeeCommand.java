@@ -7,7 +7,6 @@ import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.Priority;
-import dev.brighten.anticheat.check.api.Setting;
 
 @Init(commands = true,priority = Priority.LOW)
 public class BungeeCommand {

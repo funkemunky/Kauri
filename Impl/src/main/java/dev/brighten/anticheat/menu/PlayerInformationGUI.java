@@ -81,7 +81,7 @@ public class PlayerInformationGUI extends ChestMenu {
         List<String> loreList = new ArrayList<>(Arrays.asList("",
                 halfLine,
                 "&eUsing Forge&7: &f" + (modData != null),
-                //"&eUsing Lunar&7: &f" + data.usingLunar,
+                "&eUsing Lunar&7: &f" + data.usingLunar,
                 ""));
 
         if(modData != null) {

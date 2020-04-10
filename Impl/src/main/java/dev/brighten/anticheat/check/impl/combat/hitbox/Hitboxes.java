@@ -11,7 +11,6 @@ import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.AtomicDouble;
 import dev.brighten.api.check.CheckType;
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;

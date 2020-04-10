@@ -21,7 +21,6 @@ import dev.brighten.anticheat.check.impl.combat.hitbox.ReachA;
 import dev.brighten.anticheat.check.impl.combat.killaura.*;
 import dev.brighten.anticheat.check.impl.movement.fly.FlyA;
 import dev.brighten.anticheat.check.impl.movement.fly.FlyB;
-import dev.brighten.anticheat.check.impl.movement.fly.FlyC;
 import dev.brighten.anticheat.check.impl.movement.fly.FlyE;
 import dev.brighten.anticheat.check.impl.movement.general.FastLadder;
 import dev.brighten.anticheat.check.impl.movement.general.HealthSpoof;
