@@ -65,29 +65,6 @@ public class Kauri extends JavaPlugin {
         MiscUtils.printToConsole(Color.Red + "Starting Kauri " + getDescription().getVersion() + "...");
         INSTANCE = this;
 
-        this.getServer().getMessenger().registerOutgoingPluginChannel(this, "Lunar-Client");
-        this.getServer().getMessenger().registerIncomingPluginChannel(this, "Lunar-Client", (channel, player, bytes) -> {
-            if (bytes[0] == 26) {
-                User user = LunarClientAPI.getInstance().getUserManager().getPlayerData(player);
-                if (user != null && !user.isLunarClient()){
-                    user.setLunarClient(true);
-                    new AuthenticateEvent(player).call(LunarClientAPI.getInstance());
-
-                    try {
-                        LunarClientAPI.getInstance().sendNotification(player, "Thanks for using Lunar Client!", Notification.INFO, 7);
-                    } catch (IOException e) {
-                        //ignore
-                    }
-                }
-
-                for (Player other : Bukkit.getServer().getOnlinePlayers()) {
-                    if (LunarClientAPI.getInstance().isAuthenticated(other)) {
-                        other.sendPluginMessage(this, channel, bytes);
-                    }
-                }
-            }
-        });
-
         load(); //Everything in one method so we can use it in other places like when reloading.
     }
 

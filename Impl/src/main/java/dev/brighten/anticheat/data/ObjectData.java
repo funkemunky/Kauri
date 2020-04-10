@@ -21,6 +21,7 @@ import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.processing.ClickProcessor;
 import dev.brighten.anticheat.processing.MovementProcessor;
 import dev.brighten.anticheat.utils.PastLocation;
+import gg.manny.lunar.LunarClientAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
