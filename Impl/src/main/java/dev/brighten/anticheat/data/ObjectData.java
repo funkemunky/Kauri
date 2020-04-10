@@ -34,7 +34,7 @@ public class ObjectData {
 
     public UUID uuid;
     private Player player;
-    public boolean alerts, devAlerts, sniffing;
+    public boolean alerts, devAlerts, sniffing, usingLunar;
 
     //Debugging
     public String debugging;

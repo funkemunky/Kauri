@@ -204,7 +204,8 @@ public class Check implements KauriCheck {
                     if (lastAlert.hasPassed(MathUtils.millisToTicks(Config.alertsDelay))) {
                         JsonMessage jmsg = new JsonMessage();
 
-                        String text = Color.translate(Kauri.INSTANCE.msgHandler.getLanguage().msg("cheat-alert",
+                        boolean dev = developer || vl <= vlToFlag;
+                        String text = Color.translate(dev ? "&8[&cDev&8] " : "") + Color.translate(Kauri.INSTANCE.msgHandler.getLanguage().msg("cheat-alert",
                                 "&8[&6&lKauri&8] &f%player% &7flagged &f%check%" +
                                         " &8(&ex%vl%&8) %experimental%")
                                 .replace("%player%", data.getPlayer().getName())
@@ -216,7 +217,7 @@ public class Check implements KauriCheck {
                                 "cheat-alert-hover",
                                 "&eDescription&8: &f%desc%\n&eInfo: &f%info%\n&r\n&7&oClick to teleport to player.")
                                 .replace("%desc%", String.join("\n",
-                                        dev.brighten.anticheat.utils.MiscUtils
+                                        MiscUtils
                                                 .splitIntoLine(description, 20)))
                                 .replace("%player%", data.getPlayer().getName())
                                 .replace("%check%", name)

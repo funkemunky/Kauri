@@ -42,7 +42,10 @@ public class BadPacketsD extends Check {
         if(timeStamp - data.creation < 1000L) {
             serverAllowed = data.getPlayer().getAllowFlight();
             clientAllowed = data.getPlayer().getAllowFlight();
-            RunUtils.task(() -> data.getPlayer().setAllowFlight(false), Kauri.INSTANCE);
+            RunUtils.task(() -> {
+                data.getPlayer().setFlying(false);
+                data.getPlayer().setAllowFlight(false);
+            }, Kauri.INSTANCE);
         } else {
             if(!serverAllowed && clientAllowed) {
                 if(vl++ > 1) {

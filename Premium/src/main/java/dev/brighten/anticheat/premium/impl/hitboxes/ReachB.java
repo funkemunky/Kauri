@@ -48,8 +48,8 @@ public class ReachB extends Check {
                     .collect(Collectors.toList());
 
             List<SimpleCollisionBox> entityLocs = data.targetPastLocation.getEstimatedLocation(timeStamp,
-                            data.lagInfo.ping,
-                            220L + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
+                            data.lagInfo.transPing,
+                            180L + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
                     .stream()
                     .map(ReachB::getHitbox).collect(Collectors.toList());
 
@@ -77,8 +77,7 @@ public class ReachB extends Check {
             val subtraction = 0.0325 + Math.min(0.2, targetData.playerInfo.deltaXZ / 2.6);
             distance-= subtraction;
 
-            if(collided > 2 && data.lagInfo.lastPacketDrop.hasPassed(0)
-                    && data.lagInfo.lastPingDrop.hasPassed(10)) {
+            if(collided > 1 && data.lagInfo.lastPacketDrop.hasPassed(2)) {
                 if(distance > 3.02
                         && Kauri.INSTANCE.tps > 19 &&
                         Kauri.INSTANCE.lastTickLag.hasPassed(40)) {

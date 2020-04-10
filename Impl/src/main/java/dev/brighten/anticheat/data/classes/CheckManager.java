@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class CheckManager {
     private ObjectData objectData;
     public Map<String, Check> checks = new ConcurrentHashMap<>();
-    private Map<Class<?>, List<WrappedCheck>> checkMethods = new ConcurrentHashMap<>();
+    public Map<Class<?>, List<WrappedCheck>> checkMethods = new ConcurrentHashMap<>();
 
     public CheckManager(ObjectData objectData) {
         this.objectData = objectData;

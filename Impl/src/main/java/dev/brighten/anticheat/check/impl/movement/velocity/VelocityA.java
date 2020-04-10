@@ -2,6 +2,7 @@ package dev.brighten.anticheat.check.impl.movement.velocity;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
@@ -14,14 +15,27 @@ import dev.brighten.api.check.CheckType;
 @Cancellable
 public class VelocityA extends Check {
 
-    private double vY;
+    private double vY, tvY;
     private long velocityTS;
-    
+    private boolean tookVelocity;
+
+    @Packet
+    public void onVelocity(WrappedOutVelocityPacket packet) {
+        if(packet.getId() == data.getPlayer().getEntityId()) {
+            tvY = packet.getY();
+            tookVelocity = true;
+        }
+    }
     @Packet
     public void onTransaction(WrappedInTransactionPacket packet, long timeStamp) {
-        if(packet.getAction() == (short) 101) {
+        if(packet.getAction() == (short) 101
+                && (data.playerInfo.clientGround
+                || data.playerInfo.lClientGround
+                || data.playerInfo.serverGround)
+                && data.lagInfo.lastPacketDrop.hasPassed(10)) {
             velocityTS = timeStamp;
-            vY = data.playerInfo.velocityY;
+            vY = tvY;
+            tookVelocity = false;
         }
     }
 
@@ -31,6 +45,7 @@ public class VelocityA extends Check {
                 && !data.playerInfo.generalCancel
                 && !data.lagInfo.lagging
                 && data.playerInfo.worldLoaded
+                && !tookVelocity
                 && !data.blockInfo.inWeb
                 && data.lagInfo.lastPacketDrop.hasPassed(5)
                 && !data.blockInfo.onClimbable

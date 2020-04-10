@@ -130,8 +130,8 @@ public class BlockInformation {
         handler.setOffset(1.25);
         blocksAbove = handler.isCollidedWith(Materials.SOLID);
 
-        handler.setSize(1.5, 1.78);
-        handler.setOffset(0.02);
+        handler.setSize(2, 1.79);
+        handler.setOffset(0.01);
         blocksNear = handler.isCollidedWith(Materials.SOLID);
 
         if(objectData.boxDebuggers.size() > 0) {

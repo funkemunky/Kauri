@@ -10,15 +10,23 @@ import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.TickTimer;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.data.DataManager;
+import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.listeners.PacketListener;
 import dev.brighten.anticheat.logs.LoggerManager;
 import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.processing.PacketProcessor;
+import dev.brighten.anticheat.utils.lunar.LunarClientAPI;
+import dev.brighten.anticheat.utils.lunar.event.impl.AuthenticateEvent;
+import dev.brighten.anticheat.utils.lunar.user.User;
+import dev.brighten.anticheat.utils.lunar.util.type.Notification;
+import dev.brighten.anticheat.utils.lunar.util.type.StaffModule;
 import dev.brighten.api.KauriAPI;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -56,6 +64,29 @@ public class Kauri extends JavaPlugin {
     public void onEnable() {
         MiscUtils.printToConsole(Color.Red + "Starting Kauri " + getDescription().getVersion() + "...");
         INSTANCE = this;
+
+        this.getServer().getMessenger().registerOutgoingPluginChannel(this, "Lunar-Client");
+        this.getServer().getMessenger().registerIncomingPluginChannel(this, "Lunar-Client", (channel, player, bytes) -> {
+            if (bytes[0] == 26) {
+                User user = LunarClientAPI.getInstance().getUserManager().getPlayerData(player);
+                if (user != null && !user.isLunarClient()){
+                    user.setLunarClient(true);
+                    new AuthenticateEvent(player).call(LunarClientAPI.getInstance());
+
+                    try {
+                        LunarClientAPI.getInstance().sendNotification(player, "Thanks for using Lunar Client!", Notification.INFO, 7);
+                    } catch (IOException e) {
+                        //ignore
+                    }
+                }
+
+                for (Player other : Bukkit.getServer().getOnlinePlayers()) {
+                    if (LunarClientAPI.getInstance().isAuthenticated(other)) {
+                        other.sendPluginMessage(this, channel, bytes);
+                    }
+                }
+            }
+        });
 
         load(); //Everything in one method so we can use it in other places like when reloading.
     }

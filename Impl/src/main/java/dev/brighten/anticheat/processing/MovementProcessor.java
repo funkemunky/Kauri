@@ -316,9 +316,7 @@ public class MovementProcessor {
         data.playerInfo.generalCancel = data.playerInfo.canFly
                 || data.playerInfo.creative
                 || hasLevi
-                || (data.playerInfo.deltaY > -0.0981
-                && data.playerInfo.deltaY < -0.0979
-                && data.playerInfo.deltaXZ < 0.01)
+                || (MathUtils.getDelta(-0.098, data.playerInfo.deltaY) < 0.001 && data.playerInfo.deltaXZ < 0.3)
                 || timeStamp - data.playerInfo.lastServerPos < 50L
                 || data.playerInfo.riptiding
                 || data.playerInfo.gliding

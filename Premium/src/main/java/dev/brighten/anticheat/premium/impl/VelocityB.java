@@ -46,7 +46,9 @@ public class VelocityB extends Check {
 
     @Packet
     public void onTransaction(WrappedInTransactionPacket packet, long timeStamp) {
-        if(packet.getAction() == (short) 101) {
+        if(packet.getAction() == (short) 101
+                && data.lagInfo.lastPacketDrop.hasPassed(10)
+                & (data.playerInfo.clientGround || data.playerInfo.lClientGround)) {
             pvX = vX;
             pvZ = vZ;
             vY = -1;

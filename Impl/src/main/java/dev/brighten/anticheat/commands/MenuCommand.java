@@ -197,9 +197,13 @@ public class MenuCommand {
                                 builder.name((settings.enabled ? "&a" : "&c") + val.name);
                                 info.getButton().setStack(builder.build());
                                 menu.buildInventory(false);
-                                Kauri.INSTANCE.dataManager.dataMap.values().parallelStream()
-                                        .forEach(data -> data.checkManager.checks.get(val.name)
-                                                .enabled = settings.enabled);
+                                Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
+                                        .parallelStream()
+                                        .forEach(data -> {
+                                            data.checkManager.checks.clear();
+                                            data.checkManager.checkMethods.clear();
+                                            data.checkManager.addChecks();
+                                        }));
                                 break;
                             }
                             case RIGHT:
@@ -224,9 +228,13 @@ public class MenuCommand {
                                 builder.lore(lore2.stream().map(Color::translate).toArray(String[]::new));
                                 info.getButton().setStack(builder.build());
                                 menu.buildInventory(false);
-                                Kauri.INSTANCE.dataManager.dataMap.values().parallelStream()
-                                        .forEach(data -> data.checkManager.checks.get(settings.name)
-                                                .executable = settings.executable);
+                                Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
+                                        .parallelStream()
+                                        .forEach(data -> {
+                                            data.checkManager.checks.clear();
+                                            data.checkManager.checkMethods.clear();
+                                            data.checkManager.addChecks();
+                                        }));
                                 break;
                             }
                             case MIDDLE: {
@@ -252,9 +260,13 @@ public class MenuCommand {
                                 builder.lore(lore2.stream().map(Color::translate).toArray(String[]::new));
                                 info.getButton().setStack(builder.build());
                                 menu.buildInventory(false);
-                                Kauri.INSTANCE.dataManager.dataMap.values().parallelStream()
-                                        .forEach(data -> data.checkManager.checks.get(settings.name)
-                                                .cancellable = settings.cancellable);
+                                Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
+                                        .parallelStream()
+                                        .forEach(data -> {
+                                            data.checkManager.checks.clear();
+                                            data.checkManager.checkMethods.clear();
+                                            data.checkManager.addChecks();
+                                        }));
                                 break;
                             }
                         }
