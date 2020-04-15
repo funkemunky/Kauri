@@ -27,6 +27,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class ObjectData {
 
@@ -55,7 +56,8 @@ public class ObjectData {
     public List<Log> logs = new ArrayList<>();
     public ProtocolVersion playerVersion = ProtocolVersion.UNKNOWN;
     public Set<Player> boxDebuggers = new HashSet<>();
-    public Map<Long, PotionEffect> effectsToAdd = new HashMap<>();
+    public final Map<String, Long> keepAliveStamps = new HashMap<>();
+    public final Map<String, Short> transactionActions = new HashMap<>();
     public List<CancelType> typesToCancel = Collections.synchronizedList(new EvictingList<>(10));
     public List<String> sniffedPackets = new ArrayList<>();
     public BukkitTask task;
@@ -92,9 +94,47 @@ public class ObjectData {
                 return;
             }
 
-            TinyProtocolHandler.sendPacket(getPlayer(), new WrappedOutTransaction(0, (short) 69, false)
-                    .getObject());
-        }, 5L, 40L);
+            if(System.currentTimeMillis() - lagInfo.lastTransPing > 2000L){
+                TinyProtocolHandler.sendPacket(getPlayer(),
+                        new WrappedOutTransaction(0, setTransactionAction("ping"), false)
+                                .getObject());
+            }
+        }, Kauri.INSTANCE, 40L, 40L);
+    }
+
+    public short getRandomShort(int baseNumber, int bound) {
+        return (short) getRandomInt(baseNumber, bound);
+    }
+
+    public int getRandomInt(int baseNumber, int bound) {
+        return baseNumber + ThreadLocalRandom.current().nextInt(bound);
+    }
+
+    public long getRandomLong(long baseNumber, long bound) {
+        return baseNumber + ThreadLocalRandom.current().nextLong(bound);
+    }
+
+    public long setKeepAliveStamp(String name) {
+        long stamp = getRandomLong(100, 4000);
+        keepAliveStamps.put(name, stamp);
+
+        return stamp;
+    }
+
+    public long getKeepAliveStamp(String name) {
+        return keepAliveStamps.getOrDefault(name, -1L);
+    }
+
+    public short getTransactionAction(String name) {
+        return transactionActions.getOrDefault(name, (short) 0);
+    }
+
+    public short setTransactionAction(String name) {
+        short action = getRandomShort(10, 500);
+
+        transactionActions.put(name, action);
+
+        return action;
     }
 
     public Player getPlayer() {

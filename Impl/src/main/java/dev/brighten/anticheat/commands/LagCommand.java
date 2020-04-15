@@ -24,7 +24,7 @@ public class LagCommand {
         cmd.getSender().sendMessage(Color.Gold + Color.Bold + "Server Lag Information");
         cmd.getSender().sendMessage("");
         cmd.getSender().sendMessage(Color.translate("&eTPS&8: &f" +
-                MathUtils.round(Kauri.INSTANCE.tps, 2)));
+                MathUtils.round(Kauri.INSTANCE.getTps(), 2)));
         AtomicLong chunkCount = new AtomicLong(0);
         Bukkit.getWorlds().forEach(world -> chunkCount.addAndGet(world.getLoadedChunks().length));
         cmd.getSender().sendMessage(Color.translate("&eChunks&8: &f" + chunkCount.get()));

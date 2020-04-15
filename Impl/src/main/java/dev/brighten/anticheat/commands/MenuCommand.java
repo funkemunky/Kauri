@@ -303,7 +303,7 @@ public class MenuCommand {
 
             for (int i = 0; i < Math.min(45, sortedIds.size()); i++) {
                 UUID uuid = sortedIds.get(i);
-                Player player = Bukkit.getPlayer(uuid);
+                OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
                 Log vl = logs.get(uuid).get(0);
 
                 ItemBuilder builder = new ItemBuilder(XMaterial.SKULL_ITEM.parseMaterial());

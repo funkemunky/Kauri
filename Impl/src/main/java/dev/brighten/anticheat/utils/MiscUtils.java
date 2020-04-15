@@ -63,6 +63,10 @@ public class MiscUtils {
         return output.toString().split("\n");
     }
 
+    public static double max(double... values) {
+        return Arrays.stream(values).max().orElse(Double.MAX_VALUE);
+    }
+
     public static boolean isInteger(String string) {
         try {
             Integer.parseInt(string);

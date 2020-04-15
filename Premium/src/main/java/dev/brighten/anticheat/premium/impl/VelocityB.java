@@ -2,6 +2,7 @@ package dev.brighten.anticheat.premium.impl;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInKeepAlivePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
@@ -14,7 +15,7 @@ import dev.brighten.api.check.CheckType;
 import org.bukkit.enchantments.Enchantment;
 
 @CheckInfo(name = "Velocity (B)", description = "A horizontally velocity check.", checkType = CheckType.VELOCITY,
-        punishVL = 70, developer = true)
+        punishVL = 80, vlToFlag = 15)
 @Cancellable
 public class VelocityB extends Check {
 
@@ -25,14 +26,13 @@ public class VelocityB extends Check {
     private static double[] moveValues = new double[] {-0.98, 0, 0.98};
 
     @Packet
-    public void onVelocity(WrappedOutVelocityPacket packet, long timeStamp) {
+    public void onVelocity(WrappedOutVelocityPacket packet) {
         if(packet.getId() == data.getPlayer().getEntityId()) {
             tookVelocity = true;
             vX = packet.getX();
             vY = packet.getY();
             vZ = packet.getZ();
             pvX = pvZ = 0;
-            lastVelocity = timeStamp;
         }
     }
 
@@ -45,25 +45,27 @@ public class VelocityB extends Check {
     }
 
     @Packet
-    public void onTransaction(WrappedInTransactionPacket packet, long timeStamp) {
-        if(packet.getAction() == (short) 101
-                && data.lagInfo.lastPacketDrop.hasPassed(10)
-                & (data.playerInfo.clientGround || data.playerInfo.lClientGround)) {
+    public void onTransaction(WrappedInKeepAlivePacket packet, long timeStamp) {
+        if(packet.getTime() == data.getKeepAliveStamp("velocity")) {
             pvX = vX;
             pvZ = vZ;
             vY = -1;
+            lastVelocity = timeStamp;
             tookVelocity = false;
         }
     }
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if((pvX != 0 || pvZ != 0) && !tookVelocity) {
+        if((pvX != 0 || pvZ != 0)) {
             boolean found = false;
 
             double drag = 0.91;
 
-            if(data.blockInfo.blocksNear || data.blockInfo.inLiquid) {
+            if(data.blockInfo.blocksNear
+                    || data.blockInfo.inLiquid
+                    || tookVelocity
+                    || data.lagInfo.lastPacketDrop.hasNotPassed(10)) {
                 pvX = pvZ = 0;
                 return;
             }
@@ -134,7 +136,6 @@ public class VelocityB extends Check {
 
             if(ratio < (data.playerVersion.isOrAbove(ProtocolVersion.V1_9)? 0.8 : 0.993)
                     && timeStamp - data.creation > 3000L
-                    && data.lagInfo.lastPacketDrop.hasPassed(2)
                     && !data.blockInfo.blocksNear) {
                 if(++buffer > 25) {
                     vl++;
@@ -147,7 +148,7 @@ public class VelocityB extends Check {
             pvX *= drag;
             pvZ *= drag;
 
-            if(timeStamp - lastVelocity > 350L || data.playerInfo.clientGround) pvX = pvZ = 0;
+            if(timeStamp - lastVelocity > 350L) pvX = pvZ = 0;
 
             if(Math.abs(pvX) < 0.005) pvX = 0;
             if(Math.abs(pvZ) < 0.005) pvZ = 0;

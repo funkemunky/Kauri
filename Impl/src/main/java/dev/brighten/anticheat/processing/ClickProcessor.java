@@ -26,7 +26,7 @@ public class ClickProcessor {
     public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
         long delta = timeStamp - lastTimestamp;
 
-        if(delta < 2000 && delta > 10
+        if(delta < 600 && delta > 10
                 && !data.playerInfo.breakingBlock && data.playerInfo.lastBlockPlace.hasPassed(3)) {
             cpsList.add(delta);
             LongSummaryStatistics summary = cpsList.parallelStream().mapToLong(v -> v).summaryStatistics();

@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @CheckInfo(name = "Fly (B)", description = "Checks for improper acceleration.", checkType = CheckType.FLIGHT,
-        vlToFlag = 4, punishVL = 30)
+        vlToFlag = 4, punishVL = 12)
 @Cancellable
 public class FlyB extends Check {
 

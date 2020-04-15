@@ -23,7 +23,7 @@ import dev.brighten.anticheat.check.impl.movement.fly.FlyA;
 import dev.brighten.anticheat.check.impl.movement.fly.FlyB;
 import dev.brighten.anticheat.check.impl.movement.fly.FlyE;
 import dev.brighten.anticheat.check.impl.movement.general.FastLadder;
-import dev.brighten.anticheat.check.impl.movement.general.HealthSpoof;
+import dev.brighten.anticheat.check.impl.world.HealthSpoof;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallA;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallB;
 import dev.brighten.anticheat.check.impl.movement.speed.SpeedA;
@@ -42,12 +42,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.val;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import java.io.IOException;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -126,6 +131,11 @@ public class Check implements KauriCheck {
     }
 
     public void flag(String information, Object... variables) {
+        flag(false, information, variables);
+    }
+
+    public void flag(boolean devAlerts, String information, Object... variables) {
+        if(Kauri.INSTANCE.getTps() < 18) devAlerts = true;
         if(lastExemptCheck.hasPassed()) exempt = KauriAPI.INSTANCE.exemptHandler.isExempt(data.uuid, this);
         if(exempt) return;
         if(information.contains("%v")) {
@@ -190,54 +200,47 @@ public class Check implements KauriCheck {
         }
 
         Atlas.getInstance().getEventManager().callEvent(event);
+        boolean dev = devAlerts || (developer || vl <= vlToFlag);
         Kauri.INSTANCE.executor.execute(() -> {
             if(!event.isCancelled()) {
                 final String info = finalInformation
                         .replace("%p", String.valueOf(data.lagInfo.transPing))
-                        .replace("%t", String.valueOf(MathUtils.round(Kauri.INSTANCE.tps, 2)));
+                        .replace("%t", String.valueOf(MathUtils.round(Kauri.INSTANCE.getTps(), 2)));
                 if (Kauri.INSTANCE.lastTickLag.hasPassed() && (data.lagInfo.lastPacketDrop.hasPassed(5)
                         || data.lagInfo.lastPingDrop.hasPassed(20))
                         && System.currentTimeMillis() - Kauri.INSTANCE.lastTick < 100L) {
                     Kauri.INSTANCE.loggerManager.addLog(data, this, info);
 
                     if (lastAlert.hasPassed(MathUtils.millisToTicks(Config.alertsDelay))) {
-                        JsonMessage jmsg = new JsonMessage();
+                        List<TextComponent> components = new ArrayList<>();
 
-                        boolean dev = developer || vl <= vlToFlag;
-                        String text = Color.translate(dev ? "&8[&cDev&8] " : "") + Color.translate(Kauri.INSTANCE.msgHandler.getLanguage().msg("cheat-alert",
+                        if(dev) {
+                            components.add(new TextComponent(createTxt("&8[&cDev&8] ")));
+                        }
+                        val text = createTxt(Kauri.INSTANCE.msgHandler.getLanguage().msg("cheat-alert",
                                 "&8[&6&lKauri&8] &f%player% &7flagged &f%check%" +
-                                        " &8(&ex%vl%&8) %experimental%")
-                                .replace("%player%", data.getPlayer().getName())
-                                .replace("%check%", name)
-                                .replace("%info%", info)
-                                .replace("%vl%", String.valueOf(MathUtils.round(vl, 1)))
-                                .replace("%experimental%", developer ? "&c&o(Experimental)" : ""));
-                        jmsg.addText(text).addHoverText(Color.translate(Kauri.INSTANCE.msgHandler.getLanguage().msg(
-                                "cheat-alert-hover",
-                                "&eDescription&8: &f%desc%\n&eInfo: &f%info%\n&r\n&7&oClick to teleport to player.")
-                                .replace("%desc%", String.join("\n",
-                                        MiscUtils
-                                                .splitIntoLine(description, 20)))
-                                .replace("%player%", data.getPlayer().getName())
-                                .replace("%check%", name)
-                                .replace("%info%", info)
-                                .replace("%vl%", String.valueOf(MathUtils.round(vl, 1)))
-                                .replace("%experimental%", developer ? "&c(Experimental)" : "")))
-                                .setClickEvent(JsonMessage.ClickableType.RunCommand, "/" + Config.alertCommand
-                                        .replace("%player%", data.getPlayer().getName())
-                                        .replace("%check%", name)
-                                        .replace("%info%", info)
-                                        .replace("%vl%", String.valueOf(MathUtils.round(vl, 2))));
+                                        " &8(&ex%vl%&8) %experimental%"), info);
 
-                        if(Config.testMode && (developer || vl < vlToFlag ? !data.devAlerts : !data.alerts))
-                            jmsg.sendToPlayer(data.getPlayer());
+                        text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] {
+                                createTxt(Kauri.INSTANCE.msgHandler.getLanguage().msg("cheat-alert-hover",
+                                        "&eDescription&8: &f%desc%" +
+                                        "\n&eInfo: &f%info%\n&r\n&7&oClick to teleport to player."), info)}));
+                        text.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                                formatAlert("/" + Config.alertCommand, info)));
 
-                        if(Config.alertsConsole) MiscUtils.printToConsole(text);
-                            if(!developer && vl > vlToFlag)
+                        components.add(text);
+
+                        TextComponent[] toSend = components.toArray(new TextComponent[0]);
+
+                        if(Config.testMode && (dev ? !data.devAlerts : !data.alerts))
+                            data.getPlayer().spigot().sendMessage(toSend);
+
+                        if(Config.alertsConsole) MiscUtils.printToConsole(new TextComponent(toSend).toPlainText());
+                            if(!dev)
                                 Kauri.INSTANCE.dataManager.hasAlerts
-                                        .forEach(data -> jmsg.sendToPlayer(data.getPlayer()));
+                                        .forEach(data -> data.getPlayer().spigot().sendMessage(toSend));
                             else Kauri.INSTANCE.dataManager.devAlerts
-                                    .forEach(data -> jmsg.sendToPlayer(data.getPlayer()));
+                                    .forEach(data -> data.getPlayer().spigot().sendMessage(toSend));
                         lastAlert.reset();
                     }
 
@@ -257,6 +260,22 @@ public class Check implements KauriCheck {
         });
     }
 
+    private TextComponent createTxt(String txt) {
+        return new TextComponent(formatAlert(Color.translate(txt), ""));
+    }
+    private TextComponent createTxt(String txt, String info) {
+        return new TextComponent(formatAlert(Color.translate(txt), info));
+    }
+    private String formatAlert(String toFormat, String info) {
+        return Color.translate(toFormat.replace("%desc%", String.join("\n",
+                MiscUtils
+                        .splitIntoLine(description, 20)))
+                .replace("%player%", data.getPlayer().getName())
+                .replace("%check%", name)
+                .replace("%info%", info)
+                .replace("%vl%", String.valueOf(MathUtils.round(vl, 1)))
+                .replace("%experimental%", developer ? "&c(Experimental)" : ""));
+    }
     private void punish() {
         if(banExempt || developer || !executable || punishVl == -1 || vl <= punishVl
                 || System.currentTimeMillis() - Kauri.INSTANCE.lastTick > 200L) return;
@@ -348,7 +367,7 @@ public class Check implements KauriCheck {
     public static void registerChecks() {
         register(new AutoclickerA());
         //register(new AutoclickerB());
-        register(new AutoclickerC());
+        //'register(new AutoclickerC());
         register(new AutoclickerG());
         register(new FlyA());
         register(new FlyB());
@@ -359,7 +378,7 @@ public class Check implements KauriCheck {
         //register(new FlyH());
         register(new FastLadder());
         register(new NoFallA());
-        register(new NoFallB());
+        //register(new NoFallB());
         register(new Hitboxes());
         register(new ReachA());
         register(new AimA());
@@ -370,10 +389,10 @@ public class Check implements KauriCheck {
         register(new SpeedA());
         register(new SpeedB());
         register(new SpeedC());
-        register(new KillauraA());
+        //register(new KillauraA());
         register(new KillauraB());
         register(new KillauraC());
-        register(new KillauraD());
+        //register(new KillauraD());
         register(new KillauraE());
         //register(new Phase());
         //register(new OmniSprint());

@@ -28,7 +28,7 @@ public class LoggerManager {
 
     public void addLog(ObjectData data, Check check, String info) {
         Log log = new Log(data.uuid , check.name, info, check.vl, data.lagInfo.transPing,
-                System.currentTimeMillis(), Kauri.INSTANCE.tps);
+                System.currentTimeMillis(), Kauri.INSTANCE.getTps());
 
         storage.addLog(log);
     }

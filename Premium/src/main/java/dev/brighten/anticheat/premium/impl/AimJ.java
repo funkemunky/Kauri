@@ -13,6 +13,7 @@ public class AimJ extends Check {
 
     private int buffer;
     private EvictingList<Double> listX = new EvictingList<>(100);
+
     @Packet
     public void onLook(WrappedInFlyingPacket packet) {
         if(packet.isLook()) {
@@ -31,6 +32,7 @@ public class AimJ extends Check {
                 listX.add(xDelta);
                 listX.add(yDelta);
             }
+
             if(listX.size() >= 100) {
                 long count = listX.parallelStream().filter(xd -> xd > 0.01).count();
 

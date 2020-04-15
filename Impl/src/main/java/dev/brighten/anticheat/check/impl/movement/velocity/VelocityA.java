@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.check.impl.movement.velocity;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInKeepAlivePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.MathUtils;
@@ -26,13 +27,10 @@ public class VelocityA extends Check {
             tookVelocity = true;
         }
     }
+
     @Packet
-    public void onTransaction(WrappedInTransactionPacket packet, long timeStamp) {
-        if(packet.getAction() == (short) 101
-                && (data.playerInfo.clientGround
-                || data.playerInfo.lClientGround
-                || data.playerInfo.serverGround)
-                && data.lagInfo.lastPacketDrop.hasPassed(10)) {
+    public void onTransaction(WrappedInKeepAlivePacket packet, long timeStamp) {
+        if(packet.getTime() == data.getKeepAliveStamp("velocity")) {
             velocityTS = timeStamp;
             vY = tvY;
             tookVelocity = false;
@@ -62,7 +60,10 @@ public class VelocityA extends Check {
             vY-= 0.08;
             vY*= 0.98;
 
-            if(vY < 0.005 || data.blockInfo.collidesHorizontally
+            if(vY < 0.005
+                    || (timeStamp - velocityTS) > 400L
+                    || data.playerInfo.clientGround
+                    || data.blockInfo.collidesHorizontally
                     || data.blockInfo.collidesVertically) vY = 0;
 
             debug("pct=" + pct + " vl=" + vl);

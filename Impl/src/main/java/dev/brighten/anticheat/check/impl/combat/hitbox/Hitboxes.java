@@ -39,7 +39,8 @@ public class Hitboxes extends Check {
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if (checkParameters(data)) {
 
-            List<RayCollision> rayTrace = data.pastLocation.getEstimatedLocation(timeStamp, 0, 150L).stream()
+            List<RayCollision> rayTrace = data.pastLocation.getEstimatedLocation(timeStamp,
+                    0, 100L + (data.lagInfo.transPing / 2)).stream()
                     .map(l -> {
                         KLocation loc = l.clone();
                         loc.y+=data.playerInfo.sneaking ? 1.54 : 1.62;
@@ -50,7 +51,7 @@ public class Hitboxes extends Check {
 
             List<SimpleCollisionBox> entityLocations = data.targetPastLocation
                     .getEstimatedLocation(timeStamp,
-                            data.lagInfo.ping, 220L
+                            data.lagInfo.transPing, 150L
                                     + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
                     .stream()
                     .map(loc -> getHitbox(loc, data.target.getType()))
@@ -87,7 +88,7 @@ public class Hitboxes extends Check {
         return data.playerInfo.lastAttack.hasNotPassed(0)
                 && data.target != null
                 && data.target.getType().equals(EntityType.PLAYER) && ((Player) data.target).isOnline()
-                && data.targetPastLocation.previousLocations.size() > 8
+                && data.targetPastLocation.previousLocations.size() > 12
                 && Kauri.INSTANCE.lastTickLag.hasPassed(10)
                 && allowedEntities.contains(data.target.getType())
                 && !data.playerInfo.creative
@@ -97,12 +98,12 @@ public class Hitboxes extends Check {
 
     private static SimpleCollisionBox getHitbox(KLocation loc, EntityType type) {
         if(type.equals(EntityType.PLAYER)) {
-            return new SimpleCollisionBox(loc.toVector(), 0.6, 1.8).expand(0.2, 0.2, 0.2);
+            return new SimpleCollisionBox(loc.toVector(), 0.6, 1.8).expand(0.25, 0.25, 0.25);
         } else {
             Vector bounds = MiscUtils.entityDimensions.get(type);
 
             return new SimpleCollisionBox(loc.toVector(), bounds.getX() + bounds.getZ(), bounds.getY())
-            .expand(0.2, 0.2, 0.2);
+            .expand(0.3, 0.3, 0.3);
         }
     }
 }

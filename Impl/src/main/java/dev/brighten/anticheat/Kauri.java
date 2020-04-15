@@ -8,6 +8,7 @@ import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.TickTimer;
+import cc.funkemunky.api.utils.math.RollingAverageDouble;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.data.DataManager;
 import dev.brighten.anticheat.listeners.PacketListener;
@@ -35,7 +36,7 @@ public class Kauri extends JavaPlugin {
     public LoggerManager loggerManager;
 
     //Lag Information
-    public double tps;
+    public RollingAverageDouble tps = new RollingAverageDouble(4, 20);
     public TickTimer lastTickLag;
     public long lastTick;
 
@@ -140,12 +141,16 @@ public class Kauri extends JavaPlugin {
             }
             if(ticks.get() >= 10) {
                 ticks.set(0);
-                tps = 500D / (currentTime - lastTimeStamp.get()) * 20;
+                tps.add(500D / (currentTime - lastTimeStamp.get()) * 20);
                 lastTimeStamp.set(currentTime);
             }
             lastTick = currentTime;
             Kauri.INSTANCE.lastTick = currentTime;
         }, this, 1L, 1L);
+    }
+
+    public double getTps() {
+        return tps.getAverage();
     }
 
     public void onReload(Runnable runnable) {

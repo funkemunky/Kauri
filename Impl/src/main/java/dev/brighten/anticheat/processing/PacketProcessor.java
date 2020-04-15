@@ -90,14 +90,6 @@ public class PacketProcessor {
                     data.lagInfo.lastPacketDrop.reset();
                 }
 
-                if (timeStamp - data.creation > 10000L
-                        && Kauri.INSTANCE.lastTickLag.hasPassed(20)
-                        && timeStamp - Kauri.INSTANCE.lastTick < new VariableValue<>(
-                        110L, 60L, ProtocolVersion::isPaper).get()
-                        && timeStamp - data.lagInfo.lastTrans
-                        > new VariableValue<>(20000L, 5000L, () -> Kauri.INSTANCE.isNewer).get())
-                    RunUtils.task(() -> data.getPlayer().kickPlayer("Lag?"));
-
                 data.lagInfo.lastFlying = timeStamp;
 
                 Kauri.INSTANCE.profiler.start("data:moveprocessor");
@@ -207,13 +199,20 @@ public class PacketProcessor {
 
                 long time = packet.getTime();
 
-                data.lagInfo.lastPing = data.lagInfo.ping;
-                data.lagInfo.ping = System.currentTimeMillis() - data.lagInfo.lastKeepAlive;
+                if(time == data.getKeepAliveStamp("velocity")) {
+                    data.playerInfo.lastVelocity.reset();
+                    data.playerInfo.lastVelocityTimestamp = timeStamp;
+                    data.predictionService.rmotionX = data.playerInfo.velocityX;
+                    data.predictionService.rmotionZ = data.playerInfo.velocityZ;
+                    data.predictionService.velocity = true;
+                } else {
+                    data.lagInfo.lastPing = data.lagInfo.ping;
+                    data.lagInfo.ping = System.currentTimeMillis() - data.lagInfo.lastKeepAlive;
+                }
 
                 data.checkManager.runPacket(packet, timeStamp);
                 if(data.sniffing) {
-                    data.sniffedPackets.add(event.getType() + ":@:" +time
-                            + ":@:" + event.getTimeStamp());
+                    data.sniffedPackets.add(event.getType() + ":@:" + time + ":@:" + event.getTimeStamp());
                 }
                 break;
             }
@@ -236,16 +235,10 @@ public class PacketProcessor {
             case Packet.Client.TRANSACTION: {
                 WrappedInTransactionPacket packet = new WrappedInTransactionPacket(object, data.getPlayer());
 
-                if(packet.getAction() == (short) 101) {
-                    data.playerInfo.lastVelocity.reset();
-                    data.playerInfo.lastVelocityTimestamp = timeStamp;
-                    data.predictionService.rmotionX = data.playerInfo.velocityX;
-                    data.predictionService.rmotionZ = data.playerInfo.velocityZ;
-                    data.predictionService.velocity = true;
-                } else if(packet.getAction() == (short) 102) {
+                if(packet.getAction() == data.getTransactionAction("respawn")) {
                     data.playerInfo.lastRespawn = timeStamp;
                     data.playerInfo.lastRespawnTimer.reset();
-                } else if (packet.getAction() == (short) 69) {
+                } else if (packet.getAction() == data.getTransactionAction("ping")) {
                     data.lagInfo.lastTransPing = data.lagInfo.transPing;
                     data.lagInfo.transPing = System.currentTimeMillis() - data.lagInfo.lastTrans;
                     data.lagInfo.lastClientTrans = timeStamp;
@@ -259,7 +252,10 @@ public class PacketProcessor {
 
                     data.lagInfo.pingAverages.add(data.lagInfo.transPing);
                     data.lagInfo.averagePing = data.lagInfo.pingAverages.getAverage();
-
+                    TinyProtocolHandler.sendPacket(data.getPlayer(),
+                            new WrappedOutTransaction(0, data.setTransactionAction("ping"),
+                                    false)
+                                    .getObject());
                 }
 
                 data.checkManager.runPacket(packet, timeStamp);
@@ -365,7 +361,7 @@ public class PacketProcessor {
                 data.playerInfo.lastRespawn = timeStamp;
                 data.playerInfo.lastRespawnTimer.reset();
                 TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutTransaction(0,
-                        (short) 102, false).getObject());
+                        data.setTransactionAction("respawn"), false).getObject());
 
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
@@ -407,8 +403,8 @@ public class PacketProcessor {
                 WrappedOutVelocityPacket packet = new WrappedOutVelocityPacket(object, data.getPlayer());
 
                 if (packet.getId() == data.getPlayer().getEntityId()) {
-                    TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutTransaction(0,
-                            (short) 101, false).getObject());
+                    TinyProtocolHandler.sendPacket(data.getPlayer(),
+                            new WrappedOutKeepAlivePacket(data.setKeepAliveStamp("velocity")).getObject());
                     data.playerInfo.velocityX = (float) packet.getX();
                     data.playerInfo.velocityY = (float) packet.getY();
                     data.playerInfo.velocityZ = (float) packet.getZ();
@@ -431,15 +427,12 @@ public class PacketProcessor {
 
                 data.lagInfo.lastKeepAlive = System.currentTimeMillis();
                 data.checkManager.runPacket(packet, timeStamp);
-
-                TinyProtocolHandler.sendPacket(data.getPlayer(),
-                        new WrappedOutTransaction(0, (short) 69, false).getObject());
                 break;
             }
             case Packet.Server.TRANSACTION: {
                 WrappedOutTransaction packet = new WrappedOutTransaction(object, data.getPlayer());
 
-                if (packet.getAction() == (short) 69) {
+                if (packet.getAction() == data.getTransactionAction("ping")) {
                     data.lagInfo.lastTrans = System.currentTimeMillis();
                 }
                 break;

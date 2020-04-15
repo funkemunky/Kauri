@@ -11,6 +11,7 @@ import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
 import org.bukkit.Bukkit;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @CheckInfo(name = "Reach (B)", description = "Ensures the reach of a player is legitimate.",
-        checkType = CheckType.HITBOX, punishVL = 15)
+        checkType = CheckType.HITBOX, punishVL = 8)
 @Cancellable(cancelType = CancelType.ATTACK)
 public class ReachB extends Check {
 
@@ -40,33 +41,29 @@ public class ReachB extends Check {
 
             if(targetData == null || data.playerInfo.creative) return;
 
-            List<RayCollision> origin = Stream.of(data.playerInfo.from.clone(), data.playerInfo.to.clone())
-                    .map(loc -> {
-                        loc.y+= data.playerInfo.sneaking ? 1.54 : 1.62;
-                        return new RayCollision(loc.toVector(), MathUtils.getDirection(loc));
-                    })
-                    .collect(Collectors.toList());
+            KLocation originLoc = data.playerInfo.to.clone();
+
+            originLoc.y+= data.playerInfo.sneaking ? 1.54 : 1.62;
+            RayCollision ray = new RayCollision(originLoc.toVector(), MathUtils.getDirection(originLoc));
 
             List<SimpleCollisionBox> entityLocs = data.targetPastLocation.getEstimatedLocation(timeStamp,
-                            data.lagInfo.transPing,
-                            180L + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
+                            data.lagInfo.transPing + 50,
+                            150L + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
                     .stream()
                     .map(ReachB::getHitbox).collect(Collectors.toList());
 
             double distance = 69;
             int misses = 0, collided = 0;
-            for (RayCollision ray : origin) {
-                if(debug) ray.draw(WrappedEnumParticle.CRIT, Bukkit.getOnlinePlayers());
-                for (SimpleCollisionBox box : entityLocs) {
-                    if(debug) box.draw(WrappedEnumParticle.FLAME, Bukkit.getOnlinePlayers());
-                    val check = RayCollision.distance(ray, box);
+            if(debug) ray.draw(WrappedEnumParticle.CRIT, Bukkit.getOnlinePlayers());
+            for (SimpleCollisionBox box : entityLocs) {
+                if(debug) box.draw(WrappedEnumParticle.FLAME, Bukkit.getOnlinePlayers());
+                val check = RayCollision.distance(ray, box);
 
-                    if(check == -1) {
-                        misses++;
-                        continue;
-                    } else collided++;
-                    distance = Math.min(distance, check);
-                }
+                if(check == -1) {
+                    misses++;
+                    continue;
+                } else collided++;
+                distance = Math.min(distance, check);
             }
 
             if(distance == 69) {
@@ -74,12 +71,11 @@ public class ReachB extends Check {
                 return;
             }
 
-            val subtraction = 0.0325 + Math.min(0.2, targetData.playerInfo.deltaXZ / 2.6);
+            val subtraction = 0.0425 + Math.min(0.2, (data.playerInfo.deltaXZ + targetData.playerInfo.deltaXZ) / 3);
             distance-= subtraction;
 
             if(collided > 1 && data.lagInfo.lastPacketDrop.hasPassed(2)) {
-                if(distance > 3.02
-                        && Kauri.INSTANCE.tps > 19 &&
+                if(distance > 3.02 &&
                         Kauri.INSTANCE.lastTickLag.hasPassed(40)) {
                     if(++buffer > 4) {
                         vl++;

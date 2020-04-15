@@ -4,7 +4,7 @@ import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.Priority;
 import dev.brighten.anticheat.check.api.Check;
-import dev.brighten.anticheat.premium.impl.VelocityB;
+import dev.brighten.anticheat.premium.impl.*;
 import dev.brighten.anticheat.premium.impl.autoclicker.*;
 import dev.brighten.anticheat.premium.impl.hitboxes.ReachB;
 
@@ -17,12 +17,12 @@ public class PremiumChecks {
         Check.register(new ReachB());
         //Check.register(new Motion());
         //Check.register(new AimG());
-        //Check.register(new AimI());
+       // Check.register(new AimI());
         //Check.register(new AimJ());
         Check.register(new AutoclickerD());
         Check.register(new AutoclickerE());
-        //Check.register(new InventoryA());
-        //Check.register(new InventoryB());
+        Check.register(new InventoryA());
+        Check.register(new InventoryB());
         Check.register(new AutoclickerH());
         Check.register(new AutoclickerI());
         Check.register(new AutoclickerJ());

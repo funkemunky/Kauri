@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@CheckInfo(name = "Reach (A)", checkType = CheckType.HITBOX, punishVL = 8, description = "A simple distance check.")
+@CheckInfo(name = "Reach (A)", checkType = CheckType.HITBOX, punishVL = 5, description = "A simple distance check.")
 @Cancellable(cancelType = CancelType.ATTACK)
 public class ReachA extends Check {
 
