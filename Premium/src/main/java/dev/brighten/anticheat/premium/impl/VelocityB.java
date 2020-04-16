@@ -26,12 +26,13 @@ public class VelocityB extends Check {
     private static double[] moveValues = new double[] {-0.98, 0, 0.98};
 
     @Packet
-    public void onVelocity(WrappedOutVelocityPacket packet) {
+    public void onVelocity(WrappedOutVelocityPacket packet, long timeStamp) {
         if(packet.getId() == data.getPlayer().getEntityId()) {
             tookVelocity = true;
             vX = packet.getX();
             vY = packet.getY();
             vZ = packet.getZ();
+            lastVelocity = timeStamp;
             pvX = pvZ = 0;
         }
     }
@@ -45,18 +46,16 @@ public class VelocityB extends Check {
     }
 
     @Packet
-    public void onTransaction(WrappedInKeepAlivePacket packet, long timeStamp) {
-        if(packet.getTime() == data.getKeepAliveStamp("velocity")) {
+    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
+        if(tookVelocity && (MathUtils.getDelta(data.playerInfo.deltaY, vY) < 0.00001
+                || (timeStamp - lastVelocity) > data.lagInfo.transPing * 4)) {
+            tookVelocity = false;
             pvX = vX;
             pvZ = vZ;
             vY = -1;
-            lastVelocity = timeStamp;
-            tookVelocity = false;
+            vX = 0;
+            vZ = 0;
         }
-    }
-
-    @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if((pvX != 0 || pvZ != 0)) {
             boolean found = false;
 

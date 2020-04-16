@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.logs.data.impl;
 
+import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
@@ -8,9 +9,13 @@ import dev.brighten.anticheat.logs.data.sql.MySQL;
 import dev.brighten.anticheat.logs.data.sql.Query;
 import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.logs.objects.Punishment;
+import lombok.val;
+import org.jetbrains.annotations.Nullable;
 
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 
 public class MySQLStorage implements DataStorage {
 
@@ -31,6 +36,10 @@ public class MySQLStorage implements DataStorage {
                 "`UUID` VARCHAR(64) NOT NULL," +
                 "`TIME` LONG NOT NULL," +
                 "`CHECK` VARCHAR(32) NOT NULL)").execute();
+        Query.prepare("CREATE TABLE IF NOT EXISTS `NAMECACHE` (" +
+                "`UUID` VARCHAR(64) NOT NULL," +
+                "`NAME` VARCHAR(16) NOT NULL," +
+                "`TIMESTAMP` LONG NOT NULL)").execute();
         Kauri.INSTANCE.loggingThread.execute(() -> {
             Query.prepare("DROP INDEX `UUID` on `VIOLATIONS`");
             Query.prepare("CREATE INDEX `UUID` ON `VIOLATIONS` (UUID)").execute();
@@ -153,5 +162,67 @@ public class MySQLStorage implements DataStorage {
     @Override
     public void addPunishment(Punishment punishment) {
         punishments.add(punishment);
+    }
+
+    @Override
+    public void cacheAPICall(UUID uuid, String name) {
+        Kauri.INSTANCE.loggingThread.execute(() -> {
+            Query.prepare("DELETE FROM `NAMECACHE` WHERE `UUID` = ?").append(uuid.toString()).execute();
+            Query.prepare("INSERT INTO `NAMECACHE` (`UUID`, `NAME`, `TIMESTAMP`) VALUES (?, ?, ?)")
+                    .append(uuid.toString()).append(name).append(System.currentTimeMillis()).execute();
+        });
+    }
+
+    @Override
+    @Nullable
+    public UUID getUUIDFromName(String name) {
+        try {
+            val rs = Query.prepare("SELECT `UUID`, `TIMESTAMP` FROM `NAMECACHE` WHERE `NAME` = ?")
+                    .append(name).executeQuery();
+
+            String uuidString = rs.getString("UUID");
+
+            if(uuidString != null) {
+                UUID uuid = UUID.fromString(rs.getString("UUID"));
+
+                if(System.currentTimeMillis() - rs.getLong("TIMESTAMP") > TimeUnit.DAYS.toMillis(1)) {
+                    Kauri.INSTANCE.loggingThread.execute(() -> {
+                        Query.prepare("DELETE FROM `NAMECACHE` WHERE `UUID` = ?").append(uuidString).execute();
+                        MiscUtils.printToConsole("Deleted " + uuidString + " from name cache (age > 1 day).");
+                    });
+                }
+                return uuid;
+            }
+        } catch (SQLException e) {
+            RunUtils.task(e::printStackTrace);
+        } catch(Exception e) {
+            e.printStackTrace();
+            //Empty catch
+        }
+        return null;
+    }
+
+    @Override
+    @Nullable
+    public String getNameFromUUID(UUID uuid) {
+        try {
+            val rs = Query.prepare("SELECT `NAME` `TIMESTAMP` FROM `NAMECACHE` WHERE `UUID` = ?")
+                    .append(uuid.toString()).executeQuery();
+
+            String name = rs.getString("NAME");
+
+            if(name != null) {
+                if(System.currentTimeMillis() - rs.getLong("TIMESTAMP") > TimeUnit.DAYS.toMillis(1)) {
+                    Kauri.INSTANCE.loggingThread.execute(() -> {
+                        Query.prepare("DELETE FROM `NAMECACHE` WHERE `NAME` = ?").append(name).execute();
+                        MiscUtils.printToConsole("Deleted " + name + " from name cache (age > 1 day).");
+                    });
+                }
+                return name;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

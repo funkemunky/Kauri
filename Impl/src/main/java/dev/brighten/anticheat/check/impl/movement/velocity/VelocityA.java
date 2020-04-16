@@ -21,24 +21,21 @@ public class VelocityA extends Check {
     private boolean tookVelocity;
 
     @Packet
-    public void onVelocity(WrappedOutVelocityPacket packet) {
+    public void onVelocity(WrappedOutVelocityPacket packet, long timeStamp) {
         if(packet.getId() == data.getPlayer().getEntityId()) {
             tvY = packet.getY();
+            velocityTS = timeStamp;
             tookVelocity = true;
         }
     }
 
     @Packet
-    public void onTransaction(WrappedInKeepAlivePacket packet, long timeStamp) {
-        if(packet.getTime() == data.getKeepAliveStamp("velocity")) {
-            velocityTS = timeStamp;
-            vY = tvY;
-            tookVelocity = false;
-        }
-    }
-
-    @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
+        if(tookVelocity && !data.playerInfo.clientGround
+                && data.playerInfo.lClientGround) {
+            tookVelocity = false;
+            vY = tvY;
+        }
         if(vY > 0
                 && !data.playerInfo.generalCancel
                 && !data.lagInfo.lagging
@@ -62,7 +59,6 @@ public class VelocityA extends Check {
 
             if(vY < 0.005
                     || (timeStamp - velocityTS) > 400L
-                    || data.playerInfo.clientGround
                     || data.blockInfo.collidesHorizontally
                     || data.blockInfo.collidesVertically) vY = 0;
 

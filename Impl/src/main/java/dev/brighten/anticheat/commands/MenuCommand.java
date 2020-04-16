@@ -3,16 +3,19 @@ package dev.brighten.anticheat.commands;
 import cc.funkemunky.api.commands.ancmd.Command;
 import cc.funkemunky.api.commands.ancmd.CommandAdapter;
 import cc.funkemunky.api.utils.*;
+import com.mojang.util.UUIDTypeAdapter;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckSettings;
 import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.menu.LogsGUI;
+import dev.brighten.anticheat.processing.MovementProcessor;
 import dev.brighten.anticheat.utils.Pastebin;
 import dev.brighten.anticheat.utils.menu.button.Button;
 import dev.brighten.anticheat.utils.menu.button.ClickAction;
 import dev.brighten.anticheat.utils.menu.preset.button.FillerButton;
 import dev.brighten.anticheat.utils.menu.type.impl.ChestMenu;
+import dev.brighten.anticheat.utils.mojang.MojangAPI;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
 import org.bukkit.Bukkit;
@@ -160,6 +163,11 @@ public class MenuCommand {
 
             lore.addAll(description);
 
+            lore.add("");
+            lore.add("&f&oLeft Click &7to toggle check &fon/off&7.");
+            lore.add("&f&oMiddle Click &7to toggle check &fcancellable&7.");
+            lore.add("&f&oRight Click &7to toggle check &fexecutable&7.");
+
 
             Button button = createButton(
                     val.enabled ? (val.executable ? XMaterial.FILLED_MAP.parseMaterial()
@@ -193,6 +201,11 @@ public class MenuCommand {
                                         "&eCancellable&7: &f" + val.cancellable,
                                         "&eDescription&7: &f"));
                                 lore2.addAll(description);
+                                lore2.add("");
+                                lore2.add("&f&oLeft Click &7to toggle check &fon/off&7.");
+                                lore2.add("&f&oMiddle Click &7to toggle check &fcancellable&7.");
+                                lore2.add("&f&oRight Click &7to toggle check &fexecutable&7.");
+
                                 builder.lore(lore2.stream().map(Color::translate).toArray(String[]::new));
                                 builder.name((settings.enabled ? "&a" : "&c") + val.name);
                                 info.getButton().setStack(builder.build());
@@ -203,6 +216,7 @@ public class MenuCommand {
                                             data.checkManager.checks.clear();
                                             data.checkManager.checkMethods.clear();
                                             data.checkManager.addChecks();
+                                            data.creation = System.currentTimeMillis();
                                         }));
                                 break;
                             }
@@ -225,6 +239,11 @@ public class MenuCommand {
                                         "&eCancellable&7: &f" + val.cancellable,
                                         "&eDescription&7: &f"));
                                 lore2.addAll(description);
+                                lore2.add("");
+                                lore2.add("&f&oLeft Click &7to toggle check &fon/off&7.");
+                                lore2.add("&f&oMiddle Click &7to toggle check &fcancellable&7.");
+                                lore2.add("&f&oRight Click &7to toggle check &fexecutable&7.");
+
                                 builder.lore(lore2.stream().map(Color::translate).toArray(String[]::new));
                                 info.getButton().setStack(builder.build());
                                 menu.buildInventory(false);
@@ -234,6 +253,7 @@ public class MenuCommand {
                                             data.checkManager.checks.clear();
                                             data.checkManager.checkMethods.clear();
                                             data.checkManager.addChecks();
+                                            data.creation = System.currentTimeMillis();
                                         }));
                                 break;
                             }
@@ -257,6 +277,11 @@ public class MenuCommand {
                                         "&eCancellable&7: &f" + val.cancellable,
                                         "&eDescription&7: &f"));
                                 lore2.addAll(description);
+                                lore2.add("");
+                                lore2.add("&f&oLeft Click &7to toggle check &fon/off&7.");
+                                lore2.add("&f&oMiddle Click &7to toggle check &fcancellable&7.");
+                                lore2.add("&f&oRight Click &7to toggle check &fexecutable&7.");
+
                                 builder.lore(lore2.stream().map(Color::translate).toArray(String[]::new));
                                 info.getButton().setStack(builder.build());
                                 menu.buildInventory(false);
@@ -266,6 +291,7 @@ public class MenuCommand {
                                             data.checkManager.checks.clear();
                                             data.checkManager.checkMethods.clear();
                                             data.checkManager.addChecks();
+                                            data.creation = System.currentTimeMillis();
                                         }));
                                 break;
                             }
@@ -294,7 +320,6 @@ public class MenuCommand {
                     .getLogsWithinTimeFrame(TimeUnit.HOURS.toMillis(2));
 
             List<UUID> sortedIds = logs.keySet().stream()
-                    .filter(uuid -> Bukkit.getPlayer(uuid) != null)
                     .sorted(Comparator.comparing(key -> {
                         val logsList =  logs.get(key);
                         return logsList.get(logsList.size() - 1).timeStamp;
@@ -303,15 +328,16 @@ public class MenuCommand {
 
             for (int i = 0; i < Math.min(45, sortedIds.size()); i++) {
                 UUID uuid = sortedIds.get(i);
-                OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
+                String name = MojangAPI.getUsername(uuid);
+                if(name == null) name = "null";
                 Log vl = logs.get(uuid).get(0);
 
                 ItemBuilder builder = new ItemBuilder(XMaterial.SKULL_ITEM.parseMaterial());
 
                 builder.amount(1);
                 builder.durability(3);
-                builder.owner(player.getName());
-                builder.name(Color.Green + player.getName());
+                builder.owner(name);
+                builder.name(Color.Green + name);
                 builder.lore("", "&eCheck&7: &f" + vl.checkName, "&eVL&7: &f" + vl.vl, "&ePing&7: &f" + vl.ping,
                         "&eTPS&7: &f" + MathUtils.round(vl.tps, 2), "",
                         "&f&oShift-Left Click &7&oto view logs.");
@@ -348,16 +374,18 @@ public class MenuCommand {
         SimpleDateFormat format = new SimpleDateFormat("MM/dd/YYYY hh:mm");
         format.setTimeZone(TimeZone.getTimeZone("US/Eastern"));
 
-        OfflinePlayer pl = Bukkit.getOfflinePlayer(uuid);
+        String name = MojangAPI.getUsername(uuid);
+
+        if(name == null) name = "null";
         for (Log log : logs) {
-            body.append("(").append(format.format(new Date(log.timeStamp))).append("): ").append(pl.getName())
+            body.append("(").append(format.format(new Date(log.timeStamp))).append("): ").append(name)
                     .append(" failed ").append(log.checkName).append(" at VL ").append(log.vl)
                     .append(" (tps=").append(MathUtils.round(log.tps, 4)).append(" ping=").append(log.ping)
                     .append(")").append("\n");
         }
 
         try {
-            return Pastebin.makePaste(body.toString(), pl.getName() + "'s Log", Pastebin.Privacy.UNLISTED);
+            return Pastebin.makePaste(body.toString(), name + "'s Log", Pastebin.Privacy.UNLISTED);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

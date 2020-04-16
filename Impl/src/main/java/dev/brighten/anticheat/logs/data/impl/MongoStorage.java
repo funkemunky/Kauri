@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 public class MongoStorage implements DataStorage {
 
-    private MongoCollection<Document> logsCollection, punishmentsCollection;
+    private MongoCollection<Document> logsCollection, punishmentsCollection, nameUUIDCollection;
     private MongoDatabase database;
 
     private List<Log> logs = new CopyOnWriteArrayList<>();
@@ -47,6 +47,7 @@ public class MongoStorage implements DataStorage {
         database = client.getDatabase(MongoConfig.database);
         logsCollection = database.getCollection("logs");
         punishmentsCollection = database.getCollection("punishments");
+        nameUUIDCollection = database.getCollection("nameUuid");
 
         RunUtils.taskTimerAsync(() -> {
             if(logs.size() > 0) {
@@ -151,5 +152,27 @@ public class MongoStorage implements DataStorage {
     @Override
     public void addPunishment(Punishment punishment) {
        punishments.add(punishment);
+    }
+
+    @Override
+    public void cacheAPICall(UUID uuid, String name) {
+        nameUUIDCollection.deleteMany(Filters.or(Filters.eq("uuid", uuid.toString()),
+                Filters.eq("name", name)));
+
+        Document document = new Document("uuid", uuid.toString());
+        document.put("name", name);
+        document.put("timestamp", System.currentTimeMillis());
+
+        nameUUIDCollection.insertOne(document);
+    }
+
+    @Override
+    public UUID getUUIDFromName(String name) {
+        return null;
+    }
+
+    @Override
+    public String getNameFromUUID(UUID uuid) {
+        return null;
     }
 }
