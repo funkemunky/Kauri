@@ -266,6 +266,7 @@ public class Check implements KauriCheck {
     private TextComponent createTxt(String txt, String info) {
         return new TextComponent(formatAlert(Color.translate(txt), info));
     }
+
     private String formatAlert(String toFormat, String info) {
         return Color.translate(toFormat.replace("%desc%", String.join("\n",
                 MiscUtils
@@ -276,7 +277,8 @@ public class Check implements KauriCheck {
                 .replace("%vl%", String.valueOf(MathUtils.round(vl, 1)))
                 .replace("%experimental%", developer ? "&c(Experimental)" : ""));
     }
-    private void punish() {
+
+    public void punish() {
         if(banExempt || developer || !executable || punishVl == -1 || vl <= punishVl
                 || System.currentTimeMillis() - Kauri.INSTANCE.lastTick > 200L) return;
 

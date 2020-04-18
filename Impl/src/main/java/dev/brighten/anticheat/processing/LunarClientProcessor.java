@@ -11,10 +11,14 @@ import org.bukkit.event.Listener;
 @Init(requirePlugins = "LunarClientAPI")
 public class LunarClientProcessor implements Listener  {
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onAuth(PlayerAuthenticateEvent event) {
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
+        if(data == null) {
+            Kauri.INSTANCE.dataManager.createData(event.getPlayer());
+            data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
+        }
         data.usingLunar = true;
     }
 }

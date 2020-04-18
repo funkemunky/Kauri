@@ -158,7 +158,7 @@ public class MenuCommand {
                     "&eCancellable&7: &f" + val.cancellable,
                     "&eDescription&7: &f"));
 
-            List<String> description = Arrays.asList(dev.brighten.anticheat.utils.MiscUtils
+            List<String> description = Arrays.asList(MiscUtils
                     .splitIntoLine(val.description, 35));
 
             lore.addAll(description);
