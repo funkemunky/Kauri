@@ -47,7 +47,7 @@ public class ReachB extends Check {
             RayCollision ray = new RayCollision(originLoc.toVector(), MathUtils.getDirection(originLoc));
 
             List<SimpleCollisionBox> entityLocs = data.targetPastLocation.getEstimatedLocation(timeStamp,
-                            data.lagInfo.transPing + 50,
+                            data.lagInfo.transPing,
                             150L + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
                     .stream()
                     .map(ReachB::getHitbox).collect(Collectors.toList());
