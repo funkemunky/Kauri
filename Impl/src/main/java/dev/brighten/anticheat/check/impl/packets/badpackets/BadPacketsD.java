@@ -44,7 +44,7 @@ public class BadPacketsD extends Check {
             serverAllowed = data.getPlayer().getAllowFlight();
             clientAllowed = data.getPlayer().getAllowFlight();
             RunUtils.task(() -> {
-                data.getPlayer().setFlying(false);
+                data.getPlayer().setAllowFlight(true);
                 data.getPlayer().setAllowFlight(false);
                 data.getPlayer().setGameMode(GameMode.SURVIVAL);
             }, Kauri.INSTANCE);

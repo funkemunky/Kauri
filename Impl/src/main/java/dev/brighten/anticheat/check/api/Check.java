@@ -19,9 +19,7 @@ import dev.brighten.anticheat.check.impl.combat.hand.*;
 import dev.brighten.anticheat.check.impl.combat.hitbox.Hitboxes;
 import dev.brighten.anticheat.check.impl.combat.hitbox.ReachA;
 import dev.brighten.anticheat.check.impl.combat.killaura.*;
-import dev.brighten.anticheat.check.impl.movement.fly.FlyA;
-import dev.brighten.anticheat.check.impl.movement.fly.FlyB;
-import dev.brighten.anticheat.check.impl.movement.fly.FlyE;
+import dev.brighten.anticheat.check.impl.movement.fly.*;
 import dev.brighten.anticheat.check.impl.movement.general.FastLadder;
 import dev.brighten.anticheat.check.impl.world.HealthSpoof;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallA;
@@ -249,7 +247,7 @@ public class Check implements KauriCheck {
                     if (Config.bungeeAlerts) {
                         try {
                             Atlas.getInstance().getBungeeManager()
-                                    .sendObjects("ALL", data.getPlayer().getUniqueId(), name,
+                                    .sendObjects("override", data.getPlayer().getUniqueId(), name,
                                             MathUtils.round(vl, 2), info);
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -373,11 +371,9 @@ public class Check implements KauriCheck {
         register(new AutoclickerG());
         register(new FlyA());
         register(new FlyB());
-        //register(new FlyC());
-        //register(new FlyD());
+        register(new FlyC());
+        register(new FlyD());
         register(new FlyE());
-        //register(new FlyG());
-        //register(new FlyH());
         register(new FastLadder());
         register(new NoFallA());
         //register(new NoFallB());
@@ -426,7 +422,6 @@ public class Check implements KauriCheck {
         register(new PacketSpam());
         register(new SignOp());
         register(new SignCrash());
-        //register(new Test());
         register(new LargeMove());
     }
 

@@ -1,12 +1,10 @@
 package dev.brighten.anticheat.utils.mojang;
 
-import com.google.gson.JsonArray;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.db.utils.json.JSONArray;
 import dev.brighten.db.utils.json.JSONException;
 import dev.brighten.db.utils.json.JSONObject;
 import dev.brighten.db.utils.json.JsonReader;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,7 +18,6 @@ import java.util.UUID;
 
 public class MojangAPI {
 
-    @Nullable
     public static String getUsername(UUID uuid) {
         String name = Kauri.INSTANCE.loggerManager.storage.getNameFromUUID(uuid);
 
@@ -35,7 +32,6 @@ public class MojangAPI {
         return name;
     }
 
-    @Nullable
     public static UUID getUUID(String name) {
         UUID uuid = Kauri.INSTANCE.loggerManager.storage.getUUIDFromName(name);
 

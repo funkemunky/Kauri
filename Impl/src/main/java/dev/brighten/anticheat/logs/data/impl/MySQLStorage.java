@@ -10,7 +10,6 @@ import dev.brighten.anticheat.logs.data.sql.Query;
 import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.logs.objects.Punishment;
 import lombok.val;
-import org.jetbrains.annotations.Nullable;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -174,7 +173,6 @@ public class MySQLStorage implements DataStorage {
     }
 
     @Override
-    @Nullable
     public UUID getUUIDFromName(String name) {
         try {
             val rs = Query.prepare("SELECT `UUID`, `TIMESTAMP` FROM `NAMECACHE` WHERE `NAME` = ?")
@@ -203,7 +201,6 @@ public class MySQLStorage implements DataStorage {
     }
 
     @Override
-    @Nullable
     public String getNameFromUUID(UUID uuid) {
         try {
             val rs = Query.prepare("SELECT `NAME` `TIMESTAMP` FROM `NAMECACHE` WHERE `UUID` = ?")

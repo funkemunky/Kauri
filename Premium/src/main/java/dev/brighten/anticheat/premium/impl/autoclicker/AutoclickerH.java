@@ -18,6 +18,7 @@ import java.util.LinkedList;
 public class AutoclickerH extends Check {
 
     private double ticks, cps, buffer;
+    private double lastKurt;
     private Deque<Double> clickSamples = new LinkedList<>();
 
     @Packet
@@ -27,8 +28,9 @@ public class AutoclickerH extends Check {
                 final GraphUtil.GraphResult results = GraphUtil.getGraph(clickSamples);
 
                 val negatives = results.getNegatives();
-                if (negatives == 1) {
-                    if (++buffer > 3) {
+                val kurtosis = data.clickProcessor.getKurtosis();
+                if (negatives == 1 && MathUtils.getDelta(kurtosis, lastKurt) > 0.2) {
+                    if (++buffer > 1) {
                         vl++;
                         flag("cps=%v buffer=%v", cps, buffer);
                     }
@@ -36,7 +38,9 @@ public class AutoclickerH extends Check {
                     buffer = 0;
                 }
                 this.clickSamples.clear();
-                debug("cps=%v negatives=%v buffer=%v", cps, negatives, MathUtils.round(buffer, 1));
+                debug("cps=%v negatives=%v buffer=%v kurt=%v.2",
+                        cps, negatives, MathUtils.round(buffer, 1), kurtosis);
+                lastKurt = kurtosis;
             }
             this.cps = 0;
             this.ticks = 0;

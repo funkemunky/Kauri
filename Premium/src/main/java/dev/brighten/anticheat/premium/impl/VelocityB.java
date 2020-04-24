@@ -48,7 +48,7 @@ public class VelocityB extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(tookVelocity && (MathUtils.getDelta(data.playerInfo.deltaY, vY) < 0.00001
-                || (timeStamp - lastVelocity) > data.lagInfo.transPing * 4)) {
+                || (timeStamp - lastVelocity) > data.lagInfo.transPing * 10)) {
             tookVelocity = false;
             pvX = vX;
             pvZ = vZ;

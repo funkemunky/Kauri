@@ -18,6 +18,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,7 +30,8 @@ public class BlockInformation {
     public float currentFriction;
     public CollisionHandler
             handler = new CollisionHandler(new ArrayList<>(), new ArrayList<>(), new KLocation(0,0,0));
-    public List<Block> verticalCollisions, horizontalCollisions, blocks = new ArrayList<>();
+    public List<Block> verticalCollisions, horizontalCollisions;
+    public final List<Block> blocks = Collections.synchronizedList(new ArrayList<>());
 
     public BlockInformation(ObjectData objectData) {
         this.objectData = objectData;
@@ -38,7 +40,9 @@ public class BlockInformation {
     public void runCollisionCheck() {
         if(!Kauri.INSTANCE.enabled
                 || Kauri.INSTANCE.lastEnabled.hasNotPassed(6)) return;
-        blocks.clear();
+        synchronized (blocks) {
+            blocks.clear();
+        }
 
         double dy = objectData.playerInfo.deltaY;
         double dh = objectData.playerInfo.deltaXZ;
@@ -60,7 +64,9 @@ public class BlockInformation {
                     Location loc = new Location(objectData.getPlayer().getWorld(), x, y, z);
 
                     if(loc.getWorld().isChunkLoaded(loc.getBlockX() >> 4, loc.getBlockZ() >> 4)) {
-                        blocks.add(loc.getBlock());
+                        synchronized (blocks) {
+                            blocks.add(loc.getBlock());
+                        }
                     } else objectData.playerInfo.worldLoaded = false;
                 }
             }

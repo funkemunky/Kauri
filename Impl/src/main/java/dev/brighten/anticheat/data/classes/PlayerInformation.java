@@ -3,6 +3,7 @@ package dev.brighten.anticheat.data.classes;
 import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumAnimation;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.TickTimer;
+import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingList;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import org.bukkit.block.Block;
 
@@ -28,7 +29,7 @@ public class PlayerInformation {
     //Server Position
     public long lastServerPos, lastRespawn;
     public boolean serverPos;
-    public EvictingList<KLocation> posLocs = new EvictingList<>(5);
+    public ConcurrentEvictingList<KLocation> posLocs = new ConcurrentEvictingList<>(5);
 
     //Attack
     public TickTimer lastAttack = new TickTimer(5);

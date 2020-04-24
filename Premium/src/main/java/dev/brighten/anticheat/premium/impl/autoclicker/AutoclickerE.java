@@ -8,14 +8,13 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
 
-import java.util.Deque;
-import java.util.LinkedList;
+import java.util.*;
 
 @CheckInfo(name = "Autoclicker (E)", description = "Checks for hard to get deviations (Elevated/funkemunky).",
         checkType = CheckType.AUTOCLICKER, developer = true)
 public class AutoclickerE extends Check {
 
-    private Deque<Long> clickSamples = new LinkedList<>();
+    private final List<Long> clickSamples = Collections.synchronizedList(new ArrayList<>());
 
     private long lastSwing;
     private double stdDelta;
@@ -30,30 +29,32 @@ public class AutoclickerE extends Check {
                 || data.playerInfo.lastBlockPlace.hasNotPassed(1))
             return;
 
-        if (delay > 1L && delay < 300L && this.clickSamples.add(delay) && this.clickSamples.size() == 30) {
-            double average = this.clickSamples.stream().mapToDouble(Long::doubleValue).average().orElse(0.0);
+        synchronized (clickSamples) {
+            if (delay > 1L && delay < 300L && this.clickSamples.add(delay) && this.clickSamples.size() == 30) {
+                double average = this.clickSamples.stream().mapToDouble(Long::doubleValue).average().orElse(0.0);
 
-            double stdDeviation = 0.0;
+                double stdDeviation = 0.0;
 
-            for (Long click : this.clickSamples) {
-                stdDeviation += Math.pow(click.doubleValue() - average, 2);
+                for (Long click : this.clickSamples) {
+                    stdDeviation += Math.pow(click.doubleValue() - average, 2);
+                }
+
+                stdDeviation /= this.clickSamples.size();
+
+                val std = Math.sqrt(stdDeviation);
+                if (std < 15.d) {
+                    if(verbose.add(std < 9. ? 2 : 1) > 4) {
+                        vl++;
+                        this.flag("STD: " + std);
+                    }
+                } else verbose.subtract(1.5);
+
+                debug("std=%v verbose=%v", std, verbose.value());
+
+                this.clickSamples.clear();
             }
 
-            stdDeviation /= this.clickSamples.size();
-
-            val std = Math.sqrt(stdDeviation);
-            if (std < 15.d) {
-                if(verbose.add(std < 9. ? 2 : 1) > 4) {
-                    vl++;
-                    this.flag("STD: " + std);
-                }
-            } else verbose.subtract(1.5);
-
-            debug("std=%v verbose=%v", std, verbose.value());
-
-            this.clickSamples.clear();
+            this.lastSwing = timeStamp;
         }
-
-        this.lastSwing = timeStamp;
     }
 }

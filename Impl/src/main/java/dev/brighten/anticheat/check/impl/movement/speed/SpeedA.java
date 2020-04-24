@@ -17,8 +17,10 @@ public class SpeedA extends Check {
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
-        if(!packet.isPos() || data.playerInfo.generalCancel || data.playerInfo.lastVelocity.hasNotPassed(25))
+        if(!packet.isPos() || data.playerInfo.generalCancel || data.playerInfo.lastVelocity.hasNotPassed(25)) {
+            if(data.playerInfo.generalCancel)verbose.subtract();
             return;
+        }
 
         double baseSpeed = data.playerInfo.baseSpeed + (!data.playerInfo.clientGround ? 0.06f
                 : (data.playerInfo.groundTicks > 10 ? 0.02 : 0.03));

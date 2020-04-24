@@ -69,6 +69,12 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>me.mat1337.loader</groupId>
+      <artifactId>loader</artifactId>
+      <version>2.4.1</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>org.github.spigot</groupId>
       <artifactId>1.13.2</artifactId>
       <version>1.13.2</version>
@@ -95,7 +101,7 @@
     <dependency>
       <groupId>cc.funkemunky.utils</groupId>
       <artifactId>Atlas</artifactId>
-      <version>1.8.2-PRE-3</version>
+      <version>1.8.2-PRE-5</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>

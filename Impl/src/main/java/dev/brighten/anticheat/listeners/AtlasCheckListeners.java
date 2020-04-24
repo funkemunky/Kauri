@@ -5,9 +5,12 @@ import cc.funkemunky.api.events.Listen;
 import cc.funkemunky.api.events.ListenerPriority;
 import cc.funkemunky.api.events.impl.PacketReceiveEvent;
 import cc.funkemunky.api.events.impl.PacketSendEvent;
+import cc.funkemunky.api.tinyprotocol.api.Packet;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInCustomPayload;
 import cc.funkemunky.api.utils.Init;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.utils.MiscUtils;
 
 @Init
 public class AtlasCheckListeners implements AtlasListener {
@@ -15,6 +18,7 @@ public class AtlasCheckListeners implements AtlasListener {
     @Listen(priority = ListenerPriority.NORMAL)
     public void onPacket(PacketReceiveEvent event) {
         if(event.getPlayer() == null) return;
+
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
         if(data != null) {

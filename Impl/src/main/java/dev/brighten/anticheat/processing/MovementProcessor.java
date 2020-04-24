@@ -26,7 +26,7 @@ import java.util.List;
 public class MovementProcessor {
     private final ObjectData data;
 
-    private Deque<Double> yawGcdList = new ConcurrentEvictingList<>(40),
+    public Deque<Double> yawGcdList = new ConcurrentEvictingList<>(40),
             pitchGcdList = new ConcurrentEvictingList<>(40);
     public long deltaX, deltaY, lastDeltaX, lastDeltaY, lastCinematic;
     public double sensitivityX, sensitivityY, yawMode, pitchMode, sensXPercent, sensYPercent;
@@ -220,7 +220,7 @@ public class MovementProcessor {
                     f3 = smoothCamFilterY * 0.5f;
 
                     float pyaw = data.playerInfo.from.yaw + f2 * .15f;
-                    float ppitch = data.playerInfo.from.pitch + f3 * .15f;
+                    float ppitch = data.playerInfo.from.pitch - f3 * .15f;
 
                     if(data.playerInfo.cinematicMode =
                             (MathUtils.getDelta(pyaw, data.playerInfo.from.yaw) < (Math.abs(deltaX) > 50 ? 3 : 1)

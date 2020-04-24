@@ -14,10 +14,12 @@ import dev.brighten.anticheat.logs.LoggerManager;
 import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.processing.PacketProcessor;
 import dev.brighten.api.KauriAPI;
+import me.mat1337.loader.Loader;
 import org.bukkit.Bukkit;
 
 import java.util.ArrayList;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 public class Load {
 

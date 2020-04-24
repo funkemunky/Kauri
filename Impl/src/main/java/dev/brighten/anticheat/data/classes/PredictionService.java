@@ -112,13 +112,13 @@ public class PredictionService {
 
                     rmotionZ *= shit;
                     rmotionX *= shit;
-                    MiscUtils.testMessage("slime: " + shit + ", " + data.blockInfo.currentFriction);
+                    //MiscUtils.testMessage("slime: " + shit + ", " + data.blockInfo.currentFriction);
                 }
             } else if(XMaterial.SOUL_SAND.parseMaterial().equals(blockBelow.getType())) {
                 double shit = 0.4;
                 rmotionX *= shit;
                 rmotionZ *= shit;
-                MiscUtils.testMessage("soulsand: " + shit + ", " + data.blockInfo.currentFriction);
+                //MiscUtils.testMessage("soulsand: " + shit + ", " + data.blockInfo.currentFriction);
             }
         }
 
@@ -523,16 +523,16 @@ public class PredictionService {
 
                 if (diff < preD) { // if the diff is small enough
                     flag = false;
-                    MiscUtils.testMessage(Color.Green + "(" + rmotionX + ", " + motionX + "); (" + rmotionZ + ", " + motionZ + ")");
+                    //MiscUtils.testMessage(Color.Green + "(" + rmotionX + ", " + motionX + "); (" + rmotionZ + ", " + motionZ + ")");
 
-                    MiscUtils.testMessage(Color.Green + diffString + " loops " + loops + " key: " + key + " sneak=" + sneak + " move=" + moveForward + " ai=" + aiMoveSpeed);
+                    //MiscUtils.testMessage(Color.Green + diffString + " loops " + loops + " key: " + key + " sneak=" + sneak + " move=" + moveForward + " ai=" + aiMoveSpeed);
                     fMath = fastMath; // saves the fastmath option if the player changed it
                     break found;
                 }
-                MiscUtils.testMessage(Color.Red + "(" + rmotionX + ", " + motionX + "); (" + rmotionZ + ", " + motionZ + ")");
-                MiscUtils.testMessage(Color.Red + diffString + " loops " + loops + " key: " + key + " sneak=" + sneak
-                        + " move=" + moveForward + " ai=" + aiMoveSpeed + " shit=" + Atlas.getInstance()
-                        .getBlockBoxManager().getBlockBox().getMovementFactor(data.getPlayer()));
+                //MiscUtils.testMessage(Color.Red + "(" + rmotionX + ", " + motionX + "); (" + rmotionZ + ", " + motionZ + ")");
+                //MiscUtils.testMessage(Color.Red + diffString + " loops " + loops + " key: " + key + " sneak=" + sneak
+                //        + " move=" + moveForward + " ai=" + aiMoveSpeed + " shit=" + Atlas.getInstance()
+                 //       .getBlockBoxManager().getBlockBox().getMovementFactor(data.getPlayer()));
 
                 if (diff < closestdiff) {
                     closestdiff = diff;

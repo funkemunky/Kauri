@@ -211,7 +211,6 @@ public class MenuCommand {
                                 info.getButton().setStack(builder.build());
                                 menu.buildInventory(false);
                                 Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
-                                        .parallelStream()
                                         .forEach(data -> {
                                             data.checkManager.checks.clear();
                                             data.checkManager.checkMethods.clear();
@@ -248,7 +247,6 @@ public class MenuCommand {
                                 info.getButton().setStack(builder.build());
                                 menu.buildInventory(false);
                                 Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
-                                        .parallelStream()
                                         .forEach(data -> {
                                             data.checkManager.checks.clear();
                                             data.checkManager.checkMethods.clear();
@@ -286,7 +284,6 @@ public class MenuCommand {
                                 info.getButton().setStack(builder.build());
                                 menu.buildInventory(false);
                                 Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
-                                        .parallelStream()
                                         .forEach(data -> {
                                             data.checkManager.checks.clear();
                                             data.checkManager.checkMethods.clear();

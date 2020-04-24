@@ -1,5 +1,7 @@
 package dev.brighten.anticheat.data;
 
+import cc.funkemunky.api.handlers.ForgeHandler;
+import cc.funkemunky.api.handlers.ModData;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
@@ -7,6 +9,7 @@ import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.TickTimer;
 import cc.funkemunky.api.utils.math.RollingAverageLong;
 import cc.funkemunky.api.utils.math.cond.MaxInteger;
+import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingList;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
@@ -27,6 +30,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ObjectData {
@@ -53,13 +57,13 @@ public class ObjectData {
     public ClickProcessor clickProcessor;
     public int hashCode;
     public boolean banned;
-    public List<Log> logs = new ArrayList<>();
+    public ModData modData;
     public ProtocolVersion playerVersion = ProtocolVersion.UNKNOWN;
     public Set<Player> boxDebuggers = new HashSet<>();
-    public final Map<String, Long> keepAliveStamps = new HashMap<>();
-    public final Map<String, Short> transactionActions = new HashMap<>();
-    public List<CancelType> typesToCancel = Collections.synchronizedList(new EvictingList<>(10));
-    public List<String> sniffedPackets = new ArrayList<>();
+    public final Map<String, Long> keepAliveStamps = Collections.synchronizedMap(new HashMap<>());
+    public final Map<String, Short> transactionActions = Collections.synchronizedMap(new HashMap<>());
+    public ConcurrentEvictingList<CancelType> typesToCancel = new ConcurrentEvictingList<>(10);
+    public final List<String> sniffedPackets = new CopyOnWriteArrayList<>();
     public BukkitTask task;
 
     public ObjectData(UUID uuid) {
@@ -86,7 +90,13 @@ public class ObjectData {
         predictionService = new PredictionService(this);
         moveProcessor = new MovementProcessor(this);
 
-        Kauri.INSTANCE.executor.execute(() -> playerVersion = TinyProtocolHandler.getProtocolVersion(getPlayer()));
+        modData = ForgeHandler.getMods(getPlayer());
+        RunUtils.taskLaterAsync(() -> {
+            modData = ForgeHandler.getMods(getPlayer());
+        }, Kauri.INSTANCE, 100L);
+        Kauri.INSTANCE.executor.execute(() -> {
+            playerVersion = TinyProtocolHandler.getProtocolVersion(getPlayer());
+        });
         if(task != null) task.cancel();
         task = RunUtils.taskTimerAsync(() -> {
             if(getPlayer() == null) {
@@ -115,10 +125,12 @@ public class ObjectData {
     }
 
     public long setKeepAliveStamp(String name) {
-        long stamp = getRandomLong(100, 4000);
-        keepAliveStamps.put(name, stamp);
+        synchronized (keepAliveStamps) {
+            long stamp = getRandomLong(100, 4000);
+            keepAliveStamps.put(name, stamp);
 
-        return stamp;
+            return stamp;
+        }
     }
 
     public long getKeepAliveStamp(String name) {
@@ -130,11 +142,13 @@ public class ObjectData {
     }
 
     public short setTransactionAction(String name) {
-        short action = getRandomShort(10, 500);
+        synchronized (transactionActions) {
+            short action = getRandomShort(10, 500);
 
-        transactionActions.put(name, action);
+            transactionActions.put(name, action);
 
-        return action;
+            return action;
+        }
     }
 
     public Player getPlayer() {

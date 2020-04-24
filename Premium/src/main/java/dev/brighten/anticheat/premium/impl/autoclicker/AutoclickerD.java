@@ -7,6 +7,7 @@ import dev.brighten.api.check.CheckType;
 import lombok.val;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @CheckInfo(name = "Autoclicker (D)", description = "Oscillation check by Abigail.",
@@ -15,7 +16,8 @@ import java.util.List;
 public class AutoclickerD extends Check {
 
     private long ltimeStamp;
-    private List<Long> delays = new ArrayList<>(), samples = new ArrayList<>();
+    private final List<Long> delays = Collections.synchronizedList(new ArrayList<>()),
+            samples = Collections.synchronizedList(new ArrayList<>());
     private double lavg, lstd, verbose;
 
     @Packet
@@ -28,14 +30,18 @@ public class AutoclickerD extends Check {
         }
         long delta = timeStamp - ltimeStamp;
 
-        if (delta < 400) samples.add(delta);
+        synchronized (samples) {
+            if (delta < 400) samples.add(delta);
+        }
 
         if (samples.size() >= 10) {
             val sampleSummary = samples.stream().mapToLong(v -> v).summaryStatistics();
 
             long osc = (sampleSummary.getMax() + sampleSummary.getMin()) / 2;
 
-            delays.add(osc);
+            synchronized (delays) {
+                delays.add(osc);
+            }
             if (delays.size() >= 5) {
                 List<Double> list = new ArrayList<>();
 

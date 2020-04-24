@@ -6,6 +6,7 @@ import dev.brighten.anticheat.data.ObjectData;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerEditBookEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -19,6 +20,7 @@ public class BukkitCheckListeners implements Listener {
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
         if(data != null) {
+            data.playerInfo.breakingBlock = event.getAction().name().contains("BLOCK");
             data.checkManager.runEvent(event);
         }
     }

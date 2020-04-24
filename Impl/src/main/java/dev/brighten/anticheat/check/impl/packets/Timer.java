@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.check.impl.packets;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingList;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Cancellable;

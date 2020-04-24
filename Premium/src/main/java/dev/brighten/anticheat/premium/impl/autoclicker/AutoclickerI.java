@@ -8,14 +8,16 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
 
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.List;
 
 @CheckInfo(name = "Autoclicker (I)", description = "Checks for impossible ratio consistency. Check by Elevated.",
         checkType = CheckType.AUTOCLICKER, enabled = false, developer = true)
 public class AutoclickerI extends Check {
 
-    private Deque<Long> clickSamples = new LinkedList<>();
+    private List<Long> clickSamples = new ArrayList<>();
 
     private long lastSwing;
     private double lstd;

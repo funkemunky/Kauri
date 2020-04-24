@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.processing;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
+import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingList;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.data.ObjectData;
 import lombok.Getter;
@@ -14,7 +15,7 @@ import java.util.LongSummaryStatistics;
 
 @RequiredArgsConstructor
 public class ClickProcessor {
-    public EvictingList<Long> cpsList = new EvictingList<>(40);
+    public ConcurrentEvictingList<Long> cpsList = new ConcurrentEvictingList<>(40);
     @Getter
     private double std, nosqrtStd, average, nosqrtKurtosis, kurtosis, skew, variance;
     @Getter

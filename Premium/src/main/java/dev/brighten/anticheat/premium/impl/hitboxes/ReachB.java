@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.premium.impl.hitboxes;
 
+import cc.funkemunky.api.reflections.impl.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
@@ -14,6 +15,7 @@ import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
+import net.minecraft.server.v1_8_R3.AxisAlignedBB;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -34,6 +36,15 @@ public class ReachB extends Check {
     @Setting(name = "debug")
     private static boolean debug = false;
 
+    @Setting(name = "lunarclient.threshold")
+    private static double lunarThreshold = 3.14;
+
+    @Setting(name = "lunarclient.offsetEnable")
+    private static boolean lunarOffset = false;
+
+    @Setting(name = "lunarclient.bufferSubtract")
+    private static double lunarBufferSubtract = 0.05;
+
     @Packet
     public void onFly(WrappedInFlyingPacket packet, long timeStamp) {
         if(timeStamp - lastUse < 1 && entity != null && entity instanceof Player) {
@@ -48,7 +59,7 @@ public class ReachB extends Check {
 
             List<SimpleCollisionBox> entityLocs = data.targetPastLocation.getEstimatedLocation(timeStamp,
                             data.lagInfo.transPing,
-                            150L + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
+                            200L + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
                     .stream()
                     .map(ReachB::getHitbox).collect(Collectors.toList());
 
@@ -71,11 +82,14 @@ public class ReachB extends Check {
                 return;
             }
 
+            boolean lunar = lunarOffset && data.usingLunar;
+
             val subtraction = 0.0425 + Math.min(0.2, (data.playerInfo.deltaXZ + targetData.playerInfo.deltaXZ) / 3);
             distance-= subtraction;
 
             if(collided > 1 && data.lagInfo.lastPacketDrop.hasPassed(2)) {
-                if(distance > 3.02 &&
+                if(distance > (lunar ? lunarThreshold : 3.02) &&
+
                         Kauri.INSTANCE.lastTickLag.hasPassed(40)) {
                     if(++buffer > 4) {
                         vl++;

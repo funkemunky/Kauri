@@ -21,7 +21,7 @@ public class AutoclickerJ extends Check {
 
         if(data.clickProcessor.getKurtosis() < 0
                 && data.clickProcessor.getAverage() < 180
-                && data.clickProcessor.getVariance() > 1050
+                && data.clickProcessor.getVariance() > 700
                 && data.clickProcessor.getSkew() < 0.3
                 && data.clickProcessor.cpsList.size() >= 30) {
             if(buffer++ > 40) {

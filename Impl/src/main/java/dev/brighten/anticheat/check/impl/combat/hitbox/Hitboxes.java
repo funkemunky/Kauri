@@ -102,8 +102,9 @@ public class Hitboxes extends Check {
         } else {
             Vector bounds = MiscUtils.entityDimensions.get(type);
 
-            return new SimpleCollisionBox(loc.toVector(), bounds.getX() + bounds.getZ(), bounds.getY())
-            .expand(0.3, 0.3, 0.3);
+            return new SimpleCollisionBox(loc.toVector()).expand(bounds.getX(), 0, bounds.getZ())
+                    .expandMax(0, bounds.getY(), 0)
+                    .expand(0.3, 0.3, 0.3);
         }
     }
 }

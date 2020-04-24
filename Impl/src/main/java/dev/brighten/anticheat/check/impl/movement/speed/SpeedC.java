@@ -18,15 +18,14 @@ import java.util.List;
 
 @Cancellable
 @CheckInfo(name = "Speed (C)", description = "Speed check by DeprecatedLuke, improved by funkemunky.",
-        developer = true, punishVL = 20, vlToFlag = 2)
+        punishVL = 30, vlToFlag = 5)
 public class SpeedC extends Check {
 
     public double previousDistance;
     private double drag = 0.91;
     private int fallTicks;
-    private int webTicks, liquidTicks;
+    private int webTicks;
     private double velocityX, velocityZ;
-    private boolean lSprint;
     private TickTimer horizontalIdle = new TickTimer(20);
     private static Material ice = XMaterial.ICE.parseMaterial(), packed_ice = XMaterial.PACKED_ICE.parseMaterial();
 
@@ -41,8 +40,7 @@ public class SpeedC extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if (!packet.isPos()
-                || (data.playerInfo.deltaXZ == 0 && data.playerInfo.deltaY == 0)
-                || data.playerInfo.generalCancel) return;
+                || (data.playerInfo.deltaXZ == 0 && data.playerInfo.deltaY == 0)) return;
 
         List<String> tags = new ArrayList<>();
 
@@ -227,7 +225,7 @@ public class SpeedC extends Check {
         }
 
         double horizontalMove = (horizontalDistance - previousHorizontal) - moveSpeed;
-        if (horizontalDistance > 0.1) {
+        if (horizontalDistance > 0.1 && !data.playerInfo.generalCancel) {
             if (horizontalMove > 0 && data.playerInfo.lastVelocity.hasPassed(10)) {
                 vl++;
                 if(horizontalMove > 0.54 || vl > 7) {
