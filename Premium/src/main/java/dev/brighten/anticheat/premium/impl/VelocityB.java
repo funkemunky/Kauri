@@ -135,13 +135,14 @@ public class VelocityB extends Check {
 
             if(ratio < (data.playerVersion.isOrAbove(ProtocolVersion.V1_9)? 0.8 : 0.993)
                     && timeStamp - data.creation > 3000L
+                    && !data.usingLunar
                     && !data.blockInfo.blocksNear) {
-                if(++buffer > 25) {
+                if(++buffer > 35) {
                     vl++;
                     flag("pct=%v.2% buffer=%v.1 forward=%v.2 strafe=%v.2",
                             ratio * 100, buffer, moveStrafe, moveForward);
                 }
-            } else buffer-= buffer > 0 ? data.lagInfo.lastPacketDrop.hasNotPassed(20) ? 0.5 : 0.25 : 0;
+            } else buffer-= buffer > 0 ? data.lagInfo.lastPacketDrop.hasNotPassed(20) ? 1 : 0.5 : 0;
             debug("ratio=%v.3 buffer=%v.1 strafe=%v.2 forward=%v.2 lastUse=%v found=%v",
                     ratio, buffer, moveStrafe, moveForward, data.playerInfo.lastUseItem.getPassed(), found);
             pvX *= drag;

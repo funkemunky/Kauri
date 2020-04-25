@@ -22,64 +22,58 @@ public class CheckManager {
         this.objectData = objectData;
     }
 
-    public boolean runPacket(NMSObject object, long timeStamp) {
+    public synchronized boolean runPacket(NMSObject object, long timeStamp) {
         if(!checkMethods.containsKey(object.getClass())) return true;
 
-        synchronized (checkMethods) {
-            val methods = checkMethods.get(object.getClass());
-            AtomicBoolean okay = new AtomicBoolean(true);
-            methods.parallelStream()
-                    .forEach(wrapped -> {
-                        if(wrapped.isPacket && wrapped.check.enabled && wrapped.isCompatible()) {
-                            if(wrapped.isBoolean) {
-                                if(wrapped.oneParam) {
-                                    boolean returned = wrapped.method.invoke(wrapped.check, object);
+        val methods = checkMethods.get(object.getClass());
+        AtomicBoolean okay = new AtomicBoolean(true);
+        methods.parallelStream()
+                .forEach(wrapped -> {
+                    if(wrapped.isPacket && wrapped.check.enabled && wrapped.isCompatible()) {
+                        if(wrapped.isBoolean) {
+                            if(wrapped.oneParam) {
+                                boolean returned = wrapped.method.invoke(wrapped.check, object);
 
-                                    if(!returned) okay.set(false);
-                                }
-                                else {
-                                    boolean returned = wrapped.method.invoke(wrapped.check, object, timeStamp);
-
-                                    if(!returned) okay.set(false);
-                                }
-                            } else {
-                                if(wrapped.oneParam) wrapped.method.invoke(wrapped.check, object);
-                                else wrapped.method.invoke(wrapped.check, object, timeStamp);
+                                if(!returned) okay.set(false);
                             }
+                            else {
+                                boolean returned = wrapped.method.invoke(wrapped.check, object, timeStamp);
+
+                                if(!returned) okay.set(false);
+                            }
+                        } else {
+                            if(wrapped.oneParam) wrapped.method.invoke(wrapped.check, object);
+                            else wrapped.method.invoke(wrapped.check, object, timeStamp);
                         }
-                    });
-            return okay.get();
-        }
+                    }
+                });
+        return okay.get();
     }
 
-    public void runEvent(Event event) {
-        synchronized (checkMethods) {
-            if(!checkMethods.containsKey(event.getClass())) return;
+    public synchronized void runEvent(Event event) {
+        if(!checkMethods.containsKey(event.getClass())) return;
 
-            val methods = checkMethods.get(event.getClass());
+        val methods = checkMethods.get(event.getClass());
 
-            methods.parallelStream()
-                    .forEach(wrapped -> {
-                        if(wrapped.isEvent && wrapped.check.enabled) {
-                            wrapped.method.invoke(wrapped.check, event);
-                        }
-                    });
-        }
+        methods.parallelStream()
+                .forEach(wrapped -> {
+                    if(wrapped.isEvent && wrapped.check.enabled) {
+                        wrapped.method.invoke(wrapped.check, event);
+                    }
+                });
     }
 
-    public void runEvent(AtlasEvent event) {
-       synchronized (checkMethods) {
-           if(!checkMethods.containsKey(event.getClass())) return;
+    public synchronized void runEvent(AtlasEvent event) {
+        if(!checkMethods.containsKey(event.getClass())) return;
 
-           val methods = checkMethods.get(event.getClass());
+        val methods = checkMethods.get(event.getClass());
 
-           methods.parallelStream()
-                   .forEach(wrapped -> {
-                       if(!wrapped.isPacket && wrapped.check.enabled) {
-                           wrapped.method.invoke(wrapped.check, event);
-                       }
-                   });
-       }
+        methods.parallelStream()
+                .forEach(wrapped -> {
+                    if(!wrapped.isPacket && wrapped.check.enabled) {
+                        wrapped.method.invoke(wrapped.check, event);
+                    }
+                });
     }
 
     public void addChecks() {

@@ -13,6 +13,7 @@ import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.impl.combat.aim.*;
 import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerA;
+import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerB;
 import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerC;
 import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerG;
 import dev.brighten.anticheat.check.impl.combat.hand.*;
@@ -366,8 +367,8 @@ public class Check implements KauriCheck {
 
     public static void registerChecks() {
         register(new AutoclickerA());
-        //register(new AutoclickerB());
-        //'register(new AutoclickerC());
+        register(new AutoclickerB());
+        register(new AutoclickerC());
         register(new AutoclickerG());
         register(new FlyA());
         register(new FlyB());
@@ -390,7 +391,7 @@ public class Check implements KauriCheck {
         //register(new KillauraA());
         register(new KillauraB());
         register(new KillauraC());
-        //register(new KillauraD());
+        register(new KillauraD());
         register(new KillauraE());
         //register(new Phase());
         //register(new OmniSprint());
@@ -422,7 +423,7 @@ public class Check implements KauriCheck {
         register(new PacketSpam());
         register(new SignOp());
         register(new SignCrash());
-        register(new LargeMove());
+        //register(new LargeMove());
     }
 
     public static boolean isCheck(String name) {

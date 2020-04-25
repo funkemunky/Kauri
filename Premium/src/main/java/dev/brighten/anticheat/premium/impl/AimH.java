@@ -19,7 +19,7 @@ public class AimH extends Check {
 
             if(data.moveProcessor.yawGcdList.size() < 30) return;
 
-            if(delta > 0.2 ||  data.moveProcessor.sensitivityX > 2.0001 || data.moveProcessor.sensitivityY > 2.0001) {
+            if(delta > 0.228 ||  data.moveProcessor.sensitivityX > 2.0001 || data.moveProcessor.sensitivityY > 2.0001) {
                 if(++buffer > 40) {
                     vl++;
                     flag("sens=%v delta=%v.2 buffer=%v", data.moveProcessor.sensXPercent, delta, buffer);

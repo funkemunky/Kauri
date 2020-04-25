@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@CheckInfo(name = "Reach (C)", checkType = CheckType.HITBOX)
+@CheckInfo(name = "Reach (C)", checkType = CheckType.HITBOX, punishVL = 2)
 public class ReachC extends Check {
 
     private long lastUse;
@@ -45,7 +45,7 @@ public class ReachC extends Check {
 
             List<BoundingBox> entityLocs = data.targetPastLocation.getEstimatedLocation(timeStamp,
                     data.lagInfo.transPing,
-                    150L + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
+                    200L + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
                     .stream()
                     .map(ReachC::getHitbox)
                     .collect(Collectors.toList());
@@ -69,18 +69,18 @@ public class ReachC extends Check {
             }
 
             if(distance == 69) {
-                buffer-= buffer > 0 ? 0.01 : 0;
+                buffer-= buffer > 0 ? 0.001 : 0;
                 return;
             }
 
-            if(collided > 1 && data.lagInfo.lastPacketDrop.hasPassed(2)) {
-                if(distance > 3.02 &&
+            if(collided > 2 && data.lagInfo.lastPacketDrop.hasPassed(2)) {
+                if(distance > 3.03 &&
                         Kauri.INSTANCE.lastTickLag.hasPassed(40)) {
-                    if(++buffer > 4) {
+                    if(++buffer > 2) {
                         vl++;
                         flag("distance=%v.3 buffer=%v.1 misses=%v", distance, buffer, misses);
                     }
-                } else buffer-= buffer > 0 ? 0.02 : 0;
+                } else buffer-= buffer > 0 ? 0.01 : 0;
             }
 
             debug("distance=%v.3 buffer=%v.1 ticklag=%v collided=%v",

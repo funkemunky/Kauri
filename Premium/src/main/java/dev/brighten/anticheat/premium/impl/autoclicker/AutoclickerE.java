@@ -24,8 +24,7 @@ public class AutoclickerE extends Check {
     public void onClick(WrappedInArmAnimationPacket packet, long timeStamp) {
         long delay = timeStamp - this.lastSwing;
 
-        if (data.playerInfo.lookingAtBlock
-                || data.playerInfo.breakingBlock
+        if (data.playerInfo.breakingBlock
                 || data.playerInfo.lastBlockPlace.hasNotPassed(1))
             return;
 

@@ -14,7 +14,7 @@ import java.util.Deque;
 import java.util.LinkedList;
 
 @CheckInfo(name = "Autoclicker (H)", description = "Meant to detect Vape and other autoclickers. By Elevated.",
-        checkType = CheckType.AUTOCLICKER, punishVL = 11, vlToFlag = 1)
+        checkType = CheckType.AUTOCLICKER, punishVL = 7, vlToFlag = 2)
 public class AutoclickerH extends Check {
 
     private double ticks, cps, buffer;
@@ -50,9 +50,7 @@ public class AutoclickerH extends Check {
     @Packet
     public void onArm(WrappedInArmAnimationPacket packet) {
         if(data.playerInfo.breakingBlock
-                || data.playerInfo.lookingAtBlock
                 || data.playerInfo.lastBlockPlace.hasNotPassed(2)) return;
         ++cps;
-        vl-= vl > 0 ? 0.0025f : 0;
     }
 }

@@ -1,12 +1,7 @@
 package dev.brighten.anticheat.check.impl.combat.autoclicker;
 
-import cc.funkemunky.api.reflections.impl.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
-import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.*;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutHeldItemSlot;
-import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumAnimation;
-import cc.funkemunky.api.utils.Materials;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.math.cond.MaxDouble;
 import dev.brighten.anticheat.check.api.*;
@@ -19,51 +14,15 @@ public class AutoclickerC extends Check {
 
     private long lastArm;
     private double cps;
-    private boolean blocked, blocking;
-    private int armTicks, slot;
-    private MaxDouble verbose = new MaxDouble(40), verbose2 = new MaxDouble(40);
+    private boolean blocked;
+    private int armTicks;
+    private MaxDouble verbose = new MaxDouble(40);
 
     @Packet
     public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
         cps = 1000D / (timeStamp - lastArm);
         lastArm = timeStamp;
         armTicks++;
-    }
-
-    @Packet
-    public void onUse(WrappedInUseEntityPacket packet) {
-        if(packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) {
-            if(blocking && packet.getPlayer().getItemInHand() != null) {
-
-                WrappedEnumAnimation animation =
-                        MinecraftReflection.getItemAnimation(packet.getPlayer().getItemInHand());
-
-                if(animation != null && animation.equals(WrappedEnumAnimation.NONE)) {
-                    if (verbose.add() > 14) {
-                        flag("t=%v vb=%v", "block", MathUtils.round(verbose.value(), 2));
-                    } else if (verbose.value() > 8) {
-                        TinyProtocolHandler.sendPacket(packet.getPlayer(),
-                                new WrappedOutHeldItemSlot(slot == 8 ? 0 : Math.min(8, slot + 1))
-                                        .getObject());
-                        debug("unblocked");
-                    }
-                }
-            } else verbose.subtract(0.01);
-        }
-    }
-
-    @Packet
-    public void onDig(WrappedInBlockDigPacket packet) {
-        if(packet.getAction().name().contains("DROP")
-                || packet.getAction().equals(WrappedInBlockDigPacket.EnumPlayerDigType.RELEASE_USE_ITEM)) {
-            blocking = false;
-        }
-    }
-
-    @Packet
-    public void onHeld(WrappedInHeldItemSlotPacket packet) {
-        blocking = false;
-        slot = packet.getSlot();
     }
 
     @Packet
@@ -86,8 +45,8 @@ public class AutoclickerC extends Check {
 
     @Packet
     public void onPlace(WrappedInBlockPlacePacket packet) {
-        if(packet.getItemStack() == null || !Materials.isUsable(packet.getItemStack().getType())) return;
-        blocked = blocking = true;
+        if(packet.getItemStack() == null || !packet.getItemStack().getType().name().contains("SWORD")) return;
+        blocked = true;
     }
 }
 

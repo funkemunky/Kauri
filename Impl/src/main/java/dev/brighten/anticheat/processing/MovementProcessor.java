@@ -172,12 +172,6 @@ public class MovementProcessor {
 
             origin.y+= data.playerInfo.sneaking ? 1.54 : 1.62;
 
-            RayCollision collision = new RayCollision(origin.toVector(), MathUtils.getDirection(origin));
-
-            List<CollisionBox> boxes = Helper.getCollisionsOnRay(collision, data.getPlayer().getWorld(),
-                    data.playerInfo.creative ? 5 : 4, 0.5);
-
-            data.playerInfo.lookingAtBlock = boxes.size() > 0;
             double yawGcd = data.playerInfo.yawGCD / offset;
             double pitchGcd = data.playerInfo.pitchGCD / offset;
 

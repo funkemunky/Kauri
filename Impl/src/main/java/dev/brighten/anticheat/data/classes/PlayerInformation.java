@@ -54,7 +54,7 @@ public class PlayerInformation {
             lastTargetSwitch = new TickTimer(3),
             lastBlockPlace = new TickTimer(10),
             lastToggleFlight = new TickTimer(10),
-            lastWorldUnload = new TickTimer(20),
+            lastWindowClick = new TickTimer(20),
             lastInsideBlock = new TickTimer(5),
             lastHalfBlock = new TickTimer(20),
             lastPlaceLiquid = new TickTimer(20),
@@ -64,7 +64,6 @@ public class PlayerInformation {
             lastRespawnTimer = new TickTimer(20);
 
     public double velocityX, velocityY, velocityZ;
-    public boolean lookingAtBlock;
 
     public WrappedEnumAnimation animation = WrappedEnumAnimation.NONE;
 

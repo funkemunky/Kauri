@@ -8,7 +8,7 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Autoclicker (J)", description = "Checks the kurtosis of a player's click pattern.",
-        checkType = CheckType.AUTOCLICKER, maxVersion = ProtocolVersion.V1_8_9, punishVL = 110, vlToFlag = 50)
+        checkType = CheckType.AUTOCLICKER, maxVersion = ProtocolVersion.V1_8_9, punishVL = 130, vlToFlag = 50)
 public class AutoclickerJ extends Check {
 
     private double buffer;
@@ -16,7 +16,7 @@ public class AutoclickerJ extends Check {
 
     @Packet
     public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
-        if(data.playerInfo.breakingBlock || data.playerInfo.lookingAtBlock
+        if(data.playerInfo.breakingBlock
                 || data.playerInfo.lastBlockPlace.hasNotPassed(1)) return;
 
         if(data.clickProcessor.getKurtosis() < 0

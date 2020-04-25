@@ -2,6 +2,7 @@ package dev.brighten.anticheat.logs.data.impl;
 
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
+import com.mysql.jdbc.MysqlDataTruncation;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.logs.data.DataStorage;
@@ -55,21 +56,29 @@ public class MySQLStorage implements DataStorage {
         RunUtils.taskTimerAsync(() -> {
             if(logs.size() > 0) {
                 for (Log log : logs) {
-                    Query.prepare("INSERT INTO `VIOLATIONS`" +
-                            " (`UUID`, `TIME`, `VL`, `CHECK`, `PING`, `TPS`, `INFO`) VALUES (?,?,?,?,?,?,?)")
-                            .append(log.uuid.toString()).append(log.timeStamp).append(log.vl)
-                            .append(log.checkName).append((int)log.ping).append(log.tps)
-                            .append(log.info)
-                            .execute();
+                    try {
+                        Query.prepare("INSERT INTO `VIOLATIONS`" +
+                                " (`UUID`, `TIME`, `VL`, `CHECK`, `PING`, `TPS`, `INFO`) VALUES (?,?,?,?,?,?,?)")
+                                .append(log.uuid.toString()).append(log.timeStamp).append(log.vl)
+                                .append(log.checkName).append((int)log.ping).append(log.tps)
+                                .append(log.info)
+                                .execute();
+                    } catch(Exception e) {
+                        e.printStackTrace();
+                    }
                     logs.remove(log);
                 }
             }
             if(punishments.size() > 0) {
                 for(Punishment punishment : punishments) {
-                    Query.prepare("INSERT INTO `PUNISHMENTS` (`UUID`,`TIME`,`CHECK`) VALUES (?,?,?)")
-                            .append(punishment.uuid.toString())
-                            .append(punishment.timeStamp).append(punishment.checkName)
-                            .execute();
+                    try {
+                        Query.prepare("INSERT INTO `PUNISHMENTS` (`UUID`,`TIME`,`CHECK`) VALUES (?,?,?)")
+                                .append(punishment.uuid.toString())
+                                .append(punishment.timeStamp).append(punishment.checkName)
+                                .execute();
+                    } catch(Exception e) {
+                        e.printStackTrace();
+                    }
                     punishments.remove(punishment);
                 }
             }

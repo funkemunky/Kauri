@@ -124,7 +124,6 @@ public class PacketProcessor {
 
                 switch (packet.getAction()) {
                     case START_DESTROY_BLOCK: {
-                        data.playerInfo.breakingBlock = true;
                         data.predictionService.useSword
                                 = data.playerInfo.usingItem = false;
                         break;
@@ -132,8 +131,7 @@ public class PacketProcessor {
                     case STOP_DESTROY_BLOCK:
                     case ABORT_DESTROY_BLOCK: {
                         data.predictionService.useSword
-                                = data.playerInfo.usingItem
-                                = data.playerInfo.breakingBlock = false;
+                                = data.playerInfo.usingItem = false;
                         break;
                     }
                     case RELEASE_USE_ITEM: {
@@ -306,6 +304,7 @@ public class PacketProcessor {
                 WrappedInWindowClickPacket packet = new WrappedInWindowClickPacket(object, data.getPlayer());
 
                 data.predictionService.useSword = data.playerInfo.usingItem = false;
+                data.playerInfo.lastWindowClick.reset();
                 data.checkManager.runPacket(packet, timeStamp);
 
                 if(data.sniffing) {

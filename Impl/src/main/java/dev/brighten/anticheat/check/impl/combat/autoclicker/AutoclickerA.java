@@ -35,7 +35,6 @@ public class AutoclickerA extends Check {
     @Packet
     public void onArmAnimation(WrappedInArmAnimationPacket packet) {
         if(!data.playerInfo.breakingBlock
-                && !data.playerInfo.lookingAtBlock
                 && data.playerInfo.lastBrokenBlock.hasPassed(5)
                 && data.playerInfo.lastBlockPlace.hasPassed(2))
             cps++;

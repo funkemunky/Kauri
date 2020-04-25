@@ -84,7 +84,7 @@ public class ReachB extends Check {
 
             boolean lunar = lunarOffset && data.usingLunar;
 
-            val subtraction = 0.0425 + Math.min(0.2, (data.playerInfo.deltaXZ + targetData.playerInfo.deltaXZ) / 3);
+            val subtraction = 0.0625 + Math.min(0.2, (data.playerInfo.deltaXZ + targetData.playerInfo.deltaXZ) / 2.5);
             distance-= subtraction;
 
             if(collided > 1 && data.lagInfo.lastPacketDrop.hasPassed(2)) {
@@ -95,7 +95,7 @@ public class ReachB extends Check {
                         vl++;
                         flag("distance=%v.3 buffer=%v.1 misses=%v", distance, buffer, misses);
                     }
-                } else buffer-= buffer > 0 ? 0.02 : 0;
+                } else buffer-= buffer > 0 ? (lunar ? lunarBufferSubtract : 0.02) : 0;
             }
 
             debug("distance=%v.3 buffer=%v.1 ticklag=%v collided=%v subtraction=%v.4",

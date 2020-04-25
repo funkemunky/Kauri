@@ -27,6 +27,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
@@ -60,6 +61,8 @@ public class ObjectData {
     public ModData modData;
     public ProtocolVersion playerVersion = ProtocolVersion.UNKNOWN;
     public Set<Player> boxDebuggers = new HashSet<>();
+    public List<PotionEffectType> potionEffects = Collections.synchronizedList(new ArrayList<>()),
+            effectsToChange = Collections.synchronizedList(new ArrayList<>());
     public final Map<String, Long> keepAliveStamps = Collections.synchronizedMap(new HashMap<>());
     public final Map<String, Short> transactionActions = Collections.synchronizedMap(new HashMap<>());
     public ConcurrentEvictingList<CancelType> typesToCancel = new ConcurrentEvictingList<>(10);
@@ -149,6 +152,10 @@ public class ObjectData {
 
             return action;
         }
+    }
+
+    public void addPotionEffect(PotionEffectType type) {
+        setTransactionAction("addpotion");
     }
 
     public Player getPlayer() {
