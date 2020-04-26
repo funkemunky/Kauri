@@ -24,13 +24,13 @@ public class AutoclickerH extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if (++ticks == 20) {
-            if (cps > 9 && clickSamples.add(cps) && clickSamples.size() == 10) {
+            if (cps > 8 && clickSamples.add(cps) && clickSamples.size() == 10) {
                 final GraphUtil.GraphResult results = GraphUtil.getGraph(clickSamples);
 
                 val negatives = results.getNegatives();
                 val kurtosis = data.clickProcessor.getKurtosis();
                 if (negatives == 1 && MathUtils.getDelta(kurtosis, lastKurt) > 0.2) {
-                    if (++buffer > 1) {
+                    if (++buffer > 3) {
                         vl++;
                         flag("cps=%v buffer=%v", cps, buffer);
                     }
