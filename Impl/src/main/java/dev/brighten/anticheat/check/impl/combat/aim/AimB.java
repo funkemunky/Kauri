@@ -4,6 +4,8 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.processing.MovementProcessor;
+import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Aim (B)", description = "Checks for common denominators in pitch difference.",
@@ -24,8 +26,9 @@ public class AimB extends Check {
                     flag("offset=%v deltaPitch=%v", data.playerInfo.pitchGCD, data.playerInfo.deltaPitch);
                 }
             } else vl-= vl > 0 ? 0.5 : 0;
-            debug("gcd=" + data.playerInfo.pitchGCD + " cin=" + data.playerInfo.cinematicMode
-                    + " deltaPitch=" + data.playerInfo.deltaPitch + " vl=" + vl);
+            debug("gcd=%v cin=%v dpitch=%v.2 vl=%v.1",
+                    data.playerInfo.pitchGCD,
+                    data.playerInfo.cinematicMode, data.playerInfo.deltaPitch, vl);
         }
     }
 }

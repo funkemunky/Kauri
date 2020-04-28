@@ -10,6 +10,7 @@ import cc.funkemunky.api.tinyprotocol.packet.out.*;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.RunUtils;
+import cc.funkemunky.api.utils.XMaterial;
 import cc.funkemunky.api.utils.objects.VariableValue;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
@@ -169,7 +170,8 @@ public class PacketProcessor {
 
                     if(pos.getX() == -1 && (pos.getY() == 255 || pos.getY() == -1)
                             && pos.getZ() == -1 && stack != null
-                            && stack.getType().name().contains("SWORD")) {
+                            && (stack.getType().name().contains("SWORD")
+                            || stack.getType().equals(XMaterial.BOW.parseMaterial()))) {
                         data.predictionService.useSword = data.playerInfo.usingItem = true;
                         data.playerInfo.lastUseItem.reset();
                     } else if(stack != null) {

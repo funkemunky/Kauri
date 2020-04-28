@@ -19,6 +19,7 @@ import org.bukkit.util.Vector;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @CheckInfo(name = "Hitboxes", description = "Checks if the player attacks outside a player's hitbox.",
         checkType = CheckType.HITBOX, punishVL = 15)
@@ -39,8 +40,7 @@ public class Hitboxes extends Check {
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if (checkParameters(data)) {
 
-            List<RayCollision> rayTrace = data.pastLocation.getEstimatedLocation(timeStamp,
-                    0, 100L + (data.lagInfo.transPing / 2)).stream()
+            List<RayCollision> rayTrace = Stream.of(data.playerInfo.to.clone(), data.playerInfo.from.clone())
                     .map(l -> {
                         KLocation loc = l.clone();
                         loc.y+=data.playerInfo.sneaking ? 1.54 : 1.62;
@@ -51,7 +51,7 @@ public class Hitboxes extends Check {
 
             List<SimpleCollisionBox> entityLocations = data.targetPastLocation
                     .getEstimatedLocation(timeStamp,
-                            data.lagInfo.transPing, 150L
+                            data.lagInfo.transPing, 200L
                                     + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
                     .stream()
                     .map(loc -> getHitbox(loc, data.target.getType()))

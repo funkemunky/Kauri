@@ -13,50 +13,28 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 
-@CheckInfo(name = "Autoclicker (I)", description = "Checks for impossible ratio consistency. Check by Elevated.",
-        checkType = CheckType.AUTOCLICKER, enabled = false, developer = true)
+@CheckInfo(name = "Autoclicker (I)", description = "Checks for double clicking abuse.",
+        checkType = CheckType.AUTOCLICKER, developer = true)
 public class AutoclickerI extends Check {
 
-    private List<Long> clickSamples = new ArrayList<>();
-
-    private long lastSwing;
-    private double lstd;
-    private MaxDouble verbose = new MaxDouble(10);
+    private int buffer = 0;
 
     @Packet
-    public void onClick(WrappedInArmAnimationPacket packet, long timeStamp) {
-        long delay = timeStamp - this.lastSwing;
+    public void onClick(WrappedInArmAnimationPacket packet) {
 
         if (data.playerInfo.breakingBlock
                 || data.playerInfo.lastBlockPlace.hasNotPassed(1))
             return;
 
-        if (delay > 1L && delay < 300L && this.clickSamples.add(delay) && this.clickSamples.size() == 30) {
-            double average = this.clickSamples.stream().mapToDouble(Long::doubleValue).average().orElse(0.0);
-
-            double stdDeviation = 0.0;
-
-            for (Long click : this.clickSamples) {
-                stdDeviation += Math.pow(click.doubleValue() - average, 2);
+        if(data.clickProcessor.getZeros() > 1 && data.clickProcessor.getAverage() > 55) {
+            if(++buffer > 12) {
+                vl++;
+                flag("doubleClicks=%v average=%v.2 buffer=%v",
+                        data.clickProcessor.getZeros(), data.clickProcessor.getAverage(), buffer);
             }
+        } else buffer = 0;
 
-            stdDeviation /= this.clickSamples.size();
-
-            val std = Math.sqrt(stdDeviation);
-            val deltaStd = Math.abs(std - lstd);
-            if (deltaStd < 2.5) {
-                if(verbose.add(std < 15 ? 2 : 1) > 4) {
-                    vl++;
-                    this.flag("std=%v.2 delta=%v.2 buffer=%v.1", std, deltaStd, verbose.value());
-                }
-            } else verbose.subtract(1);
-
-            debug("std=%v.2 delta=%v.2 verbose=%v.1", std, deltaStd, verbose.value());
-
-            lstd = std;
-            this.clickSamples.clear();
-        }
-
-        this.lastSwing = timeStamp;
+        debug("buffer=%v zeros=%v avg=%v.2",
+                data.clickProcessor.getZeros(), data.clickProcessor.getAverage(), buffer);
     }
 }

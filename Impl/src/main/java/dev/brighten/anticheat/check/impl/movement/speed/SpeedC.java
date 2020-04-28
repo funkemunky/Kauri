@@ -18,11 +18,10 @@ import java.util.List;
 
 @Cancellable
 @CheckInfo(name = "Speed (C)", description = "Speed check by DeprecatedLuke, improved by funkemunky.",
-        punishVL = 30, vlToFlag = 5)
+        punishVL = 30, vlToFlag = 5, developer = true)
 public class SpeedC extends Check {
 
     public double previousDistance;
-    private double drag = 0.91;
     private int fallTicks;
     private int webTicks;
     private double velocityX, velocityZ;
@@ -45,21 +44,22 @@ public class SpeedC extends Check {
         List<String> tags = new ArrayList<>();
 
         double moveSpeed = Math.pow(data.getPlayer().getWalkSpeed() * 5, 2);
-        double drag = this.drag;
-        boolean onGround = packet.isGround() || data.blockInfo.onSlime;
+        double drag = 0.91;
+        boolean onGround = data.playerInfo.clientGround || data.blockInfo.onSlime;
 
         if (data.playerInfo.deltaY < 0) fallTicks++;
         else fallTicks = 0;
 
         double velocityXZ = MathUtils.hypot(velocityX, velocityZ);
 
-        if(data.playerInfo.blockBelow == null) return;
+        Material type = data.playerInfo.blockBelow == null
+                ? XMaterial.AIR.parseMaterial()
+                : data.playerInfo.blockBelow.getType();
 
-        Material type = data.playerInfo.blockBelow.getType();
-
-        if (onGround || data.playerInfo.jumped) {
+        if (onGround || (data.playerInfo.lClientGround
+                && MathUtils.getDelta(data.playerInfo.jumpHeight, data.playerInfo.deltaY) < 0.1)) {
             tags.add("ground");
-            drag *= 0.91;
+            drag *= data.blockInfo.currentFriction;
             moveSpeed *= drag > 0.708 ? 1.3 : data.predictionService.aiMoveSpeed * 1.1f;
             moveSpeed *= 0.16277136 / Math.pow(drag, 3);
 
@@ -70,7 +70,7 @@ public class SpeedC extends Check {
 
                 if (data.playerInfo.jumped) {
                     tags.add("hop");
-                    moveSpeed += 0.05;
+                    moveSpeed += 0.1;
                     if (data.playerInfo.wasOnSlime) {
                         tags.add("slimehop");
                         moveSpeed += 0.1;
@@ -99,7 +99,7 @@ public class SpeedC extends Check {
             }
         } else {
             tags.add("air");
-            moveSpeed = 0.027;
+            moveSpeed = 0.0278;
             drag = 0.91;
 
             if (timeStamp - data.playerInfo.lastServerPos < 100L) {
@@ -235,8 +235,8 @@ public class SpeedC extends Check {
             } else vl-= vl > 0 ? 0.2 : 0;
         }
 
-        debug("+%v.4,tags=%v,place=%v,dy=%v.3", horizontalMove, String.join(",", tags),
-                data.playerInfo.lastBlockPlace.getPassed(), Helper.format(data.playerInfo.deltaY, 4));
+        debug("+%v.4,tags=%v,place=%v,dy=%v.3,jumped=%v", horizontalMove, String.join(",", tags),
+                data.playerInfo.lastBlockPlace.getPassed(), data.playerInfo.deltaY, data.playerInfo.jumped);
 
 
         if(velocityXZ > 0) {
@@ -248,6 +248,5 @@ public class SpeedC extends Check {
         }
 
         this.previousDistance = horizontalDistance * drag;
-        this.drag = data.blockInfo.inWater ? 0.8 : data.blockInfo.currentFriction;
     }
 }

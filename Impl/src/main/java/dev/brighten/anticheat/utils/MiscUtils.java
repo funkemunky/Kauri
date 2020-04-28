@@ -155,13 +155,16 @@ public class MiscUtils {
         return MathUtils.yawTo180F((float)(-(MathUtils.getAngleDelta(from.yaw, to.yaw) - (double)((float)pitchToEntity))));
     }
 
-
     public static boolean isReflectedAsNumber(Class<?> type) {
         return Number.class.isAssignableFrom(type) || NUMBER_REFLECTED_PRIMITIVES.contains(type);
     }
 
     public static long gcd(long current, long previous) {
         return (previous <= 16384L) ? current : gcd(previous, current % previous);
+    }
+
+    public static long gcdPrevious(long current, long previous) {
+        return (previous <= 16384L) ? previous : gcdPrevious(previous, current % previous);
     }
 
     public static float gcd(float current, float previous) {

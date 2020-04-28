@@ -20,7 +20,7 @@ public class ClickProcessor {
     @Getter
     private double std, average, nosqrtKurtosis, kurtosis, skew, variance;
     @Getter
-    private long min, max, sum;
+    private long min, max, sum, zeros;
     private long lastTimestamp;
 
     private final ObjectData data;
@@ -32,6 +32,8 @@ public class ClickProcessor {
                 && !data.playerInfo.breakingBlock && data.playerInfo.lastBlockPlace.hasPassed(3)) {
             cpsList.add(delta);
             LongSummaryStatistics summary = cpsList.parallelStream().mapToLong(v -> v).summaryStatistics();
+
+            zeros = cpsList.parallelStream().filter(dt -> dt <= 2).count();
 
             average = summary.getAverage();
             min = summary.getMin();
