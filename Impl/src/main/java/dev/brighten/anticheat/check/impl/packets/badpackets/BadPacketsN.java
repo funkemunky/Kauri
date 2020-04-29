@@ -13,18 +13,20 @@ import dev.brighten.api.check.CheckType;
         checkType = CheckType.BADPACKETS, maxVersion = ProtocolVersion.V1_8_9)
 public class BadPacketsN extends Check {
 
+    private boolean lastFlying;
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long ts) {
         if(ts - data.creation < 4000L) return;
 
-        if(Math.abs(data.playerInfo.deltaXZ) < 0.005 && data.playerInfo.deltaXZ != 0) {
+        if(!lastFlying && Math.abs(data.playerInfo.deltaXZ) < 0.005 && data.playerInfo.deltaXZ != 0) {
             vl++;
             flag("type=xz deltaX=%v", data.playerInfo.deltaX);
         }
 
-        if(Math.abs(data.playerInfo.deltaY) < 0.005 && data.playerInfo.deltaY != 0) {
+        if(!lastFlying && Math.abs(data.playerInfo.deltaY) < 0.005 && data.playerInfo.deltaY != 0) {
             vl++;
             flag("type=y deltaY=%v", data.playerInfo.deltaY);
         }
+        lastFlying = packet.isPos();
     }
 }

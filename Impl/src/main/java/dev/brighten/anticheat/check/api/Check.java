@@ -208,7 +208,7 @@ public class Check implements KauriCheck {
                 if (Kauri.INSTANCE.lastTickLag.hasPassed() && (data.lagInfo.lastPacketDrop.hasPassed(5)
                         || data.lagInfo.lastPingDrop.hasPassed(20))
                         && System.currentTimeMillis() - Kauri.INSTANCE.lastTick < 100L) {
-                    Kauri.INSTANCE.loggerManager.addLog(data, this, info);
+                    if(vl > 0) Kauri.INSTANCE.loggerManager.addLog(data, this, info);
 
                     if (lastAlert.hasPassed(MathUtils.millisToTicks(Config.alertsDelay))) {
                         List<TextComponent> components = new ArrayList<>();

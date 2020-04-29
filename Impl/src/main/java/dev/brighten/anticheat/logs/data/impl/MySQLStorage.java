@@ -41,16 +41,15 @@ public class MySQLStorage implements DataStorage {
                 "`NAME` VARCHAR(16) NOT NULL," +
                 "`TIMESTAMP` LONG NOT NULL)").execute();
         Kauri.INSTANCE.loggingThread.execute(() -> {
-            Query.prepare("DROP INDEX `UUID` on `VIOLATIONS`");
-            Query.prepare("CREATE INDEX `UUID` ON `VIOLATIONS` (UUID)").execute();
-        });
-        Kauri.INSTANCE.loggingThread.execute(() -> {
-            Query.prepare("DROP INDEX `UUID` ON `PUNISHMENTS`").execute();
-            Query.prepare("CREATE INDEX `UUID` ON `PUNISHMENTS` (UUID)").execute();
-        });
-        Kauri.INSTANCE.loggingThread.execute(() -> {
-            Query.prepare("DROP INDEX `TIME` ON `VIOLATIONS`").execute();
-            Query.prepare("CREATE INDEX `TIME` ON `VIOLATIONS` (`TIME`)").execute();
+            MiscUtils.printToConsole("&7Creating iv_uuid index for SQL...");
+            Query.prepare("CREATE INDEX `iv_uuid` ON `VIOLATIONS` (UUID)").execute();
+            MiscUtils.printToConsole("&aCreated iv_uuid!");
+            MiscUtils.printToConsole("&7Creating ip_uuid index for SQL...");
+            Query.prepare("CREATE INDEX `ip_uuid` ON `PUNISHMENTS` (UUID)").execute();
+            MiscUtils.printToConsole("&aCreated ip_uuid!");
+            MiscUtils.printToConsole("&a7 Creating iv_time index for SQL...");
+            Query.prepare("CREATE INDEX `iv_time` ON `VIOLATIONS` (`TIME`)").execute();
+            MiscUtils.printToConsole("&aCreated!");
         });
 
         RunUtils.taskTimerAsync(() -> {
