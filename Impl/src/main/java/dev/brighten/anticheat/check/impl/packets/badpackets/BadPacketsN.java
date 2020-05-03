@@ -18,11 +18,6 @@ public class BadPacketsN extends Check {
     public void onFlying(WrappedInFlyingPacket packet, long ts) {
         if(ts - data.creation < 4000L) return;
 
-        if(!lastFlying && Math.abs(data.playerInfo.deltaXZ) < 0.005 && data.playerInfo.deltaXZ != 0) {
-            vl++;
-            flag("type=xz deltaX=%v", data.playerInfo.deltaX);
-        }
-
         if(!lastFlying && Math.abs(data.playerInfo.deltaY) < 0.005 && data.playerInfo.deltaY != 0) {
             vl++;
             flag("type=y deltaY=%v", data.playerInfo.deltaY);

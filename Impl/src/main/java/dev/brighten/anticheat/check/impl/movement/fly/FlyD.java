@@ -27,7 +27,7 @@ public class FlyD extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if(packet.isPos()) {
-            double threshold = MiscUtils.max(0.8, data.playerInfo.jumpHeight * 2, velocityY * 1.25);
+            double threshold = MiscUtils.max(0.8, data.playerInfo.jumpHeight * 3, velocityY * 2.8);
 
             if(data.playerInfo.deltaY > threshold && !data.playerInfo.flightCancel) {
                 vl++;

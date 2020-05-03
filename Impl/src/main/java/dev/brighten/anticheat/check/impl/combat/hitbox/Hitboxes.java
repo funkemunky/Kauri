@@ -67,7 +67,7 @@ public class Hitboxes extends Check {
                         double dist = point.distance(ray.getOrigin());
 
                         distance.set(Math.min(dist, distance.get()));
-                        return dist < 3.4f;
+                        return dist < 4f;
                     }
                     return false;
                 }).count();
@@ -79,7 +79,7 @@ public class Hitboxes extends Check {
                     && data.lagInfo.lastPacketDrop.hasPassed(4)) {
                 if(vl++ > 10)  flag("distance=%v ping=%p tps=%t",
                         distance.get() != -1 ? distance.get() : "[none collided]");
-            } else vl -= vl > 0 ? 0.5 : 0;
+            } else vl -= vl > 0 ? 0.25 : 0;
 
             debug("collided=" + collisions + " distance=" + distance.get() + " type=" + data.target.getType());
         }
@@ -99,7 +99,7 @@ public class Hitboxes extends Check {
 
     private static SimpleCollisionBox getHitbox(KLocation loc, EntityType type) {
         if(type.equals(EntityType.PLAYER)) {
-            return new SimpleCollisionBox(loc.toVector(), 0.6, 1.8).expand(0.25, 0.25, 0.25);
+            return new SimpleCollisionBox(loc.toVector(), 0.6, 1.8).expand(0.3, 0.3, 0.3);
         } else {
             Vector bounds = MiscUtils.entityDimensions.get(type);
 

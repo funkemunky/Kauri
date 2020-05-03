@@ -207,7 +207,7 @@ public class PacketProcessor {
                     data.predictionService.velocity = true;
                 } else {
                     data.lagInfo.lastPing = data.lagInfo.ping;
-                    data.lagInfo.ping = System.currentTimeMillis() - data.lagInfo.lastKeepAlive;
+                    data.lagInfo.ping = event.getTimeStamp() - data.lagInfo.lastKeepAlive;
                 }
 
                 data.checkManager.runPacket(packet, timeStamp);
@@ -240,14 +240,14 @@ public class PacketProcessor {
                     data.playerInfo.lastRespawnTimer.reset();
                 } else if (packet.getAction() == data.getTransactionAction("ping")) {
                     data.lagInfo.lastTransPing = data.lagInfo.transPing;
-                    data.lagInfo.transPing = System.currentTimeMillis() - data.lagInfo.lastTrans;
+                    data.lagInfo.transPing = event.getTimeStamp() - data.lagInfo.lastTrans;
                     data.lagInfo.lastClientTrans = timeStamp;
 
 
                     //We use transPing for checking lag since the packet used is little known.
                     //AimE have not seen anyone create a spoof for it or even talk about the possibility of needing one.
                     //Large jumps in latency most of the intervalTime mean lag.
-                    if (MathUtils.getDelta(data.lagInfo.lastTransPing, data.lagInfo.transPing) > 25)
+                    if (MathUtils.getDelta(data.lagInfo.lastTransPing, data.lagInfo.transPing) > 15)
                         data.lagInfo.lastPingDrop.reset();
 
                     data.lagInfo.pingAverages.add(data.lagInfo.transPing);
@@ -426,7 +426,7 @@ public class PacketProcessor {
             case Packet.Server.KEEP_ALIVE: {
                 WrappedOutKeepAlivePacket packet = new WrappedOutKeepAlivePacket(object, data.getPlayer());
 
-                data.lagInfo.lastKeepAlive = System.currentTimeMillis();
+                data.lagInfo.lastKeepAlive = event.getTimeStamp();
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
             }
@@ -434,7 +434,7 @@ public class PacketProcessor {
                 WrappedOutTransaction packet = new WrappedOutTransaction(object, data.getPlayer());
 
                 if (packet.getAction() == data.getTransactionAction("ping")) {
-                    data.lagInfo.lastTrans = System.currentTimeMillis();
+                    data.lagInfo.lastTrans = event.getTimeStamp();
                 }
                 break;
             }

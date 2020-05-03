@@ -28,11 +28,12 @@ public class FlyC extends Check {
                 && !data.playerInfo.nearGround
                 && !data.playerInfo.clientGround
                 && !data.playerInfo.lClientGround
-                && data.playerInfo.airTicks > 2
+                && data.playerInfo.airTicks > 5
                 && !data.playerInfo.flightCancel) {
             if(data.playerInfo.deltaY > data.playerInfo.lDeltaY) {
                 vl++;
-                flag("%v.2>-%v.2", data.playerInfo.deltaY, data.playerInfo.lDeltaY);
+                flag("%v.2>-%v.2 at=%v",
+                        data.playerInfo.deltaY, data.playerInfo.lDeltaY, data.playerInfo.airTicks);
             }
         }
     }

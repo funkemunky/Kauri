@@ -53,8 +53,6 @@ public class BadPacketsD extends Check {
                 if(vl++ > 1) {
                     flag("server=" + serverAllowed + " client=" + clientAllowed);
                     RunUtils.task(() -> {
-                        data.getPlayer().setFlying(true);
-                        data.getPlayer().setAllowFlight(true);
                         data.getPlayer().setFlying(false);
                         data.getPlayer().setAllowFlight(false);
                     }, Kauri.INSTANCE);

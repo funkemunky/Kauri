@@ -67,8 +67,10 @@ public class VelocityB extends Check {
             if(data.blockInfo.blocksNear
                     || data.blockInfo.inLiquid
                     || tookVelocity
+                    || data.lagInfo.lastPingDrop.hasNotPassed(10)
                     || data.lagInfo.lastPacketDrop.hasNotPassed(10)) {
                 pvX = pvZ = 0;
+                buffer-= buffer > 0 ? 1 : 0;
                 return;
             }
 
