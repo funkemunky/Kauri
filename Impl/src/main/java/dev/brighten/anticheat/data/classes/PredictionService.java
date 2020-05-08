@@ -1,6 +1,5 @@
 package dev.brighten.anticheat.data.classes;
 
-import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.*;
@@ -8,7 +7,6 @@ import cc.funkemunky.api.utils.world.BlockData;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.Helper;
-import dev.brighten.anticheat.utils.MiscUtils;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.potion.PotionEffectType;

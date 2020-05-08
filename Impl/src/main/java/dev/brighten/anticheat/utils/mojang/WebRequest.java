@@ -1,12 +1,12 @@
 package dev.brighten.anticheat.utils.mojang;
 
+import com.google.gson.JsonElement;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-
-import com.google.gson.JsonElement;
 
 public class WebRequest {
 	

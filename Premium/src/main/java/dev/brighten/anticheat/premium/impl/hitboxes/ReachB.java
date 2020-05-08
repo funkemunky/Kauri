@@ -1,6 +1,5 @@
 package dev.brighten.anticheat.premium.impl.hitboxes;
 
-import cc.funkemunky.api.reflections.impl.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
@@ -12,17 +11,14 @@ import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.data.ObjectData;
-import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
-import net.minecraft.server.v1_8_R3.AxisAlignedBB;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @CheckInfo(name = "Reach (B)", description = "Ensures the reach of a player is legitimate.",
         checkType = CheckType.HITBOX, punishVL = 8)
@@ -36,21 +32,12 @@ public class ReachB extends Check {
     @Setting(name = "debug")
     private static boolean debug = false;
 
-    @Setting(name = "lunarclient.threshold")
-    private static double lunarThreshold = 3.14;
-
-    @Setting(name = "lunarclient.offsetEnable")
-    private static boolean lunarOffset = false;
-
-    @Setting(name = "lunarclient.bufferSubtract")
-    private static double lunarBufferSubtract = 0.05;
-
     @Packet
     public void onFly(WrappedInFlyingPacket packet, long timeStamp) {
         if(timeStamp - lastUse < 1 && entity != null && entity instanceof Player) {
             ObjectData targetData = Kauri.INSTANCE.dataManager.getData((Player) entity);
 
-            if(targetData == null || data.playerInfo.creative) return;
+            if(data.playerInfo.creative) return;
 
             KLocation originLoc = data.playerInfo.to.clone();
 
@@ -82,20 +69,20 @@ public class ReachB extends Check {
                 return;
             }
 
-            boolean lunar = lunarOffset && data.usingLunar;
-
-            val subtraction = 0.0625 + Math.min(0.2, (data.playerInfo.deltaXZ + targetData.playerInfo.deltaXZ) / 2.5);
+            double subtraction = 0.0625;
+            if(targetData != null)
+                subtraction+= Math.min(0.2, (data.playerInfo.deltaXZ + targetData.playerInfo.deltaXZ) / 2.65);
+            else subtraction+= 0.021;
             distance-= subtraction;
 
             if(collided > 1 && data.lagInfo.lastPacketDrop.hasPassed(2)) {
-                if(distance > (lunar ? lunarThreshold : 3.02) &&
-
+                if(distance > 3.02 &&
                         Kauri.INSTANCE.lastTickLag.hasPassed(40)) {
                     if(++buffer > 4) {
                         vl++;
                         flag("distance=%v.3 buffer=%v.1 misses=%v", distance, buffer, misses);
                     }
-                } else buffer-= buffer > 0 ? (lunar ? lunarBufferSubtract : 0.02) : 0;
+                } else buffer-= buffer > 0 ? 0.02 : 0;
             }
 
             debug("distance=%v.3 buffer=%v.1 ticklag=%v collided=%v subtraction=%v.4",

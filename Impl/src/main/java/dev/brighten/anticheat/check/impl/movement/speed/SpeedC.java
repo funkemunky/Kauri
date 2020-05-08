@@ -1,14 +1,20 @@
 package dev.brighten.anticheat.check.impl.movement.speed;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInKeepAlivePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
-import cc.funkemunky.api.utils.*;
+import cc.funkemunky.api.utils.Materials;
+import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.PlayerUtils;
+import cc.funkemunky.api.utils.XMaterial;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.Helper;
 import dev.brighten.anticheat.utils.MovementUtils;
+import dev.brighten.anticheat.utils.TickTimer;
 import lombok.val;
 import org.bukkit.Material;
 import org.bukkit.potion.PotionEffectType;
@@ -25,12 +31,18 @@ public class SpeedC extends Check {
     private int fallTicks;
     private int webTicks;
     private double velocityX, velocityZ;
-    private TickTimer horizontalIdle = new TickTimer(20);
+    private TickTimer horizontalIdle;
     private static Material ice = XMaterial.ICE.parseMaterial(), packed_ice = XMaterial.PACKED_ICE.parseMaterial();
 
+    @Override
+    public void setData(ObjectData data) {
+        super.setData(data);
+        horizontalIdle = new TickTimer(data, 20);
+    }
+
     @Packet
-    public void onTrans(WrappedInTransactionPacket packet) {
-        if(packet.getAction() == (short)101) {
+    public void onTrans(WrappedInKeepAlivePacket packet) {
+        if(packet.getTime() == data.getKeepAliveStamp("velocity")) {
             velocityX = data.playerInfo.velocityX;
             velocityZ = data.playerInfo.velocityZ;
         }
@@ -99,7 +111,7 @@ public class SpeedC extends Check {
             }
         } else {
             tags.add("air");
-            moveSpeed = 0.0278;
+            moveSpeed = 0.027;
             drag = 0.91;
 
             if (timeStamp - data.playerInfo.lastServerPos < 100L) {

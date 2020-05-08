@@ -1,7 +1,9 @@
 package dev.brighten.anticheat.check.impl.combat.autoclicker;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
-import cc.funkemunky.api.tinyprotocol.packet.in.*;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.math.cond.MaxDouble;
 import dev.brighten.anticheat.check.api.*;

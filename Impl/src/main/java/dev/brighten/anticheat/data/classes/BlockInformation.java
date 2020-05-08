@@ -58,16 +58,16 @@ public class BlockInformation {
         int endZ = Location.locToBlock(objectData.playerInfo.to.z + 1.5 + dh);
 
         objectData.playerInfo.worldLoaded = true;
-        for(int x = startX ; x < endX ; x++) {
-            for(int y = startY ; y < endY ; y++) {
-                for(int z = startZ ; z < endZ ; z++) {
-                    Location loc = new Location(objectData.getPlayer().getWorld(), x, y, z);
+        synchronized (blocks) {
+            for(int x = startX ; x < endX ; x++) {
+                for(int y = startY ; y < endY ; y++) {
+                    for(int z = startZ ; z < endZ ; z++) {
+                        Location loc = new Location(objectData.getPlayer().getWorld(), x, y, z);
 
-                    if(loc.getWorld().isChunkLoaded(loc.getBlockX() >> 4, loc.getBlockZ() >> 4)) {
-                        synchronized (blocks) {
+                        if(loc.getWorld().isChunkLoaded(loc.getBlockX() >> 4, loc.getBlockZ() >> 4)) {
                             blocks.add(loc.getBlock());
-                        }
-                    } else objectData.playerInfo.worldLoaded = false;
+                        } else objectData.playerInfo.worldLoaded = false;
+                    }
                 }
             }
         }

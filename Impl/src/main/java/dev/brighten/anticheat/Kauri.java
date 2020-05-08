@@ -11,7 +11,7 @@ import cc.funkemunky.api.utils.TickTimer;
 import cc.funkemunky.api.utils.math.RollingAverageDouble;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.data.DataManager;
-import dev.brighten.anticheat.listeners.PacketListener;
+import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.logs.LoggerManager;
 import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.processing.PacketProcessor;
@@ -71,7 +71,6 @@ public class Kauri extends JavaPlugin {
         MiscUtils.printToConsole("&7Unregistering Kauri API...");
         kauriAPI.service.shutdown();
         loggingThread.shutdown();
-        PacketListener.packetThread.shutdown();
 
         if(!reload) {
             kauriAPI = null;
@@ -87,6 +86,7 @@ public class Kauri extends JavaPlugin {
 
         MiscUtils.printToConsole("&7Unloading DataManager...");
         //Clearing the dataManager.
+        Kauri.INSTANCE.dataManager.dataMap.values().forEach(ObjectData::onLogout);
         Kauri.INSTANCE.dataManager.dataMap.clear();
 
         MiscUtils.printToConsole("&7Clearing checks and cached entity information...");

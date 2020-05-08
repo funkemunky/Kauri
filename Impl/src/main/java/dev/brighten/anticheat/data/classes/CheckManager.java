@@ -9,20 +9,23 @@ import dev.brighten.anticheat.data.ObjectData;
 import lombok.val;
 import org.bukkit.event.Event;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CheckManager {
     private ObjectData objectData;
     public Map<String, Check> checks = new ConcurrentHashMap<>();
-    public final Map<Class<?>, List<WrappedCheck>> checkMethods = Collections.synchronizedMap(new ConcurrentHashMap<>());
+    public final Map<Class<?>, List<WrappedCheck>> checkMethods = new ConcurrentHashMap<>();
 
     public CheckManager(ObjectData objectData) {
         this.objectData = objectData;
     }
 
-    public synchronized boolean runPacket(NMSObject object, long timeStamp) {
+    public boolean runPacket(NMSObject object, long timeStamp) {
         if(!checkMethods.containsKey(object.getClass())) return true;
 
         val methods = checkMethods.get(object.getClass());
@@ -50,7 +53,7 @@ public class CheckManager {
         return okay.get();
     }
 
-    public synchronized void runEvent(Event event) {
+    public void runEvent(Event event) {
         if(!checkMethods.containsKey(event.getClass())) return;
 
         val methods = checkMethods.get(event.getClass());
@@ -63,7 +66,7 @@ public class CheckManager {
                 });
     }
 
-    public synchronized void runEvent(AtlasEvent event) {
+    public void runEvent(AtlasEvent event) {
         if(!checkMethods.containsKey(event.getClass())) return;
 
         val methods = checkMethods.get(event.getClass());
@@ -82,7 +85,7 @@ public class CheckManager {
                 .map(clazz -> {
                     CheckInfo settings = Check.checkClasses.get(clazz);
                     Check check = clazz.getConstructor().newInstance();
-                    check.data = objectData.INSTANCE;
+                    check.setData(objectData);
                     CheckSettings checkSettings = Check.checkSettings.get(clazz);
                     check.enabled = checkSettings.enabled;
                     check.executable = checkSettings.executable;

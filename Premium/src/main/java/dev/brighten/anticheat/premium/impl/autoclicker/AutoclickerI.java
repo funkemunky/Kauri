@@ -1,17 +1,10 @@
 package dev.brighten.anticheat.premium.impl.autoclicker;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
-import cc.funkemunky.api.utils.math.cond.MaxDouble;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
-import lombok.val;
-
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.List;
 
 @CheckInfo(name = "Autoclicker (I)", description = "Checks for double clicking abuse.",
         checkType = CheckType.AUTOCLICKER, developer = true)

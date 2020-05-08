@@ -89,8 +89,9 @@ public class FlyB extends Check {
                 }
             } else vl-= vl > 0 ? 0.2f : 0;
 
-            debug("deltaY=" + data.playerInfo.deltaY + " predicted=" + predicted
-                    + " ground=" + data.playerInfo.clientGround + " vl=" + vl);
+            debug("deltaY=%v.3 predicted=%v.3 ground=%v lpass=%v vl=%v.1",
+                    data.playerInfo.deltaY, predicted, data.playerInfo.clientGround,
+                    data.playerInfo.liquidTimer.getPassed(), vl);
         }
     }
 }

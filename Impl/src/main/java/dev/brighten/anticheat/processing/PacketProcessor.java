@@ -9,12 +9,9 @@ import cc.funkemunky.api.tinyprotocol.packet.in.*;
 import cc.funkemunky.api.tinyprotocol.packet.out.*;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.XMaterial;
-import cc.funkemunky.api.utils.objects.VariableValue;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
-import dev.brighten.anticheat.utils.MiscUtils;
 import lombok.val;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -87,6 +84,7 @@ public class PacketProcessor {
             case Packet.Client.LOOK: {
                 WrappedInFlyingPacket packet = new WrappedInFlyingPacket(object, data.getPlayer());
 
+                data.currentTicks++;
                 if (timeStamp - data.lagInfo.lastFlying <= 2 || timeStamp - data.lagInfo.lastFlying >= 90) {
                     data.lagInfo.lastPacketDrop.reset();
                 }

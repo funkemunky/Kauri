@@ -2,7 +2,6 @@ package dev.brighten.anticheat.commands;
 
 import cc.funkemunky.api.commands.ancmd.Command;
 import cc.funkemunky.api.commands.ancmd.CommandAdapter;
-import cc.funkemunky.api.config.MessageConfig;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
 import dev.brighten.anticheat.Kauri;

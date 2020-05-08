@@ -7,21 +7,18 @@ import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.handlers.PlayerSizeHandler;
 import cc.funkemunky.api.utils.objects.VariableValue;
 import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingList;
-import cc.funkemunky.api.utils.world.CollisionBox;
-import cc.funkemunky.api.utils.world.types.RayCollision;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
-import dev.brighten.anticheat.utils.Helper;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.MouseFilter;
 import dev.brighten.anticheat.utils.MovementUtils;
+import dev.brighten.anticheat.utils.TickTimer;
 import lombok.val;
 import org.bukkit.GameMode;
 import org.bukkit.potion.PotionEffectType;
 
 import java.math.RoundingMode;
 import java.util.Deque;
-import java.util.List;
 
 public class MovementProcessor {
     private final ObjectData data;
@@ -32,7 +29,7 @@ public class MovementProcessor {
     public double sensitivityX, sensitivityY, yawMode, pitchMode, sensXPercent, sensYPercent;
     private MouseFilter mxaxis = new MouseFilter(), myaxis = new MouseFilter();
     private float smoothCamFilterX, smoothCamFilterY, smoothCamYaw, smoothCamPitch;
-    private TickTimer lastReset = new TickTimer(5);
+    private TickTimer lastReset;
     private GameMode lastGamemode;
     public static double offset = Math.pow(2, 24);
 
@@ -40,6 +37,7 @@ public class MovementProcessor {
 
     public MovementProcessor(ObjectData data) {
         this.data = data;
+        lastReset = new TickTimer(data, 5);
 
         if(ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_8)) {
             try {
@@ -311,6 +309,7 @@ public class MovementProcessor {
                 || hasLevi
                 || (MathUtils.getDelta(-0.098, data.playerInfo.deltaY) < 0.001 && data.playerInfo.deltaXZ < 0.3)
                 || timeStamp - data.playerInfo.lastServerPos < 50L
+                || data.playerInfo.serverPos
                 || data.playerInfo.riptiding
                 || data.playerInfo.gliding
                 || data.playerInfo.lastPlaceLiquid.hasNotPassed(5)

@@ -51,7 +51,7 @@ public class Hitboxes extends Check {
 
             List<SimpleCollisionBox> entityLocations = data.targetPastLocation
                     .getEstimatedLocation(timeStamp,
-                            data.lagInfo.transPing, 200L
+                            data.lagInfo.transPing, 150L
                                     + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
                     .stream()
                     .map(loc -> getHitbox(loc, data.target.getType()))
@@ -67,7 +67,7 @@ public class Hitboxes extends Check {
                         double dist = point.distance(ray.getOrigin());
 
                         distance.set(Math.min(dist, distance.get()));
-                        return dist < 4f;
+                        return dist < 3.65f;
                     }
                     return false;
                 }).count();
@@ -99,7 +99,7 @@ public class Hitboxes extends Check {
 
     private static SimpleCollisionBox getHitbox(KLocation loc, EntityType type) {
         if(type.equals(EntityType.PLAYER)) {
-            return new SimpleCollisionBox(loc.toVector(), 0.6, 1.8).expand(0.3, 0.3, 0.3);
+            return new SimpleCollisionBox(loc.toVector(), 0.6, 1.8).expand(0.25, 0.25, 0.25);
         } else {
             Vector bounds = MiscUtils.entityDimensions.get(type);
 

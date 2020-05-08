@@ -5,19 +5,13 @@ import cc.funkemunky.api.events.Listen;
 import cc.funkemunky.api.events.ListenerPriority;
 import cc.funkemunky.api.events.impl.PacketReceiveEvent;
 import cc.funkemunky.api.events.impl.PacketSendEvent;
-import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.Init;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 @Init
 public class PacketListener implements AtlasListener {
 
-    public static ExecutorService packetThread = Executors.newFixedThreadPool(2);
     @Listen(ignoreCancelled = true, priority = ListenerPriority.LOW)
     public void onEvent(PacketReceiveEvent event) {
         if(event.getPlayer() == null) return;
@@ -25,7 +19,7 @@ public class PacketListener implements AtlasListener {
 
         if(data == null) return;
 
-        packetThread.execute(() -> Kauri.INSTANCE.packetProcessor.processClient(event,
+        data.playerThread.execute(() -> Kauri.INSTANCE.packetProcessor.processClient(event,
                 data, event.getPacket(), event.getType(), event.getTimeStamp()));
     }
 
@@ -41,7 +35,7 @@ public class PacketListener implements AtlasListener {
 
         if(data == null) return;
 
-        packetThread.execute(() -> Kauri.INSTANCE.packetProcessor.processServer(event,
+        data.playerThread.execute(() -> Kauri.INSTANCE.packetProcessor.processServer(event,
                 data, event.getPacket(), event.getType(), event.getTimeStamp()));
     }
 }

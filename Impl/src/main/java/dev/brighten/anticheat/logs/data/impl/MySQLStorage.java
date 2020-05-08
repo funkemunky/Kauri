@@ -2,7 +2,6 @@ package dev.brighten.anticheat.logs.data.impl;
 
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
-import com.mysql.jdbc.MysqlDataTruncation;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.logs.data.DataStorage;

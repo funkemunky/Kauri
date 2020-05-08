@@ -5,12 +5,11 @@ import cc.funkemunky.api.handlers.ModData;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
+import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.RunUtils;
-import cc.funkemunky.api.utils.TickTimer;
 import cc.funkemunky.api.utils.math.RollingAverageLong;
 import cc.funkemunky.api.utils.math.cond.MaxInteger;
 import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingList;
-import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.CancelType;
@@ -19,19 +18,20 @@ import dev.brighten.anticheat.data.classes.BlockInformation;
 import dev.brighten.anticheat.data.classes.CheckManager;
 import dev.brighten.anticheat.data.classes.PlayerInformation;
 import dev.brighten.anticheat.data.classes.PredictionService;
-import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.processing.ClickProcessor;
 import dev.brighten.anticheat.processing.MovementProcessor;
 import dev.brighten.anticheat.utils.PastLocation;
+import dev.brighten.anticheat.utils.TickTimer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ObjectData {
@@ -48,7 +48,7 @@ public class ObjectData {
     public PastLocation pastLocation, targetPastLocation;
     public LivingEntity target;
     public SimpleCollisionBox box = new SimpleCollisionBox(), targetBounds = new SimpleCollisionBox();
-    public ObjectData INSTANCE, targetData;
+    public ObjectData targetData;
     public CheckManager checkManager;
     public PlayerInformation playerInfo;
     public BlockInformation blockInfo;
@@ -56,23 +56,24 @@ public class ObjectData {
     public PredictionService predictionService;
     public MovementProcessor moveProcessor;
     public ClickProcessor clickProcessor;
-    public int hashCode;
+    public int hashCode, currentTicks;
     public boolean banned;
     public ModData modData;
     public ProtocolVersion playerVersion = ProtocolVersion.UNKNOWN;
     public Set<Player> boxDebuggers = new HashSet<>();
-    public List<PotionEffectType> potionEffects = Collections.synchronizedList(new ArrayList<>()),
-            effectsToChange = Collections.synchronizedList(new ArrayList<>());
+    public List<PotionEffectType> potionEffects = new ArrayList<>(),
+            effectsToChange = new ArrayList<>();
     public final Map<String, Long> keepAliveStamps = Collections.synchronizedMap(new HashMap<>());
     public final Map<String, Short> transactionActions = Collections.synchronizedMap(new HashMap<>());
     public ConcurrentEvictingList<CancelType> typesToCancel = new ConcurrentEvictingList<>(10);
     public final List<String> sniffedPackets = new CopyOnWriteArrayList<>();
     public BukkitTask task;
+    public ExecutorService playerThread;
 
     public ObjectData(UUID uuid) {
         this.uuid = uuid;
         hashCode = uuid.hashCode();
-        INSTANCE = this;
+        playerThread = Executors.newSingleThreadExecutor();
 
         if(!Config.testMode) {
             if(alerts = getPlayer().hasPermission("kauri.command.alerts"))
@@ -80,7 +81,7 @@ public class ObjectData {
             if(devAlerts = getPlayer().hasPermission("kauri.command.alerts.dev"))
                 Kauri.INSTANCE.dataManager.devAlerts.add(this);
         }
-        playerInfo = new PlayerInformation();
+        playerInfo = new PlayerInformation(this);
         creation = playerInfo.lastRespawn = System.currentTimeMillis();
         blockInfo = new BlockInformation(this);
         clickProcessor = new ClickProcessor(this);
@@ -111,6 +112,11 @@ public class ObjectData {
                 TinyProtocolHandler.sendPacket(getPlayer(),
                         new WrappedOutTransaction(0, setTransactionAction("ping"), false)
                                 .getObject());
+            }
+            if(Config.kickForLunar18 && usingLunar
+                    && !playerVersion.equals(ProtocolVersion.UNKNOWN)
+                    && playerVersion.isAbove(ProtocolVersion.V1_8)) {
+                RunUtils.task(() -> getPlayer().kickPlayer(Color.Red + "Lunar Client 1.8.9 is not allowed.\nJoin on 1.7.10 or any other client."));
             }
         }, Kauri.INSTANCE, 40L, 40L);
     }
@@ -170,16 +176,19 @@ public class ObjectData {
         public long ping, averagePing, transPing, lastPing, lastTransPing;
         public MaxInteger lagTicks = new MaxInteger(25);
         public boolean lagging;
-        public TickTimer lastPacketDrop = new TickTimer(10),
-                lastPingDrop = new TickTimer(40);
+        public TickTimer lastPacketDrop = new TickTimer(ObjectData.this, 10),
+                lastPingDrop = new TickTimer(ObjectData.this, 40);
         public RollingAverageLong pingAverages = new RollingAverageLong(10, 0);
         public long lastFlying = 0;
     }
 
     public void onLogout() {
+        playerThread.shutdown();
+        task.cancel();
+        keepAliveStamps.clear();
+        transactionActions.clear();
         Kauri.INSTANCE.dataManager.hasAlerts.remove(this);
         Kauri.INSTANCE.dataManager.debugging.remove(this);
-        task.cancel();
     }
 
     public static void debugBoxes(boolean debugging, Player debugger) {

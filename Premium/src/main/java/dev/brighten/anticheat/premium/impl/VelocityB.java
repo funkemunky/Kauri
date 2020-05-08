@@ -3,7 +3,6 @@ package dev.brighten.anticheat.premium.impl;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInKeepAlivePacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.MathUtils;

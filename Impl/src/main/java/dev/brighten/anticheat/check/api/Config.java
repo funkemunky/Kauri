@@ -23,6 +23,9 @@ public class Config {
     @ConfigSetting(path = "punishments", name = "bungeeCommand")
     static boolean bungeePunishments = false;
 
+    @ConfigSetting(path = "general", name = "kickForLunar18")
+    public static boolean kickForLunar18 = true;
+
     @ConfigSetting(path = "punishments", name = "bungeeBroadcast")
     static boolean bungeeBroadcast = false;
 

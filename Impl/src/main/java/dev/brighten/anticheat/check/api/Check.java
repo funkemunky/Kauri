@@ -19,12 +19,13 @@ import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerG;
 import dev.brighten.anticheat.check.impl.combat.hand.*;
 import dev.brighten.anticheat.check.impl.combat.hitbox.Hitboxes;
 import dev.brighten.anticheat.check.impl.combat.hitbox.ReachA;
-import dev.brighten.anticheat.check.impl.combat.killaura.*;
+import dev.brighten.anticheat.check.impl.combat.killaura.KillauraB;
+import dev.brighten.anticheat.check.impl.combat.killaura.KillauraC;
+import dev.brighten.anticheat.check.impl.combat.killaura.KillauraD;
+import dev.brighten.anticheat.check.impl.combat.killaura.KillauraE;
 import dev.brighten.anticheat.check.impl.movement.fly.*;
 import dev.brighten.anticheat.check.impl.movement.general.FastLadder;
-import dev.brighten.anticheat.check.impl.world.HealthSpoof;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallA;
-import dev.brighten.anticheat.check.impl.movement.nofall.NoFallB;
 import dev.brighten.anticheat.check.impl.movement.speed.SpeedA;
 import dev.brighten.anticheat.check.impl.movement.speed.SpeedB;
 import dev.brighten.anticheat.check.impl.movement.speed.SpeedC;
@@ -32,6 +33,7 @@ import dev.brighten.anticheat.check.impl.movement.velocity.VelocityA;
 import dev.brighten.anticheat.check.impl.packets.Timer;
 import dev.brighten.anticheat.check.impl.packets.badpackets.*;
 import dev.brighten.anticheat.check.impl.packets.exploits.*;
+import dev.brighten.anticheat.check.impl.world.HealthSpoof;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.api.KauriAPI;
 import dev.brighten.api.check.CheckType;
@@ -87,6 +89,10 @@ public class Check implements KauriCheck {
     private TickTimer lastExemptCheck = new TickTimer(20);
 
     private TickTimer lastAlert = new TickTimer(MathUtils.millisToTicks(Config.alertsDelay));
+
+    public void setData(ObjectData data) {
+        this.data = data;
+    }
 
     public static void register(Check check) {
         if(!check.getClass().isAnnotationPresent(CheckInfo.class)) {
@@ -388,6 +394,7 @@ public class Check implements KauriCheck {
         register(new SpeedA());
         register(new SpeedB());
         register(new SpeedC());
+       //register(new Test());
         //register(new KillauraA());
         register(new KillauraB());
         register(new KillauraC());

@@ -3,8 +3,9 @@ package dev.brighten.anticheat.check.impl.combat.killaura;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.TickTimer;
 import dev.brighten.anticheat.check.api.*;
+import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.utils.TickTimer;
 import dev.brighten.api.check.CheckType;
 import org.bukkit.entity.EntityType;
 
@@ -16,7 +17,14 @@ public class KillauraE extends Check {
     private boolean attacked;
     private float lmoveForward;
     private double lastDeltaXZ, verbose;
-    private TickTimer lastKeyChange = new TickTimer(4);
+    private TickTimer lastKeyChange;
+
+    @Override
+    public void setData(ObjectData data) {
+        super.setData(data);
+
+        lastKeyChange = new TickTimer(data, 4);
+    }
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
