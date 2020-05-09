@@ -14,11 +14,11 @@ public class MovementUtils {
 
     private static Enchantment DEPTH;
 
-    public static float getJumpHeight(Player player) {
+    public static float getJumpHeight(ObjectData data) {
         float baseHeight = 0.42f;
 
-        if(player.hasPotionEffect(PotionEffectType.JUMP)) {
-            baseHeight+= PlayerUtils.getPotionEffectLevel(player, PotionEffectType.JUMP) * 0.1f;
+        if(data.potionProcessor.hasPotionEffect(PotionEffectType.JUMP)) {
+            baseHeight+= PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.JUMP) * 0.1f;
         }
 
         return baseHeight;

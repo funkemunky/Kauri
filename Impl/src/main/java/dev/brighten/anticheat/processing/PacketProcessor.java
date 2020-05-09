@@ -233,6 +233,7 @@ public class PacketProcessor {
             case Packet.Client.TRANSACTION: {
                 WrappedInTransactionPacket packet = new WrappedInTransactionPacket(object, data.getPlayer());
 
+                data.potionProcessor.onTransaction(packet);
                 if(packet.getAction() == data.getTransactionAction("respawn")) {
                     data.playerInfo.lastRespawn = timeStamp;
                     data.playerInfo.lastRespawnTimer.reset();
@@ -370,6 +371,15 @@ public class PacketProcessor {
 
                 if(!data.checkManager.runPacket(packet, timeStamp)) {
                     event.setCancelled(true);
+                }
+                break;
+            }
+            case Packet.Server.ENTITY_EFFECT: {
+                WrappedOutEntityEffectPacket packet = new WrappedOutEntityEffectPacket(object, data.getPlayer());
+
+                if(packet.entityId == data.getPlayer().getEntityId()) {
+                    data.potionProcessor.onPotionEffect(packet);
+                    data.checkManager.runPacket(packet, timeStamp);
                 }
                 break;
             }

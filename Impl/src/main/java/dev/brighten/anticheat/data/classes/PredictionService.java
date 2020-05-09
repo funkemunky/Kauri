@@ -417,10 +417,10 @@ public class PredictionService {
                     aiMoveSpeed+= aiMoveSpeed * 0.30000001192092896D;
                 }
 
-                if(data.getPlayer().hasPotionEffect(PotionEffectType.SPEED)) {
+                if(data.potionProcessor.hasPotionEffect(PotionEffectType.SPEED)) {
                     aiMoveSpeed += (PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.SPEED) * (0.20000000298023224D)) * aiMoveSpeed;
                 }
-                if(data.getPlayer().hasPotionEffect(PotionEffectType.SLOW)) {
+                if(data.potionProcessor.hasPotionEffect(PotionEffectType.SLOW)) {
                     aiMoveSpeed += (PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.SLOW) * (-0.15000000596046448D)) * aiMoveSpeed;
                 }
 

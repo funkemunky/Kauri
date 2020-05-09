@@ -15,7 +15,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 @Init
 public class BukkitCheckListeners implements Listener {
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onInteract(PlayerInteractEvent event) {
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
@@ -25,7 +25,7 @@ public class BukkitCheckListeners implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onMove(PlayerMoveEvent event) {
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
@@ -34,7 +34,7 @@ public class BukkitCheckListeners implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onBookEdit(PlayerEditBookEvent event) {
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
@@ -43,7 +43,7 @@ public class BukkitCheckListeners implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onEvent(SignChangeEvent event) {
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
@@ -51,19 +51,4 @@ public class BukkitCheckListeners implements Listener {
             data.checkManager.runEvent(event);
         }
     }
-
-    /*@EventHandler(priority = EventPriority.LOW)
-    public void onEvent(EntityPotionEffectEvent event) {
-        if(event.getEntity() instanceof Player) {
-            ObjectData data = Kauri.INSTANCE.dataManager.getData((Player)event.getEntity());
-
-            if(data != null) {
-                long id = data.getPlayer().getEntityId() + 400L + ThreadLocalRandom.current().nextLong(50);
-                TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutKeepAlivePacket(id).getObject());
-                data.effectsToAdd.put(id,
-                        event.getNewEffect());
-                data.checkManager.runEvent(event);
-            }
-        }
-    }*/
 }

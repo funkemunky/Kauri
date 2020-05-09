@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.processing;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
+import cc.funkemunky.api.utils.TickTimer;
 import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingList;
 import dev.brighten.anticheat.data.ObjectData;
 import lombok.Getter;
@@ -21,6 +22,8 @@ public class ClickProcessor {
     private long min, max, sum, zeros;
     private long lastTimestamp;
 
+    private TickTimer lastZeroCheck = new TickTimer(5);
+
     private final ObjectData data;
 
     public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
@@ -29,15 +32,17 @@ public class ClickProcessor {
         if(delta < 600
                 && !data.playerInfo.breakingBlock && data.playerInfo.lastBlockPlace.hasPassed(3)) {
             cpsList.add(delta);
-            LongSummaryStatistics summary = cpsList.parallelStream().mapToLong(v -> v).summaryStatistics();
+            LongSummaryStatistics summary = cpsList.stream().mapToLong(v -> v).summaryStatistics();
 
-            zeros = cpsList.parallelStream().filter(dt -> dt <= 2).count();
+            if(lastZeroCheck.hasPassed()) {
+                zeros = cpsList.stream().filter(dt -> dt <= 2).count();
+                lastZeroCheck.reset();
+            }
 
             average = summary.getAverage();
             min = summary.getMin();
             max = summary.getMax();
             sum = summary.getSum();
-
             val array = cpsList.stream().mapToDouble(l -> l).toArray();
             kurtosis = new Kurtosis().evaluate(array);
             skew = new Skewness().evaluate(array);
@@ -46,5 +51,11 @@ public class ClickProcessor {
             nosqrtKurtosis = max;
         }
         lastTimestamp = timeStamp;
+    }
+
+    public boolean isNotReady() {
+        return data.playerInfo.breakingBlock
+                || data.playerInfo.lastBlockPlace.hasNotPassed(3)
+                || cpsList.size() < 30;
     }
 }

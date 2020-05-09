@@ -20,6 +20,7 @@ import dev.brighten.anticheat.data.classes.PlayerInformation;
 import dev.brighten.anticheat.data.classes.PredictionService;
 import dev.brighten.anticheat.processing.ClickProcessor;
 import dev.brighten.anticheat.processing.MovementProcessor;
+import dev.brighten.anticheat.processing.PotionProcessor;
 import dev.brighten.anticheat.utils.PastLocation;
 import dev.brighten.anticheat.utils.TickTimer;
 import org.bukkit.Bukkit;
@@ -55,6 +56,7 @@ public class ObjectData {
     public LagInformation lagInfo;
     public PredictionService predictionService;
     public MovementProcessor moveProcessor;
+    public PotionProcessor potionProcessor;
     public ClickProcessor clickProcessor;
     public int hashCode, currentTicks;
     public boolean banned;
@@ -88,6 +90,7 @@ public class ObjectData {
         pastLocation = new PastLocation();
         lagInfo = new LagInformation();
         targetPastLocation = new PastLocation();
+        potionProcessor = new PotionProcessor(this);
         checkManager = new CheckManager(this);
         checkManager.addChecks();
 

@@ -33,13 +33,13 @@ public class BukkitListener implements Listener {
     public static ItemStack MAGIC_WAND = MiscUtils.createItem(XMaterial.BLAZE_ROD.parseMaterial(),
             1, "&6Magic Wand");
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onJoin(PlayerJoinEvent event) {
         Kauri.INSTANCE.dataManager.dataMap.remove(event.getPlayer().getUniqueId());
         Kauri.INSTANCE.executor.execute(() ->  Kauri.INSTANCE.dataManager.createData(event.getPlayer()));
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onLeave(PlayerQuitEvent event) {
         //Removing if the player has debug access so there aren't any null objects left to cause problems later.
         if(event.getPlayer().hasPermission("kauri.debug"))
@@ -49,7 +49,7 @@ public class BukkitListener implements Listener {
         Kauri.INSTANCE.dataManager.dataMap.remove(event.getPlayer().getUniqueId());
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler
     public void onInteract(PlayerInteractEvent event) {
         if(event.getClickedBlock() == null || !event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) return;
 

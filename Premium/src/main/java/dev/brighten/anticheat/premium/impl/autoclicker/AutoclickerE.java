@@ -15,8 +15,7 @@ public class AutoclickerE extends Check {
 
     @Packet
     public void onClick(WrappedInArmAnimationPacket packet) {
-        if (data.playerInfo.breakingBlock
-                || data.playerInfo.lastBlockPlace.hasNotPassed(1))
+        if (data.clickProcessor.isNotReady())
             return;
 
         if (data.clickProcessor.getStd() < 15.d) {

@@ -8,6 +8,7 @@ import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.api.packets.channelhandler.TinyProtocol1_7;
 import cc.funkemunky.api.tinyprotocol.api.packets.channelhandler.TinyProtocol1_8;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutCloseWindowPacket;
 import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.Kauri;
@@ -25,6 +26,7 @@ import dev.brighten.anticheat.check.impl.combat.killaura.KillauraD;
 import dev.brighten.anticheat.check.impl.combat.killaura.KillauraE;
 import dev.brighten.anticheat.check.impl.movement.fly.*;
 import dev.brighten.anticheat.check.impl.movement.general.FastLadder;
+import dev.brighten.anticheat.check.impl.movement.general.OmniSprint;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallA;
 import dev.brighten.anticheat.check.impl.movement.speed.SpeedA;
 import dev.brighten.anticheat.check.impl.movement.speed.SpeedB;
@@ -34,6 +36,7 @@ import dev.brighten.anticheat.check.impl.packets.Timer;
 import dev.brighten.anticheat.check.impl.packets.badpackets.*;
 import dev.brighten.anticheat.check.impl.packets.exploits.*;
 import dev.brighten.anticheat.check.impl.world.HealthSpoof;
+import dev.brighten.anticheat.check.impl.world.Phase;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.api.KauriAPI;
 import dev.brighten.api.check.CheckType;
@@ -272,6 +275,10 @@ public class Check implements KauriCheck {
         return new TextComponent(formatAlert(Color.translate(txt), info));
     }
 
+    public boolean isPosition(WrappedInFlyingPacket packet) {
+        return packet.isPos() && (data.playerInfo.deltaXZ > 0 || data.playerInfo.deltaY != 0);
+    }
+
     private String formatAlert(String toFormat, String info) {
         return Color.translate(toFormat.replace("%desc%", String.join("\n",
                 MiscUtils
@@ -400,8 +407,8 @@ public class Check implements KauriCheck {
         register(new KillauraC());
         register(new KillauraD());
         register(new KillauraE());
-        //register(new Phase());
-        //register(new OmniSprint());
+        register(new Phase());
+        register(new OmniSprint());
         //register(new Inertia());
         register(new Timer());
         register(new BadPacketsA());

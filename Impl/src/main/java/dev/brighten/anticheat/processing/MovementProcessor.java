@@ -131,7 +131,7 @@ public class MovementProcessor {
         /* We only set the jumpheight on ground since there's no need to check for it while they're in the air.
          * If we did check while it was in the air, there would be false positives in the checks that use it. */
         if (packet.isGround() || data.playerInfo.serverGround || data.playerInfo.lClientGround) {
-            data.playerInfo.jumpHeight = MovementUtils.getJumpHeight(data.getPlayer());
+            data.playerInfo.jumpHeight = MovementUtils.getJumpHeight(data);
             data.playerInfo.totalHeight = MovementUtils.getTotalHeight(data.playerVersion,
                     (float)data.playerInfo.jumpHeight);
         }
@@ -302,7 +302,7 @@ public class MovementProcessor {
 
         data.playerInfo.baseSpeed = MovementUtils.getBaseSpeed(data);
         /* General Cancel Booleans */
-        boolean hasLevi = levitation != null && data.getPlayer().hasPotionEffect(levitation);
+        boolean hasLevi = levitation != null && data.potionProcessor.hasPotionEffect(levitation);
 
         data.playerInfo.generalCancel = data.playerInfo.canFly
                 || data.playerInfo.creative
