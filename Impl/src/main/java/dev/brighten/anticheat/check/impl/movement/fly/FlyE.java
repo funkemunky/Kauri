@@ -19,7 +19,7 @@ public class FlyE extends Check {
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
         if(packet.isPos()) {
-            float maxHeight = MovementUtils.getJumpHeight(data.getPlayer());
+            float maxHeight = MovementUtils.getJumpHeight(data);
             if(!data.playerInfo.flightCancel
                     && data.playerInfo.jumped
                     && !data.playerInfo.wasOnSlime

@@ -31,10 +31,10 @@ public class AimJ extends Check {
             float yaw = data.playerInfo.to.yaw;
             float xDelta = Math.abs(yaw - predicted);
 
-            if(data.moveProcessor.sensXPercent == data.moveProcessor.sensYPercent) {
+            if(data.moveProcessor.sensXPercent == data.moveProcessor.sensYPercent && data.currentTicks > 40) {
                 deltas.add(xDelta);
 
-                if(xDelta > 0.001) {
+                if(xDelta > 0.008) {
                     vl++;
                     flag("delta=%v.2", xDelta);
                 }
