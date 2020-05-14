@@ -69,10 +69,9 @@ public class ReachB extends Check {
                 return;
             }
 
-            double subtraction = 0.0625;
+            double subtraction = 0.0125;
             if(targetData != null)
-                subtraction+= Math.min(0.2, (data.playerInfo.deltaXZ + targetData.playerInfo.deltaXZ) / 2.65);
-            else subtraction+= 0.021;
+                subtraction+= Math.min(0.2, (data.playerInfo.deltaXZ + targetData.playerInfo.deltaXZ) / 2.8);
             distance-= subtraction;
 
             if(collided > 1 && data.lagInfo.lastPacketDrop.hasPassed(2)) {

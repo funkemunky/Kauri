@@ -1,6 +1,9 @@
 package dev.brighten.anticheat.premium.impl;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutEntityHeadRotation;
+import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -9,46 +12,79 @@ import dev.brighten.anticheat.utils.AtomicDouble;
 import dev.brighten.anticheat.utils.Verbose;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
+import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.LongSummaryStatistics;
 
 @CheckInfo(name = "Aim (G)", description = "A simple check to detect Vape's aimassist.",
         checkType = CheckType.AIM, developer = true, enabled = false, punishVL = 30)
 public class AimG extends Check {
 
-    private Verbose verbose = new Verbose(50, 6);
-    private EvictingList<Long> ldeltaX = new EvictingList<>(25), ldeltaY = new EvictingList<>(25);
+    private float yaw, pitch, lastYaw, lastPitch, lastDeltaYaw, lastDeltaPitch, lastYawDifference;
+    private boolean sentRotation;
+    private List<Float> yawSamples = new ArrayList<>(), pitchSamples = new ArrayList<>();
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if(!packet.isLook() || data.playerInfo.cinematicMode) return;
+        if(!packet.isLook()) return;
 
-        val deltaX = Math.abs(data.moveProcessor.deltaX - data.moveProcessor.lastDeltaX);
-        val deltaY = Math.abs(data.moveProcessor.deltaY - data.moveProcessor.lastDeltaY);
+        // Get the yaw/pitch values from the rotation
+        final float yaw = packet.getYaw();
+        final float pitch = packet.getPitch();
 
-        ldeltaX.add(deltaX);
-        ldeltaY.add(deltaY);
+        // Get the yaw/pitch values from the outGoing rotation
+        final float outYaw = this.yaw;
+        final float outPitch = this.pitch;
 
-        if(ldeltaY.size() >= 20 || ldeltaX.size() >= 20) {
-            LongSummaryStatistics xsummary = ldeltaX.parallelStream().mapToLong(l -> l).summaryStatistics();
+        // Getting the delta of the last yaw/pitch values and the current outGoing values
+        final float deltaYaw = MathUtils.getAngleDelta(this.lastYaw, outYaw);
+        final float deltaPitch = MathUtils.getAngleDelta(this.lastPitch, outPitch);
 
-            LongSummaryStatistics distinctX = ldeltaX.parallelStream().mapToLong(l -> l).distinct().summaryStatistics(),
-                    distinctY = ldeltaY.parallelStream().mapToLong(l -> l).distinct().summaryStatistics();
+        // Get the difference between the previous rotations
+        final float differenceYaw = Math.abs(lastDeltaYaw - deltaYaw);
+        final float differencePitch = Math.abs(lastDeltaPitch - deltaPitch);
 
-            AtomicDouble std = new AtomicDouble();
+        // Get the Jolt of the rotations
+        final float joltYaw = Math.abs(differenceYaw - lastYawDifference);
+        final float joltPitch = Math.abs(differencePitch - lastYawDifference);
 
-            ldeltaX.parallelStream().forEach(l -> std.addAndGet(Math.pow(l - distinctX.getAverage(), 2)));
+        // I abused jeremy
+        if (differenceYaw > 2.0 && differencePitch == 0.0) {
+            yawSamples.add(joltYaw);
+            pitchSamples.add(joltPitch);
 
-            std.set(Math.sqrt(std.get() / ldeltaX.size()));
+            if (yawSamples.size() == 20 && pitchSamples.size() == 20) {
+                final long distinctYaw = yawSamples.stream().distinct().count();
+                final long distinctPitch = pitchSamples.stream().distinct().count();
 
-            if(distinctY.getCount() <= 6 && distinctX.getCount() <= 13
-                    && std.get() < 11 && data.moveProcessor.deltaX > 30) {
-                vl++;
-                flag("ydis=%v xdis=%v avg=%v.2 std=%v.2 deltaX=%v", distinctY.getCount(), distinctX.getCount(),
-                        xsummary.getAverage(), std.get(), data.moveProcessor.deltaX);
+                final long duplicatesYaw = yawSamples.size() - distinctYaw;
+                final long duplicatesPitch = pitchSamples.size() - distinctPitch;
+
+                final boolean invalid = (duplicatesYaw == 0.0 || duplicatesPitch == 0.0) && duplicatesYaw < 2 && duplicatesPitch < 2;
+
+                if (invalid) {
+                    vl++;
+                    flag("dup=" + duplicatesYaw + " dupp=" + duplicatesPitch);
+                } else debug("nope");
+
+                yawSamples.clear();
+                pitchSamples.clear();
             }
-            debug("xdis=%v ydis=%v xavg=%v.2 xstd=%v.2 deltaX=%v vl=%v", distinctX.getCount(), distinctY.getCount(),
-                    xsummary.getAverage(), std.get(), data.moveProcessor.deltaX, vl);
         }
+
+        this.lastYaw = yaw;
+        this.lastPitch = pitch;
+        this.lastDeltaYaw = deltaYaw;
+        this.lastDeltaPitch = deltaPitch;
+        this.lastYawDifference = differenceYaw;
+    }
+
+    @Packet
+    public void onRotation(WrappedOutEntityHeadRotation packet) {
+        yaw = packet.getPlayer().getLocation().getYaw();
+        pitch = packet.getPlayer().getLocation().getPitch();
+        sentRotation = true;
     }
 }

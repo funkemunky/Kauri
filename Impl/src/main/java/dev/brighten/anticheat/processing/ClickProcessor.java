@@ -2,8 +2,11 @@ package dev.brighten.anticheat.processing;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.utils.TickTimer;
+import cc.funkemunky.api.utils.Tuple;
 import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingList;
+import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.utils.MiscUtils;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -11,18 +14,24 @@ import org.apache.commons.math3.stat.descriptive.moment.Kurtosis;
 import org.apache.commons.math3.stat.descriptive.moment.Skewness;
 import org.apache.commons.math3.stat.descriptive.moment.Variance;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.LongSummaryStatistics;
 
 @RequiredArgsConstructor
 public class ClickProcessor {
-    public ConcurrentEvictingList<Long> cpsList = new ConcurrentEvictingList<>(40);
+    public EvictingList<Long> cpsList = new EvictingList<>(40);
     @Getter
     private double std, average, nosqrtKurtosis, kurtosis, skew, variance;
     @Getter
     private long min, max, sum, zeros;
     private long lastTimestamp;
+    @Getter
+    private int outliers, lowOutliers, highOutliers;
+    @Getter
+    private Tuple<List<Double>, List<Double>> outliersTuple = new Tuple<>(new ArrayList<>(), new ArrayList<>());
 
-    private TickTimer lastZeroCheck = new TickTimer(5);
+    private TickTimer lastZeroCheck = new TickTimer(2);
 
     private final ObjectData data;
 
@@ -36,6 +45,10 @@ public class ClickProcessor {
 
             if(lastZeroCheck.hasPassed()) {
                 zeros = cpsList.stream().filter(dt -> dt <= 2).count();
+                if(cpsList.size() >= 20) {
+                    outliersTuple = MiscUtils.getOutliers(cpsList);
+                    outliers = (lowOutliers = outliersTuple.one.size()) + (highOutliers = outliersTuple.two.size());
+                }
                 lastZeroCheck.reset();
             }
 
@@ -43,10 +56,9 @@ public class ClickProcessor {
             min = summary.getMin();
             max = summary.getMax();
             sum = summary.getSum();
-            val array = cpsList.stream().mapToDouble(l -> l).toArray();
-            kurtosis = new Kurtosis().evaluate(array);
-            skew = new Skewness().evaluate(array);
-            variance = new Variance().evaluate(array);
+            kurtosis = MiscUtils.getKurtosis(cpsList);
+            skew = MiscUtils.getSkewness(cpsList);
+            variance = MiscUtils.varianceSquared(average, cpsList);
             std = Math.sqrt(variance);
             nosqrtKurtosis = max;
         }

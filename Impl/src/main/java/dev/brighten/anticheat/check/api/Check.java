@@ -143,10 +143,18 @@ public class Check implements KauriCheck {
     }
 
     public void flag(boolean devAlerts, String information, Object... variables) {
+        flag(devAlerts, Integer.MAX_VALUE, information, variables);
+    }
+
+    public void flag(int resetVLTime, String information, Object... variables) {
+        flag(false, resetVLTime, information, variables);
+    }
+
+    public void flag(boolean devAlerts, int resetVLTime, String information, Object... variables) {
         if(Kauri.INSTANCE.getTps() < 18) devAlerts = true;
         if(lastExemptCheck.hasPassed()) exempt = KauriAPI.INSTANCE.exemptHandler.isExempt(data.uuid, this);
         if(exempt) return;
-        if(information.contains("%v")) {
+        if(variables.length > 0 && information.contains("%v")) {
             String[] splitInfo = information.split("%v");
 
             for (int i = 0; i < splitInfo.length; i++) {
@@ -211,6 +219,7 @@ public class Check implements KauriCheck {
         boolean dev = devAlerts || (developer || vl <= vlToFlag);
         Kauri.INSTANCE.executor.execute(() -> {
             if(!event.isCancelled()) {
+                if(lastAlert.hasPassed(resetVLTime)) vl = 0;
                 final String info = finalInformation
                         .replace("%p", String.valueOf(data.lagInfo.transPing))
                         .replace("%t", String.valueOf(MathUtils.round(Kauri.INSTANCE.getTps(), 2)));
@@ -329,7 +338,7 @@ public class Check implements KauriCheck {
 
     public void debug(String information, Object... variables) {
         if(Kauri.INSTANCE.dataManager.debugging.size() == 0) return;
-        if(information.contains("%v")) {
+        if(variables.length > 0 && information.contains("%v")) {
             String[] splitInfo = information.split("%v");
 
             for (int i = 0; i < splitInfo.length; i++) {

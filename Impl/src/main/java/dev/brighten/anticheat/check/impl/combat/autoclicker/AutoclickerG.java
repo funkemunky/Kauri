@@ -3,59 +3,35 @@ package dev.brighten.anticheat.check.impl.combat.autoclicker;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockDigPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.utils.Color;
+import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.*;
+import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.api.check.CheckType;
+import lombok.val;
 
-@CheckInfo(name = "Autoclicker (G)", description = "Checks for outliers in clicks. (FFX Autoclicker 6).",
-        checkType = CheckType.AUTOCLICKER, vlToFlag = 40, punishVL = 80)
+import java.util.concurrent.TimeUnit;
+
+@CheckInfo(name = "Autoclicker (G)", description = "Checks for outliers in clicks.",
+        checkType = CheckType.AUTOCLICKER, vlToFlag = 10, developer = true, punishVL = 80)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerG extends Check {
 
-    private int clicks, outliers, flyingCount;
-    private boolean release;
-    private double buffer;
-
-    @Packet
-    public void check(WrappedInFlyingPacket packet) {
-        ++this.flyingCount;
-    }
-
-    @Packet
-    public void check(WrappedInBlockDigPacket packet) {
-        if (packet.getAction() == WrappedInBlockDigPacket.EnumPlayerDigType.RELEASE_USE_ITEM) {
-            this.release = true;
-        }
-    }
-
+    float buffer;
     @Packet
     public void check(WrappedInArmAnimationPacket packet) {
-        if (!data.playerInfo.breakingBlock
-                && data.playerInfo.lastBlockPlace.hasPassed(4)) {
-            if (this.flyingCount < 10) {
-                if (this.release) {
-                    this.release = false;
-                    this.flyingCount = 0;
-                    return;
-                }
-                if (this.flyingCount > 3) {
-                    ++this.outliers;
-                } else if (this.flyingCount == 0) {
-                    return;
-                }
-                if (++this.clicks == 40) {
-                    if (this.outliers == 0) {
-                        if (++buffer >= 7.0) {
-                            if(data.clickProcessor.getStd() > 30 && data.clickProcessor.getKurtosis() < 6) vl++;
-                            flag("o=%v buffer=%v.1 std=%v.2", outliers, buffer, data.clickProcessor.getStd());
-                        }
-                    } else buffer-= buffer > 0 ? 1.5 : 0;
-                    debug("outliers=" + outliers + " vl=" + vl);
-                    this.outliers = 0;
-                    this.clicks = 0;
-                }
+        if (data.clickProcessor.isNotReady()) return;
+
+        int low = data.clickProcessor.getLowOutliers(), high = data.clickProcessor.getHighOutliers();
+        double cpsAvg = 1000L / data.clickProcessor.getAverage(); //I used long for 1000 since long is 64 bit with double.
+        if((low + high) == 0) {
+            if((buffer < 20 ? ++buffer : buffer) > 6) {
+                vl++;
+                flag(20 * 30,
+                        "buffer=%v low=%v high=%v.", buffer, low, high);
             }
-            this.flyingCount = 0;
-            vl-= vl > 0 ? 0.002 : 0;
-        }
+        } else buffer-= buffer > 0 ? 0.75f : 0;
+        debug("buffer=%v low=%v high=%v avg=%v.2 cpsAvg=%v.1",
+                buffer, low, high, data.clickProcessor.getAverage(), cpsAvg);
     }
 }

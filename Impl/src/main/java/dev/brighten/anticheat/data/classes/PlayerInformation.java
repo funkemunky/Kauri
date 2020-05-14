@@ -1,12 +1,16 @@
 package dev.brighten.anticheat.data.classes;
 
 import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumAnimation;
+import cc.funkemunky.api.utils.ConfigSetting;
+import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingList;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.TickTimer;
+import lombok.NoArgsConstructor;
 import org.bukkit.block.Block;
 
+@NoArgsConstructor
 public class PlayerInformation {
     public boolean serverGround, lClientGround, clientGround, nearGround,
             collided, insideBlock,
@@ -20,10 +24,7 @@ public class PlayerInformation {
     public long lastVelocityTimestamp;
     public Block blockBelow, blockOnTo;
 
-    private final ObjectData data;
-
     public PlayerInformation(ObjectData data) {
-        this.data = data;
 
         liquidTimer = new TickTimer(data, 50); 
         webTimer = new TickTimer(data, 40);  
@@ -52,7 +53,7 @@ public class PlayerInformation {
     public boolean cinematicMode;
 
     //Gcd
-    public double yawGCD, pitchGCD, lastYawGCD, lastPitchGCD;
+    public int yawGCD, pitchGCD, lastYawGCD, lastPitchGCD;
 
     //Server Position
     public long lastServerPos, lastRespawn;

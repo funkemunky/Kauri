@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.check.impl.combat.killaura;
 
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.utils.MathUtils;
@@ -9,48 +10,37 @@ import dev.brighten.anticheat.utils.TickTimer;
 import dev.brighten.api.check.CheckType;
 import org.bukkit.entity.EntityType;
 
-@CheckInfo(name = "Killaura (E)", description = "Checks if a user is sprinting while attacking a player.",
-        checkType = CheckType.KILLAURA, punishVL = 20, developer = true, enabled = false)
+@CheckInfo(name = "Killaura (E)", description = "Checks if a player attacks before blocking.",
+        checkType = CheckType.KILLAURA, punishVL = 20, vlToFlag = 6, developer = true)
 @Cancellable(cancelType = CancelType.ATTACK)
 public class KillauraE extends Check {
 
-    private boolean attacked;
-    private float lmoveForward;
-    private double lastDeltaXZ, verbose;
-    private TickTimer lastKeyChange;
+    private boolean attacks, interacts;
 
-    @Override
-    public void setData(ObjectData data) {
-        super.setData(data);
-
-        lastKeyChange = new TickTimer(data, 4);
+    @Packet
+    public void onUse(WrappedInUseEntityPacket packet) {
+        switch(packet.getAction()) {
+            case ATTACK:
+                attacks = true;
+                break;
+            case INTERACT:
+            case INTERACT_AT:
+                interacts = true;
+                break;
+        }
     }
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if(lmoveForward != data.predictionService.moveForward) lastKeyChange.reset();
-        if(attacked) {
-            if(data.target != null
-                    && data.target.getType().equals(EntityType.PLAYER)
-                    && data.playerInfo.lastVelocity.hasPassed(7)
-                    && data.predictionService.moveForward > 0
-                    && data.playerInfo.deltaXZ > data.playerInfo.baseSpeed - 0.005
-                    && data.playerInfo.deltaXZ >= lastDeltaXZ * 0.99) {
-                if(data.lagInfo.lastPingDrop.hasPassed(5) && verbose++ > 3) {
-                    vl++;
-                    flag("dxz=%v ldxz=%v", MathUtils.round(data.playerInfo.deltaXZ, 2),
-                            MathUtils.round(lastDeltaXZ, 2));
-                }
-            } else verbose-= verbose > 0 ? 0.2 : 0;
-            debug("deltaXZ=" + data.playerInfo.deltaXZ + " ldxz=" + lastDeltaXZ);
-            attacked = false;
-        } else lastDeltaXZ = data.playerInfo.deltaXZ;
-        lmoveForward = data.predictionService.moveForward;
+        attacks = interacts = false;
     }
 
     @Packet
-    public void onUse(WrappedInUseEntityPacket packet) {
-        attacked = true;
+    public void onBlock(WrappedInBlockPlacePacket packet) {
+        if(attacks && !interacts) {
+            flag(10, "attacked=true interacted=false");
+        }
+        debug("attacks=%v interacts=%v", attacks, interacts);
     }
 
 }

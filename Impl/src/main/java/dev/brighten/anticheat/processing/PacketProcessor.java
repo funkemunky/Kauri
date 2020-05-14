@@ -21,7 +21,7 @@ public class PacketProcessor {
 
     private BukkitTask task;
 
-    public void processClient(PacketReceiveEvent event, ObjectData data, Object object, String type, long timeStamp) {
+    public synchronized void processClient(PacketReceiveEvent event, ObjectData data, Object object, String type, long timeStamp) {
         Kauri.INSTANCE.profiler.start("packet:client:" + getType(type));
         switch (type) {
             case Packet.Client.ABILITIES: {
@@ -335,7 +335,7 @@ public class PacketProcessor {
         Kauri.INSTANCE.profiler.stop("packet:client:" + getType(type));
     }
 
-    public void processServer(PacketSendEvent event, ObjectData data, Object object, String type, long timeStamp) {
+    public synchronized void processServer(PacketSendEvent event, ObjectData data, Object object, String type, long timeStamp) {
         Kauri.INSTANCE.profiler.start("packet:server:" + type);
 
         switch (type) {

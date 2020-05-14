@@ -30,7 +30,7 @@ public class FlyB extends Check {
             double predicted = (data.playerInfo.lDeltaY - 0.08) * 0.9800000190734863D;
 
             if(data.playerInfo.lClientGround && !data.playerInfo.clientGround) {
-                predicted = Math.min(data.playerInfo.deltaY, MovementUtils.getJumpHeight(packet.getPlayer()));
+                predicted = Math.min(data.playerInfo.deltaY, MovementUtils.getJumpHeight(data));
             }
 
             for (Block block : Helper.blockCollisions(new ArrayList<>(data.blockInfo.handler.getBlocks()),

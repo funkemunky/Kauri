@@ -44,18 +44,18 @@ public class BlockInformation {
             blocks.clear();
         }
 
-        double dy = objectData.playerInfo.deltaY;
+        double dy = Math.abs(objectData.playerInfo.deltaY);
         double dh = objectData.playerInfo.deltaXZ;
 
-        if(dy > 2) dy = 2;
-        if(dh > 2) dh = 2;
+        if(dy > 3) dy = 3;
+        if(dh > 3) dh = 3;
 
-        int startX = Location.locToBlock(objectData.playerInfo.to.x - 1.5 - dh);
-        int endX = Location.locToBlock(objectData.playerInfo.to.x + 1.5 + dh);
+        int startX = Location.locToBlock(objectData.playerInfo.to.x - 1 - dh);
+        int endX = Location.locToBlock(objectData.playerInfo.to.x + 1 + dh);
         int startY = Location.locToBlock(objectData.playerInfo.to.y - 1 - dy);
         int endY = Location.locToBlock(objectData.playerInfo.to.y + 3 + dy);
-        int startZ = Location.locToBlock(objectData.playerInfo.to.z - 1.5 - dh);
-        int endZ = Location.locToBlock(objectData.playerInfo.to.z + 1.5 + dh);
+        int startZ = Location.locToBlock(objectData.playerInfo.to.z - 1 - dh);
+        int endZ = Location.locToBlock(objectData.playerInfo.to.z + 1 + dh);
 
         objectData.playerInfo.worldLoaded = true;
         synchronized (blocks) {

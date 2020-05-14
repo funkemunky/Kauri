@@ -7,7 +7,6 @@ import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutEntityEffectPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import dev.brighten.anticheat.data.ObjectData;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;

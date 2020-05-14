@@ -6,6 +6,7 @@ import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import cc.funkemunky.api.utils.Color;
+import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.math.RollingAverageLong;
 import cc.funkemunky.api.utils.math.cond.MaxInteger;
@@ -18,6 +19,7 @@ import dev.brighten.anticheat.data.classes.BlockInformation;
 import dev.brighten.anticheat.data.classes.CheckManager;
 import dev.brighten.anticheat.data.classes.PlayerInformation;
 import dev.brighten.anticheat.data.classes.PredictionService;
+import dev.brighten.anticheat.listeners.PacketListener;
 import dev.brighten.anticheat.processing.ClickProcessor;
 import dev.brighten.anticheat.processing.MovementProcessor;
 import dev.brighten.anticheat.processing.PotionProcessor;
@@ -70,7 +72,7 @@ public class ObjectData {
     public ConcurrentEvictingList<CancelType> typesToCancel = new ConcurrentEvictingList<>(10);
     public final List<String> sniffedPackets = new CopyOnWriteArrayList<>();
     public BukkitTask task;
-    public ExecutorService playerThread;
+    private ExecutorService playerThread;
 
     public ObjectData(UUID uuid) {
         this.uuid = uuid;
@@ -122,6 +124,12 @@ public class ObjectData {
                 RunUtils.task(() -> getPlayer().kickPlayer(Color.Red + "Lunar Client 1.8.9 is not allowed.\nJoin on 1.7.10 or any other client."));
             }
         }, Kauri.INSTANCE, 40L, 40L);
+    }
+
+    public ExecutorService getThread() {
+        if(PacketListener.expansiveThreading)
+            return playerThread;
+        return Kauri.INSTANCE.executor;
     }
 
     public short getRandomShort(int baseNumber, int bound) {
@@ -186,7 +194,7 @@ public class ObjectData {
     }
 
     public void onLogout() {
-        playerThread.shutdown();
+        getThread().shutdown();
         task.cancel();
         keepAliveStamps.clear();
         transactionActions.clear();
