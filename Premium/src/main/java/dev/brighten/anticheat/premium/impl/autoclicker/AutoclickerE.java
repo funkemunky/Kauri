@@ -18,11 +18,14 @@ public class AutoclickerE extends Check {
         if (data.clickProcessor.isNotReady())
             return;
 
-        if (data.clickProcessor.getStd() < 15.d) {
-            if(verbose.add(data.clickProcessor.getStd() < 9. ? 2 : 1) > 4) {
+        int modals = data.clickProcessor.getModes().size();
+        double skewness = Math.abs(data.clickProcessor.getSkewness());
+
+        if (modals > 1 && skewness > 0.5) {
+            if(verbose.add(data.clickProcessor.getVariance() > 6000 ? 2 : 1) > 4) {
                 vl++;
-                this.flag("STD: " + data.clickProcessor.getStd());
+                this.flag("skewness=%v.2 modals=%v", skewness, modals);
             }
-        } else verbose.subtract(1.5);
+        } else verbose.subtract(.5);
     }
 }

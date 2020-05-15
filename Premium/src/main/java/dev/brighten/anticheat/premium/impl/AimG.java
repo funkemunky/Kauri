@@ -2,9 +2,13 @@ package dev.brighten.anticheat.premium.impl;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutEntityHeadRotation;
+import cc.funkemunky.api.utils.Color;
+import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.MiscUtils;
+import dev.brighten.anticheat.utils.MiscUtils;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
+import cc.funkemunky.api.utils.world.types.RayCollision;
+import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -12,79 +16,79 @@ import dev.brighten.anticheat.utils.AtomicDouble;
 import dev.brighten.anticheat.utils.Verbose;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
+import org.bukkit.Location;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.DoubleSummaryStatistics;
 import java.util.List;
 import java.util.LongSummaryStatistics;
+import java.util.stream.Collectors;
 
 @CheckInfo(name = "Aim (G)", description = "A simple check to detect Vape's aimassist.",
         checkType = CheckType.AIM, developer = true, enabled = false, punishVL = 30)
 public class AimG extends Check {
 
-    private float yaw, pitch, lastYaw, lastPitch, lastDeltaYaw, lastDeltaPitch, lastYawDifference;
-    private boolean sentRotation;
-    private List<Float> yawSamples = new ArrayList<>(), pitchSamples = new ArrayList<>();
+    private EvictingList<Double> samples = new EvictingList<>(30);
+    private int buffer;
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if(!packet.isLook()) return;
+        if ((!packet.isLook() && !packet.isPos())
+                || data.target == null
+                || data.playerInfo.lastAttack.hasPassed(1)) return;
 
-        // Get the yaw/pitch values from the rotation
-        final float yaw = packet.getYaw();
-        final float pitch = packet.getPitch();
+        val origin = data.playerInfo.to.clone();
 
-        // Get the yaw/pitch values from the outGoing rotation
-        final float outYaw = this.yaw;
-        final float outPitch = this.pitch;
+        origin.y+= data.playerInfo.sneaking ? 1.54 : 1.62;
+        RayCollision ray = new RayCollision(origin.toVector(), MathUtils.getDirection(origin));
 
-        // Getting the delta of the last yaw/pitch values and the current outGoing values
-        final float deltaYaw = MathUtils.getAngleDelta(this.lastYaw, outYaw);
-        final float deltaPitch = MathUtils.getAngleDelta(this.lastPitch, outPitch);
+        SimpleCollisionBox box = getHitbox(data.target.getLocation(), data.target.getType());
 
-        // Get the difference between the previous rotations
-        final float differenceYaw = Math.abs(lastDeltaYaw - deltaYaw);
-        final float differencePitch = Math.abs(lastDeltaPitch - deltaPitch);
+        Vector collision = ray.collisionPoint(box);
 
-        // Get the Jolt of the rotations
-        final float joltYaw = Math.abs(differenceYaw - lastYawDifference);
-        final float joltPitch = Math.abs(differencePitch - lastYawDifference);
+        if(collision != null) {
+            Vector centorOfBox = MathUtils.getCenterOfBox(box.toBoundingBox());
 
-        // I abused jeremy
-        if (differenceYaw > 2.0 && differencePitch == 0.0) {
-            yawSamples.add(joltYaw);
-            pitchSamples.add(joltPitch);
+            samples.add(collision.distance(centorOfBox));
 
-            if (yawSamples.size() == 20 && pitchSamples.size() == 20) {
-                final long distinctYaw = yawSamples.stream().distinct().count();
-                final long distinctPitch = pitchSamples.stream().distinct().count();
+            if(samples.size() > 15) {
+                val outliersTuple = MiscUtils.getOutliers(samples);
 
-                final long duplicatesYaw = yawSamples.size() - distinctYaw;
-                final long duplicatesPitch = pitchSamples.size() - distinctPitch;
+                int low = outliersTuple.one.size(), high = outliersTuple.two.size();
+                DoubleSummaryStatistics summary = samples.stream().mapToDouble(v -> v).summaryStatistics();
 
-                final boolean invalid = (duplicatesYaw == 0.0 || duplicatesPitch == 0.0) && duplicatesYaw < 2 && duplicatesPitch < 2;
+                double mean = summary.getAverage(), std = MathUtils.stdev(samples),
+                        median = MiscUtils.getMedian(samples);
 
-                if (invalid) {
-                    vl++;
-                    flag("dup=" + duplicatesYaw + " dupp=" + duplicatesPitch);
-                } else debug("nope");
+                double skewness = MiscUtils.getSkewness(samples);
+                double kurtosis = MiscUtils.getKurtosis(samples);
 
-                yawSamples.clear();
-                pitchSamples.clear();
+                if((Math.abs(kurtosis) < 0.1 && skewness > 0.8) || (std > 0.1 && (low + high) == 0)) {
+                    if(++buffer > 5) {
+                        vl++;
+                        flag(20 * 20, "outliers=" + (low + high));
+                    }
+                    debug(Color.Green + "Flag: " + buffer);
+                } else buffer = 0;
+
+                debug("low=%v high=%v mean=%v.1 std=%v.2 kurt=%v.2 skewness=%v.2",
+                        low, high, mean, std, kurtosis, skewness);
             }
         }
-
-        this.lastYaw = yaw;
-        this.lastPitch = pitch;
-        this.lastDeltaYaw = deltaYaw;
-        this.lastDeltaPitch = deltaPitch;
-        this.lastYawDifference = differenceYaw;
     }
 
-    @Packet
-    public void onRotation(WrappedOutEntityHeadRotation packet) {
-        yaw = packet.getPlayer().getLocation().getYaw();
-        pitch = packet.getPlayer().getLocation().getPitch();
-        sentRotation = true;
+    private static SimpleCollisionBox getHitbox(Location loc, EntityType type) {
+        if(type.equals(EntityType.PLAYER)) {
+            return new SimpleCollisionBox(loc.toVector(), 0.6, 1.8).expand(0.1, 0.1, 0.1);
+        } else {
+            Vector bounds = cc.funkemunky.api.utils.MiscUtils.entityDimensions.get(type);
+
+            return new SimpleCollisionBox(loc.toVector(), 0, 0).expand(bounds.getX(), 0, bounds.getZ())
+                    .expandMax(0, bounds.getY(), 0)
+                    .expand(0.1, 0.1, 0.1);
+        }
     }
 }
