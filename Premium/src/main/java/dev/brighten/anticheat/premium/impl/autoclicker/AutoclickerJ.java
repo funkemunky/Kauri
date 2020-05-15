@@ -16,27 +16,26 @@ public class AutoclickerJ extends Check {
 
     @Packet
     public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
-        if(data.playerInfo.breakingBlock
-                || data.playerInfo.lastBlockPlace.hasNotPassed(1)) return;
+        if(data.clickProcessor.isNotReady()) return;
 
+        double skew = Math.abs(data.clickProcessor.getSkewness());
         if(data.clickProcessor.getKurtosis() < 0
                 && data.clickProcessor.getAverage() < 180
-                && (data.clickProcessor.getVariance() > 700 || data.clickProcessor.getSkew() < 0.08)
-                && data.clickProcessor.getSkew() < 0.3
-                && (data.clickProcessor.getZeros() <= 1 ||  data.clickProcessor.getAverage() <= 50.4)
-                && data.clickProcessor.cpsList.size() >= 30) {
+                && (data.clickProcessor.getVariance() > 700 || skew < 0.15)
+                && skew < 0.6
+                && (data.clickProcessor.getZeros() <= 1 ||  data.clickProcessor.getAverage() <= 50.4)) {
             if(buffer++ > 40) {
                 vl++;
-                flag("k=%v.4 avg=%v.3 s=%v.3 v=%v.3 b=%v.1 zeros=%v",
+                flag(20 * 40, "k=%v.4 avg=%v.3 s=%v.3 v=%v.3 b=%v.1 zeros=%v",
                         data.clickProcessor.getKurtosis(), data.clickProcessor.getAverage(),
-                        data.clickProcessor.getSkew(), data.clickProcessor.getVariance(), buffer,
+                        data.clickProcessor.getSkewness(), data.clickProcessor.getVariance(), buffer,
                         data.clickProcessor.getZeros());
             }
-        } else buffer-= buffer > 0 ? 4 : 0;
+        } else buffer-= buffer > 0 ? 2 : 0;
         long delta = timeStamp - lastArm;
         debug("kurtosis=%v.4 std=%v.4 avg=%v.3 skew=%v.3 variance=%v.3 buffer=%v.1 delta=%v zeros=%v",
                 data.clickProcessor.getKurtosis(), data.clickProcessor.getStd(), data.clickProcessor.getAverage(),
-                data.clickProcessor.getSkew(),
+                data.clickProcessor.getSkewness(),
                 data.clickProcessor.getVariance(),
                 buffer, delta, data.clickProcessor.getZeros());
         lastArm = timeStamp;

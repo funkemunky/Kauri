@@ -7,6 +7,7 @@ import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.handlers.PlayerSizeHandler;
 import cc.funkemunky.api.utils.objects.VariableValue;
 import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingList;
+import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.MiscUtils;
@@ -20,13 +21,16 @@ import org.bukkit.potion.PotionEffectType;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.Deque;
+import java.util.List;
 
 public class MovementProcessor {
     private final ObjectData data;
 
-    public Deque<Float> yawGcdList = new ConcurrentEvictingList<>(40),
-            pitchGcdList = new ConcurrentEvictingList<>(40);
-    public long deltaX, deltaY, lastDeltaX, lastDeltaY, lastCinematic;
+    public Deque<Float> yawGcdList = new EvictingList<>(50),
+            pitchGcdList = new EvictingList<>(50);
+    public int deltaX, deltaY, lastDeltaX, lastDeltaY;
+    public Tuple<List<Double>, List<Double>> yawOutliers, pitchOutliers;
+    public long lastCinematic;
     public float sensitivityX, sensitivityY, yawMode, pitchMode, sensXPercent, sensYPercent;
     private MouseFilter mxaxis = new MouseFilter(), myaxis = new MouseFilter();
     private float smoothCamFilterX, smoothCamFilterY, smoothCamYaw, smoothCamPitch;
@@ -162,19 +166,13 @@ public class MovementProcessor {
                 - data.playerInfo.from.yaw;
         data.playerInfo.deltaPitch = data.playerInfo.to.pitch - data.playerInfo.from.pitch;
         if (packet.isLook()) {
-            int dpcount = MiscUtils.getDecimalCount(data.playerInfo.deltaPitch),
-                    ldpcount = MiscUtils.getDecimalCount(data.playerInfo.lDeltaPitch);
 
-            boolean doNotSetPitch = dpcount != ldpcount;
-            if(!doNotSetPitch) {
-                data.playerInfo.lastPitchGCD = data.playerInfo.pitchGCD;
-                data.playerInfo.pitchGCD = MiscUtils.gcd((int) (data.playerInfo.deltaPitch * offset),
-                        (int) (data.playerInfo.lDeltaPitch * offset));
-            }
-
+            data.playerInfo.lastPitchGCD = data.playerInfo.pitchGCD;
             data.playerInfo.lastYawGCD = data.playerInfo.yawGCD;
             data.playerInfo.yawGCD = MiscUtils.gcd((int) (data.playerInfo.deltaYaw * offset),
                     (int) (data.playerInfo.lDeltaYaw * offset));
+            data.playerInfo.pitchGCD = MiscUtils.gcd((int) (data.playerInfo.deltaPitch * offset),
+                    (int) (data.playerInfo.lDeltaPitch * offset));
 
             val origin = data.playerInfo.to.clone();
 
@@ -187,15 +185,17 @@ public class MovementProcessor {
             if (data.playerInfo.yawGCD > 90000 && data.playerInfo.yawGCD < 2E7
                     && yawGcd > 0.01f && data.playerInfo.deltaYaw < 8)
                 yawGcdList.add(yawGcd);
-            if (!doNotSetPitch && data.playerInfo.pitchGCD > 90000 && data.playerInfo.pitchGCD < 2E7
+            if (data.playerInfo.pitchGCD > 90000 && data.playerInfo.pitchGCD < 2E7
                     && Math.abs(data.playerInfo.deltaPitch) < 8) pitchGcdList.add(pitchGcd);
 
             if (yawGcdList.size() > 3 && pitchGcdList.size() > 3) {
 
                 //Making sure to get shit within the std for a more accurate result.
-                if (!doNotSetPitch && lastReset.hasPassed()) {
+                if (lastReset.hasPassed()) {
                     yawMode = MathUtils.getMode(yawGcdList);
                     pitchMode = MathUtils.getMode(pitchGcdList);
+                    yawOutliers = MiscUtils.getOutliers(yawGcdList);
+                    pitchOutliers = MiscUtils.getOutliers(pitchGcdList);
                     lastReset.reset();
                     sensXPercent = sensToPercent(sensitivityX = getSensitivityFromYawGCD(yawMode));
                     sensYPercent = sensToPercent(sensitivityY = getSensitivityFromPitchGCD(pitchMode));
@@ -209,7 +209,7 @@ public class MovementProcessor {
 
                 if((data.playerInfo.pitchGCD < 1E5 || data.playerInfo.yawGCD < 1E5) && smoothCamFilterY < 1E6
                         && smoothCamFilterX < 1E6 && timeStamp - data.creation > 1000L) {
-                    float f = (float)sensitivityX * 0.6f + .2f;
+                    float f = sensitivityX * 0.6f + .2f;
                     float f1 = f * f * f * 8;
                     float f2 = deltaX * f1;
                     float f3 = deltaY * f1;
@@ -343,15 +343,13 @@ public class MovementProcessor {
             data.pastLocation.addLocation(data.playerInfo.to.clone());
     }
     private static int getDeltaX(float yawDelta, float gcd) {
-        float f2 = yawToF2(yawDelta);
 
-        return Math.round(f2 / getF1FromYaw(gcd));
+        return Math.round(yawDelta / gcd);
     }
 
     private static int getDeltaY(float pitchDelta, float gcd) {
-        float f3 = pitchToF3(pitchDelta);
 
-        return Math.round(f3 / getF1FromPitch(gcd));
+        return Math.round(pitchDelta / gcd);
     }
 
     public static int sensToPercent(float sensitivity) {

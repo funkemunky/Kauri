@@ -13,7 +13,7 @@ import lombok.val;
 import java.util.concurrent.TimeUnit;
 
 @CheckInfo(name = "Autoclicker (G)", description = "Checks for outliers in clicks.",
-        checkType = CheckType.AUTOCLICKER, vlToFlag = 10, developer = true, punishVL = 80)
+        checkType = CheckType.AUTOCLICKER, vlToFlag = 10, punishVL = 80)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerG extends Check {
 

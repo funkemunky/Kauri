@@ -22,16 +22,21 @@ import java.util.LongSummaryStatistics;
 public class ClickProcessor {
     public EvictingList<Long> cpsList = new EvictingList<>(40);
     @Getter
-    private double std, average, nosqrtKurtosis, kurtosis, skew, variance;
+    private double std, average, nosqrtKurtosis, kurtosis, skewness, median, variance;
     @Getter
     private long min, max, sum, zeros;
     private long lastTimestamp;
     @Getter
     private int outliers, lowOutliers, highOutliers;
     @Getter
+    private List<Double> modes = new ArrayList<>();
+    @Getter
     private Tuple<List<Double>, List<Double>> outliersTuple = new Tuple<>(new ArrayList<>(), new ArrayList<>());
 
     private TickTimer lastZeroCheck = new TickTimer(2);
+
+    @Getter
+    private boolean notReady;
 
     private final ObjectData data;
 
@@ -56,18 +61,18 @@ public class ClickProcessor {
             min = summary.getMin();
             max = summary.getMax();
             sum = summary.getSum();
+            modes = MiscUtils.getModes(cpsList);
+            median = MiscUtils.getMedian(cpsList);
             kurtosis = MiscUtils.getKurtosis(cpsList);
-            skew = MiscUtils.getSkewness(cpsList);
+            //skew = MiscUtils.getSkewness(cpsList);
             variance = MiscUtils.varianceSquared(average, cpsList);
+            skewness = (average - median) / std;
             std = Math.sqrt(variance);
             nosqrtKurtosis = max;
         }
-        lastTimestamp = timeStamp;
-    }
-
-    public boolean isNotReady() {
-        return data.playerInfo.breakingBlock
+        notReady = data.playerInfo.breakingBlock
                 || data.playerInfo.lastBlockPlace.hasNotPassed(3)
-                || cpsList.size() < 30;
+                || cpsList.size() < 22;
+        lastTimestamp = timeStamp;
     }
 }

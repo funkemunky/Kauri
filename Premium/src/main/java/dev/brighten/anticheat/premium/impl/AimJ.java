@@ -14,11 +14,8 @@ import lombok.val;
 import java.util.ArrayList;
 import java.util.List;
 
-@CheckInfo(name = "Aim (J)", description = "Prediction.", checkType = CheckType.AIM, developer = true)
+@CheckInfo(name = "Aim (J)", description = "Prediction.", checkType = CheckType.AIM, vlToFlag = 15, developer = true)
 public class AimJ extends Check {
-
-    private int buffer;
-    private EvictingList<Float> deltas = new EvictingList<>(20);
 
     @Packet
     public void onLook(WrappedInFlyingPacket packet) {
@@ -31,19 +28,15 @@ public class AimJ extends Check {
             float yaw = data.playerInfo.to.yaw;
             float xDelta = Math.abs(yaw - predicted);
 
-            if(data.moveProcessor.sensXPercent == data.moveProcessor.sensYPercent && data.currentTicks > 40) {
-                deltas.add(xDelta);
-
-                if(xDelta > 0.008) {
+            if(data.moveProcessor.sensXPercent == data.moveProcessor.sensYPercent && data.moveProcessor.pitchGcdList.size() > 30) {
+                if(xDelta > (data.playerInfo.deltaX > 100 ? 0.02 : 0.008)) {
                     vl++;
-                    flag("delta=%v.2", xDelta);
+                    flag(20 * 15, "delta=%v.2", xDelta);
                 }
 
-                debug("one=%v two=%v", xDelta, data.moveProcessor.deltaX);
-            } else debug("sensX=%v sensY=%v", data.moveProcessor.sensXPercent, data.moveProcessor.sensYPercent);
-
-            //debug("yaw=%v.1 pdelta=%v.2 deltaX=%v yawDelta=%v.3 sens=%v", yaw,
-            //        xDelta, data.moveProcessor.deltaX, data.playerInfo.deltaYaw, data.moveProcessor.sensXPercent);
+                debug("one=%v two=%v sens=%v.2", xDelta, data.moveProcessor.deltaY, data.moveProcessor.sensYPercent);
+            } else debug("sensX=%v sensY=%v",
+                    data.moveProcessor.sensXPercent, data.moveProcessor.sensYPercent);
         }
     }
 }

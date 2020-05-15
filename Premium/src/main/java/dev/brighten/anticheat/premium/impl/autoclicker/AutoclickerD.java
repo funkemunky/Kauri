@@ -12,6 +12,7 @@ import java.util.List;
 @CheckInfo(name = "Autoclicker (D)", description = "Oscillation check by Abigail.",
         checkType = CheckType.AUTOCLICKER, punishVL = 15, executable = false, vlToFlag = 4)
 @Cancellable(cancelType = CancelType.INTERACT)
+//TODO Redo with a proper oscillation alogorithim (actually was done in exile before).
 public class AutoclickerD extends Check {
 
     private long ltimeStamp;
@@ -21,9 +22,7 @@ public class AutoclickerD extends Check {
 
     @Packet
     public void onClick(WrappedInArmAnimationPacket packet, long timeStamp) {
-        if(data.playerInfo.lastBrokenBlock.hasNotPassed(1)
-                || data.playerInfo.breakingBlock
-                || data.playerInfo.lastBlockPlace.hasNotPassed(1)) {
+        if(data.clickProcessor.isNotReady()) {
             ltimeStamp = timeStamp;
             return;
         }

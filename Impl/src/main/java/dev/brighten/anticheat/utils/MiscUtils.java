@@ -20,6 +20,7 @@ import org.bukkit.util.Vector;
 import java.io.Closeable;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
@@ -153,11 +154,24 @@ public class MiscUtils {
         return tuple;
     }
 
-    private static double getMedian(List<Double> data) {
-        if (data.size() % 2 == 0)
-            return (data.get(data.size() / 2) + data.get(data.size() / 2 - 1)) / 2;
-        else
-            return data.get(data.size() / 2);
+    public static double getMedian(List<Double> data) {
+        if(data.size() > 1) {
+            if (data.size() % 2 == 0)
+                return (data.get(data.size() / 2) + data.get(data.size() / 2 - 1)) / 2;
+            else
+                return data.get(Math.round(data.size() / 2f));
+        }
+        return 0;
+    }
+
+    public static double getMedian(Iterable<? extends Number> iterable) {
+        List<Double> data = new ArrayList<>();
+
+        for (Number number : iterable) {
+            data.add(number.doubleValue());
+        }
+
+        return getMedian(data);
     }
 
     //Copied from apache math Kurtosis class.
@@ -237,6 +251,25 @@ public class MiscUtils {
         }
 
         return (n2 == 0.0) ? 0.0 : (n2 / (n3 - 1));
+    }
+
+    public static List<Double> getModes(final Iterable<? extends Number> iterable) {
+        List<Double> numbers = new ArrayList<>();
+
+        for (Number number : iterable) {
+            numbers.add(number.doubleValue());
+        }
+        final Map<Double, Long> countFrequencies = numbers.stream()
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+        final double maxFrequency = countFrequencies.values().stream()
+                .mapToDouble(count -> count)
+                .max().orElse(-1);
+
+        return countFrequencies.entrySet().stream()
+                .filter(tuple -> tuple.getValue() == maxFrequency)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
     }
 
     //Copied from apache math Skewness class.
