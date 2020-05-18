@@ -28,7 +28,7 @@ public class LoggerManager {
 
     public void addLog(ObjectData data, Check check, String info) {
         Log log = new Log(data.uuid , check.name, info, check.vl, data.lagInfo.transPing,
-                System.currentTimeMillis(), Kauri.INSTANCE.getTps());
+                System.currentTimeMillis(), Kauri.INSTANCE.tps);
 
         storage.addLog(log);
     }
@@ -64,15 +64,13 @@ public class LoggerManager {
 
         Map<UUID, List<Log>> logs = new HashMap<>();
 
-        getLogs(null, null, 0, Integer.MAX_VALUE,
-                currentTime - timeFrame, currentTime + 100)
-                .forEach(log -> {
-                    List<Log> logsList = logs.getOrDefault(log.uuid, new ArrayList<>());
 
-                    logsList.add(log);
+        Kauri.INSTANCE.dataManager.dataMap.keySet().forEach(uuid -> {
+            List<Log> logsList = getLogs(uuid, null, 0, Integer.MAX_VALUE,
+                    currentTime - timeFrame, currentTime);
 
-                    logs.put(log.uuid, logsList);
-                });
+            logs.put(uuid, logsList);
+        });
 
         return logs;
     }

@@ -12,8 +12,7 @@ public class MySQL {
         try {
             if (conn == null || conn.isClosed()) {
                 Class.forName("com.mysql.jdbc.Driver");
-                conn = DriverManager.getConnection("jdbc:mysql://" + MySQLConfig.ip
-                                + ":3306/?useSSL=true&autoReconnect=true",
+                conn = DriverManager.getConnection("jdbc:mysql://" + MySQLConfig.ip + ":3306/?useSSL=false",
                         MySQLConfig.username,
                         MySQLConfig.password);
                 conn.setAutoCommit(true);

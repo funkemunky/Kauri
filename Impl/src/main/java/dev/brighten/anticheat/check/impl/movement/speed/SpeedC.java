@@ -1,20 +1,14 @@
 package dev.brighten.anticheat.check.impl.movement.speed;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInKeepAlivePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
-import cc.funkemunky.api.utils.Materials;
-import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.PlayerUtils;
-import cc.funkemunky.api.utils.XMaterial;
+import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
-import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.Helper;
 import dev.brighten.anticheat.utils.MovementUtils;
-import dev.brighten.anticheat.utils.TickTimer;
 import lombok.val;
 import org.bukkit.Material;
 import org.bukkit.potion.PotionEffectType;
@@ -23,26 +17,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Cancellable
-@CheckInfo(name = "Speed (C)", description = "Speed check by DeprecatedLuke, improved by funkemunky.",
-        punishVL = 30, vlToFlag = 5, developer = true)
+@CheckInfo(name = "Speed (C)", description = "Speed check by DeprecatedLuke, improved by funkemunky.", developer = true)
 public class SpeedC extends Check {
 
     public double previousDistance;
+    private double drag = 0.91;
     private int fallTicks;
-    private int webTicks;
+    private int webTicks, liquidTicks;
     private double velocityX, velocityZ;
-    private TickTimer horizontalIdle;
+    private boolean lSprint;
+    private TickTimer horizontalIdle = new TickTimer(20);
     private static Material ice = XMaterial.ICE.parseMaterial(), packed_ice = XMaterial.PACKED_ICE.parseMaterial();
 
-    @Override
-    public void setData(ObjectData data) {
-        super.setData(data);
-        horizontalIdle = new TickTimer(data, 20);
-    }
-
     @Packet
-    public void onTrans(WrappedInKeepAlivePacket packet) {
-        if(packet.getTime() == data.getKeepAliveStamp("velocity")) {
+    public void onTrans(WrappedInTransactionPacket packet) {
+        if(packet.getAction() == (short)101) {
             velocityX = data.playerInfo.velocityX;
             velocityZ = data.playerInfo.velocityZ;
         }
@@ -51,27 +40,27 @@ public class SpeedC extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if (!packet.isPos()
-                || (data.playerInfo.deltaXZ == 0 && data.playerInfo.deltaY == 0)) return;
+                || (data.playerInfo.deltaXZ == 0 && data.playerInfo.deltaY == 0)
+                || data.playerInfo.generalCancel) return;
 
         List<String> tags = new ArrayList<>();
 
         double moveSpeed = Math.pow(data.getPlayer().getWalkSpeed() * 5, 2);
-        double drag = 0.91;
-        boolean onGround = data.playerInfo.clientGround || data.blockInfo.onSlime;
+        double drag = this.drag;
+        boolean onGround = packet.isGround() || data.blockInfo.onSlime;
 
         if (data.playerInfo.deltaY < 0) fallTicks++;
         else fallTicks = 0;
 
         double velocityXZ = MathUtils.hypot(velocityX, velocityZ);
 
-        Material type = data.playerInfo.blockBelow == null
-                ? XMaterial.AIR.parseMaterial()
-                : data.playerInfo.blockBelow.getType();
+        if(data.playerInfo.blockBelow == null) return;
 
-        if (onGround || (data.playerInfo.lClientGround
-                && MathUtils.getDelta(data.playerInfo.jumpHeight, data.playerInfo.deltaY) < 0.1)) {
+        Material type = data.playerInfo.blockBelow.getType();
+
+        if (onGround || data.playerInfo.jumped) {
             tags.add("ground");
-            drag *= data.blockInfo.currentFriction;
+            drag *= 0.91;
             moveSpeed *= drag > 0.708 ? 1.3 : data.predictionService.aiMoveSpeed * 1.1f;
             moveSpeed *= 0.16277136 / Math.pow(drag, 3);
 
@@ -82,7 +71,7 @@ public class SpeedC extends Check {
 
                 if (data.playerInfo.jumped) {
                     tags.add("hop");
-                    moveSpeed += 0.1;
+                    moveSpeed += 0.05;
                     if (data.playerInfo.wasOnSlime) {
                         tags.add("slimehop");
                         moveSpeed += 0.1;
@@ -230,6 +219,11 @@ public class SpeedC extends Check {
             moveSpeed+= 0.1;
         }
 
+        if (data.playerInfo.slimeTimer.hasNotPassed(0)) {
+            tags.add("slime");
+            moveSpeed -= 0.07;
+        }
+
         double dyf = Helper.format(data.playerInfo.deltaY, 4);
         if (dyf > -0.0785 && dyf < 0 && !data.playerInfo.serverGround) {
             tags.add("first");
@@ -237,8 +231,9 @@ public class SpeedC extends Check {
         }
 
         double horizontalMove = (horizontalDistance - previousHorizontal) - moveSpeed;
-        if (horizontalDistance > 0.1 && !data.playerInfo.generalCancel) {
-            if (horizontalMove > 0 && data.playerInfo.lastVelocity.hasPassed(10)) {
+        if (horizontalDistance > 0.1) {
+            if (horizontalMove > 0 && data.playerInfo.lastVelocity.hasPassed(10)
+                    && data.playerInfo.lastVelocity.hasPassed(10)) {
                 vl++;
                 if(horizontalMove > 0.54 || vl > 7) {
                     flag("+%v,tags=%v",
@@ -247,8 +242,8 @@ public class SpeedC extends Check {
             } else vl-= vl > 0 ? 0.2 : 0;
         }
 
-        debug("+%v.4,tags=%v,place=%v,dy=%v.3,jumped=%v", horizontalMove, String.join(",", tags),
-                data.playerInfo.lastBlockPlace.getPassed(), data.playerInfo.deltaY, data.playerInfo.jumped);
+        debug("+%v.4,tags=%v,place=%v,dy=%v.3", horizontalMove, String.join(",", tags),
+                data.playerInfo.lastBlockPlace.getPassed(), Helper.format(data.playerInfo.deltaY, 4));
 
 
         if(velocityXZ > 0) {
@@ -260,5 +255,6 @@ public class SpeedC extends Check {
         }
 
         this.previousDistance = horizontalDistance * drag;
+        this.drag = data.blockInfo.inWater ? 0.8 : data.blockInfo.currentFriction;
     }
 }

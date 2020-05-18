@@ -7,25 +7,24 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Aim (B)", description = "Checks for common denominators in pitch difference.",
-        checkType = CheckType.AIM, punishVL = 45)
+        checkType = CheckType.AIM, punishVL = 80)
 public class AimB extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if(packet.isLook()
-                && Math.abs(data.playerInfo.deltaPitch) > 1E-5) {
+                && Math.abs(data.playerInfo.deltaPitch) > 1E-5
+                && Math.abs(data.playerInfo.to.pitch) < 78) {
             if(data.playerInfo.pitchGCD < 100000
                     && data.playerInfo.lastAttack.hasNotPassed(10)
                     && !data.playerInfo.cinematicMode
                     && data.moveProcessor.sensitivityX < 0.44) {
-                if(++vl > 28) {
+                if(vl++ > 35) {
                     flag("offset=%v deltaPitch=%v", data.playerInfo.pitchGCD, data.playerInfo.deltaPitch);
                 }
             } else vl-= vl > 0 ? 0.5 : 0;
-            debug("gcd=%v cin=%v dpitch=%v ldp=%v pitch=%v.2 lpitch=%v.2 vl=%v.1",
-                    data.playerInfo.pitchGCD,
-                    data.playerInfo.cinematicMode, data.playerInfo.deltaPitch, data.playerInfo.lDeltaPitch,
-                    data.playerInfo.to.pitch, data.playerInfo.from.pitch, vl);
+            debug("gcd=" + data.playerInfo.pitchGCD + " cin=" + data.playerInfo.cinematicMode
+                    + " deltaPitch=" + data.playerInfo.deltaPitch + " vl=" + vl);
         }
     }
 }

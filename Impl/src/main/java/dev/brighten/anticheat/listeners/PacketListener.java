@@ -5,7 +5,6 @@ import cc.funkemunky.api.events.Listen;
 import cc.funkemunky.api.events.ListenerPriority;
 import cc.funkemunky.api.events.impl.PacketReceiveEvent;
 import cc.funkemunky.api.events.impl.PacketSendEvent;
-import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.Init;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
@@ -16,19 +15,13 @@ import java.util.concurrent.Executors;
 @Init
 public class PacketListener implements AtlasListener {
 
-    @ConfigSetting(path = "performance", name = "expansiveThreading")
-    public static boolean expansiveThreading = true;
-
-    private ExecutorService service = Executors.newSingleThreadScheduledExecutor();
-
+    public static ExecutorService packetThread = Executors.newSingleThreadScheduledExecutor();
     @Listen(ignoreCancelled = true, priority = ListenerPriority.LOW)
     public void onEvent(PacketReceiveEvent event) {
         if(event.getPlayer() == null) return;
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
-        if(data == null) return;
-
-        (expansiveThreading ? data.getThread() : service).execute(() -> Kauri.INSTANCE.packetProcessor.processClient(event,
+        packetThread.execute(() -> Kauri.INSTANCE.packetProcessor.processClient(event,
                 data, event.getPacket(), event.getType(), event.getTimeStamp()));
     }
 
@@ -42,9 +35,7 @@ public class PacketListener implements AtlasListener {
 
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
-        if(data == null) return;
-
-        (expansiveThreading ? data.getThread() : service).execute(() -> Kauri.INSTANCE.packetProcessor.processServer(event,
+        packetThread.execute(() -> Kauri.INSTANCE.packetProcessor.processServer(event,
                 data, event.getPacket(), event.getType(), event.getTimeStamp()));
     }
 }

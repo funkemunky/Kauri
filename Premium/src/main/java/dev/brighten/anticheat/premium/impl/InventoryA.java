@@ -13,9 +13,7 @@ public class InventoryA extends Check {
 
     @Packet
     public void onWindow(WrappedInWindowClickPacket packet) {
-        if(packet.getId() == 0 && !data.playerInfo.inventoryOpen
-                && data.playerInfo.worldLoaded
-                && data.lagInfo.lastPacketDrop.hasPassed(5)) {
+        if(packet.getId() == 0 && !data.playerInfo.inventoryOpen) {
             vl++;
             if(vl > 2) flag("id=%v", packet.getId());
             if(cancellable) TinyProtocolHandler.sendPacket(packet.getPlayer(),

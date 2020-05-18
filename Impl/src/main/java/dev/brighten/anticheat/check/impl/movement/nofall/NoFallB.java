@@ -14,7 +14,9 @@ public class NoFallB extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if(data.playerInfo.serverGround != data.playerInfo.clientGround
+        boolean serverGround = data.playerInfo.serverGround
+                && (data.playerInfo.clientGround || data.playerInfo.deltaY == 0);
+        if(serverGround != data.playerInfo.clientGround
                 && (data.playerInfo.deltaY != 0 || data.playerInfo.deltaXZ > 0)
                 && data.playerInfo.lastBlockPlace.hasPassed(15)
                 && data.playerInfo.lastVelocity.hasPassed(10)

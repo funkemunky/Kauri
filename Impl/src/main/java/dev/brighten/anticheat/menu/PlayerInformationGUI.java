@@ -76,12 +76,11 @@ public class PlayerInformationGUI extends ChestMenu {
         ItemBuilder forgeItem = new ItemBuilder(XMaterial.ANVIL.parseMaterial());
 
         forgeItem.amount(1);
-        forgeItem.name(Color.Gold + "Client  Information");
+        forgeItem.name(Color.Gold + "Forge Information");
 
         List<String> loreList = new ArrayList<>(Arrays.asList("",
                 halfLine,
                 "&eUsing Forge&7: &f" + (modData != null),
-                "&eUsing Lunar&7: &f" + data.usingLunar,
                 ""));
 
         if(modData != null) {

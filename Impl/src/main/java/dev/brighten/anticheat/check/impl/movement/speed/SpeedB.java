@@ -9,7 +9,7 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Speed (B)", description = "Checks for changing in air which should be impossible.",
-        checkType = CheckType.SPEED, punishVL = 20, vlToFlag = 2)
+        checkType = CheckType.SPEED, punishVL = 20)
 @Cancellable
 public class SpeedB extends Check {
 

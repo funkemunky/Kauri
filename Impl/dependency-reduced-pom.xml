@@ -3,7 +3,7 @@
   <parent>
     <artifactId>Kauri</artifactId>
     <groupId>dev.brighten.anticheat</groupId>
-    <version>2.7.4</version>
+    <version>2.6.3</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>Impl</artifactId>
@@ -49,6 +49,12 @@
             </goals>
             <configuration>
               <minimizeJar>false</minimizeJar>
+              <relocations>
+                <relocation>
+                  <pattern>org.apache.commons.math3</pattern>
+                  <shadedPattern>dev.brighten.utils.org.apache.commons.math3</shadedPattern>
+                </relocation>
+              </relocations>
             </configuration>
           </execution>
         </executions>
@@ -60,18 +66,6 @@
       <groupId>org.github.spigot</groupId>
       <artifactId>1.8.8</artifactId>
       <version>1.8.8</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>gg.manny</groupId>
-      <artifactId>lunar-client-api</artifactId>
-      <version>1.0</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>me.mat1337.loader</groupId>
-      <artifactId>loader</artifactId>
-      <version>2.4.1</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

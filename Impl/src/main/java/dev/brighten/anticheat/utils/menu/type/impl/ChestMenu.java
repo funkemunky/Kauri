@@ -23,12 +23,12 @@ public class ChestMenu implements Menu {
 
     @Getter
     @Setter
-    String title;
-    final MenuDimension dimension;
+    private String title;
+    private final MenuDimension dimension;
     @Setter
     private Menu parent;
     @Getter
-    BukkitInventoryHolder holder;
+    private BukkitInventoryHolder holder;
     public Button[] contents;
     private CloseHandler closeHandler;
 

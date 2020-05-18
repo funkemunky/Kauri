@@ -10,7 +10,7 @@ import dev.brighten.api.check.CheckType;
 import org.bukkit.util.Vector;
 
 @CheckInfo(name = "Aim (F)", description = "An angle deviation check made by DeprecatedLuke.", checkType = CheckType.AIM,
-        punishVL = 20, developer = true, enabled = false)
+        punishVL = 20, developer = true)
 public class AimF extends Check {
 
     private float lastPitch = -1;

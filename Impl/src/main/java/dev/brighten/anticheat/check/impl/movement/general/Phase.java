@@ -1,11 +1,8 @@
-package dev.brighten.anticheat.check.impl.world;
+package dev.brighten.anticheat.check.impl.movement.general;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
-import cc.funkemunky.api.utils.KLocation;
-import cc.funkemunky.api.utils.Materials;
-import cc.funkemunky.api.utils.Tuple;
-import cc.funkemunky.api.utils.XMaterial;
+import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import cc.funkemunky.api.utils.world.BlockData;
 import cc.funkemunky.api.utils.world.types.RayCollision;
@@ -14,9 +11,7 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Event;
 import dev.brighten.anticheat.check.api.Packet;
-import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.Helper;
-import dev.brighten.anticheat.utils.TickTimer;
 import dev.brighten.api.check.CheckType;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -37,16 +32,10 @@ public class Phase extends Check {
 
     private static boolean debug = false;
     private EvictingList<KLocation> previousLocs = new EvictingList<>(12);
-    private TickTimer lastOpen;
+    private TickTimer lastOpen = new TickTimer(7);
 
     private int setbackTicks = 0;
     private KLocation setback;
-
-    @Override
-    public void setData(ObjectData data) {
-        super.setData(data);
-        lastOpen = new TickTimer(data, 7);
-    }
 
     private static List<Material> negative = Stream.of(XMaterial.LADDER, XMaterial.VINE)
             .map(XMaterial::parseMaterial)
@@ -68,8 +57,7 @@ public class Phase extends Check {
                 || lastOpen.hasNotPassed(14)) return;
 
 
-        if(timeStamp - data.playerInfo.lastServerPos > 20L
-                && timeStamp - data.playerInfo.lastRespawn > 20L) {
+        if(timeStamp - data.playerInfo.lastServerPos > 10L) {
             SimpleCollisionBox currentHitbox = Helper.getMovementHitbox(data.getPlayer());
             SimpleCollisionBox newHitbox = Helper.getMovementHitbox(data.getPlayer(), packet.getX(), packet.getY(), packet.getZ());
             currentHitbox.expand(-0.0625); newHitbox.expand(-0.0625); // reduce falseflag chances

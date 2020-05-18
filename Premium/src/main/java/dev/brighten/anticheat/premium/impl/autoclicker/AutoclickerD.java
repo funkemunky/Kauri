@@ -10,19 +10,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 @CheckInfo(name = "Autoclicker (D)", description = "Oscillation check by Abigail.",
-        checkType = CheckType.AUTOCLICKER, punishVL = 15, executable = false, vlToFlag = 4)
+        checkType = CheckType.AUTOCLICKER, punishVL = 15, vlToFlag = 4)
 @Cancellable(cancelType = CancelType.INTERACT)
-//TODO Redo with a proper oscillation alogorithim (actually was done in exile before).
 public class AutoclickerD extends Check {
 
     private long ltimeStamp;
-    private final List<Long> delays = new ArrayList<>(),
-            samples = new ArrayList<>();
-    private double lavg, lstd, verbose;
+    private List<Long> delays = new ArrayList<>();
+    private List<Long> samples = new ArrayList<>();
+    private int verbose;
+    private double lavg, lstd, lrange;
 
     @Packet
     public void onClick(WrappedInArmAnimationPacket packet, long timeStamp) {
-        if(data.clickProcessor.isNotReady()) {
+        if(data.playerInfo.lastBrokenBlock.hasNotPassed(1)
+                || data.playerInfo.lookingAtBlock
+                || data.playerInfo.lastBlockPlace.hasNotPassed(1)) {
             ltimeStamp = timeStamp;
             return;
         }
@@ -47,7 +49,7 @@ public class AutoclickerD extends Check {
                 double avg = summary.getAverage();
 
                 if (std < 18 && (MathUtils.getDelta(avg, lavg) > 5 || MathUtils.getDelta(std, lstd) < 0.4 || std < 3)) {
-                    if ((verbose+= data.clickProcessor.getStd() < 30 ? 0.5 : 1) > 4) {
+                    if (++verbose > 4) {
                         vl++;
                         flag("std=%v.2 avg=%v.2 ping=%p tps=%t", std, avg);
                     }

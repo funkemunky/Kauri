@@ -55,7 +55,7 @@ public class FlyA extends Check {
         maxHeight = Math.max(1.3, maxHeight); //Fixes the occasional fuck up (usually on reload). Temporary.
 
         double totalHeight = data.playerInfo.to.y - groundY;
-        if(totalHeight > maxHeight + 2
+        if(totalHeight > maxHeight
                 && packet.isPos()
                 && !data.playerInfo.clientGround
                 && !data.playerInfo.serverGround

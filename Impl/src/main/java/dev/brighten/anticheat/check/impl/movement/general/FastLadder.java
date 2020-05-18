@@ -1,12 +1,11 @@
 package dev.brighten.anticheat.check.impl.movement.general;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.utils.TickTimer;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
-import dev.brighten.anticheat.data.ObjectData;
-import dev.brighten.anticheat.utils.TickTimer;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "FastLadder", description = "Ensures players do not go faster than legitimate speeds on ladders.",
@@ -14,14 +13,7 @@ import dev.brighten.api.check.CheckType;
 @Cancellable
 public class FastLadder extends Check {
 
-    private TickTimer lastJump;
-
-    @Override
-    public void setData(ObjectData data) {
-        super.setData(data);
-        lastJump = new TickTimer(data, 6);
-    }
-
+    private TickTimer lastJump = new TickTimer(6);
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if(packet.isPos()

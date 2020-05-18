@@ -3,7 +3,6 @@ main: dev.brighten.anticheat.Kauri
 description: You won't see this nibba.
 author: "funkemunky"
 depend: [Atlas]
-softdepend: [LunarClientAPI]
 api-version: "1.13"
 version: ${project.version}
 permissions:

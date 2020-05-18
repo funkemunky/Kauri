@@ -8,35 +8,28 @@ import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.api.packets.channelhandler.TinyProtocol1_7;
 import cc.funkemunky.api.tinyprotocol.api.packets.channelhandler.TinyProtocol1_8;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutCloseWindowPacket;
 import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.impl.combat.aim.*;
-import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerA;
-import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerB;
-import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerC;
-import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerG;
-import dev.brighten.anticheat.check.impl.combat.hand.*;
+import dev.brighten.anticheat.check.impl.combat.autoclicker.*;
+import dev.brighten.anticheat.check.impl.combat.hand.HandA;
+import dev.brighten.anticheat.check.impl.combat.hand.HandB;
+import dev.brighten.anticheat.check.impl.combat.hand.HandC;
+import dev.brighten.anticheat.check.impl.combat.hand.HandD;
 import dev.brighten.anticheat.check.impl.combat.hitbox.Hitboxes;
+import dev.brighten.anticheat.check.impl.combat.killaura.*;
 import dev.brighten.anticheat.check.impl.combat.hitbox.ReachA;
-import dev.brighten.anticheat.check.impl.combat.killaura.KillauraB;
-import dev.brighten.anticheat.check.impl.combat.killaura.KillauraC;
-import dev.brighten.anticheat.check.impl.combat.killaura.KillauraD;
-import dev.brighten.anticheat.check.impl.combat.killaura.KillauraE;
 import dev.brighten.anticheat.check.impl.movement.fly.*;
 import dev.brighten.anticheat.check.impl.movement.general.FastLadder;
-import dev.brighten.anticheat.check.impl.movement.general.OmniSprint;
+import dev.brighten.anticheat.check.impl.movement.general.HealthSpoof;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallA;
-import dev.brighten.anticheat.check.impl.movement.speed.SpeedA;
-import dev.brighten.anticheat.check.impl.movement.speed.SpeedB;
-import dev.brighten.anticheat.check.impl.movement.speed.SpeedC;
+import dev.brighten.anticheat.check.impl.movement.nofall.NoFallB;
+import dev.brighten.anticheat.check.impl.movement.speed.*;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityA;
 import dev.brighten.anticheat.check.impl.packets.Timer;
 import dev.brighten.anticheat.check.impl.packets.badpackets.*;
 import dev.brighten.anticheat.check.impl.packets.exploits.*;
-import dev.brighten.anticheat.check.impl.world.HealthSpoof;
-import dev.brighten.anticheat.check.impl.world.Phase;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.api.KauriAPI;
 import dev.brighten.api.check.CheckType;
@@ -46,25 +39,21 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.val;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import java.io.IOException;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @NoArgsConstructor
 public class Check implements KauriCheck {
 
-    public static Map<WrappedClass, CheckInfo> checkClasses = new ConcurrentHashMap<>();
-    public static Map<WrappedClass, CheckSettings> checkSettings = new ConcurrentHashMap<>();
+    public static Map<WrappedClass, CheckInfo> checkClasses = Collections.synchronizedMap(new HashMap<>());
+    public static Map<WrappedClass, CheckSettings> checkSettings = Collections.synchronizedMap(new HashMap<>());
 
     private static WrappedClass protocolClass = ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_8)
             ? new WrappedClass(TinyProtocol1_7.class) : new WrappedClass(TinyProtocol1_8.class);
@@ -81,7 +70,7 @@ public class Check implements KauriCheck {
     public boolean developer;
     @Getter
     @Setter
-    public float vl, punishVl, vlToFlag;
+    public float vl, punishVl;
     public ProtocolVersion minVersion, maxVersion;
     @Getter
     public CheckType checkType;
@@ -92,10 +81,6 @@ public class Check implements KauriCheck {
     private TickTimer lastExemptCheck = new TickTimer(20);
 
     private TickTimer lastAlert = new TickTimer(MathUtils.millisToTicks(Config.alertsDelay));
-
-    public void setData(ObjectData data) {
-        this.data = data;
-    }
 
     public static void register(Check check) {
         if(!check.getClass().isAnnotationPresent(CheckInfo.class)) {
@@ -139,22 +124,9 @@ public class Check implements KauriCheck {
     }
 
     public void flag(String information, Object... variables) {
-        flag(false, information, variables);
-    }
-
-    public void flag(boolean devAlerts, String information, Object... variables) {
-        flag(devAlerts, Integer.MAX_VALUE, information, variables);
-    }
-
-    public void flag(int resetVLTime, String information, Object... variables) {
-        flag(false, resetVLTime, information, variables);
-    }
-
-    public void flag(boolean devAlerts, int resetVLTime, String information, Object... variables) {
-        if(Kauri.INSTANCE.getTps() < 18) devAlerts = true;
         if(lastExemptCheck.hasPassed()) exempt = KauriAPI.INSTANCE.exemptHandler.isExempt(data.uuid, this);
         if(exempt) return;
-        if(variables.length > 0 && information.contains("%v")) {
+        if(information.contains("%v")) {
             String[] splitInfo = information.split("%v");
 
             for (int i = 0; i < splitInfo.length; i++) {
@@ -216,48 +188,53 @@ public class Check implements KauriCheck {
         }
 
         Atlas.getInstance().getEventManager().callEvent(event);
-        boolean dev = devAlerts || (developer || vl <= vlToFlag);
         Kauri.INSTANCE.executor.execute(() -> {
             if(!event.isCancelled()) {
-                if(lastAlert.hasPassed(resetVLTime)) vl = 0;
                 final String info = finalInformation
                         .replace("%p", String.valueOf(data.lagInfo.transPing))
-                        .replace("%t", String.valueOf(MathUtils.round(Kauri.INSTANCE.getTps(), 2)));
+                        .replace("%t", String.valueOf(MathUtils.round(Kauri.INSTANCE.tps, 2)));
                 if (Kauri.INSTANCE.lastTickLag.hasPassed() && (data.lagInfo.lastPacketDrop.hasPassed(5)
                         || data.lagInfo.lastPingDrop.hasPassed(20))
                         && System.currentTimeMillis() - Kauri.INSTANCE.lastTick < 100L) {
-                    if(vl > 0) Kauri.INSTANCE.loggerManager.addLog(data, this, info);
+                    Kauri.INSTANCE.loggerManager.addLog(data, this, info);
 
                     if (lastAlert.hasPassed(MathUtils.millisToTicks(Config.alertsDelay))) {
-                        List<TextComponent> components = new ArrayList<>();
+                        JsonMessage jmsg = new JsonMessage();
 
-                        if(dev) {
-                            components.add(new TextComponent(createTxt("&8[&cDev&8] ")));
-                        }
-                        val text = createTxt(Kauri.INSTANCE.msgHandler.getLanguage().msg("cheat-alert",
+                        String text = Color.translate(Kauri.INSTANCE.msgHandler.getLanguage().msg("cheat-alert",
                                 "&8[&6&lKauri&8] &f%player% &7flagged &f%check%" +
-                                        " &8(&ex%vl%&8) %experimental%"), info);
+                                        " &8(&ex%vl%&8) %experimental%")
+                                .replace("%player%", data.getPlayer().getName())
+                                .replace("%check%", name)
+                                .replace("%info%", info)
+                                .replace("%vl%", String.valueOf(MathUtils.round(vl, 1)))
+                                .replace("%experimental%", developer ? "&c&o(Experimental)" : ""));
+                        jmsg.addText(text).addHoverText(Color.translate(Kauri.INSTANCE.msgHandler.getLanguage().msg(
+                                "cheat-alert-hover",
+                                "&eDescription&8: &f%desc%\n&eInfo: &f%info%\n&r\n&7&oClick to teleport to player.")
+                                .replace("%desc%", String.join("\n",
+                                        dev.brighten.anticheat.utils.MiscUtils
+                                                .splitIntoLine(description, 20)))
+                                .replace("%player%", data.getPlayer().getName())
+                                .replace("%check%", name)
+                                .replace("%info%", info)
+                                .replace("%vl%", String.valueOf(MathUtils.round(vl, 1)))
+                                .replace("%experimental%", developer ? "&c(Experimental)" : "")))
+                                .setClickEvent(JsonMessage.ClickableType.RunCommand, "/" + Config.alertCommand
+                                        .replace("%player%", data.getPlayer().getName())
+                                        .replace("%check%", name)
+                                        .replace("%info%", info)
+                                        .replace("%vl%", String.valueOf(MathUtils.round(vl, 2))));
 
-                        text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] {
-                                createTxt(Kauri.INSTANCE.msgHandler.getLanguage().msg("cheat-alert-hover",
-                                        "&eDescription&8: &f%desc%" +
-                                        "\n&eInfo: &f%info%\n&r\n&7&oClick to teleport to player."), info)}));
-                        text.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-                                formatAlert("/" + Config.alertCommand, info)));
+                        if(Config.testMode && (developer ? !data.devAlerts : !data.alerts))
+                            jmsg.sendToPlayer(data.getPlayer());
 
-                        components.add(text);
-
-                        TextComponent[] toSend = components.toArray(new TextComponent[0]);
-
-                        if(Config.testMode && (dev ? !data.devAlerts : !data.alerts))
-                            data.getPlayer().spigot().sendMessage(toSend);
-
-                        if(Config.alertsConsole) MiscUtils.printToConsole(new TextComponent(toSend).toPlainText());
-                            if(!dev)
+                        if(Config.alertsConsole) MiscUtils.printToConsole(text);
+                            if(!developer)
                                 Kauri.INSTANCE.dataManager.hasAlerts
-                                        .forEach(data -> data.getPlayer().spigot().sendMessage(toSend));
+                                        .forEach(data -> jmsg.sendToPlayer(data.getPlayer()));
                             else Kauri.INSTANCE.dataManager.devAlerts
-                                    .forEach(data -> data.getPlayer().spigot().sendMessage(toSend));
+                                    .forEach(data -> jmsg.sendToPlayer(data.getPlayer()));
                         lastAlert.reset();
                     }
 
@@ -266,7 +243,7 @@ public class Check implements KauriCheck {
                     if (Config.bungeeAlerts) {
                         try {
                             Atlas.getInstance().getBungeeManager()
-                                    .sendObjects("override", data.getPlayer().getUniqueId(), name,
+                                    .sendObjects("ALL", data.getPlayer().getUniqueId(), name,
                                             MathUtils.round(vl, 2), info);
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -277,50 +254,19 @@ public class Check implements KauriCheck {
         });
     }
 
-    private TextComponent createTxt(String txt) {
-        return new TextComponent(formatAlert(Color.translate(txt), ""));
-    }
-    private TextComponent createTxt(String txt, String info) {
-        return new TextComponent(formatAlert(Color.translate(txt), info));
-    }
-
-    public boolean isPosition(WrappedInFlyingPacket packet) {
-        return packet.isPos() && (data.playerInfo.deltaXZ > 0 || data.playerInfo.deltaY != 0);
-    }
-
-    private String formatAlert(String toFormat, String info) {
-        return Color.translate(toFormat.replace("%desc%", String.join("\n",
-                MiscUtils
-                        .splitIntoLine(description, 20)))
-                .replace("%player%", data.getPlayer().getName())
-                .replace("%check%", name)
-                .replace("%info%", info)
-                .replace("%vl%", String.valueOf(MathUtils.round(vl, 1)))
-                .replace("%experimental%", developer ? "&c(Experimental)" : ""));
-    }
-
-    public void punish() {
+    private void punish() {
         if(banExempt || developer || !executable || punishVl == -1 || vl <= punishVl
                 || System.currentTimeMillis() - Kauri.INSTANCE.lastTick > 200L) return;
 
 
         Kauri.INSTANCE.loggerManager.addPunishment(data, this);
         if(!data.banned) {
-            if(!Config.broadcastMessage.equalsIgnoreCase("off")) {
-                if (!Config.bungeeBroadcast) {
-                    RunUtils.task(() -> {
-                        if (!Config.broadcastMessage.equalsIgnoreCase("off")) {
-                            Bukkit.broadcastMessage(Color.translate(Config.broadcastMessage
-                                    .replace("%name%", data.getPlayer().getName())));
-                        }
-                    }, Kauri.INSTANCE);
-                } else {
-                    BungeeAPI.broadcastMessage(Color.translate(Config.broadcastMessage
-                            .replace("%name%", data.getPlayer().getName())));
-                }
-            }
             if(!Config.bungeePunishments) {
                 RunUtils.task(() -> {
+                    if(!Config.broadcastMessage.equalsIgnoreCase("off")) {
+                        Bukkit.broadcastMessage(Color.translate(Config.broadcastMessage
+                                .replace("%name%", data.getPlayer().getName())));
+                    }
                     ConsoleCommandSender sender = Bukkit.getConsoleSender();
                     Config.punishCommands.
                             forEach(cmd -> Bukkit.dispatchCommand(
@@ -329,8 +275,12 @@ public class Check implements KauriCheck {
                     vl = 0;
                 }, Kauri.INSTANCE);
             } else {
-                Config.punishCommands.
-                        forEach(cmd -> BungeeAPI.sendCommand(cmd.replace("%name%", data.getPlayer().getName())));
+                if(!Config.broadcastMessage.equalsIgnoreCase("off")) {
+                    BungeeAPI.broadcastMessage(Color.translate(Config.broadcastMessage
+                            .replace("%name%", data.getPlayer().getName())));
+                    Config.punishCommands.
+                            forEach(cmd -> BungeeAPI.sendCommand(cmd.replace("%name%", data.getPlayer().getName())));
+                }
             }
             data.banned = true;
         }
@@ -338,7 +288,7 @@ public class Check implements KauriCheck {
 
     public void debug(String information, Object... variables) {
         if(Kauri.INSTANCE.dataManager.debugging.size() == 0) return;
-        if(variables.length > 0 && information.contains("%v")) {
+        if(information.contains("%v")) {
             String[] splitInfo = information.split("%v");
 
             for (int i = 0; i < splitInfo.length; i++) {
@@ -364,15 +314,11 @@ public class Check implements KauriCheck {
                             } else if(variables[i] instanceof Float) {
                                 splitInfo[i + 1] = split2.replace("." + parsed, "");
                                 float var = (float) variables[i];
-                                if(!Float.isNaN(var) && !Float.isInfinite(var))
                                 splitInfo[i] = split + MathUtils.round(var, parsed);
-                                else splitInfo[i] = split + var;
                             } else if(variables[i] instanceof Double) {
                                 splitInfo[i + 1] = split2.replace("." + parsed, "");
                                 double var = (double) variables[i];
-                                if(!Double.isNaN(var) && !Double.isInfinite(var))
                                 splitInfo[i] = split + MathUtils.round(var, parsed);
-                                else splitInfo[i] = split + var;
                             }
                         }
                     } else splitInfo[i] = split + variables[i];
@@ -389,36 +335,39 @@ public class Check implements KauriCheck {
 
     public static void registerChecks() {
         register(new AutoclickerA());
-        register(new AutoclickerB());
+        //register(new AutoclickerB());
         register(new AutoclickerC());
+        //register(new AutoclickerF());
         register(new AutoclickerG());
         register(new FlyA());
         register(new FlyB());
         register(new FlyC());
         register(new FlyD());
         register(new FlyE());
+        register(new FlyF());
+        //register(new FlyG());
+        //register(new FlyH());
         register(new FastLadder());
         register(new NoFallA());
         //register(new NoFallB());
         register(new Hitboxes());
-        register(new ReachA());
         register(new AimA());
         register(new AimB());
         register(new AimC());
         register(new AimD());
         register(new AimF());
+        register(new AimH());
         register(new SpeedA());
         register(new SpeedB());
         register(new SpeedC());
-       //register(new Test());
-        //register(new KillauraA());
+        //register(new SpeedD());
+        //register(new SpeedE());
+        register(new KillauraA());
         register(new KillauraB());
         register(new KillauraC());
         register(new KillauraD());
         register(new KillauraE());
-        register(new Phase());
-        register(new OmniSprint());
-        //register(new Inertia());
+        //register(new Phase());
         register(new Timer());
         register(new BadPacketsA());
         register(new BadPacketsB());
@@ -433,19 +382,20 @@ public class Check implements KauriCheck {
         register(new BadPacketsK());
         register(new BadPacketsL());
         register(new BadPacketsM());
-        register(new BadPacketsN());
+        //register(new BadPacketsN());
         register(new VelocityA());
         register(new HandA());
         register(new HandB());
         register(new HandC());
+        register(new ReachA());
         register(new HandD());
-        register(new HandE());
         register(new HealthSpoof());
         register(new BookOp());
         register(new BookEnchant());
         register(new PacketSpam());
         register(new SignOp());
         register(new SignCrash());
+        //register(new Test());
         //register(new LargeMove());
     }
 
