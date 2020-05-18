@@ -3,26 +3,20 @@ package dev.brighten.anticheat.processing;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.utils.TickTimer;
 import cc.funkemunky.api.utils.Tuple;
-import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingList;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.MiscUtils;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
-import org.apache.commons.math3.stat.descriptive.moment.Kurtosis;
-import org.apache.commons.math3.stat.descriptive.moment.Skewness;
-import org.apache.commons.math3.stat.descriptive.moment.Variance;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.LongSummaryStatistics;
 
 @RequiredArgsConstructor
 public class ClickProcessor {
     public EvictingList<Long> cpsList = new EvictingList<>(40);
     @Getter
-    private double std, average, nosqrtKurtosis, kurtosis, skewness, median, variance;
+    private double std, mean, kurtosis, skewness, median, variance;
     @Getter
     private long min, max, sum, zeros;
     private long lastTimestamp;
@@ -33,7 +27,7 @@ public class ClickProcessor {
     @Getter
     private Tuple<List<Double>, List<Double>> outliersTuple = new Tuple<>(new ArrayList<>(), new ArrayList<>());
 
-    private TickTimer lastZeroCheck = new TickTimer(2);
+    private TickTimer lastZeroCheck = new TickTimer(1);
 
     @Getter
     private boolean notReady;
@@ -46,7 +40,6 @@ public class ClickProcessor {
         if(delta < 600
                 && !data.playerInfo.breakingBlock && data.playerInfo.lastBlockPlace.hasPassed(3)) {
             cpsList.add(delta);
-            LongSummaryStatistics summary = cpsList.stream().mapToLong(v -> v).summaryStatistics();
 
             if(lastZeroCheck.hasPassed()) {
                 zeros = cpsList.stream().filter(dt -> dt <= 2).count();
@@ -57,18 +50,26 @@ public class ClickProcessor {
                 lastZeroCheck.reset();
             }
 
-            average = summary.getAverage();
-            min = summary.getMin();
-            max = summary.getMax();
-            sum = summary.getSum();
+            min = Long.MAX_VALUE;
+            max = Long.MIN_VALUE;
+            sum = 0;
+            for (Long v : cpsList) {
+                sum+= v;
+                min = Math.min(v, min);
+                max = Math.max(v, max);
+            }
+
+            mean = sum / (double)cpsList.size();
             modes = MiscUtils.getModes(cpsList);
             median = MiscUtils.getMedian(cpsList);
-            kurtosis = MiscUtils.getKurtosis(cpsList);
-            //skew = MiscUtils.getSkewness(cpsList);
-            variance = MiscUtils.varianceSquared(average, cpsList);
-            skewness = (average - median) / std;
-            std = Math.sqrt(variance);
-            nosqrtKurtosis = max;
+
+            std = 0;
+            for (Long v : cpsList) std+= Math.pow(v - mean, 2);
+
+            variance = std / (long)cpsList.size();
+            std = Math.sqrt(std / (long)cpsList.size());
+            kurtosis = MiscUtils.getKurtosisApache(cpsList);
+            skewness = MiscUtils.getSkewnessApache(cpsList);
         }
         notReady = data.playerInfo.breakingBlock
                 || data.playerInfo.lastBlockPlace.hasNotPassed(3)

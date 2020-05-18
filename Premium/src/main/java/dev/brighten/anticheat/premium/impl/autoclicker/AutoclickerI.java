@@ -19,11 +19,11 @@ public class AutoclickerI extends Check {
             return;
 
         double skewness = Math.abs(data.clickProcessor.getSkewness()),
-                cpsMean = 1000L / data.clickProcessor.getAverage(),
+                cpsMean = 1000L / data.clickProcessor.getMean(),
                 variance = data.clickProcessor.getVariance();
         int outliers = data.clickProcessor.getOutliers();
 
-        if(skewness < 0.2 && cpsMean > 8 && variance > 700) {
+        if(skewness < 0.1 && cpsMean > 8 && variance > 900) {
             if(++buffer > 9) {
                 vl++;
                 flag("skewness=%v.2 std=%v.2 var=%v.2", skewness, data.clickProcessor.getStd(), variance);

@@ -39,7 +39,7 @@ public class ReachA extends Check {
         List<SimpleCollisionBox> targetBoxes = data.targetPastLocation
                 .getEstimatedLocation(timeStamp,
                         data.lagInfo.transPing,
-                        100L + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
+                        150L + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
                 .stream()
                 .map(loc -> getHitbox(loc, target.getType()))
                 .collect(Collectors.toList());

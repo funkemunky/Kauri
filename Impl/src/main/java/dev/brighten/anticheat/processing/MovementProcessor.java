@@ -28,7 +28,7 @@ public class MovementProcessor {
 
     public Deque<Float> yawGcdList = new EvictingList<>(50),
             pitchGcdList = new EvictingList<>(50);
-    public int deltaX, deltaY, lastDeltaX, lastDeltaY;
+    public float deltaX, deltaY, lastDeltaX, lastDeltaY;
     public Tuple<List<Double>, List<Double>> yawOutliers, pitchOutliers;
     public long lastCinematic;
     public float sensitivityX, sensitivityY, yawMode, pitchMode, sensXPercent, sensYPercent;
@@ -42,7 +42,7 @@ public class MovementProcessor {
 
     public MovementProcessor(ObjectData data) {
         this.data = data;
-        lastReset = new TickTimer(data, 5);
+        lastReset = new TickTimer(data, 3);
 
         if(ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_8)) {
             try {
@@ -178,8 +178,7 @@ public class MovementProcessor {
 
             origin.y+= data.playerInfo.sneaking ? 1.54 : 1.62;
 
-            float yawGcd = data.playerInfo.yawGCD / offset;
-            float pitchGcd = data.playerInfo.pitchGCD / offset;
+            float yawGcd = data.playerInfo.yawGCD / offset, pitchGcd = data.playerInfo.pitchGCD / offset;
 
             //Adding gcd of yaw and pitch.
             if (data.playerInfo.yawGCD > 90000 && data.playerInfo.yawGCD < 2E7
@@ -342,14 +341,12 @@ public class MovementProcessor {
         if(timeStamp - data.playerInfo.lastServerPos > 100L)
             data.pastLocation.addLocation(data.playerInfo.to.clone());
     }
-    private static int getDeltaX(float yawDelta, float gcd) {
-
-        return Math.round(yawDelta / gcd);
+    private static float getDeltaX(float yawDelta, float gcd) {
+        return (yawDelta / gcd);
     }
 
-    private static int getDeltaY(float pitchDelta, float gcd) {
-
-        return Math.round(pitchDelta / gcd);
+    private static float getDeltaY(float pitchDelta, float gcd) {
+        return (pitchDelta / gcd);
     }
 
     public static int sensToPercent(float sensitivity) {

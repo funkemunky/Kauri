@@ -1,9 +1,7 @@
 package dev.brighten.anticheat.premium.impl;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutEntityHeadRotation;
 import cc.funkemunky.api.utils.Color;
-import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.utils.MiscUtils;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
@@ -12,22 +10,15 @@ import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
-import dev.brighten.anticheat.utils.AtomicDouble;
-import dev.brighten.anticheat.utils.Verbose;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
 import java.util.DoubleSummaryStatistics;
-import java.util.List;
-import java.util.LongSummaryStatistics;
-import java.util.stream.Collectors;
 
-@CheckInfo(name = "Aim (G)", description = "A simple check to detect Vape's aimassist.",
+@CheckInfo(name = "Aim (G)", description = "Checks the difference between angles.",
         checkType = CheckType.AIM, developer = true, enabled = false, punishVL = 30)
 public class AimG extends Check {
 
@@ -61,10 +52,10 @@ public class AimG extends Check {
                 DoubleSummaryStatistics summary = samples.stream().mapToDouble(v -> v).summaryStatistics();
 
                 double mean = summary.getAverage(), std = MathUtils.stdev(samples),
-                        median = MiscUtils.getMedian(samples);
+                ble skewness = MiscUtils.getSkewnessApache(samples);
+                median = MiscUtils.getMedian(samples);
 
-                double skewness = MiscUtils.getSkewness(samples);
-                double kurtosis = MiscUtils.getKurtosis(samples);
+                dou              double kurtosis = MiscUtils.getKurtosisApache(samples);
 
                 if((Math.abs(kurtosis) < 0.1 && skewness > 0.8) || (std > 0.1 && (low + high) == 0)) {
                     if(++buffer > 5) {

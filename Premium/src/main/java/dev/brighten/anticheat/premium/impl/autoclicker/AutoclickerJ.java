@@ -20,21 +20,21 @@ public class AutoclickerJ extends Check {
 
         double skew = Math.abs(data.clickProcessor.getSkewness());
         if(data.clickProcessor.getKurtosis() < 0
-                && data.clickProcessor.getAverage() < 180
+                && data.clickProcessor.getMean() < 180
                 && (data.clickProcessor.getVariance() > 700 || skew < 0.15)
                 && skew < 0.6
-                && (data.clickProcessor.getZeros() <= 1 ||  data.clickProcessor.getAverage() <= 50.4)) {
+                && (data.clickProcessor.getZeros() <= 1 ||  data.clickProcessor.getMean() <= 50.4)) {
             if(buffer++ > 40) {
                 vl++;
                 flag(20 * 40, "k=%v.4 avg=%v.3 s=%v.3 v=%v.3 b=%v.1 zeros=%v",
-                        data.clickProcessor.getKurtosis(), data.clickProcessor.getAverage(),
+                        data.clickProcessor.getKurtosis(), data.clickProcessor.getMean(),
                         data.clickProcessor.getSkewness(), data.clickProcessor.getVariance(), buffer,
                         data.clickProcessor.getZeros());
             }
         } else buffer-= buffer > 0 ? 2 : 0;
         long delta = timeStamp - lastArm;
         debug("kurtosis=%v.4 std=%v.4 avg=%v.3 skew=%v.3 variance=%v.3 buffer=%v.1 delta=%v zeros=%v",
-                data.clickProcessor.getKurtosis(), data.clickProcessor.getStd(), data.clickProcessor.getAverage(),
+                data.clickProcessor.getKurtosis(), data.clickProcessor.getStd(), data.clickProcessor.getMean(),
                 data.clickProcessor.getSkewness(),
                 data.clickProcessor.getVariance(),
                 buffer, delta, data.clickProcessor.getZeros());

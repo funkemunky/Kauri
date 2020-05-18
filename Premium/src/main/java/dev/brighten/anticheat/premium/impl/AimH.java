@@ -10,12 +10,12 @@ import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
 
-@CheckInfo(name = "Aim (H)", description = "Checks the sensitivity difference.",
+@CheckInfo(name = "Aim (H)", description = "Checks for any low outliers in deltayaw.",
         developer = true, checkType = CheckType.AIM)
 public class AimH extends Check {
 
     private int buffer;
-    private EvictingList<Integer> deltaXes = new EvictingList<>(20);
+    private EvictingList<Float> deltaXes = new EvictingList<>(20);
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {

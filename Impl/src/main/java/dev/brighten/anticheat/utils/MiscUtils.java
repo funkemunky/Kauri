@@ -175,7 +175,7 @@ public class MiscUtils {
     }
 
     //Copied from apache math Kurtosis class.
-    public static double getKurtosis(Iterable<? extends Number> iterable) {
+    public static double getKurtosisApache(Iterable<? extends Number> iterable) {
         List<Double> values = new ArrayList<>();
 
         double total = 0;
@@ -205,7 +205,7 @@ public class MiscUtils {
         return kurt;
     }
 
-    /*public static double getKurtosis(final Iterable<? extends Number> iterable) {
+    public static double getKurtosis(final Iterable<? extends Number> iterable) {
         double n = 0.0;
         double n2 = 0.0;
 
@@ -227,7 +227,7 @@ public class MiscUtils {
             n7 += Math.pow(n5 - n8.doubleValue(), 4.0);
         }
         return n3 * (n7 / Math.pow(n6 / n2, 2.0)) - n4;
-    }*/
+    }
 
     public static float pow(float number, int times) {
         float answer = number;
@@ -273,7 +273,7 @@ public class MiscUtils {
     }
 
     //Copied from apache math Skewness class.
-    public static double getSkewness(Iterable<? extends Number> iterable) {
+    public static double getSkewnessApache(Iterable<? extends Number> iterable) {
         List<Double> values = new ArrayList<>();
 
         double total = 0;
@@ -310,7 +310,7 @@ public class MiscUtils {
 
         return skew;
     }
-    /*
+
     public static double getSkewness(final Iterable<? extends Number> iterable) {
         double sum = 0;
         int buffer = 0;
@@ -330,7 +330,7 @@ public class MiscUtils {
         final double median = (buffer % 2 != 0) ? numberList.get(buffer / 2) : (numberList.get((buffer - 1) / 2) + numberList.get(buffer / 2)) / 2;
 
         return 3 * (mean - median) / deviationSquared(iterable);
-    }*/
+    }
 
     public static float stdev(Collection<Float> list) {
         float sum = 0.0f;
