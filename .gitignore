@@ -23,8 +23,8 @@
 hs_err_pid*
 
 # Kauri Project Files and Stuffs
-**/.idea/*.*
-**/out/*.*
+**/.idea/**
+**/out/**
 Kauri/.idea/misc.xml
 *.lst
 Kauri/API/target/**
