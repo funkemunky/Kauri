@@ -12,6 +12,8 @@ import dev.brighten.anticheat.data.ObjectData;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 @Init(commands = true)
 public class LagCommand {
 
@@ -22,17 +24,21 @@ public class LagCommand {
         cmd.getSender().sendMessage(Color.Gold + Color.Bold + "Server Lag Information");
         cmd.getSender().sendMessage("");
         cmd.getSender().sendMessage(Color.translate("&eTPS&8: &f" +
-                MathUtils.round(Kauri.INSTANCE.tps, 2)));
+                MathUtils.round(Kauri.INSTANCE.getTps(), 2)));
+        AtomicLong chunkCount = new AtomicLong(0);
+        Bukkit.getWorlds().forEach(world -> chunkCount.addAndGet(world.getLoadedChunks().length));
+        cmd.getSender().sendMessage(Color.translate("&eChunks&8: &f" + chunkCount.get()));
         double totalMem =  MathUtils.round(Runtime.getRuntime().totalMemory() / 1E9, 2);
         double freeMem = MathUtils.round(Runtime.getRuntime().freeMemory() / 1E9, 2);
         double allocated = MathUtils.round(Runtime.getRuntime().maxMemory() / 1E9, 2);
         cmd.getSender().sendMessage(Color.translate("&eMemory (GB)&8: &f"
                 + freeMem + "&7/&f" + totalMem + "&7/&f" + allocated));
-        cmd.getSender().sendMessage(Color.translate("&eKauri CPU Usage&8:" +
-                MathUtils.round(50D / Kauri.INSTANCE.profiler.results(ResultsType.TICK).values()
+        cmd.getSender().sendMessage(Color.translate("&eKauri CPU Usage&8: &f" +
+                MathUtils.round(Kauri.INSTANCE.profiler.results(ResultsType.TICK).values()
                         .stream()
-                        .mapToDouble(val -> val.two)
-                        .sum())));
+                        .mapToDouble(val -> val.two / 1000000D)
+                        .filter(val -> !Double.isNaN(val) && !Double.isInfinite(val))
+                        .sum() / 50D * 100, 1)) + "%");
         cmd.getSender().sendMessage(MiscUtils.line(Color.Dark_Gray));
     }
 

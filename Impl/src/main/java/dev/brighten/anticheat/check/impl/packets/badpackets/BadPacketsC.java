@@ -9,8 +9,8 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "BadPackets (C)", description = "Checks for players sneaking and sprinting at the same time.",
-        checkType = CheckType.BADPACKETS, punishVL = 20)
+@CheckInfo(name = "BadPackets (C)", description = "Checks for players who send slot packets at the same time as flying.",
+        checkType = CheckType.BADPACKETS, punishVL = 20, developer = true)
 @Cancellable
 public class BadPacketsC extends Check {
 
@@ -26,7 +26,7 @@ public class BadPacketsC extends Check {
     public void onHeld(WrappedInHeldItemSlotPacket packet, long timeStamp) {
         long delta = timeStamp - lastTimestamp;
 
-        if(delta <= 8 && data.lagInfo.lastPingDrop.hasPassed(20)) {
+        if(delta <= 8 && data.lagInfo.lastPacketDrop.hasPassed(5)) {
             if(verbose.add() > 7) {
                 vl++;
                 flag("delta=%v ping=%p", delta);

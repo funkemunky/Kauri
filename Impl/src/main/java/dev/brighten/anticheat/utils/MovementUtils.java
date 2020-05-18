@@ -14,23 +14,27 @@ public class MovementUtils {
 
     private static Enchantment DEPTH;
 
-    public static float getJumpHeight(Player player) {
+    public static float getJumpHeight(ObjectData data) {
         float baseHeight = 0.42f;
 
-        if(player.hasPotionEffect(PotionEffectType.JUMP)) {
-            baseHeight+= PlayerUtils.getPotionEffectLevel(player, PotionEffectType.JUMP) * 0.1f;
+        if(data.potionProcessor.hasPotionEffect(PotionEffectType.JUMP)) {
+            baseHeight+= PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.JUMP) * 0.1f;
         }
 
         return baseHeight;
     }
 
     public static boolean isOnLadder(ObjectData data) {
-        int i = MathHelper.floor_double(data.playerInfo.to.x);
-        int j = MathHelper.floor_double(data.box.yMin);
-        int k = MathHelper.floor_double(data.playerInfo.to.z);
-        Block block = BlockUtils.getBlock(new Location(data.getPlayer().getWorld(), i, j, k));
+        try {
+            int i = MathHelper.floor_double(data.playerInfo.to.x);
+            int j = MathHelper.floor_double(data.box.yMin);
+            int k = MathHelper.floor_double(data.playerInfo.to.z);
+            Block block = BlockUtils.getBlock(new Location(data.getPlayer().getWorld(), i, j, k));
 
-        return Materials.checkFlag(block.getType(), Materials.LADDER);
+            return Materials.checkFlag(block.getType(), Materials.LADDER);
+        } catch(NullPointerException e) {
+            return false;
+        }
     }
 
     public static int getDepthStriderLevel(Player player) {
@@ -48,8 +52,8 @@ public class MovementUtils {
     }
 
     public static double getBaseSpeed(ObjectData data) {
-        return (0.284 + PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.SPEED)
-                * (data.playerInfo.clientGround ? 0.052 : 0.028)) + (data.getPlayer().getWalkSpeed() - 0.2) * 2.5;
+        return 0.2806 + (PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.SPEED)
+                * (data.playerInfo.clientGround ? 0.062 : 0.04)) + (data.getPlayer().getWalkSpeed() - 0.2) * 2.5;
     }
 
     public static float getFriction(ObjectData data) {
@@ -82,7 +86,9 @@ public class MovementUtils {
 
     static {
         try {
-            DEPTH = Enchantment.getByName("DEPTH_STRIDER");
+            if(ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_8)) {
+                DEPTH = Enchantment.getByName("DEPTH_STRIDER");
+            }
         } catch(Exception e) {
             DEPTH = null;
         }

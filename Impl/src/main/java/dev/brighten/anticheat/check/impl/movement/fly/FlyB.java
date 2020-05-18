@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @CheckInfo(name = "Fly (B)", description = "Checks for improper acceleration.", checkType = CheckType.FLIGHT,
-        vlToFlag = 3)
+        vlToFlag = 4, punishVL = 12)
 @Cancellable
 public class FlyB extends Check {
 
@@ -30,10 +30,10 @@ public class FlyB extends Check {
             double predicted = (data.playerInfo.lDeltaY - 0.08) * 0.9800000190734863D;
 
             if(data.playerInfo.lClientGround && !data.playerInfo.clientGround) {
-                predicted = Math.min(data.playerInfo.deltaY, MovementUtils.getJumpHeight(packet.getPlayer()));
+                predicted = Math.min(data.playerInfo.deltaY, MovementUtils.getJumpHeight(data));
             }
 
-            for (Block block : Helper.blockCollisions(data.blockInfo.handler.getBlocks(),
+            for (Block block : Helper.blockCollisions(new ArrayList<>(data.blockInfo.handler.getBlocks()),
                     data.box.copy().expand(0.25 + Math.abs(data.playerInfo.deltaX),0.5,
                             0.25 + Math.abs(data.playerInfo.deltaZ))
                             .expandMin(0, -0.5f + Math.min(0, data.playerInfo.deltaY), 0))) {
@@ -68,30 +68,30 @@ public class FlyB extends Check {
             }
 
             if((data.playerInfo.clientGround && predicted > -0.08 && predicted < -0.077)
-                    || Math.abs(predicted) < 0.005) {
+                    || (Math.abs(predicted) < 0.005 && data.playerVersion.isOrBelow(ProtocolVersion.V1_8_9))) {
                 predicted = 0;
             }
 
             double deltaPredict =  MathUtils.getDelta(data.playerInfo.deltaY, predicted);
 
             if(!data.playerInfo.flightCancel
+                    && (MathUtils.getDelta(-0.098, data.playerInfo.deltaY) > 0.001 || data.playerInfo.deltaXZ > 0.3)
                     && !(data.playerInfo.blockOnTo != null && data.playerInfo.blockOnTo.getType().isSolid())
                     && (!data.blockInfo.blocksAbove || data.playerInfo.deltaY >= 0)
                     && data.playerInfo.slimeTimer.hasPassed(20)
                     && timeStamp - data.playerInfo.lastServerPos > 100L
                     && data.playerInfo.liquidTimer.hasPassed(8)
                     && data.playerInfo.lastBlockPlace.hasPassed(8)
-                    && data.playerVersion.isOrBelow(ProtocolVersion.V1_8_9)
                     && data.playerInfo.lastVelocity.hasPassed(10)
                     && deltaPredict > 0.0001) {
-                vl++;
-                if(vl > (data.lagInfo.lastPacketDrop.hasPassed(5) ? 2.5 : 4)) {
-                    flag("deltaY=%v predicted=%v", data.playerInfo.deltaY, predicted);
+                if(++vl > (data.lagInfo.lastPacketDrop.hasPassed(5) ? 2.5 : 4)) {
+                    flag("dY=%v.3 p=%v.3 dx=%v.3", data.playerInfo.deltaY, predicted, data.playerInfo.deltaXZ);
                 }
             } else vl-= vl > 0 ? 0.2f : 0;
 
-            debug("deltaY=" + data.playerInfo.deltaY + " predicted=" + predicted
-                    + " ground=" + data.playerInfo.clientGround + " vl=" + vl);
+            debug("deltaY=%v.3 predicted=%v.3 ground=%v lpass=%v vl=%v.1",
+                    data.playerInfo.deltaY, predicted, data.playerInfo.clientGround,
+                    data.playerInfo.liquidTimer.getPassed(), vl);
         }
     }
 }

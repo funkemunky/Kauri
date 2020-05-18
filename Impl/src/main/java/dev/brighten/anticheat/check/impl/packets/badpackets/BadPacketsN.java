@@ -1,32 +1,26 @@
 package dev.brighten.anticheat.check.impl.packets.badpackets;
 
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "BadPackets (N)", description = "Checks for impossible positions.",
-        checkType = CheckType.BADPACKETS, punishVL = 4, developer = true, enabled = false)
+@CheckInfo(name = "BadPackets (N)", description = "Checks if the user is sending impossible movement packets.",
+        developer = true,
+        checkType = CheckType.BADPACKETS, maxVersion = ProtocolVersion.V1_8_9)
 public class BadPacketsN extends Check {
 
-    private boolean lastNonFlying;
+    private boolean lastFlying;
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if(packet.isPos()) {
-            if(data.playerInfo.to.toVector().distance(data.playerInfo.from.toVector()) == 0
-                    && timeStamp - data.creation > 1000L
-                    && data.lagInfo.lastPingDrop.hasPassed(40)
-                    && data.playerInfo.lastRespawnTimer.hasPassed(20)
-                    && timeStamp - data.playerInfo.lastServerPos > 100L
-                    && !lastNonFlying) {
-                vl++;
-                flag("");
-            }
-            lastNonFlying = false;
-        } else {
-            lastNonFlying = true;
-        }
-    }
+    public void onFlying(WrappedInFlyingPacket packet, long ts) {
+        if(ts - data.creation < 4000L) return;
 
+        if(!lastFlying && Math.abs(data.playerInfo.deltaY) < 0.005 && data.playerInfo.deltaY != 0) {
+            vl++;
+            flag("type=y deltaY=%v", data.playerInfo.deltaY);
+        }
+        lastFlying = packet.isPos();
+    }
 }

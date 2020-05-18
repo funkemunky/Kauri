@@ -8,16 +8,18 @@ import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.logs.objects.Punishment;
 import dev.brighten.db.db.FlatfileDatabase;
 import dev.brighten.db.db.StructureSet;
+import dev.brighten.db.utils.MiscUtils;
 import dev.brighten.db.utils.Pair;
-import dev.brighten.dev.depends.org.bson.Document;
+import lombok.val;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class FlatfileStorage implements DataStorage {
 
-    private FlatfileDatabase database;
+    private FlatfileDatabase database, nameCache;
 
     private List<Log> logs = new CopyOnWriteArrayList<>();
     private List<Punishment> punishments = new CopyOnWriteArrayList<>();
@@ -25,6 +27,8 @@ public class FlatfileStorage implements DataStorage {
     public FlatfileStorage() {
         database = new FlatfileDatabase("logs");
         database.loadMappings();
+        nameCache = new FlatfileDatabase("nameCache");
+        nameCache.loadMappings();
 
         RunUtils.taskTimerAsync(() -> {
             if(logs.size() > 0) {
@@ -142,5 +146,48 @@ public class FlatfileStorage implements DataStorage {
     @Override
     public void addPunishment(Punishment punishment) {
         punishments.add(punishment);
+    }
+
+    @Override
+    public void cacheAPICall(UUID uuid, String name) {
+        Kauri.INSTANCE.loggingThread.execute(() -> {
+            nameCache.remove(set -> set.getObject("uuid").equals(uuid.toString()));
+            val set = nameCache.create(MiscUtils.randomString(30, true));
+
+            set.input("uuid", uuid.toString());
+            set.input("name", name);
+            set.input("timestamp", System.currentTimeMillis());
+        });
+    }
+
+    @Override
+    public UUID getUUIDFromName(String name) {
+        val optional = nameCache.get(false, set -> set.getObject("name").equals(name)).stream().findFirst();
+
+        if(optional.isPresent()) {
+            val set = optional.get();
+
+            if((System.currentTimeMillis() - (long)set.getObject("timestamp")) > TimeUnit.DAYS.toMillis(1)) {
+                nameCache.remove(set.getId());
+            }
+            return UUID.fromString(set.getObject("uuid"));
+        }
+        return null;
+    }
+
+    @Override
+    public String getNameFromUUID(UUID uuid) {
+        val optional = nameCache.get(false, set -> set.getObject("uuid").equals(uuid.toString()))
+                .stream().findFirst();
+
+        if(optional.isPresent()) {
+            val set = optional.get();
+
+            if((System.currentTimeMillis() - (long)set.getObject("timestamp")) > TimeUnit.DAYS.toMillis(1)) {
+                nameCache.remove(set.getId());
+            }
+            return set.getObject("name");
+        }
+        return null;
     }
 }

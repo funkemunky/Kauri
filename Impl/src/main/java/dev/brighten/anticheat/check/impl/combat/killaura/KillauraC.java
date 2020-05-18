@@ -8,10 +8,11 @@ import dev.brighten.api.check.CheckType;
 
 @Cancellable(cancelType = CancelType.ATTACK)
 @CheckInfo(name = "Killaura (C)", description = "Checks for noswing modules on clients.",
-        checkType = CheckType.KILLAURA, punishVL = 20)
+        checkType = CheckType.KILLAURA, punishVL = 20, maxVersion = ProtocolVersion.V1_8_9)
 public class KillauraC extends Check {
 
     private long lastArm;
+
     @Packet
     public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
         lastArm = timeStamp;
@@ -24,7 +25,7 @@ public class KillauraC extends Check {
 
         long delta = timeStamp - lastArm;
 
-        if(delta > 200
+        if(delta > 100L
                 && data.lagInfo.lastPacketDrop.hasPassed(10)
                 && !data.lagInfo.lagging) {
             vl++;

@@ -8,13 +8,10 @@ import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.*;
 import cc.funkemunky.api.tinyprotocol.packet.out.*;
 import cc.funkemunky.api.utils.KLocation;
-import cc.funkemunky.api.utils.Materials;
 import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.RunUtils;
-import cc.funkemunky.api.utils.objects.VariableValue;
+import cc.funkemunky.api.utils.XMaterial;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
-import dev.brighten.anticheat.utils.MiscUtils;
 import lombok.val;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -24,7 +21,7 @@ public class PacketProcessor {
 
     private BukkitTask task;
 
-    public void processClient(PacketReceiveEvent event, ObjectData data, Object object, String type, long timeStamp) {
+    public synchronized void processClient(PacketReceiveEvent event, ObjectData data, Object object, String type, long timeStamp) {
         Kauri.INSTANCE.profiler.start("packet:client:" + getType(type));
         switch (type) {
             case Packet.Client.ABILITIES: {
@@ -72,6 +69,7 @@ public class PacketProcessor {
                         data.target = (LivingEntity) packet.getEntity();
                     }
                     data.predictionService.hit = true;
+                    data.playerInfo.usingItem = data.predictionService.useSword = false;
                 }
                 data.checkManager.runPacket(packet, timeStamp);
                 if(data.sniffing) {
@@ -86,17 +84,10 @@ public class PacketProcessor {
             case Packet.Client.LOOK: {
                 WrappedInFlyingPacket packet = new WrappedInFlyingPacket(object, data.getPlayer());
 
+                data.currentTicks++;
                 if (timeStamp - data.lagInfo.lastFlying <= 2 || timeStamp - data.lagInfo.lastFlying >= 90) {
                     data.lagInfo.lastPacketDrop.reset();
                 }
-
-                if (timeStamp - data.creation > 10000L
-                        && Kauri.INSTANCE.lastTickLag.hasPassed(20)
-                        && timeStamp - Kauri.INSTANCE.lastTick < new VariableValue<>(
-                        110L, 60L, ProtocolVersion::isPaper).get()
-                        && timeStamp - data.lagInfo.lastTrans
-                        > new VariableValue<>(20000L, 5000L, () -> Kauri.INSTANCE.isNewer).get())
-                    RunUtils.task(() -> data.getPlayer().kickPlayer("Lag?"));
 
                 data.lagInfo.lastFlying = timeStamp;
 
@@ -120,7 +111,7 @@ public class PacketProcessor {
                 ActionProcessor.process(data, packet);
                 data.checkManager.runPacket(packet, timeStamp);
 
-                MiscUtils.testMessage(data.getPlayer().getName() + ": " + packet.getAction());
+                //MiscUtils.testMessage(data.getPlayer().getName() + ": " + packet.getAction());
                 if(data.sniffing) {
                     data.sniffedPackets.add(event.getType() + ":@:" + packet.getAction().name()
                             + ":@:" + event.getTimeStamp());
@@ -132,7 +123,6 @@ public class PacketProcessor {
 
                 switch (packet.getAction()) {
                     case START_DESTROY_BLOCK: {
-                        data.playerInfo.breakingBlock = true;
                         data.predictionService.useSword
                                 = data.playerInfo.usingItem = false;
                         break;
@@ -140,8 +130,7 @@ public class PacketProcessor {
                     case STOP_DESTROY_BLOCK:
                     case ABORT_DESTROY_BLOCK: {
                         data.predictionService.useSword
-                                = data.playerInfo.usingItem
-                                = data.playerInfo.breakingBlock = false;
+                                = data.playerInfo.usingItem = false;
                         break;
                     }
                     case RELEASE_USE_ITEM: {
@@ -177,15 +166,16 @@ public class PacketProcessor {
                     val pos = packet.getPosition();
                     val stack = packet.getItemStack();
 
-                    if(pos.getX() == -1 && pos.getY() ==
-                            (ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_8) ? 255 : -1)
-                            && pos.getZ() == -1 && stack != null) {
+                    if(pos.getX() == -1 && (pos.getY() == 255 || pos.getY() == -1)
+                            && pos.getZ() == -1 && stack != null
+                            && (stack.getType().name().contains("SWORD")
+                            || stack.getType().equals(XMaterial.BOW.parseMaterial()))) {
                         data.predictionService.useSword = data.playerInfo.usingItem = true;
                         data.playerInfo.lastUseItem.reset();
                     } else if(stack != null) {
-                        if(stack.getType().isBlock() && stack.getTypeId() != 0) {
+                        if(stack.getType().isBlock() && stack.getType().getId() != 0) {
                             data.playerInfo.lastBlockPlace.reset();
-                            MiscUtils.testMessage(event.getPlayer().getItemInHand().getType().name());
+                           // MiscUtils.testMessage(event.getPlayer().getItemInHand().getType().name());
                         }
                     }
                 }
@@ -207,16 +197,20 @@ public class PacketProcessor {
 
                 long time = packet.getTime();
 
-                if (time != 100) {
+                if(time == data.getKeepAliveStamp("velocity")) {
+                    data.playerInfo.lastVelocity.reset();
+                    data.playerInfo.lastVelocityTimestamp = timeStamp;
+                    data.predictionService.rmotionX = data.playerInfo.velocityX;
+                    data.predictionService.rmotionZ = data.playerInfo.velocityZ;
+                    data.predictionService.velocity = true;
+                } else {
                     data.lagInfo.lastPing = data.lagInfo.ping;
-                    data.lagInfo.ping = System.currentTimeMillis() - data.lagInfo.lastKeepAlive;
-
-                    data.checkManager.runPacket(packet, timeStamp);
+                    data.lagInfo.ping = event.getTimeStamp() - data.lagInfo.lastKeepAlive;
                 }
 
+                data.checkManager.runPacket(packet, timeStamp);
                 if(data.sniffing) {
-                    data.sniffedPackets.add(event.getType() + ":@:" + packet.getTime()
-                            + ":@:" + event.getTimeStamp());
+                    data.sniffedPackets.add(event.getType() + ":@:" + time + ":@:" + event.getTimeStamp());
                 }
                 break;
             }
@@ -239,30 +233,28 @@ public class PacketProcessor {
             case Packet.Client.TRANSACTION: {
                 WrappedInTransactionPacket packet = new WrappedInTransactionPacket(object, data.getPlayer());
 
-                if (packet.getAction() == (short) 69) {
+                data.potionProcessor.onTransaction(packet);
+                if(packet.getAction() == data.getTransactionAction("respawn")) {
+                    data.playerInfo.lastRespawn = timeStamp;
+                    data.playerInfo.lastRespawnTimer.reset();
+                } else if (packet.getAction() == data.getTransactionAction("ping")) {
                     data.lagInfo.lastTransPing = data.lagInfo.transPing;
-                    data.lagInfo.transPing = System.currentTimeMillis() - data.lagInfo.lastTrans;
+                    data.lagInfo.transPing = event.getTimeStamp() - data.lagInfo.lastTrans;
                     data.lagInfo.lastClientTrans = timeStamp;
 
 
                     //We use transPing for checking lag since the packet used is little known.
                     //AimE have not seen anyone create a spoof for it or even talk about the possibility of needing one.
                     //Large jumps in latency most of the intervalTime mean lag.
-                    if (MathUtils.getDelta(data.lagInfo.lastTransPing, data.lagInfo.transPing) > 25)
+                    if (MathUtils.getDelta(data.lagInfo.lastTransPing, data.lagInfo.transPing) > 15)
                         data.lagInfo.lastPingDrop.reset();
 
                     data.lagInfo.pingAverages.add(data.lagInfo.transPing);
                     data.lagInfo.averagePing = data.lagInfo.pingAverages.getAverage();
-
-                } else if(packet.getAction() == (short)101) {
-                    data.playerInfo.lastVelocity.reset();
-                    data.playerInfo.lastVelocityTimestamp = timeStamp;
-                    data.predictionService.rmotionX = data.playerInfo.velocityX;
-                    data.predictionService.rmotionZ = data.playerInfo.velocityZ;
-                    data.predictionService.velocity = true;
-                } else if(packet.getAction() == (short)154) {
-                    data.playerInfo.lastRespawn = timeStamp;
-                    data.playerInfo.lastRespawnTimer.reset();
+                    TinyProtocolHandler.sendPacket(data.getPlayer(),
+                            new WrappedOutTransaction(0, data.setTransactionAction("ping"),
+                                    false)
+                                    .getObject());
                 }
 
                 data.checkManager.runPacket(packet, timeStamp);
@@ -275,6 +267,7 @@ public class PacketProcessor {
             case Packet.Client.ARM_ANIMATION: {
                 WrappedInArmAnimationPacket packet = new WrappedInArmAnimationPacket(object, data.getPlayer());
 
+                data.clickProcessor.onArm(packet, timeStamp);
                 data.checkManager.runPacket(packet, timeStamp);
                 if(data.sniffing) {
                     data.sniffedPackets.add(event.getType() + ":@:" + event.getTimeStamp());
@@ -312,6 +305,7 @@ public class PacketProcessor {
                 WrappedInWindowClickPacket packet = new WrappedInWindowClickPacket(object, data.getPlayer());
 
                 data.predictionService.useSword = data.playerInfo.usingItem = false;
+                data.playerInfo.lastWindowClick.reset();
                 data.checkManager.runPacket(packet, timeStamp);
 
                 if(data.sniffing) {
@@ -341,7 +335,7 @@ public class PacketProcessor {
         Kauri.INSTANCE.profiler.stop("packet:client:" + getType(type));
     }
 
-    public void processServer(PacketSendEvent event, ObjectData data, Object object, String type, long timeStamp) {
+    public synchronized void processServer(PacketSendEvent event, ObjectData data, Object object, String type, long timeStamp) {
         Kauri.INSTANCE.profiler.start("packet:server:" + type);
 
         switch (type) {
@@ -366,8 +360,8 @@ public class PacketProcessor {
 
                 data.playerInfo.lastRespawn = timeStamp;
                 data.playerInfo.lastRespawnTimer.reset();
-                TinyProtocolHandler.sendPacket(event.getPlayer(),
-                        new WrappedOutTransaction(0, (short) 154, false).getObject());
+                TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutTransaction(0,
+                        data.setTransactionAction("respawn"), false).getObject());
 
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
@@ -377,6 +371,15 @@ public class PacketProcessor {
 
                 if(!data.checkManager.runPacket(packet, timeStamp)) {
                     event.setCancelled(true);
+                }
+                break;
+            }
+            case Packet.Server.ENTITY_EFFECT: {
+                WrappedOutEntityEffectPacket packet = new WrappedOutEntityEffectPacket(object, data.getPlayer());
+
+                if(packet.entityId == data.getPlayer().getEntityId()) {
+                    data.potionProcessor.onPotionEffect(packet);
+                    data.checkManager.runPacket(packet, timeStamp);
                 }
                 break;
             }
@@ -410,7 +413,7 @@ public class PacketProcessor {
 
                 if (packet.getId() == data.getPlayer().getEntityId()) {
                     TinyProtocolHandler.sendPacket(data.getPlayer(),
-                            new WrappedOutTransaction(0, (short) 101, false).getObject());
+                            new WrappedOutKeepAlivePacket(data.setKeepAliveStamp("velocity")).getObject());
                     data.playerInfo.velocityX = (float) packet.getX();
                     data.playerInfo.velocityY = (float) packet.getY();
                     data.playerInfo.velocityZ = (float) packet.getZ();
@@ -431,18 +434,15 @@ public class PacketProcessor {
             case Packet.Server.KEEP_ALIVE: {
                 WrappedOutKeepAlivePacket packet = new WrappedOutKeepAlivePacket(object, data.getPlayer());
 
-                data.lagInfo.lastKeepAlive = System.currentTimeMillis();
+                data.lagInfo.lastKeepAlive = event.getTimeStamp();
                 data.checkManager.runPacket(packet, timeStamp);
-
-                TinyProtocolHandler.sendPacket(data.getPlayer(),
-                        new WrappedOutTransaction(0, (short) 69, false).getObject());
                 break;
             }
             case Packet.Server.TRANSACTION: {
                 WrappedOutTransaction packet = new WrappedOutTransaction(object, data.getPlayer());
 
-                if (packet.getAction() == (short) 69) {
-                    data.lagInfo.lastTrans = System.currentTimeMillis();
+                if (packet.getAction() == data.getTransactionAction("ping")) {
+                    data.lagInfo.lastTrans = event.getTimeStamp();
                 }
                 break;
             }

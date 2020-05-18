@@ -10,27 +10,27 @@ import dev.brighten.anticheat.utils.GraphUtil;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
 
-import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.List;
 
 @CheckInfo(name = "Autoclicker (H)", description = "Meant to detect Vape and other autoclickers. By Elevated.",
-        checkType = CheckType.AUTOCLICKER, punishVL = 8)
+        checkType = CheckType.AUTOCLICKER, punishVL = 7, vlToFlag = 2)
 public class AutoclickerH extends Check {
 
     private double ticks, cps, buffer;
+    private double lastKurt;
     private Deque<Double> clickSamples = new LinkedList<>();
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if (++ticks == 20) {
-            if (cps > 9 && clickSamples.add(cps) && clickSamples.size() == 10) {
+            if (cps > 8 && clickSamples.add(cps) && clickSamples.size() == 10) {
                 final GraphUtil.GraphResult results = GraphUtil.getGraph(clickSamples);
 
                 val negatives = results.getNegatives();
-                if (negatives == 1) {
-                    if (++buffer > 2) {
+                val kurtosis = data.clickProcessor.getKurtosis();
+                if (negatives == 1 && MathUtils.getDelta(kurtosis, lastKurt) > 0.2) {
+                    if (++buffer > 3) {
                         vl++;
                         flag("cps=%v buffer=%v", cps, buffer);
                     }
@@ -38,7 +38,9 @@ public class AutoclickerH extends Check {
                     buffer = 0;
                 }
                 this.clickSamples.clear();
-                debug("cps=%v negatives=%v buffer=%v", cps, negatives, MathUtils.round(buffer, 1));
+                debug("cps=%v negatives=%v buffer=%v kurt=%v.2",
+                        cps, negatives, MathUtils.round(buffer, 1), kurtosis);
+                lastKurt = kurtosis;
             }
             this.cps = 0;
             this.ticks = 0;
@@ -48,9 +50,7 @@ public class AutoclickerH extends Check {
     @Packet
     public void onArm(WrappedInArmAnimationPacket packet) {
         if(data.playerInfo.breakingBlock
-                || data.playerInfo.lookingAtBlock
                 || data.playerInfo.lastBlockPlace.hasNotPassed(2)) return;
         ++cps;
-        vl-= vl > 0 ? 0.0025f : 0;
     }
 }

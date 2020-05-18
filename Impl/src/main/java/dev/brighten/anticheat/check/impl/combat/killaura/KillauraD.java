@@ -12,7 +12,7 @@ public class KillauraD extends Check {
 
     @Packet
     public void onUse(WrappedInUseEntityPacket packet) {
-        if(data.playerInfo.inventoryOpen) {
+        if(data.playerInfo.lastWindowClick.hasNotPassed(4)) {
             vl++;
             flag("inv=" + data.playerInfo.inventoryId);
         }

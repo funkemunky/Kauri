@@ -8,9 +8,10 @@ import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.TickTimer;
+import cc.funkemunky.api.utils.math.RollingAverageDouble;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.data.DataManager;
-import dev.brighten.anticheat.listeners.PacketListener;
+import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.logs.LoggerManager;
 import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.processing.PacketProcessor;
@@ -19,7 +20,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -32,11 +36,12 @@ public class Kauri extends JavaPlugin {
     public LoggerManager loggerManager;
 
     //Lag Information
-    public double tps;
+    public RollingAverageDouble tps = new RollingAverageDouble(4, 20);
     public TickTimer lastTickLag;
     public long lastTick;
 
-    public ExecutorService executor, loggingThread;
+    public ExecutorService executor;
+    public ScheduledExecutorService loggingThread;
     public ToggleableProfiler profiler;
 
     public boolean enabled = false;
@@ -46,6 +51,8 @@ public class Kauri extends JavaPlugin {
     public KauriAPI kauriAPI;
 
     public boolean isNewer;
+
+    public List<Runnable> onReload = new ArrayList<>();
 
     public void onEnable() {
         MiscUtils.printToConsole(Color.Red + "Starting Kauri " + getDescription().getVersion() + "...");
@@ -64,7 +71,6 @@ public class Kauri extends JavaPlugin {
         MiscUtils.printToConsole("&7Unregistering Kauri API...");
         kauriAPI.service.shutdown();
         loggingThread.shutdown();
-        PacketListener.packetThread.shutdown();
 
         if(!reload) {
             kauriAPI = null;
@@ -80,8 +86,8 @@ public class Kauri extends JavaPlugin {
 
         MiscUtils.printToConsole("&7Unloading DataManager...");
         //Clearing the dataManager.
+        Kauri.INSTANCE.dataManager.dataMap.values().forEach(ObjectData::onLogout);
         Kauri.INSTANCE.dataManager.dataMap.clear();
-
 
         MiscUtils.printToConsole("&7Clearing checks and cached entity information...");
         EntityProcessor.vehicles.clear(); //Clearing all registered vehicles.
@@ -99,16 +105,20 @@ public class Kauri extends JavaPlugin {
 
     public void reload() {
         Kauri.INSTANCE.reloadConfig();
-        Atlas.getInstance().initializeScanner(this, false, false);
-
-        dataManager.dataMap.clear();
-        EntityProcessor.vehicles.clear();
 
         Check.checkClasses.clear();
         Check.checkSettings.clear();
-        Check.registerChecks();
+        dataManager.dataMap.clear();
+        EntityProcessor.vehicles.clear();
+
+        Atlas.getInstance().initializeScanner(this, false, false);
 
         loggerManager = new LoggerManager();
+
+        for (Runnable runnable : onReload) {
+            runnable.run();
+            onReload.remove(runnable);
+        }
 
         Bukkit.getOnlinePlayers().forEach(dataManager::createData);
     }
@@ -131,11 +141,19 @@ public class Kauri extends JavaPlugin {
             }
             if(ticks.get() >= 10) {
                 ticks.set(0);
-                tps = 500D / (currentTime - lastTimeStamp.get()) * 20;
+                tps.add(500D / (currentTime - lastTimeStamp.get()) * 20);
                 lastTimeStamp.set(currentTime);
             }
             lastTick = currentTime;
             Kauri.INSTANCE.lastTick = currentTime;
         }, this, 1L, 1L);
+    }
+
+    public double getTps() {
+        return tps.getAverage();
+    }
+
+    public void onReload(Runnable runnable) {
+        onReload.add(runnable);
     }
 }
