@@ -2,6 +2,7 @@ package dev.brighten.anticheat.utils;
 
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
+import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.Materials;
 import cc.funkemunky.api.utils.XMaterial;
 import cc.funkemunky.api.utils.handlers.PlayerSizeHandler;
@@ -204,17 +205,16 @@ public class Helper {
 		}
 		return Arrays.stream(locs)
 				.map(loc -> {
-					if(!loc.getWorld().isChunkLoaded(loc.getBlockX() >> 4, loc.getBlockZ() >> 4)) return null;
-					Block block = loc.getBlock();
+					Block block = BlockUtils.getBlock(loc);
 
-					if(block.getType().isSolid()) {
+					if(block == null) return null;
+					if(Materials.checkFlag(block.getType(), Materials.SOLID)) {
 						return BlockData.getData(block.getType()).getBox(block, ProtocolVersion.getGameVersion());
 					}
 					return null;
 				})
 				.filter(box -> {
 					if(box == null) return false;
-
 					return collision.isCollided(box);
 				}).collect(Collectors.toList());
 	}

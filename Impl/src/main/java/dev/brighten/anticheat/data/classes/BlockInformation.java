@@ -13,14 +13,12 @@ import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.CollisionHandler;
 import dev.brighten.anticheat.utils.Helper;
-import lombok.val;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,7 +30,8 @@ public class BlockInformation {
     public float currentFriction;
     public CollisionHandler
             handler = new CollisionHandler(new ArrayList<>(), new ArrayList<>(), new KLocation(0,0,0));
-    public List<Block> verticalCollisions, horizontalCollisions, blocks = new ArrayList<>();
+    public List<Block> verticalCollisions, horizontalCollisions;
+    public final List<Block> blocks = Collections.synchronizedList(new ArrayList<>());
 
     public BlockInformation(ObjectData objectData) {
         this.objectData = objectData;
@@ -41,32 +40,34 @@ public class BlockInformation {
     public void runCollisionCheck() {
         if(!Kauri.INSTANCE.enabled
                 || Kauri.INSTANCE.lastEnabled.hasNotPassed(6)) return;
-        blocks.clear();
+        synchronized (blocks) {
+            blocks.clear();
+        }
 
-        double dy = objectData.playerInfo.deltaY;
+        double dy = Math.abs(objectData.playerInfo.deltaY);
         double dh = objectData.playerInfo.deltaXZ;
 
-        if(dy > 2) dy = 2;
-        else if(dy < -2) dy = -2;
+        if(dy > 3) dy = 3;
+        if(dh > 3) dh = 3;
 
-        if(dh > 2) dh = 2;
-
-        int startX = Location.locToBlock(objectData.playerInfo.to.x - 1 - dh);
-        int endX = Location.locToBlock(objectData.playerInfo.to.x + 1 + dh);
-        int startY = Location.locToBlock(objectData.playerInfo.to.y - 0.51 - dy);
-        int endY = Location.locToBlock(objectData.playerInfo.to.y + 1.99 + dy);
-        int startZ = Location.locToBlock(objectData.playerInfo.to.z - 1 - dh);
-        int endZ = Location.locToBlock(objectData.playerInfo.to.z + 1 + dh);
+        int startX = Location.locToBlock(objectData.playerInfo.to.x - 1.1 - dh);
+        int endX = Location.locToBlock(objectData.playerInfo.to.x + 1.1 + dh);
+        int startY = Location.locToBlock(objectData.playerInfo.to.y - 1.1 - dy);
+        int endY = Location.locToBlock(objectData.playerInfo.to.y + 3 + dy);
+        int startZ = Location.locToBlock(objectData.playerInfo.to.z - 1.1 - dh);
+        int endZ = Location.locToBlock(objectData.playerInfo.to.z + 1.1 + dh);
 
         objectData.playerInfo.worldLoaded = true;
-        for(int x = startX ; x < endX ; x++) {
-            for(int y = startY ; y < endY ; y++) {
-                for(int z = startZ ; z < endZ ; z++) {
-                    Location loc = new Location(objectData.getPlayer().getWorld(), x, y, z);
+        synchronized (blocks) {
+            for(int x = startX ; x < endX ; x++) {
+                for(int y = startY ; y < endY ; y++) {
+                    for(int z = startZ ; z < endZ ; z++) {
+                        Location loc = new Location(objectData.getPlayer().getWorld(), x, y, z);
 
-                    if(loc.getWorld().isChunkLoaded(loc.getBlockX() >> 4, loc.getBlockZ() >> 4)) {
-                        blocks.add(loc.getBlock());
-                    } else objectData.playerInfo.worldLoaded = false;
+                        if(loc.getWorld().isChunkLoaded(loc.getBlockX() >> 4, loc.getBlockZ() >> 4)) {
+                            blocks.add(loc.getBlock());
+                        } else objectData.playerInfo.worldLoaded = false;
+                    }
                 }
             }
         }
@@ -79,7 +80,7 @@ public class BlockInformation {
 
         //Bukkit.broadcastMessage("chigga4");
 
-        handler.setSize(0.6f, 0.1f);
+        handler.setSize(0.6f, 0f);
         handler.setOffset(-0.1);
 
         objectData.playerInfo.serverGround =
@@ -111,14 +112,15 @@ public class BlockInformation {
         inWeb = handler.isCollidedWith(XMaterial.COBWEB.parseMaterial());
         onSlime = handler.isCollidedWith(XMaterial.SLIME_BLOCK.parseMaterial());
 
-        handler.setOffset(0);
-        handler.setSize(0.6, 1.8);
+        handler.setOffset(-0.02);
+        handler.setSize(0.64, 1.82);
 
         inLava = handler.isCollidedWith(XMaterial.LAVA.parseMaterial(),
                 XMaterial.STATIONARY_LAVA.parseMaterial());
         inWater = handler.isCollidedWith(XMaterial.WATER.parseMaterial(), XMaterial.STATIONARY_WATER.parseMaterial());
         inLiquid = inLava || inWater;
 
+        handler.setOffset(0);
         handler.setSize(0.599, 1.8);
 
         inBlock = handler.isCollidedWith(Materials.SOLID);
@@ -127,17 +129,16 @@ public class BlockInformation {
             onClimbable = objectData.playerInfo.blockOnTo != null
                     && BlockUtils.isClimbableBlock(objectData.playerInfo.blockOnTo);
         } else {
-            handler.setSize(0.61, 0);
-            handler.setSingle(true);
+            handler.setSize(0.64, 1.8);
             onClimbable = handler.isCollidedWith(Materials.LADDER);
-            handler.setSingle(false);
         }
 
         handler.setSize(0.6, 2.4);
+        handler.setOffset(1.25);
         blocksAbove = handler.isCollidedWith(Materials.SOLID);
 
-        handler.setSize(1.5, 1.78);
-        handler.setOffset(0.02);
+        handler.setSize(2, 1.79);
+        handler.setOffset(0.01);
         blocksNear = handler.isCollidedWith(Materials.SOLID);
 
         if(objectData.boxDebuggers.size() > 0) {

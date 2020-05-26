@@ -1,64 +1,38 @@
 package dev.brighten.anticheat.premium.impl.autoclicker;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.math.cond.MaxDouble;
-import cc.funkemunky.api.utils.objects.evicting.EvictingList;
+import cc.funkemunky.api.utils.Color;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
-import lombok.val;
 
-import java.util.Deque;
-import java.util.LinkedList;
-
-@CheckInfo(name = "Autoclicker (I)", description = "Checks for impossible ratio consistency. Check by Elevated.",
-        checkType = CheckType.AUTOCLICKER, enabled = false, developer = true)
+@CheckInfo(name = "Autoclicker (I)", description = "Checks to see if an autoclicker is on a low shift of data.",
+        checkType = CheckType.AUTOCLICKER, developer = true)
 public class AutoclickerI extends Check {
 
-    private Deque<Long> clickSamples = new LinkedList<>();
-
-    private long lastSwing;
-    private double lstd;
-    private MaxDouble verbose = new MaxDouble(10);
+    private float buffer = 0;
 
     @Packet
-    public void onClick(WrappedInArmAnimationPacket packet, long timeStamp) {
-        long delay = timeStamp - this.lastSwing;
-
-        if (data.playerInfo.lookingAtBlock
-                || data.playerInfo.breakingBlock
-                || data.playerInfo.lastBlockPlace.hasNotPassed(1))
+    public void onClick(WrappedInArmAnimationPacket packet) {
+        if (data.clickProcessor.isNotReady())
             return;
 
-        if (delay > 1L && delay < 300L && this.clickSamples.add(delay) && this.clickSamples.size() == 30) {
-            double average = this.clickSamples.stream().mapToDouble(Long::doubleValue).average().orElse(0.0);
+        double skewness = Math.abs(data.clickProcessor.getSkewness()),
+                cpsMean = 1000L / data.clickProcessor.getMean(),
+                variance = data.clickProcessor.getVariance();
+        int outliers = data.clickProcessor.getOutliers();
 
-            double stdDeviation = 0.0;
-
-            for (Long click : this.clickSamples) {
-                stdDeviation += Math.pow(click.doubleValue() - average, 2);
+        if(skewness < 0.1 && cpsMean > 8 && variance > 900) {
+            if(++buffer > 9) {
+                vl++;
+                flag("skewness=%v.2 std=%v.2 var=%v.2", skewness, data.clickProcessor.getStd(), variance);
             }
+            debug(Color.Green + "Flag");
+        } else buffer-= buffer > 0 ? .5f : 0;
 
-            stdDeviation /= this.clickSamples.size();
-
-            val std = Math.sqrt(stdDeviation);
-            val deltaStd = Math.abs(std - lstd);
-            if (deltaStd < 2.5) {
-                if(verbose.add(std < 15 ? 2 : 1) > 4) {
-                    vl++;
-                    this.flag("std=%v.2 delta=%v.2 buffer=%v.1", std, deltaStd, verbose.value());
-                }
-            } else verbose.subtract(1);
-
-            debug("std=%v.2 delta=%v.2 verbose=%v.1", std, deltaStd, verbose.value());
-
-            lstd = std;
-            this.clickSamples.clear();
-        }
-
-        this.lastSwing = timeStamp;
+        debug("skewness=%v.3 std=%v.2 variance=%v.2 cpsMean=%v.2 outliers=%v modes=%v buffer=%v",
+                skewness, data.clickProcessor.getStd(), variance, cpsMean,
+                outliers, data.clickProcessor.getModes().size(), buffer);
     }
 }

@@ -2,57 +2,70 @@ package dev.brighten.anticheat.check.impl.combat.hitbox;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
+import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.Tuple;
+import cc.funkemunky.api.utils.handlers.PlayerSizeHandler;
+import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;
+import lombok.val;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.Vector;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-@CheckInfo(name = "Reach (A)", checkType = CheckType.HITBOX, punishVL = 12, description = "A simple distance check.")
+@CheckInfo(name = "Reach (A)", checkType = CheckType.HITBOX, punishVL = 5, description = "A simple distance check.")
 @Cancellable(cancelType = CancelType.ATTACK)
 public class ReachA extends Check {
 
     private long lastUse;
     private LivingEntity target;
-    private int buffer;
+    private double buffer;
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if(timeStamp - lastUse > 10 || data.playerInfo.creative || data.targetPastLocation.previousLocations.size() < 8) return;
+        if(timeStamp - lastUse > 3 || data.playerInfo.creative || data.targetPastLocation.previousLocations.size() < 10) return;
 
-        List<KLocation> origins = Arrays.asList(data.playerInfo.to.clone(), data.playerInfo.from.clone());
-        List<Tuple<KLocation, Vector>> targetBoxes = data.targetPastLocation
-                .getEstimatedLocation(data.lagInfo.transPing,
-                        225L + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
+        List<SimpleCollisionBox> origins = Stream.of(data.playerInfo.to.clone(), data.playerInfo.from.clone())
+                .map(loc -> PlayerSizeHandler.getInstance().bounds(data.getPlayer(), loc.x, loc.y, loc.z))
+                .collect(Collectors.toList());
+        List<SimpleCollisionBox> targetBoxes = data.targetPastLocation
+                .getEstimatedLocation(timeStamp,
+                        data.lagInfo.transPing)
                 .stream()
-                .map(loc -> new Tuple<>(loc, getHitbox(target.getType())))
+                .map(loc -> getHitbox(loc, target.getType()))
                 .collect(Collectors.toList());
 
         double distance = 69;
 
-        for (KLocation origin : origins) {
-            for (Tuple<KLocation, Vector> tuple : targetBoxes) {
-                distance = Math.min(distance, origin.toVector().setY(0).distance(tuple.one.toVector().setY(0))
-                        - tuple.two.length());
+        val bounds = getHitbox(new KLocation(0,0,0), target.getType());
+        double width = bounds.max().setY(0).distance(bounds.min().setY(0));
+        for (SimpleCollisionBox origin : origins) {
+            //origin.draw(WrappedEnumParticle.FLAME, Collections.singleton(data.getPlayer()));
+            for (SimpleCollisionBox target : targetBoxes) {
+                distance = Math.min(distance, origin.distance(target) - width);
+                //target.draw(WrappedEnumParticle.FLAME, Collections.singleton(data.getPlayer()));
             }
         }
 
-        if(distance > 3.2 && distance != 69) {
-            if(++buffer > 3) {
-                vl++;
-                flag("distance=%v buffer=%v", MathUtils.round(distance, 3), buffer);
-            }
-        } else buffer = 0;
+        if(data.lagInfo.lastPacketDrop.hasPassed(3)) {
+            if (distance > 3.02 && distance != 69) {
+                if (++buffer > 6) {
+                    vl++;
+                    flag("distance=%v.2 buffer=%v", distance, buffer);
+                }
+            } else buffer -= buffer > 0 ? 0.1 : 0;
+        } else buffer-= buffer > 0 ? 0.02 : 0;
 
-        debug("distance=%v boxes=%v buffer=%v", distance, targetBoxes.size(), buffer);
+        debug("distance=%v.3 boxes=%v width=%v.2 buffer=%v", distance, targetBoxes.size(), width, buffer);
     }
 
     @Packet
@@ -64,11 +77,12 @@ public class ReachA extends Check {
         }
     }
 
-    private Vector getHitbox(EntityType type) {
+    private SimpleCollisionBox getHitbox(KLocation loc, EntityType type) {
         Vector vec = MiscUtils.entityDimensions.get(type).clone();
 
         if(vec == null) vec = new Vector(5, 0, 5);
 
-        return vec.setY(0);
+        return new SimpleCollisionBox(loc.toVector(), loc.toVector()).expand(vec.getX(), 0, vec.getZ())
+                .expandMax(0, vec.getY(), 0).expand(0.1, 0.1, 0.1);
     }
 }

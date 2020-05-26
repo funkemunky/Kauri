@@ -6,35 +6,37 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.handlers.PlayerSizeHandler;
 import cc.funkemunky.api.utils.objects.VariableValue;
+import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingList;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
-import cc.funkemunky.api.utils.world.CollisionBox;
-import cc.funkemunky.api.utils.world.types.RayCollision;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
-import dev.brighten.anticheat.utils.Helper;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.MouseFilter;
 import dev.brighten.anticheat.utils.MovementUtils;
+import cc.funkemunky.api.utils.TickTimer;
 import lombok.val;
 import org.bukkit.GameMode;
 import org.bukkit.potion.PotionEffectType;
 
+import java.math.BigInteger;
 import java.math.RoundingMode;
-import java.util.Collections;
+import java.util.Deque;
 import java.util.List;
 
 public class MovementProcessor {
     private final ObjectData data;
 
-    private List<Double> yawGcdList = new EvictingList<>(40),
-            pitchGcdList = new EvictingList<>(40);
-    public long deltaX, deltaY, lastDeltaX, lastDeltaY, lastCinematic;
-    public double sensitivityX, sensitivityY, yawMode, pitchMode, sensXPercent, sensYPercent;
+    public Deque<Float> yawGcdList = new EvictingList<>(50),
+            pitchGcdList = new EvictingList<>(50);
+    public float deltaX, deltaY, lastDeltaX, lastDeltaY;
+    public Tuple<List<Double>, List<Double>> yawOutliers, pitchOutliers;
+    public long lastCinematic;
+    public float sensitivityX, sensitivityY, yawMode, pitchMode, sensXPercent, sensYPercent;
     private MouseFilter mxaxis = new MouseFilter(), myaxis = new MouseFilter();
     private float smoothCamFilterX, smoothCamFilterY, smoothCamYaw, smoothCamPitch;
-    private TickTimer lastReset = new TickTimer(5);
-
-    public static double offset = Math.pow(2, 24);
+    private TickTimer lastReset = new TickTimer(3), generalProcess = new TickTimer(3);
+    private GameMode lastGamemode;
+    public static float offset = (int)Math.pow(2, 24);
 
     public PotionEffectType levitation = null;
 
@@ -53,7 +55,6 @@ public class MovementProcessor {
     public void process(WrappedInFlyingPacket packet, long timeStamp) {
         //We check if it's null and intialize the from and to as equal to prevent large deltas causing false positives since there
         //was no previous from (Ex: delta of 380 instead of 0.45 caused by jump jump in location from 0,0,0 to 380,0,0)
-        Kauri.INSTANCE.profiler.start("data:moveprocessor:setting:one");
         if (data.playerInfo.from == null) {
             data.playerInfo.from
                     = data.playerInfo.to
@@ -77,8 +78,6 @@ public class MovementProcessor {
         }
 
         data.playerInfo.to.timeStamp = timeStamp;
-        Kauri.INSTANCE.profiler.stop("data:moveprocessor:setting:one");
-        Kauri.INSTANCE.profiler.start("data:moveprocessor:pos");
         if (data.playerInfo.posLocs.size() > 0) {
             val optional = data.playerInfo.posLocs.stream()
                     .filter(loc -> loc.toVector().setY(0)
@@ -89,14 +88,13 @@ public class MovementProcessor {
             if (optional.isPresent()) {
                 data.playerInfo.serverPos = true;
                 data.playerInfo.lastServerPos = timeStamp;
+                data.playerInfo.lastTeleportTimer.reset();
                 data.playerInfo.inventoryOpen = false;
                 data.playerInfo.posLocs.remove(optional.get());
             }
         } else if (data.playerInfo.serverPos) {
             data.playerInfo.serverPos = false;
         }
-        Kauri.INSTANCE.profiler.stop("data:moveprocessor:pos");
-        Kauri.INSTANCE.profiler.start("data:moveprocessor:setting:two");
         data.playerInfo.lClientGround = data.playerInfo.clientGround;
         data.playerInfo.clientGround = packet.isGround();
         //Setting the motion delta for use in checks to prevent repeated functions.
@@ -113,23 +111,25 @@ public class MovementProcessor {
         data.playerInfo.blockBelow = BlockUtils.getBlock(data.playerInfo.to.toLocation(data.getPlayer().getWorld())
                 .subtract(0, 1, 0));
 
+        if(!data.getPlayer().getGameMode().equals(lastGamemode)) data.playerInfo.lastGamemodeTimer.reset();
+        lastGamemode = data.getPlayer().getGameMode();
+        data.playerInfo.creative = data.getPlayer().getGameMode().equals(GameMode.CREATIVE)
+                || data.getPlayer().getGameMode().toString().equalsIgnoreCase("SPECTATOR");
+
         if(data.playerInfo.blockBelow != null)
             data.blockInfo.currentFriction = ReflectionsUtil.getFriction(data.playerInfo.blockBelow);
-        Kauri.INSTANCE.profiler.stop("data:moveprocessor:setting:two");
+
         if(packet.isPos()) {
-            Kauri.INSTANCE.profiler.start("data:moveprocessor:collision");
             //We create a separate from BoundingBox for the predictionService since it should operate on pre-motion data.
             data.box = PlayerSizeHandler.instance.bounds(data.getPlayer(),
                     data.playerInfo.to.x, data.playerInfo.to.y, data.playerInfo.to.z);
 
-            data.blockInfo.runCollisionCheck(); //run b4 everything else for use below.
-            Kauri.INSTANCE.profiler.stop("data:moveprocessor:collision");
+            if(timeStamp - data.creation > 400L) data.blockInfo.runCollisionCheck(); //run b4 everything else for use below.
         }
 
         if(MathUtils.getDelta(deltaY, -0.098) < 0.001 && data.playerInfo.deltaXZ <= 0.3) {
             data.playerInfo.worldLoaded = false;
         }
-        Kauri.INSTANCE.profiler.start("data:moveprocessor:setting:three");
         data.playerInfo.inVehicle = data.getPlayer().getVehicle() != null;
         data.playerInfo.gliding = PlayerUtils.isGliding(data.getPlayer());
         data.playerInfo.riptiding = Atlas.getInstance().getBlockBoxManager()
@@ -137,7 +137,7 @@ public class MovementProcessor {
         /* We only set the jumpheight on ground since there's no need to check for it while they're in the air.
          * If we did check while it was in the air, there would be false positives in the checks that use it. */
         if (packet.isGround() || data.playerInfo.serverGround || data.playerInfo.lClientGround) {
-            data.playerInfo.jumpHeight = MovementUtils.getJumpHeight(data.getPlayer());
+            data.playerInfo.jumpHeight = MovementUtils.getJumpHeight(data);
             data.playerInfo.totalHeight = MovementUtils.getTotalHeight(data.playerVersion,
                     (float)data.playerInfo.jumpHeight);
         }
@@ -159,35 +159,27 @@ public class MovementProcessor {
             data.playerInfo.to.yaw = packet.getYaw();
             data.playerInfo.to.pitch = packet.getPitch();
         }
+
         //Setting the angle delta for use in checks to prevent repeated functions.
         data.playerInfo.lDeltaYaw = data.playerInfo.deltaYaw;
         data.playerInfo.lDeltaPitch = data.playerInfo.deltaPitch;
-        data.playerInfo.deltaYaw = MathUtils.getDelta(data.playerInfo.to.yaw, data.playerInfo.from.yaw);
+        data.playerInfo.deltaYaw = data.playerInfo.to.yaw
+                - data.playerInfo.from.yaw;
         data.playerInfo.deltaPitch = data.playerInfo.to.pitch - data.playerInfo.from.pitch;
-        Kauri.INSTANCE.profiler.stop("data:moveprocessor:setting:three");
         if (packet.isLook()) {
-            Kauri.INSTANCE.profiler.start("data:moveprocessor:yawstuffs");
-            data.playerInfo.lastYawGCD = data.playerInfo.yawGCD;
-            data.playerInfo.yawGCD = MiscUtils.gcd((long) (data.playerInfo.deltaYaw * offset),
-                    (long) (data.playerInfo.lDeltaYaw * offset));
+
             data.playerInfo.lastPitchGCD = data.playerInfo.pitchGCD;
-            data.playerInfo.pitchGCD = MiscUtils.gcd((long) (Math.abs(data.playerInfo.deltaPitch) * offset),
-                    (long) (Math.abs(data.playerInfo.lDeltaPitch) * offset));
+            data.playerInfo.lastYawGCD = data.playerInfo.yawGCD;
+            data.playerInfo.yawGCD = MiscUtils.gcd((int) (data.playerInfo.deltaYaw * offset),
+                    (int) (data.playerInfo.lDeltaYaw * offset));
+            data.playerInfo.pitchGCD = MiscUtils.gcd((int) (data.playerInfo.deltaPitch * offset),
+                    (int) (data.playerInfo.lDeltaPitch * offset));
 
             val origin = data.playerInfo.to.clone();
 
             origin.y+= data.playerInfo.sneaking ? 1.54 : 1.62;
 
-            Kauri.INSTANCE.profiler.start("data:moveprocessor:yawstuffs:raycollision");
-            RayCollision collision = new RayCollision(origin.toVector(), MathUtils.getDirection(origin));
-
-            List<CollisionBox> boxes = Helper.getCollisionsOnRay(collision, data.getPlayer().getWorld(),
-                    data.playerInfo.creative ? 5 : 4, 1);
-
-            data.playerInfo.lookingAtBlock = boxes.size() > 0;
-            Kauri.INSTANCE.profiler.stop("data:moveprocessor:yawstuffs:raycollision");
-            double yawGcd = data.playerInfo.yawGCD / offset;
-            double pitchGcd = data.playerInfo.pitchGCD / offset;
+            float yawGcd = data.playerInfo.yawGCD / offset, pitchGcd = data.playerInfo.pitchGCD / offset;
 
             //Adding gcd of yaw and pitch.
             if (data.playerInfo.yawGCD > 90000 && data.playerInfo.yawGCD < 2E7
@@ -202,6 +194,8 @@ public class MovementProcessor {
                 if (lastReset.hasPassed()) {
                     yawMode = MathUtils.getMode(yawGcdList);
                     pitchMode = MathUtils.getMode(pitchGcdList);
+                    yawOutliers = MiscUtils.getOutliers(yawGcdList);
+                    pitchOutliers = MiscUtils.getOutliers(pitchGcdList);
                     lastReset.reset();
                     sensXPercent = sensToPercent(sensitivityX = getSensitivityFromYawGCD(yawMode));
                     sensYPercent = sensToPercent(sensitivityY = getSensitivityFromPitchGCD(pitchMode));
@@ -210,12 +204,12 @@ public class MovementProcessor {
 
                 lastDeltaX = deltaX;
                 lastDeltaY = deltaY;
-                deltaX = getDeltaX(data.playerInfo.deltaYaw, (float) yawMode);
-                deltaY = getDeltaY(data.playerInfo.deltaPitch, (float) pitchMode);
+                deltaX = getDeltaX(data.playerInfo.deltaYaw, yawMode);
+                deltaY = getDeltaY(data.playerInfo.deltaPitch, pitchMode);
 
                 if((data.playerInfo.pitchGCD < 1E5 || data.playerInfo.yawGCD < 1E5) && smoothCamFilterY < 1E6
                         && smoothCamFilterX < 1E6 && timeStamp - data.creation > 1000L) {
-                    float f = (float)sensitivityX * 0.6f + .2f;
+                    float f = sensitivityX * 0.6f + .2f;
                     float f1 = f * f * f * 8;
                     float f2 = deltaX * f1;
                     float f3 = deltaY * f1;
@@ -228,7 +222,7 @@ public class MovementProcessor {
                     f3 = smoothCamFilterY * 0.5f;
 
                     float pyaw = data.playerInfo.from.yaw + f2 * .15f;
-                    float ppitch = data.playerInfo.from.pitch + f3 * .15f;
+                    float ppitch = data.playerInfo.from.pitch - f3 * .15f;
 
                     if(data.playerInfo.cinematicMode =
                             (MathUtils.getDelta(pyaw, data.playerInfo.from.yaw) < (Math.abs(deltaX) > 50 ? 3 : 1)
@@ -242,7 +236,6 @@ public class MovementProcessor {
                     data.playerInfo.cinematicMode = false;
                 }
             }
-            Kauri.INSTANCE.profiler.stop("data:moveprocessor:yawstuffs");
         }
 
         if (packet.isPos()) {
@@ -319,20 +312,18 @@ public class MovementProcessor {
 
         data.playerInfo.baseSpeed = MovementUtils.getBaseSpeed(data);
         /* General Cancel Booleans */
-        boolean hasLevi = levitation != null && data.getPlayer().hasPotionEffect(levitation);
+        boolean hasLevi = levitation != null && data.potionProcessor.hasPotionEffect(levitation);
 
         data.playerInfo.generalCancel = data.playerInfo.canFly
                 || data.playerInfo.creative
                 || hasLevi
-                || (data.playerInfo.deltaY > -0.0981
-                && data.playerInfo.deltaY < -0.0979
-                && data.playerInfo.deltaXZ < 0.01)
+                || (MathUtils.getDelta(-0.098, data.playerInfo.deltaY) < 0.001 && data.playerInfo.deltaXZ < 0.3)
                 || timeStamp - data.playerInfo.lastServerPos < 50L
+                || data.playerInfo.serverPos
                 || data.playerInfo.riptiding
                 || data.playerInfo.gliding
                 || data.playerInfo.lastPlaceLiquid.hasNotPassed(5)
                 || data.playerInfo.inVehicle
-                || data.playerInfo.lastWorldUnload.hasNotPassed(10)
                 || !data.playerInfo.worldLoaded
                 || timeStamp - data.playerInfo.lastRespawn < 2500L
                 || data.playerInfo.lastToggleFlight.hasNotPassed(40)
@@ -348,71 +339,78 @@ public class MovementProcessor {
                 || data.playerInfo.lastHalfBlock.hasNotPassed(2);
 
         //Adding past location
-        data.pastLocation.addLocation(data.playerInfo.to.clone());
+        if(timeStamp - data.playerInfo.lastServerPos > 100L)
+            data.pastLocation.addLocation(data.playerInfo.to.clone());
     }
-    private static int getDeltaX(double yawDelta, double gcd) {
-        double f2 = yawToF2(yawDelta);
-
-        return MathUtils.floor(f2 / getF1FromYaw(gcd));
-    }
-
-    private static int getDeltaY(double pitchDelta, double gcd) {
-        double f3 = pitchToF3(pitchDelta);
-
-        return MathUtils.floor(f3 / getF1FromPitch(gcd));
+    private static float getDeltaX(float yawDelta, float gcd) {
+        return (yawDelta / gcd);
     }
 
-    public static int sensToPercent(double sensitivity) {
+    private static float getDeltaY(float pitchDelta, float gcd) {
+        return (pitchDelta / gcd);
+    }
+
+    public static int sensToPercent(float sensitivity) {
         return (int) MathUtils.round(
                 sensitivity / .5f * 100, 0,
                 RoundingMode.HALF_UP);
     }
 
-    //TODO Condense. This is just for easy reading until I test everything.
-    private static double getSensitivityFromYawGCD(double gcd) {
+    //Noncondensed
+    /*private static double getSensitivityFromYawGCD(double gcd) {
         double stepOne = yawToF2(gcd) / 8;
         double stepTwo = Math.cbrt(stepOne);
         double stepThree = stepTwo - .2f;
         return stepThree / .6f;
+    }*/
+
+    //Condensed
+    private static float getSensitivityFromYawGCD(float gcd) {
+        return ((float)Math.cbrt((double)yawToF2(gcd) / 8) - .2f) / .6f;
     }
 
-    //TODO Condense. This is just for easy reading until I test everything.
-    private static double getSensitivityFromPitchGCD(double gcd) {
+    //Noncondensed
+    /*private static double getSensitivityFromPitchGCD(double gcd) {
         double stepOne = pitchToF3(gcd) / 8;
         double stepTwo = Math.cbrt(stepOne);
         double stepThree = stepTwo - .2f;
         return stepThree / .6f;
+    }*/
+
+    //Condensed
+    private static float getSensitivityFromPitchGCD(float gcd) {
+        return ((float)Math.cbrt((double)pitchToF3(gcd) / 8) - .2f) / .6f;
     }
 
-    private static double getF1FromYaw(double gcd) {
-        double f = getFFromYaw(gcd);
+    private static float getF1FromYaw(float gcd) {
+        float f = getFFromYaw(gcd);
 
-        return Math.pow(f, 3) * 8;
+        return f * f * f * 8;
     }
 
-    private static double getFFromYaw(double gcd) {
-        double sens = getSensitivityFromYawGCD(gcd);
-        return sens * .6f + .2;
+    private static float getFFromYaw(float gcd) {
+        float sens = getSensitivityFromYawGCD(gcd);
+        return sens * .6f + .2f;
     }
 
-    private static double getFFromPitch(double gcd) {
-        double sens = getSensitivityFromPitchGCD(gcd);
-        return sens * .6f + .2;
+    private static float getFFromPitch(float gcd) {
+        float sens = getSensitivityFromPitchGCD(gcd);
+        return sens * .6f + .2f;
     }
 
-    private static double getF1FromPitch(double gcd) {
-        double f = getFFromPitch(gcd);
+    private static float getF1FromPitch(float gcd) {
+        float f = getFFromPitch(gcd);
 
         return (float)Math.pow(f, 3) * 8;
     }
 
-    private static double yawToF2(double yawDelta) {
-        return yawDelta / .15;
+    private static float yawToF2(float yawDelta) {
+        return yawDelta / .15f;
     }
 
-    private static double pitchToF3(double pitchDelta) {
+    private static float pitchToF3(float pitchDelta) {
         int b0 = pitchDelta >= 0 ? 1 : -1; //Checking for inverted mouse.
-        return pitchDelta / .15 / b0;
+        return pitchDelta / .15f / b0;
     }
 
 }

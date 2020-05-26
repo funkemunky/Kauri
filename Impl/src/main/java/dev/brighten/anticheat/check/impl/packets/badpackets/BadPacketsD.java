@@ -10,6 +10,7 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
+import org.bukkit.GameMode;
 
 @CheckInfo(name = "BadPackets (D)",
         description = "Checks for clients spoofing flight permissions.",
@@ -42,11 +43,19 @@ public class BadPacketsD extends Check {
         if(timeStamp - data.creation < 1000L) {
             serverAllowed = data.getPlayer().getAllowFlight();
             clientAllowed = data.getPlayer().getAllowFlight();
-            RunUtils.task(() -> data.getPlayer().setAllowFlight(false), Kauri.INSTANCE);
+            RunUtils.task(() -> {
+                data.getPlayer().setAllowFlight(true);
+                data.getPlayer().setAllowFlight(false);
+                data.getPlayer().setGameMode(GameMode.SURVIVAL);
+            }, Kauri.INSTANCE);
         } else {
             if(!serverAllowed && clientAllowed) {
                 if(vl++ > 1) {
                     flag("server=" + serverAllowed + " client=" + clientAllowed);
+                    RunUtils.task(() -> {
+                        data.getPlayer().setFlying(false);
+                        data.getPlayer().setAllowFlight(false);
+                    }, Kauri.INSTANCE);
                 }
             } else vl = 0;
         }

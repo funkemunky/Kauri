@@ -1,48 +1,52 @@
 package dev.brighten.anticheat.premium.impl;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.Color;
-import cc.funkemunky.api.utils.objects.Interval;
+import cc.funkemunky.api.tinyprotocol.packet.types.MathHelper;
+import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
-import dev.brighten.anticheat.utils.Verbose;
+import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
 
-import java.util.Deque;
-import java.util.DoubleSummaryStatistics;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
 
-@CheckInfo(name = "Aim (G)", description = "A simple check to detect Vape's aimassist.",
-        checkType = CheckType.AIM, developer = true, enabled = false, punishVL = 30)
+@CheckInfo(name = "Aim (G)", description = "Prediction.", checkType = CheckType.AIM, vlToFlag = 15, developer = true)
 public class AimG extends Check {
 
-    private Verbose verbose = new Verbose(50, 6);
-    private Interval ldeltaX = new Interval(50);
-    private Interval ldeltaY = new Interval(50);
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
-        if(!packet.isLook() || data.playerInfo.cinematicMode) return;
+    public void onLook(WrappedInFlyingPacket packet) {
+        if(packet.isLook()) {
+            if(data.moveProcessor.pitchGcdList.size() < 45) return;
 
-        val deltaX = Math.abs(data.moveProcessor.deltaX - data.moveProcessor.lastDeltaX);
-        val deltaY = Math.abs(data.moveProcessor.deltaY - data.moveProcessor.lastDeltaY);
+            if(data.moveProcessor.sensXPercent == data.moveProcessor.sensYPercent) {
+                float start = data.moveProcessor.sensitivityY * 0.6f + .2f;
 
-        ldeltaX.add(data.moveProcessor.deltaX);
-        ldeltaY.add(deltaY);
+                float tri = start * start * start * 8;
+                float xUse = data.moveProcessor.deltaX * tri;
+                float predicted = data.playerInfo.from.yaw + xUse * .15f;
+                float yaw = data.playerInfo.to.yaw;
+                float xDelta = Math.abs(yaw - predicted);
+                float shit = Float.parseFloat("." + String.valueOf(Math.abs(data.moveProcessor.deltaX))
+                        .split("\\.")[1]);
+                if(shit > 0.1 && Math.abs(xDelta) > 500) {
+                    debug("innacurracy too high: " + shit);
+                    return;
+                }
+                if(xDelta > (data.playerInfo.deltaX > 100 ? 0.02 : 0.008)) {
+                    vl++;
+                    flag(20 * 15, "delta=%v.2", xDelta);
+                }
 
-        if(ldeltaY.size() >= 15 ||  ldeltaX.size() >= 15) {
-            long xdis = ldeltaX.distinctCount(), ydis = ldeltaY.distinctCount();
-            DoubleSummaryStatistics summary = ldeltaX.getSummary();
-
-            if(ydis <= 3 && xdis < 12 && summary.getAverage() > 22) {
-                vl++;
-                flag("ydis=%v xdis=%v", ydis, xdis);
-            }
-            debug("xdis=%v ydis=%v xavg=%v.2 xstd=%v.2", xdis, ydis, summary.getAverage(), ldeltaX.std());
-
-            ldeltaX.clear();
-            ldeltaY.clear();
+                debug("one=%v two=%v sens=%v.2 yawOutliers=%v", xDelta,
+                        data.moveProcessor.deltaX, data.moveProcessor.sensYPercent,
+                        data.moveProcessor.yawOutliers.one.size() + data.moveProcessor.yawOutliers.two.size());
+            } else debug("sensX=%v sensY=%v dyaw=%v ldyaw=%v",
+                    data.moveProcessor.sensXPercent, data.moveProcessor.sensYPercent,
+                    data.playerInfo.deltaYaw, data.playerInfo.lDeltaYaw);
         }
     }
 }

@@ -30,7 +30,7 @@ public class ChatCheck implements AtlasListener {
 
     @Listen(priority = ListenerPriority.LOW)
     public void onPacketReceive(PacketReceiveEvent event) {
-        if(event.getPacket() == null) return;
+        if(!enabled || event.getPacket() == null) return;
         if(event.getType().equals(Packet.Client.CHAT)) {
             WrappedInChatPacket packet = new WrappedInChatPacket(event.getPacket(), event.getPlayer());
 
@@ -48,7 +48,7 @@ public class ChatCheck implements AtlasListener {
             int max = allowExtendedCharacters ? 591 : 255;
 
             for (char c : packet.getMessage().toCharArray()) {
-                if((int)c > min && (int)c < max) continue;
+                if((int)c > min && (int)c < max || whitelistedCharacters.contains(c)) continue;
 
                 event.getPlayer().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
                         .msg("illegal-chars",

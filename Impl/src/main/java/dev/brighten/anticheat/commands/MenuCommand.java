@@ -13,10 +13,11 @@ import dev.brighten.anticheat.utils.menu.button.Button;
 import dev.brighten.anticheat.utils.menu.button.ClickAction;
 import dev.brighten.anticheat.utils.menu.preset.button.FillerButton;
 import dev.brighten.anticheat.utils.menu.type.impl.ChestMenu;
+import dev.brighten.anticheat.utils.mojang.MojangAPI;
 import dev.brighten.api.check.CheckType;
+import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.inventory.ClickType;
 
@@ -70,7 +71,10 @@ public class MenuCommand {
                         Kauri.INSTANCE.getDescription().getVersion(), "&e&oRight Click &7&oclick to get support."));
         menu.setItem(15, createButton(XMaterial.PAPER.parseMaterial(), 1, "&cView Recent Violators",
                 (player, info) -> {
-            getRecentViolatorsMenu().showMenu(player);
+            Kauri.INSTANCE.executor.execute(() -> {
+                player.sendMessage(Color.Gray + "Loading menu...");
+                getRecentViolatorsMenu().showMenu(player);
+            });
         }, "", "&7View players who flagged checks recently."));
         return menu;
     }
@@ -150,10 +154,15 @@ public class MenuCommand {
                     "&eCancellable&7: &f" + val.cancellable,
                     "&eDescription&7: &f"));
 
-            List<String> description = Arrays.asList(dev.brighten.anticheat.utils.MiscUtils
+            List<String> description = Arrays.asList(MiscUtils
                     .splitIntoLine(val.description, 35));
 
             lore.addAll(description);
+
+            lore.add("");
+            lore.add("&f&oLeft Click &7to toggle check &fon/off&7.");
+            lore.add("&f&oMiddle Click &7to toggle check &fcancellable&7.");
+            lore.add("&f&oRight Click &7to toggle check &fexecutable&7.");
 
 
             Button button = createButton(
@@ -188,13 +197,22 @@ public class MenuCommand {
                                         "&eCancellable&7: &f" + val.cancellable,
                                         "&eDescription&7: &f"));
                                 lore2.addAll(description);
+                                lore2.add("");
+                                lore2.add("&f&oLeft Click &7to toggle check &fon/off&7.");
+                                lore2.add("&f&oMiddle Click &7to toggle check &fcancellable&7.");
+                                lore2.add("&f&oRight Click &7to toggle check &fexecutable&7.");
+
                                 builder.lore(lore2.stream().map(Color::translate).toArray(String[]::new));
                                 builder.name((settings.enabled ? "&a" : "&c") + val.name);
                                 info.getButton().setStack(builder.build());
                                 menu.buildInventory(false);
-                                Kauri.INSTANCE.dataManager.dataMap.values().parallelStream()
-                                        .forEach(data -> data.checkManager.checks.get(val.name)
-                                                .enabled = settings.enabled);
+                                Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
+                                        .forEach(data -> {
+                                            data.checkManager.checks.clear();
+                                            data.checkManager.checkMethods.clear();
+                                            data.checkManager.addChecks();
+                                            data.creation = System.currentTimeMillis();
+                                        }));
                                 break;
                             }
                             case RIGHT:
@@ -216,12 +234,21 @@ public class MenuCommand {
                                         "&eCancellable&7: &f" + val.cancellable,
                                         "&eDescription&7: &f"));
                                 lore2.addAll(description);
+                                lore2.add("");
+                                lore2.add("&f&oLeft Click &7to toggle check &fon/off&7.");
+                                lore2.add("&f&oMiddle Click &7to toggle check &fcancellable&7.");
+                                lore2.add("&f&oRight Click &7to toggle check &fexecutable&7.");
+
                                 builder.lore(lore2.stream().map(Color::translate).toArray(String[]::new));
                                 info.getButton().setStack(builder.build());
                                 menu.buildInventory(false);
-                                Kauri.INSTANCE.dataManager.dataMap.values().parallelStream()
-                                        .forEach(data -> data.checkManager.checks.get(settings.name)
-                                                .executable = settings.executable);
+                                Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
+                                        .forEach(data -> {
+                                            data.checkManager.checks.clear();
+                                            data.checkManager.checkMethods.clear();
+                                            data.checkManager.addChecks();
+                                            data.creation = System.currentTimeMillis();
+                                        }));
                                 break;
                             }
                             case MIDDLE: {
@@ -244,12 +271,21 @@ public class MenuCommand {
                                         "&eCancellable&7: &f" + val.cancellable,
                                         "&eDescription&7: &f"));
                                 lore2.addAll(description);
+                                lore2.add("");
+                                lore2.add("&f&oLeft Click &7to toggle check &fon/off&7.");
+                                lore2.add("&f&oMiddle Click &7to toggle check &fcancellable&7.");
+                                lore2.add("&f&oRight Click &7to toggle check &fexecutable&7.");
+
                                 builder.lore(lore2.stream().map(Color::translate).toArray(String[]::new));
                                 info.getButton().setStack(builder.build());
                                 menu.buildInventory(false);
-                                Kauri.INSTANCE.dataManager.dataMap.values().parallelStream()
-                                        .forEach(data -> data.checkManager.checks.get(settings.name)
-                                                .cancellable = settings.cancellable);
+                                Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
+                                        .forEach(data -> {
+                                            data.checkManager.checks.clear();
+                                            data.checkManager.checkMethods.clear();
+                                            data.checkManager.addChecks();
+                                            data.creation = System.currentTimeMillis();
+                                        }));
                                 break;
                             }
                         }
@@ -271,43 +307,51 @@ public class MenuCommand {
 
     private ChestMenu getRecentViolatorsMenu() {
         ChestMenu menu = new ChestMenu(Color.Gold + "Recent Violators", 6);
-
         menu.setParent(main);
+        try {
+            Map<UUID, List<Log>> logs = Kauri.INSTANCE.loggerManager
+                    .getLogsWithinTimeFrame(TimeUnit.HOURS.toMillis(2));
 
-        Map<UUID, List<Log>> logs = Kauri.INSTANCE.loggerManager
-                .getLogsWithinTimeFrame(TimeUnit.DAYS.toMillis(1));
+            List<UUID> sortedIds = logs.keySet().stream()
+                    .sorted(Comparator.comparing(key -> {
+                        val logsList =  logs.get(key);
+                        return logsList.get(logsList.size() - 1).timeStamp;
+                    }))
+                    .collect(Collectors.toList());
 
-        List<UUID> sortedIds = logs.keySet().stream()
-                .sorted(Comparator.comparing(key -> logs.get(key).get(0).timeStamp))
-                .collect(Collectors.toList());
+            for (int i = 0; i < Math.min(45, sortedIds.size()); i++) {
+                UUID uuid = sortedIds.get(i);
+                String name = MojangAPI.getUsername(uuid);
+                if(name == null) name = "null";
+                Log vl = logs.get(uuid).get(0);
 
-        for (int i = 0; i < Math.min(45, sortedIds.size()); i++) {
-            UUID uuid = sortedIds.get(i);
-            OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-            Log vl = logs.get(uuid).get(0);
+                ItemBuilder builder = new ItemBuilder(XMaterial.SKULL_ITEM.parseMaterial());
 
-            ItemBuilder builder = new ItemBuilder(XMaterial.SKULL_ITEM.parseMaterial());
-
-            builder.amount(1);
-            builder.durability(3);
-            builder.owner(player.getName());
-            builder.name(Color.Green + player.getName());
-            builder.lore("", "&eCheck&7: &f" + vl.checkName, "&eVL&7: &f" + vl.vl, "&ePing&7: &f" + vl.ping,
-                    "&eTPS&7: &f" + MathUtils.round(vl.tps, 2), "",
-                    "&f&oShift-Left Click &7&oto view logs.");
-            menu.addItem(new Button(false, builder.build(),
-                    (target, info) -> {
-                if(info.getClickType().equals(ClickType.SHIFT_LEFT)
-                        && target.hasPermission("kauri.command.logs")) {
-                    LogsGUI gui = new LogsGUI(Bukkit.getOfflinePlayer(uuid));
-                    menu.setParent(null);
-                    menu.close(target);
-                    gui.setParent(info.getMenu());
-                    menu.setParent(main);
-                    gui.showMenu(target);
-                }
-            }));
+                builder.amount(1);
+                builder.durability(3);
+                builder.owner(name);
+                builder.name(Color.Green + name);
+                builder.lore("", "&eCheck&7: &f" + vl.checkName, "&eVL&7: &f" + vl.vl, "&ePing&7: &f" + vl.ping,
+                        "&eTPS&7: &f" + MathUtils.round(vl.tps, 2), "",
+                        "&f&oShift-Left Click &7&oto view logs.");
+                menu.addItem(new Button(false, builder.build(),
+                        (target, info) -> {
+                            if(info.getClickType().equals(ClickType.SHIFT_LEFT)
+                                    && target.hasPermission("kauri.command.logs")) {
+                                LogsGUI gui = new LogsGUI(Bukkit.getOfflinePlayer(uuid));
+                                menu.setParent(null);
+                                menu.close(target);
+                                gui.setParent(info.getMenu());
+                                menu.setParent(main);
+                                gui.showMenu(target);
+                            }
+                        }));
+            }
+            return menu;
+        } catch(Exception e) {
+            e.printStackTrace();
         }
+
         return menu;
     }
 
@@ -323,16 +367,18 @@ public class MenuCommand {
         SimpleDateFormat format = new SimpleDateFormat("MM/dd/YYYY hh:mm");
         format.setTimeZone(TimeZone.getTimeZone("US/Eastern"));
 
-        OfflinePlayer pl = Bukkit.getOfflinePlayer(uuid);
+        String name = MojangAPI.getUsername(uuid);
+
+        if(name == null) name = "null";
         for (Log log : logs) {
-            body.append("(").append(format.format(new Date(log.timeStamp))).append("): ").append(pl.getName())
+            body.append("(").append(format.format(new Date(log.timeStamp))).append("): ").append(name)
                     .append(" failed ").append(log.checkName).append(" at VL ").append(log.vl)
                     .append(" (tps=").append(MathUtils.round(log.tps, 4)).append(" ping=").append(log.ping)
                     .append(")").append("\n");
         }
 
         try {
-            return Pastebin.makePaste(body.toString(), pl.getName() + "'s Log", Pastebin.Privacy.UNLISTED);
+            return Pastebin.makePaste(body.toString(), name + "'s Log", Pastebin.Privacy.UNLISTED);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

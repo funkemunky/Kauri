@@ -23,7 +23,6 @@ public class AutoclickerB extends Check {
 
         if(delta > 2000 || delta < 3
                 || data.playerInfo.breakingBlock
-                || data.playerInfo.lastBrokenBlock.hasNotPassed(5)
                 || data.playerInfo.lastBlockPlace.hasNotPassed(5)) {
             lastTimestamp = timeStamp;
             return;

@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.check.impl.packets.badpackets;
 
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
 import cc.funkemunky.api.utils.XMaterial;
 import dev.brighten.anticheat.check.api.Check;
@@ -9,7 +10,7 @@ import dev.brighten.api.check.CheckType;
 import lombok.val;
 
 @CheckInfo(name = "BadPackets (L)", description = "Player sends block place packets without any item in hand",
-        checkType = CheckType.BADPACKETS, developer = true)
+        checkType = CheckType.BADPACKETS, developer = true, maxVersion = ProtocolVersion.V1_8_9)
 public class BadPacketsL extends Check {
 
     @Packet
