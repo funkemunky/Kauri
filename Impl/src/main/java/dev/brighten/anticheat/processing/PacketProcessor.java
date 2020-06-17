@@ -273,6 +273,12 @@ public class PacketProcessor {
                 }
                 break;
             }
+            case Packet.Client.SETTINGS: {
+                WrappedInSettingsPacket packet = new WrappedInSettingsPacket(object, data.getPlayer());
+
+                data.checkManager.runPacket(packet, timeStamp);
+                break;
+            }
             case Packet.Client.HELD_ITEM_SLOT: {
                 WrappedInHeldItemSlotPacket packet = new WrappedInHeldItemSlotPacket(object, data.getPlayer());
 
@@ -411,7 +417,7 @@ public class PacketProcessor {
 
                 if (packet.getId() == data.getPlayer().getEntityId()) {
                     TinyProtocolHandler.sendPacket(data.getPlayer(),
-                            new WrappedOutKeepAlivePacket(data.setKeepAliveStamp("velocity")).getObject());
+                                    new WrappedOutKeepAlivePacket(data.setKeepAliveStamp("velocity")).getObject());
                     data.playerInfo.velocityX = (float) packet.getX();
                     data.playerInfo.velocityY = (float) packet.getY();
                     data.playerInfo.velocityZ = (float) packet.getZ();

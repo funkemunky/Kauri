@@ -25,34 +25,33 @@ public class FlyB extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if(packet.isPos() && (data.playerInfo.deltaY != 0 || data.playerInfo.deltaXZ != 0)) {
+        if(packet.isPos() || (data.playerInfo.deltaY != 0)) {
             //We check if the player is in ground, since theoretically the y should be zero.
             double predicted = (data.playerInfo.lDeltaY - 0.08) * 0.9800000190734863D;
 
             if(data.playerInfo.lClientGround && !data.playerInfo.clientGround) {
-                predicted = Math.min(data.playerInfo.deltaY, MovementUtils.getJumpHeight(data));
+                predicted = MovementUtils.getJumpHeight(data);
             }
 
-            for (Block block : Helper.blockCollisions(new ArrayList<>(data.blockInfo.handler.getBlocks()),
-                    data.box.copy().expand(0.25 + Math.abs(data.playerInfo.deltaX),0.5,
-                            0.25 + Math.abs(data.playerInfo.deltaZ))
-                            .expandMin(0, -0.5f + Math.min(0, data.playerInfo.deltaY), 0))) {
-                CollisionBox box = BlockData.getData(block.getType())
-                        .getBox(block, ProtocolVersion.getGameVersion());
+            boolean usedCollision = false;
 
-                List<SimpleCollisionBox> sBoxes = new ArrayList<>();
-                box.downCast(sBoxes);
+            for (SimpleCollisionBox sBox : data.blockInfo.belowCollisions) {
+                double minDelta = sBox.yMax - data.playerInfo.from.y;
 
-                for (SimpleCollisionBox sBox : sBoxes) {
-                    double minDelta = sBox.yMax - data.playerInfo.from.y, maxDelta = sBox.yMin - (data.playerInfo.from.y + 1.8);
+                if(MathUtils.getDelta(data.playerInfo.deltaY, minDelta) < 1E-7) {
+                    predicted = minDelta;
+                    usedCollision = true;
+                    break;
+                }
+            }
 
-                    if(MathUtils.getDelta(data.playerInfo.deltaY, minDelta) < 1E-7) {
-                        predicted = minDelta;
-                        break;
-                    } else if(MathUtils.getDelta(data.playerInfo.deltaY, maxDelta) < 1E-7) {
-                        predicted = maxDelta;
-                        break;
-                    }
+            for (SimpleCollisionBox sBox : data.blockInfo.aboveCollisions) {
+                double maxDelta = sBox.yMin - (data.playerInfo.from.y + 1.8);
+
+                if(MathUtils.getDelta(data.playerInfo.deltaY, maxDelta) < 1E-7) {
+                    predicted = maxDelta;
+                    usedCollision = true;
+                    break;
                 }
             }
 
@@ -89,8 +88,8 @@ public class FlyB extends Check {
                 }
             } else vl-= vl > 0 ? 0.2f : 0;
 
-            debug("deltaY=%v.3 predicted=%v.3 ground=%v lpass=%v vl=%v.1",
-                    data.playerInfo.deltaY, predicted, data.playerInfo.clientGround,
+            debug("pos=%v deltaY=%v.3 collided=%v predicted=%v.3 ground=%v lpass=%v vl=%v.1",
+                    packet.getY(), data.playerInfo.deltaY, usedCollision, predicted, data.playerInfo.clientGround,
                     data.playerInfo.liquidTimer.getPassed(), vl);
         }
     }

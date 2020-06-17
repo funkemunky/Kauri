@@ -31,6 +31,7 @@ public class BlockInformation {
     public CollisionHandler
             handler = new CollisionHandler(new ArrayList<>(), new ArrayList<>(), new KLocation(0,0,0));
     public List<Block> verticalCollisions, horizontalCollisions;
+    public List<SimpleCollisionBox> aboveCollisions = new ArrayList<>(), belowCollisions = new ArrayList<>();
     public final List<Block> blocks = Collections.synchronizedList(new ArrayList<>());
 
     public BlockInformation(ObjectData objectData) {
@@ -80,8 +81,7 @@ public class BlockInformation {
 
         //Bukkit.broadcastMessage("chigga4");
 
-        handler.setSize(0.6f, 0f);
-        handler.setOffset(-0.1);
+        handler.setSize(0.6f, 0.05f);
 
         objectData.playerInfo.serverGround =
                 handler.isCollidedWith(Materials.SOLID) || handler.contains(EntityType.BOAT);
@@ -156,6 +156,21 @@ public class BlockInformation {
                 -0.01,
                 Math.abs(objectData.playerInfo.from.z - objectData.playerInfo.to.z) + 0.1);
         collidesHorizontally = !(horizontalCollisions = blockCollisions(handler.getBlocks(), box)).isEmpty();
+
+        handler.setSize(0.8, 2.8);
+        handler.setOffset(1);
+
+        aboveCollisions.clear();
+        belowCollisions.clear();
+
+        handler.getCollisionBoxes().forEach(cb -> cb.downCast(aboveCollisions));
+
+        handler.setSize(0.8, 0.8);
+        handler.setOffset(-1);
+        handler.getCollisionBoxes().forEach(cb -> cb.downCast(belowCollisions));
+
+        handler.setSize(0.6, 1.8);
+        handler.setOffset(0);
 
         box = getBox().expand(0, 0.1, 0);
         collidesVertically = !(verticalCollisions = blockCollisions(handler.getBlocks(), box)).isEmpty();

@@ -16,7 +16,7 @@ public class PremiumChecks {
         Check.register(new VelocityB());
         Check.register(new ReachB());
         //Check.register(new Motion());
-        Check.register(new AimI());
+        //Check.register(new AimI());
         //Check.register(new AimG());
         //Check.register(new AimH());
         Check.register(new AutoclickerD());
@@ -24,7 +24,7 @@ public class PremiumChecks {
         Check.register(new InventoryA());
         Check.register(new InventoryB());
         Check.register(new AutoclickerH());
-        //Check.register(new AutoclickerI());
+        Check.register(new AutoclickerI());
         Check.register(new AutoclickerJ());
     }
 }

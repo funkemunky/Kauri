@@ -75,6 +75,18 @@ public class MovementProcessor {
             data.playerInfo.to.x = packet.getX();
             data.playerInfo.to.y = packet.getY();
             data.playerInfo.to.z = packet.getZ();
+        } else if(packet.isGround()) {
+            val optional = data.blockInfo.belowCollisions.stream()
+                    .filter(box -> {
+                        MiscUtils.testMessage("delta=" + (box.yMax - data.playerInfo.to.y));
+                        return Math.pow(box.yMax - data.playerInfo.to.y, 2) <= 9.0E-4D && data.box.copy()
+                                .offset(0, -.1, 0).isCollided(box);
+                    }).findFirst();
+
+            if(optional.isPresent()) {
+                data.playerInfo.to.y-= data.playerInfo.to.y - optional.get().yMax;
+                data.playerInfo.clientGround = data.playerInfo.serverGround = true;
+            }
         }
 
         data.playerInfo.to.timeStamp = timeStamp;

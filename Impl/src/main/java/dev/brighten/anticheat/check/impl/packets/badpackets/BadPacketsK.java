@@ -10,15 +10,17 @@ import dev.brighten.api.check.CheckType;
         punishVL = 1, checkType = CheckType.BADPACKETS)
 public class BadPacketsK extends Check {
 
-    private int lastSlot = -1;
+    private int lastSlot = -1, buffer;
 
-    //TODO Check if a server sends packet of duplicate a client would respond.
     @Packet
     public void onHeld(WrappedInHeldItemSlotPacket packet) {
-        if(lastSlot != -1 && lastSlot == packet.getSlot()) {
-            vl++;
-            flag("current=%v;last=%v", packet.getSlot(), lastSlot);
-        }
+        if(lastSlot != -1 && lastSlot == packet.getSlot() && data.lagInfo.lastPacketDrop.hasPassed(2)) {
+            if(++buffer > 3) {
+                vl++;
+                flag("current=%v;last=%v", packet.getSlot(), lastSlot);
+            }
+        } else if(buffer > 0) buffer--;
+        debug("slot=%v lastslot=%v", packet.getSlot(), lastSlot);
         lastSlot = packet.getSlot();
     }
 }

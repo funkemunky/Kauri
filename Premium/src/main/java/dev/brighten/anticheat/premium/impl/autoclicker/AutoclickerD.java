@@ -14,7 +14,6 @@ import java.util.List;
 @CheckInfo(name = "Autoclicker (D)", description = "Oscillation check by Abigail.",
         checkType = CheckType.AUTOCLICKER, punishVL = 15, executable = false, vlToFlag = 4)
 @Cancellable(cancelType = CancelType.INTERACT)
-//TODO Redo with a proper oscillation alogorithim (actually was done in exile before).
 public class AutoclickerD extends Check {
 
     private long totalClickTime, lastClickTime;

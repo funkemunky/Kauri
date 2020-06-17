@@ -1,57 +1,49 @@
 package dev.brighten.anticheat.check.impl.combat.autoclicker;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.objects.Interval;
+import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;
+import lombok.val;
 
-@CheckInfo(name = "Autoclicker (B)", description = "Checks for a common ratio between consistency and click average.",
-        developer = true, executable = false, enabled = false, checkType = CheckType.AUTOCLICKER, punishVL = 40)
+@CheckInfo(name = "Autoclicker (B)", description = "Checks for common blocking patterns",
+        developer = true, checkType = CheckType.AUTOCLICKER, punishVL = 35)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerB extends Check {
 
-    private Interval interval = new Interval(100);
-    private long lastTimestamp;
-    private double lStd, lAvg, lRatio;
+    private int lastPlace, lastArm;
+    private EvictingList<Integer> tickDeltas = new EvictingList<>(10);
 
     @Packet
-    public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
+    public void onArm(WrappedInArmAnimationPacket packet, int currentTick) {
+        lastArm = currentTick;
+    }
 
-        long delta = timeStamp - lastTimestamp;
+    @Packet
+    public void onBlockPlace(WrappedInBlockPlacePacket packet, int currentTick) {
+        int deltaArm = currentTick - lastArm;
 
-        if(delta > 2000 || delta < 3
-                || data.playerInfo.breakingBlock
-                || data.playerInfo.lastBlockPlace.hasNotPassed(5)) {
-            lastTimestamp = timeStamp;
-            return;
+        tickDeltas.add(deltaArm);
+        if(tickDeltas.size() > 8) {
+            val summary = tickDeltas.stream().mapToInt(v -> v).summaryStatistics();
+
+            int range = summary.getMax() - summary.getMin();
+            double average = summary.getAverage();
+
+            if(average < 2 && range <= 1) {
+                if(++vl > 12) {
+                    flag("range=%v", range);
+                }
+            } else if(vl > 0) vl-= 0.5f;
+
+            debug("range=%v average=%v.1 vl=%v.1", range, average, vl);
         }
 
-        if(interval.size() >= 20) {
-            double avg = interval.average();
-            double std = interval.std();
-            double ratio = avg / std;
-            double cps = 1000 / avg, lcps = 1000 / lAvg;
-
-            boolean greater = (MathUtils.getDelta(cps, lcps) > 2 && MathUtils.getDelta(std, lStd) < 3);
-            if((MathUtils.getDelta(ratio, lRatio) < 0.2 && MathUtils.getDelta(avg, lAvg) > 8)
-                    || (MathUtils.getDelta(std, avg) < 7)
-                    || greater) {
-                vl++;
-                if(vl > 5) {
-                    flag("std=%v avg=%v", std, avg);
-                }
-                debug(Color.Green + "Flagged");
-            } else vl-= vl > 0 ? 0.5f : 0;
-
-            debug("ratio=" + Color.Green + ratio + Color.Gray + " std=" + std + " avg=" + avg + " vl=" + vl);
-            interval.clear();
-            lStd = std;
-            lAvg = avg;
-            lRatio = ratio;
-        } else interval.add(delta);
-
-        lastTimestamp = timeStamp;
+        debug("deltaArm=%v", deltaArm);
+        lastPlace = currentTick;
     }
 }

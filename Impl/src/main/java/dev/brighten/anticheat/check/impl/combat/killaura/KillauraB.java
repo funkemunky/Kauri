@@ -10,21 +10,20 @@ import dev.brighten.api.check.CheckType;
 @Cancellable(cancelType = CancelType.ATTACK)
 public class KillauraB extends Check {
 
-    private long lastFlying;
+    private long lastFlying, lastUse;
 
     @Packet
     public void use(WrappedInUseEntityPacket packet, long timeStamp) {
         if(!packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) return;
         long delta = timeStamp - lastFlying;
-        if(delta < 2) {
-            if(data.lagInfo.lastPacketDrop.hasPassed(4)) {
-                if(++vl > 10) {
-                    flag("delta=" + delta);
-                }
-            } vl-= vl > 0 ? 0.2 : 0;
+        if(delta < 2 && timeStamp - lastUse > 5) {
+            if(++vl > 10) {
+                flag("delta=" + delta);
+            }
         } else vl-= vl > 0 ? 0.25 : 0;
         debug("lagging=" + data.lagInfo.lastPacketDrop.hasNotPassed(2)
                 + " vl=" + vl + " delta=" + delta);
+        lastUse = timeStamp;
     }
 
     @Packet

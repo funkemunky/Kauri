@@ -12,7 +12,7 @@ public class WrappedCheck {
     public String checkName;
     public WrappedMethod method;
     public Check check;
-    public boolean isBoolean, oneParam, isPacket, isEvent;
+    public boolean isBoolean, oneParam, isTick, isTimeStamp, isPacket, isEvent;
     private boolean canRunWithVersion, didVersionCheck;
     public List<Class<?>> parameters;
 
@@ -23,6 +23,11 @@ public class WrappedCheck {
         isBoolean = method.getMethod().getReturnType().equals(boolean.class);
         parameters = method.getParameters();
         oneParam = parameters.size() == 1;
+
+        if(!oneParam) {
+            isTick = method.getMethod().getParameterTypes()[1] == int.class;
+            isTimeStamp = !isTick;
+        }
         isPacket = method.getMethod().isAnnotationPresent(Packet.class);
         isEvent = method.getMethod().isAnnotationPresent(Event.class);
     }

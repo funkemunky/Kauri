@@ -6,6 +6,7 @@ import cc.funkemunky.api.reflections.types.WrappedMethod;
 import cc.funkemunky.api.tinyprotocol.api.NMSObject;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.utils.MiscUtils;
 import lombok.val;
 import org.bukkit.event.Event;
 
@@ -28,6 +29,8 @@ public class CheckManager {
 
             val methods = checkMethods.get(object.getClass());
             AtomicBoolean okay = new AtomicBoolean(true);
+
+            int currentTick = MiscUtils.currentTick();
             methods.parallelStream()
                     .forEach(wrapped -> {
                         if(wrapped.isPacket && wrapped.check.enabled && wrapped.isCompatible()) {
@@ -38,13 +41,21 @@ public class CheckManager {
                                     if(!returned) okay.set(false);
                                 }
                                 else {
-                                    boolean returned = wrapped.method.invoke(wrapped.check, object, timeStamp);
+                                    boolean returned;
+
+                                    if(wrapped.isTimeStamp) {
+                                        returned = wrapped.method.invoke(wrapped.check, object, timeStamp);
+                                    } else returned = wrapped.method.invoke(wrapped.check, object, currentTick);
 
                                     if(!returned) okay.set(false);
                                 }
                             } else {
                                 if(wrapped.oneParam) wrapped.method.invoke(wrapped.check, object);
-                                else wrapped.method.invoke(wrapped.check, object, timeStamp);
+                                else {
+                                    if(wrapped.isTimeStamp) {
+                                        wrapped.method.invoke(wrapped.check, object, timeStamp);
+                                    } else wrapped.method.invoke(wrapped.check, object, currentTick);
+                                }
                             }
                         }
                     });

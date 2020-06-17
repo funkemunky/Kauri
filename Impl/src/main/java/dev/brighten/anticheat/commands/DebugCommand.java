@@ -3,6 +3,9 @@ package dev.brighten.anticheat.commands;
 import cc.funkemunky.api.commands.ancmd.Command;
 import cc.funkemunky.api.commands.ancmd.CommandAdapter;
 import cc.funkemunky.api.reflections.types.WrappedClass;
+import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
+import cc.funkemunky.api.tinyprotocol.api.packets.channelhandler.TinyProtocol1_7;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutHeldItemSlot;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.Materials;
@@ -25,6 +28,29 @@ import java.util.UUID;
 
 @Init(commands = true)
 public class DebugCommand {
+
+    @Command(name = "kauri.setslot", permission = "kauri.command.debug", usage = "/<command> <slot>",
+            display = "setslot <slot>", description = "Set your slot.", playerOnly = true)
+    public void onSlot(CommandAdapter cmd) {
+        if(cmd.getArgs().length > 0) {
+            if(!MiscUtils.isInteger(cmd.getArgs()[0])) {
+                cmd.getSender().sendMessage(Color.Red + "Argument provided is not a slot.");
+                return;
+            }
+
+            int slot = Integer.parseInt(cmd.getArgs()[0]);
+
+            if(slot < 0 || slot > 8) {
+                cmd.getSender().sendMessage(Color.Red + "You must provide a number between 0 and 8.");
+                return;
+            }
+
+            WrappedOutHeldItemSlot packet = new WrappedOutHeldItemSlot(slot);
+            TinyProtocolHandler.sendPacket(cmd.getPlayer(), packet);
+
+            cmd.getSender().sendMessage(Color.Green + "Set your item slot to slot " + slot);
+        } else cmd.getSender().sendMessage(Color.Red + "Invalid arguments.");
+    }
 
     @Command(name = "kauri.debug", aliases = {"debug"}, permission = "kauri.command.debug",
             usage = "/<command> <check> [player]", display = "debug", description = "debug a check", playerOnly = true)

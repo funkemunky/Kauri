@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.utils;
 
 import cc.funkemunky.api.reflections.Reflections;
+import cc.funkemunky.api.reflections.impl.CraftReflection;
 import cc.funkemunky.api.reflections.impl.MinecraftReflection;
 import cc.funkemunky.api.reflections.types.WrappedClass;
 import cc.funkemunky.api.reflections.types.WrappedField;
@@ -64,6 +65,13 @@ public class MiscUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private static WrappedField ticksField = MinecraftReflection.minecraftServer.getFieldByName("ticks");
+    private static Object minecraftServer = null;
+    public static int currentTick() {
+        if(minecraftServer == null) minecraftServer = CraftReflection.getMinecraftServer();
+        return ticksField.get(minecraftServer);
     }
 
     private static WrappedClass movingObjectPos = Reflections.getNMSClass("MovingObjectPosition");

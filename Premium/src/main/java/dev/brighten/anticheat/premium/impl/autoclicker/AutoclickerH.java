@@ -3,9 +3,7 @@ package dev.brighten.anticheat.premium.impl.autoclicker;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.MathUtils;
-import dev.brighten.anticheat.check.api.Check;
-import dev.brighten.anticheat.check.api.CheckInfo;
-import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.utils.GraphUtil;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
@@ -14,7 +12,8 @@ import java.util.Deque;
 import java.util.LinkedList;
 
 @CheckInfo(name = "Autoclicker (H)", description = "Meant to detect Vape and other autoclickers. By Elevated.",
-        checkType = CheckType.AUTOCLICKER, punishVL = 6, vlToFlag = 2)
+        checkType = CheckType.AUTOCLICKER, punishVL = 6, vlToFlag = 2, developer = true)
+@Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerH extends Check {
 
     private double ticks, cps, buffer;

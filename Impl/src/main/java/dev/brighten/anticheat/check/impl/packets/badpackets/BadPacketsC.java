@@ -10,7 +10,7 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "BadPackets (C)", description = "Checks for players who send slot packets at the same time as flying.",
-        checkType = CheckType.BADPACKETS, punishVL = 20, developer = true)
+        checkType = CheckType.BADPACKETS, punishVL = 20)
 @Cancellable
 public class BadPacketsC extends Check {
 
@@ -31,6 +31,6 @@ public class BadPacketsC extends Check {
                 vl++;
                 flag("delta=%v ping=%p", delta);
             }
-        } else verbose.subtract(0.25);
+        } else verbose.subtract(0.5);
     }
 }
