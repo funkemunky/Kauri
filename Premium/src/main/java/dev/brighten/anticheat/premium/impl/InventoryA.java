@@ -13,13 +13,8 @@ public class InventoryA extends Check {
 
     @Packet
     public void onWindow(WrappedInWindowClickPacket packet) {
-        if(packet.getId() == 0 && !data.playerInfo.inventoryOpen
-                && data.playerInfo.worldLoaded
-                && data.lagInfo.lastPacketDrop.hasPassed(5)) {
-            vl++;
-            if(vl > 2) flag("id=%v", packet.getId());
-            if(cancellable) TinyProtocolHandler.sendPacket(packet.getPlayer(),
-                    new WrappedOutCloseWindowPacket(data.playerInfo.inventoryId).getObject());
-        }
+        debug("action=%v button=%v counter=%v id=%v slot=%v mode=%v",
+                packet.getAction().name(), packet.getButton(), packet.getCounter(),
+                packet.getId(), packet.getSlot(), packet.getMode());
     }
 }

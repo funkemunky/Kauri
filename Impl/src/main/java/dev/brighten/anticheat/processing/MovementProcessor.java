@@ -34,7 +34,7 @@ public class MovementProcessor {
     public float sensitivityX, sensitivityY, yawMode, pitchMode, sensXPercent, sensYPercent;
     private MouseFilter mxaxis = new MouseFilter(), myaxis = new MouseFilter();
     private float smoothCamFilterX, smoothCamFilterY, smoothCamYaw, smoothCamPitch;
-    private TickTimer lastReset = new TickTimer(3), generalProcess = new TickTimer(3);
+    private TickTimer lastReset = new TickTimer(1), generalProcess = new TickTimer(3);
     private GameMode lastGamemode;
     public static float offset = (int)Math.pow(2, 24);
 
@@ -194,11 +194,10 @@ public class MovementProcessor {
             float yawGcd = data.playerInfo.yawGCD / offset, pitchGcd = data.playerInfo.pitchGCD / offset;
 
             //Adding gcd of yaw and pitch.
-            if (data.playerInfo.yawGCD > 90000 && data.playerInfo.yawGCD < 2E7
-                    && yawGcd > 0.01f && data.playerInfo.deltaYaw < 8)
+            if (data.playerInfo.yawGCD > 160000 && data.playerInfo.yawGCD < 10500000)
                 yawGcdList.add(yawGcd);
-            if (data.playerInfo.pitchGCD > 90000 && data.playerInfo.pitchGCD < 2E7
-                    && Math.abs(data.playerInfo.deltaPitch) < 8) pitchGcdList.add(pitchGcd);
+            if (data.playerInfo.pitchGCD > 160000 && data.playerInfo.pitchGCD < 10500000)
+                pitchGcdList.add(pitchGcd);
 
             if (yawGcdList.size() > 3 && pitchGcdList.size() > 3) {
 
@@ -377,7 +376,7 @@ public class MovementProcessor {
     }*/
 
     //Condensed
-    private static float getSensitivityFromYawGCD(float gcd) {
+    public static float getSensitivityFromYawGCD(float gcd) {
         return ((float)Math.cbrt((double)yawToF2(gcd) / 8) - .2f) / .6f;
     }
 

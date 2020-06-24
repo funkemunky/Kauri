@@ -29,24 +29,9 @@ public class AimG extends Check {
                 float xUse = data.moveProcessor.deltaX * tri;
                 float predicted = data.playerInfo.from.yaw + xUse * .15f;
                 float yaw = data.playerInfo.to.yaw;
-                float xDelta = Math.abs(yaw - predicted);
-                float shit = Float.parseFloat("." + String.valueOf(Math.abs(data.moveProcessor.deltaX))
-                        .split("\\.")[1]);
-                if(shit > 0.1 && Math.abs(xDelta) > 500) {
-                    debug("innacurracy too high: " + shit);
-                    return;
-                }
-                if(xDelta > (data.playerInfo.deltaX > 100 ? 0.02 : 0.008)) {
-                    vl++;
-                    flag(20 * 15, "delta=%v.2", xDelta);
-                }
 
-                debug("one=%v two=%v sens=%v.2 yawOutliers=%v", xDelta,
-                        data.moveProcessor.deltaX, data.moveProcessor.sensYPercent,
-                        data.moveProcessor.yawOutliers.one.size() + data.moveProcessor.yawOutliers.two.size());
-            } else debug("sensX=%v sensY=%v dyaw=%v ldyaw=%v",
-                    data.moveProcessor.sensXPercent, data.moveProcessor.sensYPercent,
-                    data.playerInfo.deltaYaw, data.playerInfo.lDeltaYaw);
+                debug("yaw=%v.1 predicted=%v.1 deltaX=%v", yaw, predicted, data.moveProcessor.deltaX);
+            }
         }
     }
 }

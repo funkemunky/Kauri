@@ -440,7 +440,6 @@ public class Check implements KauriCheck {
         register(new HandD());
         register(new HandE());
         register(new HandF());
-        register(new HandG());
         register(new HealthSpoof());
         register(new BookOp());
         register(new BookEnchant());

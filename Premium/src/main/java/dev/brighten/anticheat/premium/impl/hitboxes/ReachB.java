@@ -44,7 +44,7 @@ public class ReachB extends Check {
             if(data.playerInfo.creative) return;
 
             List<CollisionBox> entityLocs = data.targetPastLocation.getEstimatedLocation(timeStamp,
-                            data.lagInfo.transPing, 150L)
+                            data.lagInfo.transPing, 200L)
                     .stream()
                     .map(loc -> getHitbox(entity, loc)).collect(Collectors.toList());
 
@@ -60,7 +60,8 @@ public class ReachB extends Check {
                 originLoc.y+= data.playerInfo.sneaking ? 1.54 : 1.62;
                 RayCollision ray = new RayCollision(originLoc.toVector(), MathUtils.getDirection(originLoc));
                 if(debug) ray.draw(WrappedEnumParticle.CRIT, Bukkit.getOnlinePlayers());
-                for (SimpleCollisionBox box : simpleBoxes) {
+                for (SimpleCollisionBox sbox : simpleBoxes) {
+                    SimpleCollisionBox box = sbox.copy();
                     box.expand(0.1);
                     if(debug) box.draw(WrappedEnumParticle.FLAME, Bukkit.getOnlinePlayers());
                     val check = RayCollision.distance(ray, box);
@@ -86,7 +87,6 @@ public class ReachB extends Check {
                         Kauri.INSTANCE.lastTickLag.hasPassed(40)) {
                     if(++buffer > 4) {
                         vl++;
-                        flag("distance=%v.3 buffer=%v.1 misses=%v", distance, buffer, misses);
                         flag("distance=%v.3 buffer=%v.1 misses=%v", distance, buffer, misses);
                     }
                 } else buffer-= buffer > 0 ? data.playerVersion.isAbove(ProtocolVersion.V1_8_9) ? 0.1f : 0.05f : 0;

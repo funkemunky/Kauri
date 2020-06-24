@@ -14,34 +14,19 @@ import lombok.val;
         developer = true, checkType = CheckType.AIM)
 public class AimH extends Check {
 
-    private int buffer;
-    private EvictingList<Float> deltaXes = new EvictingList<>(20);
-
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if(packet.isLook()) {
-            double delta = MathUtils.getDelta(data.moveProcessor.sensitivityX, data.moveProcessor.sensitivityY);
+        if(!packet.isLook()) return;
 
-            if(data.moveProcessor.yawGcdList.size() < 30) return;
+        float rx = Math.abs(data.moveProcessor.deltaX) % 1, ry = Math.abs(data.moveProcessor.deltaY) % 1;
 
-            deltaXes.add(data.moveProcessor.deltaX);
+        boolean xFlag = (rx > 0.1 && rx < 0.9), yFlag = (ry > 0.1 && ry < 0.9);
 
-            if(deltaXes.size() >= 20) {
-                val o = MiscUtils.getOutliers(deltaXes);
+        if(xFlag && yFlag && !data.playerInfo.cinematicMode) {
+            vl++;
+            flag("shit");
+        } else if(vl > 0) vl-= 0.1;
 
-                val size = o.one.size() + o.two.size();
-
-                if(size <= 1 && data.moveProcessor.deltaY <= 1) {
-                    if(++buffer > 8) {
-                        vl++;
-                        flag(20 * 60, "o=%v", size);
-                    }
-                } else buffer = 0;
-
-                debug("low=%v high=%v buffer=%v", o.one.size(), o.two.size(), buffer);
-            }
-
-            debug("delta=%v.2 buffer=%v senx=%v.3", delta, buffer, data.moveProcessor.sensitivityX);
-        }
+        debug("rx=%v ry=%v", rx, ry);
     }
 }

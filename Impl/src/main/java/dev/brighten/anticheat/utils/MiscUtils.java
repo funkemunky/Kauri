@@ -11,7 +11,9 @@ import cc.funkemunky.api.tinyprotocol.packet.types.Vec3D;
 import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumAnimation;
 import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.commands.KauriCommand;
+import dev.brighten.anticheat.processing.MovementProcessor;
 import lombok.val;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
@@ -415,6 +417,12 @@ public class MiscUtils {
         return (Math.abs(previous) <= 16384L) ? Math.abs(current) : gcd(previous, current % previous);
     }
 
+    public static float gcd(float current, float previous) {
+        val sens = MovementProcessor.getSensitivityFromYawGCD(current / MovementProcessor.offset);
+
+        return sens >= 0 || sens <= 1 ? Math.abs(current) : gcd(previous, current % previous);
+    }
+
     public static int getDecimalCount(float number) {
         return String.valueOf(number).split("\\.")[1].length();
     }
@@ -426,12 +434,9 @@ public class MiscUtils {
     public static long gcd(long current, long previous) {
         return (previous <= 16384L) ? current : gcd(previous, current % previous);
     }
+
     public static long gcdPrevious(long current, long previous) {
         return (previous <= 16384L) ? previous : gcdPrevious(previous, current % previous);
-    }
-
-    public static float gcd(float current, float previous) {
-        return (previous <= 16384L) ? current : gcd(previous, current % previous);
     }
 
     public static long lcm(long a, long b)

@@ -1,57 +1,50 @@
 package dev.brighten.anticheat.premium.impl;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.utils.Color;
+import cc.funkemunky.api.utils.MathHelper;
+import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.TickTimer;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "Aim (I)", developer = true, punishVL = 20, checkType = CheckType.AIM,
-        description = "Checks for minecraft rotation exploits by clients. " +
-                "By FlyCode with help from Itz_Lucky and funkemunky.")
+@CheckInfo(name = "Aim (I)", developer = true, punishVL = 20, checkType = CheckType.AIM, description = "")
 public class AimI extends Check {
 
     private boolean looked;
+    private float lYawMode, lPitchMode;
+    private TickTimer lastModeChange = new TickTimer(20);
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
-        if (packet.isLook()
-                && data.playerInfo.lastAttack.hasNotPassed(20)) {
+        if (!packet.isLook()) return;
 
-            double sensitivity = data.moveProcessor.sensXPercent;
+        float pdx = Math.abs(data.playerInfo.deltaYaw) / data.moveProcessor.yawMode;
+        float pdy = Math.abs(data.playerInfo.deltaPitch) / data.moveProcessor.pitchMode;
 
-            double pitch = data.playerInfo.to.pitch, yaw = data.playerInfo.to.yaw;
+        float rymode = MathUtils.round(data.moveProcessor.yawMode, 2),
+                rpmode = MathUtils.round(data.moveProcessor.pitchMode, 2);
 
-            double o = modulusRotation(sensitivity, pitch);
+        if(rymode != lYawMode || rpmode != lPitchMode) lastModeChange.reset();
 
-            //Nasty
-            int l = String.valueOf(o).length();
+        float deltaX = Math.abs(MathHelper.floor_float(pdx) - pdx),
+                deltaY = Math.abs(MathHelper.floor_float(pdy) - pdy);
 
-            if (Math.abs(pitch) != 90.0
-                    && ((sensitivity > 99 && (o > 0.0 && l > 0 && l < 8)) || o == 0.0f)) {
-                vl++;
-                flag("pitch=%v.3 sens=%v o=%v.4 l=%v", pitch, sensitivity, o, l);
-            }
-            debug("pitch=%v.3 sens=%v o=%v.4 l=%v", pitch, sensitivity, o, l);
+        boolean flagX = deltaX < 0.92 && deltaX > 0.08, flagY = deltaY < 0.92 && deltaY > 0.08;
+
+        if((flagX && flagY) && lastModeChange.hasPassed(20)) {
+            vl++;
+            debug(Color.Green + "Flag (%v): %v, %v", vl, flagX, flagY);
+        } else {
+            vl = 0;
+            if(flagX && flagY) debug(Color.Red + "Did not flag due to sensitivity change");
         }
-    }
 
-    public static boolean isPrime(int n) {
-        if (n <= 1) {
-            return false;
-        }
-        for (int i = 2; i < Math.sqrt(n); i++) {
-            if (n % i == 0) {
-                return false;
-            }
-        }
-        return true;
-    }
+        debug("ymode=%v.2 pmode=%v.2 pdx=%v.1 pdy=%v.1 deltaX=%v.2 deltaY=%v.2",
+                data.moveProcessor.yawMode, data.moveProcessor.pitchMode, pdx, pdy, deltaX, deltaY);
 
-    private double modulusRotation(double s, double pitch) {
-        //Client calulations
-        float f = (float) (s * 0.6F + 0.2F);
-        float f2 = f * f * f * 1.2F;
-
-        return (pitch % f2);
+        lYawMode = rymode;
+        lPitchMode = rpmode;
     }
 }
