@@ -6,7 +6,7 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.data.ObjectData;
-import dev.brighten.anticheat.utils.TickTimer;
+import cc.funkemunky.api.utils.TickTimer;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "FastLadder", description = "Ensures players do not go faster than legitimate speeds on ladders.",
@@ -19,7 +19,7 @@ public class FastLadder extends Check {
     @Override
     public void setData(ObjectData data) {
         super.setData(data);
-        lastJump = new TickTimer(data, 6);
+        lastJump = new TickTimer(6);
     }
 
     @Packet

@@ -10,7 +10,7 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.MiscUtils;
-import dev.brighten.anticheat.utils.TickTimer;
+import cc.funkemunky.api.utils.TickTimer;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
 import org.bukkit.util.Vector;
@@ -27,7 +27,7 @@ public class OmniSprint extends Check {
     @Override
     public void setData(ObjectData data) {
         super.setData(data);
-        lastKeySwitch = new TickTimer(data, 1);
+        lastKeySwitch = new TickTimer(1);
     }
 
     @Packet
