@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.check.impl.combat.hand;
 
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import dev.brighten.anticheat.check.api.*;
@@ -11,21 +12,30 @@ import dev.brighten.api.check.CheckType;
 public class HandA extends Check {
 
     private long lastFlying;
+    private boolean arm, placed;
 
     @Packet
     public void onBlockPlace(WrappedInBlockPlacePacket place, long timeStamp) {
-        long delta = timeStamp - lastFlying;
+        debug("place sent arm=%v ticks=%v", arm, lastFlying);
+        placed = true;
+        lastFlying = 0;
+    }
 
-        if(!data.lagInfo.lagging && data.lagInfo.lastPacketDrop.hasPassed(5) && delta < 10) {
-            if(vl++ > 6) {
-                flag("delta=%vms", delta);
-            }
-        } else vl-= vl > 0 ? 1f : 0;
-        debug("delta=" + delta + "ms vl=" + vl);
+    @Packet
+    public void onArm(WrappedInArmAnimationPacket packet) {
+        debug("arm packet sent placed=%v", placed);
+        arm = true;
     }
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        lastFlying = timeStamp;
+        lastFlying++;
+        if(arm) {
+            debug("arm is true");
+        }
+        if(placed) {
+            debug("placed is true");
+        }
+        arm = placed = false;
     }
 }

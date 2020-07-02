@@ -49,6 +49,7 @@ public class PlayerInformation {
         lastGamemodeTimer = new TickTimer(10);
         lastRespawnTimer = new TickTimer(20);
         lastAttack = new TickTimer(5);
+        cinematicTimer = new TickTimer(8);
     }
 
     //Cinematic
@@ -79,7 +80,7 @@ public class PlayerInformation {
     public TickTimer liquidTimer, webTimer, climbTimer, slimeTimer, iceTimer, blockAboveTimer, soulSandTimer;
     public TickTimer lastBrokenBlock, lastVelocity, lastTargetSwitch, lastBlockPlace, lastToggleFlight,
             lastWindowClick, lastInsideBlock, lastHalfBlock, lastPlaceLiquid, lastUseItem,
-            lastTeleportTimer, lastGamemodeTimer, lastRespawnTimer, lastChunkUnloaded;
+            lastTeleportTimer, lastGamemodeTimer, lastRespawnTimer, lastChunkUnloaded, cinematicTimer;
 
     public double velocityX, velocityY, velocityZ;
 

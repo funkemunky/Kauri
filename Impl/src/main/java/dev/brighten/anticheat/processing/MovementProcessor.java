@@ -250,8 +250,10 @@ public class MovementProcessor {
 
                     if(data.playerInfo.cinematicMode =
                             (MathUtils.getDelta(pyaw, data.playerInfo.from.yaw) < (Math.abs(deltaX) > 50 ? 3 : 1)
-                            && MathUtils.getDelta(ppitch, data.playerInfo.to.pitch) < (Math.abs(deltaY) > 30 ? 2 : 1)))
+                            && MathUtils.getDelta(ppitch, data.playerInfo.to.pitch) < (Math.abs(deltaY) > 30 ? 2 : 1))) {
                         lastCinematic = timeStamp;
+                        data.playerInfo.cinematicTimer.reset();
+                    }
 
                     //MiscUtils.testMessage("pyaw=" + pyaw + " ppitch=" + ppitch + " yaw=" + data.playerInfo.to.yaw + " pitch=" + data.playerInfo.to.pitch);
                 } else {
@@ -429,12 +431,12 @@ public class MovementProcessor {
     }
 
     private static float yawToF2(float yawDelta) {
-        return yawDelta / .15f;
+        return (float)((double)yawDelta / .15);
     }
 
     private static float pitchToF3(float pitchDelta) {
         int b0 = pitchDelta >= 0 ? 1 : -1; //Checking for inverted mouse.
-        return pitchDelta / .15f / b0;
+        return (float)((double)(pitchDelta / b0) / .15);
     }
 
 }

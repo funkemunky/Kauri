@@ -89,6 +89,8 @@ public class PacketProcessor {
 
                 data.lagInfo.lastFlying = timeStamp;
 
+                data.clickProcessor.onFlying(packet);
+
                 Kauri.INSTANCE.profiler.start("data:moveprocessor");
                 data.moveProcessor.process(packet, timeStamp);
                 Kauri.INSTANCE.profiler.stop("data:moveprocessor");

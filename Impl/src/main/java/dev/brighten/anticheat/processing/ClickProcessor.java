@@ -1,6 +1,8 @@
 package dev.brighten.anticheat.processing;
 
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.TickTimer;
 import cc.funkemunky.api.utils.Tuple;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
@@ -33,9 +35,15 @@ public class ClickProcessor {
     private boolean notReady;
 
     private final ObjectData data;
+    private int flyingTicks;
+
+    public void onFlying(WrappedInFlyingPacket packet) {
+        flyingTicks++;
+    }
 
     public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
-        long delta = timeStamp - lastTimestamp;
+        long delta = data.playerVersion.isBelow(ProtocolVersion.V1_9)
+                ? flyingTicks * 50L : timeStamp - lastTimestamp;
 
         if(delta < 600
                 && !data.playerInfo.breakingBlock && data.playerInfo.lastBlockPlace.hasPassed(3)) {
@@ -76,6 +84,8 @@ public class ClickProcessor {
         notReady = data.playerInfo.breakingBlock
                 || data.playerInfo.lastBlockPlace.hasNotPassed(3)
                 || cpsList.size() < 22;
+
         lastTimestamp = timeStamp;
+        flyingTicks = 0;
     }
 }

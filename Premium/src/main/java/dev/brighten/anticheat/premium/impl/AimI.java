@@ -9,42 +9,35 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
+import lombok.val;
 
-@CheckInfo(name = "Aim (I)", developer = true, punishVL = 20, checkType = CheckType.AIM, description = "")
+@CheckInfo(name = "Aim (I)", developer = true, punishVL = 20, checkType = CheckType.AIM,
+        description = "Improper modulo.")
 public class AimI extends Check {
 
-    private boolean looked;
-    private float lYawMode, lPitchMode;
-    private TickTimer lastModeChange = new TickTimer(20);
+    private int buffer;
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
         if (!packet.isLook()) return;
 
-        float pdx = Math.abs(data.playerInfo.deltaYaw) / data.moveProcessor.yawMode;
-        float pdy = Math.abs(data.playerInfo.deltaPitch) / data.moveProcessor.pitchMode;
+        if(data.moveProcessor.sensXPercent != data.moveProcessor.sensYPercent) return;
+        val pitch = unFixed(data.playerInfo.to.pitch);
 
-        float rymode = MathUtils.round(data.moveProcessor.yawMode, 2),
-                rpmode = MathUtils.round(data.moveProcessor.pitchMode, 2);
+        if(Math.abs(pitch) < 0.005) {
+            if(++buffer > 14) {
+                vl++;
+                flag("pitch=%v", pitch);
+            }
+            debug(Color.Green + "Flagged");
+        } else buffer = 0;
 
-        if(rymode != lYawMode || rpmode != lPitchMode) lastModeChange.reset();
+        debug("pitch=%v l=%v", pitch, String.valueOf(pitch).length());
+    }
 
-        float deltaX = Math.abs(MathHelper.floor_float(pdx) - pdx),
-                deltaY = Math.abs(MathHelper.floor_float(pdy) - pdy);
+    private float unFixed(float whatever) {
+        val f = data.moveProcessor.sensitivityX * 0.6f + .2f;
+        val shit = f * f * f * 1.2f;
 
-        boolean flagX = deltaX < 0.92 && deltaX > 0.08, flagY = deltaY < 0.92 && deltaY > 0.08;
-
-        if((flagX && flagY) && lastModeChange.hasPassed(20)) {
-            vl++;
-            debug(Color.Green + "Flag (%v): %v, %v", vl, flagX, flagY);
-        } else {
-            vl = 0;
-            if(flagX && flagY) debug(Color.Red + "Did not flag due to sensitivity change");
-        }
-
-        debug("ymode=%v.2 pmode=%v.2 pdx=%v.1 pdy=%v.1 deltaX=%v.2 deltaY=%v.2",
-                data.moveProcessor.yawMode, data.moveProcessor.pitchMode, pdx, pdy, deltaX, deltaY);
-
-        lYawMode = rymode;
-        lPitchMode = rpmode;
+        return whatever % shit;
     }
 }
