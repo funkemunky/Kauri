@@ -20,7 +20,8 @@ public class AimH extends Check {
 
         if(data.moveProcessor.sensXPercent != data.moveProcessor.sensYPercent) return;
 
-        float rx = Math.abs(data.moveProcessor.deltaX) % 1, ry = Math.abs(data.moveProcessor.deltaY) % 1;
+        float rx = data.playerInfo.deltaYaw % data.moveProcessor.yawMode,
+                ry = data.playerInfo.deltaPitch % data.moveProcessor.pitchMode;
 
         boolean xFlag = (rx > 0.1 && rx < 0.9), yFlag = (ry > 0.1 && ry < 0.9);
 
