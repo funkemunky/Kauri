@@ -21,6 +21,8 @@ public class FlyA extends Check {
     public void onFlying(WrappedInFlyingPacket packet) {
         if(!packet.isPos() || data.playerInfo.lastTeleportTimer.hasNotPassed(1)
                 || data.playerInfo.serverAllowedFlight
+                || data.playerInfo.lastVelocity.hasNotPassed(2)
+                || data.playerInfo.webTimer.hasNotPassed(2)
                 || data.playerInfo.liquidTimer.hasNotPassed(1)
                 || data.playerInfo.climbTimer.hasNotPassed(1)
                 || data.playerInfo.lastRespawnTimer.hasNotPassed(5)) return;
@@ -28,7 +30,7 @@ public class FlyA extends Check {
         long start = System.nanoTime();
         boolean onGround = packet.getY() % GROUND == 0, fromGround = data.playerInfo.from.y % GROUND == 0;
 
-        boolean hitHead = (packet.getY() + 1.8f) % GROUND <= 0;
+        boolean hitHead = (packet.getY() + 1.8f) % GROUND <= 1E-8;
 
         if(Math.abs(data.playerInfo.deltaY - CHUNK_LOAD) < 1E-5) {
             debug("chunk isn't loaded");

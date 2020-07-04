@@ -28,6 +28,7 @@ import cc.funkemunky.api.utils.TickTimer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -36,6 +37,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Consumer;
 
 public class ObjectData {
 
@@ -65,8 +67,7 @@ public class ObjectData {
     public ModData modData;
     public ProtocolVersion playerVersion = ProtocolVersion.UNKNOWN;
     public Set<Player> boxDebuggers = new HashSet<>();
-    public final Map<String, Long> keepAliveStamps = Collections.synchronizedMap(new HashMap<>());
-    public final Map<String, Short> transactionActions = Collections.synchronizedMap(new HashMap<>());
+    public final Map<Integer, List<Consumer<ObjectData>>> keepAliveStamps = Collections.synchronizedMap(new HashMap<>());
     public ConcurrentEvictingList<CancelType> typesToCancel = new ConcurrentEvictingList<>(10);
     public final List<String> sniffedPackets = new CopyOnWriteArrayList<>();
     public BukkitTask task;
@@ -109,11 +110,6 @@ public class ObjectData {
                 return;
             }
 
-            if(System.currentTimeMillis() - lagInfo.lastTransPing > 2000L){
-                TinyProtocolHandler.sendPacket(getPlayer(),
-                        new WrappedOutTransaction(0, setTransactionAction("ping"), false)
-                                .getObject());
-            }
             if(Config.kickForLunar18 && usingLunar
                     && !playerVersion.equals(ProtocolVersion.UNKNOWN)
                     && playerVersion.isAbove(ProtocolVersion.V1_8)) {
@@ -140,35 +136,17 @@ public class ObjectData {
         return baseNumber + ThreadLocalRandom.current().nextLong(bound);
     }
 
-    public long setKeepAliveStamp(String name) {
+    public int setKeepAliveStamp(Consumer<ObjectData> action) {
         synchronized (keepAliveStamps) {
-            long stamp = getRandomLong(100, 4000);
-            keepAliveStamps.put(name, stamp);
+            int id = Kauri.INSTANCE.keepaliveProcessor.currentKeepalive.id;
 
-            return stamp;
+            List<Consumer<ObjectData>> actions = keepAliveStamps.getOrDefault(id, new ArrayList<>());
+
+            actions.add(action);
+            keepAliveStamps.put(id, actions);
+
+            return id;
         }
-    }
-
-    public long getKeepAliveStamp(String name) {
-        return keepAliveStamps.getOrDefault(name, -1L);
-    }
-
-    public short getTransactionAction(String name) {
-        return transactionActions.getOrDefault(name, (short) 0);
-    }
-
-    public short setTransactionAction(String name) {
-        synchronized (transactionActions) {
-            short action = getRandomShort(10, 500);
-
-            transactionActions.put(name, action);
-
-            return action;
-        }
-    }
-
-    public void addPotionEffect(PotionEffectType type) {
-        setTransactionAction("addpotion");
     }
 
     public Player getPlayer() {
@@ -193,7 +171,6 @@ public class ObjectData {
         getThread().shutdown();
         task.cancel();
         keepAliveStamps.clear();
-        transactionActions.clear();
         Kauri.INSTANCE.dataManager.hasAlerts.remove(this);
         Kauri.INSTANCE.dataManager.debugging.remove(this);
     }

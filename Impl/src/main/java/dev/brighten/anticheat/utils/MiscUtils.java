@@ -71,6 +71,7 @@ public class MiscUtils {
 
     private static WrappedField ticksField = MinecraftReflection.minecraftServer.getFieldByName("ticks");
     private static Object minecraftServer = null;
+    //TODO Make this use the new abstraction system.
     public static int currentTick() {
         if(minecraftServer == null) minecraftServer = CraftReflection.getMinecraftServer();
         return ticksField.get(minecraftServer);

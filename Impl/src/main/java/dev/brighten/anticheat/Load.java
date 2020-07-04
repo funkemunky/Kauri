@@ -13,6 +13,7 @@ import dev.brighten.anticheat.data.DataManager;
 import dev.brighten.anticheat.logs.LoggerManager;
 import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.processing.PacketProcessor;
+import dev.brighten.anticheat.processing.keepalive.KeepaliveProcessor;
 import dev.brighten.api.KauriAPI;
 import org.bukkit.Bukkit;
 
@@ -45,6 +46,7 @@ public class Load {
         Kauri.INSTANCE.packetProcessor = new PacketProcessor();
         Kauri.INSTANCE.dataManager = new DataManager();
         Kauri.INSTANCE.loggerManager = new LoggerManager();
+        Kauri.INSTANCE.keepaliveProcessor = new KeepaliveProcessor();
         EntityProcessor.start();
 
         register("Registering checks...");

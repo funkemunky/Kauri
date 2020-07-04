@@ -341,7 +341,7 @@ public class MovementProcessor {
         /* General Cancel Booleans */
         boolean hasLevi = levitation != null && data.potionProcessor.hasPotionEffect(levitation);
 
-        data.playerInfo.generalCancel = data.playerInfo.canFly
+        data.playerInfo.generalCancel = data.playerInfo.serverAllowedFlight
                 || data.playerInfo.creative
                 || hasLevi
                 || (MathUtils.getDelta(-0.098, data.playerInfo.deltaY) < 0.001 && data.playerInfo.deltaXZ < 0.3)

@@ -45,8 +45,8 @@ public class VelocityB extends Check {
     }
 
     @Packet
-    public void onKeepAlive(WrappedInKeepAlivePacket packet) {
-        if(tookVelocity && packet.getTime() == data.getKeepAliveStamp("velocity")) {
+    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
+        if(timeStamp - data.playerInfo.lastVelocityTimestamp < 50) {
             tookVelocity = false;
             pvX = vX;
             pvZ = vZ;
@@ -54,10 +54,6 @@ public class VelocityB extends Check {
             vX = 0;
             vZ = 0;
         }
-    }
-
-    @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if((pvX != 0 || pvZ != 0)) {
             boolean found = false;
 
