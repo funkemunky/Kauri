@@ -25,6 +25,7 @@ import dev.brighten.anticheat.processing.MovementProcessor;
 import dev.brighten.anticheat.processing.PotionProcessor;
 import dev.brighten.anticheat.utils.PastLocation;
 import cc.funkemunky.api.utils.TickTimer;
+import lombok.AllArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -67,7 +68,7 @@ public class ObjectData {
     public ModData modData;
     public ProtocolVersion playerVersion = ProtocolVersion.UNKNOWN;
     public Set<Player> boxDebuggers = new HashSet<>();
-    public final Map<Integer, List<Consumer<ObjectData>>> keepAliveStamps = Collections.synchronizedMap(new HashMap<>());
+    public final List<Action> keepAliveStamps = new CopyOnWriteArrayList<>();
     public ConcurrentEvictingList<CancelType> typesToCancel = new ConcurrentEvictingList<>(10);
     public final List<String> sniffedPackets = new CopyOnWriteArrayList<>();
     public BukkitTask task;
@@ -137,16 +138,12 @@ public class ObjectData {
     }
 
     public int setKeepAliveStamp(Consumer<ObjectData> action) {
-        synchronized (keepAliveStamps) {
-            int id = Kauri.INSTANCE.keepaliveProcessor.currentKeepalive.id;
+        int id = Kauri.INSTANCE.keepaliveProcessor.currentKeepalive.start;
 
-            List<Consumer<ObjectData>> actions = keepAliveStamps.getOrDefault(id, new ArrayList<>());
+        keepAliveStamps.add(new Action(id, action));
+        Bukkit.broadcastMessage("added action");
 
-            actions.add(action);
-            keepAliveStamps.put(id, actions);
-
-            return id;
-        }
+        return id;
     }
 
     public Player getPlayer() {
@@ -200,5 +197,11 @@ public class ObjectData {
     public static void debugBoxes(boolean debugging, Player debugger, String... targets) {
         debugBoxes(debugging, debugger, (ObjectData[])Arrays.stream(targets).map(Bukkit::getPlayer)
                 .map(Kauri.INSTANCE.dataManager::getData).toArray(ObjectData[]::new));
+    }
+
+    @AllArgsConstructor
+    public static class Action {
+        public int stamp;
+        public Consumer<ObjectData> action;
     }
 }

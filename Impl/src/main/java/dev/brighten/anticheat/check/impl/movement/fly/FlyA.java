@@ -24,6 +24,7 @@ public class FlyA extends Check {
                 || data.playerInfo.lastVelocity.hasNotPassed(2)
                 || data.playerInfo.webTimer.hasNotPassed(2)
                 || data.playerInfo.liquidTimer.hasNotPassed(1)
+                || data.blockInfo.blocksAbove
                 || data.playerInfo.climbTimer.hasNotPassed(1)
                 || data.playerInfo.lastRespawnTimer.hasNotPassed(5)) return;
 
@@ -39,14 +40,21 @@ public class FlyA extends Check {
 
         long end = -1;
         if(!onGround && !fromGround && !hitHead) {
-            double predicted = (data.playerInfo.lDeltaY - 0.08) * 0.9800000190734863D;
+            double predicted = (data.playerInfo.lDeltaY - 0.08) * (double)0.98f;
 
-            if(Math.abs(predicted) < 0.005 && data.playerVersion.isBelow(ProtocolVersion.V1_9))
+            if(Math.abs(predicted) < 0.005) {
+                if(data.playerVersion.isBelow(ProtocolVersion.V1_9))
                 predicted = 0;
+                double last = predicted;
+                predicted-= 0.08;
+                predicted*= (double)0.98f;
+                if(Math.abs(data.playerInfo.deltaY - predicted) > Math.abs(last - data.playerInfo.deltaY))
+                    predicted = last;
+            }
 
             double check = Math.abs(data.playerInfo.deltaY - predicted);
 
-            if(check > 0.0000001) {
+            if(check > 0.05) {
                 vl++;
                 flag("deltaY=%v.4 predicted=%v.4", data.playerInfo.deltaY, predicted);
             }

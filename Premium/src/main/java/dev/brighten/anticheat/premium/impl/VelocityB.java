@@ -6,6 +6,7 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInKeepAlivePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.MathUtils;
+import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -27,12 +28,13 @@ public class VelocityB extends Check {
     @Packet
     public void onVelocity(WrappedOutVelocityPacket packet, long timeStamp) {
         if(packet.getId() == data.getPlayer().getEntityId()) {
-            tookVelocity = true;
-            vX = packet.getX();
-            vY = packet.getY();
-            vZ = packet.getZ();
-            lastVelocity = timeStamp;
-            pvX = pvZ = 0;
+            data.setKeepAliveStamp(d -> {
+                tookVelocity = true;
+                vX = pvX = packet.getX();
+                vY = pvZ = packet.getY();
+                vZ = packet.getZ();
+                lastVelocity = timeStamp;
+            });
         }
     }
 
@@ -46,15 +48,7 @@ public class VelocityB extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if(timeStamp - data.playerInfo.lastVelocityTimestamp < 50) {
-            tookVelocity = false;
-            pvX = vX;
-            pvZ = vZ;
-            vY = -1;
-            vX = 0;
-            vZ = 0;
-        }
-        if((pvX != 0 || pvZ != 0)) {
+        if((vX != 0 || vZ != 0)) {
             boolean found = false;
 
             double drag = 0.91;

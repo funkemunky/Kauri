@@ -9,7 +9,7 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Fly (C)", description = "Checks if a player accelerates vertically before touching ground.",
-        checkType = CheckType.FLIGHT, developer = true, punishVL = 10)
+        checkType = CheckType.FLIGHT, punishVL = 10)
 @Cancellable
 public class FlyC extends Check {
 

@@ -95,7 +95,7 @@ public class PacketProcessor {
                 data.lagInfo.lastFlying = timeStamp;
 
                 data.clickProcessor.onFlying(packet);
-
+                data.potionProcessor.onFlying(packet);
                 Kauri.INSTANCE.profiler.start("data:moveprocessor");
                 data.moveProcessor.process(packet, timeStamp);
                 Kauri.INSTANCE.profiler.stop("data:moveprocessor");
@@ -212,13 +212,13 @@ public class PacketProcessor {
                     data.lagInfo.lastPing = data.lagInfo.ping;
                     data.lagInfo.ping = (current - ka.start) * 50;
 
-                    data.keepAliveStamps.computeIfPresent(ka.id, (key, val) -> {
-                        val.forEach(action -> action.accept(data));
-                        synchronized (data.keepAliveStamps) {
-                            data.keepAliveStamps.remove(ka.id);
+                        for (ObjectData.Action action : data.keepAliveStamps) {
+                            if(action.stamp > ka.start) continue;
+
+                            action.action.accept(data);
+
+                            data.keepAliveStamps.remove(action);
                         }
-                        return val;
-                    });
                 });
 
                 if(optional.isPresent())
@@ -437,6 +437,7 @@ public class PacketProcessor {
                         d.predictionService.rmotionX = data.playerInfo.velocityX;
                         d.predictionService.rmotionZ = data.playerInfo.velocityZ;
                         d.predictionService.velocity = true;
+                        Bukkit.broadcastMessage("Velocity");
                     });
                 }
                 data.checkManager.runPacket(packet, timeStamp);
