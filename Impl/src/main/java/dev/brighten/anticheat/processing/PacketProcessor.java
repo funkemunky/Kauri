@@ -1,9 +1,7 @@
 package dev.brighten.anticheat.processing;
 
-import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.events.impl.PacketReceiveEvent;
 import cc.funkemunky.api.events.impl.PacketSendEvent;
-import cc.funkemunky.api.reflections.impl.CraftReflection;
 import cc.funkemunky.api.reflections.impl.MinecraftReflection;
 import cc.funkemunky.api.reflections.types.WrappedField;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
@@ -16,12 +14,10 @@ import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.XMaterial;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
-import dev.brighten.anticheat.utils.MiscUtils;
 import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitTask;
 
 public class PacketProcessor {
 
@@ -373,7 +369,7 @@ public class PacketProcessor {
 
                 data.playerInfo.lastRespawn = timeStamp;
                 data.playerInfo.lastRespawnTimer.reset();
-                data.setKeepAliveStamp(d -> {
+                data.runKeepaliveAction(d -> {
                     d.playerInfo.lastRespawn = timeStamp;
                     d.playerInfo.lastRespawnTimer.reset();
                 });
@@ -431,7 +427,7 @@ public class PacketProcessor {
                     data.playerInfo.velocityX = (float) packet.getX();
                     data.playerInfo.velocityY = (float) packet.getY();
                     data.playerInfo.velocityZ = (float) packet.getZ();
-                    data.setKeepAliveStamp(d -> {
+                    data.runKeepaliveAction(d -> {
                         d.playerInfo.lastVelocity.reset();
                         d.playerInfo.lastVelocityTimestamp = System.currentTimeMillis();
                         d.predictionService.rmotionX = data.playerInfo.velocityX;

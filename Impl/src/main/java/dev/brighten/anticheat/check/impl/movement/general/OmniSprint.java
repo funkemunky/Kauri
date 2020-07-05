@@ -35,6 +35,7 @@ public class OmniSprint extends Check {
         if(!lastKey.equals(data.predictionService.key)) lastKeySwitch.reset();
         if(isPosition(packet)
                 && !data.playerInfo.generalCancel
+                && data.playerInfo.climbTimer.hasPassed(2)
                 && data.playerInfo.liquidTimer.hasPassed(2)
                 && data.playerInfo.sprinting) {
             if(data.predictionService.moveForward <= 0

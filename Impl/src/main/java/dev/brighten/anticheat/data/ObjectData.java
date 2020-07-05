@@ -117,6 +117,10 @@ public class ObjectData {
                 RunUtils.task(() -> getPlayer().kickPlayer(Color.Red + "Lunar Client 1.8.9 is not allowed.\nJoin on 1.7.10 or any other client."));
             }
         }, Kauri.INSTANCE, 40L, 40L);
+
+        getPlayer().getActivePotionEffects().forEach(pe -> {
+            runKeepaliveAction(d -> d.potionProcessor.potionEffects.add(pe));
+        });
     }
 
     public ExecutorService getThread() {
@@ -137,11 +141,10 @@ public class ObjectData {
         return baseNumber + ThreadLocalRandom.current().nextLong(bound);
     }
 
-    public int setKeepAliveStamp(Consumer<ObjectData> action) {
+    public int runKeepaliveAction(Consumer<ObjectData> action) {
         int id = Kauri.INSTANCE.keepaliveProcessor.currentKeepalive.start;
 
         keepAliveStamps.add(new Action(id, action));
-        Bukkit.broadcastMessage("added action");
 
         return id;
     }

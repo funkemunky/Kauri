@@ -16,6 +16,7 @@ public class NoFallB extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if(!packet.isPos() || !data.playerInfo.worldLoaded || data.playerInfo.serverPos
+                || data.playerInfo.lastTeleportTimer.hasPassed(1)
                 || data.playerInfo.lastRespawnTimer.hasNotPassed(1))
             return;
 
