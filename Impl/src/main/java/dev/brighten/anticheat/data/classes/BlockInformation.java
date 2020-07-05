@@ -108,16 +108,16 @@ public class BlockInformation {
         handler.setOffset(-0.02);
         handler.setSingle(false);
         handler.setSize(0.602, 1.802);
-        handler.setOffset(-0.1);
+        handler.setOffset(-0.001);
         onSoulSand = handler.isCollidedWith(XMaterial.SOUL_SAND.parseMaterial());
         inWeb = handler.isCollidedWith(XMaterial.COBWEB.parseMaterial());
         onSlime = handler.isCollidedWith(XMaterial.SLIME_BLOCK.parseMaterial());
 
-        handler.setOffset(-0.02);
-        handler.setSize(0.7, 1.82);
-
+        handler.setOffset((double).4f);
+        handler.setSize(0.4, 1.4f);
         inLava = handler.isCollidedWith(XMaterial.LAVA.parseMaterial(),
                 XMaterial.STATIONARY_LAVA.parseMaterial());
+        handler.setSize(0.598, 1.4f);
         inWater = handler.isCollidedWith(XMaterial.WATER.parseMaterial(), XMaterial.STATIONARY_WATER.parseMaterial());
         inLiquid = inLava || inWater;
 

@@ -16,7 +16,9 @@ import dev.brighten.anticheat.utils.Helper;
 import dev.brighten.anticheat.utils.MovementUtils;
 import cc.funkemunky.api.utils.TickTimer;
 import lombok.val;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
@@ -29,7 +31,7 @@ public class SpeedC extends Check {
 
     public double previousDistance;
     private int webTicks;
-    private boolean onSoul, onWeb;
+    private boolean onSoul, onWeb, sprint;
     private double velocityX, velocityZ;
 
     @Packet
@@ -40,6 +42,9 @@ public class SpeedC extends Check {
         }
 
         double drag = 0.91;
+
+        Block block = new Location(data.getPlayer().getWorld(), data.playerInfo.from.x,
+                data.playerInfo.from.y - 1, data.playerInfo.from.z).getBlock();
         checkProcessing: {
             if (!packet.isPos()
                     || data.playerInfo.serverPos
@@ -57,6 +62,7 @@ public class SpeedC extends Check {
                 tags.add("ground");
                 drag *= data.blockInfo.currentFriction;
                 moveSpeed *= 1.3;
+
                 moveSpeed *= 0.16277136 / Math.pow(drag, 3);
 
                 if (data.playerInfo.deltaY > 0
@@ -66,44 +72,39 @@ public class SpeedC extends Check {
                 }
             } else {
                 tags.add("air");
-                moveSpeed = 0.026;
+                moveSpeed = sprint && !data.blockInfo.inLiquid ? 0.026 : 0.02;
                 drag = 0.91;
             }
 
-            data.blockInfo.handler.setOffset(1);
-            data.blockInfo.handler.setSize(0.6, 1);
-
             if (data.blockInfo.inWater) {
                 tags.add("water");
-                moveSpeed *= 0.7;
+                drag = 0.8f;
+
+                val depth = MovementUtils.getDepthStriderLevel(data.getPlayer());
+                if (depth > 0) {
+                    drag = (0.54600006F - drag) * depth / 3.0F;
+                    tags.add("depthstrider");
+                    moveSpeed += (data.predictionService.aiMoveSpeed * 1.0F - moveSpeed) *  3.0F;
+                }
             }
 
-            if (data.blockInfo.inLava
-                    && data.getPlayer().getNoDamageTicks() == data.getPlayer().getMaximumNoDamageTicks()
-                    && data.blockInfo.handler.isCollidedWith(Materials.LAVA)) {
+            if (data.blockInfo.inLava) {
                 tags.add("lava");
-                moveSpeed *= 0.7;
+                drag = 0.5;
             }
 
             data.blockInfo.handler.setOffset(0);
-
-
-            val depth = MovementUtils.getDepthStriderLevel(data.getPlayer());
-            if (depth > 0 && data.playerInfo.liquidTimer.hasNotPassed(4)) {
-                tags.add("depthstrider");
-                moveSpeed += depth;
-            }
 
             moveSpeed += velocityXZ * (data.playerInfo.lastVelocity.hasNotPassed(20) ? 2 : 1);
 
             if(onWeb && data.playerInfo.lastBrokenBlock.hasPassed(3)) {
                 tags.add("web");
-                moveSpeed*= .3;
+                moveSpeed*=.25;
             }
 
-            if(onSoul && onGround && data.playerInfo.clientGround) {
+            if(onSoul && onGround && data.playerInfo.clientGround && data.playerInfo.lClientGround) {
                 tags.add("soulsand");
-                moveSpeed*= 0.5;
+                moveSpeed*= 0.4;
             }
 
             double horizontalMove = (data.playerInfo.deltaXZ - previousDistance) - moveSpeed;
@@ -133,6 +134,7 @@ public class SpeedC extends Check {
         }
         onWeb = data.blockInfo.inWeb;
         onSoul = data.blockInfo.onSoulSand;
+        sprint = data.playerInfo.sprinting;
         this.previousDistance = data.playerInfo.deltaXZ * drag;
     }
 }
