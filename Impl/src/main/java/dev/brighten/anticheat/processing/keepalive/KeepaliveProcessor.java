@@ -9,6 +9,7 @@ import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.MiscUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 public class KeepaliveProcessor implements Runnable {
 
-    private ScheduledFuture task;
+    private BukkitTask task;
 
     public KeepAlive currentKeepalive;
     public int tick;
@@ -39,8 +40,17 @@ public class KeepaliveProcessor implements Runnable {
 
         WrappedOutKeepAlivePacket packet = new WrappedOutKeepAlivePacket(currentKeepalive.id);
 
+        currentKeepalive.startStamp = System.currentTimeMillis();
         for (ObjectData value : Kauri.INSTANCE.dataManager.dataMap.values()) {
+            if(value.target != null)
+            value.targetPastLocation.addLocation(value.target.getLocation());
             TinyProtocolHandler.sendPacket(value.getPlayer(), packet);
+            /*value.getThread().execute(() -> {
+                for (Runnable runnable : value.tasksToRun) {
+                    runnable.run();
+                    value.tasksToRun.remove(runnable);
+                }
+            });*/
         }
     }
 
@@ -61,8 +71,7 @@ public class KeepaliveProcessor implements Runnable {
 
     public void start() {
         if(task == null) {
-            task = Atlas.getInstance().getSchedular()
-                    .scheduleAtFixedRate(this, 50L, 50L, TimeUnit.MILLISECONDS);
+            task = RunUtils.taskTimer(this, 0L, 1L);
         }
     }
 
@@ -75,7 +84,7 @@ public class KeepaliveProcessor implements Runnable {
 
     public void stop() {
         if(task != null) {
-            task.cancel(true);
+            task.cancel();
             task = null;
         }
     }

@@ -16,11 +16,8 @@ import cc.funkemunky.api.utils.XMaterial;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import lombok.val;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerLocaleChangeEvent;
 
 public class PacketProcessor {
 
@@ -201,7 +198,7 @@ public class PacketProcessor {
 
                 long time = packet.getTime();
 
-                Kauri.INSTANCE.keepaliveProcessor.addResponse(data, (int)time);
+                Kauri.INSTANCE.keepaliveProcessor.addResponse(data, Math.toIntExact(time));
 
                 val optional = Kauri.INSTANCE.keepaliveProcessor.getResponse(data);
 
@@ -209,12 +206,18 @@ public class PacketProcessor {
 
                 optional.ifPresent(ka -> {
                     data.lagInfo.lastPing = data.lagInfo.ping;
-                    data.lagInfo.ping = (current - ka.start) * 50;
+                    data.lagInfo.ping = (current - ka.start);
+
+                    ka.getReceived(data.uuid).ifPresent(r -> {
+                        r.receivedStamp = event.getTimeStamp();
+                        data.lagInfo.lmillisPing = data.lagInfo.millisPing;
+                        data.lagInfo.millisPing = r.receivedStamp - ka.startStamp;
+                    });
 
                         for (ObjectData.Action action : data.keepAliveStamps) {
                             if(action.stamp > ka.start) continue;
 
-                            action.action.accept(data);
+                            action.action.accept(ka);
 
                             data.keepAliveStamps.remove(action);
                         }
@@ -373,8 +376,8 @@ public class PacketProcessor {
                 data.playerInfo.lastRespawn = timeStamp;
                 data.playerInfo.lastRespawnTimer.reset();
                 data.runKeepaliveAction(d -> {
-                    d.playerInfo.lastRespawn = timeStamp;
-                    d.playerInfo.lastRespawnTimer.reset();
+                    data.playerInfo.lastRespawn = timeStamp;
+                    data.playerInfo.lastRespawnTimer.reset();
                 });
 
                 data.checkManager.runPacket(packet, timeStamp);
@@ -425,19 +428,20 @@ public class PacketProcessor {
             case NMSObject.Server.ENTITY: {
                 WrappedOutRelativePosition packet = new WrappedOutRelativePosition(object, data.getPlayer());
 
-                val optional = data.getPlayer().getWorld().getEntities().stream()
+                /*val optional = data.getPlayer().getWorld().getEntities().stream()
                         .filter(ent -> ent.getEntityId() == packet.getId()).findFirst();
 
                 if(optional.isPresent()) {
                     KLocation loc = new KLocation(optional.get().getLocation());
                     data.runKeepaliveAction(d -> {
-                        loc.x+= packet.getX() / 32.;
-                        loc.y+= packet.getY() / 32.;
-                        loc.z+= packet.getZ() / 32.;
+                        val shit = d.receivedKeepalive.getOrDefault(data.uuid, null);
+                        loc.timeStamp = shit != null ? shit.stamp : d.start;
 
-                        d.entityLocations.put(packet.getId(), loc);
+                        if(data.target != null && optional.get().getEntityId() == data.target.getEntityId())
+                            data.targetPastLocation.addLocation(loc);
+                        data.entityLocations.put(packet.getId(), loc);
                     });
-                }
+                }*/
                 if(!data.checkManager.runPacket(packet, timeStamp)) {
                     event.setCancelled(true);
                 }
@@ -459,12 +463,11 @@ public class PacketProcessor {
                     data.playerInfo.velocityY = (float) packet.getY();
                     data.playerInfo.velocityZ = (float) packet.getZ();
                     data.runKeepaliveAction(d -> {
-                        d.playerInfo.lastVelocity.reset();
-                        d.playerInfo.lastVelocityTimestamp = System.currentTimeMillis();
-                        d.predictionService.rmotionX = data.playerInfo.velocityX;
-                        d.predictionService.rmotionZ = data.playerInfo.velocityZ;
-                        d.predictionService.velocity = true;
-                        Bukkit.broadcastMessage("Velocity");
+                        data.playerInfo.lastVelocity.reset();
+                        data.playerInfo.lastVelocityTimestamp = System.currentTimeMillis();
+                        data.predictionService.rmotionX = data.playerInfo.velocityX;
+                        data.predictionService.rmotionZ = data.playerInfo.velocityZ;
+                        data.predictionService.velocity = true;
                     });
                 }
                 data.checkManager.runPacket(packet, timeStamp);

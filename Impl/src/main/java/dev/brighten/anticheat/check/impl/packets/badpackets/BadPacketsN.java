@@ -10,6 +10,7 @@ public class BadPacketsN extends Check {
 
     @Packet
     public void onOut(WrappedOutRelativePosition packet) {
+        if(data.target != null && data.target.getEntityId() == packet.getId())
         debug("entity=%v x=%v y=%v z=%v yaw=%v pitch=%v", packet.getId(),
                 packet.getX() / 32d, packet.getY() / 32d, packet.getZ() / 32d, packet.getYaw(), packet.getPitch());
     }

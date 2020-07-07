@@ -4,7 +4,6 @@ import cc.funkemunky.api.handlers.ForgeHandler;
 import cc.funkemunky.api.handlers.ModData;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.math.RollingAverageLong;
 import cc.funkemunky.api.utils.math.cond.MaxInteger;
@@ -21,13 +20,13 @@ import dev.brighten.anticheat.listeners.PacketListener;
 import dev.brighten.anticheat.processing.ClickProcessor;
 import dev.brighten.anticheat.processing.MovementProcessor;
 import dev.brighten.anticheat.processing.PotionProcessor;
+import dev.brighten.anticheat.processing.keepalive.KeepAlive;
 import dev.brighten.anticheat.utils.PastLocation;
 import lombok.AllArgsConstructor;
+import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
@@ -71,10 +70,13 @@ public class ObjectData {
     public final List<String> sniffedPackets = new CopyOnWriteArrayList<>();
     public BukkitTask task;
     private ExecutorService playerThread;
+    public final List<Runnable> tasksToRun = new CopyOnWriteArrayList<>();
 
     public ObjectData(UUID uuid) {
         this.uuid = uuid;
         hashCode = uuid.hashCode();
+
+        if(PacketListener.expansiveThreading)
         playerThread = Executors.newSingleThreadExecutor();
 
         if(!Config.testMode) {
@@ -117,14 +119,33 @@ public class ObjectData {
         }, Kauri.INSTANCE, 40L, 40L);
 
         getPlayer().getActivePotionEffects().forEach(pe -> {
-            runKeepaliveAction(d -> d.potionProcessor.potionEffects.add(pe));
+            runKeepaliveAction(d -> this.potionProcessor.potionEffects.add(pe));
         });
     }
 
     public ExecutorService getThread() {
         if(PacketListener.expansiveThreading)
             return playerThread;
-        return Kauri.INSTANCE.executor;
+        return PacketListener.service;
+    }
+
+    public int[] getReceived() {
+        int[] toReturn = new int[] {0, 0};
+        val op = Kauri.INSTANCE.keepaliveProcessor.getResponse(this);
+
+        if(op.isPresent()) {
+            toReturn[0] = op.get().start;
+            val op2 = op.get().getReceived(uuid);
+
+            op2.ifPresent(kaReceived -> toReturn[1] = kaReceived.stamp);
+        }
+
+        return toReturn;
+    }
+
+    public void runTask(Runnable runnable) {
+        //tasksToRun.add(runnable);
+        getThread().execute(runnable);
     }
 
     public short getRandomShort(int baseNumber, int bound) {
@@ -139,7 +160,7 @@ public class ObjectData {
         return baseNumber + ThreadLocalRandom.current().nextLong(bound);
     }
 
-    public int runKeepaliveAction(Consumer<ObjectData> action) {
+    public int runKeepaliveAction(Consumer<KeepAlive> action) {
         int id = Kauri.INSTANCE.keepaliveProcessor.currentKeepalive.start;
 
         keepAliveStamps.add(new Action(id, action));
@@ -155,8 +176,9 @@ public class ObjectData {
     }
 
     public class LagInformation {
-        public long lastKeepAlive, lastTrans, lastClientTrans;
-        public long ping, averagePing, transPing, lastPing, lastTransPing;
+        public long lastKeepAlive, lastTrans, lastClientTrans, transPing, lastTransPing, averagePing,
+                millisPing, lmillisPing;
+        public int ping, lastPing;
         public MaxInteger lagTicks = new MaxInteger(25);
         public boolean lagging;
         public TickTimer lastPacketDrop = new TickTimer( 10),
@@ -166,6 +188,7 @@ public class ObjectData {
     }
 
     public void onLogout() {
+        if(PacketListener.expansiveThreading)
         getThread().shutdown();
         task.cancel();
         keepAliveStamps.clear();
@@ -203,6 +226,6 @@ public class ObjectData {
     @AllArgsConstructor
     public static class Action {
         public int stamp;
-        public Consumer<ObjectData> action;
+        public Consumer<KeepAlive> action;
     }
 }

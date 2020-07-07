@@ -22,7 +22,7 @@ public class PotionProcessor {
             if(packet.getPlayer().hasPotionEffect(effect.getType())) continue;
 
             data.runKeepaliveAction(d -> {
-                d.potionProcessor.potionEffects.remove(effect);
+                data.potionProcessor.potionEffects.remove(effect);
             });
         }
     }
@@ -30,9 +30,9 @@ public class PotionProcessor {
     public void onPotionEffect(WrappedOutEntityEffectPacket packet) {
         data.runKeepaliveAction(d -> {
             val type = PotionEffectType.getById(packet.effectId);
-            d.potionProcessor.potionEffects.stream().filter(pe -> pe.getType().equals(type))
-                    .forEach(d.potionProcessor.potionEffects::remove);
-            d.potionProcessor.potionEffects
+            data.potionProcessor.potionEffects.stream().filter(pe -> pe.getType().equals(type))
+                    .forEach(data.potionProcessor.potionEffects::remove);
+            data.potionProcessor.potionEffects
                     .add(new PotionEffect(type, packet.duration, packet.amplifier,
                             (packet.flags & 1) == 1, (packet.flags & 2) == 2));
         });

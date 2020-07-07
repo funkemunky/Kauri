@@ -21,7 +21,7 @@ public class PacketListener implements AtlasListener {
     @ConfigSetting(path = "performance", name = "expansiveThreading")
     public static boolean expansiveThreading = true;
 
-    private ExecutorService service = Executors.newSingleThreadScheduledExecutor();
+    public static ExecutorService service = Executors.newSingleThreadScheduledExecutor();
 
     @Listen(ignoreCancelled = true, priority = ListenerPriority.LOW)
     public void onEvent(PacketReceiveEvent event) {
@@ -38,7 +38,7 @@ public class PacketListener implements AtlasListener {
             }
         }
 
-        (expansiveThreading ? data.getThread() : service).execute(() -> Kauri.INSTANCE.packetProcessor.processClient(event,
+        data.runTask(() -> Kauri.INSTANCE.packetProcessor.processClient(event,
                 data, event.getPacket(), event.getType(), event.getTimeStamp()));
     }
 
@@ -54,7 +54,7 @@ public class PacketListener implements AtlasListener {
 
         if(data == null) return;
 
-        (expansiveThreading ? data.getThread() : service).execute(() -> Kauri.INSTANCE.packetProcessor.processServer(event,
+        data.runTask(() -> Kauri.INSTANCE.packetProcessor.processServer(event,
                 data, event.getPacket(), event.getType(), event.getTimeStamp()));
     }
 }

@@ -17,7 +17,7 @@ import org.bukkit.enchantments.Enchantment;
 @Cancellable
 public class VelocityB extends Check {
 
-    private double vX, vZ, vY, pvX, pvZ;
+    private double pvX, pvZ;
     private boolean useEntity, tookVelocity, sprint;
     private double buffer;
     private long lastVelocity;
@@ -28,9 +28,8 @@ public class VelocityB extends Check {
         if(packet.getId() == data.getPlayer().getEntityId()) {
             data.runKeepaliveAction(d -> {
                 tookVelocity = true;
-                vX = pvX = packet.getX();
-                vY = pvZ = packet.getY();
-                vZ = packet.getZ();
+                pvX = packet.getX();
+                pvZ = packet.getZ();
                 lastVelocity = timeStamp;
             });
         }
@@ -46,14 +45,13 @@ public class VelocityB extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if((vX != 0 || vZ != 0)) {
+        if((pvX != 0 || pvZ != 0)) {
             boolean found = false;
 
             double drag = 0.91;
 
             if(data.blockInfo.blocksNear
                     || data.blockInfo.inLiquid
-                    || tookVelocity
                     || data.lagInfo.lastPingDrop.hasNotPassed(10)
                     || data.lagInfo.lastPacketDrop.hasNotPassed(10)) {
                 pvX = pvZ = 0;

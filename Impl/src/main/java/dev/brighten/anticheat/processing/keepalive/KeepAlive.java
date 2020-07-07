@@ -15,6 +15,7 @@ public class KeepAlive {
 
     public final int start;
     public final int id;
+    public long startStamp;
 
     public KeepAlive(int start) {
         this.start = start;
@@ -35,5 +36,6 @@ public class KeepAlive {
     public static class KAReceived {
         public final ObjectData data;
         public final int stamp;
+        public long receivedStamp;
     }
 }
