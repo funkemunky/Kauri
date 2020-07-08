@@ -343,21 +343,27 @@ public class MiscUtils {
         return 3 * (mean - median) / deviationSquared(iterable);
     }
 
-    public static float stdev(Collection<Float> list) {
-        float sum = 0.0f;
-        float num = 0.0f;
+    public static double stdev(final Iterable<? extends Number> iterable) {
+        double sum = 0.0f;
+        double num = 0.0f;
 
-        for (Float v : list) {
+        final List<Double> list = new ArrayList<>();
+
+        for (Number number : iterable) {
+            list.add(number.doubleValue());
+        }
+
+        for (Double v : list) {
             sum+= v;
         }
 
-        float mean = sum / (float)list.size();
+        double mean = sum / (float)list.size();
 
-        for (Float v : list) {
+        for (Double v : list) {
             num+= Math.pow(v - mean, 2.0D);
         }
 
-        return MathHelper.sqrt(num / (float)list.size());
+        return MathHelper.sqrt(num / (double)list.size());
     }
 
     public static float normalizeAngle(float angle) {
