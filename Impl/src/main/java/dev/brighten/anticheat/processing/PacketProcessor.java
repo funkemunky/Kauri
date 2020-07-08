@@ -22,7 +22,8 @@ import org.bukkit.entity.Player;
 public class PacketProcessor {
 
     private static WrappedField pingField = MinecraftReflection.entityPlayer.getFieldByName("ping");
-    public synchronized void processClient(PacketReceiveEvent event, ObjectData data, Object object, String type, long timeStamp) {
+    public synchronized void processClient(PacketReceiveEvent event, ObjectData data, Object object, String type,
+                                           long timeStamp) {
         Kauri.INSTANCE.profiler.start("packet:client:" + getType(type));
         switch (type) {
             case Packet.Client.ABILITIES: {
@@ -209,9 +210,9 @@ public class PacketProcessor {
                     data.lagInfo.ping = (current - ka.start);
 
                     ka.getReceived(data.uuid).ifPresent(r -> {
-                        r.receivedStamp = event.getTimeStamp();
+                        r.receivedStamp = data.lagInfo.recieved = event.getTimeStamp();
                         data.lagInfo.lmillisPing = data.lagInfo.millisPing;
-                        data.lagInfo.millisPing = r.receivedStamp - ka.startStamp;
+                        data.lagInfo.millisPing = r.receivedStamp - (data.lagInfo.start = ka.startStamp);
                     });
 
                         for (ObjectData.Action action : data.keepAliveStamps) {
@@ -484,6 +485,9 @@ public class PacketProcessor {
             case Packet.Server.KEEP_ALIVE: {
                 WrappedOutKeepAlivePacket packet = new WrappedOutKeepAlivePacket(object, data.getPlayer());
 
+                if(packet.getTime() == Kauri.INSTANCE.keepaliveProcessor.currentKeepalive.id) {
+                    Kauri.INSTANCE.keepaliveProcessor.currentKeepalive.startStamp = event.getTimeStamp();
+                }
                 data.lagInfo.lastKeepAlive = event.getTimeStamp();
                 data.checkManager.runPacket(packet, timeStamp);
                 break;

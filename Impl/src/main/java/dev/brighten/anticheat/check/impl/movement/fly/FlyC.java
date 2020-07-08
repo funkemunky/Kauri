@@ -14,8 +14,9 @@ import dev.brighten.api.check.CheckType;
 public class FlyC extends Check {
 
     @Packet
-    public void onPacket(WrappedInFlyingPacket packet) {
+    public void onPacket(WrappedInFlyingPacket packet, long timeStamp) {
         if(packet.isPos()
+                && timeStamp - data.playerInfo.lastVelocityTimestamp > 200L
                 && data.playerInfo.lastVelocity.hasPassed(4)
                 && !data.playerInfo.nearGround
                 && !data.playerInfo.clientGround

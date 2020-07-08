@@ -5,6 +5,7 @@ import cc.funkemunky.api.handlers.ModData;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.utils.*;
+import dev.brighten.anticheat.utils.TickTimer;
 import cc.funkemunky.api.utils.math.RollingAverageLong;
 import cc.funkemunky.api.utils.math.cond.MaxInteger;
 import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingList;
@@ -62,6 +63,7 @@ public class ObjectData {
     public int hashCode;
     public boolean banned;
     public ModData modData;
+    public KLocation targetLoc;
     public ProtocolVersion playerVersion = ProtocolVersion.UNKNOWN;
     public Set<Player> boxDebuggers = new HashSet<>();
     public final List<Action> keepAliveStamps = new CopyOnWriteArrayList<>();
@@ -177,7 +179,7 @@ public class ObjectData {
 
     public class LagInformation {
         public long lastKeepAlive, lastTrans, lastClientTrans, transPing, lastTransPing, averagePing,
-                millisPing, lmillisPing;
+                millisPing, lmillisPing, recieved, start;
         public int ping, lastPing;
         public MaxInteger lagTicks = new MaxInteger(25);
         public boolean lagging;

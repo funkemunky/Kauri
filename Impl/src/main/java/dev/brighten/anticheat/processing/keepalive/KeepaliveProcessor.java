@@ -3,6 +3,7 @@ package dev.brighten.anticheat.processing.keepalive;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutKeepAlivePacket;
+import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.Kauri;
@@ -42,8 +43,12 @@ public class KeepaliveProcessor implements Runnable {
 
         currentKeepalive.startStamp = System.currentTimeMillis();
         for (ObjectData value : Kauri.INSTANCE.dataManager.dataMap.values()) {
-            if(value.target != null)
-            value.targetPastLocation.addLocation(value.target.getLocation());
+            if(value.target != null) {
+                value.targetPastLocation.addLocation(value.target.getLocation());
+                value.runKeepaliveAction(ka -> {
+                    value.targetLoc = new KLocation(value.target.getLocation());
+                });
+            }
             TinyProtocolHandler.sendPacket(value.getPlayer(), packet);
             /*value.getThread().execute(() -> {
                 for (Runnable runnable : value.tasksToRun) {

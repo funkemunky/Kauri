@@ -1,8 +1,10 @@
 package dev.brighten.anticheat.check.impl.movement.speed;
 
+import cc.funkemunky.api.reflections.impl.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInKeepAlivePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
@@ -31,11 +33,17 @@ public class SpeedC extends Check {
     private double velocityX, velocityZ;
 
     @Packet
+    public void onOut(WrappedOutVelocityPacket packet) {
+        if(packet.getId() != data.getPlayer().getEntityId()) return;
+
+        data.runKeepaliveAction(ka -> {
+            velocityX = packet.getX();
+            velocityZ = packet.getZ();
+        });
+    }
+
+    @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if(timeStamp - data.playerInfo.lastVelocityTimestamp < 50L) {
-            velocityX = data.playerInfo.velocityX;
-            velocityZ = data.playerInfo.velocityZ;
-        }
         if (!packet.isPos()
                 || data.playerInfo.serverPos
                 || (data.playerInfo.deltaXZ == 0 && data.playerInfo.deltaY == 0))
@@ -43,8 +51,6 @@ public class SpeedC extends Check {
 
         double drag = 0.91;
 
-        Block block = BlockUtils.getBlock(new Location(data.getPlayer().getWorld(), data.playerInfo.from.x,
-                data.playerInfo.from.y - 1, data.playerInfo.from.z));
         checkProcessing: {
 
             List<String> tags = new ArrayList<>();
@@ -56,7 +62,7 @@ public class SpeedC extends Check {
 
             if (onGround) {
                 tags.add("ground");
-                drag *= data.blockInfo.currentFriction;
+                drag *= data.blockInfo.fromFriction;
                 moveSpeed *= 1.3;
 
                 moveSpeed *= 0.16277136 / Math.pow(drag, 3);
@@ -120,8 +126,8 @@ public class SpeedC extends Check {
 
 
             if(velocityXZ > 0) {
-                velocityX*= (drag * (onGround ? data.blockInfo.currentFriction : 1));
-                velocityZ*= (drag * (onGround ? data.blockInfo.currentFriction : 1));
+                velocityX*= (drag * (onGround ? data.blockInfo.fromFriction : 1));
+                velocityZ*= (drag * (onGround ? data.blockInfo.fromFriction : 1));
 
                 if(Math.abs(velocityX) < 0.005) velocityX = 0;
                 if(Math.abs(velocityZ) < 0.005) velocityZ = 0;

@@ -40,7 +40,7 @@ public class ReachA extends Check {
 
         List<KLocation> origins = Stream.of(data.playerInfo.from.clone())
                 .collect(Collectors.toList());
-        List<KLocation> targetBoxes = data.targetPastLocation.getEstimatedLocation(data.lagInfo.ping, 2);
+        List<KLocation> targetBoxes = data.targetPastLocation.getEstimatedLocation(data.lagInfo.ping + 2, 2);
 
         double distance = 69;
 

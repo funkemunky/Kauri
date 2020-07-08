@@ -9,7 +9,7 @@ import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
-import cc.funkemunky.api.utils.TickTimer;
+import dev.brighten.anticheat.utils.TickTimer;
 import cc.funkemunky.api.utils.math.RollingAverageDouble;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.data.DataManager;

@@ -6,7 +6,7 @@ import cc.funkemunky.api.events.Listen;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.TickTimer;
+import dev.brighten.anticheat.utils.TickTimer;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Config;
 import org.bukkit.Bukkit;

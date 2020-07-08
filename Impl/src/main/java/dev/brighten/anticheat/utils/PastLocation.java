@@ -19,18 +19,13 @@ public class PastLocation {
                 .orElse(this.previousLocations.get(0)));
     }
 
-    public List<KLocation> getEstimatedLocation(int ping, long delta) {
-        List<KLocation> locs = new ArrayList<>();
+    public List<KLocation> getEstimatedLocation(int ping, int delta) {
+        int index = Math.max(0, previousLocations.size() - ping - 1);
 
-        int current = Kauri.INSTANCE.keepaliveProcessor.tick;
+        if(previousLocations.size() < 15) return new ArrayList<>();
 
-        for (KLocation loc : previousLocations) {
-            if(Math.abs(current - (int)loc.timeStamp - ping) <= delta) {
-                locs.add(loc);
-            }
-        }
-
-        return locs;
+        return new ArrayList<>(previousLocations).subList(Math.max(0, index - delta),
+                Math.min(previousLocations.size() - 1, index + delta));
     }
 
     public List<KLocation> getPreviousRange(int ping) {
@@ -44,16 +39,11 @@ public class PastLocation {
     }
 
     public void addLocation(Location location) {
-        if (previousLocations.size() >= 20) {
+        if (previousLocations.size() >= 40) {
             previousLocations.remove(0);
         }
 
-
-        KLocation loc = new KLocation(location);
-
-        loc.timeStamp = Kauri.INSTANCE.keepaliveProcessor.tick;
-
-        previousLocations.add(loc);
+        previousLocations.add(new KLocation(location));
     }
 
     public KLocation getLast() {
@@ -67,14 +57,10 @@ public class PastLocation {
     }
 
     public void addLocation(KLocation location) {
-        if (previousLocations.size() >= 20) {
+        if (previousLocations.size() >= 40) {
             previousLocations.remove(0);
         }
 
-        KLocation loc = location.clone();
-
-        loc.timeStamp = Kauri.INSTANCE.keepaliveProcessor.tick;
-
-        previousLocations.add(loc);
+        previousLocations.add(location.clone());
     }
 }

@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.processing;
 
 import cc.funkemunky.api.Atlas;
+import cc.funkemunky.api.reflections.impl.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.types.MathHelper;
@@ -14,10 +15,12 @@ import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.MouseFilter;
 import dev.brighten.anticheat.utils.MovementUtils;
-import cc.funkemunky.api.utils.TickTimer;
+import dev.brighten.anticheat.utils.TickTimer;
 import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigInteger;
@@ -91,7 +94,7 @@ public class MovementProcessor {
 
         data.playerInfo.to.timeStamp = timeStamp;
         //Adding past location
-        data.pastLocation.addLocation(data.playerInfo.to.clone());
+        data.pastLocation.addLocation(data.playerInfo.to);
 
         if (data.playerInfo.posLocs.size() > 0) {
             val optional = data.playerInfo.posLocs.stream()
@@ -135,7 +138,13 @@ public class MovementProcessor {
                 && !data.getPlayer().getGameMode().equals(GameMode.ADVENTURE);
 
         if(data.playerInfo.blockBelow != null)
-            data.blockInfo.currentFriction = ReflectionsUtil.getFriction(data.playerInfo.blockBelow);
+            data.blockInfo.currentFriction = MinecraftReflection.getFriction(data.playerInfo.blockBelow);
+
+        Block block = BlockUtils.getBlock(new Location(data.getPlayer().getWorld(),
+                data.playerInfo.from.x, data.playerInfo.from.y - 1, data.playerInfo.from.z));
+
+        if(block != null)
+            data.blockInfo.fromFriction = MinecraftReflection.getFriction(block);
 
         if(packet.isPos()) {
             //We create a separate from BoundingBox for the predictionService since it should operate on pre-motion data.

@@ -18,19 +18,17 @@ import org.bukkit.enchantments.Enchantment;
 public class VelocityB extends Check {
 
     private double pvX, pvZ;
-    private boolean useEntity, tookVelocity, sprint;
+    private boolean useEntity, sprint;
     private double buffer;
-    private long lastVelocity;
+    private int ticks;
     private static double[] moveValues = new double[] {-0.98, 0, 0.98};
 
     @Packet
-    public void onVelocity(WrappedOutVelocityPacket packet, long timeStamp) {
+    public void onVelocity(WrappedOutVelocityPacket packet) {
         if(packet.getId() == data.getPlayer().getEntityId()) {
             data.runKeepaliveAction(d -> {
-                tookVelocity = true;
                 pvX = packet.getX();
                 pvZ = packet.getZ();
-                lastVelocity = timeStamp;
             });
         }
     }
@@ -60,7 +58,7 @@ public class VelocityB extends Check {
             }
 
             if(data.playerInfo.lClientGround) {
-                drag*= data.blockInfo.currentFriction;
+                drag*= data.blockInfo.fromFriction;
             }
 
             if(useEntity && (sprint || (data.getPlayer().getItemInHand() != null
@@ -138,7 +136,10 @@ public class VelocityB extends Check {
             pvX *= drag;
             pvZ *= drag;
 
-            if(timeStamp - lastVelocity > 350L) pvX = pvZ = 0;
+            if(++ticks > 6) {
+                ticks = 0;
+                pvX = pvZ = 0;
+            }
 
             if(Math.abs(pvX) < 0.005) pvX = 0;
             if(Math.abs(pvZ) < 0.005) pvZ = 0;

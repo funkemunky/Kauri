@@ -1,9 +1,7 @@
 package dev.brighten.anticheat.processing.keepalive;
 
-import cc.funkemunky.api.Atlas;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
-import dev.brighten.anticheat.utils.MiscUtils;
 import lombok.RequiredArgsConstructor;
 
 import java.util.HashMap;
