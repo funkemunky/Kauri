@@ -11,6 +11,7 @@ import dev.brighten.db.db.StructureSet;
 import dev.brighten.db.utils.MiscUtils;
 import dev.brighten.db.utils.Pair;
 import lombok.val;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -23,6 +24,7 @@ public class FlatfileStorage implements DataStorage {
 
     private List<Log> logs = new CopyOnWriteArrayList<>();
     private List<Punishment> punishments = new CopyOnWriteArrayList<>();
+    private BukkitTask task;
 
     public FlatfileStorage() {
         database = new FlatfileDatabase("logs");
@@ -30,7 +32,7 @@ public class FlatfileStorage implements DataStorage {
         nameCache = new FlatfileDatabase("nameCache");
         nameCache.loadMappings();
 
-        RunUtils.taskTimerAsync(() -> {
+        task = RunUtils.taskTimerAsync(() -> {
             if(logs.size() > 0) {
                 for (Log log : logs) {
                     StructureSet set = database.create(UUID.randomUUID().toString());
@@ -64,6 +66,20 @@ public class FlatfileStorage implements DataStorage {
             }
         }, Kauri.INSTANCE, 120L, 40L);
     }
+
+
+    @Override
+    public void shutdown() {
+        task.cancel();
+        task = null;
+        logs.clear();
+        punishments.clear();
+        database.disconnect();
+        database = null;
+        nameCache.disconnect();
+        nameCache = null;
+    }
+
     @Override
     public List<Log> getLogs(UUID uuid, Check check, int arrayMin, int arrayMax, long timeFrom, long timeTo) {
         List<StructureSet> sets = database.get(structSet ->

@@ -72,7 +72,6 @@ public class ObjectData {
     public final List<String> sniffedPackets = new CopyOnWriteArrayList<>();
     public BukkitTask task;
     private ExecutorService playerThread;
-    public final List<Runnable> tasksToRun = new CopyOnWriteArrayList<>();
 
     public ObjectData(UUID uuid) {
         this.uuid = uuid;
@@ -196,6 +195,12 @@ public class ObjectData {
         keepAliveStamps.clear();
         Kauri.INSTANCE.dataManager.hasAlerts.remove(this);
         Kauri.INSTANCE.dataManager.debugging.remove(this);
+        checkManager.checkMethods.clear();
+        checkManager.checks.clear();
+        checkManager = null;
+        typesToCancel.clear();
+        sniffedPackets.clear();
+        keepAliveStamps.clear();
     }
 
     public static void debugBoxes(boolean debugging, Player debugger) {

@@ -3,6 +3,7 @@ package dev.brighten.anticheat.logs.data;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.logs.objects.Punishment;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.List;
 import java.util.UUID;
@@ -26,4 +27,6 @@ public interface DataStorage {
     UUID getUUIDFromName(String name);
 
     String getNameFromUUID(UUID uuid);
+
+    void shutdown();
 }

@@ -16,6 +16,7 @@ import dev.brighten.db.depends.com.mongodb.client.model.Aggregates;
 import dev.brighten.db.depends.com.mongodb.client.model.Filters;
 import dev.brighten.dev.depends.org.bson.Document;
 import dev.brighten.dev.depends.org.bson.conversions.Bson;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -26,6 +27,7 @@ public class MongoStorage implements DataStorage {
 
     private MongoCollection<Document> logsCollection, punishmentsCollection, nameUUIDCollection;
     private MongoDatabase database;
+    private BukkitTask task;
 
     private List<Log> logs = new CopyOnWriteArrayList<>();
     private List<Punishment> punishments = new CopyOnWriteArrayList<>();
@@ -49,7 +51,7 @@ public class MongoStorage implements DataStorage {
         punishmentsCollection = database.getCollection("punishments");
         nameUUIDCollection = database.getCollection("nameUuid");
 
-        RunUtils.taskTimerAsync(() -> {
+        task = RunUtils.taskTimerAsync(() -> {
             if(logs.size() > 0) {
                 for (Log log : logs) {
                     logsCollection.insertOne(new Document("uuid", log.uuid.toString())
@@ -109,6 +111,19 @@ public class MongoStorage implements DataStorage {
                 .map(doc -> new Punishment(UUID.fromString(doc.getString("uuid")),
                         doc.getString("check"), doc.getLong("time")))
                 .collect(Collectors.toList());
+    }
+
+
+    @Override
+    public void shutdown() {
+        task.cancel();
+        task = null;
+        logs.clear();
+        punishments.clear();
+        database = null;
+        logsCollection = null;
+        punishmentsCollection = null;
+        nameUUIDCollection = null;
     }
 
     @Override
