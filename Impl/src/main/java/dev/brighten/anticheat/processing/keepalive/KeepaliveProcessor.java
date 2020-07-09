@@ -14,13 +14,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class KeepaliveProcessor implements Runnable {
 
-    private BukkitTask task;
+    private ScheduledFuture<?> task;
 
     public KeepAlive currentKeepalive;
     public int tick;
@@ -28,8 +26,10 @@ public class KeepaliveProcessor implements Runnable {
     public final List<KeepAlive> keepAlives = Collections.synchronizedList(new EvictingList<>(20));
 
     public ConcurrentHashMap<UUID, Integer> lastResponses = new ConcurrentHashMap<>();
+    public ScheduledExecutorService executor;
 
     public KeepaliveProcessor() {
+        executor = Executors.newSingleThreadScheduledExecutor();
         start();
     }
 
@@ -77,7 +77,7 @@ public class KeepaliveProcessor implements Runnable {
 
     public void start() {
         if(task == null) {
-            task = RunUtils.taskTimer(this, 0L, 1L);
+            task = executor.scheduleAtFixedRate(this, 50L, 50L, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -90,7 +90,8 @@ public class KeepaliveProcessor implements Runnable {
 
     public void stop() {
         if(task != null) {
-            task.cancel();
+            task.cancel(true);
+            executor.shutdown();
             task = null;
         }
     }
