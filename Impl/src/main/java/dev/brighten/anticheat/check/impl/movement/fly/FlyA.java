@@ -24,6 +24,7 @@ public class FlyA extends Check {
                 || data.playerInfo.flightCancel
                 || timeStamp - data.playerInfo.lastVelocityTimestamp <= 200L
                 || data.playerInfo.lastVelocity.hasNotPassed(2)
+                || data.playerInfo.lastBlockPlace.hasNotPassed(6)
                 || data.playerInfo.blockAboveTimer.hasNotPassed(3)
                 || data.playerInfo.lastRespawnTimer.hasNotPassed(5)) return;
 
