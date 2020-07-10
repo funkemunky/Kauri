@@ -10,6 +10,8 @@ import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.utils.MiscUtils;
+import dev.brighten.anticheat.utils.TickTimer;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
 
@@ -22,30 +24,30 @@ import java.util.List;
 public class Timer extends Check {
 
     private int ticks, buffer;
-    private RollingAverage avg = new RollingAverage(80);
+    private EvictingList<Integer> tickList = new EvictingList<>(60);
 
     @Packet
-    public void onPacket(WrappedInFlyingPacket packet, long current) {
-        avg.add(ticks, current);
-        if(current - data.creation > 2000L) {
-            val average = 1 + (1 - avg.getAverage());
-            if (average > 1.011) {
-                if (++buffer > 8) {
-                    vl++;
-                    flag("timer=%v.1% buffer=%v", average * 100, buffer);
-                }
-            } else if (buffer > 0) buffer -= 2;
-            debug("tick=%v avg=%v.3 buffer=%v", ticks, average, buffer);
-        }
-        ticks = 0;
+    public void onPacket(WrappedInFlyingPacket packet) {
+        ticks++;
     }
 
     @Packet
-    public void onTrans(WrappedInTransactionPacket packet) {
+    public void onTrans(WrappedInTransactionPacket packet, long current) {
         val optional = Kauri.INSTANCE.keepaliveProcessor.getKeepById(packet.getAction());
 
         if(optional.isPresent()) {
-            ticks++;
+            tickList.add(ticks);
+            if(current - data.creation > 2000L) {
+                val average = tickList.stream().mapToInt(v -> v).average().orElse(1);
+                if (average > 1.014) {
+                    if (++buffer > 80) {
+                        vl++;
+                        flag("timer=%v.1% buffer=%v", average * 100, buffer);
+                    }
+                } else if (buffer > 0) buffer -= 2;
+                debug("tick=%v avg=%v.3 buffer=%v", ticks, average, buffer);
+            }
+            ticks = 0;
         }
     }
 }
