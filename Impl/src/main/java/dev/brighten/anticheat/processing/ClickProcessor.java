@@ -45,9 +45,9 @@ public class ClickProcessor {
     }
 
     public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
-        long delta = flyingTicks * 50L;
+        long delta = flyingTicks;
 
-        if(delta < 600
+        if(delta < 15
                 && !data.playerInfo.breakingBlock && data.playerInfo.lastBlockPlace.hasPassed(3)) {
             cpsList.add(delta);
 

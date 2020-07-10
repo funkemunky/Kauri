@@ -15,8 +15,8 @@ public class AutoclickerG extends Check {
         if (data.clickProcessor.isNotReady()) return;
 
         int low = data.clickProcessor.getLowOutliers(), high = data.clickProcessor.getHighOutliers();
-        double cpsAvg = 1000L / data.clickProcessor.getMean(); //I used long for 1000 since long is 64 bit with double.
-        if((low + high) == 0 && data.clickProcessor.getMean() < 126) {
+        double cpsAvg = 20L / data.clickProcessor.getMean(); //I used long for 1000 since long is 64 bit with double.
+        if((low + high) == 0 && data.clickProcessor.getMean() < 2.52) {
             if((buffer < 20 ? ++buffer : buffer) > 6) {
                 vl++;
                 flag(20 * 30,

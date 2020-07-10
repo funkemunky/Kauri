@@ -24,7 +24,7 @@ import java.util.List;
 public class Timer extends Check {
 
     private int ticks, buffer;
-    private EvictingList<Integer> tickList = new EvictingList<>(60);
+    private EvictingList<Integer> tickList = new EvictingList<>(20);
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
@@ -44,7 +44,7 @@ public class Timer extends Check {
                         vl++;
                         flag("timer=%v.1% buffer=%v", average * 100, buffer);
                     }
-                } else if (buffer > 0) buffer -= 2;
+                } else if (buffer > 0) buffer -= 5;
                 debug("tick=%v avg=%v.3 buffer=%v", ticks, average, buffer);
             }
             ticks = 0;

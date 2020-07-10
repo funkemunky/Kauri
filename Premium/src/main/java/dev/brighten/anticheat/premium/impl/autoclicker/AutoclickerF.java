@@ -51,14 +51,13 @@ public class AutoclickerF extends Check {
             double hit = hitAverage.stream().mapToInt(v -> v).average().orElse(-1),
                     nohit = noHitAvg.stream().mapToInt(v -> v).average().orElse(-1);
 
-            double delta = nohit - hit;
+            double delta = Math.abs(nohit - hit);
             double std = MiscUtils.stdev(hitAverage), nstd = MiscUtils.stdev(noHitAvg);
+            double stdDelta = Math.abs(std - nstd);
 
-            //We dont do Math.abs since it actually can hinder detection in this instance.
-            //It should never go below zero if the player is legitimate.
-            if (delta < 0.05 && Math.abs(std - nstd) < 0.08) {
+            if (delta < 0.05 && stdDelta < 0.08 && data.clickProcessor.getMean() <= 2) {
                 vl++;
-                flag("shit");
+                flag("delta=%v.3 std=%v.3 mean=%v.1", delta, stdDelta, data.clickProcessor.getMean());
             }
 
             debug("flying=%v hit=%v.2 nohit=%v.2 std=%v nstd=%v", flying, hit, nohit, std, nstd);
