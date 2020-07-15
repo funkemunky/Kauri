@@ -1,22 +1,16 @@
 package dev.brighten.anticheat.check.impl.packets;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInKeepAlivePacket;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutPositionPacket;
 import cc.funkemunky.api.utils.math.RollingAverage;
-import cc.funkemunky.api.utils.math.RollingAverageLong;
-import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
-import dev.brighten.anticheat.utils.MiscUtils;
-import dev.brighten.anticheat.utils.TickTimer;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @CheckInfo(name = "Timer", description = "Checks the rate of packets coming in.",
         checkType = CheckType.BADPACKETS, vlToFlag = 4, developer = true)
@@ -24,7 +18,7 @@ import java.util.List;
 public class Timer extends Check {
 
     private int ticks, buffer;
-    private EvictingList<Integer> tickList = new EvictingList<>(20);
+    private RollingAverage rolling = new RollingAverage(20);
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
@@ -32,13 +26,20 @@ public class Timer extends Check {
     }
 
     @Packet
-    public void onTrans(WrappedInTransactionPacket packet, long current) {
-        val optional = Kauri.INSTANCE.keepaliveProcessor.getKeepById(packet.getAction());
+    public void onTp(WrappedOutPositionPacket packet) {
+        data.runKeepaliveAction(ka -> {
+            ticks--;
+        });
+    }
+
+    @Packet
+    public void onTrans(WrappedInKeepAlivePacket packet, long current) {
+        val optional = Kauri.INSTANCE.keepaliveProcessor.getKeepById((int)packet.getTime());
 
         if(optional.isPresent()) {
-            tickList.add(ticks);
+            rolling.add(ticks, System.nanoTime());
             if(current - data.creation > 2000L) {
-                val average = tickList.stream().mapToInt(v -> v).average().orElse(1);
+                val average = rolling.getAverage();
                 if (average > 1.014) {
                     if (++buffer > 80) {
                         vl++;

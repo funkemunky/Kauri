@@ -1,23 +1,19 @@
-package dev.brighten.anticheat.check.impl.packets.badpackets;
+package dev.brighten.anticheat.premium.impl;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.*;
-import cc.funkemunky.api.utils.math.cond.MaxDouble;
 import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "BadPackets (C)", description = "Checks for players who send slot packets at the same time as flying.",
-        checkType = CheckType.BADPACKETS, punishVL = 20)
-@Cancellable
-public class BadPacketsC extends Check {
+@CheckInfo(name = "Inventory (C)", description = "Checks for invalid window clicks.", checkType = CheckType.INVENTORY)
+public class InventoryC extends Check {
 
     private boolean sentFlying, sentTrans;
 
     @Packet
-    public void use(WrappedInHeldItemSlotPacket packet) {
+    public void use(WrappedInWindowClickPacket packet) {
          debug("sentFlying=%v sentTrans=%v", sentFlying, sentTrans);
         if(sentFlying && sentTrans) {
             vl+= 2;

@@ -1,17 +1,11 @@
 package dev.brighten.anticheat.processing.keepalive;
 
-import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutKeepAlivePacket;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import cc.funkemunky.api.utils.KLocation;
-import cc.funkemunky.api.utils.RunUtils;
-import cc.funkemunky.api.utils.objects.evicting.EvictingList;
+import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingMap;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
-import dev.brighten.anticheat.utils.MiscUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -23,7 +17,7 @@ public class KeepaliveProcessor implements Runnable {
     public KeepAlive currentKeepalive;
     public int tick;
 
-    public final List<KeepAlive> keepAlives = Collections.synchronizedList(new EvictingList<>(20));
+    public final Map<Integer, KeepAlive> keepAlives = new ConcurrentEvictingMap<>(30);
 
     public ConcurrentHashMap<UUID, Integer> lastResponses = new ConcurrentHashMap<>();
     public ScheduledExecutorService executor;
@@ -37,10 +31,11 @@ public class KeepaliveProcessor implements Runnable {
     public void run() {
         tick++;
         synchronized (keepAlives) {
-            keepAlives.add(currentKeepalive = new KeepAlive(tick));
+            currentKeepalive = new KeepAlive(tick);
+            keepAlives.put(currentKeepalive.id, currentKeepalive);
         }
 
-        WrappedOutTransaction packet = new WrappedOutTransaction((int)0, (short)currentKeepalive.id, false);
+        WrappedOutKeepAlivePacket packet = new WrappedOutKeepAlivePacket(currentKeepalive.id);
 
         currentKeepalive.startStamp = System.currentTimeMillis();
         for (ObjectData value : Kauri.INSTANCE.dataManager.dataMap.values()) {
@@ -61,11 +56,11 @@ public class KeepaliveProcessor implements Runnable {
     }
 
     public Optional<KeepAlive> getKeepByTick(int tick) {
-        return keepAlives.parallelStream().filter(ka -> ka.start == tick).findFirst();
+        return keepAlives.values().parallelStream().filter(ka -> ka.start == tick).findFirst();
     }
 
     public Optional<KeepAlive> getKeepById(int id) {
-        return keepAlives.parallelStream().filter(ka -> ka.id == id).findFirst();
+        return Optional.ofNullable(keepAlives.get((short)id));
     }
 
     public Optional<KeepAlive> getResponse(ObjectData data) {

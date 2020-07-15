@@ -1,7 +1,9 @@
 package dev.brighten.anticheat.check.impl.combat.killaura;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInKeepAlivePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
+import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;
 
@@ -10,24 +12,30 @@ import dev.brighten.api.check.CheckType;
 @Cancellable(cancelType = CancelType.ATTACK)
 public class KillauraB extends Check {
 
-    private long lastFlying, lastUse;
+    private boolean sentFlying, sentTrans;
 
     @Packet
-    public void use(WrappedInUseEntityPacket packet, long timeStamp) {
-        if(!packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) return;
-        long delta = timeStamp - lastFlying;
-        if(delta < 2 && timeStamp - lastUse > 5) {
-            if(++vl > 10) {
-                flag("delta=" + delta);
+    public void use(WrappedInUseEntityPacket packet) {
+        debug("sentFlying=%v sentTrans=%v", sentFlying, sentTrans);
+        if(sentFlying && sentTrans) {
+            vl+= 2;
+            if(vl > 11) {
+                flag("fly=%v trans=%v", sentFlying, sentTrans);
             }
-        } else vl-= vl > 0 ? 0.25 : 0;
-        debug("lagging=" + data.lagInfo.lastPacketDrop.hasNotPassed(2)
-                + " vl=" + vl + " delta=" + delta);
-        lastUse = timeStamp;
+        } else if(vl > 0) vl--;
+        sentFlying = sentTrans = false;
     }
 
     @Packet
-    public void flying(WrappedInFlyingPacket packet, long timeStamp) {
-        lastFlying = timeStamp;
+    public void onTrans(WrappedInKeepAlivePacket packet) {
+        if(Kauri.INSTANCE.keepaliveProcessor.keepAlives.containsKey((int)packet.getTime())) {
+            sentFlying = false;
+            sentTrans = true;
+        }
+    }
+
+    @Packet
+    public void flying(WrappedInFlyingPacket packet) {
+        sentFlying = true;
     }
 }

@@ -1,10 +1,7 @@
 package dev.brighten.anticheat.check.impl.movement.speed;
 
-import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.reflections.impl.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInKeepAlivePacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.world.BlockData;
@@ -12,14 +9,8 @@ import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
-import dev.brighten.anticheat.data.ObjectData;
-import dev.brighten.anticheat.utils.Helper;
 import dev.brighten.anticheat.utils.MovementUtils;
 import lombok.val;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +22,7 @@ public class SpeedC extends Check {
 
     public double previousDistance;
     private int webTicks;
-    private boolean onSoul, onWeb, sprint;
+    private boolean onSoul, onWeb, sprint, inWater, inLava;
     private double velocityX, velocityZ;
 
     @Packet
@@ -80,9 +71,11 @@ public class SpeedC extends Check {
                 drag = 0.91;
             }
 
-            if (data.blockInfo.inWater) {
+            if (inWater) {
                 tags.add("water");
-                drag = 0.8f;
+                drag = 0.8;
+
+                moveSpeed = 0.02f;
 
                 val depth = MovementUtils.getDepthStriderLevel(data.getPlayer());
                 if (depth > 0) {
@@ -90,10 +83,6 @@ public class SpeedC extends Check {
                     tags.add("depthstrider");
                     moveSpeed += (data.predictionService.aiMoveSpeed * 1.0F - moveSpeed) *  3.0F;
                 }
-
-                //TODO Make a fix for this that accounts for flowing water.
-                //TODO Also check to see if this fix even works with a longer chain of flowing water.
-                //moveSpeed+= 0.04;
 
                 val optional = data.blockInfo.blocks.stream()
                         .filter(block -> Materials.checkFlag(block.getType(), Materials.WATER)
@@ -106,12 +95,12 @@ public class SpeedC extends Check {
                 if(optional.isPresent()) {
                     val flow = optional.get();
 
-                    moveSpeed+= Math.hypot(flow.a, flow.c);
+                    moveSpeed+= 0.014D;
                     tags.add("water-flow");
                 }
             }
 
-            if (data.blockInfo.inLava) {
+            if (inLava) {
                 tags.add("lava");
                 drag = 0.5;
             }
@@ -162,6 +151,8 @@ public class SpeedC extends Check {
         onWeb = data.blockInfo.inWeb;
         onSoul = data.blockInfo.onSoulSand;
         sprint = data.playerInfo.sprinting;
+        inWater = data.blockInfo.inWater;
+        inLava = data.blockInfo.inLava;
         this.previousDistance = data.playerInfo.deltaXZ * drag;
     }
 }

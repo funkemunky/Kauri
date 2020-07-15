@@ -8,7 +8,8 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "Aim (I)", description = "Checks for bad modulo gcd patches.", checkType = CheckType.AIM)
+@CheckInfo(name = "Aim (I)", description = "Checks for bad modulo gcd patches.", checkType = CheckType.AIM,
+        developer = true)
 public class AimI extends Check {
 
     private float ldelta;
@@ -25,7 +26,7 @@ public class AimI extends Check {
                 deltaYaw = Math.abs(clampedYaw - data.playerInfo.to.yaw);
         float sub = Math.abs(deltaPitch - ldelta);
 
-        if(deltaPitch < 5E-5 && sub > 0) {
+        if(deltaPitch < 0.002 && deltaYaw < 0.03 && sub > 0 && deltaPitch > 1E-10) {
             buffer+= 2;
 
             if(buffer > 20) {

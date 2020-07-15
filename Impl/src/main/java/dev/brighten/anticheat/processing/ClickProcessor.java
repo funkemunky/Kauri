@@ -1,10 +1,7 @@
 package dev.brighten.anticheat.processing;
 
-import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
-import dev.brighten.anticheat.Kauri;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInKeepAlivePacket;
 import dev.brighten.anticheat.utils.TickTimer;
 import cc.funkemunky.api.utils.Tuple;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
@@ -12,7 +9,6 @@ import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.MiscUtils;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +20,6 @@ public class ClickProcessor {
     private double std, mean, kurtosis, skewness, median, variance;
     @Getter
     private long min, max, sum, zeros;
-    private long lastTimestamp;
     @Getter
     private int outliers, lowOutliers, highOutliers;
     @Getter
@@ -40,7 +35,7 @@ public class ClickProcessor {
     private final ObjectData data;
     private int flyingTicks;
 
-    public void onFlying(WrappedInTransactionPacket packet) {
+    public void onFlying(WrappedInKeepAlivePacket packet) {
         flyingTicks++;
     }
 
@@ -87,7 +82,6 @@ public class ClickProcessor {
                 || data.playerInfo.lastBlockPlace.hasNotPassed(3)
                 || cpsList.size() < 22;
 
-        lastTimestamp = timeStamp;
         flyingTicks = 0;
     }
 }

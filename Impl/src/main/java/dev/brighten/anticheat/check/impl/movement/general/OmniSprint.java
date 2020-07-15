@@ -34,6 +34,8 @@ public class OmniSprint extends Check {
     public void onMove(WrappedInFlyingPacket packet) {
         if(!lastKey.equals(data.predictionService.key)) lastKeySwitch.reset();
         if(isPosition(packet)
+                && data.playerInfo.lastTeleportTimer.hasPassed(4)
+                && !data.playerInfo.serverPos
                 && !data.playerInfo.generalCancel
                 && data.playerInfo.climbTimer.hasPassed(2)
                 && data.playerInfo.liquidTimer.hasPassed(2)

@@ -25,6 +25,7 @@ public class PremiumChecks {
         Check.register(new AutoclickerE());
         Check.register(new InventoryA());
         Check.register(new InventoryB());
+        Check.register(new InventoryC());
         Check.register(new AutoclickerH());
         Check.register(new AutoclickerI());
         Check.register(new AutoclickerJ());
