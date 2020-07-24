@@ -60,7 +60,7 @@ public class KeepaliveProcessor implements Runnable {
     }
 
     public Optional<KeepAlive> getKeepById(int id) {
-        return Optional.ofNullable(keepAlives.get((short)id));
+        return Optional.ofNullable(keepAlives.get(id));
     }
 
     public Optional<KeepAlive> getResponse(ObjectData data) {
