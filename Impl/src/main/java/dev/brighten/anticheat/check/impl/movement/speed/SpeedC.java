@@ -21,7 +21,7 @@ import java.util.List;
 public class SpeedC extends Check {
 
     public double previousDistance;
-    private int webTicks;
+    private float drag;
     private boolean onSoul, onWeb, sprint, inWater, inLava;
     private double velocityX, velocityZ;
 
@@ -42,8 +42,6 @@ public class SpeedC extends Check {
                 || (data.playerInfo.deltaXZ == 0 && data.playerInfo.deltaY == 0))
             return;
 
-        double drag = 0.91;
-
         checkProcessing: {
 
             List<String> tags = new ArrayList<>();
@@ -55,8 +53,7 @@ public class SpeedC extends Check {
 
             if (onGround) {
                 tags.add("ground");
-                drag *= data.blockInfo.fromFriction;
-                moveSpeed *= 1.3;
+                drag *= 0.91f;
 
                 moveSpeed *= 0.16277136 / Math.pow(drag, 3);
 
@@ -68,12 +65,12 @@ public class SpeedC extends Check {
             } else {
                 tags.add("air");
                 moveSpeed = sprint && !data.blockInfo.inLiquid ? 0.026 : 0.02;
-                drag = 0.91;
+                drag = 0.91f;
             }
 
             if (inWater) {
                 tags.add("water");
-                drag = 0.8;
+                drag = 0.8f;
 
                 moveSpeed = 0.02f;
 
@@ -102,7 +99,7 @@ public class SpeedC extends Check {
 
             if (inLava) {
                 tags.add("lava");
-                drag = 0.5;
+                drag = 0.5f;
             }
 
             if(data.playerInfo.usingItem) {
@@ -123,9 +120,9 @@ public class SpeedC extends Check {
                 moveSpeed*= 0.4;
             }
 
-            double horizontalMove = (data.playerInfo.deltaXZ - previousDistance) - moveSpeed;
+            double horizontalMove = (data.playerInfo.deltaXZ - previousDistance) / moveSpeed * 100;
             if (data.playerInfo.deltaXZ > 0.1 && !data.playerInfo.generalCancel) {
-                if (horizontalMove > 0 && data.playerInfo.lastVelocity.hasPassed(10)) {
+                if (horizontalMove > 100 && data.playerInfo.lastVelocity.hasPassed(10)) {
                     vl++;
                     if(horizontalMove > 0.2 || vl > 2) {
                         flag("+%v,tags=%v",
@@ -134,7 +131,7 @@ public class SpeedC extends Check {
                 } else vl-= vl > 0 ? 0.05 : 0;
             }
 
-            debug("+%v.4,tags=%v,place=%v,dy=%v.3,jumped=%v,ai=%v", horizontalMove, String.join(",", tags),
+            debug("+%v.4%,tags=%v,place=%v,dy=%v.3,jumped=%v,ai=%v", horizontalMove, String.join(",", tags),
                     data.playerInfo.lastBlockPlace.getPassed(), data.playerInfo.deltaY, data.playerInfo.jumped,
                     data.predictionService.aiMoveSpeed);
 
@@ -154,5 +151,6 @@ public class SpeedC extends Check {
         inWater = data.blockInfo.inWater;
         inLava = data.blockInfo.inLava;
         this.previousDistance = data.playerInfo.deltaXZ * drag;
+        drag = data.blockInfo.currentFriction;
     }
 }
