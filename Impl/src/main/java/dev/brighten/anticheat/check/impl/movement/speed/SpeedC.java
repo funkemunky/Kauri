@@ -55,6 +55,8 @@ public class SpeedC extends Check {
                 tags.add("ground");
                 drag *= 0.91f;
 
+                moveSpeed*= 1.3;
+
                 moveSpeed *= 0.16277136 / Math.pow(drag, 3);
 
                 if (data.playerInfo.deltaY > 0
@@ -64,7 +66,7 @@ public class SpeedC extends Check {
                 }
             } else {
                 tags.add("air");
-                moveSpeed = sprint && !data.blockInfo.inLiquid ? 0.026 : 0.02;
+                moveSpeed = sprint ? 0.026 : 0.02;
                 drag = 0.91f;
             }
 
@@ -72,7 +74,7 @@ public class SpeedC extends Check {
                 tags.add("water");
                 drag = 0.8f;
 
-                moveSpeed = 0.02f;
+                moveSpeed = 0.02;
 
                 val depth = MovementUtils.getDepthStriderLevel(data.getPlayer());
                 if (depth > 0) {
