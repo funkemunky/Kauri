@@ -16,9 +16,9 @@ public class PremiumChecks {
         Check.register(new VelocityB());
         Check.register(new ReachB());
         //Check.register(new Motion());
-        Check.register(new AimI());
+        //Check.register(new AimI());
         //Check.register(new AimG());
-        Check.register(new AimH());
+        //Check.register(new AimH());
         Check.register(new AutoclickerD());
         Check.register(new AutoclickerE());
         Check.register(new InventoryA());
