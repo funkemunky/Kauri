@@ -37,3 +37,6 @@ API/target/**
 classes/**
 out/**
 target/**
+**/target/**
+*.properties
+dependency-reduced-pom.xml
