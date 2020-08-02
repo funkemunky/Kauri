@@ -22,7 +22,7 @@ public class LagCheck extends AtlasEvent {
                 .parallelStream()
                 .forEach(data -> {
                     if(timeStamp - data.lagInfo.lastClientTrans > 10000L
-                            && Kauri.INSTANCE.keepaliveProcessor.tick - data.playerInfo.to.timeStamp < 2L) {
+                            && timeStamp - data.playerInfo.to.timeStamp < 100L) {
                         data.lagTicks++;
 
                         RunUtils.task(() ->

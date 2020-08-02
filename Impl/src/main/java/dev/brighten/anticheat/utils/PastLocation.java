@@ -1,10 +1,8 @@
 package dev.brighten.anticheat.utils;
 
 import cc.funkemunky.api.utils.KLocation;
-import dev.brighten.anticheat.Kauri;
 import org.bukkit.Location;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -19,28 +17,26 @@ public class PastLocation {
                 .orElse(this.previousLocations.get(0)));
     }
 
-    public List<KLocation> getEstimatedLocation(int ping, long delta) {
-        List<KLocation> locs = new ArrayList<>();
-
-        int current = Kauri.INSTANCE.keepaliveProcessor.tick;
-
-        for (KLocation loc : previousLocations) {
-            if(Math.abs(current - (int)loc.timeStamp - ping) <= delta) {
-                locs.add(loc);
-            }
-        }
-
-        return locs;
+    public List<KLocation> getEstimatedLocation(long time, long ping, long delta) {
+        return this.previousLocations
+                .stream()
+                .filter(loc -> time - loc.timeStamp > 0 && Math.abs(time - loc.timeStamp - ping) < delta)
+                .collect(Collectors.toList());
     }
 
-    public List<KLocation> getPreviousRange(int ping) {
-        List<KLocation> kloc = new ArrayList<>();
+    public List<KLocation> getEstimatedLocation(long time, long ping) {
+        return this.previousLocations.stream()
+                .filter(loc -> time - loc.timeStamp > 0
+                        && time - loc.timeStamp <= ping + (ping < 50 ? 100 : 50))
+                .collect(Collectors.toList());
+    }
 
-        for(int i = ping ; i >= 0 ; i--) {
-            kloc.add(previousLocations.get(i));
-        }
+    public List<KLocation> getPreviousRange(long delta) {
+        long stamp = System.currentTimeMillis();
 
-        return kloc;
+        return this.previousLocations.stream()
+                .filter(loc -> stamp - loc.timeStamp < delta)
+                .collect(Collectors.toList());
     }
 
     public void addLocation(Location location) {
@@ -48,12 +44,7 @@ public class PastLocation {
             previousLocations.remove(0);
         }
 
-
-        KLocation loc = new KLocation(location);
-
-        loc.timeStamp = Kauri.INSTANCE.keepaliveProcessor.tick;
-
-        previousLocations.add(loc);
+        previousLocations.add(new KLocation(location));
     }
 
     public KLocation getLast() {
@@ -71,10 +62,6 @@ public class PastLocation {
             previousLocations.remove(0);
         }
 
-        KLocation loc = location.clone();
-
-        loc.timeStamp = Kauri.INSTANCE.keepaliveProcessor.tick;
-
-        previousLocations.add(loc);
+        previousLocations.add(location.clone());
     }
 }

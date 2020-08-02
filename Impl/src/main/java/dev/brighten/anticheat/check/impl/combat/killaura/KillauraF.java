@@ -17,7 +17,7 @@ public class KillauraF extends Check {
             if(data.playerInfo.sprinting && data.target instanceof Player) {
                 double accel = Math.abs(data.playerInfo.deltaXZ - data.playerInfo.lDeltaXZ);
 
-                if(accel < 0.00001) {
+                if(accel < 0.0005) {
                     if(++buffer > 2) {
                         vl++;
                         flag("accel=%v.4", accel);

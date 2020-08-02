@@ -90,9 +90,6 @@ public class MovementProcessor {
         }
 
         data.playerInfo.to.timeStamp = timeStamp;
-        //Adding past location
-        data.pastLocation.addLocation(data.playerInfo.to.clone());
-
         if (data.playerInfo.posLocs.size() > 0) {
             val optional = data.playerInfo.posLocs.stream()
                     .filter(loc -> {
@@ -367,6 +364,10 @@ public class MovementProcessor {
                 || data.playerInfo.onLadder
                 || data.playerInfo.climbTimer.hasNotPassed(4)
                 || data.playerInfo.lastHalfBlock.hasNotPassed(2);
+
+        //Adding past location
+        if(timeStamp - data.playerInfo.lastServerPos > 100L)
+            data.pastLocation.addLocation(data.playerInfo.to.clone());
     }
     private static float getDeltaX(float yawDelta, float gcd) {
         return MathHelper.floor(yawDelta / gcd);

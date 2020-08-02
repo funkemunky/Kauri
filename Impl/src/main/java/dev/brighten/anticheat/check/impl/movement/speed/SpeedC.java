@@ -3,7 +3,10 @@ package dev.brighten.anticheat.check.impl.movement.speed;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInKeepAlivePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
-import cc.funkemunky.api.utils.*;
+import cc.funkemunky.api.utils.Materials;
+import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.PlayerUtils;
+import cc.funkemunky.api.utils.XMaterial;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -11,6 +14,7 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.Helper;
 import dev.brighten.anticheat.utils.MovementUtils;
+import cc.funkemunky.api.utils.TickTimer;
 import lombok.val;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -36,16 +40,16 @@ public class SpeedC extends Check {
             velocityX = data.playerInfo.velocityX;
             velocityZ = data.playerInfo.velocityZ;
         }
-        if (!packet.isPos()
-                || data.playerInfo.serverPos
-                || (data.playerInfo.deltaXZ == 0 && data.playerInfo.deltaY == 0))
-            return;
 
         double drag = 0.91;
 
-        Block block = BlockUtils.getBlock(new Location(data.getPlayer().getWorld(), data.playerInfo.from.x,
-                data.playerInfo.from.y - 1, data.playerInfo.from.z));
+        Block block = new Location(data.getPlayer().getWorld(), data.playerInfo.from.x,
+                data.playerInfo.from.y - 1, data.playerInfo.from.z).getBlock();
         checkProcessing: {
+            if (!packet.isPos()
+                    || data.playerInfo.serverPos
+                    || (data.playerInfo.deltaXZ == 0 && data.playerInfo.deltaY == 0))
+                break checkProcessing;
 
             List<String> tags = new ArrayList<>();
 

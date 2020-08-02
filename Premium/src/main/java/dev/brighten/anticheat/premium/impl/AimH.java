@@ -1,47 +1,35 @@
 package dev.brighten.anticheat.premium.impl;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.api.check.CheckType;
+import lombok.val;
 
 @CheckInfo(name = "Aim (H)", description = "Checks for any low outliers in deltayaw.",
         developer = true, checkType = CheckType.AIM, vlToFlag = 9)
 public class AimH extends Check {
-    private double lastPosX, lastPosZ, lastHorizontalDistance;
-    private float lastYaw, lastPitch;
 
     @Packet
-    public void process(final WrappedInFlyingPacket packet, final long current) {
-        final double posX = packet.getX();
-        final double posZ = packet.getZ();
+    public void onFlying(WrappedInFlyingPacket packet) {
+        if(!packet.isLook()) return;
 
-        final float yaw = packet.getYaw();
-        final float pitch = packet.getPitch();
+        if(data.moveProcessor.sensXPercent != data.moveProcessor.sensYPercent) return;
 
-        final double horizontalDistance = Math.hypot(posX - lastPosX, posZ - lastPosZ);
+        float rx = data.playerInfo.deltaYaw % data.moveProcessor.yawMode,
+                ry = data.playerInfo.deltaPitch % data.moveProcessor.pitchMode;
 
-        // Player moved
-        if (posX != lastPosX || posZ != lastPosZ) {
-            final float deltaYaw = Math.abs(yaw - lastYaw);
-            final float deltaPitch = Math.abs(pitch - lastPitch);
+        boolean xFlag = (rx > 0.1 && rx < 0.9), yFlag = (ry > 0.1 && ry < 0.9);
 
-            final boolean attacking = current - data.playerInfo.lastAttackTimeStamp < 100L;
-            final double acceleration = Math.abs(horizontalDistance - lastHorizontalDistance);
+        if(xFlag && yFlag && data.playerInfo.cinematicTimer.hasPassed(5)) {
+            vl++;
+            flag("rx=%v.4 ry=%v.4", rx, ry);
+        } else if(vl > 0) vl-= 0.5;
 
-            // Player made a large head rotation and didn't accelerate / decelerate which is impossible
-            if (acceleration < 1e-02 && deltaYaw > 30.f && deltaPitch > 15.f && attacking) {
-                vl++;
-                flag("accel=%v.2 deltaYaw=%v.2 deltaPitch=%v.2 attacking=%v",
-                        acceleration, deltaYaw, deltaPitch, attacking);
-            }
-        }
-
-        this.lastHorizontalDistance = horizontalDistance;
-        this.lastYaw = yaw;
-        this.lastPitch = pitch;
-        this.lastPosX = posX;
-        this.lastPosZ = posZ;
+        debug("rx=%v ry=%v", rx, ry);
     }
 }
