@@ -2,7 +2,6 @@ package dev.brighten.anticheat.check.impl.movement.speed;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInKeepAlivePacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import cc.funkemunky.api.utils.Materials;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.PlayerUtils;

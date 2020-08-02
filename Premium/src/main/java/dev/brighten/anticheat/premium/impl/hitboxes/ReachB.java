@@ -13,18 +13,15 @@ import cc.funkemunky.api.utils.world.types.RayCollision;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.*;
-import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @CheckInfo(name = "Reach (B)", description = "Ensures the reach of a player is legitimate.",
         checkType = CheckType.HITBOX, punishVL = 8)

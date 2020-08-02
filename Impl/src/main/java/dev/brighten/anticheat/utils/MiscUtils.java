@@ -13,7 +13,6 @@ import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.commands.KauriCommand;
 import dev.brighten.anticheat.processing.MovementProcessor;
 import lombok.val;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;

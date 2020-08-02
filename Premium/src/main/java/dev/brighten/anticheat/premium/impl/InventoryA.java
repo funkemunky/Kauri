@@ -1,8 +1,6 @@
 package dev.brighten.anticheat.premium.impl;
 
-import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInWindowClickPacket;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutCloseWindowPacket;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;
 
