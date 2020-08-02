@@ -421,7 +421,6 @@ public class PacketProcessor {
                     data.playerInfo.velocityX = (float) packet.getX();
                     data.playerInfo.velocityY = (float) packet.getY();
                     data.playerInfo.velocityZ = (float) packet.getZ();
-                    data.playerInfo.lastVelocity.reset();
                     data.playerInfo.lastVelocityTimestamp = timeStamp + data.lagInfo.transPing;
                 }
                 data.checkManager.runPacket(packet, timeStamp);
