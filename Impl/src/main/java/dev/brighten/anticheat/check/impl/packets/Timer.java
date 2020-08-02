@@ -36,7 +36,6 @@ public class Timer extends Check {
             if(!Double.isNaN(pct) && !Double.isInfinite(pct)) {
 
                 if ((pct > 101.8D)
-                        && data.lagInfo.lastPacketDrop.hasPassed(10)
                         && Kauri.INSTANCE.lastTickLag.hasPassed(5)) {
                     //Maybe lower threshold? I do not think it needs that high of one.
                     if (buffer++ > 100) {
