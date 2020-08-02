@@ -5,9 +5,11 @@ import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutEntityEffectPacket;
 import dev.brighten.anticheat.data.ObjectData;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import org.bukkit.Bukkit;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -21,20 +23,23 @@ public class PotionProcessor {
         for (PotionEffect effect : potionEffects) {
             if(packet.getPlayer().hasPotionEffect(effect.getType())) continue;
 
-            data.runKeepaliveAction(d -> {
+            data.setKeepAliveStamp(d -> {
                 d.potionProcessor.potionEffects.remove(effect);
+                Bukkit.broadcastMessage("effect remove");
             });
         }
     }
 
     public void onPotionEffect(WrappedOutEntityEffectPacket packet) {
-        data.runKeepaliveAction(d -> {
+        data.setKeepAliveStamp(d -> {
             val type = PotionEffectType.getById(packet.effectId);
             d.potionProcessor.potionEffects.stream().filter(pe -> pe.getType().equals(type))
                     .forEach(d.potionProcessor.potionEffects::remove);
             d.potionProcessor.potionEffects
                     .add(new PotionEffect(type, packet.duration, packet.amplifier,
                             (packet.flags & 1) == 1, (packet.flags & 2) == 2));
+
+            Bukkit.broadcastMessage("effect add");
         });
     }
 

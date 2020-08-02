@@ -2,7 +2,6 @@ package dev.brighten.anticheat.check.impl.movement.fly;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.Color;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
@@ -21,9 +20,12 @@ public class FlyA extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if(!packet.isPos() || data.playerInfo.lastTeleportTimer.hasNotPassed(1)
-                || data.playerInfo.flightCancel
+                || data.playerInfo.serverAllowedFlight
                 || data.playerInfo.lastVelocity.hasNotPassed(2)
-                || data.playerInfo.blockAboveTimer.hasNotPassed(3)
+                || data.playerInfo.webTimer.hasNotPassed(2)
+                || data.playerInfo.liquidTimer.hasNotPassed(1)
+                || data.blockInfo.blocksAbove
+                || data.playerInfo.climbTimer.hasNotPassed(1)
                 || data.playerInfo.lastRespawnTimer.hasNotPassed(5)) return;
 
         long start = System.nanoTime();

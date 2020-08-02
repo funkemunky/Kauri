@@ -2,9 +2,11 @@ package dev.brighten.anticheat.premium.impl;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInKeepAlivePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.MathUtils;
+import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -26,7 +28,7 @@ public class VelocityB extends Check {
     @Packet
     public void onVelocity(WrappedOutVelocityPacket packet, long timeStamp) {
         if(packet.getId() == data.getPlayer().getEntityId()) {
-            data.runKeepaliveAction(d -> {
+            data.setKeepAliveStamp(d -> {
                 tookVelocity = true;
                 vX = pvX = packet.getX();
                 vY = pvZ = packet.getY();
