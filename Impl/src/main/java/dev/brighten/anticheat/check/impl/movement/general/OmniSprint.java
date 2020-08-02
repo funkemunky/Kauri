@@ -1,19 +1,13 @@
 package dev.brighten.anticheat.check.impl.movement.general;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.Color;
-import cc.funkemunky.api.utils.KLocation;
-import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.data.ObjectData;
-import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.TickTimer;
 import dev.brighten.api.check.CheckType;
-import lombok.val;
-import org.bukkit.util.Vector;
 
 @CheckInfo(name = "OmniSprint", description = "Checks for sprinting in illegal directions.",
         checkType = CheckType.GENERAL, vlToFlag = 15, punishVL = 50, developer = true)

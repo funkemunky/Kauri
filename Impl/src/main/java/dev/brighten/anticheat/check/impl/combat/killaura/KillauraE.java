@@ -3,12 +3,8 @@ package dev.brighten.anticheat.check.impl.combat.killaura;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
-import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.*;
-import dev.brighten.anticheat.data.ObjectData;
-import dev.brighten.anticheat.utils.TickTimer;
 import dev.brighten.api.check.CheckType;
-import org.bukkit.entity.EntityType;
 
 @CheckInfo(name = "Killaura (E)", description = "Checks if a player attacks before blocking.",
         checkType = CheckType.KILLAURA, punishVL = 20, vlToFlag = 6, developer = true)

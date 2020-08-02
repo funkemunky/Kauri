@@ -1,15 +1,9 @@
 package dev.brighten.anticheat.premium.impl.autoclicker;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
-import cc.funkemunky.api.utils.Color;
-import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.utils.Pattern;
 import dev.brighten.api.check.CheckType;
-import lombok.val;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @CheckInfo(name = "Autoclicker (D)", description = "Oscillation check by Abigail.",
         checkType = CheckType.AUTOCLICKER, punishVL = 15, executable = false, vlToFlag = 4)
