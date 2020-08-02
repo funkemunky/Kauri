@@ -179,16 +179,11 @@ public class Check implements KauriCheck {
                             } else if(variables[i] instanceof Float) {
                                 splitInfo[i + 1] = split2.replace("." + parsed, "");
                                 float var = (float) variables[i];
-
-                                if(!Float.isNaN(var) && !Float.isInfinite(var)) {
-                                    splitInfo[i] = split + MathUtils.round(var, parsed);
-                                } else splitInfo[i] = split + MathUtils.round(var, parsed);
+                                splitInfo[i] = split + MathUtils.round(var, parsed);
                             } else if(variables[i] instanceof Double) {
                                 splitInfo[i + 1] = split2.replace("." + parsed, "");
                                 double var = (double) variables[i];
-                                if(!Double.isNaN(var) && !Double.isInfinite(var)) {
-                                    splitInfo[i] = split + MathUtils.round(var, parsed);
-                                } else splitInfo[i] = split + var;
+                                splitInfo[i] = split + MathUtils.round(var, parsed);
                             }
                         }
                     } else splitInfo[i] = split + variables[i];
@@ -410,7 +405,6 @@ public class Check implements KauriCheck {
         register(new AimB());
         register(new AimC());
         register(new AimD());
-        register(new AimE());
         register(new AimF());
         register(new SpeedA());
         register(new SpeedB());

@@ -1,8 +1,8 @@
 package dev.brighten.anticheat.check.impl.packets.badpackets;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.*;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInHeldItemSlotPacket;
 import cc.funkemunky.api.utils.math.cond.MaxDouble;
-import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -14,30 +14,23 @@ import dev.brighten.api.check.CheckType;
 @Cancellable
 public class BadPacketsC extends Check {
 
-    private boolean sentFlying, sentTrans;
+    private long lastTimestamp;
+    private MaxDouble verbose = new MaxDouble(20);
 
     @Packet
-    public void use(WrappedInHeldItemSlotPacket packet) {
-         debug("sentFlying=%v sentTrans=%v", sentFlying, sentTrans);
-        if(sentFlying && sentTrans) {
-            vl+= 2;
-            if(vl > 11) {
-                flag("fly=%v trans=%v", sentFlying, sentTrans);
+    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
+        lastTimestamp = timeStamp;
+    }
+
+    @Packet
+    public void onHeld(WrappedInHeldItemSlotPacket packet, long timeStamp) {
+        long delta = timeStamp - lastTimestamp;
+
+        if(delta <= 8 && data.lagInfo.lastPacketDrop.hasPassed(5)) {
+            if(verbose.add() > 7) {
+                vl++;
+                flag("delta=%v ping=%p", delta);
             }
-        } else if(vl > 0) vl--;
-        sentFlying = sentTrans = false;
-    }
-
-    @Packet
-    public void onTrans(WrappedInKeepAlivePacket packet) {
-        if(Kauri.INSTANCE.keepaliveProcessor.keepAlives.containsKey((int)packet.getTime())) {
-            sentFlying = false;
-            sentTrans = true;
-        }
-    }
-
-    @Packet
-    public void flying(WrappedInFlyingPacket packet, long timeStamp) {
-        sentFlying = true;
+        } else verbose.subtract(0.5);
     }
 }

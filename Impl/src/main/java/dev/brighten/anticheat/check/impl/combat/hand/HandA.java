@@ -1,7 +1,8 @@
 package dev.brighten.anticheat.check.impl.combat.hand;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.*;
-import dev.brighten.anticheat.Kauri;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;
 
@@ -10,30 +11,31 @@ import dev.brighten.api.check.CheckType;
 @Cancellable(cancelType = CancelType.INTERACT)
 public class HandA extends Check {
 
-    private boolean sentFlying, sentTrans;
+    private long lastFlying;
+    private boolean arm, placed;
 
     @Packet
-    public void use(WrappedInBlockPlacePacket packet) {
-         debug("sentFlying=%v sentTrans=%v", sentFlying, sentTrans);
-        if(sentFlying && sentTrans) {
-            vl+= 2;
-            if(vl > 11) {
-                flag("fly=%v trans=%v", sentFlying, sentTrans);
-            }
-        } else if(vl > 0) vl--;
-        sentFlying = sentTrans = false;
+    public void onBlockPlace(WrappedInBlockPlacePacket place, long timeStamp) {
+        debug("place sent arm=%v ticks=%v", arm, lastFlying);
+        placed = true;
+        lastFlying = 0;
     }
 
     @Packet
-    public void onTrans(WrappedInKeepAlivePacket packet) {
-        if(Kauri.INSTANCE.keepaliveProcessor.keepAlives.containsKey((int)packet.getTime())) {
-            sentFlying = false;
-            sentTrans = true;
+    public void onArm(WrappedInArmAnimationPacket packet) {
+        debug("arm packet sent placed=%v", placed);
+        arm = true;
+    }
+
+    @Packet
+    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
+        lastFlying++;
+        if(arm) {
+            debug("arm is true");
         }
-    }
-
-    @Packet
-    public void flying(WrappedInFlyingPacket packet) {
-        sentFlying = true;
+        if(placed) {
+            debug("placed is true");
+        }
+        arm = placed = false;
     }
 }
