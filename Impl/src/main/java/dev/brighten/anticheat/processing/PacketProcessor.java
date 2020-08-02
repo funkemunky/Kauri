@@ -199,6 +199,34 @@ public class PacketProcessor {
 
                 long time = packet.getTime();
 
+                Kauri.INSTANCE.keepaliveProcessor.addResponse(data, Math.toIntExact(time));
+
+                val optional = Kauri.INSTANCE.keepaliveProcessor.getResponse(data);
+
+                int current = Kauri.INSTANCE.keepaliveProcessor.tick;
+
+                optional.ifPresent(ka -> {
+                    data.lagInfo.lastPing = data.lagInfo.ping;
+                    data.lagInfo.ping = (current - ka.start);
+
+                    ka.getReceived(data.uuid).ifPresent(r -> {
+                        r.receivedStamp = data.lagInfo.recieved = event.getTimeStamp();
+                        data.lagInfo.lmillisPing = data.lagInfo.millisPing;
+                        data.lagInfo.millisPing = r.receivedStamp - (data.lagInfo.start = ka.startStamp);
+                    });
+
+                        for (ObjectData.Action action : data.keepAliveStamps) {
+                            if(action.stamp > ka.start) continue;
+
+                            action.action.accept(ka);
+
+                            data.keepAliveStamps.remove(action);
+                        }
+                });
+
+                if(optional.isPresent())
+                    event.setCancelled(true);
+
                 data.checkManager.runPacket(packet, timeStamp);
                 if(data.sniffing) {
                     data.sniffedPackets.add(event.getType() + ":@:" + time + ":@:" + event.getTimeStamp());
@@ -224,33 +252,6 @@ public class PacketProcessor {
             case Packet.Client.TRANSACTION: {
                 WrappedInTransactionPacket packet = new WrappedInTransactionPacket(object, data.getPlayer());
 
-                Kauri.INSTANCE.keepaliveProcessor.addResponse(data, packet.getAction());
-
-                val optional = Kauri.INSTANCE.keepaliveProcessor.getResponse(data);
-
-                int current = Kauri.INSTANCE.keepaliveProcessor.tick;
-
-                optional.ifPresent(ka -> {
-                    data.lagInfo.lastPing = data.lagInfo.ping;
-                    data.lagInfo.ping = (current - ka.start);
-
-                    ka.getReceived(data.uuid).ifPresent(r -> {
-                        r.receivedStamp = data.lagInfo.recieved = event.getTimeStamp();
-                        data.lagInfo.lmillisPing = data.lagInfo.millisPing;
-                        data.lagInfo.millisPing = r.receivedStamp - (data.lagInfo.start = ka.startStamp);
-                    });
-
-                    for (ObjectData.Action action : data.keepAliveStamps) {
-                        if(action.stamp > ka.start) continue;
-
-                        action.action.accept(ka);
-
-                        data.keepAliveStamps.remove(action);
-                    }
-                });
-
-                if(optional.isPresent())
-                    event.setCancelled(true);
                 if (packet.getAction() == (short)69L) {
                     data.lagInfo.lastTransPing = data.lagInfo.transPing;
                     data.lagInfo.transPing = event.getTimeStamp() - data.lagInfo.lastTrans;

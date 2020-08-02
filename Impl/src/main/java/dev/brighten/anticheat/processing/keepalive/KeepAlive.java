@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class KeepAlive {
 
@@ -18,7 +17,7 @@ public class KeepAlive {
 
     public KeepAlive(int start) {
         this.start = start;
-        id = (int) ThreadLocalRandom.current().nextInt(0, 30000);
+        id = (int)(System.nanoTime() / 1000000L) + start;
     }
 
     public final Map<UUID, KAReceived> receivedKeepalive = new HashMap<>();
