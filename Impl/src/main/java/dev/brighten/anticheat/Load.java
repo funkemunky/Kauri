@@ -1,7 +1,6 @@
 package dev.brighten.anticheat;
 
 import cc.funkemunky.api.Atlas;
-import cc.funkemunky.api.commands.ancmd.CommandManager;
 import cc.funkemunky.api.config.MessageHandler;
 import cc.funkemunky.api.profiling.ToggleableProfiler;
 import cc.funkemunky.api.utils.Color;
@@ -31,9 +30,6 @@ public class Load {
         register("Loading config...");
         Kauri.INSTANCE.saveDefaultConfig();
 
-        register("Loading commands...");
-        Kauri.INSTANCE.commandManager = new CommandManager(Kauri.INSTANCE);
-
         register("Loading messages...");
         Kauri.INSTANCE.msgHandler = new MessageHandler(Kauri.INSTANCE);
 
@@ -51,7 +47,7 @@ public class Load {
         Kauri.INSTANCE.dataManager = new DataManager();
         Kauri.INSTANCE.loggerManager = new LoggerManager();
         Kauri.INSTANCE.keepaliveProcessor = new KeepaliveProcessor();
-        Kauri.INSTANCE.entityProcessor = new EntityProcessor().start();
+        EntityProcessor.start();
 
         register("Registering checks...");
         Check.registerChecks();
@@ -72,7 +68,7 @@ public class Load {
         Kauri.INSTANCE.enabled = true;
         Kauri.INSTANCE.lastEnabled.reset();
 
-        Bukkit.getWorlds().forEach(world -> Kauri.INSTANCE.entityProcessor.vehicles.put(world.getUID(), new ArrayList<>()));
+        Bukkit.getWorlds().forEach(world -> EntityProcessor.vehicles.put(world.getUID(), new ArrayList<>()));
     }
 
     private static void register(String string) {

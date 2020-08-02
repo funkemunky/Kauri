@@ -4,7 +4,6 @@ import dev.brighten.anticheat.logs.data.config.MySQLConfig;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 
 public class MySQL {
     private static Connection conn;
@@ -32,17 +31,6 @@ public class MySQL {
     public static void use() {
         try {
             init();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void shutdown() {
-        try {
-            if(conn != null && !conn.isClosed()) {
-                conn.close();
-                conn = null;
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }

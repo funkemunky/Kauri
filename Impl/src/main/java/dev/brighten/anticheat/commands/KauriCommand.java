@@ -21,9 +21,9 @@ public class KauriCommand {
             permission = "kauri.command",
             noPermissionMessage = "&cThis server is running Kauri by funkemunky, Elevated, and Abigail.")
     public void onCommand(CommandAdapter cmd) {
-        Atlas.getInstance().getCommandManager(Kauri.INSTANCE).runHelpMessage(cmd,
+        Atlas.getInstance().getCommandManager().runHelpMessage(cmd,
                 cmd.getSender(),
-                Atlas.getInstance().getCommandManager(Kauri.INSTANCE).getDefaultScheme());
+                Atlas.getInstance().getCommandManager().getDefaultScheme());
     }
 
     @Command(name = "kauri.test", description = "Add yourself to test messaging.",
