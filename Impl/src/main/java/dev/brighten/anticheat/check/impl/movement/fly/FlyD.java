@@ -26,14 +26,14 @@ public class FlyD extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if(packet.isPos()) {
-            double threshold = MiscUtils.max(data.playerInfo.jumpHeight * 1.5, velocityY * 1.5);
+            double threshold = MiscUtils.max(data.playerInfo.jumpHeight * 1.25, velocityY * 1.25);
 
             if(data.playerInfo.deltaY > threshold && !data.playerInfo.flightCancel) {
                 vl++;
                 flag("%v.2>-%v", data.playerInfo.deltaY, threshold);
             }
 
-            debug("threshold=%v.2 velocity=%v.2", threshold, velocityY);
+            debug("deltaY=%v.4 threshold=%v.4 velocity=%v.2", data.playerInfo.deltaY, threshold, velocityY);
             if(velocityY > 0) {
                 velocityY-= 0.08;
                 velocityY *= 0.98;
