@@ -88,10 +88,6 @@ public class SpeedC extends Check {
                     tags.add("depthstrider");
                     moveSpeed += (data.predictionService.aiMoveSpeed * 1.0F - moveSpeed) *  3.0F;
                 }
-
-                //TODO Make a fix for this that accounts for flowing water.
-                //TODO Also check to see if this fix even works with a longer chain of flowing water.
-                moveSpeed+= 0.02;
             }
 
             if (data.blockInfo.inLava) {
@@ -110,7 +106,7 @@ public class SpeedC extends Check {
 
             if(onSoul && onGround && data.playerInfo.clientGround && data.playerInfo.lClientGround) {
                 tags.add("soulsand");
-                moveSpeed*= 0.5;
+                moveSpeed*= 0.4;
             }
 
             double horizontalMove = (data.playerInfo.deltaXZ - previousDistance) - moveSpeed;

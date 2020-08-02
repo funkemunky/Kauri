@@ -29,7 +29,7 @@ public class FlyB extends Check {
             //We check if the player is in ground, since theoretically the y should be zero.
             double predicted = (data.playerInfo.lDeltaY - 0.08) * 0.9800000190734863D;
 
-            if(data.playerInfo.lClientGround && !data.playerInfo.clientGround && data.playerInfo.deltaY > 0) {
+            if(data.playerInfo.lClientGround && !data.playerInfo.clientGround) {
                 predicted = MovementUtils.getJumpHeight(data);
             }
 
