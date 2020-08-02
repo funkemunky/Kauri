@@ -6,7 +6,6 @@ import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import cc.funkemunky.api.utils.Color;
-import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.math.RollingAverageLong;
 import cc.funkemunky.api.utils.math.cond.MaxInteger;

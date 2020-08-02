@@ -2,9 +2,6 @@ package dev.brighten.anticheat.check.impl.combat.autoclicker;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
-import cc.funkemunky.api.utils.Color;
-import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.objects.Interval;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;

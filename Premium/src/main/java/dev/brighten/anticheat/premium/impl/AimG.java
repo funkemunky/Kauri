@@ -1,18 +1,10 @@
 package dev.brighten.anticheat.premium.impl;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.types.MathHelper;
-import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
-import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.api.check.CheckType;
-import lombok.val;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @CheckInfo(name = "Aim (G)", description = "Prediction.", checkType = CheckType.AIM, vlToFlag = 15, developer = true)
 public class AimG extends Check {
