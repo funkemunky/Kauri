@@ -38,15 +38,17 @@ public class AimG extends Check {
             samplesPitch.add(deltaPitch);
         }
 
-        if (samplesPitch.size() == 16 && samplesYaw.size() == 16) {
+        if (samplesPitch.size() == 20 && samplesYaw.size() == 20) {
             final double averageYaw = samplesYaw.stream().mapToDouble(d -> d).average().orElse(0.0);
             final double averagePitch = samplesPitch.stream().mapToDouble(d -> d).average().orElse(0.0);
 
             final double deviation = MiscUtils.stdev(samplesPitch);
             final double averageDelta = Math.abs(averagePitch - lastAverage);
 
-            if (deviation > 6.f && averageDelta > 1f && averageYaw < 30.d) {
-                if (++buffer > 4) {
+            if (deviation > 6.f && averageDelta > 1.5f && averageYaw < 30.d) {
+                buffer += 0.5;
+
+                if (buffer > 4) {
                     vl++;
                     flag("");
                 }

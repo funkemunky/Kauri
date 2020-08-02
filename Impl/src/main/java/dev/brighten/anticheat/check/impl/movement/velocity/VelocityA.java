@@ -14,31 +14,25 @@ import dev.brighten.api.check.CheckType;
 @Cancellable
 public class VelocityA extends Check {
 
-    private double vY, tvY;
+    private double vY;
     private long velocityTS;
-    private boolean tookVelocity;
 
     @Packet
     public void onVelocity(WrappedOutVelocityPacket packet, long timeStamp) {
         if(packet.getId() == data.getPlayer().getEntityId()) {
-            tvY = packet.getY();
-            velocityTS = timeStamp;
-            tookVelocity = true;
+            data.runKeepaliveAction(ka -> {
+                vY = packet.getY();
+                velocityTS = timeStamp;
+            });
         }
     }
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if(tookVelocity && !data.playerInfo.clientGround
-                && data.playerInfo.lClientGround) {
-            tookVelocity = false;
-            vY = tvY;
-        }
         if(vY > 0
                 && !data.playerInfo.generalCancel
                 && !data.lagInfo.lagging
                 && data.playerInfo.worldLoaded
-                && !tookVelocity
                 && !data.blockInfo.inWeb
                 && data.lagInfo.lastPacketDrop.hasPassed(5)
                 && !data.blockInfo.onClimbable

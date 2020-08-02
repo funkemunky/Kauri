@@ -10,7 +10,7 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.MiscUtils;
-import dev.brighten.anticheat.utils.TickTimer;
+import cc.funkemunky.api.utils.TickTimer;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
 import org.bukkit.util.Vector;

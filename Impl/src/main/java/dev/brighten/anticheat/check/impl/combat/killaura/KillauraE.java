@@ -6,7 +6,7 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.data.ObjectData;
-import dev.brighten.anticheat.utils.TickTimer;
+import cc.funkemunky.api.utils.TickTimer;
 import dev.brighten.api.check.CheckType;
 import org.bukkit.entity.EntityType;
 

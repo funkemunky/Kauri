@@ -7,7 +7,7 @@ import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingList;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.data.ObjectData;
-import dev.brighten.anticheat.utils.TickTimer;
+import cc.funkemunky.api.utils.TickTimer;
 import lombok.NoArgsConstructor;
 import org.bukkit.block.Block;
 

@@ -19,10 +19,9 @@ public class FlyA extends Check {
     private static double GROUND = 1 / 64d, CHUNK_LOAD = -0.1 * 0.98D;
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
+    public void onFlying(WrappedInFlyingPacket packet) {
         if(!packet.isPos() || data.playerInfo.lastTeleportTimer.hasNotPassed(1)
                 || data.playerInfo.flightCancel
-                || timeStamp - data.playerInfo.lastVelocityTimestamp <= 200L
                 || data.playerInfo.lastVelocity.hasNotPassed(2)
                 || data.playerInfo.blockAboveTimer.hasNotPassed(3)
                 || data.playerInfo.lastRespawnTimer.hasNotPassed(5)) return;

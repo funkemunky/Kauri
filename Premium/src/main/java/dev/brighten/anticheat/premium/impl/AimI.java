@@ -1,48 +1,49 @@
 package dev.brighten.anticheat.premium.impl;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.Color;
-import cc.funkemunky.api.utils.objects.evicting.EvictingList;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
-import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "Aim (I)", description = "Checks for bad modulo gcd patches.", checkType = CheckType.AIM)
+@CheckInfo(name = "Aim (I)", description = "")
 public class AimI extends Check {
 
-    private float ldelta;
-    private int buffer;
+    private int movements, lastMovements, total, invalid;
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if(!packet.isLook()) return;
+        ++movements;
+    }
 
-        float clampedPitch = modulo(data.moveProcessor.sensitivityY, data.playerInfo.to.pitch),
-                clampedYaw = modulo(data.moveProcessor.sensitivityX, data.playerInfo.to.yaw);
+    @Packet
+    public void onUseEntity(WrappedInUseEntityPacket packet) {
+        if (packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) {
+            final boolean proper = movements < 4 && lastMovements < 4;
 
-        float deltaPitch = Math.abs(clampedPitch - data.playerInfo.to.pitch),
-                deltaYaw = Math.abs(clampedYaw - data.playerInfo.to.yaw);
-        float sub = Math.abs(deltaPitch - ldelta);
+            if (proper) {
+                final boolean flag = movements == lastMovements;
 
-        if(deltaPitch < 5E-5 && sub > 0) {
-            buffer+= 2;
+                if (flag) {
+                    ++invalid;
+                }
 
-            if(buffer > 20) {
-                vl++;
-                flag("clampedDif=%v.3 deltaClamp=%v.3 buffer=%v", deltaPitch, sub, buffer);
+                if (++total == 25) {
+
+                    if (invalid > 20) {
+                        vl++;
+                        flag("");
+                    }
+
+                    debug("invalid=%v", invalid);
+
+                    total = invalid = 0;
+                }
             }
-            debug(Color.Green + "Flag");
-        } else if(buffer > 0) buffer--;
 
-        debug("p=%v.5 clamped=%v.5 deltaPitch=%v.5 deltaYaw=%v.5 sub=%v buffer=%v sens=%v", packet.getPitch(), clampedPitch,
-                deltaPitch, deltaYaw, sub, buffer, data.moveProcessor.sensitivityX);
-        ldelta = deltaPitch;
+            lastMovements = movements;
+            movements = 0;
+        }
     }
 
-    private static float modulo(float s, float angle) {
-        float f = (s * 0.6f + .2f);
-        float f2 = f * f * f * 1.2f;
-        return angle - (angle % f2);
-    }
 }

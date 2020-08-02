@@ -6,7 +6,7 @@ import cc.funkemunky.api.profiling.ToggleableProfiler;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
-import dev.brighten.anticheat.utils.TickTimer;
+import cc.funkemunky.api.utils.TickTimer;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.Config;
 import dev.brighten.anticheat.data.DataManager;
