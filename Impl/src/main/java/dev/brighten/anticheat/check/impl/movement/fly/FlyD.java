@@ -17,10 +17,14 @@ public class FlyD extends Check {
     private double velocityY;
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long timestamp) {
-        if(timestamp - data.playerInfo.lastVelocityTimestamp < 50L)
+    public void onKeepAlive(WrappedInKeepAlivePacket packet) {
+        if(packet.getTime() == data.getKeepAliveStamp("velocity")) {
             velocityY = data.playerInfo.velocityY;
+        }
+    }
 
+    @Packet
+    public void onFlying(WrappedInFlyingPacket packet) {
         if(packet.isPos()) {
             double threshold = MiscUtils.max(0.8, data.playerInfo.jumpHeight * 3, velocityY * 2.8);
 

@@ -4,8 +4,6 @@ import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.config.MessageHandler;
 import cc.funkemunky.api.profiling.ToggleableProfiler;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
-import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
@@ -17,7 +15,6 @@ import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.logs.LoggerManager;
 import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.processing.PacketProcessor;
-import dev.brighten.anticheat.processing.keepalive.KeepaliveProcessor;
 import dev.brighten.api.KauriAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
@@ -37,7 +34,6 @@ public class Kauri extends JavaPlugin {
     public PacketProcessor packetProcessor;
     public DataManager dataManager;
     public LoggerManager loggerManager;
-    public KeepaliveProcessor keepaliveProcessor;
 
     //Lag Information
     public RollingAverageDouble tps = new RollingAverageDouble(4, 20);
@@ -75,10 +71,6 @@ public class Kauri extends JavaPlugin {
         MiscUtils.printToConsole("&7Unregistering Kauri API...");
         kauriAPI.service.shutdown();
         loggingThread.shutdown();
-
-        MiscUtils.printToConsole("Unregistering processors...");
-        keepaliveProcessor.stop();
-        keepaliveProcessor = null;
 
         if(!reload) {
             kauriAPI = null;
@@ -155,11 +147,6 @@ public class Kauri extends JavaPlugin {
             lastTick = currentTime;
             Kauri.INSTANCE.lastTick = currentTime;
         }, this, 1L, 1L);
-
-        WrappedOutTransaction transaction =new WrappedOutTransaction(0, (short)69, false);
-        RunUtils.taskTimerAsync(() ->
-            Bukkit.getOnlinePlayers().forEach(player ->
-                TinyProtocolHandler.sendPacket(player, transaction)), 40L, 40L);
     }
 
     public double getTps() {

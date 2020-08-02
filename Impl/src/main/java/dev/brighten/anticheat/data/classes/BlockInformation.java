@@ -83,7 +83,6 @@ public class BlockInformation {
 
         handler.setSize(0.6f, 0.05f);
 
-        handler.setOffset(-0.05);
         objectData.playerInfo.serverGround =
                 handler.isCollidedWith(Materials.SOLID) || handler.contains(EntityType.BOAT);
         //Bukkit.broadcastMessage("chigga5");
@@ -114,7 +113,7 @@ public class BlockInformation {
         onSlime = handler.isCollidedWith(XMaterial.SLIME_BLOCK.parseMaterial());
 
         handler.setOffset(-0.02);
-        handler.setSize(0.7, 1.82);
+        handler.setSize(0.64, 1.82);
 
         inLava = handler.isCollidedWith(XMaterial.LAVA.parseMaterial(),
                 XMaterial.STATIONARY_LAVA.parseMaterial());

@@ -15,10 +15,6 @@ public class NoFallB extends Check {
     private static double GROUND = 1 / 64d;
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if(!packet.isPos() || !data.playerInfo.worldLoaded || data.playerInfo.serverPos
-                || data.playerInfo.lastRespawnTimer.hasNotPassed(1))
-            return;
-
         boolean ground = data.playerInfo.to.y % GROUND == 0;
 
         if(ground != packet.isGround()) {
