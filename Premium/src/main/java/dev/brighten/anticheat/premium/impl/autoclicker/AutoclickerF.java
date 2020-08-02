@@ -3,16 +3,13 @@ package dev.brighten.anticheat.premium.impl.autoclicker;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
-import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.api.check.CheckType;
-import lombok.val;
 
 @CheckInfo(name = "Autoclicker (F)", description = "Checks for a constant skew of values.", developer = true,
         checkType = CheckType.AUTOCLICKER, minVersion = ProtocolVersion.V1_8)
@@ -23,12 +20,8 @@ public class AutoclickerF extends Check {
     public EvictingList<Integer> hitAverage = new EvictingList<>(15), noHitAvg = new EvictingList<>(15);
 
     @Packet
-    public void onFlying(WrappedInTransactionPacket packet) {
-        val optional = Kauri.INSTANCE.keepaliveProcessor.getKeepById(packet.getAction());
-
-        if(optional.isPresent()) {
-            flying++;
-        }
+    public void onFlying(WrappedInFlyingPacket packet) {
+        flying++;
     }
 
     @Packet

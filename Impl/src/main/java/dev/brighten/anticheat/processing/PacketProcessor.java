@@ -91,6 +91,7 @@ public class PacketProcessor {
 
                 data.lagInfo.lastFlying = timeStamp;
 
+                data.clickProcessor.onFlying(packet);
                 data.potionProcessor.onFlying(packet);
                 Kauri.INSTANCE.profiler.start("data:moveprocessor");
                 data.moveProcessor.process(packet, timeStamp);
@@ -232,8 +233,6 @@ public class PacketProcessor {
                 optional.ifPresent(ka -> {
                     data.lagInfo.lastPing = data.lagInfo.ping;
                     data.lagInfo.ping = (current - ka.start);
-
-                    data.clickProcessor.onFlying(packet);
 
                     ka.getReceived(data.uuid).ifPresent(r -> {
                         r.receivedStamp = data.lagInfo.recieved = event.getTimeStamp();

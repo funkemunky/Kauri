@@ -3,8 +3,6 @@ package dev.brighten.anticheat.processing;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
-import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.utils.TickTimer;
 import cc.funkemunky.api.utils.Tuple;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
@@ -12,7 +10,6 @@ import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.MiscUtils;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,12 +37,13 @@ public class ClickProcessor {
     private final ObjectData data;
     private int flyingTicks;
 
-    public void onFlying(WrappedInTransactionPacket packet) {
+    public void onFlying(WrappedInFlyingPacket packet) {
         flyingTicks++;
     }
 
     public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
-        long delta = flyingTicks * 50L;
+        long delta = data.playerVersion.isBelow(ProtocolVersion.V1_9)
+                ? flyingTicks * 50L : timeStamp - lastTimestamp;
 
         if(delta < 600
                 && !data.playerInfo.breakingBlock && data.playerInfo.lastBlockPlace.hasPassed(3)) {
