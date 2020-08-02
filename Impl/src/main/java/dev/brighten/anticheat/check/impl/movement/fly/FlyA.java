@@ -1,8 +1,6 @@
 package dev.brighten.anticheat.check.impl.movement.fly;
 
-import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.Color;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -10,50 +8,67 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.MovementUtils;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "Fly (A)", description = "Simple fly check.", punishVL = 5,
-        checkType = CheckType.FLIGHT, developer = true)
+@CheckInfo(name = "Fly (A)", description = "Sets a maximum height distance", punishVL = 5,
+        checkType = CheckType.FLIGHT)
 @Cancellable
 public class FlyA extends Check {
 
-    private static double GROUND = 1 / 64d, CHUNK_LOAD = -0.1 * 0.98D;
+    private double maxHeight, groundY;
+    private float slimeHeight;
+    private boolean wasOnSlime, tookVelocity;
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
-        if(!packet.isPos() || data.playerInfo.lastTeleportTimer.hasNotPassed(1)
-                || data.playerInfo.serverAllowedFlight
-                || data.playerInfo.liquidTimer.hasNotPassed(1)
-                || data.playerInfo.climbTimer.hasNotPassed(1)
-                || data.playerInfo.lastRespawnTimer.hasNotPassed(5)) return;
+    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
+        if(data.blockInfo.onSlime
+                && data.playerInfo.lDeltaY < -.4) {
+            wasOnSlime = true;
+            slimeHeight = -1 * (float)data.playerInfo.lDeltaY;
 
-        long start = System.nanoTime();
-        boolean onGround = packet.getY() % GROUND == 0, fromGround = data.playerInfo.from.y % GROUND == 0;
-
-        boolean hitHead = (packet.getY() + 1.8f) % GROUND <= 0;
-
-        if(Math.abs(data.playerInfo.deltaY - CHUNK_LOAD) < 1E-5) {
-            debug("chunk isn't loaded");
-            return;
+            groundY = data.playerInfo.to.y;
+            maxHeight = Math.max(maxHeight, MovementUtils.getTotalHeight(data.playerVersion, slimeHeight) * 2.5);
+        } else if(!tookVelocity && data.playerInfo.serverGround) {
+            groundY = data.playerInfo.to.y;
+            wasOnSlime = false;
+            maxHeight = data.playerInfo.totalHeight * 2.5;
         }
 
-        long end = -1;
-        if(!onGround && !fromGround && !hitHead) {
-            double predicted = (data.playerInfo.lDeltaY - 0.08) * 0.9800000190734863D;
-
-            if(Math.abs(predicted) < 0.005 && data.playerVersion.isBelow(ProtocolVersion.V1_9))
-                predicted = 0;
-
-            double check = Math.abs(data.playerInfo.deltaY - predicted);
-
-            if(check > 0.0000001) {
-                vl++;
-                flag("deltaY=%v.4 predicted=%v.4", data.playerInfo.deltaY, predicted);
-            }
-            end = System.nanoTime() - start;
-
-            debug(Color.Green + "deltaY=%v difference=%v", data.playerInfo.deltaY, check);
+        if(data.playerInfo.lastVelocity.hasNotPassed(10)) {
+            tookVelocity = true;
+        } else if(data.playerInfo.serverGround) {
+            tookVelocity = false;
         }
 
-        debug("ground=%v fground=%v hitHead=%v time=%v",
-                onGround, fromGround, hitHead, end);
+        if(tookVelocity || data.blockInfo.inLiquid || data.playerInfo.lastPlaceLiquid.hasNotPassed(10)
+                || data.blockInfo.onClimbable) {
+            groundY = data.playerInfo.to.y;
+            maxHeight = data.playerInfo.totalHeight * 1.4;
+        }
+
+        if(data.playerInfo.clientGround || data.playerInfo.serverGround
+                || data.playerInfo.flightCancel
+                || data.playerInfo.serverPos
+                || (data.playerInfo.blockOnTo != null && data.playerInfo.blockOnTo.getType().isSolid())
+                || data.playerInfo.lastBlockPlace.hasNotPassed(7)) {
+            groundY = data.playerInfo.to.y;
+        }
+
+        maxHeight = Math.max(1.3, maxHeight); //Fixes the occasional fuck up (usually on reload). Temporary.
+
+        double totalHeight = data.playerInfo.to.y - groundY;
+        if(totalHeight > maxHeight + 2
+                && packet.isPos()
+                && !data.playerInfo.clientGround
+                && !data.playerInfo.serverGround
+                && !data.playerInfo.nearGround
+                && !data.playerInfo.flightCancel) {
+            vl++;
+            flag("%v>-%v; ping=%p tps=%t", totalHeight, maxHeight);
+        }
+
+        debug("total=" + totalHeight + " max=" + maxHeight
+                + " ground=" + data.playerInfo.serverGround
+                + " vel=" + tookVelocity + " slime=" + wasOnSlime);
+
+        vl-= vl > 0 ? 0.01 : 0;
     }
 }

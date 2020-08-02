@@ -57,7 +57,7 @@ public class ReachB extends Check {
             double distance = 69, horzDistance = 69;
             int misses = 0, collided = 0;
             for (KLocation originLoc : Arrays.asList(data.playerInfo.to.clone(), data.playerInfo.from.clone())) {
-                originLoc.y+= data.playerInfo.sneaking ? 1.54f : 1.62f;
+                originLoc.y+= data.playerInfo.sneaking ? 1.54 : 1.62;
                 RayCollision ray = new RayCollision(originLoc.toVector(), MathUtils.getDirection(originLoc));
                 if(debug) ray.draw(WrappedEnumParticle.CRIT, Bukkit.getOnlinePlayers());
                 for (SimpleCollisionBox sbox : simpleBoxes) {

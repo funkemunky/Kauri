@@ -24,7 +24,7 @@ import dev.brighten.anticheat.processing.ClickProcessor;
 import dev.brighten.anticheat.processing.MovementProcessor;
 import dev.brighten.anticheat.processing.PotionProcessor;
 import dev.brighten.anticheat.utils.PastLocation;
-import cc.funkemunky.api.utils.TickTimer;
+import dev.brighten.anticheat.utils.TickTimer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -60,11 +60,13 @@ public class ObjectData {
     public MovementProcessor moveProcessor;
     public PotionProcessor potionProcessor;
     public ClickProcessor clickProcessor;
-    public int hashCode;
+    public int hashCode, currentTicks;
     public boolean banned;
     public ModData modData;
     public ProtocolVersion playerVersion = ProtocolVersion.UNKNOWN;
     public Set<Player> boxDebuggers = new HashSet<>();
+    public List<PotionEffectType> potionEffects = new ArrayList<>(),
+            effectsToChange = new ArrayList<>();
     public final Map<String, Long> keepAliveStamps = Collections.synchronizedMap(new HashMap<>());
     public final Map<String, Short> transactionActions = Collections.synchronizedMap(new HashMap<>());
     public ConcurrentEvictingList<CancelType> typesToCancel = new ConcurrentEvictingList<>(10);
@@ -183,8 +185,8 @@ public class ObjectData {
         public long ping, averagePing, transPing, lastPing, lastTransPing;
         public MaxInteger lagTicks = new MaxInteger(25);
         public boolean lagging;
-        public TickTimer lastPacketDrop = new TickTimer( 10),
-                lastPingDrop = new TickTimer( 40);
+        public TickTimer lastPacketDrop = new TickTimer(ObjectData.this, 10),
+                lastPingDrop = new TickTimer(ObjectData.this, 40);
         public RollingAverageLong pingAverages = new RollingAverageLong(10, 0);
         public long lastFlying = 0;
     }

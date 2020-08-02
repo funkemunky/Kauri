@@ -83,6 +83,7 @@ public class PacketProcessor {
             case Packet.Client.LOOK: {
                 WrappedInFlyingPacket packet = new WrappedInFlyingPacket(object, data.getPlayer());
 
+                data.currentTicks++;
                 if (timeStamp - data.lagInfo.lastFlying <= 2 || timeStamp - data.lagInfo.lastFlying >= 90) {
                     data.lagInfo.lastPacketDrop.reset();
                 }
@@ -455,8 +456,8 @@ public class PacketProcessor {
 
                 data.playerInfo.posLocs.add(new KLocation(packet.getX(), packet.getY(), packet.getZ(),
                         packet.getYaw(), packet.getPitch()));
-                data.playerInfo.lastServerPos = timeStamp;
                 data.checkManager.runPacket(packet, timeStamp);
+                data.playerInfo.lastServerPos = timeStamp;
                 break;
             }
         }

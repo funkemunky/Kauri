@@ -1,13 +1,9 @@
 package dev.brighten.anticheat.check.impl.combat.hitbox;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.MiscUtils;
-import cc.funkemunky.api.utils.world.CollisionBox;
-import cc.funkemunky.api.utils.world.EntityData;
-import cc.funkemunky.api.utils.world.types.ComplexCollisionBox;
 import cc.funkemunky.api.utils.world.types.RayCollision;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
@@ -16,12 +12,10 @@ import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.AtomicDouble;
 import dev.brighten.api.check.CheckType;
 import org.bukkit.GameMode;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -46,28 +40,25 @@ public class Hitboxes extends Check {
     private static boolean allowNPCFlag = true;
 
     @Packet
-    public void onFlying(WrappedInUseEntityPacket packet, long timeStamp) {
+    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if (checkParameters(data)) {
 
             List<RayCollision> rayTrace = Stream.of(data.playerInfo.to.clone(), data.playerInfo.from.clone())
                     .map(l -> {
                         KLocation loc = l.clone();
-                        loc.y+=data.playerInfo.sneaking ? 1.54f : 1.62f;
+                        loc.y+=data.playerInfo.sneaking ? 1.54 : 1.62;
                         return new RayCollision(loc.toVector(),
                                 MathUtils.getDirection(loc));
                     })
                     .collect(Collectors.toList());
 
-            List<SimpleCollisionBox> entityLocations = new ArrayList<>();
-
-
-           data.targetPastLocation
+            List<SimpleCollisionBox> entityLocations = data.targetPastLocation
                     .getEstimatedLocation(timeStamp,
                             data.lagInfo.transPing, 150L
                                     + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
                     .stream()
-                    .map(loc -> getHitbox(loc, data.target))
-                    .forEach(box -> box.downCast(entityLocations));
+                    .map(loc -> getHitbox(loc, data.target.getType()))
+                    .collect(Collectors.toList());
 
             long collisions = 0;
             AtomicDouble distance = new AtomicDouble(10);
@@ -100,6 +91,8 @@ public class Hitboxes extends Check {
     private static boolean checkParameters(ObjectData data) {
         return data.playerInfo.lastAttack.hasNotPassed(0)
                 && data.target != null
+                && data.target.getType().equals(EntityType.PLAYER)
+                && (allowNPCFlag || ((Player) data.target).isOnline())
                 && data.targetPastLocation.previousLocations.size() > 12
                 && Kauri.INSTANCE.lastTickLag.hasPassed(10)
                 && allowedEntities.contains(data.target.getType())
@@ -108,15 +101,15 @@ public class Hitboxes extends Check {
                 && !data.getPlayer().getGameMode().equals(GameMode.CREATIVE);
     }
 
-    private static CollisionBox getHitbox(KLocation loc, Entity type) {
-        List<SimpleCollisionBox> boxes = new ArrayList<>();
+    private static SimpleCollisionBox getHitbox(KLocation loc, EntityType type) {
+        if(type.equals(EntityType.PLAYER)) {
+            return new SimpleCollisionBox(loc.toVector(), 0.6, 1.8).expand(0.25, 0.25, 0.25);
+        } else {
+            Vector bounds = MiscUtils.entityDimensions.get(type);
 
-        EntityData.getEntityBox(loc, type).downCast(boxes);
-
-        boxes.forEach(box -> box.expand(0.2));
-
-        if(boxes.size() == 1) return boxes.get(0);
-
-        return new ComplexCollisionBox(boxes.toArray(new SimpleCollisionBox[0]));
+            return new SimpleCollisionBox(loc.toVector(), 0, 0).expand(bounds.getX(), 0, bounds.getZ())
+                    .expandMax(0, bounds.getY(), 0)
+                    .expand(0.3, 0.3, 0.3);
+        }
     }
 }

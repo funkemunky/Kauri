@@ -14,7 +14,7 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.Helper;
 import dev.brighten.anticheat.utils.MovementUtils;
-import cc.funkemunky.api.utils.TickTimer;
+import dev.brighten.anticheat.utils.TickTimer;
 import lombok.val;
 import org.bukkit.Material;
 import org.bukkit.potion.PotionEffectType;
@@ -37,7 +37,7 @@ public class SpeedC extends Check {
     @Override
     public void setData(ObjectData data) {
         super.setData(data);
-        horizontalIdle = new TickTimer(20);
+        horizontalIdle = new TickTimer(data, 20);
     }
 
     @Packet

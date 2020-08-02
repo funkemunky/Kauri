@@ -20,8 +20,9 @@ public class AutoclickerJ extends Check {
 
         double skew = Math.abs(data.clickProcessor.getSkewness());
         if(data.clickProcessor.getKurtosis() < 0
-                && data.clickProcessor.getMean() < 150L
-                && skew < 0.1
+                && data.clickProcessor.getMean() < 180
+                && (data.clickProcessor.getVariance() > 700 || skew < 0.15)
+                && skew < 0.6
                 && (data.clickProcessor.getZeros() <= 1 ||  data.clickProcessor.getMean() <= 50.4)) {
             if(buffer++ > 40) {
                 vl++;
