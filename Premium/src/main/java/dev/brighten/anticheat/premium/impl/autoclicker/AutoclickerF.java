@@ -3,60 +3,49 @@ package dev.brighten.anticheat.premium.impl.autoclicker;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
-import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.api.check.CheckType;
+import lombok.val;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @CheckInfo(name = "Autoclicker (F)", description = "Checks for a constant skew of values.", developer = true,
-        checkType = CheckType.AUTOCLICKER, minVersion = ProtocolVersion.V1_8)
+        checkType = CheckType.AUTOCLICKER, maxVersion = ProtocolVersion.V1_8_9)
 public class AutoclickerF extends Check {
 
-    public int flying, lflying, buffer, attackTick;
+    public int flying, buffer;
 
-    public EvictingList<Integer> hitAverage = new EvictingList<>(15), noHitAvg = new EvictingList<>(15);
-
+    public List<Float> cpsList = new ArrayList<>();
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         flying++;
     }
 
     @Packet
-    public void onUse(WrappedInUseEntityPacket packet, int current) {
-        attackTick = current;
-    }
+    public void onArm(WrappedInArmAnimationPacket packet) {
+        float cps = 20.f / flying;
 
-    @Packet
-    public void onArm(WrappedInArmAnimationPacket packet, int current) {
-        checkProcessing:
-        {
-            if (flying > 10)
-                break checkProcessing;
-            if (data.playerInfo.breakingBlock || current - attackTick < 4)
-                hitAverage.add(flying);
-            else noHitAvg.add(flying);
+        cpsList.add(cps);
 
-            if (hitAverage.size() < 14 || noHitAvg.size() < 14) return;
+        if(cpsList.size() == 20) {
+            val skewness = MiscUtils.getSkewness(cpsList);
+            val variance = MiscUtils.stdev(cpsList);
 
-            double hit = hitAverage.stream().mapToInt(v -> v).average().orElse(-1),
-                    nohit = noHitAvg.stream().mapToInt(v -> v).average().orElse(-1);
+            if(variance > 2.5 && Math.abs(skewness) < 0.1) {
+                buffer+= 4;
+                if(buffer > 6) {
+                    vl++;
+                    flag("skew=%v.2 variance=%v.3", skewness, variance);
+                }
+            } else if(buffer > 0) buffer--;
 
-            double delta = nohit - hit;
-            double std = MiscUtils.stdev(hitAverage), nstd = MiscUtils.stdev(noHitAvg);
-
-            //We dont do Math.abs since it actually can hinder detection in this instance.
-            //It should never go below zero if the player is legitimate.
-            if (delta < 0.05 && Math.abs(std - nstd) < 0.08) {
-                vl++;
-                flag("shit");
-            }
-
-            debug("flying=%v hit=%v.2 nohit=%v.2 std=%v nstd=%v", flying, hit, nohit, std, nstd);
+            debug("skew=%v.4 std=%v.4 buffer=%v", skewness, variance, buffer);
+            cpsList.clear();
         }
-        lflying = flying;
         flying = 0;
     }
 }
