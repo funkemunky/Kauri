@@ -55,7 +55,7 @@ public class SpeedC extends Check {
 
         List<String> tags = new ArrayList<>();
 
-        double moveSpeed = data.predictionService.aiMoveSpeed;
+        double moveSpeed = Math.pow(data.getPlayer().getWalkSpeed() * 5, 2);
         double drag = 0.91;
         boolean onGround = data.playerInfo.clientGround || data.blockInfo.onSlime;
 

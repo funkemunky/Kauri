@@ -3,7 +3,6 @@ package dev.brighten.anticheat.processing;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.types.MathHelper;
 import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.handlers.PlayerSizeHandler;
 import cc.funkemunky.api.utils.objects.VariableValue;
@@ -370,11 +369,11 @@ public class MovementProcessor {
             data.pastLocation.addLocation(data.playerInfo.to.clone());
     }
     private static float getDeltaX(float yawDelta, float gcd) {
-        return MathHelper.floor(yawDelta / gcd);
+        return (yawDelta / gcd);
     }
 
     private static float getDeltaY(float pitchDelta, float gcd) {
-        return MathHelper.floor(pitchDelta / gcd);
+        return (pitchDelta / gcd);
     }
 
     public static int sensToPercent(float sensitivity) {
