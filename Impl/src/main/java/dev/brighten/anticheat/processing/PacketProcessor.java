@@ -404,7 +404,6 @@ public class PacketProcessor {
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
             }
-
             case Packet.Server.CLOSE_WINDOW: {
                 WrappedOutCloseWindowPacket packet = new WrappedOutCloseWindowPacket(object, data.getPlayer());
                 data.playerInfo.inventoryOpen = false;
