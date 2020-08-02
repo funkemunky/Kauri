@@ -2,35 +2,40 @@ package dev.brighten.anticheat.check.impl.movement.fly;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.world.BlockData;
-import cc.funkemunky.api.utils.world.CollisionBox;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
-import dev.brighten.anticheat.utils.Helper;
-import dev.brighten.anticheat.utils.MovementUtils;
 import dev.brighten.api.check.CheckType;
-import org.bukkit.block.Block;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @CheckInfo(name = "Fly (B)", description = "Checks for improper acceleration.", checkType = CheckType.FLIGHT,
-        vlToFlag = 4, punishVL = 12)
+        vlToFlag = 4, punishVL = 12, developer = true)
 @Cancellable
 public class FlyB extends Check {
 
+    private double predicted;
+
+    @Packet
+    public void onVelocity(WrappedOutVelocityPacket packet) {
+        data.runKeepaliveAction(d -> {
+            predicted = packet.getY();
+        });
+    }
+
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if(packet.isPos() || (data.playerInfo.deltaY != 0)) {
+        if(packet.isPos()) {
             //We check if the player is in ground, since theoretically the y should be zero.
-            double predicted = (data.playerInfo.lDeltaY - 0.08) * 0.9800000190734863D;
 
-            if(data.playerInfo.lClientGround && !data.playerInfo.clientGround) {
-                predicted = MovementUtils.getJumpHeight(data);
+            if(data.playerInfo.lClientGround && !data.playerInfo.clientGround
+                    && (data.playerInfo.deltaY > 0 && data.playerInfo.deltaY < data.playerInfo.jumpHeight * 1.5)) {
+                predicted = data.playerInfo.jumpHeight;
+            } else if(data.playerInfo.lClientGround
+                    && !data.playerInfo.clientGround && data.playerInfo.lDeltaY == 0 && data.playerInfo.deltaY < 0) {
+                predicted = data.playerInfo.deltaY;
             }
 
             boolean usedCollision = false;
@@ -53,17 +58,6 @@ public class FlyB extends Check {
                     usedCollision = true;
                     break;
                 }
-            }
-
-            //Basically, this bug would only occur if the client's movement is less than a certain amount.
-            //If it is, it won't send any position packet. Usually this only occurs when the magnitude
-            //of motionY is less than 0.005 and it rounds it to 0.
-            //The easiest way I found to produce this oddity is by putting myself in a corner and just jumping.
-            if(Math.abs(data.playerInfo.deltaY - -0.078)  < 0.01
-                    && MathUtils.getDelta(data.playerInfo.deltaY, predicted) > 0.0001
-                    && Math.abs(data.playerInfo.deltaY - data.playerInfo.lDeltaY) > 0.11) {
-                predicted = -0.08;
-                predicted*= 0.9800000190734863D;
             }
 
             if((data.playerInfo.clientGround && predicted > -0.08 && predicted < -0.077)
@@ -91,6 +85,15 @@ public class FlyB extends Check {
             debug("pos=%v deltaY=%v.3 collided=%v predicted=%v.3 ground=%v lpass=%v vl=%v.1",
                     packet.getY(), data.playerInfo.deltaY, usedCollision, predicted, data.playerInfo.clientGround,
                     data.playerInfo.liquidTimer.getPassed(), vl);
+
+            predicted-= 0.08;
+            predicted*= (double)0.98f;
+        } else {
+            if(data.playerInfo.deltaXZ == 0 && data.playerInfo.lDeltaY != 0 && !data.playerInfo.clientGround) {
+                if(Math.abs(predicted) < 0.005 && data.playerVersion.isBelow(ProtocolVersion.V1_9)) predicted = 0;
+                predicted-= 0.08;
+                predicted*= (double)0.98f;
+            } else predicted = 0;
         }
     }
 }

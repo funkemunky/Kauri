@@ -4,7 +4,6 @@ import cc.funkemunky.api.events.impl.PacketReceiveEvent;
 import cc.funkemunky.api.events.impl.PacketSendEvent;
 import cc.funkemunky.api.reflections.impl.MinecraftReflection;
 import cc.funkemunky.api.reflections.types.WrappedField;
-import cc.funkemunky.api.tinyprotocol.api.NMSObject;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
@@ -17,10 +16,8 @@ import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import lombok.val;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerLocaleChangeEvent;
 
 public class PacketProcessor {
 
@@ -405,39 +402,11 @@ public class PacketProcessor {
                 }
                 break;
             }
-
             case Packet.Server.CLOSE_WINDOW: {
                 WrappedOutCloseWindowPacket packet = new WrappedOutCloseWindowPacket(object, data.getPlayer());
                 data.playerInfo.inventoryOpen = false;
                 data.playerInfo.inventoryId = 0;
 
-                if(!data.checkManager.runPacket(packet, timeStamp)) {
-                    event.setCancelled(true);
-                }
-                break;
-            }
-            case NMSObject.Server.LEGACY_REL_LOOK:
-            case NMSObject.Server.LEGACY_REL_POSITION:
-            case NMSObject.Server.LEGACY_REL_POSITION_LOOK:
-            case NMSObject.Server.REL_LOOK:
-            case NMSObject.Server.REL_POSITION:
-            case NMSObject.Server.REL_POSITION_LOOK:
-            case NMSObject.Server.ENTITY: {
-                WrappedOutRelativePosition packet = new WrappedOutRelativePosition(object, data.getPlayer());
-
-                val optional = data.getPlayer().getWorld().getEntities().stream()
-                        .filter(ent -> ent.getEntityId() == packet.getId()).findFirst();
-
-                if(optional.isPresent()) {
-                    KLocation loc = new KLocation(optional.get().getLocation());
-                    data.runKeepaliveAction(d -> {
-                        loc.x+= packet.getX() / 32.;
-                        loc.y+= packet.getY() / 32.;
-                        loc.z+= packet.getZ() / 32.;
-
-                        d.entityLocations.put(packet.getId(), loc);
-                    });
-                }
                 if(!data.checkManager.runPacket(packet, timeStamp)) {
                     event.setCancelled(true);
                 }
