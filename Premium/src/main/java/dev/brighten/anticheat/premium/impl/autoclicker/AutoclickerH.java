@@ -25,9 +25,9 @@ public class AutoclickerH extends Check {
                 || data.playerInfo.lastBlockPlace.hasNotPassed(2)) return;
 
         long range = data.clickProcessor.getMax() - data.clickProcessor.getMin();
-        if(data.clickProcessor.getStd() < 0.3
-                && data.clickProcessor.getMean() < 3
-                && range > 3) {
+        if(data.clickProcessor.getStd() < 15
+                && data.clickProcessor.getMean() < 150
+                && range > 150L) {
             buffer++;
         } else if(buffer > 0) buffer-= 0.25f;
 

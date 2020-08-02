@@ -1,13 +1,11 @@
 package dev.brighten.anticheat.check.impl.movement.speed;
 
-import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.reflections.impl.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInKeepAlivePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.*;
-import cc.funkemunky.api.utils.world.BlockData;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -93,31 +91,12 @@ public class SpeedC extends Check {
 
                 //TODO Make a fix for this that accounts for flowing water.
                 //TODO Also check to see if this fix even works with a longer chain of flowing water.
-                //moveSpeed+= 0.04;
-
-                val optional = data.blockInfo.blocks.stream()
-                        .filter(block -> Materials.checkFlag(block.getType(), Materials.WATER)
-                                && BlockData.getData(block.getType()).getBox(block, data.playerVersion)
-                                .isCollided(data.box))
-                        .map(MinecraftReflection::getBlockFlow)
-                        .filter(pos -> pos.a != 0 || pos.b != 0 || pos.c != 0)
-                        .findFirst();
-
-                if(optional.isPresent()) {
-                    val flow = optional.get();
-
-                    moveSpeed+= Math.hypot(flow.a, flow.c);
-                    tags.add("water-flow");
-                }
+                moveSpeed+= 0.02;
             }
 
             if (data.blockInfo.inLava) {
                 tags.add("lava");
                 drag = 0.5;
-            }
-
-            if(data.playerInfo.usingItem) {
-                moveSpeed*= 0.2;
             }
 
             data.blockInfo.handler.setOffset(0);
@@ -129,9 +108,9 @@ public class SpeedC extends Check {
                 moveSpeed*=.25;
             }
 
-            if(onSoul && onGround) {
+            if(onSoul && onGround && data.playerInfo.clientGround && data.playerInfo.lClientGround) {
                 tags.add("soulsand");
-                moveSpeed*= 0.4;
+                moveSpeed*= 0.5;
             }
 
             double horizontalMove = (data.playerInfo.deltaXZ - previousDistance) - moveSpeed;
