@@ -422,7 +422,7 @@ public class Check implements KauriCheck {
         register(new KillauraD());
         register(new KillauraE());
         register(new KillauraF());
-        //register(new Phase());
+        register(new Phase());
         register(new OmniSprint());
         //register(new Inertia());
         register(new Timer());
@@ -438,7 +438,6 @@ public class Check implements KauriCheck {
         register(new BadPacketsK());
         register(new BadPacketsL());
         register(new BadPacketsM());
-        register(new BadPacketsN());
         register(new VelocityA());
         register(new VelocityC());
         register(new HandA());

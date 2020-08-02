@@ -16,7 +16,7 @@ public class HandA extends Check {
     public void use(WrappedInBlockPlacePacket packet) {
          debug("sentFlying=%v sentTrans=%v", sentFlying, sentTrans);
         if(sentFlying && sentTrans) {
-            vl+= 2;
+            vl++;
             if(vl > 11) {
                 flag("fly=%v trans=%v", sentFlying, sentTrans);
             }

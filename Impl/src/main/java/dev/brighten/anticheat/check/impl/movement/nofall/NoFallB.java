@@ -7,7 +7,7 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "NoFall (B)", description = "",
+@CheckInfo(name = "NoFall (B)", description = "A very simple NoFall check.",
         checkType = CheckType.NOFALL, punishVL = 12, executable = false, developer = true)
 @Cancellable
 public class NoFallB extends Check {
@@ -16,16 +16,17 @@ public class NoFallB extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if(!packet.isPos() || !data.playerInfo.worldLoaded || data.playerInfo.serverPos
-                || data.playerInfo.lastTeleportTimer.hasPassed(1)
+                || data.playerInfo.lastTeleportTimer.hasNotPassed(1)
                 || data.playerInfo.lastRespawnTimer.hasNotPassed(1))
             return;
 
         boolean ground = data.playerInfo.to.y % GROUND == 0;
 
-        if(ground != packet.isGround()) {
-            vl++;
-            flag("c=%v s=%v", packet.isGround(), ground);
-        }
+        if(ground != packet.isGround() && !data.blockInfo.onSlime) {
+            if(++vl > 2) {
+                flag("c=%v s=%v", packet.isGround(), ground);
+            }
+        } else if(vl > 0) vl-= 0.5;
 
         debug("c=%v s=%v", packet.isGround(), ground);
     }

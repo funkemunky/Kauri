@@ -17,7 +17,7 @@ import java.util.List;
 
 @Cancellable
 @CheckInfo(name = "Speed (C)", description = "Minecraft calculated speed check",
-        punishVL = 30, vlToFlag = 5, developer = true)
+        punishVL = 30, vlToFlag = 5)
 public class SpeedC extends Check {
 
     public double previousDistance;
@@ -55,11 +55,10 @@ public class SpeedC extends Check {
                 tags.add("ground");
                 drag *= 0.91f;
 
-                moveSpeed*= 1.3;
-
                 moveSpeed *= 0.16277136 / Math.pow(drag, 3);
 
                 if (data.playerInfo.deltaY > 0
+                        && data.getPlayer().isSprinting()
                         && data.playerInfo.deltaY < data.playerInfo.jumpHeight * 1.5) {
                     tags.add("ascend");
                     moveSpeed += 0.2;
@@ -74,7 +73,7 @@ public class SpeedC extends Check {
                 tags.add("water");
                 drag = 0.8f;
 
-                moveSpeed = 0.02;
+                moveSpeed = 0.034;
 
                 val depth = MovementUtils.getDepthStriderLevel(data.getPlayer());
                 if (depth > 0) {
@@ -82,26 +81,12 @@ public class SpeedC extends Check {
                     tags.add("depthstrider");
                     moveSpeed += (data.predictionService.aiMoveSpeed * 1.0F - moveSpeed) *  3.0F;
                 }
-
-                val optional = data.blockInfo.blocks.stream()
-                        .filter(block -> Materials.checkFlag(block.getType(), Materials.WATER)
-                                && BlockData.getData(block.getType()).getBox(block, data.playerVersion)
-                                .isCollided(data.box))
-                        .map(MinecraftReflection::getBlockFlow)
-                        .filter(pos -> pos.a != 0 || pos.b != 0 || pos.c != 0)
-                        .findFirst();
-
-                if(optional.isPresent()) {
-                    val flow = optional.get();
-
-                    moveSpeed+= 0.014D;
-                    tags.add("water-flow");
-                }
             }
 
             if (inLava) {
                 tags.add("lava");
                 drag = 0.5f;
+                moveSpeed = 0.026;
             }
 
             if(data.playerInfo.usingItem) {
@@ -122,11 +107,16 @@ public class SpeedC extends Check {
                 moveSpeed*= 0.4;
             }
 
+            if(data.playerInfo.lastTeleportTimer.hasNotPassed(3)) {
+                tags.add("teleported");
+                moveSpeed+= 0.5;
+            }
+
             double horizontalMove = (data.playerInfo.deltaXZ - previousDistance) / moveSpeed * 100;
             if (data.playerInfo.deltaXZ > 0.1 && !data.playerInfo.generalCancel) {
                 if (horizontalMove > 100 && data.playerInfo.lastVelocity.hasPassed(10)) {
                     vl++;
-                    if(horizontalMove > 0.2 || vl > 2) {
+                    if(horizontalMove > 400 || vl > 4) {
                         flag("+%v,tags=%v",
                                 MathUtils.round(horizontalMove, 5), String.join(",", tags));
                     }

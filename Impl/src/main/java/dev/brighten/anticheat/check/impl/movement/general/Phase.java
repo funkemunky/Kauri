@@ -1,16 +1,17 @@
 package dev.brighten.anticheat.check.impl.movement.general;
 
-import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
-import cc.funkemunky.api.utils.KLocation;
-import cc.funkemunky.api.utils.Materials;
-import cc.funkemunky.api.utils.RunUtils;
+import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.world.BlockData;
+import cc.funkemunky.api.utils.world.CollisionBox;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;
+import dev.brighten.db.utils.Pair;
 import lombok.val;
+import org.bukkit.Location;
+import org.bukkit.block.Block;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,79 +24,52 @@ public class Phase extends Check {
 
     private KLocation fromWhereShitAintBad = null;
     @Packet
-    public boolean onFlying(WrappedInFlyingPacket packet, long now) {
-        if(now - data.creation < 1200L || now - data.playerInfo.lastRespawn < 150L)
-            return false;
+    public void onFlying(WrappedInFlyingPacket packet, long now) {
+        if(now - data.creation < 1200L || now - data.playerInfo.lastRespawn < 150L || data.playerInfo.serverPos)
+            return;
 
         KLocation to = data.playerInfo.to, from = data.playerInfo.from;
+
+        if(fromWhereShitAintBad == null) fromWhereShitAintBad = from;
 
         SimpleCollisionBox box = new SimpleCollisionBox(from.toVector(), to.toVector());
 
         box.expand(0.3, 0, 0.3);
         box.expandMax(0, 1.8, 0);
-        box.expand(-0.0001, -0.1, -0.0001);
+        box.expand(-0.025);
 
-        val blockBoxes = data.blockInfo.blocks.stream()
-                .filter(block -> Materials.checkFlag(block.getType(), Materials.SOLID))
-                .map(block -> BlockData.getData(block.getType()).getBox(block, data.playerVersion))
-                .collect(Collectors.toList());
-        val boxes = blockBoxes.stream()
-                .filter(box::isCollided).collect(Collectors.toList());
+        box.sort();
 
-        val fromBox = new SimpleCollisionBox(data.playerInfo.from.toVector(), 0.6, 1.8)
-                .expand(-0, -.05, -0);
-        val fromCollided = boxes.stream().filter(bbox -> bbox.isCollided(fromBox))
-                .collect(Collectors.toList());
+        int minX = MathUtils.floor(box.xMin), minY = MathUtils.floor(box.yMin), minZ = MathUtils.floor(box.zMin);
+        int maxX = MathUtils.floor(box.xMax + 1), maxY = MathUtils.floor(box.yMax + 1), maxZ = MathUtils.floor(box.zMax + 1);
 
-        if(fromCollided.size() == 0) {
-            fromWhereShitAintBad = data.playerInfo.from;
+        List<Pair<Block, CollisionBox>> boxes = new ArrayList<>();
+        for(int x = minX ; x < maxX ; x++) {
+            for(int y = minY; y < maxY ; y++) {
+                for(int z = minZ ; z < maxZ ; z++) {
+                    Block block = BlockUtils.getBlock(new Location(packet.getPlayer().getWorld(), x, y, z));
+
+                    if(block == null || block.isEmpty() || !Materials
+                            .checkFlag(block.getType(), Materials.SOLID)) continue;
+
+                    val blockBox = BlockData.getData(block.getType()).getBox(block, data.playerVersion);
+
+                    if(box.isCollided(blockBox)) {
+                        boxes.add(new Pair<>(block, blockBox));
+                    }
+                }
+            }
         }
 
-        List<SimpleCollisionBox> debugMeAsshole = new ArrayList<>();
-        boxes.forEach(bbox -> {
-            bbox.downCast(debugMeAsshole);
-            bbox.draw(WrappedEnumParticle.FLAME, Collections.singleton(packet.getPlayer()));
-        });
+        //box.draw(WrappedEnumParticle.CRIT_MAGIC, Collections.singleton(packet.getPlayer()));
 
-        for (SimpleCollisionBox sbox : debugMeAsshole) {
-            debug("minX=%v.3 minY=%v.3 minZ=%v.3 maxX=.%v3 maxY=%v.3 maxZ=%v.3",
-                    sbox.xMin, sbox.yMin, sbox.zMin, sbox.xMax, sbox.yMax, sbox.zMax);
+        if(boxes.size() > 0) {
+            debug("collided=%v blocks=%v", boxes.size(), boxes.stream()
+                    .map(pair -> pair.key.getType().name()).collect(Collectors.joining(", ")));
+
+            RunUtils.task(() -> packet.getPlayer().teleport(from.toLocation(packet.getPlayer().getWorld())));
+        } else if(!data.blockInfo.collidesHorizontally) {
+            fromWhereShitAintBad = data.playerInfo.to;
         }
-
-        if((now - data.playerInfo.lastServerPos >= 10 || data.playerInfo.phaseFlagged)
-                && fromCollided.size() == 0 && boxes.size() > 0) {
-            data.playerInfo.phaseFlagged = true;
-            RunUtils.task(() -> packet.getPlayer().teleport((fromWhereShitAintBad != null
-                    ? fromWhereShitAintBad : from)
-                    .toLocation(data.getPlayer().getWorld())));
-            vl++;
-            flag("boxes=%v", boxes.size());
-            debug("fx=%v tx=%v", from.x, to.x);
-            return false;
-        } else if(boxes.size() > 0) {
-            debug("from=%v boxes=%v", fromCollided.size(), boxes.size());
-            data.playerInfo.phaseFlagged = false;
-        } else data.playerInfo.phaseFlagged = false;
-        /*for(int i = 0 ; i < distance ; i++) {
-            double mult = i / 2.;
-            double x = ray.originX + ray.directionX * mult;
-            double y = ray.originY * ray.directionY * mult;
-            double z = ray.originZ * ray.directionZ * mult;
-
-            //debug
-            WrappedPacketPlayOutWorldParticle particle =
-                    new WrappedPacketPlayOutWorldParticle(WrappedEnumParticle.CRIT, true,
-                            (float)x, (float)y, (float)z, 0, 0, 0, 0, 1);
-
-            TinyProtocolHandler.sendPacket(packet.getPlayer(), particle);
-            //end debug
-
-            SimpleCollisionBox box = new SimpleCollisionBox(new Vector(x, y, z), 0.6, 1.8);
-
-            //debug 2
-            box.draw(WrappedEnumParticle.FLAME, Collections.singleton(packet.getPlayer()));
-            //end debug 2
-        }*/
-        return false;
     }
 }

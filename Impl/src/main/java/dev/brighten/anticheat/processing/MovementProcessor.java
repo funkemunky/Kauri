@@ -96,13 +96,9 @@ public class MovementProcessor {
         //Adding past location
         data.pastLocation.addLocation(data.playerInfo.to);
 
-        if (data.playerInfo.posLocs.size() > 0) {
+        if (data.playerInfo.posLocs.size() > 0 && !packet.isGround()) {
             val optional = data.playerInfo.posLocs.stream()
-                    .filter(loc -> {
-                        return loc.toVector().setY(0)
-                                .distance(data.playerInfo.to.toVector().setY(0)) <= 1E-8
-                                && MathUtils.getDelta(loc.y, data.playerInfo.to.y) < 4;
-            })
+                    .filter(loc -> loc.x == packet.getX() && loc.y == packet.getY() && loc.z == packet.getZ())
                     .findFirst();
 
             if (optional.isPresent()) {

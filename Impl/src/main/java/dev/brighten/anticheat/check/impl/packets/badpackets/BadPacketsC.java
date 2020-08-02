@@ -20,7 +20,7 @@ public class BadPacketsC extends Check {
     public void use(WrappedInHeldItemSlotPacket packet) {
          debug("sentFlying=%v sentTrans=%v", sentFlying, sentTrans);
         if(sentFlying && sentTrans) {
-            vl+= 2;
+            vl++;
             if(vl > 11) {
                 flag("fly=%v trans=%v", sentFlying, sentTrans);
             }
