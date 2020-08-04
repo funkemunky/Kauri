@@ -434,6 +434,17 @@ public class PacketProcessor {
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
             }
+            case "PacketPlayOutRelEntityMove":
+            case "PacketPlayOutEntityLook":
+            case "PacketPlayOutRelEntityMoveLook":
+            case "PacketPlayOutEntity$PacketPlayOutRelEntityMove":
+            case "PacketPlayOutEntity$PacketPlayOutRelEntityMoveLook":
+            case "PacketPlayOutEntity$PacketPlayOutEntityLook": {
+                WrappedOutRelativePosition packet = new WrappedOutRelativePosition(object, data.getPlayer());
+
+                data.checkManager.runPacket(packet, timeStamp);
+                break;
+            }
             case Packet.Server.KEEP_ALIVE: {
                 WrappedOutKeepAlivePacket packet = new WrappedOutKeepAlivePacket(object, data.getPlayer());
 

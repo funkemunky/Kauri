@@ -10,6 +10,7 @@ import dev.brighten.anticheat.premium.impl.autoclicker.AutoclickerH;
 import dev.brighten.anticheat.premium.impl.autoclicker.AutoclickerI;
 import dev.brighten.anticheat.premium.impl.autoclicker.AutoclickerJ;
 import dev.brighten.anticheat.premium.impl.hitboxes.ReachB;
+import dev.brighten.anticheat.premium.impl.hitboxes.ReachC;
 
 @Init(priority = Priority.LOWEST)
 public class PremiumChecks {
@@ -18,6 +19,7 @@ public class PremiumChecks {
         MiscUtils.printToConsole("&aThanks for purchasing Kauri Ara.");
         Check.register(new VelocityB());
         Check.register(new ReachB());
+        Check.register(new ReachC());
         //Check.register(new Motion());
         Check.register(new AimI());
         Check.register(new AimG());

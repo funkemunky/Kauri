@@ -79,7 +79,7 @@ public class Kauri extends JavaPlugin {
             Atlas.getInstance().getEventManager().unregisterAll(this); //Unregistering Atlas listeners.
             MiscUtils.printToConsole("&7Unregistering commands...");
             //Unregister all commands starting with the arg "Kauri"
-            Atlas.getInstance().getCommandManager().unregisterCommand("kauri");
+            Atlas.getInstance().getCommandManager(this).unregisterCommands();
             MiscUtils.printToConsole("&7Shutting down all Bukkit tasks...");
             Bukkit.getScheduler().cancelTasks(this); //Cancelling all Bukkit tasks for this plugin.
         }
