@@ -136,8 +136,14 @@ public class CheckManager {
                                 new ArrayList<>());
 
                         methods.add(new WrappedCheck(check, method));
-                        methods.sort(Comparator.comparing(m ->
-                                m.method.getMethod().getAnnotation(Packet.class).priority().getPriority()));
+                        if(method.getMethod().isAnnotationPresent(Packet.class)) {
+                            methods.sort(Comparator.comparing(m ->
+                                    m.method.getMethod().getAnnotation(Packet.class).priority().getPriority()));
+                        } else {
+                            methods.sort(Comparator.comparing(m ->
+                                    m.method.getMethod().getAnnotation(dev.brighten.anticheat.check.api.Event.class)
+                                            .priority().getPriority()));
+                        }
                         checkMethods.put(parameter, methods);
                     });
         });

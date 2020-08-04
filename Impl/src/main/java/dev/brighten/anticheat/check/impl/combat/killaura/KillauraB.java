@@ -2,6 +2,7 @@ package dev.brighten.anticheat.check.impl.combat.killaura;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInKeepAlivePacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.*;
@@ -27,8 +28,8 @@ public class KillauraB extends Check {
     }
 
     @Packet
-    public void onTrans(WrappedInKeepAlivePacket packet) {
-        if(Kauri.INSTANCE.keepaliveProcessor.keepAlives.containsKey((int)packet.getTime())) {
+    public void onTrans(WrappedInTransactionPacket packet) {
+        if(Kauri.INSTANCE.keepaliveProcessor.keepAlives.containsKey(packet.getAction())) {
             sentFlying = false;
             sentTrans = true;
         }

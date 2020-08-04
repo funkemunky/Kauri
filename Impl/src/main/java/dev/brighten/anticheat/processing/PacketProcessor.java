@@ -198,7 +198,32 @@ public class PacketProcessor {
 
                 long time = packet.getTime();
 
-                Kauri.INSTANCE.keepaliveProcessor.addResponse(data, (int)time);
+                data.checkManager.runPacket(packet, timeStamp);
+                if(data.sniffing) {
+                    data.sniffedPackets.add(event.getType() + ":@:" + time + ":@:" + event.getTimeStamp());
+                }
+                break;
+            }
+            case Packet.Client.CLIENT_COMMAND: {
+                WrappedInClientCommandPacket packet = new WrappedInClientCommandPacket(object, data.getPlayer());
+
+                if(packet.getCommand()
+                        .equals(WrappedInClientCommandPacket.EnumClientCommand.OPEN_INVENTORY_ACHIEVEMENT)) {
+                    data.playerInfo.inventoryOpen = true;
+                }
+
+                data.checkManager.runPacket(packet, timeStamp);
+
+                if(data.sniffing) {
+                    data.sniffedPackets.add(event.getType() + ":@:" + packet.getCommand().name()
+                            + ":@:" + event.getTimeStamp());
+                }
+                break;
+            }
+            case Packet.Client.TRANSACTION: {
+                WrappedInTransactionPacket packet = new WrappedInTransactionPacket(object, data.getPlayer());
+
+                Kauri.INSTANCE.keepaliveProcessor.addResponse(data, packet.getAction());
 
                 val optional = Kauri.INSTANCE.keepaliveProcessor.getResponse(data);
 
@@ -225,35 +250,7 @@ public class PacketProcessor {
                     }
                 });
 
-                if(optional.isPresent())
-                    event.setCancelled(true);
-
-                data.checkManager.runPacket(packet, timeStamp);
-                if(data.sniffing) {
-                    data.sniffedPackets.add(event.getType() + ":@:" + time + ":@:" + event.getTimeStamp());
-                }
-                break;
-            }
-            case Packet.Client.CLIENT_COMMAND: {
-                WrappedInClientCommandPacket packet = new WrappedInClientCommandPacket(object, data.getPlayer());
-
-                if(packet.getCommand()
-                        .equals(WrappedInClientCommandPacket.EnumClientCommand.OPEN_INVENTORY_ACHIEVEMENT)) {
-                    data.playerInfo.inventoryOpen = true;
-                }
-
-                data.checkManager.runPacket(packet, timeStamp);
-
-                if(data.sniffing) {
-                    data.sniffedPackets.add(event.getType() + ":@:" + packet.getCommand().name()
-                            + ":@:" + event.getTimeStamp());
-                }
-                break;
-            }
-            case Packet.Client.TRANSACTION: {
-                WrappedInTransactionPacket packet = new WrappedInTransactionPacket(object, data.getPlayer());
-
-                if (packet.getAction() == (short)69L) {
+                if (!optional.isPresent() && packet.getAction() == (short)69L) {
                     data.lagInfo.lastTransPing = data.lagInfo.transPing;
                     data.lagInfo.transPing = event.getTimeStamp() - data.lagInfo.lastTrans;
                     data.lagInfo.lastClientTrans = timeStamp;
@@ -473,6 +470,8 @@ public class PacketProcessor {
                 if (packet.getAction() == (short)69) {
                     data.lagInfo.lastTrans = event.getTimeStamp();
                 }
+
+                data.checkManager.runPacket(packet, timeStamp);
                 break;
             }
             /* NOTE: Keepalives or transactions cause kicks. My bet is it is the transaction */

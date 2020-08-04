@@ -2,6 +2,7 @@ package dev.brighten.anticheat.processing;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInKeepAlivePacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import dev.brighten.anticheat.utils.TickTimer;
 import cc.funkemunky.api.utils.Tuple;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
@@ -35,7 +36,7 @@ public class ClickProcessor {
     private final ObjectData data;
     private int flyingTicks;
 
-    public void onFlying(WrappedInKeepAlivePacket packet) {
+    public void onFlying(WrappedInTransactionPacket packet) {
         flyingTicks++;
     }
 
@@ -66,7 +67,7 @@ public class ClickProcessor {
                 }
             }
 
-            mean = sum / (double)cpsList.size();
+            mean = sum / (double)Math.max(1, cpsList.size());
             modes = MiscUtils.getModes(cpsList);
             median = MiscUtils.getMedian(cpsList);
 

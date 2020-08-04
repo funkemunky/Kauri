@@ -20,8 +20,8 @@ public class AutoclickerF extends Check {
     public EvictingList<Integer> hitAverage = new EvictingList<>(15), noHitAvg = new EvictingList<>(15);
 
     @Packet
-    public void onFlying(WrappedInKeepAlivePacket packet) {
-        val optional = Kauri.INSTANCE.keepaliveProcessor.getKeepById((int)packet.getTime());
+    public void onFlying(WrappedInTransactionPacket packet) {
+        val optional = Kauri.INSTANCE.keepaliveProcessor.getKeepById(packet.getAction());
 
         if(optional.isPresent()) {
             flying++;

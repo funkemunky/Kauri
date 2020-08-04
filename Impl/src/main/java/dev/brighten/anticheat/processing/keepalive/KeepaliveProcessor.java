@@ -20,7 +20,7 @@ public class KeepaliveProcessor implements Runnable {
 
     public final Map<Short, KeepAlive> keepAlives = new ConcurrentEvictingMap<>(30);
 
-    public ConcurrentHashMap<UUID, Integer> lastResponses = new ConcurrentHashMap<>();
+    public ConcurrentHashMap<UUID, Short> lastResponses = new ConcurrentHashMap<>();
     public ScheduledExecutorService executor;
 
     public KeepaliveProcessor() {
@@ -36,7 +36,7 @@ public class KeepaliveProcessor implements Runnable {
             keepAlives.put(currentKeepalive.id, currentKeepalive);
         }
 
-        WrappedOutTransaction packet = new WrappedOutTransaction(0, (short)currentKeepalive.id, false);
+        WrappedOutTransaction packet = new WrappedOutTransaction(0, currentKeepalive.id, false);
 
         currentKeepalive.startStamp = System.currentTimeMillis();
         for (ObjectData value : Kauri.INSTANCE.dataManager.dataMap.values()) {
@@ -60,7 +60,7 @@ public class KeepaliveProcessor implements Runnable {
         return keepAlives.values().parallelStream().filter(ka -> ka.start == tick).findFirst();
     }
 
-    public Optional<KeepAlive> getKeepById(int id) {
+    public Optional<KeepAlive> getKeepById(short id) {
         return Optional.ofNullable(keepAlives.get(id));
     }
 
@@ -77,7 +77,7 @@ public class KeepaliveProcessor implements Runnable {
         }
     }
 
-    public void addResponse(ObjectData data, int id) {
+    public void addResponse(ObjectData data, short id) {
         getKeepById(id).ifPresent(ka -> {
             lastResponses.put(data.uuid, id);
             ka.received(data);

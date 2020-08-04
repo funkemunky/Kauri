@@ -2,6 +2,7 @@ package dev.brighten.anticheat.check.impl.packets;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInKeepAlivePacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutPositionPacket;
 import cc.funkemunky.api.utils.math.RollingAverage;
 import dev.brighten.anticheat.Kauri;
@@ -33,8 +34,8 @@ public class Timer extends Check {
     }
 
     @Packet
-    public void onTrans(WrappedInKeepAlivePacket packet, long current) {
-        val optional = Kauri.INSTANCE.keepaliveProcessor.getKeepById((int)packet.getTime());
+    public void onTrans(WrappedInTransactionPacket packet, long current) {
+        val optional = Kauri.INSTANCE.keepaliveProcessor.getKeepById(packet.getAction());
 
         if(optional.isPresent()) {
             rolling.add(ticks, System.nanoTime());

@@ -26,8 +26,8 @@ public class AutoclickerI extends Check {
     }
 
     @Packet
-    public void onTrans(WrappedInKeepAlivePacket packet) {
-        if(Kauri.INSTANCE.keepaliveProcessor.keepAlives.containsKey((int)packet.getTime())) {
+    public void onTrans(WrappedInTransactionPacket packet) {
+        if(Kauri.INSTANCE.keepaliveProcessor.keepAlives.containsKey(packet.getAction())) {
             sentFlying = false;
             sentTrans = true;
         }
