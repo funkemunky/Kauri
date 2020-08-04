@@ -23,44 +23,47 @@ public class CheckManager {
         this.objectData = objectData;
     }
 
-    public boolean runPacket(NMSObject object, long timeStamp) {
+    public void runPacket(NMSObject object, long timeStamp) {
         synchronized (checkMethods) {
-            if(!checkMethods.containsKey(object.getClass())) return true;
+            if(!checkMethods.containsKey(object.getClass())) return;
 
             val methods = checkMethods.get(object.getClass());
-            AtomicBoolean okay = new AtomicBoolean(true);
 
             int currentTick = MiscUtils.currentTick();
             methods.parallelStream()
                     .forEach(wrapped -> {
-                        if(wrapped.isPacket && wrapped.check.enabled && wrapped.isCompatible()) {
-                            if(wrapped.isBoolean) {
-                                if(wrapped.oneParam) {
-                                    boolean returned = wrapped.method.invoke(wrapped.check, object);
-
-                                    if(!returned) okay.set(false);
-                                }
-                                else {
-                                    boolean returned;
-
-                                    if(wrapped.isTimeStamp) {
-                                        returned = wrapped.method.invoke(wrapped.check, object, timeStamp);
-                                    } else returned = wrapped.method.invoke(wrapped.check, object, currentTick);
-
-                                    if(!returned) okay.set(false);
-                                }
-                            } else {
-                                if(wrapped.oneParam) wrapped.method.invoke(wrapped.check, object);
-                                else {
-                                    if(wrapped.isTimeStamp) {
-                                        wrapped.method.invoke(wrapped.check, object, timeStamp);
-                                    } else wrapped.method.invoke(wrapped.check, object, currentTick);
-                                }
+                        if(!wrapped.isBoolean && wrapped.isPacket && wrapped.check.enabled && wrapped.isCompatible()) {
+                            if(wrapped.oneParam) wrapped.method.invoke(wrapped.check, object);
+                            else {
+                                if(wrapped.isTimeStamp) {
+                                    wrapped.method.invoke(wrapped.check, object, timeStamp);
+                                } else wrapped.method.invoke(wrapped.check, object, currentTick);
                             }
                         }
                     });
-            return okay.get();
         }
+    }
+
+    public boolean runPacketCancellable(NMSObject object, long timeStamp) {
+        if(!checkMethods.containsKey(object.getClass())) return false;
+
+        val methods = checkMethods.get(object.getClass());
+
+        int currentTick = MiscUtils.currentTick();
+        boolean cancelled = false;
+        for (WrappedCheck wrapped : methods) {
+            if(!wrapped.isBoolean) continue;
+
+            if(wrapped.isPacket && wrapped.check.enabled && wrapped.isCompatible()) {
+                if(wrapped.oneParam) {
+                    if(wrapped.method.invoke(wrapped.check, object)) cancelled = true;
+                } else if(wrapped.isTimeStamp) {
+                    if(wrapped.method.invoke(wrapped.check, object, timeStamp)) cancelled = true;
+                } else if(wrapped.method.invoke(wrapped.check, object, currentTick)) cancelled = true;
+            }
+        }
+
+        return cancelled;
     }
 
     public void runEvent(Event event) {
@@ -69,7 +72,7 @@ public class CheckManager {
 
             val methods = checkMethods.get(event.getClass());
 
-            methods.parallelStream()
+            methods.stream().filter(wrapped -> wrapped.isBoolean).sorted()
                     .forEach(wrapped -> {
                         if(wrapped.isEvent && wrapped.check.enabled) {
                             wrapped.method.invoke(wrapped.check, event);
@@ -133,6 +136,8 @@ public class CheckManager {
                                 new ArrayList<>());
 
                         methods.add(new WrappedCheck(check, method));
+                        methods.sort(Comparator.comparing(m ->
+                                m.method.getMethod().getAnnotation(Packet.class).priority().getPriority()));
                         checkMethods.put(parameter, methods);
                     });
         });

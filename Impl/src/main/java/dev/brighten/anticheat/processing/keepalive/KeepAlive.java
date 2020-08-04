@@ -13,12 +13,12 @@ import java.util.concurrent.ThreadLocalRandom;
 public class KeepAlive {
 
     public final int start;
-    public final int id;
+    public final short id;
     public long startStamp;
 
     public KeepAlive(int start) {
         this.start = start;
-        id = (int) ThreadLocalRandom.current().nextInt(0, 30000);
+        id = (short) ThreadLocalRandom.current().nextInt(Short.MIN_VALUE, Short.MAX_VALUE);
     }
 
     public final Map<UUID, KAReceived> receivedKeepalive = new HashMap<>();

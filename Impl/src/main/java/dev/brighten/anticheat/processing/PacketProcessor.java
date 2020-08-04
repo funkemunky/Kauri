@@ -367,9 +367,7 @@ public class PacketProcessor {
                 data.playerInfo.canFly = packet.isAllowedFlight();
                 data.playerInfo.flying = packet.isFlying();
                 data.predictionService.fly = packet.isAllowedFlight();
-                if(!data.checkManager.runPacket(packet, timeStamp)) {
-                    event.setCancelled(true);
-                }
+                data.checkManager.runPacket(packet, timeStamp);
                 break;
             }
             case Packet.Server.RESPAWN: {
@@ -388,9 +386,7 @@ public class PacketProcessor {
             case Packet.Server.HELD_ITEM: {
                 WrappedOutHeldItemSlot packet = new WrappedOutHeldItemSlot(object, data.getPlayer());
 
-                if(!data.checkManager.runPacket(packet, timeStamp)) {
-                    event.setCancelled(true);
-                }
+                data.checkManager.runPacket(packet, timeStamp);
                 break;
             }
             case Packet.Server.ENTITY_EFFECT: {
@@ -405,9 +401,7 @@ public class PacketProcessor {
             case Packet.Server.ENTITY_METADATA: {
                 WrappedOutEntityMetadata packet = new WrappedOutEntityMetadata(object, data.getPlayer());
 
-                if (!data.checkManager.runPacket(packet, timeStamp)) {
-                    event.setCancelled(true);
-                }
+                data.checkManager.runPacket(packet, timeStamp);
                 break;
             }
 
@@ -416,9 +410,7 @@ public class PacketProcessor {
                 data.playerInfo.inventoryOpen = false;
                 data.playerInfo.inventoryId = 0;
 
-                if(!data.checkManager.runPacket(packet, timeStamp)) {
-                    event.setCancelled(true);
-                }
+                data.checkManager.runPacket(packet, timeStamp);
                 break;
             }
             case Packet.Server.OPEN_WINDOW: {
@@ -463,9 +455,7 @@ public class PacketProcessor {
             case "PacketPlayOutEntity$PacketPlayOutEntityLook": {
                 WrappedOutRelativePosition packet = new WrappedOutRelativePosition(object, data.getPlayer());
 
-                if(!data.checkManager.runPacket(packet, timeStamp)) {
-                    event.setCancelled(true);
-                }
+                data.checkManager.runPacket(packet, timeStamp);
                 break;
             }
             case Packet.Server.KEEP_ALIVE: {

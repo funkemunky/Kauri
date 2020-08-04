@@ -10,6 +10,7 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
+import lombok.val;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -61,17 +62,22 @@ public class ReachC extends Check {
             KLocation entityLoc = new KLocation(target.getLocation()), previous = new KLocation(0,0, 0);
 
             int ping = MathUtils.floor(data.lagInfo.transPing / 50.);
+
+            for (int i = pastRelMoves.size() - 1; i > 0; i--) {
+                val move = pastRelMoves.get(i);
+
+                entityLoc.x-= move.x;
+                entityLoc.y-= move.y;
+                entityLoc.z-= move.z;
+
+                debug("(%v) x=%v.4 y=%v.4 z=%v.4", i, entityLoc.x, entityLoc.y, entityLoc.z);
+            }
             int count = 0;
 
             long locDif = now - entityLoc.timeStamp;
 
             double pct = (locDif - data.lagInfo.transPing)
                     / (double) (locDif - (now - previous.timeStamp));
-
-            debug("(%v) current (%v.2%): x=%v.3 y=%v.3 z=%v.3",
-                    count, pct, entityLoc.x, entityLoc.y, entityLoc.z);
-            debug("(%v)previous (%v.2%): x=%v.3 y=%v.3 z=%v.3",
-                    count, pct, previous.x, previous.y, previous.z);
             attacked = false;
         }
     }

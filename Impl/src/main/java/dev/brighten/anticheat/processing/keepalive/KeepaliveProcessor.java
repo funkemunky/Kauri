@@ -2,6 +2,7 @@ package dev.brighten.anticheat.processing.keepalive;
 
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutKeepAlivePacket;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingMap;
 import dev.brighten.anticheat.Kauri;
@@ -17,7 +18,7 @@ public class KeepaliveProcessor implements Runnable {
     public KeepAlive currentKeepalive;
     public int tick;
 
-    public final Map<Integer, KeepAlive> keepAlives = new ConcurrentEvictingMap<>(30);
+    public final Map<Short, KeepAlive> keepAlives = new ConcurrentEvictingMap<>(30);
 
     public ConcurrentHashMap<UUID, Integer> lastResponses = new ConcurrentHashMap<>();
     public ScheduledExecutorService executor;
@@ -35,7 +36,7 @@ public class KeepaliveProcessor implements Runnable {
             keepAlives.put(currentKeepalive.id, currentKeepalive);
         }
 
-        WrappedOutKeepAlivePacket packet = new WrappedOutKeepAlivePacket(currentKeepalive.id);
+        WrappedOutTransaction packet = new WrappedOutTransaction(0, (short)currentKeepalive.id, false);
 
         currentKeepalive.startStamp = System.currentTimeMillis();
         for (ObjectData value : Kauri.INSTANCE.dataManager.dataMap.values()) {
