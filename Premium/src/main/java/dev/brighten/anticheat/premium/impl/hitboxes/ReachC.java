@@ -27,12 +27,14 @@ public class ReachC extends Check {
     public void onRel(WrappedOutRelativePosition position, long now) {
         if(target == null) return;
         if(target.getEntityId() == position.getId()) {
-            float f = position.isLook() ? (float) (position.getYaw() * 360) / 256.0F : 0;
-            float f1 = position.isLook() ? (float) (position.getPitch() * 360) / 256.0F : 0;
-            KLocation loc = new KLocation(position.getX() / 32., position.getY() / 32., position.getZ() / 32.,
-                    f, f1);
-            loc.timeStamp = now;
-            pastRelMoves.add(loc);
+            data.runKeepaliveAction(ka -> {
+                float f = position.isLook() ? (float) (position.getYaw() * 360) / 256.0F : 0;
+                float f1 = position.isLook() ? (float) (position.getPitch() * 360) / 256.0F : 0;
+                KLocation loc = new KLocation(position.getX() / 32., position.getY() / 32., position.getZ() / 32.,
+                        f, f1);
+                loc.timeStamp = now;
+                pastRelMoves.add(loc);
+            });
         }
     }
 

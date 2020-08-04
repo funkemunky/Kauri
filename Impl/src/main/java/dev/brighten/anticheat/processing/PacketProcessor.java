@@ -421,34 +421,6 @@ public class PacketProcessor {
                 }
                 break;
             }
-            case NMSObject.Server.LEGACY_REL_LOOK:
-            case NMSObject.Server.LEGACY_REL_POSITION:
-            case NMSObject.Server.LEGACY_REL_POSITION_LOOK:
-            case NMSObject.Server.REL_LOOK:
-            case NMSObject.Server.REL_POSITION:
-            case NMSObject.Server.REL_POSITION_LOOK:
-            case NMSObject.Server.ENTITY: {
-                WrappedOutRelativePosition packet = new WrappedOutRelativePosition(object, data.getPlayer());
-
-                /*val optional = data.getPlayer().getWorld().getEntities().stream()
-                        .filter(ent -> ent.getEntityId() == packet.getId()).findFirst();
-
-                if(optional.isPresent()) {
-                    KLocation loc = new KLocation(optional.get().getLocation());
-                    data.runKeepaliveAction(d -> {
-                        val shit = d.receivedKeepalive.getOrDefault(data.uuid, null);
-                        loc.timeStamp = shit != null ? shit.stamp : d.start;
-
-                        if(data.target != null && optional.get().getEntityId() == data.target.getEntityId())
-                            data.targetPastLocation.addLocation(loc);
-                        data.entityLocations.put(packet.getId(), loc);
-                    });
-                }*/
-                if(!data.checkManager.runPacket(packet, timeStamp)) {
-                    event.setCancelled(true);
-                }
-                break;
-            }
             case Packet.Server.OPEN_WINDOW: {
                 WrappedOutOpenWindow packet = new WrappedOutOpenWindow(object, data.getPlayer());
 
@@ -491,7 +463,9 @@ public class PacketProcessor {
             case "PacketPlayOutEntity$PacketPlayOutEntityLook": {
                 WrappedOutRelativePosition packet = new WrappedOutRelativePosition(object, data.getPlayer());
 
-                data.checkManager.runPacket(packet, timeStamp);
+                if(!data.checkManager.runPacket(packet, timeStamp)) {
+                    event.setCancelled(true);
+                }
                 break;
             }
             case Packet.Server.KEEP_ALIVE: {
