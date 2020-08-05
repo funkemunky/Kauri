@@ -1,14 +1,19 @@
 package dev.brighten.anticheat.utils;
 
+import cc.funkemunky.api.reflections.Reflections;
 import cc.funkemunky.api.reflections.impl.CraftReflection;
 import cc.funkemunky.api.reflections.impl.MinecraftReflection;
+import cc.funkemunky.api.reflections.types.WrappedClass;
 import cc.funkemunky.api.reflections.types.WrappedField;
+import cc.funkemunky.api.reflections.types.WrappedMethod;
 import cc.funkemunky.api.tinyprotocol.packet.types.MathHelper;
+import cc.funkemunky.api.tinyprotocol.packet.types.Vec3D;
 import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumAnimation;
 import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.commands.KauriCommand;
 import dev.brighten.anticheat.processing.MovementProcessor;
 import lombok.val;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
@@ -70,6 +75,25 @@ public class MiscUtils {
     public static int currentTick() {
         if(minecraftServer == null) minecraftServer = CraftReflection.getMinecraftServer();
         return ticksField.get(minecraftServer);
+    }
+
+    private static WrappedClass movingObjectPos = Reflections.getNMSClass("MovingObjectPosition");
+    private static WrappedMethod calcIntercept = MinecraftReflection.axisAlignedBB
+            .getMethodByType(movingObjectPos.getParent(), 0);
+    private static WrappedField movingObjectPosVec3DField = movingObjectPos
+            .getFieldByType(MinecraftReflection.vec3D.getParent(), 0);
+
+    public static Vec3D calculateIntercept(BoundingBox box, Vector vecA, Vector vecB) {
+        Object axisAlignedBB = box.toAxisAlignedBB();
+
+        Object movingObjectPos = calcIntercept
+                .invoke(axisAlignedBB, new Vec3D(vecA.getX(), vecA.getY(), vecA.getZ()).getObject(),
+                        new Vec3D(vecB.getX(), vecB.getY(), vecB.getZ()).getObject());
+
+        if(movingObjectPos != null) {
+            return new Vec3D((Object) movingObjectPosVec3DField.get(movingObjectPos));
+        }
+        return null;
     }
 
     public static void close(AutoCloseable... closeables) {

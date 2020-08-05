@@ -69,7 +69,6 @@ public class ObjectData {
     public final List<Action> keepAliveStamps = new CopyOnWriteArrayList<>();
     public final Map<Integer, KLocation> entityLocations = new HashMap<>();
     public ConcurrentEvictingList<CancelType> typesToCancel = new ConcurrentEvictingList<>(10);
-    public final Map<Long, Long> keepAlives = Collections.synchronizedMap(new HashMap<>());
     public final List<String> sniffedPackets = new CopyOnWriteArrayList<>();
     public BukkitTask task;
     private ExecutorService playerThread;
@@ -178,9 +177,9 @@ public class ObjectData {
     }
 
     public class LagInformation {
-        public long lastKeepAlive, lastTrans, lastClientTrans, ping, lastPing, averagePing,
+        public long lastKeepAlive, lastTrans, lastClientTrans, transPing, lastTransPing, averagePing,
                 millisPing, lmillisPing, recieved, start;
-        public int transPing, lastTransPing;
+        public int ping, lastPing;
         public MaxInteger lagTicks = new MaxInteger(25);
         public boolean lagging;
         public TickTimer lastPacketDrop = new TickTimer( 10),

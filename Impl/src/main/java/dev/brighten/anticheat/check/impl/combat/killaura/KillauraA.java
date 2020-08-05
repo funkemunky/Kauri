@@ -41,7 +41,7 @@ public class KillauraA extends Check {
 
         List<SimpleCollisionBox> targetBoxes = new ArrayList<>();
 
-        data.targetPastLocation.getEstimatedLocation(data.lagInfo.transPing + 50, 150)
+        data.targetPastLocation.getEstimatedLocation(data.lagInfo.ping, 3)
                 .forEach(loc -> EntityData.getEntityBox(loc, data.target).downCast(targetBoxes));
 
         double distance = targetBoxes.stream().map(ray::collisionPoint)

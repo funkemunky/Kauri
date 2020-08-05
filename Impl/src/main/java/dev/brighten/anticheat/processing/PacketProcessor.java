@@ -198,16 +198,6 @@ public class PacketProcessor {
 
                 long time = packet.getTime();
 
-                if(data.keepAlives.containsKey(time)) {
-                    long last = data.keepAlives.get(time);
-
-                    data.lagInfo.lastPing = data.lagInfo.ping;
-                    data.lagInfo.ping = event.getTimeStamp() - last;
-
-                    data.lagInfo.pingAverages.add(data.lagInfo.ping);
-                    data.lagInfo.averagePing = data.lagInfo.pingAverages.getAverage();
-                }
-
                 data.checkManager.runPacket(packet, timeStamp);
                 if(data.sniffing) {
                     data.sniffedPackets.add(event.getType() + ":@:" + time + ":@:" + event.getTimeStamp());
@@ -240,8 +230,8 @@ public class PacketProcessor {
                 int current = Kauri.INSTANCE.keepaliveProcessor.tick;
 
                 optional.ifPresent(ka -> {
-                    data.lagInfo.lastTransPing = data.lagInfo.transPing;
-                    data.lagInfo.transPing = (current - ka.start);
+                    data.lagInfo.lastPing = data.lagInfo.ping;
+                    data.lagInfo.ping = (current - ka.start);
 
                     data.clickProcessor.onFlying(packet);
 
@@ -260,7 +250,21 @@ public class PacketProcessor {
                     }
                 });
 
-                data.lagInfo.lastClientTrans = timeStamp;
+                if (!optional.isPresent() && packet.getAction() == (short)69L) {
+                    data.lagInfo.lastTransPing = data.lagInfo.transPing;
+                    data.lagInfo.transPing = event.getTimeStamp() - data.lagInfo.lastTrans;
+                    data.lagInfo.lastClientTrans = timeStamp;
+
+
+                    //We use transPing for checking lag since the packet used is little known.
+                    //AimE have not seen anyone create a spoof for it or even talk about the possibility of needing one.
+                    //Large jumps in latency most of the intervalTime mean lag.
+                    if (MathUtils.getDelta(data.lagInfo.lastTransPing, data.lagInfo.transPing) > 15)
+                        data.lagInfo.lastPingDrop.reset();
+
+                    data.lagInfo.pingAverages.add(data.lagInfo.transPing);
+                    data.lagInfo.averagePing = data.lagInfo.pingAverages.getAverage();
+                }
 
                 data.checkManager.runPacket(packet, timeStamp);
                 if(data.sniffing) {
@@ -453,7 +457,9 @@ public class PacketProcessor {
             case Packet.Server.KEEP_ALIVE: {
                 WrappedOutKeepAlivePacket packet = new WrappedOutKeepAlivePacket(object, data.getPlayer());
 
-                data.keepAlives.put(packet.getTime(), event.getTimeStamp());
+                if(packet.getTime() == Kauri.INSTANCE.keepaliveProcessor.currentKeepalive.id) {
+                    Kauri.INSTANCE.keepaliveProcessor.currentKeepalive.startStamp = event.getTimeStamp();
+                }
                 data.lagInfo.lastKeepAlive = event.getTimeStamp();
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
