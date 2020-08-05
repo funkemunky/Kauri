@@ -363,26 +363,6 @@ public class PacketProcessor {
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
             }
-            case Packet.Server.SPAWN_ENTITY_LIVING: {
-                WrappedOutSpawnEntityLivingPacket packet =
-                        new WrappedOutSpawnEntityLivingPacket(object, data.getPlayer());
-
-                data.checkManager.runPacket(packet, timeStamp);
-                break;
-            }
-            case Packet.Server.SPAWN_ENTITY: {
-                WrappedOutSpawnEntityPacket packet = new WrappedOutSpawnEntityPacket(object, data.getPlayer());
-
-                data.checkManager.runPacket(packet, timeStamp);
-                break;
-            }
-            case Packet.Server.NAMED_ENTITY_SPAWN: {
-                WrappedOutNamedEntitySpawnPacket packet =
-                        new WrappedOutNamedEntitySpawnPacket(object, data.getPlayer());
-
-                data.checkManager.runPacket(packet, timeStamp);
-                break;
-            }
             case Packet.Server.RESPAWN: {
                 WrappedOutRespawnPacket packet = new WrappedOutRespawnPacket(object, data.getPlayer());
 
@@ -461,7 +441,6 @@ public class PacketProcessor {
             }
             case "PacketPlayOutRelEntityMove":
             case "PacketPlayOutEntityLook":
-            case Packet.Server.ENTITY:
             case "PacketPlayOutRelEntityMoveLook":
             case "PacketPlayOutEntity$PacketPlayOutRelEntityMove":
             case "PacketPlayOutEntity$PacketPlayOutRelEntityMoveLook":
