@@ -62,8 +62,8 @@ public class Hitboxes extends Check {
 
 
            data.targetPastLocation
-                    .getEstimatedLocation(data.lagInfo.ping, 3
-                                    + Math.abs(data.lagInfo.ping - data.lagInfo.lastPing))
+                    .getEstimatedLocation(data.lagInfo.transPing * 50, 150
+                                    + Math.abs(data.lagInfo.transPing - data.lagInfo.lastTransPing))
                     .stream()
                     .map(loc -> getHitbox(loc, data.target))
                     .forEach(box -> box.downCast(entityLocations));
