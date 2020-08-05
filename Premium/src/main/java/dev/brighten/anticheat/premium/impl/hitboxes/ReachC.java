@@ -3,6 +3,7 @@ package dev.brighten.anticheat.premium.impl.hitboxes;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutRelativePosition;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.KLocation;
@@ -13,9 +14,13 @@ import com.google.gson.internal.$Gson$Preconditions;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.utils.Vec3D;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
-import net.minecraft.server.v1_8_R3.*;
+import net.minecraft.server.v1_8_R3.EntityLiving;
+import net.minecraft.server.v1_8_R3.MovingObjectPosition;
+import net.minecraft.server.v1_8_R3.WorldServer;
+import dev.brighten.anticheat.utils.AxisAlignedBB;
 import org.bukkit.Location;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftLivingEntity;
@@ -36,8 +41,12 @@ public class ReachC extends Check {
     private int inc, xLoc, yLoc, zLoc;
     private LivingEntity target;
     private boolean attacked;
+
     @Packet
-    public void onTrans(WrappedOutTransaction packet, long now) {
+    public void onRelative(WrappedOutRelativePosition packet) {}
+
+    @Packet
+    public boolean onTrans(WrappedOutTransaction packet, long now) {
         if(packet.getId() == 0 && target != null) {
 
             EntityLiving entity = ((CraftLivingEntity)target).getHandle();
@@ -55,6 +64,7 @@ public class ReachC extends Check {
                             newLoc = new KLocation(xLoc, yLoc, zLoc);
                             inc = 3;
                             locs.clear();
+                            debug("reset");
                         }
                         //this.posX + (this.newPosX - this.posX) / (double) this.newPosRotationIncrements;
                         if (inc > 0) {
@@ -68,7 +78,7 @@ public class ReachC extends Check {
 
                             locs.add(current);
 
-                            //debug("%v x=%v.4 y=%v.4 z=%v.4", inc, incremented.x, incremented.y, incremented.z);
+                            debug("%v x=%v.4 y=%v.4 z=%v.4", inc, incremented.x, incremented.y, incremented.z);
 
                             inc--;
                         }
@@ -100,7 +110,7 @@ public class ReachC extends Check {
                             current.timeStamp = now;
 
                             locs.add(current);
-                            //debug("%v x=%v.4 y=%v.4 z=%v.4", inc, incremented.x, incremented.y, incremented.z);
+                            debug("%v x=%v.4 y=%v.4 z=%v.4", inc, incremented.x, incremented.y, incremented.z);
 
                             inc--;
                         }
@@ -113,6 +123,7 @@ public class ReachC extends Check {
                 }
             }
         }
+        return false;
     }
 
     @Packet
@@ -145,26 +156,23 @@ public class ReachC extends Check {
                 origins.add(from.toLocation(packet.getPlayer().getWorld()));
                 origins.add(to.toLocation(packet.getPlayer().getWorld()));
 
-                List<SimpleCollisionBox> boxes = new ArrayList<>();
+                List<AxisAlignedBB> boxes = new ArrayList<>();
 
                 KLocation current = previous.clone();
 
                 for (KLocation loc : locs) {
-                    boxes.add(((SimpleCollisionBox)EntityData.getEntityBox(loc, target)).expand(0.1));
+                    boxes.add(new AxisAlignedBB(
+                            ((SimpleCollisionBox)EntityData.getEntityBox(loc, target)).expand(0.1)));
                 }
 
                 double distance = 69;
 
                 for (Location origin : origins) {
-                    Vec3D vec = new Vec3D(origin.getX(), origin.getY(), origin.getZ());
-                    val dirVec = origin.clone().add(origin.getDirection().multiply(10));
-                    Vec3D dir = new Vec3D(dirVec.getX(), dirVec.getY(), dirVec.getZ());
-                    for (SimpleCollisionBox box : boxes) {
-                        AxisAlignedBB aabb = box.toAxisAlignedBB();
-                        MovingObjectPosition move = aabb.a(vec, dir);
+                    for (AxisAlignedBB box : boxes) {
+                        Vec3D move = box.rayTrace(origin.toVector(), origin.getDirection(), 10);
 
                         if(move != null) {
-                            distance = Math.min(distance, Math.sqrt(move.pos.distanceSquared(vec)));
+                            distance = Math.min(distance, Math.sqrt(move.toVector().distance(origin.toVector())));
                         }
                     }
                 }

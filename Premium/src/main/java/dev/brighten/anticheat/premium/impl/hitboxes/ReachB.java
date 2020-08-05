@@ -82,7 +82,7 @@ public class ReachB extends Check {
                 }
             }
 
-            int ping = Math.min(locs.size() - 1, data.lagInfo.ping + 4);
+            int ping = Math.min(locs.size() - 1, data.lagInfo.transPing + 4);
             List<CollisionBox> entityLocs = Arrays.asList(data.targetLoc, locs.get(ping)).stream()
                     .map(loc -> getHitbox(data.getPlayer(), loc))
                     .collect(Collectors.toList());
