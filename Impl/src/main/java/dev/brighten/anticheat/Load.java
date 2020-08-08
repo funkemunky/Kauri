@@ -25,7 +25,7 @@ public class Load {
 
     public static void load() {
         register("Kicking players online...");
-        Bukkit.getOnlinePlayers().forEach(player -> player.kickPlayer("Starting up..."));
+        //Bukkit.getOnlinePlayers().forEach(player -> player.kickPlayer("Starting up..."));
         register("Starting thread pool...");
         Kauri.INSTANCE.executor = Executors.newFixedThreadPool(3);
         Kauri.INSTANCE.loggingThread = Executors.newScheduledThreadPool(2);

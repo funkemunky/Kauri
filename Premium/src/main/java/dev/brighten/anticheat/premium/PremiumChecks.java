@@ -15,6 +15,7 @@ public class PremiumChecks {
     public PremiumChecks() {
         MiscUtils.printToConsole("&aThanks for purchasing Kauri Ara.");
         Check.register(new VelocityB());
+        Check.register(new VelocityD());
         Check.register(new ReachB());
         Check.register(new ReachC());
         //Check.register(new Motion());

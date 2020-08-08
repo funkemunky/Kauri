@@ -10,6 +10,7 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInKeepAlivePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutRelativePosition;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.Init;
 import dev.brighten.anticheat.Kauri;
@@ -85,6 +86,14 @@ public class PacketListener implements AtlasListener {
             case Packet.Server.LEGACY_REL_POSITION:
             case Packet.Server.LEGACY_REL_POSITION_LOOK: {
                 val packet = new WrappedOutRelativePosition(event.getPacket(), event.getPlayer());
+                if(data.checkManager.runPacketCancellable(packet, event.getTimeStamp())) {
+                    event.setCancelled(true);
+                }
+                break;
+            }
+            case Packet.Server.ENTITY_VELOCITY: {
+                val packet = new WrappedOutVelocityPacket(event.getPacket(), event.getPlayer());
+
                 if(data.checkManager.runPacketCancellable(packet, event.getTimeStamp())) {
                     event.setCancelled(true);
                 }
