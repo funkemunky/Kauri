@@ -1,45 +1,50 @@
 package dev.brighten.anticheat.premium.impl.hitboxes;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.*;
 import cc.funkemunky.api.utils.KLocation;
-import cc.funkemunky.api.utils.world.EntityData;
-import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
+import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
-import dev.brighten.anticheat.utils.Vec3D;
 import dev.brighten.api.check.CheckType;
-import lombok.val;
-import dev.brighten.anticheat.utils.AxisAlignedBB;
 import net.minecraft.server.v1_8_R3.MathHelper;
-import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.util.Vector;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @CheckInfo(name = "Reach (C)", description = "Test reach check.", checkType = CheckType.HITBOX, developer = true)
 public class ReachC extends Check {
     private LivingEntity target;
     private boolean attacked;
-    private KLocation location;
+    private KLocation lastLoc = new KLocation(0,0,0), current;
+    private EvictingList<KLocation> locations = new EvictingList<>(30);
 
     @Packet
-    public void onIn(WrappedOutTransaction packet, int tick) {
+    public boolean onIn(WrappedOutRelativePosition packet, long now) {
         //this.posX + (this.newPosX - this.posX) / (double) this.newPosRotationIncrements;
-        if(packet.getId() != 0 || target == null) return;
+        if(target == null) return false;
 
-        data.runKeepaliveAction(ka -> {
-            location = new KLocation(target.getLocation());
-            location.x = deaccurafy(location.x);
-            location.y = deaccurafy(location.y);
-            location.z = deaccurafy(location.z);
+        lastLoc = current;
+        current = new KLocation(target.getLocation());
+        current.x = deaccurafy(current.x);
+        current.y = deaccurafy(current.y);
+        current.z = deaccurafy(current.z);
+        current.timeStamp = now;
 
-            debug(location.toVector().toString());
-        });
+        KLocation current = this.current.clone(), lastLoc = this.lastLoc;
+        for(int inc = 3 ; inc > 0 ; --inc) {
+            double x = current.x + (lastLoc.x - current.x) / inc;
+            double y = current.y + (lastLoc.y - current.y) / inc;
+            double z = current.z + (lastLoc.z - current.z) / inc;
+
+            KLocation loc = new KLocation(x, y, z);
+            lastLoc = current;
+            loc.timeStamp = current.timeStamp;
+            current = loc;
+
+            locations.add(loc);
+            current.timeStamp+= 50;
+        }
+        return false;
     }
 
     private static double deaccurafy(double val) {
@@ -128,63 +133,30 @@ public class ReachC extends Check {
     }*/
 
     @Packet
-    public void onUse(WrappedInUseEntityPacket packet) {
+    public boolean onUse(WrappedInUseEntityPacket packet, long now) {
         if(packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) {
-            if(!(packet.getEntity() instanceof LivingEntity)) {
+            if (!(packet.getEntity() instanceof LivingEntity)) {
                 target = null;
-                return;
+                return false;
             }
+
+            if (target == null
+                    || packet.getEntity().getEntityId() != target.getEntityId()) locations.clear();
 
             target = (LivingEntity) packet.getEntity();
 
-            attacked = true;
-        }
-    }
+            int ping = (data.lagInfo.transPing) * 50;
 
-    @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
-        if(attacked && target != null && location != null) {
-
-            List<Location> origins = new ArrayList<>();
-
-            val from = data.playerInfo.from.clone();
-            val to = data.playerInfo.to.clone();
-            from.y+= data.playerInfo.sneaking ? 1.54 : 1.62;
-            to.y+= data.playerInfo.sneaking ? 1.54: 1.62;
-
-            origins.add(from.toLocation(packet.getPlayer().getWorld()));
-            origins.add(to.toLocation(packet.getPlayer().getWorld()));
-
-            List<AxisAlignedBB> boxes = new ArrayList<>();
-
-            Vector current = location.toVector();
-
-            boxes.add(new AxisAlignedBB(
-                    ((SimpleCollisionBox)EntityData.getEntityBox(current, target)).expand(0.1)));
-
-            double distance = 69;
-
-            for (Location origin : origins) {
-                for (AxisAlignedBB box : boxes) {
-                    Vec3D move = box.rayTrace(origin.toVector(), origin.getDirection(), 10);
-
-                    if(move != null) {
-                        distance = Math.min(distance, Math.sqrt(move.toVector().distance(origin.toVector())));
-                    }
+            for (int i = locations.size() - 1; i > 0; --i) {
+                KLocation loc = locations.get(i);
+                long delta = now - loc.timeStamp;
+                if (delta - ping <= 600) {
+                    debug("(%vms) x=%v y=%v z=%v", delta, loc.x, loc.y, loc.z);
                 }
             }
 
-            if(distance == 69) return;
-
-            if(distance > 3) {
-                vl++;
-                flag("dist=%v", distance);
-            } else if(vl > 0) vl-= 0.1f;
-
-            debug("dist=%v vl=%v.2", distance, vl);
-            debug("(TO) x=%v.4 y=%v.4 z=%v.4",
-                    current.getX(), current.getY(), current.getZ());
-            attacked = false;
+            attacked = true;
         }
+        return false;
     }
 }

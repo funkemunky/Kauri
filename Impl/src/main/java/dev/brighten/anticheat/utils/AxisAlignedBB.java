@@ -208,7 +208,7 @@ public class AxisAlignedBB {
 
     public Vec3D rayTrace(Vector vorigin, Vector vdirection, double distance) {
         Vec3D origin = new Vec3D(vorigin.getX(), vorigin.getY(), vorigin.getZ());
-        Vector direction = vdirection.multiply(distance);
+        Vector direction = vdirection.clone().multiply(distance);
         Vec3D dir = new Vec3D(direction.getX(), direction.getY(), direction.getZ());
 
         return rayTrace(origin, dir);

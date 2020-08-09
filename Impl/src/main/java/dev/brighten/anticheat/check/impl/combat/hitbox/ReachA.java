@@ -40,8 +40,12 @@ public class ReachA extends Check {
 
         List<KLocation> origins = Stream.of(data.playerInfo.from.clone())
                 .collect(Collectors.toList());
-        List<KLocation> targetBoxes = data.targetPastLocation.getEstimatedLocation(data.lagInfo.transPing + 2, 2);
+        List<KLocation> targetBoxes = data.targetPastLocation.getEstimatedLocation(data.lagInfo.transPing + 4, 2);
 
+        for (KLocation targetBox : targetBoxes) {
+            debug("(%vms) x=%v.4 y=%v.4 z=%v.4",
+                    timeStamp - targetBox.timeStamp, targetBox.x, targetBox.y, targetBox.z);
+        }
         double distance = 69;
 
         val bounds = getHitbox(target, new KLocation(0,0,0));
