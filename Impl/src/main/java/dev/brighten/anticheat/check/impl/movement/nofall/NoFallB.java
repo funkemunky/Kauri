@@ -20,7 +20,7 @@ public class NoFallB extends Check {
                 || data.playerInfo.lastRespawnTimer.hasNotPassed(1))
             return;
 
-        boolean ground = data.playerInfo.to.y % GROUND == 0;
+        boolean ground = data.playerInfo.to.y % GROUND == 0 && data.playerInfo.serverGround;
 
         if(ground != packet.isGround() && !data.blockInfo.onSlime) {
             if(++vl > 2) {
