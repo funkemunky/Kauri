@@ -1,35 +1,35 @@
 package dev.brighten.anticheat.utils;
 
-import dev.brighten.anticheat.Kauri;
+import dev.brighten.anticheat.data.ObjectData;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 public class TickTimer {
-    private int ticks = Kauri.INSTANCE.keepaliveProcessor.tick, defaultPassed;
-
-    public TickTimer(int defaultPassed) {
-        this.defaultPassed = defaultPassed;
-    }
+    private final ObjectData data;
+    private final int defaultPassed;
+    private int ticks;
 
     public void reset() {
-        ticks = Kauri.INSTANCE.keepaliveProcessor.tick;
+        ticks = data.currentTicks;
     }
 
     public boolean hasPassed() {
-        return Kauri.INSTANCE.keepaliveProcessor.tick - ticks > defaultPassed;
+        return data.currentTicks - ticks > defaultPassed;
     }
 
     public boolean hasPassed(int amount) {
-        return Kauri.INSTANCE.keepaliveProcessor.tick - ticks > amount;
+        return data.currentTicks - ticks > amount;
     }
 
     public boolean hasNotPassed() {
-        return Kauri.INSTANCE.keepaliveProcessor.tick - ticks <= defaultPassed;
+        return data.currentTicks - ticks <= defaultPassed;
     }
 
     public boolean hasNotPassed(int amount) {
-        return Kauri.INSTANCE.keepaliveProcessor.tick - ticks <= amount;
+        return data.currentTicks - ticks <= amount;
     }
 
     public int getPassed() {
-        return Kauri.INSTANCE.keepaliveProcessor.tick - ticks;
+        return data.currentTicks - ticks;
     }
 }
