@@ -2,7 +2,6 @@ package dev.brighten.anticheat.premium.impl;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInKeepAlivePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.MathUtils;
@@ -18,21 +17,19 @@ import org.bukkit.enchantments.Enchantment;
 @Cancellable
 public class VelocityB extends Check {
 
-    private double vX, vZ, vY, pvX, pvZ;
-    private boolean useEntity, tookVelocity, sprint;
+    private double pvX, pvZ;
+    private boolean useEntity, sprint;
     private double buffer;
-    private long lastVelocity;
+    private int ticks;
     private static double[] moveValues = new double[] {-0.98, 0, 0.98};
 
     @Packet
-    public void onVelocity(WrappedOutVelocityPacket packet, long timeStamp) {
+    public void onVelocity(WrappedOutVelocityPacket packet) {
         if(packet.getId() == data.getPlayer().getEntityId()) {
-            tookVelocity = true;
-            vX = packet.getX();
-            vY = packet.getY();
-            vZ = packet.getZ();
-            lastVelocity = timeStamp;
-            pvX = pvZ = 0;
+            data.runKeepaliveAction(d -> {
+                pvX = packet.getX();
+                pvZ = packet.getZ();
+            });
         }
     }
 
@@ -45,18 +42,6 @@ public class VelocityB extends Check {
     }
 
     @Packet
-    public void onKeepAlive(WrappedInKeepAlivePacket packet) {
-        if(tookVelocity && packet.getTime() == data.getKeepAliveStamp("velocity")) {
-            tookVelocity = false;
-            pvX = vX;
-            pvZ = vZ;
-            vY = -1;
-            vX = 0;
-            vZ = 0;
-        }
-    }
-
-    @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if((pvX != 0 || pvZ != 0)) {
             boolean found = false;
@@ -65,7 +50,6 @@ public class VelocityB extends Check {
 
             if(data.blockInfo.blocksNear
                     || data.blockInfo.inLiquid
-                    || tookVelocity
                     || data.lagInfo.lastPingDrop.hasNotPassed(10)
                     || data.lagInfo.lastPacketDrop.hasNotPassed(10)) {
                 pvX = pvZ = 0;
@@ -74,7 +58,7 @@ public class VelocityB extends Check {
             }
 
             if(data.playerInfo.lClientGround) {
-                drag*= data.blockInfo.currentFriction;
+                drag*= data.blockInfo.fromFriction;
             }
 
             if(useEntity && (sprint || (data.getPlayer().getItemInHand() != null
@@ -152,7 +136,10 @@ public class VelocityB extends Check {
             pvX *= drag;
             pvZ *= drag;
 
-            if(timeStamp - lastVelocity > 350L) pvX = pvZ = 0;
+            if(++ticks > 6) {
+                ticks = 0;
+                pvX = pvZ = 0;
+            }
 
             if(Math.abs(pvX) < 0.005) pvX = 0;
             if(Math.abs(pvZ) < 0.005) pvZ = 0;
