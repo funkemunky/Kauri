@@ -10,6 +10,7 @@ public class Pastebin {
     static String pasteURL = "https://funkemunky.cc/pastebin/make";
 
     public Pastebin() {
+        
     }
 
     static String checkResponse(String response) {
