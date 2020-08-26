@@ -26,6 +26,4 @@ public interface DataStorage {
     UUID getUUIDFromName(String name);
 
     String getNameFromUUID(UUID uuid);
-
-    void shutdown();
 }

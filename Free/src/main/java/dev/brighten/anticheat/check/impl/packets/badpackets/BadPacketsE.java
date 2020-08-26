@@ -19,7 +19,7 @@ public class BadPacketsE extends Check {
     @Override
     public void setData(ObjectData data) {
         super.setData(data);
-        lastSwing = new TickTimer(8);
+        lastSwing = new TickTimer(data, 8);
     }
 
     @Packet

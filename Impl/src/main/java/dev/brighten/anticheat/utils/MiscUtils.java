@@ -69,7 +69,6 @@ public class MiscUtils {
 
     private static WrappedField ticksField = MinecraftReflection.minecraftServer.getFieldByName("ticks");
     private static Object minecraftServer = null;
-    //TODO Make this use the new abstraction system.
     public static int currentTick() {
         if(minecraftServer == null) minecraftServer = CraftReflection.getMinecraftServer();
         return ticksField.get(minecraftServer);
@@ -322,27 +321,21 @@ public class MiscUtils {
         return 3 * (mean - median) / deviationSquared(iterable);
     }
 
-    public static double stdev(final Iterable<? extends Number> iterable) {
-        double sum = 0.0f;
-        double num = 0.0f;
+    public static float stdev(Collection<Float> list) {
+        float sum = 0.0f;
+        float num = 0.0f;
 
-        final List<Double> list = new ArrayList<>();
-
-        for (Number number : iterable) {
-            list.add(number.doubleValue());
-        }
-
-        for (Double v : list) {
+        for (Float v : list) {
             sum+= v;
         }
 
-        double mean = sum / (float)list.size();
+        float mean = sum / (float)list.size();
 
-        for (Double v : list) {
+        for (Float v : list) {
             num+= Math.pow(v - mean, 2.0D);
         }
 
-        return MathHelper.sqrt(num / (double)list.size());
+        return MathHelper.sqrt(num / (float)list.size());
     }
 
     public static float normalizeAngle(float angle) {

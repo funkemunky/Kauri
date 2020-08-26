@@ -10,7 +10,6 @@ import dev.brighten.anticheat.logs.data.sql.Query;
 import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.logs.objects.Punishment;
 import lombok.val;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -21,7 +20,6 @@ public class MySQLStorage implements DataStorage {
 
     private List<Log> logs = new CopyOnWriteArrayList<>();
     private List<Punishment> punishments = new CopyOnWriteArrayList<>();
-    private BukkitTask task;
 
     public MySQLStorage() {
         MySQL.init();
@@ -53,7 +51,7 @@ public class MySQLStorage implements DataStorage {
             MiscUtils.printToConsole("&aCreated!");
         });
 
-        task = RunUtils.taskTimerAsync(() -> {
+        RunUtils.taskTimerAsync(() -> {
             if(logs.size() > 0) {
                 for (Log log : logs) {
                     try {
@@ -84,16 +82,6 @@ public class MySQLStorage implements DataStorage {
             }
         }, Kauri.INSTANCE, 120L, 40L);
     }
-
-    @Override
-    public void shutdown() {
-        task.cancel();
-        task = null;
-        logs.clear();
-        punishments.clear();
-        MySQL.shutdown();
-    }
-
     @Override
     public List<Log> getLogs(UUID uuid, Check check, int arrayMin, int arrayMax, long timeFrom, long timeTo) {
         List<Log> logs = new ArrayList<>();

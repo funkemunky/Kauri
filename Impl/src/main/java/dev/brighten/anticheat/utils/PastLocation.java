@@ -3,7 +3,6 @@ package dev.brighten.anticheat.utils;
 import cc.funkemunky.api.utils.KLocation;
 import org.bukkit.Location;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -17,27 +16,30 @@ public class PastLocation {
                 .orElse(this.previousLocations.get(0)));
     }
 
-    public List<KLocation> getEstimatedLocation(int ping, int delta) {
-        int index = Math.max(0, previousLocations.size() - ping - 1);
-
-        if(previousLocations.size() < 15) return new ArrayList<>();
-
-        return new ArrayList<>(previousLocations).subList(Math.max(0, index - delta),
-                Math.min(previousLocations.size() - 1, index + delta));
+    public List<KLocation> getEstimatedLocation(long time, long ping, long delta) {
+        return this.previousLocations
+                .stream()
+                .filter(loc -> time - loc.timeStamp > 0 && Math.abs(time - loc.timeStamp - ping) < delta)
+                .collect(Collectors.toList());
     }
 
-    public List<KLocation> getPreviousRange(int ping) {
-        List<KLocation> kloc = new ArrayList<>();
+    public List<KLocation> getEstimatedLocation(long time, long ping) {
+        return this.previousLocations.stream()
+                .filter(loc -> time - loc.timeStamp > 0
+                        && time - loc.timeStamp <= ping + (ping < 50 ? 100 : 50))
+                .collect(Collectors.toList());
+    }
 
-        for(int i = ping ; i >= 0 ; i--) {
-            kloc.add(previousLocations.get(i));
-        }
+    public List<KLocation> getPreviousRange(long delta) {
+        long stamp = System.currentTimeMillis();
 
-        return kloc;
+        return this.previousLocations.stream()
+                .filter(loc -> stamp - loc.timeStamp < delta)
+                .collect(Collectors.toList());
     }
 
     public void addLocation(Location location) {
-        if (previousLocations.size() >= 40) {
+        if (previousLocations.size() >= 20) {
             previousLocations.remove(0);
         }
 
@@ -55,7 +57,7 @@ public class PastLocation {
     }
 
     public void addLocation(KLocation location) {
-        if (previousLocations.size() >= 40) {
+        if (previousLocations.size() >= 20) {
             previousLocations.remove(0);
         }
 

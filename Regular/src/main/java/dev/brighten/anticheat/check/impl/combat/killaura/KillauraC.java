@@ -20,18 +20,20 @@ public class KillauraC extends Check {
 
     @Packet
     public void onUse(WrappedInUseEntityPacket packet, long timeStamp) {
-        if(!packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) return;
+        if(!packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)
+                || data.playerVersion.isOrAbove(ProtocolVersion.V1_9)) return;
 
         long delta = timeStamp - lastArm;
 
-        if(delta > 1000L
+        if(delta > 100L
                 && data.lagInfo.lastPacketDrop.hasPassed(10)
                 && !data.lagInfo.lagging) {
             vl++;
             if(vl > 3) {
                 flag("ms:" + delta);
             }
-        } else if(vl > 0) vl-= 0.5f;
+        } else vl-= vl > 0 ? data.lagInfo.lagging
+                || data.lagInfo.lastPacketDrop.hasNotPassed(20) ? 0.25f : 0.1f : 0;
 
         debug("ms=" + delta);
     }
