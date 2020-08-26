@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>Premium</artifactId>
+    <artifactId>Checks</artifactId>
 
     <build>
         <plugins>
@@ -51,10 +51,9 @@
         <dependency>
             <groupId>dev.brighten.anticheat</groupId>
             <artifactId>Impl</artifactId>
-            <version>${parent.version}</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
-
 
 </project>

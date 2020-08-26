@@ -1,60 +1,29 @@
 package dev.brighten.anticheat.premium.impl;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import com.google.common.collect.Lists;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
-import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.api.check.CheckType;
 
-import java.util.Deque;
-
-@CheckInfo(name = "Aim (G)", description = "Checks if the yaw rotation snaps.",
-        checkType = CheckType.AIM, punishVL = 10)
+@CheckInfo(name = "Aim (G)", description = "Prediction.", checkType = CheckType.AIM, vlToFlag = 15, developer = true)
 public class AimG extends Check {
 
-    private final Deque<Float> samplesYaw = Lists.newLinkedList();
-    private final Deque<Float> samplesPitch = Lists.newLinkedList();
-
-    private double buffer = 0.0;
-    private double lastAverage = 0.0;
-
     @Packet
-    public void process(WrappedInFlyingPacket packet, long now) {
-        if(!packet.isLook()) return;
+    public void onLook(WrappedInFlyingPacket packet) {
+        if(packet.isLook()) {
+            if(data.moveProcessor.pitchGcdList.size() < 45) return;
 
-        final float deltaYaw = Math.abs(data.playerInfo.deltaYaw);
-        final float deltaPitch = Math.abs(data.playerInfo.deltaPitch);
+            if(data.moveProcessor.sensXPercent == data.moveProcessor.sensYPercent) {
+                float start = data.moveProcessor.sensitivityY * 0.6f + .2f;
 
-        final boolean attacking = now - data.playerInfo.lastAttackTimeStamp < 500L;
+                float tri = start * start * start * 8;
+                float xUse = data.moveProcessor.deltaX * tri;
+                float predicted = data.playerInfo.from.yaw + xUse * .15f;
+                float yaw = data.playerInfo.to.yaw;
 
-        if (deltaYaw > 0.0 && deltaPitch > 0.0 && attacking) {
-            samplesYaw.add(deltaYaw);
-            samplesPitch.add(deltaPitch);
-        }
-
-        if (samplesPitch.size() == 16 && samplesYaw.size() == 16) {
-            final double averageYaw = samplesYaw.stream().mapToDouble(d -> d).average().orElse(0.0);
-            final double averagePitch = samplesPitch.stream().mapToDouble(d -> d).average().orElse(0.0);
-
-            final double deviation = MiscUtils.stdev(samplesPitch);
-            final double averageDelta = Math.abs(averagePitch - lastAverage);
-
-            if (deviation > 6.f && averageDelta > 1f && averageYaw < 30.d) {
-                if (++buffer > 4) {
-                    vl++;
-                    flag("");
-                }
-            } else {
-                buffer = Math.max(buffer - 0.125, 0);
+                debug("yaw=%v.1 predicted=%v.1 deltaX=%v", yaw, predicted, data.moveProcessor.deltaX);
             }
-
-            debug("buffer=%v.2 deviaion=%v.3 avgDelta=%v.3 averageYaw=%v.3",
-                    buffer, deviation, averageDelta, averageYaw);
-            samplesYaw.clear();
-            samplesPitch.clear();
-            lastAverage = averagePitch;
         }
     }
 }

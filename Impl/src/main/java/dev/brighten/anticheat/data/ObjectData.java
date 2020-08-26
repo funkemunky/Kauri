@@ -4,8 +4,8 @@ import cc.funkemunky.api.handlers.ForgeHandler;
 import cc.funkemunky.api.handlers.ModData;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import cc.funkemunky.api.utils.Color;
-import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.math.RollingAverageLong;
 import cc.funkemunky.api.utils.math.cond.MaxInteger;
@@ -22,14 +22,12 @@ import dev.brighten.anticheat.listeners.PacketListener;
 import dev.brighten.anticheat.processing.ClickProcessor;
 import dev.brighten.anticheat.processing.MovementProcessor;
 import dev.brighten.anticheat.processing.PotionProcessor;
-import dev.brighten.anticheat.processing.keepalive.KeepAlive;
 import dev.brighten.anticheat.utils.PastLocation;
 import dev.brighten.anticheat.utils.TickTimer;
-import lombok.AllArgsConstructor;
-import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
@@ -37,7 +35,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Consumer;
 
 public class ObjectData {
 
@@ -62,16 +59,16 @@ public class ObjectData {
     public MovementProcessor moveProcessor;
     public PotionProcessor potionProcessor;
     public ClickProcessor clickProcessor;
-    public int hashCode;
+    public int hashCode, currentTicks;
     public boolean banned;
     public ModData modData;
-    public KLocation targetLoc;
     public ProtocolVersion playerVersion = ProtocolVersion.UNKNOWN;
     public Set<Player> boxDebuggers = new HashSet<>();
-    public final List<Action> keepAliveStamps = new CopyOnWriteArrayList<>();
-    public final Map<Integer, KLocation> entityLocations = new HashMap<>();
+    public List<PotionEffectType> potionEffects = new ArrayList<>(),
+            effectsToChange = new ArrayList<>();
+    public final Map<String, Long> keepAliveStamps = Collections.synchronizedMap(new HashMap<>());
+    public final Map<String, Short> transactionActions = Collections.synchronizedMap(new HashMap<>());
     public ConcurrentEvictingList<CancelType> typesToCancel = new ConcurrentEvictingList<>(10);
-    public final Map<Long, Long> keepAlives = Collections.synchronizedMap(new HashMap<>());
     public final List<String> sniffedPackets = new CopyOnWriteArrayList<>();
     public BukkitTask task;
     private ExecutorService playerThread;
@@ -79,8 +76,6 @@ public class ObjectData {
     public ObjectData(UUID uuid) {
         this.uuid = uuid;
         hashCode = uuid.hashCode();
-
-        if(PacketListener.expansiveThreading)
         playerThread = Executors.newSingleThreadExecutor();
 
         if(!Config.testMode) {
@@ -115,41 +110,23 @@ public class ObjectData {
                 return;
             }
 
+            if(System.currentTimeMillis() - lagInfo.lastTransPing > 2000L){
+                TinyProtocolHandler.sendPacket(getPlayer(),
+                        new WrappedOutTransaction(0, setTransactionAction("ping"), false)
+                                .getObject());
+            }
             if(Config.kickForLunar18 && usingLunar
                     && !playerVersion.equals(ProtocolVersion.UNKNOWN)
                     && playerVersion.isAbove(ProtocolVersion.V1_8)) {
                 RunUtils.task(() -> getPlayer().kickPlayer(Color.Red + "Lunar Client 1.8.9 is not allowed.\nJoin on 1.7.10 or any other client."));
             }
         }, Kauri.INSTANCE, 40L, 40L);
-
-        getPlayer().getActivePotionEffects().forEach(pe -> {
-            runKeepaliveAction(d -> this.potionProcessor.potionEffects.add(pe));
-        });
     }
 
     public ExecutorService getThread() {
         if(PacketListener.expansiveThreading)
             return playerThread;
-        return PacketListener.service;
-    }
-
-    public int[] getReceived() {
-        int[] toReturn = new int[] {0, 0};
-        val op = Kauri.INSTANCE.keepaliveProcessor.getResponse(this);
-
-        if(op.isPresent()) {
-            toReturn[0] = op.get().start;
-            val op2 = op.get().getReceived(uuid);
-
-            op2.ifPresent(kaReceived -> toReturn[1] = kaReceived.stamp);
-        }
-
-        return toReturn;
-    }
-
-    public void runTask(Runnable runnable) {
-        //tasksToRun.add(runnable);
-        getThread().execute(runnable);
+        return Kauri.INSTANCE.executor;
     }
 
     public short getRandomShort(int baseNumber, int bound) {
@@ -164,12 +141,35 @@ public class ObjectData {
         return baseNumber + ThreadLocalRandom.current().nextLong(bound);
     }
 
-    public int runKeepaliveAction(Consumer<KeepAlive> action) {
-        int id = Kauri.INSTANCE.keepaliveProcessor.currentKeepalive.start;
+    public long setKeepAliveStamp(String name) {
+        synchronized (keepAliveStamps) {
+            long stamp = getRandomLong(100, 4000);
+            keepAliveStamps.put(name, stamp);
 
-        keepAliveStamps.add(new Action(id, action));
+            return stamp;
+        }
+    }
 
-        return id;
+    public long getKeepAliveStamp(String name) {
+        return keepAliveStamps.getOrDefault(name, -1L);
+    }
+
+    public short getTransactionAction(String name) {
+        return transactionActions.getOrDefault(name, (short) 0);
+    }
+
+    public short setTransactionAction(String name) {
+        synchronized (transactionActions) {
+            short action = getRandomShort(10, 500);
+
+            transactionActions.put(name, action);
+
+            return action;
+        }
+    }
+
+    public void addPotionEffect(PotionEffectType type) {
+        setTransactionAction("addpotion");
     }
 
     public Player getPlayer() {
@@ -180,30 +180,23 @@ public class ObjectData {
     }
 
     public class LagInformation {
-        public long lastKeepAlive, lastTrans, lastClientTrans, ping, lastPing, averagePing,
-                millisPing, lmillisPing, recieved, start;
-        public int transPing, lastTransPing;
+        public long lastKeepAlive, lastTrans, lastClientTrans;
+        public long ping, averagePing, transPing, lastPing, lastTransPing;
         public MaxInteger lagTicks = new MaxInteger(25);
         public boolean lagging;
-        public TickTimer lastPacketDrop = new TickTimer( 10),
-                lastPingDrop = new TickTimer( 40);
+        public TickTimer lastPacketDrop = new TickTimer(ObjectData.this, 10),
+                lastPingDrop = new TickTimer(ObjectData.this, 40);
         public RollingAverageLong pingAverages = new RollingAverageLong(10, 0);
         public long lastFlying = 0;
     }
 
     public void onLogout() {
-        if(PacketListener.expansiveThreading)
         getThread().shutdown();
         task.cancel();
         keepAliveStamps.clear();
+        transactionActions.clear();
         Kauri.INSTANCE.dataManager.hasAlerts.remove(this);
         Kauri.INSTANCE.dataManager.debugging.remove(this);
-        checkManager.checkMethods.clear();
-        checkManager.checks.clear();
-        checkManager = null;
-        typesToCancel.clear();
-        sniffedPackets.clear();
-        keepAliveStamps.clear();
     }
 
     public static void debugBoxes(boolean debugging, Player debugger) {
@@ -231,11 +224,5 @@ public class ObjectData {
     public static void debugBoxes(boolean debugging, Player debugger, String... targets) {
         debugBoxes(debugging, debugger, (ObjectData[])Arrays.stream(targets).map(Bukkit::getPlayer)
                 .map(Kauri.INSTANCE.dataManager::getData).toArray(ObjectData[]::new));
-    }
-
-    @AllArgsConstructor
-    public static class Action {
-        public int stamp;
-        public Consumer<KeepAlive> action;
     }
 }
