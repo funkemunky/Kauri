@@ -7,10 +7,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 
 public class Pastebin {
-
-    static String api_dev_key = "15479eb626106167cade921b7d2b7e3c"; //Insert your own api_dev_key if you have one.
-    static String api_user_key = "ddcdb9d88bd8e596fb7b9bc216985f51";
-    static String pasteURL = "http://www.pastebin.com/api/api_post.php";
+    static String pasteURL = "https://funkemunky.cc/pastebin/make";
 
     public Pastebin() {
     }
@@ -26,10 +23,7 @@ public class Pastebin {
             throws UnsupportedEncodingException {
         String content = URLEncoder.encode(body, "UTF-8");
         String title = URLEncoder.encode(name + " report", "UTF-8");
-        String data = "api_option=paste&api_dev_key=" + Pastebin.api_dev_key
-                + "&api_paste_private=" + privacy.getPrivacy() + "&api_paste_name=" + title
-                + "&api_paste_expire_date=N&api_paste_format=" + "text"
-                + "&api_user_key=" + api_user_key + "&api_dev_key=" + api_dev_key + "&api_paste_code=" + content;
+        String data = "body=" + content + "&name=" + title + "&privacy=" + privacy.name();
         String response = Pastebin.page(Pastebin.pasteURL, data);
         String check = Pastebin.checkResponse(response);
         if (!check.equals("")) {
@@ -42,10 +36,7 @@ public class Pastebin {
             throws UnsupportedEncodingException {
         String content = URLEncoder.encode(body, "UTF-8");
         String title = URLEncoder.encode(name + " report", "UTF-8");
-        String data = "api_option=paste&api_dev_key=" + Pastebin.api_dev_key
-                + "&api_paste_private=" + privacy.getPrivacy() + "&api_paste_name=" + title
-                + "&api_paste_expire_date=" + expire + "&api_paste_format=" + "text"
-                + "&api_dev_key=" + api_dev_key + "&api_paste_code=" + content;
+        String data = "body=" + content + "&name=" + title + "&privacy=" + privacy.name() + "&expire=" + expire;
         String response = Pastebin.page(Pastebin.pasteURL, data);
         String check = Pastebin.checkResponse(response);
         if (!check.equals("")) {

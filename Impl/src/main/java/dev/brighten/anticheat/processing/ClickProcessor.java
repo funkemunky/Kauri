@@ -1,11 +1,12 @@
 package dev.brighten.anticheat.processing;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
-import cc.funkemunky.api.utils.TickTimer;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import cc.funkemunky.api.utils.Tuple;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.MiscUtils;
+import dev.brighten.anticheat.utils.TickTimer;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -19,7 +20,6 @@ public class ClickProcessor {
     private double std, mean, kurtosis, skewness, median, variance;
     @Getter
     private long min, max, sum, zeros;
-    private long lastTimestamp;
     @Getter
     private int outliers, lowOutliers, highOutliers;
     @Getter
@@ -33,11 +33,16 @@ public class ClickProcessor {
     private boolean notReady;
 
     private final ObjectData data;
+    private int flyingTicks;
+
+    public void onFlying(WrappedInTransactionPacket packet) {
+        flyingTicks++;
+    }
 
     public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
-        long delta = timeStamp - lastTimestamp;
+        long delta = flyingTicks;
 
-        if(delta < 600
+        if(delta < 15
                 && !data.playerInfo.breakingBlock && data.playerInfo.lastBlockPlace.hasPassed(3)) {
             cpsList.add(delta);
 
@@ -61,7 +66,7 @@ public class ClickProcessor {
                 }
             }
 
-            mean = sum / (double)cpsList.size();
+            mean = sum / (double)Math.max(1, cpsList.size());
             modes = MiscUtils.getModes(cpsList);
             median = MiscUtils.getMedian(cpsList);
 
@@ -76,6 +81,7 @@ public class ClickProcessor {
         notReady = data.playerInfo.breakingBlock
                 || data.playerInfo.lastBlockPlace.hasNotPassed(3)
                 || cpsList.size() < 22;
-        lastTimestamp = timeStamp;
+
+        flyingTicks = 0;
     }
 }

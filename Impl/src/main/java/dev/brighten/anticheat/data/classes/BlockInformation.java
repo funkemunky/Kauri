@@ -19,10 +19,8 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class BlockInformation {
@@ -74,6 +72,8 @@ public class BlockInformation {
                 }
             }
         }
+
+        blocks.parallelStream().forEach(this::updateBlock);
 
         if(!objectData.playerInfo.worldLoaded) return;
 
@@ -196,6 +196,27 @@ public class BlockInformation {
         collidesVertically = !(verticalCollisions = blockCollisions(handler.getBlocks(), box)).isEmpty();
 
         this.handler = handler;
+
+        //Preventing any memory leaks caused by lots and lots of locations being stored.
+        for (Location loc : lastUpdates.keySet()) {
+            lastUpdates.compute(loc, (key, time) -> {
+                if(time == null || System.currentTimeMillis() - time > 15000L) {
+                    return null;
+                }
+                return time;
+            });
+        }
+    }
+
+    private final Map<Location, Long> lastUpdates = new ConcurrentHashMap<>();
+    private synchronized void updateBlock(Block block) {
+        lastUpdates.compute(block.getLocation(), (location, lastUpdate) -> {
+            if(lastUpdate == null || System.currentTimeMillis() - lastUpdate > 10000L) {
+                objectData.getPlayer().sendBlockChange(block.getLocation(), block.getType(), block.getData());
+                return System.currentTimeMillis();
+            }
+            return lastUpdate;
+        });
     }
 
     public SimpleCollisionBox getBox() {
