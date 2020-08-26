@@ -22,12 +22,6 @@ public class DataManager {
             debugging.clear();
             dataMap.values().stream().filter(data -> data.debugging != null).forEach(debugging::add);
         }, Kauri.INSTANCE, 60L, 30L);
-
-        RunUtils.taskTimerAsync(() -> dataMap.values().stream()
-                        .filter(data -> data.target != null)
-                        .forEach(data -> data.targetPastLocation.addLocation(data.target.getLocation())),
-                Kauri.INSTANCE, 1L,
-                1L);
     }
 
     public ObjectData getData(Player player) {
