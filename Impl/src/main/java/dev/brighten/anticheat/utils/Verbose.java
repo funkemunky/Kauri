@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.utils;
 
+import cc.funkemunky.api.utils.TickTimer;
 import cc.funkemunky.api.utils.math.cond.MaxDouble;
 
 public class Verbose {

@@ -12,6 +12,31 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutCloseWindowPacket;
 import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.Kauri;
+import dev.brighten.anticheat.check.impl.combat.aim.*;
+import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerA;
+import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerB;
+import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerC;
+import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerG;
+import dev.brighten.anticheat.check.impl.combat.hand.*;
+import dev.brighten.anticheat.check.impl.combat.hitbox.Hitboxes;
+import dev.brighten.anticheat.check.impl.combat.hitbox.ReachA;
+import dev.brighten.anticheat.check.impl.combat.killaura.KillauraB;
+import dev.brighten.anticheat.check.impl.combat.killaura.KillauraC;
+import dev.brighten.anticheat.check.impl.combat.killaura.KillauraD;
+import dev.brighten.anticheat.check.impl.combat.killaura.KillauraE;
+import dev.brighten.anticheat.check.impl.movement.fly.*;
+import dev.brighten.anticheat.check.impl.movement.general.FastLadder;
+import dev.brighten.anticheat.check.impl.movement.general.OmniSprint;
+import dev.brighten.anticheat.check.impl.movement.nofall.NoFallA;
+import dev.brighten.anticheat.check.impl.movement.speed.SpeedA;
+import dev.brighten.anticheat.check.impl.movement.speed.SpeedB;
+import dev.brighten.anticheat.check.impl.movement.speed.SpeedC;
+import dev.brighten.anticheat.check.impl.movement.velocity.VelocityA;
+import dev.brighten.anticheat.check.impl.packets.Timer;
+import dev.brighten.anticheat.check.impl.packets.badpackets.*;
+import dev.brighten.anticheat.check.impl.packets.exploits.*;
+import dev.brighten.anticheat.check.impl.world.HealthSpoof;
+import dev.brighten.anticheat.check.impl.world.Phase;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.api.KauriAPI;
 import dev.brighten.api.check.CheckType;
@@ -159,16 +184,11 @@ public class Check implements KauriCheck {
                             } else if(variables[i] instanceof Float) {
                                 splitInfo[i + 1] = split2.replace("." + parsed, "");
                                 float var = (float) variables[i];
-
-                                if(!Float.isNaN(var) && !Float.isInfinite(var)) {
-                                    splitInfo[i] = split + MathUtils.round(var, parsed);
-                                } else splitInfo[i] = split + MathUtils.round(var, parsed);
+                                splitInfo[i] = split + MathUtils.round(var, parsed);
                             } else if(variables[i] instanceof Double) {
                                 splitInfo[i + 1] = split2.replace("." + parsed, "");
                                 double var = (double) variables[i];
-                                if(!Double.isNaN(var) && !Double.isInfinite(var)) {
-                                    splitInfo[i] = split + MathUtils.round(var, parsed);
-                                } else splitInfo[i] = split + var;
+                                splitInfo[i] = split + MathUtils.round(var, parsed);
                             }
                         }
                     } else splitInfo[i] = split + variables[i];
@@ -372,7 +392,65 @@ public class Check implements KauriCheck {
     }
 
     public static void registerChecks() {
-
+        register(new AutoclickerA());
+        register(new AutoclickerB());
+        register(new AutoclickerC());
+        register(new AutoclickerG());
+        register(new FlyA());
+        register(new FlyB());
+        register(new FlyC());
+        register(new FlyD());
+        register(new FlyE());
+        register(new FastLadder());
+        register(new NoFallA());
+        //register(new NoFallB());
+        register(new Hitboxes());
+        register(new ReachA());
+        register(new AimA());
+        register(new AimB());
+        register(new AimC());
+        register(new AimD());
+        register(new AimF());
+        register(new SpeedA());
+        register(new SpeedB());
+        register(new SpeedC());
+       //register(new Test());
+        //register(new KillauraA());
+        register(new KillauraB());
+        register(new KillauraC());
+        register(new KillauraD());
+        register(new KillauraE());
+        register(new Phase());
+        register(new OmniSprint());
+        //register(new Inertia());
+        register(new Timer());
+        register(new BadPacketsA());
+        register(new BadPacketsB());
+        register(new BadPacketsC());
+        register(new BadPacketsD());
+        register(new BadPacketsE());
+        register(new BadPacketsF());
+        register(new BadPacketsG());
+        register(new BadPacketsH());
+        register(new BadPacketsI());
+        register(new BadPacketsK());
+        register(new BadPacketsL());
+        register(new BadPacketsM());
+        //register(new BadPacketsN());
+        register(new VelocityA());
+        register(new HandA());
+        register(new HandB());
+        register(new HandC());
+        register(new HandD());
+        register(new HandE());
+        register(new HandF());
+        register(new HealthSpoof());
+        register(new BookOp());
+        register(new BookEnchant());
+        register(new PacketSpam());
+        register(new SignOp());
+        register(new SignCrash());
+        //register(new LargeMove());
     }
 
     public static boolean isCheck(String name) {
