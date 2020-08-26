@@ -35,4 +35,15 @@ public class MySQL {
             e.printStackTrace();
         }
     }
+
+    public static void shutdown() {
+        try {
+            if(conn != null && !conn.isClosed()) {
+                conn.close();
+                conn = null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -16,6 +16,7 @@ import dev.brighten.db.depends.com.mongodb.client.model.Aggregates;
 import dev.brighten.db.depends.com.mongodb.client.model.Filters;
 import dev.brighten.dev.depends.org.bson.Document;
 import dev.brighten.dev.depends.org.bson.conversions.Bson;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -26,6 +27,7 @@ public class MongoStorage implements DataStorage {
 
     private MongoCollection<Document> logsCollection, punishmentsCollection, nameUUIDCollection;
     private MongoDatabase database;
+    private BukkitTask task;
 
     private List<Log> logs = new CopyOnWriteArrayList<>();
     private List<Punishment> punishments = new CopyOnWriteArrayList<>();
@@ -34,7 +36,7 @@ public class MongoStorage implements DataStorage {
         MongoClient client;
         if(MongoConfig.loginDetails) {
             client = MongoClients.create(MongoClientSettings.builder().applyToClusterSettings(builder ->
-                builder.hosts(Collections.singletonList(new ServerAddress(MongoConfig.ip, MongoConfig.port))))
+                    builder.hosts(Collections.singletonList(new ServerAddress(MongoConfig.ip, MongoConfig.port))))
                     .credential(MongoCredential.createCredential(MongoConfig.username,
                             MongoConfig.authDatabase.length() > 0 ? MongoConfig.authDatabase : MongoConfig.database,
                             MongoConfig.password.toCharArray()))
@@ -49,7 +51,7 @@ public class MongoStorage implements DataStorage {
         punishmentsCollection = database.getCollection("punishments");
         nameUUIDCollection = database.getCollection("nameUuid");
 
-        RunUtils.taskTimerAsync(() -> {
+        task = RunUtils.taskTimerAsync(() -> {
             if(logs.size() > 0) {
                 for (Log log : logs) {
                     logsCollection.insertOne(new Document("uuid", log.uuid.toString())
@@ -111,6 +113,19 @@ public class MongoStorage implements DataStorage {
                 .collect(Collectors.toList());
     }
 
+
+    @Override
+    public void shutdown() {
+        task.cancel();
+        task = null;
+        logs.clear();
+        punishments.clear();
+        database = null;
+        logsCollection = null;
+        punishmentsCollection = null;
+        nameUUIDCollection = null;
+    }
+
     @Override
     public List<Log> getHighestVL(UUID uuid, Check check, int limit, long timeFrom, long timeTo) {
         Bson document = new Document("$gte", timeFrom).append("$lt", timeTo);
@@ -151,7 +166,7 @@ public class MongoStorage implements DataStorage {
 
     @Override
     public void addPunishment(Punishment punishment) {
-       punishments.add(punishment);
+        punishments.add(punishment);
     }
 
     @Override

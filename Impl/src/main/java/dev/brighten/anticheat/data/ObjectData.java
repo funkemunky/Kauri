@@ -123,7 +123,7 @@ public class ObjectData {
         }, Kauri.INSTANCE, 40L, 40L);
 
         getPlayer().getActivePotionEffects().forEach(pe -> {
-            runKeepaliveAction(d -> this.potionProcessor.po.add(pe));
+            runKeepaliveAction(d -> this.potionProcessor.potionEffects.add(pe));
         });
     }
 

@@ -19,7 +19,7 @@ public class FastLadder extends Check {
     @Override
     public void setData(ObjectData data) {
         super.setData(data);
-        lastJump = new TickTimer(data, 6);
+        lastJump = new TickTimer( 6);
     }
 
     @Packet

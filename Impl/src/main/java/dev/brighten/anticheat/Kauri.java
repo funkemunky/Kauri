@@ -117,6 +117,7 @@ public class Kauri extends JavaPlugin {
 
         MiscUtils.printToConsole("&7Clearing checks and cached entity information...");
         entityProcessor.vehicles.clear(); //Clearing all registered vehicles.
+        entityProcessor.task.cancel();
 
         entityProcessor = null;
 

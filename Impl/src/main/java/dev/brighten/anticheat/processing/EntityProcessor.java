@@ -15,10 +15,10 @@ import java.util.stream.Collectors;
 
 public class EntityProcessor {
 
-    public static Map<UUID, List<Entity>> vehicles = new ConcurrentHashMap<>();
-    public static BukkitTask task;
+    public Map<UUID, List<Entity>> vehicles = new ConcurrentHashMap<>();
+    public BukkitTask task;
 
-    private static void runEntityProcessor() {
+    private void runEntityProcessor() {
         Atlas.getInstance().getEntities().keySet().forEach(uuid -> vehicles.put(uuid,
                 Atlas.getInstance().getEntities().get(uuid)
                         .stream()
@@ -26,7 +26,9 @@ public class EntityProcessor {
                         .collect(Collectors.toList())));
     }
 
-    public static void start() {
-        task = RunUtils.taskTimerAsync(EntityProcessor::runEntityProcessor, Kauri.INSTANCE, 0L, 10L);
+    public static EntityProcessor start() {
+        EntityProcessor processor = new EntityProcessor();
+        processor.task = RunUtils.taskTimerAsync(processor::runEntityProcessor, Kauri.INSTANCE, 0L, 10L);
+        return processor;
     }
 }

@@ -21,7 +21,7 @@ public class OmniSprint extends Check {
     @Override
     public void setData(ObjectData data) {
         super.setData(data);
-        lastKeySwitch = new TickTimer(data, 1);
+        lastKeySwitch = new TickTimer( 1);
     }
 
     @Packet
