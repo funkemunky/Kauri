@@ -1,7 +1,8 @@
 package dev.brighten.anticheat.premium.impl.autoclicker;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.*;
-import cc.funkemunky.api.utils.Color;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;

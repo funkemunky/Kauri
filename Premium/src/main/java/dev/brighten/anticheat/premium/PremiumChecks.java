@@ -7,7 +7,6 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.premium.impl.*;
 import dev.brighten.anticheat.premium.impl.autoclicker.*;
 import dev.brighten.anticheat.premium.impl.hitboxes.ReachB;
-import dev.brighten.anticheat.premium.impl.hitboxes.ReachC;
 
 @Init(priority = Priority.LOWEST)
 public class PremiumChecks {

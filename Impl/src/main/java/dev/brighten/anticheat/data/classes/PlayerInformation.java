@@ -1,10 +1,7 @@
 package dev.brighten.anticheat.data.classes;
 
 import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumAnimation;
-import cc.funkemunky.api.utils.ConfigSetting;
-import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.KLocation;
-import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingList;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.TickTimer;

@@ -1,18 +1,14 @@
 package dev.brighten.anticheat.premium.impl;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.MathUtils;
 import com.google.common.collect.Lists;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
-import dev.brighten.anticheat.processing.MovementProcessor;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.api.check.CheckType;
 
 import java.util.Deque;
-import java.util.LinkedList;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @CheckInfo(name = "Aim (G)", description = "Checks if the yaw rotation snaps.",
         checkType = CheckType.AIM, punishVL = 10)
