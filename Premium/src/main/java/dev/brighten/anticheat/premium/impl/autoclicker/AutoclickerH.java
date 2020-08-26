@@ -1,15 +1,8 @@
 package dev.brighten.anticheat.premium.impl.autoclicker;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.*;
-import dev.brighten.anticheat.utils.GraphUtil;
 import dev.brighten.api.check.CheckType;
-import lombok.val;
-
-import java.util.Deque;
-import java.util.LinkedList;
 
 @CheckInfo(name = "Autoclicker (H)", description = "Checks for low standard deviation.",
         checkType = CheckType.AUTOCLICKER, punishVL = 6, vlToFlag = 2, developer = true)
