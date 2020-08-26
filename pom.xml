@@ -7,12 +7,13 @@
     <groupId>dev.brighten.anticheat</groupId>
     <artifactId>Kauri</artifactId>
     <packaging>pom</packaging>
-    <version>2.8.5</version>
+    <version>2.9.0</version>
     <modules>
         <module>API</module>
         <module>Impl</module>
         <module>Premium</module>
-        <module>Checks</module>
+        <module>Regular</module>
+        <module>Free</module>
     </modules>
 
     <repositories>
@@ -46,7 +47,7 @@
         <dependency>
             <groupId>cc.funkemunky.utils</groupId>
             <artifactId>Atlas</artifactId>
-            <version>1.8.3.2</version>
+            <version>1.8.4</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

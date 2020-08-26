@@ -1,8 +1,10 @@
 package dev.brighten.anticheat.processing;
 
 import cc.funkemunky.api.Atlas;
+import cc.funkemunky.api.reflections.impl.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.types.MathHelper;
 import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.handlers.PlayerSizeHandler;
 import cc.funkemunky.api.utils.objects.VariableValue;
@@ -12,8 +14,11 @@ import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.MouseFilter;
 import dev.brighten.anticheat.utils.MovementUtils;
+import dev.brighten.anticheat.utils.TickTimer;
 import lombok.val;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.potion.PotionEffectType;
 
 import java.math.RoundingMode;
@@ -72,13 +77,11 @@ public class MovementProcessor {
             data.playerInfo.to.x = packet.getX();
             data.playerInfo.to.y = packet.getY();
             data.playerInfo.to.z = packet.getZ();
-        } else if(packet.isGround()) {
+            //if this is the case, this assumes client movement in between therefore we have to calculate where ground would be.
+        } else if(packet.isGround() && !data.playerInfo.clientGround) { //this is the last ground
             val optional = data.blockInfo.belowCollisions.stream()
-                    .filter(box -> {
-                        MiscUtils.testMessage("delta=" + (box.yMax - data.playerInfo.to.y));
-                        return Math.pow(box.yMax - data.playerInfo.to.y, 2) <= 9.0E-4D && data.box.copy()
-                                .offset(0, -.1, 0).isCollided(box);
-                    }).findFirst();
+                    .filter(box -> Math.pow(box.yMax - data.playerInfo.to.y, 2) <= 9.0E-4D && data.box.copy()
+                            .offset(0, -.1, 0).isCollided(box)).findFirst();
 
             if(optional.isPresent()) {
                 data.playerInfo.to.y-= data.playerInfo.to.y - optional.get().yMax;
@@ -87,11 +90,12 @@ public class MovementProcessor {
         }
 
         data.playerInfo.to.timeStamp = timeStamp;
-        if (data.playerInfo.posLocs.size() > 0) {
+        //Adding past location
+        data.pastLocation.addLocation(data.playerInfo.to);
+
+        if (data.playerInfo.posLocs.size() > 0 && !packet.isGround()) {
             val optional = data.playerInfo.posLocs.stream()
-                    .filter(loc -> loc.toVector().setY(0)
-                            .distance(data.playerInfo.to.toVector().setY(0)) <= 1E-8
-                            && MathUtils.getDelta(loc.y, data.playerInfo.to.y) < 4)
+                    .filter(loc -> loc.x == packet.getX() && loc.y == packet.getY() && loc.z == packet.getZ())
                     .findFirst();
 
             if (optional.isPresent()) {
@@ -104,17 +108,18 @@ public class MovementProcessor {
         } else if (data.playerInfo.serverPos) {
             data.playerInfo.serverPos = false;
         }
+
         data.playerInfo.lClientGround = data.playerInfo.clientGround;
         data.playerInfo.clientGround = packet.isGround();
         //Setting the motion delta for use in checks to prevent repeated functions.
         data.playerInfo.lDeltaX = data.playerInfo.deltaX;
         data.playerInfo.lDeltaY = data.playerInfo.deltaY;
         data.playerInfo.lDeltaZ = data.playerInfo.deltaZ;
-        data.playerInfo.deltaX = data.playerInfo.to.x - data.playerInfo.from.x;
-        data.playerInfo.deltaY = data.playerInfo.to.y - data.playerInfo.from.y;
-        data.playerInfo.deltaZ = data.playerInfo.to.z - data.playerInfo.from.z;
+        data.playerInfo.deltaX = data.playerInfo.serverPos ? 0 : data.playerInfo.to.x - data.playerInfo.from.x;
+        data.playerInfo.deltaY = data.playerInfo.serverPos ? 0 : data.playerInfo.to.y - data.playerInfo.from.y;
+        data.playerInfo.deltaZ = data.playerInfo.serverPos ? 0 : data.playerInfo.to.z - data.playerInfo.from.z;
         data.playerInfo.lDeltaXZ = data.playerInfo.deltaXZ;
-        data.playerInfo.deltaXZ = MathUtils.hypot(data.playerInfo.deltaX, data.playerInfo.deltaZ);
+        data.playerInfo.deltaXZ = data.playerInfo.serverPos ? 0 : MathUtils.hypot(data.playerInfo.deltaX, data.playerInfo.deltaZ);
 
         data.playerInfo.blockOnTo = BlockUtils.getBlock(data.playerInfo.to.toLocation(data.getPlayer().getWorld()));
         data.playerInfo.blockBelow = BlockUtils.getBlock(data.playerInfo.to.toLocation(data.getPlayer().getWorld())
@@ -122,11 +127,17 @@ public class MovementProcessor {
 
         if(!data.getPlayer().getGameMode().equals(lastGamemode)) data.playerInfo.lastGamemodeTimer.reset();
         lastGamemode = data.getPlayer().getGameMode();
-        data.playerInfo.creative = data.getPlayer().getGameMode().equals(GameMode.CREATIVE)
-                || data.getPlayer().getGameMode().toString().equalsIgnoreCase("SPECTATOR");
+        data.playerInfo.creative = !data.getPlayer().getGameMode().equals(GameMode.SURVIVAL)
+                && !data.getPlayer().getGameMode().equals(GameMode.ADVENTURE);
 
         if(data.playerInfo.blockBelow != null)
-            data.blockInfo.currentFriction = ReflectionsUtil.getFriction(data.playerInfo.blockBelow);
+            data.blockInfo.currentFriction = MinecraftReflection.getFriction(data.playerInfo.blockBelow);
+
+        Block block = BlockUtils.getBlock(new Location(data.getPlayer().getWorld(),
+                data.playerInfo.from.x, data.playerInfo.from.y - 1, data.playerInfo.from.z));
+
+        if(block != null)
+            data.blockInfo.fromFriction = MinecraftReflection.getFriction(block);
 
         if(packet.isPos()) {
             //We create a separate from BoundingBox for the predictionService since it should operate on pre-motion data.
@@ -136,7 +147,7 @@ public class MovementProcessor {
             if(timeStamp - data.creation > 400L) data.blockInfo.runCollisionCheck(); //run b4 everything else for use below.
         }
 
-        if(MathUtils.getDelta(deltaY, -0.098) < 0.001 && data.playerInfo.deltaXZ <= 0.3) {
+        if(MathUtils.getDelta(deltaY, -0.098) < 0.001) {
             data.playerInfo.worldLoaded = false;
         }
         data.playerInfo.inVehicle = data.getPlayer().getVehicle() != null;
@@ -150,7 +161,18 @@ public class MovementProcessor {
             data.playerInfo.totalHeight = MovementUtils.getTotalHeight(data.playerVersion,
                     (float)data.playerInfo.jumpHeight);
         }
+
+        if(Atlas.getInstance().getBlockBoxManager().getBlockBox()
+                .isChunkLoaded(data.playerInfo.to.toLocation(data.getPlayer().getWorld())))
+            data.playerInfo.lastChunkUnloaded.reset();
+
         data.playerInfo.lworldLoaded = data.playerInfo.worldLoaded;
+
+        if(MathUtils.getDelta(data.playerInfo.deltaY, -0.098) < 0.0001
+                && data.playerInfo.lastChunkUnloaded.hasNotPassed(35))
+            data.playerInfo.worldLoaded = false;
+        else data.playerInfo.worldLoaded = true;
+
 
         data.lagInfo.lagging = data.lagInfo.lagTicks.subtract() > 0
                 || !data.playerInfo.worldLoaded
@@ -234,8 +256,10 @@ public class MovementProcessor {
 
                     if(data.playerInfo.cinematicMode =
                             (MathUtils.getDelta(pyaw, data.playerInfo.from.yaw) < (Math.abs(deltaX) > 50 ? 3 : 1)
-                            && MathUtils.getDelta(ppitch, data.playerInfo.to.pitch) < (Math.abs(deltaY) > 30 ? 2 : 1)))
+                            && MathUtils.getDelta(ppitch, data.playerInfo.to.pitch) < (Math.abs(deltaY) > 30 ? 2 : 1))) {
                         lastCinematic = timeStamp;
+                        data.playerInfo.cinematicTimer.reset();
+                    }
 
                     //MiscUtils.testMessage("pyaw=" + pyaw + " ppitch=" + ppitch + " yaw=" + data.playerInfo.to.yaw + " pitch=" + data.playerInfo.to.pitch);
                 } else {
@@ -260,9 +284,9 @@ public class MovementProcessor {
             }
             data.playerInfo.canFly = data.getPlayer().getAllowFlight();
             data.playerInfo.flying = data.getPlayer().isFlying();
-            data.playerInfo.creative = data.getPlayer().getGameMode().equals(GameMode.CREATIVE);
         }
 
+        data.playerInfo.serverAllowedFlight = data.getPlayer().getAllowFlight();
         if (data.playerInfo.breakingBlock) data.playerInfo.lastBrokenBlock.reset();
 
         //Setting fallDistance
@@ -322,7 +346,7 @@ public class MovementProcessor {
         /* General Cancel Booleans */
         boolean hasLevi = levitation != null && data.potionProcessor.hasPotionEffect(levitation);
 
-        data.playerInfo.generalCancel = data.playerInfo.canFly
+        data.playerInfo.generalCancel = data.playerInfo.serverAllowedFlight
                 || data.playerInfo.creative
                 || hasLevi
                 || (MathUtils.getDelta(-0.098, data.playerInfo.deltaY) < 0.001 && data.playerInfo.deltaXZ < 0.3)
@@ -345,17 +369,13 @@ public class MovementProcessor {
                 || data.playerInfo.onLadder
                 || data.playerInfo.climbTimer.hasNotPassed(4)
                 || data.playerInfo.lastHalfBlock.hasNotPassed(2);
-
-        //Adding past location
-        if(timeStamp - data.playerInfo.lastServerPos > 100L)
-            data.pastLocation.addLocation(data.playerInfo.to.clone());
     }
     private static float getDeltaX(float yawDelta, float gcd) {
-        return (yawDelta / gcd);
+        return MathHelper.floor(yawDelta / gcd);
     }
 
     private static float getDeltaY(float pitchDelta, float gcd) {
-        return (pitchDelta / gcd);
+        return MathHelper.floor(pitchDelta / gcd);
     }
 
     public static int sensToPercent(float sensitivity) {
@@ -413,12 +433,12 @@ public class MovementProcessor {
     }
 
     private static float yawToF2(float yawDelta) {
-        return yawDelta / .15f;
+        return (float)((double)yawDelta / .15);
     }
 
     private static float pitchToF3(float pitchDelta) {
         int b0 = pitchDelta >= 0 ? 1 : -1; //Checking for inverted mouse.
-        return pitchDelta / .15f / b0;
+        return (float)((double)(pitchDelta / b0) / .15);
     }
 
 }
