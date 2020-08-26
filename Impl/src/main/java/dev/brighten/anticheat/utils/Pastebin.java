@@ -13,6 +13,7 @@ public class Pastebin {
     static String pasteURL = "http://www.pastebin.com/api/api_post.php";
 
     public Pastebin() {
+        
     }
 
     static String checkResponse(String response) {
