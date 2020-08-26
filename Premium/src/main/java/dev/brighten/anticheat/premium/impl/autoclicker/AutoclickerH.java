@@ -4,45 +4,27 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "Autoclicker (H)", description = "Meant to detect Vape and other autoclickers. By Elevated.",
+@CheckInfo(name = "Autoclicker (H)", description = "Checks for low standard deviation.",
         checkType = CheckType.AUTOCLICKER, punishVL = 6, vlToFlag = 2, developer = true)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerH extends Check {
 
-    private double ticks, cps, buffer;
-    private double lastKurt;
-    private Deque<Double> clickSamples = new LinkedList<>();
-
-    @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
-        if (++ticks == 20) {
-            if (cps > 8 && clickSamples.add(cps) && clickSamples.size() == 10) {
-                final GraphUtil.GraphResult results = GraphUtil.getGraph(clickSamples);
-
-                val negatives = results.getNegatives();
-                val kurtosis = data.clickProcessor.getKurtosis();
-                if (negatives == 1 && MathUtils.getDelta(kurtosis, lastKurt) > 0.2) {
-                    if (++buffer > 3) {
-                        vl++;
-                        flag("cps=%v buffer=%v", cps, buffer);
-                    }
-                } else {
-                    buffer = 0;
-                }
-                this.clickSamples.clear();
-                debug("cps=%v negatives=%v buffer=%v kurt=%v.2",
-                        cps, negatives, MathUtils.round(buffer, 1), kurtosis);
-                lastKurt = kurtosis;
-            }
-            this.cps = 0;
-            this.ticks = 0;
-        }
-    }
+    public float buffer;
 
     @Packet
     public void onArm(WrappedInArmAnimationPacket packet) {
         if(data.playerInfo.breakingBlock
+                || data.clickProcessor.isNotReady()
                 || data.playerInfo.lastBlockPlace.hasNotPassed(2)) return;
-        ++cps;
+
+        long range = data.clickProcessor.getMax() - data.clickProcessor.getMin();
+        if(data.clickProcessor.getStd() < 0.3
+                && data.clickProcessor.getMean() < 3
+                && range > 3) {
+            buffer++;
+        } else if(buffer > 0) buffer-= 0.25f;
+
+        debug("std=%v.2 mean=%v.1 range=%v buffer.1", data.clickProcessor.getStd(),
+                data.clickProcessor.getMean(), range, buffer);
     }
 }

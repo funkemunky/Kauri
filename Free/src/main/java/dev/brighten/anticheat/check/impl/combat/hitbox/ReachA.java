@@ -3,15 +3,14 @@ package dev.brighten.anticheat.check.impl.combat.hitbox;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.utils.KLocation;
-import cc.funkemunky.api.utils.MiscUtils;
-import cc.funkemunky.api.utils.handlers.PlayerSizeHandler;
+import cc.funkemunky.api.utils.world.CollisionBox;
+import cc.funkemunky.api.utils.world.EntityData;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
-import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.util.Vector;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,24 +28,24 @@ public class ReachA extends Check {
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(timeStamp - lastUse > 3 || data.playerInfo.creative || data.targetPastLocation.previousLocations.size() < 10) return;
 
-        List<SimpleCollisionBox> origins = Stream.of(data.playerInfo.to.clone(), data.playerInfo.from.clone())
-                .map(loc -> PlayerSizeHandler.getInstance().bounds(data.getPlayer(), loc.x, loc.y, loc.z))
+        List<KLocation> origins = Stream.of(data.playerInfo.from.clone())
                 .collect(Collectors.toList());
-        List<SimpleCollisionBox> targetBoxes = data.targetPastLocation
-                .getEstimatedLocation(timeStamp,
-                        data.lagInfo.transPing)
-                .stream()
-                .map(loc -> getHitbox(loc, target.getType()))
-                .collect(Collectors.toList());
+        List<KLocation> targetBoxes = data.targetPastLocation.getEstimatedLocation(data.lagInfo.transPing + 4, 2);
 
+        for (KLocation targetBox : targetBoxes) {
+            debug("(%vms) x=%v.4 y=%v.4 z=%v.4",
+                    timeStamp - targetBox.timeStamp, targetBox.x, targetBox.y, targetBox.z);
+        }
         double distance = 69;
 
-        val bounds = getHitbox(new KLocation(0,0,0), target.getType());
-        double width = bounds.max().setY(0).distance(bounds.min().setY(0));
-        for (SimpleCollisionBox origin : origins) {
+        val bounds = getHitbox(target, new KLocation(0,0,0));
+
+        if(bounds == null) return;
+        double width = bounds.max().setY(0).distance(bounds.min().setY(0)) / 2.;
+        for (KLocation origin : origins) {
             //origin.draw(WrappedEnumParticle.FLAME, Collections.singleton(data.getPlayer()));
-            for (SimpleCollisionBox target : targetBoxes) {
-                distance = Math.min(distance, origin.distance(target) - width);
+            for (KLocation target : targetBoxes) {
+                distance = Math.min(distance, origin.toVector().distance(target.toVector()) - width);
                 //target.draw(WrappedEnumParticle.FLAME, Collections.singleton(data.getPlayer()));
             }
         }
@@ -65,19 +64,15 @@ public class ReachA extends Check {
 
     @Packet
     public void onUse(WrappedInUseEntityPacket packet, long timeStamp) {
-        if(packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)
+        if (packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)
                 && packet.getEntity() instanceof LivingEntity) {
             lastUse = timeStamp;
             target = (LivingEntity) packet.getEntity();
         }
     }
 
-    private SimpleCollisionBox getHitbox(KLocation loc, EntityType type) {
-        Vector vec = MiscUtils.entityDimensions.get(type).clone();
-
-        if(vec == null) vec = new Vector(5, 0, 5);
-
-        return new SimpleCollisionBox(loc.toVector(), loc.toVector()).expand(vec.getX(), 0, vec.getZ())
-                .expandMax(0, vec.getY(), 0).expand(0.1, 0.1, 0.1);
+    private static SimpleCollisionBox getHitbox(Entity entity, KLocation loc) {
+        CollisionBox box = EntityData.getEntityBox(loc, entity);
+        return box instanceof SimpleCollisionBox ? (SimpleCollisionBox) box : null;
     }
 }

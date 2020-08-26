@@ -8,13 +8,14 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Fly (C)", description = "Checks if a player accelerates vertically before touching ground.",
-        checkType = CheckType.FLIGHT, developer = true, punishVL = 10)
+        checkType = CheckType.FLIGHT, punishVL = 10)
 @Cancellable
 public class FlyC extends Check {
 
     @Packet
-    public void onPacket(WrappedInFlyingPacket packet) {
+    public void onPacket(WrappedInFlyingPacket packet, long timeStamp) {
         if(packet.isPos()
+                && timeStamp - data.playerInfo.lastVelocityTimestamp > 200L
                 && data.playerInfo.lastVelocity.hasPassed(4)
                 && !data.playerInfo.nearGround
                 && !data.playerInfo.clientGround

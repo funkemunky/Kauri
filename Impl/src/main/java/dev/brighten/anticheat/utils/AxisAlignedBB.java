@@ -104,13 +104,11 @@ public class AxisAlignedBB {
     }
 
     public AxisAlignedBB c(double d0, double d1, double d2) {
-        return new AxisAlignedBB(this.minX + d0, this.minY + d1,
-                this.minZ + d2, this.maxX + d0, this.maxY + d1, this.maxZ + d2);
+        return new AxisAlignedBB(this.minX + d0, this.minY + d1, this.minZ + d2, this.maxX + d0, this.maxY + d1, this.maxZ + d2);
     }
 
     public double a(AxisAlignedBB axisalignedbb, double d0) {
-        if (axisalignedbb.maxY > this.minY && axisalignedbb.minY < this.maxY && axisalignedbb.maxZ > this.minZ
-                && axisalignedbb.minZ < this.maxZ) {
+        if (axisalignedbb.maxY > this.minY && axisalignedbb.minY < this.maxY && axisalignedbb.maxZ > this.minZ && axisalignedbb.minZ < this.maxZ) {
             double d1;
 
             if (d0 > 0.0D && axisalignedbb.maxX <= this.minX) {
@@ -132,8 +130,7 @@ public class AxisAlignedBB {
     }
 
     public double b(AxisAlignedBB axisalignedbb, double d0) {
-        if (axisalignedbb.maxX > this.minX && axisalignedbb.minX < this.maxX
-                && axisalignedbb.maxZ > this.minZ && axisalignedbb.minZ < this.maxZ) {
+        if (axisalignedbb.maxX > this.minX && axisalignedbb.minX < this.maxX && axisalignedbb.maxZ > this.minZ && axisalignedbb.minZ < this.maxZ) {
             double d1;
 
             if (d0 > 0.0D && axisalignedbb.maxY <= this.minY) {
@@ -155,8 +152,7 @@ public class AxisAlignedBB {
     }
 
     public double c(AxisAlignedBB axisalignedbb, double d0) {
-        if (axisalignedbb.maxX > this.minX && axisalignedbb.minX < this.maxX
-                && axisalignedbb.maxY > this.minY && axisalignedbb.minY < this.maxY) {
+        if (axisalignedbb.maxX > this.minX && axisalignedbb.minX < this.maxX && axisalignedbb.maxY > this.minY && axisalignedbb.minY < this.maxY) {
             double d1;
 
             if (d0 > 0.0D && axisalignedbb.maxZ <= this.minZ) {
@@ -178,14 +174,11 @@ public class AxisAlignedBB {
     }
 
     public boolean b(AxisAlignedBB axisalignedbb) {
-        return (axisalignedbb.maxX > this.minX && axisalignedbb.minX < this.maxX)
-                && ((axisalignedbb.maxY > this.minY && axisalignedbb.minY < this.maxY)
-                && (axisalignedbb.maxZ > this.minZ && axisalignedbb.minZ < this.maxZ));
+        return axisalignedbb.maxX > this.minX && axisalignedbb.minX < this.maxX ? (axisalignedbb.maxY > this.minY && axisalignedbb.minY < this.maxY ? axisalignedbb.maxZ > this.minZ && axisalignedbb.minZ < this.maxZ : false) : false;
     }
 
     public boolean a(Vec3D vec3d) {
-        return (vec3d.x > this.minX && vec3d.x < this.maxX) && ((vec3d.y > this.minY && vec3d.y < this.maxY)
-                && (vec3d.z > this.minZ && vec3d.z < this.maxZ));
+        return vec3d.a > this.minX && vec3d.a < this.maxX ? (vec3d.b > this.minY && vec3d.b < this.maxY ? vec3d.c > this.minZ && vec3d.c < this.maxZ : false) : false;
     }
 
     public double a() {
@@ -209,14 +202,14 @@ public class AxisAlignedBB {
 
     public Vec3D rayTrace(RayCollision collision, double distance) {
         Vec3D origin = new Vec3D(collision.originX, collision.originY, collision.originZ);
-        Vec3D dir = origin.clone().add(collision.directionX * distance, collision.directionY * distance, collision.directionZ * distance);
+        Vec3D dir = new Vec3D(collision.directionX * distance, collision.directionY * distance, collision.directionZ * distance);
         return rayTrace(origin, dir);
     }
 
     public Vec3D rayTrace(Vector vorigin, Vector vdirection, double distance) {
         Vec3D origin = new Vec3D(vorigin.getX(), vorigin.getY(), vorigin.getZ());
         Vector direction = vdirection.clone().multiply(distance);
-        Vec3D dir = origin.clone().add(direction.getX(), direction.getY(), direction.getZ());
+        Vec3D dir = new Vec3D(direction.getX(), direction.getY(), direction.getZ());
 
         return rayTrace(origin, dir);
     }
@@ -303,15 +296,15 @@ public class AxisAlignedBB {
     }
 
     private boolean b(Vec3D vec3d) {
-        return vec3d != null && (vec3d.y >= this.minY && vec3d.y <= this.maxY && vec3d.z >= this.minZ && vec3d.z <= this.maxZ);
+        return vec3d == null ? false : vec3d.b >= this.minY && vec3d.b <= this.maxY && vec3d.c >= this.minZ && vec3d.c <= this.maxZ;
     }
 
     private boolean c(Vec3D vec3d) {
-        return vec3d != null && (vec3d.x >= this.minX && vec3d.x <= this.maxX && vec3d.z >= this.minZ && vec3d.z <= this.maxZ);
+        return vec3d == null ? false : vec3d.a >= this.minX && vec3d.a <= this.maxX && vec3d.c >= this.minZ && vec3d.c <= this.maxZ;
     }
 
     private boolean d(Vec3D vec3d) {
-        return vec3d != null && (vec3d.x >= this.minX && vec3d.x <= this.maxX && vec3d.y >= this.minY && vec3d.y <= this.maxY);
+        return vec3d == null ? false : vec3d.a >= this.minX && vec3d.a <= this.maxX && vec3d.b >= this.minY && vec3d.b <= this.maxY;
     }
 
     public String toString() {

@@ -130,7 +130,7 @@ public class PredictionService {
         if(!data.blockInfo.inLiquid) {
             if (lastOnGround) {
                // multiplier = 0.60000005239967D;
-                multiplier*= data.blockInfo.currentFriction;
+                multiplier*= data.blockInfo.fromFriction;
 
                //MiscUtils.testMessage("friction: " + data.blockInfo.currentFriction);
             }
@@ -408,7 +408,7 @@ public class PredictionService {
                 float var3 = 0.91f;
 
                 if(lastOnGround) {
-                    var3*= data.blockInfo.currentFriction;
+                    var3*= data.blockInfo.fromFriction;
                 }
 
                 aiMoveSpeed = walkSpeed;
