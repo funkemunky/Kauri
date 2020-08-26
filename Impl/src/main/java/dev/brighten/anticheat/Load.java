@@ -53,7 +53,7 @@ public class Load {
         Kauri.INSTANCE.dataManager = new DataManager();
         Kauri.INSTANCE.loggerManager = new LoggerManager();
         Kauri.INSTANCE.keepaliveProcessor = new KeepaliveProcessor();
-        Kauri.INSTANCE.entityProcessor = new EntityProcessor().start();
+        Kauri.INSTANCE.entityProcessor = EntityProcessor.start();
 
         register("Registering checks...");
         Check.registerChecks();

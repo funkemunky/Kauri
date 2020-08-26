@@ -3,9 +3,11 @@ package dev.brighten.anticheat.processing.keepalive;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import cc.funkemunky.api.utils.KLocation;
+import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingMap;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.Map;
 import java.util.Optional;
@@ -14,7 +16,7 @@ import java.util.concurrent.*;
 
 public class KeepaliveProcessor implements Runnable {
 
-    private ScheduledFuture<?> task;
+    private BukkitTask task;
 
     public KeepAlive currentKeepalive;
     public int tick;
@@ -22,10 +24,8 @@ public class KeepaliveProcessor implements Runnable {
     public final Map<Short, KeepAlive> keepAlives = new ConcurrentEvictingMap<>(30);
 
     public ConcurrentHashMap<UUID, Short> lastResponses = new ConcurrentHashMap<>();
-    public ScheduledExecutorService executor;
 
     public KeepaliveProcessor() {
-        executor = Executors.newSingleThreadScheduledExecutor();
         start();
     }
 
@@ -74,7 +74,7 @@ public class KeepaliveProcessor implements Runnable {
 
     public void start() {
         if(task == null) {
-            task = executor.scheduleAtFixedRate(this, 50L, 50L, TimeUnit.MILLISECONDS);
+            task = RunUtils.taskTimer(this, 0L, 0L);
         }
     }
 
@@ -87,8 +87,7 @@ public class KeepaliveProcessor implements Runnable {
 
     public void stop() {
         if(task != null) {
-            task.cancel(true);
-            executor.shutdown();
+            task.cancel();
             task = null;
         }
     }
