@@ -39,6 +39,13 @@ public class Load {
         register("Loading messages...");
         Kauri.INSTANCE.msgHandler = new MessageHandler(Kauri.INSTANCE);
 
+        register("Registering processors...");
+        Kauri.INSTANCE.packetProcessor = new PacketProcessor();
+        Kauri.INSTANCE.dataManager = new DataManager();
+        Kauri.INSTANCE.loggerManager = new LoggerManager();
+        Kauri.INSTANCE.keepaliveProcessor = new KeepaliveProcessor();
+        Kauri.INSTANCE.entityProcessor = EntityProcessor.start();
+
         register("Running scanner...");
         Atlas.getInstance().initializeScanner(Kauri.INSTANCE, true, true);
 
@@ -47,13 +54,6 @@ public class Load {
 
         register("Loading API...");
         Kauri.INSTANCE.kauriAPI = new KauriAPI();
-
-        register("Registering processors...");
-        Kauri.INSTANCE.packetProcessor = new PacketProcessor();
-        Kauri.INSTANCE.dataManager = new DataManager();
-        Kauri.INSTANCE.loggerManager = new LoggerManager();
-        Kauri.INSTANCE.keepaliveProcessor = new KeepaliveProcessor();
-        Kauri.INSTANCE.entityProcessor = EntityProcessor.start();
 
         register("Registering checks...");
         Check.registerChecks();

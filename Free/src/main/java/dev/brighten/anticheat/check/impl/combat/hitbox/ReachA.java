@@ -30,7 +30,7 @@ public class ReachA extends Check {
 
         List<KLocation> origins = Stream.of(data.playerInfo.from.clone())
                 .collect(Collectors.toList());
-        List<KLocation> targetBoxes = data.targetPastLocation.getEstimatedLocation(data.lagInfo.transPing + 4, 2);
+        List<KLocation> targetBoxes = data.targetPastLocation.getEstimatedLocation(timeStamp, (data.lagInfo.transPing + 3) * 50);
 
         for (KLocation targetBox : targetBoxes) {
             debug("(%vms) x=%v.4 y=%v.4 z=%v.4",
@@ -51,7 +51,7 @@ public class ReachA extends Check {
         }
 
         if(data.lagInfo.lastPacketDrop.hasPassed(3)) {
-            if (distance > 3.02 && distance != 69) {
+            if (distance > 3.15 && distance != 69) {
                 if (++buffer > 6) {
                     vl++;
                     flag("distance=%v.2 buffer=%v", distance, buffer);

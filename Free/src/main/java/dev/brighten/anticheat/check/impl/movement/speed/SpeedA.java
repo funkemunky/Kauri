@@ -82,7 +82,7 @@ public class SpeedA extends Check {
             double threshold = Math.hypot(deltaX, deltaZ) + (data.playerInfo.lClientGround
                     ? (lastPos.hasPassed(1) ? 0.024 : 0.01) : 0);
 
-            if(!data.playerInfo.generalCancel) {
+            if(!data.playerInfo.generalCancel && data.playerInfo.lastVelocity.hasPassed(15)) {
                 if(data.playerInfo.deltaXZ > threshold) {
                     vl++;
                     flag("%v.3>%v.3", data.playerInfo.deltaXZ, threshold);

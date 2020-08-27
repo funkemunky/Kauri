@@ -25,7 +25,7 @@ public class AimI extends Check {
                 deltaYaw = Math.abs(clampedYaw - data.playerInfo.to.yaw);
         float sub = Math.abs(deltaPitch - ldelta);
 
-        if(deltaPitch < 0.002 && deltaYaw < 0.03 && sub > 0 && deltaPitch > 1E-10) {
+        if(deltaPitch < 0.002 && deltaYaw < 0.03 && sub > 0 && sub < 0.01 && deltaPitch > 1E-10) {
             buffer+= 2;
 
             if(buffer > 20) {

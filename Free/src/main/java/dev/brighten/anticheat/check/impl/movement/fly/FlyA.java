@@ -9,8 +9,8 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "Fly (A)", description = "Simple fly check.", punishVL = 5,
-        checkType = CheckType.FLIGHT, developer = true)
+@CheckInfo(name = "Fly (A)", description = "Simple fly check.", punishVL = 10,
+        checkType = CheckType.FLIGHT, vlToFlag = 1)
 @Cancellable
 public class FlyA extends Check {
 
@@ -22,12 +22,10 @@ public class FlyA extends Check {
                 || data.playerInfo.flightCancel
                 || timeStamp - data.playerInfo.lastVelocityTimestamp <= 200L
                 || data.playerInfo.lastVelocity.hasNotPassed(2)
-                || data.playerInfo.lastBlockPlace.hasNotPassed(6)
                 || data.playerInfo.blockAboveTimer.hasNotPassed(3)
                 || data.playerInfo.lastRespawnTimer.hasNotPassed(5)) return;
 
         long start = System.nanoTime();
-        boolean onGround = packet.getY() % GROUND == 0, fromGround = data.playerInfo.from.y % GROUND == 0;
 
         boolean hitHead = (packet.getY() + 1.8f) % GROUND <= 1E-8;
 
@@ -37,8 +35,16 @@ public class FlyA extends Check {
         }
 
         long end = -1;
-        if(!onGround && !fromGround && !hitHead) {
+        if(!data.playerInfo.clientGround && !hitHead) {
             double predicted = (data.playerInfo.lDeltaY - 0.08) * (double)0.98f;
+
+            if(data.playerInfo.lClientGround) {
+                if(data.playerInfo.deltaY > 0) {
+                    predicted = data.playerInfo.blockAboveTimer.hasNotPassed(3)
+                            ? Math.min(data.playerInfo.deltaY, data.playerInfo.jumpHeight)
+                            : data.playerInfo.jumpHeight;
+                } else predicted = -0.08 * (double)0.98f;
+            }
 
             if(Math.abs(predicted) < 0.005) {
                 if(data.playerVersion.isBelow(ProtocolVersion.V1_9))
@@ -52,7 +58,7 @@ public class FlyA extends Check {
 
             double check = Math.abs(data.playerInfo.deltaY - predicted);
 
-            if(check > 0.05) {
+            if(check > 0.015) {
                 vl++;
                 flag("deltaY=%v.4 predicted=%v.4", data.playerInfo.deltaY, predicted);
             }
@@ -62,6 +68,6 @@ public class FlyA extends Check {
         }
 
         debug("ground=%v fground=%v hitHead=%v time=%v",
-                onGround, fromGround, hitHead, end);
+                data.playerInfo.clientGround, data.playerInfo.lClientGround, hitHead, end);
     }
 }
