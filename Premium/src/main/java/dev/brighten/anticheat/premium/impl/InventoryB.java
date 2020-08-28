@@ -21,7 +21,7 @@ public class InventoryB extends Check {
                 && data.playerInfo.inventoryOpen
                 && !data.blockInfo.inLava
                 && !data.blockInfo.inWeb
-                && data.playerInfo.lastVelocity.hasPassed(5)
+                && data.playerInfo.lastVelocity.hasPassed(30)
                 && !data.blockInfo.collidesHorizontally
                 && (data.predictionService.moveStrafing != 0 || data.predictionService.moveForward != 0)) {
             if(verbose++ > 3) {

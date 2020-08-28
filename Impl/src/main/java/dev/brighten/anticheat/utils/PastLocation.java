@@ -1,7 +1,6 @@
 package dev.brighten.anticheat.utils;
 
 import cc.funkemunky.api.utils.KLocation;
-import cc.funkemunky.api.utils.MathUtils;
 import org.bukkit.Location;
 
 import java.util.Comparator;
@@ -13,17 +12,22 @@ public class PastLocation {
     public List<KLocation> previousLocations = new CopyOnWriteArrayList<>();
 
     public KLocation getPreviousLocation(long time) {
-        long timeStamp = System.currentTimeMillis() - time;
         return (this.previousLocations.stream()
-                .min(Comparator.comparing((loc) -> MathUtils.getDelta(timeStamp, loc.timeStamp)))
+                .min(Comparator.comparing(loc -> Math.abs(time - loc.timeStamp)))
                 .orElse(this.previousLocations.get(0)));
     }
 
-    public List<KLocation> getEstimatedLocation(long time, long delta) {
-        long prevTimeStamp = System.currentTimeMillis() - time;
+    public List<KLocation> getEstimatedLocation(long time, long ping, long delta) {
         return this.previousLocations
                 .stream()
-                .filter(loc -> MathUtils.getDelta(prevTimeStamp, loc.timeStamp) < delta)
+                .filter(loc -> time - loc.timeStamp > 0 && Math.abs(time - loc.timeStamp - ping) < delta)
+                .collect(Collectors.toList());
+    }
+
+    public List<KLocation> getEstimatedLocation(long time, long ping) {
+        return this.previousLocations.stream()
+                .filter(loc -> time - loc.timeStamp > 0
+                        && time - loc.timeStamp <= ping + (ping < 50 ? 100 : 50))
                 .collect(Collectors.toList());
     }
 
@@ -41,6 +45,16 @@ public class PastLocation {
         }
 
         previousLocations.add(new KLocation(location));
+    }
+
+    public KLocation getLast() {
+        if(previousLocations.size() == 0) return null;
+        return previousLocations.get(previousLocations.size() - 1);
+    }
+
+    public KLocation getFirst() {
+        if(previousLocations.size() == 0) return null;
+        return previousLocations.get(0);
     }
 
     public void addLocation(KLocation location) {

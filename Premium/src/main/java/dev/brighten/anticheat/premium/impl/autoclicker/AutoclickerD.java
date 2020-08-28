@@ -1,67 +1,79 @@
 package dev.brighten.anticheat.premium.impl.autoclicker;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
-import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.*;
+import dev.brighten.anticheat.utils.Pattern;
 import dev.brighten.api.check.CheckType;
-import lombok.val;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @CheckInfo(name = "Autoclicker (D)", description = "Oscillation check by Abigail.",
-        checkType = CheckType.AUTOCLICKER, punishVL = 15, vlToFlag = 4)
+        checkType = CheckType.AUTOCLICKER, punishVL = 15, executable = false, vlToFlag = 4)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerD extends Check {
 
-    private long ltimeStamp;
-    private List<Long> delays = new ArrayList<>();
-    private List<Long> samples = new ArrayList<>();
-    private int verbose;
-    private double lavg, lstd, lrange;
+    private long totalClickTime, lastClickTime;
+    private int clicks, oscillationTime, oscillationLevel, lowest, highest;
+    private Pattern pattern = new Pattern();
 
     @Packet
     public void onClick(WrappedInArmAnimationPacket packet, long timeStamp) {
-        if(data.playerInfo.lastBrokenBlock.hasNotPassed(1)
-                || data.playerInfo.lookingAtBlock
-                || data.playerInfo.lastBlockPlace.hasNotPassed(1)) {
-            ltimeStamp = timeStamp;
-            return;
-        }
-        long delta = timeStamp - ltimeStamp;
+        clicks++;
+        long diff = timeStamp - lastClickTime;
 
-        if (delta < 400) samples.add(delta);
+        if((totalClickTime+=diff) > 990) {
 
-        if (samples.size() >= 10) {
-            val sampleSummary = samples.stream().mapToLong(v -> v).summaryStatistics();
+            if (clicks >= 3 && diff <= 200.0f) {
+                int time = oscillationTime + 1;
+                int lowest = this.lowest;
+                int highest = this.highest;
 
-            long osc = (sampleSummary.getMax() + sampleSummary.getMin()) / 2;
+                if (lowest == -1) {
+                    lowest = clicks;
+                } else if (clicks < lowest) {
+                    lowest = clicks;
+                }
+                if (highest == -1) {
+                    highest = clicks;
+                } else if (clicks > highest) {
+                    highest = clicks;
+                }
 
-            delays.add(osc);
-            if (delays.size() >= 5) {
-                List<Double> list = new ArrayList<>();
-
-                delays.stream()
-                        .mapToDouble(v -> v)
-                        .forEach(list::add);
-                double std = MathUtils.stdev(list);
-                val summary = delays.stream().mapToDouble(v -> v).summaryStatistics();
-                double avg = summary.getAverage();
-
-                if (std < 18 && (MathUtils.getDelta(avg, lavg) > 5 || MathUtils.getDelta(std, lstd) < 0.4 || std < 3)) {
-                    if (++verbose > 4) {
-                        vl++;
-                        flag("std=%v.2 avg=%v.2 ping=%p tps=%t", std, avg);
+                int oscillation = highest - lowest;
+                int oscLevel = oscillationLevel;
+                if (time >= 9) {
+                    if (highest >= 8) {
+                        if (highest >= 9 && oscillation <= 5) {
+                            oscLevel += 2;
+                        }
+                        if(oscillation > 3 && oscLevel > 0) {
+                            --oscLevel;
+                        }
+                    } else if(oscLevel > 0){
+                        --oscLevel;
                     }
-                } else verbose = 0;
+                    time = 0;
+                    highest = -1;
+                    lowest = -1;
+                }
+                if (oscillation > 2) {
+                    time = 0;
+                    oscLevel = 0;
+                    highest = -1;
+                    lowest = -1;
+                }
+                if (oscLevel >= 10) {
+                    vl++;
+                    flag("osc=" + oscLevel);
+                }
+                debug("osc=%v level=%v high=%v low=%v", oscillation, oscLevel, highest, lowest);
+                this.lowest = lowest;
+                this.highest = highest;
+                this.oscillationTime = time;
+                this.oscillationLevel = oscLevel;
 
-                debug("std=%v.2 avg=%v.2 verbose=%v", std, avg, verbose);
-                delays.clear();
-                lavg = avg;
-                lstd = std;
             }
-            samples.clear();
+            totalClickTime = 0;
+            clicks = 1;
         }
-        ltimeStamp = timeStamp;
+        lastClickTime = timeStamp;
     }
 }

@@ -19,10 +19,11 @@ import org.bukkit.entity.EntityType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Getter
 public class CollisionHandler {
-	private List<Block> blocks;
+	private List<Block> blocks = new CopyOnWriteArrayList<>();
 	private List<Entity> entities;
 	private ObjectData data;
 	private KLocation location;
@@ -35,7 +36,7 @@ public class CollisionHandler {
 	private boolean debugging;
 
 	public CollisionHandler(List<Block> blocks, List<Entity> entities, KLocation to) {
-		this.blocks = blocks;
+		this.blocks.addAll(blocks);
 		this.entities = entities;
 		this.location = to;
 	}
@@ -70,7 +71,8 @@ public class CollisionHandler {
 		for (Block b : blocks) {
 			Location block = b.getLocation();
 			if (Materials.checkFlag(b.getType(), bitmask)
-					&& (!single || (block.getBlockX() == MathUtils.floor(location.x) && block.getBlockZ() == MathUtils.floor(location.z)))) {
+					&& (!single || (block.getBlockX() == MathUtils.floor(location.x)
+					&& block.getBlockZ() == MathUtils.floor(location.z)))) {
 				if (BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion()).isCollided(playerBox)) {
 					return true;
 				}

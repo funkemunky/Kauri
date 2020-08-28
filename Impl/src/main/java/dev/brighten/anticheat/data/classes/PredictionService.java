@@ -1,6 +1,5 @@
 package dev.brighten.anticheat.data.classes;
 
-import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.*;
@@ -8,7 +7,6 @@ import cc.funkemunky.api.utils.world.BlockData;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.Helper;
-import dev.brighten.anticheat.utils.MiscUtils;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.potion.PotionEffectType;
@@ -75,8 +73,11 @@ public class PredictionService {
         fMath = fastMath; // if the Player uses Optifine FastMath
 
         try {
-            if(!position && !velocity
-                    && (checkConditions = checkConditions(lastSprint))) {
+            if(velocity) {
+                lmotionX = data.playerInfo.velocityX;
+                lmotionZ = data.playerInfo.velocityZ;
+            }
+            if(!position && (checkConditions = checkConditions(lastSprint))) {
                 if (lastSprint && hit) { // If the Player Sprints and Hit a Player he get slowdown
                     lmotionX *= 0.6D;
                     lmotionZ *= 0.6D;
@@ -109,13 +110,13 @@ public class PredictionService {
 
                     rmotionZ *= shit;
                     rmotionX *= shit;
-                    MiscUtils.testMessage("slime: " + shit + ", " + data.blockInfo.currentFriction);
+                    //MiscUtils.testMessage("slime: " + shit + ", " + data.blockInfo.currentFriction);
                 }
             } else if(XMaterial.SOUL_SAND.parseMaterial().equals(blockBelow.getType())) {
                 double shit = 0.4;
                 rmotionX *= shit;
                 rmotionZ *= shit;
-                MiscUtils.testMessage("soulsand: " + shit + ", " + data.blockInfo.currentFriction);
+                //MiscUtils.testMessage("soulsand: " + shit + ", " + data.blockInfo.currentFriction);
             }
         }
 
@@ -129,7 +130,7 @@ public class PredictionService {
         if(!data.blockInfo.inLiquid) {
             if (lastOnGround) {
                // multiplier = 0.60000005239967D;
-                multiplier*= data.blockInfo.currentFriction;
+                multiplier*= data.blockInfo.fromFriction;
 
                //MiscUtils.testMessage("friction: " + data.blockInfo.currentFriction);
             }
@@ -338,6 +339,12 @@ public class PredictionService {
         moveStrafing = moveS;
         moveForward = moveF;
         this.key = key;
+
+        /*if(data.getPlayer().getName().equals("Dogeritoz")) {
+            Bukkit.broadcastMessage("key=" + key + " mx=" + MathUtils.round(mx, 6)
+                    + " mz=" + MathUtils.round(mz, 6) + " myaw=" + MathUtils.round(motionYaw, 4)
+                    + " velocity=" + velocity + " vx=" + data.playerInfo.velocityX + " vz=" + data.playerInfo.velocityZ);
+        }*/
     }
 
     private void calc(boolean checkCollisions) {
@@ -401,7 +408,7 @@ public class PredictionService {
                 float var3 = 0.91f;
 
                 if(lastOnGround) {
-                    var3*= data.blockInfo.currentFriction;
+                    var3*= data.blockInfo.fromFriction;
                 }
 
                 aiMoveSpeed = walkSpeed;
@@ -410,10 +417,10 @@ public class PredictionService {
                     aiMoveSpeed+= aiMoveSpeed * 0.30000001192092896D;
                 }
 
-                if(data.getPlayer().hasPotionEffect(PotionEffectType.SPEED)) {
+                if(data.potionProcessor.hasPotionEffect(PotionEffectType.SPEED)) {
                     aiMoveSpeed += (PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.SPEED) * (0.20000000298023224D)) * aiMoveSpeed;
                 }
-                if(data.getPlayer().hasPotionEffect(PotionEffectType.SLOW)) {
+                if(data.potionProcessor.hasPotionEffect(PotionEffectType.SLOW)) {
                     aiMoveSpeed += (PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.SLOW) * (-0.15000000596046448D)) * aiMoveSpeed;
                 }
 
@@ -514,16 +521,16 @@ public class PredictionService {
 
                 if (diff < preD) { // if the diff is small enough
                     flag = false;
-                    MiscUtils.testMessage(Color.Green + "(" + rmotionX + ", " + motionX + "); (" + rmotionZ + ", " + motionZ + ")");
+                    //MiscUtils.testMessage(Color.Green + "(" + rmotionX + ", " + motionX + "); (" + rmotionZ + ", " + motionZ + ")");
 
-                    MiscUtils.testMessage(Color.Green + diffString + " loops " + loops + " key: " + key + " sneak=" + sneak + " move=" + moveForward + " ai=" + aiMoveSpeed);
+                    //MiscUtils.testMessage(Color.Green + diffString + " loops " + loops + " key: " + key + " sneak=" + sneak + " move=" + moveForward + " ai=" + aiMoveSpeed);
                     fMath = fastMath; // saves the fastmath option if the player changed it
                     break found;
                 }
-                MiscUtils.testMessage(Color.Red + "(" + rmotionX + ", " + motionX + "); (" + rmotionZ + ", " + motionZ + ")");
-                MiscUtils.testMessage(Color.Red + diffString + " loops " + loops + " key: " + key + " sneak=" + sneak
-                        + " move=" + moveForward + " ai=" + aiMoveSpeed + " shit=" + Atlas.getInstance()
-                        .getBlockBoxManager().getBlockBox().getMovementFactor(data.getPlayer()));
+                //MiscUtils.testMessage(Color.Red + "(" + rmotionX + ", " + motionX + "); (" + rmotionZ + ", " + motionZ + ")");
+                //MiscUtils.testMessage(Color.Red + diffString + " loops " + loops + " key: " + key + " sneak=" + sneak
+                //        + " move=" + moveForward + " ai=" + aiMoveSpeed + " shit=" + Atlas.getInstance()
+                 //       .getBlockBoxManager().getBlockBox().getMovementFactor(data.getPlayer()));
 
                 if (diff < closestdiff) {
                     closestdiff = diff;

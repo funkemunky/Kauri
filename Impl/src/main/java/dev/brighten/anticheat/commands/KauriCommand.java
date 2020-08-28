@@ -18,11 +18,12 @@ public class KauriCommand {
     private static List<Player> testers = new ArrayList<>();
 
     @Command(name = "kauri", description = "The Kauri main command.", display = "Kauri", aliases = {"anticheat"},
-            permission = "kauri.command")
+            permission = "kauri.command",
+            noPermissionMessage = "&cThis server is running Kauri by funkemunky, Elevated, and Abigail.")
     public void onCommand(CommandAdapter cmd) {
-        Atlas.getInstance().getCommandManager().runHelpMessage(cmd,
+        Atlas.getInstance().getCommandManager(Kauri.INSTANCE).runHelpMessage(cmd,
                 cmd.getSender(),
-                Atlas.getInstance().getCommandManager().getDefaultScheme());
+                Atlas.getInstance().getCommandManager(Kauri.INSTANCE).getDefaultScheme());
     }
 
     @Command(name = "kauri.test", description = "Add yourself to test messaging.",

@@ -1,48 +1,60 @@
 package dev.brighten.anticheat.premium.impl;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.Color;
-import cc.funkemunky.api.utils.objects.Interval;
+import com.google.common.collect.Lists;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
-import dev.brighten.anticheat.utils.Verbose;
+import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.api.check.CheckType;
-import lombok.val;
 
 import java.util.Deque;
-import java.util.DoubleSummaryStatistics;
-import java.util.LinkedList;
 
-@CheckInfo(name = "Aim (G)", description = "A simple check to detect Vape's aimassist.",
-        checkType = CheckType.AIM, developer = true, enabled = false, punishVL = 30)
+@CheckInfo(name = "Aim (G)", description = "Checks if the yaw rotation snaps.",
+        checkType = CheckType.AIM, punishVL = 10)
 public class AimG extends Check {
 
-    private Verbose verbose = new Verbose(50, 6);
-    private Interval ldeltaX = new Interval(50);
-    private Interval ldeltaY = new Interval(50);
+    private final Deque<Float> samplesYaw = Lists.newLinkedList();
+    private final Deque<Float> samplesPitch = Lists.newLinkedList();
+
+    private double buffer = 0.0;
+    private double lastAverage = 0.0;
+
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
-        if(!packet.isLook() || data.playerInfo.cinematicMode) return;
+    public void process(WrappedInFlyingPacket packet, long now) {
+        if(!packet.isLook()) return;
 
-        val deltaX = Math.abs(data.moveProcessor.deltaX - data.moveProcessor.lastDeltaX);
-        val deltaY = Math.abs(data.moveProcessor.deltaY - data.moveProcessor.lastDeltaY);
+        final float deltaYaw = Math.abs(data.playerInfo.deltaYaw);
+        final float deltaPitch = Math.abs(data.playerInfo.deltaPitch);
 
-        ldeltaX.add(data.moveProcessor.deltaX);
-        ldeltaY.add(deltaY);
+        final boolean attacking = now - data.playerInfo.lastAttackTimeStamp < 500L;
 
-        if(ldeltaY.size() >= 15 ||  ldeltaX.size() >= 15) {
-            long xdis = ldeltaX.distinctCount(), ydis = ldeltaY.distinctCount();
-            DoubleSummaryStatistics summary = ldeltaX.getSummary();
+        if (deltaYaw > 0.0 && deltaPitch > 0.0 && attacking) {
+            samplesYaw.add(deltaYaw);
+            samplesPitch.add(deltaPitch);
+        }
 
-            if(ydis <= 3 && xdis < 12 && summary.getAverage() > 22) {
-                vl++;
-                flag("ydis=%v xdis=%v", ydis, xdis);
+        if (samplesPitch.size() == 16 && samplesYaw.size() == 16) {
+            final double averageYaw = samplesYaw.stream().mapToDouble(d -> d).average().orElse(0.0);
+            final double averagePitch = samplesPitch.stream().mapToDouble(d -> d).average().orElse(0.0);
+
+            final double deviation = MiscUtils.stdev(samplesPitch);
+            final double averageDelta = Math.abs(averagePitch - lastAverage);
+
+            if (deviation > 6.f && averageDelta > 1f && averageYaw < 30.d) {
+                if (++buffer > 4) {
+                    vl++;
+                    flag("");
+                }
+            } else {
+                buffer = Math.max(buffer - 0.125, 0);
             }
-            debug("xdis=%v ydis=%v xavg=%v.2 xstd=%v.2", xdis, ydis, summary.getAverage(), ldeltaX.std());
 
-            ldeltaX.clear();
-            ldeltaY.clear();
+            debug("buffer=%v.2 deviaion=%v.3 avgDelta=%v.3 averageYaw=%v.3",
+                    buffer, deviation, averageDelta, averageYaw);
+            samplesYaw.clear();
+            samplesPitch.clear();
+            lastAverage = averagePitch;
         }
     }
 }

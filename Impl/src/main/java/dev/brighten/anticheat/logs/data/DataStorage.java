@@ -20,4 +20,12 @@ public interface DataStorage {
     void removeAll(UUID uuid);
 
     void addPunishment(Punishment punishment);
+
+    void cacheAPICall(UUID uuid, String name);
+
+    UUID getUUIDFromName(String name);
+
+    String getNameFromUUID(UUID uuid);
+
+    void shutdown();
 }

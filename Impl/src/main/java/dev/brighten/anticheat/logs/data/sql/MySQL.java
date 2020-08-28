@@ -12,7 +12,8 @@ public class MySQL {
         try {
             if (conn == null || conn.isClosed()) {
                 Class.forName("com.mysql.jdbc.Driver");
-                conn = DriverManager.getConnection("jdbc:mysql://" + MySQLConfig.ip + ":3306/?useSSL=false",
+                conn = DriverManager.getConnection("jdbc:mysql://" + MySQLConfig.ip
+                                + ":3306/?useSSL=true&autoReconnect=true",
                         MySQLConfig.username,
                         MySQLConfig.password);
                 conn.setAutoCommit(true);
@@ -30,6 +31,17 @@ public class MySQL {
     public static void use() {
         try {
             init();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void shutdown() {
+        try {
+            if(conn != null && !conn.isClosed()) {
+                conn.close();
+                conn = null;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
