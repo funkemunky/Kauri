@@ -49,6 +49,8 @@ public class Load {
         register("Running scanner...");
         Atlas.getInstance().initializeScanner(Kauri.INSTANCE, true, true);
 
+
+
         register("Setting the language to " + Color.Yellow + Config.language);
         Kauri.INSTANCE.msgHandler.setCurrentLang(Config.language);
 

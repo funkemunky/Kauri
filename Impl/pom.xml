@@ -80,13 +80,7 @@
         <dependency>
             <groupId>gg.manny</groupId>
             <artifactId>lunar-client-api</artifactId>
-            <version>1.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>me.mat1337.loader</groupId>
-            <artifactId>loader</artifactId>
-            <version>2.4.1</version>
+            <version>1.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
