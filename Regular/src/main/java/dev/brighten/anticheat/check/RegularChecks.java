@@ -3,6 +3,7 @@ package dev.brighten.anticheat.check;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.Priority;
 import dev.brighten.anticheat.check.api.Check;
+import dev.brighten.anticheat.check.api.CheckRegister;
 import dev.brighten.anticheat.check.impl.combat.aim.*;
 import dev.brighten.anticheat.check.impl.combat.hand.*;
 import dev.brighten.anticheat.check.impl.combat.killaura.*;
@@ -25,9 +26,15 @@ import dev.brighten.anticheat.check.impl.packets.exploits.*;
 import dev.brighten.anticheat.check.impl.world.HealthSpoof;
 
 @Init(priority = Priority.LOWEST)
-public class RegularChecks {
+public class RegularChecks implements CheckRegister {
 
     public RegularChecks() {
+        registerChecks();
+    }
+
+
+    @Override
+    public void registerChecks() {
         Check.register(new AutoclickerC());
         Check.register(new AutoclickerG());
         Check.register(new FlyB());
