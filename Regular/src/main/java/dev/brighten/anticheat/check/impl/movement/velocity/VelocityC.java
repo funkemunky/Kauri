@@ -8,73 +8,95 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
+import org.bukkit.potion.PotionEffectType;
 
 @CheckInfo(name = "Velocity (C)", description = "A simple horizontal velocity check.", checkType = CheckType.VELOCITY,
         developer = true)
 public class VelocityC extends Check {
 
-    private double vx, vz;
-    private int ticks, buffer;
-    private boolean attacked;
+    private double vxz;
+    private double ldx, ldz;
+    private double x, z, lx, lz, deltaX, deltaZ;
+    private int tick;
+    private float friction;
 
     @Packet
-    public void onVelocity(WrappedOutVelocityPacket packet) {
-        if(packet.getId() != data.getPlayer().getEntityId()) return;
-
-        vx = vz = 0;
+    public boolean onVelocity(WrappedOutVelocityPacket packet) {
+        if(packet.getId() != data.getPlayer().getEntityId()) return false;
         data.runKeepaliveAction(ka -> {
-            vx = packet.getX();
-            vz = packet.getZ();
+            vxz = Math.hypot(packet.getX(), packet.getZ());
+            tick = 0;
         });
+        return false;
     }
 
     @Packet
-    public void onAttack(WrappedInUseEntityPacket packet) {
-        attacked = true;
-    }
-
-    @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
-        if(vx != 0 || vz != 0) {
-            double drag = 0.91;
-
-            if(data.blockInfo.blocksNear) {
-                vx = vz = 0;
-                return;
-            }
-
-            if(data.playerInfo.lClientGround) {
-                drag*= data.blockInfo.fromFriction;
-            }
-
-            if(attacked) {
-                vx*= 0.6;
-                vz*= 0.6;
-            }
-
-            double deltaX = data.playerInfo.deltaX, deltaZ = data.playerInfo.deltaZ;
-            double weightX = deltaX / vx, weightZ = deltaZ / vz;
-            double weight = Math.hypot(weightX, weightZ);
-
-            if(weight < 0.5) {
-                buffer+= 2;
-                if(++buffer > 17) {
-                    vl++;
-                    flag("weight=%v.2 buffer=%v", weight, buffer);
-                }
-                debug(Color.Green + "Flag: " + buffer);
-            } else if(buffer > 0) buffer--;
-
-            debug("(%v) w=%v.2 dx=%v.4 dz=%v.4 vx=%v.4 vz=%v.4",
-                    buffer, weight, deltaX, deltaZ, vx, vz);
-
-            vx*= drag;
-            vz*= drag;
-            if(++ticks > 5) {
-                vx = vz = 0;
-                ticks = 0;
-            }
+    public boolean onFlying(WrappedInFlyingPacket packet) {
+        if(!packet.isPos()) {
+            return false;
         }
-        attacked = false;
+
+        lx = x;
+        lz = z;
+        x = packet.getX();
+        z = packet.getZ();
+
+        deltaX = x - lx;
+        deltaZ = z - lz;
+
+        double deltaXZ = Math.hypot(deltaX, deltaZ);
+
+        if(deltaXZ == 0 || vxz == 0) {
+            vxz = 0;
+            return false;
+        }
+
+        if(data.playerInfo.liquidTimer.hasNotPassed(2)
+                || data.blockInfo.blocksNear
+                || data.playerInfo.webTimer.hasNotPassed(2)) {
+            vxz = 0;
+            tick = 0;
+            return false;
+        }
+
+        double friction = this.friction, moveFactor = data.getPlayer().getWalkSpeed() / 2f;
+
+        moveFactor+= moveFactor * 0.30000001192092896D;
+
+        if(data.potionProcessor.hasPotionEffect(PotionEffectType.SPEED)) {
+            moveFactor += (data.potionProcessor.getEffectByType(PotionEffectType.SPEED).getAmplifier() + 1)
+                    * 0.20000000298023224D * moveFactor;
+        }
+
+        if(data.playerInfo.lClientGround) {
+            friction*= 0.91;
+            moveFactor/= Math.pow(friction, 3);
+        } else {
+            friction = 0.91;
+            moveFactor = 0.026;
+        }
+
+        vxz -= moveFactor / (0.98 * 0.98);
+
+        double ratio = 1 - ((vxz - deltaXZ) - moveFactor);
+
+        debug("ratio=%v.4 deltaXZ=%v.4 move=%v, vxz=%v.4 friction=%v tick=%v",
+                ratio, deltaXZ, moveFactor, vxz, friction, tick);
+
+        if(ratio < 0.95) {
+            vl++;
+            if(vl > 5) {
+                flag("pct=%v.1", ratio * 100);
+            }
+        } else if(vl > 0) vl-= 2;
+
+        vxz*= friction;
+        this.friction = data.blockInfo.currentFriction;
+
+        if(++tick > 3 || Math.abs(vxz) < 0.005) {
+            vxz = 0;
+            tick = 0;
+        }
+        return false;
     }
 }

@@ -54,7 +54,7 @@ public class Hitboxes extends Check {
                         .add(0, packet.getPlayer().isSneaking() ? 1.54 : 1.62, 0);
 
                 RayCollision ray = new RayCollision(origin.toVector(), origin.getDirection());
-                boolean collided = data.targetPastLocation.getEstimatedLocation(now, data.lagInfo.transPing * 50, 150L)
+                boolean collided = data.targetPastLocation.getEstimatedLocation(now, (data.lagInfo.transPing + 3) * 50, 100L)
                         .stream().map(loc -> ((SimpleCollisionBox)EntityData.getEntityBox(loc, target))
                                 .expand(0.1).expand(hExpand, vExpand, hExpand))
                         .anyMatch(ray::isCollided);
