@@ -7,6 +7,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -19,11 +20,19 @@ public class EntityProcessor {
     public BukkitTask task;
 
     private void runEntityProcessor() {
-        Atlas.getInstance().getEntities().keySet().forEach(uuid -> vehicles.put(uuid,
-                Atlas.getInstance().getEntities().get(uuid)
-                        .stream()
-                        .filter(entity -> entity instanceof Vehicle)
-                        .collect(Collectors.toList())));
+        Atlas.getInstance().getEntities().keySet().parallelStream()
+                .map(uuid -> Atlas.getInstance().getEntities().get(uuid))
+                .filter(entity -> entity instanceof Vehicle)
+                .sequential()
+                .forEach(entity -> {
+                    vehicles.compute(entity.getWorld().getUID(), (key, entities) -> {
+                        if(entities == null) entities = new ArrayList<>();
+
+                        entities.add(entity);
+
+                        return entities;
+                    });
+                });
     }
 
     public static EntityProcessor start() {

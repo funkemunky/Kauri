@@ -24,6 +24,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -50,6 +52,7 @@ public class Kauri extends JavaPlugin {
     public ExecutorService executor;
     public ScheduledExecutorService loggingThread;
     public ToggleableProfiler profiler;
+    public String LINK = "";
 
     public boolean enabled = false;
     public TickTimer lastEnabled;

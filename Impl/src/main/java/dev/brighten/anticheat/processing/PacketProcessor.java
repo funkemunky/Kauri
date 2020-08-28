@@ -491,8 +491,26 @@ public class PacketProcessor {
             case Packet.Server.POSITION: {
                 WrappedOutPositionPacket packet = new WrappedOutPositionPacket(object, data.getPlayer());
 
-                data.playerInfo.posLocs.add(new KLocation(packet.getX(), packet.getY(), packet.getZ(),
-                        packet.getYaw(), packet.getPitch()));
+                KLocation loc = new KLocation(packet.getX(), packet.getY(), packet.getZ(),
+                        packet.getYaw(), packet.getPitch());
+
+                if(packet.getFlags().contains(WrappedOutPositionPacket.EnumPlayerTeleportFlags.X)) {
+                    loc.x+= data.playerInfo.to.x;
+                }
+                if(packet.getFlags().contains(WrappedOutPositionPacket.EnumPlayerTeleportFlags.Y)) {
+                    loc.y+= data.playerInfo.to.y;
+                }
+                if(packet.getFlags().contains(WrappedOutPositionPacket.EnumPlayerTeleportFlags.Z)) {
+                    loc.z+= data.playerInfo.to.z;
+                }
+                if(packet.getFlags().contains(WrappedOutPositionPacket.EnumPlayerTeleportFlags.X_ROT)) {
+                    loc.pitch+= data.playerInfo.to.pitch;
+                }
+                if(packet.getFlags().contains(WrappedOutPositionPacket.EnumPlayerTeleportFlags.Y_ROT)) {
+                    loc.yaw+= data.playerInfo.to.yaw;
+                }
+
+                data.playerInfo.posLocs.add(loc);
                 data.playerInfo.lastServerPos = timeStamp;
                 data.checkManager.runPacket(packet, timeStamp);
                 break;

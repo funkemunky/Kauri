@@ -11,6 +11,7 @@ import cc.funkemunky.api.utils.world.BlockData;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.utils.CollisionHandler;
 import dev.brighten.anticheat.utils.Helper;
 import lombok.val;
@@ -78,7 +79,7 @@ public class BlockInformation {
         if(!objectData.playerInfo.worldLoaded) return;
 
         CollisionHandler handler = new CollisionHandler(blocks,
-                Atlas.getInstance().getEntities().getOrDefault(objectData.getPlayer().getUniqueId(), new ArrayList<>()),
+                Kauri.INSTANCE.entityProcessor.vehicles.getOrDefault(objectData.getPlayer().getUniqueId(), new ArrayList<>()),
                 objectData.playerInfo.to);
 
         //Bukkit.broadcastMessage("chigga4");

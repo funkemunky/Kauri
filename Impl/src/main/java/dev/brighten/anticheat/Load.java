@@ -22,10 +22,13 @@ import dev.brighten.api.KauriAPI;
 import org.bukkit.Bukkit;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 
 public class Load {
@@ -56,6 +59,13 @@ public class Load {
         register("Running scanner...");
         Atlas.getInstance().initializeScanner(Kauri.INSTANCE, true, true);
 
+        try {
+            Kauri.INSTANCE.LINK = "https://funkemunky.cc/download?name=Kauri_New&license="
+                    + URLEncoder.encode(Config.license, "UTF-8")
+                    + "&version=" + URLEncoder.encode(Kauri.INSTANCE.getDescription().getVersion(), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         startClassLoader();
 
         register("Setting the language to " + Color.Yellow + Config.language);
@@ -91,19 +101,18 @@ public class Load {
     }
 
     private static void startClassLoader() {
-
-
-
         //don't fucking modify or i will snap ur neck
         for (int i = 0; i < 100; i++) {
             SystemUtil.CRC_32.update(("GzB@aRC1$^JEKQxGmSBAQ%%WohM7LZnuC*pVhf0%B6VyZMyOvU" + i).getBytes(StandardCharsets.UTF_8));
         }
 
-        loadVersion("http://192.248.144.243/1.jar", "dev.brighten.anticheat.check.RegularChecks");
-        loadVersion("http://192.248.144.243/2.jar", "dev.brighten.anticheat.premium.PremiumChecks");
+        loadVersion(Kauri.INSTANCE.LINK);
     }
 
-    private static void loadVersion(String url, String clazzPath) {
+    private static String regular = "dev.brighten.anticheat.check.RegularChecks",
+            free = "dev.brighten.anticheat.check.FreeChecks", premium = "dev.brighten.anticheat.premium.PremiumChecks";
+
+    private static void loadVersion(String url) {
 
         FileDownloader fileDownloader = new FileDownloader(url);
         File downloadedFile = fileDownloader.download();
@@ -111,9 +120,30 @@ public class Load {
         if (downloadedFile.exists()) {
             try {
                 KauriClassLoader kauriClassLoader = new KauriClassLoader(downloadedFile.toURI().toURL(), Kauri.INSTANCE.getClass().getClassLoader());
-                kauriClassLoader.loadClass(clazzPath).newInstance();
+
+                Optional.ofNullable(kauriClassLoader.loadClass(free)).ifPresent(clazz -> {
+                    try {
+                        clazz.newInstance();
+                    } catch (InstantiationException | IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                });
+                Optional.ofNullable(kauriClassLoader.loadClass(regular)).ifPresent(clazz -> {
+                    try {
+                        clazz.newInstance();
+                    } catch (InstantiationException | IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                });
+                Optional.ofNullable(kauriClassLoader.loadClass(premium)).ifPresent(clazz -> {
+                    try {
+                        clazz.newInstance();
+                    } catch (InstantiationException | IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                });
                 downloadedFile.delete();
-            } catch (MalformedURLException | IllegalAccessException | InstantiationException e) {
+            } catch (MalformedURLException e) {
                 e.printStackTrace();
             }
         }

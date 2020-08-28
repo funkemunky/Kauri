@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>Free</artifactId>
-    <version>${parent.version}-FREE</version>
+    <version>${parent.version}</version>
 
     <build>
         <plugins>
@@ -53,7 +53,7 @@
             <groupId>dev.brighten.anticheat</groupId>
             <artifactId>Impl</artifactId>
             <version>${parent.version}</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
