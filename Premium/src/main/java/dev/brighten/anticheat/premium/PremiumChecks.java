@@ -4,15 +4,21 @@ import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.Priority;
 import dev.brighten.anticheat.check.api.Check;
+import dev.brighten.anticheat.check.api.CheckRegister;
 import dev.brighten.anticheat.premium.impl.*;
 import dev.brighten.anticheat.premium.impl.autoclicker.*;
 import dev.brighten.anticheat.premium.impl.hitboxes.ReachB;
 
 @Init(priority = Priority.LOWEST)
-public class PremiumChecks {
+public class PremiumChecks implements CheckRegister {
 
     public PremiumChecks() {
         MiscUtils.printToConsole("&aThanks for purchasing Kauri Ara.");
+        registerChecks();
+    }
+
+    @Override
+    public void registerChecks() {
         Check.register(new VelocityB());
         Check.register(new ReachB());
         //Check.register(new ReachC());
