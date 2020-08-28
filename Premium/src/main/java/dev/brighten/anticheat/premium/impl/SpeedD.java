@@ -15,7 +15,7 @@ public class SpeedD extends Check {
         if(!packet.isPos()
                 || (data.playerInfo.deltaY == 0 || data.playerInfo.deltaXZ == 0)
                 || data.playerInfo.serverPos) return;
-
-
+        
+        
     }
 }
