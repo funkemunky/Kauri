@@ -1,4 +1,4 @@
-package dev.brighten.anticheat.utils.jar;
+package dev.brighten.anticheat.utils.file;
 
 import java.io.*;
 import java.util.Enumeration;

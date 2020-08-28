@@ -1,7 +1,7 @@
 package dev.brighten.anticheat.classloader;
 
 import dev.brighten.anticheat.utils.SystemUtil;
-import dev.brighten.anticheat.utils.jar.JarUtil;
+import dev.brighten.anticheat.utils.file.JarUtil;
 import lombok.Getter;
 
 import java.io.File;
@@ -17,9 +17,6 @@ import java.util.Map;
 public class KauriClassLoader extends URLClassLoader {
 
     private Map<String, byte[]> classBytes;
-
-    @Getter
-    private List<String> toLoad = new ArrayList<>();
 
     public KauriClassLoader(URL url, java.lang.ClassLoader parent) {
         super(new URL[]{url}, parent);
@@ -61,11 +58,6 @@ public class KauriClassLoader extends URLClassLoader {
             classBytes.put(realName, nBytes);
         });
 
-        classBytes.forEach(((s, bytes) -> {
-            if (s.startsWith("dev") && s.contains("/")) {
-                this.toLoad.add(s);
-            }
-        }));
         while (!jarFile.delete()) {
         }
     }
