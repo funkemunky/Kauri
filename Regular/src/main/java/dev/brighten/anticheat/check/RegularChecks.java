@@ -34,7 +34,6 @@ public class RegularChecks implements CheckRegister {
         registerChecks();
     }
 
-
     @Override
     public void registerChecks() {
         Check.register(new AutoclickerC());

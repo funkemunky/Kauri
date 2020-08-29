@@ -59,14 +59,23 @@ public class Load {
         register("Running scanner...");
         Atlas.getInstance().initializeScanner(Kauri.INSTANCE, true, true);
 
-        try {
-            Kauri.INSTANCE.LINK = "https://funkemunky.cc/download?name=Kauri_New&license="
-                    + URLEncoder.encode(Config.license, "UTF-8")
-                    + "&version=" + URLEncoder.encode(Kauri.INSTANCE.getDescription().getVersion(), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+
+        if(Config.initChecks) {
+            register("Initializing checks...");
+            Optional.ofNullable(Bukkit.getPluginManager().getPlugin("KauriLoader")).ifPresent(plugin -> {
+                Config.license = plugin.getConfig().getString("license");
+            });
+
+            try {
+                Kauri.INSTANCE.LINK = "https://funkemunky.cc/download?name=Kauri_New&license="
+                        + URLEncoder.encode(Config.license, "UTF-8")
+                        + "&version=" + URLEncoder.encode(Kauri.INSTANCE.getDescription().getVersion(), "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+
+            startClassLoader();
         }
-        startClassLoader();
 
         register("Setting the language to " + Color.Yellow + Config.language);
         Kauri.INSTANCE.msgHandler.setCurrentLang(Config.language);

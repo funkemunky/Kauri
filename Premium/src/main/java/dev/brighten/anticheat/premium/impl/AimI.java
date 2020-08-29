@@ -25,18 +25,19 @@ public class AimI extends Check {
                 deltaYaw = Math.abs(clampedYaw - data.playerInfo.to.yaw);
         float sub = Math.abs(deltaPitch - ldelta);
 
-        if(deltaPitch < 0.002 && deltaYaw < 0.03 && sub > 0 && sub < 0.01 && deltaPitch > 1E-10) {
-            buffer+= 2;
+        if(deltaPitch < 0.001 && deltaYaw < 0.02 && sub > 0 && deltaPitch > 1E-10) {
+            buffer++;
 
             if(buffer > 20) {
                 vl++;
-                flag("clampedDif=%v.3 deltaClamp=%v.3 buffer=%v", deltaPitch, sub, buffer);
+                flag("cpitchDif=%v.3 cyawDif=%v.3 deltaClamp=%v.3 buffer=%v",
+                        deltaPitch, deltaYaw, sub, buffer);
             }
             debug(Color.Green + "Flag");
         } else if(buffer > 0) buffer--;
 
-        debug("p=%v.5 clamped=%v.5 deltaPitch=%v.5 deltaYaw=%v.5 sub=%v buffer=%v sens=%v", packet.getPitch(), clampedPitch,
-                deltaPitch, deltaYaw, sub, buffer, data.moveProcessor.sensitivityX);
+        debug("p=%v.5 clamped=%v.5 deltaPitch=%v.5 deltaYaw=%v.5 sub=%v buffer=%v sens=%v",
+                packet.getPitch(), clampedPitch, deltaPitch, deltaYaw, sub, buffer, data.moveProcessor.sensitivityX);
         ldelta = deltaPitch;
     }
 

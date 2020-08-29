@@ -75,7 +75,7 @@ public class ReachB extends Check {
                 } else tmisses++;
 
                 if(checkFrom != null) {
-                    fdistance = Math.min(new Vector(checkFrom.x, checkFrom.y, checkFrom.z)
+                    distance = Math.min(new Vector(checkFrom.x, checkFrom.y, checkFrom.z)
                             .distance(fromOrigin.toVector()), fdistance);
                     fcollided++;
                 } else fmisses++;

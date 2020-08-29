@@ -125,7 +125,7 @@ public class Check implements KauriCheck {
         flag(false, resetVLTime, information, variables);
     }
 
-    private static long lastFlagRun = 0L;
+    private long lastFlagRun = 0L;
 
     public synchronized void flag(boolean devAlerts, int resetVLTime, String information, Object... variables) {
         if(Kauri.INSTANCE.getTps() < 18) devAlerts = true;

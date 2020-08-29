@@ -13,12 +13,11 @@ import dev.brighten.anticheat.check.api.Packet;
 @Cancellable
 public class SpeedC extends Check {
 
-    private MaxInteger verbose = new MaxInteger(40);
-
+    private int verbose;
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
         if(!packet.isPos() || data.playerInfo.generalCancel || data.playerInfo.lastVelocity.hasNotPassed(25)) {
-            if(data.playerInfo.generalCancel)verbose.subtract();
+            if(data.playerInfo.generalCancel && verbose > 0) verbose--;
             return;
         }
 
@@ -38,14 +37,14 @@ public class SpeedC extends Check {
             baseSpeed+= 0.2;
 
         if(data.playerInfo.deltaXZ > baseSpeed) {
-            if(verbose.add(data.playerInfo.deltaXZ - baseSpeed > 0.45f ? 4 : 1) > 25
+            if(++verbose > 25
                     || data.playerInfo.deltaXZ - baseSpeed > 0.45f) {
                 vl++;
                 flag("%v>-%v",
                         MathUtils.round(data.playerInfo.deltaXZ, 3),
                         MathUtils.round(baseSpeed, 3));
             }
-        } else verbose.subtract();
+        } else if(verbose > 0) verbose--;
 
         debug("deltaXZ=%v base=%v vb=%v", data.playerInfo.deltaXZ, baseSpeed, verbose);
     }

@@ -47,6 +47,7 @@ public class KeepaliveProcessor implements Runnable {
                     value.targetLoc = new KLocation(value.target.getLocation());
                 });
             }
+
             TinyProtocolHandler.sendPacket(value.getPlayer(), packet);
             /*value.getThread().execute(() -> {
                 for (Runnable runnable : value.tasksToRun) {

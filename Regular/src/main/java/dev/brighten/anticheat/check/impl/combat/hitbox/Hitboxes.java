@@ -50,17 +50,27 @@ public class Hitboxes extends Check {
                 double vExpand = Math.abs(data.playerInfo.deltaPitch / 90) * distance;
                 double hExpand = Math.abs(data.playerInfo.deltaYaw / 180) * distance;
 
-                Location origin = packet.getPlayer().getLocation().clone()
-                        .add(0, packet.getPlayer().isSneaking() ? 1.54 : 1.62, 0);
+                Location origin = data.playerInfo.from.toLocation(data.getPlayer().getWorld()),
+                        origin2 = data.playerInfo.to.toLocation(data.getPlayer().getWorld());
 
-                RayCollision ray = new RayCollision(origin.toVector(), origin.getDirection());
-                boolean collided = data.targetPastLocation.getEstimatedLocation(now, (data.lagInfo.transPing + 3) * 50, 100L)
+                if(data.playerInfo.sneaking) {
+                    origin.add(0, 1.54f, 0);
+                    origin2.add(0, 1.54f, 0);
+                } else {
+                    origin.add(0, 1.62f, 0);
+                    origin2.add(0, 1.62f, 0);
+                }
+
+                RayCollision ray = new RayCollision(origin.toVector(), origin.getDirection()),
+                        ray2 = new RayCollision(origin2.toVector(), origin2.getDirection());
+                boolean collided = data.targetPastLocation
+                        .getEstimatedLocation(now, (data.lagInfo.transPing + 3) * 50, 100L)
                         .stream().map(loc -> ((SimpleCollisionBox)EntityData.getEntityBox(loc, target))
-                                .expand(0.1).expand(hExpand, vExpand, hExpand))
-                        .anyMatch(ray::isCollided);
+                                .expand(0.15).expand(hExpand, vExpand, hExpand))
+                        .anyMatch(box -> ray.isCollided(box) || ray2.isCollided(box));
 
                 if(!collided) {
-                    if(++buffer > 2) {
+                    if(++buffer > 4) {
                         vl++;
                         flag("v=%v.3 h=%v.3 ping=%v", vExpand, hExpand, data.lagInfo.transPing);
                     }
