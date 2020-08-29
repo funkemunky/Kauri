@@ -16,6 +16,7 @@ import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.utils.AxisAlignedBB;
 import dev.brighten.anticheat.utils.Vec3D;
 import dev.brighten.api.check.CheckType;
+import dev.brighten.db.utils.Pair;
 import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -44,16 +45,16 @@ public class ReachB extends Check {
         if(timeStamp - lastUse == 0 && entity != null) {
             if(data.playerInfo.creative) return;
 
-            List<CollisionBox> entityLocs = data.targetPastLocation.getEstimatedLocation(timeStamp,
-                    data.lagInfo.transPing, 200L)
+            List<Pair<SimpleCollisionBox, Double>> entityLocs = data.targetPastLocation.getEstimatedLocation(timeStamp,
+                    data.lagInfo.transPing * 50, 200L)
                     .stream()
-                    .map(loc -> getHitbox(entity, loc)).collect(Collectors.toList());
-
-            List<SimpleCollisionBox> simpleBoxes = new ArrayList<>();
-
-            entityLocs.forEach(box -> box.downCast(simpleBoxes));
-
-            entityLocs.clear();
+                    .map(loc -> {
+                        SimpleCollisionBox hitbox = (SimpleCollisionBox) getHitbox(entity, loc);
+                        int index = data.targetPastLocation.previousLocations.indexOf(loc);
+                        return new Pair<>(hitbox, Math.max(0,index > 0 ? data.targetPastLocation.previousLocations
+                                .get(index- 1)
+                                .toVector().distance(loc.toVector()) : 0));
+                    }).collect(Collectors.toList());
 
             double distance = 69, fdistance = 69, tdistance = 69;
             int misses = 0, collided = 0, fmisses = 0, tmisses = 0, fcollided = 0, tcollided = 0;
@@ -61,8 +62,8 @@ public class ReachB extends Check {
                     fromOrigin = data.getPlayer().getEyeLocation();
 
             toOrigin.setY(toOrigin.getY() + (data.playerInfo.sneaking ? 1.54 : 1.62));
-            for (SimpleCollisionBox sbox : simpleBoxes) {
-                val copied = sbox.copy().expand(0.1);
+            for (Pair<SimpleCollisionBox, Double> sbox : entityLocs) {
+                val copied = sbox.key.copy().expand(0.1);
                 AxisAlignedBB aabb = new AxisAlignedBB(copied);
                 if(debug) copied.draw(WrappedEnumParticle.FLAME, Bukkit.getOnlinePlayers());
                 Vec3D checkTo = aabb.rayTrace(toOrigin.toVector(), toOrigin.getDirection(), 10),
@@ -70,13 +71,13 @@ public class ReachB extends Check {
 
                 if(checkTo != null) {
                     tdistance = Math.min(new Vector(checkTo.x, checkTo.y, checkTo.z)
-                            .distance(toOrigin.toVector()), tdistance);
+                            .distance(toOrigin.toVector()) - (sbox.value / 2.5f), tdistance);
                     tcollided++;
                 } else tmisses++;
 
                 if(checkFrom != null) {
-                    distance = Math.min(new Vector(checkFrom.x, checkFrom.y, checkFrom.z)
-                            .distance(fromOrigin.toVector()), fdistance);
+                    fdistance = Math.min(new Vector(checkFrom.x, checkFrom.y, checkFrom.z)
+                            .distance(fromOrigin.toVector()) - (sbox.value / 2.5f), fdistance);
                     fcollided++;
                 } else fmisses++;
             }

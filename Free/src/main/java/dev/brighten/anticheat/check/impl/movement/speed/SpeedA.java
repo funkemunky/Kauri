@@ -36,7 +36,6 @@ public class SpeedA extends Check {
         check: {
             if(!packet.isPos()
                     || (data.playerInfo.deltaY == 0 && data.playerInfo.deltaXZ == 0)) {
-                deltaX = deltaZ = 0;
                 break check;
             }
 
@@ -80,7 +79,7 @@ public class SpeedA extends Check {
             deltaZ+= moveForward;
 
             double threshold = Math.hypot(deltaX, deltaZ) + (data.playerInfo.lClientGround
-                    ? (lastPos.hasPassed(1) ? 0.024 : 0.01) : 0);
+                    ? (lastPos.hasPassed(1) ? 0.024 : 0.01) : 0) * 1.06;
 
             if(!data.playerInfo.generalCancel && data.playerInfo.lastVelocity.hasPassed(15)) {
                 if(data.playerInfo.deltaXZ > threshold) {
