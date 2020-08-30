@@ -49,7 +49,7 @@ public class SpeedD extends Check {
 
             double ratio = (data.playerInfo.deltaXZ - ldxz) / moveFactor * 100;
 
-            if (ratio > 100.1) {
+            if (ratio > 100.1 && !data.playerInfo.generalCancel && data.playerInfo.lastVelocity.hasPassed(2)) {
                 vl++;
                 flag("p=%v.1% dxz=%v.5 ldxz=%v.5 tags=%v", ratio, data.playerInfo.deltaXZ, ldxz, tags.build());
             } else if (vl > 0)

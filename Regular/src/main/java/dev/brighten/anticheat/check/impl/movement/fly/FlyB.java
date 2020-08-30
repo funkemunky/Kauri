@@ -46,6 +46,7 @@ public class FlyB extends Check {
             double deltaPredict = MathUtils.getDelta(data.playerInfo.deltaY, predicted);
 
             if(!data.playerInfo.flightCancel
+                    && data.playerInfo.lastVelocity.hasPassed(3)
                     && !data.playerInfo.clientGround
                     && (!data.blockInfo.blocksAbove || data.playerInfo.deltaY <= 0)
                     && deltaPredict > 0.015) {

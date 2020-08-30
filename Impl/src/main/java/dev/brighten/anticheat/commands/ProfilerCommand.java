@@ -7,7 +7,6 @@ import cc.funkemunky.api.profiling.ResultsType;
 import cc.funkemunky.api.profiling.Timing;
 import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.utils.AtomicDouble;
 import dev.brighten.anticheat.utils.Helper;
 import dev.brighten.anticheat.utils.Pastebin;
 import dev.brighten.anticheat.utils.menu.button.Button;
@@ -24,6 +23,7 @@ import org.bukkit.scheduler.BukkitTask;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -55,7 +55,7 @@ public class ProfilerCommand {
                 menu.fill(new FillerButton());
                 final List<Tuple<Double, Button>> buttons = new ArrayList<>();
 
-                AtomicDouble samples = new AtomicDouble(0);
+
 
                 val map = Kauri.INSTANCE.profiler.results(ResultsType.TICK);
 
@@ -64,6 +64,8 @@ public class ProfilerCommand {
                         .filter(key -> !key.contains("check:"))
                         .mapToLong(key -> Math.round(map.get(key).two))
                         .sum();
+
+                AtomicReference<Double> samples = new AtomicReference<>((double) 0);
 
                 map.forEach((key, result) -> {
                     if(!key.contains("check:")) {
@@ -81,7 +83,7 @@ public class ProfilerCommand {
                                                 .format(timing.stdDev / 1000000D, 3)).build());
 
                         buttons.add(new Tuple<>(result.two, button));
-                        samples.addAndGet(result.two / 1000000D);
+                        samples.updateAndGet(v -> (v + result.two / 1000000D));
                     }
                 });
 
@@ -196,12 +198,12 @@ public class ProfilerCommand {
                             .mapToLong(key -> Math.round(map.get(key).two))
                             .sum();
                     List<Map.Entry<String, Long>> entries = new ArrayList<>(sorted.entrySet());
-                    AtomicDouble samples = new AtomicDouble(0);
+                    AtomicReference<Double> samples = new AtomicReference<>((double) 0);
                     map.keySet().stream().filter(key -> !key.contains("check:")).forEach(key -> {
                         val entry = map.get(key);
                         Timing timing = Kauri.INSTANCE.profiler.getTimingsMap().get(key);
                         double time = entry.two / 1000000D;
-                        samples.addAndGet(time);
+                        samples.updateAndGet(v -> v + time);
                         cmd.getSender().sendMessage(Helper.drawUsage(50,
                                 time)
                                 + " §c" + key
