@@ -411,7 +411,7 @@ public class PredictionService {
                     var3*= data.blockInfo.fromFriction;
                 }
 
-                aiMoveSpeed = walkSpeed;
+                aiMoveSpeed = data.getPlayer().getWalkSpeed() / 2f;
 
                 if (sprint) {
                     aiMoveSpeed+= aiMoveSpeed * 0.30000001192092896D;

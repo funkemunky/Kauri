@@ -19,7 +19,6 @@ import org.bukkit.entity.Player;
 
 public class PacketProcessor {
 
-    private static WrappedField pingField = MinecraftReflection.entityPlayer.getFieldByName("ping");
     public synchronized void processClient(PacketReceiveEvent event, ObjectData data, Object object, String type,
                                            long timeStamp) {
         Kauri.INSTANCE.profiler.start("packet:client:" + getType(type));
@@ -83,7 +82,7 @@ public class PacketProcessor {
             case Packet.Client.LOOK: {
                 WrappedInFlyingPacket packet = new WrappedInFlyingPacket(object, data.getPlayer());
 
-                if (timeStamp - data.lagInfo.lastFlying <= 2 || timeStamp - data.lagInfo.lastFlying >= 90) {
+                if (timeStamp - data.lagInfo.lastFlying <= 2) {
                     data.lagInfo.lastPacketDrop.reset();
                 }
 

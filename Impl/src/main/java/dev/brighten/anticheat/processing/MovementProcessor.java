@@ -346,11 +346,11 @@ public class MovementProcessor {
         /* General Cancel Booleans */
         boolean hasLevi = levitation != null && data.potionProcessor.hasPotionEffect(levitation);
 
-        data.playerInfo.generalCancel = data.playerInfo.serverAllowedFlight
+        data.playerInfo.generalCancel = data.getPlayer().getAllowFlight()
                 || data.playerInfo.creative
                 || hasLevi
-                || (MathUtils.getDelta(-0.098, data.playerInfo.deltaY) < 0.001 && data.playerInfo.deltaXZ < 0.3)
-                || timeStamp - data.playerInfo.lastServerPos < 50L
+                || (MathUtils.getDelta(-0.098, data.playerInfo.deltaY) < 0.001
+                && data.playerInfo.lastChunkUnloaded.hasNotPassed(60))
                 || data.playerInfo.serverPos
                 || data.playerInfo.riptiding
                 || data.playerInfo.gliding
@@ -364,11 +364,11 @@ public class MovementProcessor {
 
         data.playerInfo.flightCancel = data.playerInfo.generalCancel
                 || data.playerInfo.webTimer.hasNotPassed(4)
-                || data.playerInfo.lastPlaceLiquid.hasNotPassed(15)
-                || data.playerInfo.liquidTimer.hasNotPassed(6)
+                || data.playerInfo.liquidTimer.hasNotPassed(3)
                 || data.playerInfo.onLadder
+                || data.playerInfo.slimeTimer.hasNotPassed(5)
                 || data.playerInfo.climbTimer.hasNotPassed(4)
-                || data.playerInfo.lastHalfBlock.hasNotPassed(2);
+                || data.playerInfo.lastHalfBlock.hasNotPassed(3);
     }
     private static float getDeltaX(float yawDelta, float gcd) {
         return MathHelper.floor(yawDelta / gcd);

@@ -19,7 +19,6 @@ public class SpeedA extends Check {
 
     private boolean sprinting;
     private double deltaX, deltaZ, velocity;
-    private TickTimer lastPos = new TickTimer(5);
 
     private static double keyVal = MathHelper.sqrt_double((0.98 * 0.98) + (0.98 * 0.98));
 
@@ -78,8 +77,7 @@ public class SpeedA extends Check {
             deltaX+= moveStrafing;
             deltaZ+= moveForward;
 
-            double threshold = Math.hypot(deltaX, deltaZ) + (data.playerInfo.lClientGround
-                    ? (lastPos.hasPassed(1) ? 0.024 : 0.01) : 0) * 1.06;
+            double threshold = Math.hypot(deltaX, deltaZ) * 1.15;
 
             if(!data.playerInfo.generalCancel && data.playerInfo.lastVelocity.hasPassed(15)) {
                 if(data.playerInfo.deltaXZ > threshold) {
@@ -93,7 +91,6 @@ public class SpeedA extends Check {
             //Adding the friction deceleration for next calculation.
             deltaX*= friction;
             deltaZ*= friction;
-            lastPos.reset();
         }
         sprinting = data.playerInfo.sprinting; //Setting the sprint for the next packet.
     }
