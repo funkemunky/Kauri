@@ -16,7 +16,7 @@ public class AimE extends Check {
         if(!packet.isLook()) return;
 
         val difference = Math.abs(data.moveProcessor.deltaX - data.moveProcessor.lastDeltaX);
-        if (data.moveProcessor.deltaY <= 1 && data.moveProcessor.deltaX >= 20) {
+        if (data.moveProcessor.deltaY <= 1 && difference > 1 && data.moveProcessor.deltaX >= 20) {
             vl++;
             if(vl > 20) {
                 flag("x=%v y=%v", data.moveProcessor.deltaX, data.moveProcessor.deltaY);

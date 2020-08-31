@@ -10,22 +10,18 @@ import dev.brighten.api.check.CheckType;
         developer = true, checkType = CheckType.AIM, vlToFlag = 9)
 public class AimH extends Check {
     private double lastPosX, lastPosZ, lastHorizontalDistance;
-    private float lastYaw, lastPitch;
 
     @Packet
     public void process(final WrappedInFlyingPacket packet, final long current) {
         final double posX = packet.getX();
         final double posZ = packet.getZ();
 
-        final float yaw = packet.getYaw();
-        final float pitch = packet.getPitch();
-
         final double horizontalDistance = Math.hypot(posX - lastPosX, posZ - lastPosZ);
 
         // Player moved
         if (posX != lastPosX || posZ != lastPosZ) {
-            final float deltaYaw = Math.abs(yaw - lastYaw);
-            final float deltaPitch = Math.abs(pitch - lastPitch);
+            final float deltaYaw = Math.abs(data.playerInfo.deltaYaw);
+            final float deltaPitch = Math.abs(data.playerInfo.deltaPitch);
 
             final boolean attacking = current - data.playerInfo.lastAttackTimeStamp < 100L;
             final double acceleration = Math.abs(horizontalDistance - lastHorizontalDistance);
@@ -39,8 +35,6 @@ public class AimH extends Check {
         }
 
         this.lastHorizontalDistance = horizontalDistance;
-        this.lastYaw = yaw;
-        this.lastPitch = pitch;
         this.lastPosX = posX;
         this.lastPosZ = posZ;
     }

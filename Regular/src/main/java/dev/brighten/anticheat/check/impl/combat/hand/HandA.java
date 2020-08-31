@@ -2,6 +2,7 @@ package dev.brighten.anticheat.check.impl.combat.hand;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInHeldItemSlotPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.*;
@@ -12,30 +13,20 @@ import dev.brighten.api.check.CheckType;
 @Cancellable(cancelType = CancelType.INTERACT)
 public class HandA extends Check {
 
-    private boolean sentFlying, sentTrans;
+    private long lastFlying;
 
     @Packet
-    public void use(WrappedInBlockPlacePacket packet) {
-         debug("sentFlying=%v sentTrans=%v", sentFlying, sentTrans);
-        if(sentFlying && sentTrans) {
+    public void use(WrappedInBlockPlacePacket packet, long current) {
+        if(current - lastFlying < 10) {
             vl++;
             if(vl > 11) {
-                flag("fly=%v trans=%v", sentFlying, sentTrans);
+                flag("delta=%v", current - lastFlying);
             }
         } else if(vl > 0) vl--;
-        sentFlying = sentTrans = false;
     }
 
     @Packet
-    public void onTrans(WrappedInTransactionPacket packet) {
-        if(Kauri.INSTANCE.keepaliveProcessor.keepAlives.containsKey(packet.getAction())) {
-            sentFlying = false;
-            sentTrans = true;
-        }
-    }
-
-    @Packet
-    public void flying(WrappedInFlyingPacket packet) {
-        sentFlying = true;
+    public void flying(WrappedInFlyingPacket packet, long current) {
+        lastFlying = current;
     }
 }
