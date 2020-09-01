@@ -22,7 +22,6 @@ public class SpeedD extends Check {
             if (!packet.isPos()
                     || (data.playerInfo.deltaY == 0 && data.playerInfo.deltaXZ == 0)
                     || data.playerInfo.serverPos) {
-                ldxz = 0.12f;
                 break checkProccesing;
             }
             float drag = friction;
@@ -51,11 +50,12 @@ public class SpeedD extends Check {
 
             if (ratio > 100.1 && !data.playerInfo.generalCancel && data.playerInfo.lastVelocity.hasPassed(2)) {
                 vl++;
-                flag("p=%v.1% dxz=%v.5 ldxz=%v.5 tags=%v", ratio, data.playerInfo.deltaXZ, ldxz, tags.build());
+                flag("p=%v.1% dxz=%v.3 aimove=%v.3 tags=%v",
+                        ratio, data.playerInfo.deltaXZ, data.predictionService.aiMoveSpeed, tags.build());
             } else if (vl > 0)
                 debug("ratio=%v.1 tags=%v", ratio, tags.build());
 
-            ldxz = Math.max(0.12f, data.playerInfo.deltaXZ * drag);
+            ldxz = data.playerInfo.deltaXZ * drag;
         }
         friction = data.blockInfo.currentFriction;
     }

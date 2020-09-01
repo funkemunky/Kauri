@@ -62,8 +62,7 @@ public class SpeedA extends Check {
 
                 //Checking if a player is jumping.
                 if(!data.playerInfo.clientGround
-                        && data.playerInfo.deltaY > 0
-                        && data.playerInfo.deltaY <= data.playerInfo.jumpHeight)
+                        && data.playerInfo.deltaY > 0)
                     moveFactor+= 0.2;
             } else { //The values for the player in air.
                 moveFactor = sprinting ? 0.026 : 0.02;
@@ -76,7 +75,6 @@ public class SpeedA extends Check {
 
             deltaX+= moveStrafing;
             deltaZ+= moveForward;
-
             double threshold = Math.hypot(deltaX, deltaZ) * 1.15;
 
             if(!data.playerInfo.generalCancel && data.playerInfo.lastVelocity.hasPassed(15)) {

@@ -6,7 +6,7 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "Aim (H)", description = "Checks for any low outliers in deltayaw.",
+@CheckInfo(name = "Aim (H)", description = "checks for large headsnaps.",
         developer = true, checkType = CheckType.AIM, vlToFlag = 9)
 public class AimH extends Check {
     private double lastPosX, lastPosZ, lastHorizontalDistance;

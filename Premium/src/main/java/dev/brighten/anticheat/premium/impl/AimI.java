@@ -7,7 +7,7 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "Aim (I)", description = "Checks for bad modulo gcd patches.", checkType = CheckType.AIM,
+@CheckInfo(name = "Aim (I)", description = "Checks for bad gcd patches.", checkType = CheckType.AIM,
         developer = true)
 public class AimI extends Check {
 
@@ -25,16 +25,16 @@ public class AimI extends Check {
                 deltaYaw = Math.abs(clampedYaw - data.playerInfo.to.yaw);
         float sub = Math.abs(deltaPitch - ldelta);
 
-        if(deltaPitch < 0.02 && deltaYaw < 0.02 && sub > 0 && deltaPitch > 1E-10) {
+        if(deltaPitch < 0.001 && deltaYaw < 0.02 && sub > 0 && deltaPitch > 1E-10) {
             buffer++;
 
             if(buffer > 20) {
                 vl++;
-                flag("cpitchDif=%v.3 cyawDif=%v.3 deltaClamp=%v.3 buffer=%v",
+                flag("cpitchDif=%v cyawDif=%v.3 deltaClamp=%v buffer=%v",
                         deltaPitch, deltaYaw, sub, buffer);
             }
             debug(Color.Green + "Flag");
-        } else if(buffer > 0) buffer-= 2;
+        } else if(buffer > 0) buffer--;
 
         debug("p=%v.5 clamped=%v.5 deltaPitch=%v.5 deltaYaw=%v.5 sub=%v buffer=%v sens=%v",
                 packet.getPitch(), clampedPitch, deltaPitch, deltaYaw, sub, buffer, data.moveProcessor.sensitivityX);

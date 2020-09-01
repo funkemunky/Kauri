@@ -353,6 +353,7 @@ public class MovementProcessor {
                 && data.playerInfo.lastChunkUnloaded.hasNotPassed(60))
                 || data.playerInfo.serverPos
                 || data.playerInfo.riptiding
+                || data.playerInfo.lastTeleportTimer.hasNotPassed(1)
                 || data.playerInfo.gliding
                 || data.playerInfo.lastPlaceLiquid.hasNotPassed(5)
                 || data.playerInfo.inVehicle

@@ -10,8 +10,8 @@ import dev.brighten.api.check.CheckType;
 
 import java.util.Deque;
 
-@CheckInfo(name = "Aim (G)", description = "Checks if the yaw rotation snaps.",
-        checkType = CheckType.AIM, punishVL = 10)
+@CheckInfo(name = "Aim (G)", description = "Checks for low aim deviations.",
+        checkType = CheckType.AIM, punishVL = 10, developer = true)
 public class AimG extends Check {
 
     private final Deque<Float> samplesYaw = Lists.newLinkedList();
@@ -41,10 +41,10 @@ public class AimG extends Check {
             final double deviation = MiscUtils.stdev(samplesPitch);
             final double averageDelta = Math.abs(averagePitch - lastAverage);
 
-            if (deviation > 6.f && averageDelta > 1f && averageYaw < 30.d) {
+            if (deviation > 6.f && averageDelta > 1f && averageYaw > 1L && averageYaw < 30.d) {
                 if (++buffer > 4) {
                     vl++;
-                    flag("");
+                    flag("dev=%v.1 avgD=%v.1 avgY=%v.1", deviation, averageDelta, averageYaw);
                 }
             } else {
                 buffer = Math.max(buffer - 0.125, 0);
