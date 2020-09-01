@@ -487,7 +487,6 @@ public class PacketProcessor {
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
             }
-            /* NOTE: Keepalives or transactions cause kicks. My bet is it is the transaction */
             case Packet.Server.POSITION: {
                 WrappedOutPositionPacket packet = new WrappedOutPositionPacket(object, data.getPlayer());
 
