@@ -49,8 +49,8 @@ public class RegularChecks implements CheckRegister {
         Check.register(new AimB());
         Check.register(new AimC());
         Check.register(new AimD());
-        Check.register(new AimE());
-        Check.register(new AimF());
+        //Check.register(new AimE());
+        //Check.register(new AimF());
         Check.register(new SpeedB());
         Check.register(new SpeedC());
         Check.register(new KillauraA());

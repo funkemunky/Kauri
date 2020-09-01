@@ -5,7 +5,7 @@ import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.utils.Pattern;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "Autoclicker (D)", description = "Oscillation check by Abigail.",
+@CheckInfo(name = "Autoclicker (D)", description = "Checks for clicking oscillation.",
         checkType = CheckType.AUTOCLICKER, punishVL = 15, executable = false, vlToFlag = 4)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerD extends Check {

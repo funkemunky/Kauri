@@ -3,6 +3,7 @@ package dev.brighten.anticheat.premium.impl.autoclicker;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;
@@ -12,30 +13,20 @@ import dev.brighten.api.check.CheckType;
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerI extends Check {
 
-    private boolean sentFlying, sentTrans;
+    private long lastFlying;
 
     @Packet
-    public void use(WrappedInArmAnimationPacket packet) {
-         debug("sentFlying=%v sentTrans=%v", sentFlying, sentTrans);
-        if(sentFlying && sentTrans) {
+    public void use(WrappedInArmAnimationPacket packet, long current) {
+        if(current - lastFlying < 10) {
             vl++;
             if(vl > 11) {
-                flag("fly=%v trans=%v", sentFlying, sentTrans);
+                flag("delta=0");
             }
-        } else if(vl > 0) vl-= 2;
-        sentFlying = sentTrans = false;
+        } else if(vl > 0) vl--;
     }
 
     @Packet
-    public void onTrans(WrappedInTransactionPacket packet) {
-        if(Kauri.INSTANCE.keepaliveProcessor.keepAlives.containsKey(packet.getAction())) {
-            sentFlying = false;
-            sentTrans = true;
-        }
-    }
-
-    @Packet
-    public void flying(WrappedInFlyingPacket packet, long timeStamp) {
-        sentFlying = true;
+    public void flying(WrappedInFlyingPacket packet, long current) {
+        lastFlying = current;
     }
 }

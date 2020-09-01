@@ -12,30 +12,20 @@ import dev.brighten.api.check.CheckType;
 @Cancellable(cancelType = CancelType.ATTACK)
 public class KillauraB extends Check {
 
-    private boolean sentFlying, sentTrans;
+    private long lastFlying;
 
     @Packet
-    public void use(WrappedInUseEntityPacket packet) {
-        debug("sentFlying=%v sentTrans=%v", sentFlying, sentTrans);
-        if(sentFlying && sentTrans) {
+    public void use(WrappedInUseEntityPacket packet, long current) {
+        if(current - lastFlying < 10) {
             vl++;
             if(vl > 11) {
-                flag("fly=%v trans=%v", sentFlying, sentTrans);
+                flag("delta=0");
             }
         } else if(vl > 0) vl--;
-        sentFlying = sentTrans = false;
     }
 
     @Packet
-    public void onTrans(WrappedInTransactionPacket packet) {
-        if(Kauri.INSTANCE.keepaliveProcessor.keepAlives.containsKey(packet.getAction())) {
-            sentFlying = false;
-            sentTrans = true;
-        }
-    }
-
-    @Packet
-    public void flying(WrappedInFlyingPacket packet) {
-        sentFlying = true;
+    public void flying(WrappedInFlyingPacket packet, long current) {
+        lastFlying = current;
     }
 }

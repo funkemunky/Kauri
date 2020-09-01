@@ -37,13 +37,13 @@ public class NoFallA extends Check {
                 && data.playerInfo.lastHalfBlock.hasPassed(4)
                 && !data.blockInfo.onSlime
                 && !data.blockInfo.blocksAbove
+                && data.playerInfo.lastTeleportTimer.hasPassed(1)
                 && data.playerInfo.lastBlockPlace.hasPassed(8)
                 && data.playerInfo.lastVelocity.hasPassed(4)
                 && (data.playerInfo.deltaY != 0 || data.playerInfo.deltaXZ > 0)
                 && data.playerInfo.blockAboveTimer.hasPassed(10)
                 && flag) {
             vl+= data.lagInfo.lagging
-                    || data.lagInfo.lastPacketDrop.hasNotPassed(1)
                     || data.playerInfo.nearGround
                     || data.blockInfo.blocksNear
                     ? 1 : data.playerInfo.clientGround ? 2 : 3;

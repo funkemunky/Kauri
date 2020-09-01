@@ -66,7 +66,7 @@ public class Hitboxes extends Check {
                 boolean collided = data.targetPastLocation
                         .getEstimatedLocation(now, (data.lagInfo.transPing + 3) * 50, 100L)
                         .stream().map(loc -> ((SimpleCollisionBox)EntityData.getEntityBox(loc, target))
-                                .expand(0.15).expand(hExpand, vExpand, hExpand))
+                                .expand(data.playerInfo.deltaXZ / 2.5f).expand(.15f).expand(hExpand, vExpand, hExpand))
                         .anyMatch(box -> ray.isCollided(box) || ray2.isCollided(box));
 
                 if(!collided) {
