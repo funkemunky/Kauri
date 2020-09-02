@@ -1,60 +1,49 @@
 package dev.brighten.anticheat.premium.impl;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.utils.Color;
+import cc.funkemunky.api.utils.MathUtils;
 import com.google.common.collect.Lists;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.processing.MovementProcessor;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.api.check.CheckType;
+import lombok.val;
 
 import java.util.Deque;
 
-@CheckInfo(name = "Aim (G)", description = "Checks for low aim deviations.",
-        checkType = CheckType.AIM, punishVL = 10, developer = true)
+@CheckInfo(name = "Aim (G)", description = "Checks for bad GCD bypasses. (Rhys collab)",
+        checkType = CheckType.AIM, punishVL = 30)
 public class AimG extends Check {
 
-    private final Deque<Float> samplesYaw = Lists.newLinkedList();
-    private final Deque<Float> samplesPitch = Lists.newLinkedList();
-
-    private double buffer = 0.0;
-    private double lastAverage = 0.0;
+    private float lastDeltaPitch;
 
     @Packet
     public void process(WrappedInFlyingPacket packet, long now) {
         if(!packet.isLook()) return;
 
-        final float deltaYaw = Math.abs(data.playerInfo.deltaYaw);
-        final float deltaPitch = Math.abs(data.playerInfo.deltaPitch);
+        float deltaPitch = Math.abs(modulo(data.moveProcessor.sensitivityY, data.playerInfo.to.pitch)
+                - data.playerInfo.to.pitch);
 
-        final boolean attacking = now - data.playerInfo.lastAttackTimeStamp < 500L;
+        long gcd = MiscUtils.gcd((long)(deltaPitch * MovementProcessor.offset),
+                (long)(lastDeltaPitch * MovementProcessor.offset));
 
-        if (deltaYaw > 0.0 && deltaPitch > 0.0 && attacking) {
-            samplesYaw.add(deltaYaw);
-            samplesPitch.add(deltaPitch);
-        }
-
-        if (samplesPitch.size() == 16 && samplesYaw.size() == 16) {
-            final double averageYaw = samplesYaw.stream().mapToDouble(d -> d).average().orElse(0.0);
-            final double averagePitch = samplesPitch.stream().mapToDouble(d -> d).average().orElse(0.0);
-
-            final double deviation = MiscUtils.stdev(samplesPitch);
-            final double averageDelta = Math.abs(averagePitch - lastAverage);
-
-            if (deviation > 6.f && averageDelta > 1f && averageYaw > 1L && averageYaw < 30.d) {
-                if (++buffer > 4) {
-                    vl++;
-                    flag("dev=%v.1 avgD=%v.1 avgY=%v.1", deviation, averageDelta, averageYaw);
-                }
-            } else {
-                buffer = Math.max(buffer - 0.125, 0);
+        if(gcd < 5000L) {
+            if(++vl > 3) {
+                flag("gcd=%v", gcd);
             }
+        } else if(vl > 0) vl-= 0.2f;
 
-            debug("buffer=%v.2 deviaion=%v.3 avgDelta=%v.3 averageYaw=%v.3",
-                    buffer, deviation, averageDelta, averageYaw);
-            samplesYaw.clear();
-            samplesPitch.clear();
-            lastAverage = averagePitch;
-        }
+        debug("gcd=%v vl=%v.1", gcd, vl);
+
+        lastDeltaPitch = deltaPitch;
+    }
+
+    private static float modulo(float s, float angle) {
+        float f = (s * 0.6f + .2f);
+        float f2 = f * f * f * 1.2f;
+        return angle - (angle % f2);
     }
 }

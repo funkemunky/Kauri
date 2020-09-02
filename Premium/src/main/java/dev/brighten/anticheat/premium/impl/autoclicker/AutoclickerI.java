@@ -20,7 +20,7 @@ public class AutoclickerI extends Check {
         if(current - lastFlying < 10) {
             vl++;
             if(vl > 11) {
-                flag("delta=0");
+                flag("delta=%v", current - lastFlying);
             }
         } else if(vl > 0) vl--;
     }

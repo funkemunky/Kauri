@@ -364,12 +364,12 @@ public class MovementProcessor {
                 || Kauri.INSTANCE.lastTickLag.hasNotPassed(5);
 
         data.playerInfo.flightCancel = data.playerInfo.generalCancel
-                || data.playerInfo.webTimer.hasNotPassed(4)
-                || data.playerInfo.liquidTimer.hasNotPassed(3)
+                || data.playerInfo.webTimer.hasNotPassed(8)
+                || data.playerInfo.liquidTimer.hasNotPassed(8)
                 || data.playerInfo.onLadder
-                || data.playerInfo.slimeTimer.hasNotPassed(5)
-                || data.playerInfo.climbTimer.hasNotPassed(4)
-                || data.playerInfo.lastHalfBlock.hasNotPassed(3);
+                || data.playerInfo.slimeTimer.hasNotPassed(8)
+                || data.playerInfo.climbTimer.hasNotPassed(6)
+                || data.playerInfo.lastHalfBlock.hasNotPassed(5);
     }
     private static float getDeltaX(float yawDelta, float gcd) {
         return MathHelper.floor(yawDelta / gcd);

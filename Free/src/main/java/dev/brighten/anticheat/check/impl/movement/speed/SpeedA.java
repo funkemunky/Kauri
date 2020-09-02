@@ -13,7 +13,7 @@ import dev.brighten.anticheat.check.api.Packet;
 import org.bukkit.potion.PotionEffectType;
 
 @CheckInfo(name = "Speed (A)", description = "A simple limiting speed check with a high verbose threshold.",
-        punishVL = 34, vlToFlag = 2)
+        punishVL = 34, vlToFlag = 2, developer = true)
 @Cancellable
 public class SpeedA extends Check {
 

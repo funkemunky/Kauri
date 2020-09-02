@@ -25,11 +25,9 @@ public class ReachA extends Check {
     private double buffer;
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if(timeStamp - lastUse > 3 || data.playerInfo.creative || data.targetPastLocation.previousLocations.size() < 10) return;
+    public void onFlying(WrappedInUseEntityPacket packet, long timeStamp) {
+        if(data.playerInfo.creative || data.targetPastLocation.previousLocations.size() < 10) return;
 
-        List<KLocation> origins = Stream.of(data.playerInfo.from.clone())
-                .collect(Collectors.toList());
         List<KLocation> targetBoxes = data.targetPastLocation.getEstimatedLocation(timeStamp, (data.lagInfo.transPing + 3) * 50);
 
         for (KLocation targetBox : targetBoxes) {
@@ -42,12 +40,9 @@ public class ReachA extends Check {
 
         if(bounds == null) return;
         double width = bounds.max().setY(0).distance(bounds.min().setY(0)) / 2.;
-        for (KLocation origin : origins) {
-            //origin.draw(WrappedEnumParticle.FLAME, Collections.singleton(data.getPlayer()));
-            for (KLocation target : targetBoxes) {
-                distance = Math.min(distance, origin.toVector().distance(target.toVector()) - width);
-                //target.draw(WrappedEnumParticle.FLAME, Collections.singleton(data.getPlayer()));
-            }
+        for (KLocation target : targetBoxes) {
+            distance = Math.min(distance, data.playerInfo.to.toVector().distance(target.toVector()) - width);
+            //target.draw(WrappedEnumParticle.FLAME, Collections.singleton(data.getPlayer()));
         }
 
         if(data.lagInfo.lastPacketDrop.hasPassed(3)) {

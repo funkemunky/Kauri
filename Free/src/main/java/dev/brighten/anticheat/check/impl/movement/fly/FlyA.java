@@ -10,7 +10,7 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Fly (A)", description = "Simple fly check.", punishVL = 10,
-        checkType = CheckType.FLIGHT, vlToFlag = 1)
+        checkType = CheckType.FLIGHT, vlToFlag = 1, developer = true)
 @Cancellable
 public class FlyA extends Check {
 

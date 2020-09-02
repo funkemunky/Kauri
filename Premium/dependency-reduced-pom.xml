@@ -43,18 +43,6 @@
   </build>
   <dependencies>
     <dependency>
-      <groupId>dev.brighten.anticheat</groupId>
-      <artifactId>Impl</artifactId>
-      <version>2.9.1</version>
-      <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>API</artifactId>
-          <groupId>dev.brighten.anticheat</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
       <groupId>cc.funkemunky.utils</groupId>
       <artifactId>lombok</artifactId>
       <version>1.18.0</version>

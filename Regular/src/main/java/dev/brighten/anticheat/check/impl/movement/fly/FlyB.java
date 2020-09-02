@@ -16,6 +16,7 @@ import dev.brighten.api.check.CheckType;
 public class FlyB extends Check {
 
     private long lastPos;
+    private float buffer;
     private static double mult = 0.98f;
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
@@ -50,9 +51,11 @@ public class FlyB extends Check {
                     && (!data.playerInfo.clientGround || data.playerInfo.deltaY < predicted)
                     && data.playerInfo.blockAboveTimer.hasPassed(1)
                     && deltaPredict > 0.015) {
-                ++vl;
-                flag("dY=%v.3 p=%v.3 dx=%v.3", data.playerInfo.deltaY, predicted, data.playerInfo.deltaXZ);
-            } else vl-= vl > 0 ? 0.2f : 0;
+                if(++buffer > 2) {
+                    ++vl;
+                    flag("dY=%v.3 p=%v.3 dx=%v.3", data.playerInfo.deltaY, predicted, data.playerInfo.deltaXZ);
+                }
+            } else buffer-= buffer > 0 ? 0.2f : 0;
 
             debug("pos=%v deltaY=%v.3 predicted=%v.3 ground=%v lpass=%v vl=%v.1",
                     packet.getY(), data.playerInfo.deltaY, predicted, data.playerInfo.clientGround,

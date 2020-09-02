@@ -1,6 +1,8 @@
 package dev.brighten.anticheat.premium.impl;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
+import cc.funkemunky.api.utils.PlayerUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -16,6 +18,16 @@ public class SpeedD extends Check {
     private float friction = 0.91f;
 
     @Packet
+    public void onVelocity(WrappedOutVelocityPacket packet) {
+        if(packet.getId() == data.getPlayer().getEntityId()) {
+            data.runKeepaliveAction(ka -> {
+                ldxz = Math.hypot(packet.getX(), packet.getZ());
+                debug("set velocity: %v.3", ldxz);
+            });
+        }
+    }
+
+    @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         checkProccesing:
         {
@@ -27,7 +39,17 @@ public class SpeedD extends Check {
             float drag = friction;
 
             TagsBuilder tags = new TagsBuilder();
-            double moveFactor = data.predictionService.aiMoveSpeed;
+            double moveFactor = data.getPlayer().getWalkSpeed() / 2f;
+
+            moveFactor+= moveFactor * 0.3f;
+
+            if(data.potionProcessor.hasPotionEffect(PotionEffectType.SPEED))
+                moveFactor += (PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.SPEED)
+                        * (0.20000000298023224D)) * moveFactor;
+
+            if(data.potionProcessor.hasPotionEffect(PotionEffectType.SLOW))
+                moveFactor += (PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.SLOW)
+                        * (-0.15000000596046448D)) * moveFactor;
 
             if (data.playerInfo.lClientGround) {
                 tags.addTag("ground");
@@ -44,16 +66,14 @@ public class SpeedD extends Check {
                 moveFactor = data.playerInfo.sprinting ? 0.026 : 0.02;
             }
 
-            if (data.playerInfo.sprinting) tags.addTag("sprint");
-
             double ratio = (data.playerInfo.deltaXZ - ldxz) / moveFactor * 100;
 
             if (ratio > 100.1 && !data.playerInfo.generalCancel && data.playerInfo.lastVelocity.hasPassed(2)) {
                 vl++;
                 flag("p=%v.1% dxz=%v.3 aimove=%v.3 tags=%v",
                         ratio, data.playerInfo.deltaXZ, data.predictionService.aiMoveSpeed, tags.build());
-            } else if (vl > 0)
-                debug("ratio=%v.1 tags=%v", ratio, tags.build());
+            }
+            debug("ratio=%v.1 tags=%v", ratio, tags.build());
 
             ldxz = data.playerInfo.deltaXZ * drag;
         }
