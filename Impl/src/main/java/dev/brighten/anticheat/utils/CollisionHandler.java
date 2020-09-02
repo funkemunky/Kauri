@@ -61,13 +61,7 @@ public class CollisionHandler {
 		return entities.stream().anyMatch(e -> e.getType() == type);
 	}
 
-	public boolean isCollidedWith(int bitmask) {
-		SimpleCollisionBox playerBox = new SimpleCollisionBox()
-				.offset(location.x, location.y, location.z)
-				.expandMin(0, shift, 0)
-				.expandMax(0, height, 0)
-				.expand(width / 2, 0, width / 2);
-
+	public boolean isCollidedWith(SimpleCollisionBox playerBox, int bitmask) {
 		for (Block b : blocks) {
 			Location block = b.getLocation();
 			if (Materials.checkFlag(b.getType(), bitmask)
@@ -82,13 +76,18 @@ public class CollisionHandler {
 		return false;
 	}
 
-	public List<CollisionBox> getCollisionBoxes() {
-		List<CollisionBox> collided = new ArrayList<>();
+	public boolean isCollidedWith(int bitmask) {
 		SimpleCollisionBox playerBox = new SimpleCollisionBox()
 				.offset(location.x, location.y, location.z)
 				.expandMin(0, shift, 0)
 				.expandMax(0, height, 0)
 				.expand(width / 2, 0, width / 2);
+
+		return isCollidedWith(playerBox, bitmask);
+	}
+
+	public List<CollisionBox> getCollisionBoxes(SimpleCollisionBox playerBox) {
+		List<CollisionBox> collided = new ArrayList<>();
 
 		for (Block b : blocks) {
 			Location block = b.getLocation();
@@ -98,8 +97,16 @@ public class CollisionHandler {
 				collided.add(box);
 			}
 		}
-
 		return collided;
+	}
+	public List<CollisionBox> getCollisionBoxes() {
+		SimpleCollisionBox playerBox = new SimpleCollisionBox()
+				.offset(location.x, location.y, location.z)
+				.expandMin(0, shift, 0)
+				.expandMax(0, height, 0)
+				.expand(width / 2, 0, width / 2);
+
+		return getCollisionBoxes(playerBox);
 	}
 
 	public boolean isCollidedWith(CollisionBox box) {
@@ -112,13 +119,7 @@ public class CollisionHandler {
 		return box.isCollided(playerBox);
 	}
 
-	public boolean isCollidedWith(Material... materials) {
-		SimpleCollisionBox playerBox = new SimpleCollisionBox()
-				.offset(location.x, location.y, location.z)
-				.expandMin(0, shift, 0)
-				.expandMax(0, height, 0)
-				.expand(width / 2, 0, width / 2);
-
+	public boolean isCollidedWith(SimpleCollisionBox playerBox, Material... materials) {
 		for (Block b : blocks) {
 			if (MiscUtils.contains(materials, b.getType())) {
 				if (BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion()).isCollided(playerBox))
@@ -127,5 +128,14 @@ public class CollisionHandler {
 		}
 
 		return false;
+	}
+	public boolean isCollidedWith(Material... materials) {
+		SimpleCollisionBox playerBox = new SimpleCollisionBox()
+				.offset(location.x, location.y, location.z)
+				.expandMin(0, shift, 0)
+				.expandMax(0, height, 0)
+				.expand(width / 2, 0, width / 2);
+
+		return isCollidedWith(playerBox, materials);
 	}
 }

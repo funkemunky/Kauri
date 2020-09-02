@@ -30,7 +30,7 @@ public class MovementProcessor {
 
     public Deque<Float> yawGcdList = new EvictingList<>(50),
             pitchGcdList = new EvictingList<>(50);
-    public float deltaX, deltaY, lastDeltaX, lastDeltaY;
+    public float deltaX, deltaY, lastDeltaX, lastDeltaY, smoothYaw, smoothPitch, lsmoothYaw, lsmoothPitch;
     public Tuple<List<Double>, List<Double>> yawOutliers, pitchOutliers;
     public long lastCinematic;
     public float sensitivityX, sensitivityY, yawMode, pitchMode, sensXPercent, sensYPercent;
@@ -246,20 +246,31 @@ public class MovementProcessor {
 
                     smoothCamFilterX = mxaxis.smooth(smoothCamYaw, .05f * f1);
                     smoothCamFilterY = myaxis.smooth(smoothCamPitch, .05f * f1);
-                    smoothCamYaw = f2;
-                    smoothCamPitch = f3;
+
+                    this.smoothCamYaw+= f2;
+                    this.smoothCamFilterY+= f3;
+
                     f2 = smoothCamFilterX * 0.5f;
                     f3 = smoothCamFilterY * 0.5f;
 
                     float pyaw = data.playerInfo.from.yaw + f2 * .15f;
                     float ppitch = data.playerInfo.from.pitch - f3 * .15f;
 
-                    if(data.playerInfo.cinematicMode =
-                            (MathUtils.getDelta(pyaw, data.playerInfo.from.yaw) < (Math.abs(deltaX) > 50 ? 3 : 1)
-                            && MathUtils.getDelta(ppitch, data.playerInfo.to.pitch) < (Math.abs(deltaY) > 30 ? 2 : 1))) {
-                        lastCinematic = timeStamp;
-                        data.playerInfo.cinematicTimer.reset();
-                    }
+                    this.lsmoothYaw = smoothYaw;
+                    this.lsmoothPitch = smoothPitch;
+                    this.smoothYaw = pyaw;
+                    this.smoothPitch = ppitch;
+
+                    float yaccel = Math.abs(data.playerInfo.deltaYaw) - Math.abs(data.playerInfo.lDeltaYaw),
+                            pAccel = Math.abs(data.playerInfo.deltaPitch) - Math.abs(data.playerInfo.lDeltaPitch);
+
+                    if(MathUtils.getDelta(smoothYaw, data.playerInfo.from.yaw) > (yaccel > 0 ? (yaccel > 10 ? 3 : 1) : 0.1)
+                            || MathUtils.getDelta(smoothPitch, data.playerInfo.from.pitch) > (pAccel > 0 ? (yaccel > 10 ? 3 : 1) : 0.1)) {
+                        smoothCamYaw = smoothCamPitch = 0;
+                        data.playerInfo.cinematicMode = false;
+                        mxaxis.reset();
+                        myaxis.reset();
+                    } else data.playerInfo.cinematicMode = true;
 
                     //MiscUtils.testMessage("pyaw=" + pyaw + " ppitch=" + ppitch + " yaw=" + data.playerInfo.to.yaw + " pitch=" + data.playerInfo.to.pitch);
                 } else {
@@ -268,6 +279,8 @@ public class MovementProcessor {
                     data.playerInfo.cinematicMode = false;
                 }
             }
+        } else {
+            smoothCamYaw = smoothCamPitch = 0;
         }
 
         if (packet.isPos()) {
@@ -300,7 +313,7 @@ public class MovementProcessor {
 
         //Running jump check
         if (!data.playerInfo.clientGround) {
-            if (!data.playerInfo.jumped && !data.playerInfo.inAir && data.playerInfo.deltaY > 0) {
+            if (!data.playerInfo.jumped && data.playerInfo.lClientGround && data.playerInfo.deltaY > 0) {
                 data.playerInfo.jumped = true;
             } else {
                 data.playerInfo.inAir = true;

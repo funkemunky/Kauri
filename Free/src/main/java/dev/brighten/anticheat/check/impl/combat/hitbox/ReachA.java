@@ -28,20 +28,17 @@ public class ReachA extends Check {
     public void onFlying(WrappedInUseEntityPacket packet, long timeStamp) {
         if(data.playerInfo.creative || data.targetPastLocation.previousLocations.size() < 10) return;
 
-        List<KLocation> targetBoxes = data.targetPastLocation.getEstimatedLocation(timeStamp, (data.lagInfo.transPing + 3) * 50);
+        List<SimpleCollisionBox> targetBoxes = data.targetPastLocation
+                .getEstimatedLocation(timeStamp, (data.lagInfo.transPing + 3) * 50, 100L)
+                .stream().map(loc -> getHitbox(target, loc)).collect(Collectors.toList());
 
-        for (KLocation targetBox : targetBoxes) {
-            debug("(%vms) x=%v.4 y=%v.4 z=%v.4",
-                    timeStamp - targetBox.timeStamp, targetBox.x, targetBox.y, targetBox.z);
-        }
         double distance = 69;
 
         val bounds = getHitbox(target, new KLocation(0,0,0));
 
         if(bounds == null) return;
-        double width = bounds.max().setY(0).distance(bounds.min().setY(0)) / 2.;
-        for (KLocation target : targetBoxes) {
-            distance = Math.min(distance, data.playerInfo.to.toVector().distance(target.toVector()) - width);
+        for (SimpleCollisionBox target : targetBoxes) {
+            distance = Math.min(distance, data.box.distance(target));
             //target.draw(WrappedEnumParticle.FLAME, Collections.singleton(data.getPlayer()));
         }
 
@@ -54,7 +51,7 @@ public class ReachA extends Check {
             } else buffer -= buffer > 0 ? 0.1 : 0;
         } else buffer-= buffer > 0 ? 0.02 : 0;
 
-        debug("distance=%v.3 boxes=%v width=%v.2 buffer=%v", distance, targetBoxes.size(), width, buffer);
+        debug("distance=%v.3 boxes=%v buffer=%v", distance, targetBoxes.size(), buffer);
     }
 
     @Packet

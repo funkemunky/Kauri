@@ -18,7 +18,9 @@ public class NoFallA extends Check {
     public void onPacket(WrappedInFlyingPacket packet, long timeStamp) {
 
         boolean flag = data.playerInfo.clientGround
-                ? data.playerInfo.deltaY != 0 && !data.playerInfo.serverGround
+                ? data.playerInfo.deltaY != 0
+                && (Math.abs(data.playerInfo.deltaY) >= Math.abs(data.playerInfo.lDeltaY))
+                && !data.playerInfo.serverGround
                 && data.playerInfo.lastBlockPlace.hasPassed(10)
                 : data.playerInfo.deltaY == 0 && data.playerInfo.lDeltaY == 0;
 

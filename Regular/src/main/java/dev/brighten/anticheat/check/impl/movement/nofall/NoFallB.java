@@ -15,14 +15,16 @@ public class NoFallB extends Check {
     private static double GROUND = 1 / 64d;
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if(!packet.isPos() || !data.playerInfo.worldLoaded || data.playerInfo.serverPos
+        if(!packet.isPos() || !data.playerInfo.worldLoaded
+                || data.playerInfo.generalCancel
                 || data.playerInfo.lastTeleportTimer.hasNotPassed(1)
                 || data.playerInfo.lastRespawnTimer.hasNotPassed(1))
             return;
 
-        boolean ground = data.playerInfo.to.y % GROUND == 0 && data.playerInfo.serverGround;
+        boolean ground = data.playerInfo.to.y % GROUND == 0;
 
-        if(ground != packet.isGround() && !data.blockInfo.onSlime) {
+        if(ground != packet.isGround() && !data.blockInfo.onSlime
+                && data.playerInfo.lastHalfBlock.hasPassed(3)) {
             if(++vl > 2) {
                 flag("c=%v s=%v", packet.isGround(), ground);
             }

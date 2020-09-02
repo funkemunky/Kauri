@@ -2,6 +2,7 @@ package dev.brighten.anticheat.premium.impl;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.Color;
+import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -25,7 +26,8 @@ public class AimI extends Check {
                 deltaYaw = Math.abs(clampedYaw - data.playerInfo.to.yaw);
         float sub = Math.abs(deltaPitch - ldelta);
 
-        if(deltaPitch < 0.0008 && deltaYaw < 0.04 && sub > 0 && deltaPitch > 1E-10) {
+        if(deltaPitch < 0.01 && deltaYaw < 0.04 && sub > 0 && deltaPitch > 1E-10
+                && MathUtils.getDelta(data.moveProcessor.sensXPercent, data.moveProcessor.sensitivityY) < 2) {
             buffer++;
 
             if(buffer > 15) {

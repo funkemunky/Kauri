@@ -16,6 +16,7 @@ import dev.brighten.anticheat.utils.CollisionHandler;
 import dev.brighten.anticheat.utils.Helper;
 import lombok.val;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.Vector;
@@ -78,6 +79,24 @@ public class BlockInformation {
 
         if(!objectData.playerInfo.worldLoaded) return;
 
+        SimpleCollisionBox waterBox = objectData.box.copy().expand(0, -.38, 0);
+
+        waterBox.xMin = Math.floor(waterBox.xMin);
+        waterBox.yMin = Math.floor(waterBox.yMin);
+        waterBox.zMin = Math.floor(waterBox.zMin);
+        waterBox.xMax = Math.floor(waterBox.xMax + 1.);
+        waterBox.yMax = Math.floor(waterBox.yMax + 1.);
+        waterBox.zMax = Math.floor(waterBox.zMax + 1.);
+
+        SimpleCollisionBox lavaBox = objectData.box.copy().expand(-.1f, -.4f, -.1f);
+
+        waterBox.xMin = Math.floor(waterBox.xMin);
+        waterBox.yMin = Math.floor(waterBox.yMin);
+        waterBox.zMin = Math.floor(waterBox.zMin);
+        waterBox.xMax = Math.floor(waterBox.xMax + 1.);
+        waterBox.yMax = Math.floor(waterBox.yMax + 1.);
+        waterBox.zMax = Math.floor(waterBox.zMax + 1.);
+
         CollisionHandler handler = new CollisionHandler(blocks,
                 Kauri.INSTANCE.entityProcessor.vehicles.getOrDefault(objectData.getPlayer().getUniqueId(), new ArrayList<>()),
                 objectData.playerInfo.to);
@@ -98,6 +117,8 @@ public class BlockInformation {
         handler.setOffset(-0.6f);
         handler.setSize(0.8f, 1f);
         miscNear = handler.isCollidedWith(XMaterial.CAKE.parseMaterial(),
+                Material.valueOf(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_13)
+                        ? "CAKE_BLOCK" : "LEGACY_CAKE_BLOCK"),
                 XMaterial.BREWING_STAND.parseMaterial(), XMaterial.FLOWER_POT.parseMaterial(),
                 XMaterial.SKULL_ITEM.parseMaterial(), XMaterial.SNOW.parseMaterial(),
                 XMaterial.WITHER_SKELETON_SKULL.parseMaterial(), XMaterial.SKELETON_WALL_SKULL.parseMaterial(),
@@ -116,12 +137,13 @@ public class BlockInformation {
         inWeb = handler.isCollidedWith(XMaterial.COBWEB.parseMaterial());
         onSlime = handler.isCollidedWith(XMaterial.SLIME_BLOCK.parseMaterial());
 
+
         handler.setOffset((double).4f);
         handler.setSize(0.4f, 1.4f);
-        inLava = handler.isCollidedWith(XMaterial.LAVA.parseMaterial(),
+        inLava = handler.isCollidedWith(lavaBox, XMaterial.LAVA.parseMaterial(),
                 XMaterial.STATIONARY_LAVA.parseMaterial());
         handler.setSize(0.598f, 1.4f);
-        inWater = handler.isCollidedWith(XMaterial.WATER.parseMaterial(), XMaterial.STATIONARY_WATER.parseMaterial());
+        inWater = handler.isCollidedWith(waterBox, XMaterial.WATER.parseMaterial(), XMaterial.STATIONARY_WATER.parseMaterial());
         inLiquid = inLava || inWater;
 
         handler.setOffset(0);

@@ -52,13 +52,14 @@ public class Load {
         register("Registering processors...");
         Kauri.INSTANCE.packetProcessor = new PacketProcessor();
         Kauri.INSTANCE.dataManager = new DataManager();
-        Kauri.INSTANCE.loggerManager = new LoggerManager();
         Kauri.INSTANCE.keepaliveProcessor = new KeepaliveProcessor();
         Kauri.INSTANCE.entityProcessor = EntityProcessor.start();
 
         register("Running scanner...");
         Atlas.getInstance().initializeScanner(Kauri.INSTANCE, true, true);
 
+        register("Registering logging...");
+        Kauri.INSTANCE.loggerManager = new LoggerManager();
 
         if(Config.initChecks) {
             register("Initializing checks...");

@@ -193,7 +193,7 @@ public class ObjectData {
 
     public void onLogout() {
         if(PacketListener.expansiveThreading)
-        getThread().shutdown();
+            playerThread.shutdownNow();
         task.cancel();
         keepAliveStamps.clear();
         Kauri.INSTANCE.dataManager.hasAlerts.remove(this);
@@ -204,6 +204,7 @@ public class ObjectData {
         typesToCancel.clear();
         sniffedPackets.clear();
         keepAliveStamps.clear();
+        Kauri.INSTANCE.dataManager.dataMap.remove(uuid);
     }
 
     public static void debugBoxes(boolean debugging, Player debugger) {

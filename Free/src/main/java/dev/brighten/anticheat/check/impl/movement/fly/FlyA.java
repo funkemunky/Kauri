@@ -8,6 +8,7 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
+import net.minecraft.server.v1_8_R3.BlockClay;
 
 @CheckInfo(name = "Fly (A)", description = "Simple fly check.", punishVL = 10,
         checkType = CheckType.FLIGHT, vlToFlag = 1, developer = true)
@@ -34,11 +35,14 @@ public class FlyA extends Check {
             return;
         }
 
+        boolean ground = data.playerInfo.clientGround && data.playerInfo.to.y % GROUND < 0.001;
+        boolean lground = data.playerInfo.lClientGround = data.playerInfo.from.y % GROUND < 0.001;
+
         long end = -1;
-        if(!data.playerInfo.clientGround && !hitHead) {
+        if(!ground && !hitHead) {
             double predicted = (data.playerInfo.lDeltaY - 0.08) * (double)0.98f;
 
-            if(data.playerInfo.lClientGround) {
+            if(lground) {
                 if(data.playerInfo.deltaY > 0) {
                     predicted = data.playerInfo.blockAboveTimer.hasNotPassed(3)
                             ? Math.min(data.playerInfo.deltaY, data.playerInfo.jumpHeight)
@@ -58,16 +62,15 @@ public class FlyA extends Check {
 
             double check = Math.abs(data.playerInfo.deltaY - predicted);
 
-            if(check > 0.015) {
+            if(check > 0.016 && data.playerInfo.lastHalfBlock.hasPassed(5)) {
                 vl++;
                 flag("deltaY=%v.4 predicted=%v.4", data.playerInfo.deltaY, predicted);
-            }
+            } else if(vl > 0) vl-= 0.1;
             end = System.nanoTime() - start;
 
             debug(Color.Green + "deltaY=%v difference=%v", data.playerInfo.deltaY, check);
         }
 
-        debug("ground=%v fground=%v hitHead=%v time=%v",
-                data.playerInfo.clientGround, data.playerInfo.lClientGround, hitHead, end);
+        debug("ground=%v fground=%v hitHead=%v time=%v", ground, lground, hitHead, end);
     }
 }

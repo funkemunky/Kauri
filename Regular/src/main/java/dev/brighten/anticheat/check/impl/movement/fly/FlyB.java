@@ -11,7 +11,7 @@ import dev.brighten.anticheat.utils.MovementUtils;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Fly (B)", description = "Checks for improper acceleration.", checkType = CheckType.FLIGHT,
-        vlToFlag = 4, punishVL = 30, developer = true)
+        vlToFlag = 4, punishVL = 30)
 @Cancellable
 public class FlyB extends Check {
 
@@ -50,8 +50,8 @@ public class FlyB extends Check {
                     && data.playerInfo.lastVelocity.hasPassed(3)
                     && (!data.playerInfo.clientGround || data.playerInfo.deltaY < predicted)
                     && data.playerInfo.blockAboveTimer.hasPassed(1)
-                    && deltaPredict > 0.015) {
-                if(++buffer > 2) {
+                    && deltaPredict > 0.016) {
+                if(++buffer > 2 || (deltaPredict > 0.1 && !data.blockInfo.blocksNear)) {
                     ++vl;
                     flag("dY=%v.3 p=%v.3 dx=%v.3", data.playerInfo.deltaY, predicted, data.playerInfo.deltaXZ);
                 }

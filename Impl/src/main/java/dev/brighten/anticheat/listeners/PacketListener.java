@@ -33,7 +33,7 @@ public class PacketListener implements AtlasListener {
         if(event.getPlayer() == null) return;
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
-        if(data == null) return;
+        if(data == null || data.checkManager == null) return;
 
         data.getThread().execute(() ->
                 Kauri.INSTANCE.packetProcessor.processClient(event,
@@ -72,7 +72,7 @@ public class PacketListener implements AtlasListener {
 
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
-        if(data == null) return;
+        if(data == null || data.checkManager == null) return;
 
         data.getThread().execute(() -> Kauri.INSTANCE.packetProcessor.processServer(event,
                 data, event.getPacket(), event.getType(), event.getTimeStamp()));
