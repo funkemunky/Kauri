@@ -3,6 +3,7 @@ package dev.brighten.anticheat.check.impl.movement.fly;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.Color;
+import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -35,8 +36,8 @@ public class FlyA extends Check {
             return;
         }
 
-        boolean ground = data.playerInfo.clientGround && data.playerInfo.to.y % GROUND < 0.001;
-        boolean lground = data.playerInfo.lClientGround = data.playerInfo.from.y % GROUND < 0.001;
+        boolean ground = data.playerInfo.clientGround;
+        boolean lground = data.playerInfo.lClientGround;
 
         long end = -1;
         if(!ground && !hitHead) {
@@ -47,7 +48,14 @@ public class FlyA extends Check {
                     predicted = data.playerInfo.blockAboveTimer.hasNotPassed(3)
                             ? Math.min(data.playerInfo.deltaY, data.playerInfo.jumpHeight)
                             : data.playerInfo.jumpHeight;
-                } else predicted = -0.08 * (double)0.98f;
+                } else {
+                    double toCheck = (predicted - 0.08) * (double)0.98f;
+
+                    if(Math.abs(toCheck - data.playerInfo.deltaY)
+                            < Math.abs(predicted - data.playerInfo.deltaY)) {
+                        predicted = toCheck;
+                    }
+                }
             }
 
             if(Math.abs(predicted) < 0.005) {

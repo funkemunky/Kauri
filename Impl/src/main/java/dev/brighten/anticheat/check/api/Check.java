@@ -181,7 +181,7 @@ public class Check implements KauriCheck {
 
         event.setCancelled(!Config.alertDev);
 
-        if(cancellable && cancelMode != null && data.lagInfo.lastPacketDrop.hasPassed(8)) {
+        if(cancellable && cancelMode != null && vl > vlToFlag && data.lagInfo.lastPacketDrop.hasPassed(8)) {
             switch(cancelMode) {
                 case ATTACK: {
                     for(int i = 0 ; i < 2 ; i++) data.typesToCancel.add(cancelMode);
