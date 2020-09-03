@@ -30,7 +30,8 @@ public class AimG extends Check {
         long gcd = MiscUtils.gcd((long)(deltaPitch * MovementProcessor.offset),
                 (long)(lastDeltaPitch * MovementProcessor.offset));
 
-        if(gcd < 5000L
+        if(gcd < 500L
+                && data.moveProcessor.yawGcdList.size() > 40
                 && MathUtils.getDelta(data.moveProcessor.sensXPercent, data.moveProcessor.sensYPercent) < 2) {
             if(++vl > 3) {
                 flag("gcd=%v", gcd);

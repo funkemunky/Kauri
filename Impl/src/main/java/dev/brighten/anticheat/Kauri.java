@@ -49,7 +49,7 @@ public class Kauri extends JavaPlugin {
     public long lastTick;
     public CommandManager commandManager;
 
-    public ExecutorService executor;
+    public ScheduledExecutorService executor;
     public ScheduledExecutorService loggingThread;
     public ToggleableProfiler profiler;
     public String LINK = "";

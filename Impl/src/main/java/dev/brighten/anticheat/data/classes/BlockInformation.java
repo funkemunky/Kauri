@@ -12,6 +12,8 @@ import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.processing.EntityProcessor;
+import dev.brighten.anticheat.utils.CacheList;
+import dev.brighten.anticheat.utils.CacheMap;
 import dev.brighten.anticheat.utils.CollisionHandler;
 import dev.brighten.anticheat.utils.Helper;
 import lombok.val;
@@ -20,9 +22,11 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.Vector;
+import sun.misc.Cache;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class BlockInformation {
@@ -137,12 +141,8 @@ public class BlockInformation {
         inWeb = handler.isCollidedWith(XMaterial.COBWEB.parseMaterial());
         onSlime = handler.isCollidedWith(XMaterial.SLIME_BLOCK.parseMaterial());
 
-
-        handler.setOffset((double).4f);
-        handler.setSize(0.4f, 1.4f);
         inLava = handler.isCollidedWith(lavaBox, XMaterial.LAVA.parseMaterial(),
                 XMaterial.STATIONARY_LAVA.parseMaterial());
-        handler.setSize(0.598f, 1.4f);
         inWater = handler.isCollidedWith(waterBox, XMaterial.WATER.parseMaterial(), XMaterial.STATIONARY_WATER.parseMaterial());
         inLiquid = inLava || inWater;
 
@@ -219,27 +219,14 @@ public class BlockInformation {
         collidesVertically = !(verticalCollisions = blockCollisions(handler.getBlocks(), box)).isEmpty();
 
         this.handler = handler;
-
-        //Preventing any memory leaks caused by lots and lots of locations being stored.
-        for (Location loc : lastUpdates.keySet()) {
-            lastUpdates.compute(loc, (key, time) -> {
-                if(time == null || System.currentTimeMillis() - time > 15000L) {
-                    return null;
-                }
-                return time;
-            });
-        }
     }
 
-    private final Map<Location, Long> lastUpdates = new ConcurrentHashMap<>();
+    private final List<Location> lastUpdates = new CacheList<>(10, TimeUnit.SECONDS);
     private synchronized void updateBlock(Block block) {
-        lastUpdates.compute(block.getLocation(), (location, lastUpdate) -> {
-            if(lastUpdate == null || System.currentTimeMillis() - lastUpdate > 10000L) {
-                objectData.getPlayer().sendBlockChange(block.getLocation(), block.getType(), block.getData());
-                return System.currentTimeMillis();
-            }
-            return lastUpdate;
-        });
+        if(!lastUpdates.contains(block.getLocation())) {
+            objectData.getPlayer().sendBlockChange(block.getLocation(), block.getType(), block.getData());
+            lastUpdates.add(block.getLocation());
+        }
     }
 
     public SimpleCollisionBox getBox() {
