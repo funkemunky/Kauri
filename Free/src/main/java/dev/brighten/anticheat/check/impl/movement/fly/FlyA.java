@@ -62,7 +62,8 @@ public class FlyA extends Check {
 
             double check = Math.abs(data.playerInfo.deltaY - predicted);
 
-            if(check > 0.016 && data.playerInfo.lastHalfBlock.hasPassed(5)) {
+            if(check > 0.016 && data.playerInfo.lastHalfBlock.hasPassed(5)
+                    && data.playerInfo.lastVelocity.hasPassed(4)) {
                 vl++;
                 flag("deltaY=%v.4 predicted=%v.4", data.playerInfo.deltaY, predicted);
             } else if(vl > 0) vl-= 0.1;
