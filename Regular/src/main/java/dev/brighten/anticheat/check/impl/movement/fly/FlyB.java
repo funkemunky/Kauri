@@ -49,9 +49,9 @@ public class FlyB extends Check {
             if(!data.playerInfo.flightCancel
                     && data.playerInfo.lastVelocity.hasPassed(3)
                     && (!data.playerInfo.clientGround || data.playerInfo.deltaY < predicted)
-                    && data.playerInfo.blockAboveTimer.hasPassed(1)
+                    && data.playerInfo.blockAboveTimer.hasPassed(5)
                     && deltaPredict > 0.016) {
-                if(++buffer > 2 || (deltaPredict > 0.1 && !data.blockInfo.blocksNear)) {
+                if(++buffer > 2 || (deltaPredict > 0.3 && !data.blockInfo.blocksNear)) {
                     ++vl;
                     flag("dY=%v.3 p=%v.3 dx=%v.3", data.playerInfo.deltaY, predicted, data.playerInfo.deltaXZ);
                 }

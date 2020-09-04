@@ -73,7 +73,7 @@ public class SpeedA extends Check {
 
             if (ratio > 100.8 && data.playerInfo.lastBrokenBlock.hasPassed(data.lagInfo.transPing + 1)
                     && !data.playerInfo.generalCancel && data.playerInfo.lastVelocity.hasPassed(2)) {
-                buffer+= ratio > 500 ? 3 : 1;
+                buffer+= ratio > 1000 ? 3 : 1;
 
                 if(buffer > 2) {
                     vl++;

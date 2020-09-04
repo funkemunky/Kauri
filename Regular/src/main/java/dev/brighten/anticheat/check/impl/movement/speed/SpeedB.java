@@ -23,7 +23,7 @@ public class SpeedB extends Check {
                 double accelZ = data.playerInfo.deltaZ - data.playerInfo.lDeltaZ;
                 double hypot = MathUtils.hypot(accelX, accelZ);
 
-                if(hypot > 0.12
+                if(hypot > 0.1
                         && !data.blockInfo.blocksNear
                         && data.playerInfo.lastVelocity.hasPassed(8)
                         && !data.blockInfo.inLiquid
@@ -35,10 +35,10 @@ public class SpeedB extends Check {
                         flag("x=%v z=%v",
                                 MathUtils.round(accelX, 3), MathUtils.round(accelZ, 3));
                     }
-                } else verbose-= verbose > 0 ? 0.1 : 0;
+                } else verbose-= verbose > 0 ? 0.2f : 0;
 
-                debug("x=" + accelX + " z=" + accelZ + " vl=" + vl);
-            }
-        }
+                debug("x=" + accelX + " z=" + accelZ + " vl=" + verbose);
+            } else if(verbose > 0) verbose-= 0.1f;
+        } else if(verbose > 0) verbose-= 0.05f;
     }
 }

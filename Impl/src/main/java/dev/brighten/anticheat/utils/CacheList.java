@@ -70,7 +70,6 @@ public class CacheList<E> extends CopyOnWriteArrayList<E> {
                 else if(now - time > expireTime) {
                     remove(key);
                     cachedTimes.remove(key);
-                    System.out.println("Cleared " + key);
                 }
             });
         }, 500L, 150L, TimeUnit.MILLISECONDS);

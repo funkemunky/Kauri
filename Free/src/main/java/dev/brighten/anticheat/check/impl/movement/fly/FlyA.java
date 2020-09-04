@@ -38,10 +38,12 @@ public class FlyA extends Check {
 
         boolean ground = data.playerInfo.clientGround;
         boolean lground = data.playerInfo.lClientGround;
+        
+        double lDeltaY = data.playerInfo.lClientGround ? 0 : data.playerInfo.lDeltaY;
 
         long end = -1;
         if(!ground && !hitHead) {
-            double predicted = (data.playerInfo.lDeltaY - 0.08) * (double)0.98f;
+            double predicted = (lDeltaY - 0.08) * (double)0.98f;
 
             if(lground) {
                 if(data.playerInfo.deltaY > 0) {

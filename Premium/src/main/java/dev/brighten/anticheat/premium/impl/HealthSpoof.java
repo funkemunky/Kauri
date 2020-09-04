@@ -1,4 +1,4 @@
-package dev.brighten.anticheat.check.impl.world;
+package dev.brighten.anticheat.premium.impl;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;

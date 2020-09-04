@@ -210,74 +210,79 @@ public class MovementProcessor {
 
             origin.y+= data.playerInfo.sneaking ? 1.54 : 1.62;
 
-            float yawGcd = data.playerInfo.yawGCD / offset, pitchGcd = data.playerInfo.pitchGCD / offset;
+            if(data.playerInfo.lastTeleportTimer.hasPassed(1)) {
+                float yawGcd = data.playerInfo.yawGCD / offset, pitchGcd = data.playerInfo.pitchGCD / offset;
 
-            //Adding gcd of yaw and pitch.
-            if (data.playerInfo.yawGCD > 160000 && data.playerInfo.yawGCD < 10500000)
-                yawGcdList.add(yawGcd);
-            if (data.playerInfo.pitchGCD > 160000 && data.playerInfo.pitchGCD < 10500000)
-                pitchGcdList.add(pitchGcd);
+                //Adding gcd of yaw and pitch.
+                if (data.playerInfo.yawGCD > 160000 && data.playerInfo.yawGCD < 10500000)
+                    yawGcdList.add(yawGcd);
+                if (data.playerInfo.pitchGCD > 160000 && data.playerInfo.pitchGCD < 10500000)
+                    pitchGcdList.add(pitchGcd);
 
-            if (yawGcdList.size() > 3 && pitchGcdList.size() > 3) {
+                if (yawGcdList.size() > 3 && pitchGcdList.size() > 3) {
 
-                //Making sure to get shit within the std for a more accurate result.
-                if (lastReset.hasPassed()) {
-                    yawMode = MathUtils.getMode(yawGcdList);
-                    pitchMode = MathUtils.getMode(pitchGcdList);
-                    yawOutliers = MiscUtils.getOutliers(yawGcdList);
-                    pitchOutliers = MiscUtils.getOutliers(pitchGcdList);
-                    lastReset.reset();
-                    sensXPercent = sensToPercent(sensitivityX = getSensitivityFromYawGCD(yawMode));
-                    sensYPercent = sensToPercent(sensitivityY = getSensitivityFromPitchGCD(pitchMode));
-                }
+                    //Making sure to get shit within the std for a more accurate result.
+                    if (lastReset.hasPassed()) {
+                        yawMode = MathUtils.getMode(yawGcdList);
+                        pitchMode = MathUtils.getMode(pitchGcdList);
+                        yawOutliers = MiscUtils.getOutliers(yawGcdList);
+                        pitchOutliers = MiscUtils.getOutliers(pitchGcdList);
+                        lastReset.reset();
+                        sensXPercent = sensToPercent(sensitivityX = getSensitivityFromYawGCD(yawMode));
+                        sensYPercent = sensToPercent(sensitivityY = getSensitivityFromPitchGCD(pitchMode));
+                    }
 
 
-                lastDeltaX = deltaX;
-                lastDeltaY = deltaY;
-                deltaX = getDeltaX(data.playerInfo.deltaYaw, yawMode);
-                deltaY = getDeltaY(data.playerInfo.deltaPitch, pitchMode);
+                    lastDeltaX = deltaX;
+                    lastDeltaY = deltaY;
+                    deltaX = getDeltaX(data.playerInfo.deltaYaw, yawMode);
+                    deltaY = getDeltaY(data.playerInfo.deltaPitch, pitchMode);
 
-                if((data.playerInfo.pitchGCD < 1E5 || data.playerInfo.yawGCD < 1E5) && smoothCamFilterY < 1E6
-                        && smoothCamFilterX < 1E6 && timeStamp - data.creation > 1000L) {
-                    float f = sensitivityX * 0.6f + .2f;
-                    float f1 = f * f * f * 8;
-                    float f2 = deltaX * f1;
-                    float f3 = deltaY * f1;
+                    if ((data.playerInfo.pitchGCD < 1E5 || data.playerInfo.yawGCD < 1E5) && smoothCamFilterY < 1E6
+                            && smoothCamFilterX < 1E6 && timeStamp - data.creation > 1000L) {
+                        float f = sensitivityX * 0.6f + .2f;
+                        float f1 = f * f * f * 8;
+                        float f2 = deltaX * f1;
+                        float f3 = deltaY * f1;
 
-                    smoothCamFilterX = mxaxis.smooth(smoothCamYaw, .05f * f1);
-                    smoothCamFilterY = myaxis.smooth(smoothCamPitch, .05f * f1);
+                        smoothCamFilterX = mxaxis.smooth(smoothCamYaw, .05f * f1);
+                        smoothCamFilterY = myaxis.smooth(smoothCamPitch, .05f * f1);
 
-                    this.smoothCamYaw+= f2;
-                    this.smoothCamFilterY+= f3;
+                        this.smoothCamYaw += f2;
+                        this.smoothCamFilterY += f3;
 
-                    f2 = smoothCamFilterX * 0.5f;
-                    f3 = smoothCamFilterY * 0.5f;
+                        f2 = smoothCamFilterX * 0.5f;
+                        f3 = smoothCamFilterY * 0.5f;
 
-                    float pyaw = data.playerInfo.from.yaw + f2 * .15f;
-                    float ppitch = data.playerInfo.from.pitch - f3 * .15f;
+                        float pyaw = data.playerInfo.from.yaw + f2 * .15f;
+                        float ppitch = data.playerInfo.from.pitch - f3 * .15f;
 
-                    this.lsmoothYaw = smoothYaw;
-                    this.lsmoothPitch = smoothPitch;
-                    this.smoothYaw = pyaw;
-                    this.smoothPitch = ppitch;
+                        this.lsmoothYaw = smoothYaw;
+                        this.lsmoothPitch = smoothPitch;
+                        this.smoothYaw = pyaw;
+                        this.smoothPitch = ppitch;
 
-                    float yaccel = Math.abs(data.playerInfo.deltaYaw) - Math.abs(data.playerInfo.lDeltaYaw),
-                            pAccel = Math.abs(data.playerInfo.deltaPitch) - Math.abs(data.playerInfo.lDeltaPitch);
+                        float yaccel = Math.abs(data.playerInfo.deltaYaw) - Math.abs(data.playerInfo.lDeltaYaw),
+                                pAccel = Math.abs(data.playerInfo.deltaPitch) - Math.abs(data.playerInfo.lDeltaPitch);
 
-                    if(MathUtils.getDelta(smoothYaw, data.playerInfo.from.yaw) > (yaccel > 0 ? (yaccel > 10 ? 3 : 1) : 0.1)
-                            || MathUtils.getDelta(smoothPitch, data.playerInfo.from.pitch) > (pAccel > 0 ? (yaccel > 10 ? 3 : 1) : 0.1)) {
-                        smoothCamYaw = smoothCamPitch = 0;
-                        data.playerInfo.cinematicMode = false;
+                        if (MathUtils.getDelta(smoothYaw, data.playerInfo.from.yaw) > (yaccel > 0 ? (yaccel > 10 ? 3 : 1) : 0.1)
+                                || MathUtils.getDelta(smoothPitch, data.playerInfo.from.pitch) > (pAccel > 0 ? (yaccel > 10 ? 3 : 1) : 0.1)) {
+                            smoothCamYaw = smoothCamPitch = 0;
+                            data.playerInfo.cinematicMode = false;
+                            mxaxis.reset();
+                            myaxis.reset();
+                        } else data.playerInfo.cinematicMode = true;
+
+                        //MiscUtils.testMessage("pyaw=" + pyaw + " ppitch=" + ppitch + " yaw=" + data.playerInfo.to.yaw + " pitch=" + data.playerInfo.to.pitch);
+                    } else {
                         mxaxis.reset();
                         myaxis.reset();
-                    } else data.playerInfo.cinematicMode = true;
-
-                    //MiscUtils.testMessage("pyaw=" + pyaw + " ppitch=" + ppitch + " yaw=" + data.playerInfo.to.yaw + " pitch=" + data.playerInfo.to.pitch);
-                } else {
-                    mxaxis.reset();
-                    myaxis.reset();
-                    data.playerInfo.cinematicMode = false;
+                        data.playerInfo.cinematicMode = false;
+                    }
                 }
+            } else {
+                yawGcdList.clear();
+                pitchGcdList.clear();
             }
         } else {
             smoothCamYaw = smoothCamPitch = 0;
@@ -313,7 +318,9 @@ public class MovementProcessor {
 
         //Running jump check
         if (!data.playerInfo.clientGround) {
-            if (!data.playerInfo.jumped && data.playerInfo.lClientGround && data.playerInfo.deltaY > 0) {
+            if (!data.playerInfo.jumped && data.playerInfo.lClientGround
+                    && data.playerInfo.deltaY >= 0
+                    && data.playerInfo.deltaY <= data.playerInfo.jumpHeight) {
                 data.playerInfo.jumped = true;
             } else {
                 data.playerInfo.inAir = true;

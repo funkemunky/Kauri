@@ -24,7 +24,6 @@ import dev.brighten.anticheat.check.impl.movement.velocity.VelocityA;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityC;
 import dev.brighten.anticheat.check.impl.packets.Timer;
 import dev.brighten.anticheat.check.impl.packets.exploits.*;
-import dev.brighten.anticheat.check.impl.world.HealthSpoof;
 
 @Init(priority = Priority.LOWEST)
 public class RegularChecks implements CheckRegister {
@@ -68,7 +67,6 @@ public class RegularChecks implements CheckRegister {
         Check.register(new HandC());
         Check.register(new HandD());
         Check.register(new HandE());
-        Check.register(new HealthSpoof());
         Check.register(new BookOp());
         Check.register(new BookEnchant());
         Check.register(new PacketSpam());
