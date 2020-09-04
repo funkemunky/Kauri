@@ -9,7 +9,6 @@ import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.data.ObjectData;
-import dev.brighten.anticheat.utils.AtomicDouble;
 import dev.brighten.api.check.CheckType;
 import org.bukkit.GameMode;
 import org.bukkit.entity.EntityType;
@@ -18,6 +17,7 @@ import org.bukkit.util.Vector;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -61,7 +61,7 @@ public class Hitboxes extends Check {
                     .collect(Collectors.toList());
 
             long collisions = 0;
-            AtomicDouble distance = new AtomicDouble(10);
+            AtomicReference<Double> distance = new AtomicReference<>((double) 0);
 
             for (RayCollision ray : rayTrace) {
                 collisions+= entityLocations.stream().filter(bb -> {
