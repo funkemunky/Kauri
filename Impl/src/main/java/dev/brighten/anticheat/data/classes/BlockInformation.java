@@ -22,7 +22,6 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.Vector;
-import sun.misc.Cache;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
