@@ -18,7 +18,7 @@ public class KauriCommand {
     private static List<Player> testers = new ArrayList<>();
 
     @Command(name = "kauri", description = "The Kauri main command.", display = "Kauri", aliases = {"anticheat"},
-            permission = "kauri.command",
+            permission = "kauri.command", async = false,
             noPermissionMessage = "&cThis server is running Kauri by funkemunky, Elevated, and Abigail.")
     public void onCommand(CommandAdapter cmd) {
         Atlas.getInstance().getCommandManager(Kauri.INSTANCE).runHelpMessage(cmd,
