@@ -1,4 +1,4 @@
-package dev.brighten.anticheat.utils.file;
+package dev.brighten.anticheat.classloader.file;
 
 import lombok.Getter;
 import lombok.Setter;

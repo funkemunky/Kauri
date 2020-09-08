@@ -10,8 +10,10 @@ import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -24,9 +26,17 @@ public class ReachA extends Check {
     private LivingEntity target;
     private double buffer;
 
+    private static List<EntityType> allowedEntityTypes = Arrays
+            .asList(EntityType.ZOMBIE, EntityType.SHEEP, EntityType.BLAZE,
+                    EntityType.SKELETON, EntityType.PLAYER, EntityType.VILLAGER, EntityType.IRON_GOLEM,
+                    EntityType.WITCH, EntityType.COW, EntityType.CREEPER);
+
     @Packet
     public void onFlying(WrappedInUseEntityPacket packet, long timeStamp) {
-        if(data.playerInfo.creative || data.targetPastLocation.previousLocations.size() < 10) return;
+        if(data.playerInfo.creative
+                || data.targetPastLocation.previousLocations.size() < 10
+                || target == null
+                || !allowedEntityTypes.contains(target.getType())) return;
 
         List<SimpleCollisionBox> targetBoxes = data.targetPastLocation
                 .getEstimatedLocation(timeStamp, (data.lagInfo.transPing + 3) * 50, 100L)
@@ -64,7 +74,6 @@ public class ReachA extends Check {
     }
 
     private static SimpleCollisionBox getHitbox(Entity entity, KLocation loc) {
-        CollisionBox box = EntityData.getEntityBox(loc, entity);
-        return box instanceof SimpleCollisionBox ? (SimpleCollisionBox) box : null;
+        return (SimpleCollisionBox) EntityData.getEntityBox(loc, entity);
     }
 }

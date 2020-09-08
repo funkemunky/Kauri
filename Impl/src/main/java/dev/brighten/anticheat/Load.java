@@ -17,13 +17,12 @@ import dev.brighten.anticheat.processing.PacketProcessor;
 import dev.brighten.anticheat.processing.keepalive.KeepaliveProcessor;
 import dev.brighten.anticheat.utils.SystemUtil;
 import dev.brighten.anticheat.utils.TickTimer;
-import dev.brighten.anticheat.utils.file.FileDownloader;
+import dev.brighten.anticheat.classloader.file.FileDownloader;
 import dev.brighten.api.KauriAPI;
 import org.bukkit.Bukkit;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;

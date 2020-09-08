@@ -1,14 +1,11 @@
 package dev.brighten.anticheat.classloader;
 
 import dev.brighten.anticheat.utils.SystemUtil;
-import dev.brighten.anticheat.utils.file.JarUtil;
-import lombok.Getter;
+import dev.brighten.anticheat.classloader.file.JarUtil;
 
 import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**

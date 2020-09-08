@@ -319,8 +319,7 @@ public class MovementProcessor {
         //Running jump check
         if (!data.playerInfo.clientGround) {
             if (!data.playerInfo.jumped && data.playerInfo.lClientGround
-                    && data.playerInfo.deltaY >= 0
-                    && data.playerInfo.deltaY <= data.playerInfo.jumpHeight) {
+                    && data.playerInfo.deltaY >= 0) {
                 data.playerInfo.jumped = true;
             } else {
                 data.playerInfo.inAir = true;

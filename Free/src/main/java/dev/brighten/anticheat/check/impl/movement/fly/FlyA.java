@@ -12,7 +12,7 @@ import dev.brighten.api.check.CheckType;
 import net.minecraft.server.v1_8_R3.BlockClay;
 
 @CheckInfo(name = "Fly (A)", description = "Simple fly check.", punishVL = 10,
-        checkType = CheckType.FLIGHT, vlToFlag = 1, developer = true)
+        checkType = CheckType.FLIGHT, vlToFlag = 3, developer = true)
 @Cancellable
 public class FlyA extends Check {
 
@@ -75,6 +75,7 @@ public class FlyA extends Check {
             if(check > 0.016 && data.playerInfo.lastHalfBlock.hasPassed(5)
                     && data.playerInfo.lastVelocity.hasPassed(4)) {
                 vl++;
+                if(vl > 2)
                 flag("deltaY=%v.4 predicted=%v.4", data.playerInfo.deltaY, predicted);
             } else if(vl > 0) vl-= 0.1;
             end = System.nanoTime() - start;

@@ -21,13 +21,14 @@ public class SpeedA extends Check {
     private double ldxz = .12f;
     private float friction = 0.91f;
     private float buffer;
+    private double vxz;
 
     @Packet
     public void onVelocity(WrappedOutVelocityPacket packet) {
         if(packet.getId() == data.getPlayer().getEntityId()) {
             data.runKeepaliveAction(ka -> {
-                ldxz = Math.hypot(packet.getX(), packet.getZ());
-                debug("set velocity: %v.3", ldxz);
+                vxz = Math.hypot(packet.getX(), packet.getZ());
+                debug("set velocity: %v.3", vxz);
             });
         }
     }
@@ -86,7 +87,10 @@ public class SpeedA extends Check {
             } else if(buffer > 0) buffer-= 0.2f;
             debug("ratio=%v.1 tags=%v", ratio, tags.build());
 
-            ldxz = data.playerInfo.deltaXZ * drag;
+            if(vxz != 0) {
+                ldxz = vxz;
+                vxz = 0;
+            } else ldxz = data.playerInfo.deltaXZ * drag;
         }
         friction = data.blockInfo.currentFriction;
     }
