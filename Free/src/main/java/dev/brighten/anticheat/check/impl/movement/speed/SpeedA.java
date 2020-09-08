@@ -4,6 +4,7 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.PlayerUtils;
+import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -14,6 +15,7 @@ import org.bukkit.potion.PotionEffectType;
 
 @CheckInfo(name = "Speed (A)", description = "Minecraft code speed acceleration check.",
         checkType = CheckType.SPEED, developer = true)
+@Cancellable
 public class SpeedA extends Check {
 
     private double ldxz = .12f;
