@@ -51,7 +51,7 @@ public class FlyB extends Check {
                     && (!data.playerInfo.clientGround || data.playerInfo.deltaY < predicted)
                     && data.playerInfo.blockAboveTimer.hasPassed(5)
                     && deltaPredict > 0.016) {
-                if(++buffer > 2 || (deltaPredict > 0.3 && !data.blockInfo.blocksNear)) {
+                if(++buffer > 2) {
                     ++vl;
                     flag("dY=%v.3 p=%v.3 dx=%v.3", data.playerInfo.deltaY, predicted, data.playerInfo.deltaXZ);
                 }
