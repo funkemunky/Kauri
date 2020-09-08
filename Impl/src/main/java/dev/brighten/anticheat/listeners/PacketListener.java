@@ -35,8 +35,8 @@ public class PacketListener implements AtlasListener {
 
         if(data == null || data.checkManager == null) return;
 
-        Kauri.INSTANCE.packetProcessor.processClient(event,
-                data, event.getPacket(), event.getType(), event.getTimeStamp());
+        data.getThread().execute(() -> Kauri.INSTANCE.packetProcessor.processClient(event,
+                data, event.getPacket(), event.getType(), event.getTimeStamp()));
 
         switch(event.getType()) {
             case Packet.Client.USE_ENTITY: {
@@ -73,8 +73,8 @@ public class PacketListener implements AtlasListener {
 
         if(data == null || data.checkManager == null) return;
 
-        Kauri.INSTANCE.packetProcessor.processServer(event,
-                data, event.getPacket(), event.getType(), event.getTimeStamp());
+        data.getThread().execute(() -> Kauri.INSTANCE.packetProcessor.processServer(event,
+                data, event.getPacket(), event.getType(), event.getTimeStamp()));
 
         switch(event.getType()) {
             case Packet.Server.REL_LOOK:
