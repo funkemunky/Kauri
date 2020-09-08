@@ -72,6 +72,7 @@ public class SpeedA extends Check {
             double ratio = (data.playerInfo.deltaXZ - ldxz) / moveFactor * 100;
 
             if (ratio > 100.8 && data.playerInfo.lastBrokenBlock.hasPassed(data.lagInfo.transPing + 1)
+                    && data.playerInfo.liquidTimer.hasPassed(2)
                     && !data.playerInfo.generalCancel && data.playerInfo.lastVelocity.hasPassed(2)) {
                 buffer+= ratio > 1000 ? 3 : 1;
 
