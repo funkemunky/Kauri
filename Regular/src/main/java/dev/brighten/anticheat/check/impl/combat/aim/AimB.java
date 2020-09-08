@@ -16,7 +16,7 @@ public class AimB extends Check {
                 && Math.abs(data.playerInfo.deltaPitch) > 1E-5) {
             if(data.playerInfo.pitchGCD < 100000
                     && !data.playerInfo.cinematicMode
-                    && data.moveProcessor.sensitivityX < 0.44) {
+                    && Math.abs(data.playerInfo.to.pitch) < 80) {
                 if(++vl > 28) {
                     flag("offset=%v deltaPitch=%v", data.playerInfo.pitchGCD, data.playerInfo.deltaPitch);
                 }
