@@ -42,14 +42,16 @@ public class MySQLStorage implements DataStorage {
                 "`NAME` VARCHAR(16) NOT NULL," +
                 "`TIMESTAMP` LONG NOT NULL)").execute();
         Kauri.INSTANCE.loggingThread.execute(() -> {
-            MiscUtils.printToConsole("&7Creating iv_uuid index for SQL...");
-            Query.prepare("CREATE INDEX `iv_uuid` ON `VIOLATIONS` (UUID)").execute();
-            MiscUtils.printToConsole("&aCreated iv_uuid!");
-            MiscUtils.printToConsole("&7Creating ip_uuid index for SQL...");
-            Query.prepare("CREATE INDEX `ip_uuid` ON `PUNISHMENTS` (UUID)").execute();
-            MiscUtils.printToConsole("&aCreated ip_uuid!");
-            MiscUtils.printToConsole("&a7 Creating iv_time index for SQL...");
-            Query.prepare("CREATE INDEX `iv_time` ON `VIOLATIONS` (`TIME`)").execute();
+            MiscUtils.printToConsole("&7Creating UUID index for SQL violations...");
+            Query.prepare("CREATE INDEX `UUID` ON `VIOLATIONS` (UUID)").execute();
+            MiscUtils.printToConsole("&aCreated!");
+            MiscUtils.printToConsole("&7Creating UUID index for SQL punishments...");
+            Query.prepare("CREATE INDEX `UUID` ON `PUNISHMENTS` (UUID)").execute();
+            MiscUtils.printToConsole("&aCreated!");
+            MiscUtils.printToConsole("&a7 Creating TIME index for SQL violations...");
+            Query.prepare("CREATE INDEX `TIME` ON `VIOLATIONS` (`TIME`)").execute();
+            MiscUtils.printToConsole("&a7 Creating CHECK index for SQL violations...");
+            Query.prepare("CREATE INDEX `CHECK` ON `VIOLATIONS` (`CHECK`)");
             MiscUtils.printToConsole("&aCreated!");
         });
 
@@ -98,6 +100,7 @@ public class MySQLStorage implements DataStorage {
     public List<Log> getLogs(UUID uuid, Check check, int arrayMin, int arrayMax, long timeFrom, long timeTo) {
         List<Log> logs = new ArrayList<>();
 
+        long start = System.nanoTime();
         if(uuid != null) {
             Query.prepare("SELECT `TIME`, `VL`, `CHECK`, `PING`, `TPS`, `INFO` " +
                     "FROM `VIOLATIONS` WHERE `UUID` = ?"+ (check != null ? " AND WHERE `CHECK` = " + check.name : "")
@@ -120,6 +123,8 @@ public class MySQLStorage implements DataStorage {
                                 rs.getLong("TIME"), rs.getDouble("TPS")));
                     });
         }
+        long elapsed = System.nanoTime() - start;
+        System.out.println(String.format("Grabbed logs in %.3fms", elapsed / 1E6D));
 
         return logs;
     }

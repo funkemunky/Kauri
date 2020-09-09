@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.logs.data.impl;
 
+import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
@@ -52,9 +53,14 @@ public class MongoStorage implements DataStorage {
         punishmentsCollection = database.getCollection("punishments");
         nameUUIDCollection = database.getCollection("nameUuid");
 
+        MiscUtils.printToConsole("&7Creating indexes for logs...");
         logsCollection.createIndex(Indexes.ascending("uuid"));
+        logsCollection.createIndex(Indexes.ascending("check"));
+        logsCollection.createIndex(Indexes.ascending("vl"));
+        MiscUtils.printToConsole("&aCompleted index creation!");
+        MiscUtils.printToConsole("&7Creating index for punishments...");
         punishmentsCollection.createIndex(Indexes.ascending("uuid"));
-
+        MiscUtils.printToConsole("&aCompleted index creation!");
 
         task = RunUtils.taskTimerAsync(() -> {
             if(logs.size() > 0) {
