@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 public class EntityProcessor {
@@ -26,7 +27,7 @@ public class EntityProcessor {
                 .sequential()
                 .forEach(entity -> {
                     vehicles.compute(entity.getWorld().getUID(), (key, entities) -> {
-                        if(entities == null) entities = new ArrayList<>();
+                        if(entities == null) entities = new CopyOnWriteArrayList<>();
 
                         entities.add(entity);
 

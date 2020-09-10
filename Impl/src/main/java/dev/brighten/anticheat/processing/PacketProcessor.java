@@ -13,6 +13,7 @@ import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.XMaterial;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.utils.MiscUtils;
 import lombok.val;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -489,7 +490,13 @@ public class PacketProcessor {
                 }
 
                 data.playerInfo.posLocs.add(loc);
-                data.playerInfo.lastServerPos = timeStamp;
+                data.runKeepaliveAction(ka -> {
+                    data.playerInfo.serverPos = true;
+                    data.playerInfo.lastServerPos = System.currentTimeMillis();
+                    data.playerInfo.lastTeleportTimer.reset();
+                    data.playerInfo.inventoryOpen = false;
+                    MiscUtils.testMessage("Teleport transaction received");
+                });
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
             }

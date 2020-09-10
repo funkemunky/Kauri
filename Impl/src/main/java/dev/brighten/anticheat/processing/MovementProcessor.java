@@ -95,17 +95,21 @@ public class MovementProcessor {
 
         if (data.playerInfo.posLocs.size() > 0 && !packet.isGround()) {
             val optional = data.playerInfo.posLocs.stream()
-                    .filter(loc -> loc.x == packet.getX() && loc.y == packet.getY() && loc.z == packet.getZ())
+                    .filter(loc -> {
+                        MiscUtils.testMessage(String.format("playerLoc=(x=%.2f y=%.2f z=%.2f) tpLoc=(x=%.2f y=%.2f z=%.2f)", loc.x, loc.y, loc.z, packet.getX(), packet.getY(), packet.getZ()));
+                        return loc.x == packet.getX() && loc.y == packet.getY() && loc.z == packet.getZ();
+                    })
                     .findFirst();
 
             if (optional.isPresent()) {
-                data.playerInfo.serverPos = true;
-                data.playerInfo.lastServerPos = timeStamp;
-                data.playerInfo.lastTeleportTimer.reset();
-                data.playerInfo.inventoryOpen = false;
-                data.playerInfo.posLocs.remove(optional.get());
+                //data.playerInfo.serverPos = true;
+                //data.playerInfo.lastServerPos = timeStamp;
+                //data.playerInfo.lastTeleportTimer.reset();
+                //data.playerInfo.inventoryOpen = false;
+                //data.playerInfo.posLocs.remove(optional.get());
             }
-        } else if (data.playerInfo.serverPos) {
+        }
+        if (data.playerInfo.serverPos && data.playerInfo.lastTeleportTimer.hasPassed(0)) {
             data.playerInfo.serverPos = false;
         }
 

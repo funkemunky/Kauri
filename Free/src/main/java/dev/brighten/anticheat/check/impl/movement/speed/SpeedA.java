@@ -79,7 +79,7 @@ public class SpeedA extends Check {
                     && !data.playerInfo.generalCancel && data.playerInfo.lastVelocity.hasPassed(2)) {
                 buffer+= ratio > 1000 ? 3 : 1;
 
-                if(buffer > 2) {
+                if(buffer > 5) {
                     vl++;
                     flag("p=%v.1% dxz=%v.3 aimove=%v.3 tags=%v",
                             ratio, data.playerInfo.deltaXZ, data.predictionService.aiMoveSpeed, tags.build());
