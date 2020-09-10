@@ -29,7 +29,7 @@ public class FreeChecks implements CheckRegister {
         Check.register(new BadPacketsB());
         Check.register(new BadPacketsC());
         Check.register(new BadPacketsD());
-        Check.register(new BadPacketsE());
+        //Check.register(new BadPacketsE());
         Check.register(new BadPacketsF());
         Check.register(new BadPacketsG());
         Check.register(new BadPacketsH());

@@ -53,7 +53,7 @@ public class ReachA extends Check {
         }
 
         if(data.lagInfo.lastPacketDrop.hasPassed(3)) {
-            if (distance > 3.15 && distance != 69) {
+            if (distance > 3.3 && distance != 69) {
                 if (++buffer > 6) {
                     vl++;
                     flag("distance=%v.2 buffer=%v", distance, buffer);

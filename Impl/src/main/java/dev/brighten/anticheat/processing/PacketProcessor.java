@@ -36,7 +36,6 @@ public class PacketProcessor {
                 data.predictionService.fly = packet.isAllowedFlight();
                 data.predictionService.walkSpeed = packet.getWalkSpeed();
 
-                data.playerInfo.canFly = packet.isAllowedFlight();
                 data.checkManager.runPacket(packet, timeStamp);
                 if(data.sniffing) {
                     data.sniffedPackets.add(event.getType() + ":@:"
@@ -355,7 +354,6 @@ public class PacketProcessor {
                     data.playerInfo.lastToggleFlight.reset();
                 }
 
-                data.playerInfo.canFly = packet.isAllowedFlight();
                 data.playerInfo.flying = packet.isFlying();
                 data.predictionService.fly = packet.isAllowedFlight();
                 data.checkManager.runPacket(packet, timeStamp);

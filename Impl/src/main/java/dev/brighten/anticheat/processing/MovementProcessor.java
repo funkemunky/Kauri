@@ -102,11 +102,11 @@ public class MovementProcessor {
                     .findFirst();
 
             if (optional.isPresent()) {
-                //data.playerInfo.serverPos = true;
-                //data.playerInfo.lastServerPos = timeStamp;
-                //data.playerInfo.lastTeleportTimer.reset();
-                //data.playerInfo.inventoryOpen = false;
-                //data.playerInfo.posLocs.remove(optional.get());
+                data.playerInfo.serverPos = true;
+                data.playerInfo.lastServerPos = timeStamp;
+                data.playerInfo.lastTeleportTimer.reset();
+                data.playerInfo.inventoryOpen = false;
+                data.playerInfo.posLocs.remove(optional.get());
             }
         }
         if (data.playerInfo.serverPos && data.playerInfo.lastTeleportTimer.hasPassed(0)) {
@@ -151,9 +151,6 @@ public class MovementProcessor {
             if(timeStamp - data.creation > 400L) data.blockInfo.runCollisionCheck(); //run b4 everything else for use below.
         }
 
-        if(MathUtils.getDelta(deltaY, -0.098) < 0.001) {
-            data.playerInfo.worldLoaded = false;
-        }
         data.playerInfo.inVehicle = data.getPlayer().getVehicle() != null;
         data.playerInfo.gliding = PlayerUtils.isGliding(data.getPlayer());
         data.playerInfo.riptiding = Atlas.getInstance().getBlockBoxManager()
@@ -269,8 +266,8 @@ public class MovementProcessor {
                         float yaccel = Math.abs(data.playerInfo.deltaYaw) - Math.abs(data.playerInfo.lDeltaYaw),
                                 pAccel = Math.abs(data.playerInfo.deltaPitch) - Math.abs(data.playerInfo.lDeltaPitch);
 
-                        if (MathUtils.getDelta(smoothYaw, data.playerInfo.from.yaw) > (yaccel > 0 ? (yaccel > 10 ? 3 : 1) : 0.1)
-                                || MathUtils.getDelta(smoothPitch, data.playerInfo.from.pitch) > (pAccel > 0 ? (yaccel > 10 ? 3 : 1) : 0.1)) {
+                        if (MathUtils.getDelta(smoothYaw, data.playerInfo.from.yaw) > (yaccel > 0 ? (yaccel > 10 ? 3 : 2) : 0.1)
+                                || MathUtils.getDelta(smoothPitch, data.playerInfo.from.pitch) > (pAccel > 0 ? (yaccel > 10 ? 3 : 2) : 0.1)) {
                             smoothCamYaw = smoothCamPitch = 0;
                             data.playerInfo.cinematicMode = false;
                             mxaxis.reset();

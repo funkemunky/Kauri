@@ -100,7 +100,6 @@ public class MySQLStorage implements DataStorage {
     public List<Log> getLogs(UUID uuid, Check check, int arrayMin, int arrayMax, long timeFrom, long timeTo) {
         List<Log> logs = new ArrayList<>();
 
-        long start = System.nanoTime();
         if(uuid != null) {
             Query.prepare("SELECT `TIME`, `VL`, `CHECK`, `PING`, `TPS`, `INFO` " +
                     "FROM `VIOLATIONS` WHERE `UUID` = ?"+ (check != null ? " AND WHERE `CHECK` = " + check.name : "")
@@ -123,8 +122,6 @@ public class MySQLStorage implements DataStorage {
                                 rs.getLong("TIME"), rs.getDouble("TPS")));
                     });
         }
-        long elapsed = System.nanoTime() - start;
-        System.out.println(String.format("Grabbed logs in %.3fms", elapsed / 1E6D));
 
         return logs;
     }
