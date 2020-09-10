@@ -22,8 +22,6 @@ import java.util.stream.Stream;
 @Cancellable(cancelType = CancelType.ATTACK)
 public class ReachA extends Check {
 
-    private long lastUse;
-    private LivingEntity target;
     private double buffer;
 
     private static List<EntityType> allowedEntityTypes = Arrays
@@ -35,16 +33,16 @@ public class ReachA extends Check {
     public void onFlying(WrappedInUseEntityPacket packet, long timeStamp) {
         if(data.playerInfo.creative
                 || data.targetPastLocation.previousLocations.size() < 10
-                || target == null
-                || !allowedEntityTypes.contains(target.getType())) return;
+                || packet.getAction() != WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK
+                || !allowedEntityTypes.contains(packet.getEntity().getType())) return;
 
         List<SimpleCollisionBox> targetBoxes = data.targetPastLocation
                 .getEstimatedLocation(timeStamp, (data.lagInfo.transPing + 3) * 50, 100L)
-                .stream().map(loc -> getHitbox(target, loc)).collect(Collectors.toList());
+                .stream().map(loc -> getHitbox(packet.getEntity(), loc)).collect(Collectors.toList());
 
         double distance = 69;
 
-        val bounds = getHitbox(target, new KLocation(0,0,0));
+        val bounds = getHitbox(packet.getEntity(), new KLocation(0,0,0));
 
         if(bounds == null) return;
         for (SimpleCollisionBox target : targetBoxes) {
@@ -62,15 +60,6 @@ public class ReachA extends Check {
         } else buffer-= buffer > 0 ? 0.02 : 0;
 
         debug("distance=%v.3 boxes=%v buffer=%v", distance, targetBoxes.size(), buffer);
-    }
-
-    @Packet
-    public void onUse(WrappedInUseEntityPacket packet, long timeStamp) {
-        if (packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)
-                && packet.getEntity() instanceof LivingEntity) {
-            lastUse = timeStamp;
-            target = (LivingEntity) packet.getEntity();
-        }
     }
 
     private static SimpleCollisionBox getHitbox(Entity entity, KLocation loc) {
