@@ -7,40 +7,32 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.processing.MovementProcessor;
 import dev.brighten.anticheat.utils.MiscUtils;
+import dev.brighten.anticheat.utils.Verbose;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Aim (G)", description = "Checks for bad GCD bypasses. (Rhys collab)",
         checkType = CheckType.AIM, punishVL = 30)
 public class AimG extends Check {
 
-    private float lastDeltaPitch, lastDeltaYaw;
+    private Verbose verbose = new Verbose(20, 15);
 
     @Packet
-    public void process(WrappedInFlyingPacket packet, long now) {
+    public void process(WrappedInFlyingPacket packet) {
         if(!packet.isLook()) return;
 
         float deltaPitch = Math.abs(modulo(Math.min(1, data.moveProcessor.sensitivityY), data.playerInfo.to.pitch)
                 - data.playerInfo.to.pitch);
-        float deltaYaw = Math.abs(modulo(Math.min(1, data.moveProcessor.sensitivityX), data.playerInfo.to.yaw)
-                - data.playerInfo.to.yaw);
 
-        long gcd = MiscUtils.gcd((long)(deltaPitch * MovementProcessor.offset),
-                (long)(lastDeltaPitch * MovementProcessor.offset)),
-                gcdYaw = MiscUtils.gcd((long)(deltaYaw * MovementProcessor.offset),
-                        (long)(lastDeltaYaw * MovementProcessor.offset));
-
-        if(gcd < 200L
+        if(deltaPitch < 1E-5f
                 && data.moveProcessor.yawGcdList.size() > 40
                 && MathUtils.getDelta(data.moveProcessor.sensXPercent, data.moveProcessor.sensYPercent) < 2) {
-            if(++vl > 3) {
-                flag("gcd=%v", gcd);
+            if(verbose.flag(1, 5)) {
+                vl++;
+                flag("deltaPitch=%v", deltaPitch);
             }
-        } else if(vl > 0) vl-= 0.2f;
+        } else verbose.subtract(0.5);
 
-        debug("gcd=%v gcdYaw=%v vl=%v.1", gcd, gcdYaw, vl);
-
-        lastDeltaYaw = deltaYaw;
-        lastDeltaPitch = deltaPitch;
+        debug("gcd=%v buffer=%v.1", deltaPitch, verbose.value());
     }
 
     private static float modulo(float s, float angle) {

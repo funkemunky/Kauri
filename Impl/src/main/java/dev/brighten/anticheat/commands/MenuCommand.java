@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 @Init(commands = true)
 public class MenuCommand {
 
-    private ChestMenu main, categoryMenu;
+    private static ChestMenu main, categoryMenu;
     public MenuCommand() {
         main = getMainMenu();
         categoryMenu = getChecksCategoryMenu();
@@ -49,7 +49,7 @@ public class MenuCommand {
         cmd.getPlayer().sendMessage(Color.Green + "Opened main menu.");
     }
 
-    private ChestMenu getMainMenu() {
+    private static ChestMenu getMainMenu() {
         ChestMenu menu = new ChestMenu(Color.Gold + "Kauri Menu", 3);
 
         menu.setItem(11, createButton(XMaterial.ANVIL.parseMaterial(), 1, "&cEdit Checks",
@@ -71,15 +71,13 @@ public class MenuCommand {
                         Kauri.INSTANCE.getDescription().getVersion(), "&e&oRight Click &7&oclick to get support."));
         menu.setItem(15, createButton(XMaterial.PAPER.parseMaterial(), 1, "&cView Recent Violators",
                 (player, info) -> {
-            Kauri.INSTANCE.executor.execute(() -> {
-                player.sendMessage(Color.Gray + "Loading menu...");
-                getRecentViolatorsMenu().showMenu(player);
-            });
+                    player.sendMessage(Color.Gray + "Loading menu...");
+                    getRecentViolatorsMenu(true).showMenu(player);
         }, "", "&7View players who flagged checks recently."));
         return menu;
     }
 
-    private ChestMenu getChecksCategoryMenu() {
+    private static ChestMenu getChecksCategoryMenu() {
         ChestMenu menu = new ChestMenu(Color.Gold + "Check Categories", 3);
 
         menu.setParent(main);
@@ -130,7 +128,7 @@ public class MenuCommand {
         return menu;
     }
 
-    private ChestMenu getChecksMenu(CheckType type) {
+    private static ChestMenu getChecksMenu(CheckType type) {
         ChestMenu menu = new ChestMenu(Color.Gold + "Checks", 6);
 
         menu.setParent(categoryMenu);
@@ -305,13 +303,16 @@ public class MenuCommand {
         return menu;
     }
 
-    private ChestMenu getRecentViolatorsMenu() {
+    public static ChestMenu getRecentViolatorsMenu(boolean fromMain) {
         ChestMenu menu = new ChestMenu(Color.Gold + "Recent Violators", 6);
+        if(fromMain)
         menu.setParent(main);
         try {
+            System.out.println("Getting logs...");
             Map<UUID, List<Log>> logs = Kauri.INSTANCE.loggerManager
                     .getLogsWithinTimeFrame(TimeUnit.HOURS.toMillis(2));
 
+            System.out.println("Sorting...");
             List<UUID> sortedIds = logs.keySet().stream()
                     .sorted(Comparator.comparing(key -> {
                         val logsList =  logs.get(key);
@@ -319,6 +320,7 @@ public class MenuCommand {
                     }))
                     .collect(Collectors.toList());
 
+            System.out.println("Formatting...");
             for (int i = 0; i < Math.min(45, sortedIds.size()); i++) {
                 UUID uuid = sortedIds.get(i);
                 String name = MojangAPI.getUsername(uuid);

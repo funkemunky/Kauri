@@ -12,6 +12,7 @@ import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.math.RollingAverageDouble;
 import dev.brighten.anticheat.check.api.Check;
+import dev.brighten.anticheat.check.api.Config;
 import dev.brighten.anticheat.data.DataManager;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.logs.LoggerManager;
@@ -28,6 +29,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -151,6 +153,22 @@ public class Kauri extends JavaPlugin {
         for (Runnable runnable : onReload) {
             runnable.run();
             onReload.remove(runnable);
+        }
+
+        if(Config.initChecks) {
+            Optional.ofNullable(Bukkit.getPluginManager().getPlugin("KauriLoader")).ifPresent(plugin -> {
+                Config.license = plugin.getConfig().getString("license");
+            });
+
+            try {
+                Kauri.INSTANCE.LINK = "https://funkemunky.cc/download?name=Kauri_New&license="
+                        + URLEncoder.encode(Config.license, "UTF-8")
+                        + "&version=" + URLEncoder.encode(Kauri.INSTANCE.getDescription().getVersion(), "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+
+            Load.startClassLoader();
         }
 
         Bukkit.getOnlinePlayers().forEach(dataManager::createData);

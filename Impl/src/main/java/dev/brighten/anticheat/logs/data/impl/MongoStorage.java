@@ -92,8 +92,11 @@ public class MongoStorage implements DataStorage {
         if(check != null) aggregates.add(Aggregates.match(Filters.eq("check", check.name)));
 
         aggregates.addAll(Arrays.asList(Aggregates.match(Filters.eq("time", document)),
-                new BasicDBObject("$skip", arrayMin), new BasicDBObject("$limit", arrayMax),
                 new BasicDBObject("$sort", new BasicDBObject("time", -1))));
+
+        if(arrayMin != 0 && arrayMax != Integer.MAX_VALUE) {
+            aggregates.addAll(Arrays.asList(new BasicDBObject("$skip", arrayMin), new BasicDBObject("$limit", arrayMax)));
+        }
 
         AggregateIterable<Document> agg = logsCollection.aggregate(aggregates).allowDiskUse(true);
 

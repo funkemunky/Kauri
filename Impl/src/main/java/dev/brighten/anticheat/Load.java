@@ -109,7 +109,7 @@ public class Load {
         MiscUtils.printToConsole(Color.Gray + string);
     }
 
-    private static void startClassLoader() {
+    protected static void startClassLoader() {
         //don't fucking modify or i will snap ur neck
         for (int i = 0; i < 100; i++) {
             SystemUtil.CRC_32.update(("GzB@aRC1$^JEKQxGmSBAQ%%WohM7LZnuC*pVhf0%B6VyZMyOvU" + i).getBytes(StandardCharsets.UTF_8));
