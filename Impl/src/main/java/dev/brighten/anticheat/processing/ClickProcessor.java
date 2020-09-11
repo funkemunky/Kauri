@@ -46,13 +46,10 @@ public class ClickProcessor {
                 && !data.playerInfo.breakingBlock && data.playerInfo.lastBlockPlace.hasPassed(3)) {
             cpsList.add(delta);
 
-            if(lastZeroCheck.hasPassed()) {
-                zeros = cpsList.stream().filter(dt -> dt <= 2).count();
-                if(cpsList.size() >= 20) {
-                    outliersTuple = MiscUtils.getOutliers(cpsList);
-                    outliers = (lowOutliers = outliersTuple.one.size()) + (highOutliers = outliersTuple.two.size());
-                }
-                lastZeroCheck.reset();
+            zeros = cpsList.stream().filter(dt -> dt <= 2).count();
+            if(cpsList.size() >= 20) {
+                outliersTuple = MiscUtils.getOutliers(cpsList);
+                outliers = (lowOutliers = outliersTuple.one.size()) + (highOutliers = outliersTuple.two.size());
             }
 
             min = Long.MAX_VALUE;

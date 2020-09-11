@@ -93,11 +93,14 @@ public class MovementProcessor {
         //Adding past location
         data.pastLocation.addLocation(data.playerInfo.to);
 
-        if (data.playerInfo.posLocs.size() > 0 && !packet.isGround()) {
+        if (data.playerInfo.posLocs.size() > 0 && packet.isPos() && !packet.isGround()) {
             val optional = data.playerInfo.posLocs.stream()
                     .filter(loc -> {
                         MiscUtils.testMessage(String.format("playerLoc=(x=%.2f y=%.2f z=%.2f) tpLoc=(x=%.2f y=%.2f z=%.2f)", loc.x, loc.y, loc.z, packet.getX(), packet.getY(), packet.getZ()));
-                        return loc.x == packet.getX() && loc.y == packet.getY() && loc.z == packet.getZ();
+                        double dx = data.playerInfo.to.x - loc.x, dy = data.playerInfo.to.y - loc.y, dz = data.playerInfo.to.z - loc.z;
+                        double delta =  dx * dx + dy * dy + dz * dz;
+
+                        return delta < 0.25;
                     })
                     .findFirst();
 
@@ -108,8 +111,7 @@ public class MovementProcessor {
                 data.playerInfo.inventoryOpen = false;
                 data.playerInfo.posLocs.remove(optional.get());
             }
-        }
-        if (data.playerInfo.serverPos && data.playerInfo.lastTeleportTimer.hasPassed(0)) {
+        } else if (data.playerInfo.serverPos && data.playerInfo.lastTeleportTimer.hasPassed(0)) {
             data.playerInfo.serverPos = false;
         }
 
@@ -373,7 +375,6 @@ public class MovementProcessor {
                 && data.playerInfo.lastChunkUnloaded.hasNotPassed(60))
                 || data.playerInfo.serverPos
                 || data.playerInfo.riptiding
-                || data.playerInfo.lastTeleportTimer.hasNotPassed(1)
                 || data.playerInfo.gliding
                 || data.playerInfo.lastPlaceLiquid.hasNotPassed(5)
                 || data.playerInfo.inVehicle

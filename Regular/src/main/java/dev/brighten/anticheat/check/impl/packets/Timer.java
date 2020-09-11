@@ -22,14 +22,8 @@ public class Timer extends Check {
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
+        if(!data.playerInfo.serverPos)
         ticks++;
-    }
-
-    @Packet
-    public void onTp(WrappedOutPositionPacket packet) {
-        data.runKeepaliveAction(ka -> {
-            ticks--;
-        });
     }
 
     @Packet

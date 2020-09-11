@@ -15,6 +15,7 @@ import dev.brighten.api.check.CheckType;
 public class AimG extends Check {
 
     private Verbose verbose = new Verbose(20, 15);
+    private float lastDeltaPitch;
 
     @Packet
     public void process(WrappedInFlyingPacket packet) {
@@ -23,7 +24,11 @@ public class AimG extends Check {
         float deltaPitch = Math.abs(modulo(Math.min(1, data.moveProcessor.sensitivityY), data.playerInfo.to.pitch)
                 - data.playerInfo.to.pitch);
 
-        if(deltaPitch < 1E-5f
+        long gcd = MiscUtils.gcd((long)(deltaPitch * MovementProcessor.offset),
+                (long)(lastDeltaPitch * MovementProcessor.offset));
+
+        if(deltaPitch < 9E-5f
+                && gcd < 1000
                 && data.moveProcessor.yawGcdList.size() > 40
                 && MathUtils.getDelta(data.moveProcessor.sensXPercent, data.moveProcessor.sensYPercent) < 2) {
             if(verbose.flag(1, 5)) {
@@ -32,7 +37,8 @@ public class AimG extends Check {
             }
         } else verbose.subtract(0.5);
 
-        debug("gcd=%v buffer=%v.1", deltaPitch, verbose.value());
+        debug("deltaPitch=%v gcd=%v buffer=%v.1", deltaPitch, gcd, verbose.value());
+        lastDeltaPitch = deltaPitch;
     }
 
     private static float modulo(float s, float angle) {

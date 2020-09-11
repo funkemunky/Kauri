@@ -88,7 +88,6 @@ public class Kauri extends JavaPlugin {
         keepaliveProcessor.stop();
         keepaliveProcessor = null;
 
-
         if(!reload) {
             kauriAPI = null;
             MiscUtils.printToConsole("&7Unregistering Atlas and Bukkit listeners...");

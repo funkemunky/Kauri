@@ -488,13 +488,6 @@ public class PacketProcessor {
                 }
 
                 data.playerInfo.posLocs.add(loc);
-                data.runKeepaliveAction(ka -> {
-                    data.playerInfo.serverPos = true;
-                    data.playerInfo.lastServerPos = System.currentTimeMillis();
-                    data.playerInfo.lastTeleportTimer.reset();
-                    data.playerInfo.inventoryOpen = false;
-                    MiscUtils.testMessage("Teleport transaction received");
-                });
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
             }

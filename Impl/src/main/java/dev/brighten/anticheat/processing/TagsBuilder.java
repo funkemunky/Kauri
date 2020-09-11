@@ -15,4 +15,8 @@ public class TagsBuilder {
     public String build() {
         return String.join(", ", tags);
     }
+
+    public int getSize() {
+        return tags.size();
+    }
 }

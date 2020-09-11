@@ -2,13 +2,12 @@ package dev.brighten.anticheat.premium.impl;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.MathUtils;
-import dev.brighten.anticheat.check.api.Check;
-import dev.brighten.anticheat.check.api.CheckInfo;
-import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Motion", description = "motion check kind of thing.", checkType = CheckType.GENERAL,
         developer = true, enabled = false)
+@Cancellable(cancelType = CancelType.MOVEMENT)
 public class Motion extends Check {
 
     @Packet
@@ -20,7 +19,6 @@ public class Motion extends Check {
                     && data.playerInfo.soulSandTimer.hasPassed(10)
                     && !data.playerInfo.generalCancel
                     && data.playerInfo.deltaXZ > predXZ
-                    && data.lagInfo.lastPingDrop.hasPassed(40)
                     && !data.blockInfo.collidesHorizontally) {
                 vl++;
                 if(vl > 24) {
