@@ -41,6 +41,13 @@ public class AutoclickerE extends Check {
             tags.addTag("kurtosis");
         }
 
+        double duplicates = data.clickProcessor.cpsList.size() - data.clickProcessor.getDistinct();
+
+        if(duplicates > 25 && data.clickProcessor.getMean() < 2.5) {
+            if(tags.getSize() == 0) buffer++;
+            tags.addTag("duplicates");
+        }
+
         if(skewness < 0.15 && data.clickProcessor.getMean() < 2.5) {
             if(tags.getSize() == 0) buffer+= 0.5f;
             tags.addTag("skew");

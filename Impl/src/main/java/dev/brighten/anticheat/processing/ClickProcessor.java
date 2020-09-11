@@ -21,7 +21,7 @@ public class ClickProcessor {
     @Getter
     private long min, max, sum, zeros;
     @Getter
-    private int outliers, lowOutliers, highOutliers;
+    private int outliers, lowOutliers, highOutliers, distinct;
     @Getter
     private List<Double> modes = new ArrayList<>();
     @Getter
@@ -66,6 +66,8 @@ public class ClickProcessor {
             mean = sum / (double)Math.max(1, cpsList.size());
             modes = MiscUtils.getModes(cpsList);
             median = MiscUtils.getMedian(cpsList);
+
+            distinct = (int)cpsList.stream().mapToLong(vlv -> vlv).distinct().count();
 
             std = 0;
             for (Long v : cpsList) std+= Math.pow(v - mean, 2);
