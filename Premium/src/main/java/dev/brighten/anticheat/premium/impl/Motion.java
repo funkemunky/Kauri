@@ -14,22 +14,21 @@ public class Motion extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if(packet.isPos()) {
-            double deltaX = MathUtils.getDelta(data.predictionService.predX, data.playerInfo.deltaX),
-                    deltaZ = MathUtils.getDelta(data.predictionService.predZ, data.playerInfo.deltaZ);
+            double predXZ = Math.hypot(data.predictionService.predX, data.predictionService.predZ);
 
             if(data.predictionService.flag
                     && data.playerInfo.soulSandTimer.hasPassed(10)
                     && !data.playerInfo.generalCancel
-                    && data.playerInfo.deltaXZ > 0
+                    && data.playerInfo.deltaXZ > predXZ
                     && data.lagInfo.lastPingDrop.hasPassed(40)
                     && !data.blockInfo.collidesHorizontally) {
                 vl++;
                 if(vl > 24) {
                     flag("deltaX=%v deltaZ=%v",
-                            MathUtils.round(deltaX, 3), MathUtils.round(deltaZ, 3));
+                            MathUtils.round(data.playerInfo.deltaXZ, 3), MathUtils.round(predXZ, 3));
                 }
             } else vl-= vl > 0 ? 1.25 : 0;
-            debug("deltaX=" + deltaX + " deltaZ=" + deltaZ + " key=" + data.predictionService.key
+            debug("deltaX=" + data.playerInfo.deltaXZ + " deltaZ=" + predXZ + " key=" + data.predictionService.key
                     + " collided=" + data.blockInfo.collidesHorizontally);
         }
     }

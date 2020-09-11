@@ -48,8 +48,8 @@ public class RegularChecks implements CheckRegister {
         Check.register(new AimB());
         Check.register(new AimC());
         Check.register(new AimD());
-        //Check.register(new AimE());
-        //Check.register(new AimF());
+        Check.register(new AimE());
+        Check.register(new AimF());
         Check.register(new SpeedB());
         Check.register(new SpeedC());
         Check.register(new KillauraA());
@@ -57,8 +57,8 @@ public class RegularChecks implements CheckRegister {
         Check.register(new KillauraC());
         Check.register(new KillauraD());
         Check.register(new KillauraE());
-        //Check.register(new KillauraF());
-        //Check.register(new OmniSprint());
+        Check.register(new KillauraF());
+        Check.register(new OmniSprint());
         Check.register(new Timer());
         Check.register(new VelocityA());
         Check.register(new VelocityC());
