@@ -14,9 +14,12 @@ import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.api.KauriAPI;
+import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.KauriCheck;
+import dev.brighten.api.listener.KauriCancelEvent;
 import dev.brighten.api.listener.KauriFlagEvent;
+import dev.brighten.api.listener.KauriPunishEvent;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -182,19 +185,24 @@ public class Check implements KauriCheck {
         event.setCancelled(!Config.alertDev);
 
         if(cancellable && cancelMode != null && vl > vlToFlag && data.lagInfo.lastPacketDrop.hasPassed(8)) {
-            switch(cancelMode) {
-                case ATTACK: {
-                    for(int i = 0 ; i < 2 ; i++) data.typesToCancel.add(cancelMode);
-                    break;
-                }
-                case INVENTORY: {
-                    TinyProtocolHandler.sendPacket(data.getPlayer(),
-                            new WrappedOutCloseWindowPacket(data.playerInfo.inventoryId));
-                    break;
-                }
-                default: {
-                    data.typesToCancel.add(cancelMode);
-                    break;
+            KauriCancelEvent cancelEvent = new KauriCancelEvent(data.getPlayer(), cancelMode);
+
+            Atlas.getInstance().getEventManager().callEvent(cancelEvent);
+            if(!cancelEvent.isCancelled()) {
+                switch(cancelEvent.getCancelType()) {
+                    case ATTACK: {
+                        for(int i = 0 ; i < 2 ; i++) data.typesToCancel.add(cancelMode);
+                        break;
+                    }
+                    case INVENTORY: {
+                        TinyProtocolHandler.sendPacket(data.getPlayer(),
+                                new WrappedOutCloseWindowPacket(data.playerInfo.inventoryId));
+                        break;
+                    }
+                    default: {
+                        data.typesToCancel.add(cancelMode);
+                        break;
+                    }
                 }
             }
         }
@@ -287,36 +295,42 @@ public class Check implements KauriCheck {
         if(banExempt || developer || !executable || punishVl == -1 || vl <= punishVl
                 || System.currentTimeMillis() - Kauri.INSTANCE.lastTick > 200L) return;
 
+        KauriPunishEvent punishEvent = new KauriPunishEvent(data.getPlayer(), this);
 
-        Kauri.INSTANCE.loggerManager.addPunishment(data, this);
-        if(!data.banned) {
-            if(!Config.broadcastMessage.equalsIgnoreCase("off")) {
-                if (!Config.bungeeBroadcast) {
+        Atlas.getInstance().getEventManager().callEvent(punishEvent);
+
+        vl = 0;
+        if(!punishEvent.isCancelled()) {
+            Kauri.INSTANCE.loggerManager.addPunishment(data, this);
+            if(!data.banned) {
+                if(!Config.broadcastMessage.equalsIgnoreCase("off")) {
+                    if (!Config.bungeeBroadcast) {
+                        RunUtils.task(() -> {
+                            if (!Config.broadcastMessage.equalsIgnoreCase("off")) {
+                                Bukkit.broadcastMessage(Color.translate(Config.broadcastMessage
+                                        .replace("%name%", data.getPlayer().getName())));
+                            }
+                        }, Kauri.INSTANCE);
+                    } else {
+                        BungeeAPI.broadcastMessage(Color.translate(Config.broadcastMessage
+                                .replace("%name%", data.getPlayer().getName())));
+                    }
+                }
+                if(!Config.bungeePunishments) {
                     RunUtils.task(() -> {
-                        if (!Config.broadcastMessage.equalsIgnoreCase("off")) {
-                            Bukkit.broadcastMessage(Color.translate(Config.broadcastMessage
-                                    .replace("%name%", data.getPlayer().getName())));
-                        }
+                        ConsoleCommandSender sender = Bukkit.getConsoleSender();
+                        Config.punishCommands.
+                                forEach(cmd -> Bukkit.dispatchCommand(
+                                        sender,
+                                        cmd.replace("%name%", data.getPlayer().getName())));
+                        vl = 0;
                     }, Kauri.INSTANCE);
                 } else {
-                    BungeeAPI.broadcastMessage(Color.translate(Config.broadcastMessage
-                            .replace("%name%", data.getPlayer().getName())));
-                }
-            }
-            if(!Config.bungeePunishments) {
-                RunUtils.task(() -> {
-                    ConsoleCommandSender sender = Bukkit.getConsoleSender();
                     Config.punishCommands.
-                            forEach(cmd -> Bukkit.dispatchCommand(
-                                    sender,
-                                    cmd.replace("%name%", data.getPlayer().getName())));
-                    vl = 0;
-                }, Kauri.INSTANCE);
-            } else {
-                Config.punishCommands.
-                        forEach(cmd -> BungeeAPI.sendCommand(cmd.replace("%name%", data.getPlayer().getName())));
+                            forEach(cmd -> BungeeAPI.sendCommand(cmd.replace("%name%", data.getPlayer().getName())));
+                }
+                data.banned = true;
             }
-            data.banned = true;
         }
     }
 

@@ -9,6 +9,7 @@ import cc.funkemunky.api.utils.world.BlockData;
 import cc.funkemunky.api.utils.world.types.RayCollision;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.check.api.*;
+import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
 import org.bukkit.Location;

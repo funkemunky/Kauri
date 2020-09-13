@@ -2,6 +2,7 @@ package dev.brighten.anticheat.check.impl.combat.autoclicker;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import dev.brighten.anticheat.check.api.*;
+import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Autoclicker (G)", description = "Checks for outliers in clicks.",

@@ -252,12 +252,14 @@ public class MovementProcessor {
                         smoothCamFilterY = myaxis.smooth(smoothCamPitch, .05f * f1);
 
                         this.smoothCamYaw += f2;
-                        this.smoothCamFilterY += f3;
+                        this.smoothCamPitch += f3;
 
                         f2 = smoothCamFilterX * 0.5f;
                         f3 = smoothCamFilterY * 0.5f;
 
-                        float pyaw = data.playerInfo.from.yaw + f2 * .15f;
+                        //val clampedFrom = (Math.abs(data.playerInfo.from.yaw) > 360 ? data.playerInfo.from.yaw % 360 : data.playerInfo.from.yaw);
+                        val clampedFrom = MathUtils.yawTo180F(data.playerInfo.from.yaw);
+                        float pyaw = clampedFrom + f2 * .15f;
                         float ppitch = data.playerInfo.from.pitch - f3 * .15f;
 
                         this.lsmoothYaw = smoothYaw;
@@ -268,7 +270,7 @@ public class MovementProcessor {
                         float yaccel = Math.abs(data.playerInfo.deltaYaw) - Math.abs(data.playerInfo.lDeltaYaw),
                                 pAccel = Math.abs(data.playerInfo.deltaPitch) - Math.abs(data.playerInfo.lDeltaPitch);
 
-                        if (MathUtils.getDelta(smoothYaw, data.playerInfo.from.yaw) > (yaccel > 0 ? (yaccel > 10 ? 3 : 2) : 0.1)
+                        if (MathUtils.getDelta(smoothYaw, clampedFrom) > (yaccel > 0 ? (yaccel > 10 ? 3 : 2) : 0.1)
                                 || MathUtils.getDelta(smoothPitch, data.playerInfo.from.pitch) > (pAccel > 0 ? (yaccel > 10 ? 3 : 2) : 0.1)) {
                             smoothCamYaw = smoothCamPitch = 0;
                             data.playerInfo.cinematicMode = false;

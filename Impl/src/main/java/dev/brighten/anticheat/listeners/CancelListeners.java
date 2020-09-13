@@ -3,7 +3,7 @@ package dev.brighten.anticheat.listeners;
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.Init;
 import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.check.api.CancelType;
+import dev.brighten.api.check.CancelType;
 import dev.brighten.anticheat.data.ObjectData;
 import lombok.val;
 import org.bukkit.entity.Player;

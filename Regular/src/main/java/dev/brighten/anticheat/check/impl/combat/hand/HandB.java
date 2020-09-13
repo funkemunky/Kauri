@@ -3,6 +3,7 @@ package dev.brighten.anticheat.check.impl.combat.hand;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockDigPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import dev.brighten.anticheat.check.api.*;
+import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Hand (B)", description = "Checks for irregular block place packets.",

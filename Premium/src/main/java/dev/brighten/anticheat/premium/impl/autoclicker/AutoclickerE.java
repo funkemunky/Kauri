@@ -29,37 +29,30 @@ public class AutoclickerE extends Check {
             buffer++;
         }
 
-        if(data.clickProcessor.getStd() < 1 && data.clickProcessor.getOutliers() <= 1) {
-            if(tags.getSize() == 0) buffer++;
+        if(data.clickProcessor.getStd() < 0.5 && data.clickProcessor.getOutliers() <= 1) {
+            buffer+= 0.75;
             tags.addTag("deviation");
         }
 
         if(data.clickProcessor.getKurtosis() < 0
                 && (data.clickProcessor.getOutliers() <= 1 || skewness < 0.1)
                 && data.clickProcessor.getMean() < 2.5) {
-            if(tags.getSize() == 0) buffer++;
+            buffer+= 0.75;
             tags.addTag("kurtosis");
         }
 
-        double duplicates = data.clickProcessor.cpsList.size() - data.clickProcessor.getDistinct();
-
-        if(duplicates > 25 && data.clickProcessor.getMean() < 2.5) {
-            if(tags.getSize() == 0) buffer++;
-            tags.addTag("duplicates");
-        }
-
         if(skewness < 0.15 && data.clickProcessor.getMean() < 2.5) {
-            if(tags.getSize() == 0) buffer+= 0.5f;
+            buffer+= 0.5f;
             tags.addTag("skew");
         }
 
         if(tags.getSize() > 0) {
-            if(buffer > 11) {
+            if(buffer > 25) {
                 vl++;
-                buffer = 3;
+                buffer = 15;
                 flag("tags=%v", tags.build());
             }
-        } else if(buffer > 0) buffer-= 0.25f;
+        } else if(buffer > 0) buffer-= 0.5f;
 
         debug("tags=%v mean=%v.2 skew=%v.2 kurt=%v.2 std=%v.3 outliers=%v buffer=%v.1",
                 (tags.getSize() > 0 ? Color.Green : "") +tags.build() + Color.Gray, data.clickProcessor.getMean(),

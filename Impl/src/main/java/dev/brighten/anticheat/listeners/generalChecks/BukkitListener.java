@@ -45,7 +45,7 @@ public class BukkitListener implements Listener {
         if(event.getPlayer().hasPermission("kauri.debug"))
             ObjectData.debugBoxes(false, event.getPlayer());
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
-        if(data != null) data.onLogout();
+        if(data != null) data.unregister();
         Kauri.INSTANCE.dataManager.dataMap.remove(event.getPlayer().getUniqueId());
     }
 

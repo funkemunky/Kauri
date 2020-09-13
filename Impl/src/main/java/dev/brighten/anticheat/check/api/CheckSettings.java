@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.check.api;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
+import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;

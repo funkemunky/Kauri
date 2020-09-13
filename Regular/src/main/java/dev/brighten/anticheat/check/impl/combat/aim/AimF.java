@@ -41,6 +41,7 @@ public class AimF extends Check {
                 && data.playerInfo.lDeltaYaw <= data.playerInfo.deltaYaw
                 && yawDif != 0
                 && yawDif < 3
+                && !data.playerInfo.cinematicMode
                 && angle > 10000
         )
         {

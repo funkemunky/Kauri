@@ -12,7 +12,7 @@ import cc.funkemunky.api.utils.math.cond.MaxInteger;
 import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingList;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.check.api.CancelType;
+import dev.brighten.api.check.CancelType;
 import dev.brighten.anticheat.check.api.Config;
 import dev.brighten.anticheat.data.classes.BlockInformation;
 import dev.brighten.anticheat.data.classes.CheckManager;
@@ -25,6 +25,7 @@ import dev.brighten.anticheat.processing.PotionProcessor;
 import dev.brighten.anticheat.processing.keepalive.KeepAlive;
 import dev.brighten.anticheat.utils.PastLocation;
 import dev.brighten.anticheat.utils.TickTimer;
+import dev.brighten.api.data.Data;
 import lombok.AllArgsConstructor;
 import lombok.val;
 import org.bukkit.Bukkit;
@@ -39,7 +40,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
-public class ObjectData {
+public class ObjectData implements Data {
 
     public UUID uuid;
     private Player player;
@@ -127,10 +128,53 @@ public class ObjectData {
         });
     }
 
+    @Override
+    public void reloadChecks() {
+        checkManager.checkMethods.clear();
+        checkManager.checks.clear();
+        checkManager.addChecks();
+    }
+
+    public void unregister() {
+        if(PacketListener.expansiveThreading)
+            playerThread.shutdownNow();
+        task.cancel();
+        keepAliveStamps.clear();
+        Kauri.INSTANCE.dataManager.hasAlerts.remove(this);
+        Kauri.INSTANCE.dataManager.debugging.remove(this);
+        checkManager.checkMethods.clear();
+        checkManager.checks.clear();
+        checkManager = null;
+        typesToCancel.clear();
+        sniffedPackets.clear();
+        keepAliveStamps.clear();
+        Kauri.INSTANCE.dataManager.dataMap.remove(uuid);
+    }
+
+    @Override
+    public UUID getUUID() {
+        return uuid;
+    }
+
     public ExecutorService getThread() {
         if(PacketListener.expansiveThreading)
             return playerThread;
         return PacketListener.service;
+    }
+
+    @Override
+    public boolean isUsingLunar() {
+        return usingLunar;
+    }
+
+    @Override
+    public ProtocolVersion getClientVersion() {
+        return playerVersion;
+    }
+
+    @Override
+    public ModData getForgeMods() {
+        return modData;
     }
 
     public int[] getReceived() {
@@ -189,22 +233,6 @@ public class ObjectData {
                 lastPingDrop = new TickTimer( 40);
         public RollingAverageLong pingAverages = new RollingAverageLong(10, 0);
         public long lastFlying = 0;
-    }
-
-    public void onLogout() {
-        if(PacketListener.expansiveThreading)
-            playerThread.shutdownNow();
-        task.cancel();
-        keepAliveStamps.clear();
-        Kauri.INSTANCE.dataManager.hasAlerts.remove(this);
-        Kauri.INSTANCE.dataManager.debugging.remove(this);
-        checkManager.checkMethods.clear();
-        checkManager.checks.clear();
-        checkManager = null;
-        typesToCancel.clear();
-        sniffedPackets.clear();
-        keepAliveStamps.clear();
-        Kauri.INSTANCE.dataManager.dataMap.remove(uuid);
     }
 
     public static void debugBoxes(boolean debugging, Player debugger) {

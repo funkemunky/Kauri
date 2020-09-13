@@ -3,6 +3,7 @@ package dev.brighten.anticheat.premium.impl;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.*;
+import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Motion", description = "motion check kind of thing.", checkType = CheckType.GENERAL,

@@ -30,7 +30,6 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -103,7 +102,7 @@ public class Kauri extends JavaPlugin {
 
         MiscUtils.printToConsole("&7Unloading DataManager...");
         //Clearing the dataManager.
-        dataManager.dataMap.values().forEach(ObjectData::onLogout);
+        dataManager.dataMap.values().forEach(ObjectData::unregister);
         dataManager.dataMap.clear();
 
         MiscUtils.printToConsole("&7Stopping log process...");

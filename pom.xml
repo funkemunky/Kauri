@@ -45,15 +45,39 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.github.spigot</groupId>
+            <artifactId>1.8.8</artifactId>
+            <version>1.8.8</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>cc.funkemunky.utils</groupId>
             <artifactId>Atlas</artifactId>
             <version>1.9</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>gg.manny</groupId>
+            <artifactId>lunar-client-api</artifactId>
+            <version>1.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.github.spigot</groupId>
-            <artifactId>1.8.8</artifactId>
-            <version>1.8.8</version>
+            <artifactId>1.13.2</artifactId>
+            <version>1.13.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.github.spigot</groupId>
+            <artifactId>1.12.2</artifactId>
+            <version>1.12.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.github.spigot</groupId>
+            <artifactId>1.7.10</artifactId>
+            <version>1.7.10</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

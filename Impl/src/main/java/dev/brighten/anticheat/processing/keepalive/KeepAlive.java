@@ -23,7 +23,7 @@ public class KeepAlive {
 
     public final Map<UUID, KAReceived> receivedKeepalive = new HashMap<>();
 
-    protected void received(ObjectData data) {
+    public void received(ObjectData data) {
         receivedKeepalive.put(data.uuid, new KAReceived(data, Kauri.INSTANCE.keepaliveProcessor.tick));
     }
 

@@ -1,5 +1,7 @@
 package dev.brighten.anticheat.check.api;
 
+import dev.brighten.api.check.CancelType;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
