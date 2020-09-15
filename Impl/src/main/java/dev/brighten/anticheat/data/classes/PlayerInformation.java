@@ -41,6 +41,8 @@ public class PlayerInformation {
         lastInsideBlock = new TickTimer(5);
         lastHalfBlock = new TickTimer(20);
         lastPlaceLiquid = new TickTimer(20);
+        lastBlockDigPacket = new TickTimer(5);
+        lastBlockPlacePacket = new TickTimer(5);
         lastUseItem = new TickTimer(15);
         lastTeleportTimer = new TickTimer(10);
         lastGamemodeTimer = new TickTimer(10);
@@ -75,7 +77,8 @@ public class PlayerInformation {
     //ticks
     public int groundTicks, airTicks;
     public TickTimer liquidTimer, webTimer, climbTimer, slimeTimer, iceTimer, blockAboveTimer, soulSandTimer;
-    public TickTimer lastBrokenBlock, lastVelocity, lastTargetSwitch, lastBlockPlace, lastToggleFlight,
+    public TickTimer lastBrokenBlock, lastVelocity, lastTargetSwitch, lastBlockPlace, lastBlockPlacePacket,
+            lastBlockDigPacket, lastToggleFlight,
             lastWindowClick, lastInsideBlock, lastHalfBlock, lastPlaceLiquid, lastUseItem,
             lastTeleportTimer, lastGamemodeTimer, lastRespawnTimer, lastChunkUnloaded, cinematicTimer;
 

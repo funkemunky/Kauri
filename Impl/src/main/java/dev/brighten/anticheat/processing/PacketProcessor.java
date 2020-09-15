@@ -20,7 +20,7 @@ import org.bukkit.entity.Player;
 
 public class PacketProcessor {
 
-    public synchronized void processClient(PacketReceiveEvent event, ObjectData data, Object object, String type,
+    public void processClient(PacketReceiveEvent event, ObjectData data, Object object, String type,
                                            long timeStamp) {
         Kauri.INSTANCE.profiler.start("packet:client:" + getType(type));
         switch (type) {
@@ -28,10 +28,6 @@ public class PacketProcessor {
                 WrappedInAbilitiesPacket packet = new WrappedInAbilitiesPacket(object, data.getPlayer());
 
                 data.playerInfo.flying = packet.isFlying();
-
-                if (data.playerInfo.canFly != packet.isAllowedFlight()) {
-                    data.playerInfo.lastToggleFlight.reset();
-                }
 
                 data.predictionService.fly = packet.isAllowedFlight();
                 data.predictionService.walkSpeed = packet.getWalkSpeed();
@@ -119,6 +115,7 @@ public class PacketProcessor {
             case Packet.Client.BLOCK_DIG: {
                 WrappedInBlockDigPacket packet = new WrappedInBlockDigPacket(object, data.getPlayer());
 
+                data.playerInfo.lastBlockDigPacket.reset();
                 switch (packet.getAction()) {
                     case START_DESTROY_BLOCK: {
                         data.predictionService.useSword
@@ -157,6 +154,7 @@ public class PacketProcessor {
             case Packet.Client.BLOCK_PLACE: {
                 WrappedInBlockPlacePacket packet = new WrappedInBlockPlacePacket(object, data.getPlayer());
 
+                data.playerInfo.lastBlockPlacePacket.reset();
                 if (event.getPlayer().getItemInHand() != null) {
                     if(event.getPlayer().getItemInHand().getType().name().contains("BUCKET")) {
                         data.playerInfo.lastPlaceLiquid.reset();
@@ -343,16 +341,12 @@ public class PacketProcessor {
         Kauri.INSTANCE.profiler.stop("packet:client:" + getType(type));
     }
 
-    public synchronized void processServer(PacketSendEvent event, ObjectData data, Object object, String type, long timeStamp) {
+    public void processServer(PacketSendEvent event, ObjectData data, Object object, String type, long timeStamp) {
         Kauri.INSTANCE.profiler.start("packet:server:" + type);
 
         switch (type) {
             case Packet.Server.ABILITIES: {
                 WrappedOutAbilitiesPacket packet = new WrappedOutAbilitiesPacket(object, data.getPlayer());
-
-                if (data.playerInfo.canFly != packet.isAllowedFlight()) {
-                    data.playerInfo.lastToggleFlight.reset();
-                }
 
                 data.playerInfo.flying = packet.isFlying();
                 data.predictionService.fly = packet.isAllowedFlight();

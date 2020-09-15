@@ -16,7 +16,10 @@ public class AutoclickerH extends Check {
     public void onArm(WrappedInArmAnimationPacket packet) {
         if(data.playerInfo.breakingBlock
                 || data.clickProcessor.isNotReady()
-                || data.playerInfo.lastBlockPlace.hasNotPassed(2)) return;
+                || data.playerInfo.lastBrokenBlock.hasNotPassed(5)
+                || data.playerInfo.lastBlockDigPacket.hasNotPassed(1)
+                || data.playerInfo.lastBlockPlacePacket.hasNotPassed(1))
+            return;
 
         long range = data.clickProcessor.getMax() - data.clickProcessor.getMin();
         if(data.clickProcessor.getStd() < 0.3

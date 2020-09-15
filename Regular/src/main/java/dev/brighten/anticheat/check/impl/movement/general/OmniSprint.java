@@ -26,7 +26,7 @@ public class OmniSprint extends Check {
 
     @Packet
     public void onMove(WrappedInFlyingPacket packet) {
-        if(!lastKey.equals(data.predictionService.key)) lastKeySwitch.reset();
+        /*f(!lastKey.equals(data.predictionService.key)) lastKeySwitch.reset();
         if(isPosition(packet)
                 && !data.playerInfo.generalCancel
                 && data.playerInfo.lastTeleportTimer.hasPassed(2)
@@ -45,6 +45,9 @@ public class OmniSprint extends Check {
                     data.predictionService.key, data.playerInfo.serverGround, lastKeySwitch.getPassed());
         }
         lastKey = data.predictionService.key;
+         final float var15 = sin(yaw * (float) Math.PI / 180.0F); // cos, sin = Math function of optifine
+                    final float var16 = cos(yaw * (float) Math.PI / 180.0F);
+        */
     }
 
 }

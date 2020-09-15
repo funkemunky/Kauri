@@ -14,7 +14,7 @@ import dev.brighten.api.check.CheckType;
         checkType = CheckType.AIM, punishVL = 30)
 public class AimG extends Check {
 
-    private Verbose verbose = new Verbose(20, 15);
+    private Verbose verbose = new Verbose(40, 15);
     private float lastDeltaPitch;
 
     @Packet
@@ -31,11 +31,11 @@ public class AimG extends Check {
                 && gcd < 1000
                 && data.moveProcessor.yawGcdList.size() > 40
                 && MathUtils.getDelta(data.moveProcessor.sensXPercent, data.moveProcessor.sensYPercent) < 2) {
-            if(verbose.flag(1, 5)) {
+            if(verbose.flag(1, 12)) {
                 vl++;
                 flag("deltaPitch=%v", deltaPitch);
             }
-        } else verbose.subtract(0.5);
+        } else verbose.subtract(1);
 
         debug("deltaPitch=%v gcd=%v buffer=%v.1", deltaPitch, gcd, verbose.value());
         lastDeltaPitch = deltaPitch;

@@ -43,7 +43,7 @@ public class ReachB extends Check {
             if(data.playerInfo.creative) return;
 
             List<Pair<SimpleCollisionBox, Double>> entityLocs = data.targetPastLocation.getEstimatedLocation(timeStamp,
-                    data.lagInfo.transPing * 50, 200L)
+                    (data.lagInfo.transPing + 3) * 50, 100L)
                     .stream()
                     .map(loc -> {
                         SimpleCollisionBox hitbox = (SimpleCollisionBox) getHitbox(entity, loc);

@@ -42,8 +42,13 @@ public class ClickProcessor {
     public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
         long delta = flyingTicks;
 
+        if(data.playerInfo.breakingBlock) cpsList.clear();
+
         if(delta < 15
-                && !data.playerInfo.breakingBlock && data.playerInfo.lastBlockPlace.hasPassed(3)) {
+                && !data.playerInfo.breakingBlock
+                && data.playerInfo.lastBlockPlacePacket.hasPassed(1)
+                && data.playerInfo.lastBlockDigPacket.hasPassed(1)
+                && data.playerInfo.lastBlockPlace.hasPassed(3)) {
             cpsList.add(delta);
 
             zeros = cpsList.stream().filter(dt -> dt <= 2).count();

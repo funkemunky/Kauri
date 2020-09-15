@@ -165,16 +165,8 @@ public class MovementProcessor {
                     (float)data.playerInfo.jumpHeight);
         }
 
-        if(Atlas.getInstance().getBlockBoxManager().getBlockBox()
-                .isChunkLoaded(data.playerInfo.to.toLocation(data.getPlayer().getWorld())))
+        if(!data.playerInfo.worldLoaded)
             data.playerInfo.lastChunkUnloaded.reset();
-
-        data.playerInfo.lworldLoaded = data.playerInfo.worldLoaded;
-
-        if(MathUtils.getDelta(data.playerInfo.deltaY, -0.098) < 0.0001
-                && data.playerInfo.lastChunkUnloaded.hasNotPassed(35))
-            data.playerInfo.worldLoaded = false;
-        else data.playerInfo.worldLoaded = true;
 
 
         data.lagInfo.lagging = data.lagInfo.lagTicks.subtract() > 0
@@ -373,14 +365,14 @@ public class MovementProcessor {
         data.playerInfo.generalCancel = data.getPlayer().getAllowFlight()
                 || data.playerInfo.creative
                 || hasLevi
-                || (MathUtils.getDelta(-0.098, data.playerInfo.deltaY) < 0.001
-                && data.playerInfo.lastChunkUnloaded.hasNotPassed(60))
+                || data.lagInfo.transPing > 40
                 || data.playerInfo.serverPos
                 || data.playerInfo.riptiding
                 || data.playerInfo.gliding
                 || data.playerInfo.lastPlaceLiquid.hasNotPassed(5)
                 || data.playerInfo.inVehicle
-                || !data.playerInfo.worldLoaded
+                || (data.playerInfo.lastChunkUnloaded.hasNotPassed(35)
+                && MathUtils.getDelta(-0.098, data.playerInfo.deltaY) < 0.0001)
                 || timeStamp - data.playerInfo.lastRespawn < 2500L
                 || data.playerInfo.lastToggleFlight.hasNotPassed(40)
                 || timeStamp - data.creation < 4000

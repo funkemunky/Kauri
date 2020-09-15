@@ -3,6 +3,7 @@ package dev.brighten.anticheat.check;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.Priority;
+import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckRegister;
 import dev.brighten.anticheat.check.impl.combat.aim.*;
@@ -29,6 +30,7 @@ public class RegularChecks implements CheckRegister {
     public RegularChecks() {
         MiscUtils.printToConsole("&aThanks for purchasing Kauri Premium.");
         registerChecks();
+        Kauri.INSTANCE.usingPremium = true;
     }
 
     @Override

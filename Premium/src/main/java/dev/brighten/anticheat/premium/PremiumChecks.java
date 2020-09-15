@@ -3,6 +3,7 @@ package dev.brighten.anticheat.premium;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.Priority;
+import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckRegister;
 import dev.brighten.anticheat.premium.impl.*;
@@ -15,6 +16,7 @@ public class PremiumChecks implements CheckRegister {
     public PremiumChecks() {
         MiscUtils.printToConsole("&aThanks for purchasing Kauri Ara.");
         registerChecks();
+        Kauri.INSTANCE.usingAra = true;
     }
 
     @Override

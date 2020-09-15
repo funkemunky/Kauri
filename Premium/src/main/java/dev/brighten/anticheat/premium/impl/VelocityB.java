@@ -24,16 +24,6 @@ public class VelocityB extends Check {
     private static double[] moveValues = new double[] {-0.98, 0, 0.98};
 
     @Packet
-    public void onVelocity(WrappedOutVelocityPacket packet) {
-        if(packet.getId() == data.getPlayer().getEntityId()) {
-            data.runKeepaliveAction(d -> {
-                pvX = packet.getX();
-                pvZ = packet.getZ();
-            });
-        }
-    }
-
-    @Packet
     public void onUseEntity(WrappedInUseEntityPacket packet) {
         if(!useEntity
                 && packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) {
@@ -43,12 +33,17 @@ public class VelocityB extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
+        if(Math.abs(data.playerInfo.deltaY - data.playerInfo.velocityY) < 0.005) {
+            pvX = data.playerInfo.velocityX;
+            pvZ = data.playerInfo.velocityZ;
+        }
         if((pvX != 0 || pvZ != 0)) {
             boolean found = false;
 
             double drag = 0.91;
 
             if(data.blockInfo.blocksNear
+                    || data.blockInfo.blocksAbove
                     || data.blockInfo.inLiquid
                     || data.lagInfo.lastPingDrop.hasNotPassed(10)
                     || data.lagInfo.lastPacketDrop.hasNotPassed(10)) {

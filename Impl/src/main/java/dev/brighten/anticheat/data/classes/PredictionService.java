@@ -373,9 +373,6 @@ public class PredictionService {
             fastMath = (fastLoop == 2) == fMath;
             for (int blockLoop = 2; blockLoop > 0; blockLoop--) { // if the Player blocks server side but not client
                 // side (minecraft glitch)
-                boolean blocking2 = (blockLoop == 1) != useSword;
-                if (data.playerInfo.usingItem)
-                    blocking2 = true;
 
                 loops++;
 
@@ -393,11 +390,6 @@ public class PredictionService {
 //					if (sneak)
 //						return;
 //				}
-
-                if (blocking2) { // if the player blocks with a sword
-                    moveForward *= 0.2F;
-                    moveStrafing *= 0.2F;
-                }
 
                 float jumpMovementFactor = 0.02F;
                 if (lastSprint) {

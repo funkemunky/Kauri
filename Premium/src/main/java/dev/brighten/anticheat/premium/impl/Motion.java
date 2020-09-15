@@ -11,6 +11,7 @@ import dev.brighten.api.check.CheckType;
 @Cancellable(cancelType = CancelType.MOVEMENT)
 public class Motion extends Check {
 
+    private int buffer;
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if(packet.isPos()) {
@@ -21,8 +22,8 @@ public class Motion extends Check {
                     && !data.playerInfo.generalCancel
                     && data.playerInfo.deltaXZ > predXZ
                     && !data.blockInfo.collidesHorizontally) {
-                vl++;
-                if(vl > 24) {
+                if(++buffer > 10) {
+                    vl++;
                     flag("deltaX=%v deltaZ=%v",
                             MathUtils.round(data.playerInfo.deltaXZ, 3), MathUtils.round(predXZ, 3));
                 }

@@ -29,6 +29,6 @@ public class KauriAPI {
     }
 
     public void reloadChecksForPlayer(Player player) {
-        dataManager.getData(player);
+        dataManager.getData(player).reloadChecks();
     }
 }

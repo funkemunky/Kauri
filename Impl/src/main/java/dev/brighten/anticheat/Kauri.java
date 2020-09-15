@@ -55,7 +55,7 @@ public class Kauri extends JavaPlugin {
     public ToggleableProfiler profiler;
     public String LINK = "";
 
-    public boolean enabled = false;
+    public boolean enabled = false, usingPremium, usingAra;
     public TickTimer lastEnabled;
 
     public MessageHandler msgHandler;

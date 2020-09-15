@@ -17,7 +17,12 @@ public class AutoclickerJ extends Check {
 
     @Packet
     public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
-        if(data.clickProcessor.isNotReady()) return;
+        if(data.playerInfo.breakingBlock
+                || data.clickProcessor.isNotReady()
+                || data.playerInfo.lastBrokenBlock.hasNotPassed(5)
+                || data.playerInfo.lastBlockDigPacket.hasNotPassed(1)
+                || data.playerInfo.lastBlockPlacePacket.hasNotPassed(1))
+            return;
 
         double skew = Math.abs(data.clickProcessor.getSkewness());
         if(data.clickProcessor.getKurtosis() < 0

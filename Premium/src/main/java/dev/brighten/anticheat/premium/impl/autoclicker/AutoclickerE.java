@@ -16,7 +16,11 @@ public class AutoclickerE extends Check {
     private float buffer;
     @Packet
     public void onClick(WrappedInArmAnimationPacket packet) {
-        if (data.clickProcessor.isNotReady() || data.playerInfo.breakingBlock)
+        if(data.playerInfo.breakingBlock
+                || data.clickProcessor.isNotReady()
+                || data.playerInfo.lastBrokenBlock.hasNotPassed(5)
+                || data.playerInfo.lastBlockDigPacket.hasNotPassed(1)
+                || data.playerInfo.lastBlockPlacePacket.hasNotPassed(1))
             return;
 
         double skewness = Math.abs(data.clickProcessor.getSkewness());

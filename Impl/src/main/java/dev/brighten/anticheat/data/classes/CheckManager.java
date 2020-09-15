@@ -23,24 +23,22 @@ public class CheckManager {
     }
 
     public void runPacket(NMSObject object, long timeStamp) {
-        synchronized (checkMethods) {
-            if(!checkMethods.containsKey(object.getClass())) return;
+        if(!checkMethods.containsKey(object.getClass())) return;
 
-            val methods = checkMethods.get(object.getClass());
+        val methods = checkMethods.get(object.getClass());
 
-            int currentTick = MiscUtils.currentTick();
-            methods.parallelStream()
-                    .forEach(wrapped -> {
-                        if(!wrapped.isBoolean && wrapped.isPacket && wrapped.check.enabled && wrapped.isCompatible()) {
-                            if(wrapped.oneParam) wrapped.method.invoke(wrapped.check, object);
-                            else {
-                                if(wrapped.isTimeStamp) {
-                                    wrapped.method.invoke(wrapped.check, object, timeStamp);
-                                } else wrapped.method.invoke(wrapped.check, object, currentTick);
-                            }
+        int currentTick = MiscUtils.currentTick();
+        methods.parallelStream()
+                .forEach(wrapped -> {
+                    if(!wrapped.isBoolean && wrapped.isPacket && wrapped.check.enabled && wrapped.isCompatible()) {
+                        if(wrapped.oneParam) wrapped.method.invoke(wrapped.check, object);
+                        else {
+                            if(wrapped.isTimeStamp) {
+                                wrapped.method.invoke(wrapped.check, object, timeStamp);
+                            } else wrapped.method.invoke(wrapped.check, object, currentTick);
                         }
-                    });
-        }
+                    }
+                });
     }
 
     public boolean runPacketCancellable(NMSObject object, long timeStamp) {
@@ -81,18 +79,16 @@ public class CheckManager {
     }
 
     public void runEvent(AtlasEvent event) {
-        synchronized (checkMethods) {
-            if(!checkMethods.containsKey(event.getClass())) return;
+        if(!checkMethods.containsKey(event.getClass())) return;
 
-            val methods = checkMethods.get(event.getClass());
+        val methods = checkMethods.get(event.getClass());
 
-            methods.parallelStream()
-                    .forEach(wrapped -> {
-                        if(!wrapped.isPacket && wrapped.check.enabled) {
-                            wrapped.method.invoke(wrapped.check, event);
-                        }
-                    });
-        }
+        methods.parallelStream()
+                .forEach(wrapped -> {
+                    if(!wrapped.isPacket && wrapped.check.enabled) {
+                        wrapped.method.invoke(wrapped.check, event);
+                    }
+                });
     }
 
     public void addChecks() {

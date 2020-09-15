@@ -131,7 +131,10 @@ public class Check implements KauriCheck {
     private long lastFlagRun = 0L;
 
     public synchronized void flag(boolean devAlerts, int resetVLTime, String information, Object... variables) {
-        if(Kauri.INSTANCE.getTps() < 18) devAlerts = true;
+        if(Kauri.INSTANCE.getTps() < 18 || data.lagInfo.transPing > 40) {
+            devAlerts = true;
+            vl = 0;
+        }
         if(lastExemptCheck.hasPassed()) exempt = KauriAPI.INSTANCE.exemptHandler.isExempt(data.uuid, this);
         if(exempt) return;
         if(System.currentTimeMillis() - lastFlagRun < 50L) return;
