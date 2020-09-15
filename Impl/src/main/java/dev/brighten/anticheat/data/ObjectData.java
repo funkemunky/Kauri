@@ -130,8 +130,18 @@ public class ObjectData implements Data {
 
     @Override
     public void reloadChecks() {
+        unloadChecks();
+        loadChecks();
+    }
+
+    @Override
+    public void unloadChecks() {
         checkManager.checkMethods.clear();
         checkManager.checks.clear();
+    }
+
+    @Override
+    public void loadChecks() {
         checkManager.addChecks();
     }
 

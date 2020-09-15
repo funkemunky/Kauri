@@ -22,12 +22,12 @@ public class Motion extends Check {
                     && !data.playerInfo.generalCancel
                     && data.playerInfo.deltaXZ > predXZ
                     && !data.blockInfo.collidesHorizontally) {
-                if(++buffer > 10) {
+                if(++buffer > 15) {
                     vl++;
                     flag("deltaX=%v deltaZ=%v",
                             MathUtils.round(data.playerInfo.deltaXZ, 3), MathUtils.round(predXZ, 3));
                 }
-            } else vl-= vl > 0 ? 1.25 : 0;
+            } else buffer-= buffer > 0 ? 1.25 : 0;
             debug("deltaX=" + data.playerInfo.deltaXZ + " deltaZ=" + predXZ + " key=" + data.predictionService.key
                     + " collided=" + data.blockInfo.collidesHorizontally);
         }
