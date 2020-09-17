@@ -1,5 +1,6 @@
 package dev.brighten.api;
 
+import cc.funkemunky.api.reflections.Reflections;
 import dev.brighten.api.handlers.ExemptHandler;
 import dev.brighten.api.wrappers.WrappedDataManager;
 import dev.brighten.api.wrappers.WrappedKauri;
@@ -22,9 +23,8 @@ public class KauriAPI {
         INSTANCE = this;
         exemptHandler = new ExemptHandler();
         service = Executors.newSingleThreadScheduledExecutor();
-        kauriPlugin = new WrappedKauri(Bukkit.getPluginManager().isPluginEnabled("KauriLoader")
-                ? Bukkit.getPluginManager().getPlugin("KauriLoader")
-                : Bukkit.getPluginManager().getPlugin("Kauri"));
+        kauriPlugin = new WrappedKauri(Reflections.getClass("dev.brighten.anticheat.Kauri")
+                .getFieldByName("INSTANCE").get(null));
         dataManager = kauriPlugin.getDataManager();
     }
 

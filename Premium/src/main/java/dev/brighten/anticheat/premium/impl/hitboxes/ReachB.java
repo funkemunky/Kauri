@@ -98,7 +98,7 @@ public class ReachB extends Check {
             }
 
             if(collided > 1 && data.lagInfo.lastPacketDrop.hasPassed(2)) {
-                if(distance > 3.02 &&
+                if(distance > 3.03 &&
                         Kauri.INSTANCE.lastTickLag.hasPassed(40)) {
                     if(++buffer > 4) {
                         vl++;

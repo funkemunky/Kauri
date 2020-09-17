@@ -185,12 +185,14 @@ public class Check implements KauriCheck {
         final String finalInformation = information;
         KauriFlagEvent event = new KauriFlagEvent(data.getPlayer(), this, finalInformation);
 
-        event.setCancelled(!Config.alertDev);
+        Bukkit.getPluginManager().callEvent(event);
+
+        if(event.isCancelled()) return;
 
         if(cancellable && cancelMode != null && vl > vlToFlag && data.lagInfo.lastPacketDrop.hasPassed(8)) {
             KauriCancelEvent cancelEvent = new KauriCancelEvent(data.getPlayer(), cancelMode);
 
-            Atlas.getInstance().getEventManager().callEvent(cancelEvent);
+            Bukkit.getPluginManager().callEvent(cancelEvent);
             if(!cancelEvent.isCancelled()) {
                 switch(cancelEvent.getCancelType()) {
                     case ATTACK: {
@@ -210,62 +212,59 @@ public class Check implements KauriCheck {
             }
         }
 
-        Atlas.getInstance().getEventManager().callEvent(event);
         boolean dev = devAlerts || (developer || vl <= vlToFlag);
         Kauri.INSTANCE.executor.execute(() -> {
-            if(!event.isCancelled()) {
-                if(lastAlert.hasPassed(resetVLTime)) vl = 0;
-                final String info = finalInformation
-                        .replace("%p", String.valueOf(data.lagInfo.transPing))
-                        .replace("%t", String.valueOf(MathUtils.round(Kauri.INSTANCE.getTps(), 2)));
-                if (Kauri.INSTANCE.lastTickLag.hasPassed() && (data.lagInfo.lastPacketDrop.hasPassed(5)
-                        || data.lagInfo.lastPingDrop.hasPassed(20))
-                        && System.currentTimeMillis() - Kauri.INSTANCE.lastTick < 100L) {
-                    if(vl > 0) Kauri.INSTANCE.loggerManager.addLog(data, this, info);
+            if(lastAlert.hasPassed(resetVLTime)) vl = 0;
+            final String info = finalInformation
+                    .replace("%p", String.valueOf(data.lagInfo.transPing))
+                    .replace("%t", String.valueOf(MathUtils.round(Kauri.INSTANCE.getTps(), 2)));
+            if (Kauri.INSTANCE.lastTickLag.hasPassed() && (data.lagInfo.lastPacketDrop.hasPassed(5)
+                    || data.lagInfo.lastPingDrop.hasPassed(20))
+                    && System.currentTimeMillis() - Kauri.INSTANCE.lastTick < 100L) {
+                if(vl > 0) Kauri.INSTANCE.loggerManager.addLog(data, this, info);
 
-                    if (lastAlert.hasPassed(MathUtils.millisToTicks(Config.alertsDelay))) {
-                        List<TextComponent> components = new ArrayList<>();
+                if (lastAlert.hasPassed(MathUtils.millisToTicks(Config.alertsDelay))) {
+                    List<TextComponent> components = new ArrayList<>();
 
-                        if(dev) {
-                            components.add(new TextComponent(createTxt("&8[&cDev&8] ")));
-                        }
-                        val text = createTxt(Kauri.INSTANCE.msgHandler.getLanguage().msg("cheat-alert",
-                                "&8[&6&lKauri&8] &f%player% &7flagged &f%check%" +
-                                        " &8(&ex%vl%&8) %experimental%"), info);
-
-                        text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] {
-                                createTxt(Kauri.INSTANCE.msgHandler.getLanguage().msg("cheat-alert-hover",
-                                        "&eDescription&8: &f%desc%" +
-                                        "\n&eInfo: &f%info%\n&r\n&7&oClick to teleport to player."), info)}));
-                        text.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-                                formatAlert("/" + Config.alertCommand, info)));
-
-                        components.add(text);
-
-                        TextComponent[] toSend = components.toArray(new TextComponent[0]);
-
-                        if(Config.testMode && (dev ? !data.devAlerts : !data.alerts))
-                            data.getPlayer().spigot().sendMessage(toSend);
-
-                        if(Config.alertsConsole) MiscUtils.printToConsole(new TextComponent(toSend).toPlainText());
-                            if(!dev)
-                                Kauri.INSTANCE.dataManager.hasAlerts
-                                        .forEach(data -> data.getPlayer().spigot().sendMessage(toSend));
-                            else Kauri.INSTANCE.dataManager.devAlerts
-                                    .forEach(data -> data.getPlayer().spigot().sendMessage(toSend));
-                        lastAlert.reset();
+                    if(dev) {
+                        components.add(new TextComponent(createTxt("&8[&cDev&8] ")));
                     }
+                    val text = createTxt(Kauri.INSTANCE.msgHandler.getLanguage().msg("cheat-alert",
+                            "&8[&6&lKauri&8] &f%player% &7flagged &f%check%" +
+                                    " &8(&ex%vl%&8) %experimental%"), info);
 
-                    punish();
+                    text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] {
+                            createTxt(Kauri.INSTANCE.msgHandler.getLanguage().msg("cheat-alert-hover",
+                                    "&eDescription&8: &f%desc%" +
+                                            "\n&eInfo: &f%info%\n&r\n&7&oClick to teleport to player."), info)}));
+                    text.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                            formatAlert("/" + Config.alertCommand, info)));
 
-                    if (Config.bungeeAlerts) {
-                        try {
-                            Atlas.getInstance().getBungeeManager()
-                                    .sendObjects("override", data.getPlayer().getUniqueId(), name,
-                                            MathUtils.round(vl, 2), info);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                    components.add(text);
+
+                    TextComponent[] toSend = components.toArray(new TextComponent[0]);
+
+                    if(Config.testMode && (dev ? !data.devAlerts : !data.alerts))
+                        data.getPlayer().spigot().sendMessage(toSend);
+
+                    if(Config.alertsConsole) MiscUtils.printToConsole(new TextComponent(toSend).toPlainText());
+                    if(!dev)
+                        Kauri.INSTANCE.dataManager.hasAlerts
+                                .forEach(data -> data.getPlayer().spigot().sendMessage(toSend));
+                    else Kauri.INSTANCE.dataManager.devAlerts
+                            .forEach(data -> data.getPlayer().spigot().sendMessage(toSend));
+                    lastAlert.reset();
+                }
+
+                punish();
+
+                if (Config.bungeeAlerts) {
+                    try {
+                        Atlas.getInstance().getBungeeManager()
+                                .sendObjects("override", data.getPlayer().getUniqueId(), name,
+                                        MathUtils.round(vl, 2), info);
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
             }
@@ -300,7 +299,7 @@ public class Check implements KauriCheck {
 
         KauriPunishEvent punishEvent = new KauriPunishEvent(data.getPlayer(), this);
 
-        Atlas.getInstance().getEventManager().callEvent(punishEvent);
+        Bukkit.getPluginManager().callEvent(punishEvent);
 
         vl = 0;
         if(!punishEvent.isCancelled()) {
@@ -311,12 +310,13 @@ public class Check implements KauriCheck {
                         RunUtils.task(() -> {
                             if (!Config.broadcastMessage.equalsIgnoreCase("off")) {
                                 Bukkit.broadcastMessage(Color.translate(Config.broadcastMessage
-                                        .replace("%name%", data.getPlayer().getName())));
+                                        .replace("%name%", data.getPlayer().getName())
+                                        .replace("%check%", getName())));
                             }
                         }, Kauri.INSTANCE);
                     } else {
                         BungeeAPI.broadcastMessage(Color.translate(Config.broadcastMessage
-                                .replace("%name%", data.getPlayer().getName())));
+                                .replace("%name%", data.getPlayer().getName())).replace("%check%", getName()));
                     }
                 }
                 if(!Config.bungeePunishments) {

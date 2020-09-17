@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.check.impl.movement.speed;
 
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
@@ -14,7 +15,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffectType;
 
 @CheckInfo(name = "Speed (A)", description = "Minecraft code speed acceleration check.",
-        checkType = CheckType.SPEED, developer = true)
+        checkType = CheckType.SPEED)
 @Cancellable
 public class SpeedA extends Check {
 
@@ -70,6 +71,13 @@ public class SpeedA extends Check {
                 tags.addTag("air");
                 drag = 0.91f;
                 moveFactor = 0.026f;
+            }
+
+            if(data.blockInfo.inWater) {
+                tags.addTag("water");
+
+                drag = data.getClientVersion().isOrAbove(ProtocolVersion.V1_13) ? 0.9f : 0.8f;
+                moveFactor = 0.034;
             }
 
             double ratio = (data.playerInfo.deltaXZ - ldxz) / moveFactor * 100;

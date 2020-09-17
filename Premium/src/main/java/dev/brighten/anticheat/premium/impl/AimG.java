@@ -28,6 +28,7 @@ public class AimG extends Check {
                 (long)(lastDeltaPitch * MovementProcessor.offset));
 
         if(deltaPitch < 9E-5f
+                && deltaPitch > 0
                 && gcd < 1000
                 && data.moveProcessor.yawGcdList.size() > 40
                 && MathUtils.getDelta(data.moveProcessor.sensXPercent, data.moveProcessor.sensYPercent) < 2) {

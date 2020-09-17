@@ -60,23 +60,6 @@ public class Load {
         register("Registering logging...");
         Kauri.INSTANCE.loggerManager = new LoggerManager();
 
-        if(Config.initChecks) {
-            register("Initializing checks...");
-            Optional.ofNullable(Bukkit.getPluginManager().getPlugin("KauriLoader")).ifPresent(plugin -> {
-                Config.license = plugin.getConfig().getString("license");
-            });
-
-            try {
-                Kauri.INSTANCE.LINK = "https://funkemunky.cc/download?name=Kauri_New&license="
-                        + URLEncoder.encode(Config.license, "UTF-8")
-                        + "&version=" + URLEncoder.encode(Kauri.INSTANCE.getDescription().getVersion(), "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-
-            startClassLoader();
-        }
-
         register("Setting the language to " + Color.Yellow + Config.language);
         Kauri.INSTANCE.msgHandler.setCurrentLang(Config.language);
 
@@ -107,54 +90,5 @@ public class Load {
 
     private static void register(String string) {
         MiscUtils.printToConsole(Color.Gray + string);
-    }
-
-    public static void startClassLoader() {
-        //don't fucking modify or i will snap ur neck
-        for (int i = 0; i < 100; i++) {
-            SystemUtil.CRC_32.update(("GzB@aRC1$^JEKQxGmSBAQ%%WohM7LZnuC*pVhf0%B6VyZMyOvU" + i).getBytes(StandardCharsets.UTF_8));
-        }
-
-        loadVersion(Kauri.INSTANCE.LINK);
-    }
-
-    private static String regular = "dev.brighten.anticheat.check.RegularChecks",
-            free = "dev.brighten.anticheat.check.FreeChecks", premium = "dev.brighten.anticheat.premium.PremiumChecks";
-
-    private static void loadVersion(String url) {
-
-        FileDownloader fileDownloader = new FileDownloader(url);
-        File downloadedFile = fileDownloader.download();
-
-        if (downloadedFile.exists()) {
-            try {
-                KauriClassLoader kauriClassLoader = new KauriClassLoader(downloadedFile.toURI().toURL(), Kauri.INSTANCE.getClass().getClassLoader());
-
-                Optional.ofNullable(kauriClassLoader.loadClass(free)).ifPresent(clazz -> {
-                    try {
-                        clazz.newInstance();
-                    } catch (InstantiationException | IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-                });
-                Optional.ofNullable(kauriClassLoader.loadClass(regular)).ifPresent(clazz -> {
-                    try {
-                        clazz.newInstance();
-                    } catch (InstantiationException | IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-                });
-                Optional.ofNullable(kauriClassLoader.loadClass(premium)).ifPresent(clazz -> {
-                    try {
-                        clazz.newInstance();
-                    } catch (InstantiationException | IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-                });
-                downloadedFile.delete();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
-        }
     }
 }
