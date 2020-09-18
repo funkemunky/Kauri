@@ -12,7 +12,7 @@ import dev.brighten.anticheat.data.ObjectData;
 @Init
 public class AtlasCheckListeners implements AtlasListener {
 
-    @Listen(priority = ListenerPriority.NORMAL)
+    @Listen(priority = ListenerPriority.HIGHEST)
     public void onPacket(PacketReceiveEvent event) {
         if(event.getPlayer() == null) return;
 
@@ -23,7 +23,7 @@ public class AtlasCheckListeners implements AtlasListener {
         }
     }
 
-    @Listen(priority = ListenerPriority.NORMAL)
+    @Listen(priority = ListenerPriority.HIGHEST)
     public void onPacket(PacketSendEvent event) {
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 

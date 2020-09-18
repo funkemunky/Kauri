@@ -53,8 +53,8 @@ public class BlockInformation {
         double dy = Math.abs(objectData.playerInfo.deltaY);
         double dh = objectData.playerInfo.deltaXZ;
 
-        if(dy > 3) dy = 3;
-        if(dh > 3) dh = 3;
+        if(dy > 2) dy = 2;
+        if(dh > 2) dh = 2;
 
         int startX = Location.locToBlock(objectData.playerInfo.to.x - 2 - dh);
         int endX = Location.locToBlock(objectData.playerInfo.to.x + 2 + dh);
@@ -78,6 +78,7 @@ public class BlockInformation {
             }
         }
 
+        if(Kauri.INSTANCE.keepaliveProcessor.currentKeepalive.start % 2 == 0)
         blocks.parallelStream().forEach(this::updateBlock);
 
         if(!objectData.playerInfo.worldLoaded) return;

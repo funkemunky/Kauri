@@ -2,6 +2,7 @@ package dev.brighten.anticheat.check.impl.movement.fly;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
@@ -22,7 +23,8 @@ public class FlyB extends Check {
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(packet.isPos() && (data.playerInfo.deltaY != 0 || data.playerInfo.deltaXZ != 0)) {
             //We check if the player is in ground, since theoretically the y should be zero.
-            double predicted = (data.playerInfo.lDeltaY - 0.08) * mult;
+            double lDeltaY = data.playerInfo.lClientGround ? 0 : data.playerInfo.lDeltaY;
+            double predicted = (lDeltaY - 0.08) * mult;
 
             if(data.playerInfo.lClientGround && !data.playerInfo.clientGround && data.playerInfo.deltaY > 0) {
                 predicted = MovementUtils.getJumpHeight(data);
@@ -46,20 +48,22 @@ public class FlyB extends Check {
 
             double deltaPredict = MathUtils.getDelta(data.playerInfo.deltaY, predicted);
 
+            boolean flagged = false;
             if(!data.playerInfo.flightCancel
                     && data.playerInfo.lastVelocity.hasPassed(3)
                     && (!data.playerInfo.clientGround || data.playerInfo.deltaY < predicted)
                     && data.playerInfo.blockAboveTimer.hasPassed(5)
                     && deltaPredict > 0.016) {
+                flagged = true;
                 if(++buffer > 2 || Math.abs(deltaPredict) > 0.2) {
                     ++vl;
                     flag("dY=%v.3 p=%v.3 dx=%v.3", data.playerInfo.deltaY, predicted, data.playerInfo.deltaXZ);
                 }
             } else buffer-= buffer > 0 ? 0.2f : 0;
 
-            debug("pos=%v deltaY=%v.3 predicted=%v.3 ground=%v lpass=%v vl=%v.1",
+            debug((flagged ? Color.Green : "") +"pos=%v deltaY=%v.3 predicted=%v.3 ground=%v lpass=%v buffer=%v.1",
                     packet.getY(), data.playerInfo.deltaY, predicted, data.playerInfo.clientGround,
-                    data.playerInfo.liquidTimer.getPassed(), vl);
+                    data.playerInfo.liquidTimer.getPassed(), buffer);
             lastPos = timeStamp;
         }
     }

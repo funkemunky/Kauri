@@ -30,7 +30,7 @@ public class PacketListener implements AtlasListener {
 
     @Listen(ignoreCancelled = true, priority = ListenerPriority.LOW)
     public void onEvent(PacketReceiveEvent event) {
-        if(event.getPlayer() == null) return;
+        if(event.getPlayer() == null || event.isCancelled()) return;
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
         if(data == null || data.checkManager == null) return;

@@ -1,102 +1,174 @@
 package dev.brighten.anticheat.check.impl.movement.velocity;
 
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
-import cc.funkemunky.api.utils.Color;
+import cc.funkemunky.api.utils.MathUtils;
+import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
-import org.bukkit.potion.PotionEffectType;
+import org.bukkit.enchantments.Enchantment;
 
 @CheckInfo(name = "Velocity (C)", description = "A simple horizontal velocity check.", checkType = CheckType.VELOCITY,
-        developer = true)
+        punishVL = 80, vlToFlag = 15)
+@Cancellable
 public class VelocityC extends Check {
 
-    private double vxz;
-    private double ldx, ldz;
-    private double x, z, lx, lz, deltaX, deltaZ;
-    private int tick;
-    private float friction;
+    private double pvX, pvY, pvZ;
+    private boolean useEntity, sprint;
+    private double buffer;
+    private int ticks;
+    private static double[] moveValues = new double[] {-0.98, 0, 0.98};
 
     @Packet
-    public boolean onVelocity(WrappedOutVelocityPacket packet) {
-        if(packet.getId() != data.getPlayer().getEntityId()) return false;
-        data.runKeepaliveAction(ka -> {
-            vxz = Math.hypot(packet.getX(), packet.getZ());
-            tick = 0;
-        });
-        return false;
+    public void velocity(WrappedOutVelocityPacket packet) {
+        pvX = packet.getX();
+        pvY = packet.getY();
+        pvZ = packet.getZ();
     }
 
     @Packet
-    public boolean onFlying(WrappedInFlyingPacket packet) {
-        if(!packet.isPos()) {
-            return false;
+    public void onUseEntity(WrappedInUseEntityPacket packet) {
+        if(!useEntity
+                && packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) {
+            useEntity = true;
         }
+    }
 
-        lx = x;
-        lz = z;
-        x = packet.getX();
-        z = packet.getZ();
-
-        deltaX = x - lx;
-        deltaZ = z - lz;
-
-        double deltaXZ = Math.hypot(deltaX, deltaZ);
-
-        if(deltaXZ == 0 || vxz == 0) {
-            vxz = 0;
-            return false;
+    @Packet
+    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
+        if(Math.abs(data.playerInfo.deltaY - pvY) < 0.005 && pvY != 0) {
+            pvX = data.playerInfo.velocityX;
+            pvZ = data.playerInfo.velocityZ;
+            pvY = 0;
         }
+        if((pvX != 0 || pvZ != 0)) {
+            boolean found = false;
 
-        if(data.playerInfo.liquidTimer.hasNotPassed(2)
-                || data.blockInfo.blocksNear
-                || data.playerInfo.webTimer.hasNotPassed(2)) {
-            vxz = 0;
-            tick = 0;
-            return false;
-        }
+            double drag = 0.91;
 
-        double friction = this.friction, moveFactor = data.getPlayer().getWalkSpeed() / 2f;
-
-        moveFactor+= moveFactor * 0.30000001192092896D;
-
-        if(data.potionProcessor.hasPotionEffect(PotionEffectType.SPEED)) {
-            moveFactor += (data.potionProcessor.getEffectByType(PotionEffectType.SPEED).getAmplifier() + 1)
-                    * 0.20000000298023224D * moveFactor;
-        }
-
-        if(data.playerInfo.lClientGround) {
-            friction*= 0.91;
-            moveFactor/= Math.pow(friction, 3);
-        } else {
-            friction = 0.91;
-            moveFactor = 0.026;
-        }
-
-        vxz -= moveFactor / (0.98 * 0.98);
-
-        double ratio = 1 - ((vxz - deltaXZ) - moveFactor);
-
-        debug("ratio=%v.4 deltaXZ=%v.4 move=%v, vxz=%v.4 friction=%v tick=%v",
-                ratio, deltaXZ, moveFactor, vxz, friction, tick);
-
-        if(ratio < 0.95) {
-            vl++;
-            if(vl > 5) {
-                flag("pct=%v.1", ratio * 100);
+            if(data.blockInfo.blocksNear
+                    || pvY != 0
+                    || data.blockInfo.blocksAbove
+                    || data.blockInfo.inLiquid
+                    || data.lagInfo.lastPingDrop.hasNotPassed(10)
+                    || data.lagInfo.lastPacketDrop.hasNotPassed(10)) {
+                pvX = pvZ = 0;
+                buffer-= buffer > 0 ? 1 : 0;
+                return;
             }
-        } else if(vl > 0) vl-= 2;
 
-        vxz*= friction;
-        this.friction = data.blockInfo.currentFriction;
+            if(data.playerInfo.lClientGround) {
+                drag*= data.blockInfo.fromFriction;
+            }
 
-        if(++tick > 3 || Math.abs(vxz) < 0.005) {
-            vxz = 0;
-            tick = 0;
+            if(useEntity && (sprint || (data.getPlayer().getItemInHand() != null
+                    && data.getPlayer().getItemInHand().containsEnchantment(Enchantment.KNOCKBACK)))) {
+                pvX*= 0.6;
+                pvZ*= 0.6;
+            }
+            double f = 0.16277136 / (drag * drag * drag);
+            double f5;
+
+            if (data.playerInfo.lClientGround) {
+                f5 = data.predictionService.aiMoveSpeed * f;
+            } else {
+                f5 = sprint ? 0.026 : 0.02;
+            }
+
+            double vX = pvX;
+            double vZ = pvZ;
+            double vXZ = 0;
+
+            double moveStrafe = 0, moveForward = 0;
+            for (double forward : moveValues) {
+                for(double strafe : moveValues) {
+                    double s2 = strafe;
+                    double f2 = forward;
+                    if(data.playerInfo.usingItem) {
+                        s2*= 0.2;
+                        f2*= 0.2;
+                    }
+                    moveFlying(s2, f2, f5);
+
+                    double deltaX = Math.abs(pvX - data.playerInfo.deltaX);
+                    double deltaZ = Math.abs(pvZ - data.playerInfo.deltaZ);
+
+                    pvX = vX;
+                    pvZ = vZ;
+                    if(deltaX <= 0.005 - (data.playerInfo.usingItem ? 0.0045 : 0)
+                            && deltaZ <= 0.005 - (data.playerInfo.usingItem ? 0.0045 : 0)) {
+                        moveForward = f2;
+                        moveStrafe = s2;
+                        found = true;
+                        break;
+                    }
+
+                }
+            }
+
+            if(!found) {
+                moveStrafe = data.predictionService.moveStrafing;
+                moveForward = data.predictionService.moveForward;
+                if(data.playerInfo.usingItem) {
+                    moveStrafe*= 0.2;
+                    moveForward*= 0.2;
+                }
+            }
+
+            moveFlying(moveStrafe, moveForward, f5);
+
+            vXZ = MathUtils.hypot(pvX, pvZ);
+
+            double ratio = data.playerInfo.deltaXZ / vXZ;
+
+            if(ratio < 0.7
+                    && timeStamp - data.creation > 3000L
+                    && !data.getPlayer().getItemInHand().getType().isEdible()
+                    && !data.blockInfo.blocksNear) {
+                if(++buffer > 20) {
+                    vl++;
+                    flag("pct=%v.2% buffer=%v.1 forward=%v.2 strafe=%v.2",
+                            ratio * 100, buffer, moveStrafe, moveForward);
+                }
+            } else buffer-= buffer > 0 ? data.lagInfo.lastPacketDrop.hasNotPassed(20) ? .5 : 0.25 : 0;
+            debug("ratio=%v.3 buffer=%v.1 strafe=%v.2 forward=%v.2 lastUse=%v found=%v",
+                    ratio, buffer, moveStrafe, moveForward, data.playerInfo.lastUseItem.getPassed(), found);
+            pvX *= drag;
+            pvZ *= drag;
+
+            if(++ticks > 6) {
+                ticks = 0;
+                pvX = pvZ = 0;
+            }
+
+            if(Math.abs(pvX) < 0.005) pvX = 0;
+            if(Math.abs(pvZ) < 0.005) pvZ = 0;
         }
-        return false;
+        sprint = data.playerInfo.sprinting;
+        useEntity = false;
+    }
+
+    private void moveFlying(double strafe, double forward, double friction) {
+        double f = strafe * strafe + forward * forward;
+
+        if (f >= 1.0E-4F) {
+            f = Math.sqrt(f);
+
+            if (f < 1.0F) {
+                f = 1.0F;
+            }
+
+            f = friction / f;
+            strafe = strafe * f;
+            forward = forward * f;
+            double f1 = Math.sin(data.playerInfo.to.yaw * Math.PI / 180.0F);
+            double f2 = Math.cos(data.playerInfo.to.yaw * Math.PI / 180.0F);
+            pvX += (strafe * f2 - forward * f1);
+            pvZ += (forward * f2 + strafe * f1);
+        }
     }
 }

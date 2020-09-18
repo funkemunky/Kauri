@@ -387,11 +387,11 @@ public class MovementProcessor {
                 || data.playerInfo.lastHalfBlock.hasNotPassed(5);
     }
     private static float getDeltaX(float yawDelta, float gcd) {
-        return MathHelper.floor(yawDelta / gcd);
+        return Math.round(yawDelta / gcd);
     }
 
     private static float getDeltaY(float pitchDelta, float gcd) {
-        return MathHelper.floor(pitchDelta / gcd);
+        return Math.round(pitchDelta / gcd);
     }
 
     public static int sensToPercent(float sensitivity) {

@@ -55,8 +55,6 @@ public class ProfilerCommand {
                 menu.fill(new FillerButton());
                 final List<Tuple<Double, Button>> buttons = new ArrayList<>();
 
-
-
                 val map = Kauri.INSTANCE.profiler.results(ResultsType.TICK);
 
                 long total = map.keySet()
@@ -65,25 +63,29 @@ public class ProfilerCommand {
                         .mapToLong(key -> Math.round(map.get(key).two))
                         .sum();
 
+                double overall = Kauri.INSTANCE.profiler.getTimingsMap().values().stream()
+                        .mapToDouble(t -> t.total / 1000000D).sum();
+
                 AtomicReference<Double> samples = new AtomicReference<>((double) 0);
 
                 map.forEach((key, result) -> {
                     if(!key.contains("check:")) {
                         Timing timing = Kauri.INSTANCE.profiler.getTimingsMap().get(key);
+                        double totalMS = timing.total / 1000000D;
                         Button button = new Button(false, new ItemBuilder(XMaterial.REDSTONE.parseMaterial())
                                 .amount(1)
                                 .name(Color.Gold + key).lore("",
                                         "&7Weighted Usage: " + Helper
                                                 .drawUsage(total, result.two),
                                         "&7MS: &f" + Helper
-                                                .format(timing.total / 1000000D, 3),
+                                                .format(totalMS, 3),
                                         "&7Samples: &f" + Helper
                                                 .format(result.two / 1000000D, 3),
                                         "&7Deviation: &f" + Helper
                                                 .format(timing.stdDev / 1000000D, 3)).build());
 
-                        buttons.add(new Tuple<>(result.two, button));
-                        samples.updateAndGet(v -> (v + result.two / 1000000D));
+                        buttons.add(new Tuple<>(totalMS, button));
+                        samples.updateAndGet(v -> (v + (result.two / 1000000D) * (totalMS / overall)));
                     }
                 });
 
