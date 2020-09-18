@@ -1,4 +1,4 @@
-package dev.brighten.anticheat.check.impl.packets;
+package dev.brighten.anticheat.check.impl.packets.badpackets;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
@@ -12,7 +12,7 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
 
-@CheckInfo(name = "Timer", description = "Checks the rate of packets coming in.",
+@CheckInfo(name = "Timer (A)", description = "Checks the rate of packets coming in.",
         checkType = CheckType.BADPACKETS, vlToFlag = 4, developer = true)
 @Cancellable
 public class Timer extends Check {
