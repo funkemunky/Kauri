@@ -25,9 +25,11 @@ public class VelocityB extends Check {
 
     @Packet
     public void velocity(WrappedOutVelocityPacket packet) {
-        pvX = packet.getX();
-        pvY = packet.getY();
-        pvZ = packet.getZ();
+        if(packet.getId() == data.getPlayer().getEntityId()) {
+            pvX = packet.getX();
+            pvY = packet.getY();
+            pvZ = packet.getZ();
+        }
     }
 
     @Packet
