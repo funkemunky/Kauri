@@ -21,7 +21,7 @@ import dev.brighten.anticheat.check.impl.movement.speed.SpeedB;
 import dev.brighten.anticheat.check.impl.movement.speed.SpeedC;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityA;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityC;
-import dev.brighten.anticheat.check.impl.packets.TimerB;
+import dev.brighten.anticheat.check.impl.packets.Timer;
 import dev.brighten.anticheat.check.impl.packets.exploits.*;
 
 @Init(priority = Priority.LOWEST)
@@ -57,7 +57,7 @@ public class RegularChecks implements CheckRegister {
         Check.register(new KillauraE());
         Check.register(new KillauraF());
         Check.register(new OmniSprint());
-        Check.register(new TimerB());
+        Check.register(new Timer());
         Check.register(new VelocityA());
         Check.register(new VelocityC());
         Check.register(new HandA());

@@ -93,7 +93,6 @@ public class FreeChecks implements CheckRegister {
         Check.register(new BadPacketsK());
         Check.register(new BadPacketsL());
         Check.register(new BadPacketsM());
-        Check.register(new Timer());
         //Check.register(new BadPacketsN())
     }
 }
