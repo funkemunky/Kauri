@@ -2,7 +2,10 @@ package dev.brighten.anticheat.check.impl.combat.killaura;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
-import dev.brighten.anticheat.check.api.*;
+import dev.brighten.anticheat.check.api.Cancellable;
+import dev.brighten.anticheat.check.api.Check;
+import dev.brighten.anticheat.check.api.CheckInfo;
+import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 

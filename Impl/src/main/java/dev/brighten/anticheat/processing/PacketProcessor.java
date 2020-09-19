@@ -2,8 +2,6 @@ package dev.brighten.anticheat.processing;
 
 import cc.funkemunky.api.events.impl.PacketReceiveEvent;
 import cc.funkemunky.api.events.impl.PacketSendEvent;
-import cc.funkemunky.api.reflections.impl.MinecraftReflection;
-import cc.funkemunky.api.reflections.types.WrappedField;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
@@ -13,7 +11,6 @@ import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.XMaterial;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
-import dev.brighten.anticheat.utils.MiscUtils;
 import lombok.val;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;

@@ -1,6 +1,5 @@
 package dev.brighten.anticheat.data.classes;
 
-import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
 import cc.funkemunky.api.utils.BlockUtils;
@@ -11,9 +10,7 @@ import cc.funkemunky.api.utils.world.BlockData;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
-import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.utils.CacheList;
-import dev.brighten.anticheat.utils.CacheMap;
 import dev.brighten.anticheat.utils.CollisionHandler;
 import dev.brighten.anticheat.utils.Helper;
 import lombok.val;
@@ -23,8 +20,10 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.Vector;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 

@@ -9,25 +9,16 @@ import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.Config;
-import dev.brighten.anticheat.classloader.KauriClassLoader;
 import dev.brighten.anticheat.data.DataManager;
 import dev.brighten.anticheat.logs.LoggerManager;
 import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.processing.PacketProcessor;
 import dev.brighten.anticheat.processing.keepalive.KeepaliveProcessor;
-import dev.brighten.anticheat.utils.SystemUtil;
 import dev.brighten.anticheat.utils.TickTimer;
-import dev.brighten.anticheat.classloader.file.FileDownloader;
 import dev.brighten.api.KauriAPI;
 import org.bukkit.Bukkit;
 
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Optional;
 import java.util.concurrent.Executors;
 
 public class Load {
@@ -41,6 +32,9 @@ public class Load {
 
         register("Loading config...");
         Kauri.INSTANCE.saveDefaultConfig();
+
+        register("Loading API...");
+        Kauri.INSTANCE.kauriAPI = new KauriAPI();
 
         register("Loading commands...");
         Kauri.INSTANCE.commandManager = new CommandManager(Kauri.INSTANCE);
@@ -62,9 +56,6 @@ public class Load {
 
         register("Setting the language to " + Color.Yellow + Config.language);
         Kauri.INSTANCE.msgHandler.setCurrentLang(Config.language);
-
-        register("Loading API...");
-        Kauri.INSTANCE.kauriAPI = new KauriAPI();
 
         register("Registering checks...");
         Check.registerChecks();

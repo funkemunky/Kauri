@@ -1,20 +1,14 @@
 package dev.brighten.anticheat.processing;
 
-import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutEntityEffectPacket;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import dev.brighten.anticheat.data.ObjectData;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @RequiredArgsConstructor

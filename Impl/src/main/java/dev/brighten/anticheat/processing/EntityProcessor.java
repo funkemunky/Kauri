@@ -7,13 +7,11 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
 
 public class EntityProcessor {
 

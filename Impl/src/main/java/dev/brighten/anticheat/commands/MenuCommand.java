@@ -14,8 +14,14 @@ import dev.brighten.anticheat.utils.menu.button.ClickAction;
 import dev.brighten.anticheat.utils.menu.preset.button.FillerButton;
 import dev.brighten.anticheat.utils.menu.type.impl.ChestMenu;
 import dev.brighten.anticheat.utils.mojang.MojangAPI;
+import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -49,32 +55,78 @@ public class MenuCommand {
         cmd.getPlayer().sendMessage(Color.Green + "Opened main menu.");
     }
 
+    private static BaseComponent[] freeMessage = new ComponentBuilder("We would appreciate if you purchased a " +
+            "full version. It really helps to fund the development of Kauri for the longterm.")
+            .color(ChatColor.GRAY)
+            .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                            new ComponentBuilder("Opens https://funkemunky.cc/shop")
+                                    .color(ChatColor.GRAY).italic(true).create()))
+            .event(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://funkemunky.cc/shop"))
+            .create(),
+            fullMessage = new ComponentBuilder("Thanks for buying a full copy!").color(ChatColor.GREEN)
+                    .append("If you run a server that needs best in class combat detection, we suggesting trying ")
+                    .color(ChatColor.GRAY).append("Kauri Ara").color(ChatColor.GOLD).bold(true)
+                    .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                            new ComponentBuilder("Opens https://funkemunky.cc/shop")
+                                    .color(ChatColor.GRAY).italic(true).create()))
+                    .event(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://funkemunky.cc/shop"))
+                    .create(),
+            araMessage = new ComponentBuilder("Thanks for purchasing Kauri Ara!")
+                    .color(ChatColor.GREEN).create();
     private static ChestMenu getMainMenu() {
         ChestMenu menu = new ChestMenu(Color.Gold + "Kauri Menu", 3);
 
         menu.setItem(11, createButton(XMaterial.ANVIL.parseMaterial(), 1, "&cEdit Checks",
                 (player, info) -> categoryMenu.showMenu(player),
                 "", "&7Toggle Kauri checks on or off."));
+        KauriVersion plan = KauriVersion.getPlan();
         menu.setItem(13, createButton(XMaterial.ENCHANTED_BOOK.parseMaterial(), 1, "&cKauri Anticheat",
                 (player, info) -> {
-                    if (info.getClickType().equals(ClickType.RIGHT)
-                            || info.getClickType().equals(ClickType.SHIFT_RIGHT)) {
-                        menu.setParent(null);
-                        menu.close(player);
-                        player.sendMessage(MiscUtils.line(Color.Dark_Gray));
-                        player.sendMessage(Color.translate("&6Discord: &fhttps://discord.me/Brighten"));
-                        player.sendMessage(Color.translate("&6Website: &fhttps://funkemunky.cc/contact"));
-                        player.sendMessage(MiscUtils.line(Color.Dark_Gray));
+                    switch(info.getClickType()) {
+                        case RIGHT:
+                        case SHIFT_RIGHT: {
+                            menu.setParent(null);
+                            menu.close(player);
+                            player.sendMessage(MiscUtils.line(Color.Dark_Gray));
+                            player.sendMessage(Color.translate("&6Discord: &fhttps://discord.me/Brighten"));
+                            player.sendMessage(Color.translate("&6Website: &fhttps://funkemunky.cc/contact"));
+                            player.sendMessage(MiscUtils.line(Color.Dark_Gray));
+                            break;
+                        }
+                        case LEFT:
+                        case SHIFT_LEFT: {
+                            menu.setParent(null);
+                            menu.close(player);
+                            if(plan.equals(KauriVersion.FREE)) {
+                                player.spigot().sendMessage(freeMessage);
+                            } else if(plan.equals(KauriVersion.FULL)) {
+                                player.spigot().sendMessage(fullMessage);
+                            } else player.spigot().sendMessage(araMessage);
+                            break;
+                        }
                     }
                 },
-                "", "&7You are using &6Kauri Anticheat v" +
-                        Kauri.INSTANCE.getDescription().getVersion(), "&e&oRight Click &7&oclick to get support."));
+                getKauriLore(plan)));
         menu.setItem(15, createButton(XMaterial.PAPER.parseMaterial(), 1, "&cView Recent Violators",
                 (player, info) -> {
                     player.sendMessage(Color.Gray + "Loading menu...");
                     getRecentViolatorsMenu(true).showMenu(player);
         }, "", "&7View players who flagged checks recently."));
         return menu;
+    }
+
+    private static String[] getKauriLore(KauriVersion plan) {
+        if(plan.equals(KauriVersion.FREE)) {
+            return new String[] {"", "&7You are using &6Kauri Anticheat v" +
+                    KauriVersion.getVersion(),  "&7Your Plan: &e" + plan.name,
+                    "", "&cYou are currently using a &oFREE TRIAL&c",
+                    "", "&e&oLeft click &7&oto purchase a full version.",
+                    "&e&oRight Click &7&oclick to get support."};
+        } else {
+            return new String[] {"", "&7You are using &6Kauri Anticheat v" +
+                    KauriVersion.getVersion(), "&7Your Plan: &e" + plan.name,
+                    "", "&e&oRight Click &7&oclick to get support."};
+        }
     }
 
     private static ChestMenu getChecksCategoryMenu() {

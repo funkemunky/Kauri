@@ -2,7 +2,6 @@ package dev.brighten.anticheat.check.impl.packets.badpackets;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutPositionPacket;
 import cc.funkemunky.api.utils.math.RollingAverage;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Cancellable;

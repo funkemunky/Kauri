@@ -12,7 +12,7 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class KeepaliveProcessor implements Runnable {
 

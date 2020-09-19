@@ -2,7 +2,7 @@ package dev.brighten.anticheat.utils;
 
 import dev.brighten.anticheat.Kauri;
 
-import java.util.*;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 

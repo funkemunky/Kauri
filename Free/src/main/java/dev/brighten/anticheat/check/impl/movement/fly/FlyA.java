@@ -3,13 +3,11 @@ package dev.brighten.anticheat.check.impl.movement.fly;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.Color;
-import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
-import net.minecraft.server.v1_8_R3.BlockClay;
 
 @CheckInfo(name = "Fly (A)", description = "Simple fly check.", punishVL = 10,
         checkType = CheckType.FLIGHT, vlToFlag = 3, developer = true)

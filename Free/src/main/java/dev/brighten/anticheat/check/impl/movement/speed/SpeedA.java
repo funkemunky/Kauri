@@ -2,7 +2,6 @@ package dev.brighten.anticheat.check.impl.movement.speed;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.PlayerUtils;
 import dev.brighten.anticheat.check.api.Cancellable;
@@ -11,7 +10,6 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.processing.TagsBuilder;
 import dev.brighten.api.check.CheckType;
-import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffectType;
 
 @CheckInfo(name = "Speed (A)", description = "Minecraft code speed acceleration check.",

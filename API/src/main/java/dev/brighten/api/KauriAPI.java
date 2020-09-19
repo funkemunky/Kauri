@@ -4,7 +4,6 @@ import cc.funkemunky.api.reflections.Reflections;
 import dev.brighten.api.handlers.ExemptHandler;
 import dev.brighten.api.wrappers.WrappedDataManager;
 import dev.brighten.api.wrappers.WrappedKauri;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.concurrent.Executors;
@@ -17,7 +16,8 @@ public class KauriAPI {
     public ExemptHandler exemptHandler;
     public ScheduledExecutorService service;
     public WrappedDataManager dataManager;
-    private WrappedKauri kauriPlugin;
+    WrappedKauri kauriPlugin;
+
 
     public KauriAPI() {
         INSTANCE = this;

@@ -10,6 +10,7 @@ import cc.funkemunky.api.utils.RunUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.Config;
 import dev.brighten.anticheat.classloader.KauriClassLoader;
+import dev.brighten.anticheat.classloader.file.FileDownloader;
 import dev.brighten.anticheat.data.DataManager;
 import dev.brighten.anticheat.logs.LoggerManager;
 import dev.brighten.anticheat.processing.EntityProcessor;
@@ -17,7 +18,6 @@ import dev.brighten.anticheat.processing.PacketProcessor;
 import dev.brighten.anticheat.processing.keepalive.KeepaliveProcessor;
 import dev.brighten.anticheat.utils.SystemUtil;
 import dev.brighten.anticheat.utils.TickTimer;
-import dev.brighten.anticheat.classloader.file.FileDownloader;
 import dev.brighten.api.KauriAPI;
 import org.bukkit.Bukkit;
 
