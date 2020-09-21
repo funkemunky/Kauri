@@ -32,7 +32,8 @@ public class MovementProcessor {
     public float deltaX, deltaY, lastDeltaX, lastDeltaY, smoothYaw, smoothPitch, lsmoothYaw, lsmoothPitch;
     public Tuple<List<Double>, List<Double>> yawOutliers, pitchOutliers;
     public long lastCinematic;
-    public float sensitivityX, sensitivityY, yawMode, pitchMode, sensXPercent, sensYPercent;
+    public float sensitivityX, sensitivityY, yawMode, pitchMode;
+    public int sensXPercent, sensYPercent;
     private MouseFilter mxaxis = new MouseFilter(), myaxis = new MouseFilter();
     private float smoothCamFilterX, smoothCamFilterY, smoothCamYaw, smoothCamPitch;
     private TickTimer lastReset = new TickTimer(1), generalProcess = new TickTimer(3);
@@ -394,9 +395,11 @@ public class MovementProcessor {
     }
 
     public static int sensToPercent(float sensitivity) {
-        return (int) MathUtils.round(
-                sensitivity / .5f * 100, 0,
-                RoundingMode.HALF_UP);
+        return MathHelper.floor_float(sensitivity / .5f * 100);
+    }
+
+    public static float percentToSens(int percent) {
+        return percent / 100.f * .5f;
     }
 
     //Noncondensed
@@ -409,7 +412,7 @@ public class MovementProcessor {
 
     //Condensed
     public static float getSensitivityFromYawGCD(float gcd) {
-        return ((float)Math.cbrt((double)yawToF2(gcd) / 8) - .2f) / .6f;
+        return ((float)Math.cbrt(yawToF2(gcd) / 8f) - .2f) / .6f;
     }
 
     //Noncondensed
@@ -422,7 +425,7 @@ public class MovementProcessor {
 
     //Condensed
     private static float getSensitivityFromPitchGCD(float gcd) {
-        return ((float)Math.cbrt((double)pitchToF3(gcd) / 8) - .2f) / .6f;
+        return ((float)Math.cbrt(pitchToF3(gcd) / 8f) - .2f) / .6f;
     }
 
     private static float getF1FromYaw(float gcd) {
@@ -448,12 +451,12 @@ public class MovementProcessor {
     }
 
     private static float yawToF2(float yawDelta) {
-        return (float)((double)yawDelta / .15);
+        return yawDelta / .15f;
     }
 
     private static float pitchToF3(float pitchDelta) {
         int b0 = pitchDelta >= 0 ? 1 : -1; //Checking for inverted mouse.
-        return (float)((double)(pitchDelta / b0) / .15);
+        return (pitchDelta / b0) / .15f;
     }
 
 }
