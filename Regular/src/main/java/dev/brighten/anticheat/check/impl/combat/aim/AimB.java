@@ -1,7 +1,6 @@
 package dev.brighten.anticheat.check.impl.combat.aim;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -27,10 +26,9 @@ public class AimB extends Check {
             //       data.playerInfo.cinematicMode, data.playerInfo.deltaPitch, data.playerInfo.lDeltaPitch,
             //        data.playerInfo.to.pitch, data.playerInfo.from.pitch, vl);
 
-            debug("(%v) yaw=%v.4 pitch=%v.4",
-                    data.playerInfo.cinematicMode,
-                    Math.abs(MathUtils.yawTo180F(data.playerInfo.from.yaw) - data.moveProcessor.smoothYaw),
-                    Math.abs(data.playerInfo.from.pitch - data.moveProcessor.smoothPitch));
+            debug("(%v) yaw=%v.4 pitch=%v.4 syaw=%v.4 spitch=%v.4",
+                    data.playerInfo.cinematicMode, data.playerInfo.to.yaw, data.playerInfo.to.pitch,
+                    data.moveProcessor.smoothYaw, data.moveProcessor.smoothPitch);
         }
     }
 }
