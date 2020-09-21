@@ -13,8 +13,8 @@ import org.bukkit.entity.Player;
 @Init(commands = true)
 public class PlayerInfoCommand {
 
-    @Command(name = "kauri.playerinfo", description = "get the information of a player", display = "info [player]",
-            aliases = {"playerinfo", "pi", "kauri.pi", "kauri.pinfo"}, playerOnly = true,
+    @Command(name = "kauri.info", description = "get the information of a player", display = "info [player]",
+            aliases = {"playerinfo", "pi", "kauri.pi", "kauri.playerinfo"}, playerOnly = true,
             permission = "kauri.command.info")
     public void onCommand(CommandAdapter cmd) {
         Kauri.INSTANCE.executor.execute(() -> {

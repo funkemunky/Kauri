@@ -64,8 +64,9 @@ public class PlayerInformationGUI extends ChestMenu {
         vioItem.lore("",
                 halfLine,
                 "&eVersion&7: &f" + data.playerVersion.name(),
-                "&ePing/tPing&7: &f" + data.lagInfo.ping + "ms, " + data.lagInfo.transPing + " ticks",
-                "&eLast Packet Drop&7: &f" + data.lagInfo.lastPacketDrop.getPassed() + " ticks ago",
+                "&ePing/tPing&7: &f" + data.lagInfo.ping + "ms, " + data.lagInfo.transPing + "ms",
+                "&eLast Packet Drop&7: &f" + DurationFormatUtils
+                        .formatDurationHMS(data.lagInfo.lastPacketDrop.getPassed() * 50),
                 halfLine);
         return vioItem.build();
     }
