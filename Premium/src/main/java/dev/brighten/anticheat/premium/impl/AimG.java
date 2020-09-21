@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.premium.impl;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -15,31 +16,23 @@ import dev.brighten.api.check.CheckType;
 public class AimG extends Check {
 
     private Verbose verbose = new Verbose(40, 15);
-    private float lastDeltaPitch;
 
     @Packet
     public void process(WrappedInFlyingPacket packet) {
         if(!packet.isLook()) return;
 
-        float deltaPitch = Math.abs(modulo(Math.min(1, data.moveProcessor.sensitivityY), data.playerInfo.to.pitch)
+        float sens = MovementProcessor.percentToSens(data.moveProcessor.sensYPercent);
+        float deltaPitch = Math.abs(modulo(sens, data.playerInfo.to.pitch)
                 - data.playerInfo.to.pitch);
+        float clampedYaw = MathUtils.yawTo180F(data.playerInfo.to.yaw);
+        float deltaYaw = Math.abs(modulo(sens, clampedYaw) - clampedYaw);
 
-        long gcd = MiscUtils.gcd((long)(deltaPitch * MovementProcessor.offset),
-                (long)(lastDeltaPitch * MovementProcessor.offset));
+        if(deltaYaw < 0.01 && deltaPitch < 8E-5) {
+            debug(Color.Green + "Flag");
+        }
 
-        if(deltaPitch < 9E-5f
-                && deltaPitch > 0
-                && gcd < 1000
-                && data.moveProcessor.yawGcdList.size() > 40
-                && MathUtils.getDelta(data.moveProcessor.sensXPercent, data.moveProcessor.sensYPercent) < 2) {
-            if(verbose.flag(1, 12)) {
-                vl++;
-                flag("deltaPitch=%v", deltaPitch);
-            }
-        } else verbose.subtract(1);
-
-        debug("deltaPitch=%v gcd=%v buffer=%v.1", deltaPitch, gcd, verbose.value());
-        lastDeltaPitch = deltaPitch;
+        debug("deltaPitch=%v deltaYaw=%v sens=%v buffer=%v.1", deltaPitch, deltaYaw,
+                data.moveProcessor.sensYPercent + ", " + data.moveProcessor.sensXPercent, verbose.value());
     }
 
     private static float modulo(float s, float angle) {
