@@ -38,9 +38,19 @@ import java.util.stream.Collectors;
 public class MenuCommand {
 
     private static ChestMenu main, categoryMenu;
+    private static long lastReset;
     public MenuCommand() {
         main = getMainMenu();
         categoryMenu = getChecksCategoryMenu();
+    }
+
+    private static ChestMenu getMain() {
+        if(System.currentTimeMillis() - lastReset > 10000L) {
+            lastReset = System.currentTimeMillis();
+            return main = getMainMenu();
+        }
+
+        return main;
     }
 
     private static Button createButton(Material material, int amount, String name, ClickAction action, String... lore) {
@@ -50,7 +60,7 @@ public class MenuCommand {
     @Command(name = "kauri.menu", description = "Open the Kauri menu.", display = "menu", usage = "/<command>",
             aliases = {"kauri.gui"}, playerOnly = true, permission = "kauri.command.menu")
     public void onCommand(CommandAdapter cmd) {
-        main.showMenu(cmd.getPlayer());
+        getMain().showMenu(cmd.getPlayer());
         categoryMenu = getChecksCategoryMenu();
         cmd.getPlayer().sendMessage(Color.Green + "Opened main menu.");
     }
@@ -79,6 +89,7 @@ public class MenuCommand {
         menu.setItem(11, createButton(XMaterial.ANVIL.parseMaterial(), 1, "&cEdit Checks",
                 (player, info) -> categoryMenu.showMenu(player),
                 "", "&7Toggle Kauri checks on or off."));
+
         KauriVersion plan = KauriVersion.getPlan();
         menu.setItem(13, createButton(XMaterial.ENCHANTED_BOOK.parseMaterial(), 1, "&cKauri Anticheat",
                 (player, info) -> {
@@ -118,13 +129,15 @@ public class MenuCommand {
     private static String[] getKauriLore(KauriVersion plan) {
         if(plan.equals(KauriVersion.FREE)) {
             return new String[] {"", "&7You are using &6Kauri Anticheat v" +
-                    KauriVersion.getVersion(),  "&7Your Plan: &e" + plan.name,
+                    KauriVersion.getVersion(),
+                    "", "&7Your Plan: &e" + plan.name,
                     "", "&cYou are currently using a &oFREE TRIAL&c",
                     "", "&e&oLeft click &7&oto purchase a full version.",
                     "&e&oRight Click &7&oclick to get support."};
         } else {
             return new String[] {"", "&7You are using &6Kauri Anticheat v" +
-                    KauriVersion.getVersion(), "&7Your Plan: &e" + plan.name,
+                    KauriVersion.getVersion(),
+                    "", "&7Your Plan: &e" + plan.name + "&o($" + plan.price + (plan.monthly ? " a month" : "") + ")",
                     "", "&e&oRight Click &7&oclick to get support."};
         }
     }
