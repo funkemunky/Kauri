@@ -16,29 +16,22 @@ import dev.brighten.api.check.CheckType;
 public class AimG extends Check {
 
     private Verbose verbose = new Verbose(40, 15);
-    private float lDeltaPitch;
 
     @Packet
     public void process(WrappedInFlyingPacket packet) {
         if(!packet.isLook()) return;
 
         float sens = MovementProcessor.percentToSens(data.moveProcessor.sensYPercent);
-        float deltaPitch = Math.abs(modulo(sens, data.playerInfo.from.pitch)
+        float deltaPitch = Math.abs(modulo(sens, data.playerInfo.to.pitch)
                 - data.playerInfo.to.pitch);
-
-        float gcd = MiscUtils.gcd((long)(deltaPitch * MovementProcessor.offset),
-                (long)(lDeltaPitch * MovementProcessor.offset));
         float clampedYaw = MathUtils.yawTo180F(data.playerInfo.to.yaw);
-        float deltaYaw = Math.abs(modulo(sens, MathUtils.yawTo180F(data.playerInfo.from.yaw)) - clampedYaw);
-        float delta = Math.abs(deltaYaw - deltaPitch);
+        float deltaYaw = Math.abs(modulo(sens, clampedYaw) - clampedYaw);
 
         if(deltaYaw < 0.01 && deltaPitch < 8E-5) {
             debug(Color.Green + "Flag");
         }
 
-        lDeltaPitch = deltaPitch;
-
-        debug("gcd=%v deltaPitch=%v deltaYaw=%v sens=%v buffer=%v.1", gcd, deltaPitch, deltaYaw,
+        debug("deltaPitch=%v deltaYaw=%v sens=%v buffer=%v.1", deltaPitch, deltaYaw,
                 data.moveProcessor.sensYPercent + ", " + data.moveProcessor.sensXPercent, verbose.value());
     }
 
