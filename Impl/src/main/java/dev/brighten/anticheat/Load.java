@@ -42,9 +42,6 @@ public class Load {
         register("Loading config...");
         Kauri.INSTANCE.saveDefaultConfig();
 
-        register("Loading API...");
-        Kauri.INSTANCE.kauriAPI = new KauriAPI();
-
         register("Loading commands...");
         Kauri.INSTANCE.commandManager = new CommandManager(Kauri.INSTANCE);
 
@@ -82,6 +79,9 @@ public class Load {
 
         register("Setting the language to " + Color.Yellow + Config.language);
         Kauri.INSTANCE.msgHandler.setCurrentLang(Config.language);
+
+        register("Loading API...");
+        Kauri.INSTANCE.kauriAPI = new KauriAPI();
 
         register("Registering checks...");
         Check.registerChecks();

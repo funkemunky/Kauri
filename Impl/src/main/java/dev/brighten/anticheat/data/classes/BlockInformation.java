@@ -33,7 +33,7 @@ public class BlockInformation {
             onSoulSand, blocksAbove, collidesVertically, collidesHorizontally, blocksNear, inBlock, miscNear;
     public float currentFriction, fromFriction;
     public CollisionHandler
-            handler = new CollisionHandler(new ArrayList<>(), new ArrayList<>(), new KLocation(0,0,0), null);
+            handler = new CollisionHandler(new ArrayList<>(), new ArrayList<>(), new KLocation(0,0,0));
     public List<Block> verticalCollisions, horizontalCollisions;
     public List<SimpleCollisionBox> aboveCollisions = new ArrayList<>(), belowCollisions = new ArrayList<>();
     public final List<Block> blocks = Collections.synchronizedList(new ArrayList<>());
@@ -102,7 +102,7 @@ public class BlockInformation {
 
         CollisionHandler handler = new CollisionHandler(blocks,
                 Kauri.INSTANCE.entityProcessor.vehicles.getOrDefault(objectData.getPlayer().getUniqueId(), new ArrayList<>()),
-                objectData.playerInfo.to, objectData);
+                objectData.playerInfo.to);
 
         //Bukkit.broadcastMessage("chigga4");
 
@@ -174,8 +174,7 @@ public class BlockInformation {
                     .forEach(block -> {
                         objectData.boxDebuggers.forEach(pl -> {
                             List<SimpleCollisionBox> boxes = new ArrayList<>();
-                             BlockData.getData(block.getType()).getBox(block, ProtocolVersion.getGameVersion())
-                                     .downCast(boxes);
+                             BlockData.getData(block.getType()).getBox(block, ProtocolVersion.getGameVersion()).downCast(boxes);
 
                              boxes.forEach(sbox -> {
                                  val max = sbox.max().subtract(block.getLocation().toVector());
@@ -188,8 +187,6 @@ public class BlockInformation {
 
                         });
                     });
-            handler.setSize(0.8f, 2f);
-            handler.setOffset(-.2f);
             handler.getCollisionBoxes().forEach(cb -> cb.draw(WrappedEnumParticle.FLAME, objectData.boxDebuggers));
         }
         handler.setSize(0.6f, 1.8f);
@@ -225,8 +222,7 @@ public class BlockInformation {
 
     private final List<Location> lastUpdates = new CacheList<>(10, TimeUnit.SECONDS);
     private synchronized void updateBlock(Block block) {
-        if(!lastUpdates.contains(block.getLocation())
-                && !objectData.playerInfo.shitMap.containsKey(block.getLocation())) {
+        if(!lastUpdates.contains(block.getLocation())) {
             objectData.getPlayer().sendBlockChange(block.getLocation(), block.getType(), block.getData());
             lastUpdates.add(block.getLocation());
         }
