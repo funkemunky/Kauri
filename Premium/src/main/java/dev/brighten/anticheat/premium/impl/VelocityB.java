@@ -127,7 +127,7 @@ public class VelocityB extends Check {
 
             double ratio = data.playerInfo.deltaXZ / vXZ;
 
-            if(ratio < (data.playerVersion.isOrAbove(ProtocolVersion.V1_9) ? 0.8 : 0.993)
+            if(ratio < 0.998
                     && timeStamp - data.creation > 3000L
                     && !data.getPlayer().getItemInHand().getType().isEdible()
                     && !data.blockInfo.blocksNear) {
