@@ -7,11 +7,17 @@ import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.*;
 import cc.funkemunky.api.tinyprotocol.packet.out.*;
+import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.KLocation;
+import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.XMaterial;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import lombok.val;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -119,7 +125,22 @@ public class PacketProcessor {
                                 = data.playerInfo.usingItem = false;
                         break;
                     }
-                    case STOP_DESTROY_BLOCK:
+                    case STOP_DESTROY_BLOCK: {
+                        data.predictionService.useSword
+                                = data.playerInfo.usingItem = false;
+
+                        val pos = packet.getPosition();
+
+                        Location loc = new Location(data.getPlayer().getWorld(),
+                                pos.getX(), pos.getY(), pos.getZ());
+
+                        data.playerInfo.shitMap.put(loc, Material.AIR);
+                        data.runKeepaliveAction(ka -> {
+                            data.playerInfo.shitMap.remove(loc);
+                            Bukkit.broadcastMessage("shit");
+                        });
+                        break;
+                    }
                     case ABORT_DESTROY_BLOCK: {
                         data.predictionService.useSword
                                 = data.playerInfo.usingItem = false;
@@ -168,6 +189,14 @@ public class PacketProcessor {
                     } else if(stack != null) {
                         if(stack.getType().isBlock() && stack.getType().getId() != 0) {
                             data.playerInfo.lastBlockPlace.reset();
+                            Location loc = new Location(
+                                    data.getPlayer().getWorld(), pos.getX(), pos.getY(), pos.getZ());
+
+                            data.playerInfo.shitMap.put(loc, stack.getType());
+
+                            RunUtils.taskLater(() -> data.runKeepaliveAction(ka -> {
+                                data.playerInfo.shitMap.remove(loc);
+                            }), 1);
                            // MiscUtils.testMessage(event.getPlayer().getItemInHand().getType().name());
                         }
                     }

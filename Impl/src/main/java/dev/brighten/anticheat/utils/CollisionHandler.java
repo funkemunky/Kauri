@@ -35,10 +35,11 @@ public class CollisionHandler {
 	@Setter
 	private boolean debugging;
 
-	public CollisionHandler(List<Block> blocks, List<Entity> entities, KLocation to) {
+	public CollisionHandler(List<Block> blocks, List<Entity> entities, KLocation to, ObjectData data) {
 		this.blocks.addAll(blocks);
 		this.entities = entities;
 		this.location = to;
+		this.data = data;
 	}
 
 	public void setSize(double width, double height) {
@@ -64,10 +65,12 @@ public class CollisionHandler {
 	public boolean isCollidedWith(SimpleCollisionBox playerBox, int bitmask) {
 		for (Block b : blocks) {
 			Location block = b.getLocation();
-			if (Materials.checkFlag(b.getType(), bitmask)
+			Material material = data.playerInfo.shitMap.getOrDefault(block, b.getType());
+
+			if (Materials.checkFlag(material, bitmask)
 					&& (!single || (block.getBlockX() == MathUtils.floor(location.x)
 					&& block.getBlockZ() == MathUtils.floor(location.z)))) {
-				if (BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion()).isCollided(playerBox)) {
+				if (BlockData.getData(material).getBox(b, ProtocolVersion.getGameVersion()).isCollided(playerBox)) {
 					return true;
 				}
 			}
@@ -91,9 +94,10 @@ public class CollisionHandler {
 
 		for (Block b : blocks) {
 			Location block = b.getLocation();
+			Material material = data.playerInfo.shitMap.getOrDefault(block, b.getType());
 
 			CollisionBox box;
-			if((box = BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion())).isCollided(playerBox)) {
+			if((box = BlockData.getData(material).getBox(b, ProtocolVersion.getGameVersion())).isCollided(playerBox)) {
 				collided.add(box);
 			}
 		}
@@ -121,8 +125,11 @@ public class CollisionHandler {
 
 	public boolean isCollidedWith(SimpleCollisionBox playerBox, Material... materials) {
 		for (Block b : blocks) {
-			if (MiscUtils.contains(materials, b.getType())) {
-				if (BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion()).isCollided(playerBox))
+			Location block = b.getLocation();
+			Material material = data.playerInfo.shitMap.getOrDefault(block, b.getType());
+
+			if (MiscUtils.contains(materials, material)) {
+				if (BlockData.getData(material).getBox(b, ProtocolVersion.getGameVersion()).isCollided(playerBox))
 					return true;
 			}
 		}

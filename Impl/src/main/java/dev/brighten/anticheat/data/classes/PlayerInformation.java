@@ -6,7 +6,12 @@ import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.TickTimer;
 import lombok.NoArgsConstructor;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @NoArgsConstructor
 public class PlayerInformation {
@@ -20,6 +25,7 @@ public class PlayerInformation {
     public float headYaw, headPitch;
     public float deltaYaw, deltaPitch, lDeltaYaw, lDeltaPitch;
     public long lastVelocityTimestamp;
+    public Map<Location, Material> shitMap = new HashMap<>();
     public Block blockBelow, blockOnTo;
 
     public PlayerInformation(ObjectData data) {
