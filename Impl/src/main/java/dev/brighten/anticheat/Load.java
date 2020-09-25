@@ -42,6 +42,9 @@ public class Load {
         register("Loading config...");
         Kauri.INSTANCE.saveDefaultConfig();
 
+        register("Loading API...");
+        Kauri.INSTANCE.kauriAPI = new KauriAPI();
+
         register("Loading commands...");
         Kauri.INSTANCE.commandManager = new CommandManager(Kauri.INSTANCE);
 
@@ -74,14 +77,11 @@ public class Load {
                 e.printStackTrace();
             }
 
-            startClassLoader();
+            startClassLoader(false);
         }
 
         register("Setting the language to " + Color.Yellow + Config.language);
         Kauri.INSTANCE.msgHandler.setCurrentLang(Config.language);
-
-        register("Loading API...");
-        Kauri.INSTANCE.kauriAPI = new KauriAPI();
 
         register("Registering checks...");
         Check.registerChecks();
@@ -109,10 +109,12 @@ public class Load {
         MiscUtils.printToConsole(Color.Gray + string);
     }
 
-    public static void startClassLoader() {
+    public static void startClassLoader(boolean reload) {
         //don't fucking modify or i will snap ur neck
-        for (int i = 0; i < 100; i++) {
-            SystemUtil.CRC_32.update(("GzB@aRC1$^JEKQxGmSBAQ%%WohM7LZnuC*pVhf0%B6VyZMyOvU" + i).getBytes(StandardCharsets.UTF_8));
+        if(!reload) {
+            for (int i = 0; i < 100; i++) {
+                SystemUtil.CRC_32.update(("GzB@aRC1$^JEKQxGmSBAQ%%WohM7LZnuC*pVhf0%B6VyZMyOvU" + i).getBytes(StandardCharsets.UTF_8));
+            }
         }
 
         loadVersion(Kauri.INSTANCE.LINK);

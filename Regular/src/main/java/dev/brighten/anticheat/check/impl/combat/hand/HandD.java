@@ -2,6 +2,7 @@ package dev.brighten.anticheat.check.impl.combat.hand;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.math.cond.MaxDouble;
@@ -27,6 +28,8 @@ import java.util.List;
 public class HandD extends Check {
 
     private MaxDouble verbose = new MaxDouble(20);
+    private Block block;
+
     @Packet
     public void onPlace(WrappedInBlockPlacePacket packet) {
         val pos = packet.getPosition();
@@ -37,6 +40,13 @@ public class HandD extends Check {
 
             if(block == null) return;
 
+            this.block = block;
+        }
+    }
+
+    @Packet
+    public void onFlying(WrappedInFlyingPacket packet) {
+        if(block != null) {
             List<SimpleCollisionBox> boxes = new ArrayList<>();
 
             BlockData.getData(block.getType()).getBox(block, ProtocolVersion.getGameVersion())
@@ -72,6 +82,7 @@ public class HandD extends Check {
             } else verbose.subtract(0.5);
 
             debug("collided=%v verbose=%v", collided, verbose.value());
+            block = null;
         }
     }
 }
