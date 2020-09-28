@@ -11,7 +11,7 @@ import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.Verbose;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "Aim (G)", description = "Checks for bad GCD bypasses. (Rhys collab)",
+@CheckInfo(name = "Aim (G)", description = "Checks for bad GCD bypasses.",
         checkType = CheckType.AIM, punishVL = 30)
 public class AimG extends Check {
 
