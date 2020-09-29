@@ -7,20 +7,35 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Aim (H)", description = "checks for large headsnaps.",
-        developer = true, checkType = CheckType.AIM, vlToFlag = 3)
+        developer = true, checkType = CheckType.AIM, vlToFlag = 9)
 public class AimH extends Check {
+    private double lastPosX, lastPosZ, lastHorizontalDistance;
 
-    private float lDeltaYaw;
     @Packet
-    public void process(final WrappedInFlyingPacket packet) {
-        if(packet.isLook()) {
-            double deltaYaw = Math.abs(data.playerInfo.to.yaw - data.playerInfo.from.yaw);
-            double delta = Math.abs(deltaYaw - lDeltaYaw);
+    public void process(final WrappedInFlyingPacket packet, final long current) {
+        final double posX = packet.getX();
+        final double posZ = packet.getZ();
 
-            if(delta > 80 && lDeltaYaw < 100 && deltaYaw > 320) {
+        final double horizontalDistance = Math.hypot(posX - lastPosX, posZ - lastPosZ);
+
+        // Player moved
+        if (posX != lastPosX || posZ != lastPosZ) {
+            final float deltaYaw = Math.abs(data.playerInfo.deltaYaw);
+            final float deltaPitch = Math.abs(data.playerInfo.deltaPitch);
+
+            final boolean attacking = current - data.playerInfo.lastAttackTimeStamp < 100L;
+            final double acceleration = Math.abs(horizontalDistance - lastHorizontalDistance);
+
+            // Player made a large head rotation and didn't accelerate / decelerate which is impossible
+            if (acceleration < 1e-02 && deltaYaw > 30.f && deltaPitch > 15.f && attacking) {
                 vl++;
-                flag("dyaw=%v.1 ldyaw=%v.1", deltaYaw, lDeltaYaw);
-            } else if(vl > 0) vl-= 0.01;
-        } else lDeltaYaw = 0;
+                flag("accel=%v.2 deltaYaw=%v.2 deltaPitch=%v.2 attacking=%v",
+                        acceleration, deltaYaw, deltaPitch, attacking);
+            }
+        }
+
+        this.lastHorizontalDistance = horizontalDistance;
+        this.lastPosX = posX;
+        this.lastPosZ = posZ;
     }
 }
