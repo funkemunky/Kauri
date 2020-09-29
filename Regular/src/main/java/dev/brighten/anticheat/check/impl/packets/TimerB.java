@@ -1,6 +1,8 @@
 package dev.brighten.anticheat.check.impl.packets;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -15,23 +17,28 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Cancellable
 public class TimerB extends Check {
 
-    private int buffer;
-    private final List<Long> list = new CopyOnWriteArrayList<>();
+    private int buffer, lagTicks;
+    private final List<Long> list = new EvictingList<>(20);
     private long lastFlying = System.currentTimeMillis();
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet, long current) {
         long delta = current - lastFlying;
 
-        if(list.size() > 20 && (delta > 5 && delta < 90)) {
+        /*if(list.size() > 20 && (delta > 5 && delta < 90)) {
             if(list.size() > 21) {
                 list.stream().filter(l -> l < 5 || l > 90).forEach(list::remove);
             }
             for (int i = 0; i < list.size() - 20; i++) {
                 list.remove(0);
             }
-        }
+        }*/
 
+        int ticks = Math.round(delta / 50.f) - 1;
+
+        if(ticks > 0) this.lagTicks+= ticks;
+
+        if((lagTicks-= lagTicks > 0 ? 1 : 0) <= 0)
         list.add(delta);
 
         double average = list.stream().mapToLong(l -> l).average().orElse(50);
@@ -45,7 +52,7 @@ public class TimerB extends Check {
             }
         } else if(buffer > 0) buffer-= 1f;
 
-        debug("delta=%v.2", average);
+        debug("delta=%v.2 lagTicks=%v", average, lagTicks);
         lastFlying = current;
     }
 }
