@@ -7,12 +7,15 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 
-@CheckInfo(name = "Speed (C)", description = "A simple limiting speed check with a high verbose threshold.",
-        punishVL = 34, vlToFlag = 2)
+@CheckInfo(name = "Speed (C)", description = "Checks if a player moves past the absolute maximum speed they can possible do.",
+        punishVL = 34, developer = true)
 @Cancellable
 public class SpeedC extends Check {
 
     private int verbose;
+    private float lfriction, maxMove, lai;
+    private static double forwardFactor = Math.sqrt(0.98 * 0.98 + 0.98 * 0.98);
+
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
         if(!packet.isPos() || data.playerInfo.generalCancel || data.playerInfo.lastVelocity.hasNotPassed(25)) {
@@ -20,31 +23,44 @@ public class SpeedC extends Check {
             return;
         }
 
-        double baseSpeed = data.playerInfo.baseSpeed + (!data.playerInfo.clientGround ? 0.06f
-                : (data.playerInfo.groundTicks > 10 ? 0.02 : 0.03));
+        float ai = (float)data.predictionService.aiMoveSpeed;
+        float deltaXZ = (float) data.playerInfo.deltaXZ;
+        if(lfriction != data.blockInfo.fromFriction
+                || maxMove == 0
+                || ai != lai
+                || data.playerInfo.clientGround != data.playerInfo.lClientGround)
+            maxMove = getMaxMovement(ai, data.blockInfo.fromFriction);
 
-        baseSpeed+= data.playerInfo.iceTimer.hasNotPassed(70) ? 0.4
-                + (Math.min(60, 60 - data.playerInfo.iceTimer.getPassed()) * 0.015) : 0;
-        baseSpeed+= data.playerInfo.blockAboveTimer.hasNotPassed(20) ? 0.35
-                + ((20 - data.playerInfo.blockAboveTimer.getPassed()) * 0.005) : 0;
-        baseSpeed+= data.playerInfo.lastHalfBlock.hasNotPassed(20)
-                ? 0.2 + (20 - data.playerInfo.lastHalfBlock.getPassed()) * 0.005
-                : 0;
-        baseSpeed+= data.playerInfo.wasOnSlime ? 0.1 : 0;
+        if(deltaXZ > maxMove) {
+            flag("[%v.3]>-[%v.3]", deltaXZ, maxMove);
+        }
 
-        if(data.playerInfo.lastBlockPlace.hasNotPassed(10))
-            baseSpeed+= 0.2;
+        debug("deltaXZ=%v.2 threshold=%v.2", deltaXZ, maxMove);
 
-        if(data.playerInfo.deltaXZ > baseSpeed) {
-            if(++verbose > 25
-                    || data.playerInfo.deltaXZ - baseSpeed > 0.45f) {
-                vl++;
-                flag("%v>-%v",
-                        MathUtils.round(data.playerInfo.deltaXZ, 3),
-                        MathUtils.round(baseSpeed, 3));
-            }
-        } else if(verbose > 0) verbose--;
+        lfriction = data.blockInfo.fromFriction;
+        lai = ai;
+    }
 
-        debug("deltaXZ=%v base=%v vb=%v", data.playerInfo.deltaXZ, baseSpeed, verbose);
+    public static float getMaxMovement(float aiMoveSpeed, float friction) {
+
+        float deltaXZ = 0;
+        float max = 0;
+        for(int i = 0 ; i < 20 ; i++) {
+            float movement = aiMoveSpeed
+                    * (0.16277136F / (float)Math.pow(friction * 0.91f, 3));
+
+            if(i % 4 == 0) movement+= 0.2f;
+
+            float f = movement / (float)forwardFactor;
+            float strafe = 0.98f * f, forward = 0.98f * f;
+
+            deltaXZ+= Math.hypot(forward * -1, strafe);
+
+            max = Math.max(deltaXZ, max);
+
+            deltaXZ*= friction;
+        }
+
+        return max;
     }
 }

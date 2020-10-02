@@ -83,10 +83,12 @@ public class SpeedA extends Check {
             if (ratio > 100.8 && data.playerInfo.lastBrokenBlock.hasPassed(data.lagInfo.transPing + 1)
                     && data.playerInfo.liquidTimer.hasPassed(2)
                     && !data.playerInfo.generalCancel && data.playerInfo.lastVelocity.hasPassed(2)) {
-                vl++;
-                flag("p=%v.1% dxz=%v.3 aimove=%v.3 tags=%v",
-                        ratio, data.playerInfo.deltaXZ, data.predictionService.aiMoveSpeed, tags.build());
-            } else if(vl > 0) vl-= 0.05f;
+                if(++buffer > 4) {
+                    vl++;
+                    flag("p=%v.1% dxz=%v.3 aimove=%v.3 tags=%v",
+                            ratio, data.playerInfo.deltaXZ, data.predictionService.aiMoveSpeed, tags.build());
+                }
+            } else if(buffer > 0) buffer-= 0.2f;
             debug("ratio=%v.1 tags=%v", ratio, tags.build());
 
             if(vxz != 0) {
