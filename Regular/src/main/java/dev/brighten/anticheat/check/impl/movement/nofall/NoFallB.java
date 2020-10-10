@@ -24,8 +24,7 @@ public class NoFallB extends Check {
 
         boolean ground = data.playerInfo.to.y % GROUND < 0.0001;
 
-        if(ground != packet.isGround() && !data.blockInfo.onSlime
-                && !data.playerInfo.serverGround
+        if(!ground && data.playerInfo.clientGround && !data.blockInfo.onSlime
                 && data.playerInfo.lastHalfBlock.hasPassed(3)) {
             if(++vl > 2) {
                 flag("c=%v s=%v", packet.isGround(), ground);
