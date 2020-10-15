@@ -9,9 +9,14 @@ import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.MiscUtils;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.utils.StringUtils;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.awt.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Init(commands = true)
@@ -20,7 +25,7 @@ public class LagCommand {
     @Command(name = "kauri.lag", description = "view important lag information", display = "lag",
             aliases = {"lag", "klag"}, permission = "kauri.command.lag")
     public void onCommand(CommandAdapter cmd) {
-        cmd.getSender().sendMessage(MiscUtils.line(Color.Dark_Gray));
+        StringUtils.Messages.LINE.send(cmd.getSender());
         cmd.getSender().sendMessage(Color.Gold + Color.Bold + "Server Lag Information");
         cmd.getSender().sendMessage("");
         cmd.getSender().sendMessage(Color.translate("&eTPS&8: &f" +
@@ -39,7 +44,7 @@ public class LagCommand {
                         .mapToDouble(val -> val.two / 1000000D)
                         .filter(val -> !Double.isNaN(val) && !Double.isInfinite(val))
                         .sum() / 50D * 100, 1)) + "%");
-        cmd.getSender().sendMessage(MiscUtils.line(Color.Dark_Gray));
+        StringUtils.Messages.LINE.send(cmd.getSender());
     }
 
     @Command(name = "kauri.lag.gc", description = "run a garbage collector.", display = "lag gc",
@@ -53,9 +58,7 @@ public class LagCommand {
         Runtime.getRuntime().gc();
         time = (System.nanoTime() - stamp) / 1E6D;
 
-        cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("gc-complete",
-                "&aCompleted garbage collection in %ms%ms!")
-                .replace("%ms%", String.valueOf(MathUtils.round(time, 2))));
+        StringUtils.Messages.GC_COMPLETE.send(cmd.getSender(), time);
     }
 
     @Command(name = "kauri.lag.player", description = "view player lag", display = "lag player [player]",
@@ -66,16 +69,14 @@ public class LagCommand {
             if(cmd.getSender() instanceof Player) {
                 target = cmd.getPlayer();
             } else {
-                cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
-                        .msg("provide-player", "&cYou must provide a player."));
+                StringUtils.Messages.PROVIDE_PLAYER.send(cmd.getSender());
                 return;
             }
         } else {
             target = Bukkit.getPlayer(cmd.getArgs()[0]);
 
             if(target == null) {
-                cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
-                        .msg("player-not-online", "&cThe player provided is not online!"));
+                StringUtils.Messages.PLAYER_ONLINE_NO.send(cmd.getSender());
                 return;
             }
         }
@@ -83,15 +84,14 @@ public class LagCommand {
         ObjectData data = Kauri.INSTANCE.dataManager.getData(target);
 
         if(data != null) {
-            cmd.getSender().sendMessage(MiscUtils.line(Color.Dark_Gray));
-            cmd.getSender().sendMessage(Color.Gold + Color.Bold + target.getName() + "'s Lag Information");
-            cmd.getSender().sendMessage("");
-            cmd.getSender().sendMessage(Color.translate("&ePing&7: &f"
-                    + data.lagInfo.ping + "&7/&f" + data.lagInfo.transPing));
-            cmd.getSender().sendMessage(Color.translate("&eLast Skip&7: &f" + data.lagInfo.lastPacketDrop.getPassed()));
-            cmd.getSender().sendMessage(Color.translate("&eLagging&7:&f" + data.lagInfo.lagging));
-            cmd.getSender().sendMessage(MiscUtils.line(Color.Dark_Gray));
-        } else cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("data-error",
-                "&cThere was an error trying to find your data."));
+            StringUtils.Messages.LINE.send(cmd.getSender());
+            StringUtils.sendMessage(cmd.getSender(), Color.Gold + Color.Bold + target.getName() + "'s Lag Information");
+            StringUtils.sendMessage(cmd.getSender(), "");
+            StringUtils.sendMessage(cmd.getSender(), "&ePing&7: &f"
+                    + data.lagInfo.ping + "ms&7/&f" + data.lagInfo.transPing + " tick");
+            StringUtils.sendMessage(cmd.getSender(), "&eLast Skip&7: &f" + data.lagInfo.lastPacketDrop.getPassed());
+            StringUtils.sendMessage(cmd.getSender(), "&eLagging&7: &f" + data.lagInfo.lagging);
+            StringUtils.Messages.LINE.send(cmd.getSender());
+        } else StringUtils.Messages.DATA_ERROR.send(cmd.getSender());
     }
 }

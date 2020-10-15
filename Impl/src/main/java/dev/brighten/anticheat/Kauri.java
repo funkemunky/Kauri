@@ -19,8 +19,11 @@ import dev.brighten.anticheat.logs.LoggerManager;
 import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.processing.PacketProcessor;
 import dev.brighten.anticheat.processing.keepalive.KeepaliveProcessor;
+import dev.brighten.anticheat.utils.StringUtils;
 import dev.brighten.anticheat.utils.TickTimer;
 import dev.brighten.api.KauriAPI;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -146,6 +149,8 @@ public class Kauri extends JavaPlugin {
 
         Atlas.getInstance().initializeScanner(this, false, false);
 
+        StringUtils.Messages.reload();
+
         loggerManager = new LoggerManager();
 
         for (Runnable runnable : onReload) {
@@ -175,6 +180,10 @@ public class Kauri extends JavaPlugin {
     public void load() {
         isNewer = ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_13);
         Load.load();
+    }
+
+    public TextComponent getMessage(String name, String def) {
+        return new TextComponent(TextComponent.fromLegacyText(msgHandler.getLanguage().msg(name, def)));
     }
 
     public void runTpsTask() {
