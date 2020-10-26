@@ -212,6 +212,7 @@ public class PredictionService {
 
         return motionYaw;
     }
+
     private void calcKey(float motionYaw, double mx, double mz) {
         // of the Player
 

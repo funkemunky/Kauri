@@ -23,7 +23,7 @@ public class TimerB extends Check {
     public void onPacket(WrappedInFlyingPacket packet, long current) {
         long delta = current - lastFlying;
 
-        if(list.size() > 20 && (delta > 5 && delta < 90)) {
+        if(list.size() > 20 && (list.size() > 60 || (delta > 5 && delta < 90))) {
             if(list.size() > 21) {
                 list.stream().filter(l -> l < 5 || l > 90).forEach(list::remove);
             }

@@ -24,6 +24,7 @@ public class FlyC extends Check {
                     && data.playerInfo.jumped
                     && !data.playerInfo.wasOnSlime
                     && data.playerInfo.lClientGround
+                    && !data.blockInfo.bedNear
                     && !data.playerInfo.serverGround
                     && data.playerInfo.blockAboveTimer.hasPassed(6)
                     && data.playerInfo.lastBlockPlace.hasPassed(20)

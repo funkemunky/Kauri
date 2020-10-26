@@ -20,17 +20,14 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class BlockInformation {
     private ObjectData objectData;
     public boolean onClimbable, onSlab, onStairs, onHalfBlock, inLiquid, inLava, inWater, inWeb, onSlime, onIce,
-            onSoulSand, blocksAbove, collidesVertically, collidesHorizontally, blocksNear, inBlock, miscNear;
+            onSoulSand, blocksAbove, collidesVertically, bedNear, collidesHorizontally, blocksNear, inBlock, miscNear;
     public float currentFriction, fromFriction;
     public CollisionHandler
             handler = new CollisionHandler(new ArrayList<>(), new ArrayList<>(), new KLocation(0,0,0), null);
@@ -41,6 +38,9 @@ public class BlockInformation {
     public BlockInformation(ObjectData objectData) {
         this.objectData = objectData;
     }
+
+    private static Material[] bedBlocks =
+            Arrays.stream(Material.values()).filter(mat -> mat.name().contains("BED")).toArray(Material[]::new);
 
     public void runCollisionCheck() {
         if(!Kauri.INSTANCE.enabled
@@ -127,7 +127,9 @@ public class BlockInformation {
                 XMaterial.WITHER_SKELETON_SKULL.parseMaterial(), XMaterial.SKELETON_WALL_SKULL.parseMaterial(),
                 XMaterial.WITHER_SKELETON_WALL_SKULL.parseMaterial());
 
-        if(!onHalfBlock) onHalfBlock = miscNear;
+        bedNear = handler.isCollidedWith(bedBlocks);
+
+        if(!onHalfBlock) onHalfBlock = miscNear || bedNear;
 
         handler.setSize(0.6f, 1.8f);
         handler.setSingle(true);
