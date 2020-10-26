@@ -141,7 +141,7 @@ public class VelocityB extends Check {
             }
 
             double ratioX = data.playerInfo.deltaX / pvX, ratioZ = data.playerInfo.deltaZ / pvZ;
-            double ratio = Math.hypot(ratioX, ratioZ);
+            double ratio = (ratioX + ratioZ) / 2;
 
             if(ratio < 0.998
                     && timeStamp - data.creation > 3000L

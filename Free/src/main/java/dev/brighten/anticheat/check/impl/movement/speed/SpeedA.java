@@ -13,7 +13,7 @@ import dev.brighten.api.check.CheckType;
 import org.bukkit.potion.PotionEffectType;
 
 @CheckInfo(name = "Speed (A)", description = "Minecraft code speed acceleration check.",
-        checkType = CheckType.SPEED, developer = true)
+        checkType = CheckType.SPEED)
 @Cancellable
 public class SpeedA extends Check {
 
@@ -37,8 +37,7 @@ public class SpeedA extends Check {
         checkProccesing:
         {
             if (!packet.isPos()
-                    || (data.playerInfo.deltaY == 0 && data.playerInfo.deltaXZ == 0)
-                    || data.playerInfo.serverPos) {
+                    || (data.playerInfo.deltaY == 0 && data.playerInfo.deltaXZ == 0)) {
                 break checkProccesing;
             }
             float drag = friction;
@@ -78,17 +77,25 @@ public class SpeedA extends Check {
                 moveFactor = 0.034;
             }
 
+            if(data.playerInfo.lastTeleportTimer.hasNotPassed(6)
+                    || data.playerInfo.lastRespawnTimer.hasNotPassed(6)) {
+                tags.addTag("teleport");
+                moveFactor+= 0.1;
+                moveFactor*= 5;
+            }
+
             double ratio = (data.playerInfo.deltaXZ - ldxz) / moveFactor * 100;
 
             if (ratio > 100.8 && data.playerInfo.lastBrokenBlock.hasPassed(data.lagInfo.transPing + 1)
                     && data.playerInfo.liquidTimer.hasPassed(2)
+                    && data.playerInfo.lastTeleportTimer.hasPassed(1)
                     && !data.playerInfo.generalCancel && data.playerInfo.lastVelocity.hasPassed(2)) {
-                if(++buffer > 4) {
+                if((buffer+= ratio > 500 ? 2 : 1) > 4) {
                     vl++;
                     flag("p=%v.1% dxz=%v.3 aimove=%v.3 tags=%v",
                             ratio, data.playerInfo.deltaXZ, data.predictionService.aiMoveSpeed, tags.build());
                 }
-            } else if(buffer > 0) buffer-= 0.2f;
+            } else if(buffer > 0) buffer-= 0.25f;
             debug("ratio=%v.1 tags=%v", ratio, tags.build());
 
             if(vxz != 0) {

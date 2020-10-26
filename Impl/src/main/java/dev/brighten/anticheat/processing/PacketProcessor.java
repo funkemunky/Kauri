@@ -444,6 +444,12 @@ public class PacketProcessor {
                         data.predictionService.velocity = true;
                     });
                 }
+
+                if(data.sniffing) {
+                    data.sniffedPackets.add(event.getType() + ":@:" + packet.getId() + ";"
+                            + packet.getX() + ";" + packet.getY() + ";" + packet.getZ()
+                            + ":@:" + event.getTimeStamp());
+                }
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
             }
@@ -482,6 +488,10 @@ public class PacketProcessor {
                     data.lagInfo.lastTrans = event.getTimeStamp();
                 }
 
+                if(data.sniffing) {
+                    data.sniffedPackets.add(event.getType() + ":@:" + packet.getId() + ";"
+                            + packet.getAction() + ":@:" + event.getTimeStamp());
+                }
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
             }

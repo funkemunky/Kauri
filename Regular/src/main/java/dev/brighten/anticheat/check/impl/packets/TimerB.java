@@ -7,6 +7,9 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -16,19 +19,20 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class TimerB extends Check {
 
     private int buffer;
-    private final List<Long> list = new CopyOnWriteArrayList<>();
+    private final Deque<Long> list = new LinkedList<>();
     private long lastFlying = System.currentTimeMillis();
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet, long current) {
         long delta = current - lastFlying;
 
-        if(list.size() > 20 && (list.size() > 60 || (delta > 5 && delta < 90))) {
-            if(list.size() > 21) {
+        if(list.size() > 30 && (list.size() > 60 || (delta > 5 && delta < 90))) {
+            if(list.size() > 31) {
                 list.stream().filter(l -> l < 5 || l > 90).forEach(list::remove);
             }
-            for (int i = 0; i < list.size() - 20; i++) {
-                list.remove(0);
+            //Removing all values until its 30 or less
+            while(list.size() > 30) {
+                list.removeFirst();
             }
         }
 
@@ -38,7 +42,7 @@ public class TimerB extends Check {
 
         double pct = 50 / average * 100;
 
-        if(pct > 101 && list.size() > 15) {
+        if(pct > 101 && list.size() > 20) {
             if(++buffer > 20) {
                 vl++;
                 flag("pct=%v.1", pct);
