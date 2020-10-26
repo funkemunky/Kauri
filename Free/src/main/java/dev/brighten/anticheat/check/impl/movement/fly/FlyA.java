@@ -76,9 +76,9 @@ public class FlyA extends Check {
                     && data.playerInfo.lastHalfBlock.hasPassed(5)
                     && data.playerInfo.lastVelocity.hasPassed(4)) {
                 vl++;
-                if(vl > 2)
+                if(vl > 3)
                 flag("deltaY=%v.4 predicted=%v.4", data.playerInfo.deltaY, predicted);
-            } else if(vl > 0) vl-= 0.1;
+            } else if(vl > 0) vl-= 0.25;
             end = System.nanoTime() - start;
 
             debug(Color.Green + "deltaY=%v difference=%v", data.playerInfo.deltaY, check);

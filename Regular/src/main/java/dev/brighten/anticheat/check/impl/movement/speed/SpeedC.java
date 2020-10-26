@@ -25,11 +25,9 @@ public class SpeedC extends Check {
 
         float ai = (float)data.predictionService.aiMoveSpeed;
         float deltaXZ = (float) data.playerInfo.deltaXZ;
-        if(lfriction != data.blockInfo.fromFriction
-                || maxMove == 0
-                || ai != lai
-                || data.playerInfo.clientGround != data.playerInfo.lClientGround)
-            maxMove = getMaxMovement(ai, data.blockInfo.fromFriction);
+        float drag = data.playerInfo.lClientGround ? 0.91f * data.blockInfo.fromFriction : 0.91f;
+
+        maxMove = getMaxMovement(data.playerInfo.clientGround, data.playerInfo.lClientGround ? ai : 0.026f, drag) * 2.5f;
 
         if(deltaXZ > maxMove) {
             flag("[%v.3]>-[%v.3]", deltaXZ, maxMove);
@@ -41,20 +39,20 @@ public class SpeedC extends Check {
         lai = ai;
     }
 
-    public static float getMaxMovement(float aiMoveSpeed, float friction) {
+    public static float getMaxMovement(boolean onGround, float aiMoveSpeed, float friction) {
 
         float deltaXZ = 0;
         float max = 0;
         for(int i = 0 ; i < 20 ; i++) {
-            float movement = aiMoveSpeed
-                    * (0.16277136F / (float)Math.pow(friction * 0.91f, 3));
+            float movement = onGround ? aiMoveSpeed
+                    * (0.16277136F / (float)Math.pow(friction, 3)) : 0.026f;
 
             if(i % 4 == 0) movement+= 0.2f;
 
             float f = movement / (float)forwardFactor;
             float strafe = 0.98f * f, forward = 0.98f * f;
 
-            deltaXZ+= Math.hypot(forward * -1, strafe);
+            deltaXZ+= Math.hypot(0, strafe);
 
             max = Math.max(deltaXZ, max);
 
