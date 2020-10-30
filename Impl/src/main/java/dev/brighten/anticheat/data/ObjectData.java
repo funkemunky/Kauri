@@ -23,6 +23,7 @@ import dev.brighten.anticheat.processing.MovementProcessor;
 import dev.brighten.anticheat.processing.PotionProcessor;
 import dev.brighten.anticheat.processing.keepalive.KeepAlive;
 import dev.brighten.anticheat.utils.PastLocation;
+import dev.brighten.anticheat.utils.RelativePastLocation;
 import dev.brighten.anticheat.utils.TickTimer;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.data.Data;
@@ -58,6 +59,7 @@ public class ObjectData implements Data {
     public CheckManager checkManager;
     public PlayerInformation playerInfo;
     public BlockInformation blockInfo;
+    public RelativePastLocation relTPastLocation = new RelativePastLocation();
     public LagInformation lagInfo;
     public PredictionService predictionService;
     public MovementProcessor moveProcessor;
