@@ -12,13 +12,13 @@ import dev.brighten.anticheat.check.api.Packet;
 @Cancellable
 public class SpeedC extends Check {
 
-    private int verbose;
-    private float lfriction, maxMove, lai;
-    private static double forwardFactor = Math.sqrt(0.98 * 0.98 + 0.98 * 0.98);
+    private float verbose;
+    private double maxMove;
+    private static final double forwardFactor = Math.sqrt(0.98 * 0.98 + 0.98 * 0.98);
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
-        if(!packet.isPos() || data.playerInfo.generalCancel || data.playerInfo.lastVelocity.hasNotPassed(25)) {
+        if(!packet.isPos() || data.playerInfo.generalCancel) {
             if(data.playerInfo.generalCancel && verbose > 0) verbose--;
             return;
         }
@@ -27,32 +27,38 @@ public class SpeedC extends Check {
         float deltaXZ = (float) data.playerInfo.deltaXZ;
         float drag = data.playerInfo.lClientGround ? 0.91f * data.blockInfo.fromFriction : 0.91f;
 
-        maxMove = getMaxMovement(data.playerInfo.clientGround, data.playerInfo.lClientGround ? ai : 0.026f, drag) * 2.5f;
+        maxMove = getMaxMovement(ai, drag) * 2.2f;
 
-        if(deltaXZ > maxMove) {
-            flag("[%v.3]>-[%v.3]", deltaXZ, maxMove);
+        if(data.playerInfo.lastVelocity.hasNotPassed(30)) {
+            maxMove = Math.max(maxMove,
+                    Math.hypot(data.playerInfo.velocityX, data.playerInfo.velocityZ) * 2.5f);
         }
 
-        debug("deltaXZ=%v.2 threshold=%v.2", deltaXZ, maxMove);
+        if(deltaXZ > maxMove) {
+            verbose+= deltaXZ > maxMove * 1.5 ? 3 : 1;
 
-        lfriction = data.blockInfo.fromFriction;
-        lai = ai;
+            if(++verbose > 2) {
+                vl++;
+                flag("[%v.3]>-[%v.3]", deltaXZ, maxMove);
+            }
+        } else if(verbose > 0) verbose-= 0.1f;
+
+        debug("deltaXZ=%v.2 threshold=%v.2", deltaXZ, maxMove);
     }
 
-    public static float getMaxMovement(boolean onGround, float aiMoveSpeed, float friction) {
-
+    public static float getMaxMovement(float aiMoveSpeed, float friction) {
         float deltaXZ = 0;
         float max = 0;
         for(int i = 0 ; i < 20 ; i++) {
-            float movement = onGround ? aiMoveSpeed
-                    * (0.16277136F / (float)Math.pow(friction, 3)) : 0.026f;
+            float movement = aiMoveSpeed
+                    * (0.16277136F / (float)Math.pow(friction * 0.91f, 3));
 
             if(i % 4 == 0) movement+= 0.2f;
 
             float f = movement / (float)forwardFactor;
             float strafe = 0.98f * f, forward = 0.98f * f;
 
-            deltaXZ+= Math.hypot(0, strafe);
+            deltaXZ+= Math.hypot(forward * -1, strafe);
 
             max = Math.max(deltaXZ, max);
 

@@ -38,6 +38,7 @@ public class AutoclickerF extends Check {
     @Packet
     public void onArm(WrappedInArmAnimationPacket packet, int current) {
         if(data.playerInfo.breakingBlock
+                || data.playerInfo.lookingAtBlock
                 || data.playerInfo.lastBrokenBlock.hasNotPassed(5)
                 || data.playerInfo.lastBlockDigPacket.hasNotPassed(1)
                 || data.playerInfo.lastBlockPlacePacket.hasNotPassed(1))

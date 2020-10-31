@@ -472,9 +472,9 @@ public class PacketProcessor {
             case "PacketPlayOutEntity$PacketPlayOutEntityLook": {
                 WrappedOutRelativePosition packet = new WrappedOutRelativePosition(object, data.getPlayer());
 
-                if(data.target != null && data.target.getEntityId() == packet.getId()) {
-                    data.relTPastLocation.addLocation(packet);
-                }
+                //if(data.target != null && data.target.getEntityId() == packet.getId()) {
+                    //data.relTPastLocation.addLocation(packet);
+                //}
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
             }

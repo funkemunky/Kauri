@@ -26,6 +26,7 @@ public class AutoclickerC extends Check {
 
     @Packet
     public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
+        if(data.playerInfo.breakingBlock || data.playerInfo.lookingAtBlock) return;
         cps = 1000D / (timeStamp - lastArm);
         lastArm = timeStamp;
         armTicks++;

@@ -26,7 +26,7 @@ public class ReachC extends Check {
                 return;
             }
 
-            int tick = now - data.lagInfo.transPing;
+            int tick = now - data.lagInfo.transPing - 4;
 
             Optional<RelativePastLocation.RelativeLocation> loc = data.relTPastLocation.getLocation(tick);
 
@@ -38,12 +38,10 @@ public class ReachC extends Check {
 
             RelativePastLocation.RelativeLocation location = loc.get();
 
-
-
-            Vector currentPos = location.getPosition(3 -Math.abs(tick - location.tick));
+            Vector currentPos = location.getPosition(3 - Math.abs(tick - location.tick));
 
             double distance = currentPos.clone().setY(0).distance(data.playerInfo.to.toVector().setY(0));
-            debug(location.location.toString());
+            debug("%v.2", distance);
             //debug("distance=%v.2 locTick=%v tick=%v", distance, location.tick, tick);
         }
     }

@@ -17,6 +17,7 @@ public class AutoclickerG extends Check {
     @Packet
     public void check(WrappedInArmAnimationPacket packet) {
         if(data.playerInfo.breakingBlock
+                || data.playerInfo.lookingAtBlock
                 || data.clickProcessor.isNotReady()
                 || data.playerInfo.lastBrokenBlock.hasNotPassed(5)
                 || data.playerInfo.lastBlockDigPacket.hasNotPassed(1)

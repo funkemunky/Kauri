@@ -16,7 +16,7 @@ import java.util.Map;
 @NoArgsConstructor
 public class PlayerInformation {
     public boolean serverGround, lClientGround, clientGround, nearGround,
-            collided, insideBlock, phaseFlagged,
+            collided, insideBlock, lookingAtBlock,
             onLadder, isClimbing, usingItem, wasOnIce, wasOnSlime, jumped, inAir, lworldLoaded, worldLoaded;
     public boolean generalCancel, flightCancel;
     public float fallDistance;

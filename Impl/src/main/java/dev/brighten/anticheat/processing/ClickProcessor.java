@@ -46,6 +46,7 @@ public class ClickProcessor {
 
         if(delta < 15
                 && !data.playerInfo.breakingBlock
+                && !data.playerInfo.lookingAtBlock
                 && data.playerInfo.lastBlockPlacePacket.hasPassed(1)
                 && data.playerInfo.lastBlockDigPacket.hasPassed(1)
                 && data.playerInfo.lastBlockPlace.hasPassed(3)) {

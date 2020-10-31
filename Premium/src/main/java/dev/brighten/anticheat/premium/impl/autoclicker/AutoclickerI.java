@@ -18,7 +18,7 @@ public class AutoclickerI extends Check {
 
     @Packet
     public void use(WrappedInArmAnimationPacket packet, long current) {
-        if(current - lastFlying < 10) {
+        if(current - lastFlying < 10 && data.lagInfo.lastPacketDrop.hasPassed(10)) {
             vl++;
             if(vl > 11) {
                 flag("delta=%v", current - lastFlying);

@@ -8,6 +8,7 @@ import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.handlers.PlayerSizeHandler;
 import cc.funkemunky.api.utils.objects.VariableValue;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
+import cc.funkemunky.api.utils.world.types.RayCollision;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.MiscUtils;
@@ -151,6 +152,16 @@ public class MovementProcessor {
                     data.playerInfo.to.x, data.playerInfo.to.y, data.playerInfo.to.z);
 
             if(timeStamp - data.creation > 400L) data.blockInfo.runCollisionCheck(); //run b4 everything else for use below.
+        }
+
+        if(packet.isPos() || packet.isLook()) {
+            KLocation origin = data.playerInfo.to.clone();
+            origin.y+= data.playerInfo.sneaking ? 1.54f : 1.62f;
+            RayCollision collision = new RayCollision(origin.toVector(), MathUtils.getDirection(origin));
+
+            data.playerInfo.lookingAtBlock = collision
+                    .boxesOnRay(data.getPlayer().getWorld(),
+                            data.getPlayer().getGameMode().equals(GameMode.CREATIVE) ? 6.0 : 5.0).size() > 0;
         }
 
         data.playerInfo.inVehicle = data.getPlayer().getVehicle() != null;
