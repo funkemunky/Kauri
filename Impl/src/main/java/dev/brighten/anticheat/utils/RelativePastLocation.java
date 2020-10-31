@@ -1,5 +1,7 @@
 package dev.brighten.anticheat.utils;
 
+import cc.funkemunky.api.reflections.impl.CraftReflection;
+import cc.funkemunky.api.reflections.impl.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutRelativePosition;
 import cc.funkemunky.api.utils.MathHelper;
@@ -32,6 +34,9 @@ public class RelativePastLocation {
 
         if(entity == null) return;
 
+        int[] loc = ReflectionUtil
+                .getTrackerLoc(CraftReflection.getVanillaWorld(entity.getWorld()), entity.getEntityId());
+
         if(ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_9)) {
             int rx = packet.getX(), ry = packet.getY(), rz = packet.getZ();
 
@@ -45,7 +50,8 @@ public class RelativePastLocation {
             z = rz / 32.;
         }
 
-        RelativeLocation location = new RelativeLocation(x, y, z, entity.getLocation().clone(),
+        RelativeLocation location = new RelativeLocation(x, y, z,
+                new Location(entity.getWorld(), loc[0] / 32., loc[1] / 32., loc[2] / 32.),
                 3, MiscUtils.currentTick());
 
         pastLocations.add(location);
