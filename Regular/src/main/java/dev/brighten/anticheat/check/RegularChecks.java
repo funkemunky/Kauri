@@ -68,5 +68,6 @@ public class RegularChecks implements CheckRegister {
         Check.register(new PacketSpam());
         Check.register(new SignOp());
         Check.register(new SignCrash());
+        Check.register(new CreativeCrash());
     }
 }

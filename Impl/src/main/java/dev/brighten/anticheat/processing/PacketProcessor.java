@@ -13,6 +13,7 @@ import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.XMaterial;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.RelativePastLocation;
 import lombok.val;
 import org.bukkit.Bukkit;
@@ -130,17 +131,6 @@ public class PacketProcessor {
                     case STOP_DESTROY_BLOCK: {
                         data.predictionService.useSword
                                 = data.playerInfo.usingItem = false;
-
-                        val pos = packet.getPosition();
-
-                        Location loc = new Location(data.getPlayer().getWorld(),
-                                pos.getX(), pos.getY(), pos.getZ());
-
-                        data.playerInfo.shitMap.put(loc, Material.AIR);
-                        data.runKeepaliveAction(ka -> {
-                            data.playerInfo.shitMap.remove(loc);
-                            Bukkit.broadcastMessage("shit");
-                        });
                         break;
                     }
                     case ABORT_DESTROY_BLOCK: {
