@@ -53,13 +53,14 @@ public class FlyB extends Check {
                     && data.playerInfo.lastVelocity.hasPassed(3)
                     && (!data.playerInfo.clientGround || data.playerInfo.deltaY < predicted)
                     && data.playerInfo.blockAboveTimer.hasPassed(5)
+                    && data.playerInfo.lastBlockPlace.hasPassed(4)
                     && deltaPredict > 0.016) {
                 flagged = true;
-                if(++buffer > 2 || Math.abs(deltaPredict) > 0.2) {
+                if(++buffer > 2) {
                     ++vl;
                     flag("dY=%v.3 p=%v.3 dx=%v.3", data.playerInfo.deltaY, predicted, data.playerInfo.deltaXZ);
                 }
-            } else buffer-= buffer > 0 ? 0.2f : 0;
+            } else buffer-= buffer > 0 ? 0.5f : 0;
 
             debug((flagged ? Color.Green : "") +"pos=%v deltaY=%v.3 predicted=%v.3 ground=%v lpass=%v buffer=%v.1",
                     packet.getY(), data.playerInfo.deltaY, predicted, data.playerInfo.clientGround,

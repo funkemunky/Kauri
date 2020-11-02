@@ -34,6 +34,8 @@ public class AimH extends Check {
             }
         }
 
+        debug("looking=%v", data.playerInfo.lookingAtBlock);
+
         this.lastHorizontalDistance = horizontalDistance;
         this.lastPosX = posX;
         this.lastPosZ = posZ;

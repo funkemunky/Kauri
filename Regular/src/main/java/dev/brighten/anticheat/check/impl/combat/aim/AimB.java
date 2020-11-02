@@ -1,7 +1,6 @@
 package dev.brighten.anticheat.check.impl.combat.aim;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -22,15 +21,10 @@ public class AimB extends Check {
                     flag("offset=%v deltaPitch=%v", data.playerInfo.pitchGCD, data.playerInfo.deltaPitch);
                 }
             } else vl-= vl > 0 ? 0.5 : 0;
-            //debug("gcd=%v cin=%v dpitch=%v ldp=%v pitch=%v.2 lpitch=%v.2 vl=%v.1",
-            //        data.playerInfo.pitchGCD,
-            //       data.playerInfo.cinematicMode, data.playerInfo.deltaPitch, data.playerInfo.lDeltaPitch,
-            //        data.playerInfo.to.pitch, data.playerInfo.from.pitch, vl);
-
-            debug("(%v) yaw=%v.4 pitch=%v.4",
-                    data.playerInfo.cinematicMode,
-                    Math.abs(MathUtils.yawTo180F(data.playerInfo.from.yaw) - data.moveProcessor.smoothYaw),
-                    Math.abs(data.playerInfo.from.pitch - data.moveProcessor.smoothPitch));
+            debug("gcd=%v cin=%v dpitch=%v ldp=%v pitch=%v.2 lpitch=%v.2 vl=%v.1",
+                    data.playerInfo.pitchGCD,
+                   data.playerInfo.cinematicMode, data.playerInfo.deltaPitch, data.playerInfo.lDeltaPitch,
+                    data.playerInfo.to.pitch, data.playerInfo.from.pitch, vl);
         }
     }
 }

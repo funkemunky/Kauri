@@ -13,6 +13,8 @@ import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.XMaterial;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.utils.MiscUtils;
+import dev.brighten.anticheat.utils.RelativePastLocation;
 import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -55,6 +57,7 @@ public class PacketProcessor {
                         if (data.target != null && data.target.getEntityId() != packet.getId()) {
                             //Resetting location to prevent false positives.
                             data.targetPastLocation.previousLocations.clear();
+                            data.relTPastLocation.getPastLocations().clear();
                             data.playerInfo.lastTargetSwitch.reset();
                             if (packet.getEntity() instanceof Player) {
                                 data.targetData = Kauri.INSTANCE.dataManager.getData((Player) packet.getEntity());
@@ -128,17 +131,6 @@ public class PacketProcessor {
                     case STOP_DESTROY_BLOCK: {
                         data.predictionService.useSword
                                 = data.playerInfo.usingItem = false;
-
-                        val pos = packet.getPosition();
-
-                        Location loc = new Location(data.getPlayer().getWorld(),
-                                pos.getX(), pos.getY(), pos.getZ());
-
-                        data.playerInfo.shitMap.put(loc, Material.AIR);
-                        data.runKeepaliveAction(ka -> {
-                            data.playerInfo.shitMap.remove(loc);
-                            Bukkit.broadcastMessage("shit");
-                        });
                         break;
                     }
                     case ABORT_DESTROY_BLOCK: {
@@ -444,6 +436,12 @@ public class PacketProcessor {
                         data.predictionService.velocity = true;
                     });
                 }
+
+                if(data.sniffing) {
+                    data.sniffedPackets.add(event.getType() + ":@:" + packet.getId() + ";"
+                            + packet.getX() + ";" + packet.getY() + ";" + packet.getZ()
+                            + ":@:" + event.getTimeStamp());
+                }
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
             }
@@ -464,6 +462,9 @@ public class PacketProcessor {
             case "PacketPlayOutEntity$PacketPlayOutEntityLook": {
                 WrappedOutRelativePosition packet = new WrappedOutRelativePosition(object, data.getPlayer());
 
+                //if(data.target != null && data.target.getEntityId() == packet.getId()) {
+                    //data.relTPastLocation.addLocation(packet);
+                //}
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
             }
@@ -482,6 +483,10 @@ public class PacketProcessor {
                     data.lagInfo.lastTrans = event.getTimeStamp();
                 }
 
+                if(data.sniffing) {
+                    data.sniffedPackets.add(event.getType() + ":@:" + packet.getId() + ";"
+                            + packet.getAction() + ":@:" + event.getTimeStamp());
+                }
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
             }

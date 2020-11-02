@@ -5,12 +5,15 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.Tuple;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 import org.bukkit.enchantments.Enchantment;
+
+import java.util.*;
 
 @CheckInfo(name = "Velocity (B)", description = "A horizontally velocity check.", checkType = CheckType.VELOCITY,
         punishVL = 80, vlToFlag = 15)
@@ -85,49 +88,62 @@ public class VelocityB extends Check {
             double vZ = pvZ;
             double vXZ = 0;
 
+            List<Tuple<Double[], Double[]>> predictions = new ArrayList<>();
+
             double moveStrafe = 0, moveForward = 0;
             for (double forward : moveValues) {
                 for(double strafe : moveValues) {
                     double s2 = strafe;
                     double f2 = forward;
+
                     if(data.playerInfo.usingItem) {
                         s2*= 0.2;
                         f2*= 0.2;
                     }
+
                     moveFlying(s2, f2, f5);
 
-                    double deltaX = Math.abs(pvX - data.playerInfo.deltaX);
-                    double deltaZ = Math.abs(pvZ - data.playerInfo.deltaZ);
+                    predictions.add(new Tuple<>(new Double[]{f2, s2}, new Double[]{pvX, pvZ}));
 
                     pvX = vX;
                     pvZ = vZ;
-                    if(deltaX <= 0.005 - (data.playerInfo.usingItem ? 0.0045 : 0)
-                            && deltaZ <= 0.005 - (data.playerInfo.usingItem ? 0.0045 : 0)) {
-                        moveForward = f2;
-                        moveStrafe = s2;
-                        found = true;
-                        break;
-                    }
-
                 }
             }
 
-            if(!found) {
+            Optional<Tuple<Double[],Double[]>> velocity = predictions.stream()
+                    .filter(tuple -> {
+                double deltaX = Math.abs(tuple.two[0] - data.playerInfo.deltaX);
+                double deltaZ = Math.abs(tuple.two[1] - data.playerInfo.deltaZ);
+
+                return deltaX < 0.01 && deltaZ < 0.01;
+            }).min(Comparator.comparing(tuple -> {
+                double deltaX = Math.abs(tuple.two[0] - data.playerInfo.deltaX);
+                double deltaZ = Math.abs(tuple.two[1] - data.playerInfo.deltaZ);
+
+                return Math.hypot(deltaX, deltaZ);
+            }));
+
+            if(!velocity.isPresent()) {
                 moveStrafe = data.predictionService.moveStrafing;
                 moveForward = data.predictionService.moveForward;
                 if(data.playerInfo.usingItem) {
                     moveStrafe*= 0.2;
                     moveForward*= 0.2;
                 }
+                moveFlying(moveStrafe, moveForward, f5);
+            } else {
+                Tuple<Double[],Double[]> tuple = velocity.get();
+
+                moveForward = tuple.one[0];
+                moveStrafe = tuple.one[1];
+                pvX = tuple.two[0];
+                pvZ = tuple.two[1];
             }
 
-            moveFlying(moveStrafe, moveForward, f5);
+            double ratioX = data.playerInfo.deltaX / pvX, ratioZ = data.playerInfo.deltaZ / pvZ;
+            double ratio = (ratioX + ratioZ) / 2;
 
-            vXZ = MathUtils.hypot(pvX, pvZ);
-
-            double ratio = data.playerInfo.deltaXZ / vXZ;
-
-            if(ratio < (data.playerVersion.isOrAbove(ProtocolVersion.V1_9) ? 0.8 : 0.993)
+            if(ratio < 0.998
                     && timeStamp - data.creation > 3000L
                     && !data.getPlayer().getItemInHand().getType().isEdible()
                     && !data.blockInfo.blocksNear) {
@@ -137,8 +153,10 @@ public class VelocityB extends Check {
                             ratio * 100, buffer, moveStrafe, moveForward);
                 }
             } else buffer-= buffer > 0 ? data.lagInfo.lastPacketDrop.hasNotPassed(20) ? .5 : 0.25 : 0;
+
             debug("ratio=%v.3 buffer=%v.1 strafe=%v.2 forward=%v.2 lastUse=%v found=%v",
                     ratio, buffer, moveStrafe, moveForward, data.playerInfo.lastUseItem.getPassed(), found);
+
             pvX *= drag;
             pvZ *= drag;
 

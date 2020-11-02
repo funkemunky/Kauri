@@ -19,13 +19,13 @@ public class NoFallB extends Check {
                 || data.playerInfo.generalCancel
                 || data.playerInfo.serverPos
                 || data.playerInfo.lastTeleportTimer.hasNotPassed(2)
-                || data.playerInfo.lastRespawnTimer.hasNotPassed(1))
+                || data.playerInfo.lastRespawnTimer.hasNotPassed(10))
             return;
 
         boolean ground = data.playerInfo.to.y % GROUND < 0.0001;
 
         if(ground != packet.isGround() && !data.blockInfo.onSlime
-                && !data.playerInfo.serverGround
+                && !data.playerInfo.nearGround
                 && data.playerInfo.lastHalfBlock.hasPassed(3)) {
             if(++vl > 2) {
                 flag("c=%v s=%v", packet.isGround(), ground);

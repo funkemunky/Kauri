@@ -26,6 +26,7 @@ public class AutoclickerB extends Check {
 
     @Packet
     public void onBlockPlace(WrappedInBlockPlacePacket packet, int currentTick) {
+        if(data.playerInfo.lookingAtBlock || data.playerInfo.breakingBlock) return;
         int deltaArm = currentTick - lastArm;
 
         tickDeltas.add(deltaArm);
