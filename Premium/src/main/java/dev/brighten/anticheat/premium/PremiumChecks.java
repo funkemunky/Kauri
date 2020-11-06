@@ -26,8 +26,9 @@ public class PremiumChecks implements CheckRegister {
         Check.register(new ReachB());
         //Check.register(new ReachC());
         Check.register(new Motion());
-        //Check.register(new AimG());
+        Check.register(new AimG());
         Check.register(new AimH());
+        Check.register(new AimI());
         Check.register(new HealthSpoof());
         Check.register(new AutoclickerD());
         Check.register(new AutoclickerF());

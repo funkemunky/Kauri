@@ -2,17 +2,20 @@ package dev.brighten.anticheat.classloader;
 
 import dev.brighten.anticheat.classloader.file.JarUtil;
 import dev.brighten.anticheat.utils.SystemUtil;
+import lombok.Getter;
 
 import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created on 28/08/2020 Package dev.brighten.anticheat.classloader
  */
 public class KauriClassLoader extends URLClassLoader {
 
+    @Getter
     private Map<String, byte[]> classBytes;
 
     public KauriClassLoader(URL url, java.lang.ClassLoader parent) {
@@ -25,8 +28,7 @@ public class KauriClassLoader extends URLClassLoader {
         }
 
         //Load the class bytes from the encrypted file
-        classBytes = JarUtil.loadNonClassEntries(jarFile);
-
+        classBytes = new ConcurrentHashMap<>(JarUtil.loadNonClassEntries(jarFile));
 
         Map<String, byte[]> encryptedClasses = JarUtil.loadJar(jarFile);
 
@@ -39,7 +41,6 @@ public class KauriClassLoader extends URLClassLoader {
 
             String realName = name.replaceAll("/", ".").replaceAll("\\.class", "");
 
-
             byte[] nBytes = new byte[bytes.length];
 
             for (int i = 0; i < bytes.length; i++) {
@@ -50,8 +51,8 @@ public class KauriClassLoader extends URLClassLoader {
                 b ^= SystemUtil.CRC_32.getValue() / 4;
                 b ^= SystemUtil.CRC_32.getValue() / 5;
                 nBytes[i] = b;
-            }
 
+            }
             classBytes.put(realName, nBytes);
         });
 
