@@ -19,6 +19,7 @@ import dev.brighten.anticheat.check.impl.movement.general.OmniSprint;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallB;
 import dev.brighten.anticheat.check.impl.movement.speed.SpeedB;
 import dev.brighten.anticheat.check.impl.movement.speed.SpeedC;
+import dev.brighten.anticheat.check.impl.movement.speed.SpeedD;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityA;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityC;
 import dev.brighten.anticheat.check.impl.packets.exploits.*;
@@ -48,6 +49,7 @@ public class RegularChecks implements CheckRegister {
         Check.register(new AimE());
         Check.register(new SpeedB());
         Check.register(new SpeedC());
+        Check.register(new SpeedD());
         Check.register(new KillauraA());
         Check.register(new KillauraB());
         Check.register(new KillauraC());
@@ -67,6 +69,7 @@ public class RegularChecks implements CheckRegister {
         Check.register(new BookEnchant());
         Check.register(new PacketSpam());
         Check.register(new SignOp());
+        Check.register(new LargeMove());
         Check.register(new SignCrash());
         Check.register(new CreativeCrash());
         Check.register(new BookCrash());

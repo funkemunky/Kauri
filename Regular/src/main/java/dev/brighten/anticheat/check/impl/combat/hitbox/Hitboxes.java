@@ -40,6 +40,8 @@ public class Hitboxes extends Check {
     @Setting(name = "allowNPCFlag")
     private static boolean allowNPCFlag = true;
 
+    private float buffer;
+
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if (checkParameters(data)) {
@@ -80,9 +82,12 @@ public class Hitboxes extends Check {
                     && timeStamp - data.creation > 3000L
                     && data.lagInfo.lastPingDrop.hasPassed(10)
                     && data.lagInfo.lastPacketDrop.hasPassed(4)) {
-                if(vl++ > 10)  flag("distance=%v ping=%p tps=%t",
-                        distance.get() != -1 ? distance.get() : "[none collided]");
-            } else vl -= vl > 0 ? 0.25 : 0;
+                if(++buffer > 6)  {
+                    vl++;
+                    flag("distance=%v ping=%p tps=%t",
+                            distance.get() != -1 ? distance.get() : "[none collided]");
+                }
+            } else buffer -= buffer > 0 ? 0.2 : 0;
 
             debug("collided=" + collisions + " distance=" + distance.get() + " type=" + data.target.getType());
         }

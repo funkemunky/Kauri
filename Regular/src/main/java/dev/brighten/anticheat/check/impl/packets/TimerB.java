@@ -31,7 +31,7 @@ public class TimerB extends Check {
                 list.stream().filter(l -> l < 5 || l > 90).forEach(list::remove);
             }
             //Removing all values until its 30 or less
-            while(list.size() > 30) {
+            while(list.size() > 40) {
                 list.removeFirst();
             }
         }
@@ -42,7 +42,7 @@ public class TimerB extends Check {
 
         double pct = 50 / average * 100;
 
-        if(pct > 101 && list.size() > 20) {
+        if(pct > 101 && list.size() > 30) {
             if(++buffer > 20) {
                 vl++;
                 flag("pct=%v.1", pct);

@@ -10,7 +10,7 @@ import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Motion", description = "motion check kind of thing.", checkType = CheckType.GENERAL,
-        developer = true, enabled = false)
+        developer = true)
 @Cancellable(cancelType = CancelType.MOVEMENT)
 public class Motion extends Check {
 
