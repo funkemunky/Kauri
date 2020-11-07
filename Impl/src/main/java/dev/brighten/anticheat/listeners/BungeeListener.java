@@ -8,7 +8,6 @@ import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Config;
-import cc.funkemunky.api.utils.TickTimer;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.AtlasTimer;
 import org.bukkit.Bukkit;

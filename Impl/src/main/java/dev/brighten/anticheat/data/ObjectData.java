@@ -24,7 +24,6 @@ import dev.brighten.anticheat.processing.PotionProcessor;
 import dev.brighten.anticheat.processing.keepalive.KeepAlive;
 import dev.brighten.anticheat.utils.PastLocation;
 import dev.brighten.anticheat.utils.RelativePastLocation;
-import cc.funkemunky.api.utils.TickTimer;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.PlayerTimer;
 import dev.brighten.api.check.CancelType;

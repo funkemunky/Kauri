@@ -7,11 +7,8 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
-import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 @CheckInfo(name = "Timer (B)", description = "Checks the rate of packets coming in.",
         checkType = CheckType.BADPACKETS, vlToFlag = 20, developer = true)

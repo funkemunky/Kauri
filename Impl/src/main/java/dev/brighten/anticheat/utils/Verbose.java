@@ -1,7 +1,6 @@
 package dev.brighten.anticheat.utils;
 
 import cc.funkemunky.api.utils.math.cond.MaxDouble;
-import cc.funkemunky.api.utils.TickTimer;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.AtlasTimer;
 

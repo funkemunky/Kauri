@@ -14,15 +14,14 @@ import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.MouseFilter;
 import dev.brighten.anticheat.utils.MovementUtils;
-import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import dev.brighten.anticheat.utils.timer.Timer;
+import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import lombok.val;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.potion.PotionEffectType;
 
-import java.math.RoundingMode;
 import java.util.Deque;
 import java.util.List;
 

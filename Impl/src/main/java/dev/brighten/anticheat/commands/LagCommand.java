@@ -6,17 +6,12 @@ import cc.funkemunky.api.profiling.ResultsType;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.MiscUtils;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.StringUtils;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.awt.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Init(commands = true)

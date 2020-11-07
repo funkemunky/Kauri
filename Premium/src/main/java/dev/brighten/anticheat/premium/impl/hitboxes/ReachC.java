@@ -1,16 +1,11 @@
 package dev.brighten.anticheat.premium.impl.hitboxes;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutRelativePosition;
-import cc.funkemunky.api.utils.KLocation;
-import cc.funkemunky.api.utils.objects.evicting.EvictingList;
-import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.RelativePastLocation;
 import dev.brighten.api.check.CheckType;
-import net.minecraft.server.v1_8_R3.MathHelper;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.Vector;
 
