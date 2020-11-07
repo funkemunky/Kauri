@@ -272,7 +272,9 @@ public class MenuCommand {
                                 Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
                                         .forEach(data -> {
                                             data.checkManager.checks.clear();
-                                            data.checkManager.checkMethods.clear();
+                                            synchronized (data.checkManager.checkMethods) {
+                                                data.checkManager.checkMethods.clear();
+                                            }
                                             data.checkManager.addChecks();
                                             data.creation = System.currentTimeMillis();
                                         }));
@@ -308,7 +310,9 @@ public class MenuCommand {
                                 Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
                                         .forEach(data -> {
                                             data.checkManager.checks.clear();
-                                            data.checkManager.checkMethods.clear();
+                                            synchronized (data.checkManager.checkMethods) {
+                                                data.checkManager.checkMethods.clear();
+                                            }
                                             data.checkManager.addChecks();
                                             data.creation = System.currentTimeMillis();
                                         }));
@@ -345,7 +349,9 @@ public class MenuCommand {
                                 Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
                                         .forEach(data -> {
                                             data.checkManager.checks.clear();
-                                            data.checkManager.checkMethods.clear();
+                                            synchronized (data.checkManager.checkMethods) {
+                                                data.checkManager.checkMethods.clear();
+                                            }
                                             data.checkManager.addChecks();
                                             data.creation = System.currentTimeMillis();
                                         }));

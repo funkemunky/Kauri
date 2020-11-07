@@ -32,6 +32,7 @@ public class PremiumChecks implements CheckRegister {
         Check.register(new AutoclickerD());
         Check.register(new AutoclickerF());
         Check.register(new AutoclickerE());
+        Check.register(new InventoryA());
         Check.register(new InventoryB());
         Check.register(new InventoryC());
         Check.register(new AutoclickerH());

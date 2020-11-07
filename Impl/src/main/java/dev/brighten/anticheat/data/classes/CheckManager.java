@@ -96,7 +96,8 @@ public class CheckManager {
         Check.checkClasses.keySet().stream()
                 .map(clazz -> {
                     CheckInfo settings = Check.checkClasses.get(clazz);
-                    Check check = clazz.getConstructor(ObjectData.class).newInstance(objectData);
+                    Check check = clazz.getConstructor().newInstance();
+                    check.setData(objectData);
                     CheckSettings checkSettings = Check.checkSettings.get(clazz);
                     check.enabled = checkSettings.enabled;
                     check.executable = checkSettings.executable;
@@ -116,30 +117,32 @@ public class CheckManager {
                 .sequential()
                 .forEach(check -> checks.put(check.name, check));
 
-        checks.keySet().stream().map(name -> checks.get(name)).forEach(check -> {
-            WrappedClass checkClass = new WrappedClass(check.getClass());
-            
-            Arrays.stream(check.getClass().getDeclaredMethods())
-                    .filter(method -> method.isAnnotationPresent(Packet.class)
-                            || method.isAnnotationPresent(dev.brighten.anticheat.check.api.Event.class))
-                    .map(method -> new WrappedMethod(checkClass, method))
-                    .forEach(method -> {
-                        Class<?> parameter = method.getParameters().get(0);
-                        List<WrappedCheck> methods = checkMethods.getOrDefault(
-                                parameter,
-                                new ArrayList<>());
+        synchronized (checkMethods) {
+            checks.keySet().stream().map(name -> checks.get(name)).forEach(check -> {
+                WrappedClass checkClass = new WrappedClass(check.getClass());
 
-                        methods.add(new WrappedCheck(check, method));
-                        if(method.getMethod().isAnnotationPresent(Packet.class)) {
-                            methods.sort(Comparator.comparing(m ->
-                                    m.method.getMethod().getAnnotation(Packet.class).priority().getPriority()));
-                        } else {
-                            methods.sort(Comparator.comparing(m ->
-                                    m.method.getMethod().getAnnotation(dev.brighten.anticheat.check.api.Event.class)
-                                            .priority().getPriority()));
-                        }
-                        checkMethods.put(parameter, methods);
-                    });
-        });
+                Arrays.stream(check.getClass().getDeclaredMethods())
+                        .filter(method -> method.isAnnotationPresent(Packet.class)
+                                || method.isAnnotationPresent(dev.brighten.anticheat.check.api.Event.class))
+                        .map(method -> new WrappedMethod(checkClass, method))
+                        .forEach(method -> {
+                            Class<?> parameter = method.getParameters().get(0);
+                            List<WrappedCheck> methods = checkMethods.getOrDefault(
+                                    parameter,
+                                    new ArrayList<>());
+
+                            methods.add(new WrappedCheck(check, method));
+                            if(method.getMethod().isAnnotationPresent(Packet.class)) {
+                                methods.sort(Comparator.comparing(m ->
+                                        m.method.getMethod().getAnnotation(Packet.class).priority().getPriority()));
+                            } else {
+                                methods.sort(Comparator.comparing(m ->
+                                        m.method.getMethod().getAnnotation(dev.brighten.anticheat.check.api.Event.class)
+                                                .priority().getPriority()));
+                            }
+                            checkMethods.put(parameter, methods);
+                        });
+            });
+        }
     }
 }

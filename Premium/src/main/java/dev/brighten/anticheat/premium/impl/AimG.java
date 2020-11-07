@@ -15,31 +15,40 @@ import dev.brighten.api.check.CheckType;
         checkType = CheckType.AIM, punishVL = 30)
 public class AimG extends Check {
 
-    private Verbose verbose = new Verbose(40, 15);
-    private float lDeltaPitch;
-
     @Packet
     public void process(WrappedInFlyingPacket packet) {
         if(!packet.isLook()) return;
 
-        float sens = MovementProcessor.percentToSens(data.moveProcessor.sensYPercent);
-        float deltaPitch = Math.abs(modulo(sens, data.playerInfo.from.pitch)
-                - data.playerInfo.to.pitch);
+        float fPitch = data.playerInfo.from.pitch;
 
-        float gcd = MiscUtils.gcd((long)(deltaPitch * MovementProcessor.offset),
-                (long)(lDeltaPitch * MovementProcessor.offset));
-        float clampedYaw = MathUtils.yawTo180F(data.playerInfo.to.yaw);
-        float deltaYaw = Math.abs(modulo(sens, MathUtils.yawTo180F(data.playerInfo.from.yaw)) - clampedYaw);
-        float delta = Math.abs(deltaYaw - deltaPitch);
+        float sens = data.moveProcessor.sensitivityY;
 
-        if(deltaYaw < 0.01 && deltaPitch < 8E-5) {
-            debug(Color.Green + "Flag");
+        if(data.moveProcessor.sensYPercent != data.moveProcessor.sensXPercent) {
+            debug("naughty pcts %v %v",
+                    data.moveProcessor.sensXPercent, data.moveProcessor.sensYPercent);
+            return;
         }
 
-        lDeltaPitch = deltaPitch;
+       /* float f = sens * 0.6f + .2f;
+        float f2 = f * f * f * 8f;
 
-        debug("gcd=%v deltaPitch=%v deltaYaw=%v sens=%v buffer=%v.1", gcd, deltaPitch, deltaYaw,
-                data.moveProcessor.sensYPercent + ", " + data.moveProcessor.sensXPercent, verbose.value());
+        double deltaY = Math.abs(data.moveProcessor.deltaY) % 1;
+        fPitch-= f2 * deltaY * .15f;
+
+        boolean y = deltaY > 0.9 || deltaY < 0.1;
+
+        if(!y) debug(Color.Green + "Flaggy");*/
+
+        float tPitch = modulo(data.moveProcessor.sensitivityY, data.playerInfo.to.pitch);
+        float delta = Math.abs(data.playerInfo.to.pitch - tPitch);
+
+        if(delta < 0.008 && Math.abs(data.moveProcessor.deltaY) < 100) {
+            vl++;
+            flag("test");
+            debug(Color.Green + " delta=%v deltaY=%v.1", delta, data.moveProcessor.deltaY);
+        }
+
+        debug("delta=%v sens=%v pcts=%v", delta, sens, data.moveProcessor.sensYPercent);
     }
 
     private static float modulo(float s, float angle) {

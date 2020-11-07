@@ -241,8 +241,8 @@ public class MovementProcessor {
 
                     lastDeltaX = deltaX;
                     lastDeltaY = deltaY;
-                    deltaX = getDeltaX(data.playerInfo.deltaYaw, yawMode);
-                    deltaY = getDeltaY(data.playerInfo.deltaPitch, pitchMode);
+                    deltaX = getExpiermentalDeltaX(data);
+                    deltaY = getExpiermentalDeltaY(data);
 
                     if ((data.playerInfo.pitchGCD < 1E5 || data.playerInfo.yawGCD < 1E5) && smoothCamFilterY < 1E6
                             && smoothCamFilterX < 1E6 && timeStamp - data.creation > 1000L) {
@@ -398,11 +398,33 @@ public class MovementProcessor {
                 || data.playerInfo.lastHalfBlock.isNotPassed(5);
     }
     private static float getDeltaX(float yawDelta, float gcd) {
-        return Math.round(yawDelta / gcd);
+        return MathHelper.ceiling_float_int(yawDelta / gcd);
     }
 
     private static float getDeltaY(float pitchDelta, float gcd) {
-        return Math.round(pitchDelta / gcd);
+        return MathHelper.ceiling_float_int(pitchDelta / gcd);
+    }
+
+    public static float getExpiermentalDeltaX(ObjectData data) {
+        float deltaPitch = data.playerInfo.deltaYaw;
+        float sens = data.moveProcessor.sensitivityX;
+        float f = sens * 0.6f + .2f;
+        float calc = f * f * f * 8;
+
+        float result = deltaPitch / (calc * .15f);
+
+        return result;
+    }
+
+    public static float getExpiermentalDeltaY(ObjectData data) {
+        float deltaPitch = data.playerInfo.deltaPitch;
+        float sens = data.moveProcessor.sensitivityY;
+        float f = sens * 0.6f + .2f;
+        float calc = f * f * f * 8;
+
+        float result = deltaPitch / (calc * .15f);
+
+        return result;
     }
 
     public static int sensToPercent(float sensitivity) {
@@ -410,7 +432,7 @@ public class MovementProcessor {
     }
 
     public static float percentToSens(int percent) {
-        return percent / 100.f * .5f;
+        return percent * .0070422534f;
     }
 
     //Noncondensed
