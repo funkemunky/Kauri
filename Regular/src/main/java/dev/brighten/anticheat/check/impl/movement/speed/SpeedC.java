@@ -29,7 +29,7 @@ public class SpeedC extends Check {
 
         maxMove = getMaxMovement(ai, drag) * 1.8f;
 
-        if(data.playerInfo.lastVelocity.hasNotPassed(30)) {
+        if(data.playerInfo.lastVelocity.isNotPassed(30)) {
             maxMove = Math.max(maxMove,
                     Math.hypot(data.playerInfo.velocityX, data.playerInfo.velocityZ) * 2.5f);
         }

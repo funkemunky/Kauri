@@ -50,10 +50,10 @@ public class FlyB extends Check {
 
             boolean flagged = false;
             if(!data.playerInfo.flightCancel
-                    && data.playerInfo.lastVelocity.hasPassed(3)
+                    && data.playerInfo.lastVelocity.isPassed(3)
                     && (!data.playerInfo.clientGround || data.playerInfo.deltaY < predicted)
-                    && data.playerInfo.blockAboveTimer.hasPassed(5)
-                    && data.playerInfo.lastBlockPlace.hasPassed(4)
+                    && data.playerInfo.blockAboveTimer.isPassed(5)
+                    && data.playerInfo.lastBlockPlace.isPassed(4)
                     && deltaPredict > 0.016) {
                 flagged = true;
                 if(++buffer > 2) {

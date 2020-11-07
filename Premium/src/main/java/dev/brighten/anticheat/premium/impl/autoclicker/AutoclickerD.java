@@ -22,9 +22,9 @@ public class AutoclickerD extends Check {
     public void onClick(WrappedInArmAnimationPacket packet, long timeStamp) {
         if(!data.playerInfo.breakingBlock
                 && !data.playerInfo.lookingAtBlock
-                && data.playerInfo.lastBrokenBlock.hasPassed(5)
-                && data.playerInfo.lastBlockDigPacket.hasPassed(1)
-                && data.playerInfo.lastBlockPlacePacket.hasPassed(1)) {
+                && data.playerInfo.lastBrokenBlock.isPassed(5)
+                && data.playerInfo.lastBlockDigPacket.isPassed(1)
+                && data.playerInfo.lastBlockPlacePacket.isPassed(1)) {
             clicks++;
             long diff = timeStamp - lastClickTime;
 

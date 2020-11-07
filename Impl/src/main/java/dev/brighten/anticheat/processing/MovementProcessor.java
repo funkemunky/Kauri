@@ -14,7 +14,8 @@ import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.MouseFilter;
 import dev.brighten.anticheat.utils.MovementUtils;
-import dev.brighten.anticheat.utils.TickTimer;
+import dev.brighten.anticheat.utils.timer.impl.TickTimer;
+import dev.brighten.anticheat.utils.timer.Timer;
 import lombok.val;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -37,7 +38,7 @@ public class MovementProcessor {
     public int sensXPercent, sensYPercent;
     private MouseFilter mxaxis = new MouseFilter(), myaxis = new MouseFilter();
     private float smoothCamFilterX, smoothCamFilterY, smoothCamYaw, smoothCamPitch;
-    private TickTimer lastReset = new TickTimer(1), generalProcess = new TickTimer(3);
+    private Timer lastReset = new TickTimer(1), generalProcess = new TickTimer(3);
     private GameMode lastGamemode;
     public static float offset = (int)Math.pow(2, 24);
 
@@ -112,7 +113,7 @@ public class MovementProcessor {
                 data.playerInfo.inventoryOpen = false;
                 data.playerInfo.posLocs.remove(optional.get());
             }
-        } else if (data.playerInfo.serverPos && data.playerInfo.lastTeleportTimer.hasPassed(0)) {
+        } else if (data.playerInfo.serverPos && data.playerInfo.lastTeleportTimer.isPassed(0)) {
             data.playerInfo.serverPos = false;
         }
 
@@ -216,7 +217,7 @@ public class MovementProcessor {
 
             origin.y+= data.playerInfo.sneaking ? 1.54 : 1.62;
 
-            if(data.playerInfo.lastTeleportTimer.hasPassed(1)) {
+            if(data.playerInfo.lastTeleportTimer.isPassed(1)) {
                 float yawGcd = data.playerInfo.yawGCD / offset, pitchGcd = data.playerInfo.pitchGCD / offset;
 
                 //Adding gcd of yaw and pitch.
@@ -228,7 +229,7 @@ public class MovementProcessor {
                 if (yawGcdList.size() > 3 && pitchGcdList.size() > 3) {
 
                     //Making sure to get shit within the std for a more accurate result.
-                    if (lastReset.hasPassed()) {
+                    if (lastReset.isPassed()) {
                         yawMode = MathUtils.getMode(yawGcdList);
                         pitchMode = MathUtils.getMode(pitchGcdList);
                         yawOutliers = MiscUtils.getOutliers(yawGcdList);
@@ -380,22 +381,22 @@ public class MovementProcessor {
                 || data.playerInfo.serverPos
                 || data.playerInfo.riptiding
                 || data.playerInfo.gliding
-                || data.playerInfo.lastPlaceLiquid.hasNotPassed(5)
+                || data.playerInfo.lastPlaceLiquid.isNotPassed(5)
                 || data.playerInfo.inVehicle
-                || (data.playerInfo.lastChunkUnloaded.hasNotPassed(35)
+                || (data.playerInfo.lastChunkUnloaded.isNotPassed(35)
                 && MathUtils.getDelta(-0.098, data.playerInfo.deltaY) < 0.0001)
                 || timeStamp - data.playerInfo.lastRespawn < 2500L
-                || data.playerInfo.lastToggleFlight.hasNotPassed(40)
+                || data.playerInfo.lastToggleFlight.isNotPassed(40)
                 || timeStamp - data.creation < 4000
-                || Kauri.INSTANCE.lastTickLag.hasNotPassed(5);
+                || Kauri.INSTANCE.lastTickLag.isNotPassed(5);
 
         data.playerInfo.flightCancel = data.playerInfo.generalCancel
-                || data.playerInfo.webTimer.hasNotPassed(8)
-                || data.playerInfo.liquidTimer.hasNotPassed(8)
+                || data.playerInfo.webTimer.isNotPassed(8)
+                || data.playerInfo.liquidTimer.isNotPassed(8)
                 || data.playerInfo.onLadder
-                || data.playerInfo.slimeTimer.hasNotPassed(8)
-                || data.playerInfo.climbTimer.hasNotPassed(6)
-                || data.playerInfo.lastHalfBlock.hasNotPassed(5);
+                || data.playerInfo.slimeTimer.isNotPassed(8)
+                || data.playerInfo.climbTimer.isNotPassed(6)
+                || data.playerInfo.lastHalfBlock.isNotPassed(5);
     }
     private static float getDeltaX(float yawDelta, float gcd) {
         return Math.round(yawDelta / gcd);

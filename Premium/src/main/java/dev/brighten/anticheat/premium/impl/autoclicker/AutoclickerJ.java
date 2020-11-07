@@ -23,9 +23,9 @@ public class AutoclickerJ extends Check {
         if(data.playerInfo.breakingBlock
                 || data.playerInfo.lookingAtBlock
                 || data.clickProcessor.isNotReady()
-                || data.playerInfo.lastBrokenBlock.hasNotPassed(5)
-                || data.playerInfo.lastBlockDigPacket.hasNotPassed(1)
-                || data.playerInfo.lastBlockPlacePacket.hasNotPassed(1))
+                || data.playerInfo.lastBrokenBlock.isNotPassed(5)
+                || data.playerInfo.lastBlockDigPacket.isNotPassed(1)
+                || data.playerInfo.lastBlockPlacePacket.isNotPassed(1))
             return;
 
         double skew = Math.abs(data.clickProcessor.getSkewness());

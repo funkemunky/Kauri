@@ -50,7 +50,7 @@ public class ReachA extends Check {
             //target.draw(WrappedEnumParticle.FLAME, Collections.singleton(data.getPlayer()));
         }
 
-        if(data.lagInfo.lastPacketDrop.hasPassed(3)) {
+        if(data.lagInfo.lastPacketDrop.isPassed(3)) {
             if (distance > 3.3 && distance != 69) {
                 if (++buffer > 6) {
                     vl++;

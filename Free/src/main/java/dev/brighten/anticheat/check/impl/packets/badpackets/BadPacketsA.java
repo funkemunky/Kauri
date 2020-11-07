@@ -20,7 +20,7 @@ public class BadPacketsA extends Check {
     @Packet
     public void onDig(WrappedInBlockDigPacket packet, long timeStamp) {
         if(timeStamp - lastBlockPlace < 5 && !data.lagInfo.lagging
-                && data.lagInfo.lastPacketDrop.hasPassed(5)) {
+                && data.lagInfo.lastPacketDrop.isPassed(5)) {
             if(vl++ > 4) {
                 flag("unblocked and blocked in same tick.");
             }

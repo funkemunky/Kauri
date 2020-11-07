@@ -80,8 +80,8 @@ public class Hitboxes extends Check {
 
             if (collisions == 0
                     && timeStamp - data.creation > 3000L
-                    && data.lagInfo.lastPingDrop.hasPassed(10)
-                    && data.lagInfo.lastPacketDrop.hasPassed(4)) {
+                    && data.lagInfo.lastPingDrop.isPassed(10)
+                    && data.lagInfo.lastPacketDrop.isPassed(4)) {
                 if(++buffer > 6)  {
                     vl++;
                     flag("distance=%v ping=%p tps=%t",
@@ -94,15 +94,15 @@ public class Hitboxes extends Check {
     }
 
     private static boolean checkParameters(ObjectData data) {
-        return data.playerInfo.lastAttack.hasNotPassed(0)
+        return data.playerInfo.lastAttack.isNotPassed(0)
                 && data.target != null
                 && data.target.getType().equals(EntityType.PLAYER)
                 && (allowNPCFlag || ((Player) data.target).isOnline())
                 && data.targetPastLocation.previousLocations.size() > 12
-                && Kauri.INSTANCE.lastTickLag.hasPassed(10)
+                && Kauri.INSTANCE.lastTickLag.isPassed(10)
                 && allowedEntities.contains(data.target.getType())
                 && !data.playerInfo.creative
-                && data.playerInfo.lastTargetSwitch.hasPassed()
+                && data.playerInfo.lastTargetSwitch.isPassed()
                 && !data.getPlayer().getGameMode().equals(GameMode.CREATIVE);
     }
 

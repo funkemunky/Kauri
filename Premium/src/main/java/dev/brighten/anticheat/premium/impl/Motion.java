@@ -21,7 +21,7 @@ public class Motion extends Check {
             double predXZ = Math.hypot(data.predictionService.predX, data.predictionService.predZ);
 
             if(data.predictionService.flag
-                    && data.playerInfo.soulSandTimer.hasPassed(10)
+                    && data.playerInfo.soulSandTimer.isPassed(10)
                     && !data.playerInfo.generalCancel
                     && data.playerInfo.deltaXZ > predXZ
                     && !data.blockInfo.collidesHorizontally) {

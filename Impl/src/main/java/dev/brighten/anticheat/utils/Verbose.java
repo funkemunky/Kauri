@@ -1,19 +1,22 @@
 package dev.brighten.anticheat.utils;
 
 import cc.funkemunky.api.utils.math.cond.MaxDouble;
+import cc.funkemunky.api.utils.TickTimer;
+import dev.brighten.anticheat.utils.timer.Timer;
+import dev.brighten.anticheat.utils.timer.impl.AtlasTimer;
 
 public class Verbose {
     private MaxDouble vl;
     private double maxVl;
-    private TickTimer lastFlag;
+    private Timer lastFlag;
 
     public Verbose(double maxVl, int resetTicks) {
         vl = new MaxDouble(this.maxVl = maxVl);
-        lastFlag = new TickTimer(resetTicks);
+        lastFlag = new AtlasTimer(resetTicks);
     }
 
     public boolean flag(double toAdd, double max) {
-        if(lastFlag.hasPassed()) {
+        if(lastFlag.isPassed()) {
             vl.subtract(maxVl * 1.5);
         }
         lastFlag.reset();

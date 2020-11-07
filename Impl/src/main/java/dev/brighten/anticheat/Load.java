@@ -18,7 +18,8 @@ import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.processing.PacketProcessor;
 import dev.brighten.anticheat.processing.keepalive.KeepaliveProcessor;
 import dev.brighten.anticheat.utils.SystemUtil;
-import dev.brighten.anticheat.utils.TickTimer;
+import cc.funkemunky.api.utils.TickTimer;
+import dev.brighten.anticheat.utils.timer.impl.AtlasTimer;
 import dev.brighten.api.KauriAPI;
 import org.bukkit.Bukkit;
 
@@ -99,7 +100,7 @@ public class Load {
                 Bukkit.getOnlinePlayers().forEach(Kauri.INSTANCE.dataManager::createData);
             }, Kauri.INSTANCE, 6L);
         }
-        Kauri.INSTANCE.lastEnabled = new TickTimer(20);
+        Kauri.INSTANCE.lastEnabled = new AtlasTimer(20);
         Kauri.INSTANCE.enabled = true;
         Kauri.INSTANCE.lastEnabled.reset();
 

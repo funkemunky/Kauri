@@ -18,8 +18,8 @@ public class BadPacketsN extends Check {
 
         double delta = Math.abs(data.playerInfo.deltaY - predicted);
         if(data.playerInfo.deltaY > predicted && delta > 1E-14
-                && data.playerInfo.liquidTimer.hasPassed(20)
-                && data.playerInfo.slimeTimer.hasPassed(8)
+                && data.playerInfo.liquidTimer.isPassed(20)
+                && data.playerInfo.slimeTimer.isPassed(8)
                 && !data.playerInfo.flightCancel) {
             vl++;
             flag("delta=%v y=%v", delta, data.playerInfo.deltaY);

@@ -30,7 +30,7 @@ public class Inertia extends Check {
             dir = MathUtils.yawTo180D(dir);
             float yaw = MathUtils.yawTo180F(data.playerInfo.to.yaw);
 
-            boolean velocity = data.playerInfo.lastVelocity.hasNotPassed(40);
+            boolean velocity = data.playerInfo.lastVelocity.isNotPassed(40);
             boolean ground = data.playerInfo.groundTicks > 3;
 
             double delta = Math.abs(dir - yaw);

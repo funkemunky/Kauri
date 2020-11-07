@@ -20,7 +20,7 @@ public class HandC extends Check {
     public void onUse(WrappedInUseEntityPacket packet, long timeStamp) {
         long delta = timeStamp - lastBlockDig;
 
-        if(!data.lagInfo.lagging && data.lagInfo.lastPacketDrop.hasPassed(5) && delta < 10) {
+        if(!data.lagInfo.lagging && data.lagInfo.lastPacketDrop.isPassed(5) && delta < 10) {
             if(vl++ > 3) {
                 flag("delta=%vms", delta);
             }

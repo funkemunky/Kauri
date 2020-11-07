@@ -44,7 +44,7 @@ public class BlockInformation {
 
     public void runCollisionCheck() {
         if(!Kauri.INSTANCE.enabled
-                || Kauri.INSTANCE.lastEnabled.hasNotPassed(6)) return;
+                || Kauri.INSTANCE.lastEnabled.isNotPassed(6)) return;
         synchronized (blocks) {
             blocks.clear();
         }

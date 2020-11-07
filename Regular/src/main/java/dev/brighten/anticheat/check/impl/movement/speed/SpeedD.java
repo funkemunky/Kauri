@@ -14,7 +14,7 @@ public class SpeedD extends Check {
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
-        if(!packet.isPos() || data.playerInfo.generalCancel || data.playerInfo.lastVelocity.hasNotPassed(25)) {
+        if(!packet.isPos() || data.playerInfo.generalCancel || data.playerInfo.lastVelocity.isNotPassed(25)) {
             if(data.playerInfo.generalCancel)verbose.subtract();
             return;
         }
@@ -22,16 +22,16 @@ public class SpeedD extends Check {
         double baseSpeed = data.playerInfo.baseSpeed + (!data.playerInfo.clientGround ? 0.06f
                 : (data.playerInfo.groundTicks > 10 ? 0.02 : 0.03));
 
-        baseSpeed+= data.playerInfo.iceTimer.hasNotPassed(70) ? 0.4
+        baseSpeed+= data.playerInfo.iceTimer.isNotPassed(70) ? 0.4
                 + (Math.min(60, 60 - data.playerInfo.iceTimer.getPassed()) * 0.015) : 0;
-        baseSpeed+= data.playerInfo.blockAboveTimer.hasNotPassed(20) ? 0.35
+        baseSpeed+= data.playerInfo.blockAboveTimer.isNotPassed(20) ? 0.35
                 + ((20 - data.playerInfo.blockAboveTimer.getPassed()) * 0.005) : 0;
-        baseSpeed+= data.playerInfo.lastHalfBlock.hasNotPassed(20)
+        baseSpeed+= data.playerInfo.lastHalfBlock.isNotPassed(20)
                 ? 0.2 + (20 - data.playerInfo.lastHalfBlock.getPassed()) * 0.005
                 : 0;
         baseSpeed+= data.playerInfo.wasOnSlime ? 0.1 : 0;
 
-        if(data.playerInfo.lastBlockPlace.hasNotPassed(10))
+        if(data.playerInfo.lastBlockPlace.isNotPassed(10))
             baseSpeed+= 0.2;
 
         if(data.playerInfo.deltaXZ > baseSpeed) {

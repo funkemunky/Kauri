@@ -253,6 +253,7 @@ public class PacketProcessor {
                 int current = Kauri.INSTANCE.keepaliveProcessor.tick;
 
                 optional.ifPresent(ka -> {
+                    data.playerTicks++;
                     data.lagInfo.lastTransPing = data.lagInfo.transPing;
                     data.lagInfo.transPing = (current - ka.start);
 

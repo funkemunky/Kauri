@@ -46,14 +46,14 @@ public class VelocityA extends Check {
                 && data.playerInfo.worldLoaded
                 && !tookVelocity
                 && !data.blockInfo.inWeb
-                && data.lagInfo.lastPacketDrop.hasPassed(5)
+                && data.lagInfo.lastPacketDrop.isPassed(5)
                 && !data.blockInfo.onClimbable
-                && data.playerInfo.blockAboveTimer.hasPassed(6)) {
+                && data.playerInfo.blockAboveTimer.isPassed(6)) {
 
             double pct = data.playerInfo.deltaY / vY * 100;
 
             if (pct < 99.999
-                    && !data.playerInfo.lastBlockPlace.hasNotPassed(5)
+                    && !data.playerInfo.lastBlockPlace.isNotPassed(5)
                     && !data.blockInfo.blocksAbove) {
                 if (++vl > 15) flag("pct=" + MathUtils.round(pct, 2) + "%");
             } else vl-= vl > 0 ? 0.25f : 0;

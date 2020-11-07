@@ -25,11 +25,11 @@ public class SpeedB extends Check {
 
                 if(hypot > 0.1
                         && !data.blockInfo.blocksNear
-                        && data.playerInfo.lastVelocity.hasPassed(8)
+                        && data.playerInfo.lastVelocity.isPassed(8)
                         && !data.blockInfo.inLiquid
-                        && data.playerInfo.lastHalfBlock.hasPassed(10)
+                        && data.playerInfo.lastHalfBlock.isPassed(10)
                         && (accelX > -0.07 || accelZ > -0.07)
-                        && data.playerInfo.lastBlockPlace.hasPassed(7)) {
+                        && data.playerInfo.lastBlockPlace.isPassed(7)) {
                     if(verbose++ > 2) {
                         vl++;
                         flag("x=%v z=%v",

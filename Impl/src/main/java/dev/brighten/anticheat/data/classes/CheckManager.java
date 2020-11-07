@@ -96,8 +96,7 @@ public class CheckManager {
         Check.checkClasses.keySet().stream()
                 .map(clazz -> {
                     CheckInfo settings = Check.checkClasses.get(clazz);
-                    Check check = clazz.getConstructor().newInstance();
-                    check.setData(objectData);
+                    Check check = clazz.getConstructor(ObjectData.class).newInstance(objectData);
                     CheckSettings checkSettings = Check.checkSettings.get(clazz);
                     check.enabled = checkSettings.enabled;
                     check.executable = checkSettings.executable;

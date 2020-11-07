@@ -19,9 +19,9 @@ public class AutoclickerG extends Check {
         if(data.playerInfo.breakingBlock
                 || data.playerInfo.lookingAtBlock
                 || data.clickProcessor.isNotReady()
-                || data.playerInfo.lastBrokenBlock.hasNotPassed(5)
-                || data.playerInfo.lastBlockDigPacket.hasNotPassed(1)
-                || data.playerInfo.lastBlockPlacePacket.hasNotPassed(1))
+                || data.playerInfo.lastBrokenBlock.isNotPassed(5)
+                || data.playerInfo.lastBlockDigPacket.isNotPassed(1)
+                || data.playerInfo.lastBlockPlacePacket.isNotPassed(1))
             return;
 
         int low = data.clickProcessor.getLowOutliers(), high = data.clickProcessor.getHighOutliers();
