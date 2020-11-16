@@ -74,7 +74,7 @@ public class PlayerInformation {
 
     //actions
     public boolean sneaking, sprinting, ridingJump, breakingBlock, flying, canFly, creative, inVehicle,
-            gliding, riptiding, inventoryOpen, serverAllowedFlight;
+            gliding, riptiding, inventoryOpen, serverAllowedFlight, doingVelocity, doingTeleport;
     public int inventoryId = 0;
 
     //Keepalives

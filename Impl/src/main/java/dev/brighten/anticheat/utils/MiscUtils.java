@@ -42,6 +42,24 @@ public class MiscUtils {
         NUMBER_REFLECTED_PRIMITIVES = s;
     }
 
+    public static Float getMode(Collection<Float> collect) {
+        Map<Float, Integer> repeated = new HashMap<>();
+
+        //Sorting each value by how to repeat into a map.
+        collect.forEach(val -> {
+            float value = (float)MathUtils.trim(7, val);
+            int number = repeated.getOrDefault(value, 0);
+
+            repeated.put(val, number + 1);
+        });
+
+        //Calculating the largest value to the key, which would be the mode.
+        return repeated.keySet().stream()
+                .map(key -> new Tuple<>(key, repeated.get(key))) //We map it into a Tuple for easier sorting.
+                .max(Comparator.comparing(tup -> tup.two, Comparator.naturalOrder()))
+                .orElseThrow(NullPointerException::new).one;
+    }
+
     public static double max(double... values) {
         return Arrays.stream(values).max().orElse(Double.MAX_VALUE);
     }

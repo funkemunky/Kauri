@@ -4,9 +4,10 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.api.KauriVersion;
 
 @CheckInfo(name = "Aim (I)", description = "Checks for weird pitch values that are near impossible to accomplish",
-        punishVL = 12)
+        punishVL = 12, planVersion = KauriVersion.ARA)
 public class AimI extends Check {
 
     private int buffer;

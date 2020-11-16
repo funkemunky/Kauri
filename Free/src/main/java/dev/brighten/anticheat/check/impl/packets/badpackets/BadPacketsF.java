@@ -3,11 +3,12 @@ package dev.brighten.anticheat.check.impl.packets.badpackets;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Event;
+import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 import org.bukkit.event.block.BlockPlaceEvent;
 
 @CheckInfo(name = "BadPackets (F)", description = "Checks if the block placed is the item in the player's hand.",
-        checkType = CheckType.BADPACKETS, punishVL = 2)
+        checkType = CheckType.BADPACKETS, punishVL = 2, planVersion = KauriVersion.FREE)
 public class BadPacketsF extends Check {
 
     @Event

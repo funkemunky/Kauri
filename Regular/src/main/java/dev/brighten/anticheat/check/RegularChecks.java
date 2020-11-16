@@ -14,6 +14,8 @@ import dev.brighten.anticheat.check.impl.combat.hitbox.Hitboxes;
 import dev.brighten.anticheat.check.impl.combat.killaura.*;
 import dev.brighten.anticheat.check.impl.movement.fly.FlyB;
 import dev.brighten.anticheat.check.impl.movement.fly.FlyC;
+import dev.brighten.anticheat.check.impl.movement.fly.FlyD;
+import dev.brighten.anticheat.check.impl.movement.fly.FlyE;
 import dev.brighten.anticheat.check.impl.movement.general.FastLadder;
 import dev.brighten.anticheat.check.impl.movement.general.OmniSprint;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallB;
@@ -22,6 +24,7 @@ import dev.brighten.anticheat.check.impl.movement.speed.SpeedC;
 import dev.brighten.anticheat.check.impl.movement.speed.SpeedD;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityA;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityC;
+import dev.brighten.anticheat.check.impl.packets.TimerB;
 import dev.brighten.anticheat.check.impl.packets.exploits.*;
 
 @Init(priority = Priority.LOWEST)
@@ -39,6 +42,8 @@ public class RegularChecks implements CheckRegister {
         Check.register(new AutoclickerG());
         Check.register(new FlyB());
         Check.register(new FlyC());
+        Check.register(new FlyD());
+        Check.register(new FlyE());
         Check.register(new FastLadder());
         Check.register(new NoFallB());
         Check.register(new Hitboxes());
@@ -56,8 +61,9 @@ public class RegularChecks implements CheckRegister {
         Check.register(new KillauraD());
         Check.register(new KillauraE());
         Check.register(new KillauraF());
+        Check.register(new KillauraG());
         Check.register(new OmniSprint());
-        //Check.register(new TimerB());
+        Check.register(new TimerB());
         Check.register(new VelocityA());
         Check.register(new VelocityC());
         Check.register(new HandA());

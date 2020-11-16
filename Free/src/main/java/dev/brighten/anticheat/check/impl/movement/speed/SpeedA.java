@@ -9,11 +9,12 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.processing.TagsBuilder;
+import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 import org.bukkit.potion.PotionEffectType;
 
 @CheckInfo(name = "Speed (A)", description = "Minecraft code speed acceleration check.",
-        checkType = CheckType.SPEED)
+        checkType = CheckType.SPEED, planVersion = KauriVersion.FREE)
 @Cancellable
 public class SpeedA extends Check {
 

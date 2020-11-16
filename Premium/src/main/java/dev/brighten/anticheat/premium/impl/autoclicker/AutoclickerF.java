@@ -10,11 +10,12 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.MiscUtils;
+import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
 
 @CheckInfo(name = "Autoclicker (F)", description = "Checks for a constant skew of values.", developer = true,
-        checkType = CheckType.AUTOCLICKER, minVersion = ProtocolVersion.V1_8)
+        checkType = CheckType.AUTOCLICKER, minVersion = ProtocolVersion.V1_8, planVersion = KauriVersion.ARA)
 public class AutoclickerF extends Check {
 
     public int flying, lflying, buffer, attackTick;

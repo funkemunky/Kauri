@@ -8,6 +8,7 @@ import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 import org.bukkit.enchantments.Enchantment;
 
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 @CheckInfo(name = "Velocity (B)", description = "A horizontally velocity check.", checkType = CheckType.VELOCITY,
-        punishVL = 80, vlToFlag = 15)
+        punishVL = 80, vlToFlag = 15, planVersion = KauriVersion.ARA)
 @Cancellable
 public class VelocityB extends Check {
 
@@ -144,7 +145,7 @@ public class VelocityB extends Check {
             double ratioX = data.playerInfo.deltaX / pvX, ratioZ = data.playerInfo.deltaZ / pvZ;
             double ratio = (ratioX + ratioZ) / 2;
 
-            if(ratio < 0.998
+            if((ratio < 0.998 || ratio > 3)
                     && timeStamp - data.creation > 3000L
                     && !data.getPlayer().getItemInHand().getType().isEdible()
                     && !data.blockInfo.blocksNear) {

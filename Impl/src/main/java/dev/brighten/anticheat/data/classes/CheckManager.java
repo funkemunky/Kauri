@@ -30,13 +30,19 @@ public class CheckManager {
         int currentTick = MiscUtils.currentTick();
         methods.parallelStream()
                 .forEach(wrapped -> {
-                    if(!wrapped.isBoolean && wrapped.isPacket && wrapped.check.enabled && wrapped.isCompatible()) {
-                        if(wrapped.oneParam) wrapped.method.invoke(wrapped.check, object);
-                        else {
-                            if(wrapped.isTimeStamp) {
-                                wrapped.method.invoke(wrapped.check, object, timeStamp);
-                            } else wrapped.method.invoke(wrapped.check, object, currentTick);
+                    try {
+                        if(!wrapped.isBoolean && wrapped.isPacket && wrapped.check.enabled && wrapped.isCompatible()) {
+                            if(wrapped.oneParam) wrapped.method.getMethod().invoke(wrapped.check, object);
+                            else {
+                                if(wrapped.isTimeStamp) {
+                                    wrapped.method.getMethod().invoke(wrapped.check, object, timeStamp);
+                                } else wrapped.method.getMethod().invoke(wrapped.check, object, currentTick);
+                            }
                         }
+                    } catch(Exception e) {
+                        cc.funkemunky.api.utils.MiscUtils
+                                .printToConsole("Error occurred in check " + wrapped.checkName);
+                        e.printStackTrace();
                     }
                 });
     }
@@ -50,13 +56,19 @@ public class CheckManager {
         boolean cancelled = false;
         for (WrappedCheck wrapped : methods) {
             if(!wrapped.isBoolean) continue;
-
-            if(wrapped.isPacket && wrapped.check.enabled && wrapped.isCompatible()) {
-                if(wrapped.oneParam) {
-                    if(wrapped.method.invoke(wrapped.check, object)) cancelled = true;
-                } else if(wrapped.isTimeStamp) {
-                    if(wrapped.method.invoke(wrapped.check, object, timeStamp)) cancelled = true;
-                } else if(wrapped.method.invoke(wrapped.check, object, currentTick)) cancelled = true;
+            try {
+                if(wrapped.isPacket && wrapped.check.enabled && wrapped.isCompatible()) {
+                    if(wrapped.oneParam) {
+                        if((boolean)wrapped.method.getMethod().invoke(wrapped.check, object)) cancelled = true;
+                    } else if(wrapped.isTimeStamp) {
+                        if((boolean)wrapped.method.getMethod().invoke(wrapped.check, object, timeStamp))
+                            cancelled = true;
+                    } else if((boolean)wrapped.method.getMethod().invoke(wrapped.check, object, currentTick))
+                        cancelled = true;
+                }
+            } catch(Exception e) {
+                cc.funkemunky.api.utils.MiscUtils.printToConsole("Error occurred in check " + wrapped.checkName);
+                e.printStackTrace();
             }
         }
 
@@ -72,7 +84,13 @@ public class CheckManager {
             methods.stream().filter(wrapped -> wrapped.isBoolean).sorted()
                     .forEach(wrapped -> {
                         if(wrapped.isEvent && wrapped.check.enabled) {
-                            wrapped.method.invoke(wrapped.check, event);
+                            try {
+                                wrapped.method.getMethod().invoke(wrapped.check, event);
+                            } catch(Exception e) {
+                                cc.funkemunky.api.utils.MiscUtils
+                                        .printToConsole("Error occurred in check " + wrapped.checkName);
+                                e.printStackTrace();
+                            }
                         }
                     });
         }

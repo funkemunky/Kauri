@@ -28,8 +28,8 @@ import java.util.List;
 public class MovementProcessor {
     private final ObjectData data;
 
-    public Deque<Float> yawGcdList = new EvictingList<>(50),
-            pitchGcdList = new EvictingList<>(50);
+    public Deque<Float> yawGcdList = new EvictingList<>(100),
+            pitchGcdList = new EvictingList<>(100);
     public float deltaX, deltaY, lastDeltaX, lastDeltaY, smoothYaw, smoothPitch, lsmoothYaw, lsmoothPitch;
     public Tuple<List<Double>, List<Double>> yawOutliers, pitchOutliers;
     public long lastCinematic;
@@ -110,6 +110,7 @@ public class MovementProcessor {
                 data.playerInfo.lastServerPos = timeStamp;
                 data.playerInfo.lastTeleportTimer.reset();
                 data.playerInfo.inventoryOpen = false;
+                data.playerInfo.doingTeleport = false;
                 data.playerInfo.posLocs.remove(optional.get());
             }
         } else if (data.playerInfo.serverPos && data.playerInfo.lastTeleportTimer.isPassed(0)) {
@@ -207,17 +208,18 @@ public class MovementProcessor {
 
             data.playerInfo.lastPitchGCD = data.playerInfo.pitchGCD;
             data.playerInfo.lastYawGCD = data.playerInfo.yawGCD;
-            data.playerInfo.yawGCD = MiscUtils.gcd((int) (data.playerInfo.deltaYaw * offset),
-                    (int) (data.playerInfo.lDeltaYaw * offset));
-            data.playerInfo.pitchGCD = MiscUtils.gcd((int) (data.playerInfo.deltaPitch * offset),
-                    (int) (data.playerInfo.lDeltaPitch * offset));
+            data.playerInfo.yawGCD = MiscUtils.gcd((int) (Math.abs(data.playerInfo.deltaYaw) * offset),
+                    (int) (Math.abs(data.playerInfo.lDeltaYaw) * offset));
+            data.playerInfo.pitchGCD = MiscUtils.gcd((int) (Math.abs(data.playerInfo.deltaPitch) * offset),
+                    (int) (Math.abs(data.playerInfo.lDeltaPitch) * offset));
 
             val origin = data.playerInfo.to.clone();
 
             origin.y+= data.playerInfo.sneaking ? 1.54 : 1.62;
 
             if(data.playerInfo.lastTeleportTimer.isPassed(1)) {
-                float yawGcd = data.playerInfo.yawGCD / offset, pitchGcd = data.playerInfo.pitchGCD / offset;
+                float yawGcd = MathUtils.round(data.playerInfo.yawGCD / offset, 5),
+                        pitchGcd = MathUtils.round(data.playerInfo.pitchGCD / offset, 5);
 
                 //Adding gcd of yaw and pitch.
                 if (data.playerInfo.yawGCD > 160000 && data.playerInfo.yawGCD < 10500000)
@@ -380,6 +382,7 @@ public class MovementProcessor {
                 || data.playerInfo.serverPos
                 || data.playerInfo.riptiding
                 || data.playerInfo.gliding
+                || data.playerInfo.doingTeleport
                 || data.playerInfo.lastPlaceLiquid.isNotPassed(5)
                 || data.playerInfo.inVehicle
                 || (data.playerInfo.lastChunkUnloaded.isNotPassed(35)
@@ -393,6 +396,7 @@ public class MovementProcessor {
                 || data.playerInfo.webTimer.isNotPassed(8)
                 || data.playerInfo.liquidTimer.isNotPassed(8)
                 || data.playerInfo.onLadder
+                || data.playerInfo.doingVelocity
                 || data.playerInfo.slimeTimer.isNotPassed(8)
                 || data.playerInfo.climbTimer.isNotPassed(6)
                 || data.playerInfo.lastHalfBlock.isNotPassed(5);

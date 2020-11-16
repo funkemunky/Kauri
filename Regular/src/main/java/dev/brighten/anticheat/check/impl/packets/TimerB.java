@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.check.impl.packets;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import com.mongodb.internal.connection.ConcurrentLinkedDeque;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -9,6 +10,7 @@ import dev.brighten.api.check.CheckType;
 
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @CheckInfo(name = "Timer (B)", description = "Checks the rate of packets coming in.",
         checkType = CheckType.BADPACKETS, vlToFlag = 20, developer = true)
@@ -16,6 +18,7 @@ import java.util.LinkedList;
 public class TimerB extends Check {
 
     private int buffer;
+    private boolean clearing;
     private final Deque<Long> list = new LinkedList<>();
     private long lastFlying = System.currentTimeMillis();
 
@@ -23,30 +26,42 @@ public class TimerB extends Check {
     public void onPacket(WrappedInFlyingPacket packet, long current) {
         long delta = current - lastFlying;
 
-        if(list.size() > 30 && (list.size() > 60 || (delta > 5 && delta < 90))) {
+        if(list.size() > 30 && (list.size() > 60 || (delta > 5 && delta < 90)) && !clearing) {
+            clearing = true;
             if(list.size() > 31) {
-                list.stream().filter(l -> l < 5 || l > 90).forEach(list::remove);
+                list.stream().filter(l -> l < 5 || l > 90)
+                        .forEach(v ->  {
+                                list.remove(v);
+                        });
             }
             //Removing all values until its 30 or less
             while(list.size() > 40) {
                 list.removeFirst();
             }
+            clearing = false;
         }
 
-        list.add(delta);
+        check: {
+            if(clearing) break check;
 
-        double average = list.stream().mapToLong(l -> l).average().orElse(50);
+            if(!data.playerInfo.doingTeleport
+                    && !data.playerInfo.serverPos
+                    && data.playerInfo.lastRespawnTimer.isPassed(10))
+                list.add(delta);
 
-        double pct = 50 / average * 100;
+            double average = list.stream().mapToLong(l -> l).average().orElse(50);
 
-        if(pct > 101 && list.size() > 30) {
-            if(++buffer > 20) {
-                vl++;
-                flag("pct=%v.1", pct);
-            }
-        } else if(buffer > 0) buffer-= 1f;
+            double pct = 50 / average * 100;
 
-        debug("delta=%v.2", average);
+            if(pct > 101 && list.size() > 30) {
+                if(++buffer > 20) {
+                    vl++;
+                    flag("pct=%v.1", pct);
+                }
+            } else if(buffer > 0) buffer-= 1f;
+
+            debug("delta=%v.2", average);
+        }
         lastFlying = current;
     }
 }

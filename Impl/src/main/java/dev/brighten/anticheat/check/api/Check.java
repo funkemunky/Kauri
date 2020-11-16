@@ -16,6 +16,7 @@ import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import dev.brighten.api.KauriAPI;
+import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.KauriCheck;
@@ -67,6 +68,8 @@ public class Check implements KauriCheck {
     public CheckType checkType;
 
     public CancelType cancelMode;
+    @Getter
+    private KauriVersion plan;
 
     public boolean exempt, banExempt;
     private Timer lastExemptCheck = new TickTimer(20);

@@ -7,6 +7,7 @@ import cc.funkemunky.api.tinyprotocol.packet.types.WrappedWatchableObject;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
 
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @CheckInfo(name = "HealthSpoof", description = "Spoofs the health of players.", checkType = CheckType.GENERAL,
-        executable = false, maxVersion = ProtocolVersion.V1_12_2)
+        executable = false, maxVersion = ProtocolVersion.V1_12_2, planVersion = KauriVersion.ARA)
 public class HealthSpoof extends Check {
 
     private static boolean newer = ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_9);

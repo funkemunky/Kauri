@@ -423,8 +423,10 @@ public class PacketProcessor {
                     data.playerInfo.velocityX = (float) packet.getX();
                     data.playerInfo.velocityY = (float) packet.getY();
                     data.playerInfo.velocityZ = (float) packet.getZ();
+                    data.playerInfo.doingVelocity = true;
                     data.runKeepaliveAction(d -> {
                         data.playerInfo.lastVelocity.reset();
+                        data.playerInfo.doingVelocity = false;
                         data.playerInfo.lastVelocityTimestamp = System.currentTimeMillis();
                         data.predictionService.rmotionX = data.playerInfo.velocityX;
                         data.predictionService.rmotionZ = data.playerInfo.velocityZ;
@@ -507,6 +509,7 @@ public class PacketProcessor {
                     loc.yaw+= data.playerInfo.to.yaw;
                 }
 
+                data.playerInfo.doingTeleport = true;
                 data.playerInfo.posLocs.add(loc);
                 data.checkManager.runPacket(packet, timeStamp);
                 break;

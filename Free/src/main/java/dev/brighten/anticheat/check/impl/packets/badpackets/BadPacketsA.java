@@ -7,11 +7,12 @@ import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "BadPackets (A)", description = "Checks for blockDig and blockPlace times.",
-        checkType = CheckType.BADPACKETS, punishVL = 12)
+        checkType = CheckType.BADPACKETS, punishVL = 12, planVersion = KauriVersion.FREE)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class BadPacketsA extends Check {
 
