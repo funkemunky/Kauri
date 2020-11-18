@@ -51,8 +51,8 @@ public class AimG extends Check {
             }
         } else if(buffer > 0) buffer-= 2;
 
-        debug((flag ? Color.Green + buffer + ": " : "") +"mx=%v.2 my=%v.2 dx=%v.2 dy=%v.2",
-                mx, my, deltaX, deltaY);
+        debug((flag ? Color.Green + buffer + ": " : "") +"mx=%v.2 my=%v.2 dx=%v.2 dy=%v.2 s=%v",
+                mx, my, deltaX, deltaY, data.moveProcessor.sensitivityX);
     }
 
     private static float modulo(float s, float angle) {

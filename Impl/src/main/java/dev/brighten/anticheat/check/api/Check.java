@@ -95,7 +95,7 @@ public class Check implements KauriCheck {
         if(check.getClass().isAnnotationPresent(Cancellable.class))
             type = check.getClass().getAnnotation(Cancellable.class).cancelType();
         CheckSettings settings = new CheckSettings(info.name(), info.description(), info.checkType(), type,
-                info.punishVL(), info.vlToFlag(), info.minVersion(), info.maxVersion());
+                info.planVersion(), info.punishVL(), info.vlToFlag(), info.minVersion(), info.maxVersion());
 
         String path = "checks." + name;
         settings.enabled = new ConfigDefault<>(info.enabled(),

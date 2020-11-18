@@ -43,6 +43,12 @@
                                        <exclude>dev/brighten/anticheat/utils/SystemUtil.class</exclude>
                                    </excludes>
                                </filter>
+                               <filter>
+                                   <artifact>dev.brighten.anticheat:Free</artifact>
+                                   <excludes>
+                                       <exclude>dev/brighten/anticheat/Load.class</exclude>
+                                   </excludes>
+                               </filter>
                            </filters>
                         </configuration>
                     </execution>
@@ -62,7 +68,7 @@
             <groupId>dev.brighten.anticheat</groupId>
             <artifactId>Impl</artifactId>
             <version>${parent.version}</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

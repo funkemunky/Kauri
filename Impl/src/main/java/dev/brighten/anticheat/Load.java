@@ -10,6 +10,7 @@ import cc.funkemunky.api.utils.RunUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckRegister;
 import dev.brighten.anticheat.check.api.Config;
+import dev.brighten.anticheat.classloader.CheckLicense;
 import dev.brighten.anticheat.classloader.KauriClassLoader;
 import dev.brighten.anticheat.classloader.file.FileDownloader;
 import dev.brighten.anticheat.data.DataManager;
@@ -104,6 +105,8 @@ public class Load {
         Kauri.INSTANCE.lastEnabled.reset();
 
         Bukkit.getWorlds().forEach(world -> Kauri.INSTANCE.entityProcessor.vehicles.put(world.getUID(), new ArrayList<>()));
+
+        CheckLicense.checkLicense();
     }
 
     private static void register(String string) {

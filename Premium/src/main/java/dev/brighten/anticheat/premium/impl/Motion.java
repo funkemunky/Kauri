@@ -32,7 +32,8 @@ public class Motion extends Check {
                             MathUtils.round(data.playerInfo.deltaXZ, 3), MathUtils.round(predXZ, 3));
                 }
             } else buffer-= buffer > 0 ? 1.25 : 0;
-            debug("deltaX=" + data.playerInfo.deltaXZ + " deltaZ=" + predXZ + " key=" + data.predictionService.key
+            debug("deltaX=" + data.playerInfo.deltaXZ + " deltaZ=" + predXZ + " key="
+                    + data.predictionService.key
                     + " collided=" + data.blockInfo.collidesHorizontally);
         }
     }
