@@ -62,6 +62,8 @@ public class Hitboxes extends Check {
                     .map(loc -> getHitbox(loc, data.target.getType()))
                     .collect(Collectors.toList());
 
+            if(entityLocations.size() < 2) return;
+
             long collisions = 0;
             AtomicReference<Double> distance = new AtomicReference<>((double) 0);
 
@@ -108,13 +110,13 @@ public class Hitboxes extends Check {
 
     private static SimpleCollisionBox getHitbox(KLocation loc, EntityType type) {
         if(type.equals(EntityType.PLAYER)) {
-            return new SimpleCollisionBox(loc.toVector(), 0.6, 1.8).expand(0.3, 0.3, 0.3);
+            return new SimpleCollisionBox(loc.toVector(), 0.6, 1.8).expand(0.4, 0.4, 0.4);
         } else {
             Vector bounds = MiscUtils.entityDimensions.get(type);
 
             return new SimpleCollisionBox(loc.toVector(), 0, 0).expand(bounds.getX(), 0, bounds.getZ())
                     .expandMax(0, bounds.getY(), 0)
-                    .expand(0.3, 0.3, 0.3);
+                    .expand(0.4, 0.4, 0.4);
         }
     }
 }
