@@ -85,6 +85,11 @@ public class SpeedA extends Check {
                 moveFactor*= 5;
             }
 
+            if(data.playerInfo.lastEntityCollision.isNotPassed(2)) {
+                tags.addTag("entity-collision");
+                moveFactor+= 0.05;
+            }
+
             double ratio = (data.playerInfo.deltaXZ - ldxz) / moveFactor * 100;
 
             if (ratio > 100.8 && data.playerInfo.lastBrokenBlock.isPassed(data.lagInfo.transPing + 1)

@@ -7,8 +7,6 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.processing.MovementProcessor;
-import dev.brighten.anticheat.utils.MiscUtils;
-import dev.brighten.anticheat.utils.Verbose;
 import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 

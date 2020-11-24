@@ -1,7 +1,6 @@
 package dev.brighten.anticheat.check.impl.packets;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import com.mongodb.internal.connection.ConcurrentLinkedDeque;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -9,8 +8,7 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
 import java.util.Deque;
-import java.util.LinkedList;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 @CheckInfo(name = "Timer (B)", description = "Checks the rate of packets coming in.",
         checkType = CheckType.BADPACKETS, vlToFlag = 20, developer = true)
@@ -19,7 +17,7 @@ public class TimerB extends Check {
 
     private int buffer;
     private boolean clearing;
-    private final Deque<Long> list = new LinkedList<>();
+    private final Deque<Long> list = new ConcurrentLinkedDeque<>();
     private long lastFlying = System.currentTimeMillis();
 
     @Packet

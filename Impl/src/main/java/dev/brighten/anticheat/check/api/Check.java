@@ -190,14 +190,14 @@ public class Check implements KauriCheck {
         final String finalInformation = information;
         KauriFlagEvent event = new KauriFlagEvent(data.getPlayer(), this, finalInformation);
 
-        Bukkit.getPluginManager().callEvent(event);
+        Atlas.getInstance().getEventManager().callEvent(event);
 
         if(event.isCancelled()) return;
 
         if(cancellable && cancelMode != null && vl > vlToFlag && data.lagInfo.lastPacketDrop.isPassed(8)) {
             KauriCancelEvent cancelEvent = new KauriCancelEvent(data.getPlayer(), cancelMode);
 
-            Bukkit.getPluginManager().callEvent(cancelEvent);
+            Atlas.getInstance().getEventManager().callEvent(cancelEvent);
             if(!cancelEvent.isCancelled()) {
                 switch(cancelEvent.getCancelType()) {
                     case ATTACK: {
@@ -304,7 +304,7 @@ public class Check implements KauriCheck {
 
         KauriPunishEvent punishEvent = new KauriPunishEvent(data.getPlayer(), this);
 
-        Bukkit.getPluginManager().callEvent(punishEvent);
+        Atlas.getInstance().getEventManager().callEvent(punishEvent);
 
         vl = 0;
         if(!punishEvent.isCancelled()) {

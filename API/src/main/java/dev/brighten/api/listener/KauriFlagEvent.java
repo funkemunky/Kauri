@@ -1,18 +1,18 @@
 package dev.brighten.api.listener;
 
+import cc.funkemunky.api.events.AtlasEvent;
 import cc.funkemunky.api.events.Cancellable;
 import dev.brighten.api.check.KauriCheck;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 @RequiredArgsConstructor
 @Getter
 @Setter
-public class KauriFlagEvent extends Event implements Cancellable {
+public class KauriFlagEvent extends AtlasEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
 
     private boolean cancelled;

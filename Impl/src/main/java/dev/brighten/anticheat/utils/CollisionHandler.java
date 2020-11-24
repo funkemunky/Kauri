@@ -7,6 +7,7 @@ import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.world.BlockData;
 import cc.funkemunky.api.utils.world.CollisionBox;
+import cc.funkemunky.api.utils.world.EntityData;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.data.ObjectData;
 import lombok.Getter;
@@ -76,7 +77,32 @@ public class CollisionHandler {
 			}
 		}
 
+		if(bitmask == 0) {
+			for(Entity entity : entities) {
+				if(EntityData.getEntityBox(entity.getLocation(), entity).isCollided(playerBox))
+					return true;
+			}
+		}
+
 		return false;
+	}
+
+	public boolean isCollidedWithEntity(SimpleCollisionBox box) {
+		for(Entity entity : entities) {
+			if(EntityData.getEntityBox(entity.getLocation(), entity).isCollided(box))
+				return true;
+		}
+		return false;
+	}
+
+	public boolean isCollidedWithEntity() {
+		SimpleCollisionBox playerBox = new SimpleCollisionBox()
+				.offset(location.x, location.y, location.z)
+				.expandMin(0, shift, 0)
+				.expandMax(0, height, 0)
+				.expand(width / 2, 0, width / 2);
+
+		return isCollidedWithEntity(playerBox);
 	}
 
 	public boolean isCollidedWith(int bitmask) {
@@ -101,6 +127,13 @@ public class CollisionHandler {
 				collided.add(box);
 			}
 		}
+
+		for(Entity entity : entities) {
+			CollisionBox box = EntityData.getEntityBox(entity.getLocation(), entity);
+			if(box.isCollided(playerBox))
+				collided.add(box);
+		}
+
 		return collided;
 	}
 	public List<CollisionBox> getCollisionBoxes() {
@@ -128,8 +161,15 @@ public class CollisionHandler {
 			Location block = b.getLocation();
 			Material material = data.playerInfo.shitMap.getOrDefault(block, b.getType());
 
-			if (MiscUtils.contains(materials, material)) {
+			if (materials.length == 0 || MiscUtils.contains(materials, material)) {
 				if (BlockData.getData(material).getBox(b, ProtocolVersion.getGameVersion()).isCollided(playerBox))
+					return true;
+			}
+		}
+
+		if(materials.length == 0) {
+			for(Entity entity : entities) {
+				if(EntityData.getEntityBox(entity.getLocation(), entity).isCollided(playerBox))
 					return true;
 			}
 		}

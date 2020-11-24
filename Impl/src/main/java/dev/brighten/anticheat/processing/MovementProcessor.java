@@ -361,6 +361,7 @@ public class MovementProcessor {
         if (data.blockInfo.onSlime) data.playerInfo.slimeTimer.reset();
         if (data.blockInfo.onSoulSand) data.playerInfo.soulSandTimer.reset();
         if (data.blockInfo.blocksAbove) data.playerInfo.blockAboveTimer.reset();
+        if (data.blockInfo.collidedWithEntity) data.playerInfo.lastEntityCollision.reset();
 
         //Player ground/air positioning ticks.
         if (!data.playerInfo.serverGround) {

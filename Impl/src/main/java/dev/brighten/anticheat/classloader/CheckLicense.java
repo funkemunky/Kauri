@@ -8,11 +8,11 @@ import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
+import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 public class CheckLicense {
@@ -23,7 +23,6 @@ public class CheckLicense {
             Plugin loader;
             if((loader = Bukkit.getPluginManager().getPlugin("KauriLoader")) != null) {
                 license = loader.getConfig().getString("license");
-                System.out.println("license: " + license);
             } else license = Config.license;
         }
 
@@ -31,21 +30,23 @@ public class CheckLicense {
         try {
             URL url = new URL(getURL("Kauri", license));
 
+            HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+
             BufferedReader bufferedReader = new BufferedReader(
-                    new InputStreamReader(url.openConnection().getInputStream(), StandardCharsets.UTF_8));
+                    new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
 
             String response = JsonReader.readAll(bufferedReader);
-            System.out.println(response);
             valid = Boolean.parseBoolean(response);
 
             if(!valid) {
-                url = new URL(getURL("Kauri%20New", license));
+                url = new URL(getURL("Kauri%20Ara", license));
+
+                connection = (HttpsURLConnection) url.openConnection();
 
                 bufferedReader = new BufferedReader(
-                        new InputStreamReader(url.openConnection().getInputStream(), StandardCharsets.UTF_8));
+                        new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
 
                 response = JsonReader.readAll(bufferedReader);
-                System.out.println(response);
                 valid = Boolean.parseBoolean(response);
             }
         } catch (IOException e) {
@@ -56,8 +57,6 @@ public class CheckLicense {
             MiscUtils.printToConsole("Kauri license is not valid! Disabling...");
             Bukkit.getPluginManager().disablePlugin(Kauri.INSTANCE);
         }
-
-
     }
 
     @SneakyThrows

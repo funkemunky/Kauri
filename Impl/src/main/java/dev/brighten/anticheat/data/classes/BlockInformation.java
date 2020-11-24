@@ -27,7 +27,8 @@ import java.util.stream.Collectors;
 public class BlockInformation {
     private ObjectData objectData;
     public boolean onClimbable, onSlab, onStairs, onHalfBlock, inLiquid, inLava, inWater, inWeb, onSlime, onIce,
-            onSoulSand, blocksAbove, collidesVertically, bedNear, collidesHorizontally, blocksNear, inBlock, miscNear;
+            onSoulSand, blocksAbove, collidesVertically, bedNear, collidesHorizontally, blocksNear, inBlock, miscNear,
+            collidedWithEntity;
     public float currentFriction, fromFriction;
     public CollisionHandler
             handler = new CollisionHandler(new ArrayList<>(), new ArrayList<>(), new KLocation(0,0,0), null);
@@ -101,7 +102,7 @@ public class BlockInformation {
         waterBox.zMax = Math.floor(waterBox.zMax + 1.);
 
         CollisionHandler handler = new CollisionHandler(blocks,
-                Kauri.INSTANCE.entityProcessor.vehicles.getOrDefault(objectData.getPlayer().getUniqueId(), new ArrayList<>()),
+                Kauri.INSTANCE.entityProcessor.allEntitiesNearPlayer.getOrDefault(objectData.uuid, new ArrayList<>()),
                 objectData.playerInfo.to, objectData);
 
         //Bukkit.broadcastMessage("chigga4");
@@ -162,11 +163,11 @@ public class BlockInformation {
 
         handler.setSize(0.6f, 2.4f);
         handler.setOffset(1.25f);
-        blocksAbove = handler.isCollidedWith(Materials.SOLID);
+        blocksAbove = handler.isCollidedWith();
 
         handler.setSize(2f, 1.79f);
         handler.setOffset(0.01f);
-        blocksNear = handler.isCollidedWith(Materials.SOLID);
+        blocksNear = handler.isCollidedWith();
 
         if(objectData.boxDebuggers.size() > 0) {
             handler.setSize(0.62f, 1.81f);
@@ -202,7 +203,11 @@ public class BlockInformation {
                 Math.abs(objectData.playerInfo.from.x - objectData.playerInfo.to.x) + 0.1f,
                 -0.01f,
                 Math.abs(objectData.playerInfo.from.z - objectData.playerInfo.to.z) + 0.1f);
-        collidesHorizontally = !(horizontalCollisions = blockCollisions(handler.getBlocks(), box)).isEmpty();
+
+        handler.setSize(0.62, 1.79);
+        handler.setOffset(0.01);
+        collidesHorizontally = !(horizontalCollisions = blockCollisions(handler.getBlocks(), box)).isEmpty()
+                || handler.isCollidedWith();
 
         handler.setSize(0.8f, 2.8f);
         handler.setOffset(1f);
@@ -216,11 +221,17 @@ public class BlockInformation {
         handler.setOffset(-1f);
         handler.getCollisionBoxes().forEach(cb -> cb.downCast(belowCollisions));
 
+        box = getBox().expand(0, 0.1f, 0);
+
+        handler.setSize(0.59, 1.81);
+        handler.setOffset(-0.01);
+        collidesVertically = !(verticalCollisions = blockCollisions(handler.getBlocks(), box)).isEmpty()
+                || handler.isCollidedWith();
+
         handler.setSize(0.6f, 1.8f);
         handler.setOffset(0f);
 
-        box = getBox().expand(0, 0.1f, 0);
-        collidesVertically = !(verticalCollisions = blockCollisions(handler.getBlocks(), box)).isEmpty();
+        collidedWithEntity = handler.isCollidedWithEntity();
 
         this.handler = handler;
     }

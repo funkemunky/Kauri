@@ -56,6 +56,7 @@ public class PlayerInformation {
         lastRespawnTimer = new PlayerTimer(data, 20);
         lastAttack = new PlayerTimer(data, 5);
         cinematicTimer = new PlayerTimer(data, 8);
+        lastEntityCollision = new PlayerTimer(data, 4);
     }
 
     //Cinematic
@@ -84,7 +85,7 @@ public class PlayerInformation {
     public int groundTicks, airTicks;
     public Timer liquidTimer, webTimer, climbTimer, slimeTimer, iceTimer, blockAboveTimer, soulSandTimer;
     public Timer lastBrokenBlock, lastVelocity, lastTargetSwitch, lastBlockPlace, lastBlockPlacePacket,
-            lastBlockDigPacket, lastToggleFlight, lastAttack,
+            lastBlockDigPacket, lastToggleFlight, lastAttack, lastEntityCollision,
             lastWindowClick, lastInsideBlock, lastHalfBlock, lastPlaceLiquid, lastUseItem,
             lastTeleportTimer, lastGamemodeTimer, lastRespawnTimer, lastChunkUnloaded, cinematicTimer;
 
