@@ -51,20 +51,20 @@ public class FlyB extends Check {
             boolean flagged = false;
             if(!data.playerInfo.flightCancel
                     && data.playerInfo.lastVelocity.isPassed(3)
-                    && (!data.playerInfo.clientGround || data.playerInfo.deltaY < predicted)
+                    && !data.playerInfo.serverGround
                     && data.playerInfo.blockAboveTimer.isPassed(5)
                     && data.playerInfo.lastBlockPlace.isPassed(4)
                     && deltaPredict > 0.016) {
                 flagged = true;
-                if(++buffer > 2) {
+                if(++buffer > 2 || data.playerInfo.kAirTicks > 35) {
                     ++vl;
                     flag("dY=%v.3 p=%v.3 dx=%v.3", data.playerInfo.deltaY, predicted, data.playerInfo.deltaXZ);
                 }
             } else buffer-= buffer > 0 ? 0.5f : 0;
 
-            debug((flagged ? Color.Green : "") +"pos=%v deltaY=%v.3 predicted=%v.3 ground=%v lpass=%v buffer=%v.1",
+            debug((flagged ? Color.Green : "") +"pos=%v deltaY=%v.3 predicted=%v.3 ground=%v lpass=%v air=%v buffer=%v.1",
                     packet.getY(), data.playerInfo.deltaY, predicted, data.playerInfo.clientGround,
-                    data.playerInfo.liquidTimer.getPassed(), buffer);
+                    data.playerInfo.liquidTimer.getPassed(), data.playerInfo.kAirTicks, buffer);
             lastPos = timeStamp;
         }
     }

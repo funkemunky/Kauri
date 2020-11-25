@@ -12,6 +12,7 @@ import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.XMaterial;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.listeners.api.impl.KeepaliveAcceptedEvent;
 import lombok.val;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
@@ -258,6 +259,9 @@ public class PacketProcessor {
                         data.lagInfo.lmillisPing = data.lagInfo.millisPing;
                         data.lagInfo.millisPing = r.receivedStamp - (data.lagInfo.start = ka.startStamp);
                     });
+
+                    KeepaliveAcceptedEvent e = Kauri.INSTANCE.eventHandler
+                            .runEvent(new KeepaliveAcceptedEvent(data, ka));
 
                     for (ObjectData.Action action : data.keepAliveStamps) {
                         if(action.stamp > ka.start) continue;

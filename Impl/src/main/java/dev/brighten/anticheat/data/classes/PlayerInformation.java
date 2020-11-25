@@ -82,7 +82,7 @@ public class PlayerInformation {
     public int velocityKeepalive, teleportKeepalive;
 
     //ticks
-    public int groundTicks, airTicks;
+    public int groundTicks, airTicks, kGroundTicks, kAirTicks;
     public Timer liquidTimer, webTimer, climbTimer, slimeTimer, iceTimer, blockAboveTimer, soulSandTimer;
     public Timer lastBrokenBlock, lastVelocity, lastTargetSwitch, lastBlockPlace, lastBlockPlacePacket,
             lastBlockDigPacket, lastToggleFlight, lastAttack, lastEntityCollision,

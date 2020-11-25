@@ -14,6 +14,7 @@ import dev.brighten.anticheat.classloader.CheckLicense;
 import dev.brighten.anticheat.classloader.KauriClassLoader;
 import dev.brighten.anticheat.classloader.file.FileDownloader;
 import dev.brighten.anticheat.data.DataManager;
+import dev.brighten.anticheat.listeners.api.EventHandler;
 import dev.brighten.anticheat.logs.LoggerManager;
 import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.processing.PacketProcessor;
@@ -46,6 +47,7 @@ public class Load {
 
         register("Loading API...");
         Kauri.INSTANCE.kauriAPI = new KauriAPI();
+        Kauri.INSTANCE.eventHandler = new EventHandler();
 
         register("Loading commands...");
         Kauri.INSTANCE.commandManager = new CommandManager(Kauri.INSTANCE);

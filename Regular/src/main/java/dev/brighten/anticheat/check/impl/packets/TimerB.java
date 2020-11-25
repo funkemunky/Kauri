@@ -7,7 +7,7 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
-import java.util.Deque;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 @CheckInfo(name = "Timer (B)", description = "Checks the rate of packets coming in.",
@@ -17,7 +17,7 @@ public class TimerB extends Check {
 
     private int buffer;
     private boolean clearing;
-    private final Deque<Long> list = new ConcurrentLinkedDeque<>();
+    private final List<Long> list = Collections.synchronizedList(new ArrayList<>());
     private long lastFlying = System.currentTimeMillis();
 
     @Packet
@@ -25,16 +25,23 @@ public class TimerB extends Check {
         long delta = current - lastFlying;
 
         if(list.size() > 30 && (list.size() > 60 || (delta > 5 && delta < 90)) && !clearing) {
-            clearing = true;
-            if(list.size() > 31) {
-                list.stream().filter(l -> l < 5 || l > 90)
-                        .forEach(v ->  {
-                                list.remove(v);
-                        });
+            if(!clearing && list.size() > 31) {
+                clearing = true;
+                synchronized (list) {
+                    list.stream().filter(l -> l < 5 || l > 90)
+                            .forEach(list::remove);
+                }
+                clearing = false;
             }
             //Removing all values until its 30 or less
-            while(list.size() > 40) {
-                list.removeFirst();
+            if(!clearing) {
+                clearing = true;
+                while (list.size() > 40) {
+                    synchronized (list) {
+                        list.remove(0);
+                    }
+                }
+                clearing = false;
             }
             clearing = false;
         }
@@ -47,16 +54,17 @@ public class TimerB extends Check {
                     && data.playerInfo.lastRespawnTimer.isPassed(10))
                 list.add(delta);
 
+            if(clearing) break check;
             double average = list.stream().mapToLong(l -> l).average().orElse(50);
 
             double pct = 50 / average * 100;
 
             if(pct > 101 && list.size() > 30) {
-                if(++buffer > 20) {
+                if(++buffer > 30) {
                     vl++;
                     flag("pct=%v.1", pct);
                 }
-            } else if(buffer > 0) buffer-= 1f;
+            } else if(buffer > 0) buffer-= 2f;
 
             debug("delta=%v.2", average);
         }

@@ -11,6 +11,7 @@ import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import cc.funkemunky.api.utils.world.types.RayCollision;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.listeners.api.impl.KeepaliveAcceptedEvent;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.MouseFilter;
 import dev.brighten.anticheat.utils.MovementUtils;
@@ -40,6 +41,18 @@ public class MovementProcessor {
     private Timer lastReset = new TickTimer(1), generalProcess = new TickTimer(3);
     private GameMode lastGamemode;
     public static float offset = (int)Math.pow(2, 24);
+    public static double groundOffset = 1 / 64.;
+    private static String keepaliveAcceptListener = Kauri.INSTANCE.eventHandler
+            .listen(KeepaliveAcceptedEvent.class,  listner -> {
+                if(listner.getData().playerInfo.serverGround
+                        || listner.getData().playerInfo.to.y % groundOffset < 0.00001) {
+                    listner.getData().playerInfo.kGroundTicks++;
+                    listner.getData().playerInfo.kAirTicks = 0;
+                } else {
+                    listner.getData().playerInfo.kAirTicks++;
+                    listner.getData().playerInfo.kGroundTicks = 0;
+                }
+    });
 
     public PotionEffectType levitation = null;
 
@@ -379,7 +392,6 @@ public class MovementProcessor {
         data.playerInfo.generalCancel = data.getPlayer().getAllowFlight()
                 || data.playerInfo.creative
                 || hasLevi
-                || data.lagInfo.transPing > 40
                 || data.playerInfo.serverPos
                 || data.playerInfo.riptiding
                 || data.playerInfo.gliding
