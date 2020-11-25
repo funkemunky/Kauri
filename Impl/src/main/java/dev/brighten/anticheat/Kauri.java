@@ -171,7 +171,7 @@ public class Kauri extends JavaPlugin {
                 e.printStackTrace();
             }
 
-            Load.startClassLoader(true);
+            Load.startClassLoader();
         }
 
         Bukkit.getOnlinePlayers().forEach(dataManager::createData);

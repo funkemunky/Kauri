@@ -6,8 +6,8 @@ import cc.funkemunky.api.reflections.types.WrappedClass;
 import cc.funkemunky.api.reflections.types.WrappedMethod;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
-import cc.funkemunky.api.tinyprotocol.api.channel.ChannelNew;
-import cc.funkemunky.api.tinyprotocol.api.channel.ChannelOld;
+import cc.funkemunky.api.tinyprotocol.api.packets.channelhandler.TinyProtocol1_7;
+import cc.funkemunky.api.tinyprotocol.api.packets.channelhandler.TinyProtocol1_8;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutCloseWindowPacket;
 import cc.funkemunky.api.utils.*;
@@ -48,7 +48,7 @@ public class Check implements KauriCheck {
     public static Map<WrappedClass, CheckSettings> checkSettings = new ConcurrentHashMap<>();
 
     private static WrappedClass protocolClass = ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_8)
-            ? new WrappedClass(ChannelOld.class) : new WrappedClass(ChannelNew.class);
+            ? new WrappedClass(TinyProtocol1_7.class) : new WrappedClass(TinyProtocol1_8.class);
     private static WrappedMethod getChannel = protocolClass.getMethod("getChannel", Player.class);
 
 
