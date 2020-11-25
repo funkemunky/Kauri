@@ -5,11 +5,12 @@ import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Autoclicker (H)", description = "Checks for low standard deviation.",
-        checkType = CheckType.AUTOCLICKER, punishVL = 6, vlToFlag = 2, developer = true)
+        checkType = CheckType.AUTOCLICKER, punishVL = 6, vlToFlag = 2, developer = true, planVersion = KauriVersion.ARA)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerH extends Check {
 
@@ -20,9 +21,9 @@ public class AutoclickerH extends Check {
         if(data.playerInfo.breakingBlock
                 || data.playerInfo.lookingAtBlock
                 || data.clickProcessor.isNotReady()
-                || data.playerInfo.lastBrokenBlock.hasNotPassed(5)
-                || data.playerInfo.lastBlockDigPacket.hasNotPassed(1)
-                || data.playerInfo.lastBlockPlacePacket.hasNotPassed(1))
+                || data.playerInfo.lastBrokenBlock.isNotPassed(5)
+                || data.playerInfo.lastBlockDigPacket.isNotPassed(1)
+                || data.playerInfo.lastBlockPlacePacket.isNotPassed(1))
             return;
 
         long range = data.clickProcessor.getMax() - data.clickProcessor.getMin();

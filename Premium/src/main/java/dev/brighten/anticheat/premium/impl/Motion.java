@@ -6,11 +6,12 @@ import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Motion", description = "motion check kind of thing.", checkType = CheckType.GENERAL,
-        developer = true, enabled = false)
+        developer = true, planVersion = KauriVersion.ARA)
 @Cancellable(cancelType = CancelType.MOVEMENT)
 public class Motion extends Check {
 
@@ -21,7 +22,7 @@ public class Motion extends Check {
             double predXZ = Math.hypot(data.predictionService.predX, data.predictionService.predZ);
 
             if(data.predictionService.flag
-                    && data.playerInfo.soulSandTimer.hasPassed(10)
+                    && data.playerInfo.soulSandTimer.isPassed(10)
                     && !data.playerInfo.generalCancel
                     && data.playerInfo.deltaXZ > predXZ
                     && !data.blockInfo.collidesHorizontally) {
@@ -31,7 +32,8 @@ public class Motion extends Check {
                             MathUtils.round(data.playerInfo.deltaXZ, 3), MathUtils.round(predXZ, 3));
                 }
             } else buffer-= buffer > 0 ? 1.25 : 0;
-            debug("deltaX=" + data.playerInfo.deltaXZ + " deltaZ=" + predXZ + " key=" + data.predictionService.key
+            debug("deltaX=" + data.playerInfo.deltaXZ + " deltaZ=" + predXZ + " key="
+                    + data.predictionService.key
                     + " collided=" + data.blockInfo.collidesHorizontally);
         }
     }

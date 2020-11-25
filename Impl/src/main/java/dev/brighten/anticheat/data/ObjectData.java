@@ -24,7 +24,8 @@ import dev.brighten.anticheat.processing.PotionProcessor;
 import dev.brighten.anticheat.processing.keepalive.KeepAlive;
 import dev.brighten.anticheat.utils.PastLocation;
 import dev.brighten.anticheat.utils.RelativePastLocation;
-import dev.brighten.anticheat.utils.TickTimer;
+import dev.brighten.anticheat.utils.timer.Timer;
+import dev.brighten.anticheat.utils.timer.impl.PlayerTimer;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.data.Data;
 import lombok.AllArgsConstructor;
@@ -65,7 +66,7 @@ public class ObjectData implements Data {
     public MovementProcessor moveProcessor;
     public PotionProcessor potionProcessor;
     public ClickProcessor clickProcessor;
-    public int hashCode;
+    public int hashCode, playerTicks;
     public boolean banned;
     public ModData modData;
     public KLocation targetLoc;
@@ -241,8 +242,8 @@ public class ObjectData implements Data {
         public int transPing, lastTransPing;
         public MaxInteger lagTicks = new MaxInteger(25);
         public boolean lagging;
-        public TickTimer lastPacketDrop = new TickTimer( 10),
-                lastPingDrop = new TickTimer( 40);
+        public Timer lastPacketDrop = new PlayerTimer(ObjectData.this, 10),
+                lastPingDrop = new PlayerTimer(ObjectData.this, 40);
         public RollingAverageLong pingAverages = new RollingAverageLong(10, 0);
         public long lastFlying = 0;
     }

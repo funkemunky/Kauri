@@ -13,6 +13,7 @@ import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.utils.AxisAlignedBB;
 import dev.brighten.anticheat.utils.Vec3D;
+import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 import dev.brighten.db.utils.Pair;
@@ -26,7 +27,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @CheckInfo(name = "Reach (B)", description = "Ensures the reach of a player is legitimate.",
-        checkType = CheckType.HITBOX, punishVL = 8)
+        checkType = CheckType.HITBOX, punishVL = 8, planVersion = KauriVersion.ARA)
 @Cancellable(cancelType = CancelType.ATTACK)
 public class ReachB extends Check {
 
@@ -43,7 +44,7 @@ public class ReachB extends Check {
             if(data.playerInfo.creative) return;
 
             List<Pair<SimpleCollisionBox, Double>> entityLocs = data.targetPastLocation.getEstimatedLocation(timeStamp,
-                    (data.lagInfo.transPing + 3) * 50, 100L)
+                    (data.lagInfo.transPing + 3) * 50, 75L)
                     .stream()
                     .map(loc -> {
                         SimpleCollisionBox hitbox = (SimpleCollisionBox) getHitbox(entity, loc);
@@ -68,13 +69,13 @@ public class ReachB extends Check {
 
                 if(checkTo != null) {
                     tdistance = Math.min(new Vector(checkTo.x, checkTo.y, checkTo.z)
-                            .distance(toOrigin.toVector()) - (sbox.value / 2.5f), tdistance);
+                            .distance(toOrigin.toVector()) - (sbox.value / 3f), tdistance);
                     tcollided++;
                 } else tmisses++;
 
                 if(checkFrom != null) {
                     fdistance = Math.min(new Vector(checkFrom.x, checkFrom.y, checkFrom.z)
-                            .distance(fromOrigin.toVector()) - (sbox.value / 2.5f), fdistance);
+                            .distance(fromOrigin.toVector()) - (sbox.value / 3f), fdistance);
                     fcollided++;
                 } else fmisses++;
             }
@@ -97,9 +98,9 @@ public class ReachB extends Check {
                 return;
             }
 
-            if(collided > 1 && data.lagInfo.lastPacketDrop.hasPassed(2)) {
+            if(collided > 1 && data.lagInfo.lastPacketDrop.isPassed(2)) {
                 if(distance > 3.03 &&
-                        Kauri.INSTANCE.lastTickLag.hasPassed(40)) {
+                        Kauri.INSTANCE.lastTickLag.isPassed(40)) {
                     if(++buffer > 4) {
                         vl++;
                         flag("distance=%v.3 from=%v buffer=%v.1 misses=%v",

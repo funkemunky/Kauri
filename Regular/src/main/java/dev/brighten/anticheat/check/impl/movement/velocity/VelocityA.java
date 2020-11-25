@@ -21,22 +21,16 @@ public class VelocityA extends Check {
     @Packet
     public void onVelocity(WrappedOutVelocityPacket packet, long timeStamp) {
         if(packet.getId() == data.getPlayer().getEntityId()) {
-            data.runKeepaliveAction(ka -> {
-                tvY = packet.getY();
-                velocityTS = timeStamp;
-                tookVelocity = true;
-            });
+            tvY = packet.getY();
+            velocityTS = timeStamp;
+            tookVelocity = true;
         }
     }
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        /*if(tookVelocity && !data.playerInfo.clientGround
+        if(tookVelocity && !data.playerInfo.clientGround
                 && data.playerInfo.lClientGround) {
-            tookVelocity = false;
-            vY = tvY;
-        }*/
-        if(tookVelocity) {
             tookVelocity = false;
             vY = tvY;
         }
@@ -46,14 +40,14 @@ public class VelocityA extends Check {
                 && data.playerInfo.worldLoaded
                 && !tookVelocity
                 && !data.blockInfo.inWeb
-                && data.lagInfo.lastPacketDrop.hasPassed(5)
+                && data.lagInfo.lastPacketDrop.isPassed(5)
                 && !data.blockInfo.onClimbable
-                && data.playerInfo.blockAboveTimer.hasPassed(6)) {
+                && data.playerInfo.blockAboveTimer.isPassed(6)) {
 
             double pct = data.playerInfo.deltaY / vY * 100;
 
-            if (pct < 99.999
-                    && !data.playerInfo.lastBlockPlace.hasNotPassed(5)
+            if ((pct < 99.999 || pct > 300)
+                    && !data.playerInfo.lastBlockPlace.isNotPassed(5)
                     && !data.blockInfo.blocksAbove) {
                 if (++vl > 15) flag("pct=" + MathUtils.round(pct, 2) + "%");
             } else vl-= vl > 0 ? 0.25f : 0;

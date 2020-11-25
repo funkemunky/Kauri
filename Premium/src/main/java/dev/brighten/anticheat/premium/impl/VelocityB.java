@@ -1,22 +1,24 @@
 package dev.brighten.anticheat.premium.impl;
 
-import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
-import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.Tuple;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 import org.bukkit.enchantments.Enchantment;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 
 @CheckInfo(name = "Velocity (B)", description = "A horizontally velocity check.", checkType = CheckType.VELOCITY,
-        punishVL = 80, vlToFlag = 15)
+        punishVL = 80, vlToFlag = 15, planVersion = KauriVersion.ARA)
 @Cancellable
 public class VelocityB extends Check {
 
@@ -59,8 +61,8 @@ public class VelocityB extends Check {
                     || data.blockInfo.blocksAbove
                     || pvY != 0
                     || data.blockInfo.inLiquid
-                    || data.lagInfo.lastPingDrop.hasNotPassed(10)
-                    || data.lagInfo.lastPacketDrop.hasNotPassed(10)) {
+                    || data.lagInfo.lastPingDrop.isNotPassed(10)
+                    || data.lagInfo.lastPacketDrop.isNotPassed(10)) {
                 pvX = pvZ = 0;
                 buffer-= buffer > 0 ? 1 : 0;
                 return;
@@ -143,7 +145,7 @@ public class VelocityB extends Check {
             double ratioX = data.playerInfo.deltaX / pvX, ratioZ = data.playerInfo.deltaZ / pvZ;
             double ratio = (ratioX + ratioZ) / 2;
 
-            if(ratio < 0.998
+            if((ratio < 0.998 || ratio > 3)
                     && timeStamp - data.creation > 3000L
                     && !data.getPlayer().getItemInHand().getType().isEdible()
                     && !data.blockInfo.blocksNear) {
@@ -152,7 +154,7 @@ public class VelocityB extends Check {
                     flag("pct=%v.2% buffer=%v.1 forward=%v.2 strafe=%v.2",
                             ratio * 100, buffer, moveStrafe, moveForward);
                 }
-            } else buffer-= buffer > 0 ? data.lagInfo.lastPacketDrop.hasNotPassed(20) ? .5 : 0.25 : 0;
+            } else buffer-= buffer > 0 ? data.lagInfo.lastPacketDrop.isNotPassed(20) ? .5 : 0.25 : 0;
 
             debug("ratio=%v.3 buffer=%v.1 strafe=%v.2 forward=%v.2 lastUse=%v found=%v",
                     ratio, buffer, moveStrafe, moveForward, data.playerInfo.lastUseItem.getPassed(), found);

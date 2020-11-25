@@ -215,6 +215,7 @@ public class MenuCommand {
                     "&eEnabled&7: &f" + val.enabled,
                     "&eExecutable&7: &f" + val.executable,
                     "&eCancellable&7: &f" + val.cancellable,
+                    "&ePlan&7: &f" + val.plan.name + " &7(&f&o$" + val.plan.price + (val.plan.monthly ? " a month" : ""),
                     "&eDescription&7: &f"));
 
             List<String> description = Arrays.asList(MiscUtils
@@ -272,7 +273,9 @@ public class MenuCommand {
                                 Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
                                         .forEach(data -> {
                                             data.checkManager.checks.clear();
-                                            data.checkManager.checkMethods.clear();
+                                            synchronized (data.checkManager.checkMethods) {
+                                                data.checkManager.checkMethods.clear();
+                                            }
                                             data.checkManager.addChecks();
                                             data.creation = System.currentTimeMillis();
                                         }));
@@ -308,7 +311,9 @@ public class MenuCommand {
                                 Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
                                         .forEach(data -> {
                                             data.checkManager.checks.clear();
-                                            data.checkManager.checkMethods.clear();
+                                            synchronized (data.checkManager.checkMethods) {
+                                                data.checkManager.checkMethods.clear();
+                                            }
                                             data.checkManager.addChecks();
                                             data.creation = System.currentTimeMillis();
                                         }));
@@ -345,7 +350,9 @@ public class MenuCommand {
                                 Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
                                         .forEach(data -> {
                                             data.checkManager.checks.clear();
-                                            data.checkManager.checkMethods.clear();
+                                            synchronized (data.checkManager.checkMethods) {
+                                                data.checkManager.checkMethods.clear();
+                                            }
                                             data.checkManager.addChecks();
                                             data.creation = System.currentTimeMillis();
                                         }));

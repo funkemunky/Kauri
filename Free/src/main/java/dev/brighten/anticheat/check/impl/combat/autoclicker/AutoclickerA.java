@@ -3,11 +3,12 @@ package dev.brighten.anticheat.check.impl.combat.autoclicker;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import dev.brighten.anticheat.check.api.*;
+import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Autoclicker (A)", description = "A fast click check.", checkType = CheckType.AUTOCLICKER,
-        punishVL = 2)
+        punishVL = 2, planVersion = KauriVersion.FULL)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerA extends Check {
 
@@ -36,9 +37,9 @@ public class AutoclickerA extends Check {
     @Packet
     public void onArmAnimation(WrappedInArmAnimationPacket packet) {
         if(!data.playerInfo.breakingBlock
-                && data.playerInfo.lastBrokenBlock.hasPassed(5)
-                && data.playerInfo.lastBlockDigPacket.hasPassed(1)
-                && data.playerInfo.lastBlockPlacePacket.hasPassed(1))
+                && data.playerInfo.lastBrokenBlock.isPassed(5)
+                && data.playerInfo.lastBlockDigPacket.isPassed(1)
+                && data.playerInfo.lastBlockPlacePacket.isPassed(1))
             cps++;
         debug("breaking=%v lastBroken=%v", data.playerInfo.breakingBlock,
                 data.playerInfo.lastBrokenBlock.getPassed());

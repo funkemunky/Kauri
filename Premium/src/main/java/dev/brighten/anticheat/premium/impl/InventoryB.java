@@ -8,11 +8,12 @@ import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Inventory (B)", description = "Checks if a player moves while their inventory is open",
-        checkType = CheckType.INVENTORY, punishVL = 40, developer = true, enabled = false)
+        checkType = CheckType.INVENTORY, punishVL = 40, developer = true, enabled = false, planVersion = KauriVersion.ARA)
 @Cancellable(cancelType = CancelType.MOVEMENT)
 public class InventoryB extends Check {
 
@@ -25,7 +26,7 @@ public class InventoryB extends Check {
                 && data.playerInfo.inventoryOpen
                 && !data.blockInfo.inLava
                 && !data.blockInfo.inWeb
-                && data.playerInfo.lastVelocity.hasPassed(30)
+                && data.playerInfo.lastVelocity.isPassed(30)
                 && !data.blockInfo.collidesHorizontally
                 && (data.predictionService.moveStrafing != 0 || data.predictionService.moveForward != 0)) {
             if(verbose++ > 3) {

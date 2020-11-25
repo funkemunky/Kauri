@@ -8,11 +8,12 @@ import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
 
 @CheckInfo(name = "Timer (A)", description = "Checks the rate of packets coming in.",
-        checkType = CheckType.BADPACKETS, vlToFlag = 4, developer = true)
+        checkType = CheckType.BADPACKETS, vlToFlag = 4, developer = true, planVersion = KauriVersion.FREE)
 @Cancellable
 public class Timer extends Check {
 
@@ -30,7 +31,7 @@ public class Timer extends Check {
         val optional = Kauri.INSTANCE.keepaliveProcessor.getKeepById(packet.getAction());
 
         if(optional.isPresent()) {
-            rolling.add(ticks, System.nanoTime());
+            rolling.add(ticks, current);
             if(current - data.creation > 2000L) {
                 val average = rolling.getAverage();
                 if (average > 1.014) {

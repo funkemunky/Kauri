@@ -6,12 +6,13 @@ import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Autoclicker (J)", description = "Checks the kurtosis of a player's click pattern.",
         checkType = CheckType.AUTOCLICKER, maxVersion = ProtocolVersion.V1_8_9, punishVL = 130, vlToFlag = 50,
-        developer = true)
+        developer = true, planVersion = KauriVersion.ARA)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerJ extends Check {
 
@@ -23,9 +24,9 @@ public class AutoclickerJ extends Check {
         if(data.playerInfo.breakingBlock
                 || data.playerInfo.lookingAtBlock
                 || data.clickProcessor.isNotReady()
-                || data.playerInfo.lastBrokenBlock.hasNotPassed(5)
-                || data.playerInfo.lastBlockDigPacket.hasNotPassed(1)
-                || data.playerInfo.lastBlockPlacePacket.hasNotPassed(1))
+                || data.playerInfo.lastBrokenBlock.isNotPassed(5)
+                || data.playerInfo.lastBlockDigPacket.isNotPassed(1)
+                || data.playerInfo.lastBlockPlacePacket.isNotPassed(1))
             return;
 
         double skew = Math.abs(data.clickProcessor.getSkewness());

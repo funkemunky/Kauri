@@ -40,6 +40,8 @@ public class Hitboxes extends Check {
     @Setting(name = "allowNPCFlag")
     private static boolean allowNPCFlag = true;
 
+    private float buffer;
+
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if (checkParameters(data)) {
@@ -60,6 +62,8 @@ public class Hitboxes extends Check {
                     .map(loc -> getHitbox(loc, data.target.getType()))
                     .collect(Collectors.toList());
 
+            if(entityLocations.size() < 2) return;
+
             long collisions = 0;
             AtomicReference<Double> distance = new AtomicReference<>((double) 0);
 
@@ -78,38 +82,41 @@ public class Hitboxes extends Check {
 
             if (collisions == 0
                     && timeStamp - data.creation > 3000L
-                    && data.lagInfo.lastPingDrop.hasPassed(10)
-                    && data.lagInfo.lastPacketDrop.hasPassed(4)) {
-                if(vl++ > 10)  flag("distance=%v ping=%p tps=%t",
-                        distance.get() != -1 ? distance.get() : "[none collided]");
-            } else vl -= vl > 0 ? 0.25 : 0;
+                    && data.lagInfo.lastPingDrop.isPassed(10)
+                    && data.lagInfo.lastPacketDrop.isPassed(4)) {
+                if(++buffer > 6)  {
+                    vl++;
+                    flag("distance=%v ping=%p tps=%t",
+                            distance.get() != -1 ? distance.get() : "[none collided]");
+                }
+            } else buffer -= buffer > 0 ? 0.2 : 0;
 
             debug("collided=" + collisions + " distance=" + distance.get() + " type=" + data.target.getType());
         }
     }
 
     private static boolean checkParameters(ObjectData data) {
-        return data.playerInfo.lastAttack.hasNotPassed(0)
+        return data.playerInfo.lastAttack.isNotPassed(0)
                 && data.target != null
                 && data.target.getType().equals(EntityType.PLAYER)
                 && (allowNPCFlag || ((Player) data.target).isOnline())
                 && data.targetPastLocation.previousLocations.size() > 12
-                && Kauri.INSTANCE.lastTickLag.hasPassed(10)
+                && Kauri.INSTANCE.lastTickLag.isPassed(10)
                 && allowedEntities.contains(data.target.getType())
                 && !data.playerInfo.creative
-                && data.playerInfo.lastTargetSwitch.hasPassed()
+                && data.playerInfo.lastTargetSwitch.isPassed()
                 && !data.getPlayer().getGameMode().equals(GameMode.CREATIVE);
     }
 
     private static SimpleCollisionBox getHitbox(KLocation loc, EntityType type) {
         if(type.equals(EntityType.PLAYER)) {
-            return new SimpleCollisionBox(loc.toVector(), 0.6, 1.8).expand(0.3, 0.3, 0.3);
+            return new SimpleCollisionBox(loc.toVector(), 0.6, 1.8).expand(0.4, 0.4, 0.4);
         } else {
             Vector bounds = MiscUtils.entityDimensions.get(type);
 
             return new SimpleCollisionBox(loc.toVector(), 0, 0).expand(bounds.getX(), 0, bounds.getZ())
                     .expandMax(0, bounds.getY(), 0)
-                    .expand(0.3, 0.3, 0.3);
+                    .expand(0.4, 0.4, 0.4);
         }
     }
 }

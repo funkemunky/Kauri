@@ -7,18 +7,13 @@ import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.*;
 import cc.funkemunky.api.tinyprotocol.packet.out.*;
-import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.XMaterial;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
-import dev.brighten.anticheat.utils.RelativePastLocation;
 import lombok.val;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -130,17 +125,6 @@ public class PacketProcessor {
                     case STOP_DESTROY_BLOCK: {
                         data.predictionService.useSword
                                 = data.playerInfo.usingItem = false;
-
-                        val pos = packet.getPosition();
-
-                        Location loc = new Location(data.getPlayer().getWorld(),
-                                pos.getX(), pos.getY(), pos.getZ());
-
-                        data.playerInfo.shitMap.put(loc, Material.AIR);
-                        data.runKeepaliveAction(ka -> {
-                            data.playerInfo.shitMap.remove(loc);
-                            Bukkit.broadcastMessage("shit");
-                        });
                         break;
                     }
                     case ABORT_DESTROY_BLOCK: {
@@ -263,6 +247,7 @@ public class PacketProcessor {
                 int current = Kauri.INSTANCE.keepaliveProcessor.tick;
 
                 optional.ifPresent(ka -> {
+                    data.playerTicks++;
                     data.lagInfo.lastTransPing = data.lagInfo.transPing;
                     data.lagInfo.transPing = (current - ka.start);
 
@@ -438,8 +423,10 @@ public class PacketProcessor {
                     data.playerInfo.velocityX = (float) packet.getX();
                     data.playerInfo.velocityY = (float) packet.getY();
                     data.playerInfo.velocityZ = (float) packet.getZ();
+                    data.playerInfo.doingVelocity = true;
                     data.runKeepaliveAction(d -> {
                         data.playerInfo.lastVelocity.reset();
+                        data.playerInfo.doingVelocity = false;
                         data.playerInfo.lastVelocityTimestamp = System.currentTimeMillis();
                         data.predictionService.rmotionX = data.playerInfo.velocityX;
                         data.predictionService.rmotionZ = data.playerInfo.velocityZ;
@@ -522,6 +509,7 @@ public class PacketProcessor {
                     loc.yaw+= data.playerInfo.to.yaw;
                 }
 
+                data.playerInfo.doingTeleport = true;
                 data.playerInfo.posLocs.add(loc);
                 data.checkManager.runPacket(packet, timeStamp);
                 break;

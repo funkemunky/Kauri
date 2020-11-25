@@ -9,12 +9,13 @@ import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 import org.bukkit.GameMode;
 
 @CheckInfo(name = "BadPackets (D)",
         description = "Checks for clients spoofing flight permissions.",
-        checkType = CheckType.BADPACKETS, punishVL = 10)
+        checkType = CheckType.BADPACKETS, punishVL = 10, planVersion = KauriVersion.FREE)
 @Cancellable
 public class BadPacketsD extends Check {
 

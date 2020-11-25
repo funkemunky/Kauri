@@ -1,11 +1,8 @@
 package dev.brighten.anticheat.utils;
 
 import cc.funkemunky.api.reflections.impl.CraftReflection;
-import cc.funkemunky.api.reflections.impl.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutRelativePosition;
-import cc.funkemunky.api.utils.MathHelper;
-import cc.funkemunky.api.utils.Tuple;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

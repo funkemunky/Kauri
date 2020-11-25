@@ -7,39 +7,50 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.processing.MovementProcessor;
-import dev.brighten.anticheat.utils.MiscUtils;
-import dev.brighten.anticheat.utils.Verbose;
+import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Aim (G)", description = "Checks for bad GCD bypasses. (Rhys collab)",
-        checkType = CheckType.AIM, punishVL = 30)
+        checkType = CheckType.AIM, punishVL = 30, developer = true, planVersion = KauriVersion.ARA)
 public class AimG extends Check {
 
-    private Verbose verbose = new Verbose(40, 15);
-    private float lDeltaPitch;
-
+    private int buffer;
     @Packet
     public void process(WrappedInFlyingPacket packet) {
         if(!packet.isLook()) return;
 
-        float sens = MovementProcessor.percentToSens(data.moveProcessor.sensYPercent);
-        float deltaPitch = Math.abs(modulo(sens, data.playerInfo.from.pitch)
-                - data.playerInfo.to.pitch);
-
-        float gcd = MiscUtils.gcd((long)(deltaPitch * MovementProcessor.offset),
-                (long)(lDeltaPitch * MovementProcessor.offset));
-        float clampedYaw = MathUtils.yawTo180F(data.playerInfo.to.yaw);
-        float deltaYaw = Math.abs(modulo(sens, MathUtils.yawTo180F(data.playerInfo.from.yaw)) - clampedYaw);
-        float delta = Math.abs(deltaYaw - deltaPitch);
-
-        if(deltaYaw < 0.01 && deltaPitch < 8E-5) {
-            debug(Color.Green + "Flag");
+        final double yawGcd = data.playerInfo.yawGCD / MovementProcessor.offset,
+                pitchGCD = data.playerInfo.pitchGCD / MovementProcessor.offset;
+        if(data.moveProcessor.sensYPercent != data.moveProcessor.sensXPercent
+                || MathUtils.getDelta(data.moveProcessor.yawMode, yawGcd) > 0.1
+                || MathUtils.getDelta(data.moveProcessor.pitchMode, pitchGCD) > 0.1) {
+            debug("sensitivity instability sx=%v sy=%v ym=%v.2 pm=%v.2 ygcd=%v.2 pgcd=%v.2",
+                    data.moveProcessor.sensXPercent, data.moveProcessor.sensYPercent, data.moveProcessor.yawMode,
+                    data.moveProcessor.pitchMode, yawGcd, pitchGCD);
+            return;
         }
 
-        lDeltaPitch = deltaPitch;
+        final float deltaYaw = Math.abs(data.playerInfo.deltaYaw), deltaPitch = Math.abs(data.playerInfo.deltaPitch);
+        final double mx = (deltaYaw / data.moveProcessor.yawMode)
+                % (Math.abs(data.playerInfo.lDeltaYaw) / data.moveProcessor.yawMode);
+        final double my = (deltaPitch / data.moveProcessor.pitchMode)
+                % (Math.abs(data.playerInfo.lDeltaPitch) / data.moveProcessor.pitchMode);
 
-        debug("gcd=%v deltaPitch=%v deltaYaw=%v sens=%v buffer=%v.1", gcd, deltaPitch, deltaYaw,
-                data.moveProcessor.sensYPercent + ", " + data.moveProcessor.sensXPercent, verbose.value());
+        final double deltaX = Math.abs(Math.floor(mx) - mx);
+        final double deltaY = Math.abs(Math.floor(my) - my);
+
+        final boolean shitX = deltaX > 0.05 && deltaX < 0.95, shitY = deltaY > 0.05 && deltaY < 0.95;
+        final boolean flag = shitX && shitY;
+
+        if(flag) {
+            if(++buffer > 9) {
+                vl++;
+                flag("mx=%v.2 my=%v.2 dx=%v.2 dy=%v.2", mx, my, deltaX, deltaY);
+            }
+        } else if(buffer > 0) buffer-= 2;
+
+        debug((flag ? Color.Green + buffer + ": " : "") +"mx=%v.2 my=%v.2 dx=%v.2 dy=%v.2 s=%v",
+                mx, my, deltaX, deltaY, data.moveProcessor.sensitivityX);
     }
 
     private static float modulo(float s, float angle) {

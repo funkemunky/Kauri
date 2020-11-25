@@ -55,8 +55,8 @@ public class VelocityC extends Check {
                     || pvY != 0
                     || data.blockInfo.blocksAbove
                     || data.blockInfo.inLiquid
-                    || data.lagInfo.lastPingDrop.hasNotPassed(10)
-                    || data.lagInfo.lastPacketDrop.hasNotPassed(10)) {
+                    || data.lagInfo.lastPingDrop.isNotPassed(10)
+                    || data.lagInfo.lastPacketDrop.isNotPassed(10)) {
                 pvX = pvZ = 0;
                 buffer-= buffer > 0 ? 1 : 0;
                 return;
@@ -126,7 +126,7 @@ public class VelocityC extends Check {
 
             double ratio = data.playerInfo.deltaXZ / vXZ;
 
-            if(ratio < 0.7
+            if((ratio < 0.8)
                     && timeStamp - data.creation > 3000L
                     && !data.getPlayer().getItemInHand().getType().isEdible()
                     && !data.blockInfo.blocksNear) {
@@ -135,7 +135,7 @@ public class VelocityC extends Check {
                     flag("pct=%v.2% buffer=%v.1 forward=%v.2 strafe=%v.2",
                             ratio * 100, buffer, moveStrafe, moveForward);
                 }
-            } else buffer-= buffer > 0 ? data.lagInfo.lastPacketDrop.hasNotPassed(20) ? .5 : 0.25 : 0;
+            } else buffer-= buffer > 0 ? data.lagInfo.lastPacketDrop.isNotPassed(20) ? .5 : 0.25 : 0;
             debug("ratio=%v.3 buffer=%v.1 strafe=%v.2 forward=%v.2 lastUse=%v found=%v",
                     ratio, buffer, moveStrafe, moveForward, data.playerInfo.lastUseItem.getPassed(), found);
             pvX *= drag;

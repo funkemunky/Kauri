@@ -6,11 +6,13 @@ import cc.funkemunky.api.utils.XMaterial;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
 
 @CheckInfo(name = "BadPackets (L)", description = "Player sends block place packets without any item in hand",
-        checkType = CheckType.BADPACKETS, developer = true, maxVersion = ProtocolVersion.V1_8_9)
+        checkType = CheckType.BADPACKETS, developer = true, maxVersion = ProtocolVersion.V1_8_9,
+        planVersion = KauriVersion.FREE)
 public class BadPacketsL extends Check {
 
     @Packet

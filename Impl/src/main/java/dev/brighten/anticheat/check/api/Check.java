@@ -13,7 +13,10 @@ import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutCloseWindowPacket;
 import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.utils.timer.Timer;
+import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import dev.brighten.api.KauriAPI;
+import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.KauriCheck;
@@ -65,11 +68,13 @@ public class Check implements KauriCheck {
     public CheckType checkType;
 
     public CancelType cancelMode;
+    @Getter
+    private KauriVersion plan;
 
     public boolean exempt, banExempt;
-    private TickTimer lastExemptCheck = new TickTimer(20);
+    private Timer lastExemptCheck = new TickTimer(20);
 
-    private TickTimer lastAlert = new TickTimer(MathUtils.millisToTicks(Config.alertsDelay));
+    private Timer lastAlert = new TickTimer(MathUtils.millisToTicks(Config.alertsDelay));
 
     public void setData(ObjectData data) {
         this.data = data;
@@ -90,7 +95,7 @@ public class Check implements KauriCheck {
         if(check.getClass().isAnnotationPresent(Cancellable.class))
             type = check.getClass().getAnnotation(Cancellable.class).cancelType();
         CheckSettings settings = new CheckSettings(info.name(), info.description(), info.checkType(), type,
-                info.punishVL(), info.vlToFlag(), info.minVersion(), info.maxVersion());
+                info.planVersion(), info.punishVL(), info.vlToFlag(), info.minVersion(), info.maxVersion());
 
         String path = "checks." + name;
         settings.enabled = new ConfigDefault<>(info.enabled(),
@@ -135,7 +140,7 @@ public class Check implements KauriCheck {
             devAlerts = true;
             vl = 0;
         }
-        if(lastExemptCheck.hasPassed()) exempt = KauriAPI.INSTANCE.exemptHandler.isExempt(data.uuid, this);
+        if(lastExemptCheck.isPassed()) exempt = KauriAPI.INSTANCE.exemptHandler.isExempt(data.uuid, this);
         if(exempt) return;
         if(System.currentTimeMillis() - lastFlagRun < 50L) return;
         lastFlagRun = System.currentTimeMillis();
@@ -185,14 +190,14 @@ public class Check implements KauriCheck {
         final String finalInformation = information;
         KauriFlagEvent event = new KauriFlagEvent(data.getPlayer(), this, finalInformation);
 
-        Bukkit.getPluginManager().callEvent(event);
+        Atlas.getInstance().getEventManager().callEvent(event);
 
         if(event.isCancelled()) return;
 
-        if(cancellable && cancelMode != null && vl > vlToFlag && data.lagInfo.lastPacketDrop.hasPassed(8)) {
+        if(cancellable && cancelMode != null && vl > vlToFlag && data.lagInfo.lastPacketDrop.isPassed(8)) {
             KauriCancelEvent cancelEvent = new KauriCancelEvent(data.getPlayer(), cancelMode);
 
-            Bukkit.getPluginManager().callEvent(cancelEvent);
+            Atlas.getInstance().getEventManager().callEvent(cancelEvent);
             if(!cancelEvent.isCancelled()) {
                 switch(cancelEvent.getCancelType()) {
                     case ATTACK: {
@@ -214,16 +219,16 @@ public class Check implements KauriCheck {
 
         boolean dev = devAlerts || (developer || vl <= vlToFlag);
         Kauri.INSTANCE.executor.execute(() -> {
-            if(lastAlert.hasPassed(resetVLTime)) vl = 0;
+            if(lastAlert.isPassed(resetVLTime)) vl = 0;
             final String info = finalInformation
                     .replace("%p", String.valueOf(data.lagInfo.transPing))
                     .replace("%t", String.valueOf(MathUtils.round(Kauri.INSTANCE.getTps(), 2)));
-            if (Kauri.INSTANCE.lastTickLag.hasPassed() && (data.lagInfo.lastPacketDrop.hasPassed(5)
-                    || data.lagInfo.lastPingDrop.hasPassed(20))
+            if (Kauri.INSTANCE.lastTickLag.isPassed() && (data.lagInfo.lastPacketDrop.isPassed(5)
+                    || data.lagInfo.lastPingDrop.isPassed(20))
                     && System.currentTimeMillis() - Kauri.INSTANCE.lastTick < 100L) {
                 if(vl > 0) Kauri.INSTANCE.loggerManager.addLog(data, this, info);
 
-                if (lastAlert.hasPassed(MathUtils.millisToTicks(Config.alertsDelay))) {
+                if (lastAlert.isPassed(MathUtils.millisToTicks(Config.alertsDelay))) {
                     List<TextComponent> components = new ArrayList<>();
 
                     if(dev) {
@@ -299,7 +304,7 @@ public class Check implements KauriCheck {
 
         KauriPunishEvent punishEvent = new KauriPunishEvent(data.getPlayer(), this);
 
-        Bukkit.getPluginManager().callEvent(punishEvent);
+        Atlas.getInstance().getEventManager().callEvent(punishEvent);
 
         vl = 0;
         if(!punishEvent.isCancelled()) {

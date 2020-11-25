@@ -8,7 +8,9 @@ import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
 import dev.brighten.anticheat.check.api.Check;
+import dev.brighten.anticheat.check.api.CheckRegister;
 import dev.brighten.anticheat.check.api.Config;
+import dev.brighten.anticheat.classloader.CheckLicense;
 import dev.brighten.anticheat.classloader.KauriClassLoader;
 import dev.brighten.anticheat.classloader.file.FileDownloader;
 import dev.brighten.anticheat.data.DataManager;
@@ -17,7 +19,7 @@ import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.processing.PacketProcessor;
 import dev.brighten.anticheat.processing.keepalive.KeepaliveProcessor;
 import dev.brighten.anticheat.utils.SystemUtil;
-import dev.brighten.anticheat.utils.TickTimer;
+import dev.brighten.anticheat.utils.timer.impl.AtlasTimer;
 import dev.brighten.api.KauriAPI;
 import org.bukkit.Bukkit;
 
@@ -77,7 +79,7 @@ public class Load {
                 e.printStackTrace();
             }
 
-            startClassLoader(false);
+            startClassLoader();
         }
 
         register("Setting the language to " + Color.Yellow + Config.language);
@@ -98,30 +100,28 @@ public class Load {
                 Bukkit.getOnlinePlayers().forEach(Kauri.INSTANCE.dataManager::createData);
             }, Kauri.INSTANCE, 6L);
         }
-        Kauri.INSTANCE.lastEnabled = new TickTimer(20);
+        Kauri.INSTANCE.lastEnabled = new AtlasTimer(20);
         Kauri.INSTANCE.enabled = true;
         Kauri.INSTANCE.lastEnabled.reset();
 
         Bukkit.getWorlds().forEach(world -> Kauri.INSTANCE.entityProcessor.vehicles.put(world.getUID(), new ArrayList<>()));
+
+        CheckLicense.checkLicense();
     }
 
     private static void register(String string) {
         MiscUtils.printToConsole(Color.Gray + string);
     }
 
-    public static void startClassLoader(boolean reload) {
+    public static void startClassLoader() {
         //don't fucking modify or i will snap ur neck
-        if(!reload) {
-            for (int i = 0; i < 100; i++) {
-                SystemUtil.CRC_32.update(("GzB@aRC1$^JEKQxGmSBAQ%%WohM7LZnuC*pVhf0%B6VyZMyOvU" + i).getBytes(StandardCharsets.UTF_8));
-            }
+        for (int i = 0; i < 100; i++) {
+            SystemUtil.CRC_32.update(("GzB@aRC1$^JEKQxGmSBAQ%%WohM7LZnuC*pVhf0%B6VyZMyOvU" + i)
+                    .getBytes(StandardCharsets.UTF_8));
         }
 
         loadVersion(Kauri.INSTANCE.LINK);
     }
-
-    private static String regular = "dev.brighten.anticheat.check.RegularChecks",
-            free = "dev.brighten.anticheat.check.FreeChecks", premium = "dev.brighten.anticheat.premium.PremiumChecks";
 
     private static void loadVersion(String url) {
 
@@ -130,9 +130,23 @@ public class Load {
 
         if (downloadedFile.exists()) {
             try {
-                KauriClassLoader kauriClassLoader = new KauriClassLoader(downloadedFile.toURI().toURL(), Kauri.INSTANCE.getClass().getClassLoader());
+                KauriClassLoader kauriClassLoader = new KauriClassLoader(downloadedFile.toURI().toURL(),
+                        Kauri.INSTANCE.getClass().getClassLoader());
 
-                Optional.ofNullable(kauriClassLoader.loadClass(free)).ifPresent(clazz -> {
+                if(kauriClassLoader.getClassBytes() != null) {
+                    kauriClassLoader.getClassBytes()
+                            .forEach((key, bytes) -> {
+                                Class<?> claz = kauriClassLoader.loadClass(key);
+                                if(CheckRegister.class.isAssignableFrom(claz)) {
+                                    try {
+                                        claz.newInstance();
+                                    } catch (InstantiationException | IllegalAccessException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                    });
+                }
+                /*Optional.ofNullable(kauriClassLoader.loadClass(free)).ifPresent(clazz -> {
                     try {
                         clazz.newInstance();
                     } catch (InstantiationException | IllegalAccessException e) {
@@ -152,8 +166,9 @@ public class Load {
                     } catch (InstantiationException | IllegalAccessException e) {
                         e.printStackTrace();
                     }
-                });
-                downloadedFile.delete();
+                });*/
+                System.out.println("Deleting");
+                while(!downloadedFile.delete() && downloadedFile.exists());
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             }

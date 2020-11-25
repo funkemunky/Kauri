@@ -9,11 +9,12 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.processing.TagsBuilder;
+import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 import org.bukkit.potion.PotionEffectType;
 
 @CheckInfo(name = "Speed (A)", description = "Minecraft code speed acceleration check.",
-        checkType = CheckType.SPEED)
+        checkType = CheckType.SPEED, planVersion = KauriVersion.FREE)
 @Cancellable
 public class SpeedA extends Check {
 
@@ -77,19 +78,24 @@ public class SpeedA extends Check {
                 moveFactor = 0.034;
             }
 
-            if(data.playerInfo.lastTeleportTimer.hasNotPassed(6)
-                    || data.playerInfo.lastRespawnTimer.hasNotPassed(6)) {
+            if(data.playerInfo.lastTeleportTimer.isNotPassed(6)
+                    || data.playerInfo.lastRespawnTimer.isNotPassed(6)) {
                 tags.addTag("teleport");
                 moveFactor+= 0.1;
                 moveFactor*= 5;
             }
 
+            if(data.playerInfo.lastEntityCollision.isNotPassed(2)) {
+                tags.addTag("entity-collision");
+                moveFactor+= 0.05;
+            }
+
             double ratio = (data.playerInfo.deltaXZ - ldxz) / moveFactor * 100;
 
-            if (ratio > 100.8 && data.playerInfo.lastBrokenBlock.hasPassed(data.lagInfo.transPing + 1)
-                    && data.playerInfo.liquidTimer.hasPassed(2)
-                    && data.playerInfo.lastTeleportTimer.hasPassed(1)
-                    && !data.playerInfo.generalCancel && data.playerInfo.lastVelocity.hasPassed(2)) {
+            if (ratio > 100.8 && data.playerInfo.lastBrokenBlock.isPassed(data.lagInfo.transPing + 1)
+                    && data.playerInfo.liquidTimer.isPassed(2)
+                    && data.playerInfo.lastTeleportTimer.isPassed(1)
+                    && !data.playerInfo.generalCancel && data.playerInfo.lastVelocity.isPassed(2)) {
                 if((buffer+= ratio > 500 ? 2 : 1) > 4) {
                     vl++;
                     flag("p=%v.1% dxz=%v.3 aimove=%v.3 tags=%v",

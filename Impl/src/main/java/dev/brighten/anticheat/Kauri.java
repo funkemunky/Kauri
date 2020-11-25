@@ -20,9 +20,9 @@ import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.processing.PacketProcessor;
 import dev.brighten.anticheat.processing.keepalive.KeepaliveProcessor;
 import dev.brighten.anticheat.utils.StringUtils;
-import dev.brighten.anticheat.utils.TickTimer;
+import dev.brighten.anticheat.utils.timer.Timer;
+import dev.brighten.anticheat.utils.timer.impl.AtlasTimer;
 import dev.brighten.api.KauriAPI;
-import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
@@ -49,7 +49,7 @@ public class Kauri extends JavaPlugin {
 
     //Lag Information
     public RollingAverageDouble tps = new RollingAverageDouble(4, 20);
-    public TickTimer lastTickLag;
+    public Timer lastTickLag;
     public long lastTick;
     public CommandManager commandManager;
 
@@ -59,7 +59,7 @@ public class Kauri extends JavaPlugin {
     public String LINK = "";
 
     public boolean enabled = false, usingPremium, usingAra;
-    public TickTimer lastEnabled;
+    public Timer lastEnabled;
 
     public MessageHandler msgHandler;
     public KauriAPI kauriAPI;
@@ -187,7 +187,7 @@ public class Kauri extends JavaPlugin {
     }
 
     public void runTpsTask() {
-        lastTickLag = new TickTimer(6);
+        lastTickLag = new AtlasTimer(6);
         AtomicInteger ticks = new AtomicInteger();
         AtomicLong lastTimeStamp = new AtomicLong(0);
         RunUtils.taskTimer(() -> {

@@ -12,21 +12,15 @@ import cc.funkemunky.api.utils.Tuple;
 import dev.brighten.anticheat.commands.KauriCommand;
 import dev.brighten.anticheat.processing.MovementProcessor;
 import lombok.val;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.minecraft.server.v1_7_R4.CommandSeed;
 import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import java.awt.*;
 import java.io.Closeable;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
@@ -46,6 +40,24 @@ public class MiscUtils {
         s.add(float.class);
         s.add(double.class);
         NUMBER_REFLECTED_PRIMITIVES = s;
+    }
+
+    public static Float getMode(Collection<Float> collect) {
+        Map<Float, Integer> repeated = new HashMap<>();
+
+        //Sorting each value by how to repeat into a map.
+        collect.forEach(val -> {
+            float value = (float)MathUtils.trim(7, val);
+            int number = repeated.getOrDefault(value, 0);
+
+            repeated.put(val, number + 1);
+        });
+
+        //Calculating the largest value to the key, which would be the mode.
+        return repeated.keySet().stream()
+                .map(key -> new Tuple<>(key, repeated.get(key))) //We map it into a Tuple for easier sorting.
+                .max(Comparator.comparing(tup -> tup.two, Comparator.naturalOrder()))
+                .orElseThrow(NullPointerException::new).one;
     }
 
     public static double max(double... values) {

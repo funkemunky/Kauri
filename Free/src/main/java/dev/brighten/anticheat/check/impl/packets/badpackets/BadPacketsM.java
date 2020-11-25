@@ -5,10 +5,11 @@ import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "BadPackets (M)", description = "Checks for impossible pitch positions.",
-        checkType = CheckType.BADPACKETS, punishVL = 1)
+        checkType = CheckType.BADPACKETS, punishVL = 1, planVersion = KauriVersion.FREE)
 public class BadPacketsM extends Check {
 
     @Packet

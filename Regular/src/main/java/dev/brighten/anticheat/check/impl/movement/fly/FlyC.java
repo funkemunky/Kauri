@@ -26,10 +26,10 @@ public class FlyC extends Check {
                     && data.playerInfo.lClientGround
                     && !data.blockInfo.bedNear
                     && !data.playerInfo.serverGround
-                    && data.playerInfo.blockAboveTimer.hasPassed(6)
-                    && data.playerInfo.lastBlockPlace.hasPassed(20)
-                    && data.playerInfo.lastHalfBlock.hasPassed(4)
-                    && data.playerInfo.lastVelocity.hasPassed(4)
+                    && data.playerInfo.blockAboveTimer.isPassed(6)
+                    && data.playerInfo.lastBlockPlace.isPassed(20)
+                    && data.playerInfo.lastHalfBlock.isPassed(4)
+                    && data.playerInfo.lastVelocity.isPassed(4)
                     && MathUtils.getDelta(data.playerInfo.deltaY, maxHeight) > 0.01f) {
                 if (verbose.add() > 2) {
                     vl++;

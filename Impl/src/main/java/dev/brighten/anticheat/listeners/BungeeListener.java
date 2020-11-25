@@ -8,7 +8,8 @@ import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Config;
-import dev.brighten.anticheat.utils.TickTimer;
+import dev.brighten.anticheat.utils.timer.Timer;
+import dev.brighten.anticheat.utils.timer.impl.AtlasTimer;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.event.EventHandler;
@@ -23,7 +24,7 @@ import java.util.UUID;
 public class BungeeListener implements AtlasListener, Listener {
 
     //uuid, info, checkName, vl
-    public Map<CheckEntry, TickTimer> lastAlertsMap = new HashMap<>();
+    public Map<CheckEntry, Timer> lastAlertsMap = new HashMap<>();
 
     @Listen
     public void onBungee(BungeeReceiveEvent event) {
@@ -31,15 +32,15 @@ public class BungeeListener implements AtlasListener, Listener {
         UUID uuid = (UUID)event.objects[0];
         String checkName = (String)event.objects[1];
         CheckEntry entry = new CheckEntry(uuid, checkName);
-        TickTimer lastAlert;
+        Timer lastAlert;
         if(!lastAlertsMap.containsKey(entry)) {
-            lastAlert = new TickTimer(MathUtils.millisToTicks(Config.alertsDelay));
+            lastAlert = new AtlasTimer(MathUtils.millisToTicks(Config.alertsDelay));
             lastAlertsMap.put(entry, lastAlert);
         } else {
             lastAlert = lastAlertsMap.get(entry);
         }
 
-        if(lastAlert.hasPassed(MathUtils.millisToTicks(Config.alertsDelay))) {
+        if(lastAlert.isPassed(MathUtils.millisToTicks(Config.alertsDelay))) {
             float vl = (float)event.objects[2];
             String info = (String)event.objects[3];
 

@@ -6,10 +6,11 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.processing.TagsBuilder;
+import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Autoclicker (E)", description = "Combined autoclicker check.",
-        checkType = CheckType.AUTOCLICKER, developer = true)
+        checkType = CheckType.AUTOCLICKER, developer = true, planVersion = KauriVersion.ARA)
 public class AutoclickerE extends Check {
 
     private float buffer;
@@ -18,9 +19,9 @@ public class AutoclickerE extends Check {
         if(data.playerInfo.breakingBlock
                 || data.playerInfo.lookingAtBlock
                 || data.clickProcessor.isNotReady()
-                || data.playerInfo.lastBrokenBlock.hasNotPassed(5)
-                || data.playerInfo.lastBlockDigPacket.hasNotPassed(1)
-                || data.playerInfo.lastBlockPlacePacket.hasNotPassed(1))
+                || data.playerInfo.lastBrokenBlock.isNotPassed(5)
+                || data.playerInfo.lastBlockDigPacket.isNotPassed(1)
+                || data.playerInfo.lastBlockPlacePacket.isNotPassed(1))
             return;
 
         double skewness = Math.abs(data.clickProcessor.getSkewness());

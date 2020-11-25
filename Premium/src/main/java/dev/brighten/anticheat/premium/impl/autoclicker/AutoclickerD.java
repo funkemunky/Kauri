@@ -6,10 +6,11 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.Pattern;
+import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "Autoclicker (D)", description = "Checks for clicking oscillation.",
+@CheckInfo(name = "Autoclicker (D)", description = "Checks for clicking oscillation.", planVersion = KauriVersion.ARA,
         checkType = CheckType.AUTOCLICKER, punishVL = 15, executable = false, vlToFlag = 4)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerD extends Check {
@@ -22,9 +23,9 @@ public class AutoclickerD extends Check {
     public void onClick(WrappedInArmAnimationPacket packet, long timeStamp) {
         if(!data.playerInfo.breakingBlock
                 && !data.playerInfo.lookingAtBlock
-                && data.playerInfo.lastBrokenBlock.hasPassed(5)
-                && data.playerInfo.lastBlockDigPacket.hasPassed(1)
-                && data.playerInfo.lastBlockPlacePacket.hasPassed(1)) {
+                && data.playerInfo.lastBrokenBlock.isPassed(5)
+                && data.playerInfo.lastBlockDigPacket.isPassed(1)
+                && data.playerInfo.lastBlockPlacePacket.isPassed(1)) {
             clicks++;
             long diff = timeStamp - lastClickTime;
 

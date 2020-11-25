@@ -7,10 +7,11 @@ import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "NoFall (A)", description = "Checks to make sure the ground packet from the client is legit",
-        checkType = CheckType.NOFALL, punishVL = 20, vlToFlag = 3, executable = false)
+        checkType = CheckType.NOFALL, punishVL = 20, vlToFlag = 3, executable = false, planVersion = KauriVersion.FREE)
 @Cancellable
 public class NoFallA extends Check {
 
@@ -21,7 +22,7 @@ public class NoFallA extends Check {
                 ? data.playerInfo.deltaY != 0
                 && (Math.abs(data.playerInfo.deltaY) >= Math.abs(data.playerInfo.lDeltaY))
                 && !data.playerInfo.serverGround
-                && data.playerInfo.lastBlockPlace.hasPassed(10)
+                && data.playerInfo.lastBlockPlace.isPassed(10)
                 : data.playerInfo.deltaY == 0 && data.playerInfo.lDeltaY == 0;
 
         if(data.playerInfo.deltaY < 0 && data.playerInfo.clientGround && flag) {
@@ -36,14 +37,14 @@ public class NoFallA extends Check {
         }
 
         if(!data.playerInfo.flightCancel
-                && data.playerInfo.lastHalfBlock.hasPassed(4)
+                && data.playerInfo.lastHalfBlock.isPassed(4)
                 && !data.blockInfo.onSlime
                 && !data.blockInfo.blocksAbove
-                && data.playerInfo.lastTeleportTimer.hasPassed(1)
-                && data.playerInfo.lastBlockPlace.hasPassed(8)
-                && data.playerInfo.lastVelocity.hasPassed(4)
+                && data.playerInfo.lastTeleportTimer.isPassed(1)
+                && data.playerInfo.lastBlockPlace.isPassed(8)
+                && data.playerInfo.lastVelocity.isPassed(4)
                 && (data.playerInfo.deltaY != 0 || data.playerInfo.deltaXZ > 0)
-                && data.playerInfo.blockAboveTimer.hasPassed(10)
+                && data.playerInfo.blockAboveTimer.isPassed(10)
                 && flag) { ;
 
             if(++vl > 2) {

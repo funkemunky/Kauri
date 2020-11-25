@@ -4,7 +4,8 @@ import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumAnimation;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.data.ObjectData;
-import dev.brighten.anticheat.utils.TickTimer;
+import dev.brighten.anticheat.utils.timer.Timer;
+import dev.brighten.anticheat.utils.timer.impl.PlayerTimer;
 import lombok.NoArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -17,7 +18,7 @@ import java.util.Map;
 public class PlayerInformation {
     public boolean serverGround, lClientGround, clientGround, nearGround,
             collided, insideBlock, lookingAtBlock,
-            onLadder, isClimbing, usingItem, wasOnIce, wasOnSlime, jumped, inAir, lworldLoaded, worldLoaded;
+            onLadder, isClimbing, usingItem, wasOnIce, wasOnSlime, jumped, inAir, worldLoaded;
     public boolean generalCancel, flightCancel;
     public float fallDistance;
     public double deltaY, lDeltaY, deltaX, lDeltaX, deltaZ, lDeltaZ, deltaXZ, lDeltaXZ,
@@ -30,31 +31,32 @@ public class PlayerInformation {
 
     public PlayerInformation(ObjectData data) {
 
-        liquidTimer = new TickTimer(50);
-        webTimer = new TickTimer(40);
-        climbTimer = new TickTimer(40);
-        slimeTimer = new TickTimer(75);
-        iceTimer = new TickTimer(45);
-        blockAboveTimer = new TickTimer(50);
-        soulSandTimer = new TickTimer(40);
-        lastBrokenBlock = new TickTimer(5);
-        lastVelocity = new TickTimer(20);
-        lastTargetSwitch = new TickTimer(3);
-        lastBlockPlace = new TickTimer(10);
-        lastToggleFlight = new TickTimer(10);
-        lastChunkUnloaded = new TickTimer(20);
-        lastWindowClick = new TickTimer(20);
-        lastInsideBlock = new TickTimer(5);
-        lastHalfBlock = new TickTimer(20);
-        lastPlaceLiquid = new TickTimer(20);
-        lastBlockDigPacket = new TickTimer(5);
-        lastBlockPlacePacket = new TickTimer(5);
-        lastUseItem = new TickTimer(15);
-        lastTeleportTimer = new TickTimer(10);
-        lastGamemodeTimer = new TickTimer(10);
-        lastRespawnTimer = new TickTimer(20);
-        lastAttack = new TickTimer(5);
-        cinematicTimer = new TickTimer(8);
+        liquidTimer = new PlayerTimer(data, 50);
+        webTimer = new PlayerTimer(data, 40);
+        climbTimer = new PlayerTimer(data, 40);
+        slimeTimer = new PlayerTimer(data, 75);
+        iceTimer = new PlayerTimer(data, 45);
+        blockAboveTimer = new PlayerTimer(data, 50);
+        soulSandTimer = new PlayerTimer(data, 40);
+        lastBrokenBlock = new PlayerTimer(data, 5);
+        lastVelocity = new PlayerTimer(data, 20);
+        lastTargetSwitch = new PlayerTimer(data, 3);
+        lastBlockPlace = new PlayerTimer(data, 10);
+        lastToggleFlight = new PlayerTimer(data, 10);
+        lastChunkUnloaded = new PlayerTimer(data, 20);
+        lastWindowClick = new PlayerTimer(data, 20);
+        lastInsideBlock = new PlayerTimer(data, 5);
+        lastHalfBlock = new PlayerTimer(data, 20);
+        lastPlaceLiquid = new PlayerTimer(data, 20);
+        lastBlockDigPacket = new PlayerTimer(data, 5);
+        lastBlockPlacePacket = new PlayerTimer(data, 5);
+        lastUseItem = new PlayerTimer(data, 15);
+        lastTeleportTimer = new PlayerTimer(data, 10);
+        lastGamemodeTimer = new PlayerTimer(data, 10);
+        lastRespawnTimer = new PlayerTimer(data, 20);
+        lastAttack = new PlayerTimer(data, 5);
+        cinematicTimer = new PlayerTimer(data, 8);
+        lastEntityCollision = new PlayerTimer(data, 4);
     }
 
     //Cinematic
@@ -69,12 +71,11 @@ public class PlayerInformation {
     public EvictingList<KLocation> posLocs = new EvictingList<>(5);
 
     //Attack
-    public TickTimer lastAttack;
     public long lastAttackTimeStamp;
 
     //actions
     public boolean sneaking, sprinting, ridingJump, breakingBlock, flying, canFly, creative, inVehicle,
-            gliding, riptiding, inventoryOpen, serverAllowedFlight;
+            gliding, riptiding, inventoryOpen, serverAllowedFlight, doingVelocity, doingTeleport;
     public int inventoryId = 0;
 
     //Keepalives
@@ -82,9 +83,9 @@ public class PlayerInformation {
 
     //ticks
     public int groundTicks, airTicks;
-    public TickTimer liquidTimer, webTimer, climbTimer, slimeTimer, iceTimer, blockAboveTimer, soulSandTimer;
-    public TickTimer lastBrokenBlock, lastVelocity, lastTargetSwitch, lastBlockPlace, lastBlockPlacePacket,
-            lastBlockDigPacket, lastToggleFlight,
+    public Timer liquidTimer, webTimer, climbTimer, slimeTimer, iceTimer, blockAboveTimer, soulSandTimer;
+    public Timer lastBrokenBlock, lastVelocity, lastTargetSwitch, lastBlockPlace, lastBlockPlacePacket,
+            lastBlockDigPacket, lastToggleFlight, lastAttack, lastEntityCollision,
             lastWindowClick, lastInsideBlock, lastHalfBlock, lastPlaceLiquid, lastUseItem,
             lastTeleportTimer, lastGamemodeTimer, lastRespawnTimer, lastChunkUnloaded, cinematicTimer;
 

@@ -7,10 +7,11 @@ import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Fly (A)", description = "Simple fly check.", punishVL = 10,
-        checkType = CheckType.FLIGHT, vlToFlag = 3, developer = true)
+        checkType = CheckType.FLIGHT, vlToFlag = 3, developer = true, planVersion = KauriVersion.FREE)
 @Cancellable
 public class FlyA extends Check {
 
@@ -18,12 +19,12 @@ public class FlyA extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if(!packet.isPos() || data.playerInfo.lastTeleportTimer.hasNotPassed(1)
+        if(!packet.isPos() || data.playerInfo.lastTeleportTimer.isNotPassed(1)
                 || data.playerInfo.flightCancel
                 || timeStamp - data.playerInfo.lastVelocityTimestamp <= 200L
-                || data.playerInfo.lastVelocity.hasNotPassed(2)
-                || data.playerInfo.blockAboveTimer.hasNotPassed(3)
-                || data.playerInfo.lastRespawnTimer.hasNotPassed(5)) return;
+                || data.playerInfo.lastVelocity.isNotPassed(2)
+                || data.playerInfo.blockAboveTimer.isNotPassed(3)
+                || data.playerInfo.lastRespawnTimer.isNotPassed(5)) return;
 
         long start = System.nanoTime();
 
@@ -45,7 +46,7 @@ public class FlyA extends Check {
 
             if(lground) {
                 if(data.playerInfo.deltaY > 0) {
-                    predicted = data.playerInfo.blockAboveTimer.hasNotPassed(3)
+                    predicted = data.playerInfo.blockAboveTimer.isNotPassed(3)
                             ? Math.min(data.playerInfo.deltaY, data.playerInfo.jumpHeight)
                             : data.playerInfo.jumpHeight;
                 } else {
@@ -71,10 +72,10 @@ public class FlyA extends Check {
             double check = Math.abs(data.playerInfo.deltaY - predicted);
 
             if(check > 0.016
-                    && data.playerInfo.slimeTimer.hasPassed(10)
+                    && data.playerInfo.slimeTimer.isPassed(10)
                     && !data.playerInfo.serverGround
-                    && data.playerInfo.lastHalfBlock.hasPassed(5)
-                    && data.playerInfo.lastVelocity.hasPassed(4)) {
+                    && data.playerInfo.lastHalfBlock.isPassed(5)
+                    && data.playerInfo.lastVelocity.isPassed(4)) {
                 vl++;
                 if(vl > 3)
                 flag("deltaY=%v.4 predicted=%v.4", data.playerInfo.deltaY, predicted);

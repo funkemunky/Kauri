@@ -193,9 +193,9 @@ public class PredictionService {
     }
 
     private boolean checkSpecialBlock() {
-        return (data.playerInfo.iceTimer.hasNotPassed(20)
-                || data.playerInfo.soulSandTimer.hasNotPassed(20)
-                || data.playerInfo.climbTimer.hasNotPassed(20) || data.playerInfo.wasOnSlime)
+        return (data.playerInfo.iceTimer.isNotPassed(20)
+                || data.playerInfo.soulSandTimer.isNotPassed(20)
+                || data.playerInfo.climbTimer.isNotPassed(20) || data.playerInfo.wasOnSlime)
                 && (onGround || lastOnGround);
     }
 

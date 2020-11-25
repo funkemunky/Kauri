@@ -2,11 +2,11 @@ package dev.brighten.anticheat.processing;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
+import cc.funkemunky.api.utils.TickTimer;
 import cc.funkemunky.api.utils.Tuple;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.MiscUtils;
-import dev.brighten.anticheat.utils.TickTimer;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -47,9 +47,9 @@ public class ClickProcessor {
         if(delta < 15
                 && !data.playerInfo.breakingBlock
                 && !data.playerInfo.lookingAtBlock
-                && data.playerInfo.lastBlockPlacePacket.hasPassed(1)
-                && data.playerInfo.lastBlockDigPacket.hasPassed(1)
-                && data.playerInfo.lastBlockPlace.hasPassed(3)) {
+                && data.playerInfo.lastBlockPlacePacket.isPassed(1)
+                && data.playerInfo.lastBlockDigPacket.isPassed(1)
+                && data.playerInfo.lastBlockPlace.isPassed(3)) {
             cpsList.add(delta);
 
             zeros = cpsList.stream().filter(dt -> dt <= 2).count();
@@ -84,7 +84,7 @@ public class ClickProcessor {
             skewness = MiscUtils.getSkewnessApache(cpsList);
         }
         notReady = data.playerInfo.breakingBlock
-                || data.playerInfo.lastBlockPlace.hasNotPassed(3)
+                || data.playerInfo.lastBlockPlace.isNotPassed(3)
                 || cpsList.size() < 22;
 
         flyingTicks = 0;

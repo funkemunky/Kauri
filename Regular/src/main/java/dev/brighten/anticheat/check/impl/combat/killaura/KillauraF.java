@@ -11,7 +11,7 @@ import dev.brighten.api.check.CheckType;
 import org.bukkit.entity.Player;
 
 @CheckInfo(name = "Killaura (F)", description = "Checks for proper sprint motion mechanics.",
-        checkType = CheckType.KILLAURA, developer = true)
+        checkType = CheckType.KILLAURA)
 @Cancellable(cancelType = CancelType.ATTACK)
 public class KillauraF extends Check {
 

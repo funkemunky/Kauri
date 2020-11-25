@@ -1,7 +1,6 @@
 package dev.brighten.anticheat.check.impl.movement.speed;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -27,15 +26,15 @@ public class SpeedC extends Check {
         float deltaXZ = (float) data.playerInfo.deltaXZ;
         float drag = data.playerInfo.lClientGround ? 0.91f * data.blockInfo.fromFriction : 0.91f;
 
-        maxMove = getMaxMovement(ai, drag) * 2.2f;
+        maxMove = getMaxMovement(ai, drag) * 1.8f;
 
-        if(data.playerInfo.lastVelocity.hasNotPassed(30)) {
+        if(data.playerInfo.lastVelocity.isNotPassed(30)) {
             maxMove = Math.max(maxMove,
                     Math.hypot(data.playerInfo.velocityX, data.playerInfo.velocityZ) * 2.5f);
         }
 
         if(deltaXZ > maxMove) {
-            verbose+= deltaXZ > maxMove * 1.5 ? 3 : 1;
+            verbose+= deltaXZ > maxMove * 1.8 ? 3 : 1;
 
             if(++verbose > 2) {
                 vl++;

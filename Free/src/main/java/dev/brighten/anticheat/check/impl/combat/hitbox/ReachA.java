@@ -8,6 +8,7 @@ import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
@@ -18,7 +19,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@CheckInfo(name = "Reach (A)", checkType = CheckType.HITBOX, punishVL = 5, description = "A simple distance check.")
+@CheckInfo(name = "Reach (A)", checkType = CheckType.HITBOX, punishVL = 5, description = "A simple distance check.",
+        planVersion = KauriVersion.FREE)
 @Cancellable(cancelType = CancelType.ATTACK)
 public class ReachA extends Check {
 
@@ -50,7 +52,7 @@ public class ReachA extends Check {
             //target.draw(WrappedEnumParticle.FLAME, Collections.singleton(data.getPlayer()));
         }
 
-        if(data.lagInfo.lastPacketDrop.hasPassed(3)) {
+        if(data.lagInfo.lastPacketDrop.isPassed(3)) {
             if (distance > 3.3 && distance != 69) {
                 if (++buffer > 6) {
                     vl++;

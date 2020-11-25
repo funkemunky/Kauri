@@ -9,7 +9,6 @@ import dev.brighten.anticheat.check.api.CheckRegister;
 import dev.brighten.anticheat.premium.impl.*;
 import dev.brighten.anticheat.premium.impl.autoclicker.*;
 import dev.brighten.anticheat.premium.impl.hitboxes.ReachB;
-import dev.brighten.anticheat.premium.impl.hitboxes.ReachC;
 
 @Init(priority = Priority.LOWEST)
 public class PremiumChecks implements CheckRegister {
@@ -26,12 +25,14 @@ public class PremiumChecks implements CheckRegister {
         Check.register(new ReachB());
         //Check.register(new ReachC());
         Check.register(new Motion());
-        //Check.register(new AimG());
         Check.register(new AimH());
+        Check.register(new AimI());
+        Check.register(new AimG());
         Check.register(new HealthSpoof());
         Check.register(new AutoclickerD());
         Check.register(new AutoclickerF());
         Check.register(new AutoclickerE());
+        Check.register(new InventoryA());
         Check.register(new InventoryB());
         Check.register(new InventoryC());
         Check.register(new AutoclickerH());
