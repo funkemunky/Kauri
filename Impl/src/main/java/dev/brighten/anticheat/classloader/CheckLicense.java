@@ -13,6 +13,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 
 public class CheckLicense {
@@ -30,8 +31,10 @@ public class CheckLicense {
         try {
             URL url = new URL(getURL("Kauri", license));
 
-            HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+            URLConnection connection =  url.openConnection();
 
+            connection.setConnectTimeout(4000);
+            connection.setReadTimeout(3000);
             BufferedReader bufferedReader = new BufferedReader(
                     new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
 
@@ -41,7 +44,10 @@ public class CheckLicense {
             if(!valid) {
                 url = new URL(getURL("Kauri%20Ara", license));
 
-                connection = (HttpsURLConnection) url.openConnection();
+                connection = url.openConnection();
+
+                connection.setConnectTimeout(4000);
+                connection.setReadTimeout(3000);
 
                 bufferedReader = new BufferedReader(
                         new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
