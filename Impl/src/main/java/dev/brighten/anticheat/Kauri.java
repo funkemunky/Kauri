@@ -15,6 +15,7 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.Config;
 import dev.brighten.anticheat.data.DataManager;
 import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.listeners.api.EventHandler;
 import dev.brighten.anticheat.logs.LoggerManager;
 import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.processing.PacketProcessor;
@@ -46,6 +47,7 @@ public class Kauri extends JavaPlugin {
     public LoggerManager loggerManager;
     public KeepaliveProcessor keepaliveProcessor;
     public EntityProcessor entityProcessor;
+    public EventHandler eventHandler;
 
     //Lag Information
     public RollingAverageDouble tps = new RollingAverageDouble(4, 20);
