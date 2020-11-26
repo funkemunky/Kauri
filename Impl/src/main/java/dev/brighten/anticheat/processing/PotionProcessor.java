@@ -9,6 +9,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @RequiredArgsConstructor
@@ -42,7 +43,7 @@ public class PotionProcessor {
         return potionEffects.stream().anyMatch(effect -> effect.getType().equals(type));
     }
 
-    public PotionEffect getEffectByType(PotionEffectType type) {
-        return potionEffects.stream().filter(effect -> effect.getType().equals(type)).findFirst().orElse(null);
+    public Optional<PotionEffect> getEffectByType(PotionEffectType type) {
+        return potionEffects.stream().filter(effect -> effect.getType().equals(type)).findFirst();
     }
 }

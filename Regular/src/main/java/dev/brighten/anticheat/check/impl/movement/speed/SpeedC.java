@@ -5,6 +5,9 @@ import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.data.ObjectData;
+import lombok.RequiredArgsConstructor;
+import org.bukkit.potion.PotionEffectType;
 
 @CheckInfo(name = "Speed (C)", description = "Checks if a player moves past the absolute maximum speed they can possible do.",
         punishVL = 34, developer = true)
@@ -12,8 +15,7 @@ import dev.brighten.anticheat.check.api.Packet;
 public class SpeedC extends Check {
 
     private float verbose;
-    private double maxMove;
-    private static final double forwardFactor = Math.sqrt(0.98 * 0.98 + 0.98 * 0.98);
+    private boolean sprinting;
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
@@ -22,48 +24,47 @@ public class SpeedC extends Check {
             return;
         }
 
-        float ai = (float)data.predictionService.aiMoveSpeed;
-        float deltaXZ = (float) data.playerInfo.deltaXZ;
-        float drag = data.playerInfo.lClientGround ? 0.91f * data.blockInfo.fromFriction : 0.91f;
+        final MaxThreshold threshold = MaxThreshold.getThreshold(data.playerInfo.clientGround, sprinting);
 
-        maxMove = getMaxMovement(ai, drag) * 1.8f;
+        final double calc = threshold.getCalculatedValue(data.getPlayer().getWalkSpeed(),
+                data.potionProcessor.getEffectByType(PotionEffectType.SPEED).map(ef -> ef.getAmplifier() + 1)
+                        .orElse(0), data.playerInfo.jumped);
 
-        if(data.playerInfo.lastVelocity.isNotPassed(30)) {
-            maxMove = Math.max(maxMove,
-                    Math.hypot(data.playerInfo.velocityX, data.playerInfo.velocityZ) * 2.5f);
-        }
+        debug("threshold=%v deltaXZ=%v.4 calc=%v.4 jumped=%v",
+                threshold.display, data.playerInfo.deltaXZ, calc, data.playerInfo.jumped);
 
-        if(deltaXZ > maxMove) {
-            verbose+= deltaXZ > maxMove * 1.8 ? 3 : 1;
-
-            if(++verbose > 2) {
-                vl++;
-                flag("[%v.3]>-[%v.3]", deltaXZ, maxMove);
-            }
-        } else if(verbose > 0) verbose-= 0.1f;
-
-        debug("deltaXZ=%v.2 threshold=%v.2", deltaXZ, maxMove);
+        if(data.playerInfo.clientGround) sprinting = data.playerInfo.sprinting;
     }
 
-    public static float getMaxMovement(float aiMoveSpeed, float friction) {
-        float deltaXZ = 0;
-        float max = 0;
-        for(int i = 0 ; i < 20 ; i++) {
-            float movement = aiMoveSpeed
-                    * (0.16277136F / (float)Math.pow(friction * 0.91f, 3));
+    @RequiredArgsConstructor
+    public enum MaxThreshold {
 
-            if(i % 4 == 0) movement+= 0.2f;
+        GROUND_SPEED("Ground", 0.28, 1.3, 1.6, 1),
+        GROUND_SPRINT_SPEED("Ground + Sprint", 0.4, 1.3, 1.6, 1),
+        AIR_SPEED("Air", 0.28, 1.3, 1.6, 1),
+        AIR_SPRINT_SPEED("Air + Sprint", 0.4, 1.3, 1.6, 2);
 
-            float f = movement / (float)forwardFactor;
-            float strafe = 0.98f * f, forward = 0.98f * f;
+        public final String display;
+        public final double threshold,  speedMultiplier, walkSpeedMultiplier, jumpMultiplier;
 
-            deltaXZ+= Math.hypot(forward * -1, strafe);
-
-            max = Math.max(deltaXZ, max);
-
-            deltaXZ*= friction;
+        public static MaxThreshold getThreshold(boolean ground, boolean sprint) {
+            if(ground) {
+                return sprint ? GROUND_SPRINT_SPEED : GROUND_SPEED;
+            } else return sprint ? AIR_SPEED : AIR_SPRINT_SPEED;
         }
 
-        return max;
+        public double getCalculatedValue(double walkSpeed, int speedAmplifier, boolean jumped) {
+            double base = threshold;
+
+            if(walkSpeed > 0.2) {
+                base*= (1 + (walkSpeed - 0.2)) * walkSpeedMultiplier;
+            }
+
+            base*= speedAmplifier * speedMultiplier;
+
+            if(jumped) base*= jumpMultiplier;
+
+            return base;
+        }
     }
 }

@@ -17,9 +17,8 @@ public class MovementUtils {
     public static float getJumpHeight(ObjectData data) {
         float baseHeight = 0.42f;
 
-        if(data.potionProcessor.hasPotionEffect(PotionEffectType.JUMP)) {
-            baseHeight+= (data.potionProcessor.getEffectByType(PotionEffectType.JUMP).getAmplifier() + 1) * 0.1f;
-        }
+        baseHeight+= data.potionProcessor.getEffectByType(PotionEffectType.JUMP).map(ef -> ef.getAmplifier() + 1)
+                .orElse(0) * 0.1f;
 
         return baseHeight;
     }
