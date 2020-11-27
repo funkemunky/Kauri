@@ -149,8 +149,6 @@ public class ObjectData implements Data {
     }
 
     public void unregister() {
-        if(PacketListener.expansiveThreading)
-            playerThread.shutdownNow();
         task.cancel();
         keepAliveStamps.clear();
         Kauri.INSTANCE.dataManager.hasAlerts.remove(this);
@@ -161,6 +159,8 @@ public class ObjectData implements Data {
         typesToCancel.clear();
         sniffedPackets.clear();
         keepAliveStamps.clear();
+        if(PacketListener.expansiveThreading)
+            playerThread.shutdownNow();
         Kauri.INSTANCE.dataManager.dataMap.remove(uuid);
     }
 

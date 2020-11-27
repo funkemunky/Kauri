@@ -7,6 +7,7 @@ import cc.funkemunky.api.tinyprotocol.packet.types.WrappedWatchableObject;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.check.api.Setting;
 import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
@@ -20,6 +21,12 @@ import java.util.stream.Collectors;
 public class HealthSpoof extends Check {
 
     private static boolean newer = ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_9);
+
+    @Setting(name = "crasher")
+    private static boolean crasher = false;
+
+    @Setting(name = "healthToSpoof")
+    private static double health = 1;
 
     @Packet
     public boolean onMetadata(WrappedOutEntityMetadata packet) {
@@ -46,7 +53,7 @@ public class HealthSpoof extends Check {
 
                 debug("metadata: " + String.join(",", strings));
 
-                object.setWatchedObject(1.f);
+                object.setWatchedObject(crasher ? Float.NaN : (float)health);
                 List<Object> objects = new ArrayList<>();
 
                 for (int i = 0; i < wobjects.size(); i++) {

@@ -162,6 +162,27 @@ public class MiscUtils {
         return tuple;
     }
 
+    public static Tuple<List<Long>, List<Long>> getOutliersLong(Collection<Long> collection) {
+        List<Long> values = new ArrayList<>(collection);
+
+        if(values.size() < 4) return new Tuple<>(new ArrayList<>(), new ArrayList<>());
+
+        double q1 = getMedian(values.subList(0, values.size() / 2)),
+                q3 = getMedian(values.subList(values.size() / 2, values.size()));
+        double iqr = Math.abs(q1 - q3) * 2;
+
+        double lowThreshold = q1 - 8 * iqr, highThreshold = q3 + 8 * iqr;
+
+        val tuple = new Tuple<List<Long>, List<Long>>(new ArrayList<>(), new ArrayList<>());
+
+        for (Long value : values) {
+            if(value < lowThreshold) tuple.one.add(value);
+            else if(value > highThreshold) tuple.two.add(value);
+        }
+
+        return tuple;
+    }
+
     public static double getMedian(List<Double> data) {
         if(data.size() > 1) {
             if (data.size() % 2 == 0)

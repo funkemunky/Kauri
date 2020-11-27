@@ -20,6 +20,8 @@ public class FlyE extends Check {
         double accel = Math.abs(data.playerInfo.deltaY - data.playerInfo.lDeltaY);
 
         if(accel < 0.01 && Math.abs(data.playerInfo.deltaY) < 1.5
+                && data.playerInfo.lastTeleportTimer.isPassed(2)
+                && data.playerInfo.lastRespawnTimer.isPassed(20)
                 && !data.playerInfo.clientGround && !data.playerInfo.lClientGround) {
             buffer+= 4;
 
