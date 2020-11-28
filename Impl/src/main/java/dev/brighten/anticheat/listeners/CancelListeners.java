@@ -35,8 +35,10 @@ public class CancelListeners implements Listener {
                 ground.setPitch(event.getFrom().getPitch());
 
                 event.getPlayer().teleport(ground.add(0,0.01,0));
-                data.typesToCancel.remove(cancelType);
-                return;
+                synchronized (data.typesToCancel) {
+                    data.typesToCancel.remove(cancelType);
+                }
+                break;
             }
         }
     }
@@ -53,7 +55,9 @@ public class CancelListeners implements Listener {
                 if(!cancelType.equals(CancelType.ATTACK)) continue;
 
                 event.setCancelled(true);
-                data.typesToCancel.remove(cancelType);
+                synchronized (data.typesToCancel) {
+                    data.typesToCancel.remove(cancelType);
+                }
                 break;
             }
         }
@@ -69,7 +73,9 @@ public class CancelListeners implements Listener {
                 if(!cancelType.equals(CancelType.PLACE)) continue;
 
                 event.setCancelled(true);
-                data.typesToCancel.remove(cancelType);
+                synchronized (data.typesToCancel) {
+                    data.typesToCancel.remove(cancelType);
+                }
                 break;
             }
         }
@@ -85,7 +91,9 @@ public class CancelListeners implements Listener {
                 if(!cancelType.equals(CancelType.BREAK)) continue;
 
                 event.setCancelled(true);
-                data.typesToCancel.remove(cancelType);
+                synchronized (data.typesToCancel) {
+                    data.typesToCancel.remove(cancelType);
+                }
                 break;
             }
         }
@@ -102,7 +110,9 @@ public class CancelListeners implements Listener {
                 if(!cancelType.equals(CancelType.INTERACT)) continue;
 
                 event.setCancelled(true);
-                data.typesToCancel.remove(cancelType);
+                synchronized (data.typesToCancel) {
+                    data.typesToCancel.remove(cancelType);
+                }
                 break;
             }
         }
@@ -121,7 +131,9 @@ public class CancelListeners implements Listener {
                 if(!cancelType.equals(CancelType.INTERACT)) continue;
 
                 event.setCancelled(true);
-                data.typesToCancel.remove(cancelType);
+                synchronized (data.typesToCancel) {
+                    data.typesToCancel.remove(cancelType);
+                }
                 break;
             }
         }

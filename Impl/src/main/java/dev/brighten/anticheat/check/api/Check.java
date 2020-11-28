@@ -201,7 +201,11 @@ public class Check implements KauriCheck {
             if(!cancelEvent.isCancelled()) {
                 switch(cancelEvent.getCancelType()) {
                     case ATTACK: {
-                        for(int i = 0 ; i < 2 ; i++) data.typesToCancel.add(cancelMode);
+                        for(int i = 0 ; i < 2 ; i++) {
+                            synchronized (data.typesToCancel) {
+                                data.typesToCancel.add(cancelMode);
+                            }
+                        }
                         break;
                     }
                     case INVENTORY: {
@@ -210,7 +214,9 @@ public class Check implements KauriCheck {
                         break;
                     }
                     default: {
-                        data.typesToCancel.add(cancelMode);
+                        synchronized (data.typesToCancel) {
+                            data.typesToCancel.add(cancelMode);
+                        }
                         break;
                     }
                 }

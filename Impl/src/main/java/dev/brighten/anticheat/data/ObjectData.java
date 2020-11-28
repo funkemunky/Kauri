@@ -10,6 +10,8 @@ import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.math.RollingAverageLong;
 import cc.funkemunky.api.utils.math.cond.MaxInteger;
 import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingList;
+import cc.funkemunky.api.utils.objects.evicting.EvictingList;
+import cc.funkemunky.api.utils.objects.evicting.EvictingMap;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Config;
@@ -36,10 +38,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.*;
 import java.util.function.Consumer;
 
 public class ObjectData implements Data {
@@ -73,8 +72,8 @@ public class ObjectData implements Data {
     public ProtocolVersion playerVersion = ProtocolVersion.UNKNOWN;
     public Set<Player> boxDebuggers = new HashSet<>();
     public final List<Action> keepAliveStamps = new CopyOnWriteArrayList<>();
-    public final Map<Integer, KLocation> entityLocations = new HashMap<>();
-    public ConcurrentEvictingList<CancelType> typesToCancel = new ConcurrentEvictingList<>(10);
+    public final Map<Integer, KLocation> entityLocations = new ConcurrentHashMap<>();
+    public final List<CancelType> typesToCancel = Collections.synchronizedList(new EvictingList<>(10));
     public final Map<Long, Long> keepAlives = Collections.synchronizedMap(new HashMap<>());
     public final List<String> sniffedPackets = new CopyOnWriteArrayList<>();
     public BukkitTask task;
