@@ -215,7 +215,8 @@ public class MenuCommand {
                     "&eEnabled&7: &f" + val.enabled,
                     "&eExecutable&7: &f" + val.executable,
                     "&eCancellable&7: &f" + val.cancellable,
-                    "&ePlan&7: &f" + val.plan.name + " &7(&f&o$" + val.plan.price + (val.plan.monthly ? " a month" : ""),
+                    "&ePlan&7: &f" + val.plan.name + " &7(&c&o$" + val.plan.price
+                            + (val.plan.monthly ? " a month&7)" : "&7)"),
                     "&eDescription&7: &f"));
 
             List<String> description = Arrays.asList(MiscUtils

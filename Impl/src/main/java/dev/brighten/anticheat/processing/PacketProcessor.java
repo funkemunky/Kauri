@@ -454,13 +454,12 @@ public class PacketProcessor {
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
             }
-            case "PacketPlayOutRelEntityMove":
-            case "PacketPlayOutEntityLook":
-            case Packet.Server.ENTITY:
-            case "PacketPlayOutRelEntityMoveLook":
-            case "PacketPlayOutEntity$PacketPlayOutRelEntityMove":
-            case "PacketPlayOutEntity$PacketPlayOutRelEntityMoveLook":
-            case "PacketPlayOutEntity$PacketPlayOutEntityLook": {
+            case Packet.Server.REL_LOOK:
+            case Packet.Server.REL_POSITION:
+            case Packet.Server.REL_POSITION_LOOK:
+            case Packet.Server.LEGACY_REL_POSITION_LOOK:
+            case Packet.Server.LEGACY_REL_POSITION:
+            case Packet.Server.LEGACY_REL_LOOK: {
                 WrappedOutRelativePosition packet = new WrappedOutRelativePosition(object, data.getPlayer());
 
                 //if(data.target != null && data.target.getEntityId() == packet.getId()) {

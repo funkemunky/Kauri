@@ -14,12 +14,6 @@ public class Config {
     @ConfigSetting(path = "punishments", name = "commands")
     static List<String> punishCommands = Arrays.asList("kick %name% [Kauri] Unfair Advantage -s");
 
-    @ConfigSetting(name = "license")
-    public static String license = "insert license here";
-
-    @ConfigSetting(name = "initChecks")
-    public static boolean initChecks = true;
-
     @ConfigSetting(path = "punishments", name = "broadcast",
             comment = "Set string to \"none\" if you want to disable broadcast.")
     static String broadcastMessage = MiscUtils.line(Color.Dark_Gray)

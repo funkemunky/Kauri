@@ -24,7 +24,7 @@ public class CheckLicense {
             Plugin loader;
             if((loader = Bukkit.getPluginManager().getPlugin("KauriLoader")) != null) {
                 license = loader.getConfig().getString("license");
-            } else license = Config.license;
+            } else return;
         }
 
         boolean valid = false;
