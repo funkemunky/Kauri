@@ -35,6 +35,6 @@ public class BadPacketsO extends Check {
                     vl = 0;
                 }
             }
-        }
+        } else if(buffer > 0) buffer--;
     }
 }

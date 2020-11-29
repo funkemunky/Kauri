@@ -26,6 +26,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.inventory.ClickType;
+import org.bukkit.inventory.ItemStack;
 
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
@@ -39,13 +40,14 @@ public class MenuCommand {
 
     private static ChestMenu main, categoryMenu;
     private static long lastReset;
+
     public MenuCommand() {
         main = getMainMenu();
         categoryMenu = getChecksCategoryMenu();
     }
 
     private static ChestMenu getMain() {
-        if(System.currentTimeMillis() - lastReset > 10000L) {
+        if (System.currentTimeMillis() - lastReset > 10000L) {
             lastReset = System.currentTimeMillis();
             return main = getMainMenu();
         }
@@ -69,8 +71,8 @@ public class MenuCommand {
             "full version. It really helps to fund the development of Kauri for the longterm.")
             .color(ChatColor.GRAY)
             .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                            new ComponentBuilder("Opens https://funkemunky.cc/shop")
-                                    .color(ChatColor.GRAY).italic(true).create()))
+                    new ComponentBuilder("Opens https://funkemunky.cc/shop")
+                            .color(ChatColor.GRAY).italic(true).create()))
             .event(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://funkemunky.cc/shop"))
             .create(),
             fullMessage = new ComponentBuilder("Thanks for buying a full copy!").color(ChatColor.GREEN)
@@ -83,6 +85,7 @@ public class MenuCommand {
                     .create(),
             araMessage = new ComponentBuilder("Thanks for purchasing Kauri Ara!")
                     .color(ChatColor.GREEN).create();
+
     private static ChestMenu getMainMenu() {
         ChestMenu menu = new ChestMenu(Color.Gold + "Kauri Menu", 3);
 
@@ -93,7 +96,7 @@ public class MenuCommand {
         KauriVersion plan = KauriVersion.getPlan();
         menu.setItem(13, createButton(XMaterial.ENCHANTED_BOOK.parseMaterial(), 1, "&cKauri Anticheat",
                 (player, info) -> {
-                    switch(info.getClickType()) {
+                    switch (info.getClickType()) {
                         case RIGHT:
                         case SHIFT_RIGHT: {
                             menu.setParent(null);
@@ -108,9 +111,9 @@ public class MenuCommand {
                         case SHIFT_LEFT: {
                             menu.setParent(null);
                             menu.close(player);
-                            if(plan.equals(KauriVersion.FREE)) {
+                            if (plan.equals(KauriVersion.FREE)) {
                                 player.spigot().sendMessage(freeMessage);
-                            } else if(plan.equals(KauriVersion.FULL)) {
+                            } else if (plan.equals(KauriVersion.FULL)) {
                                 player.spigot().sendMessage(fullMessage);
                             } else player.spigot().sendMessage(araMessage);
                             break;
@@ -122,20 +125,22 @@ public class MenuCommand {
                 (player, info) -> {
                     player.sendMessage(Color.Gray + "Loading menu...");
                     getRecentViolatorsMenu(true).showMenu(player);
-        }, "", "&7View players who flagged checks recently."));
+                }, "", "&7View players who flagged checks recently."));
+
+        menu.fill(new FillerButton());
         return menu;
     }
 
     private static String[] getKauriLore(KauriVersion plan) {
-        if(plan.equals(KauriVersion.FREE)) {
-            return new String[] {"", "&7You are using &6Kauri Anticheat v" +
+        if (plan.equals(KauriVersion.FREE)) {
+            return new String[]{"", "&7You are using &6Kauri Anticheat v" +
                     KauriVersion.getVersion(),
                     "", "&7Your Plan: &e" + plan.name,
                     "", "&cYou are currently using a &oFREE TRIAL&c",
                     "", "&e&oLeft click &7&oto purchase a full version.",
                     "&e&oRight Click &7&oclick to get support."};
         } else {
-            return new String[] {"", "&7You are using &6Kauri Anticheat v" +
+            return new String[]{"", "&7You are using &6Kauri Anticheat v" +
                     KauriVersion.getVersion(),
                     "", "&7Your Plan: &e" + plan.name + "&o($" + plan.price + (plan.monthly ? " a month" : "") + ")",
                     "", "&e&oRight Click &7&oclick to get support."};
@@ -160,13 +165,13 @@ public class MenuCommand {
 
                     Check.checkSettings.values()
                             .stream()
-                            .filter(ci-> ci.type.equals(type))
+                            .filter(ci -> ci.type.equals(type))
                             .forEach(test -> {
                                 amount.incrementAndGet();
-                                if(test.enabled) enabled.incrementAndGet();
-                                if(test.executable) executable.incrementAndGet();
-                                if(test.cancellable) cancellable.incrementAndGet();
-                                if(test.cancelMode != null) totalCancellable.incrementAndGet();
+                                if (test.enabled) enabled.incrementAndGet();
+                                if (test.executable) executable.incrementAndGet();
+                                if (test.cancellable) cancellable.incrementAndGet();
+                                if (test.cancelMode != null) totalCancellable.incrementAndGet();
                             });
 
                     Button button = new Button(false,
@@ -179,10 +184,10 @@ public class MenuCommand {
                                             "", "&7&oClick to configure in this category.")
                                     .build(),
                             (player, info) -> {
-                        menu.setParent(null);
-                        menu.close(player);
-                        getChecksMenu(type).showMenu(player);
-                        menu.setParent(main);
+                                menu.setParent(null);
+                                menu.close(player);
+                                getChecksMenu(type).showMenu(player);
+                                menu.setParent(main);
                             });
                     amt.incrementAndGet();
                     menu.addItem(button);
@@ -196,190 +201,166 @@ public class MenuCommand {
     private static ChestMenu getChecksMenu(CheckType type) {
         ChestMenu menu = new ChestMenu(Color.Gold + "Checks", 6);
 
-        menu.setParent(categoryMenu);
-
         List<CheckSettings> values = Check.checkSettings.values()
                 .stream()
                 .filter(settings -> settings.type.equals(type))
                 .sorted(Comparator.comparing(val -> val.name))
                 .collect(Collectors.toList());
 
+        menu.setParent(getChecksCategoryMenu());
+
         for (int i = 0; i < values.size(); i++) {
             CheckSettings val = values.get(i);
 
-            String enabled = "checks." + val.name + ".enabled";
-            String executable = "checks." + val.name + ".executable";
-            String cancellable = "checks." + val.name + ".cancellable";
-
-            List<String> lore = new ArrayList<>(Arrays.asList("&7",
-                    "&eEnabled&7: &f" + val.enabled,
-                    "&eExecutable&7: &f" + val.executable,
-                    "&eCancellable&7: &f" + val.cancellable,
-                    "&ePlan&7: &f" + val.plan.name + " &7(&c&o$" + val.plan.price
-                            + (val.plan.monthly ? " a month&7)" : "&7)"),
-                    "&eDescription&7: &f"));
-
-            List<String> description = Arrays.asList(MiscUtils
-                    .splitIntoLine(val.description, 35));
-
-            lore.addAll(description);
-
-            lore.add("");
-            lore.add("&f&oLeft Click &7to toggle check &fon/off&7.");
-            lore.add("&f&oMiddle Click &7to toggle check &fcancellable&7.");
-            lore.add("&f&oRight Click &7to toggle check &fexecutable&7.");
-
-
-            Button button = createButton(
-                    val.enabled ? (val.executable ? XMaterial.FILLED_MAP.parseMaterial()
-                            : XMaterial.MAP.parseMaterial())
-                            : XMaterial.PAPER.parseMaterial(),
+            Button button = createButton(XMaterial.PAPER.parseMaterial(),
                     1,
                     (val.enabled ? "&a" : "&c") + val.name,
                     (player, info) -> {
-                        switch (info.getClickType()) {
-                            case LEFT:
-                            case SHIFT_LEFT: {
-                                CheckSettings settings = Check.getCheckSettings(val.name);
-                                settings.enabled = !settings.enabled;
-                                Kauri.INSTANCE.getConfig().set(enabled, settings.enabled);
-                                Kauri.INSTANCE.saveConfig();
+                        ChestMenu toOpen = getCheckEdit(val);
 
-                                ItemBuilder builder = new ItemBuilder(info.getButton().getStack());
-                                if (!settings.enabled) {
-                                    builder.type(XMaterial.PAPER.parseMaterial());
-                                } else {
-                                    builder.type(settings.executable ? XMaterial.FILLED_MAP.parseMaterial()
-                                            : XMaterial.MAP.parseMaterial());
-                                    if(settings.cancellable) {
-                                        builder.enchantment(Enchantment.DURABILITY, 1);
-                                    }
-                                }
-
-                                List<String> lore2 = new ArrayList<>(Arrays.asList("&7",
-                                        "&eEnabled&7: &f" + val.enabled,
-                                        "&eExecutable&7: &f" + val.executable,
-                                        "&eCancellable&7: &f" + val.cancellable,
-                                        "&eDescription&7: &f"));
-                                lore2.addAll(description);
-                                lore2.add("");
-                                lore2.add("&f&oLeft Click &7to toggle check &fon/off&7.");
-                                lore2.add("&f&oMiddle Click &7to toggle check &fcancellable&7.");
-                                lore2.add("&f&oRight Click &7to toggle check &fexecutable&7.");
-
-                                builder.lore(lore2.stream().map(Color::translate).toArray(String[]::new));
-                                builder.name((settings.enabled ? "&a" : "&c") + val.name);
-                                info.getButton().setStack(builder.build());
-                                menu.buildInventory(false);
-                                Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
-                                        .forEach(data -> {
-                                            data.checkManager.checks.clear();
-                                            synchronized (data.checkManager.checkMethods) {
-                                                data.checkManager.checkMethods.clear();
-                                            }
-                                            data.checkManager.addChecks();
-                                            data.creation = System.currentTimeMillis();
-                                        }));
-                                break;
-                            }
-                            case RIGHT:
-                            case SHIFT_RIGHT: {
-                                CheckSettings settings = Check.getCheckSettings(val.name);
-                                settings.executable = !settings.executable;
-                                Kauri.INSTANCE.getConfig().set(executable, settings.executable);
-                                Kauri.INSTANCE.saveConfig();
-
-                                ItemBuilder builder = new ItemBuilder(info.getButton().getStack());
-                                if (settings.enabled) {
-                                    builder.type(settings.executable ? XMaterial.FILLED_MAP.parseMaterial()
-                                            : XMaterial.MAP.parseMaterial());
-                                }
-
-                                List<String> lore2 = new ArrayList<>(Arrays.asList("&7",
-                                        "&eEnabled&7: &f" + val.enabled,
-                                        "&eExecutable&7: &f" + val.executable,
-                                        "&eCancellable&7: &f" + val.cancellable,
-                                        "&eDescription&7: &f"));
-                                lore2.addAll(description);
-                                lore2.add("");
-                                lore2.add("&f&oLeft Click &7to toggle check &fon/off&7.");
-                                lore2.add("&f&oMiddle Click &7to toggle check &fcancellable&7.");
-                                lore2.add("&f&oRight Click &7to toggle check &fexecutable&7.");
-
-                                builder.lore(lore2.stream().map(Color::translate).toArray(String[]::new));
-                                info.getButton().setStack(builder.build());
-                                menu.buildInventory(false);
-                                Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
-                                        .forEach(data -> {
-                                            data.checkManager.checks.clear();
-                                            synchronized (data.checkManager.checkMethods) {
-                                                data.checkManager.checkMethods.clear();
-                                            }
-                                            data.checkManager.addChecks();
-                                            data.creation = System.currentTimeMillis();
-                                        }));
-                                break;
-                            }
-                            case MIDDLE: {
-                                CheckSettings settings = Check.getCheckSettings(val.name);
-                                settings.cancellable = !settings.cancellable;
-                                Kauri.INSTANCE.getConfig().set(cancellable, settings.cancellable);
-                                Kauri.INSTANCE.saveConfig();
-
-                                ItemBuilder builder = new ItemBuilder(info.getButton().getStack());
-                                if (settings.enabled) {
-                                    builder.clearEnchantments();
-                                    if(settings.cancellable) {
-                                        builder.enchantment(Enchantment.DURABILITY, 1);
-                                    }
-                                }
-
-                                List<String> lore2 = new ArrayList<>(Arrays.asList("&7",
-                                        "&eEnabled&7: &f" + val.enabled,
-                                        "&eExecutable&7: &f" + val.executable,
-                                        "&eCancellable&7: &f" + val.cancellable,
-                                        "&eDescription&7: &f"));
-                                lore2.addAll(description);
-                                lore2.add("");
-                                lore2.add("&f&oLeft Click &7to toggle check &fon/off&7.");
-                                lore2.add("&f&oMiddle Click &7to toggle check &fcancellable&7.");
-                                lore2.add("&f&oRight Click &7to toggle check &fexecutable&7.");
-
-                                builder.lore(lore2.stream().map(Color::translate).toArray(String[]::new));
-                                info.getButton().setStack(builder.build());
-                                menu.buildInventory(false);
-                                Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
-                                        .forEach(data -> {
-                                            data.checkManager.checks.clear();
-                                            synchronized (data.checkManager.checkMethods) {
-                                                data.checkManager.checkMethods.clear();
-                                            }
-                                            data.checkManager.addChecks();
-                                            data.creation = System.currentTimeMillis();
-                                        }));
-                                break;
-                            }
-                        }
-                        ((ChestMenu)info.getMenu()).setParent(categoryMenu = getChecksCategoryMenu());
-                    }, lore.toArray(new String[]{}));
-
-            if (val.enabled) {
-                ItemBuilder builder = new ItemBuilder(button.getStack());
-                builder.clearEnchantments();
-                if(val.cancellable) {
-                    builder.enchantment(Enchantment.DURABILITY, 1);
-                }
-                button.setStack(builder.build());
-            }
+                        toOpen.showMenu(player);
+                    }, "", "&f&oClick me &7to view configure check", "", "&eStatus:" ,
+                    (val.enabled ? Color.Green : Color.Gray) + "Enabled",
+                    (val.executable ? Color.Green : Color.Gray) + "Executable",
+                    (val.cancellable ? Color.Green : Color.Gray) + "Cancellable");
             menu.addItem(button);
         }
+
+        menu.fill(new FillerButton());
         return menu;
+    }
+
+    public static ChestMenu getCheckEdit(CheckSettings settings) {
+        ChestMenu menu = new ChestMenu(Color.Yellow + settings.name, 3);
+
+        menu.fill(new FillerButton());
+        //Setting up middle book item
+        String title = Color.Yellow + "Kauri Plans" + Color.Gray + ": " + Color.White + returnPlans(settings.plan);
+        List<String> description = Arrays.asList(MiscUtils
+                .splitIntoLine(Color.translate(settings.description), 35));
+
+        List<String> lore = new ArrayList<>();
+        lore.add("");
+        lore.addAll(description);
+
+        for (int i = 0; i < lore.size(); i++) {
+            lore.set(i, Color.translate(lore.get(i)));
+        }
+
+        ItemStack descItem = new ItemBuilder(XMaterial.BOOK.parseMaterial()).amount(1)
+                .name(title).lore(lore).build();
+
+        Button button = new Button(false, descItem);
+
+        menu.setItem(13, button);
+
+        String enabled = "checks." + settings.name + ".enabled";
+        String executable = "checks." + settings.name + ".executable";
+        String cancellable = "checks." + settings.name + ".cancellable";
+
+        menu.setParent(getChecksMenu(settings.type));
+
+        Button buttonEnabled = new Button(false,
+                new ItemBuilder(XMaterial.INK_SAC.parseMaterial()).amount(1)
+                        .durability(settings.enabled ? 10 : 8)
+                        .name((settings.enabled ? Color.Green : Color.Gray) + "Enabled").build(),
+                (player, info) -> {
+                    settings.enabled = !settings.enabled;
+                    Kauri.INSTANCE.getConfig().set(enabled, settings.enabled);
+                    Kauri.INSTANCE.saveConfig();
+
+                    info.getButton().setStack(new ItemBuilder(XMaterial.INK_SAC.parseMaterial()).amount(1)
+                            .durability(settings.enabled ? 10 : 8)
+                            .name((settings.enabled ? Color.Green : Color.Gray) + "Enabled").build());
+                    menu.buildInventory(false);
+                    Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
+                            .forEach(data -> {
+                                data.checkManager.checks.clear();
+                                synchronized (data.checkManager.checkMethods) {
+                                    data.checkManager.checkMethods.clear();
+                                }
+                                data.checkManager.addChecks();
+                                data.creation = System.currentTimeMillis();
+                            }));
+                    menu.setParent(getChecksMenu(settings.type));
+                });
+
+        Button buttonExecutable = new Button(false,
+                new ItemBuilder(XMaterial.INK_SAC.parseMaterial()).amount(1)
+                        .durability(settings.executable ? 10 : 8)
+                        .name((settings.executable ? Color.Green : Color.Gray) + "Executable").build(),
+                (player, info) -> {
+                    settings.executable = !settings.executable;
+                    Kauri.INSTANCE.getConfig().set(executable, settings.executable);
+                    Kauri.INSTANCE.saveConfig();
+
+                    info.getButton().setStack(new ItemBuilder(XMaterial.INK_SAC.parseMaterial()).amount(1)
+                            .durability(settings.executable ? 10 : 8)
+                            .name((settings.executable ? Color.Green : Color.Gray) + "Executable").build());
+                    menu.buildInventory(false);
+                    Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
+                            .forEach(data -> {
+                                data.checkManager.checks.clear();
+                                synchronized (data.checkManager.checkMethods) {
+                                    data.checkManager.checkMethods.clear();
+                                }
+                                data.checkManager.addChecks();
+                                data.creation = System.currentTimeMillis();
+                            }));
+                    menu.setParent(getChecksMenu(settings.type));
+                });
+
+        Button buttonCancellable = new Button(false,
+                settings.cancelMode != null ? new ItemBuilder(XMaterial.INK_SAC.parseMaterial()).amount(1)
+                        .durability(settings.cancellable ? 10 : 8)
+                        .name((settings.cancellable ? Color.Green : Color.Gray) + "Cancellable").build()
+                        : new ItemBuilder(XMaterial.REDSTONE.parseMaterial())
+                        .name(Color.Red + "Cancellable Not Allowed").build(),
+                (player, info) -> {
+                    if (settings.cancelMode == null) return;
+                    settings.cancellable = !settings.cancellable;
+                    Kauri.INSTANCE.getConfig().set(cancellable, settings.cancellable);
+                    Kauri.INSTANCE.saveConfig();
+
+                    info.getButton().setStack(new ItemBuilder(XMaterial.INK_SAC.parseMaterial()).amount(1)
+                            .durability(settings.cancellable ? 10 : 8)
+                            .name((settings.cancellable ? Color.Green : Color.Gray) + "Cancellable").build());
+                    menu.buildInventory(false);
+                    Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
+                            .forEach(data -> {
+                                data.checkManager.checks.clear();
+                                synchronized (data.checkManager.checkMethods) {
+                                    data.checkManager.checkMethods.clear();
+                                }
+                                data.checkManager.addChecks();
+                                data.creation = System.currentTimeMillis();
+                            }));
+                    menu.setParent(getChecksMenu(settings.type));
+                });
+
+        //21, 22, 23
+        menu.setItem(21, buttonEnabled);
+        menu.setItem(22, buttonExecutable);
+        menu.setItem(23, buttonCancellable);
+
+        return menu;
+    }
+
+    private static String returnPlans(KauriVersion version) {
+        List<String> plans = new ArrayList<>();
+        for (KauriVersion value : KauriVersion.values()) {
+            plans.add((KauriVersion.getPlan().equals(value) ? Color.Green : Color.White) + value.name);
+            if (value.equals(version))
+                break;
+        }
+
+        return String.join(Color.Gray + ", ", plans);
     }
 
     public static ChestMenu getRecentViolatorsMenu(boolean fromMain) {
         ChestMenu menu = new ChestMenu(Color.Gold + "Recent Violators", 6);
-        if(fromMain)
-        menu.setParent(main);
+        if (fromMain)
+            menu.setParent(main);
         try {
             System.out.println("Getting logs...");
             Map<UUID, List<Log>> logs = Kauri.INSTANCE.loggerManager
@@ -388,7 +369,7 @@ public class MenuCommand {
             System.out.println("Sorting...");
             List<UUID> sortedIds = logs.keySet().stream()
                     .sorted(Comparator.comparing(key -> {
-                        val logsList =  logs.get(key);
+                        val logsList = logs.get(key);
                         return logsList.get(logsList.size() - 1).timeStamp;
                     }))
                     .collect(Collectors.toList());
@@ -397,7 +378,7 @@ public class MenuCommand {
             for (int i = 0; i < Math.min(45, sortedIds.size()); i++) {
                 UUID uuid = sortedIds.get(i);
                 String name = MojangAPI.getUsername(uuid);
-                if(name == null) name = "null";
+                if (name == null) name = "null";
                 Log vl = logs.get(uuid).get(0);
 
                 ItemBuilder builder = new ItemBuilder(XMaterial.SKULL_ITEM.parseMaterial());
@@ -411,7 +392,7 @@ public class MenuCommand {
                         "&f&oShift-Left Click &7&oto view logs.");
                 menu.addItem(new Button(false, builder.build(),
                         (target, info) -> {
-                            if(info.getClickType().equals(ClickType.SHIFT_LEFT)
+                            if (info.getClickType().equals(ClickType.SHIFT_LEFT)
                                     && target.hasPermission("kauri.command.logs")) {
                                 LogsGUI gui = new LogsGUI(Bukkit.getOfflinePlayer(uuid));
                                 menu.setParent(null);
@@ -422,8 +403,11 @@ public class MenuCommand {
                             }
                         }));
             }
+
+            menu.fill(new FillerButton());
+
             return menu;
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -435,7 +419,7 @@ public class MenuCommand {
         List<Log> logs = Kauri.INSTANCE.loggerManager.getLogs(uuid);
         Kauri.INSTANCE.profiler.stop("cmd:logs");
 
-        if(logs.size() == 0) return "No Logs";
+        if (logs.size() == 0) return "No Logs";
 
         StringBuilder body = new StringBuilder();
 
@@ -444,7 +428,7 @@ public class MenuCommand {
 
         String name = MojangAPI.getUsername(uuid);
 
-        if(name == null) name = "null";
+        if (name == null) name = "null";
         for (Log log : logs) {
             body.append("(").append(format.format(new Date(log.timeStamp))).append("): ").append(name)
                     .append(" failed ").append(log.checkName).append(" at VL ").append(log.vl)

@@ -2,6 +2,7 @@ package dev.brighten.anticheat.utils.menu;
 
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
+import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.XMaterial;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.utils.menu.button.Button;
@@ -94,16 +95,15 @@ public class MenuListener implements Listener {
             if (menu != null) {
                 menu.handleClose((Player) event.getPlayer());
 
-                menu.getParent().ifPresent(buttons -> new BukkitRunnable() {
-                    public void run() {
+                menu.getParent().ifPresent(buttons -> {
+                    RunUtils.task(() -> {
                         if (event.getPlayer().getOpenInventory() == null
                                 || (!(event.getPlayer().getOpenInventory().getTopInventory().getHolder()
                                 instanceof BukkitInventoryHolder))) {
                             buttons.showMenu((Player) event.getPlayer());
-                            this.cancel();
                         }
-                    }
-                }.runTaskTimer(Kauri.INSTANCE, 2L, 0L));
+                    });
+                });
             }
         }
         if(inventory instanceof AnvilInventory && anvils.containsKey(inventory)) {
