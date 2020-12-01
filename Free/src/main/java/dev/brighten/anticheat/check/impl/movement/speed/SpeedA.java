@@ -37,8 +37,7 @@ public class SpeedA extends Check {
     public void onFlying(WrappedInFlyingPacket packet) {
         checkProccesing:
         {
-            if (!packet.isPos()
-                    || (data.playerInfo.deltaY == 0 && data.playerInfo.deltaXZ == 0)) {
+            if (data.playerInfo.deltaY == 0 && data.playerInfo.deltaXZ == 0) {
                 break checkProccesing;
             }
             float drag = friction;

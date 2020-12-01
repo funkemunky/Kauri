@@ -12,10 +12,7 @@ import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerG;
 import dev.brighten.anticheat.check.impl.combat.hand.*;
 import dev.brighten.anticheat.check.impl.combat.hitbox.Hitboxes;
 import dev.brighten.anticheat.check.impl.combat.killaura.*;
-import dev.brighten.anticheat.check.impl.movement.fly.FlyB;
-import dev.brighten.anticheat.check.impl.movement.fly.FlyC;
-import dev.brighten.anticheat.check.impl.movement.fly.FlyD;
-import dev.brighten.anticheat.check.impl.movement.fly.FlyE;
+import dev.brighten.anticheat.check.impl.movement.fly.*;
 import dev.brighten.anticheat.check.impl.movement.general.FastLadder;
 import dev.brighten.anticheat.check.impl.movement.general.OmniSprint;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallB;
@@ -44,6 +41,7 @@ public class RegularChecks implements CheckRegister {
         Check.register(new FlyC());
         Check.register(new FlyD());
         Check.register(new FlyE());
+        Check.register(new FlyF());
         Check.register(new FastLadder());
         Check.register(new NoFallB());
         Check.register(new Hitboxes());
@@ -51,7 +49,7 @@ public class RegularChecks implements CheckRegister {
         Check.register(new AimB());
         Check.register(new AimC());
         Check.register(new AimD());
-        Check.register(new AimE());
+        //Check.register(new AimE());
         Check.register(new SpeedB());
         Check.register(new SpeedC());
         Check.register(new SpeedD());

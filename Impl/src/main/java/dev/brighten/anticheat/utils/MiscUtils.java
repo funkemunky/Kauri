@@ -169,9 +169,9 @@ public class MiscUtils {
 
         double q1 = getMedian(values.subList(0, values.size() / 2)),
                 q3 = getMedian(values.subList(values.size() / 2, values.size()));
-        double iqr = Math.abs(q1 - q3) * 2;
+        double iqr = Math.abs(q1 - q3);
 
-        double lowThreshold = q1 - 8 * iqr, highThreshold = q3 + 8 * iqr;
+        double lowThreshold = q1 - 1.5 * iqr, highThreshold = q3 + 1.5 * iqr;
 
         val tuple = new Tuple<List<Long>, List<Long>>(new ArrayList<>(), new ArrayList<>());
 
@@ -192,7 +192,6 @@ public class MiscUtils {
         }
         return 0;
     }
-
     public static double getMedian(Iterable<? extends Number> iterable) {
         List<Double> data = new ArrayList<>();
 

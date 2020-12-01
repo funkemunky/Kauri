@@ -107,11 +107,11 @@ public class BlockInformation {
 
         //Bukkit.broadcastMessage("chigga4");
 
-        handler.setSize(0.6f, 0.05f);
+        handler.setSize(0.6, 0.05f);
 
         handler.setOffset(-0.1f);
         objectData.playerInfo.serverGround =
-                handler.isCollidedWith(Materials.SOLID) || handler.contains(EntityType.BOAT);
+                handler.isIntersectedWith(Materials.SOLID) || handler.contains(EntityType.BOAT);
         //Bukkit.broadcastMessage("chigga5");
         handler.setOffset(-0.4f);
         onSlab = handler.isCollidedWith(Materials.SLABS);

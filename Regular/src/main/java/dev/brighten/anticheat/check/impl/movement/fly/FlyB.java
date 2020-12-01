@@ -21,13 +21,13 @@ public class FlyB extends Check {
     private static double mult = 0.98f;
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if(packet.isPos() && (data.playerInfo.deltaY != 0 || data.playerInfo.deltaXZ != 0)) {
+        if((data.playerInfo.deltaY != 0 || data.playerInfo.deltaXZ != 0)) {
             //We check if the player is in ground, since theoretically the y should be zero.
             double lDeltaY = data.playerInfo.lClientGround ? 0 : data.playerInfo.lDeltaY;
             double predicted = (lDeltaY - 0.08) * mult;
 
             if(data.playerInfo.lClientGround && !data.playerInfo.clientGround && data.playerInfo.deltaY > 0) {
-                predicted = MovementUtils.getJumpHeight(data);
+                predicted = Math.min(data.playerInfo.deltaY, MovementUtils.getJumpHeight(data));
             }
 
             //Basically, this bug would only occur if the client's movement is less than a certain amount.
@@ -53,10 +53,9 @@ public class FlyB extends Check {
                     && data.playerInfo.lastVelocity.isPassed(3)
                     && !data.playerInfo.serverGround
                     && data.playerInfo.blockAboveTimer.isPassed(5)
-                    && data.playerInfo.lastBlockPlace.isPassed(4)
                     && deltaPredict > 0.016) {
                 flagged = true;
-                if(++buffer > 2 || data.playerInfo.kAirTicks > 35) {
+                if(++buffer > 2 || data.playerInfo.kAirTicks > 80) {
                     ++vl;
                     flag("dY=%v.3 p=%v.3 dx=%v.3", data.playerInfo.deltaY, predicted, data.playerInfo.deltaXZ);
                 }

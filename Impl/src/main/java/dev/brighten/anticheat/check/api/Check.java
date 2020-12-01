@@ -136,7 +136,7 @@ public class Check implements KauriCheck {
     private long lastFlagRun = 0L;
 
     public synchronized void flag(boolean devAlerts, int resetVLTime, String information, Object... variables) {
-        if(Kauri.INSTANCE.getTps() < 18 || data.lagInfo.transPing > 40) {
+        if(Kauri.INSTANCE.getTps() < 18) {
             devAlerts = true;
             vl = 0;
         }
@@ -194,7 +194,7 @@ public class Check implements KauriCheck {
 
         if(event.isCancelled()) return;
 
-        if(cancellable && cancelMode != null && vl > vlToFlag && data.lagInfo.lastPacketDrop.isPassed(8)) {
+        if(cancellable && cancelMode != null && vl > vlToFlag) {
             KauriCancelEvent cancelEvent = new KauriCancelEvent(data.getPlayer(), cancelMode);
 
             Atlas.getInstance().getEventManager().callEvent(cancelEvent);
@@ -229,8 +229,7 @@ public class Check implements KauriCheck {
             final String info = finalInformation
                     .replace("%p", String.valueOf(data.lagInfo.transPing))
                     .replace("%t", String.valueOf(MathUtils.round(Kauri.INSTANCE.getTps(), 2)));
-            if (Kauri.INSTANCE.lastTickLag.isPassed() && (data.lagInfo.lastPacketDrop.isPassed(5)
-                    || data.lagInfo.lastPingDrop.isPassed(20))
+            if (Kauri.INSTANCE.lastTickLag.isPassed()
                     && System.currentTimeMillis() - Kauri.INSTANCE.lastTick < 100L) {
                 if(vl > 0) Kauri.INSTANCE.loggerManager.addLog(data, this, info);
 

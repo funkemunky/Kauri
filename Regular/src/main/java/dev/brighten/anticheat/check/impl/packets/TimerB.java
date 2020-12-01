@@ -26,29 +26,38 @@ public class TimerB extends Check {
     public void onPacket(WrappedInFlyingPacket packet, long current) {
         long delta = current - lastFlying;
 
-        if(list.size() > 40) {
-            //Removing all values until its 30 or less
+        lagFixer: {
+            if(list.size() > 40) {
+                //Removing all values until its 30 or less
 
-            Tuple<List<Long>, List<Long>> indexesToRemove = MiscUtils.getOutliersLong(list);
+                List<Long> toRemove = new ArrayList<>();
 
-            for (Long aLong : indexesToRemove.one) {
-                synchronized (list) {
-                    list.remove(aLong);
+                long normalCount = list.stream().filter(l -> l > 10 && l < 99).count();
+
+                if(normalCount < 10 && list.size() < 100)
+                    break lagFixer;
+
+                    list.stream().filter(l -> l < 10).forEach(toRemove::add);
+
+                for (Long aLong : toRemove) {
+                    synchronized (list) {
+                        list.remove(aLong);
+                    }
                 }
-            }
 
-            indexesToRemove = null;
+                toRemove.clear();
 
-            while (list.size() > 40) {
-                synchronized (list) {
-                    list.remove(0);
+                while (list.size() > 40) {
+                    synchronized (list) {
+                        list.remove(0);
+                    }
                 }
             }
         }
 
         check: {
 
-            if(data.playerInfo.lastTeleportTimer.isPassed(2)
+            if(data.playerInfo.lastTeleportTimer.isPassed(2 + data.lagInfo.transPing)
                     && data.playerInfo.lastRespawnTimer.isPassed(10)) {
                 synchronized (list) {
                     list.add(delta);
@@ -64,7 +73,7 @@ public class TimerB extends Check {
                     vl++;
                     flag("pct=%v.1", pct);
                 }
-            } else if(buffer > 0) buffer-= 2f;
+            } else if(buffer > 0) buffer-= 2;
 
             debug("delta=%v.2", average);
         }

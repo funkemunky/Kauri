@@ -45,7 +45,7 @@ public class NoFallA extends Check {
                 && data.playerInfo.lastVelocity.isPassed(4)
                 && (data.playerInfo.deltaY != 0 || data.playerInfo.deltaXZ > 0)
                 && data.playerInfo.blockAboveTimer.isPassed(10)
-                && flag) { ;
+                && flag) {
 
             if(++vl > 2) {
                 flag("ground=" + data.playerInfo.clientGround + " deltaY=" + data.playerInfo.deltaY);

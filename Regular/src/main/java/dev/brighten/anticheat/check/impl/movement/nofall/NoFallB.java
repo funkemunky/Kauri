@@ -12,7 +12,6 @@ import dev.brighten.api.check.CheckType;
 @Cancellable
 public class NoFallB extends Check {
 
-    private static double GROUND = 1 / 64d;
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if(!packet.isPos() || !data.playerInfo.worldLoaded
@@ -22,15 +21,14 @@ public class NoFallB extends Check {
                 || data.playerInfo.lastRespawnTimer.isNotPassed(10))
             return;
 
-        boolean ground = data.playerInfo.to.y % GROUND < 0.0001;
-
-        if(ground != packet.isGround() && !data.blockInfo.onSlime
+        if(!data.playerInfo.serverGround
+                && !data.playerInfo.nearGround && data.playerInfo.clientGround && !data.blockInfo.onSlime
                 && data.playerInfo.lastHalfBlock.isPassed(3)) {
             if(++vl > 2) {
-                flag("c=%v s=%v", packet.isGround(), ground);
+                flag("c=%v s=%v", packet.isGround(), data.playerInfo.serverGround);
             }
         } else if(vl > 0) vl-= 0.5;
 
-        debug("c=%v s=%v", packet.isGround(), ground);
+        debug("c=%v s=%v", packet.isGround(), data.playerInfo.serverGround);
     }
 }

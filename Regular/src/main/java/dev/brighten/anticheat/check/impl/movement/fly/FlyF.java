@@ -10,11 +10,23 @@ import dev.brighten.api.check.CheckType;
 
 @Cancellable
 @CheckInfo(name = "Fly (F)", description = "Checks if an individual flys faster than possible.",
-        checkType = CheckType.FLIGHT, planVersion = KauriVersion.FULL)
+        checkType = CheckType.FLIGHT, planVersion = KauriVersion.FULL, developer = true)
 public class FlyF extends Check {
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
+        if(data.playerInfo.deltaXZ == 0 && data.playerInfo.deltaY == 0) return;
+
+        double max = data.playerInfo.lastVelocity.isNotPassed(20)
+                ? Math.max(data.playerInfo.velocityY, data.playerInfo.jumpHeight) : data.playerInfo.jumpHeight;
+
+        if(data.playerInfo.deltaY > max && !data.playerInfo.serverGround
+                && !data.playerInfo.gliding
+                && !data.playerInfo.riptiding
+                && !data.getPlayer().getAllowFlight()) {
+            ++vl;
+            flag("dY=%v.3 max=%v.3", data.playerInfo.deltaY, max);
+        }
     }
 
 }

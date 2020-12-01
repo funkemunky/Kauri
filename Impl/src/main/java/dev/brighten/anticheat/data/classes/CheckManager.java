@@ -81,8 +81,7 @@ public class CheckManager {
 
             val methods = checkMethods.get(event.getClass());
 
-            methods.stream().filter(wrapped -> wrapped.isBoolean).sorted()
-                    .forEach(wrapped -> {
+            methods.forEach(wrapped -> {
                         if(wrapped.isEvent && wrapped.check.enabled) {
                             try {
                                 wrapped.method.getMethod().invoke(wrapped.check, event);

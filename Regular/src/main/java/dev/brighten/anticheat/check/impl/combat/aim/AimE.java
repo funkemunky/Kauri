@@ -8,7 +8,7 @@ import dev.brighten.api.check.CheckType;
 import lombok.val;
 
 @CheckInfo(name = "Aim (E)", description = "Checks for weird constant pitch.", checkType = CheckType.AIM,
-        developer = true)
+        developer = true, enabled = false)
 public class AimE extends Check {
 
     private float buffer;

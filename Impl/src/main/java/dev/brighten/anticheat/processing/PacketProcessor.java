@@ -252,6 +252,9 @@ public class PacketProcessor {
                     data.lagInfo.lastTransPing = data.lagInfo.transPing;
                     data.lagInfo.transPing = (current - ka.start);
 
+                    if(Math.abs(data.lagInfo.lastTransPing - data.lagInfo.transPing) > 1) {
+                        data.lagInfo.lastPingDrop.reset();
+                    }
                     data.clickProcessor.onFlying(packet);
 
                     ka.getReceived(data.uuid).ifPresent(r -> {

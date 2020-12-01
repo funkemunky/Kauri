@@ -44,8 +44,7 @@ public class MovementProcessor {
     public static double groundOffset = 1 / 64.;
     private static String keepaliveAcceptListener = Kauri.INSTANCE.eventHandler
             .listen(KeepaliveAcceptedEvent.class,  listner -> {
-                if(listner.getData().playerInfo.serverGround
-                        || listner.getData().playerInfo.to.y % groundOffset < 0.00001) {
+                if(listner.getData().playerInfo.serverGround) {
                     listner.getData().playerInfo.kGroundTicks++;
                     listner.getData().playerInfo.kAirTicks = 0;
                 } else {
@@ -87,7 +86,7 @@ public class MovementProcessor {
 
         //We set the to x,y,z like this to prevent inaccurate data input. Because if it isnt a positional packet,
         // it returns getX, getY, getZ as 0.
-        if (packet.isPos()) {
+        if (packet.getX() != 0 || packet.getY() != 0 || packet.getZ() != 0) {
             data.playerInfo.to.x = packet.getX();
             data.playerInfo.to.y = packet.getY();
             data.playerInfo.to.z = packet.getZ();
@@ -377,7 +376,7 @@ public class MovementProcessor {
         if (data.blockInfo.collidedWithEntity) data.playerInfo.lastEntityCollision.reset();
 
         //Player ground/air positioning ticks.
-        if (!data.playerInfo.serverGround) {
+        if (!data.playerInfo.clientGround) {
             data.playerInfo.airTicks++;
             data.playerInfo.groundTicks = 0;
         } else {

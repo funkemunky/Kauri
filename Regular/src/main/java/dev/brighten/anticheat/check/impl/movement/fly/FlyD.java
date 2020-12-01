@@ -12,14 +12,15 @@ import dev.brighten.api.check.CheckType;
 @Cancellable(cancelType = CancelType.MOVEMENT)
 public class FlyD extends Check {
 
+    private double groundY = 1 / 64.;
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if(!packet.isPos()
+        if((data.playerInfo.deltaXZ == 0 && data.playerInfo.deltaY == 0)
                 || data.playerInfo.flightCancel
                 || data.playerInfo.nearGround
-                || data.playerInfo.clientGround
                 || data.playerInfo.lClientGround
-                || data.playerInfo.airTicks <= 2
+                || data.playerInfo.clientGround
+                || data.playerInfo.lastTeleportTimer.isNotPassed(2 + data.lagInfo.transPing)
                 || data.playerInfo.lastVelocity.isNotPassed(3)
         ) return;
 

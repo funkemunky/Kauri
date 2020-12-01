@@ -87,6 +87,30 @@ public class CollisionHandler {
 		return false;
 	}
 
+	public boolean isIntersectsWith(SimpleCollisionBox playerBox, int bitmask) {
+		for (Block b : blocks) {
+			Location block = b.getLocation();
+			Material material = data.playerInfo.shitMap.getOrDefault(block, b.getType());
+
+			if (Materials.checkFlag(material, bitmask)
+					&& (!single || (block.getBlockX() == MathUtils.floor(location.x)
+					&& block.getBlockZ() == MathUtils.floor(location.z)))) {
+				if (BlockData.getData(material).getBox(b, ProtocolVersion.getGameVersion()).isIntersected(playerBox)) {
+					return true;
+				}
+			}
+		}
+
+		if(bitmask == 0) {
+			for(Entity entity : entities) {
+				if(EntityData.getEntityBox(entity.getLocation(), entity).isIntersected(playerBox))
+					return true;
+			}
+		}
+
+		return false;
+	}
+
 	public boolean isCollidedWithEntity(SimpleCollisionBox box) {
 		for(Entity entity : entities) {
 			if(EntityData.getEntityBox(entity.getLocation(), entity).isCollided(box))
@@ -113,6 +137,16 @@ public class CollisionHandler {
 				.expand(width / 2, 0, width / 2);
 
 		return isCollidedWith(playerBox, bitmask);
+	}
+
+	public boolean isIntersectedWith(int bitmask) {
+		SimpleCollisionBox playerBox = new SimpleCollisionBox()
+				.offset(location.x, location.y, location.z)
+				.expandMin(0, shift, 0)
+				.expandMax(0, height, 0)
+				.expand(width / 2, 0, width / 2);
+
+		return isIntersectsWith(playerBox, bitmask);
 	}
 
 	public List<CollisionBox> getCollisionBoxes(SimpleCollisionBox playerBox) {
