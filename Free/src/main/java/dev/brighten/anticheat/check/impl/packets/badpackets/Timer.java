@@ -22,7 +22,7 @@ public class Timer extends Check {
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
-        if(!data.playerInfo.serverPos)
+        if(data.playerInfo.lastTeleportTimer.isPassed(1))
         ticks++;
     }
 

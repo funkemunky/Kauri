@@ -30,7 +30,8 @@ public class HandB extends Check {
     }
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        lastFlying = timeStamp;
+    public void onFlying(WrappedInFlyingPacket packet, long current) {
+        if(data.playerInfo.lastTeleportTimer.isPassed(0))
+            lastFlying = current;
     }
 }

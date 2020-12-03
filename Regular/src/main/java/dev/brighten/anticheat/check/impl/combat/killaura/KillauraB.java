@@ -28,6 +28,7 @@ public class KillauraB extends Check {
 
     @Packet
     public void flying(WrappedInFlyingPacket packet, long current) {
+        if(data.playerInfo.lastTeleportTimer.isPassed(0))
         lastFlying = current;
     }
 }

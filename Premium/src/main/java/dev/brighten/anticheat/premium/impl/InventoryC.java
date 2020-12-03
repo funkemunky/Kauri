@@ -26,6 +26,7 @@ public class InventoryC extends Check {
 
     @Packet
     public void flying(WrappedInFlyingPacket packet, long current) {
-        lastFlying = current;
+        if(data.playerInfo.lastTeleportTimer.isPassed(0))
+            lastFlying = current;
     }
 }

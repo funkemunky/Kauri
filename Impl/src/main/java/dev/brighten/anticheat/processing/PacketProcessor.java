@@ -14,6 +14,7 @@ import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.listeners.api.impl.KeepaliveAcceptedEvent;
 import lombok.val;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -499,6 +500,7 @@ public class PacketProcessor {
                 KLocation loc = new KLocation(packet.getX(), packet.getY(), packet.getZ(),
                         packet.getYaw(), packet.getPitch());
 
+                int i = 0;
                 if(packet.getFlags().contains(WrappedOutPositionPacket.EnumPlayerTeleportFlags.X)) {
                     loc.x+= data.playerInfo.to.x;
                 }

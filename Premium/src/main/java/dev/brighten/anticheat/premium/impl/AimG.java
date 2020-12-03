@@ -1,61 +1,87 @@
 package dev.brighten.anticheat.premium.impl;
 
+import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.Color;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutPositionPacket;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.objects.evicting.EvictingList;
+import cc.funkemunky.api.utils.objects.evicting.EvictingMap;
+import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.processing.MovementProcessor;
+import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
+import org.bukkit.Location;
 
-@CheckInfo(name = "Aim (G)", description = "Checks for bad GCD bypasses. (Rhys collab)",
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
+
+@CheckInfo(name = "Aim (G)", description = "Spooky rotation check",
         checkType = CheckType.AIM, punishVL = 30, developer = true, planVersion = KauriVersion.ARA)
 public class AimG extends Check {
 
-    private int buffer;
+    private Map<Short, Float> ids = new EvictingMap<>(20);
+    private int yesTick = -1, buffer;
+    private boolean waited;
+    private float currentFloat;
     @Packet
-    public void process(WrappedInFlyingPacket packet) {
-        if(!packet.isLook()) return;
+    public void onFlying(WrappedInTransactionPacket packet, int current) {
+        if(ids.containsKey(packet.getAction())) {
+            waited = false;
+            yesTick = current;
+            currentFloat = ids.get(packet.getAction());
 
-        final double yawGcd = data.playerInfo.yawGCD / MovementProcessor.offset,
-                pitchGCD = data.playerInfo.pitchGCD / MovementProcessor.offset;
-        if(data.moveProcessor.sensYPercent != data.moveProcessor.sensXPercent
-                || MathUtils.getDelta(data.moveProcessor.yawMode, yawGcd) > 0.1
-                || MathUtils.getDelta(data.moveProcessor.pitchMode, pitchGCD) > 0.1) {
-            debug("sensitivity instability sx=%v sy=%v ym=%v.2 pm=%v.2 ygcd=%v.2 pgcd=%v.2",
-                    data.moveProcessor.sensXPercent, data.moveProcessor.sensYPercent, data.moveProcessor.yawMode,
-                    data.moveProcessor.pitchMode, yawGcd, pitchGCD);
-            return;
+            //debug("p=%v", data.playerInfo.to.pitch);
         }
-
-        final float deltaYaw = Math.abs(data.playerInfo.deltaYaw), deltaPitch = Math.abs(data.playerInfo.deltaPitch);
-        final double mx = (deltaYaw / data.moveProcessor.yawMode)
-                % (Math.abs(data.playerInfo.lDeltaYaw) / data.moveProcessor.yawMode);
-        final double my = (deltaPitch / data.moveProcessor.pitchMode)
-                % (Math.abs(data.playerInfo.lDeltaPitch) / data.moveProcessor.pitchMode);
-
-        final double deltaX = Math.abs(Math.floor(mx) - mx);
-        final double deltaY = Math.abs(Math.floor(my) - my);
-
-        final boolean shitX = deltaX > 0.05 && deltaX < 0.95, shitY = deltaY > 0.05 && deltaY < 0.95;
-        final boolean flag = shitX && shitY;
-
-        if(flag) {
-            if(++buffer > 9) {
-                vl++;
-                flag("mx=%v.2 my=%v.2 dx=%v.2 dy=%v.2", mx, my, deltaX, deltaY);
-            }
-        } else if(buffer > 0) buffer-= 2;
-
-        debug((flag ? Color.Green + buffer + ": " : "") +"mx=%v.2 my=%v.2 dx=%v.2 dy=%v.2 s=%v",
-                mx, my, deltaX, deltaY, data.moveProcessor.sensitivityX);
     }
 
-    private static float modulo(float s, float angle) {
-        float f = (s * 0.6f + .2f);
-        float f2 = f * f * f * 1.2f;
-        return angle - (angle % f2);
+    private float teleportPitch = -1f;
+    @Packet
+    public void oonFlying(WrappedInFlyingPacket packet, int current) {
+        if(yesTick != -1) {
+            if(yesTick + 1 > current) {
+                //return;
+            }
+            if(current != yesTick) {
+                //debug("c=%v yt=%v", current, yesTick);
+                yesTick = -1;
+                currentFloat = 0;
+                return;
+            }
+
+            teleportPitch = packet.getPitch();
+
+            yesTick = -1;
+            debug("teleport=%v cf=%v", current, currentFloat);
+            currentFloat = 0;
+        } else if(packet.isLook() && teleportPitch != -1f) {
+            final double my = ((packet.getPitch() - teleportPitch) / data.moveProcessor.pitchMode)
+                    % (Math.abs(data.playerInfo.lDeltaPitch) / data.moveProcessor.pitchMode);
+
+            final double deltaY = Math.abs(Math.floor(my) - my);
+            debug("dY=%v pgcd=%v", deltaY, data.playerInfo.pitchGCD);
+            teleportPitch = -1f;
+        }
+    }
+
+    @Packet
+    public void onTrans(WrappedOutTransaction packet) {
+        if(Kauri.INSTANCE.keepaliveProcessor.tick % 10 == 0) {
+            float random = ThreadLocalRandom.current().nextInt(100, 800) / 100000f
+                    * (ThreadLocalRandom.current().nextBoolean() ? 1 : -1);
+            WrappedOutPositionPacket pos = new WrappedOutPositionPacket(new Location(
+                    packet.getPlayer().getWorld(), 0, 0, 0, 0, random),
+                    WrappedOutPositionPacket.EnumPlayerTeleportFlags.values());
+
+            TinyProtocolHandler.sendPacket(packet.getPlayer(), pos);
+
+            ids.put(packet.getAction(), random);
+        }
     }
 }

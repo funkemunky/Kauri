@@ -40,10 +40,14 @@ public class BadPacketsO extends Check {
 
         if(!optional.isPresent()) return;
 
-        if(optional.get().start - lastId > 3
-                || Math.abs(Kauri.INSTANCE.keepaliveProcessor.tick - optional.get().start) > 60) {
+        int delta = optional.get().start - lastId;
+        if(delta > 3) {
             vl++;
-            flag("lel skipped");
+            flag("t=1 d=%v", delta);
+        }
+        if(Kauri.INSTANCE.keepaliveProcessor.tick - optional.get().start > 60) {
+            vl++;
+            flag("t=2");
         }
         flying = 0;
         lastId = optional.get().start;

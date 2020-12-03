@@ -1,30 +1,62 @@
 package dev.brighten.anticheat.check.impl.combat.aim;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.utils.Color;
+import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.processing.MovementProcessor;
 import dev.brighten.api.check.CheckType;
-import lombok.val;
 
-@CheckInfo(name = "Aim (E)", description = "Checks for weird constant pitch.", checkType = CheckType.AIM,
-        developer = true, enabled = false)
+@CheckInfo(name = "Aim (E)", description = "Checks if a player's rotation was not calculated using Minecraft math.",
+        checkType = CheckType.AIM,
+        enabled = false, punishVL = 40)
 public class AimE extends Check {
 
-    private float buffer;
-
+    private int buffer;
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
+    public void process(WrappedInFlyingPacket packet) {
         if(!packet.isLook()) return;
 
-        val difference = Math.abs(data.moveProcessor.deltaX - data.moveProcessor.lastDeltaX);
-        if (data.moveProcessor.deltaY <= 1 && difference > 3 && data.moveProcessor.deltaX >= 20) {
-            if(++buffer > 20) {
+        final double yawGcd = data.playerInfo.yawGCD / MovementProcessor.offset,
+                pitchGCD = data.playerInfo.pitchGCD / MovementProcessor.offset;
+        if(MathUtils.getDelta(data.moveProcessor.sensitivityX, data.moveProcessor.sensitivityY) > 1
+                || MathUtils.getDelta(data.moveProcessor.yawMode, yawGcd) > 0.1
+                || MathUtils.getDelta(data.moveProcessor.pitchMode, pitchGCD) > 0.1) {
+            debug("sensitivity instability sx=%v sy=%v ym=%v.2 pm=%v.2 ygcd=%v.2 pgcd=%v.2",
+                    data.moveProcessor.sensXPercent, data.moveProcessor.sensYPercent, data.moveProcessor.yawMode,
+                    data.moveProcessor.pitchMode, yawGcd, pitchGCD);
+            return;
+        }
+
+        final float deltaYaw = Math.abs(data.playerInfo.deltaYaw), deltaPitch = Math.abs(data.playerInfo.deltaPitch);
+        final double mx = (deltaYaw / data.moveProcessor.yawMode)
+                % (Math.abs(data.playerInfo.lDeltaYaw) / data.moveProcessor.yawMode);
+        final double my = (deltaPitch / data.moveProcessor.pitchMode)
+                % (Math.abs(data.playerInfo.lDeltaPitch) / data.moveProcessor.pitchMode);
+
+        final double deltaX = Math.abs(Math.floor(mx) - mx);
+        final double deltaY = Math.abs(Math.floor(my) - my);
+
+        final boolean shitX = deltaX > 0.05 && deltaX < 0.95, shitY = deltaY > 0.05 && deltaY < 0.95;
+        final boolean flag = shitX && shitY;
+
+        if(flag) {
+            if(++buffer > 9) {
                 vl++;
-                flag("x=%v y=%v", data.moveProcessor.deltaX, data.moveProcessor.deltaY);
+                flag("mx=%v.2 my=%v.2 dx=%v.2 dy=%v.2", mx, my, deltaX, deltaY);
             }
         } else if(buffer > 0) buffer-= 2;
-        debug("x=%v y=%v", data.moveProcessor.deltaX, data.moveProcessor.deltaY);
+
+        debug((flag ? Color.Green + buffer + ": " : "") +"mx=%v.2 my=%v.2 dx=%v.2 dy=%v.2 s=%v",
+                mx, my, deltaX, deltaY, data.moveProcessor.sensitivityX);
+    }
+
+    private static float modulo(float s, float angle) {
+        float f = (s * 0.6f + .2f);
+        float f2 = f * f * f * 1.2f;
+        return angle - (angle % f2);
     }
 }
 
