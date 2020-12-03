@@ -45,7 +45,8 @@ public class BadPacketsO extends Check {
             vl++;
             flag("t=1 d=%v", delta);
         }
-        if(Kauri.INSTANCE.keepaliveProcessor.tick - optional.get().start > 60) {
+        int deltaShot = Kauri.INSTANCE.keepaliveProcessor.tick - optional.get().start;
+        if(delta > 60) {
             vl++;
             flag("t=2");
         }
