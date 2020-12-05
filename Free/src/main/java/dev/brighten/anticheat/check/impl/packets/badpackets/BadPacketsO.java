@@ -26,29 +26,24 @@ public class BadPacketsO extends Check {
     public void onFlying(WrappedInFlyingPacket packet) {
         val response = Kauri.INSTANCE.keepaliveProcessor.getResponse(data);
        if(!response.isPresent()
-               || Kauri.INSTANCE.keepaliveProcessor.tick - response.get().start > 60) {
+               || ++flying > 3) {
           if(++buffer > 15) {
               vl++;
-              flag("flying=%v", flying);
+              flag("t=1 flying=%v", flying);
           }
        } else buffer = 0;
     }
 
     @Packet
-    public void onTrans(WrappedInTransactionPacket packet) {
+    public void onTrans(WrappedInTransactionPacket packet, long current) {
         val optional = Kauri.INSTANCE.keepaliveProcessor.getKeepById(packet.getAction());
 
-        if(!optional.isPresent()) return;
+        if(!optional.isPresent() || data.lagInfo.lastPacketDrop.isNotPassed(7)) return;
 
-        int delta = optional.get().start - lastId;
-        if(delta > 3) {
-            vl++;
-            flag("t=1 d=%v", delta);
-        }
         int deltaShot = Kauri.INSTANCE.keepaliveProcessor.tick - optional.get().start;
-        if(delta > 60) {
+        if(deltaShot > 60) {
             vl++;
-            flag("t=2");
+            flag("t=2 tick=%v", deltaShot);
         }
         flying = 0;
         lastId = optional.get().start;
