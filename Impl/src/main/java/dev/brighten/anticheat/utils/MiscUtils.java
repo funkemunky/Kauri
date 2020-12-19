@@ -122,6 +122,22 @@ public class MiscUtils {
         return MathUtils.yawTo180D(playerRotation.getX() - expectedRotation.getX());
     }
 
+    public static float distanceBetweenAngles(float a, float b) {
+        final float first = a % 360;
+        final float second = b % 360;
+
+        final float delta = Math.abs(first - second);
+
+        return (float) Math.abs(Math.min(360.0 - delta, delta));
+    }
+
+    public static float getDistanceBetweenAngles(final float angle1, final float angle2) {
+        float distance = Math.abs(angle1 - angle2) % 360.0f;
+        if (distance > 180.0f) {
+            distance = 360.0f - distance;
+        }
+        return distance;
+    }
 
     public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
         List<Map.Entry<K, V>> list = new ArrayList<>(map.entrySet());

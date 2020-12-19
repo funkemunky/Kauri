@@ -27,7 +27,7 @@ public class FlyB extends Check {
             double predicted = (lDeltaY - 0.08) * mult;
 
             if(data.playerInfo.lClientGround && !data.playerInfo.clientGround && data.playerInfo.deltaY > 0) {
-                predicted = Math.min(data.playerInfo.deltaY, MovementUtils.getJumpHeight(data));
+                predicted = MovementUtils.getJumpHeight(data);
             }
 
             //Basically, this bug would only occur if the client's movement is less than a certain amount.

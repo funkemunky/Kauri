@@ -19,7 +19,6 @@ public class BadPacketsO extends Check {
     private static boolean kickPlayer = true;
 
     private int flying;
-    private int lastId = Integer.MAX_VALUE;
     private int buffer;
 
     @Packet
@@ -35,17 +34,11 @@ public class BadPacketsO extends Check {
     }
 
     @Packet
-    public void onTrans(WrappedInTransactionPacket packet, long current) {
+    public void onTrans(WrappedInTransactionPacket packet) {
         val optional = Kauri.INSTANCE.keepaliveProcessor.getKeepById(packet.getAction());
 
-        if(!optional.isPresent() || data.lagInfo.lastPacketDrop.isNotPassed(7)) return;
+        if(!optional.isPresent()) return;
 
-        int deltaShot = Kauri.INSTANCE.keepaliveProcessor.tick - optional.get().start;
-        if(deltaShot > 60) {
-            vl++;
-            flag("t=2 tick=%v", deltaShot);
-        }
         flying = 0;
-        lastId = optional.get().start;
     }
 }

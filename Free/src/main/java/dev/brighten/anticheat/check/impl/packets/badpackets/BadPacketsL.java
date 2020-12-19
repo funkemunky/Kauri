@@ -10,6 +10,8 @@ import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
 
+import java.util.Optional;
+
 @CheckInfo(name = "BadPackets (L)", description = "Player sends block place packets without any item in hand",
         checkType = CheckType.BADPACKETS, developer = true, maxVersion = ProtocolVersion.V1_8_9,
         planVersion = KauriVersion.FREE)
@@ -18,12 +20,16 @@ public class BadPacketsL extends Check {
     @Packet
     public void onPlace(WrappedInBlockPlacePacket packet) {
         val pos = packet.getPosition();
-        if(packet.getItemStack() == null
-                || packet.getItemStack().getType().equals((XMaterial.AIR.parseMaterial()))
+        if((packet.getItemStack() == null
+                || !packet.getItemStack().getType().equals(packet.getPlayer().getItemInHand().getType()))
                 && (pos == null || (pos.getX() == -1 && pos.getY() == -1 && pos.getZ() == -1))) {
             //TODO check if sends if player just right clicks block.
             vl++;
-            flag("type=AIR");
+            flag("p%v h=%v", Optional.ofNullable(packet.getItemStack()).map(i -> i.getType().name())
+                    .orElse("NONE"), packet.getPlayer().getItemInHand().getType().name());
         } else debug(packet.getItemStack().getType().name());
+
+        if(pos != null)
+        debug("x=%v y=%v z=%v", pos.getX(), pos.getY(), pos.getZ());
     }
 }

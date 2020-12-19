@@ -95,7 +95,7 @@ public class SpeedA extends Check {
                     && data.playerInfo.liquidTimer.isPassed(2)
                     && data.playerInfo.lastTeleportTimer.isPassed(1)
                     && !data.playerInfo.generalCancel && data.playerInfo.lastVelocity.isPassed(2)) {
-                if((buffer+= ratio > 500 ? 2 : 1) > 4) {
+                if((buffer+= ratio > 400 ? 2 : 1) > 4 || ratio > 600) {
                     vl++;
                     flag("p=%v.1% dxz=%v.3 aimove=%v.3 tags=%v",
                             ratio, data.playerInfo.deltaXZ, data.predictionService.aiMoveSpeed, tags.build());
