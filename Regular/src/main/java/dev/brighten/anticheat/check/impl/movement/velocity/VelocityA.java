@@ -37,6 +37,8 @@ public class VelocityA extends Check {
         if(vY > 0
                 && !data.playerInfo.generalCancel
                 && !data.lagInfo.lagging
+                && !data.playerInfo.serverPos
+                && !data.playerInfo.doingTeleport
                 && data.playerInfo.worldLoaded
                 && !tookVelocity
                 && !data.blockInfo.inWeb

@@ -18,10 +18,11 @@ public class FlyC extends Check {
     private MaxDouble verbose = new MaxDouble(5);
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
-        if (data.playerInfo.deltaY != 0 || data.playerInfo.deltaXZ != 0) {
+        if (packet.isPos()) {
             float maxHeight = MovementUtils.getJumpHeight(data);
             if (!data.playerInfo.flightCancel
                     && data.playerInfo.jumped
+                    && !data.playerInfo.serverPos
                     && !data.playerInfo.wasOnSlime
                     && data.playerInfo.lClientGround
                     && !data.blockInfo.bedNear

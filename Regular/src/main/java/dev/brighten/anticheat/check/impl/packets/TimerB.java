@@ -44,6 +44,7 @@ public class TimerB extends Check {
 
         debug("[%v] ratio=%v.3 avg=%v.2", buffer, ratio, average);
 
+        if(!data.playerInfo.serverPos)
         lastFlying = current;
     }
 }

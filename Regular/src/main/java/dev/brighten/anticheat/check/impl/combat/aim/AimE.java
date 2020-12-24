@@ -52,12 +52,6 @@ public class AimE extends Check {
         debug((flag ? Color.Green + buffer + ": " : "") +"mx=%v.2 my=%v.2 dx=%v.2 dy=%v.2 s=%v",
                 mx, my, deltaX, deltaY, data.moveProcessor.sensitivityX);
     }
-
-    private static float modulo(float s, float angle) {
-        float f = (s * 0.6f + .2f);
-        float f2 = f * f * f * 1.2f;
-        return angle - (angle % f2);
-    }
 }
 
 

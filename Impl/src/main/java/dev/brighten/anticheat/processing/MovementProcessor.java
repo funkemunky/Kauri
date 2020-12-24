@@ -107,25 +107,21 @@ public class MovementProcessor {
         data.pastLocation.addLocation(data.playerInfo.to);
 
         if (data.playerInfo.posLocs.size() > 0 && packet.isPos() && !packet.isGround()) {
-            val optional = data.playerInfo.posLocs.stream()
-                    .filter(loc -> {
-                        MiscUtils.testMessage(String.format("playerLoc=(x=%.2f y=%.2f z=%.2f) tpLoc=(x=%.2f y=%.2f z=%.2f)", loc.x, loc.y, loc.z, packet.getX(), packet.getY(), packet.getZ()));
-                        double dx = data.playerInfo.to.x - loc.x, dy = data.playerInfo.to.y - loc.y, dz = data.playerInfo.to.z - loc.z;
-                        double delta =  dx * dx + dy * dy + dz * dz;
+            for (KLocation loc : data.playerInfo.posLocs) {
+                double dx = data.playerInfo.to.x - loc.x,
+                        dy = data.playerInfo.to.y - loc.y, dz = data.playerInfo.to.z - loc.z;
+                double delta =  dx * dx + dy * dy + dz * dz;
 
-                        return delta < 0.25;
-                    })
-                    .findFirst();
+                if(delta >= 0.25) continue;
 
-            if (optional.isPresent()) {
                 data.playerInfo.serverPos = true;
                 data.playerInfo.lastServerPos = timeStamp;
                 data.playerInfo.lastTeleportTimer.reset();
                 data.playerInfo.inventoryOpen = false;
                 data.playerInfo.doingTeleport = false;
-                data.playerInfo.posLocs.remove(optional.get());
+                data.playerInfo.posLocs.remove(loc);
             }
-        } else if (data.playerInfo.serverPos && data.playerInfo.lastTeleportTimer.isPassed(0)) {
+        } else if (data.playerInfo.serverPos) {
             data.playerInfo.serverPos = false;
         }
 
@@ -135,11 +131,11 @@ public class MovementProcessor {
         data.playerInfo.lDeltaX = data.playerInfo.deltaX;
         data.playerInfo.lDeltaY = data.playerInfo.deltaY;
         data.playerInfo.lDeltaZ = data.playerInfo.deltaZ;
-        data.playerInfo.deltaX = data.playerInfo.serverPos ? 0 : data.playerInfo.to.x - data.playerInfo.from.x;
-        data.playerInfo.deltaY = data.playerInfo.serverPos ? 0 : data.playerInfo.to.y - data.playerInfo.from.y;
-        data.playerInfo.deltaZ = data.playerInfo.serverPos ? 0 : data.playerInfo.to.z - data.playerInfo.from.z;
+        data.playerInfo.deltaX = data.playerInfo.to.x - data.playerInfo.from.x;
+        data.playerInfo.deltaY = data.playerInfo.to.y - data.playerInfo.from.y;
+        data.playerInfo.deltaZ = data.playerInfo.to.z - data.playerInfo.from.z;
         data.playerInfo.lDeltaXZ = data.playerInfo.deltaXZ;
-        data.playerInfo.deltaXZ = data.playerInfo.serverPos ? 0 : MathUtils.hypot(data.playerInfo.deltaX, data.playerInfo.deltaZ);
+        data.playerInfo.deltaXZ = MathUtils.hypot(data.playerInfo.deltaX, data.playerInfo.deltaZ);
 
         data.playerInfo.blockOnTo = BlockUtils.getBlock(data.playerInfo.to.toLocation(data.getPlayer().getWorld()));
         data.playerInfo.blockBelow = BlockUtils.getBlock(data.playerInfo.to.toLocation(data.getPlayer().getWorld())
@@ -391,10 +387,8 @@ public class MovementProcessor {
         data.playerInfo.generalCancel = data.getPlayer().getAllowFlight()
                 || data.playerInfo.creative
                 || hasLevi
-                || data.playerInfo.serverPos
                 || data.playerInfo.riptiding
                 || data.playerInfo.gliding
-                || data.playerInfo.doingTeleport
                 || data.playerInfo.lastPlaceLiquid.isNotPassed(5)
                 || data.playerInfo.inVehicle
                 || (data.playerInfo.lastChunkUnloaded.isNotPassed(35)
@@ -408,7 +402,7 @@ public class MovementProcessor {
                 || data.playerInfo.webTimer.isNotPassed(8)
                 || data.playerInfo.liquidTimer.isNotPassed(8)
                 || data.playerInfo.onLadder
-                || data.playerInfo.doingVelocity
+                || data.playerInfo.lastVelocity.isNotPassed(3)
                 || data.playerInfo.slimeTimer.isNotPassed(8)
                 || data.playerInfo.climbTimer.isNotPassed(6)
                 || data.playerInfo.lastHalfBlock.isNotPassed(5);

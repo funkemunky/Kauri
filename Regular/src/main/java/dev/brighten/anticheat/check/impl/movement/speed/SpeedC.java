@@ -19,7 +19,7 @@ public class SpeedC extends Check {
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
-        if(data.playerInfo.deltaXZ == 0 || data.playerInfo.generalCancel) {
+        if(!packet.isPos() || data.playerInfo.generalCancel || data.playerInfo.serverPos) {
             if(data.playerInfo.generalCancel && verbose > 0) verbose--;
             return;
         }

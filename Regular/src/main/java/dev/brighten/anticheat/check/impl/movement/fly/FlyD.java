@@ -15,8 +15,9 @@ public class FlyD extends Check {
     private double groundY = 1 / 64.;
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if((data.playerInfo.deltaXZ == 0 && data.playerInfo.deltaY == 0)
+        if(!packet.isPos()
                 || data.playerInfo.flightCancel
+                || data.playerInfo.serverPos
                 || data.playerInfo.nearGround
                 || data.playerInfo.lClientGround
                 || data.playerInfo.clientGround

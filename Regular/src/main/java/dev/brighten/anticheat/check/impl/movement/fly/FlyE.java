@@ -15,7 +15,7 @@ public class FlyE extends Check {
     private int buffer;
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if((data.playerInfo.deltaXZ == 0 && data.playerInfo.deltaY == 0) || data.playerInfo.flightCancel) return;
+        if(!packet.isPos() || data.playerInfo.flightCancel) return;
 
         double accel = Math.abs(data.playerInfo.deltaY - data.playerInfo.lDeltaY);
 

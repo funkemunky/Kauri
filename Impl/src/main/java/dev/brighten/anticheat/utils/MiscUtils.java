@@ -42,6 +42,16 @@ public class MiscUtils {
         NUMBER_REFLECTED_PRIMITIVES = s;
     }
 
+    public static float clampToVanilla(float s, float angle) {
+        float f = (s * 0.6f + .2f);
+        float f2 = f * f * f * 1.2f;
+        return angle - (angle % f2);
+    }
+
+    public static boolean endsWith(double value, String string) {
+        return String.valueOf(value).endsWith(string);
+    }
+
     public static Float getMode(Collection<Float> collect) {
         Map<Float, Integer> repeated = new HashMap<>();
 
@@ -71,6 +81,10 @@ public class MiscUtils {
         } catch(NumberFormatException e) {
             return false;
         }
+    }
+
+    public static int length(double value) {
+        return String.valueOf(value).length();
     }
 
     public static void testMessage(String message) {

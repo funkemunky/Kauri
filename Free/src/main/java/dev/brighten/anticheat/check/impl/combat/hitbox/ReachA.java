@@ -26,7 +26,7 @@ public class ReachA extends Check {
 
     private double buffer;
 
-    private static List<EntityType> allowedEntityTypes = Arrays
+    private static final List<EntityType> allowedEntityTypes = Arrays
             .asList(EntityType.ZOMBIE, EntityType.SHEEP, EntityType.BLAZE,
                     EntityType.SKELETON, EntityType.PLAYER, EntityType.VILLAGER, EntityType.IRON_GOLEM,
                     EntityType.WITCH, EntityType.COW, EntityType.CREEPER);

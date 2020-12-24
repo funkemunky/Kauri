@@ -21,7 +21,7 @@ public class FlyB extends Check {
     private static double mult = 0.98f;
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if((data.playerInfo.deltaY != 0 || data.playerInfo.deltaXZ != 0)) {
+        if(packet.isPos()) {
             //We check if the player is in ground, since theoretically the y should be zero.
             double lDeltaY = data.playerInfo.lClientGround ? 0 : data.playerInfo.lDeltaY;
             double predicted = (lDeltaY - 0.08) * mult;
@@ -50,6 +50,8 @@ public class FlyB extends Check {
 
             boolean flagged = false;
             if(!data.playerInfo.flightCancel
+                    && !data.playerInfo.serverPos
+                    && !data.playerInfo.serverPos
                     && data.playerInfo.lastVelocity.isPassed(3)
                     && !data.playerInfo.serverGround
                     && data.playerInfo.blockAboveTimer.isPassed(5)

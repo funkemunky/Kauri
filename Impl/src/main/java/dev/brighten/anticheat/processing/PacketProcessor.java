@@ -519,6 +519,11 @@ public class PacketProcessor {
 
                 data.playerInfo.doingTeleport = true;
                 data.playerInfo.posLocs.add(loc);
+
+                if(data.sniffing) {
+                    data.sniffedPackets.add(event.getType() + ":@:" + packet.getX() + ";"
+                            + packet.getY() + ";" + packet.getZ() + ":@:" + event.getTimeStamp());
+                }
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
             }

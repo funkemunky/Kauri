@@ -28,6 +28,7 @@ public class FastLadder extends Check {
         if(packet.isPos()
                 && data.playerInfo.lastVelocity.isPassed(10)
                 && data.blockInfo.onClimbable
+                && !data.playerInfo.serverPos
                 && !data.playerInfo.generalCancel) {
             if(data.playerInfo.jumped) lastJump.reset();
             if(data.playerInfo.deltaY > (lastJump.isNotPassed() ? data.playerInfo.jumpHeight : 0.144)) {

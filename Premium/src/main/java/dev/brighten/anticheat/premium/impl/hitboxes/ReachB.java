@@ -44,7 +44,7 @@ public class ReachB extends Check {
             if(data.playerInfo.creative) return;
 
             List<Pair<SimpleCollisionBox, Double>> entityLocs = data.targetPastLocation.getEstimatedLocation(timeStamp,
-                    (data.lagInfo.transPing + 3) * 50, 75L)
+                    (data.lagInfo.transPing + 2) * 50, 100L)
                     .stream()
                     .map(loc -> {
                         SimpleCollisionBox hitbox = (SimpleCollisionBox) getHitbox(entity, loc);
@@ -69,13 +69,13 @@ public class ReachB extends Check {
 
                 if(checkTo != null) {
                     tdistance = Math.min(new Vector(checkTo.x, checkTo.y, checkTo.z)
-                            .distance(toOrigin.toVector()) - (sbox.value / 3f), tdistance);
+                            .distance(toOrigin.toVector()) - (sbox.value / 2.65f), tdistance);
                     tcollided++;
                 } else tmisses++;
 
                 if(checkFrom != null) {
                     fdistance = Math.min(new Vector(checkFrom.x, checkFrom.y, checkFrom.z)
-                            .distance(fromOrigin.toVector()) - (sbox.value / 3f), fdistance);
+                            .distance(fromOrigin.toVector()) - (sbox.value / 2.65f), fdistance);
                     fcollided++;
                 } else fmisses++;
             }
@@ -106,7 +106,7 @@ public class ReachB extends Check {
                         flag("distance=%v.3 from=%v buffer=%v.1 misses=%v",
                                 distance, usedFrom, buffer, misses);
                     }
-                } else buffer-= buffer > 0 ? data.playerVersion.isAbove(ProtocolVersion.V1_8_9) ? 0.1f : 0.05f : 0;
+                } else buffer-= buffer > 0 ? data.playerVersion.isAbove(ProtocolVersion.V1_8_9) ? 0.2f : 0.1f : 0;
             }
 
             debug("distance=%v.3 from=%v buffer=%v.2 ticklag=%v collided=%v delta=%v",

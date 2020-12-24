@@ -37,9 +37,9 @@ public class SpeedA extends Check {
     public void onFlying(WrappedInFlyingPacket packet) {
         checkProccesing:
         {
-            if (data.playerInfo.deltaY == 0 && data.playerInfo.deltaXZ == 0) {
+            if (!packet.isPos())
                 break checkProccesing;
-            }
+
             float drag = friction;
 
             TagsBuilder tags = new TagsBuilder();
@@ -93,7 +93,7 @@ public class SpeedA extends Check {
 
             if (ratio > 100.8 && data.playerInfo.lastBrokenBlock.isPassed(data.lagInfo.transPing + 1)
                     && data.playerInfo.liquidTimer.isPassed(2)
-                    && data.playerInfo.lastTeleportTimer.isPassed(1)
+                    && !data.playerInfo.serverPos
                     && !data.playerInfo.generalCancel && data.playerInfo.lastVelocity.isPassed(2)) {
                 if((buffer+= ratio > 400 ? 2 : 1) > 4 || ratio > 600) {
                     vl++;

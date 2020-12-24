@@ -40,6 +40,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
+import java.util.logging.Level;
 
 @NoArgsConstructor
 public class Check implements KauriCheck {
@@ -347,6 +349,12 @@ public class Check implements KauriCheck {
         }
     }
 
+    public void kickPlayer(String reason) {
+        Bukkit.getLogger().log(Level.INFO, "Kauri is kicking player" + data.getPlayer().getName() + " for: \""
+                + reason + "\"");
+        RunUtils.task(() -> data.getPlayer().kickPlayer(Color.translate(reason)));
+    }
+
     public void debug(String information, Object... variables) {
         if(Kauri.INSTANCE.dataManager.debugging.size() == 0) return;
         if(variables.length > 0 && information.contains("%v")) {
@@ -416,7 +424,7 @@ public class Check implements KauriCheck {
                 .findFirst().orElse(null);
     }
 
-    public void kickPlayer() {
+    public void closePlayerChannel() {
         val channel = getChannel.invoke(TinyProtocolHandler.getInstance(), data.getPlayer());
 
         val wrapped = new WrappedClass(channel.getClass());

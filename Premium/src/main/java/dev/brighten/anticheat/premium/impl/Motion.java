@@ -24,6 +24,8 @@ public class Motion extends Check {
             if(data.predictionService.flag
                     && data.playerInfo.soulSandTimer.isPassed(10)
                     && !data.playerInfo.generalCancel
+                    && !data.playerInfo.serverPos
+                    && !data.playerInfo.doingTeleport
                     && data.playerInfo.deltaXZ > predXZ
                     && !data.blockInfo.collidesHorizontally) {
                 if(++buffer > 15) {

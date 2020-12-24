@@ -14,8 +14,9 @@ public class SpeedD extends Check {
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
-        if(data.playerInfo.deltaXZ == 0
-                || data.playerInfo.generalCancel || data.playerInfo.lastVelocity.isNotPassed(25)) {
+        if(!packet.isPos()
+                || data.playerInfo.generalCancel || data.playerInfo.serverPos
+                || data.playerInfo.lastVelocity.isNotPassed(25)) {
             if(data.playerInfo.generalCancel)verbose.subtract();
             return;
         }
