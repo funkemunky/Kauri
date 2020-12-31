@@ -4,6 +4,7 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.MiscUtils;
+import cc.funkemunky.api.utils.world.EntityData;
 import cc.funkemunky.api.utils.world.types.RayCollision;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
@@ -12,6 +13,7 @@ import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 import org.bukkit.GameMode;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -32,7 +34,6 @@ public class Hitboxes extends Check {
             EntityType.VILLAGER,
             EntityType.PLAYER,
             EntityType.SKELETON,
-            EntityType.PIG_ZOMBIE,
             EntityType.WITCH,
             EntityType.CREEPER,
             EntityType.ENDERMAN);
@@ -59,7 +60,7 @@ public class Hitboxes extends Check {
                     .getEstimatedLocation(timeStamp,
                             (data.lagInfo.transPing + 3) * 50, 100L)
                     .stream()
-                    .map(loc -> getHitbox(loc, data.target.getType()))
+                    .map(loc -> getHitbox(loc, data.target))
                     .collect(Collectors.toList());
 
             if(entityLocations.size() < 2) return;
@@ -98,7 +99,6 @@ public class Hitboxes extends Check {
     private static boolean checkParameters(ObjectData data) {
         return data.playerInfo.lastAttack.isNotPassed(0)
                 && data.target != null
-                && data.target.getType().equals(EntityType.PLAYER)
                 && (allowNPCFlag || ((Player) data.target).isOnline())
                 && data.targetPastLocation.previousLocations.size() > 12
                 && Kauri.INSTANCE.lastTickLag.isPassed(10)
@@ -108,15 +108,7 @@ public class Hitboxes extends Check {
                 && !data.getPlayer().getGameMode().equals(GameMode.CREATIVE);
     }
 
-    private static SimpleCollisionBox getHitbox(KLocation loc, EntityType type) {
-        if(type.equals(EntityType.PLAYER)) {
-            return new SimpleCollisionBox(loc.toVector(), 0.6, 1.8).expand(0.4, 0.4, 0.4);
-        } else {
-            Vector bounds = MiscUtils.entityDimensions.get(type);
-
-            return new SimpleCollisionBox(loc.toVector(), 0, 0).expand(bounds.getX(), 0, bounds.getZ())
-                    .expandMax(0, bounds.getY(), 0)
-                    .expand(0.4, 0.4, 0.4);
-        }
+    private static SimpleCollisionBox getHitbox(KLocation loc, Entity type) {
+        return ((SimpleCollisionBox) EntityData.getEntityBox(loc, type)).expand(0.2,0.2,0.2);
     }
 }
