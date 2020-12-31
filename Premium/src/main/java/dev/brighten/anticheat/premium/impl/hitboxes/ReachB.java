@@ -105,6 +105,7 @@ public class ReachB extends Check {
                         vl++;
                         flag("distance=%v.3 from=%v buffer=%v.1 misses=%v",
                                 distance, usedFrom, buffer, misses);
+                        buffer = 4;
                     }
                 } else buffer-= buffer > 0 ? data.playerVersion.isAbove(ProtocolVersion.V1_8_9) ? 0.2f : 0.1f : 0;
             }

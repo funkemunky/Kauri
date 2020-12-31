@@ -42,6 +42,7 @@ public class RegularChecks implements CheckRegister {
         Check.register(new FlyD());
         Check.register(new FlyE());
         Check.register(new FlyF());
+        Check.register(new FlyG());
         Check.register(new FastLadder());
         Check.register(new NoFallB());
         Check.register(new Hitboxes());

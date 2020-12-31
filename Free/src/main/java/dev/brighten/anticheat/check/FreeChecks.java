@@ -12,6 +12,7 @@ import dev.brighten.anticheat.check.impl.combat.hitbox.ReachA;
 import dev.brighten.anticheat.check.impl.movement.fly.FlyA;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallA;
 import dev.brighten.anticheat.check.impl.movement.speed.SpeedA;
+import dev.brighten.anticheat.check.impl.movement.velocity.VelocityD;
 import dev.brighten.anticheat.check.impl.packets.badpackets.*;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -23,14 +24,11 @@ public class FreeChecks implements CheckRegister {
     public FreeChecks() {
         registerChecks();
 
-        msgingTask = RunUtils.taskTimerAsync(() -> {
-            if (!Kauri.INSTANCE.usingPremium && !Kauri.INSTANCE.usingAra) {
-
-                MiscUtils.printToConsole("&fWe appreciate you using Kauri. If you would like to help us out " +
-                        "while unlocking more, please consider purchasing a " +
-                        "premium package at &e&ohttps://funkemunky.cc/shop" );
-            } else msgingTask.cancel();
-        }, Kauri.INSTANCE, 40, 18000);
+        if (!Kauri.INSTANCE.usingPremium && !Kauri.INSTANCE.usingAra) {
+            MiscUtils.printToConsole("&fWe appreciate you using Kauri. If you would like to help us out " +
+                    "while unlocking more, please consider purchasing a " +
+                    "premium package at &e&ohttps://funkemunky.cc/shop" );
+        }
     }
 
     @Override
@@ -54,5 +52,6 @@ public class FreeChecks implements CheckRegister {
         Check.register(new BadPacketsM());
         Check.register(new BadPacketsN());
         Check.register(new Timer());
+        Check.register(new VelocityD());
     }
 }

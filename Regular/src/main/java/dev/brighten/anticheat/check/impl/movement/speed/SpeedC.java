@@ -25,13 +25,27 @@ public class SpeedC extends Check {
         }
 
         final MaxThreshold threshold = MaxThreshold.getThreshold(data.playerInfo.clientGround, sprinting);
+        final int speed = data.potionProcessor.getEffectByType(PotionEffectType.SPEED)
+                .map(ef -> ef.getAmplifier() + 1)
+                .orElse(0);
 
-        final double calc = threshold.getCalculatedValue(data.getPlayer().getWalkSpeed(),
-                data.potionProcessor.getEffectByType(PotionEffectType.SPEED).map(ef -> ef.getAmplifier() + 1)
-                        .orElse(0), data.playerInfo.jumped);
+        double calc = threshold.getCalculatedValue(data.getPlayer().getWalkSpeed(),
+                speed, data.playerInfo.jumped);
 
-        debug("threshold=%v deltaXZ=%v.4 calc=%v.4 jumped=%v",
-                threshold.display, data.playerInfo.deltaXZ, calc, data.playerInfo.jumped);
+        if(data.playerInfo.lastVelocity.isNotPassed(25)) {
+            double velocityXZ = Math.hypot(data.playerInfo.velocityX, data.playerInfo.velocityZ);
+
+            if(velocityXZ > data.playerInfo.deltaXZ) calc = velocityXZ;
+        }
+
+        if(data.playerInfo.deltaXZ > calc) {
+            flag("t=[%v] %v.3>-%v.3 jumped=%v speed=%v", threshold.display,
+                    data.playerInfo.deltaXZ, calc, data.playerInfo.jumped, speed);
+            vl++;
+        }
+
+        debug("threshold=%v deltaXZ=%v.4 calc=%v.4 jumped=%v speed=%v",
+                threshold.display, data.playerInfo.deltaXZ, calc, data.playerInfo.jumped, speed);
 
         if(data.playerInfo.clientGround) sprinting = data.playerInfo.sprinting;
     }
@@ -40,7 +54,7 @@ public class SpeedC extends Check {
     public enum MaxThreshold {
 
         GROUND_SPEED("Ground", 0.28, 1.3, 1.6, 1),
-        GROUND_SPRINT_SPEED("Ground + Sprint", 0.4, 1.3, 1.6, 1),
+        GROUND_SPRINT_SPEED("Ground + Sprint", 0.43, 1.3, 1.6, 1),
         AIR_SPEED("Air", 0.28, 1.3, 1.6, 1),
         AIR_SPRINT_SPEED("Air + Sprint", 0.4, 1.3, 1.6, 2);
 
@@ -50,7 +64,7 @@ public class SpeedC extends Check {
         public static MaxThreshold getThreshold(boolean ground, boolean sprint) {
             if(ground) {
                 return sprint ? GROUND_SPRINT_SPEED : GROUND_SPEED;
-            } else return sprint ? AIR_SPEED : AIR_SPRINT_SPEED;
+            } else return sprint ? AIR_SPRINT_SPEED : AIR_SPEED;
         }
 
         public double getCalculatedValue(double walkSpeed, int speedAmplifier, boolean jumped) {
@@ -60,6 +74,7 @@ public class SpeedC extends Check {
                 base*= (1 + (walkSpeed - 0.2)) * walkSpeedMultiplier;
             }
 
+            if(speedAmplifier > 0)
             base*= speedAmplifier * speedMultiplier;
 
             if(jumped) base*= jumpMultiplier;

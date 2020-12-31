@@ -102,6 +102,12 @@ public class MovementProcessor {
             }
         }
 
+        if(data.playerInfo.serverGround && data.playerInfo.lastMoveCancel.isPassed()) {
+            data.playerInfo.setbackLocation = new Location(data.getPlayer().getWorld(),
+                    data.playerInfo.to.x, data.playerInfo.to.y, data.playerInfo.to.z,
+                    data.playerInfo.to.yaw, data.playerInfo.to.pitch);
+        }
+
         data.playerInfo.to.timeStamp = timeStamp;
         //Adding past location
         data.pastLocation.addLocation(data.playerInfo.to);

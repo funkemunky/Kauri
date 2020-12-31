@@ -20,7 +20,7 @@ public class FlyF extends Check {
         double max = data.playerInfo.lastVelocity.isNotPassed(20)
                 ? Math.max(data.playerInfo.velocityY, data.playerInfo.jumpHeight) : data.playerInfo.jumpHeight;
 
-        if(data.playerInfo.deltaY > max && !data.playerInfo.serverGround
+        if(data.playerInfo.deltaY > max
                 && !data.playerInfo.gliding
                 && data.playerInfo.lastVelocity.isPassed(3)
                 && data.playerInfo.lastTeleportTimer.isPassed(1)

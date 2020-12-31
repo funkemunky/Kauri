@@ -51,7 +51,6 @@ public class FlyB extends Check {
             boolean flagged = false;
             if(!data.playerInfo.flightCancel
                     && !data.playerInfo.serverPos
-                    && !data.playerInfo.serverPos
                     && data.playerInfo.lastVelocity.isPassed(3)
                     && !data.playerInfo.serverGround
                     && data.playerInfo.blockAboveTimer.isPassed(5)

@@ -6,6 +6,7 @@ import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.PlayerTimer;
+import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import lombok.NoArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -28,6 +29,7 @@ public class PlayerInformation {
     public long lastVelocityTimestamp;
     public Map<Location, Material> shitMap = new HashMap<>();
     public Block blockBelow, blockOnTo;
+    public Location setbackLocation = new Location(null, 0,0,0);
 
     public PlayerInformation(ObjectData data) {
 
@@ -57,6 +59,7 @@ public class PlayerInformation {
         lastAttack = new PlayerTimer(data, 5);
         cinematicTimer = new PlayerTimer(data, 8);
         lastEntityCollision = new PlayerTimer(data, 4);
+        lastMoveCancel = new TickTimer(15);
     }
 
     //Cinematic
@@ -85,7 +88,7 @@ public class PlayerInformation {
     public int groundTicks, airTicks, kGroundTicks, kAirTicks;
     public Timer liquidTimer, webTimer, climbTimer, slimeTimer, iceTimer, blockAboveTimer, soulSandTimer;
     public Timer lastBrokenBlock, lastVelocity, lastTargetSwitch, lastBlockPlace, lastBlockPlacePacket,
-            lastBlockDigPacket, lastToggleFlight, lastAttack, lastEntityCollision,
+            lastBlockDigPacket, lastToggleFlight, lastAttack, lastEntityCollision, lastMoveCancel,
             lastWindowClick, lastInsideBlock, lastHalfBlock, lastPlaceLiquid, lastUseItem,
             lastTeleportTimer, lastGamemodeTimer, lastRespawnTimer, lastChunkUnloaded, cinematicTimer;
 

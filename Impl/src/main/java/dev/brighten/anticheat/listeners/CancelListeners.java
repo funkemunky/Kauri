@@ -26,13 +26,13 @@ public class CancelListeners implements Listener {
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
         if(data != null && data.typesToCancel.size() > 0) {
+            data.playerInfo.lastMoveCancel.reset();
             for (CancelType cancelType : data.typesToCancel) {
                 if(!cancelType.equals(CancelType.MOVEMENT)) continue;
 
-                val ground = BlockUtils.findGround(event.getFrom().getWorld(), event.getFrom()).clone();
-
-                ground.setYaw(event.getFrom().getYaw());
-                ground.setPitch(event.getFrom().getPitch());
+                val ground = event.getTo().getWorld().equals(data.playerInfo.setbackLocation.getWorld()) ?
+                        data.playerInfo.setbackLocation
+                        : BlockUtils.findGround(event.getFrom().getWorld(), event.getFrom()).clone();
 
                 event.getPlayer().teleport(ground.add(0,0.01,0));
                 synchronized (data.typesToCancel) {
