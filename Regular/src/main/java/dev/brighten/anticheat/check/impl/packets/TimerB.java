@@ -1,13 +1,20 @@
 package dev.brighten.anticheat.check.impl.packets;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.utils.Tuple;
+import cc.funkemunky.api.utils.math.RollingAverage;
+import cc.funkemunky.api.utils.math.RollingAverageDouble;
+import cc.funkemunky.api.utils.math.RollingAverageLong;
+import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.api.check.CheckType;
+import lombok.val;
 
-import java.util.Deque;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 @CheckInfo(name = "Timer (B)", description = "Checks the rate of packets coming in.",
@@ -15,51 +22,29 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 @Cancellable
 public class TimerB extends Check {
 
+    private long lastFlying;
     private int buffer;
-    private boolean clearing;
-    private final Deque<Long> list = new ConcurrentLinkedDeque<>();
-    private long lastFlying = System.currentTimeMillis();
-
+    private RollingAverage averageLong = new RollingAverage(20);
     @Packet
-    public void onPacket(WrappedInFlyingPacket packet, long current) {
+    public void onFlying(WrappedInFlyingPacket packet, long millis) {
+        long current = System.nanoTime();
         long delta = current - lastFlying;
+        double milliSeconds = delta / 1E6D;
 
-        if(list.size() > 30 && (list.size() > 60 || (delta > 5 && delta < 90)) && !clearing) {
-            clearing = true;
-            if(list.size() > 31) {
-                list.stream().filter(l -> l < 5 || l > 90)
-                        .forEach(v ->  {
-                                list.remove(v);
-                        });
+        averageLong.add(milliSeconds, millis);
+
+        double average = averageLong.getAverage(), ratio = 50. / average;
+
+        if(ratio > 1.01) {
+            if(++buffer > 60) {
+                vl++;
+                flag("r=%v.1 b=%v", ratio, buffer);
             }
-            //Removing all values until its 30 or less
-            while(list.size() > 40) {
-                list.removeFirst();
-            }
-            clearing = false;
-        }
+        } else buffer = 0;
 
-        check: {
-            if(clearing) break check;
+        debug("[%v] ratio=%v.3 avg=%v.2", buffer, ratio, average);
 
-            if(!data.playerInfo.doingTeleport
-                    && !data.playerInfo.serverPos
-                    && data.playerInfo.lastRespawnTimer.isPassed(10))
-                list.add(delta);
-
-            double average = list.stream().mapToLong(l -> l).average().orElse(50);
-
-            double pct = 50 / average * 100;
-
-            if(pct > 101 && list.size() > 30) {
-                if(++buffer > 20) {
-                    vl++;
-                    flag("pct=%v.1", pct);
-                }
-            } else if(buffer > 0) buffer-= 1f;
-
-            debug("delta=%v.2", average);
-        }
-        lastFlying = current;
+        if(!data.playerInfo.serverPos)
+            lastFlying = current;
     }
 }
