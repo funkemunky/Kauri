@@ -15,12 +15,13 @@ import org.bukkit.potion.PotionEffectType;
 public class FlyG extends Check {
 
     private double stepHeight;
+    private long lastFlying;
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
-        if(packet.isPos() && MathUtils.getDelta(data.playerInfo.to.y, data.playerInfo.from.y) < 1
+    public void onFlying(WrappedInFlyingPacket packet, long now) {
+        if(MathUtils.getDelta(data.playerInfo.to.y, data.playerInfo.from.y) < 1
                 && data.playerInfo.from.y != 0) {
-            if(!data.playerInfo.clientGround) {
+            if(!data.playerInfo.clientGround && packet.isPos() && now - lastFlying < 90) {
                 stepHeight+= data.playerInfo.deltaY;
             } else if(data.playerInfo.deltaY == 0.42 || data.playerInfo.deltaY == 1.0) {
                 vl++;
@@ -50,5 +51,6 @@ public class FlyG extends Check {
                 stepHeight = 0;
             }
         }
+        lastFlying = now;
     }
 }

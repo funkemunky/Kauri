@@ -1,11 +1,12 @@
 package dev.brighten.anticheat.check.impl.world.block;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
+import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
-import org.bukkit.Location;
+import org.bukkit.util.Vector;
 
 @CheckInfo(name = "Block (A)", description = "Checks for impossible scaffold sprinting.", developer = true,
         checkType = CheckType.BLOCK)
@@ -13,12 +14,22 @@ public class BlockA extends Check {
 
     @Packet
     public void onBlock(WrappedInBlockPlacePacket event) {
-        Location placeLoc = new Location(event.getPlayer().getWorld(), event.getPosition().getX(),
-                event.getPosition().getY(), event.getPosition().getZ());
+        Vector dir = new Vector(event.getFace().getAdjacentX(),
+                0, event.getFace().getAdjacentZ()),
+                opposite = new Vector(event.getFace().opposite().getAdjacentX(),
+                        0, event.getFace().opposite().getAdjacentZ());
 
         //Getting place block
-        placeLoc.add(event.getFace().getAdjacentX(), event.getFace().getAdjacentY(), event.getFace().getAdjacentZ());
+        Vector delta = new Vector(data.playerInfo.deltaX, data.playerInfo.deltaY, data.playerInfo.deltaZ);
 
-        debug("x=%v y=%v z=%v", placeLoc.getBlockX(), placeLoc.getBlockY(), placeLoc.getBlockZ());
+        double dist = delta.distance(dir), dist2 = opposite.distance(MathUtils.getDirection(data.playerInfo.to).setY(0));
+        boolean check = dist <= 1 && dist > 0.7 && dist2 >= 1 && dist2 > 1.5;
+
+        if(check && event.getFace().getAdjacentY() == 0 && data.playerInfo.sprinting) {
+            vl++;
+            flag("dist=%v.3 dist2=%v.3 placeVec=%v", dist, dist2, dir.toString());
+        }
+
+        debug("dist=%v.3 dist2=%v.3", dist, dist2);
     }
 }

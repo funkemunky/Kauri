@@ -2,6 +2,7 @@ package dev.brighten.anticheat.data.classes;
 
 import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumAnimation;
 import cc.funkemunky.api.utils.KLocation;
+import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingList;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.timer.Timer;
@@ -12,6 +13,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -71,7 +73,7 @@ public class PlayerInformation {
     //Server Position
     public long lastServerPos, lastRespawn;
     public boolean serverPos;
-    public EvictingList<KLocation> posLocs = new EvictingList<>(5);
+    public Deque<KLocation> posLocs = new ConcurrentEvictingList<>(5);
 
     //Attack
     public long lastAttackTimeStamp;
