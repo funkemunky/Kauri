@@ -23,6 +23,7 @@ import dev.brighten.anticheat.check.impl.movement.velocity.VelocityA;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityC;
 import dev.brighten.anticheat.check.impl.packets.TimerB;
 import dev.brighten.anticheat.check.impl.packets.exploits.*;
+import dev.brighten.anticheat.check.impl.world.block.BlockA;
 
 @Init(priority = Priority.LOWEST)
 public class RegularChecks implements CheckRegister {
@@ -79,5 +80,6 @@ public class RegularChecks implements CheckRegister {
         Check.register(new CreativeCrash());
         Check.register(new BookCrash());
         Check.register(new Infinity());
+        Check.register(new BlockA());
     }
 }
