@@ -36,7 +36,7 @@ public class BadPacketsN extends Check {
     public void onFlying(WrappedInFlyingPacket packet) {
         if(lastSentTrans.isNotPassed(5) && ++flying > 20) {
             vl++;
-            flag("f=%v", flying);
+            flag("f=%v t=FLYING", flying);
 
             if(vl > punishVl && kickPlayer && !isExecutable()) {
                 kickPlayer("[Kauri] Invalid packets.");
@@ -72,7 +72,7 @@ public class BadPacketsN extends Check {
 
             if (current - lastTick > 1 && now - data.creation > 4000L) {
                 vl++;
-                flag("d=%v", current - lastTick);
+                flag("d=%v t=SKIP", current - lastTick);
             }
             lastTick = current;
         }
