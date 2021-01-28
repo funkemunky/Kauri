@@ -12,6 +12,7 @@ import org.bukkit.util.Vector;
         checkType = CheckType.BLOCK)
 public class BlockA extends Check {
 
+    private int buffer;
     @Packet
     public void onBlock(WrappedInBlockPlacePacket event) {
         Vector dir = new Vector(event.getFace().getAdjacentX(),
@@ -23,12 +24,15 @@ public class BlockA extends Check {
         Vector delta = new Vector(data.playerInfo.deltaX, data.playerInfo.deltaY, data.playerInfo.deltaZ);
 
         double dist = delta.distance(dir), dist2 = opposite.distance(MathUtils.getDirection(data.playerInfo.to).setY(0));
-        boolean check = dist <= 1 && dist > 0.7 && dist2 >= 1 && dist2 > 1.5;
+        boolean check = dist <= 1 && dist > 0.7 && dist2 >= 0.5 && dist2 < 1;
 
         if(check && event.getFace().getAdjacentY() == 0 && data.playerInfo.sprinting) {
-            vl++;
-            flag("dist=%v.3 dist2=%v.3 placeVec=%v", dist, dist2, dir.toString());
-        }
+            if((buffer+= 4) > 15) {
+                vl++;
+                flag("dist=%v.3 dist2=%v.3 placeVec=%v", dist, dist2, dir.toString());
+                buffer = 14;
+            }
+        } else if(buffer > 0) buffer--;
 
         debug("dist=%v.3 dist2=%v.3", dist, dist2);
     }
