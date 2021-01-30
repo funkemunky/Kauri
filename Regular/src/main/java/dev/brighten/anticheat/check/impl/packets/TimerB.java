@@ -24,7 +24,7 @@ public class TimerB extends Check {
 
     private long lastFlying;
     private int buffer;
-    private RollingAverage averageLong = new RollingAverage(20);
+    private RollingAverage averageLong = new RollingAverage(40);
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long millis) {
         long current = System.nanoTime();
@@ -36,7 +36,7 @@ public class TimerB extends Check {
         double average = averageLong.getAverage(), ratio = 50. / average;
 
         if(ratio > 1.01) {
-            if(++buffer > 60) {
+            if(++buffer > 75) {
                 vl++;
                 flag("r=%v.1 b=%v", ratio, buffer);
             }
@@ -44,7 +44,7 @@ public class TimerB extends Check {
 
         debug("[%v] ratio=%v.3 avg=%v.2", buffer, ratio, average);
 
-        if(!data.playerInfo.serverPos)
+        if(!data.playerInfo.serverPos && !data.playerInfo.doingTeleport)
         lastFlying = current;
     }
 }

@@ -1,9 +1,7 @@
 package dev.brighten.anticheat.utils;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
-import cc.funkemunky.api.utils.KLocation;
-import cc.funkemunky.api.utils.Materials;
-import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.world.BlockData;
 import cc.funkemunky.api.utils.world.CollisionBox;
@@ -19,8 +17,13 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 @Getter
 public class CollisionHandler {
@@ -28,6 +31,8 @@ public class CollisionHandler {
 	private List<Entity> entities;
 	private ObjectData data;
 	private KLocation location;
+	private List<Triad<Double[], Integer, Consumer<Boolean>>> intersects = new ArrayList<>(),
+			collides = new ArrayList<>();
 
 	private double width, height;
 	private double shift;
@@ -85,6 +90,14 @@ public class CollisionHandler {
 		}
 
 		return false;
+	}
+
+	public void intersectsWithFuture(int bitMask, Consumer<Boolean> intersects) {
+		this.intersects.add(new Triad<>(new Double[] {width, height, shift}, bitMask, intersects));
+	}
+
+	public void collidesWithFuture(int bitMask, Consumer<Boolean> collides) {
+		this.collides.add(new Triad<>(new Double[] {width, height, shift}, bitMask, collides));
 	}
 
 	public boolean isIntersectsWith(SimpleCollisionBox playerBox, int bitmask) {
@@ -218,5 +231,60 @@ public class CollisionHandler {
 				.expand(width / 2, 0, width / 2);
 
 		return isCollidedWith(playerBox, materials);
+	}
+
+	public void runFutures() {
+		Triad<Double[], Integer, Consumer<Boolean>> value = null;
+		Queue<Consumer<Boolean>> successful = new LinkedList<>();
+		//To remove objects
+		Queue<Triad<Double[], Integer, Consumer<Boolean>>> collisionRemove = new LinkedList<>(),
+				intersectsRemove = new LinkedList<>();
+
+		for (Block b : blocks) {
+			Location block = b.getLocation();
+			Material material = data.playerInfo.shitMap.getOrDefault(block, b.getType());
+			for (Triad<Double[], Integer, Consumer<Boolean>> intersect : intersects) {
+				if(!Materials.checkFlag(material, intersect.second)) continue;
+
+				SimpleCollisionBox playerBox = new SimpleCollisionBox()
+						.offset(location.x, location.y, location.z)
+						.expandMin(0, intersect.first[2], 0)
+						.expandMax(0, intersect.first[1], 0)
+						.expand(intersect.first[0] / 2, 0, intersect.first[0] / 2);
+
+				if (BlockData.getData(material).getBox(b, ProtocolVersion.getGameVersion()).isIntersected(playerBox)) {
+					successful.add(intersect.third);
+					intersectsRemove.add(intersect);
+				}
+			}
+			for (Triad<Double[], Integer, Consumer<Boolean>> collides : collides) {
+				if(!Materials.checkFlag(material, collides.second)) continue;
+
+				SimpleCollisionBox playerBox = new SimpleCollisionBox()
+						.offset(location.x, location.y, location.z)
+						.expandMin(0, collides.first[2], 0)
+						.expandMax(0, collides.first[1], 0)
+						.expand(collides.first[0] / 2, 0, collides.first[0] / 2);
+
+				if (BlockData.getData(material).getBox(b, ProtocolVersion.getGameVersion()).isCollided(playerBox)) {
+					successful.add(collides.third);
+					intersectsRemove.add(collides);
+				}
+			}
+
+			while((value = intersectsRemove.poll()) != null) {
+				intersects.remove(value);
+			}
+			while((value = collisionRemove.poll()) != null) {
+				collides.remove(value);
+			}
+		}
+		collides.clear();
+		intersects.clear();
+
+		Consumer<Boolean> consumer = null;
+		while((consumer = successful.poll()) != null) {
+			consumer.accept(true);
+		}
 	}
 }
