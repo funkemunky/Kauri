@@ -20,7 +20,7 @@ public class FlyG extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long now) {
         if(MathUtils.getDelta(data.playerInfo.to.y, data.playerInfo.from.y) < 1
-                && data.playerInfo.from.y != 0) {
+                && data.playerInfo.from.y != 0 && !data.playerInfo.flightCancel) {
             if(!data.playerInfo.clientGround && packet.isPos() && now - lastFlying < 90) {
                 stepHeight+= data.playerInfo.deltaY;
             } else if(data.playerInfo.deltaY == 0.42 || data.playerInfo.deltaY == 1.0) {
