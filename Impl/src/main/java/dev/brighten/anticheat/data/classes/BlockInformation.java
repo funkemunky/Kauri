@@ -78,8 +78,8 @@ public class BlockInformation {
             }
         }
 
-        if(Kauri.INSTANCE.keepaliveProcessor.currentKeepalive.start % 5 == 0)
-            for (Block block : blocks) updateBlock(block);
+        if(Kauri.INSTANCE.keepaliveProcessor.currentKeepalive.start % 2 == 0)
+        blocks.parallelStream().forEach(this::updateBlock);
 
         if(!objectData.playerInfo.worldLoaded) return;
 
@@ -110,17 +110,13 @@ public class BlockInformation {
         handler.setSize(0.6, 0.05f);
 
         handler.setOffset(-0.1f);
-        handler.intersectsWithFuture(Materials.SOLID,
-                i -> objectData.playerInfo.serverGround = i || handler.contains(EntityType.BOAT));
+        objectData.playerInfo.serverGround =
+                handler.isIntersectedWith(Materials.SOLID) || handler.contains(EntityType.BOAT);
         //Bukkit.broadcastMessage("chigga5");
         handler.setOffset(-0.4f);
-        handler.intersectsWithFuture(Materials.SLABS, i -> {
-            onSlab = i;
-        });
-
-        handler.intersectsWithFuture(Materials.STAIRS, i -> {
-            onStairs = i;
-        });
+        onSlab = handler.isCollidedWith(Materials.SLABS);
+        onStairs = handler.isCollidedWith(Materials.STAIRS);
+        onHalfBlock = onSlab || onStairs;
 
         handler.setOffset(-0.6f);
         handler.setSize(0.8f, 1f);
@@ -134,9 +130,13 @@ public class BlockInformation {
 
         bedNear = handler.isCollidedWith(bedBlocks);
 
+        if(!onHalfBlock) onHalfBlock = miscNear || bedNear;
+
         handler.setSize(0.6f, 1.8f);
-        handler.collidesWithFuture(Materials.ICE, i -> onIce = i);
+        handler.setSingle(true);
+        onIce = handler.isCollidedWith(Materials.ICE);
         handler.setOffset(-0.02f);
+        handler.setSingle(false);
         handler.setSize(0.602f, 1.802f);
         handler.setOffset(-0.001f);
         onSoulSand = handler.isCollidedWith(XMaterial.SOUL_SAND.parseMaterial());
@@ -151,7 +151,7 @@ public class BlockInformation {
         handler.setOffset(0);
         handler.setSize(0.599f, 1.8f);
 
-        handler.collidesWithFuture(Materials.SOLID, i -> inBlock = i);
+        inBlock = handler.isCollidedWith(Materials.SOLID);
 
         if(objectData.playerInfo.deltaY <= 0) {
             onClimbable = objectData.playerInfo.blockOnTo != null
@@ -233,9 +233,6 @@ public class BlockInformation {
 
         collidedWithEntity = handler.isCollidedWithEntity();
 
-        handler.runFutures();
-        onHalfBlock = onSlab || onStairs;
-        if(!onHalfBlock) onHalfBlock = miscNear || bedNear;
         this.handler = handler;
     }
 

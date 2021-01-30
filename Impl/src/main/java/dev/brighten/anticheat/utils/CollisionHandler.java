@@ -16,7 +16,10 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -28,8 +31,8 @@ public class CollisionHandler {
 	private List<Entity> entities;
 	private ObjectData data;
 	private KLocation location;
-	private Deque<Triad<Double[], Integer, Consumer<Boolean>>> intersects = new LinkedList<>(),
-			collides = new LinkedList<>();
+	private List<Triad<Double[], Integer, Consumer<Boolean>>> intersects = new ArrayList<>(),
+			collides = new ArrayList<>();
 
 	private double width, height;
 	private double shift;
@@ -232,7 +235,7 @@ public class CollisionHandler {
 
 	public void runFutures() {
 		Triad<Double[], Integer, Consumer<Boolean>> value = null;
-		Queue<Consumer<Boolean>> successful = new LinkedList<>(), failed = new LinkedList<>();
+		Queue<Consumer<Boolean>> successful = new LinkedList<>();
 		//To remove objects
 		Queue<Triad<Double[], Integer, Consumer<Boolean>>> collisionRemove = new LinkedList<>(),
 				intersectsRemove = new LinkedList<>();
@@ -276,20 +279,12 @@ public class CollisionHandler {
 				collides.remove(value);
 			}
 		}
-		while((value = collides.poll()) != null) {
-			failed.add(value.third);
-		}
-		while((value = intersects.poll()) != null) {
-			failed.add(value.third);
-		}
+		collides.clear();
+		intersects.clear();
 
 		Consumer<Boolean> consumer = null;
 		while((consumer = successful.poll()) != null) {
 			consumer.accept(true);
-		}
-
-		while((consumer = failed.poll()) != null) {
-			consumer.accept(false);
 		}
 	}
 }
