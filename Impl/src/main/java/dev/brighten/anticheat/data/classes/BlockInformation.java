@@ -79,7 +79,7 @@ public class BlockInformation {
         }
 
         if(Kauri.INSTANCE.keepaliveProcessor.currentKeepalive.start % 2 == 0)
-        blocks.parallelStream().forEach(this::updateBlock);
+            for (Block block : blocks) updateBlock(block);
 
         if(!objectData.playerInfo.worldLoaded) return;
 
