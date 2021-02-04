@@ -11,6 +11,7 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.MiscUtils;
+import dev.brighten.anticheat.utils.SimpleAverage;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
 
@@ -24,27 +25,28 @@ public class TimerB extends Check {
 
     private long lastFlying;
     private int buffer;
-    private RollingAverage averageLong = new RollingAverage(40);
+    private SimpleAverage averageLong = new SimpleAverage(30, 50);
+
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long millis) {
-        long current = System.nanoTime();
-        long delta = current - lastFlying;
-        double milliSeconds = delta / 1E6D;
+    public void onFlying(WrappedInFlyingPacket packet, long now) {
+        long delta = now - lastFlying;
 
-        averageLong.add(milliSeconds, millis);
+        if(data.playerInfo.lastTeleportTimer.isPassed(1) && !data.playerInfo.doingTeleport) {
+            if(delta < 3000L)
+                averageLong.add(delta);
 
-        double average = averageLong.getAverage(), ratio = 50. / average;
+            double average = averageLong.getAverage(), ratio = 50. / average;
 
-        if(ratio > 1.01) {
-            if(++buffer > 75) {
-                vl++;
-                flag("r=%v.1 b=%v", ratio, buffer);
-            }
-        } else buffer = 0;
+            if(ratio > 1.01) {
+                if(++buffer > 75) {
+                    vl++;
+                    flag("r=%v.1 b=%v", ratio, buffer);
+                }
+            } else buffer = 0;
 
-        debug("[%v] ratio=%v.3 avg=%v.2", buffer, ratio, average);
+            debug("[%v] ratio=%v.3 avg=%v.2", buffer, ratio, average);
+        }
 
-        if(!data.playerInfo.serverPos && !data.playerInfo.doingTeleport)
-        lastFlying = current;
+        lastFlying = now;
     }
 }

@@ -22,13 +22,12 @@ import lombok.val;
  * using Timer.
  */
 @CheckInfo(name = "Timer (A)", description = "Checks the rate of packets coming in.",
-        checkType = CheckType.BADPACKETS, vlToFlag = 4, developer = true, planVersion = KauriVersion.FREE)
+        checkType = CheckType.BADPACKETS, vlToFlag = 2, punishVL = 10, planVersion = KauriVersion.FREE)
 @Cancellable
 public class Timer extends Check {
 
-    private int buffer;
     private long maxLag = 50, lastFlying, totalFlying = -1L;
-    private SimpleAverage timeAverage = new SimpleAverage(50, 50);
+    private final SimpleAverage timeAverage = new SimpleAverage(30, 50);
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long now) {
@@ -39,33 +38,33 @@ public class Timer extends Check {
             if(totalFlying == -1L) totalFlying = now - 50L;
             else totalFlying+= 50L;
 
-            boolean lagging = delta > 80 || delta < 20;
+            final boolean lagging = delta > 80 || delta < 20;
 
             if(delta < 3000L) //We do not want giant values messing up our average, especially ones from inital login
             timeAverage.add(delta);
 
-            double avg = timeAverage.getAverage();
-            long roundedAvg = Math.round(avg); //We will use this in areas where we need to set long values.
-
-            //Preventing large maxAverages causing unnecessary timer bypass.
-            if(!lagging && maxLag > 80) maxLag = roundedAvg;
+            final double avg = timeAverage.getAverage();
+            final long roundedAvg = Math.round(avg); //We will use this in areas where we need to set long values.
 
             //Also preventing unnecessary runaway bypassing of Timer
-            if(now - totalFlying > 500) totalFlying = now - 100;
+            if(now - totalFlying > 500 && !lagging) {
+                totalFlying = now - 100;
+                debug("reset flying");
+            }
 
             maxLag = Math.max(maxLag, roundedAvg);
 
-            long threshold = now + maxLag + 50; //The extra 50 is a just in case
+            final long threshold = now + maxLag + 50; //The extra 80 is a just in case
 
             //We are now checking if their total time is above our threshod
             if(totalFlying > threshold) {
                 vl++;
                 flag("[+%v]: %v, %v", totalFlying - threshold, totalFlying, threshold);
 
-                totalFlying = now - 80; //Just preventing runaway flagging.
+                totalFlying = now - 30; //Just preventing runaway flagging.
             }
 
-            debug("time=%v threshold=%v", totalFlying, threshold);
+            debug("time=%v threshold=%v max=%v", totalFlying, threshold, maxLag);
         }
 
         lastFlying = now;
