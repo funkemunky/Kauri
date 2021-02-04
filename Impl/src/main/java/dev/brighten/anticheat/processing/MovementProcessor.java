@@ -393,6 +393,8 @@ public class MovementProcessor {
         data.playerInfo.generalCancel = data.getPlayer().getAllowFlight()
                 || data.playerInfo.creative
                 || hasLevi
+                || data.playerInfo.doingTeleport
+                || data.playerInfo.lastTeleportTimer.isNotPassed(1)
                 || data.playerInfo.riptiding
                 || data.playerInfo.gliding
                 || data.playerInfo.lastPlaceLiquid.isNotPassed(5)

@@ -40,7 +40,6 @@ public class NoFallA extends Check {
                 && data.playerInfo.lastHalfBlock.isPassed(4)
                 && !data.blockInfo.onSlime
                 && !data.blockInfo.blocksAbove
-                && !data.playerInfo.serverPos
                 && data.playerInfo.lastBlockPlace.isPassed(8)
                 && data.playerInfo.lastVelocity.isPassed(4)
                 && (data.playerInfo.deltaY != 0 || data.playerInfo.deltaXZ > 0)
