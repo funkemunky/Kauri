@@ -410,6 +410,7 @@ public class MovementProcessor {
                 || data.playerInfo.webTimer.isNotPassed(8)
                 || data.playerInfo.liquidTimer.isNotPassed(8)
                 || data.playerInfo.onLadder
+                || data.playerInfo.doingVelocity
                 || data.playerInfo.lastVelocity.isNotPassed(3)
                 || data.playerInfo.slimeTimer.isNotPassed(8)
                 || data.playerInfo.climbTimer.isNotPassed(6)

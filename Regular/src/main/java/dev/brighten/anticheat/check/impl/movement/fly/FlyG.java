@@ -16,10 +16,13 @@ public class FlyG extends Check {
 
     private double stepHeight;
     private long lastFlying;
+    private boolean exemptUntilOnGround;
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long now) {
+        if(data.playerInfo.clientGround) exemptUntilOnGround = false;
         if(MathUtils.getDelta(data.playerInfo.to.y, data.playerInfo.from.y) < 1
+                && !exemptUntilOnGround
                 && data.playerInfo.from.y != 0 && !data.playerInfo.flightCancel) {
             if(!data.playerInfo.clientGround && packet.isPos() && now - lastFlying < 90) {
                 stepHeight+= data.playerInfo.deltaY;
@@ -50,6 +53,9 @@ public class FlyG extends Check {
 
                 stepHeight = 0;
             }
+        } else {
+            exemptUntilOnGround = true;
+            stepHeight = 0;
         }
         lastFlying = now;
     }

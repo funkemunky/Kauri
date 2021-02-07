@@ -22,6 +22,7 @@ public class FlyF extends Check {
 
         if(data.playerInfo.deltaY > max
                 && !data.playerInfo.gliding
+                && !data.playerInfo.doingVelocity
                 && data.playerInfo.lastVelocity.isPassed(3)
                 && data.playerInfo.lastTeleportTimer.isPassed(1)
                 && current - data.creation > 5000L
