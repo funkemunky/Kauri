@@ -18,6 +18,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 public class PacketProcessor {
 
@@ -427,17 +428,22 @@ public class PacketProcessor {
 
                 if (packet.getId() == data.getPlayer().getEntityId()) {
                     //Setting velocity action.
-                    data.playerInfo.velocityX = (float) packet.getX();
-                    data.playerInfo.velocityY = (float) packet.getY();
-                    data.playerInfo.velocityZ = (float) packet.getZ();
+                    Vector vector = new Vector(packet.getX(), packet.getY(), packet.getZ());
+                    data.playerInfo.velocities.add(vector);
                     data.playerInfo.doingVelocity = true;
                     data.runKeepaliveAction(d -> {
-                        data.playerInfo.lastVelocity.reset();
-                        data.playerInfo.doingVelocity = false;
-                        data.playerInfo.lastVelocityTimestamp = System.currentTimeMillis();
-                        data.predictionService.rmotionX = data.playerInfo.velocityX;
-                        data.predictionService.rmotionZ = data.playerInfo.velocityZ;
-                        data.predictionService.velocity = true;
+                        if(data.playerInfo.velocities.contains(vector)) {
+                            data.playerInfo.lastVelocity.reset();
+                            data.playerInfo.doingVelocity = false;
+                            data.playerInfo.lastVelocityTimestamp = System.currentTimeMillis();
+                            data.predictionService.rmotionX = data.playerInfo.velocityX;
+                            data.predictionService.rmotionZ = data.playerInfo.velocityZ;
+                            data.predictionService.velocity = true;
+                            data.playerInfo.velocityX = data.playerInfo.calcVelocityX = (float) packet.getX();
+                            data.playerInfo.velocityY = data.playerInfo.calcVelocityY = (float) packet.getY();
+                            data.playerInfo.velocityZ = data.playerInfo.calcVelocityZ = (float) packet.getZ();
+                            data.playerInfo.velocities.remove(vector);
+                        }
                     });
                 }
 

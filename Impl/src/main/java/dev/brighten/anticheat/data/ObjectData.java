@@ -53,7 +53,7 @@ public class ObjectData implements Data {
     public long creation, lagTicks, noLagTicks;
     public PastLocation pastLocation, targetPastLocation;
     public LivingEntity target;
-    public SimpleCollisionBox box = new SimpleCollisionBox(), targetBounds = new SimpleCollisionBox();
+    public SimpleCollisionBox box = new SimpleCollisionBox();
     public ObjectData targetData;
     public CheckManager checkManager;
     public PlayerInformation playerInfo;
@@ -72,7 +72,7 @@ public class ObjectData implements Data {
     public final List<Action> keepAliveStamps = new CopyOnWriteArrayList<>();
     public final List<CancelType> typesToCancel = Collections.synchronizedList(new EvictingList<>(10));
     public final Map<Long, Long> keepAlives = Collections.synchronizedMap(new HashMap<>());
-    public final Deque<String> sniffedPackets = new LinkedList<>();
+    public final List<String> sniffedPackets = new CopyOnWriteArrayList<>();
     public final Map<Location, CollisionBox> ghostBlocks = Collections.synchronizedMap(new HashMap<>());
     public BukkitTask task;
     private ExecutorService playerThread;

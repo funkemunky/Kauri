@@ -55,15 +55,18 @@ public class MovementUtils {
                 * (data.playerInfo.clientGround ? 0.062 : 0.04)) + (data.getPlayer().getWalkSpeed() - 0.2) * 2.5;
     }
 
-    public static float getFriction(ObjectData data) {
-        float friction = 0.6f;
-
-        if(data.blockInfo.onSlime) {
-            friction = 0.8f;
-        } else if(data.blockInfo.onIce) {
-            friction = 0.98f;
+    public static float getFriction(Block block) {
+        switch(XMaterial.requestXMaterial(block.getType().name(), block.getData())) {
+            case SLIME_BLOCK:
+                return 0.8f;
+            case ICE:
+            case BLUE_ICE:
+            case FROSTED_ICE:
+            case PACKED_ICE:
+                return 0.98f;
+            default:
+                return 0.6f;
         }
-        return friction;
     }
 
     public static float getTotalHeight(float initial) {

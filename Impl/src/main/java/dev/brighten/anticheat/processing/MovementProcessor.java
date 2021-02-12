@@ -8,7 +8,9 @@ import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.handlers.PlayerSizeHandler;
 import cc.funkemunky.api.utils.objects.VariableValue;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
+import cc.funkemunky.api.utils.world.CollisionBox;
 import cc.funkemunky.api.utils.world.types.RayCollision;
+import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.listeners.api.impl.KeepaliveAcceptedEvent;
@@ -22,6 +24,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 
 import java.util.Deque;
 import java.util.List;
@@ -113,19 +116,23 @@ public class MovementProcessor {
         data.pastLocation.addLocation(data.playerInfo.to);
 
         if (data.playerInfo.posLocs.size() > 0 && packet.isPos() && !packet.isGround()) {
-            for (KLocation loc : data.playerInfo.posLocs) {
-                double dx = data.playerInfo.to.x - loc.x,
-                        dy = data.playerInfo.to.y - loc.y, dz = data.playerInfo.to.z - loc.z;
-                double delta =  dx * dx + dy * dy + dz * dz;
+            synchronized (data.playerInfo.posLocs) {
+                for (KLocation loc : data.playerInfo.posLocs) {
+                    double dx = data.playerInfo.to.x - loc.x,
+                            dy = data.playerInfo.to.y - loc.y, dz = data.playerInfo.to.z - loc.z;
+                    double delta =  dx * dx + dy * dy + dz * dz;
 
-                if(delta >= 0.25) continue;
+                    if(delta >= 0.25) continue;
 
-                data.playerInfo.serverPos = true;
-                data.playerInfo.lastServerPos = timeStamp;
-                data.playerInfo.lastTeleportTimer.reset();
-                data.playerInfo.inventoryOpen = false;
-                data.playerInfo.doingTeleport = false;
-                data.playerInfo.posLocs.remove(loc);
+                    data.playerInfo.serverPos = true;
+                    data.playerInfo.lastServerPos = timeStamp;
+                    data.playerInfo.lastTeleportTimer.reset();
+                    data.playerInfo.inventoryOpen = false;
+                    data.playerInfo.doingTeleport = false;
+                    data.playerInfo.posLocs.remove(loc);
+
+                    break;
+                }
             }
         } else if (data.playerInfo.serverPos) {
             data.playerInfo.serverPos = false;
@@ -167,6 +174,39 @@ public class MovementProcessor {
                     data.playerInfo.to.x, data.playerInfo.to.y, data.playerInfo.to.z);
 
             if(timeStamp - data.creation > 400L) data.blockInfo.runCollisionCheck(); //run b4 everything else for use below.
+        }
+
+        if(data.playerInfo.calcVelocityY > 0) {
+            data.playerInfo.calcVelocityY-= 0.08f;
+            data.playerInfo.calcVelocityY*= 0.98f;
+        } else data.playerInfo.calcVelocityY = 0;
+
+        if(Math.abs(data.playerInfo.calcVelocityX) > 0.005) {
+            data.playerInfo.calcVelocityX*= data.playerInfo.lClientGround
+                    ? data.blockInfo.currentFriction * 0.91f : 0.91f;
+        } else data.playerInfo.calcVelocityX = 0;
+
+        if(Math.abs(data.playerInfo.calcVelocityZ) > 0.005) {
+            data.playerInfo.calcVelocityZ*= data.playerInfo.lClientGround
+                    ? data.blockInfo.currentFriction * 0.91f : 0.91f;
+        } else data.playerInfo.calcVelocityZ = 0;
+
+        synchronized (data.playerInfo.velocities) {
+            for (Vector velocity : data.playerInfo.velocities) {
+                if(Math.abs(velocity.getY() - data.playerInfo.deltaY) < 0.01) {
+                    data.playerInfo.lastVelocity.reset();
+                    data.playerInfo.doingVelocity = false;
+                    data.playerInfo.lastVelocityTimestamp = System.currentTimeMillis();
+                    data.predictionService.rmotionX = data.playerInfo.velocityX;
+                    data.predictionService.rmotionZ = data.playerInfo.velocityZ;
+                    data.predictionService.velocity = true;
+                    data.playerInfo.velocityX = data.playerInfo.calcVelocityX = (float) packet.getX();
+                    data.playerInfo.velocityY = data.playerInfo.calcVelocityY = (float) packet.getY();
+                    data.playerInfo.velocityZ = data.playerInfo.calcVelocityZ = (float) packet.getZ();
+                    data.playerInfo.velocities.remove(velocity);
+                    break;
+                }
+            }
         }
 
         if(packet.isPos() || packet.isLook()) {
@@ -364,6 +404,19 @@ public class MovementProcessor {
             data.playerInfo.isClimbing = true;
         }
 
+        //Checking if the player was collided with ghost blocks.
+        synchronized (data.ghostBlocks) {
+            SimpleCollisionBox boxToCheck = data.box.copy().expand(0.4f);
+            for (Location location : data.ghostBlocks.keySet()) {
+                if(location.toVector().distanceSquared(data.playerInfo.to.toVector()) > 25) continue;
+
+                if(data.ghostBlocks.get(location).isCollided(boxToCheck)) {
+                    data.playerInfo.lastGhostCollision.reset();
+                    break;
+                }
+            }
+        }
+
         //Checking if user is in liquid.
         if (data.blockInfo.inLiquid) data.playerInfo.liquidTimer.reset();
         //Half block ticking (slabs, stairs, bed, cauldron, etc.)
@@ -393,6 +446,7 @@ public class MovementProcessor {
         data.playerInfo.generalCancel = data.getPlayer().getAllowFlight()
                 || data.playerInfo.creative
                 || hasLevi
+                || data.playerInfo.lastGhostCollision.isNotPassed()
                 || data.playerInfo.doingTeleport
                 || data.playerInfo.lastTeleportTimer.isNotPassed(1)
                 || data.playerInfo.riptiding

@@ -15,6 +15,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -77,6 +78,17 @@ public class BukkitListener implements Listener {
             box.draw(WrappedEnumParticle.FLAME, Collections.singleton(event.getPlayer()));
             event.setCancelled(true);
         }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onBlockPlace(BlockPlaceEvent event) {
+        ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
+
+        if(event.isCancelled()) {
+            data.ghostBlocks.put(event.getBlockPlaced().getLocation(),
+                    BlockData.getData(event.getBlockPlaced().getType())
+                            .getBox(event.getBlockPlaced(), data.playerVersion));
+        } else data.ghostBlocks.remove(event.getBlockPlaced().getLocation());
     }
 
     @EventHandler

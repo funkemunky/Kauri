@@ -12,10 +12,9 @@ import lombok.NoArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.util.Vector;
 
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @NoArgsConstructor
 public class PlayerInformation {
@@ -62,6 +61,7 @@ public class PlayerInformation {
         cinematicTimer = new PlayerTimer(data, 8);
         lastEntityCollision = new PlayerTimer(data, 4);
         lastMoveCancel = new TickTimer(15);
+        lastGhostCollision = new PlayerTimer(data, 5);
     }
 
     //Cinematic
@@ -73,7 +73,8 @@ public class PlayerInformation {
     //Server Position
     public long lastServerPos, lastRespawn;
     public boolean serverPos;
-    public Deque<KLocation> posLocs = new ConcurrentEvictingList<>(5);
+    public final List<KLocation> posLocs = Collections.synchronizedList(new EvictingList<>(5));
+    public final List<Vector> velocities = Collections.synchronizedList(new EvictingList<>(5));
 
     //Attack
     public long lastAttackTimeStamp;
@@ -91,10 +92,10 @@ public class PlayerInformation {
     public Timer liquidTimer, webTimer, climbTimer, slimeTimer, iceTimer, blockAboveTimer, soulSandTimer;
     public Timer lastBrokenBlock, lastVelocity, lastTargetSwitch, lastBlockPlace, lastBlockPlacePacket,
             lastBlockDigPacket, lastToggleFlight, lastAttack, lastEntityCollision, lastMoveCancel,
-            lastWindowClick, lastInsideBlock, lastHalfBlock, lastPlaceLiquid, lastUseItem,
+            lastWindowClick, lastInsideBlock, lastHalfBlock, lastPlaceLiquid, lastUseItem, lastGhostCollision,
             lastTeleportTimer, lastGamemodeTimer, lastRespawnTimer, lastChunkUnloaded, cinematicTimer;
 
-    public double velocityX, velocityY, velocityZ;
+    public double velocityX, velocityY, velocityZ, calcVelocityX, calcVelocityY, calcVelocityZ;
 
     public WrappedEnumAnimation animation = WrappedEnumAnimation.NONE;
 
