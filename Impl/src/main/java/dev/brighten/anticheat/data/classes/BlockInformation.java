@@ -78,9 +78,6 @@ public class BlockInformation {
             }
         }
 
-        if(Kauri.INSTANCE.keepaliveProcessor.currentKeepalive.start % 2 == 0)
-            for (Block block : blocks) updateBlock(block);
-
         if(!objectData.playerInfo.worldLoaded) return;
 
         SimpleCollisionBox waterBox = objectData.box.copy().expand(0, -.38, 0);
@@ -234,15 +231,6 @@ public class BlockInformation {
         collidedWithEntity = handler.isCollidedWithEntity();
 
         this.handler = handler;
-    }
-
-    private final List<Location> lastUpdates = new CacheList<>(10, TimeUnit.SECONDS);
-    private synchronized void updateBlock(Block block) {
-        if(!lastUpdates.contains(block.getLocation())
-                && !objectData.playerInfo.shitMap.containsKey(block.getLocation())) {
-            objectData.getPlayer().sendBlockChange(block.getLocation(), block.getType(), block.getData());
-            lastUpdates.add(block.getLocation());
-        }
     }
 
     public SimpleCollisionBox getBox() {

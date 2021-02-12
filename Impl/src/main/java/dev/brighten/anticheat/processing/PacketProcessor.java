@@ -53,7 +53,6 @@ public class PacketProcessor {
                         if (data.target != null && data.target.getEntityId() != packet.getId()) {
                             //Resetting location to prevent false positives.
                             data.targetPastLocation.previousLocations.clear();
-                            data.relTPastLocation.getPastLocations().clear();
                             data.playerInfo.lastTargetSwitch.reset();
                             if (packet.getEntity() instanceof Player) {
                                 data.targetData = Kauri.INSTANCE.dataManager.getData((Player) packet.getEntity());
