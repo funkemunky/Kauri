@@ -21,7 +21,8 @@ public class BadPacketsL extends Check {
     public void onPlace(WrappedInBlockPlacePacket packet) {
         val pos = packet.getPosition();
         if((packet.getItemStack() == null
-                || !packet.getItemStack().getType().equals(packet.getPlayer().getItemInHand().getType()))
+                || (packet.getItemStack().getType().isBlock()
+                && !packet.getItemStack().getType().equals(packet.getPlayer().getItemInHand().getType())))
                 && (pos == null || (pos.getX() == -1 && pos.getY() == -1 && pos.getZ() == -1))) {
             //TODO check if sends if player just right clicks block.
             vl++;

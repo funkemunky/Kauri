@@ -461,6 +461,7 @@ public class PacketProcessor {
             case Packet.Server.REL_LOOK:
             case Packet.Server.REL_POSITION:
             case Packet.Server.REL_POSITION_LOOK:
+            case Packet.Server.ENTITY:
             case Packet.Server.LEGACY_REL_POSITION_LOOK:
             case Packet.Server.LEGACY_REL_POSITION:
             case Packet.Server.LEGACY_REL_LOOK: {
@@ -469,6 +470,12 @@ public class PacketProcessor {
                 //if(data.target != null && data.target.getEntityId() == packet.getId()) {
                     //data.relTPastLocation.addLocation(packet);
                 //}
+                data.checkManager.runPacket(packet, timeStamp);
+                break;
+            }
+            case Packet.Server.ENTITY_TELEPORT: {
+                WrappedOutEntityTeleportPacket packet = new WrappedOutEntityTeleportPacket(object, data.getPlayer());
+
                 data.checkManager.runPacket(packet, timeStamp);
                 break;
             }

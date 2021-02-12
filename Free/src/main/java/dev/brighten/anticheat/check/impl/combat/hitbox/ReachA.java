@@ -4,6 +4,7 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.world.EntityData;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
+import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -33,6 +34,7 @@ public class ReachA extends Check {
 
     @Packet
     public void onFlying(WrappedInUseEntityPacket packet, long timeStamp) {
+        Kauri.INSTANCE.profiler.start("check:ReachA");
         if(data.playerInfo.creative
                 || data.targetPastLocation.previousLocations.size() < 10
                 || packet.getAction() != WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK
@@ -62,6 +64,7 @@ public class ReachA extends Check {
         } else buffer-= buffer > 0 ? 0.02 : 0;
 
         debug("distance=%v.3 boxes=%v buffer=%v", distance, targetBoxes.size(), buffer);
+        Kauri.INSTANCE.profiler.stop("check:ReachA");
     }
 
     private static SimpleCollisionBox getHitbox(Entity entity, KLocation loc) {

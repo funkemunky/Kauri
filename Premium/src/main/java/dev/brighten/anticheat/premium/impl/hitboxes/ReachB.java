@@ -99,7 +99,7 @@ public class ReachB extends Check {
             }
 
             if(collided > 1 && data.lagInfo.lastPacketDrop.isPassed(2)) {
-                if(distance > 3.03 &&
+                if(distance > 3.1 &&
                         Kauri.INSTANCE.lastTickLag.isPassed(40)) {
                     if(++buffer > 4) {
                         vl++;
@@ -107,7 +107,7 @@ public class ReachB extends Check {
                                 distance, usedFrom, buffer, misses);
                         buffer = 4;
                     }
-                } else buffer-= buffer > 0 ? data.playerVersion.isAbove(ProtocolVersion.V1_8_9) ? 0.2f : 0.1f : 0;
+                } else buffer-= buffer > 0 ? .2f : 0;
             }
 
             debug("distance=%v.3 from=%v buffer=%v.2 ticklag=%v collided=%v delta=%v",

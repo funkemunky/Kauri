@@ -14,20 +14,14 @@ import dev.brighten.api.check.CheckType;
 public class FlyF extends Check {
 
     @Packet
-    public void onPacket(WrappedInFlyingPacket packet, long current) {
+    public void onPacket(WrappedInFlyingPacket packet) {
         if(data.playerInfo.deltaXZ == 0 && data.playerInfo.deltaY == 0) return;
 
         double max = data.playerInfo.lastVelocity.isNotPassed(20)
                 ? Math.max(data.playerInfo.velocityY, data.playerInfo.jumpHeight) : data.playerInfo.jumpHeight;
 
         if(data.playerInfo.deltaY > max
-                && !data.playerInfo.gliding
-                && !data.playerInfo.doingVelocity
-                && data.playerInfo.lastVelocity.isPassed(3)
-                && data.playerInfo.lastTeleportTimer.isPassed(1)
-                && current - data.creation > 5000L
-                && !data.playerInfo.riptiding
-                && !data.getPlayer().getAllowFlight()) {
+                && !data.playerInfo.flightCancel) {
             ++vl;
             flag("dY=%v.3 max=%v.3", data.playerInfo.deltaY, max);
         }

@@ -137,8 +137,9 @@ public class DebugCommand {
                     .forEach(field -> {
                         int bitMask = field.get(null);
 
+                        boolean flag = Materials.checkFlag(material, bitMask);
                         cmd.getSender().sendMessage(Color.translate("&e" + field.getField().getName()
-                                + "&7: &f" + Materials.checkFlag(material, bitMask)));
+                                + "&7: " + (flag ? "&a" : "&c") + flag));
                     });
             cmd.getSender().sendMessage(cc.funkemunky.api.utils.MiscUtils.line(Color.Dark_Gray));
         } else cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
