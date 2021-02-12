@@ -108,6 +108,7 @@ public class BlockInformation {
         handler.setSize(0.6, 0.05f);
 
         handler.setOffset(-0.1f);
+        objectData.playerInfo.lServerGround = objectData.playerInfo.serverGround;
         objectData.playerInfo.serverGround =
                 handler.isIntersectedWith(Materials.SOLID) || handler.contains(EntityType.BOAT);
         //Bukkit.broadcastMessage("chigga5");

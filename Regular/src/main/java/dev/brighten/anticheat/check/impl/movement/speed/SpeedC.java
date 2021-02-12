@@ -19,7 +19,7 @@ public class SpeedC extends Check {
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
-        if(!packet.isPos() || data.playerInfo.generalCancel || data.playerInfo.serverPos) {
+        if(!packet.isPos() || data.playerInfo.generalCancel) {
             if(data.playerInfo.generalCancel && verbose > 0) verbose--;
             return;
         }
@@ -56,7 +56,7 @@ public class SpeedC extends Check {
         GROUND_SPEED("Ground", 0.284, 1.3, 1.6, 1),
         GROUND_SPRINT_SPEED("Ground + Sprint", 0.43, 1.3, 1.6, 1),
         AIR_SPEED("Air", 0.28, 1.3, 1.6, 1),
-        AIR_SPRINT_SPEED("Air + Sprint", 0.4, 1.3, 1.6, 2);
+        AIR_SPRINT_SPEED("Air + Sprint", 0.45, 1.3, 1.6, 2);
 
         public final String display;
         public final double threshold,  speedMultiplier, walkSpeedMultiplier, jumpMultiplier;

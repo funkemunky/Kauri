@@ -6,57 +6,46 @@ import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.processing.TagsBuilder;
 import dev.brighten.api.KauriVersion;
+import dev.brighten.api.check.CheckType;
 import org.bukkit.potion.PotionEffectType;
 
-@CheckInfo(name = "Fly (G)", description = "This checks for step my guy", developer = true,
+@CheckInfo(name = "Fly (G)", description = "Looks for impossible movements, commonly done by Step modules",
+        developer = true, checkType = CheckType.FLIGHT,
         planVersion = KauriVersion.FULL)
 @Cancellable
 public class FlyG extends Check {
 
-    private double stepHeight;
-    private long lastFlying;
-    private boolean exemptUntilOnGround;
-
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long now) {
-        if(data.playerInfo.clientGround) exemptUntilOnGround = false;
-        if(MathUtils.getDelta(data.playerInfo.to.y, data.playerInfo.from.y) < 1
-                && !exemptUntilOnGround
-                && data.playerInfo.from.y != 0 && !data.playerInfo.flightCancel) {
-            if(!data.playerInfo.clientGround && packet.isPos() && now - lastFlying < 90) {
-                stepHeight+= data.playerInfo.deltaY;
-            } else if(data.playerInfo.deltaY == 0.42 || data.playerInfo.deltaY == 1.0) {
-                vl++;
-                flag("this is embarassing");
-            } else if(data.playerInfo.deltaY > 0
-                    && (data.playerInfo.lastHalfBlock.isPassed(5)
-                    || MathUtils.getDelta(data.playerInfo.deltaY, 0.5) > 0.01)) {
-                vl++;
-                flag("oop [%v.4]", data.playerInfo.deltaY);
-            } else {
-                debug("h=%v", stepHeight);
+    public void onFlying(WrappedInFlyingPacket packet) {
+        if(!packet.isPos()) return;
 
-                if(stepHeight > 0 && !data.potionProcessor.hasPotionEffect(PotionEffectType.JUMP)) {
-                    if (stepHeight > 1.3) {
-                        vl++;
-                        flag("too high buddy dY=%v.2", stepHeight);
-                    } else if(stepHeight > 1 && stepHeight < 1.015) {
-                        vl++;
-                        flag("wrongo");
-                    } else if(stepHeight % 1. == 0) {
-                        vl++;
-                        flag("you're a magician");
-                    }
+        boolean toGround = data.playerInfo.clientGround && data.playerInfo.serverGround;
+        boolean fromGround = data.playerInfo.lClientGround && data.playerInfo.lServerGround;
+
+        TagsBuilder tags = new TagsBuilder();
+
+        double max = data.playerInfo.jumpHeight;
+        if(toGround) {
+            if(!fromGround) {
+                if(data.playerInfo.lDeltaY > 0 && data.playerInfo.blockAboveTimer.isPassed(2)) {
+                    tags.addTag("INVALID_LANDING");
+                    max = 0;
                 }
+            } else {
+                if(data.blockInfo.onSlab || data.blockInfo.onStairs)
+                    max = 0.5;
+                else if(data.blockInfo.onHalfBlock || data.blockInfo.miscNear)
+                    max = 0.5625;
 
-
-                stepHeight = 0;
+                tags.addTag("GROUND_STEP");
             }
-        } else {
-            exemptUntilOnGround = true;
-            stepHeight = 0;
         }
-        lastFlying = now;
+
+        if(data.playerInfo.deltaY > max && tags.getSize() > 0 && !data.playerInfo.flightCancel) {
+            vl++;
+            flag("t=" + tags.build());
+        }
     }
 }

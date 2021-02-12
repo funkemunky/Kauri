@@ -22,20 +22,11 @@ import java.util.Optional;
 @Cancellable
 public class VelocityB extends Check {
 
-    private double pvX, pvZ, pvY;
+    private double pvX, pvZ;
     private boolean useEntity, sprint;
     private double buffer;
     private int ticks;
-    private static double[] moveValues = new double[] {-0.98, 0, 0.98};
-
-    @Packet
-    public void velocity(WrappedOutVelocityPacket packet) {
-        if(packet.getId() == data.getPlayer().getEntityId()) {
-            pvX = packet.getX();
-            pvY = packet.getY();
-            pvZ = packet.getZ();
-        }
-    }
+    private static final double[] moveValues = new double[] {-0.98, 0, 0.98};
 
     @Packet
     public void onUseEntity(WrappedInUseEntityPacket packet) {
@@ -47,10 +38,9 @@ public class VelocityB extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if(Math.abs(data.playerInfo.deltaY - pvY) < 0.005 && pvY != 0) {
+        if(data.playerInfo.lastVelocity.isNotPassed(0)) {
             pvX = data.playerInfo.velocityX;
             pvZ = data.playerInfo.velocityZ;
-            pvY = 0;
         }
         if((pvX != 0 || pvZ != 0)) {
             boolean found = false;
@@ -59,7 +49,6 @@ public class VelocityB extends Check {
 
             if(data.blockInfo.blocksNear
                     || data.blockInfo.blocksAbove
-                    || pvY != 0
                     || data.blockInfo.inLiquid
                     || data.lagInfo.lastPingDrop.isNotPassed(10)
                     || data.lagInfo.lastPacketDrop.isNotPassed(10)) {

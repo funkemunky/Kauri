@@ -26,8 +26,9 @@ import lombok.val;
 @Cancellable
 public class Timer extends Check {
 
-    private long maxLag = 50, lastFlying, totalFlying = -1L;
-    private final SimpleAverage timeAverage = new SimpleAverage(30, 50);
+    private long lastFlying, totalFlying = -1L;
+    private double maxLag = 50;
+    private final SimpleAverage timeAverage = new SimpleAverage(20, 50);
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long now) {
@@ -35,33 +36,39 @@ public class Timer extends Check {
 
         if(!data.playerInfo.doingTeleport && data.playerInfo.lastTeleportTimer.isPassed(1)) {
             //Adding flying count
-            if(totalFlying == -1L) totalFlying = now - 50L;
+            if(totalFlying == -1L) totalFlying = now - 100L;
             else totalFlying+= 50L;
 
             final boolean lagging = delta > 80 || delta < 20;
+
+            if(lagging) totalFlying-= 10L;
 
             if(delta < 3000L) //We do not want giant values messing up our average, especially ones from inital login
             timeAverage.add(delta);
 
             final double avg = timeAverage.getAverage();
-            final long roundedAvg = Math.round(avg); //We will use this in areas where we need to set long values.
 
             //Also preventing unnecessary runaway bypassing of Timer
-            if(now - totalFlying > 500 && !lagging) {
-                totalFlying = now - 100;
+            if(now - totalFlying > 1000) {
+                totalFlying = now - 200;
                 debug("reset flying");
             }
 
-            maxLag = Math.max(maxLag, roundedAvg);
+            maxLag = Math.max(maxLag, avg);
 
-            final long threshold = now + maxLag + 50; //The extra 80 is a just in case
+            final double threshold = now + maxLag + 200; //The extra 200 is a just in case
 
             //We are now checking if their total time is above our threshod
             if(totalFlying > threshold) {
                 vl++;
-                flag("[+%v]: %v, %v", totalFlying - threshold, totalFlying, threshold);
+                flag("[+%v]: %v, %v.1",
+                        Math.round(totalFlying - threshold), totalFlying, threshold);
 
                 totalFlying = now - 30; //Just preventing runaway flagging.
+            }
+
+            if(maxLag > 50) {
+                maxLag-= 0.025;
             }
 
             debug("time=%v threshold=%v max=%v", totalFlying, threshold, maxLag);

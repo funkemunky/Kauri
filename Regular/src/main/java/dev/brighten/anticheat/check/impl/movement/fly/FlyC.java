@@ -11,11 +11,10 @@ import dev.brighten.anticheat.utils.MovementUtils;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Fly (C)", description = "Checks for invalid jump heights.",
-        checkType = CheckType.FLIGHT, punishVL = 7, vlToFlag = 2)
+        checkType = CheckType.FLIGHT, punishVL = 7, vlToFlag = 1)
 @Cancellable
 public class FlyC extends Check {
 
-    private MaxDouble verbose = new MaxDouble(5);
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
         if (packet.isPos()) {
@@ -25,22 +24,18 @@ public class FlyC extends Check {
                     && !data.playerInfo.serverPos
                     && !data.playerInfo.wasOnSlime
                     && data.playerInfo.lClientGround
-                    && !data.blockInfo.bedNear
-                    && !data.playerInfo.serverGround
+                    && !data.blockInfo.miscNear
                     && data.playerInfo.blockAboveTimer.isPassed(6)
                     && data.playerInfo.lastBlockPlace.isPassed(20)
                     && data.playerInfo.lastHalfBlock.isPassed(4)
                     && data.playerInfo.lastVelocity.isPassed(4)
                     && MathUtils.getDelta(data.playerInfo.deltaY, maxHeight) > 0.01f) {
-                if (verbose.add() > 2) {
-                    vl++;
-                    flag("deltaY=%v maxHeight=%v", data.playerInfo.deltaY, maxHeight);
-                }
-            } else verbose.subtract(0.05);
+                vl++;
+                flag("deltaY=%v maxHeight=%v", data.playerInfo.deltaY, maxHeight);
+            } else vl-= 0.01f;
 
             debug("deltaY=%v above=%v", data.playerInfo.deltaY,
                     data.playerInfo.blockAboveTimer.getPassed());
         }
-        vl -= vl > 0 ? 0.002f : 0;
     }
 }

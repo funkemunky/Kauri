@@ -18,7 +18,7 @@ import java.util.*;
 
 @NoArgsConstructor
 public class PlayerInformation {
-    public boolean serverGround, lClientGround, clientGround, nearGround,
+    public boolean serverGround, lServerGround, lClientGround, clientGround, nearGround,
             collided, insideBlock, lookingAtBlock,
             onLadder, isClimbing, usingItem, wasOnIce, wasOnSlime, jumped, inAir, worldLoaded;
     public boolean generalCancel, flightCancel;
