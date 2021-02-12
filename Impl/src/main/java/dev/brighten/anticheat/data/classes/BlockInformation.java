@@ -46,9 +46,7 @@ public class BlockInformation {
     public void runCollisionCheck() {
         if(!Kauri.INSTANCE.enabled
                 || Kauri.INSTANCE.lastEnabled.isNotPassed(6)) return;
-        synchronized (blocks) {
-            blocks.clear();
-        }
+        blocks.clear();
 
         double dy = Math.abs(objectData.playerInfo.deltaY);
         double dh = objectData.playerInfo.deltaXZ;
@@ -56,29 +54,12 @@ public class BlockInformation {
         if(dy > 2) dy = 2;
         if(dh > 2) dh = 2;
 
-        int startX = Location.locToBlock(objectData.playerInfo.to.x - 2 - dh);
-        int endX = Location.locToBlock(objectData.playerInfo.to.x + 2 + dh);
-        int startY = Location.locToBlock(objectData.playerInfo.to.y - 2 - dy);
+        int startX = Location.locToBlock(objectData.playerInfo.to.x - 1 - dh);
+        int endX = Location.locToBlock(objectData.playerInfo.to.x + 1 + dh);
+        int startY = Location.locToBlock(objectData.playerInfo.to.y - 1 - dy);
         int endY = Location.locToBlock(objectData.playerInfo.to.y + 3 + dy);
-        int startZ = Location.locToBlock(objectData.playerInfo.to.z - 2 - dh);
-        int endZ = Location.locToBlock(objectData.playerInfo.to.z + 2 + dh);
-
-        objectData.playerInfo.worldLoaded = true;
-        synchronized (blocks) {
-            for(int x = startX ; x < endX ; x++) {
-                for(int y = startY ; y < endY ; y++) {
-                    for(int z = startZ ; z < endZ ; z++) {
-                        Location loc = new Location(objectData.getPlayer().getWorld(), x, y, z);
-
-                        if(loc.getWorld().isChunkLoaded(loc.getBlockX() >> 4, loc.getBlockZ() >> 4)) {
-                            blocks.add(loc.getBlock());
-                        } else objectData.playerInfo.worldLoaded = false;
-                    }
-                }
-            }
-        }
-
-        if(!objectData.playerInfo.worldLoaded) return;
+        int startZ = Location.locToBlock(objectData.playerInfo.to.z - 1 - dh);
+        int endZ = Location.locToBlock(objectData.playerInfo.to.z + 1 + dh);
 
         SimpleCollisionBox waterBox = objectData.box.copy().expand(0, -.38, 0);
 
@@ -96,6 +77,26 @@ public class BlockInformation {
         waterBox.zMin = Math.floor(waterBox.zMin);
         waterBox.xMax = Math.floor(waterBox.xMax + 1.);
         waterBox.yMax = Math.floor(waterBox.yMax + 1.);
+
+        objectData.playerInfo.worldLoaded = true;
+        for(int x = startX ; x < endX ; x++) {
+            for(int y = startY ; y < endY ; y++) {
+                for(int z = startZ ; z < endZ ; z++) {
+                    Location loc = new Location(objectData.getPlayer().getWorld(), x, y, z);
+                    Block block = BlockUtils.getBlock(loc);
+
+                    if(block != null) {
+                        blocks.add(block);
+                    } else {
+                        objectData.playerInfo.worldLoaded = false;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if(!objectData.playerInfo.worldLoaded) return;
+
         waterBox.zMax = Math.floor(waterBox.zMax + 1.);
 
         CollisionHandler handler = new CollisionHandler(blocks,
