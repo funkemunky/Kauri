@@ -75,14 +75,10 @@ public class ObjectData implements Data {
     public final List<String> sniffedPackets = new CopyOnWriteArrayList<>();
     public final Map<Location, CollisionBox> ghostBlocks = Collections.synchronizedMap(new HashMap<>());
     public BukkitTask task;
-    private ExecutorService playerThread;
 
     public ObjectData(UUID uuid) {
         this.uuid = uuid;
         hashCode = uuid.hashCode();
-
-        if(PacketListener.expansiveThreading)
-        playerThread = Executors.newSingleThreadExecutor();
 
         if(!Config.testMode) {
             if(alerts = getPlayer().hasPermission("kauri.command.alerts"))
@@ -156,8 +152,6 @@ public class ObjectData implements Data {
         typesToCancel.clear();
         sniffedPackets.clear();
         keepAliveStamps.clear();
-        if(PacketListener.expansiveThreading)
-            playerThread.shutdownNow();
         Kauri.INSTANCE.dataManager.dataMap.remove(uuid);
     }
 
@@ -166,10 +160,9 @@ public class ObjectData implements Data {
         return uuid;
     }
 
+    @Deprecated
     public ExecutorService getThread() {
-        if(PacketListener.expansiveThreading)
-            return playerThread;
-        return PacketListener.service;
+        return Kauri.INSTANCE.executor;
     }
 
     @Override
@@ -200,12 +193,6 @@ public class ObjectData implements Data {
 
         return toReturn;
     }
-
-    public void runTask(Runnable runnable) {
-        //tasksToRun.add(runnable);
-        getThread().execute(runnable);
-    }
-
     public short getRandomShort(int baseNumber, int bound) {
         return (short) getRandomInt(baseNumber, bound);
     }

@@ -20,6 +20,7 @@ import dev.brighten.anticheat.utils.MovementUtils;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import lombok.val;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -197,12 +198,10 @@ public class MovementProcessor {
                     data.playerInfo.lastVelocity.reset();
                     data.playerInfo.doingVelocity = false;
                     data.playerInfo.lastVelocityTimestamp = System.currentTimeMillis();
-                    data.predictionService.rmotionX = data.playerInfo.velocityX;
-                    data.predictionService.rmotionZ = data.playerInfo.velocityZ;
                     data.predictionService.velocity = true;
-                    data.playerInfo.velocityX = data.playerInfo.calcVelocityX = (float) packet.getX();
-                    data.playerInfo.velocityY = data.playerInfo.calcVelocityY = (float) packet.getY();
-                    data.playerInfo.velocityZ = data.playerInfo.calcVelocityZ = (float) packet.getZ();
+                    data.playerInfo.velocityX = data.playerInfo.calcVelocityX = (float) velocity.getX();
+                    data.playerInfo.velocityY = data.playerInfo.calcVelocityY = (float) velocity.getY();
+                    data.playerInfo.velocityZ = data.playerInfo.calcVelocityZ = (float) velocity.getZ();
                     data.playerInfo.velocities.remove(velocity);
                     break;
                 }

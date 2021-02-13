@@ -18,6 +18,7 @@ public interface Data {
 
     UUID getUUID();
 
+    @Deprecated
     ExecutorService getThread();
 
     boolean isUsingLunar();

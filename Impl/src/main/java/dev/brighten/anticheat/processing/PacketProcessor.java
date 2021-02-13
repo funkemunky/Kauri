@@ -429,15 +429,15 @@ public class PacketProcessor {
                 if (packet.getId() == data.getPlayer().getEntityId()) {
                     //Setting velocity action.
                     Vector vector = new Vector(packet.getX(), packet.getY(), packet.getZ());
-                    data.playerInfo.velocities.add(vector);
+                    synchronized (data.playerInfo.velocities) {
+                        data.playerInfo.velocities.add(vector);
+                    }
                     data.playerInfo.doingVelocity = true;
                     data.runKeepaliveAction(d -> {
                         if(data.playerInfo.velocities.contains(vector)) {
                             data.playerInfo.lastVelocity.reset();
                             data.playerInfo.doingVelocity = false;
                             data.playerInfo.lastVelocityTimestamp = System.currentTimeMillis();
-                            data.predictionService.rmotionX = data.playerInfo.velocityX;
-                            data.predictionService.rmotionZ = data.playerInfo.velocityZ;
                             data.predictionService.velocity = true;
                             data.playerInfo.velocityX = data.playerInfo.calcVelocityX = (float) packet.getX();
                             data.playerInfo.velocityY = data.playerInfo.calcVelocityY = (float) packet.getY();

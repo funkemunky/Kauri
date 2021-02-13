@@ -41,6 +41,7 @@ public class VelocityB extends Check {
         if(data.playerInfo.lastVelocity.isNotPassed(0)) {
             pvX = data.playerInfo.velocityX;
             pvZ = data.playerInfo.velocityZ;
+            ticks = 0;
         }
         if((pvX != 0 || pvZ != 0)) {
             boolean found = false;
@@ -102,12 +103,7 @@ public class VelocityB extends Check {
             }
 
             Optional<Tuple<Double[],Double[]>> velocity = predictions.stream()
-                    .filter(tuple -> {
-                double deltaX = Math.abs(tuple.two[0] - data.playerInfo.deltaX);
-                double deltaZ = Math.abs(tuple.two[1] - data.playerInfo.deltaZ);
-
-                return deltaX < 0.01 && deltaZ < 0.01;
-            }).min(Comparator.comparing(tuple -> {
+                    .min(Comparator.comparing(tuple -> {
                 double deltaX = Math.abs(tuple.two[0] - data.playerInfo.deltaX);
                 double deltaZ = Math.abs(tuple.two[1] - data.playerInfo.deltaZ);
 
@@ -123,6 +119,7 @@ public class VelocityB extends Check {
                 }
                 moveFlying(moveStrafe, moveForward, f5);
             } else {
+                found = true;
                 Tuple<Double[],Double[]> tuple = velocity.get();
 
                 moveForward = tuple.one[0];
@@ -134,7 +131,8 @@ public class VelocityB extends Check {
             double ratioX = data.playerInfo.deltaX / pvX, ratioZ = data.playerInfo.deltaZ / pvZ;
             double ratio = (ratioX + ratioZ) / 2;
 
-            if((ratio < 0.998 || ratio > 3)
+            if((ratio < 0.998 || ratio > 3) && pvX != 0
+                    && pvZ != 0
                     && timeStamp - data.creation > 3000L
                     && !data.getPlayer().getItemInHand().getType().isEdible()
                     && !data.blockInfo.blocksNear) {
@@ -145,8 +143,9 @@ public class VelocityB extends Check {
                 }
             } else buffer-= buffer > 0 ? data.lagInfo.lastPacketDrop.isNotPassed(20) ? .5 : 0.25 : 0;
 
-            debug("ratio=%v.3 buffer=%v.1 strafe=%v.2 forward=%v.2 lastUse=%v found=%v",
-                    ratio, buffer, moveStrafe, moveForward, data.playerInfo.lastUseItem.getPassed(), found);
+            debug("ratio=%v.3 buffer=%v.1 strafe=%v.2 forward=%v.2 lastUse=%v found=%v lastV=%v",
+                    ratio, buffer, moveStrafe, moveForward, data.playerInfo.lastUseItem.getPassed(), found,
+                    data.playerInfo.lastVelocity.getPassed());
 
             pvX *= drag;
             pvZ *= drag;

@@ -6,16 +6,20 @@ import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.Materials;
 import cc.funkemunky.api.utils.XMaterial;
 import cc.funkemunky.api.utils.handlers.PlayerSizeHandler;
+import cc.funkemunky.api.utils.msg.ChatBuilder;
 import cc.funkemunky.api.utils.world.BlockData;
 import cc.funkemunky.api.utils.world.CollisionBox;
 import cc.funkemunky.api.utils.world.types.RayCollision;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -162,7 +166,9 @@ public class Helper {
 				.collect(Collectors.joining("", "[", ""));
 		String zeros = "00";
 		String nums = Integer.toString((int) ((time / (double) max) * 100));
-		return line + "§f] §c" + zeros.substring(0, 3 - nums.length()) + nums + "% §f❘";
+		return BaseComponent
+				.toLegacyText(TextComponent
+						.fromLegacyText(line + "§f] §c" + zeros.substring(0, 3 - nums.length()) + nums + "% §f❘"));
 	}
 
 	public static String drawUsage(long max, double time) {
@@ -170,7 +176,7 @@ public class Helper {
 		String line = IntStream.range(0, 50).mapToObj(i -> (chunk * i < time ? "§c" : "§7") + "❘")
 				.collect(Collectors.joining("", "[", ""));
 		String nums = String.valueOf(format((time / (double) max) * 100, 3));
-		return line + "§f] §c" + nums + "%";
+		return BaseComponent.toLegacyText(TextComponent.fromLegacyText(line + "§f] §c" + nums + "%"));
 	}
 
 	public static List<Block> getBlocks(CollisionHandler handler, SimpleCollisionBox collisionBox) {

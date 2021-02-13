@@ -73,10 +73,6 @@ public class PredictionService {
         fMath = fastMath; // if the Player uses Optifine FastMath
 
         try {
-            if(velocity) {
-                lmotionX = data.playerInfo.velocityX;
-                lmotionZ = data.playerInfo.velocityZ;
-            }
             if(!position && (checkConditions = checkConditions(lastSprint))) {
                 if (lastSprint && hit) { // If the Player Sprints and Hit a Player he get slowdown
                     lmotionX *= 0.6D;
@@ -101,6 +97,11 @@ public class PredictionService {
             useSword = false;
         }
         dropItem = false;
+
+        if(velocity) {
+            rmotionX = data.playerInfo.velocityX;
+            rmotionZ = data.playerInfo.velocityZ;
+        }
 
         if(blockBelow != null
                 && onGround) {

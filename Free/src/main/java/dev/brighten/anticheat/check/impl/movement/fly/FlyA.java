@@ -22,7 +22,7 @@ public class FlyA extends Check {
         if(!packet.isPos() || data.playerInfo.lastTeleportTimer.isNotPassed(1)
                 || data.playerInfo.flightCancel
                 || timeStamp - data.playerInfo.lastVelocityTimestamp <= 200L
-                || data.playerInfo.lastVelocity.isNotPassed(2)
+                || data.playerInfo.lastVelocity.isNotPassed(5)
                 || data.playerInfo.blockAboveTimer.isNotPassed(3)
                 || data.playerInfo.lastRespawnTimer.isNotPassed(5)) return;
 
