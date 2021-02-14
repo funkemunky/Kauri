@@ -22,7 +22,7 @@ public class HandC extends Check {
 
         if(!data.lagInfo.lagging && data.lagInfo.lastPacketDrop.isPassed(5) && delta < 10) {
             if(vl++ > 3) {
-                flag("delta=%vms", delta);
+                flag("delta=%sms", delta);
             }
         } else vl-= vl > 0 ? 0.5f : 0;
 

@@ -17,7 +17,7 @@ public class KillauraD extends Check {
                 && data.playerInfo.lastAttack.isNotPassed(1)
                 && data.playerInfo.inventoryOpen) {
             vl++;
-            flag("window=%v attack=%v",
+            flag("window=%s attack=%s",
                     data.playerInfo.lastWindowClick.getPassed(), data.playerInfo.lastAttack.getPassed());
         }
     }

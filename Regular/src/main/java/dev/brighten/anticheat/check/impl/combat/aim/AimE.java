@@ -24,7 +24,7 @@ public class AimE extends Check {
         if(MathUtils.getDelta(data.moveProcessor.sensitivityX, data.moveProcessor.sensitivityY) > 1
                 || MathUtils.getDelta(data.moveProcessor.yawMode, yawGcd) > 0.1
                 || MathUtils.getDelta(data.moveProcessor.pitchMode, pitchGCD) > 0.1) {
-            debug("sensitivity instability sx=%v sy=%v ym=%v.2 pm=%v.2 ygcd=%v.2 pgcd=%v.2",
+            debug("sensitivity instability sx=%s sy=%s ym=%.2f pm=%.2f ygcd=%.2f pgcd=%.2f",
                     data.moveProcessor.sensXPercent, data.moveProcessor.sensYPercent, data.moveProcessor.yawMode,
                     data.moveProcessor.pitchMode, yawGcd, pitchGCD);
             return;
@@ -45,11 +45,11 @@ public class AimE extends Check {
         if(flag) {
             if(++buffer > 9) {
                 vl++;
-                flag("mx=%v.2 my=%v.2 dx=%v.2 dy=%v.2", mx, my, deltaX, deltaY);
+                flag("mx=%.2f my=%.2f dx=%.2f dy=%.2f", mx, my, deltaX, deltaY);
             }
         } else if(buffer > 0) buffer-= 2;
 
-        debug((flag ? Color.Green + buffer + ": " : "") +"mx=%v.2 my=%v.2 dx=%v.2 dy=%v.2 s=%v",
+        debug((flag ? Color.Green + buffer + ": " : "") +"mx=%.2f my=%.2f dx=%.2f dy=%.2f s=%s",
                 mx, my, deltaX, deltaY, data.moveProcessor.sensitivityX);
     }
 }

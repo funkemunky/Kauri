@@ -27,7 +27,7 @@ public class InventoryA extends Check {
     public void onWindow(WrappedInWindowClickPacket packet) {
         if(lastMove.isNotPassed(1))  {
             vl++;
-            flag("slot=%v clickType=%v", packet.getSlot(), packet.getAction().name());
+            flag("slot=%s clickType=%s", packet.getSlot(), packet.getAction().name());
         }
     }
 

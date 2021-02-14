@@ -58,11 +58,11 @@ public class FlyB extends Check {
                 flagged = true;
                 if(++buffer > 2 || data.playerInfo.kAirTicks > 80) {
                     ++vl;
-                    flag("dY=%v.3 p=%v.3 dx=%v.3", data.playerInfo.deltaY, predicted, data.playerInfo.deltaXZ);
+                    flag("dY=%.3f p=%.3f dx=%.3f", data.playerInfo.deltaY, predicted, data.playerInfo.deltaXZ);
                 }
             } else buffer-= buffer > 0 ? 0.5f : 0;
 
-            debug((flagged ? Color.Green : "") +"pos=%v deltaY=%v.3 predicted=%v.3 ground=%v lpass=%v air=%v buffer=%v.1",
+            debug((flagged ? Color.Green : "") +"pos=%s deltaY=%.3f predicted=%.3f ground=%s lpass=%s air=%s buffer=%.1f",
                     packet.getY(), data.playerInfo.deltaY, predicted, data.playerInfo.clientGround,
                     data.playerInfo.liquidTimer.getPassed(), data.playerInfo.kAirTicks, buffer);
             lastPos = timeStamp;

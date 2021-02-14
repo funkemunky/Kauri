@@ -33,8 +33,8 @@ import java.util.List;
 public class MovementProcessor {
     private final ObjectData data;
 
-    public Deque<Float> yawGcdList = new EvictingList<>(100),
-            pitchGcdList = new EvictingList<>(100);
+    public Deque<Float> yawGcdList = new EvictingList<>(60),
+            pitchGcdList = new EvictingList<>(60);
     public float deltaX, deltaY, lastDeltaX, lastDeltaY, smoothYaw, smoothPitch, lsmoothYaw, lsmoothPitch;
     public Tuple<List<Double>, List<Double>> yawOutliers, pitchOutliers;
     public long lastCinematic;
@@ -42,7 +42,7 @@ public class MovementProcessor {
     public int sensXPercent, sensYPercent;
     private MouseFilter mxaxis = new MouseFilter(), myaxis = new MouseFilter();
     private float smoothCamFilterX, smoothCamFilterY, smoothCamYaw, smoothCamPitch;
-    private Timer lastReset = new TickTimer(1), generalProcess = new TickTimer(3);
+    private Timer lastReset = new TickTimer(2), generalProcess = new TickTimer(3);
     private GameMode lastGamemode;
     public static float offset = (int)Math.pow(2, 24);
     public static double groundOffset = 1 / 64.;
@@ -160,14 +160,9 @@ public class MovementProcessor {
         data.playerInfo.creative = !data.getPlayer().getGameMode().equals(GameMode.SURVIVAL)
                 && !data.getPlayer().getGameMode().equals(GameMode.ADVENTURE);
 
+        data.blockInfo.fromFriction = data.blockInfo.currentFriction;
         if(data.playerInfo.blockBelow != null)
             data.blockInfo.currentFriction = MinecraftReflection.getFriction(data.playerInfo.blockBelow);
-
-        Block block = BlockUtils.getBlock(new Location(data.getPlayer().getWorld(),
-                data.playerInfo.from.x, data.playerInfo.from.y - 1, data.playerInfo.from.z));
-
-        if(block != null)
-            data.blockInfo.fromFriction = MinecraftReflection.getFriction(block);
 
         if(packet.isPos()) {
             //We create a separate from BoundingBox for the predictionService since it should operate on pre-motion data.

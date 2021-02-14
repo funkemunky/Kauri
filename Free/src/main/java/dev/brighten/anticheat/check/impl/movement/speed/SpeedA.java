@@ -28,7 +28,7 @@ public class SpeedA extends Check {
         if(packet.getId() == data.getPlayer().getEntityId()) {
             data.runKeepaliveAction(ka -> {
                 vxz = Math.hypot(packet.getX(), packet.getZ());
-                debug("set velocity: %v.3", vxz);
+                debug("set velocity: %.3f", vxz);
             });
         }
     }
@@ -97,11 +97,11 @@ public class SpeedA extends Check {
                     && !data.playerInfo.generalCancel && data.playerInfo.lastVelocity.isPassed(2)) {
                 if((buffer+= ratio > 400 ? 2 : 1) > 4 || ratio > 600) {
                     vl++;
-                    flag("p=%v.1% dxz=%v.3 aimove=%v.3 tags=%v",
+                    flag("p=%.1f% dxz=%.3f aimove=%.3f tags=%s",
                             ratio, data.playerInfo.deltaXZ, data.predictionService.aiMoveSpeed, tags.build());
                 }
             } else if(buffer > 0) buffer-= 0.25f;
-            debug("ratio=%v.1 tags=%v", ratio, tags.build());
+            debug("ratio=%.1f tags=%s", ratio, tags.build());
 
             if(vxz != 0) {
                 ldxz = vxz;

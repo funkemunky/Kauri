@@ -74,7 +74,7 @@ public class AutoclickerD extends Check {
                         vl++;
                         flag("osc=" + oscLevel);
                     }
-                    debug("osc=%v level=%v high=%v low=%v", oscillation, oscLevel, highest, lowest);
+                    debug("osc=%s level=%s high=%s low=%s", oscillation, oscLevel, highest, lowest);
                     this.lowest = lowest;
                     this.highest = highest;
                     this.oscillationTime = time;

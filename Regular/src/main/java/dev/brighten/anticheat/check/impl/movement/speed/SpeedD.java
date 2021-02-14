@@ -40,13 +40,13 @@ public class SpeedD extends Check {
             if(verbose.add(data.playerInfo.deltaXZ - baseSpeed > 0.45f ? 4 : 1) > 25
                     || data.playerInfo.deltaXZ - baseSpeed > 0.45f) {
                 vl++;
-                flag("%v>-%v",
+                flag("%s>-%s",
                         MathUtils.round(data.playerInfo.deltaXZ, 3),
                         MathUtils.round(baseSpeed, 3));
             }
         } else verbose.subtract();
 
-        debug("deltaXZ=%v base=%v vb=%v", data.playerInfo.deltaXZ, baseSpeed, verbose);
+        debug("deltaXZ=%s base=%s vb=%s", data.playerInfo.deltaXZ, baseSpeed, verbose);
     }
 
 }

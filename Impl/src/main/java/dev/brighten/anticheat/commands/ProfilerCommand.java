@@ -102,8 +102,6 @@ public class ProfilerCommand {
                         new ItemBuilder(XMaterial.REDSTONE.parseMaterial())
                                 .amount(1)
                                 .name(Color.Gold + "Total").lore("",
-                                "&7Usage: " + Helper.drawUsage(50,
-                                        Helper.format(samples.get(), 3)),
                                 "&7Total: &f" + Helper.format(totalMs, 3),
                                 "&7Samples: &f" + Helper.format(samples.get(), 3),
                                 "",
@@ -257,7 +255,7 @@ public class ProfilerCommand {
                 .sorted(Comparator.comparing(key -> results.get(key).two, Comparator.reverseOrder()))
                 .collect(Collectors.toList())) {
             //Converting nanoseconds to millis to be more readable.
-            double amount = results.get(key).two / 1000000D;
+            double amount = results.get(key).two / 1E6D;
 
             Timing timing = Kauri.INSTANCE.profiler.getTimingsMap().get(key);
             total += amount;
@@ -268,6 +266,7 @@ public class ProfilerCommand {
         body.add("Total: " + total + "ms");
         body.add("Total Calls: " + Kauri.INSTANCE.profiler.totalCalls);
         body.add("Current Ticks: " + Atlas.getInstance().getCurrentTicks());
+        body.add("Total Time: " + (System.currentTimeMillis() - Kauri.INSTANCE.profiler.start) + "ms");
         StringBuilder builder = new StringBuilder();
         body.forEach(aBody -> builder.append(aBody).append(";"));
 

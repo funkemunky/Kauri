@@ -19,10 +19,10 @@ public class AimB extends Check {
                     && data.playerInfo.lastTeleportTimer.isPassed(1)
                     && Math.abs(data.playerInfo.to.pitch) < 80) {
                 if(++vl > 28) {
-                    flag("offset=%v deltaPitch=%v", data.playerInfo.pitchGCD, data.playerInfo.deltaPitch);
+                    flag("offset=%s deltaPitch=%s", data.playerInfo.pitchGCD, data.playerInfo.deltaPitch);
                 }
             } else vl-= vl > 0 ? 0.5 : 0;
-            debug("gcd=%v cin=%v dpitch=%v ldp=%v pitch=%v.2 lpitch=%v.2 vl=%v.1",
+            debug("gcd=%s cin=%s dpitch=%s ldp=%s pitch=%.2f lpitch=%.2f vl=%.1f",
                     data.playerInfo.pitchGCD,
                    data.playerInfo.cinematicMode, data.playerInfo.deltaPitch, data.playerInfo.lDeltaPitch,
                     data.playerInfo.to.pitch, data.playerInfo.from.pitch, vl);

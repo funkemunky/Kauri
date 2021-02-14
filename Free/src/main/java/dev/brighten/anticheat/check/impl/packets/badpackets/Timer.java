@@ -61,7 +61,7 @@ public class Timer extends Check {
             //We are now checking if their total time is above our threshod
             if(totalFlying > threshold) {
                 vl++;
-                flag("[+%v]: %v, %v.1",
+                flag("[+%s]: %s, %.1f",
                         Math.round(totalFlying - threshold), totalFlying, threshold);
 
                 totalFlying = now - 30; //Just preventing runaway flagging.
@@ -71,7 +71,7 @@ public class Timer extends Check {
                 maxLag-= 0.025;
             }
 
-            debug("time=%v threshold=%v max=%v", totalFlying, threshold, maxLag);
+            debug("time=%s threshold=%s max=%s", totalFlying, threshold, maxLag);
         }
 
         lastFlying = now;

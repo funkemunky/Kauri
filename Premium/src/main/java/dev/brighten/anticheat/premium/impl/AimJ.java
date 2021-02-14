@@ -40,7 +40,7 @@ public class AimJ extends Check {
                 if(!MiscUtils.endsWith(trim, "5") && o < .5) {
                     debug(Color.Green + "Flagging");
                 }
-                debug("trim=%v offset=%v", trim, o);
+                debug("trim=%s offset=%s", trim, o);
             }
         } else threshold = 0;
     }

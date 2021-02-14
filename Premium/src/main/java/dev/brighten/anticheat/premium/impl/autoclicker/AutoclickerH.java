@@ -33,7 +33,7 @@ public class AutoclickerH extends Check {
             buffer++;
         } else if(buffer > 0) buffer-= 0.25f;
 
-        debug("std=%v.2 mean=%v.1 range=%v buffer.1", data.clickProcessor.getStd(),
+        debug("std=%.2f mean=%.1f range=%s buffer.1", data.clickProcessor.getStd(),
                 data.clickProcessor.getMean(), range, buffer);
     }
 }

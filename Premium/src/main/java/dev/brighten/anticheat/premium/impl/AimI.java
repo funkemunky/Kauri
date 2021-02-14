@@ -20,10 +20,10 @@ public class AimI extends Check {
         if(pitch == lpitch && pitch == 0 && data.moveProcessor.deltaX > 12) {
             if(++buffer > 3) {
                 vl++;
-                flag("deltaX=%v buffer=%v", data.moveProcessor.deltaX, buffer);
+                flag("deltaX=%s buffer=%s", data.moveProcessor.deltaX, buffer);
             }
         } else buffer = 0;
 
-        debug("pitch=%v lpitch=%v buffer=%v", pitch, lpitch, buffer);
+        debug("pitch=%s lpitch=%s buffer=%s", pitch, lpitch, buffer);
     }
 }

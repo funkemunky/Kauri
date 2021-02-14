@@ -18,7 +18,7 @@ public class BadPacketsF extends Check {
         boolean isNull = event.getItemInHand() == null;
         if(isNull || !event.getItemInHand().getType().equals(event.getBlockPlaced().getType())) {
             vl++;
-            flag("blockType=%v itemStack=%v",  event.getBlockPlaced().getType().name(),
+            flag("blockType=%s itemStack=%s",  event.getBlockPlaced().getType().name(),
                     isNull ? "null" : event.getItemInHand().getType().name());
         }
     }

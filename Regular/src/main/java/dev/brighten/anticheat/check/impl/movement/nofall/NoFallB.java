@@ -25,10 +25,10 @@ public class NoFallB extends Check {
                 && !data.playerInfo.nearGround && data.playerInfo.clientGround && !data.blockInfo.onSlime
                 && data.playerInfo.lastHalfBlock.isPassed(3)) {
             if(++vl > 2) {
-                flag("c=%v s=%v", packet.isGround(), data.playerInfo.serverGround);
+                flag("c=%s s=%s", packet.isGround(), data.playerInfo.serverGround);
             }
         } else if(vl > 0) vl-= 0.5;
 
-        debug("c=%v s=%v", packet.isGround(), data.playerInfo.serverGround);
+        debug("c=%s s=%s", packet.isGround(), data.playerInfo.serverGround);
     }
 }

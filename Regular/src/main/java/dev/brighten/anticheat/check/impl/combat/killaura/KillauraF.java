@@ -34,12 +34,12 @@ public class KillauraF extends Check {
             if(deltaYes > 0.07 && deltaNo < 0.01) {
                 if(++buffer > 5) {
                      vl++;
-                     flag("dy=%v.3 dn=%v.3 dxz=%v.2 noxz=%v.2",
+                     flag("dy=%.3f dn=%.3f dxz=%.2f noxz=%.2f",
                              deltaYes, deltaNo, data.playerInfo.deltaXZ, noxz);
                 }
             } else if(buffer > 0) buffer--;
 
-            debug("(%v) dxz=%v.3 pxz=%v.3 noxz=%v.3 dYes=%v.3 dNo=%v.3",
+            debug("(%s) dxz=%.3f pxz=%.3f noxz=%.3f dYes=%.3f dNo=%.3f",
                     buffer, data.playerInfo.deltaXZ, pxz, noxz, deltaYes, deltaNo);
         }
         attack = false;

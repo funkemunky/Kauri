@@ -49,11 +49,11 @@ public class AutoclickerE extends Check {
             if(buffer > 20) {
                 vl++;
                 buffer = 15;
-                flag("tags=%v", tags.build());
+                flag("tags=%s", tags.build());
             }
         } else if(buffer > 0) buffer-= 0.5f;
 
-        debug("tags=%v mean=%v.2 skew=%v.2 kurt=%v.2 std=%v.3 outliers=%v buffer=%v.1",
+        debug("tags=%s mean=%.2f skew=%.2f kurt=%.2f std=%.3f outliers=%s buffer=%.1f",
                 (tags.getSize() > 0 ? Color.Green : "") +tags.build() + Color.Gray, data.clickProcessor.getMean(),
                 data.clickProcessor.getSkewness(), data.clickProcessor.getKurtosis(),
                 data.clickProcessor.getStd(), data.clickProcessor.getOutliers(), buffer);

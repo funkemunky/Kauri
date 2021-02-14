@@ -31,10 +31,10 @@ public class FlyC extends Check {
                     && data.playerInfo.lastVelocity.isPassed(4)
                     && MathUtils.getDelta(data.playerInfo.deltaY, maxHeight) > 0.01f) {
                 vl++;
-                flag("deltaY=%v maxHeight=%v", data.playerInfo.deltaY, maxHeight);
+                flag("deltaY=%s maxHeight=%s", data.playerInfo.deltaY, maxHeight);
             } else vl-= 0.01f;
 
-            debug("deltaY=%v above=%v", data.playerInfo.deltaY,
+            debug("deltaY=%s above=%s", data.playerInfo.deltaY,
                     data.playerInfo.blockAboveTimer.getPassed());
         }
     }

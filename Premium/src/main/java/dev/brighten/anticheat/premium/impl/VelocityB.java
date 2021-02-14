@@ -43,7 +43,9 @@ public class VelocityB extends Check {
             pvZ = data.playerInfo.velocityZ;
             ticks = 0;
         }
-        if((pvX != 0 || pvZ != 0)) {
+        if((pvX != 0 || pvZ != 0) && (data.playerInfo.deltaX != 0
+                || data.playerInfo.deltaY != 0
+                || data.playerInfo.deltaZ != 0)) {
             boolean found = false;
 
             double drag = 0.91;
@@ -103,21 +105,31 @@ public class VelocityB extends Check {
             }
 
             Optional<Tuple<Double[],Double[]>> velocity = predictions.stream()
-                    .min(Comparator.comparing(tuple -> {
-                double deltaX = Math.abs(tuple.two[0] - data.playerInfo.deltaX);
-                double deltaZ = Math.abs(tuple.two[1] - data.playerInfo.deltaZ);
+                    .filter(tuple -> {
+                        double deltaX = Math.abs(tuple.two[0] - data.playerInfo.deltaX);
+                        double deltaZ = Math.abs(tuple.two[1] - data.playerInfo.deltaZ);
 
-                return Math.hypot(deltaX, deltaZ);
-            }));
+                        return Math.hypot(deltaX, deltaZ) < 0.01;
+                    })
+                    .min(Comparator.comparing(tuple -> {
+                        double deltaX = Math.abs(tuple.two[0] - data.playerInfo.deltaX);
+                        double deltaZ = Math.abs(tuple.two[1] - data.playerInfo.deltaZ);
+
+                        return Math.hypot(deltaX, deltaZ);
+                    }));
 
             if(!velocity.isPresent()) {
-                moveStrafe = data.predictionService.moveStrafing;
-                moveForward = data.predictionService.moveForward;
+                double s2 = data.predictionService.moveStrafing;
+                double f2 = data.predictionService.moveForward;
+                moveStrafe = s2;
+                moveForward = f2;
+
                 if(data.playerInfo.usingItem) {
-                    moveStrafe*= 0.2;
-                    moveForward*= 0.2;
+                    s2*= 0.2;
+                    f2*= 0.2;
                 }
-                moveFlying(moveStrafe, moveForward, f5);
+
+                moveFlying(s2, f2, f5);
             } else {
                 found = true;
                 Tuple<Double[],Double[]> tuple = velocity.get();
@@ -131,21 +143,22 @@ public class VelocityB extends Check {
             double ratioX = data.playerInfo.deltaX / pvX, ratioZ = data.playerInfo.deltaZ / pvZ;
             double ratio = (ratioX + ratioZ) / 2;
 
-            if((ratio < 0.998 || ratio > 3) && pvX != 0
+            if((ratio < 0.996 || ratio > 3) && pvX != 0
                     && pvZ != 0
                     && timeStamp - data.creation > 3000L
                     && !data.getPlayer().getItemInHand().getType().isEdible()
                     && !data.blockInfo.blocksNear) {
                 if(++buffer > 30) {
                     vl++;
-                    flag("pct=%v.2% buffer=%v.1 forward=%v.2 strafe=%v.2",
+                    flag("pct=%.2f buffer=%.1f forward=%.2f strafe=%.2f",
                             ratio * 100, buffer, moveStrafe, moveForward);
                 }
             } else buffer-= buffer > 0 ? data.lagInfo.lastPacketDrop.isNotPassed(20) ? .5 : 0.25 : 0;
 
-            debug("ratio=%v.3 buffer=%v.1 strafe=%v.2 forward=%v.2 lastUse=%v found=%v lastV=%v",
-                    ratio, buffer, moveStrafe, moveForward, data.playerInfo.lastUseItem.getPassed(), found,
-                    data.playerInfo.lastVelocity.getPassed());
+            debug("ratio=%.3f dx=%.4f dz=%.4f buffer=%.1f strafe=%.2f forward=%.2f lastUse=%s " +
+                            "found=%s lastV=%s", ratio, data.playerInfo.deltaX, data.playerInfo.deltaZ,
+                    buffer, moveStrafe, moveForward, data.playerInfo.lastUseItem.getPassed(),
+                    found, data.playerInfo.lastVelocity.getPassed());
 
             pvX *= drag;
             pvZ *= drag;

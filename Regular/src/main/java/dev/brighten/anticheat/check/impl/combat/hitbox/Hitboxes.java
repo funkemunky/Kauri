@@ -87,7 +87,7 @@ public class Hitboxes extends Check {
                     && data.lagInfo.lastPacketDrop.isPassed(4)) {
                 if(++buffer > 6)  {
                     vl++;
-                    flag("distance=%v ping=%p tps=%t",
+                    flag("distance=%s ping=%p tps=%t",
                             distance.get() != -1 ? distance.get() : "[none collided]");
                 }
             } else buffer -= buffer > 0 ? 0.2 : 0;

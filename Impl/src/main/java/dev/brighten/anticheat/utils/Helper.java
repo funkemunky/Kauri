@@ -103,6 +103,30 @@ public class Helper {
 				&& box.yMax >= toCheck.yMin && box.yMin <= toCheck.yMax && box.zMax >= toCheck.zMin
 				&& box.zMin <= toCheck.zMax);
 	}
+	
+	/*return otherBox.maxX > this.minX && otherBox.minX < this.maxX && otherBox.maxY >= this.minY 
+	&& otherBox.minY <= this.maxY && otherBox.maxZ > this.minZ && otherBox.minZ < this.maxZ;
+    */
+	
+	public static boolean isCollidedVertically(SimpleCollisionBox toCheck, CollisionBox other) {
+		List<SimpleCollisionBox> downcasted = new ArrayList<>();
+
+		other.downCast(downcasted);
+
+		return downcasted.stream().anyMatch(box -> box.xMax > toCheck.xMin && box.xMin < toCheck.xMax
+				&& box.yMax >= toCheck.yMin && box.yMin <= toCheck.yMax && box.zMax > toCheck.zMin
+				&& box.zMin < toCheck.zMax);
+	}
+
+	public static boolean isCollidedHorizontally(SimpleCollisionBox toCheck, CollisionBox other) {
+		List<SimpleCollisionBox> downcasted = new ArrayList<>();
+
+		other.downCast(downcasted);
+
+		return downcasted.stream().anyMatch(box -> box.xMax >= toCheck.xMin && box.xMin <= toCheck.xMax
+				&& box.yMax > toCheck.yMin && box.yMin < toCheck.yMax && box.zMax >= toCheck.zMin
+				&& box.zMin <= toCheck.zMax);
+	}
 
 	public static List<Block> blockCollisions(List<Block> blocks, CollisionBox box, int material) {
 		return blocks.stream().filter(b -> Materials.checkFlag(b.getType(), material))
@@ -163,7 +187,7 @@ public class Helper {
 	public static String drawUsage(long max, long time) {
 		double chunk = max / 50.;
 		String line = IntStream.range(0, 50).mapToObj(i -> (chunk * i < time ? "§c" : "§7") + "❘")
-				.collect(Collectors.joining("", "[", ""));
+				.collect(Collectors.joining(""));
 		String zeros = "00";
 		String nums = Integer.toString((int) ((time / (double) max) * 100));
 		return BaseComponent
@@ -174,7 +198,7 @@ public class Helper {
 	public static String drawUsage(long max, double time) {
 		double chunk = max / 50.;
 		String line = IntStream.range(0, 50).mapToObj(i -> (chunk * i < time ? "§c" : "§7") + "❘")
-				.collect(Collectors.joining("", "[", ""));
+				.collect(Collectors.joining(""));
 		String nums = String.valueOf(format((time / (double) max) * 100, 3));
 		return BaseComponent.toLegacyText(TextComponent.fromLegacyText(line + "§f] §c" + nums + "%"));
 	}

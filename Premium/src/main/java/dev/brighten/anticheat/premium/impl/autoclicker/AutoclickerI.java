@@ -19,11 +19,11 @@ public class AutoclickerI extends Check {
 
     @Packet
     public void use(WrappedInArmAnimationPacket packet, long now) {
-        debug("arm=%v", now);
+        debug("arm=%s", now);
     }
 
     @Packet
     public void flying(WrappedInFlyingPacket packet, long now) {
-        debug("flying=%v", now);
+        debug("flying=%s", now);
     }
 }

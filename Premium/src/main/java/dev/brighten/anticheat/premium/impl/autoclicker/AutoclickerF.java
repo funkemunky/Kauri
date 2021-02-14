@@ -63,10 +63,10 @@ public class AutoclickerF extends Check {
 
             if (delta < 0.05 && stdDelta < 0.08 && data.clickProcessor.getMean() <= 2) {
                 vl++;
-                flag("delta=%v.3 std=%v.3 mean=%v.1", delta, stdDelta, data.clickProcessor.getMean());
+                flag("delta=%.3f std=%.3f mean=%.1f", delta, stdDelta, data.clickProcessor.getMean());
             }
 
-            debug("flying=%v hit=%v.2 nohit=%v.2 std=%v nstd=%v", flying, hit, nohit, std, nstd);
+            debug("flying=%s hit=%.2f nohit=%.2f std=%s nstd=%s", flying, hit, nohit, std, nstd);
         }
         lflying = flying;
         flying = 0;

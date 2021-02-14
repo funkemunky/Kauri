@@ -22,7 +22,7 @@ public class FlyF extends Check {
         if(data.playerInfo.deltaY > max
                 && !data.playerInfo.flightCancel) {
             ++vl;
-            flag("dY=%v.3 max=%v.3", data.playerInfo.deltaY, max);
+            flag("dY=%.3f max=%.3f", data.playerInfo.deltaY, max);
         }
     }
 

@@ -37,7 +37,7 @@ public class AimG extends Check {
             yesTick = current;
             currentFloat = ids.get(packet.getAction());
 
-            //debug("p=%v", data.playerInfo.to.pitch);
+            //debug("p=%s", data.playerInfo.to.pitch);
         }
     }
 
@@ -49,7 +49,7 @@ public class AimG extends Check {
                 //return;
             }
             if(current != yesTick) {
-                //debug("c=%v yt=%v", current, yesTick);
+                //debug("c=%s yt=%s", current, yesTick);
                 yesTick = -1;
                 currentFloat = 0;
                 return;
@@ -58,14 +58,14 @@ public class AimG extends Check {
             teleportPitch = packet.getPitch();
 
             yesTick = -1;
-            debug("teleport=%v cf=%v", current, currentFloat);
+            debug("teleport=%s cf=%s", current, currentFloat);
             currentFloat = 0;
         } else if(packet.isLook() && teleportPitch != -1f) {
             final double my = ((packet.getPitch() - teleportPitch) / data.moveProcessor.pitchMode)
                     % (Math.abs(data.playerInfo.lDeltaPitch) / data.moveProcessor.pitchMode);
 
             final double deltaY = Math.abs(Math.floor(my) - my);
-            debug("dY=%v pgcd=%v", deltaY, data.playerInfo.pitchGCD);
+            debug("dY=%s pgcd=%s", deltaY, data.playerInfo.pitchGCD);
             teleportPitch = -1f;
         }
     }

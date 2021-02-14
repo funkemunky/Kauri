@@ -33,10 +33,10 @@ public class HandE extends Check {
             if (this.lastX == x && this.lastY == y && this.lastZ == z) {
                 if (deltaAngle > 4.0f && ++buffer >= 4.0) {
                     vl++;
-                    flag("x=%v.1f,y=%v.1f,z=%v.1f,d=%v.1f,d=%v.1f", x, y, z, deltaAngle, buffer);
+                    flag("x=%.1ff,y=%.1ff,z=%.1ff,d=%.1ff,d=%.1ff", x, y, z, deltaAngle, buffer);
                 }
             } else buffer-= buffer > 0 ? 0.5 : 0;
-            debug("x=%v.1f,y=%v.1f,z=%v.1f,d=%v.1f,d=%v.1f", x, y, z, deltaAngle, buffer);
+            debug("x=%.1ff,y=%.1ff,z=%.1ff,d=%.1ff,d=%.1ff", x, y, z, deltaAngle, buffer);
             this.lastX = x;
             this.lastY = y;
             this.lastZ = z;

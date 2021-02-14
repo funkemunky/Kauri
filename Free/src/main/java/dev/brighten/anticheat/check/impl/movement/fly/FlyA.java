@@ -78,13 +78,13 @@ public class FlyA extends Check {
                     && data.playerInfo.lastVelocity.isPassed(4)) {
                 vl++;
                 if(vl > 3)
-                flag("deltaY=%v.4 predicted=%v.4", data.playerInfo.deltaY, predicted);
+                flag("deltaY=%.4f predicted=%.4f", data.playerInfo.deltaY, predicted);
             } else if(vl > 0) vl-= 0.25;
             end = System.nanoTime() - start;
 
-            debug(Color.Green + "deltaY=%v difference=%v", data.playerInfo.deltaY, check);
+            debug(Color.Green + "deltaY=%s difference=%s", data.playerInfo.deltaY, check);
         }
 
-        debug("ground=%v fground=%v hitHead=%v time=%v", ground, lground, hitHead, end);
+        debug("ground=%s fground=%s hitHead=%s time=%s", ground, lground, hitHead, end);
     }
 }

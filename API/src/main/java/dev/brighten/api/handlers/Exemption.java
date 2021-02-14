@@ -1,5 +1,6 @@
 package dev.brighten.api.handlers;
 
+import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.KauriCheck;
 import lombok.Getter;
 
@@ -11,9 +12,9 @@ import java.util.UUID;
 public class Exemption {
     public final UUID uuid;
     @Getter
-    private final Set<KauriCheck> checks;
+    private final Set<CheckType> checks;
 
-    public Exemption(UUID uuid, KauriCheck... checks) {
+    public Exemption(UUID uuid, CheckType... checks) {
         this.uuid = uuid;
         this.checks = new HashSet<>(Arrays.asList(checks));
     }
@@ -23,7 +24,7 @@ public class Exemption {
         checks = new HashSet<>();
     }
 
-    public void addChecks(KauriCheck... checks) {
+    public void addChecks(CheckType... checks) {
         this.checks.addAll(Arrays.asList(checks));
     }
 }

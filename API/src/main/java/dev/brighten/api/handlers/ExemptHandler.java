@@ -4,39 +4,36 @@ import dev.brighten.api.KauriAPI;
 import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.KauriCheck;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 public class ExemptHandler {
 
-    private static List<Exemption> exemptList = new ArrayList<>();
+    private static Map<UUID, Exemption> exemptions = new HashMap<>();
 
+    @Deprecated
     public Exemption addExemption(UUID uuid, KauriCheck... checks) {
-        Exemption exemption = exemptList.stream()
-                .filter(exempt -> exempt.uuid.equals(uuid))
-                .findFirst().orElseGet(() -> new Exemption(uuid, checks));
+        return addExemption(uuid, Arrays.stream(checks)
+                .map(KauriCheck::getCheckType)
+                .toArray(CheckType[]::new));
+    }
 
-        exemption.addChecks(checks);
+    public Exemption addExemption(UUID uuid, CheckType... checks) {
+        Exemption exemption = new Exemption(uuid, checks);
 
-        exemptList.add(exemption);
-
-        return exemption;
+        return exemptions.put(uuid, exemption);
     }
 
     //Adds temporary exception.
+    @Deprecated
     public Exemption addExemption(UUID uuid, long millisLater, Consumer<Exemption> onRemove, KauriCheck... checks) {
         Exemption exemption = addExemption(uuid, checks);
 
         KauriAPI.INSTANCE.service.schedule(() -> {
-            if(exemption.getChecks().size() == checks.length) {
-                exemptList.remove(exemption);
-            } else Arrays.stream(checks)
-                    .filter(check -> exemption.getChecks().contains(check))
-                    .forEach(check -> exemption.getChecks().remove(check));
+            exemptions.remove(uuid);
 
             onRemove.accept(exemption);
         }, millisLater, TimeUnit.MILLISECONDS);
@@ -44,20 +41,40 @@ public class ExemptHandler {
         return exemption;
     }
 
-    public boolean isExempt(UUID uuid, KauriCheck... checks) {
-        Exemption exemption = getExemption(uuid);
+    //Will return false initally, and then true when completed.
+    public AtomicBoolean addExemption(UUID uuid, long timeLater, TimeUnit unitLater, CheckType... checks) {
+        addExemption(uuid, checks);
 
-        return Arrays.stream(checks).anyMatch(check -> exemption.getChecks().contains(check));
+        AtomicBoolean removed = new AtomicBoolean(false);
+        KauriAPI.INSTANCE.service.schedule(() -> {
+            exemptions.remove(uuid);
+        }, timeLater, unitLater);
+
+        return removed;
+    }
+
+    @Deprecated
+    public boolean isExempt(UUID uuid, KauriCheck... checks) {
+        if(!exemptions.containsKey(uuid)) return false;
+
+        return isExempt(uuid, Arrays.stream(checks).map(KauriCheck::getCheckType).toArray(CheckType[]::new));
     }
 
     public boolean isExempt(UUID uuid, CheckType... types) {
-        return getExemption(uuid).getChecks().stream().
-                anyMatch(check ->
-                        Arrays.stream(types).anyMatch(type -> check.getCheckType().equals(type)));
+        Optional<Exemption> exemption = getPlayerExemption(uuid);
+
+        return exemption.map(exempt -> Arrays.stream(types).anyMatch(type -> exempt.getChecks().contains(type)))
+                .orElse(false);
     }
 
+    @Deprecated
     public Exemption getExemption(UUID uuid) {
-        return exemptList.stream().filter(exempt -> exempt.uuid.equals(uuid)).findFirst()
-                .orElseGet(() -> addExemption(uuid));
+        return exemptions.getOrDefault(uuid, null);
+    }
+
+    public Optional<Exemption> getPlayerExemption(UUID uuid) {
+        if(!exemptions.containsKey(uuid)) return Optional.empty();
+
+        return Optional.of(exemptions.get(uuid));
     }
 }

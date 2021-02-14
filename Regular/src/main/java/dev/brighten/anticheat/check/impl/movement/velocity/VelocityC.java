@@ -121,11 +121,11 @@ public class VelocityC extends Check {
                     && !data.blockInfo.blocksNear) {
                 if(++buffer > 20) {
                     vl++;
-                    flag("pct=%v.2% buffer=%v.1 forward=%v.2 strafe=%v.2",
+                    flag("pct=%.2f% buffer=%.1f forward=%.2f strafe=%.2f",
                             ratio * 100, buffer, moveStrafe, moveForward);
                 }
             } else buffer-= buffer > 0 ? data.lagInfo.lastPacketDrop.isNotPassed(20) ? .5 : 0.25 : 0;
-            debug("ratio=%v.3 buffer=%v.1 strafe=%v.2 forward=%v.2 lastUse=%v found=%v",
+            debug("ratio=%.3f buffer=%.1f strafe=%.2f forward=%.2f lastUse=%s found=%s",
                     ratio, buffer, moveStrafe, moveForward, data.playerInfo.lastUseItem.getPassed(), found);
             pvX *= drag;
             pvZ *= drag;

@@ -206,7 +206,11 @@ public class ObjectData implements Data {
     }
 
     public int runKeepaliveAction(Consumer<KeepAlive> action) {
-        int id = Kauri.INSTANCE.keepaliveProcessor.currentKeepalive.start;
+        return runKeepaliveAction(action, 0);
+    }
+
+    public int runKeepaliveAction(Consumer<KeepAlive> action, int later) {
+        int id = Kauri.INSTANCE.keepaliveProcessor.currentKeepalive.start + later;
 
         keepAliveStamps.add(new Action(id, action));
 

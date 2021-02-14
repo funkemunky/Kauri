@@ -38,11 +38,11 @@ public class Inertia extends Check {
                     && ground && delta > 25 && data.playerInfo.deltaXZ > 0) {
                 if(data.playerInfo.deltaYaw < 40 && ++buffer > 5) {
                     vl++;
-                    flag("d=%v.2 y=%v.1 dx=%v", delta, yaw, data.moveProcessor.deltaX);
+                    flag("d=%.2f y=%.1f dx=%s", delta, yaw, data.moveProcessor.deltaX);
                 }
             } else buffer = 0;
 
-            debug("dir=%v.3 yaw=%v.3 onGround=%v velocity=%v key=%v buffer=%v world=%v",
+            debug("dir=%.3f yaw=%.3f onGround=%s velocity=%s key=%s buffer=%s world=%s",
                     dir, yaw, ground, velocity, data.predictionService.key, buffer, data.playerInfo.worldLoaded);
         }
     }

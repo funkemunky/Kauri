@@ -36,14 +36,14 @@ public class AutoclickerJ extends Check {
                 && (data.clickProcessor.getZeros() <= 1 ||  data.clickProcessor.getMean() <= 1)) {
             if(buffer++ > 40) {
                 vl++;
-                flag(20 * 40, "k=%v.4 avg=%v.3 s=%v.3 v=%v.3 b=%v.1 zeros=%v",
+                flag(20 * 40, "k=%.4f avg=%.3f s=%.3f v=%.3f b=%.1f zeros=%s",
                         data.clickProcessor.getKurtosis(), data.clickProcessor.getMean(),
                         data.clickProcessor.getSkewness(), data.clickProcessor.getVariance(), buffer,
                         data.clickProcessor.getZeros());
             }
         } else buffer-= buffer > 0 ? 2 : 0;
         long delta = timeStamp - lastArm;
-        debug("kurtosis=%v.4 std=%v.4 avg=%v.3 skew=%v.3 variance=%v.3 buffer=%v.1 delta=%v zeros=%v",
+        debug("kurtosis=%.4f std=%.4f avg=%.3f skew=%.3f variance=%.3f buffer=%.1f delta=%s zeros=%s",
                 data.clickProcessor.getKurtosis(), data.clickProcessor.getStd(), data.clickProcessor.getMean(),
                 data.clickProcessor.getSkewness(),
                 data.clickProcessor.getVariance(),

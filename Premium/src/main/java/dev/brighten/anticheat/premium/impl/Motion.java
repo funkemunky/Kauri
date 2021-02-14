@@ -18,7 +18,7 @@ public class Motion extends Check {
     private int buffer;
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if(packet.isPos()) {
+        if(packet.isPos() && data.playerInfo.deltaXZ > 0) {
             double predXZ = Math.hypot(data.predictionService.predX, data.predictionService.predZ);
 
             if(data.predictionService.flag
@@ -30,13 +30,13 @@ public class Motion extends Check {
                     && !data.blockInfo.collidesHorizontally) {
                 if(++buffer > 15) {
                     vl++;
-                    flag("deltaX=%v deltaZ=%v",
+                    flag("deltaX=%s deltaZ=%s",
                             MathUtils.round(data.playerInfo.deltaXZ, 3), MathUtils.round(predXZ, 3));
                 }
             } else buffer-= buffer > 0 ? 1.25 : 0;
-            debug("deltaX=" + data.playerInfo.deltaXZ + " deltaZ=" + predXZ + " key="
-                    + data.predictionService.key
-                    + " collided=" + data.blockInfo.collidesHorizontally);
+            debug("(dy=%.4f) dxz=%.5f pxz=%.5f friction=%.4f key=%s collided=%s",
+                    data.playerInfo.deltaY, data.playerInfo.deltaXZ, predXZ,
+                    data.blockInfo.fromFriction, data.predictionService.key, data.blockInfo.collidesHorizontally);
         }
     }
 }

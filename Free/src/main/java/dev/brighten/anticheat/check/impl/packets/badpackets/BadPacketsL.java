@@ -26,11 +26,11 @@ public class BadPacketsL extends Check {
                 && (pos == null || (pos.getX() == -1 && pos.getY() == -1 && pos.getZ() == -1))) {
             //TODO check if sends if player just right clicks block.
             vl++;
-            flag("p%v h=%v", Optional.ofNullable(packet.getItemStack()).map(i -> i.getType().name())
+            flag("p%s h=%s", Optional.ofNullable(packet.getItemStack()).map(i -> i.getType().name())
                     .orElse("NONE"), packet.getPlayer().getItemInHand().getType().name());
         } else debug(packet.getItemStack().getType().name());
 
         if(pos != null)
-        debug("x=%v y=%v z=%v", pos.getX(), pos.getY(), pos.getZ());
+        debug("x=%s y=%s z=%s", pos.getX(), pos.getY(), pos.getZ());
     }
 }

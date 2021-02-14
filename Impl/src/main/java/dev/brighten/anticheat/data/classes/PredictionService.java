@@ -7,6 +7,8 @@ import cc.funkemunky.api.utils.world.BlockData;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.Helper;
+import dev.brighten.anticheat.utils.MiscUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.potion.PotionEffectType;
@@ -21,10 +23,11 @@ public class PredictionService {
 
     private ObjectData data;
     public boolean fly, velocity, position, sneak, sprint, useSword, hit, dropItem, inWeb, checkConditions,
-            lastOnGround, onGround, lastSprint, fMath, fastMath, walkSpecial, lastVelocity;
+            lastLastOnGround, lastOnGround, onGround, lastSprint, fMath, fastMath, walkSpecial, lastVelocity;
     public double posX, posY, posZ, lPosX, lPosY, lPosZ, rmotionX, rmotionY, rmotionZ, lmotionX, lmotionZ, lmotionY;
     public double predX, predZ;
     public double aiMoveSpeed;
+    public float oldFriction;
     public boolean flag, isBelowSpecial;
     public float walkSpeed = 0.1f, yaw, moveStrafing, moveForward;
 
@@ -42,24 +45,21 @@ public class PredictionService {
             yaw = packet.getYaw();
         }
 
+        if(posX == packet.getX() && posY == packet.getY() && posZ == packet.getZ()) return;
+
         if(packet.isPos()) {
             posX = packet.getX();
             posY = packet.getY();
             posZ = packet.getZ();
-        } else {
-            posX = 999999999;
-            posY = 999999999;
-            posZ = 999999999;
         }
 
-
-        onGround = packet.isGround();
+        onGround = data.playerInfo.clientGround;
 
         boolean specialBlock = false;
 
-        rmotionX = posX - lPosX;
-        rmotionY = posY - lPosY;
-        rmotionZ = posZ - lPosZ;
+        rmotionX = data.playerInfo.deltaX;
+        rmotionY = data.playerInfo.deltaY;
+        rmotionZ = data.playerInfo.deltaZ;
 
         Block blockBelow = BlockUtils.getBlock(new Location(data.getPlayer().getWorld(), MathHelper.floor_double(posX),
                 MathHelper.floor_double(posY -  0.20000000298023224D), MathHelper.floor_double(posZ)));
@@ -70,7 +70,12 @@ public class PredictionService {
         }
 
         //dev.brighten.anticheat.utils.MiscUtils.testMessage(Color.Gray + rmotionX + ", " + rmotionZ);
-        fMath = fastMath; // if the Player uses Optifine FastMath
+        fMath = fastMath; // if the Player uses Optifine FastMath]
+
+        if(velocity) {
+            lmotionX = data.playerInfo.velocityX;
+            lmotionZ = data.playerInfo.velocityZ;
+        }
 
         try {
             if(!position && (checkConditions = checkConditions(lastSprint))) {
@@ -84,7 +89,8 @@ public class PredictionService {
 
                 calcKey(mx, mz);
 
-                //MiscUtils.testMessage("key: " + key);
+                MiscUtils.testMessage(String.format("key=%s rx=%.4f rz=%.4f lx=%.4f lz=%.4f px=%.4f lpx=%.4g",
+                        key, rmotionX, rmotionZ, lmotionX, lmotionZ, posX, lPosX));
                 calc(true);
             }
 
@@ -98,11 +104,6 @@ public class PredictionService {
         }
         dropItem = false;
 
-        if(velocity) {
-            rmotionX = data.playerInfo.velocityX;
-            rmotionZ = data.playerInfo.velocityZ;
-        }
-
         if(blockBelow != null
                 && onGround) {
             if(XMaterial.SLIME_BLOCK.parseMaterial().equals(blockBelow.getType())) {
@@ -111,7 +112,6 @@ public class PredictionService {
 
                     rmotionZ *= shit;
                     rmotionX *= shit;
-                    //MiscUtils.testMessage("slime: " + shit + ", " + data.blockInfo.currentFriction);
                 }
             } else if(XMaterial.SOUL_SAND.parseMaterial().equals(blockBelow.getType())) {
                 double shit = 0.4;
@@ -186,7 +186,9 @@ public class PredictionService {
         lastVelocity = velocity;
         velocity = false;
         position = false;
+        oldFriction = data.blockInfo.fromFriction;
 
+        lastLastOnGround = lastOnGround;
         lastOnGround = onGround;
         lastSprint = sprint;
         walkSpecial = specialBlock;

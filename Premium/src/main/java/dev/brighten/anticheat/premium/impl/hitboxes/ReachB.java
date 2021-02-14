@@ -103,14 +103,14 @@ public class ReachB extends Check {
                         Kauri.INSTANCE.lastTickLag.isPassed(40)) {
                     if(++buffer > 4) {
                         vl++;
-                        flag("distance=%v.3 from=%v buffer=%v.1 misses=%v",
+                        flag("distance=%.3f from=%s buffer=%.1f misses=%s",
                                 distance, usedFrom, buffer, misses);
                         buffer = 4;
                     }
                 } else buffer-= buffer > 0 ? .2f : 0;
             }
 
-            debug("distance=%v.3 from=%v buffer=%v.2 ticklag=%v collided=%v delta=%v",
+            debug("distance=%.3f from=%s buffer=%.2f ticklag=%s collided=%s delta=%s",
                     distance, usedFrom, buffer, Kauri.INSTANCE.lastTickLag.getPassed(), collided,
                     timeStamp - lastUse);
         }

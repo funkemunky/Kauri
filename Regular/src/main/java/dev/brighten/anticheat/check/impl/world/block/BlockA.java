@@ -29,11 +29,11 @@ public class BlockA extends Check {
         if(check && event.getFace().getAdjacentY() == 0 && data.playerInfo.sprinting) {
             if((buffer+= 4) > 15) {
                 vl++;
-                flag("dist=%v.3 dist2=%v.3 placeVec=%v", dist, dist2, dir.toString());
+                flag("dist=%.3f dist2=%.3f placeVec=%s", dist, dist2, dir.toString());
                 buffer = 14;
             }
         } else if(buffer > 0) buffer--;
 
-        debug("dist=%v.3 dist2=%v.3", dist, dist2);
+        debug("dist=%.3f dist2=%.3f", dist, dist2);
     }
 }

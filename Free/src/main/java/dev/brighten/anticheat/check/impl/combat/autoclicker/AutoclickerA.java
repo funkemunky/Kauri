@@ -26,9 +26,9 @@ public class AutoclickerA extends Check {
         if(flyingTicks >= 20) {
             if(cps > cpsToFlag) {
                 if(cps > cpsToBan) vl++;
-                flag("cps=%v", cps);
+                flag("cps=%s", cps);
             }
-            debug("cps=%v", cps);
+            debug("cps=%s", cps);
 
             flyingTicks = cps = 0;
         }
@@ -41,7 +41,7 @@ public class AutoclickerA extends Check {
                 && data.playerInfo.lastBlockDigPacket.isPassed(1)
                 && data.playerInfo.lastBlockPlacePacket.isPassed(1))
             cps++;
-        debug("breaking=%v lastBroken=%v", data.playerInfo.breakingBlock,
+        debug("breaking=%s lastBroken=%s", data.playerInfo.breakingBlock,
                 data.playerInfo.lastBrokenBlock.getPassed());
     }
 }

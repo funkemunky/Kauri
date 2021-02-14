@@ -38,14 +38,14 @@ public class AutoclickerB extends Check {
 
             if(average < 2 && range <= 1) {
                 if(++vl > 12) {
-                    flag("range=%v", range);
+                    flag("range=%s", range);
                 }
             } else if(vl > 0) vl-= 0.5f;
 
-            debug("range=%v average=%v.1 vl=%v.1", range, average, vl);
+            debug("range=%s average=%.1f vl=%.1f", range, average, vl);
         }
 
-        debug("deltaArm=%v", deltaArm);
+        debug("deltaArm=%s", deltaArm);
         lastPlace = currentTick;
     }
 }

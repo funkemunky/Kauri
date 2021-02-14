@@ -18,10 +18,10 @@ public class BadPacketsK extends Check {
         if(lastSlot != -1 && lastSlot == packet.getSlot() && data.lagInfo.lastPacketDrop.isPassed(2)) {
             if(++buffer > 3) {
                 vl++;
-                flag("current=%v;last=%v", packet.getSlot(), lastSlot);
+                flag("current=%s;last=%s", packet.getSlot(), lastSlot);
             }
         } else if(buffer > 0) buffer--;
-        debug("slot=%v lastslot=%v", packet.getSlot(), lastSlot);
+        debug("slot=%s lastslot=%s", packet.getSlot(), lastSlot);
         lastSlot = packet.getSlot();
     }
 }

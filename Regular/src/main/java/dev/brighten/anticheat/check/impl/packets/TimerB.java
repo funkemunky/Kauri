@@ -40,11 +40,11 @@ public class TimerB extends Check {
             if(ratio > 1.01) {
                 if(++buffer > 75) {
                     vl++;
-                    flag("r=%v.1 b=%v", ratio, buffer);
+                    flag("r=%.1f b=%s", ratio, buffer);
                 }
             } else buffer = 0;
 
-            debug("[%v] ratio=%v.3 avg=%v.2", buffer, ratio, average);
+            debug("[%s] ratio=%.3f avg=%.2f", buffer, ratio, average);
         }
 
         lastFlying = now;

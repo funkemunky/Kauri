@@ -26,11 +26,12 @@ public class OmniSprint extends Check {
             if(!event.getPlayer().isSprinting() || !data.playerInfo.serverGround) break omniSprint;
 
             if(deltaXZ > 0.2
-                    && data.playerInfo.lastVelocity.isPassed(4)
-                    && data.playerInfo.lastTeleportTimer.isPassed(1)) {
+                    && !data.playerInfo.doingVelocity
+                    && !data.playerInfo.generalCancel
+                    && data.playerInfo.lastVelocity.isPassed(20)) {
                 if(++sprintBuffer > 3) {
                     vl++;
-                    flag("type=SPRINT a=%v.1 b=%v", angle, sprintBuffer);
+                    flag("type=SPRINT a=%.1f b=%s", angle, sprintBuffer);
                 }
             }
         }
@@ -50,11 +51,11 @@ public class OmniSprint extends Check {
                     && data.playerInfo.lastTeleportTimer.isPassed(1)) {
                 if(++invalidBuffer > 6) {
                     vl+= 0.25f;
-                    flag("type=INVALID sprint=%v a=%v.1 b=%v", angle, invalidBuffer);
+                    flag("type=INVALID sprint=%s a=%.1f b=%s", angle, invalidBuffer);
                 }
             } else invalidBuffer = 0;
 
-            debug("dxz=%v.5 base=%v.5", deltaXZ, base);
+            debug("dxz=%.5f base=%.5f", deltaXZ, base);
         }
     }
 

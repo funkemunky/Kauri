@@ -27,12 +27,12 @@ public class VelocityD extends Check {
 
             if(buffer > 10) {
                 vl++;
-                flag("dy=%v.4 vy=%v.4", data.playerInfo.deltaY, data.playerInfo.velocityY);
+                flag("dy=%.4f vy=%.4f", data.playerInfo.deltaY, data.playerInfo.velocityY);
                 buffer = 9;
             }
             debug(Color.Green + "Flag");
         } else if(buffer > 0) buffer--;
 
-        debug("dy=%v.4 vY=%v.4", data.playerInfo.deltaY, data.playerInfo.velocityY);
+        debug("dy=%.4f vY=%.4f", data.playerInfo.deltaY, data.playerInfo.velocityY);
     }
 }

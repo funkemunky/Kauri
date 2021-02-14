@@ -30,12 +30,12 @@ public class AimH extends Check {
             // Player made a large head rotation and didn't accelerate / decelerate which is impossible
             if (acceleration < 1e-02 && deltaYaw > 30.f && deltaPitch > 15.f && attacking) {
                 vl++;
-                flag("accel=%v.2 deltaYaw=%v.2 deltaPitch=%v.2 attacking=%v",
+                flag("accel=%.2f deltaYaw=%.2f deltaPitch=%.2f attacking=%s",
                         acceleration, deltaYaw, deltaPitch, attacking);
             }
         }
 
-        debug("looking=%v", data.playerInfo.lookingAtBlock);
+        debug("looking=%s", data.playerInfo.lookingAtBlock);
 
         this.lastHorizontalDistance = horizontalDistance;
         this.lastPosX = posX;

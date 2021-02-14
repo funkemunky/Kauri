@@ -87,9 +87,7 @@ public class PacketProcessor {
                 data.lagInfo.lastFlying = timeStamp;
 
                 data.potionProcessor.onFlying(packet);
-                Kauri.INSTANCE.profiler.start("data:moveprocessor");
                 data.moveProcessor.process(packet, timeStamp);
-                Kauri.INSTANCE.profiler.stop("data:moveprocessor");
                 data.predictionService.onReceive(packet); //Processing for prediction service.
 
                 data.checkManager.runPacket(packet, timeStamp);
@@ -429,9 +427,7 @@ public class PacketProcessor {
                 if (packet.getId() == data.getPlayer().getEntityId()) {
                     //Setting velocity action.
                     Vector vector = new Vector(packet.getX(), packet.getY(), packet.getZ());
-                    synchronized (data.playerInfo.velocities) {
-                        data.playerInfo.velocities.add(vector);
-                    }
+                    data.playerInfo.velocities.add(vector);
                     data.playerInfo.doingVelocity = true;
                     data.runKeepaliveAction(d -> {
                         if(data.playerInfo.velocities.contains(vector)) {

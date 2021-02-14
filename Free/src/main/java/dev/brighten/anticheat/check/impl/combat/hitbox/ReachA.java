@@ -58,12 +58,12 @@ public class ReachA extends Check {
             if (distance > 3.3 && distance != 69) {
                 if (++buffer > 6) {
                     vl++;
-                    flag("distance=%v.2 buffer=%v", distance, buffer);
+                    flag("distance=%.2f buffer=%s", distance, buffer);
                 }
             } else buffer -= buffer > 0 ? 0.1 : 0;
         } else buffer-= buffer > 0 ? 0.02 : 0;
 
-        debug("distance=%v.3 boxes=%v buffer=%v", distance, targetBoxes.size(), buffer);
+        debug("distance=%.3f boxes=%s buffer=%s", distance, targetBoxes.size(), buffer);
         Kauri.INSTANCE.profiler.stop("check:ReachA");
     }
 

@@ -39,12 +39,12 @@ public class SpeedC extends Check {
         }
 
         if(data.playerInfo.deltaXZ > calc) {
-            flag("t=[%v] %v.3>-%v.3 jumped=%v speed=%v", threshold.display,
+            flag("t=[%s] %.3f>-%.3f jumped=%s speed=%s", threshold.display,
                     data.playerInfo.deltaXZ, calc, data.playerInfo.jumped, speed);
             vl++;
         }
 
-        debug("threshold=%v deltaXZ=%v.4 calc=%v.4 jumped=%v speed=%v",
+        debug("threshold=%s deltaXZ=%.4f calc=%.4f jumped=%s speed=%s",
                 threshold.display, data.playerInfo.deltaXZ, calc, data.playerInfo.jumped, speed);
 
         if(data.playerInfo.clientGround) sprinting = data.playerInfo.sprinting;

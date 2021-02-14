@@ -40,7 +40,7 @@ public class KillauraE extends Check {
         if(attacks && !interacts) {
             flag(10, "attacked=true interacted=false");
         }
-        debug("attacks=%v interacts=%v", attacks, interacts);
+        debug("attacks=%s interacts=%s", attacks, interacts);
     }
 
 }

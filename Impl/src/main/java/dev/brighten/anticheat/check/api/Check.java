@@ -74,9 +74,8 @@ public class Check implements KauriCheck {
     private KauriVersion plan;
 
     public boolean exempt, banExempt;
-    private Timer lastExemptCheck = new TickTimer(20);
 
-    private Timer lastAlert = new TickTimer(MathUtils.millisToTicks(Config.alertsDelay));
+    private final Timer lastAlert = new TickTimer(MathUtils.millisToTicks(Config.alertsDelay));
 
     public void setData(ObjectData data) {
         this.data = data;
@@ -137,96 +136,52 @@ public class Check implements KauriCheck {
 
     private long lastFlagRun = 0L;
 
-    public synchronized void flag(boolean devAlerts, int resetVLTime, String information, Object... variables) {
-        if(Kauri.INSTANCE.getTps() < 18) {
-            devAlerts = true;
-            vl = 0;
-        }
-        if(lastExemptCheck.isPassed()) exempt = KauriAPI.INSTANCE.exemptHandler.isExempt(data.uuid, this);
-        if(exempt) return;
-        if(System.currentTimeMillis() - lastFlagRun < 50L) return;
-        lastFlagRun = System.currentTimeMillis();
-        if(variables.length > 0 && information.contains("%v")) {
-            String[] splitInfo = information.split("%v");
+    public void flag(boolean devAlerts, int resetVLTime, String information, Object... variables) {
+        Kauri.INSTANCE.executor.execute(() -> {
+            if(Kauri.INSTANCE.getTps() < 18)
+                vl = 0;
 
-            for (int i = 0; i < splitInfo.length; i++) {
-                String split = splitInfo[i];
+            if(KauriAPI.INSTANCE.exemptHandler.isExempt(data.uuid, checkType)) return;
+            if(System.currentTimeMillis() - lastFlagRun < 50L) return;
+            lastFlagRun = System.currentTimeMillis();
 
-                if(variables.length > i) {
-                    if ((variables[i] instanceof Double || variables[i] instanceof Float)
-                            && splitInfo.length > i + 1 && splitInfo[i + 1].startsWith(".")) {
-                        String split2 = splitInfo[i + 1];
+            final String finalInformation = String.format(information, variables);
+            KauriFlagEvent event = new KauriFlagEvent(data.getPlayer(), this, finalInformation);
 
-                        if (split2.length() >= 2) {
-                            int parsed = -1;
-                            for (int l = split2.length(); l > 1; l--) {
-                                try {
-                                    parsed = Integer.parseInt(split2.substring(1, l));
-                                    break;
-                                } catch (NumberFormatException ignored) {
+            Atlas.getInstance().getEventManager().callEvent(event);
+
+            if(event.isCancelled()) return;
+
+            if(cancellable && cancelMode != null && vl > vlToFlag) {
+                KauriCancelEvent cancelEvent = new KauriCancelEvent(data.getPlayer(), cancelMode);
+
+                Atlas.getInstance().getEventManager().callEvent(cancelEvent);
+                if(!cancelEvent.isCancelled()) {
+                    switch(cancelEvent.getCancelType()) {
+                        case ATTACK: {
+                            for(int i = 0 ; i < 2 ; i++) {
+                                synchronized (data.typesToCancel) {
+                                    data.typesToCancel.add(cancelMode);
                                 }
                             }
-
-                            if (parsed < 0) {
-                                splitInfo[i] = split + variables[i];
-                            } else if(variables[i] instanceof Float) {
-                                splitInfo[i + 1] = split2.replace("." + parsed, "");
-                                float var = (float) variables[i];
-
-                                if(!Float.isNaN(var) && !Float.isInfinite(var)) {
-                                    splitInfo[i] = split + MathUtils.round(var, parsed);
-                                } else splitInfo[i] = split + MathUtils.round(var, parsed);
-                            } else if(variables[i] instanceof Double) {
-                                splitInfo[i + 1] = split2.replace("." + parsed, "");
-                                double var = (double) variables[i];
-                                if(!Double.isNaN(var) && !Double.isInfinite(var)) {
-                                    splitInfo[i] = split + MathUtils.round(var, parsed);
-                                } else splitInfo[i] = split + var;
-                            }
+                            break;
                         }
-                    } else splitInfo[i] = split + variables[i];
-                }
-            }
-            information = String.join("", splitInfo);
-        }
-        final String finalInformation = information;
-        KauriFlagEvent event = new KauriFlagEvent(data.getPlayer(), this, finalInformation);
-
-        Atlas.getInstance().getEventManager().callEvent(event);
-
-        if(event.isCancelled()) return;
-
-        if(cancellable && cancelMode != null && vl > vlToFlag) {
-            KauriCancelEvent cancelEvent = new KauriCancelEvent(data.getPlayer(), cancelMode);
-
-            Atlas.getInstance().getEventManager().callEvent(cancelEvent);
-            if(!cancelEvent.isCancelled()) {
-                switch(cancelEvent.getCancelType()) {
-                    case ATTACK: {
-                        for(int i = 0 ; i < 2 ; i++) {
+                        case INVENTORY: {
+                            TinyProtocolHandler.sendPacket(data.getPlayer(),
+                                    new WrappedOutCloseWindowPacket(data.playerInfo.inventoryId));
+                            break;
+                        }
+                        default: {
                             synchronized (data.typesToCancel) {
                                 data.typesToCancel.add(cancelMode);
                             }
+                            break;
                         }
-                        break;
-                    }
-                    case INVENTORY: {
-                        TinyProtocolHandler.sendPacket(data.getPlayer(),
-                                new WrappedOutCloseWindowPacket(data.playerInfo.inventoryId));
-                        break;
-                    }
-                    default: {
-                        synchronized (data.typesToCancel) {
-                            data.typesToCancel.add(cancelMode);
-                        }
-                        break;
                     }
                 }
             }
-        }
 
-        boolean dev = devAlerts || (developer || vl <= vlToFlag);
-        Kauri.INSTANCE.executor.execute(() -> {
+            boolean dev = devAlerts || (developer || vl <= vlToFlag) || Kauri.INSTANCE.getTps() < 18;
             if(lastAlert.isPassed(resetVLTime)) vl = 0;
             final String info = finalInformation
                     .replace("%p", String.valueOf(data.lagInfo.transPing))
@@ -243,7 +198,7 @@ public class Check implements KauriCheck {
                     }
                     val text = createTxt(Kauri.INSTANCE.msgHandler.getLanguage().msg("cheat-alert",
                             "&8[&6&lKauri&8] &f%player% &7flagged &f%check%" +
-                                    " &8(&ex%vl%&8) %experimental%"), info);
+                                    " &8(&ex%sl%&8) %experimental%"), info);
 
                     text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] {
                             createTxt(Kauri.INSTANCE.msgHandler.getLanguage().msg("cheat-alert-hover",
@@ -301,7 +256,7 @@ public class Check implements KauriCheck {
                 .replace("%player%", data.getPlayer().getName())
                 .replace("%check%", name)
                 .replace("%info%", info)
-                .replace("%vl%", String.valueOf(MathUtils.round(vl, 1)))
+                .replace("%sl%", String.valueOf(MathUtils.round(vl, 1)))
                 .replace("%experimental%", developer ? "&c(Experimental)" : ""));
     }
 
@@ -357,49 +312,8 @@ public class Check implements KauriCheck {
 
     public void debug(String information, Object... variables) {
         if(Kauri.INSTANCE.dataManager.debugging.size() == 0) return;
-        if(variables.length > 0 && information.contains("%v")) {
-            String[] splitInfo = information.split("%v");
 
-            for (int i = 0; i < splitInfo.length; i++) {
-                String split = splitInfo[i];
-
-                if(variables.length > i) {
-                    if ((variables[i] instanceof Double || variables[i] instanceof Float)
-                            && splitInfo.length > i + 1 && splitInfo[i + 1].startsWith(".")) {
-                        String split2 = splitInfo[i + 1];
-
-                        if (split2.length() >= 2) {
-                            int parsed = -1;
-                            for (int l = split2.length(); l > 1; l--) {
-                                try {
-                                    parsed = Integer.parseInt(split2.substring(1, l));
-                                    break;
-                                } catch (NumberFormatException ignored) {
-                                }
-                            }
-
-                            if (parsed < 0) {
-                                splitInfo[i] = split + variables[i];
-                            } else if(variables[i] instanceof Float) {
-                                splitInfo[i + 1] = split2.replace("." + parsed, "");
-                                float var = (float) variables[i];
-                                if(!Float.isNaN(var) && !Float.isInfinite(var))
-                                splitInfo[i] = split + MathUtils.round(var, parsed);
-                                else splitInfo[i] = split + var;
-                            } else if(variables[i] instanceof Double) {
-                                splitInfo[i + 1] = split2.replace("." + parsed, "");
-                                double var = (double) variables[i];
-                                if(!Double.isNaN(var) && !Double.isInfinite(var))
-                                splitInfo[i] = split + MathUtils.round(var, parsed);
-                                else splitInfo[i] = split + var;
-                            }
-                        }
-                    } else splitInfo[i] = split + variables[i];
-                }
-            }
-            information = String.join("", splitInfo);
-        }
-        final String finalInformation = information;
+        final String finalInformation = String.format(information, variables);
         Kauri.INSTANCE.dataManager.debugging.stream()
                 .filter(data -> data.debugged.equals(this.data.uuid) && data.debugging.equalsIgnoreCase(name))
                 .forEach(data -> data.getPlayer()

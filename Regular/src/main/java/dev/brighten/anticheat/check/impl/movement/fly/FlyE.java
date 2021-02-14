@@ -27,7 +27,7 @@ public class FlyE extends Check {
 
             if(buffer > 15) {
                 vl++;
-                flag("accel=%v deltaY=%v.3 buffer=%v", accel, data.playerInfo.deltaY, buffer);
+                flag("accel=%s deltaY=%.3f buffer=%s", accel, data.playerInfo.deltaY, buffer);
             }
         } else if(buffer > 0) buffer--;
     }

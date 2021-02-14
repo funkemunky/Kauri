@@ -21,7 +21,7 @@ public class BadPacketsE extends Check {
         if(attackTicks++ > 3
                 && !data.lagInfo.lagging) {
             vl++;
-            flag("has not swung since %v ticks", attackTicks);
+            flag("has not swung since %s ticks", attackTicks);
         }
     }
 

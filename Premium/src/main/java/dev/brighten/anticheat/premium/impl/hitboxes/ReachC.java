@@ -63,10 +63,10 @@ public class ReachC extends Check {
             if(looped > 0 && distance > 3.0) {
                 if(++buffer > 2) {
                     vl++;
-                    flag("dist=%v.3", distance);
+                    flag("dist=%.3f", distance);
                 }
             } else if(buffer > 0) buffer-= 0.05f;
-            debug("(%v) dist=%v.3 locTime=%v stamp=%v", looped, distance, loc.sentTick,
+            debug("(%s) dist=%.3f locTime=%s stamp=%s", looped, distance, loc.sentTick,
                     Kauri.INSTANCE.keepaliveProcessor.tick - data.lagInfo.transPing);
         });
     }

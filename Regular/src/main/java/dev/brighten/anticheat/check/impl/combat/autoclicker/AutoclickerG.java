@@ -30,11 +30,11 @@ public class AutoclickerG extends Check {
             if((buffer < 20 ? ++buffer : buffer) > 6) {
                 vl++;
                 flag(20 * 30,
-                        "buffer=%v avgCps=%v.1 std=%v.2 low=%v high=%v.", buffer, cpsAvg,
+                        "buffer=%s avgCps=%.1f std=%.2f low=%s high=%s.", buffer, cpsAvg,
                         data.clickProcessor.getStd(), low, high);
             }
         } else buffer-= buffer > 0 ? 0.75f : 0;
-        debug("buffer=%v low=%v high=%v avg=%v.2 cpsAvg=%v.1",
+        debug("buffer=%s low=%s high=%s avg=%.2f cpsAvg=%.1f",
                 buffer, low, high, data.clickProcessor.getMean(), cpsAvg);
     }
 }
