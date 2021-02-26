@@ -40,25 +40,35 @@ public class ReachC extends Check {
             return;
         }
 
-        tracker.get().getProperLocation(data.lagInfo.transPing + 2).ifPresent(loc -> {
+        tracker.get().getProperLocation(data.lagInfo.transPing + 2).ifPresent(locList -> {
             KLocation origin = data.playerInfo.to.clone();
-            origin.y+= 1.62f;
-            RayCollision ray = new RayCollision(origin.toVector(), MathUtils.getDirection(origin));
+            origin.y+= data.playerInfo.sneaking ? 1.54f : 1.62f;
+            KLocation origin2 = data.playerInfo.from.clone();
+            origin.y+= data.getPlayer().isSneaking() ? 1.54f : 1.62f;
+            RayCollision ray = new RayCollision(origin.toVector(), MathUtils.getDirection(origin)),
+                    ray2 = new RayCollision(origin2.toVector(), MathUtils.getDirection(origin2));
             double distance = 69.;
             int looped = 0;
-            int delta = Kauri.INSTANCE.keepaliveProcessor.tick - data.lagInfo.transPing - loc.sentTick - 5;
-            for (int i = loc.interpolatedLocations.size() - 1 ; i >= 0 ; i--) {
-                KLocation iloc = loc.interpolatedLocations.get(i);
-                SimpleCollisionBox box = ((SimpleCollisionBox)EntityData.getEntityBox(iloc, data.target))
-                        .expand(0.1);
-                Vector point = ray.collisionPoint(box);
 
-                if(point == null) continue;
+            for (EntityLocation loc : locList) {
+                for (int i = loc.interpolatedLocations.size() - 1 ; i >= 0 ; i--) {
+                    KLocation iloc = loc.interpolatedLocations.get(i);
+                    SimpleCollisionBox box = ((SimpleCollisionBox)EntityData.getEntityBox(iloc, data.target))
+                            .expand(0.1);
+                    Vector point = ray.collisionPoint(box), point2 = ray2.collisionPoint(box);
 
-                distance = Math.min(origin.toVector().distance(point), distance);
-                looped++;
-                if(++delta > 0) break;
+                    if(point == null && point2 == null) continue;
+
+                    if(point != null)
+                    distance = Math.min(origin.toVector().distance(point), distance);
+
+                    if(point2 != null)
+                        distance = Math.min(origin2.toVector().distance(point2), distance);
+
+                    looped++;
+                }
             }
+
 
             if(looped > 0 && distance > 3.0) {
                 if(++buffer > 2) {
@@ -66,7 +76,7 @@ public class ReachC extends Check {
                     flag("dist=%.3f", distance);
                 }
             } else if(buffer > 0) buffer-= 0.05f;
-            debug("(%s) dist=%.3f locTime=%s stamp=%s", looped, distance, loc.sentTick,
+            debug("(%s) dist=%.3f stamp=%s", looped, distance,
                     Kauri.INSTANCE.keepaliveProcessor.tick - data.lagInfo.transPing);
         });
     }
@@ -80,7 +90,11 @@ public class ReachC extends Check {
             loc.newX = loc.x = tracker.x;
             loc.newY = loc.y = tracker.y;
             loc.newZ = loc.z = tracker.z;
-            if(ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_9)) {
+            if(ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_14)) {
+                loc.newX+= (short)packet.getX() / 4096D;
+                loc.newY+= (short)packet.getY() / 4096D;
+                loc.newZ+= (short)packet.getZ() / 4096D;
+            } else if(ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_9)) {
                 loc.newX+= (int)packet.getX() / 4096D;
                 loc.newY+= (int)packet.getY() / 4096D;
                 loc.newZ+= (int)packet.getZ() / 4096D;
@@ -118,17 +132,20 @@ public class ReachC extends Check {
         public double x, y, z;
         public final List<EntityLocation> locations = Collections.synchronizedList(new EvictingList<>(15));
 
-        public Optional<EntityLocation> getProperLocation(int toGoBack) {
+        public Optional<List<EntityLocation>> getProperLocation(int toGoBack) {
             synchronized (locations) {
+                List<EntityLocation> locs = new ArrayList<>();
                 for (int i = locations.size() - 1; i > 0; i--) {
                     EntityLocation loc = locations.get(i);
 
                     int stamp = Kauri.INSTANCE.keepaliveProcessor.tick - toGoBack;
 
                     if(loc.sentTick < stamp) {
-                        return Optional.of(loc);
+                        locs.add(loc);
+                        if(locs.size() >= 2) break;
                     }
                 }
+                if(locs.size() > 0) return Optional.of(locs);
             }
             return Optional.empty();
         }

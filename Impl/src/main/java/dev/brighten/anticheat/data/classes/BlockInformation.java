@@ -29,7 +29,7 @@ public class BlockInformation {
     private ObjectData objectData;
     public boolean onClimbable, onSlab, onStairs, onHalfBlock, inLiquid, inLava, inWater, inWeb, onSlime, onIce,
             onSoulSand, blocksAbove, collidesVertically, bedNear, collidesHorizontally, blocksNear, inBlock, miscNear,
-            collidedWithEntity;
+            collidedWithEntity, roseBush;
     public float currentFriction, fromFriction;
     public CollisionHandler
             handler = new CollisionHandler(new ArrayList<>(), new ArrayList<>(), new KLocation(0,0,0), null);
@@ -103,6 +103,9 @@ public class BlockInformation {
 
                         if(block.getType().equals(XMaterial.COBWEB.parseMaterial()) && blockBox.isCollided(normalBox))
                             inWeb = true;
+
+                        if(block.getType().equals(XMaterial.ROSE_BUSH.parseMaterial()))
+                            roseBush = true;
 
                         if(normalBox.copy().offset(0, 0.6f, 0).isCollided(blockBox))
                             blocksAbove = true;

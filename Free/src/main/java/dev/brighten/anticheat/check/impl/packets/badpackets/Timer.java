@@ -27,7 +27,7 @@ import lombok.val;
 public class Timer extends Check {
 
     private long lastFlying, totalFlying = -1L;
-    private double maxLag = 50;
+    private double maxLag = 50, buffer;
     private final SimpleAverage timeAverage = new SimpleAverage(20, 50);
 
     @Packet
@@ -60,12 +60,15 @@ public class Timer extends Check {
 
             //We are now checking if their total time is above our threshod
             if(totalFlying > threshold) {
-                vl++;
-                flag("[+%s]: %s, %.1f",
-                        Math.round(totalFlying - threshold), totalFlying, threshold);
+                if(++buffer > 2) {
+                    vl++;
+                    flag("[+%s]: %s, %.1f",
+                            Math.round(totalFlying - threshold), totalFlying, threshold);
+                    buffer = 2;
+                }
 
                 totalFlying = now - 30; //Just preventing runaway flagging.
-            }
+            } else if(buffer > 0) buffer-= 0.05d;
 
             if(maxLag > 50) {
                 maxLag-= 0.025;

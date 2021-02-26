@@ -3,6 +3,7 @@ package dev.brighten.anticheat.check.impl.combat.hand;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
 import cc.funkemunky.api.tinyprotocol.packet.types.BaseBlockPosition;
 import cc.funkemunky.api.utils.KLocation;
+import cc.funkemunky.api.utils.Materials;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -22,7 +23,8 @@ public class HandE extends Check {
     private double buffer;
     @Packet
     public void onBlockPlace(WrappedInBlockPlacePacket packet) {
-        if (data.pastLocation.previousLocations.isEmpty()) return;
+        if (data.pastLocation.previousLocations.isEmpty() || data.getPlayer().getItemInHand() == null
+                || !Materials.checkFlag(data.getPlayer().getItemInHand().getType(), Materials.SOLID)) return;
         BaseBlockPosition blockPosition = packet.getPosition();
         float x = packet.getVecX();
         float y = packet.getVecY();

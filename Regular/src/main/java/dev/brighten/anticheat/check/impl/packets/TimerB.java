@@ -37,10 +37,10 @@ public class TimerB extends Check {
 
             double average = averageLong.getAverage(), ratio = 50. / average;
 
-            if(ratio > 1.01) {
+            if(ratio > 1.03) {
                 if(++buffer > 75) {
                     vl++;
-                    flag("r=%.1f b=%s", ratio, buffer);
+                    flag("r=%.2f b=%s", ratio, buffer);
                 }
             } else buffer = 0;
 

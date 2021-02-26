@@ -38,7 +38,7 @@ public class VelocityB extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if(data.playerInfo.lastVelocity.isNotPassed(0)) {
+        if(data.playerInfo.lastVelocity.isNotPassed(0) && ticks == 0) {
             pvX = data.playerInfo.velocityX;
             pvZ = data.playerInfo.velocityZ;
             ticks = 0;
@@ -141,7 +141,7 @@ public class VelocityB extends Check {
             }
 
             double ratioX = data.playerInfo.deltaX / pvX, ratioZ = data.playerInfo.deltaZ / pvZ;
-            double ratio = (ratioX + ratioZ) / 2;
+            double ratio = Math.hypot(ratioX, ratioZ);
 
             if((ratio < 0.996 || ratio > 3) && pvX != 0
                     && pvZ != 0

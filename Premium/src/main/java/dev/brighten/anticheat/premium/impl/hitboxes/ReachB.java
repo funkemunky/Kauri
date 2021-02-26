@@ -31,23 +31,21 @@ import java.util.stream.Collectors;
 @Cancellable(cancelType = CancelType.ATTACK)
 public class ReachB extends Check {
 
-    private long lastUse;
     private float buffer;
-    private Entity entity;
 
     @Setting(name = "debug")
     private static boolean debug = false;
 
     @Packet
     public void onFly(WrappedInFlyingPacket packet, long timeStamp) {
-        if(timeStamp - lastUse == 0 && entity != null) {
+        if(data.playerInfo.lastAttack.isNotPassed(0) && data.target != null) {
             if(data.playerInfo.creative) return;
 
             List<Pair<SimpleCollisionBox, Double>> entityLocs = data.targetPastLocation.getEstimatedLocation(timeStamp,
                     (data.lagInfo.transPing + 2) * 50, 100L)
                     .stream()
                     .map(loc -> {
-                        SimpleCollisionBox hitbox = (SimpleCollisionBox) getHitbox(entity, loc);
+                        SimpleCollisionBox hitbox = (SimpleCollisionBox) getHitbox(data.target, loc);
                         int index = data.targetPastLocation.previousLocations.indexOf(loc);
                         return new Pair<>(hitbox, Math.max(0,index > 0 ? data.targetPastLocation.previousLocations
                                 .get(index- 1)
@@ -110,16 +108,9 @@ public class ReachB extends Check {
                 } else buffer-= buffer > 0 ? .2f : 0;
             }
 
-            debug("distance=%.3f from=%s buffer=%.2f ticklag=%s collided=%s delta=%s",
-                    distance, usedFrom, buffer, Kauri.INSTANCE.lastTickLag.getPassed(), collided,
-                    timeStamp - lastUse);
+            debug("distance=%.3f from=%s buffer=%.2f ticklag=%s collided=%s",
+                    distance, usedFrom, buffer, Kauri.INSTANCE.lastTickLag.getPassed(), collided);
         }
-    }
-
-    @Packet
-    public void onUse(WrappedInUseEntityPacket packet, long timeStamp) {
-        lastUse = timeStamp;
-        entity = packet.getEntity();
     }
 
     @Packet
