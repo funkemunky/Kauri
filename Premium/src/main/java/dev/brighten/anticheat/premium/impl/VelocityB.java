@@ -38,7 +38,7 @@ public class VelocityB extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if(data.playerInfo.lastVelocity.isNotPassed(0) && ticks == 0) {
+        if(data.playerInfo.lastVelocity.isNotPassed(0)) {
             pvX = data.playerInfo.velocityX;
             pvZ = data.playerInfo.velocityZ;
             ticks = 0;
@@ -53,8 +53,8 @@ public class VelocityB extends Check {
             if(data.blockInfo.blocksNear
                     || data.blockInfo.blocksAbove
                     || data.blockInfo.inLiquid
-                    || data.lagInfo.lastPingDrop.isNotPassed(10)
-                    || data.lagInfo.lastPacketDrop.isNotPassed(10)) {
+                    || data.lagInfo.lastPingDrop.isNotPassed(4)
+                    || data.lagInfo.lastPacketDrop.isNotPassed(2)) {
                 pvX = pvZ = 0;
                 buffer-= buffer > 0 ? 1 : 0;
                 return;
@@ -69,13 +69,14 @@ public class VelocityB extends Check {
                 pvX*= 0.6;
                 pvZ*= 0.6;
             }
+
             double f = 0.16277136 / (drag * drag * drag);
             double f5;
 
             if (data.playerInfo.lClientGround) {
                 f5 = data.predictionService.aiMoveSpeed * f;
             } else {
-                f5 = sprint ? 0.026 : 0.02;
+                f5 = sprint ? 0.026f : 0.02f;
             }
 
             double vX = pvX;
@@ -121,13 +122,14 @@ public class VelocityB extends Check {
             if(!velocity.isPresent()) {
                 double s2 = data.predictionService.moveStrafing;
                 double f2 = data.predictionService.moveForward;
-                moveStrafe = s2;
-                moveForward = f2;
 
                 if(data.playerInfo.usingItem) {
                     s2*= 0.2;
                     f2*= 0.2;
                 }
+
+                moveStrafe = s2;
+                moveForward = f2;
 
                 moveFlying(s2, f2, f5);
             } else {
@@ -141,7 +143,7 @@ public class VelocityB extends Check {
             }
 
             double ratioX = data.playerInfo.deltaX / pvX, ratioZ = data.playerInfo.deltaZ / pvZ;
-            double ratio = Math.hypot(ratioX, ratioZ);
+            double ratio = (Math.abs(ratioX) + Math.abs(ratioZ)) / 2;
 
             if((ratio < 0.996 || ratio > 3) && pvX != 0
                     && pvZ != 0
@@ -155,9 +157,9 @@ public class VelocityB extends Check {
                 }
             } else buffer-= buffer > 0 ? data.lagInfo.lastPacketDrop.isNotPassed(20) ? .5 : 0.25 : 0;
 
-            debug("ratio=%.3f dx=%.4f dz=%.4f buffer=%.1f strafe=%.2f forward=%.2f lastUse=%s " +
+            debug("ratio=%.3f dx=%.4f dz=%.4f buffer=%.1f ticks=%s strafe=%.2f forward=%.2f lastUse=%s " +
                             "found=%s lastV=%s", ratio, data.playerInfo.deltaX, data.playerInfo.deltaZ,
-                    buffer, moveStrafe, moveForward, data.playerInfo.lastUseItem.getPassed(),
+                    buffer, ticks, moveStrafe, moveForward, data.playerInfo.lastUseItem.getPassed(),
                     found, data.playerInfo.lastVelocity.getPassed());
 
             pvX *= drag;

@@ -72,13 +72,8 @@ public class PredictionService {
         //dev.brighten.anticheat.utils.MiscUtils.testMessage(Color.Gray + rmotionX + ", " + rmotionZ);
         fMath = fastMath; // if the Player uses Optifine FastMath]
 
-        if(velocity) {
-            lmotionX = data.playerInfo.velocityX;
-            lmotionZ = data.playerInfo.velocityZ;
-        }
-
         try {
-            if(!position && (checkConditions = checkConditions(lastSprint))) {
+            if(!position && !velocity && (checkConditions = checkConditions(lastSprint))) {
                 if (lastSprint && hit) { // If the Player Sprints and Hit a Player he get slowdown
                     lmotionX *= 0.6D;
                     lmotionZ *= 0.6D;

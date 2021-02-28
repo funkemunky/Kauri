@@ -162,7 +162,8 @@ public class MovementProcessor {
 
         data.blockInfo.fromFriction = data.blockInfo.currentFriction;
         if(data.playerInfo.blockBelow != null)
-            data.blockInfo.currentFriction = MinecraftReflection.getFriction(data.playerInfo.blockBelow);
+            data.blockInfo.currentFriction = BlockUtils.getFriction(XMaterial.requestXMaterial(
+                    data.playerInfo.blockBelow.getType().name(), data.playerInfo.blockBelow.getData()));
 
         if(packet.isPos()) {
             //We create a separate from BoundingBox for the predictionService since it should operate on pre-motion data.
