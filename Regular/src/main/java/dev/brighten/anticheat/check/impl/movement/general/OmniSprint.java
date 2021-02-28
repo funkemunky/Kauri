@@ -20,7 +20,7 @@ public class OmniSprint extends Check {
         double angle = MiscUtils.getAngle(event.getTo().clone(), event.getFrom().clone());
         double deltaXZ = MathUtils.getHorizontalDistance(event.getTo(), event.getFrom());
 
-        if(Math.abs(angle) > 95) return;
+        if(Math.abs(angle) > 95 || data.predictionService.key.contains("W")) return;
 
         omniSprint: {
             if(!event.getPlayer().isSprinting() || !data.playerInfo.serverGround) break omniSprint;
