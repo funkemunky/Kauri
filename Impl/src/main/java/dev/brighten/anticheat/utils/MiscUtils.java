@@ -12,15 +12,19 @@ import cc.funkemunky.api.utils.Tuple;
 import dev.brighten.anticheat.commands.KauriCommand;
 import dev.brighten.anticheat.processing.MovementProcessor;
 import lombok.val;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import java.awt.*;
 import java.io.Closeable;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
@@ -68,6 +72,13 @@ public class MiscUtils {
                 .map(key -> new Tuple<>(key, repeated.get(key))) //We map it into a Tuple for easier sorting.
                 .max(Comparator.comparing(tup -> tup.two, Comparator.naturalOrder()))
                 .orElseThrow(NullPointerException::new).one;
+    }
+
+    public static void sendMessage(CommandSender player, String message, Object... objects) {
+        String toSend = String.format(Color.translate(message), objects);
+        if(player instanceof Player) {
+            ((Player)player).spigot().sendMessage(TextComponent.fromLegacyText(toSend));
+        } else player.sendMessage(toSend);
     }
 
     public static double max(double... values) {

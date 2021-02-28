@@ -8,6 +8,7 @@ import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.StringUtils;
 import lombok.val;
 import org.bukkit.Bukkit;
@@ -18,38 +19,40 @@ import java.util.concurrent.atomic.AtomicLong;
 @Init(commands = true)
 public class LagCommand {
 
+    private static String getMsg(String name, String def) {
+        return Kauri.INSTANCE.msgHandler.getLanguage().msg("command.lag." + name, def);
+    }
+
     @Command(name = "kauri.lag", description = "view important lag information", display = "lag",
             aliases = {"lag", "klag"}, permission = "kauri.command.lag")
     public void onCommand(CommandAdapter cmd) {
         StringUtils.Messages.LINE.send(cmd.getSender());
-        cmd.getSender().sendMessage(Color.Gold + Color.Bold + "Server Lag Information");
+        MiscUtils.sendMessage(cmd.getSender(), getMsg("main.title",
+                Color.Gold + Color.Bold + "Server Lag Information"));
         cmd.getSender().sendMessage("");
-        cmd.getSender().sendMessage(Color.translate("&eTPS&8: &f" +
-                MathUtils.round(Kauri.INSTANCE.getTps(), 2)));
+        MiscUtils.sendMessage(cmd.getSender(), getMsg("main.tps", "&eTPS&8: &f%.2f\\%"),
+                Kauri.INSTANCE.getTps());
         AtomicLong chunkCount = new AtomicLong(0);
         Bukkit.getWorlds().forEach(world -> chunkCount.addAndGet(world.getLoadedChunks().length));
-        cmd.getSender().sendMessage(Color.translate("&eChunks&8: &f" + chunkCount.get()));
-        double totalMem =  MathUtils.round(Runtime.getRuntime().totalMemory() / 1E9, 2);
-        double freeMem = MathUtils.round(Runtime.getRuntime().freeMemory() / 1E9, 2);
-        double allocated = MathUtils.round(Runtime.getRuntime().maxMemory() / 1E9, 2);
-        cmd.getSender().sendMessage(Color.translate("&eMemory (GB)&8: &f"
-                + freeMem + "&7/&f" + totalMem + "&7/&f" + allocated));
+        MiscUtils.sendMessage(cmd.getSender(), getMsg("main.chunks", "&eChunks&8: &f%s"), chunkCount.get());
+        MiscUtils.sendMessage(cmd.getSender(), getMsg("main.memory",
+                "&eMemory &7(&f&oFree&7&o/&f&oTotal&7&o/&f&oAllocated&7)&8: &f%.2fGB&7/&f%.2fGB&7/&f%.2fGB"),
+                Runtime.getRuntime().freeMemory() / 1E9,
+                Runtime.getRuntime().totalMemory() / 1E9, Runtime.getRuntime().maxMemory() / 1E9);
         val results = Kauri.INSTANCE.profiler.results(ResultsType.TOTAL);
-        cmd.getSender().sendMessage(Color.translate("&eKauri CPU Usage&8: &f" +
-                MathUtils.round(results.keySet()
-                        .stream()
-                        .filter(key -> !key.contains("check:"))
-                        .mapToDouble(key -> results.get(key).two / 1000000D)
-                        .filter(val -> !Double.isNaN(val) && !Double.isInfinite(val))
-                        .sum() / 50D * 100, 1)) + "%");
+        MiscUtils.sendMessage(cmd.getSender(), getMsg("main.cpu-usage", "&eKauri CPU Usage&8: &f%.5f\\%"),
+                results.keySet().stream()
+                .filter(key -> !key.contains("check:"))
+                .mapToDouble(key -> results.get(key).two / 1000000D)
+                .filter(val -> !Double.isNaN(val) && !Double.isInfinite(val))
+                .sum() / 50D * 100);
         StringUtils.Messages.LINE.send(cmd.getSender());
     }
 
     @Command(name = "kauri.lag.gc", description = "run a garbage collector.", display = "lag gc",
             aliases = {"lag.gc", "klag.gc"}, permission = "kauri.command.lag.gc")
     public void onLagGc(CommandAdapter cmd) {
-        cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
-                .msg("start-gc", "&7Starting garbage collector..."));
+        cmd.getSender().sendMessage(getMsg("start-gc", "&7Starting garbage collector..."));
 
         long stamp = System.nanoTime();
         double time;
