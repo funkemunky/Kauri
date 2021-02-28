@@ -70,7 +70,6 @@ public class RegularChecks implements CheckRegister {
         Check.register(new HandB());
         Check.register(new HandC());
         Check.register(new HandD());
-        Check.register(new HandE());
         Check.register(new BookOp());
         Check.register(new BookEnchant());
         Check.register(new PacketSpam());

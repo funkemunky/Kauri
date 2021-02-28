@@ -4,6 +4,7 @@ import cc.funkemunky.api.events.AtlasEvent;
 import cc.funkemunky.api.reflections.types.WrappedClass;
 import cc.funkemunky.api.reflections.types.WrappedMethod;
 import cc.funkemunky.api.tinyprotocol.api.NMSObject;
+import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.MiscUtils;
@@ -28,16 +29,20 @@ public class CheckManager {
         val methods = checkMethods.get(object.getClass());
 
         int currentTick = MiscUtils.currentTick();
-        methods.parallelStream()
+        (methods.size() > 14 ? methods.parallelStream() : methods.stream())
                 .forEach(wrapped -> {
                     try {
                         if(!wrapped.isBoolean && wrapped.isPacket && wrapped.check.enabled && wrapped.isCompatible()) {
+                            Kauri.INSTANCE.profiler.start("check:" + wrapped.checkName + ":"
+                                    + object.getPacketName());
                             if(wrapped.oneParam) wrapped.method.getMethod().invoke(wrapped.check, object);
                             else {
                                 if(wrapped.isTimeStamp) {
                                     wrapped.method.getMethod().invoke(wrapped.check, object, timeStamp);
                                 } else wrapped.method.getMethod().invoke(wrapped.check, object, currentTick);
                             }
+                            Kauri.INSTANCE.profiler.stop("check:" + wrapped.checkName + ":"
+                                    + object.getPacketName());
                         }
                     } catch(Exception e) {
                         cc.funkemunky.api.utils.MiscUtils
@@ -57,6 +62,8 @@ public class CheckManager {
         for (WrappedCheck wrapped : methods) {
             if(!wrapped.isBoolean) continue;
             try {
+                Kauri.INSTANCE.profiler.start("check:" + wrapped.checkName + ":"
+                        + object.getPacketName());
                 if(wrapped.isPacket && wrapped.check.enabled && wrapped.isCompatible()) {
                     if(wrapped.oneParam) {
                         if((boolean)wrapped.method.getMethod().invoke(wrapped.check, object)) cancelled = true;
@@ -66,6 +73,8 @@ public class CheckManager {
                     } else if((boolean)wrapped.method.getMethod().invoke(wrapped.check, object, currentTick))
                         cancelled = true;
                 }
+                Kauri.INSTANCE.profiler.stop("check:" + wrapped.checkName + ":"
+                        + object.getPacketName());
             } catch(Exception e) {
                 cc.funkemunky.api.utils.MiscUtils.printToConsole("Error occurred in check " + wrapped.checkName);
                 e.printStackTrace();
@@ -84,7 +93,11 @@ public class CheckManager {
             methods.forEach(wrapped -> {
                         if(wrapped.isEvent && wrapped.check.enabled) {
                             try {
+                                Kauri.INSTANCE.profiler.start("check:" + wrapped.checkName + ":"
+                                        + event.getEventName());
                                 wrapped.method.getMethod().invoke(wrapped.check, event);
+                                Kauri.INSTANCE.profiler.stop("check:" + wrapped.checkName + ":"
+                                        + event.getEventName());
                             } catch(Exception e) {
                                 cc.funkemunky.api.utils.MiscUtils
                                         .printToConsole("Error occurred in check " + wrapped.checkName);
@@ -100,11 +113,15 @@ public class CheckManager {
 
         val methods = checkMethods.get(event.getClass());
 
-        methods.parallelStream()
+        methods
                 .forEach(wrapped -> {
+                    Kauri.INSTANCE.profiler.start("check:" + wrapped.checkName + ":"
+                            + event.getClass().getSimpleName());
                     if(!wrapped.isPacket && wrapped.check.enabled) {
                         wrapped.method.invoke(wrapped.check, event);
                     }
+                    Kauri.INSTANCE.profiler.stop("check:" + wrapped.checkName + ":"
+                            + event.getClass().getSimpleName());
                 });
     }
 

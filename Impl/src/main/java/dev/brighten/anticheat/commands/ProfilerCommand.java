@@ -69,24 +69,22 @@ public class ProfilerCommand {
                 AtomicReference<Double> samples = new AtomicReference<>((double) 0);
 
                 map.forEach((key, result) -> {
-                    if(!key.contains("check:")) {
-                        Timing timing = Kauri.INSTANCE.profiler.getTimingsMap().get(key);
-                        double totalMS = timing.total / 1000000D;
-                        Button button = new Button(false, new ItemBuilder(XMaterial.REDSTONE.parseMaterial())
-                                .amount(1)
-                                .name(Color.Gold + key).lore("",
-                                        "&7Weighted Usage: " + Helper
-                                                .drawUsage(total, result.two),
-                                        "&7MS: &f" + Helper
-                                                .format(totalMS, 3),
-                                        "&7Samples: &f" + Helper
-                                                .format(result.two / 1000000D, 3),
-                                        "&7Deviation: &f" + Helper
-                                                .format(timing.stdDev / 1000000D, 3)).build());
+                    Timing timing = Kauri.INSTANCE.profiler.getTimingsMap().get(key);
+                    double totalMS = timing.total / 1000000D;
+                    Button button = new Button(false, new ItemBuilder(XMaterial.REDSTONE.parseMaterial())
+                            .amount(1)
+                            .name(Color.Gold + key).lore("",
+                                    "&7Weighted Usage: " + Helper
+                                            .drawUsage(total, result.two),
+                                    "&7MS: &f" + Helper
+                                            .format(totalMS, 3),
+                                    "&7Samples: &f" + Helper
+                                            .format(result.two / 1000000D, 3),
+                                    "&7Deviation: &f" + Helper
+                                            .format(timing.stdDev / 1000000D, 3)).build());
 
-                        buttons.add(new Tuple<>(totalMS, button));
-                        samples.updateAndGet(v -> (v + (result.two / 1000000D) * (totalMS / overall)));
-                    }
+                    buttons.add(new Tuple<>(totalMS, button));
+                    samples.updateAndGet(v -> (v + (result.two / 1000000D) * (totalMS / overall)));
                 });
 
                 buttons.sort(Comparator.comparing(tuple -> tuple.one, Comparator.reverseOrder()));
@@ -140,7 +138,6 @@ public class ProfilerCommand {
             AtomicLong total = new AtomicLong();
             List<Map.Entry<String, Long>> entries = new ArrayList<>(sorted.entrySet());
             IntStream.range(size - Math.min(size - 10, 10), size).mapToObj(entries::get)
-                    .filter(entry -> !entry.getKey().contains("check:"))
                     .forEach(entry -> {
                         String name = entry.getKey();
                         Long time = entry.getValue();
@@ -199,7 +196,7 @@ public class ProfilerCommand {
                             .sum();
                     List<Map.Entry<String, Long>> entries = new ArrayList<>(sorted.entrySet());
                     AtomicReference<Double> samples = new AtomicReference<>((double) 0);
-                    map.keySet().stream().filter(key -> !key.contains("check:")).forEach(key -> {
+                    map.keySet().forEach(key -> {
                         val entry = map.get(key);
                         Timing timing = Kauri.INSTANCE.profiler.getTimingsMap().get(key);
                         double time = entry.two / 1000000D;

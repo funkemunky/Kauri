@@ -36,7 +36,7 @@ public class ReachA extends Check {
     public void onFlying(WrappedInUseEntityPacket packet, long timeStamp) {
         Kauri.INSTANCE.profiler.start("check:ReachA");
         if(data.playerInfo.creative
-                || data.targetPastLocation.previousLocations.size() < 10
+                || data.targetPastLocation.getPreviousLocations().size() < 10
                 || packet.getAction() != WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK
                 || !allowedEntityTypes.contains(packet.getEntity().getType())) return;
 

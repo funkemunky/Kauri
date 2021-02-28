@@ -261,7 +261,9 @@ public class MenuCommand {
         menu.setParent(getChecksMenu(settings.type));
 
         Button buttonEnabled = new Button(false,
-                new ItemBuilder(XMaterial.INK_SAC.parseMaterial()).amount(1)
+                new ItemBuilder(settings.enabled
+                        ? XMaterial.LIME_DYE.parseMaterial()
+                        : XMaterial.ROSE_RED.parseMaterial()).amount(1)
                         .durability(settings.enabled ? 10 : 8)
                         .name((settings.enabled ? Color.Green : Color.Gray) + "Enabled").build(),
                 (player, info) -> {
@@ -269,7 +271,9 @@ public class MenuCommand {
                     Kauri.INSTANCE.getConfig().set(enabled, settings.enabled);
                     Kauri.INSTANCE.saveConfig();
 
-                    info.getButton().setStack(new ItemBuilder(XMaterial.INK_SAC.parseMaterial()).amount(1)
+                    info.getButton().setStack(new ItemBuilder(settings.enabled
+                            ? XMaterial.LIME_DYE.parseMaterial()
+                            : XMaterial.ROSE_RED.parseMaterial()).amount(1)
                             .durability(settings.enabled ? 10 : 8)
                             .name((settings.enabled ? Color.Green : Color.Gray) + "Enabled").build());
                     menu.buildInventory(false);
@@ -286,7 +290,9 @@ public class MenuCommand {
                 });
 
         Button buttonExecutable = new Button(false,
-                new ItemBuilder(XMaterial.INK_SAC.parseMaterial()).amount(1)
+                new ItemBuilder(settings.executable
+                        ? XMaterial.LIME_DYE.parseMaterial()
+                        : XMaterial.ROSE_RED.parseMaterial()).amount(1)
                         .durability(settings.executable ? 10 : 8)
                         .name((settings.executable ? Color.Green : Color.Gray) + "Executable").build(),
                 (player, info) -> {
@@ -294,7 +300,9 @@ public class MenuCommand {
                     Kauri.INSTANCE.getConfig().set(executable, settings.executable);
                     Kauri.INSTANCE.saveConfig();
 
-                    info.getButton().setStack(new ItemBuilder(XMaterial.INK_SAC.parseMaterial()).amount(1)
+                    info.getButton().setStack(new ItemBuilder(settings.executable
+                            ? XMaterial.LIME_DYE.parseMaterial()
+                            : XMaterial.ROSE_RED.parseMaterial()).amount(1)
                             .durability(settings.executable ? 10 : 8)
                             .name((settings.executable ? Color.Green : Color.Gray) + "Executable").build());
                     menu.buildInventory(false);
@@ -311,7 +319,9 @@ public class MenuCommand {
                 });
 
         Button buttonCancellable = new Button(false,
-                settings.cancelMode != null ? new ItemBuilder(XMaterial.INK_SAC.parseMaterial()).amount(1)
+                settings.cancelMode != null ? new ItemBuilder(settings.cancellable
+                        ? XMaterial.LIME_DYE.parseMaterial()
+                        : XMaterial.ROSE_RED.parseMaterial()).amount(1)
                         .durability(settings.cancellable ? 10 : 8)
                         .name((settings.cancellable ? Color.Green : Color.Gray) + "Cancellable").build()
                         : new ItemBuilder(XMaterial.REDSTONE.parseMaterial())

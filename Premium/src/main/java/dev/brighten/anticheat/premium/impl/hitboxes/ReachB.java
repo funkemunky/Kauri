@@ -46,8 +46,8 @@ public class ReachB extends Check {
                     .stream()
                     .map(loc -> {
                         SimpleCollisionBox hitbox = (SimpleCollisionBox) getHitbox(data.target, loc);
-                        int index = data.targetPastLocation.previousLocations.indexOf(loc);
-                        return new Pair<>(hitbox, Math.max(0,index > 0 ? data.targetPastLocation.previousLocations
+                        int index = data.targetPastLocation.getPreviousLocations().indexOf(loc);
+                        return new Pair<>(hitbox, Math.max(0,index > 0 ? data.targetPastLocation.getPreviousLocations()
                                 .get(index- 1)
                                 .toVector().distance(loc.toVector()) : 0));
                     }).collect(Collectors.toList());

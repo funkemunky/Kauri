@@ -9,6 +9,7 @@ import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.StringUtils;
+import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -33,10 +34,12 @@ public class LagCommand {
         double allocated = MathUtils.round(Runtime.getRuntime().maxMemory() / 1E9, 2);
         cmd.getSender().sendMessage(Color.translate("&eMemory (GB)&8: &f"
                 + freeMem + "&7/&f" + totalMem + "&7/&f" + allocated));
+        val results = Kauri.INSTANCE.profiler.results(ResultsType.TOTAL);
         cmd.getSender().sendMessage(Color.translate("&eKauri CPU Usage&8: &f" +
-                MathUtils.round(Kauri.INSTANCE.profiler.results(ResultsType.TICK).values()
+                MathUtils.round(results.keySet()
                         .stream()
-                        .mapToDouble(val -> val.two / 1000000D)
+                        .filter(key -> !key.contains("check:"))
+                        .mapToDouble(key -> results.get(key).two / 1000000D)
                         .filter(val -> !Double.isNaN(val) && !Double.isInfinite(val))
                         .sum() / 50D * 100, 1)) + "%");
         StringUtils.Messages.LINE.send(cmd.getSender());

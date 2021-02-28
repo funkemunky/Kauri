@@ -100,7 +100,7 @@ public class Hitboxes extends Check {
         return data.playerInfo.lastAttack.isNotPassed(0)
                 && data.target != null
                 && (allowNPCFlag || ((Player) data.target).isOnline())
-                && data.targetPastLocation.previousLocations.size() > 12
+                && data.targetPastLocation.getPreviousLocations().size() > 12
                 && Kauri.INSTANCE.lastTickLag.isPassed(10)
                 && allowedEntities.contains(data.target.getType())
                 && !data.playerInfo.creative
