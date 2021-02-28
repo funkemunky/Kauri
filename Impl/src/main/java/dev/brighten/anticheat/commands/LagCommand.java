@@ -30,7 +30,7 @@ public class LagCommand {
         MiscUtils.sendMessage(cmd.getSender(), getMsg("main.title",
                 Color.Gold + Color.Bold + "Server Lag Information"));
         cmd.getSender().sendMessage("");
-        MiscUtils.sendMessage(cmd.getSender(), getMsg("main.tps", "&eTPS&8: &f%.2f\\%"),
+        MiscUtils.sendMessage(cmd.getSender(), getMsg("main.tps", "&eTPS&8: &f%.2f%%"),
                 Kauri.INSTANCE.getTps());
         AtomicLong chunkCount = new AtomicLong(0);
         Bukkit.getWorlds().forEach(world -> chunkCount.addAndGet(world.getLoadedChunks().length));
@@ -40,7 +40,7 @@ public class LagCommand {
                 Runtime.getRuntime().freeMemory() / 1E9,
                 Runtime.getRuntime().totalMemory() / 1E9, Runtime.getRuntime().maxMemory() / 1E9);
         val results = Kauri.INSTANCE.profiler.results(ResultsType.TOTAL);
-        MiscUtils.sendMessage(cmd.getSender(), getMsg("main.cpu-usage", "&eKauri CPU Usage&8: &f%.5f\\%"),
+        MiscUtils.sendMessage(cmd.getSender(), getMsg("main.cpu-usage", "&eKauri CPU Usage&8: &f%.5f%%"),
                 results.keySet().stream()
                 .filter(key -> !key.contains("check:"))
                 .mapToDouble(key -> results.get(key).two / 1000000D)

@@ -46,6 +46,8 @@ public class BadPacketsN extends Check {
 
     @Packet
     public void onTransaction(WrappedInTransactionPacket packet, long now) {
+        if(packet.getId() != 0) return;
+
         flying = 0;
 
         val response

@@ -204,11 +204,6 @@ public class Kauri extends JavaPlugin {
             lastTick = currentTime;
             Kauri.INSTANCE.lastTick = currentTime;
         }, this, 1L, 1L);
-
-        WrappedOutTransaction transaction =new WrappedOutTransaction(0, (short)69, false);
-        RunUtils.taskTimerAsync(() ->
-            Bukkit.getOnlinePlayers().forEach(player ->
-                TinyProtocolHandler.sendPacket(player, transaction)), 40L, 40L);
     }
 
     public double getTps() {

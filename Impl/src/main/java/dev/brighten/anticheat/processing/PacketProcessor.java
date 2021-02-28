@@ -240,41 +240,43 @@ public class PacketProcessor {
             case Packet.Client.TRANSACTION: {
                 WrappedInTransactionPacket packet = new WrappedInTransactionPacket(object, data.getPlayer());
 
-                Kauri.INSTANCE.keepaliveProcessor.addResponse(data, packet.getAction());
+                if(packet.getId() == 0) {
 
-                val optional = Kauri.INSTANCE.keepaliveProcessor.getResponse(data);
+                    Kauri.INSTANCE.keepaliveProcessor.addResponse(data, packet.getAction());
 
-                int current = Kauri.INSTANCE.keepaliveProcessor.tick;
+                    val optional = Kauri.INSTANCE.keepaliveProcessor.getResponse(data);
 
-                optional.ifPresent(ka -> {
-                    data.playerTicks++;
-                    data.lagInfo.lastTransPing = data.lagInfo.transPing;
-                    data.lagInfo.transPing = (current - ka.start);
+                    int current = Kauri.INSTANCE.keepaliveProcessor.tick;
 
-                    if(Math.abs(data.lagInfo.lastTransPing - data.lagInfo.transPing) > 1) {
-                        data.lagInfo.lastPingDrop.reset();
-                    }
-                    data.clickProcessor.onFlying(packet);
+                    optional.ifPresent(ka -> {
+                        data.playerTicks++;
+                        data.lagInfo.lastTransPing = data.lagInfo.transPing;
+                        data.lagInfo.transPing = (current - ka.start);
 
-                    ka.getReceived(data.uuid).ifPresent(r -> {
-                        r.receivedStamp = data.lagInfo.recieved = event.getTimeStamp();
-                        data.lagInfo.lmillisPing = data.lagInfo.millisPing;
-                        data.lagInfo.millisPing = r.receivedStamp - (data.lagInfo.start = ka.startStamp);
+                        if (Math.abs(data.lagInfo.lastTransPing - data.lagInfo.transPing) > 1) {
+                            data.lagInfo.lastPingDrop.reset();
+                        }
+                        data.clickProcessor.onFlying(packet);
+
+                        ka.getReceived(data.uuid).ifPresent(r -> {
+                            r.receivedStamp = data.lagInfo.recieved = event.getTimeStamp();
+                            data.lagInfo.lmillisPing = data.lagInfo.millisPing;
+                            data.lagInfo.millisPing = r.receivedStamp - (data.lagInfo.start = ka.startStamp);
+                        });
+
+                        KeepaliveAcceptedEvent e = Kauri.INSTANCE.eventHandler
+                                .runEvent(new KeepaliveAcceptedEvent(data, ka));
+
+                        for (ObjectData.Action action : data.keepAliveStamps) {
+                            if (action.stamp > ka.start) continue;
+
+                            action.action.accept(ka);
+
+                            data.keepAliveStamps.remove(action);
+                        }
                     });
-
-                    KeepaliveAcceptedEvent e = Kauri.INSTANCE.eventHandler
-                            .runEvent(new KeepaliveAcceptedEvent(data, ka));
-
-                    for (ObjectData.Action action : data.keepAliveStamps) {
-                        if(action.stamp > ka.start) continue;
-
-                        action.action.accept(ka);
-
-                        data.keepAliveStamps.remove(action);
-                    }
-                });
-
-                data.lagInfo.lastClientTrans = timeStamp;
+                    data.lagInfo.lastClientTrans = timeStamp;
+                }
 
                 data.checkManager.runPacket(packet, timeStamp);
                 if(data.sniffing) {
@@ -490,10 +492,6 @@ public class PacketProcessor {
             }
             case Packet.Server.TRANSACTION: {
                 WrappedOutTransaction packet = new WrappedOutTransaction(object, data.getPlayer());
-
-                if (packet.getAction() == (short)69) {
-                    data.lagInfo.lastTrans = event.getTimeStamp();
-                }
 
                 if(data.sniffing) {
                     data.sniffedPackets.add(event.getType() + ":@:" + packet.getId() + ";"
