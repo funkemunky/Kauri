@@ -3,8 +3,6 @@ package dev.brighten.anticheat.check;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.Priority;
-import cc.funkemunky.api.utils.RunUtils;
-import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckRegister;
 import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerA;
@@ -14,21 +12,13 @@ import dev.brighten.anticheat.check.impl.movement.nofall.NoFallA;
 import dev.brighten.anticheat.check.impl.movement.speed.SpeedA;
 import dev.brighten.anticheat.check.impl.movement.velocity.VelocityD;
 import dev.brighten.anticheat.check.impl.packets.badpackets.*;
-import org.bukkit.scheduler.BukkitTask;
 
 @Init(priority = Priority.LOWEST)
 public class FreeChecks implements CheckRegister {
 
-    private BukkitTask msgingTask;
-
     public FreeChecks() {
+        MiscUtils.printToConsole("&aLoading Kauri Free checks...");
         registerChecks();
-
-        if (!Kauri.INSTANCE.usingPremium && !Kauri.INSTANCE.usingAra) {
-            MiscUtils.printToConsole("&fWe appreciate you using Kauri. If you would like to help us out " +
-                    "while unlocking more, please consider purchasing a " +
-                    "premium package at &e&ohttps://funkemunky.cc/shop" );
-        }
     }
 
     @Override

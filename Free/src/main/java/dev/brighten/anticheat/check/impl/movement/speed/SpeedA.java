@@ -101,7 +101,8 @@ public class SpeedA extends Check {
                             ratio, data.playerInfo.deltaXZ, data.predictionService.aiMoveSpeed, tags.build());
                 }
             } else if(buffer > 0) buffer-= 0.25f;
-            debug("ratio=%.1f tags=%s", ratio, tags.build());
+            debug("ratio=%.1f tags=%s tp=%s", ratio, tags.build(),
+                    data.playerInfo.lastTeleportTimer.getPassed());
 
             if(vxz != 0) {
                 ldxz = vxz;

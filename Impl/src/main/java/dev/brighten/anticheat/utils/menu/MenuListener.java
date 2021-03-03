@@ -37,7 +37,7 @@ public class MenuListener implements Listener {
     public static Map<AnvilInventory, ValueMenu> anvils = new HashMap<>();
 
     @EventHandler(priority = EventPriority.LOW)
-    private void onInventoryClick(InventoryClickEvent event) {
+    public void onInventoryClick(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player)) return;
 
         final InventoryView inventoryView = event.getView();
@@ -83,7 +83,7 @@ public class MenuListener implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    private void onInventoryClose(InventoryCloseEvent event) {
+    public void onInventoryClose(InventoryCloseEvent event) {
         if (!(event.getPlayer() instanceof Player)) return;
 
         final InventoryView inventoryView = event.getView();

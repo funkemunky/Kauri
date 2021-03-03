@@ -161,9 +161,13 @@ public class MovementProcessor {
                 && !data.getPlayer().getGameMode().equals(GameMode.ADVENTURE);
 
         data.blockInfo.fromFriction = data.blockInfo.currentFriction;
-        if(data.playerInfo.blockBelow != null)
-            data.blockInfo.currentFriction = BlockUtils.getFriction(XMaterial.requestXMaterial(
-                    data.playerInfo.blockBelow.getType().name(), data.playerInfo.blockBelow.getData()));
+        if(data.playerInfo.blockBelow != null) {
+            val mat = XMaterial.requestXMaterial(
+                    data.playerInfo.blockBelow.getType().name(), data.playerInfo.blockBelow.getData());
+
+            if (mat != null)
+                data.blockInfo.currentFriction = BlockUtils.getFriction(mat);
+        }
 
         if(packet.isPos()) {
             //We create a separate from BoundingBox for the predictionService since it should operate on pre-motion data.
