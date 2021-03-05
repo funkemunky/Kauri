@@ -15,6 +15,7 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.Config;
 import dev.brighten.anticheat.data.DataManager;
 import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.discord.DiscordAPI;
 import dev.brighten.anticheat.listeners.api.EventHandler;
 import dev.brighten.anticheat.logs.LoggerManager;
 import dev.brighten.anticheat.processing.EntityProcessor;
@@ -104,6 +105,9 @@ public class Kauri extends JavaPlugin {
             MiscUtils.printToConsole("&7Shutting down all Bukkit tasks...");
             Bukkit.getScheduler().cancelTasks(this); //Cancelling all Bukkit tasks for this plugin.
         }
+
+        MiscUtils.printToConsole("&7Unloading Discord Webhooks...");
+        if(DiscordAPI.INSTANCE != null) DiscordAPI.INSTANCE.unload();
 
         MiscUtils.printToConsole("&7Unloading DataManager...");
         //Clearing the dataManager.

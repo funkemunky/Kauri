@@ -11,6 +11,14 @@
 
     <artifactId>Impl</artifactId>
 
+    <repositories>
+        <repository>
+            <name>jcenter</name>
+            <id>bintray-jcenter</id>
+            <url>https://jcenter.bintray.com</url>
+        </repository>
+    </repositories>
+
     <build>
         <plugins>
             <plugin>
@@ -57,7 +65,7 @@
         <dependency>
             <groupId>club.minnced</groupId>
             <artifactId>discord-webhooks</artifactId>
-            <version>0.1.6</version>
+            <version>0.</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

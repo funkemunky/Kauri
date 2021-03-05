@@ -46,13 +46,7 @@ public class DiscordAPI {
         }
         load:
         {
-            MiscUtils.printToConsole("&7Checking for valid url...");
-
-            if(!urlCheck.matcher(url).matches()) {
-                MiscUtils.printToConsole("&7URL &e%s &7not valid! Stopping Discord webhook loading process...",
-                        url);
-                break load;
-            }
+            MiscUtils.printToConsole("&7Loading URL: &e%s", url);
 
             MiscUtils.printToConsole("&7Initializing webhook api...");
             client = new WebhookClientBuilder(url).setThreadFactory(job -> {
