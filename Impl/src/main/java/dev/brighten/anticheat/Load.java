@@ -14,6 +14,7 @@ import dev.brighten.anticheat.classloader.CheckLicense;
 import dev.brighten.anticheat.classloader.KauriClassLoader;
 import dev.brighten.anticheat.classloader.file.FileDownloader;
 import dev.brighten.anticheat.data.DataManager;
+import dev.brighten.anticheat.discord.DiscordAPI;
 import dev.brighten.anticheat.listeners.api.EventHandler;
 import dev.brighten.anticheat.logs.LoggerManager;
 import dev.brighten.anticheat.processing.EntityProcessor;
@@ -86,6 +87,9 @@ public class Load {
 
         register("Registering checks...");
         Check.registerChecks();
+
+        register("Discord Webhooks...");
+        if(DiscordAPI.INSTANCE != null) DiscordAPI.INSTANCE.load();
 
         register("Running tps task...");
         Kauri.INSTANCE.runTpsTask();

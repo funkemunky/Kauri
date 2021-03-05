@@ -13,6 +13,7 @@ import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutCloseWindowPacket;
 import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.discord.DiscordAPI;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import dev.brighten.api.KauriAPI;
@@ -191,6 +192,9 @@ public class Check implements KauriCheck {
                 if(vl > 0) Kauri.INSTANCE.loggerManager.addLog(data, this, info);
 
                 if (lastAlert.isPassed(MathUtils.millisToTicks(Config.alertsDelay))) {
+                    //Sending Discord webhook alert
+                    if(DiscordAPI.INSTANCE != null)
+                        DiscordAPI.INSTANCE.sendFlag(data.getPlayer(), this, dev, vl);
                     List<TextComponent> components = new ArrayList<>();
 
                     if(dev) {
@@ -261,14 +265,19 @@ public class Check implements KauriCheck {
     }
 
     public void punish() {
-        if(banExempt || developer || !executable || punishVl == -1 || vl <= punishVl
+        if(developer || punishVl == -1 || vl <= punishVl
                 || System.currentTimeMillis() - Kauri.INSTANCE.lastTick > 200L) return;
+
+        DiscordAPI.INSTANCE.sendBan(data.getPlayer(),  this, banExempt);
+
+        vl = 0;
+
+        if(!executable || banExempt) return;
 
         KauriPunishEvent punishEvent = new KauriPunishEvent(data.getPlayer(), this);
 
         Atlas.getInstance().getEventManager().callEvent(punishEvent);
 
-        vl = 0;
         if(!punishEvent.isCancelled()) {
             Kauri.INSTANCE.loggerManager.addPunishment(data, this);
             if(!data.banned) {
