@@ -5,6 +5,8 @@ import club.minnced.discord.webhook.WebhookClient;
 import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.send.WebhookEmbed;
 import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
+import club.minnced.discord.webhook.send.WebhookMessage;
+import club.minnced.discord.webhook.send.WebhookMessageBuilder;
 import dev.brighten.api.check.KauriCheck;
 import org.bukkit.entity.Player;
 
@@ -60,6 +62,9 @@ public class DiscordAPI {
 
             author = new WebhookEmbed.EmbedAuthor("Kauri", "https://i.imgur.com/QkJPEor.jpg",
                     "https://i.imgur.com/QkJPEor.jpg");
+
+            client.send(new WebhookMessageBuilder().setUsername(author.getName()).setAvatarUrl(author.getIconUrl())
+                    .setContent("Started webhook").build());
         }
         MiscUtils.printToConsole("&7Completed loading!");
     }
@@ -81,14 +86,14 @@ public class DiscordAPI {
             if(lastTime == null || now - lastTime > delay) {
                 client.send(new WebhookEmbedBuilder().setAuthor(author)
                         .setColor(check.isExecutable() || exempt ? banRed : noBanOrange)
-                        .setTitle(new WebhookEmbed.EmbedTitle(player.getName(), ""))
+                        .setTitle(new WebhookEmbed.EmbedTitle("Kauri Ban", ""))
                         .setDescription(check.isExecutable() ?
                                 (exempt ? "Player would have been banned but is exempted from banning."
                                         : "Player was banned by Kauri.")
                                 : "Player would have been banned by Kauri but the check is not set to ban players.")
                         .addField(field("Detection", check.getName()))
                         .addField(field("Type", check.getCheckType().name()))
-                        .addField(field("Descrption", check.getDescription())).build());
+                        .addField(field("Description", check.getDescription())).build());
 
                 return now;
             }
@@ -102,13 +107,12 @@ public class DiscordAPI {
             long now = System.currentTimeMillis();
             if(lastTime == null || now - lastTime > delay) {
                 client.send(new WebhookEmbedBuilder().setAuthor(author).setColor(flagYellow)
-                        .setDescription("Player has flagged a check on Kauri.")
-                        .setTitle(new WebhookEmbed.EmbedTitle(player.getName(), ""))
+                        .setTitle(new WebhookEmbed.EmbedTitle("Kauri Flag", ""))
                         .addField(field("Player", player.getName()))
                         .addField(field("Detection", check.getName()))
                         .addField(field("Violation", MathUtils.round(vl, 1) + "/" + check.getPunishVl()))
-                        .addField(field("Type", check.getCheckType().name()))
-                        .addField(field("Descrption", check.getDescription())).build());
+                        .addField(field("Description", check.getDescription()))
+                        .setFooter(new WebhookEmbed.EmbedFooter(check.getCheckType().name(), "")).build());
 
                 return now;
             }

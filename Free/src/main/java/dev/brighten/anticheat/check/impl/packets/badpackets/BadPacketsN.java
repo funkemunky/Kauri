@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.check.impl.packets.badpackets;
 
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInKeepAlivePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
@@ -20,7 +21,7 @@ public class BadPacketsN extends Check {
     @Setting(name  = "kickPlayer")
     private static boolean kickPlayer = true;
     private int flying, lastTick;
-    private final Timer lastTrans = new TickTimer(), lastSentTrans = new TickTimer();
+    private final Timer lastTrans = new TickTimer(), lastSentTrans = new TickTimer(), lastFlying = new TickTimer();
 
     public BadPacketsN() {
         lastSentTrans.reset();
@@ -30,11 +31,10 @@ public class BadPacketsN extends Check {
     @Packet
     public void onOut(WrappedOutTransaction packet) {
         lastSentTrans.reset();
-    }
 
-    @Packet
-    public void onKeepalive(WrappedInKeepAlivePacket packet) {
-        if(lastSentTrans.isNotPassed(5) && lastTrans.isPassed(40)) {
+        if(lastFlying.isPassed(10)) return;
+
+        if(lastTrans.isPassed(140) || Kauri.INSTANCE.keepaliveProcessor.tick - lastTick > 300) {
             vl++;
             flag("f=%s t=NO_TRANS", flying);
 
@@ -42,6 +42,11 @@ public class BadPacketsN extends Check {
                 kickPlayer("[Kauri] Invalid packets.");
             }
         }
+    }
+
+    @Packet
+    public void onFlying(WrappedInFlyingPacket packet) {
+        lastFlying.reset();
     }
 
     @Packet
@@ -60,6 +65,8 @@ public class BadPacketsN extends Check {
             if (current - lastTick > 1 && now - data.creation > 4000L) {
                 vl++;
                 flag("c=%s last=%s d=%s t=SKIP", current, lastTick, current - lastTick);
+
+                if(!isExecutable()) kickPlayer("[Kauri] Invalid packets (S).");
             }
             debug("c=%s l=%s", current, lastTick);
             lastTick = current;

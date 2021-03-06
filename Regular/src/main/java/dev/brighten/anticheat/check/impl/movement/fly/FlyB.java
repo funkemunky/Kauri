@@ -34,7 +34,7 @@ public class FlyB extends Check {
             //If it is, it won't send any position packet. Usually this only occurs when the magnitude
             //of motionY is less than 0.005 and it rounds it to 0.
             //The easiest way I found to produce this oddity is by putting myself in a corner and just jumping.
-            if(Math.abs(data.playerInfo.deltaY) < 0.005
+            if(Math.abs(predicted) < 0.005
                     && ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9)) {
                 predicted = 0;
             }

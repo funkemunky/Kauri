@@ -9,6 +9,7 @@ public class TickTimer implements Timer {
 
     public TickTimer(long defaultPassed) {
         this.defaultPassed = defaultPassed;
+        currentStamp = Kauri.INSTANCE.keepaliveProcessor.tick;
     }
 
     public TickTimer() {

@@ -96,12 +96,12 @@ public class SpeedA extends Check {
                     && !data.playerInfo.generalCancel && data.playerInfo.lastVelocity.isPassed(2)) {
                 if((buffer+= ratio > 400 ? 2 : 1) > 4 || ratio > 600) {
                     vl++;
-                    flag("p=%.1f% dxz=%.3f aimove=%.3f tags=%s",
+                    flag("p=%.1f%% dxz=%.3f aimove=%.3f tags=%s",
                             ratio, data.playerInfo.deltaXZ, data.predictionService.aiMoveSpeed, tags.build());
                 }
             } else if(buffer > 0) buffer-= 0.25f;
-            debug("ratio=%.1f tags=%s tp=%s", ratio, tags.build(),
-                    data.playerInfo.lastTeleportTimer.getPassed());
+            debug("ratio=%.1f tags=%s tp=%s buffer=%.1f", ratio, tags.build(),
+                    data.playerInfo.liquidTimer.getPassed(), buffer);
 
             if(vxz != 0) {
                 ldxz = vxz;

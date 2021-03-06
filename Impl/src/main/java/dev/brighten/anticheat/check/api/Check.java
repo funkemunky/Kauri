@@ -128,7 +128,7 @@ public class Check implements KauriCheck {
     }
 
     public void flag(boolean devAlerts, String information, Object... variables) {
-        flag(devAlerts, Integer.MAX_VALUE, information, variables);
+        flag(devAlerts, 100000000, information, variables);
     }
 
     public void flag(int resetVLTime, String information, Object... variables) {

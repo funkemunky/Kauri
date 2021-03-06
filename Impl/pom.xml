@@ -13,9 +13,8 @@
 
     <repositories>
         <repository>
-            <name>jcenter</name>
-            <id>bintray-jcenter</id>
-            <url>https://jcenter.bintray.com</url>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
         </repository>
     </repositories>
 
@@ -63,9 +62,9 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>club.minnced</groupId>
+            <groupId>com.github.MinnDevelopment</groupId>
             <artifactId>discord-webhooks</artifactId>
-            <version>0.</version>
+            <version>bd2f855</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

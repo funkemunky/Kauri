@@ -116,7 +116,7 @@ public class MovementProcessor {
         //Adding past location
         data.pastLocation.addLocation(data.playerInfo.to);
 
-        if (data.playerInfo.posLocs.size() > 0 && packet.isPos() && !packet.isGround()) {
+        if (data.playerInfo.posLocs.size() > 0 && packet.isPos()) {
             synchronized (data.playerInfo.posLocs) {
                 for (KLocation loc : data.playerInfo.posLocs) {
                     double dx = data.playerInfo.to.x - loc.x,
