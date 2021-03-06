@@ -15,7 +15,7 @@ import dev.brighten.api.check.CheckType;
 import lombok.val;
 
 @CheckInfo(name = "BadPackets (N)", description = "Designed to patch disablers for Kauri.",
-        checkType = CheckType.BADPACKETS, punishVL = 50, vlToFlag = 4)
+        checkType = CheckType.BADPACKETS, punishVL = 50, vlToFlag = 4, executable = false)
 public class BadPacketsN extends Check {
 
     @Setting(name  = "kickPlayer")
