@@ -23,6 +23,7 @@ public class FlyC extends Check {
                     && data.playerInfo.jumped
                     && !data.playerInfo.serverPos
                     && !data.playerInfo.wasOnSlime
+                    && !data.blockInfo.collidesHorizontally
                     && data.playerInfo.lClientGround
                     && !data.blockInfo.miscNear
                     && data.playerInfo.blockAboveTimer.isPassed(6)
@@ -32,7 +33,7 @@ public class FlyC extends Check {
                     && MathUtils.getDelta(data.playerInfo.deltaY, maxHeight) > 0.01f) {
                 vl++;
                 flag("deltaY=%s maxHeight=%s", data.playerInfo.deltaY, maxHeight);
-            } else vl-= 0.01f;
+            } else if(vl > 0) vl-= 0.01f;
 
             debug("deltaY=%s above=%s", data.playerInfo.deltaY,
                     data.playerInfo.blockAboveTimer.getPassed());
