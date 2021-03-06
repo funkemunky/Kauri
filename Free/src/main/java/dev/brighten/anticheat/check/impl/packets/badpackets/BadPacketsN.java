@@ -29,10 +29,10 @@ public class BadPacketsN extends Check {
     }
 
     @Packet
-    public void onOut(WrappedOutTransaction packet) {
+    public void onOut(WrappedOutTransaction packet, long now) {
         lastSentTrans.reset();
 
-        if(lastFlying.isPassed(10)) return;
+        if(lastFlying.isPassed(10) || now - data.creation > 4000L) return;
 
         if(lastTrans.isPassed(140) || Kauri.INSTANCE.keepaliveProcessor.tick - lastTick > 300) {
             vl++;

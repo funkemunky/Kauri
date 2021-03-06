@@ -38,6 +38,15 @@ public class DiscordAPI {
     @ConfigSetting(path = "discord", name = "msgDelayInMillis")
     private static long delay = 2000L;
 
+    @ConfigSetting(path = "discord.send", name = "bans")
+    private static boolean sendBans = true;
+
+    @ConfigSetting(path = "discord.send", name = "alerts")
+    private static boolean sendAlerts = false;
+
+    @ConfigSetting(path = "discord.send", name = "startMsg")
+    private static boolean startMsg = true;
+
     @ConfigSetting(path = "discord", name = "devAlerts")
     private static boolean devAlerts = false;
 
@@ -63,6 +72,7 @@ public class DiscordAPI {
             author = new WebhookEmbed.EmbedAuthor("Kauri", "https://i.imgur.com/QkJPEor.jpg",
                     "https://i.imgur.com/QkJPEor.jpg");
 
+            if(startMsg)
             client.send(new WebhookMessageBuilder().setUsername(author.getName()).setAvatarUrl(author.getIconUrl())
                     .setContent("Started webhook").build());
         }
@@ -79,7 +89,7 @@ public class DiscordAPI {
     private static final int banRed = 0xD9471A, noBanOrange = 0xE8A83A, flagYellow = 0xFFEB33;
 
     public void sendBan(Player player, KauriCheck check, boolean exempt) {
-        if(client == null || (!devAlerts && check.isDeveloper())) return;
+        if(!sendBans || client == null || (!devAlerts && check.isDeveloper())) return;
 
         lastDiscordSend.compute(player.getUniqueId(), (key, lastTime) -> {
             long now = System.currentTimeMillis();
@@ -91,6 +101,7 @@ public class DiscordAPI {
                                 (exempt ? "Player would have been banned but is exempted from banning."
                                         : "Player was banned by Kauri.")
                                 : "Player would have been banned by Kauri but the check is not set to ban players.")
+                        .addField(field("Player", player.getName()))
                         .addField(field("Detection", check.getName()))
                         .addField(field("Type", check.getCheckType().name()))
                         .addField(field("Description", check.getDescription())).build());
@@ -102,7 +113,7 @@ public class DiscordAPI {
     }
 
     public void sendFlag(Player player, KauriCheck check, boolean dev, float vl) {
-        if(client == null || (!devAlerts && dev)) return;
+        if(!sendAlerts || client == null || (!devAlerts && dev)) return;
         lastDiscordSend.compute(player.getUniqueId(), (key, lastTime) -> {
             long now = System.currentTimeMillis();
             if(lastTime == null || now - lastTime > delay) {
