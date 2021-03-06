@@ -18,7 +18,7 @@ public class KeepAlive {
 
     public KeepAlive(int start) {
         this.start = start;
-        id = (short) ThreadLocalRandom.current().nextInt(Short.MIN_VALUE, Short.MAX_VALUE);
+        id = (short) (Kauri.INSTANCE.keepaliveProcessor.tick % 32767);
     }
 
     public final Map<UUID, KAReceived> receivedKeepalive = new HashMap<>();
