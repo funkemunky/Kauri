@@ -39,10 +39,10 @@ public class AimE extends Check {
         final double deltaX = Math.abs(Math.floor(mx) - mx);
         final double deltaY = Math.abs(Math.floor(my) - my);
 
-        final boolean shitX = deltaX > 0.05 && deltaX < 0.95, shitY = deltaY > 0.05 && deltaY < 0.95;
+        final boolean shitX = deltaX > 0.08 && deltaX < 0.92, shitY = deltaY > 0.08 && deltaY < 0.92;
         final boolean increase = data.playerInfo.deltaYaw > data.moveProcessor.yawMode
                 || data.playerInfo.deltaPitch > data.moveProcessor.pitchMode;
-        final boolean flag = shitX && shitY && !increase;
+        final boolean flag = (shitX || shitY) && !increase;
 
         if(flag) {
             if(++buffer > 9) {
