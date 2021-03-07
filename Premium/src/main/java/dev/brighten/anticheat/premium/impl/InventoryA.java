@@ -1,7 +1,10 @@
 package dev.brighten.anticheat.premium.impl;
 
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInClientCommandPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInCloseWindowPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInWindowClickPacket;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutOpenWindow;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -16,6 +19,7 @@ import dev.brighten.api.check.CheckType;
 public class InventoryA extends Check {
 
     private Timer lastMove;
+    private int openInventory;
 
     @Override
     public void setData(ObjectData data) {
@@ -28,6 +32,29 @@ public class InventoryA extends Check {
         if(lastMove.isNotPassed(1))  {
             vl++;
             flag("slot=%s clickType=%s", packet.getSlot(), packet.getAction().name());
+        }
+    }
+
+    @Packet
+    public void onInventoryOpen(WrappedOutOpenWindow packet) {
+        data.runKeepaliveAction(ka -> {
+            openInventory = packet.getId();
+            debug("opened server inventory id=" + packet.getId());
+        });
+    }
+
+    @Packet
+    public void onClose(WrappedInCloseWindowPacket packet) {
+        debug("closed inventory: open=%s nowClosing=%s", openInventory, packet.getId());
+        openInventory = -69;
+    }
+
+    @Packet
+    public void onClientCommand(WrappedInClientCommandPacket packet) {
+        if(packet.getCommand() == WrappedInClientCommandPacket.EnumClientCommand.OPEN_INVENTORY_ACHIEVEMENT
+        && !data.blockInfo.inPortal) {
+            openInventory = 0;
+            debug("opened inventory id=0");
         }
     }
 

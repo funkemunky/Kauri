@@ -14,20 +14,20 @@ import dev.brighten.api.check.CheckType;
 @Cancellable
 public class VelocityA extends Check {
 
-    private double vY;
+    private double vY, buffer;
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if(data.playerInfo.lastVelocity.isNotPassed(0))
+        if(data.playerInfo.lastVelocity.isNotPassed(0)) //If we just recently took velocity,
             vY = data.playerInfo.velocityY;
+
+        //If any of these conditions aren't met, we don't want to make checking for vertical velocity.
         if(vY > 0
                 && !data.playerInfo.generalCancel
-                && !data.lagInfo.lagging
-                && !data.playerInfo.serverPos
+                && !data.playerInfo.serverPos //We don't want to check on teleport
                 && !data.playerInfo.doingTeleport
                 && data.playerInfo.worldLoaded
                 && !data.blockInfo.inWeb
-                && data.lagInfo.lastPacketDrop.isPassed(5)
                 && !data.blockInfo.onClimbable
                 && data.playerInfo.blockAboveTimer.isPassed(6)) {
 
@@ -36,16 +36,22 @@ public class VelocityA extends Check {
             if ((pct < 99.999 || pct > 300)
                     && !data.playerInfo.lastBlockPlace.isNotPassed(5)
                     && !data.blockInfo.blocksAbove) {
+                if(++buffer > 15) {
+                    vl++;
+                    flag("pct=%.1f%% buffer=%.1f", pct, buffer);
+                }
                 if (++vl > 15) flag("pct=" + MathUtils.round(pct, 2) + "%");
             } else vl-= vl > 0 ? 0.25f : 0;
 
             vY-= 0.08;
             vY*= 0.98;
 
-            if(vY < 0.005
+            //If any of these conditions are met, we might as well stop checking for velocity.
+            if(vY < 0.005 //While this is a 1.8.9 and below only thing, we might as well stop checking.
                     || data.playerInfo.lastVelocity.isPassed(7)
                     || data.blockInfo.collidesHorizontally
                     || data.blockInfo.collidesVertically) vY = 0;
+
 
             debug("pct=" + pct + " vl=" + vl);
         } else vY = 0;

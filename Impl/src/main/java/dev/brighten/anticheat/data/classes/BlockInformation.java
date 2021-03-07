@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.data.classes;
 
+import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
 import cc.funkemunky.api.utils.BlockUtils;
@@ -29,7 +30,7 @@ public class BlockInformation {
     private ObjectData objectData;
     public boolean onClimbable, onSlab, onStairs, onHalfBlock, inLiquid, inLava, inWater, inWeb, onSlime, onIce,
             onSoulSand, blocksAbove, collidesVertically, bedNear, collidesHorizontally, blocksNear, inBlock, miscNear,
-            collidedWithEntity, roseBush;
+            collidedWithEntity, roseBush, inPortal;
     public float currentFriction, fromFriction;
     public CollisionHandler
             handler = new CollisionHandler(new ArrayList<>(), new ArrayList<>(), new KLocation(0,0,0), null);
@@ -51,7 +52,7 @@ public class BlockInformation {
 
         onClimbable = onSlab = onStairs = onHalfBlock = inLiquid = inLava = inWater = inWeb = onSlime
                 = onIce = onSoulSand = blocksAbove = collidesVertically = bedNear = collidesHorizontally =
-                blocksNear = inBlock = miscNear = collidedWithEntity = false;
+                blocksNear = inBlock = miscNear = collidedWithEntity = inPortal = false;
 
         double dy = Math.abs(objectData.playerInfo.deltaY);
         double dh = objectData.playerInfo.deltaXZ;
@@ -59,12 +60,12 @@ public class BlockInformation {
         if(dy > 2) dy = 2;
         if(dh > 2) dh = 2;
 
-        int startX = Location.locToBlock(objectData.playerInfo.to.x - 1 - dh);
-        int endX = Location.locToBlock(objectData.playerInfo.to.x + 1 + dh);
+        int startX = Location.locToBlock(objectData.playerInfo.to.x - 2 - dh);
+        int endX = Location.locToBlock(objectData.playerInfo.to.x + 2 + dh);
         int startY = Location.locToBlock(objectData.playerInfo.to.y - 1 - dy);
         int endY = Location.locToBlock(objectData.playerInfo.to.y + 3 + dy);
-        int startZ = Location.locToBlock(objectData.playerInfo.to.z - 1 - dh);
-        int endZ = Location.locToBlock(objectData.playerInfo.to.z + 1 + dh);
+        int startZ = Location.locToBlock(objectData.playerInfo.to.z - 2 - dh);
+        int endZ = Location.locToBlock(objectData.playerInfo.to.z + 2 + dh);
 
         SimpleCollisionBox waterBox = objectData.box.copy().expand(0, -.38, 0);
 
@@ -170,7 +171,7 @@ public class BlockInformation {
                                 onClimbable = true;
                             }
 
-                            if(groundBox.expand(0.1, 0, 0.1).isIntersected(blockBox)) {
+                            if(groundBox.expand(0.5, 0.3, 0.5).isCollided(blockBox)) {
                                 if(Materials.checkFlag(block.getType(), Materials.SLABS))
                                     onSlab = true;
                                 if(Materials.checkFlag(block.getType(), Materials.STAIRS))
@@ -181,6 +182,8 @@ public class BlockInformation {
                                     case BREWING_STAND:
                                     case FLOWER_POT:
                                     case SKULL:
+                                    case PLAYER_HEAD:
+                                    case PLAYER_WALL_HEAD:
                                     case SKELETON_SKULL:
                                     case WITHER_SKELETON_SKULL:
                                     case SKELETON_WALL_SKULL:
@@ -208,6 +211,18 @@ public class BlockInformation {
                                         bedNear = true;
                                         break;
                                     }
+                                }
+                            }
+                        } else if(blockBox.isCollided(normalBox)) {
+                            XMaterial blockMaterial =
+                                    XMaterial.requestXMaterial(block.getType().name(), block.getData());
+
+                            if(blockMaterial != null)
+                            switch(blockMaterial) {
+                                case END_PORTAL:
+                                case NETHER_PORTAL: {
+                                    inPortal = true;
+                                    break;
                                 }
                             }
                         }

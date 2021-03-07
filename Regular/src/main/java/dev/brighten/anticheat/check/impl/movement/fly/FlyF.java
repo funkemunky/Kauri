@@ -19,8 +19,13 @@ public class FlyF extends Check {
 
         double max = Math.max(data.playerInfo.calcVelocityY, data.playerInfo.jumpHeight);
 
+        if(data.playerInfo.lastHalfBlock.isNotPassed(10)) max = Math.max(0.5625, max);
+
         if(data.playerInfo.deltaY > max
-                && !data.playerInfo.flightCancel) {
+                && !data.blockInfo.roseBush
+                && !data.playerInfo.doingVelocity
+                && data.playerInfo.slimeTimer.isPassed(10)
+                && !data.playerInfo.generalCancel) {
             ++vl;
             flag("dY=%.3f max=%.3f", data.playerInfo.deltaY, max);
         }

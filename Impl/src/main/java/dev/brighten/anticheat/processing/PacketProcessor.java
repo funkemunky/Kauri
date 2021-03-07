@@ -345,8 +345,14 @@ public class PacketProcessor {
                 break;
             }
             case Packet.Client.CLOSE_WINDOW: {
+                WrappedInCloseWindowPacket packet
+                        = new WrappedInCloseWindowPacket(event.getPacket(), event.getPlayer());
+
                 data.predictionService.useSword = data.playerInfo.usingItem = false;
                 data.playerInfo.inventoryOpen = false;
+
+                data.checkManager.runPacket(packet, timeStamp);
+
                 if(data.sniffing) {
                     data.sniffedPackets.add(event.getType() + ":@:" + event.getTimeStamp());
                 }
@@ -419,6 +425,7 @@ public class PacketProcessor {
             case Packet.Server.OPEN_WINDOW: {
                 WrappedOutOpenWindow packet = new WrappedOutOpenWindow(object, data.getPlayer());
 
+                data.checkManager.runPacket(packet, timeStamp);
                 data.playerInfo.inventoryOpen = true;
                 data.playerInfo.inventoryId = packet.getId();
                 break;
