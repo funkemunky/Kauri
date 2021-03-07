@@ -42,14 +42,14 @@ public class AimE extends Check {
         final boolean shitX = deltaX > 0.08 && deltaX < 0.92, shitY = deltaY > 0.08 && deltaY < 0.92;
         final boolean increase = data.playerInfo.deltaYaw > data.moveProcessor.yawMode
                 || data.playerInfo.deltaPitch > data.moveProcessor.pitchMode;
-        final boolean flag = (shitX || shitY) && !increase;
+        final boolean flag = (shitX && shitY) && (!increase || !data.playerInfo.cinematicMode);
 
         if(flag) {
-            if(++buffer > 9) {
+            if(++buffer > 6) {
                 vl++;
                 flag("mx=%.2f my=%.2f dx=%.2f dy=%.2f", mx, my, deltaX, deltaY);
             }
-        } else if(buffer > 0) buffer--;
+        } else buffer = 0;
 
         debug((flag ? Color.Green + buffer + ": " : "") +"mx=%.2f my=%.2f dx=%.2f dy=%.2f s=%s inc=%s cin=%s",
                 mx, my, deltaX, deltaY, data.moveProcessor.sensitivityX, increase, data.playerInfo.cinematicMode);
