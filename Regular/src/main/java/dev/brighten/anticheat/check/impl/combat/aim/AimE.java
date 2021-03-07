@@ -11,7 +11,7 @@ import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Aim (E)", description = "Checks if a player's rotation was not calculated using Minecraft math.",
         checkType = CheckType.AIM,
-        enabled = false, punishVL = 40)
+        enabled = false, punishVL = 6)
 public class AimE extends Check {
 
     private int buffer;
@@ -40,17 +40,19 @@ public class AimE extends Check {
         final double deltaY = Math.abs(Math.floor(my) - my);
 
         final boolean shitX = deltaX > 0.05 && deltaX < 0.95, shitY = deltaY > 0.05 && deltaY < 0.95;
-        final boolean flag = shitX && shitY;
+        final boolean increase = data.playerInfo.deltaYaw > data.moveProcessor.yawMode
+                || data.playerInfo.deltaPitch > data.moveProcessor.pitchMode;
+        final boolean flag = shitX && shitY && !increase;
 
         if(flag) {
             if(++buffer > 9) {
                 vl++;
                 flag("mx=%.2f my=%.2f dx=%.2f dy=%.2f", mx, my, deltaX, deltaY);
             }
-        } else if(buffer > 0) buffer-= 2;
+        } else if(buffer > 0) buffer--;
 
-        debug((flag ? Color.Green + buffer + ": " : "") +"mx=%.2f my=%.2f dx=%.2f dy=%.2f s=%s",
-                mx, my, deltaX, deltaY, data.moveProcessor.sensitivityX);
+        debug((flag ? Color.Green + buffer + ": " : "") +"mx=%.2f my=%.2f dx=%.2f dy=%.2f s=%s inc=%s cin=%s",
+                mx, my, deltaX, deltaY, data.moveProcessor.sensitivityX, increase, data.playerInfo.cinematicMode);
     }
 }
 
