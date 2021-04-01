@@ -80,7 +80,7 @@ public class PacketProcessor {
             case Packet.Client.LOOK: {
                 WrappedInFlyingPacket packet = new WrappedInFlyingPacket(object, data.getPlayer());
 
-                if (timeStamp - data.lagInfo.lastFlying <= 2) {
+                if (timeStamp - data.lagInfo.lastFlying <= 15) {
                     data.lagInfo.lastPacketDrop.reset();
                 }
 

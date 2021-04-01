@@ -23,20 +23,15 @@ public class AutoclickerI extends Check {
     public void use(WrappedInArmAnimationPacket packet, long now) {
         long delta = now - lastFlying;
 
-        if(delta < 10 && now - lastArm > 30) {
+        if(delta < 10 && now - lastArm > 30 && data.lagInfo.lastPacketDrop.isPassed(1)) {
             if(++buffer > 6) {
                 vl++;
                 flag("delta=%s buffer=%s", delta, buffer);
             }
-        }
+        } else if(buffer > 0) buffer--;
 
-        debug("arm=%s", now);
+        debug("delta=%s buffer=%s", delta, buffer);
         lastArm = now;
-    }
-
-    @Packet
-    public void onUse(WrappedInUseEntityPacket packet, long now) {
-        debug("use=%s", now);
     }
 
     @Packet

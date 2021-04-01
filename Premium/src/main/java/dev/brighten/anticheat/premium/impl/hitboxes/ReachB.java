@@ -39,7 +39,9 @@ public class ReachB extends Check {
     @Packet
     public void onFly(WrappedInFlyingPacket packet, long timeStamp) {
         if(data.playerInfo.lastAttack.isNotPassed(0) && data.target != null) {
-            if(data.playerInfo.creative) return;
+            if(data.playerInfo.creative
+                    || data.playerInfo.serverPos
+                    || data.playerInfo.doingTeleport) return;
 
             List<Pair<SimpleCollisionBox, Double>> entityLocs = data.targetPastLocation.getEstimatedLocation(timeStamp,
                     (data.lagInfo.transPing + 2) * 50, 100L)

@@ -20,8 +20,9 @@ public class BadPacketsN extends Check {
 
     @Setting(name  = "kickPlayer")
     private static boolean kickPlayer = true;
-    private int flying, lastTick;
-    private final Timer lastTrans = new TickTimer(), lastSentTrans = new TickTimer(), lastFlying = new TickTimer();
+    private int flying, lastTick, noBuffer;
+    private final Timer lastTrans = new TickTimer(), lastSentTrans = new TickTimer(), lastKeepAlive = new TickTimer(),
+            lastFlying = new TickTimer();
 
     public BadPacketsN() {
         lastSentTrans.reset();
@@ -32,21 +33,31 @@ public class BadPacketsN extends Check {
     public void onOut(WrappedOutTransaction packet, long now) {
         lastSentTrans.reset();
 
-        if(lastFlying.isPassed(10) || now - data.creation < 4000L) return;
-
-        if(lastTrans.isPassed(140) || Kauri.INSTANCE.keepaliveProcessor.tick - lastTick > 300) {
-            vl++;
-            flag("f=%s t=NO_TRANS", flying);
-
-            if(vl > punishVl && kickPlayer && !isExecutable()) {
-                kickPlayer("[Kauri] Invalid packets.");
-            }
+        if(lastFlying.isPassed(10) || lastKeepAlive.isPassed(45) || now - data.creation < 4000L) {
+            noBuffer = 0;
+            return;
         }
+
+        if(lastTrans.isPassed(100) || Kauri.INSTANCE.keepaliveProcessor.tick - lastTick > 300) {
+            if(++noBuffer > 6) {
+                vl++;
+                flag("f=%s t=NO_TRANS", flying);
+
+                if(vl > punishVl && kickPlayer && !isExecutable()) {
+                    kickPlayer("[Kauri] Invalid packets.");
+                }
+            }
+        } else noBuffer = 0;
     }
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         lastFlying.reset();
+    }
+
+    @Packet
+    public void onKeepalive(WrappedInKeepAlivePacket packet) {
+        lastKeepAlive.reset();
     }
 
     @Packet

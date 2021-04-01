@@ -2,6 +2,7 @@ package dev.brighten.anticheat.check.impl.combat.hand;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -15,15 +16,19 @@ import dev.brighten.api.check.CheckType;
 public class HandA extends Check {
 
     private long lastFlying;
+    private int buffer;
 
     @Packet
     public void use(WrappedInBlockPlacePacket packet, long current) {
-        if(current - lastFlying < 10) {
-            vl++;
-            if(vl > 11) {
-                flag("delta=%s", current - lastFlying);
+        long delta = current - lastFlying;
+        if(delta < 10 && data.lagInfo.lastPacketDrop.isPassed(1)) {
+            if(++buffer > 7) {
+                vl++;
+                flag("delta=%s", delta);
             }
-        } else if(vl > 0) vl--;
+        } else if(buffer > 0) buffer--;
+
+        debug("delta=%sms buffer=%s", delta, buffer);
     }
 
     @Packet
