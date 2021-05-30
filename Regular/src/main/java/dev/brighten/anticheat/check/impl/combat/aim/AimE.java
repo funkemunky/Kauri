@@ -21,7 +21,7 @@ public class AimE extends Check {
 
         final double yawGcd = data.playerInfo.yawGCD / MovementProcessor.offset,
                 pitchGCD = data.playerInfo.pitchGCD / MovementProcessor.offset;
-        if(MathUtils.getDelta(data.moveProcessor.sensitivityX, data.moveProcessor.sensitivityY) > 1
+        if(MathUtils.getDelta(data.moveProcessor.sensXPercent, data.moveProcessor.sensYPercent) > 1
                 || MathUtils.getDelta(data.moveProcessor.yawMode, yawGcd) > 0.1
                 || MathUtils.getDelta(data.moveProcessor.pitchMode, pitchGCD) > 0.1) {
             debug("sensitivity instability sx=%s sy=%s ym=%.2f pm=%.2f ygcd=%.2f pgcd=%.2f",
