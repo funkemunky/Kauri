@@ -21,8 +21,7 @@ public class FlyA extends Check {
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(!packet.isPos() || data.playerInfo.lastTeleportTimer.isNotPassed(1)
                 || data.playerInfo.flightCancel
-                || timeStamp - data.playerInfo.lastVelocityTimestamp <= 200L
-                || data.playerInfo.lastVelocity.isNotPassed(5)
+                || data.playerInfo.lastVelocity.isNotPassed(3)
                 || data.playerInfo.blockAboveTimer.isNotPassed(3)
                 || data.playerInfo.lastRespawnTimer.isNotPassed(5)) return;
 
@@ -35,36 +34,18 @@ public class FlyA extends Check {
             return;
         }
 
-        boolean ground = data.playerInfo.clientGround;
-        boolean lground = data.playerInfo.lClientGround;
-        
-        double lDeltaY = data.playerInfo.lClientGround ? 0 : data.playerInfo.lDeltaY;
+        double lDeltaY = data.playerInfo.lDeltaY;
 
         long end = -1;
-        if(!ground && !hitHead) {
+        if(!data.playerInfo.nearGround && data.playerInfo.airTicks > 1) {
             double predicted = (lDeltaY - 0.08) * (double)0.98f;
-
-            if(lground) {
-                if(data.playerInfo.deltaY > 0) {
-                    predicted = data.playerInfo.blockAboveTimer.isNotPassed(3)
-                            ? Math.min(data.playerInfo.deltaY, data.playerInfo.jumpHeight)
-                            : data.playerInfo.jumpHeight;
-                } else {
-                    double toCheck = (predicted - 0.08) * (double)0.98f;
-
-                    if(Math.abs(toCheck - data.playerInfo.deltaY)
-                            < Math.abs(predicted - data.playerInfo.deltaY)) {
-                        predicted = toCheck;
-                    }
-                }
-            }
 
             if(Math.abs(predicted) < 0.005) {
                 if(data.playerVersion.isBelow(ProtocolVersion.V1_9))
                 predicted = 0;
                 double last = predicted;
                 predicted-= 0.08;
-                predicted*= (double)0.98f;
+                predicted*= 0.98f;
                 if(Math.abs(data.playerInfo.deltaY - predicted) > Math.abs(last - data.playerInfo.deltaY))
                     predicted = last;
             }
@@ -85,6 +66,6 @@ public class FlyA extends Check {
             debug(Color.Green + "deltaY=%s difference=%s", data.playerInfo.deltaY, check);
         }
 
-        debug("ground=%s fground=%s hitHead=%s time=%s", ground, lground, hitHead, end);
+        debug("hitHead=%s time=%s", hitHead, end);
     }
 }

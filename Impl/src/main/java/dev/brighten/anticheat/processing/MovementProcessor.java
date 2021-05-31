@@ -116,6 +116,8 @@ public class MovementProcessor {
         //Adding past location
         data.pastLocation.addLocation(data.playerInfo.to);
 
+        if(data.playerInfo.doingTeleport) data.playerInfo.lastTeleportTimer.reset();
+
         if (data.playerInfo.posLocs.size() > 0 && packet.isPos()) {
             synchronized (data.playerInfo.posLocs) {
                 for (KLocation loc : data.playerInfo.posLocs) {

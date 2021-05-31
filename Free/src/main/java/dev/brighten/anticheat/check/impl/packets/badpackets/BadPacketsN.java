@@ -4,6 +4,7 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInKeepAlivePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
+import cc.funkemunky.api.utils.Color;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -24,34 +25,24 @@ public class BadPacketsN extends Check {
     private final Timer lastTrans = new TickTimer(), lastSentTrans = new TickTimer(), lastKeepAlive = new TickTimer(),
             lastFlying = new TickTimer();
 
+    @Setting(name = "strings.kick")
+    private static String kickString = "[Kauri] Invalid packets (%s).";
+
     public BadPacketsN() {
         lastSentTrans.reset();
         lastTrans.reset();
     }
 
     @Packet
-    public void onOut(WrappedOutTransaction packet, long now) {
-        lastSentTrans.reset();
+    public void onFlying(WrappedInFlyingPacket packet) {
 
-        if(lastFlying.isPassed(10) || lastKeepAlive.isPassed(45) || now - data.creation < 4000L) {
-            noBuffer = 0;
-            return;
+        if(++flying > 30) {
+            vl++;
+            flag("f=%s lKA=%s t=CANCEL", flying, lastKeepAlive.getPassed());
+
+            if(!isExecutable() && vl > 4) kickPlayer(String.format(Color.translate(kickString), "TN"));
         }
 
-        if(lastTrans.isPassed(100) || Kauri.INSTANCE.keepaliveProcessor.tick - lastTick > 300) {
-            if(++noBuffer > 6) {
-                vl++;
-                flag("f=%s t=NO_TRANS", flying);
-
-                if(vl > punishVl && kickPlayer && !isExecutable()) {
-                    kickPlayer("[Kauri] Invalid packets.");
-                }
-            }
-        } else noBuffer = 0;
-    }
-
-    @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
         lastFlying.reset();
     }
 
@@ -77,7 +68,7 @@ public class BadPacketsN extends Check {
                 vl++;
                 flag("c=%s last=%s d=%s t=SKIP", current, lastTick, current - lastTick);
 
-                if(!isExecutable()) kickPlayer("[Kauri] Invalid packets (S).");
+                if(!isExecutable()) kickPlayer(String.format(Color.translate(kickString), "S"));
             }
             debug("c=%s l=%s", current, lastTick);
             lastTick = current;

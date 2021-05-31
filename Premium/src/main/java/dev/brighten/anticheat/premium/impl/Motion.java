@@ -23,6 +23,7 @@ public class Motion extends Check {
 
             if(data.predictionService.flag
                     && data.playerInfo.soulSandTimer.isPassed(10)
+                    && data.playerInfo.lastVelocity.isPassed(5)
                     && !data.playerInfo.generalCancel
                     && !data.playerInfo.serverPos
                     && !data.playerInfo.doingTeleport

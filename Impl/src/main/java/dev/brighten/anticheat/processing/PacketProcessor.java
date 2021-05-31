@@ -449,7 +449,7 @@ public class PacketProcessor {
                             data.playerInfo.velocityZ = data.playerInfo.calcVelocityZ = (float) packet.getZ();
                             data.playerInfo.velocities.remove(vector);
                         }
-                    });
+                    }, 2);
                 }
 
                 if(data.sniffing) {
