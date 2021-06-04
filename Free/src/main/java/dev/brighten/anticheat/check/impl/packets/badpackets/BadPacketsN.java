@@ -11,6 +11,8 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.check.api.Setting;
 import dev.brighten.anticheat.utils.timer.Timer;
+import dev.brighten.anticheat.utils.timer.impl.AtlasTimer;
+import dev.brighten.anticheat.utils.timer.impl.MillisTimer;
 import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
@@ -22,7 +24,7 @@ public class BadPacketsN extends Check {
     @Setting(name  = "kickPlayer")
     private static boolean kickPlayer = true;
     private int flying, lastTick, noBuffer;
-    private final Timer lastTrans = new TickTimer(), lastSentTrans = new TickTimer(), lastKeepAlive = new TickTimer(),
+    private final Timer lastTrans = new TickTimer(), lastSentTrans = new MillisTimer(), lastKeepAlive = new TickTimer(),
             lastFlying = new TickTimer();
 
     @Setting(name = "strings.kick")
@@ -36,7 +38,7 @@ public class BadPacketsN extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
 
-        if(++flying > 30) {
+        if(lastSentTrans.isNotPassed(300L) && ++flying > 30) {
             vl++;
             flag("f=%s lKA=%s t=CANCEL", flying, lastKeepAlive.getPassed());
 
@@ -49,6 +51,11 @@ public class BadPacketsN extends Check {
     @Packet
     public void onKeepalive(WrappedInKeepAlivePacket packet) {
         lastKeepAlive.reset();
+    }
+
+    @Packet
+    public void onOutTrans(WrappedOutTransaction packet) {
+        lastSentTrans.reset();
     }
 
     @Packet

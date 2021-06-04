@@ -129,6 +129,8 @@ public class DebugCommand {
             cmd.getSender().sendMessage(cc.funkemunky.api.utils.MiscUtils.line(Color.Dark_Gray));
             cmd.getSender().sendMessage(Color.Gold + Color.Bold + material.name() + Color.Gray + ":");
             cmd.getSender().sendMessage("");
+            cmd.getSender().sendMessage(Color.translate("&eXMaterial: &f" + XMaterial
+                    .requestXMaterial(material.name(), (byte)0)));
             cmd.getSender().sendMessage(Color.translate("&eBitmask&7: &f" + Materials.getBitmask(material)));
             WrappedClass wrapped = new WrappedClass(Materials.class);
 

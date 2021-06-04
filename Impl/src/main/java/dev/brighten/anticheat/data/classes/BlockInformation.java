@@ -16,6 +16,7 @@ import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.CollisionHandler;
 import dev.brighten.anticheat.utils.Helper;
 import lombok.val;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -60,12 +61,12 @@ public class BlockInformation {
         if(dy > 2) dy = 2;
         if(dh > 2) dh = 2;
 
-        int startX = Location.locToBlock(objectData.playerInfo.to.x - 2 - dh);
-        int endX = Location.locToBlock(objectData.playerInfo.to.x + 2 + dh);
+        int startX = Location.locToBlock(objectData.playerInfo.to.x - 1.25 - dh);
+        int endX = Location.locToBlock(objectData.playerInfo.to.x + 1.25 + dh);
         int startY = Location.locToBlock(objectData.playerInfo.to.y - 1 - dy);
         int endY = Location.locToBlock(objectData.playerInfo.to.y + 3 + dy);
-        int startZ = Location.locToBlock(objectData.playerInfo.to.z - 2 - dh);
-        int endZ = Location.locToBlock(objectData.playerInfo.to.z + 2 + dh);
+        int startZ = Location.locToBlock(objectData.playerInfo.to.z - 1.25 - dh);
+        int endZ = Location.locToBlock(objectData.playerInfo.to.z + 1.25 + dh);
 
         SimpleCollisionBox waterBox = objectData.box.copy().expand(0, -.38, 0);
 
@@ -132,9 +133,12 @@ public class BlockInformation {
                             SimpleCollisionBox groundBox = normalBox.copy()
                                     .offset(0, -.1, 0).expandMax(0, -1.2, 0);
                             XMaterial blockMaterial =
-                                    XMaterial.requestXMaterial(block.getType().name(), block.getData());
+                                    XMaterial.requestXMaterial(block.getType().name(), block.getData() != (byte)0 //Just to save a bit on performance
+                                            && block.getType().name().contains("SKULL") ? 0 : block.getData());
 
-                            if(blockMaterial == null) continue;
+                            if(blockMaterial == null) {
+                                continue;
+                            }
 
                             if(normalBox.isIntersected(blockBox)) inBlock = true;
 
@@ -171,7 +175,7 @@ public class BlockInformation {
                                 onClimbable = true;
                             }
 
-                            if(groundBox.expand(0.5, 0.3, 0.5).isCollided(blockBox)) {
+                            if(groundBox.copy().expand(0.5, 0.3, 0.5).isCollided(blockBox)) {
                                 if(Materials.checkFlag(block.getType(), Materials.SLABS))
                                     onSlab = true;
                                 if(Materials.checkFlag(block.getType(), Materials.STAIRS))
@@ -185,6 +189,12 @@ public class BlockInformation {
                                     case PLAYER_HEAD:
                                     case PLAYER_WALL_HEAD:
                                     case SKELETON_SKULL:
+                                    case CREEPER_HEAD:
+                                    case DRAGON_HEAD:
+                                    case ZOMBIE_HEAD:
+                                    case ZOMBIE_WALL_HEAD:
+                                    case CREEPER_WALL_HEAD:
+                                    case DRAGON_WALL_HEAD:
                                     case WITHER_SKELETON_SKULL:
                                     case SKELETON_WALL_SKULL:
                                     case WITHER_SKELETON_WALL_SKULL:

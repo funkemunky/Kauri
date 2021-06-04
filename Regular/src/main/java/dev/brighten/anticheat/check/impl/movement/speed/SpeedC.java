@@ -33,9 +33,10 @@ public class SpeedC extends Check {
                 speed, data.playerInfo.jumped);
 
         if(data.playerInfo.lastVelocity.isNotPassed(25)) {
-            double velocityXZ = Math.hypot(data.playerInfo.velocityX, data.playerInfo.velocityZ);
+            double velocityXZ = (data.playerInfo.velocityX * data.playerInfo.velocityX)
+                    + (data.playerInfo.velocityZ * data.playerInfo.velocityZ);
 
-            if(velocityXZ > data.playerInfo.deltaXZ) calc = velocityXZ;
+            if(velocityXZ > (data.playerInfo.deltaXZ * data.playerInfo.deltaXZ)) calc = velocityXZ;
         }
 
         if(data.playerInfo.deltaXZ > calc) {

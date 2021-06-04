@@ -17,7 +17,7 @@ public class AimH extends Check {
         final double posX = packet.getX();
         final double posZ = packet.getZ();
 
-        final double horizontalDistance = Math.hypot(posX - lastPosX, posZ - lastPosZ);
+        final double horizontalDistance = data.playerInfo.deltaXZ;
 
         // Player moved
         if (posX != lastPosX || posZ != lastPosZ) {
@@ -38,7 +38,5 @@ public class AimH extends Check {
         debug("looking=%s", data.playerInfo.lookingAtBlock);
 
         this.lastHorizontalDistance = horizontalDistance;
-        this.lastPosX = posX;
-        this.lastPosZ = posZ;
     }
 }

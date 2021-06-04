@@ -367,21 +367,18 @@ public class PredictionService {
         // loops)
 
         double flagJump = -1;
-        found: for (int fastLoop = 2; fastLoop > 0; fastLoop--) { // if the Player changes the optifine fastmath
-            // function
-            fastMath = (fastLoop == 2) == fMath;
-            for (int blockLoop = 2; blockLoop > 0; blockLoop--) { // if the Player blocks server side but not client
-                // side (minecraft glitch)
+        found: for (int blockLoop = 2; blockLoop > 0; blockLoop--) { // if the Player blocks server side but not client
+            // side (minecraft glitch)
 
-                loops++;
+            loops++;
 
-                float moveStrafing = this.moveStrafing;
-                float moveForward = this.moveForward;
+            float moveStrafing = this.moveStrafing;
+            float moveForward = this.moveForward;
 
-                if (sneak) {
-                    moveForward *= 0.3;
-                    moveStrafing *= 0.3;
-                }
+            if (sneak) {
+                moveForward *= 0.3;
+                moveStrafing *= 0.3;
+            }
 
 //				if (openInv) {
 //					if (sprint)
@@ -390,55 +387,54 @@ public class PredictionService {
 //						return;
 //				}
 
-                float jumpMovementFactor = 0.02F;
-                if (lastSprint) {
-                    jumpMovementFactor = 0.025999999F;
-                }
+            float jumpMovementFactor = 0.02F;
+            if (lastSprint) {
+                jumpMovementFactor = 0.025999999F;
+            }
 
-                float var5;
-                float var3 = 0.91f;
+            float var5;
+            float var3 = 0.91f;
 
-                if(lastOnGround) {
-                    var3*= data.blockInfo.fromFriction;
-                }
+            if(lastOnGround) {
+                var3*= data.blockInfo.fromFriction;
+            }
 
-                aiMoveSpeed = data.getPlayer().getWalkSpeed() / 2f;
+            aiMoveSpeed = data.getPlayer().getWalkSpeed() / 2f;
 
-                if (sprint) {
-                    aiMoveSpeed+= aiMoveSpeed * 0.30000001192092896D;
-                }
+            if (sprint) {
+                aiMoveSpeed+= aiMoveSpeed * 0.30000001192092896D;
+            }
 
-                if(data.potionProcessor.hasPotionEffect(PotionEffectType.SPEED)) {
-                    aiMoveSpeed += (PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.SPEED) * (0.20000000298023224D)) * aiMoveSpeed;
-                }
-                if(data.potionProcessor.hasPotionEffect(PotionEffectType.SLOW)) {
-                    aiMoveSpeed += (PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.SLOW) * (-0.15000000596046448D)) * aiMoveSpeed;
-                }
+            data.potionProcessor.getEffectByType(PotionEffectType.SPEED).ifPresent(effect ->
+                    aiMoveSpeed += ((effect.getAmplifier() + 1) * (0.20000000298023224D)) * aiMoveSpeed);
 
-                float var4 = 0.16277136F / (var3 * var3 * var3);
+            data.potionProcessor.getEffectByType(PotionEffectType.SLOW).ifPresent(effect ->
+                    aiMoveSpeed += ((effect.getAmplifier() + 1) * (-0.15000000596046448D)) * aiMoveSpeed);
 
-                if (lastOnGround) {
-                    var5 = (float)(aiMoveSpeed * var4);
-                } else {
-                    var5 = jumpMovementFactor;
-                }
+            float var4 = 0.16277136F / (var3 * var3 * var3);
 
-                double motionX = lmotionX, motionZ = lmotionZ;
+            if (lastOnGround) {
+                var5 = (float)(aiMoveSpeed * var4);
+            } else {
+                var5 = jumpMovementFactor;
+            }
 
-                float var14 = moveStrafing * moveStrafing + moveForward * moveForward;
-                if (var14 >= 1.0E-4F) {
-                    var14 = sqrt_double(var14);
-                    if (var14 < 1.0F)
-                        var14 = 1.0F;
-                    var14 = var5 / var14;
-                    moveStrafing *= var14;
-                    moveForward *= var14;
+            double motionX = lmotionX, motionZ = lmotionZ;
 
-                    final float var15 = sin(yaw * (float) Math.PI / 180.0F); // cos, sin = Math function of optifine
-                    final float var16 = cos(yaw * (float) Math.PI / 180.0F);
-                    motionX += (moveStrafing * var16 - moveForward * var15);
-                    motionZ += (moveForward * var16 + moveStrafing * var15);
-                }
+            float var14 = moveStrafing * moveStrafing + moveForward * moveForward;
+            if (var14 >= 1.0E-4F) {
+                var14 = sqrt_double(var14);
+                if (var14 < 1.0F)
+                    var14 = 1.0F;
+                var14 = var5 / var14;
+                moveStrafing *= var14;
+                moveForward *= var14;
+
+                final float var15 = sin(yaw * (float) Math.PI / 180.0F); // cos, sin = Math function of optifine
+                final float var16 = cos(yaw * (float) Math.PI / 180.0F);
+                motionX += (moveStrafing * var16 - moveForward * var15);
+                motionZ += (moveForward * var16 + moveStrafing * var15);
+            }
 
                 /*if(checkCollisions) {
                     if(data.playerInfo.onLadder) {
@@ -495,37 +491,35 @@ public class PredictionService {
                 }*/
 
 
-                predX = motionX;
-                predZ = motionZ;
+            predX = motionX;
+            predZ = motionZ;
 
-                final double diffX = rmotionX - motionX; // difference between the motion from the player and the
-                // calculated motion
-                final double diffZ = rmotionZ - motionZ;
+            final double diffX = rmotionX - motionX; // difference between the motion from the player and the
+            // calculated motion
+            final double diffZ = rmotionZ - motionZ;
 
-                diff = Math.hypot(diffX, diffZ);
+            diff = Math.hypot(diffX, diffZ);
 
-                if(Double.isNaN(diff) || Double.isInfinite(diff)) return;
+            if(Double.isNaN(diff) || Double.isInfinite(diff)) return;
 
-                // if the motion isn't correct this value can get out in flags
-                diff = new BigDecimal(diff).setScale(precision + 2, RoundingMode.HALF_UP).doubleValue();
-                diffString = new BigDecimal(diff).setScale(precision + 2, RoundingMode.HALF_UP).toPlainString();
+            // if the motion isn't correct this value can get out in flags
+            diff = new BigDecimal(diff).setScale(precision + 2, RoundingMode.HALF_UP).doubleValue();
 
-                if (diff < preD) { // if the diff is small enough
-                    flag = false;
-                    //MiscUtils.testMessage(Color.Green + "(" + rmotionX + ", " + motionX + "); (" + rmotionZ + ", " + motionZ + ")");
+            if (diff < preD) { // if the diff is small enough
+                flag = false;
+                //MiscUtils.testMessage(Color.Green + "(" + rmotionX + ", " + motionX + "); (" + rmotionZ + ", " + motionZ + ")");
 
-                    //MiscUtils.testMessage(Color.Green + diffString + " loops " + loops + " key: " + key + " sneak=" + sneak + " move=" + moveForward + " ai=" + aiMoveSpeed);
-                    fMath = fastMath; // saves the fastmath option if the player changed it
-                    break found;
-                }
-                //MiscUtils.testMessage(Color.Red + "(" + rmotionX + ", " + motionX + "); (" + rmotionZ + ", " + motionZ + ")");
-                //MiscUtils.testMessage(Color.Red + diffString + " loops " + loops + " key: " + key + " sneak=" + sneak
-                //        + " move=" + moveForward + " ai=" + aiMoveSpeed + " shit=" + Atlas.getInstance()
-                 //       .getBlockBoxManager().getBlockBox().getMovementFactor(data.getPlayer()));
+                //MiscUtils.testMessage(Color.Green + diffString + " loops " + loops + " key: " + key + " sneak=" + sneak + " move=" + moveForward + " ai=" + aiMoveSpeed);
+                fMath = fastMath; // saves the fastmath option if the player changed it
+                break found;
+            }
+            //MiscUtils.testMessage(Color.Red + "(" + rmotionX + ", " + motionX + "); (" + rmotionZ + ", " + motionZ + ")");
+            //MiscUtils.testMessage(Color.Red + diffString + " loops " + loops + " key: " + key + " sneak=" + sneak
+            //        + " move=" + moveForward + " ai=" + aiMoveSpeed + " shit=" + Atlas.getInstance()
+            //       .getBlockBoxManager().getBlockBox().getMovementFactor(data.getPlayer()));
 
-                if (diff < closestdiff) {
-                    closestdiff = diff;
-                }
+            if (diff < closestdiff) {
+                closestdiff = diff;
             }
         }
     }

@@ -22,19 +22,19 @@ public class SpeedB extends Check {
             if(data.playerInfo.airTicks > 2 && !data.playerInfo.lClientGround && !data.playerInfo.clientGround) {
                 double accelX = data.playerInfo.deltaX - data.playerInfo.lDeltaX;
                 double accelZ = data.playerInfo.deltaZ - data.playerInfo.lDeltaZ;
-                double hypot = MathUtils.hypot(accelX, accelZ);
+                double hypot = (accelX * accelX) + (accelZ * accelZ);
 
-                if(hypot > 0.1
+                if(hypot > 0.01 //0.1*0.1
                         && !data.blockInfo.blocksNear
                         && data.playerInfo.lastVelocity.isPassed(8)
                         && !data.blockInfo.inLiquid
                         && data.playerInfo.lastHalfBlock.isPassed(10)
-                        && (accelX > -0.07 || accelZ > -0.07)
+                        && (accelX > -0.0049 || accelZ > -0.0049) //0.07*0.07
                         && data.playerInfo.lastBlockPlace.isPassed(7)) {
                     if(verbose++ > 2) {
                         vl++;
-                        flag("x=%s z=%s",
-                                MathUtils.round(accelX, 3), MathUtils.round(accelZ, 3));
+                        flag("x=%.3f z=%.3f",
+                                accelX, accelZ);
                     }
                 } else verbose-= verbose > 0 ? 0.2f : 0;
 
