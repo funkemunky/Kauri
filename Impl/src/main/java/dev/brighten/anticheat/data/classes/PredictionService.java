@@ -82,6 +82,7 @@ public class PredictionService {
                 double mx = rmotionX - lmotionX; // mx, mz is an Value to calculate the rotation and the Key of the Player
                 double mz = rmotionZ - lmotionZ;
 
+                if(data.playerInfo.lastVelocity.isPassed(1))
                 calcKey(mx, mz);
 
                 MiscUtils.testMessage(String.format("key=%s rx=%.4f rz=%.4f lx=%.4f lz=%.4f px=%.4f lpx=%.4g",
