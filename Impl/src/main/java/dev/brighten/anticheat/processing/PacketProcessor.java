@@ -88,7 +88,9 @@ public class PacketProcessor {
 
                 data.potionProcessor.onFlying(packet);
                 data.moveProcessor.process(packet, timeStamp);
+                Kauri.INSTANCE.profiler.start("flying:predictionService");
                 data.predictionService.onReceive(packet); //Processing for prediction service.
+                Kauri.INSTANCE.profiler.stop("flying:predictionService");
 
                 data.checkManager.runPacket(packet, timeStamp);
                 if(data.sniffing) {
