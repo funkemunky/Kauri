@@ -442,13 +442,16 @@ public class PacketProcessor {
                     data.playerInfo.doingVelocity = true;
                     data.runKeepaliveAction(d -> {
                         if(data.playerInfo.velocities.contains(vector)) {
-                            data.playerInfo.lastVelocity.reset();
-                            data.playerInfo.doingVelocity = false;
-                            data.playerInfo.lastVelocityTimestamp = System.currentTimeMillis();
-                            data.predictionService.velocity = true;
-                            data.playerInfo.velocityX = data.playerInfo.calcVelocityX = (float) packet.getX();
-                            data.playerInfo.velocityY = data.playerInfo.calcVelocityY = (float) packet.getY();
-                            data.playerInfo.velocityZ = data.playerInfo.calcVelocityZ = (float) packet.getZ();
+                            if(data.playerInfo.doingVelocity) {
+                                data.playerInfo.lastVelocity.reset();
+
+                                data.playerInfo.doingVelocity = false;
+                                data.playerInfo.lastVelocityTimestamp = System.currentTimeMillis();
+                                data.predictionService.velocity = true;
+                                data.playerInfo.velocityX = data.playerInfo.calcVelocityX = (float) packet.getX();
+                                data.playerInfo.velocityY = data.playerInfo.calcVelocityY = (float) packet.getY();
+                                data.playerInfo.velocityZ = data.playerInfo.calcVelocityZ = (float) packet.getZ();
+                            }
                             data.playerInfo.velocities.remove(vector);
                         }
                     }, 2);
