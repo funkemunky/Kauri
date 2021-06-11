@@ -34,34 +34,34 @@ public class PlayerInformation {
 
     public PlayerInformation(ObjectData data) {
 
-        liquidTimer = new PlayerTimer(data, 50);
-        webTimer = new PlayerTimer(data, 40);
-        climbTimer = new PlayerTimer(data, 40);
-        slimeTimer = new PlayerTimer(data, 75);
-        iceTimer = new PlayerTimer(data, 45);
-        blockAboveTimer = new PlayerTimer(data, 50);
-        soulSandTimer = new PlayerTimer(data, 40);
-        lastBrokenBlock = new PlayerTimer(data, 5);
-        lastVelocity = new PlayerTimer(data, 20);
-        lastTargetSwitch = new PlayerTimer(data, 3);
-        lastBlockPlace = new PlayerTimer(data, 10);
-        lastToggleFlight = new PlayerTimer(data, 10);
-        lastChunkUnloaded = new PlayerTimer(data, 20);
-        lastWindowClick = new PlayerTimer(data, 20);
-        lastInsideBlock = new PlayerTimer(data, 5);
-        lastHalfBlock = new PlayerTimer(data, 20);
-        lastPlaceLiquid = new PlayerTimer(data, 20);
-        lastBlockDigPacket = new PlayerTimer(data, 5);
-        lastBlockPlacePacket = new PlayerTimer(data, 5);
-        lastUseItem = new PlayerTimer(data, 15);
-        lastTeleportTimer = new PlayerTimer(data, 10);
-        lastGamemodeTimer = new PlayerTimer(data, 10);
-        lastRespawnTimer = new PlayerTimer(data, 20);
-        lastAttack = new PlayerTimer(data, 5);
-        cinematicTimer = new PlayerTimer(data, 8);
-        lastEntityCollision = new PlayerTimer(data, 4);
+        liquidTimer = new TickTimer(50);
+        webTimer = new TickTimer(40);
+        climbTimer = new TickTimer(40);
+        slimeTimer = new TickTimer(75);
+        iceTimer = new TickTimer(45);
+        blockAboveTimer = new TickTimer(50);
+        soulSandTimer =new TickTimer( 40);
+        lastBrokenBlock = new TickTimer( 5);
+        lastVelocity = new TickTimer(20);
+        lastTargetSwitch = new TickTimer(3);
+        lastBlockPlace = new TickTimer(10);
+        lastToggleFlight = new TickTimer(10);
+        lastChunkUnloaded = new TickTimer(20);
+        lastWindowClick = new TickTimer(20);
+        lastInsideBlock = new TickTimer(5);
+        lastHalfBlock = new TickTimer(20);
+        lastPlaceLiquid = new TickTimer(20);
+        lastBlockDigPacket = new TickTimer(5);
+        lastBlockPlacePacket = new TickTimer(5);
+        lastUseItem = new TickTimer(15);
+        lastTeleportTimer = new TickTimer(10);
+        lastGamemodeTimer = new TickTimer(10);
+        lastRespawnTimer = new TickTimer(20);
+        lastAttack = new TickTimer(5);
+        cinematicTimer = new TickTimer(8);
+        lastEntityCollision = new TickTimer(4);
         lastMoveCancel = new TickTimer(15);
-        lastGhostCollision = new PlayerTimer(data, 5);
+        lastGhostCollision = new TickTimer(5);
     }
 
     //Cinematic
