@@ -91,11 +91,6 @@ public class VelocityB extends Check {
                     double s2 = strafe;
                     double f2 = forward;
 
-                    if(data.playerInfo.usingItem) {
-                        s2*= 0.2;
-                        f2*= 0.2;
-                    }
-
                     moveFlying(s2, f2, f5);
 
                     predictions.add(new Tuple<>(new Double[]{f2, s2}, new Double[]{pvX, pvZ}));
@@ -110,23 +105,18 @@ public class VelocityB extends Check {
                         double deltaX = Math.abs(tuple.two[0] - data.playerInfo.deltaX);
                         double deltaZ = Math.abs(tuple.two[1] - data.playerInfo.deltaZ);
 
-                        return Math.hypot(deltaX, deltaZ) < 0.01;
+                        return (deltaX * deltaX + deltaZ * deltaZ) < 0.01;
                     })
                     .min(Comparator.comparing(tuple -> {
                         double deltaX = Math.abs(tuple.two[0] - data.playerInfo.deltaX);
                         double deltaZ = Math.abs(tuple.two[1] - data.playerInfo.deltaZ);
 
-                        return Math.hypot(deltaX, deltaZ);
+                        return (deltaX * deltaX + deltaZ * deltaZ);
                     }));
 
             if(!velocity.isPresent()) {
                 double s2 = data.predictionService.moveStrafing;
                 double f2 = data.predictionService.moveForward;
-
-                if(data.playerInfo.usingItem) {
-                    s2*= 0.2;
-                    f2*= 0.2;
-                }
 
                 moveStrafe = s2;
                 moveForward = f2;
@@ -148,9 +138,10 @@ public class VelocityB extends Check {
             if((ratio < 0.996 || ratio > 3) && pvX != 0
                     && pvZ != 0
                     && timeStamp - data.creation > 3000L
+                    && data.playerInfo.lastTeleportTimer.isPassed(1)
                     && !data.getPlayer().getItemInHand().getType().isEdible()
                     && !data.blockInfo.blocksNear) {
-                if(++buffer > 30) {
+                if(data.playerInfo.lastUseItem.isPassed(2) && ++buffer > 30) {
                     vl++;
                     flag("pct=%.2f buffer=%.1f forward=%.2f strafe=%.2f",
                             ratio * 100, buffer, moveStrafe, moveForward);

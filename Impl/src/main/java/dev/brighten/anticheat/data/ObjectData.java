@@ -26,6 +26,7 @@ import dev.brighten.anticheat.processing.keepalive.KeepAlive;
 import dev.brighten.anticheat.utils.PastLocation;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.PlayerTimer;
+import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.data.Data;
 import lombok.AllArgsConstructor;
@@ -230,8 +231,8 @@ public class ObjectData implements Data {
         public int transPing, lastTransPing;
         public MaxInteger lagTicks = new MaxInteger(25);
         public boolean lagging;
-        public Timer lastPacketDrop = new PlayerTimer(ObjectData.this, 10),
-                lastPingDrop = new PlayerTimer(ObjectData.this, 40);
+        public Timer lastPacketDrop = new TickTimer(),
+                lastPingDrop = new TickTimer();
         public RollingAverageLong pingAverages = new RollingAverageLong(10, 0);
         public long lastFlying = 0;
     }

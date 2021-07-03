@@ -79,7 +79,7 @@ public class PacketProcessor {
             case Packet.Client.LOOK: {
                 WrappedInFlyingPacket packet = new WrappedInFlyingPacket(object, data.getPlayer());
 
-                if (timeStamp - data.lagInfo.lastFlying <= 2) {
+                if (timeStamp - data.lagInfo.lastFlying <= 15) {
                     data.lagInfo.lastPacketDrop.reset();
                 }
 
@@ -87,7 +87,9 @@ public class PacketProcessor {
 
                 data.potionProcessor.onFlying(packet);
                 data.moveProcessor.process(packet, timeStamp);
+                Kauri.INSTANCE.profiler.start("flying:predictionService");
                 data.predictionService.onReceive(packet); //Processing for prediction service.
+                Kauri.INSTANCE.profiler.stop("flying:predictionService");
 
                 data.checkManager.runPacket(packet, timeStamp);
                 if(data.sniffing) {
@@ -436,16 +438,19 @@ public class PacketProcessor {
                     data.playerInfo.doingVelocity = true;
                     data.runKeepaliveAction(d -> {
                         if(data.playerInfo.velocities.contains(vector)) {
-                            data.playerInfo.lastVelocity.reset();
-                            data.playerInfo.doingVelocity = false;
-                            data.playerInfo.lastVelocityTimestamp = System.currentTimeMillis();
-                            data.predictionService.velocity = true;
-                            data.playerInfo.velocityX = data.playerInfo.calcVelocityX = (float) packet.getX();
-                            data.playerInfo.velocityY = data.playerInfo.calcVelocityY = (float) packet.getY();
-                            data.playerInfo.velocityZ = data.playerInfo.calcVelocityZ = (float) packet.getZ();
+                            if(data.playerInfo.doingVelocity) {
+                                data.playerInfo.lastVelocity.reset();
+
+                                data.playerInfo.doingVelocity = false;
+                                data.playerInfo.lastVelocityTimestamp = System.currentTimeMillis();
+                                data.predictionService.velocity = true;
+                                data.playerInfo.velocityX = data.playerInfo.calcVelocityX = (float) packet.getX();
+                                data.playerInfo.velocityY = data.playerInfo.calcVelocityY = (float) packet.getY();
+                                data.playerInfo.velocityZ = data.playerInfo.calcVelocityZ = (float) packet.getZ();
+                            }
                             data.playerInfo.velocities.remove(vector);
                         }
-                    });
+                    }, 2);
                 }
 
                 if(data.sniffing) {

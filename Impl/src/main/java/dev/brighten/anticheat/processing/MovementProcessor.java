@@ -116,6 +116,8 @@ public class MovementProcessor {
         //Adding past location
         data.pastLocation.addLocation(data.playerInfo.to);
 
+        if(data.playerInfo.doingTeleport) data.playerInfo.lastTeleportTimer.reset();
+
         if (data.playerInfo.posLocs.size() > 0 && packet.isPos()) {
             synchronized (data.playerInfo.posLocs) {
                 for (KLocation loc : data.playerInfo.posLocs) {
@@ -195,13 +197,16 @@ public class MovementProcessor {
         synchronized (data.playerInfo.velocities) {
             for (Vector velocity : data.playerInfo.velocities) {
                 if(Math.abs(velocity.getY() - data.playerInfo.deltaY) < 0.01) {
-                    data.playerInfo.lastVelocity.reset();
-                    data.playerInfo.doingVelocity = false;
-                    data.playerInfo.lastVelocityTimestamp = System.currentTimeMillis();
-                    data.predictionService.velocity = true;
-                    data.playerInfo.velocityX = data.playerInfo.calcVelocityX = (float) velocity.getX();
-                    data.playerInfo.velocityY = data.playerInfo.calcVelocityY = (float) velocity.getY();
-                    data.playerInfo.velocityZ = data.playerInfo.calcVelocityZ = (float) velocity.getZ();
+                    if(data.playerInfo.doingVelocity) {
+                        data.playerInfo.lastVelocity.reset();
+
+                        data.playerInfo.doingVelocity = false;
+                        data.playerInfo.lastVelocityTimestamp = System.currentTimeMillis();
+                        data.predictionService.velocity = true;
+                        data.playerInfo.velocityX = data.playerInfo.calcVelocityX = (float) velocity.getX();
+                        data.playerInfo.velocityY = data.playerInfo.calcVelocityY = (float) velocity.getY();
+                        data.playerInfo.velocityZ = data.playerInfo.calcVelocityZ = (float) velocity.getZ();
+                    }
                     data.playerInfo.velocities.remove(velocity);
                     break;
                 }

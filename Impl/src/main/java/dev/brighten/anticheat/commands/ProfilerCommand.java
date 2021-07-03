@@ -55,7 +55,7 @@ public class ProfilerCommand {
                 menu.fill(new FillerButton());
                 final List<Tuple<Double, Button>> buttons = new ArrayList<>();
 
-                val map = Kauri.INSTANCE.profiler.results(ResultsType.TICK);
+                val map = Kauri.INSTANCE.profiler.results(ResultsType.TOTAL);
 
                 long total = map.keySet()
                         .stream()
@@ -74,8 +74,6 @@ public class ProfilerCommand {
                     Button button = new Button(false, new ItemBuilder(XMaterial.REDSTONE.parseMaterial())
                             .amount(1)
                             .name(Color.Gold + key).lore("",
-                                    "&7Weighted Usage: " + Helper
-                                            .drawUsage(total, result.two),
                                     "&7MS: &f" + Helper
                                             .format(totalMS, 3),
                                     "&7Samples: &f" + Helper

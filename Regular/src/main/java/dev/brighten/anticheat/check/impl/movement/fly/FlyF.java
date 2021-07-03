@@ -17,12 +17,14 @@ public class FlyF extends Check {
     public void onPacket(WrappedInFlyingPacket packet) {
         if(data.playerInfo.deltaXZ == 0 && data.playerInfo.deltaY == 0) return;
 
-        double max = Math.max(data.playerInfo.calcVelocityY, data.playerInfo.jumpHeight);
+        double max = data.playerInfo.lastVelocity.isNotPassed(20)
+                ? Math.max(data.playerInfo.velocityY, data.playerInfo.jumpHeight) : data.playerInfo.jumpHeight;
 
         if(data.playerInfo.lastHalfBlock.isNotPassed(10)) max = Math.max(0.5625, max);
 
         if(data.playerInfo.deltaY > max
                 && !data.blockInfo.roseBush
+                && data.playerInfo.lastVelocity.isPassed(2)
                 && !data.playerInfo.doingVelocity
                 && data.playerInfo.slimeTimer.isPassed(10)
                 && !data.playerInfo.generalCancel) {

@@ -15,15 +15,16 @@ import dev.brighten.api.check.CheckType;
 public class KillauraB extends Check {
 
     private long lastFlying;
+    private int buffer;
 
     @Packet
     public void use(WrappedInUseEntityPacket packet, long current) {
-        if(current - lastFlying < 10) {
-            vl++;
-            if(vl > 11) {
-                flag("delta=0");
+        if(current - lastFlying < 10 && data.lagInfo.lastPacketDrop.isPassed(1)) {
+            if(++buffer > 7) {
+                vl++;
+                flag("delta=%s", current - lastFlying);
             }
-        } else if(vl > 0) vl--;
+        } else if(buffer > 0) buffer--;
     }
 
     @Packet

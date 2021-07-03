@@ -21,17 +21,6 @@ public class SpeedA extends Check {
     private double ldxz = .12f;
     private float friction = 0.91f;
     private float buffer;
-    private double vxz;
-
-    @Packet
-    public void onVelocity(WrappedOutVelocityPacket packet) {
-        if(packet.getId() == data.getPlayer().getEntityId()) {
-            data.runKeepaliveAction(ka -> {
-                vxz = Math.hypot(packet.getX(), packet.getZ());
-                debug("set velocity: %.3f", vxz);
-            });
-        }
-    }
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
@@ -92,8 +81,9 @@ public class SpeedA extends Check {
             double ratio = (data.playerInfo.deltaXZ - ldxz) / moveFactor * 100;
 
             if (ratio > 100.8
+                    && data.playerInfo.lastVelocity.isPassed(2)
                     && data.playerInfo.liquidTimer.isPassed(2)
-                    && !data.playerInfo.generalCancel && data.playerInfo.lastVelocity.isPassed(2)) {
+                    && !data.playerInfo.generalCancel) {
                 if((buffer+= ratio > 400 ? 2 : 1) > 4 || ratio > 600) {
                     vl++;
                     flag("p=%.1f%% dxz=%.3f aimove=%.3f tags=%s",
@@ -103,10 +93,7 @@ public class SpeedA extends Check {
             debug("ratio=%.1f tags=%s tp=%s buffer=%.1f", ratio, tags.build(),
                     data.playerInfo.liquidTimer.getPassed(), buffer);
 
-            if(vxz != 0) {
-                ldxz = vxz;
-                vxz = 0;
-            } else ldxz = data.playerInfo.deltaXZ * drag;
+            ldxz = data.playerInfo.deltaXZ * drag;
         }
         friction = data.blockInfo.currentFriction;
     }

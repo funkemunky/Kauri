@@ -29,7 +29,7 @@ public class InventoryA extends Check {
 
     @Packet
     public void onWindow(WrappedInWindowClickPacket packet) {
-        if(lastMove.isNotPassed(1))  {
+        if(lastMove.isNotPassed(1) && data.playerInfo.lastVelocity.isPassed(20))  {
             vl++;
             flag("slot=%s clickType=%s", packet.getSlot(), packet.getAction().name());
         }
