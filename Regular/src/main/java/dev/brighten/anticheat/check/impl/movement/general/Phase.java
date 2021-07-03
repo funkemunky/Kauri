@@ -1,24 +1,18 @@
 package dev.brighten.anticheat.check.impl.movement.general;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.*;
+import cc.funkemunky.api.utils.Helper;
+import cc.funkemunky.api.utils.KLocation;
+import cc.funkemunky.api.utils.Materials;
+import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.world.BlockData;
-import cc.funkemunky.api.utils.world.CollisionBox;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.processing.TagsBuilder;
 import dev.brighten.api.check.CheckType;
-import dev.brighten.db.utils.Pair;
-import lombok.val;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @CheckInfo(name = "Phase", description = "Ensures players cannot move through blocks.",
         checkType = CheckType.EXPLOIT, cancellable = true, executable = false, developer = true)

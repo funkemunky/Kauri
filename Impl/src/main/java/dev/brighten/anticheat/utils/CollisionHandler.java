@@ -1,7 +1,9 @@
 package dev.brighten.anticheat.utils;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
-import cc.funkemunky.api.utils.*;
+import cc.funkemunky.api.utils.KLocation;
+import cc.funkemunky.api.utils.Materials;
+import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.world.BlockData;
 import cc.funkemunky.api.utils.world.CollisionBox;
@@ -22,8 +24,6 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 @Getter
 public class CollisionHandler {

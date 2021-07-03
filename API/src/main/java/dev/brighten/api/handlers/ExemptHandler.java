@@ -5,7 +5,6 @@ import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.KauriCheck;
 
 import java.util.*;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;

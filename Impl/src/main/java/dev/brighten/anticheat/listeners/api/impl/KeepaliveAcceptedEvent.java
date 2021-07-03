@@ -4,7 +4,6 @@ import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.processing.keepalive.KeepAlive;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.entity.Player;
 
 @RequiredArgsConstructor
 @Getter

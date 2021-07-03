@@ -1,11 +1,8 @@
 package dev.brighten.anticheat.listeners.api;
 
-import cc.funkemunky.api.utils.Tuple;
-
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class EventHandler {
 

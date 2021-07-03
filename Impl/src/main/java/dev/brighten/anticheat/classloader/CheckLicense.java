@@ -2,13 +2,11 @@ package dev.brighten.anticheat.classloader;
 
 import cc.funkemunky.api.utils.MiscUtils;
 import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.check.api.Config;
 import dev.brighten.db.utils.json.JsonReader;
 import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
-import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;

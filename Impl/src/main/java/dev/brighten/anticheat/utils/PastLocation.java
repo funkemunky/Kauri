@@ -1,14 +1,11 @@
 package dev.brighten.anticheat.utils;
 
 import cc.funkemunky.api.utils.KLocation;
-import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingList;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import org.bukkit.Location;
 
 import java.util.Comparator;
-import java.util.Deque;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 public class PastLocation {

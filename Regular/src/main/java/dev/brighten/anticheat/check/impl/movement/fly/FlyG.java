@@ -1,7 +1,6 @@
 package dev.brighten.anticheat.check.impl.movement.fly;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -9,7 +8,6 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.processing.TagsBuilder;
 import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
-import org.bukkit.potion.PotionEffectType;
 
 @CheckInfo(name = "Fly (G)", description = "Looks for impossible movements, commonly done by Step modules",
         developer = true, checkType = CheckType.FLIGHT,

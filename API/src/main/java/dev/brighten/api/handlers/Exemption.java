@@ -1,7 +1,6 @@
 package dev.brighten.api.handlers;
 
 import dev.brighten.api.check.CheckType;
-import dev.brighten.api.check.KauriCheck;
 import lombok.Getter;
 
 import java.util.Arrays;

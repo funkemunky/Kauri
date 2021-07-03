@@ -1,7 +1,10 @@
 package dev.brighten.anticheat.check.impl.movement.general;
 
 import cc.funkemunky.api.utils.MathUtils;
-import dev.brighten.anticheat.check.api.*;
+import dev.brighten.anticheat.check.api.Cancellable;
+import dev.brighten.anticheat.check.api.Check;
+import dev.brighten.anticheat.check.api.CheckInfo;
+import dev.brighten.anticheat.check.api.Event;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.api.check.CheckType;
 import org.bukkit.event.player.PlayerMoveEvent;
