@@ -1,11 +1,11 @@
 package dev.brighten.anticheat.discord;
 
 import cc.funkemunky.api.utils.*;
-import club.minnced.discord.webhook.WebhookClient;
-import club.minnced.discord.webhook.WebhookClientBuilder;
-import club.minnced.discord.webhook.send.WebhookEmbed;
-import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
-import club.minnced.discord.webhook.send.WebhookMessageBuilder;
+import cc.funkemunky.api.utils.club.minnced.discord.webhook.WebhookClient;
+import cc.funkemunky.api.utils.club.minnced.discord.webhook.WebhookClientBuilder;
+import cc.funkemunky.api.utils.club.minnced.discord.webhook.send.WebhookEmbed;
+import cc.funkemunky.api.utils.club.minnced.discord.webhook.send.WebhookEmbedBuilder;
+import cc.funkemunky.api.utils.club.minnced.discord.webhook.send.WebhookMessageBuilder;
 import dev.brighten.api.check.KauriCheck;
 import org.bukkit.entity.Player;
 
