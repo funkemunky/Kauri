@@ -238,6 +238,12 @@ public class PacketProcessor {
                 }
                 break;
             }
+            case Packet.Client.BLOCK_PLACE_1_9: {
+                WrappedInBlockPlace1_9 packet = new WrappedInBlockPlace1_9(object, data.getPlayer());
+
+                data.checkManager.runPacket(packet, timeStamp);
+                break;
+            }
             case Packet.Client.TRANSACTION: {
                 WrappedInTransactionPacket packet = new WrappedInTransactionPacket(object, data.getPlayer());
 

@@ -42,7 +42,7 @@ public class PlayerInformation {
         blockAboveTimer = new TickTimer(50);
         soulSandTimer =new TickTimer( 40);
         lastBrokenBlock = new TickTimer( 5);
-        lastVelocity = new TickTimer(20);
+        lastVelocity = new PlayerTimer(data);
         lastTargetSwitch = new TickTimer(3);
         lastBlockPlace = new TickTimer(10);
         lastToggleFlight = new TickTimer(10);

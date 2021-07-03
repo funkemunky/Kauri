@@ -82,6 +82,5 @@ public class RegularChecks implements CheckRegister {
         Check.register(new BookCrash());
         Check.register(new Infinity());
         Check.register(new BlockA());
-        Check.register(new Phase());
     }
 }

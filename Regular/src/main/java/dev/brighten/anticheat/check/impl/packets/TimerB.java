@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.check.impl.packets;
 
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlace1_9;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutPositionPacket;
 import dev.brighten.anticheat.check.api.Cancellable;
@@ -7,6 +8,8 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.SimpleAverage;
+import dev.brighten.anticheat.utils.timer.Timer;
+import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Timer (B)", description = "Checks the rate of packets coming in.",
@@ -14,12 +17,18 @@ import dev.brighten.api.check.CheckType;
 @Cancellable
 public class TimerB extends Check {
 
-    private long lastFlying, totalTimer = -500;
+    private long lastFlying, totalTimer = -1000;
     private int buffer;
     private SimpleAverage averageIncrease = new SimpleAverage(5, 0);
+    private Timer lastFlag = new TickTimer();
 
     @Packet
     public void onTeleport(WrappedOutPositionPacket event) {
+        totalTimer-= 50;
+    }
+
+    @Packet
+    public void onBlockPlace(WrappedInBlockPlace1_9 packet) {
         totalTimer-= 50;
     }
 
@@ -40,9 +49,14 @@ public class TimerB extends Check {
         totalTimer = Math.max(totalTimer, -1000);
 
         if(totalTimer > 150) {
-            vl++;
-            flag("t=%s aInc=%.1f", totalTimer, avgIncrease);
+            if(++buffer > 3) {
+                vl++;
+                flag("t=%s aInc=%.1f", totalTimer, avgIncrease);
+            }
+            lastFlag.reset();
             totalTimer = 0;
+        } else if(lastFlag.isPassed(120)) {
+            buffer = 0;
         }
 
         debug("delta=%sms total=%s inc=%s avgInc=%.1f", delta, totalTimer, increase, avgIncrease);
