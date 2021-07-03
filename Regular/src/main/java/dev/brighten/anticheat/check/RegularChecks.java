@@ -44,7 +44,7 @@ public class RegularChecks implements CheckRegister {
         Check.register(new FlyD());
         Check.register(new FlyE());
         Check.register(new FlyF());
-        Check.register(new FlyG());
+       // Check.register(new FlyG());
         Check.register(new FastLadder());
         Check.register(new NoFallB());
         Check.register(new Hitboxes());
@@ -63,7 +63,7 @@ public class RegularChecks implements CheckRegister {
         Check.register(new KillauraE());
         Check.register(new KillauraF());
         Check.register(new OmniSprint());
-        Check.register(new TimerB());
+        //Check.register(new TimerB());
         Check.register(new VelocityA());
         Check.register(new VelocityC());
         Check.register(new HandA());

@@ -19,19 +19,20 @@ public class Motion extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if(packet.isPos() && data.playerInfo.deltaXZ > 0) {
-            double predXZ = Math.hypot(data.predictionService.predX, data.predictionService.predZ);
+            double predXZ = (data.predictionService.predX * data.predictionService.predX)
+                    + (data.predictionService.predZ * data.predictionService.predZ);
 
             if(data.predictionService.flag
                     && data.playerInfo.soulSandTimer.isPassed(10)
                     && !data.playerInfo.generalCancel
                     && !data.playerInfo.serverPos
                     && !data.playerInfo.doingTeleport
-                    && data.playerInfo.deltaXZ > predXZ
+                    && (data.playerInfo.deltaXZ * data.playerInfo.deltaXZ) > predXZ
                     && !data.blockInfo.collidesHorizontally) {
                 if(++buffer > 15) {
                     vl++;
                     flag("deltaX=%s deltaZ=%s",
-                            MathUtils.round(data.playerInfo.deltaXZ, 3), MathUtils.round(predXZ, 3));
+                            MathUtils.round(data.playerInfo.deltaXZ, 3), MathUtils.round(Math.sqrt(predXZ), 3));
                 }
             } else buffer-= buffer > 0 ? 1.25 : 0;
             debug("(dy=%.4f) dxz=%.5f pxz=%.5f friction=%.4f key=%s collided=%s",

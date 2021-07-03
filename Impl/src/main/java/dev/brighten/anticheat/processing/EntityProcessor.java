@@ -24,25 +24,23 @@ public class EntityProcessor {
     public BukkitTask task, playerTask;
 
     private void runEntityProcessor() {
-        Atlas.getInstance().getEntities().keySet().parallelStream()
-                .map(uuid -> Atlas.getInstance().getEntities().get(uuid))
-                .filter(entity -> entity instanceof Vehicle)
-                .sequential()
-                .forEach(entity -> {
-                    vehicles.compute(entity.getWorld().getUID(), (key, entities) -> {
-                        if(entities == null) entities = new CopyOnWriteArrayList<>();
+        for (Map.Entry<UUID, Entity> entry
+                : Atlas.getInstance().getEntities().entrySet()) {
+            if(entry.getValue() instanceof Vehicle) {
+                vehicles.compute(entry.getValue().getWorld().getUID(), (key, entities) -> {
+                    if(entities == null) entities = new CopyOnWriteArrayList<>();
 
-                        entities.add(entity);
+                    entities.add(entry.getValue());
 
-                        return entities;
-                    });
+                    return entities;
                 });
+            }
+        }
     }
 
     private void runEntitiesNearPlayer() {
-        Bukkit.getOnlinePlayers().parallelStream()
+        Bukkit.getOnlinePlayers().stream()
                 .map(p -> new Tuple<Player, List<Entity>>(p, p.getNearbyEntities(5, 5, 5)))
-                .sequential()
                 .forEach(tuple -> allEntitiesNearPlayer.put(tuple.one.getUniqueId(), new ArrayList<>(tuple.two)));
     }
 

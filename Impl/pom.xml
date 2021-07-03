@@ -13,8 +13,9 @@
 
     <repositories>
         <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
+            <name>jcenter</name>
+            <id>bintray-jcenter</id>
+            <url>https://jcenter.bintray.com</url>
         </repository>
     </repositories>
 
@@ -41,6 +42,15 @@
                         </goals>
                         <configuration>
                             <minimizeJar>false</minimizeJar>
+                            <filters>
+                                <filter>
+                                    <artifact>dev.brighten.anticheat:Impl</artifact>
+                                    <excludes>
+                                        <exclude>dev/brighten/anticheat/classloader/**</exclude>
+                                        <exclude>dev/brighten/anticheat/utils/SystemUtil.class</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                         </configuration>
                     </execution>
                 </executions>
@@ -62,9 +72,9 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.MinnDevelopment</groupId>
+            <groupId>club.minnced</groupId>
             <artifactId>discord-webhooks</artifactId>
-            <version>bd2f855</version>
+            <version>0.5.7</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

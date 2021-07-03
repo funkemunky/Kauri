@@ -34,7 +34,6 @@ public class ReachA extends Check {
 
     @Packet
     public void onFlying(WrappedInUseEntityPacket packet, long timeStamp) {
-        Kauri.INSTANCE.profiler.start("check:ReachA");
         if(data.playerInfo.creative
                 || data.targetPastLocation.getPreviousLocations().size() < 10
                 || packet.getAction() != WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK
@@ -64,7 +63,6 @@ public class ReachA extends Check {
         } else buffer-= buffer > 0 ? 0.02 : 0;
 
         debug("distance=%.3f boxes=%s buffer=%s", distance, targetBoxes.size(), buffer);
-        Kauri.INSTANCE.profiler.stop("check:ReachA");
     }
 
     private static SimpleCollisionBox getHitbox(Entity entity, KLocation loc) {

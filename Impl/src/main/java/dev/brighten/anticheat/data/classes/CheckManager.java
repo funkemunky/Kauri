@@ -29,27 +29,22 @@ public class CheckManager {
         val methods = checkMethods.get(object.getClass());
 
         int currentTick = MiscUtils.currentTick();
-        (methods.size() > 14 ? methods.parallelStream() : methods.stream())
-                .forEach(wrapped -> {
-                    try {
-                        if(!wrapped.isBoolean && wrapped.isPacket && wrapped.check.enabled && wrapped.isCompatible()) {
-                            Kauri.INSTANCE.profiler.start("check:" + wrapped.checkName + ":"
-                                    + object.getPacketName());
-                            if(wrapped.oneParam) wrapped.method.getMethod().invoke(wrapped.check, object);
-                            else {
-                                if(wrapped.isTimeStamp) {
-                                    wrapped.method.getMethod().invoke(wrapped.check, object, timeStamp);
-                                } else wrapped.method.getMethod().invoke(wrapped.check, object, currentTick);
-                            }
-                            Kauri.INSTANCE.profiler.stop("check:" + wrapped.checkName + ":"
-                                    + object.getPacketName());
-                        }
-                    } catch(Exception e) {
-                        cc.funkemunky.api.utils.MiscUtils
-                                .printToConsole("Error occurred in check " + wrapped.checkName);
-                        e.printStackTrace();
+        for (WrappedCheck wrapped : methods) {
+            try {
+                if(!wrapped.isBoolean && wrapped.isPacket && wrapped.check.enabled && wrapped.isCompatible()) {
+                    if(wrapped.oneParam) wrapped.method.getMethod().invoke(wrapped.check, object);
+                    else {
+                        if(wrapped.isTimeStamp) {
+                            wrapped.method.getMethod().invoke(wrapped.check, object, timeStamp);
+                        } else wrapped.method.getMethod().invoke(wrapped.check, object, currentTick);
                     }
-                });
+                }
+            } catch(Exception e) {
+                cc.funkemunky.api.utils.MiscUtils
+                        .printToConsole("Error occurred in check " + wrapped.checkName);
+                e.printStackTrace();
+            }
+        }
     }
 
     public boolean runPacketCancellable(NMSObject object, long timeStamp) {
@@ -62,8 +57,6 @@ public class CheckManager {
         for (WrappedCheck wrapped : methods) {
             if(!wrapped.isBoolean) continue;
             try {
-                Kauri.INSTANCE.profiler.start("check:" + wrapped.checkName + ":"
-                        + object.getPacketName());
                 if(wrapped.isPacket && wrapped.check.enabled && wrapped.isCompatible()) {
                     if(wrapped.oneParam) {
                         if((boolean)wrapped.method.getMethod().invoke(wrapped.check, object)) cancelled = true;
@@ -73,8 +66,6 @@ public class CheckManager {
                     } else if((boolean)wrapped.method.getMethod().invoke(wrapped.check, object, currentTick))
                         cancelled = true;
                 }
-                Kauri.INSTANCE.profiler.stop("check:" + wrapped.checkName + ":"
-                        + object.getPacketName());
             } catch(Exception e) {
                 cc.funkemunky.api.utils.MiscUtils.printToConsole("Error occurred in check " + wrapped.checkName);
                 e.printStackTrace();
@@ -90,21 +81,17 @@ public class CheckManager {
 
             val methods = checkMethods.get(event.getClass());
 
-            methods.forEach(wrapped -> {
-                        if(wrapped.isEvent && wrapped.check.enabled) {
-                            try {
-                                Kauri.INSTANCE.profiler.start("check:" + wrapped.checkName + ":"
-                                        + event.getEventName());
-                                wrapped.method.getMethod().invoke(wrapped.check, event);
-                                Kauri.INSTANCE.profiler.stop("check:" + wrapped.checkName + ":"
-                                        + event.getEventName());
-                            } catch(Exception e) {
-                                cc.funkemunky.api.utils.MiscUtils
-                                        .printToConsole("Error occurred in check " + wrapped.checkName);
-                                e.printStackTrace();
-                            }
-                        }
-                    });
+            for (WrappedCheck wrapped : methods) {
+                if(wrapped.isEvent && wrapped.check.enabled) {
+                    try {
+                        wrapped.method.getMethod().invoke(wrapped.check, event);
+                    } catch(Exception e) {
+                        cc.funkemunky.api.utils.MiscUtils
+                                .printToConsole("Error occurred in check " + wrapped.checkName);
+                        e.printStackTrace();
+                    }
+                }
+            }
         }
     }
 
@@ -113,16 +100,11 @@ public class CheckManager {
 
         val methods = checkMethods.get(event.getClass());
 
-        methods
-                .forEach(wrapped -> {
-                    Kauri.INSTANCE.profiler.start("check:" + wrapped.checkName + ":"
-                            + event.getClass().getSimpleName());
-                    if(!wrapped.isPacket && wrapped.check.enabled) {
-                        wrapped.method.invoke(wrapped.check, event);
-                    }
-                    Kauri.INSTANCE.profiler.stop("check:" + wrapped.checkName + ":"
-                            + event.getClass().getSimpleName());
-                });
+        for (WrappedCheck wrapped : methods) {
+            if(!wrapped.isPacket && wrapped.check.enabled) {
+                wrapped.method.invoke(wrapped.check, event);
+            }
+        }
     }
 
     public void addChecks() {
@@ -148,7 +130,6 @@ public class CheckManager {
                     check.banExempt = objectData.getPlayer().hasPermission("kauri.bypass.ban");
                     return check;
                 })
-                .sequential()
                 .forEach(check -> checks.put(check.name, check));
 
         synchronized (checkMethods) {

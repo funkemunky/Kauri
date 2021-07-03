@@ -24,7 +24,6 @@ public class PacketProcessor {
 
     public void processClient(PacketReceiveEvent event, ObjectData data, Object object, String type,
                                            long timeStamp) {
-        Kauri.INSTANCE.profiler.start("packet:client:" + getType(type));
         switch (type) {
             case Packet.Client.ABILITIES: {
                 WrappedInAbilitiesPacket packet = new WrappedInAbilitiesPacket(object, data.getPlayer());
@@ -365,12 +364,9 @@ public class PacketProcessor {
                 break;
             }
         }
-        Kauri.INSTANCE.profiler.stop("packet:client:" + getType(type));
     }
 
     public void processServer(PacketSendEvent event, ObjectData data, Object object, String type, long timeStamp) {
-        Kauri.INSTANCE.profiler.start("packet:server:" + type);
-
         switch (type) {
             case Packet.Server.ABILITIES: {
                 WrappedOutAbilitiesPacket packet = new WrappedOutAbilitiesPacket(object, data.getPlayer());
@@ -541,7 +537,6 @@ public class PacketProcessor {
                 break;
             }
         }
-        Kauri.INSTANCE.profiler.stop("packet:server:" + type);
     }
 
     private static String getType(String type) {
