@@ -8,13 +8,14 @@ import dev.brighten.anticheat.logs.data.DataStorage;
 import dev.brighten.anticheat.logs.data.config.MongoConfig;
 import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.logs.objects.Punishment;
-import dev.brighten.db.depends.com.mongodb.*;
+import dev.brighten.db.depends.com.mongodb.BasicDBObject;
+import dev.brighten.db.depends.com.mongodb.MongoClientSettings;
+import dev.brighten.db.depends.com.mongodb.MongoCredential;
+import dev.brighten.db.depends.com.mongodb.ServerAddress;
 import dev.brighten.db.depends.com.mongodb.client.*;
-import dev.brighten.db.depends.com.mongodb.client.MongoClient;
 import dev.brighten.db.depends.com.mongodb.client.model.Aggregates;
 import dev.brighten.db.depends.com.mongodb.client.model.Filters;
 import dev.brighten.db.depends.com.mongodb.client.model.Indexes;
-import dev.brighten.db.depends.com.mongodb.client.model.Sorts;
 import dev.brighten.dev.depends.org.bson.Document;
 import dev.brighten.dev.depends.org.bson.conversions.Bson;
 import org.bukkit.scheduler.BukkitTask;
@@ -80,121 +81,50 @@ public class MongoStorage implements DataStorage {
             }
         }, Kauri.INSTANCE, 120L, 40L);
     }
-
     @Override
-    public List<Log> getLogs(UUID uuid) {
-        List<Log> logs = new ArrayList<>();
-        logsCollection.find(Filters.eq("uuid", uuid.toString())).sort(Sorts.descending("time"))
-                .forEach((Consumer<? super Document>) doc -> {
-                    logs.add(new Log(UUID.fromString(doc.getString("uuid")), doc.getString("check"),
-                            doc.getString("info"), doc.getDouble("vl").floatValue(), doc.getLong("ping"),
-                            doc.getLong("time"), doc.getDouble("tps")));
-                });
-        return logs;
+    public List<Log> getLogs(UUID uuid, Check check, int arrayMin, int arrayMax, long timeFrom, long timeTo) {
+        Bson document = new Document("$gte", timeFrom).append("$lt", timeTo);
+        List<Document> logs = new ArrayList<>();
+
+        List<Bson> aggregates = new ArrayList<>();
+
+        if(uuid != null) aggregates.add(Aggregates.match(Filters.eq("uuid", uuid.toString())));
+        if(check != null) aggregates.add(Aggregates.match(Filters.eq("check", check.name)));
+
+        aggregates.addAll(Arrays.asList(Aggregates.match(Filters.eq("time", document)),
+                new BasicDBObject("$sort", new BasicDBObject("time", -1))));
+
+        if(arrayMin != 0 && arrayMax != Integer.MAX_VALUE) {
+            aggregates.addAll(Arrays.asList(new BasicDBObject("$skip", arrayMin), new BasicDBObject("$limit", arrayMax)));
+        }
+
+        AggregateIterable<Document> agg = logsCollection.aggregate(aggregates).allowDiskUse(true);
+
+        agg.forEach((Consumer<Document>) logs::add);
+
+        return logs.stream()
+                .map(doc -> new Log(UUID.fromString(doc.getString("uuid")), doc.getString("check"),
+                        doc.getString("info"), doc.getDouble("vl").floatValue(), doc.getLong("ping"),
+                        doc.getLong("time"), doc.getDouble("tps")))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Log> getLogs(UUID uuid, int skip, int limit) {
-        List<Log> logs = new ArrayList<>();
-        logsCollection.find(Filters.eq("uuid", uuid.toString()))
-                .sort(Sorts.descending("time"))
-                .skip(skip)
-                .limit(limit)
-                .forEach((Consumer<? super Document>) doc -> {
-                    logs.add(new Log(UUID.fromString(doc.getString("uuid")), doc.getString("check"),
-                            doc.getString("info"), doc.getDouble("vl").floatValue(), doc.getLong("ping"),
-                            doc.getLong("time"), doc.getDouble("tps")));
-                });
-        return logs;
-    }
+    public List<Punishment> getPunishments(UUID uuid, int arrayMin, int arrayMax, long timeFrom, long timeTo) {
+        Bson document = new Document("$gte", timeFrom).append("$lt", timeTo);
+        List<Document> logs = new ArrayList<>();
+        AggregateIterable<Document> agg = punishmentsCollection.aggregate(Arrays
+                .asList(Aggregates.match(Filters.eq("uuid", uuid.toString())),
+                        Aggregates.match(Filters.eq("time", document)),
+                        new BasicDBObject("$skip", arrayMin), new BasicDBObject("$limit", arrayMax),
+                        new BasicDBObject("$sort", new BasicDBObject("time", -1)))).allowDiskUse(true);
 
-    @Override
-    public List<Log> getLogs(UUID uuid, Check check) {
-        List<Log> logs = new ArrayList<>();
-        logsCollection.find(Filters.and(Filters.eq("uuid", uuid.toString()),
-                Filters.eq("check", check.name)))
-                .sort(Sorts.descending("time"))
-                .forEach((Consumer<? super Document>) doc -> {
-                    logs.add(new Log(UUID.fromString(doc.getString("uuid")), doc.getString("check"),
-                            doc.getString("info"), doc.getDouble("vl").floatValue(), doc.getLong("ping"),
-                            doc.getLong("time"), doc.getDouble("tps")));
-                });
-        return logs;
-    }
+        agg.forEach((Consumer<Document>) logs::add);
 
-    @Override
-    public List<Log> getLogs(UUID uuid, Check check, int limit) {
-        List<Log> logs = new ArrayList<>();
-        logsCollection.find(Filters.and(Filters.eq("uuid", uuid.toString()),
-                Filters.eq("check", check.name)))
-                .sort(Sorts.descending("time"))
-                .limit(limit)
-                .forEach((Consumer<? super Document>) doc -> {
-                    logs.add(new Log(UUID.fromString(doc.getString("uuid")), doc.getString("check"),
-                            doc.getString("info"), doc.getDouble("vl").floatValue(), doc.getLong("ping"),
-                            doc.getLong("time"), doc.getDouble("tps")));
-                });
-        return logs;
-    }
-
-    @Override
-    public List<Log> getLogs(UUID uuid, int skip, int limit, String... check) {
-        List<Log> logs = new ArrayList<>();
-        Bson[] checkfilters = Arrays.stream(check)
-                .map(c -> Filters.eq("check", check))
-                .toArray(Bson[]::new);
-        logsCollection.find(Filters.and(Filters.eq("uuid", uuid.toString()),
-                Filters.or(checkfilters)))
-                .sort(Sorts.descending("time"))
-                .skip(skip).limit(limit)
-                .forEach((Consumer<? super Document>) doc -> {
-                    logs.add(new Log(UUID.fromString(doc.getString("uuid")), doc.getString("check"),
-                            doc.getString("info"), doc.getDouble("vl").floatValue(), doc.getLong("ping"),
-                            doc.getLong("time"), doc.getDouble("tps")));
-                });
-        return logs;
-    }
-
-    @Override
-    public List<Log> getLogs(long beginningTime, long endTime) {
-        List<Log> logs = new ArrayList<>();
-        logsCollection.find(Filters.and(Filters.gte("time", beginningTime),
-                Filters.lte("time", endTime)))
-                .sort(Sorts.descending("time"))
-                .forEach((Consumer<? super Document>) doc -> {
-                    logs.add(new Log(UUID.fromString(doc.getString("uuid")), doc.getString("check"),
-                            doc.getString("info"), doc.getDouble("vl").floatValue(), doc.getLong("ping"),
-                            doc.getLong("time"), doc.getDouble("tps")));
-                });
-        return logs;
-    }
-
-    @Override
-    public List<Punishment> getPunishments(UUID uuid) {
-        List<Punishment> punishments = new ArrayList<>();
-
-        punishmentsCollection.find(Filters.eq("uuid", uuid.toString()))
-                .sort(Sorts.descending("time"))
-                .forEach((Block<? super Document>) doc -> {
-                    punishments.add(new Punishment(UUID.fromString(doc.getString("uuid")),
-                            doc.getString("check"), doc.getLong("time")));
-                });
-        return punishments;
-    }
-
-    @Override
-    public List<Punishment> getPunishments(UUID uuid, long beginningTime, long endTime) {
-        List<Punishment> punishments = new ArrayList<>();
-
-        punishmentsCollection.find(Filters.and(Filters.eq("uuid", uuid.toString()),
-                Filters.gte("time", beginningTime),
-                Filters.lte("time", endTime)))
-                .sort(Sorts.descending("time"))
-                .forEach((Block<? super Document>) doc -> {
-                    punishments.add(new Punishment(UUID.fromString(doc.getString("uuid")),
-                            doc.getString("check"), doc.getLong("time")));
-                });
-        return punishments;
+        return logs.stream()
+                .map(doc -> new Punishment(UUID.fromString(doc.getString("uuid")),
+                        doc.getString("check"), doc.getLong("time")))
+                .collect(Collectors.toList());
     }
 
 
@@ -208,6 +138,33 @@ public class MongoStorage implements DataStorage {
         logsCollection = null;
         punishmentsCollection = null;
         nameUUIDCollection = null;
+    }
+
+    @Override
+    public List<Log> getHighestVL(UUID uuid, Check check, int limit, long timeFrom, long timeTo) {
+        Bson document = new Document("$gte", timeFrom).append("$lt", timeTo);
+        List<Document> logs = new ArrayList<>();
+        logsCollection.find(Filters.eq("uuid", uuid.toString()))
+                .filter(new Document("time", document))
+                .forEach((Consumer<Document>) logs::add);
+
+        Map<String, Log> logsMax = new HashMap<>();
+
+        logs.stream()
+                .map(doc -> new Log(uuid, doc.getString("check"), doc.getString("info"),
+                        doc.getDouble("vl").floatValue(), doc.getLong("ping"), doc.getLong("time"),
+                        doc.getDouble("tps")))
+                .forEach(log -> {
+                    if(logsMax.containsKey(log.checkName)) {
+                        Log toCheck = logsMax.get(log.checkName);
+
+                        if(toCheck.vl < log.vl) {
+                            logsMax.put(log.checkName, log);
+                        }
+                    } else logsMax.put(log.checkName, log);
+                });
+
+        return new ArrayList<>(logsMax.values());
     }
 
     @Override

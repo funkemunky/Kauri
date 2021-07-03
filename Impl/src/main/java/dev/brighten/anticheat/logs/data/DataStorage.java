@@ -9,23 +9,11 @@ import java.util.UUID;
 
 public interface DataStorage {
 
-    List<Log> getLogs(UUID uuid);
+    List<Log> getLogs(UUID uuid, Check check, int arrayMin, int arrayMax, long timeFrom, long timeTo);
 
-    List<Log> getLogs(UUID uuid, int skip, int limit);
+    List<Punishment> getPunishments(UUID uuid, int arrayMin, int arrayMax, long timeFrom, long timeTo);
 
-    List<Log> getLogs(UUID uuid, Check check);
-
-    List<Log> getLogs(UUID uuid, Check check, int limit);
-
-    List<Log> getLogs(UUID uuid, int skip, int limit, String... check);
-
-    List<Log> getLogs(long beginningTime, long endTime);
-
-    List<Punishment> getPunishments(UUID uuid);
-
-    List<Punishment> getPunishments(UUID uuid, long beginningTime, long endTime);
-
-
+    List<Log> getHighestVL(UUID uuid, Check check, int limit, long timeFrom, long timeTo);
 
     void addLog(Log log);
 

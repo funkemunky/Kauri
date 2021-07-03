@@ -5,7 +5,6 @@ import cc.funkemunky.api.utils.RunUtils;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.logs.data.DataStorage;
-import dev.brighten.anticheat.logs.data.sql.ExecutableStatement;
 import dev.brighten.anticheat.logs.data.sql.MySQL;
 import dev.brighten.anticheat.logs.data.sql.Query;
 import dev.brighten.anticheat.logs.objects.Log;
@@ -17,7 +16,6 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 public class MySQLStorage implements DataStorage {
 
@@ -28,7 +26,7 @@ public class MySQLStorage implements DataStorage {
     public MySQLStorage() {
         MySQL.init();
         Query.prepare("CREATE TABLE IF NOT EXISTS `VIOLATIONS` (" +
-                "`UUID` VARCHAR(48) NOT NULL," +
+                "`UUID` VARCHAR(64) NOT NULL," +
                 "`TIME` LONG NOT NULL," +
                 "`VL` FLOAT NOT NULL," +
                 "`CHECK` VARCHAR(32) NOT NULL," +
@@ -99,124 +97,73 @@ public class MySQLStorage implements DataStorage {
     }
 
     @Override
-    public List<Log> getLogs(UUID uuid) {
+    public List<Log> getLogs(UUID uuid, Check check, int arrayMin, int arrayMax, long timeFrom, long timeTo) {
         List<Log> logs = new ArrayList<>();
 
-        Query.prepare("select * from `VIOLATIONS` where `UUID` = ?").append(uuid.toString()).
-                execute(rs -> {
-                    logs.add(new Log(UUID.fromString(rs.getString("UUID")),
-                            rs.getString("CHECK"), rs.getString("INFO"),
-                            rs.getFloat("VL"), (long)rs.getInt("PING"),
-                            rs.getLong("TIME"), rs.getDouble("TPS")));
-                });
-        return logs;
-    }
-
-    @Override
-    public List<Log> getLogs(UUID uuid, int skip, int limit) {
-        List<Log> logs = new ArrayList<>();
-
-        Query.prepare("select * from `VIOLATIONS` where `UUID` = ? LIMIT ?,?")
-                .append(uuid.toString()).append(skip).append(limit).
-                execute(rs -> {
-                    logs.add(new Log(UUID.fromString(rs.getString("UUID")),
-                            rs.getString("CHECK"), rs.getString("INFO"),
-                            rs.getFloat("VL"), (long)rs.getInt("PING"),
-                            rs.getLong("TIME"), rs.getDouble("TPS")));
-                });
-        return logs;
-    }
-
-    @Override
-    public List<Log> getLogs(UUID uuid, Check check) {
-        List<Log> logs = new ArrayList<>();
-
-        Query.prepare("select * from `VIOLATIONS` where `UUID` = ? and `CHECK` = ?")
-                .append(uuid.toString()).append(check.name).
-                execute(rs -> {
-                    logs.add(new Log(UUID.fromString(rs.getString("UUID")),
-                            rs.getString("CHECK"), rs.getString("INFO"),
-                            rs.getFloat("VL"), (long)rs.getInt("PING"),
-                            rs.getLong("TIME"), rs.getDouble("TPS")));
-                });
-        return logs;
-    }
-
-    @Override
-    public List<Log> getLogs(UUID uuid, Check check, int limit) {
-        List<Log> logs = new ArrayList<>();
-
-        Query.prepare("select * from `VIOLATIONS` where `UUID` = ? and `CHECK` = ? LIMIT ?")
-                .append(uuid.toString()).append(check.name).append(limit).
-                execute(rs -> {
-                    logs.add(new Log(UUID.fromString(rs.getString("UUID")),
-                            rs.getString("CHECK"), rs.getString("INFO"),
-                            rs.getFloat("VL"), (long)rs.getInt("PING"),
-                            rs.getLong("TIME"), rs.getDouble("TPS")));
-                });
-        return logs;
-    }
-
-    @Override
-    public List<Log> getLogs(UUID uuid, int skip, int limit, String... checks) {
-        List<Log> logs = new ArrayList<>();
-
-        ExecutableStatement query = Query.prepare("select * from `VIOLATIONS` where `UUID` = ? and ("
-                + Arrays.stream(checks).map(c -> "`CHECK` = ?").collect(Collectors.joining(" OR "))
-                + ") LIMIT ?,?")
-                .append(uuid.toString());
-
-        for (String check : checks) {
-            query = query.append(check);
+        if(uuid != null) {
+            Query.prepare("SELECT `TIME`, `VL`, `CHECK`, `PING`, `TPS`, `INFO` " +
+                    "FROM `VIOLATIONS` WHERE `UUID` = ?"+ (check != null ? " AND WHERE `CHECK` = " + check.name : "")
+                    + " AND `TIME` BETWEEN ? AND ? ORDER BY `TIME` DESC LIMIT ?,?")
+                    .append(uuid.toString()).append(timeFrom).append(timeTo).append(arrayMin).append(arrayMax)
+                    .execute(rs ->
+                            logs.add(new Log(uuid,
+                                    rs.getString("CHECK"), rs.getString("INFO"),
+                                    rs.getFloat("VL"), (long)rs.getInt("PING"),
+                                    rs.getLong("TIME"), rs.getDouble("TPS"))));
+        } else {
+            Query.prepare("SELECT `UUID`, `TIME`, `VL`, `CHECK`, `PING`, `TPS`, `INFO` " +
+                    "FROM `VIOLATIONS`" + (check != null ? " WHERE `CHECK` = " + check.name + " AND" : " WHERE")
+                    + " `TIME` BETWEEN ? AND ? ORDER BY `TIME` DESC LIMIT ?,?")
+                    .append(timeFrom).append(timeTo).append(arrayMin).append(arrayMax)
+                    .execute(rs -> {
+                        logs.add(new Log(UUID.fromString(rs.getString("UUID")),
+                                rs.getString("CHECK"), rs.getString("INFO"),
+                                rs.getFloat("VL"), (long)rs.getInt("PING"),
+                                rs.getLong("TIME"), rs.getDouble("TPS")));
+                    });
         }
 
-        query.append(skip).append(limit).
-        execute(rs -> {
-            logs.add(new Log(UUID.fromString(rs.getString("UUID")),
-                    rs.getString("CHECK"), rs.getString("INFO"),
-                    rs.getFloat("VL"), (long)rs.getInt("PING"),
-                    rs.getLong("TIME"), rs.getDouble("TPS")));
+        return logs;
+    }
+
+    @Override
+    public List<Punishment> getPunishments(UUID uuid, int arrayMin, int arrayMax, long timeFrom, long timeTo) {
+        List<Punishment> punishments = new ArrayList<>();
+
+        if(uuid != null) {
+            Query.prepare("SELECT `TIME`, `CHECK` FROM `PUNISHMENTS` " +
+                    "WHERE `UUID` = ? AND TIME BETWEEN ? AND ? ORDER BY `TIME` DESC LIMIT ?,?")
+                    .append(uuid.toString()).append(timeFrom).append(timeTo).append(arrayMin).append(arrayMax)
+                    .execute(rs -> punishments
+                            .add(new Punishment(uuid, rs.getString("CHECK"), rs.getLong("TIME"))));
+        } else {
+            Query.prepare("SELECT `UUID`, `TIME`, `CHECK` FROM `PUNISHMENTS` " +
+                    "WHERE TIME BETWEEN ? AND ? ORDER BY `TIME` DESC LIMIT ?,?")
+                    .append(timeFrom).append(timeTo).append(arrayMin).append(arrayMax)
+                    .execute(rs -> punishments
+                            .add(new Punishment(UUID.fromString(rs.getString("UUID")),
+                                    rs.getString("CHECK"), rs.getLong("TIME"))));
+        }
+
+        return punishments;
+    }
+
+    @Override
+    public List<Log> getHighestVL(UUID uuid, Check check, int limit, long timeFrom, long timeTo) {
+        List<Log> logs = getLogs(uuid, check, 0, limit, timeFrom, timeTo);
+
+        Map<String, Log> logsMax = new HashMap<>();
+
+        logs.forEach(log -> {
+            if(logsMax.containsKey(log.checkName)) {
+                Log toCheck = logsMax.get(log.checkName);
+
+                if(toCheck.vl < log.vl) {
+                    logsMax.put(log.checkName, log);
+                }
+            } else logsMax.put(log.checkName, log);
         });
-        return logs;
-    }
-
-    @Override
-    public List<Log> getLogs(long beginningTime, long endTime) {
-        List<Log> logs = new ArrayList<>();
-
-        Query.prepare("select * from `VIOLATIONS` where `TIME` between ? and ?")
-                .append(beginningTime).append(endTime).
-                execute(rs -> {
-                    logs.add(new Log(UUID.fromString(rs.getString("UUID")),
-                            rs.getString("CHECK"), rs.getString("INFO"),
-                            rs.getFloat("VL"), (long)rs.getInt("PING"),
-                            rs.getLong("TIME"), rs.getDouble("TPS")));
-                });
-        return logs;
-    }
-
-    @Override
-    public List<Punishment> getPunishments(UUID uuid) {
-        List<Punishment> punishments = new ArrayList<>();
-
-        Query.prepare("select `TIME`, `CHECK` from `PUNISHMENTS` where `UUID` = ?").append(uuid.toString())
-                .execute(rs -> punishments
-                        .add(new Punishment(uuid,
-                                rs.getString("CHECK"), rs.getLong("TIME"))));
-        return punishments;
-    }
-
-    @Override
-    public List<Punishment> getPunishments(UUID uuid, long beginningTime, long endTime) {
-        List<Punishment> punishments = new ArrayList<>();
-
-        Query.prepare("select `TIME`, `CHECK` from `PUNISHMENTS` where `UUID` = ? " +
-                "and `TIME` between ? and ? order by `TIME` desc")
-                .append(uuid.toString()).append(beginningTime).append(endTime)
-                .execute(rs -> punishments
-                        .add(new Punishment(uuid,
-                                rs.getString("CHECK"), rs.getLong("TIME"))));
-        return punishments;
+        return new ArrayList<>(logsMax.values());
     }
 
     @Override

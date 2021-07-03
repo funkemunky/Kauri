@@ -6,7 +6,7 @@ import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.logs.data.DataStorage;
 import dev.brighten.anticheat.logs.data.config.MongoConfig;
 import dev.brighten.anticheat.logs.data.config.MySQLConfig;
-import dev.brighten.anticheat.logs.data.impl.NoStorage;
+import dev.brighten.anticheat.logs.data.impl.FlatfileStorage;
 import dev.brighten.anticheat.logs.data.impl.MongoStorage;
 import dev.brighten.anticheat.logs.data.impl.MySQLStorage;
 import dev.brighten.anticheat.logs.objects.Log;
@@ -23,7 +23,7 @@ public class LoggerManager {
             storage = new MongoStorage();
         } else if(MySQLConfig.enabled) {
             storage = new MySQLStorage();
-        } else storage = new NoStorage();
+        } else storage = new FlatfileStorage();
     }
 
     public void addLog(ObjectData data, Check check, String info) {
@@ -40,15 +40,11 @@ public class LoggerManager {
     }
 
     public List<Log> getLogs(UUID uuid) {
-        return storage.getLogs(uuid);
+        return storage.getLogs(uuid, null, 0, Integer.MAX_VALUE, 0, System.currentTimeMillis());
     }
 
-    public List<Log> getLogs(UUID uuid, int skip, int limit) {
-        return storage.getLogs(uuid, skip, limit);
-    }
-
-    public List<Log> getLogs(UUID uuid, int skip, int limit, String... checks) {
-        return storage.getLogs(uuid, skip, limit, checks);
+    public List<Log> getLogs(UUID uuid, Check check, int arrayMin, int arrayMax, long timeFrom, long timeTo) {
+        return storage.getLogs(uuid, check, arrayMin, arrayMax, timeFrom, timeTo);
     }
 
     public void clearLogs(UUID uuid) {
@@ -56,7 +52,11 @@ public class LoggerManager {
     }
     
     public List<Punishment> getPunishments(UUID uuid) {
-        return storage.getPunishments(uuid);
+        return storage.getPunishments(uuid, 0, Integer.MAX_VALUE, 0, System.currentTimeMillis());
+    }
+
+    public List<Punishment> getPunishments(UUID uuid, int arrayMin, int arrayMax, long timeFrom, long timeTo) {
+        return storage.getPunishments(uuid, arrayMin, arrayMax, timeFrom, timeTo);
     }
 
     public Map<UUID, List<Log>> getLogsWithinTimeFrame(long timeFrame) {
@@ -64,7 +64,8 @@ public class LoggerManager {
 
         Map<UUID, List<Log>> logs = new HashMap<>();
 
-        storage.getLogs(currentTime - timeFrame, currentTime)
+        getLogs(null, null, 0, Integer.MAX_VALUE,
+                currentTime - timeFrame, currentTime + 100)
                 .forEach(log -> {
                     List<Log> logsList = logs.getOrDefault(log.uuid, new ArrayList<>());
 

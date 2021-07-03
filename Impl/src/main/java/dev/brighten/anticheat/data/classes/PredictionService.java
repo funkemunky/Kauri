@@ -503,7 +503,7 @@ public class PredictionService {
                 // calculated motion
                 final double diffZ = rmotionZ - motionZ;
 
-                diff = (diffX * diffX) + (diffZ * diffZ);
+                diff = Math.hypot(diffX, diffZ);
 
                 if(Double.isNaN(diff) || Double.isInfinite(diff)) return;
 
@@ -511,7 +511,7 @@ public class PredictionService {
                 diff = new BigDecimal(diff).setScale(precision + 2, RoundingMode.HALF_UP).doubleValue();
                 diffString = new BigDecimal(diff).setScale(precision + 2, RoundingMode.HALF_UP).toPlainString();
 
-                if (diff < preD * preD) { // if the diff is small enough
+                if (diff < preD) { // if the diff is small enough
                     flag = false;
                     //MiscUtils.testMessage(Color.Green + "(" + rmotionX + ", " + motionX + "); (" + rmotionZ + ", " + motionZ + ")");
 
