@@ -63,20 +63,7 @@ public class LogsGUI extends ChestMenu {
             runUpdater();
         }
 
-        List<Log> filteredLogs = (filtered.size() > 0 ? logs.stream()
-                .filter(log -> {
-                    for (String s : filtered) {
-                        if (s.equalsIgnoreCase(log.checkName)) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }).sequential()
-                .sorted(Comparator.comparing(log -> log.timeStamp, Comparator.reverseOrder()))
-                .collect(Collectors.toList()) : logs);
-
-        List<Log> subList = filteredLogs.subList(Math.min((page - 1) * 45, filteredLogs.size()),
-                Math.min(page * 45, filteredLogs.size()));
+        List<Log> subList = logs;
         for (int i = 0; i < subList.size(); i++) setItem(i, buttonFromLog(subList.get(i)));
 
         if(subList.size() < 45) {
@@ -86,7 +73,7 @@ public class LogsGUI extends ChestMenu {
         }
 
         //Setting the next page option if possible.
-        if (Math.min(page * 45, filteredLogs.size()) < filteredLogs.size()) {
+        if (Math.min(page * 45, subList.size()) < subList.size()) {
             Button next = new Button(false, new ItemBuilder(XMaterial.BOOK.parseMaterial())
                     .amount(1).name(Color.Red + "Next Page &7(&e" + (page + 1) + "&7)").build(),
                     (player, info) -> {
@@ -274,10 +261,11 @@ public class LogsGUI extends ChestMenu {
     }
 
     private void updateLogs() {
-        logs = Kauri.INSTANCE.loggerManager.getLogs(player.getUniqueId())
-                .stream()
-                .sorted(Comparator.comparing(log -> log.timeStamp, Comparator.reverseOrder()))
-                .collect(Collectors.toList());
+        if(filtered.size() == 0)
+        logs = Kauri.INSTANCE.loggerManager.getLogs(player.getUniqueId(), (currentPage.get() - 1) * 45,
+                currentPage.get() * 45);
+        else Kauri.INSTANCE.loggerManager.getLogs(player.getUniqueId(), (currentPage.get() - 1) * 45,
+                currentPage.get() * 45, filtered.toArray(new String[0]));
     }
 
     private void runUpdater() {

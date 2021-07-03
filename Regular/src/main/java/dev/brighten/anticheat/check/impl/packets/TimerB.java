@@ -1,5 +1,7 @@
 package dev.brighten.anticheat.check.impl.packets;
 
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlace1_9;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutPositionPacket;
 import dev.brighten.anticheat.check.api.Cancellable;
@@ -14,12 +16,17 @@ import dev.brighten.api.check.CheckType;
 @Cancellable
 public class TimerB extends Check {
 
-    private long lastFlying, totalTimer = -500;
+    private long lastFlying, totalTimer = -1000;
     private int buffer;
     private SimpleAverage averageIncrease = new SimpleAverage(5, 0);
 
     @Packet
     public void onTeleport(WrappedOutPositionPacket event) {
+        totalTimer-= 50;
+    }
+
+    @Packet
+    public void onBlockPlace(WrappedInBlockPlace1_9 packet) {
         totalTimer-= 50;
     }
 

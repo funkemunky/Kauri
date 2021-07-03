@@ -43,16 +43,8 @@ public class ReachB extends Check {
                     || data.playerInfo.serverPos
                     || data.playerInfo.doingTeleport) return;
 
-            List<Pair<SimpleCollisionBox, Double>> entityLocs = data.targetPastLocation.getEstimatedLocation(timeStamp,
-                    (data.lagInfo.transPing + 2) * 50, 100L)
-                    .stream()
-                    .map(loc -> {
-                        SimpleCollisionBox hitbox = (SimpleCollisionBox) getHitbox(data.target, loc);
-                        int index = data.targetPastLocation.getPreviousLocations().indexOf(loc);
-                        return new Pair<>(hitbox, Math.max(0,index > 0 ? data.targetPastLocation.getPreviousLocations()
-                                .get(index- 1)
-                                .toVector().distance(loc.toVector()) : 0));
-                    }).collect(Collectors.toList());
+            List<KLocation> entityLocs = data.targetPastLocation.getEstimatedLocation(timeStamp,
+                    (data.lagInfo.transPing + 2) * 50, 100L);
 
             double distance = 69, fdistance = 69, tdistance = 69;
             int misses = 0, collided = 0, fmisses = 0, tmisses = 0, fcollided = 0, tcollided = 0;
@@ -60,7 +52,14 @@ public class ReachB extends Check {
                     fromOrigin = data.getPlayer().getEyeLocation();
 
             toOrigin.setY(toOrigin.getY() + (data.playerInfo.sneaking ? 1.54 : 1.62));
-            for (Pair<SimpleCollisionBox, Double> sbox : entityLocs) {
+            for (KLocation loc : entityLocs) {
+                SimpleCollisionBox hitbox = (SimpleCollisionBox) getHitbox(data.target, loc);
+                int index = data.targetPastLocation.getPreviousLocations().indexOf(loc);
+                Pair<SimpleCollisionBox, Double>
+                        sbox = new Pair<>(hitbox, Math.max(0,index > 0 ? data.targetPastLocation.getPreviousLocations()
+                        .get(index- 1)
+                        .toVector().distance(loc.toVector()) : 0));
+                
                 val copied = sbox.key.copy().expand(0.1);
                 AxisAlignedBB aabb = new AxisAlignedBB(copied);
                 if(debug) copied.draw(WrappedEnumParticle.FLAME, Bukkit.getOnlinePlayers());
