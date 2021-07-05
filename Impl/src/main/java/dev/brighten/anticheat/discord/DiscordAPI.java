@@ -88,6 +88,7 @@ public class DiscordAPI {
     private static final int banRed = 0xD9471A, noBanOrange = 0xE8A83A, flagYellow = 0xFFEB33;
 
     public void sendBan(Player player, KauriCheck check, boolean exempt) {
+        if(!enabled) return;
         if(!sendBans || client == null || (!devAlerts && check.isDeveloper())) return;
 
         lastDiscordSend.compute(player.getUniqueId(), (key, lastTime) -> {
@@ -112,6 +113,7 @@ public class DiscordAPI {
     }
 
     public void sendFlag(Player player, KauriCheck check, boolean dev, float vl) {
+        if(!enabled) return;
         if(!sendAlerts || client == null || (!devAlerts && dev)) return;
         lastDiscordSend.compute(player.getUniqueId(), (key, lastTime) -> {
             long now = System.currentTimeMillis();

@@ -1,6 +1,6 @@
 package dev.brighten.anticheat.check.impl.packets;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlace1_9;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutPositionPacket;
 import dev.brighten.anticheat.check.api.Cancellable;
@@ -28,7 +28,7 @@ public class TimerB extends Check {
     }
 
     @Packet
-    public void onBlockPlace(WrappedInBlockPlace1_9 packet) {
+    public void onBlockPlace(WrappedInBlockPlacePacket packet) {
         totalTimer-= 50;
     }
 
