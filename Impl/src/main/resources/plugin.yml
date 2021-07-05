@@ -1,6 +1,6 @@
 name: Kauri
 main: dev.brighten.anticheat.Kauri
-description: You won't see this nibba.
+description: The best solution for the cheater problems of today.
 author: "funkemunky"
 depend: [Atlas]
 softdepend: [LunarClientAPI]
