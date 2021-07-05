@@ -157,8 +157,6 @@ public class Kauri extends JavaPlugin {
             runnable.run();
             onReload.remove(runnable);
         }
-
-        Bukkit.getOnlinePlayers().forEach(dataManager::createData);
     }
 
     public void load() {

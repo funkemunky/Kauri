@@ -66,12 +66,6 @@ public class Load {
         Kauri.INSTANCE.profiler = new ToggleableProfiler();
         Kauri.INSTANCE.profiler.setEnabled(true);
 
-        if(Bukkit.getOnlinePlayers().size() > 0) {
-            RunUtils.taskLater(() -> {
-                MiscUtils.printToConsole(Color.Gray + "Detected players! Creating data objects...");
-                Bukkit.getOnlinePlayers().forEach(Kauri.INSTANCE.dataManager::createData);
-            }, Kauri.INSTANCE, 6L);
-        }
         Kauri.INSTANCE.lastEnabled = new AtlasTimer(20);
         Kauri.INSTANCE.enabled = true;
         Kauri.INSTANCE.lastEnabled.reset();

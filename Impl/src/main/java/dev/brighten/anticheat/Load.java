@@ -46,10 +46,10 @@ public class Load {
         Kauri.INSTANCE.msgHandler = new MessageHandler(Kauri.INSTANCE);
 
         register("Registering processors...");
-        Kauri.INSTANCE.packetProcessor = new PacketProcessor();
         Kauri.INSTANCE.dataManager = new DataManager();
         Kauri.INSTANCE.keepaliveProcessor = new KeepaliveProcessor();
         Kauri.INSTANCE.entityProcessor = EntityProcessor.start();
+        Kauri.INSTANCE.packetProcessor = new PacketProcessor();
 
         register("Running scanner...");
         Atlas.getInstance().initializeScanner(Kauri.INSTANCE, true, true);
@@ -71,13 +71,6 @@ public class Load {
         register("Starting profiler...");
         Kauri.INSTANCE.profiler = new ToggleableProfiler();
         Kauri.INSTANCE.profiler.setEnabled(true);
-
-        if(Bukkit.getOnlinePlayers().size() > 0) {
-            RunUtils.taskLater(() -> {
-                MiscUtils.printToConsole(Color.Gray + "Detected players! Creating data objects...");
-                Bukkit.getOnlinePlayers().forEach(Kauri.INSTANCE.dataManager::createData);
-            }, Kauri.INSTANCE, 6L);
-        }
         Kauri.INSTANCE.lastEnabled = new AtlasTimer(20);
         Kauri.INSTANCE.enabled = true;
         Kauri.INSTANCE.lastEnabled.reset();

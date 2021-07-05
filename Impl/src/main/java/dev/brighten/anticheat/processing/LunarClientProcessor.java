@@ -16,7 +16,6 @@ public class LunarClientProcessor implements Listener  {
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
         if(data == null) {
-            Kauri.INSTANCE.dataManager.createData(event.getPlayer());
             data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
         }
         data.usingLunar = true;

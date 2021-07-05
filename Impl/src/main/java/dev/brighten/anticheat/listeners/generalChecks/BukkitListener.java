@@ -35,19 +35,13 @@ public class BukkitListener implements Listener {
             1, "&6Magic Wand");
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onJoin(PlayerJoinEvent event) {
-        Kauri.INSTANCE.dataManager.dataMap.remove(event.getPlayer().getUniqueId());
-        Kauri.INSTANCE.executor.execute(() ->  Kauri.INSTANCE.dataManager.createData(event.getPlayer()));
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
     public void onLeave(PlayerQuitEvent event) {
         //Removing if the player has debug access so there aren't any null objects left to cause problems later.
         if(event.getPlayer().hasPermission("kauri.debug"))
             ObjectData.debugBoxes(false, event.getPlayer());
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
         if(data != null) data.unregister();
-        Kauri.INSTANCE.dataManager.dataMap.remove(event.getPlayer().getUniqueId());
+        Kauri.INSTANCE.dataManager.removeData(event.getPlayer().getUniqueId());
     }
 
     @EventHandler
