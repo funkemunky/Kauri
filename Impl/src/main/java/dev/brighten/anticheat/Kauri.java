@@ -86,6 +86,7 @@ public class Kauri extends JavaPlugin {
         MiscUtils.printToConsole("Unregistering processors...");
         keepaliveProcessor.stop();
         keepaliveProcessor = null;
+        Atlas.getInstance().getPacketProcessor().removeListeners(this);
 
         if(!reload) {
             kauriAPI = null;

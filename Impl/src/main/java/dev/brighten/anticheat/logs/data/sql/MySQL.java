@@ -47,6 +47,11 @@ public class MySQL {
         try {
             Class.forName("org.sqlite.JDBC");
             conn = DriverManager.getConnection("jdbc:sqlite:" + dataFolder);
+            conn.setAutoCommit(true);
+            Query.use(conn);
+            Query.prepare("CREATE DATABASE IF NOT EXISTS `" + MySQLConfig.database + "`").execute();
+            Query.prepare("USE `" + MySQLConfig.database + "`").execute();
+            System.out.println("Connection to H2 SQlLite has been established.");
         } catch (SQLException ex) {
             Kauri.INSTANCE.getLogger().log(Level.SEVERE,"SQLite exception on initialize", ex);
         } catch (ClassNotFoundException ex) {

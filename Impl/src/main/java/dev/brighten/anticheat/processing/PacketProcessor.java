@@ -45,7 +45,7 @@ public class PacketProcessor {
     }
 
     private final AsyncPacketListener listener = Atlas.getInstance().getPacketProcessor()
-            .processAsync(EventPriority.LOWEST, info -> {
+            .processAsync(Kauri.INSTANCE, EventPriority.LOWEST, info -> {
                 ObjectData data = Kauri.INSTANCE.dataManager.getData(info.getPlayer());
 
                 if(data == null || data.checkManager == null) return;
@@ -57,7 +57,7 @@ public class PacketProcessor {
                 }
             });
     private final PacketListener cancelListener = Atlas.getInstance().getPacketProcessor()
-            .process(EventPriority.NORMAL, info -> {
+            .process(Kauri.INSTANCE, EventPriority.NORMAL, info -> {
                 ObjectData data = Kauri.INSTANCE.dataManager.getData(info.getPlayer());
 
                 if(data == null || data.checkManager == null) return true;
