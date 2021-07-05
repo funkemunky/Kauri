@@ -25,11 +25,12 @@ public class DataManager {
     }
 
     public ObjectData getData(Player player) {
-        return dataMap.computeIfAbsent(player.getUniqueId(),
-                ObjectData::new);
+        return dataMap.getOrDefault(player.getUniqueId(), null);
     }
 
-    public void removeData(UUID player) {
-        dataMap.remove(player);
+    public void createData(Player player) {
+        ObjectData data = new ObjectData(player.getUniqueId());
+
+        dataMap.put(player.getUniqueId(), data);
     }
 }

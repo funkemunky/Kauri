@@ -73,11 +73,12 @@ public class ObjectData implements Data {
     public final Map<Long, Long> keepAlives = Collections.synchronizedMap(new HashMap<>());
     public final List<String> sniffedPackets = new CopyOnWriteArrayList<>();
     public final Map<Location, CollisionBox> ghostBlocks = Collections.synchronizedMap(new HashMap<>());
-    public BukkitTask task;
 
     public ObjectData(UUID uuid) {
         this.uuid = uuid;
         hashCode = uuid.hashCode();
+
+        player = Bukkit.getPlayer(uuid);
 
         if(!Config.testMode) {
             if(alerts = getPlayer().hasPermission("kauri.command.alerts"))
@@ -104,19 +105,6 @@ public class ObjectData implements Data {
         Kauri.INSTANCE.executor.execute(() -> {
             playerVersion = TinyProtocolHandler.getProtocolVersion(getPlayer());
         });
-        if(task != null) task.cancel();
-        task = RunUtils.taskTimerAsync(() -> {
-            if(getPlayer() == null) {
-                task.cancel();
-                return;
-            }
-
-            if(Config.kickForLunar18 && usingLunar
-                    && !playerVersion.equals(ProtocolVersion.UNKNOWN)
-                    && playerVersion.isAbove(ProtocolVersion.V1_8)) {
-                RunUtils.task(() -> getPlayer().kickPlayer(Color.Red + "Lunar Client 1.8.9 is not allowed.\nJoin on 1.7.10 or any other client."));
-            }
-        }, Kauri.INSTANCE, 40L, 40L);
 
         getPlayer().getActivePotionEffects().forEach(pe -> {
             runKeepaliveAction(d -> this.potionProcessor.potionEffects.add(pe));
@@ -141,7 +129,6 @@ public class ObjectData implements Data {
     }
 
     public void unregister() {
-        task.cancel();
         keepAliveStamps.clear();
         Kauri.INSTANCE.dataManager.hasAlerts.remove(this);
         Kauri.INSTANCE.dataManager.debugging.remove(this);

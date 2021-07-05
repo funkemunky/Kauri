@@ -107,7 +107,10 @@ public class CheckManager {
     }
 
     public void addChecks() {
-        if(objectData.getPlayer().hasPermission("kauri.bypass") && Config.bypassPermission) return;
+        assert objectData != null: "ObjectData is null in CheckManager";
+        if(objectData.getPlayer()
+                .hasPermission("kauri.bypass")
+                && Config.bypassPermission) return;
         Check.checkClasses.keySet().stream()
                 .map(clazz -> {
                     CheckInfo settings = Check.checkClasses.get(clazz);
