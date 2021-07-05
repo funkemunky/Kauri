@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.processing;
 
+import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.events.impl.PacketReceiveEvent;
 import cc.funkemunky.api.events.impl.PacketSendEvent;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
@@ -7,6 +8,7 @@ import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.*;
 import cc.funkemunky.api.tinyprotocol.packet.out.*;
+import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.XMaterial;
@@ -20,7 +22,13 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+@Init
 public class PacketProcessor {
+
+    static {
+        Atlas.getInstance().getPacketProcessor().process();
+    }
+
 
     public void processClient(PacketReceiveEvent event, ObjectData data, Object object, String type,
                                            long timeStamp) {

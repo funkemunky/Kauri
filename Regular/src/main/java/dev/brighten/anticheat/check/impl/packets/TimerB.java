@@ -19,8 +19,8 @@ public class TimerB extends Check {
 
     private long lastFlying, totalTimer = -1000;
     private int buffer;
-    private SimpleAverage averageIncrease = new SimpleAverage(5, 0);
-    private Timer lastFlag = new TickTimer();
+    private final SimpleAverage averageIncrease = new SimpleAverage(5, 0);
+    private final Timer lastFlag = new TickTimer();
 
     @Packet
     public void onTeleport(WrappedOutPositionPacket event) {
