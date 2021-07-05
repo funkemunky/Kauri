@@ -38,6 +38,7 @@ public class KillauraE extends Check {
     @Packet
     public void onBlock(WrappedInBlockPlacePacket packet) {
         if(attacks && !interacts) {
+            vl++;
             flag(10, "attacked=true interacted=false");
         }
         debug("attacks=%s interacts=%s", attacks, interacts);

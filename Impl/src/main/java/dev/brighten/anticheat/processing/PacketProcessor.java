@@ -47,6 +47,9 @@ public class PacketProcessor {
     private final AsyncPacketListener listener = Atlas.getInstance().getPacketProcessor()
             .processAsync(EventPriority.LOWEST, info -> {
                 ObjectData data = Kauri.INSTANCE.dataManager.getData(info.getPlayer());
+
+                if(data == null || data.checkManager == null) return;
+
                 if(outgoingPackets.contains(info.getType())) {
                     processServer(data, info.getPacket(), info.getType(), info.getTimestamp());
                 } else if(incomingPackets.contains(info.getType())) {
@@ -56,6 +59,9 @@ public class PacketProcessor {
     private final PacketListener cancelListener = Atlas.getInstance().getPacketProcessor()
             .process(EventPriority.NORMAL, info -> {
                 ObjectData data = Kauri.INSTANCE.dataManager.getData(info.getPlayer());
+
+                if(data == null || data.checkManager == null) return true;
+
                 switch(info.getType()) {
                     case Packet.Client.USE_ENTITY: {
                         val packet = new WrappedInUseEntityPacket(info.getPacket(), info.getPlayer());
