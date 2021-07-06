@@ -14,7 +14,7 @@ import dev.brighten.api.check.CheckType;
 import org.bukkit.potion.PotionEffectType;
 
 @CheckInfo(name = "Speed (A)", description = "Minecraft code speed acceleration check.",
-        checkType = CheckType.SPEED, planVersion = KauriVersion.FREE)
+        checkType = CheckType.SPEED, planVersion = KauriVersion.FREE, vlToFlag = 2)
 @Cancellable
 public class SpeedA extends Check {
 
@@ -84,7 +84,7 @@ public class SpeedA extends Check {
                     && data.playerInfo.lastVelocity.isPassed(2)
                     && data.playerInfo.liquidTimer.isPassed(2)
                     && !data.playerInfo.generalCancel) {
-                if((buffer+= ratio > 400 ? 2 : 1) > 4 || ratio > 600) {
+                if((buffer+= ratio > 400 ? 2 : 1) > 4 || ratio > 1500) {
                     vl++;
                     flag("p=%.1f%% dxz=%.3f aimove=%.3f tags=%s",
                             ratio, data.playerInfo.deltaXZ, data.predictionService.aiMoveSpeed, tags.build());

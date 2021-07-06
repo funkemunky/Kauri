@@ -17,6 +17,7 @@ public class NoFallB extends Check {
         if(!packet.isPos() || !data.playerInfo.worldLoaded
                 || data.playerInfo.generalCancel
                 || data.playerInfo.serverPos
+                || (data.playerInfo.deltaXZ == 0 && data.playerInfo.deltaY == 0)
                 || data.playerInfo.lastTeleportTimer.isNotPassed(2)
                 || data.playerInfo.lastRespawnTimer.isNotPassed(10))
             return;

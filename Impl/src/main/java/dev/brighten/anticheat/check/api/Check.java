@@ -134,7 +134,7 @@ public class Check implements KauriCheck {
         flag(false, resetVLTime, information, variables);
     }
 
-    private long lastFlagRun = 0L;
+    protected long lastFlagRun = 0L;
 
     public void flag(boolean devAlerts, int resetVLTime, String information, Object... variables) {
         Kauri.INSTANCE.executor.execute(() -> {

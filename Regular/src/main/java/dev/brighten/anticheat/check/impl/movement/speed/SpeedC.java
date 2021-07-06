@@ -54,7 +54,7 @@ public class SpeedC extends Check {
     @RequiredArgsConstructor
     public enum MaxThreshold {
 
-        GROUND_SPEED("Ground", 0.284, 1.3, 1.6, 1),
+        GROUND_SPEED("Ground", 0.29, 1.3, 1.6, 1),
         GROUND_SPRINT_SPEED("Ground + Sprint", 0.43, 1.3, 1.6, 1),
         AIR_SPEED("Air", 0.28, 1.3, 1.6, 1),
         AIR_SPRINT_SPEED("Air + Sprint", 0.45, 1.3, 1.6, 2);
@@ -72,7 +72,7 @@ public class SpeedC extends Check {
             double base = threshold;
 
             if(walkSpeed > 0.2) {
-                base*= (1 + (walkSpeed - 0.2)) * walkSpeedMultiplier;
+                base*= Math.max(1, 1 + (walkSpeed - 0.2)) * walkSpeedMultiplier;
             }
 
             if(speedAmplifier > 0)

@@ -21,7 +21,7 @@ public class FlyB extends Check {
     private static double mult = 0.98f;
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if(packet.isPos()) {
+        if(packet.isPos() && (data.playerInfo.deltaXZ > 0 || data.playerInfo.deltaY != 0)) {
             //We check if the player is in ground, since theoretically the y should be zero.
             double lDeltaY = data.playerInfo.lClientGround ? 0 : data.playerInfo.lDeltaY;
             boolean onGround = data.playerInfo.clientGround && data.blockInfo.blocksBelow;

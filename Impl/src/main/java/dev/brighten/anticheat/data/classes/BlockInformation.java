@@ -37,6 +37,14 @@ public class BlockInformation {
             handler = new CollisionHandler(new ArrayList<>(), new ArrayList<>(), new KLocation(0,0,0), null);
     public List<SimpleCollisionBox> aboveCollisions = new ArrayList<>(), belowCollisions = new ArrayList<>();
     public final List<Block> blocks = Collections.synchronizedList(new ArrayList<>());
+    private static List<Material> skulls = new ArrayList<>();
+
+    static {
+        for (Material value : Material.values()) {
+            if(value.name().contains("SKULL"))
+                skulls.add(value);
+        }
+    }
 
     public BlockInformation(ObjectData objectData) {
         this.objectData = objectData;
@@ -100,13 +108,14 @@ public class BlockInformation {
 
                     if(block != null) {
                         blocks.add(block);
-                        CollisionBox blockBox = BlockData.getData(block.getType())
+                        final Material type = block.getType();
+                        CollisionBox blockBox = BlockData.getData(type)
                                 .getBox(block, objectData.playerVersion);
 
-                        if(block.getType().equals(XMaterial.COBWEB.parseMaterial()) && blockBox.isCollided(normalBox))
+                        if(type.equals(XMaterial.COBWEB.parseMaterial()) && blockBox.isCollided(normalBox))
                             inWeb = true;
 
-                        if(block.getType().equals(XMaterial.ROSE_BUSH.parseMaterial()))
+                        if(type.equals(XMaterial.ROSE_BUSH.parseMaterial()))
                             roseBush = true;
 
                         if(normalBox.copy().offset(0, 0.6f, 0).isCollided(blockBox))
@@ -123,18 +132,18 @@ public class BlockInformation {
                                 .isCollided(blockBox))
                             blockBox.downCast(belowCollisions);
 
-                        if(Materials.checkFlag(block.getType(), Materials.WATER)) {
+                        if(Materials.checkFlag(type, Materials.WATER)) {
                             if(waterBox.isCollided(blockBox))
                                 inWater = inLiquid = true;
-                        } else if(Materials.checkFlag(block.getType(), Materials.LAVA)) {
+                        } else if(Materials.checkFlag(type, Materials.LAVA)) {
                             if(lavaBox.isCollided(blockBox))
                                 inLava = inLiquid = true;
-                        } else if(Materials.checkFlag(block.getType(), Materials.SOLID)) {
+                        } else if(Materials.checkFlag(type, Materials.SOLID)) {
                             SimpleCollisionBox groundBox = normalBox.copy()
                                     .offset(0, -.1, 0).expandMax(0, -1.2, 0);
                             XMaterial blockMaterial =
-                                    XMaterial.requestXMaterial(block.getType().name(), block.getData() != (byte)0 //Just to save a bit on performance
-                                            && block.getType().name().contains("SKULL") ? 0 : block.getData());
+                                    XMaterial.requestXMaterial(type.name(), block.getData() != (byte)0 //Just to save a bit on performance
+                                            && skulls.contains(type) ? 0 : block.getData());
 
                             if(blockMaterial == null) {
                                 continue;
@@ -175,15 +184,15 @@ public class BlockInformation {
                                 }
                             }
                             if(objectData.playerInfo.deltaY > 0
-                                    && Materials.checkFlag(block.getType(), Materials.LADDER)
+                                    && Materials.checkFlag(type, Materials.LADDER)
                                     && normalBox.copy().expand(0.02f, 0, 0.02f).isCollided(blockBox)) {
                                 onClimbable = true;
                             }
 
                             if(groundBox.copy().expand(0.5, 0.3, 0.5).isCollided(blockBox)) {
-                                if(Materials.checkFlag(block.getType(), Materials.SLABS))
+                                if(Materials.checkFlag(type, Materials.SLABS))
                                     onSlab = true;
-                                if(Materials.checkFlag(block.getType(), Materials.STAIRS))
+                                if(Materials.checkFlag(type, Materials.STAIRS))
                                     onStairs = true;
 
                                 switch(blockMaterial) {
@@ -230,7 +239,7 @@ public class BlockInformation {
                             }
                         } else if(blockBox.isCollided(normalBox)) {
                             XMaterial blockMaterial =
-                                    XMaterial.requestXMaterial(block.getType().name(), block.getData());
+                                    XMaterial.requestXMaterial(type.name(), block.getData());
 
                             if(blockMaterial != null)
                             switch(blockMaterial) {

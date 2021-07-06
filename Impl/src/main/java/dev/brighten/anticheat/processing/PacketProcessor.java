@@ -169,7 +169,9 @@ public class PacketProcessor {
                     data.predictionService.hit = true;
                     data.playerInfo.usingItem = data.predictionService.useSword = false;
                 }
+                if(packet.getEntity() != null)
                 data.checkManager.runPacket(packet, timestamp);
+
                 if(data.sniffing) {
                     data.sniffedPackets.add(type + ":@:" + packet.getId() + ";" + packet.getAction().name()
                             + ":@:" + timestamp);
