@@ -31,7 +31,7 @@ public class BlockInformation {
     private ObjectData objectData;
     public boolean onClimbable, onSlab, onStairs, onHalfBlock, inLiquid, inLava, inWater, inWeb, onSlime, onIce,
             onSoulSand, blocksAbove, collidesVertically, bedNear, collidesHorizontally, blocksNear, inBlock, miscNear,
-            collidedWithEntity, roseBush, inPortal;
+            collidedWithEntity, roseBush, inPortal, blocksBelow;
     public float currentFriction, fromFriction;
     public CollisionHandler
             handler = new CollisionHandler(new ArrayList<>(), new ArrayList<>(), new KLocation(0,0,0), null);
@@ -53,7 +53,7 @@ public class BlockInformation {
 
         onClimbable = onSlab = onStairs = onHalfBlock = inLiquid = inLava = inWater = inWeb = onSlime
                 = onIce = onSoulSand = blocksAbove = collidesVertically = bedNear = collidesHorizontally =
-                blocksNear = inBlock = miscNear = collidedWithEntity = inPortal = false;
+                blocksNear = inBlock = miscNear = collidedWithEntity = blocksBelow = inPortal = false;
 
         double dy = Math.abs(objectData.playerInfo.deltaY);
         double dh = objectData.playerInfo.deltaXZ;
@@ -61,12 +61,12 @@ public class BlockInformation {
         if(dy > 2) dy = 2;
         if(dh > 2) dh = 2;
 
-        int startX = Location.locToBlock(objectData.playerInfo.to.x - 1.25 - dh);
-        int endX = Location.locToBlock(objectData.playerInfo.to.x + 1.25 + dh);
+        int startX = Location.locToBlock(objectData.playerInfo.to.x - 1.5 - dh);
+        int endX = Location.locToBlock(objectData.playerInfo.to.x + 1.5 + dh);
         int startY = Location.locToBlock(objectData.playerInfo.to.y - 1 - dy);
         int endY = Location.locToBlock(objectData.playerInfo.to.y + 3 + dy);
-        int startZ = Location.locToBlock(objectData.playerInfo.to.z - 1.25 - dh);
-        int endZ = Location.locToBlock(objectData.playerInfo.to.z + 1.25 + dh);
+        int startZ = Location.locToBlock(objectData.playerInfo.to.z - 1.5 - dh);
+        int endZ = Location.locToBlock(objectData.playerInfo.to.z + 1.5 + dh);
 
         SimpleCollisionBox waterBox = objectData.box.copy().expand(0, -.38, 0);
 
@@ -139,6 +139,11 @@ public class BlockInformation {
                             if(blockMaterial == null) {
                                 continue;
                             }
+
+
+                            if(normalBox.copy().expand(0.1, 0, 0.1).expandMin(0, -1, 0)
+                                    .isIntersected(blockBox))
+                                blocksBelow = true;
 
                             if(normalBox.isIntersected(blockBox)) inBlock = true;
 
