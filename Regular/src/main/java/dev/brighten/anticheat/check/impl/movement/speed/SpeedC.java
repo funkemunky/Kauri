@@ -39,7 +39,7 @@ public class SpeedC extends Check {
             if(velocityXZ > (data.playerInfo.deltaXZ * data.playerInfo.deltaXZ)) calc = velocityXZ;
         }
 
-        if(data.playerInfo.deltaXZ > calc && data.playerInfo.lastVelocity.isNotPassed(15)) {
+        if(data.playerInfo.deltaXZ > calc && data.playerInfo.lastVelocity.isNotPassed(25)) {
             flag("t=[%s] %.3f>-%.3f jumped=%s speed=%s", threshold.display,
                     data.playerInfo.deltaXZ, calc, data.playerInfo.jumped, speed);
             vl++;

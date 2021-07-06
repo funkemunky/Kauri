@@ -15,6 +15,7 @@ import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.CollisionHandler;
 import dev.brighten.anticheat.utils.Helper;
+import dev.brighten.anticheat.utils.cache.MaterialCache;
 import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -141,9 +142,10 @@ public class BlockInformation {
                         } else if(Materials.checkFlag(type, Materials.SOLID)) {
                             SimpleCollisionBox groundBox = normalBox.copy()
                                     .offset(0, -.1, 0).expandMax(0, -1.2, 0);
+                            byte data = block.getData();
                             XMaterial blockMaterial =
-                                    XMaterial.requestXMaterial(type.name(), block.getData() != (byte)0 //Just to save a bit on performance
-                                            && skulls.contains(type) ? 0 : block.getData());
+                                    XMaterial.requestXMaterial(type.name(), data != (byte)0 //Just to save a bit on performance
+                                            && skulls.contains(type) ? 0 : data);
 
                             if(blockMaterial == null) {
                                 continue;
