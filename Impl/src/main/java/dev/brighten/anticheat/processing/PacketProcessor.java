@@ -51,9 +51,13 @@ public class PacketProcessor {
                 if(data == null || data.checkManager == null) return;
 
                 if(outgoingPackets.contains(info.getType())) {
+                    Kauri.INSTANCE.profiler.start("packet:" + info.getType());
                     processServer(data, info.getPacket(), info.getType(), info.getTimestamp());
+                    Kauri.INSTANCE.profiler.stop("packet:" + info.getType());
                 } else if(incomingPackets.contains(info.getType())) {
+                    Kauri.INSTANCE.profiler.start("packet:" + info.getType());
                     processClient(data, info.getPacket(), info.getType(), info.getTimestamp());
+                    Kauri.INSTANCE.profiler.stop("packet:" + info.getType());
                 }
             });
     private final PacketListener cancelListener = Atlas.getInstance().getPacketProcessor()

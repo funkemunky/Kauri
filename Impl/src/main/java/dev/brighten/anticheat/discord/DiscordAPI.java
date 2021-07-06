@@ -80,8 +80,10 @@ public class DiscordAPI {
 
     public void unload() {
         MiscUtils.printToConsole("&cUnloading Discord Webhook...");
-        client.close();
-        client = null;
+        if(client != null) {
+            client.close();
+            client = null;
+        }
         MiscUtils.printToConsole("&7Completed!");
     }
 
