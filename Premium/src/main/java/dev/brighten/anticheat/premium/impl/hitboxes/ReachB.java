@@ -23,6 +23,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,12 +53,14 @@ public class ReachB extends Check {
                     fromOrigin = data.getPlayer().getEyeLocation();
 
             toOrigin.setY(toOrigin.getY() + (data.playerInfo.sneaking ? 1.54 : 1.62));
-            for (KLocation loc : entityLocs) {
+            List<KLocation> previousLocs = new LinkedList<>(data.targetPastLocation.getPreviousLocations());
+            for (int i = 0; i < entityLocs.size(); i++) {
+                KLocation loc = entityLocs.get(i);
+
                 SimpleCollisionBox hitbox = (SimpleCollisionBox) getHitbox(data.target, loc);
-                int index = data.targetPastLocation.getPreviousLocations().indexOf(loc);
                 Pair<SimpleCollisionBox, Double>
-                        sbox = new Pair<>(hitbox, Math.max(0,index > 0 ? data.targetPastLocation.getPreviousLocations()
-                        .get(index- 1)
+                        sbox = new Pair<>(hitbox, Math.max(0,i > 0 ? previousLocs
+                        .get(i- 1)
                         .toVector().distance(loc.toVector()) : 0));
 
                 val copied = sbox.key.copy().expand(0.1);

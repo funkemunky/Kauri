@@ -1,15 +1,17 @@
 package dev.brighten.anticheat.utils;
 
 import cc.funkemunky.api.utils.KLocation;
+import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingList;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import org.bukkit.Location;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class PastLocation {
-    private final EvictingList<KLocation> previousLocations = new EvictingList<>(20);
+    private final ConcurrentEvictingList<KLocation> previousLocations = new ConcurrentEvictingList<>(20);
 
     public KLocation getPreviousLocation(long time) {
         return (this.getPreviousLocations().stream()
@@ -43,7 +45,7 @@ public class PastLocation {
         getPreviousLocations().add(new KLocation(location));
     }
 
-    public synchronized EvictingList<KLocation> getPreviousLocations() {
+    public ConcurrentEvictingList<KLocation> getPreviousLocations() {
         return previousLocations;
     }
 
