@@ -27,7 +27,7 @@ public class BadPacketsL extends Check {
             vl++;
             flag("p%s h=%s", Optional.ofNullable(packet.getItemStack()).map(i -> i.getType().name())
                     .orElse("NONE"), packet.getPlayer().getItemInHand().getType().name());
-        } else debug(packet.getItemStack().getType().name());
+        } else if(packet.getItemStack() != null) debug(packet.getItemStack().getType().name());
 
         if(pos != null)
         debug("x=%s y=%s z=%s", pos.getX(), pos.getY(), pos.getZ());
