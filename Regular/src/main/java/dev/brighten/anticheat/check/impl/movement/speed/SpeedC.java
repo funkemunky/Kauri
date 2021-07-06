@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.potion.PotionEffectType;
 
 @CheckInfo(name = "Speed (C)", description = "Checks if a player moves past the absolute maximum speed they can possible do.",
-        punishVL = 34, developer = true)
+        punishVL = 34, enabled = false, developer = true)
 @Cancellable
 public class SpeedC extends Check {
 
