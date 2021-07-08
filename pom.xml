@@ -7,7 +7,7 @@
     <groupId>dev.brighten.anticheat</groupId>
     <artifactId>Kauri</artifactId>
     <packaging>pom</packaging>
-    <version>2.13.3</version>
+    <version>2.13.4</version>
     <modules>
         <module>API</module>
         <module>Impl</module>
@@ -53,7 +53,7 @@
         <dependency>
             <groupId>cc.funkemunky.utils</groupId>
             <artifactId>Atlas</artifactId>
-            <version>1.10.0-SNAPSHOT-b2</version>
+            <version>1.10.0-SNAPSHOT-b5</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

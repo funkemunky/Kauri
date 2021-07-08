@@ -75,9 +75,6 @@ public class Load {
         Kauri.INSTANCE.enabled = true;
         Kauri.INSTANCE.lastEnabled.reset();
 
-        Bukkit.getWorlds().forEach(world -> Kauri.INSTANCE.entityProcessor.vehicles
-                .put(world.getUID(), new ArrayList<>()));
-
         //Creating data for online players as of now. We're running this sync so it only runs once server fully starts.
         RunUtils.taskLater(() -> Bukkit.getOnlinePlayers().forEach(pl -> Kauri.INSTANCE.dataManager.createData(pl)),
                 Kauri.INSTANCE, 1);

@@ -260,7 +260,7 @@ public class BlockInformation {
             return;
 
         CollisionHandler handler = new CollisionHandler(blocks,
-                Kauri.INSTANCE.entityProcessor.allEntitiesNearPlayer.getOrDefault(objectData.uuid, new ArrayList<>()),
+                Kauri.INSTANCE.entityProcessor.vehicles.getOrDefault(objectData.uuid, new HashSet<>()),
                 objectData.playerInfo.to, objectData);
 
         //Bukkit.broadcastMessage("chigga4");

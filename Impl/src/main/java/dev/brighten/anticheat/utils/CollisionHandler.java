@@ -18,10 +18,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
@@ -41,9 +38,9 @@ public class CollisionHandler {
 	@Setter
 	private boolean debugging;
 
-	public CollisionHandler(List<Block> blocks, List<Entity> entities, KLocation to, ObjectData data) {
+	public CollisionHandler(List<Block> blocks, Collection<Entity> entities, KLocation to, ObjectData data) {
 		this.blocks.addAll(blocks);
-		this.entities = entities;
+		this.entities = new ArrayList<>(entities);
 		this.location = to;
 		this.data = data;
 	}
