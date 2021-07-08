@@ -5,6 +5,7 @@ import dev.brighten.db.utils.json.JSONArray;
 import dev.brighten.db.utils.json.JSONException;
 import dev.brighten.db.utils.json.JSONObject;
 import dev.brighten.db.utils.json.JsonReader;
+import lombok.val;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -115,7 +116,8 @@ public class MojangAPI {
 
                 String jsonText = JsonReader.readAll(rd);
 
-                return new JSONArray(jsonText).getJSONObject(0).getString("name");
+                val array = new JSONArray(jsonText);
+                return array.getJSONObject(array.length() - 1).getString("name");
             } catch (MalformedURLException var12) {
                 Kauri.INSTANCE.getLogger().warning("Malformed URL in UUID lookup");
             } catch (Exception e) {
