@@ -1,14 +1,12 @@
 package dev.brighten.anticheat.processing;
 
 import cc.funkemunky.api.Atlas;
-import cc.funkemunky.api.reflections.impl.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.handlers.PlayerSizeHandler;
 import cc.funkemunky.api.utils.objects.VariableValue;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
-import cc.funkemunky.api.utils.world.CollisionBox;
 import cc.funkemunky.api.utils.world.types.RayCollision;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
@@ -20,10 +18,8 @@ import dev.brighten.anticheat.utils.MovementUtils;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import lombok.val;
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
@@ -218,9 +214,11 @@ public class MovementProcessor {
             origin.y+= data.playerInfo.sneaking ? 1.54f : 1.62f;
             RayCollision collision = new RayCollision(origin.toVector(), MathUtils.getDirection(origin));
 
-            data.playerInfo.lookingAtBlock = collision
+            data.getLookingAtBoxes().clear();
+            data.getLookingAtBoxes().addAll(collision
                     .boxesOnRay(data.getPlayer().getWorld(),
-                            data.getPlayer().getGameMode().equals(GameMode.CREATIVE) ? 6.0 : 5.0).size() > 0;
+                            data.getPlayer().getGameMode().equals(GameMode.CREATIVE) ? 6.0 : 5.0));
+            data.playerInfo.lookingAtBlock = data.getLookingAtBoxes().size() > 0;
         }
 
         data.playerInfo.inVehicle = data.getPlayer().getVehicle() != null;

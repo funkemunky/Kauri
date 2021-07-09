@@ -65,16 +65,16 @@ public class Hitboxes extends Check {
             if(entityLocations.size() < 2) return;
 
             long collisions = 0;
-            AtomicReference<Double> distance = new AtomicReference<>((double) 0);
+            AtomicReference<Double> distance = new AtomicReference<>((double) Double.MAX_VALUE);
 
             for (RayCollision ray : rayTrace) {
                 collisions+= entityLocations.stream().filter(bb -> {
                     Vector point;
                     if((point = ray.collisionPoint(bb)) != null) {
-                        double dist = point.distance(ray.getOrigin());
+                        double dist = point.distanceSquared(ray.getOrigin());
 
                         distance.set(Math.min(dist, distance.get()));
-                        return dist < 3.65f;
+                        return dist < 13.3225f ; //3.65^2
                     }
                     return false;
                 }).count();

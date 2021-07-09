@@ -68,6 +68,7 @@ public class ObjectData implements Data {
     public KLocation targetLoc;
     public ProtocolVersion playerVersion = ProtocolVersion.UNKNOWN;
     public Set<Player> boxDebuggers = new HashSet<>();
+    private final List<CollisionBox> lookingAtBoxes = new ArrayList<>();
     public final List<Action> keepAliveStamps = new CopyOnWriteArrayList<>();
     public final List<CancelType> typesToCancel = Collections.synchronizedList(new EvictingList<>(10));
     public final Map<Long, Long> keepAlives = Collections.synchronizedMap(new HashMap<>());
@@ -154,6 +155,10 @@ public class ObjectData implements Data {
     @Override
     public boolean isUsingLunar() {
         return usingLunar;
+    }
+
+    public synchronized List<CollisionBox> getLookingAtBoxes() {
+        return lookingAtBoxes;
     }
 
     @Override

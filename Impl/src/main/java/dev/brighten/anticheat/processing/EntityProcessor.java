@@ -43,6 +43,7 @@ public class EntityProcessor {
         for (ObjectData data : Kauri.INSTANCE.dataManager.dataMap.values()) {
             Set<Entity> entitiesNear = new HashSet<>();
             for (Entity value : Atlas.getInstance().getTrackedEntities().values()) {
+                if(!value.getWorld().getUID().equals(data.getPlayer().getWorld().getUID())) continue;
                 if(value.getLocation().distanceSquared(data.getPlayer().getLocation()) <= 25) {
                     entitiesNear.add(value);
                 }

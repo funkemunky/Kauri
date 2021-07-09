@@ -3,7 +3,10 @@ package dev.brighten.anticheat.check.impl.combat.killaura;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.utils.Color;
+import cc.funkemunky.api.utils.KLocation;
+import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.math.cond.MaxInteger;
+import cc.funkemunky.api.utils.world.CollisionBox;
 import cc.funkemunky.api.utils.world.EntityData;
 import cc.funkemunky.api.utils.world.types.RayCollision;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
@@ -11,6 +14,7 @@ import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 import org.bukkit.Location;
@@ -23,46 +27,51 @@ import java.util.Optional;
 @Cancellable(cancelType = CancelType.ATTACK)
 public class KillauraA extends Check {
 
-    private MaxInteger verbose = new MaxInteger(10);
-
-    private int lastAttack;
+    private int buffer;
 
     @Packet
-    public void onUse(WrappedInUseEntityPacket packet, int current) {
-        if(data.target == null || packet.getAction() != WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK) return;
+    public void onUse(WrappedInUseEntityPacket packet) {
+        if(data.target == null
+                || packet.getAction() != WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)
+            return;
 
-        lastAttack = current;
-    }
+        //We can't run this check if we have no block boxes to check!
+        if(data.getLookingAtBoxes().size() == 0) {
+            debug("No block boxes to look at");
+            buffer = 0; //Resetting buffer
+            return;
+        }
 
-    @Packet
-    public void onFlying(WrappedInFlyingPacket packet, int current) {
-        if(current - lastAttack == 0) {
-            Location toLoc = data.playerInfo.to.toLocation(data.getPlayer().getWorld())
-                    .add(0, data.playerInfo.sneaking ? 1.54f : 1.62f, 0);
+        //Get a single target box.
+        CollisionBox targetBox = EntityData.getEntityBox(data.target.getLocation(), data.target);
 
-            RayCollision from = new RayCollision(data.getPlayer().getEyeLocation().toVector(),
-                    data.getPlayer().getEyeLocation().getDirection()),
-                    to = new RayCollision(toLoc.toVector(), toLoc.getDirection());
+        if(targetBox == null) return;
 
-            Vector sixNineVector = toLoc.toVector().subtract(new Vector(69, 69, 69));
+        KLocation origin = data.playerInfo.to.clone();
 
-            double distance = data.targetPastLocation.getEstimatedLocation(System.currentTimeMillis(),
-                    (data.lagInfo.transPing + 3) * 50, 100L).stream().mapToDouble(loc -> {
-                SimpleCollisionBox box = (SimpleCollisionBox) EntityData.getEntityBox(loc, data.target);
+        origin.y+= data.playerInfo.sneaking ? 1.54f : 1.62f;
 
-                return Math.min(Optional.ofNullable(from.collisionPoint(box)).orElse(sixNineVector)
-                        .distance(data.getPlayer().getEyeLocation().toVector()),
-                        Optional.ofNullable(to.collisionPoint(box)).orElse(sixNineVector)
-                                .distance(toLoc.toVector()));
-                    }).min().orElse(0);
+        RayCollision ray = new RayCollision(origin.toVector(), MathUtils.getDirection(origin));
 
+        //If the ray isn't collided, we might as well not run this check. Just a simple boxes on array check
+        if(!ray.isCollided(targetBox)) return;
 
-            int fromBox = from.boxesOnRay(data.getPlayer().getWorld(), distance).size()
-                    , toBox = to.boxesOnRay(data.getPlayer().getWorld(), distance).size();
+        boolean rayCollidedOnBlock = false;
 
-            if(fromBox > 0 && toBox > 0) {
-                debug(Color.Green + "Flag");
+        for (CollisionBox lookingAtBox : data.getLookingAtBoxes()) {
+            if(ray.isCollided(lookingAtBox)) {
+                rayCollidedOnBlock = true;
+                break;
             }
         }
+
+        if(rayCollidedOnBlock) {
+            if(++buffer > 2) {
+                vl++;
+                flag("b=%s s=%s", buffer, data.getLookingAtBoxes().size());
+            }
+        } else if(buffer > 0) buffer--;
+
+        debug("b=%s collides=%s", buffer, rayCollidedOnBlock);
     }
 }
