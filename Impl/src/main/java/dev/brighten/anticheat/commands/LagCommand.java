@@ -15,7 +15,6 @@ import org.bukkit.entity.Player;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-@Init(commands = true)
 public class LagCommand {
 
     private static String getMsg(String name, String def) {

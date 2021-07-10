@@ -9,7 +9,6 @@ import dev.brighten.anticheat.Kauri;
 
 import java.util.stream.Collectors;
 
-@Init(commands = true)
 public class UsersCommand {
 
     @Command(name = "kauri.users", description = "Shows the online users.", display = "users",

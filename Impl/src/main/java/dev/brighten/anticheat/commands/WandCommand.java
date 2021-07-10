@@ -9,7 +9,6 @@ import dev.brighten.anticheat.listeners.generalChecks.BukkitListener;
 
 import java.util.Arrays;
 
-@Init(commands = true)
 public class WandCommand {
 
     @Command(name = "kauri.wand", description = "view boundingBox debugs.", display = "wand", playerOnly = true, permission = "kauri.command.wand")

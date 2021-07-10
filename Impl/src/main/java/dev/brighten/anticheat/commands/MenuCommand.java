@@ -34,7 +34,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-@Init(commands = true)
 public class MenuCommand {
 
     private static ChestMenu main, categoryMenu;

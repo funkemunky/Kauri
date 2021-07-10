@@ -10,7 +10,6 @@ import dev.brighten.anticheat.menu.PlayerInformationGUI;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-@Init(commands = true)
 public class PlayerInfoCommand {
 
     @Command(name = "kauri.info", description = "get the information of a player", display = "info [player]",

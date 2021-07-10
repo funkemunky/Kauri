@@ -27,7 +27,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-@Init(commands = true)
 public class ProfilerCommand {
 
     private Map<String, BukkitTask> taskMap = new HashMap<>();

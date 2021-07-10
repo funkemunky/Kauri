@@ -8,7 +8,6 @@ import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 
-@Init(commands = true)
 public class ToggleCommand {
 
     @Command(name = "kauri.toggle", description = "Toggle a check on or off.", display = "toggle",

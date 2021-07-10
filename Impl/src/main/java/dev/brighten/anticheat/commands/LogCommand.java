@@ -20,7 +20,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Init(commands = true)
 public class LogCommand {
 
     @Command(name = "kauri.logs", description = "View the logs of a user.", display = "logs [player]",

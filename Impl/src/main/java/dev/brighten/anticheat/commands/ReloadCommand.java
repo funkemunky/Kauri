@@ -6,7 +6,6 @@ import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
 import dev.brighten.anticheat.Kauri;
 
-@Init(commands = true)
 public class ReloadCommand {
 
     @Command(name = "kauri.reload", description = "reload the plugin.", display = "reload", permission = "kauri.command.reload")

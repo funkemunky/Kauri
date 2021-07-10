@@ -7,7 +7,6 @@ import cc.funkemunky.api.utils.Init;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Config;
 
-@Init(commands = true)
 public class DelayCommand {
 
 

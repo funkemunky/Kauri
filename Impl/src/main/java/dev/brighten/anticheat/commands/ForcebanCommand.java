@@ -9,7 +9,6 @@ import dev.brighten.anticheat.data.ObjectData;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-@Init(commands = true)
 public class ForcebanCommand {
 
     @Command(name = "kauri.forceban", display = "ban [player]", description = "Force bans a player.",

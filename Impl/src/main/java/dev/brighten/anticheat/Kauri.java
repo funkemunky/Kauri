@@ -9,6 +9,7 @@ import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.math.RollingAverageDouble;
+import co.aikar.commands.BukkitCommandManager;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.data.DataManager;
 import dev.brighten.anticheat.data.ObjectData;
@@ -43,12 +44,12 @@ public class Kauri extends JavaPlugin {
     public KeepaliveProcessor keepaliveProcessor;
     public EntityProcessor entityProcessor;
     public EventHandler eventHandler;
+    public BukkitCommandManager commandManager;
 
     //Lag Information
     public RollingAverageDouble tps = new RollingAverageDouble(4, 20);
     public Timer lastTickLag;
     public long lastTick;
-    public CommandManager commandManager;
 
     public ScheduledExecutorService executor;
     public ScheduledExecutorService loggingThread;
@@ -95,8 +96,7 @@ public class Kauri extends JavaPlugin {
             Atlas.getInstance().getEventManager().unregisterAll(this); //Unregistering Atlas listeners.
             MiscUtils.printToConsole("&7Unregistering commands...");
             //Unregister all commands starting with the arg "Kauri"
-            Atlas.getInstance().getCommandManager(Kauri.INSTANCE).unregisterCommands();
-            Atlas.getInstance().getCommandManager(Kauri.INSTANCE).unregisterCommand("kauri");
+            commandManager.unregisterCommands();
             MiscUtils.printToConsole("&7Shutting down all Bukkit tasks...");
             Bukkit.getScheduler().cancelTasks(this); //Cancelling all Bukkit tasks for this plugin.
         }

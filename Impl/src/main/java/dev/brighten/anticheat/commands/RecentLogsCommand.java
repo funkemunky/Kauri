@@ -5,7 +5,6 @@ import cc.funkemunky.api.commands.ancmd.CommandAdapter;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
 
-@Init(commands = true)
 public class RecentLogsCommand {
 
     @Command(name = "kauri.recentlogs", aliases = {"recentlogs"}, display = "recentlogs", usage = "/<command>",

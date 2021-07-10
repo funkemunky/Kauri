@@ -7,24 +7,29 @@ import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.Priority;
+import co.aikar.commands.BaseCommand;
+import co.aikar.commands.annotation.CommandAlias;
+import co.aikar.commands.annotation.CommandPermission;
+import co.aikar.commands.annotation.Subcommand;
+import org.bukkit.entity.Player;
 
-@Init(commands = true,priority = Priority.LOW)
-public class BungeeCommand {
+@Init
+public class BungeeCommand extends BaseCommand {
 
     @ConfigSetting(path = "general", name = "bungeeCmd")
     private static boolean bungeeCmd = true;
 
-    @Command(name = "bungeecmd", display = "bungee [args]", description = "send command to bungee",
-            permission = "kauri.command.bungee")
-    public void onCommand(CommandAdapter cmd) {
+    @CommandAlias("bungeecmd")
+    @CommandPermission("kauri.command.bungee")
+    public void onCommand(Player player, String[] args) {
         if(!bungeeCmd) {
-            cmd.getPlayer().sendMessage(Color.Red + "Bungee command is disabled!");
+            player.sendMessage(Color.Red + "Bungee command is disabled!");
             return;
         }
-        if(cmd.getArgs().length == 0) {
-            cmd.getPlayer().sendMessage(Color.Red + "Invalid arguments.");
+        if(args.length == 0) {
+            player.sendMessage(Color.Red + "Invalid arguments.");
             return;
         }
-        BungeeAPI.sendCommand(String.join(" ", cmd.getArgs()));
+        BungeeAPI.sendCommand(String.join(" ", args));
     }
 }
