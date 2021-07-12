@@ -9,7 +9,9 @@ import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.Tuple;
+import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.commands.KauriCommand;
+import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.processing.MovementProcessor;
 import lombok.val;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -42,6 +44,16 @@ public class MiscUtils {
         s.add(float.class);
         s.add(double.class);
         NUMBER_REFLECTED_PRIMITIVES = s;
+    }
+
+    public static void forceBanPlayer(ObjectData data) {
+        assert data.checkManager.checks.containsKey("ForceBan") : "Player " + data.getPlayer().getName()
+                + " does not have ForceBan detection loaded; cannot force ban.";
+
+        Check ban = data.checkManager.checks.get("ForceBan");
+
+        ban.vl = 2;
+        ban.punish();
     }
 
     public static float clampToVanilla(float s, float angle) {

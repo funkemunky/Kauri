@@ -33,13 +33,11 @@ public class PacketProcessor {
     static {
         new WrappedClass(Packet.Server.class).getFields().forEach(field -> {
             String packet = field.get(null);
-            Bukkit.getLogger().info("Adding outgoing packet: " + packet);
             outgoingPackets.add(packet);
         });
 
         new WrappedClass(Packet.Client.class).getFields().forEach(field -> {
             String packet = field.get(null);
-            Bukkit.getLogger().info("Adding incoming packet: " + packet);
             incomingPackets.add(packet);
         });
     }

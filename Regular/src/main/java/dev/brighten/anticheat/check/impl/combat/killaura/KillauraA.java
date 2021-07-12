@@ -58,19 +58,21 @@ public class KillauraA extends Check {
 
         boolean rayCollidedOnBlock = false;
 
-        for (CollisionBox lookingAtBox : data.getLookingAtBoxes()) {
-            if(ray.isCollided(lookingAtBox)) {
-                rayCollidedOnBlock = true;
-                break;
+        synchronized (data.getLookingAtBoxes()) {
+            for (CollisionBox lookingAtBox : data.getLookingAtBoxes()) {
+                if(ray.isCollided(lookingAtBox)) {
+                    rayCollidedOnBlock = true;
+                    break;
+                }
             }
-        }
 
-        if(rayCollidedOnBlock) {
-            if(++buffer > 2) {
-                vl++;
-                flag("b=%s s=%s", buffer, data.getLookingAtBoxes().size());
-            }
-        } else if(buffer > 0) buffer--;
+            if(rayCollidedOnBlock) {
+                if(++buffer > 2) {
+                    vl++;
+                    flag("b=%s s=%s", buffer, data.getLookingAtBoxes().size());
+                }
+            } else if(buffer > 0) buffer--;
+        }
 
         debug("b=%s collides=%s", buffer, rayCollidedOnBlock);
     }

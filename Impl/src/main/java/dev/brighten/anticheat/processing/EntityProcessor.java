@@ -17,42 +17,36 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class EntityProcessor {
 
-    public final Map<UUID, Set<Entity>> vehicles = Collections.synchronizedMap(new HashMap<>()),
-            allEntitiesNearPlayer = Collections.synchronizedMap(new HashMap<>());
+    public Map<UUID, Set<Entity>> vehicles = new ConcurrentHashMap<>(),
+            allEntitiesNearPlayer = new ConcurrentHashMap<>();
     public BukkitTask task, playerTask;
 
     private void runEntityProcessor() {
-        synchronized (vehicles) {
-            vehicles.clear();
+        vehicles.clear();
 
-            synchronized (allEntitiesNearPlayer) {
-                for (Map.Entry<UUID, Set<Entity>> entry : allEntitiesNearPlayer.entrySet()) {
-                    Set<Entity> vehicleSet = new HashSet<>();
-                    for (Entity entity : entry.getValue()) {
-                        if(entity instanceof Vehicle)
-                            vehicleSet.add(entity);
-                    }
-
-                    if(vehicleSet.size() > 0)
-                        vehicles.put(entry.getKey(), vehicleSet);
-                }
+        for (Map.Entry<UUID, Set<Entity>> entry : allEntitiesNearPlayer.entrySet()) {
+            Set<Entity> vehicleSet = new HashSet<>();
+            for (Entity entity : entry.getValue()) {
+                if (entity instanceof Vehicle)
+                    vehicleSet.add(entity);
             }
+
+            if (vehicleSet.size() > 0)
+                vehicles.put(entry.getKey(), vehicleSet);
         }
     }
 
     private void runEntitiesNearPlayer() {
-        synchronized (allEntitiesNearPlayer) {
-            allEntitiesNearPlayer.clear();
-            for (ObjectData data : Kauri.INSTANCE.dataManager.dataMap.values()) {
-                Set<Entity> entitiesNear = new HashSet<>();
-                for (Entity value : Atlas.getInstance().getTrackedEntities().values()) {
-                    if(!value.getWorld().getUID().equals(data.getPlayer().getWorld().getUID())) continue;
-                    if(value.getLocation().distanceSquared(data.getPlayer().getLocation()) <= 25) {
-                        entitiesNear.add(value);
-                    }
+        allEntitiesNearPlayer.clear();
+        for (ObjectData data : Kauri.INSTANCE.dataManager.dataMap.values()) {
+            Set<Entity> entitiesNear = new HashSet<>();
+            for (Entity value : Atlas.getInstance().getTrackedEntities().values()) {
+                if (!value.getWorld().getUID().equals(data.getPlayer().getWorld().getUID())) continue;
+                if (value.getLocation().distanceSquared(data.getPlayer().getLocation()) <= 25) {
+                    entitiesNear.add(value);
                 }
-                allEntitiesNearPlayer.put(data.getUUID(), entitiesNear);
             }
+            allEntitiesNearPlayer.put(data.getUUID(), entitiesNear);
         }
     }
 

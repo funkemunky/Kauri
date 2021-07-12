@@ -6,6 +6,7 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.handlers.PlayerSizeHandler;
 import cc.funkemunky.api.utils.objects.VariableValue;
+import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingList;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import cc.funkemunky.api.utils.world.types.RayCollision;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
@@ -29,8 +30,8 @@ import java.util.List;
 public class MovementProcessor {
     private final ObjectData data;
 
-    public Deque<Float> yawGcdList = new EvictingList<>(60),
-            pitchGcdList = new EvictingList<>(60);
+    public Deque<Float> yawGcdList = new ConcurrentEvictingList<>(60),
+            pitchGcdList = new ConcurrentEvictingList<>(60);
     public float deltaX, deltaY, lastDeltaX, lastDeltaY, smoothYaw, smoothPitch, lsmoothYaw, lsmoothPitch;
     public Tuple<List<Double>, List<Double>> yawOutliers, pitchOutliers;
     public long lastCinematic;
@@ -92,13 +93,15 @@ public class MovementProcessor {
             data.playerInfo.to.z = packet.getZ();
             //if this is the case, this assumes client movement in between therefore we have to calculate where ground would be.
         } else if(packet.isGround() && !data.playerInfo.clientGround) { //this is the last ground
-            val optional = data.blockInfo.belowCollisions.stream()
-                    .filter(box -> Math.pow(box.yMax - data.playerInfo.to.y, 2) <= 9.0E-4D && data.box.copy()
-                            .offset(0, -.1, 0).isCollided(box)).findFirst();
+            synchronized (data.blockInfo.belowCollisions) {
+                val optional = data.blockInfo.belowCollisions.stream()
+                        .filter(box -> Math.pow(box.yMax - data.playerInfo.to.y, 2) <= 9.0E-4D && data.box.copy()
+                                .offset(0, -.1, 0).isCollided(box)).findFirst();
 
-            if(optional.isPresent()) {
-                data.playerInfo.to.y-= data.playerInfo.to.y - optional.get().yMax;
-                data.playerInfo.clientGround = data.playerInfo.serverGround = true;
+                if(optional.isPresent()) {
+                    data.playerInfo.to.y-= data.playerInfo.to.y - optional.get().yMax;
+                    data.playerInfo.clientGround = data.playerInfo.serverGround = true;
+                }
             }
         }
 
@@ -214,11 +217,13 @@ public class MovementProcessor {
             origin.y+= data.playerInfo.sneaking ? 1.54f : 1.62f;
             RayCollision collision = new RayCollision(origin.toVector(), MathUtils.getDirection(origin));
 
-            data.getLookingAtBoxes().clear();
-            data.getLookingAtBoxes().addAll(collision
-                    .boxesOnRay(data.getPlayer().getWorld(),
-                            data.getPlayer().getGameMode().equals(GameMode.CREATIVE) ? 6.0 : 5.0));
-            data.playerInfo.lookingAtBlock = data.getLookingAtBoxes().size() > 0;
+            synchronized (data.getLookingAtBoxes()) {
+                data.getLookingAtBoxes().clear();
+                data.getLookingAtBoxes().addAll(collision
+                        .boxesOnRay(data.getPlayer().getWorld(),
+                                data.getPlayer().getGameMode().equals(GameMode.CREATIVE) ? 6.0 : 5.0));
+                data.playerInfo.lookingAtBlock = data.getLookingAtBoxes().size() > 0;
+            }
         }
 
         data.playerInfo.inVehicle = data.getPlayer().getVehicle() != null;

@@ -7,6 +7,7 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckRegister;
 import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerA;
 import dev.brighten.anticheat.check.impl.combat.hitbox.ReachA;
+import dev.brighten.anticheat.check.impl.misc.ForceBan;
 import dev.brighten.anticheat.check.impl.movement.fly.FlyA;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallA;
 import dev.brighten.anticheat.check.impl.movement.speed.SpeedA;
@@ -43,5 +44,6 @@ public class FreeChecks implements CheckRegister {
         Check.register(new BadPacketsN());
         Check.register(new TimerA());
         Check.register(new VelocityD());
+        Check.register(new ForceBan());
     }
 }

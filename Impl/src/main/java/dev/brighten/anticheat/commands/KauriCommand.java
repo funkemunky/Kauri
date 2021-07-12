@@ -3,6 +3,7 @@ package dev.brighten.anticheat.commands;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.commands.ancmd.Command;
 import cc.funkemunky.api.commands.ancmd.CommandAdapter;
+import cc.funkemunky.api.profiling.ResultsType;
 import cc.funkemunky.api.reflections.types.WrappedClass;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
@@ -12,13 +13,16 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.BukkitCommandCompletions;
 import co.aikar.commands.CommandHelp;
 import co.aikar.commands.annotation.*;
+import co.aikar.commands.annotation.Optional;
 import co.aikar.commands.bukkit.contexts.OnlinePlayer;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
+import dev.brighten.anticheat.check.api.Config;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.Pastebin;
+import dev.brighten.anticheat.utils.StringUtils;
 import lombok.val;
 import net.minecraft.server.v1_7_R4.CommandSeed;
 import org.bukkit.Bukkit;
@@ -29,6 +33,7 @@ import org.bukkit.entity.Player;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 @Init
@@ -121,7 +126,7 @@ public class KauriCommand extends BaseCommand {
     @Syntax("<check> [player]")
     @CommandPermission("kauri.command.debug")
     @Description("debug a check")
-    @CommandCompletion("@checks @players")
+    @CommandCompletion("@checks|none @players")
     public void onCommand(Player player, @Single String check, OnlinePlayer target) {
         ObjectData data = Kauri.INSTANCE.dataManager.getData(player);
 
@@ -130,7 +135,18 @@ public class KauriCommand extends BaseCommand {
             return;
         }
 
-        if(target != null) {
+        if(check.equalsIgnoreCase("none")) {
+
+            data.debugging = null;
+            data.debugged = null;
+            Kauri.INSTANCE.dataManager.debugging.remove(data);
+
+            Kauri.INSTANCE.dataManager.dataMap.values().stream()
+                    .filter(d -> d.boxDebuggers.contains(player))
+                    .forEach(d -> d.boxDebuggers.remove(player));
+            player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                    .msg("debug-off", "&aTurned off your debugging."));
+        } else if(target != null) {
             if(check.equalsIgnoreCase("sniff")) {
                 val targetData = Kauri.INSTANCE.dataManager.getData(target.getPlayer());
                 if(!targetData.sniffing) {
@@ -162,39 +178,41 @@ public class KauriCommand extends BaseCommand {
     }
 
     @Subcommand("block")
-
-    @Command(name = "kauri.block", description = "Check the material type information.",
-            display = "block [id,name]", permission = "kauri.command.block")
-    public void onBlock(CommandAdapter cmd) {
+    @Description("Check the material type information")
+    @CommandCompletion("@materials")
+    @Syntax("block [id,name]")
+    @CommandPermission("kauri.command.block")
+    public void onBlock(CommandSender sender, @Optional String block) {
         Material material;
-        if(args.length > 0) {
-            if(MiscUtils.isInteger(args[0])) {
-                material = Material.getMaterial(Integer.parseInt(args[0]));
+        if(block != null) {
+            if(MiscUtils.isInteger(block)) {
+                material = Material.getMaterial(Integer.parseInt(block));
             } else material = Arrays.stream(Material.values())
-                    .filter(mat -> mat.name().equalsIgnoreCase(args[0])).findFirst()
+                    .filter(mat -> mat.name().equalsIgnoreCase(block)).findFirst()
                     .orElse((XMaterial.AIR.parseMaterial()));
-        } else if(cmd.getSender() instanceof Player) {
+        } else if(sender instanceof Player) {
+            Player player = (Player) sender;
             if(player.getItemInHand() != null) {
                 material = player.getItemInHand().getType();
             } else {
-                cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                sender.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
                         .msg("block-no-item-in-hand",
                                 "&cPlease hold an item in your hand or use the proper arguments."));
                 return;
             }
         } else {
-            cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+            sender.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
                     .msg("error-invalid-args", "&cInvalid arguments! Check the help page."));
             return;
         }
 
         if(material != null) {
-            cmd.getSender().sendMessage(cc.funkemunky.api.utils.MiscUtils.line(Color.Dark_Gray));
-            cmd.getSender().sendMessage(Color.Gold + Color.Bold + material.name() + Color.Gray + ":");
-            cmd.getSender().sendMessage("");
-            cmd.getSender().sendMessage(Color.translate("&eXMaterial: &f" + XMaterial
+            sender.sendMessage(cc.funkemunky.api.utils.MiscUtils.line(Color.Dark_Gray));
+            sender.sendMessage(Color.Gold + Color.Bold + material.name() + Color.Gray + ":");
+            sender.sendMessage("");
+            sender.sendMessage(Color.translate("&eXMaterial: &f" + XMaterial
                     .requestXMaterial(material.name(), (byte)0)));
-            cmd.getSender().sendMessage(Color.translate("&eBitmask&7: &f" + Materials.getBitmask(material)));
+            sender.sendMessage(Color.translate("&eBitmask&7: &f" + Materials.getBitmask(material)));
             WrappedClass wrapped = new WrappedClass(Materials.class);
 
             wrapped.getFields(field -> field.getType().equals(int.class) && Modifier.isStatic(field.getModifiers()))
@@ -203,47 +221,28 @@ public class KauriCommand extends BaseCommand {
                         int bitMask = field.get(null);
 
                         boolean flag = Materials.checkFlag(material, bitMask);
-                        cmd.getSender().sendMessage(Color.translate("&e" + field.getField().getName()
+                        sender.sendMessage(Color.translate("&e" + field.getField().getName()
                                 + "&7: " + (flag ? "&a" : "&c") + flag));
                     });
-            cmd.getSender().sendMessage(cc.funkemunky.api.utils.MiscUtils.line(Color.Dark_Gray));
-        } else cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+            sender.sendMessage(cc.funkemunky.api.utils.MiscUtils.line(Color.Dark_Gray));
+        } else sender.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
                 .msg("block-no-material", "&cNo material was found. Please check your arguments."));
     }
 
-    @Command(name = "kauri.debug.none", aliases = {"debug.none"}, permission = "kauri.command.debug", usage = "/<command>",
-            playerOnly = true, display = "debug none", description = "turn off debugging")
-    public void onDebugOff(CommandAdapter cmd) {
-        ObjectData data = Kauri.INSTANCE.dataManager.getData(player);
-
-        if(data == null) {
-            player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
-                    .msg("error-data-object", "&cThere was an error trying to find your data object."));
-            return;
-        }
-
-        data.debugging = null;
-        data.debugged = null;
-        Kauri.INSTANCE.dataManager.debugging.remove(data);
-
-        Kauri.INSTANCE.dataManager.dataMap.values().stream()
-                .filter(d -> d.boxDebuggers.contains(player))
-                .forEach(d -> d.boxDebuggers.remove(player));
-        player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
-                .msg("debug-off", "&aTurned off your debugging."));
-    }
-
-    @Command(name = "kauri.debug.box", aliases = {"debug.box"}, permission = "kauri.command.debug", usage = "/<command>",
-            playerOnly = true, display = "debug box [player...]", description = "debug the collisions of players.")
-    public void onDebugBox(CommandAdapter cmd) {
+    @Subcommand("debug box")
+    @CommandPermission("kauri.command.debug")
+    @Description("debug the collisions of players")
+    @Syntax("[player]")
+    @CommandCompletion("@players")
+    public void onDebugBox(Player player, @Optional OnlinePlayer target) {
         String[] debuggingPlayers;
         ObjectData.debugBoxes(false, player);
-        if(args.length == 0) {
+        if(target == null) {
             ObjectData.debugBoxes(true, player, player.getUniqueId());
             debuggingPlayers = new String[] {player.getName()};
         } else {
-            ObjectData.debugBoxes(true, player,
-                    debuggingPlayers = args);
+            debuggingPlayers = new String[] {target.getPlayer().getName()};
+            ObjectData.debugBoxes(true, player, target.getPlayer().getUniqueId());
         }
 
         player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
@@ -252,24 +251,96 @@ public class KauriCommand extends BaseCommand {
 
     }
 
-   /* @Command(name = "kchecksum", permission = "kauri.command.admin.checksum")
-    public void onChecksum(CommandAdapter cmd) {
-        Method c = J;
-        String className = c.getName();
-        String classAsPath = ;
-        InputStream stream = c.getClassLoader().getResourceAsStream(classAsPath);
+    @Subcommand("delay")
+    @Description("change the delay between alerts")
+    @Syntax("[ms]")
+    @CommandPermission("kauri.command.delay")
+    public void onCommand(CommandSender sender, long delay) {
+        sender.sendMessage(Color.Gray + "Setting delay to "
+                + Color.White + delay + "ms" + Color.Gray + "...");
 
-        try {
-            byte[] array = MiscUtils.toByteArray(stream);
+        Config.alertsDelay = delay;
+        Kauri.INSTANCE.getConfig().set("alerts.delay", delay);
+        Kauri.INSTANCE.saveConfig();
+        sender.sendMessage(Color.Green + "Delay set!");
+    }
 
-            String hash = GeneralHash.getSHAHash(array, GeneralHash.SHAType.SHA1);
+    @Subcommand("forceban")
+    @Description("force ban a player")
+    @Syntax("<player>")
+    @CommandCompletion("@players")
+    @CommandPermission("kauri.command.forceban")
+    public void onForceBan(CommandSender sender, OnlinePlayer target) {
+        ObjectData data = Kauri.INSTANCE.dataManager.getData(target.getPlayer().getPlayer());
 
-            cmd.getSender().sendMessage("Checksum: " + hash);
-            System.out.println("checksum: " + hash);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }*/
+        MiscUtils.forceBanPlayer(data);
+        sender.sendMessage(Color.Green + "Force banned the player.");
+    }
+
+    private static String getMsg(String name, String def) {
+        return Kauri.INSTANCE.msgHandler.getLanguage().msg("command.lag." + name, def);
+    }
+
+    @Subcommand("lag")
+    @Description("view important lag information")
+    @Syntax("")
+    @CommandPermission("kauri.command.lag")
+    public void onCommand(CommandSender sender) {
+        StringUtils.Messages.LINE.send(sender);
+        MiscUtils.sendMessage(sender, getMsg("main.title",
+                Color.Gold + Color.Bold + "Server Lag Information"));
+        sender.sendMessage("");
+        MiscUtils.sendMessage(sender, getMsg("main.tps", "&eTPS&8: &f%.2f%%"),
+                Kauri.INSTANCE.getTps());
+        AtomicLong chunkCount = new AtomicLong(0);
+        Bukkit.getWorlds().forEach(world -> chunkCount.addAndGet(world.getLoadedChunks().length));
+        MiscUtils.sendMessage(sender, getMsg("main.chunks", "&eChunks&8: &f%s"), chunkCount.get());
+        MiscUtils.sendMessage(sender, getMsg("main.memory",
+                "&eMemory &7(&f&oFree&7&o/&f&oTotal&7&o/&f&oAllocated&7)&8: &f%.2fGB&7/&f%.2fGB&7/&f%.2fGB"),
+                Runtime.getRuntime().freeMemory() / 1E9,
+                Runtime.getRuntime().totalMemory() / 1E9, Runtime.getRuntime().maxMemory() / 1E9);
+        val results = Kauri.INSTANCE.profiler.results(ResultsType.TOTAL);
+        MiscUtils.sendMessage(sender, getMsg("main.cpu-usage", "&eKauri CPU Usage&8: &f%.5f%%"),
+                results.keySet().stream()
+                        .filter(key -> !key.contains("check:"))
+                        .mapToDouble(key -> results.get(key).two / 1000000D)
+                        .filter(val -> !Double.isNaN(val) && !Double.isInfinite(val))
+                        .sum() / 50D * 100);
+        StringUtils.Messages.LINE.send(sender);
+    }
+
+    @Subcommand("lag gc")
+    @CommandPermission("kauri.command.lag.gc")
+    @Description("run a java garbage collector")
+    public void onLagGc(CommandSender sender) {
+        sender.sendMessage(getMsg("start-gc", "&7Starting garbage collector..."));
+
+        long stamp = System.nanoTime();
+        double time;
+        Runtime.getRuntime().gc();
+        time = (System.nanoTime() - stamp) / 1E6D;
+
+        StringUtils.Messages.GC_COMPLETE.send(sender, time);
+    }
+
+    @Subcommand("lag player")
+    @Description("view a player's connection info")
+    @CommandPermission("kauri.command.lag.player")
+    public void onLagPlayer(CommandSender sender, OnlinePlayer target) {
+        ObjectData data = Kauri.INSTANCE.dataManager.getData(target.getPlayer());
+
+        if(data != null) {
+            StringUtils.Messages.LINE.send(sender);
+            StringUtils.sendMessage(sender, Color.Gold + Color.Bold + target.getPlayer().getName()
+                    + "'s Lag Information");
+            StringUtils.sendMessage(sender, "");
+            StringUtils.sendMessage(sender, "&ePing&7: &f"
+                    + data.lagInfo.ping + "ms&7/&f" + data.lagInfo.transPing + " tick");
+            StringUtils.sendMessage(sender, "&eLast Skip&7: &f" + data.lagInfo.lastPacketDrop.getPassed());
+            StringUtils.sendMessage(sender, "&eLagging&7: &f" + data.lagInfo.lagging);
+            StringUtils.Messages.LINE.send(sender);
+        } else StringUtils.Messages.DATA_ERROR.send(sender);
+    }
 
    public static List<Player> getTesters() {
        testers.stream().filter(Objects::isNull).forEach(testers::remove);
