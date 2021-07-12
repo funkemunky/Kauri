@@ -60,7 +60,7 @@ public class KillauraA extends Check {
 
         synchronized (data.getLookingAtBoxes()) {
             for (CollisionBox lookingAtBox : data.getLookingAtBoxes()) {
-                if(ray.isCollided(lookingAtBox)) {
+                if(ray.isCollided(lookingAtBox.copy().shrink(0.25,0.25,0.25))) {
                     rayCollidedOnBlock = true;
                     break;
                 }

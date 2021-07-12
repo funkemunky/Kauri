@@ -39,7 +39,7 @@ public class ReachA extends Check {
                 || !allowedEntityTypes.contains(packet.getEntity().getType())) return;
 
         List<SimpleCollisionBox> targetBoxes = data.targetPastLocation
-                .getEstimatedLocation(timeStamp, (data.lagInfo.transPing + 3) * 50, 100L)
+                .getEstimatedLocation(timeStamp, (data.lagInfo.transPing + 3) * 50L, 100L)
                 .stream().map(loc -> getHitbox(packet.getEntity(), loc)).collect(Collectors.toList());
 
         double distance = 69;

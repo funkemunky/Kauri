@@ -11,6 +11,7 @@ import cc.funkemunky.api.utils.Materials;
 import cc.funkemunky.api.utils.XMaterial;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.BukkitCommandCompletions;
+import co.aikar.commands.BukkitCommandContexts;
 import co.aikar.commands.CommandHelp;
 import co.aikar.commands.annotation.*;
 import co.aikar.commands.annotation.Optional;
@@ -49,13 +50,17 @@ public class KauriCommand extends BaseCommand {
                 .getCommandCompletions();
 
         cc.registerCompletion("checks", (c) ->
-            Check.checkClasses.values().stream().map(CheckInfo::name).collect(Collectors.toList()));
+            Check.checkClasses.values().stream().map(ci -> ci.name().replace(" ", "_")).
+                    collect(Collectors.toList()));
         cc.registerCompletion("materials", (c) -> Arrays.stream(Material.values()).map(Enum::name)
                 .collect(Collectors.toList()));
+
+        BukkitCommandContexts contexts = (BukkitCommandContexts) Kauri.INSTANCE.commandManager.getCommandContexts();
     }
 
     @HelpCommand
     @Syntax("")
+    @Description("View the help page")
     public static void onHelp(CommandSender sender, CommandHelp help) {
         sender.sendMessage(cc.funkemunky.api.utils.MiscUtils.line(Color.Dark_Gray));
         help.showHelp();
@@ -125,9 +130,9 @@ public class KauriCommand extends BaseCommand {
     @Subcommand("debug")
     @Syntax("<check> [player]")
     @CommandPermission("kauri.command.debug")
-    @Description("debug a check")
+    @Description("Debug a check")
     @CommandCompletion("@checks|none @players")
-    public void onCommand(Player player, @Single String check, OnlinePlayer target) {
+    public void onCommand(Player player, @Single String check, @Optional OnlinePlayer target) {
         ObjectData data = Kauri.INSTANCE.dataManager.getData(player);
 
         if(data == null) {
