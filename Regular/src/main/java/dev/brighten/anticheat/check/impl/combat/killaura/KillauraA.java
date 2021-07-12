@@ -2,6 +2,7 @@ package dev.brighten.anticheat.check.impl.combat.killaura;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
+import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
@@ -20,6 +21,7 @@ import dev.brighten.api.check.CheckType;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
+import java.util.Collections;
 import java.util.Optional;
 
 @CheckInfo(name = "Killaura (A)", description = "Checks for block collisions on player hits.",
@@ -43,7 +45,7 @@ public class KillauraA extends Check {
         }
 
         //Get a single target box.
-        CollisionBox targetBox = EntityData.getEntityBox(data.target.getLocation(), data.target);
+        SimpleCollisionBox targetBox = (SimpleCollisionBox) EntityData.getEntityBox(data.target.getLocation(), data.target);
 
         if(targetBox == null) return;
 
@@ -53,16 +55,28 @@ public class KillauraA extends Check {
 
         RayCollision ray = new RayCollision(origin.toVector(), MathUtils.getDirection(origin));
 
+        Vector targetPoint = ray.collisionPoint(targetBox);
+        double dist = origin.toVector().distanceSquared(targetPoint);
         //If the ray isn't collided, we might as well not run this check. Just a simple boxes on array check
-        if(!ray.isCollided(targetBox)) return;
+        if(targetPoint == null) return;
 
         boolean rayCollidedOnBlock = false;
 
         synchronized (data.getLookingAtBoxes()) {
             for (CollisionBox lookingAtBox : data.getLookingAtBoxes()) {
-                if(ray.isCollided(lookingAtBox.copy().shrink(0.25,0.25,0.25))) {
-                    rayCollidedOnBlock = true;
-                    break;
+                if((lookingAtBox instanceof SimpleCollisionBox)) {
+                    SimpleCollisionBox box = (SimpleCollisionBox) lookingAtBox;
+                    
+                    if(box.xMin % 1 != 0 || box.yMin % 1 != 0 || box.zMin % 1 != 0 
+                            || box.xMax % 1 != 0 || box.yMax % 1 != 0 || box.zMax % 1 != 0)
+                        continue;
+
+                    Vector point = ray.collisionPoint(box.copy().shrink(0.001f, 0.001f, 0.001f));
+
+                    if (point != null && origin.toVector().distanceSquared(point) < dist - 0.2) {
+                        rayCollidedOnBlock = true;
+                        break;
+                    }
                 }
             }
 

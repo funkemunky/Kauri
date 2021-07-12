@@ -1,6 +1,5 @@
 package dev.brighten.anticheat.commands;
 
-import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.commands.ancmd.Command;
 import cc.funkemunky.api.commands.ancmd.CommandAdapter;
 import cc.funkemunky.api.profiling.ResultsType;
@@ -18,14 +17,13 @@ import co.aikar.commands.annotation.Optional;
 import co.aikar.commands.bukkit.contexts.OnlinePlayer;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
-import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Config;
 import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.listeners.generalChecks.BukkitListener;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.Pastebin;
 import dev.brighten.anticheat.utils.StringUtils;
 import lombok.val;
-import net.minecraft.server.v1_7_R4.CommandSeed;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -50,8 +48,8 @@ public class KauriCommand extends BaseCommand {
                 .getCommandCompletions();
 
         cc.registerCompletion("checks", (c) ->
-            Check.checkClasses.values().stream().map(ci -> ci.name().replace(" ", "_")).
-                    collect(Collectors.toList()));
+            Check.checkClasses.values().stream().map(ci -> ci.name().replace(" ", "_"))
+                    .sorted(Comparator.comparing(s -> s)).collect(Collectors.toList()));
         cc.registerCompletion("materials", (c) -> Arrays.stream(Material.values()).map(Enum::name)
                 .collect(Collectors.toList()));
 
@@ -345,6 +343,21 @@ public class KauriCommand extends BaseCommand {
             StringUtils.sendMessage(sender, "&eLagging&7: &f" + data.lagInfo.lagging);
             StringUtils.Messages.LINE.send(sender);
         } else StringUtils.Messages.DATA_ERROR.send(sender);
+    }
+
+    @Subcommand("wand")
+    @Description("Debug collision boxes")
+    @CommandPermission("kauri.command.wand")
+    public void onWand(Player player) {
+        if(Arrays.stream(player.getInventory().getContents())
+                .anyMatch(item -> item == null || item.getType().equals(XMaterial.AIR.parseMaterial()))) {
+            player.getInventory().addItem(BukkitListener.MAGIC_WAND);
+            player.updateInventory();
+        } else {
+            player.getWorld().dropItemNaturally(player.getLocation(), BukkitListener.MAGIC_WAND);
+            player.sendMessage(Color.Red + Color.Italics + "Your inventory was full. Item dropped onto ground.");
+        }
+        player.sendMessage(Color.Green + "Added a magic wand to your inventory. Use it wisely.");
     }
 
    public static List<Player> getTesters() {

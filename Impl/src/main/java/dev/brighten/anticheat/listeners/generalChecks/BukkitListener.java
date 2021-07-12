@@ -70,6 +70,8 @@ public class BukkitListener implements Listener {
 
                 Vector subbed = max.subtract(min);
 
+                event.getPlayer().sendMessage(sbox.min().toString());
+                event.getPlayer().sendMessage(sbox.max().toString());
                 event.getPlayer().sendMessage("x=" + subbed.getX() + " y=" + subbed.getY() + " z=" + subbed.getZ());
             }
 

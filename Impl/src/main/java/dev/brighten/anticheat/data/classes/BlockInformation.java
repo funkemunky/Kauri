@@ -318,8 +318,7 @@ public class BlockInformation {
 
                         });
                     });
-            handler.setSize(0.8f, 2f);
-            handler.setOffset(-.2f);
+            handler.setSize(0.6, 1.8);
             handler.getCollisionBoxes().forEach(cb -> cb.draw(WrappedEnumParticle.FLAME, objectData.boxDebuggers));
         }
 
