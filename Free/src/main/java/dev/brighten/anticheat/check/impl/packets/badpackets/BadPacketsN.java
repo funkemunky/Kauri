@@ -38,7 +38,9 @@ public class BadPacketsN extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
 
-        if(lastSentTrans.isNotPassed(300L) && ++flying > 30) {
+        if(lastSentTrans.isNotPassed(300L) && lastKeepAlive.isNotPassed(3000L)
+                && Kauri.INSTANCE.tps.getAverage() > 19.6
+                && ++flying > 30) {
             vl++;
             flag("f=%s lKA=%s t=CANCEL", flying, lastKeepAlive.getPassed());
 
@@ -62,12 +64,11 @@ public class BadPacketsN extends Check {
     public void onTransaction(WrappedInTransactionPacket packet, long now) {
         if(packet.getId() != 0) return;
 
-        flying = 0;
-
         val response
                 = Kauri.INSTANCE.keepaliveProcessor.getKeepById(packet.getAction());
 
         if (response.isPresent()) {
+            flying = 0;
             lastTrans.reset();
             int current = response.get().start;
 
