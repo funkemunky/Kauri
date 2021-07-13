@@ -322,6 +322,10 @@ public class BlockInformation {
             handler.getCollisionBoxes().forEach(cb -> cb.draw(WrappedEnumParticle.FLAME, objectData.boxDebuggers));
         }
 
+        this.handler.getCollisionBoxes().clear();
+        this.handler.getBlocks().clear();
+        this.handler.getEntities().clear();
+        this.handler = null;
         this.handler = handler;
     }
 

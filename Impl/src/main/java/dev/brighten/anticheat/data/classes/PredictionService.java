@@ -7,21 +7,17 @@ import cc.funkemunky.api.utils.world.BlockData;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.Helper;
-import dev.brighten.anticheat.utils.MiscUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.potion.PotionEffectType;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class PredictionService {
 
-    private ObjectData data;
+    private final ObjectData data;
     public boolean fly, velocity, position, sneak, sprint, useSword, hit, dropItem, inWeb, checkConditions,
             lastLastOnGround, lastOnGround, onGround, lastSprint, fMath, fastMath, walkSpecial, lastVelocity;
     public double posX, posY, posZ, lPosX, lPosY, lPosZ, rmotionX, rmotionY, rmotionZ, lmotionX, lmotionZ, lmotionY;
@@ -85,8 +81,6 @@ public class PredictionService {
                 if(data.playerInfo.lastVelocity.isPassed(1))
                 calcKey(mx, mz);
 
-                MiscUtils.testMessage(String.format("key=%s rx=%.4f rz=%.4f lx=%.4f lz=%.4f px=%.4f lpx=%.4g",
-                        key, rmotionX, rmotionZ, lmotionX, lmotionZ, posX, lPosX));
                 calc(true);
             }
 
@@ -235,7 +229,7 @@ public class PredictionService {
         double preD = 1.2 * Math.pow(10, -Math.max(3, precision - 5));
 
         if (Math.abs(Math.abs(mx) + Math.abs(mz)) > preD) {
-            direction = (int) new BigDecimal(motionYaw).setScale(1, RoundingMode.HALF_UP).doubleValue();
+            direction = Math.round(motionYaw);
 
             if (direction == 1) {
                 moveF = 1F;
@@ -297,7 +291,7 @@ public class PredictionService {
         double preD = 1.2 * Math.pow(10, -Math.max(3, precision - 5));
 
         if (Math.abs(Math.abs(mx) + Math.abs(mz)) > preD) {
-            direction = (int) new BigDecimal(motionYaw).setScale(1, RoundingMode.HALF_UP).doubleValue();
+            direction = Math.round(motionYaw);
 
             if (direction == 1) {
                 moveF = 1F;
@@ -508,8 +502,7 @@ public class PredictionService {
                 if(Double.isNaN(diff) || Double.isInfinite(diff)) return;
 
                 // if the motion isn't correct this value can get out in flags
-                diff = new BigDecimal(diff).setScale(precision + 2, RoundingMode.HALF_UP).doubleValue();
-                diffString = new BigDecimal(diff).setScale(precision + 2, RoundingMode.HALF_UP).toPlainString();
+                diffString = String.valueOf(diff);
 
                 if (diff < preD * preD) { // if the diff is small enough
                     flag = false;

@@ -5,6 +5,7 @@ import cc.funkemunky.api.reflections.types.WrappedClass;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
+import cc.funkemunky.api.tinyprotocol.listener.PacketInfo;
 import cc.funkemunky.api.tinyprotocol.listener.functions.AsyncPacketListener;
 import cc.funkemunky.api.tinyprotocol.listener.functions.PacketListener;
 import cc.funkemunky.api.tinyprotocol.packet.in.*;
@@ -25,6 +26,7 @@ import org.bukkit.util.Vector;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
 
 public class PacketProcessor {
 
@@ -42,18 +44,20 @@ public class PacketProcessor {
         });
     }
 
-    private final AsyncPacketListener listener = Atlas.getInstance().getPacketProcessor()
-            .processAsync(Kauri.INSTANCE, EventPriority.LOWEST, info -> {
+    private final PacketListener listener = Atlas.getInstance().getPacketProcessor()
+            .process(Kauri.INSTANCE, EventPriority.LOWEST, info -> {
                 ObjectData data = Kauri.INSTANCE.dataManager.getData(info.getPlayer());
 
-                if(data == null || data.checkManager == null) return;
+                if(data == null || data.checkManager == null) return true;
 
                 if(outgoingPackets.contains(info.getType())) {
                     processServer(data, info.getPacket(), info.getType(), info.getTimestamp());
                 } else if(incomingPackets.contains(info.getType())) {
                     processClient(data, info.getPacket(), info.getType(), info.getTimestamp());
                 }
+                return true;
             });
+
     private final PacketListener cancelListener = Atlas.getInstance().getPacketProcessor()
             .process(Kauri.INSTANCE, EventPriority.NORMAL, info -> {
                 ObjectData data = Kauri.INSTANCE.dataManager.getData(info.getPlayer());

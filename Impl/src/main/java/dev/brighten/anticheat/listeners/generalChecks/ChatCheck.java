@@ -1,20 +1,24 @@
 package dev.brighten.anticheat.listeners.generalChecks;
 
+import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.events.AtlasListener;
 import cc.funkemunky.api.events.Listen;
 import cc.funkemunky.api.events.ListenerPriority;
 import cc.funkemunky.api.events.impl.PacketReceiveEvent;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
+import cc.funkemunky.api.tinyprotocol.listener.PacketInfo;
+import cc.funkemunky.api.tinyprotocol.listener.functions.PacketListener;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInChatPacket;
 import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.Init;
 import dev.brighten.anticheat.Kauri;
+import org.bukkit.event.EventPriority;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Init
-public class ChatCheck implements AtlasListener {
+public class ChatCheck {
 
     @ConfigSetting(path = "general.illegalCharacters", name = "enabled")
     private static boolean enabled = true;
@@ -28,34 +32,30 @@ public class ChatCheck implements AtlasListener {
     @ConfigSetting(path = "general.illegalCharacters", name = "messageLengthMax")
     private static int lengthMax = 250;
 
-    @Listen(priority = ListenerPriority.LOW)
-    public void onPacketReceive(PacketReceiveEvent event) {
-        if(!enabled || event.getPacket() == null) return;
-        if(event.getType().equals(Packet.Client.CHAT)) {
-            WrappedInChatPacket packet = new WrappedInChatPacket(event.getPacket(), event.getPlayer());
+    private final PacketListener chatCheckListener = Atlas.getInstance().getPacketProcessor()
+            .process(Kauri.INSTANCE, EventPriority.HIGHEST, event -> {
+                WrappedInChatPacket packet = new WrappedInChatPacket(event.getPacket(), event.getPlayer());
 
-            if(packet.getMessage().length() <= 0) return;
+                if(packet.getMessage().length() <= 0) return true;
 
-            if(packet.getMessage().length() > lengthMax) {
-                event.getPlayer().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
-                        .msg("msg-too-long",
-                                "&8[&6K&8] &cYour chat message was cancelled because it was too long."));
-                event.setCancelled(true);
-                return;
-            }
+                if(packet.getMessage().length() > lengthMax) {
+                    event.getPlayer().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                            .msg("msg-too-long",
+                                    "&8[&6K&8] &cYour chat message was cancelled because it was too long."));
+                    return false;
+                }
 
-            int min = 0;
-            int max = allowExtendedCharacters ? 591 : 255;
+                int min = 0;
+                int max = allowExtendedCharacters ? 591 : 255;
 
-            for (char c : packet.getMessage().toCharArray()) {
-                if((int)c > min && (int)c < max || whitelistedCharacters.contains(c)) continue;
+                for (char c : packet.getMessage().toCharArray()) {
+                    if((int)c > min && (int)c < max || whitelistedCharacters.contains(c)) continue;
 
-                event.getPlayer().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
-                        .msg("illegal-chars",
-                                "&8[&6K&8] &cYou are not allowed to use character \"" + c + "\"."));
-                event.setCancelled(true);
-                break;
-            }
-        }
-    }
+                    event.getPlayer().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                            .msg("illegal-chars",
+                                    "&8[&6K&8] &cYou are not allowed to use character \"" + c + "\"."));
+                    return false;
+                }
+                return true;
+            }, Packet.Client.CHAT);
 }

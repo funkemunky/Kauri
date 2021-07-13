@@ -44,7 +44,7 @@ public class DiscordAPI {
     private static boolean sendAlerts = false;
 
     @ConfigSetting(path = "discord.send", name = "startMsg")
-    private static boolean startMsg = true;
+    private static boolean startMsg = false;
 
     @ConfigSetting(path = "discord", name = "devAlerts")
     private static boolean devAlerts = false;
@@ -62,7 +62,7 @@ public class DiscordAPI {
             client = new WebhookClientBuilder(url).setThreadFactory(job -> {
                 Thread thread = new Thread(job);
 
-                thread.setName("KauriDiscord");
+                thread.setName("Discord Webhook Thread Factory");
                 thread.setDaemon(true);
 
                 return thread;

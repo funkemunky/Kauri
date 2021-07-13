@@ -59,7 +59,7 @@ public class RegularChecks implements CheckRegister {
         Check.register(new SpeedB());
         Check.register(new SpeedC());
         Check.register(new SpeedD());
-        Check.register(new KillauraA());
+        //Check.register(new KillauraA());
         Check.register(new KillauraB());
         Check.register(new KillauraC());
         Check.register(new KillauraD());

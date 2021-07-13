@@ -30,6 +30,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -52,7 +53,7 @@ public class Kauri extends JavaPlugin {
     public long lastTick;
 
     public ScheduledExecutorService executor;
-    public ScheduledExecutorService loggingThread;
+    public ExecutorService loggingThread;
     public String LINK = "";
 
     public boolean enabled = false, usingPremium, usingAra;

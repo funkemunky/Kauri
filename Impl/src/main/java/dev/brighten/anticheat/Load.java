@@ -1,16 +1,10 @@
 package dev.brighten.anticheat;
 
 import cc.funkemunky.api.Atlas;
-import cc.funkemunky.api.commands.ancmd.CommandManager;
 import cc.funkemunky.api.config.MessageHandler;
-import cc.funkemunky.api.profiling.ToggleableProfiler;
-import cc.funkemunky.api.reflections.Reflections;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
-import co.aikar.commands.CommandIssuer;
-import co.aikar.commands.Locales;
-import co.aikar.locales.LocaleManager;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.Config;
 import dev.brighten.anticheat.commands.CommandPropertiesManager;
@@ -24,12 +18,6 @@ import dev.brighten.anticheat.processing.keepalive.KeepaliveProcessor;
 import dev.brighten.anticheat.utils.timer.impl.AtlasTimer;
 import dev.brighten.api.KauriAPI;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.plugin.Plugin;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.concurrent.Executors;
 
 public class Load {
@@ -38,8 +26,8 @@ public class Load {
         register("Kicking players online...");
         //Bukkit.getOnlinePlayers().forEach(player -> player.kickPlayer("Starting up..."));
         register("Starting thread pool...");
-        Kauri.INSTANCE.executor = Executors.newScheduledThreadPool(3);
-        Kauri.INSTANCE.loggingThread = Executors.newScheduledThreadPool(2);
+        Kauri.INSTANCE.executor = Executors.newSingleThreadScheduledExecutor();
+        Kauri.INSTANCE.loggingThread = Executors.newSingleThreadExecutor();
 
         register("Loading config...");
         Kauri.INSTANCE.saveDefaultConfig();

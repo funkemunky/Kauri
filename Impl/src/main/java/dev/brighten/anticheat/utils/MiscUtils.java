@@ -187,6 +187,20 @@ public class MiscUtils {
         return longBuilder.build();
     }
 
+    /** Nik's method **/
+    public static <E> E randomElement(final Collection<? extends E> collection) {
+        if (collection.size() == 0) return null;
+        int index = new Random().nextInt(collection.size());
+
+        if (collection instanceof List) {
+            return ((List<? extends E>) collection).get(index);
+        } else {
+            Iterator<? extends E> iter = collection.iterator();
+            for (int i = 0; i < index; i++) iter.next();
+            return iter.next();
+        }
+    }
+
     //Args: Tuple (a) is low outliers, Tupe (B) is high outliers
     public static Tuple<List<Double>, List<Double>> getOutliers(Collection<? extends Number> collection) {
         List<Double> values = new ArrayList<>();

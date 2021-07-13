@@ -17,6 +17,7 @@ import co.aikar.commands.annotation.Optional;
 import co.aikar.commands.bukkit.contexts.OnlinePlayer;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
+import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Config;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.listeners.generalChecks.BukkitListener;
@@ -377,6 +378,77 @@ public class KauriCommand extends BaseCommand {
                 } else player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
                         .msg("player-not-online", "&cThe player provided is not online!"));
             } else player.sendMessage(Color.Red + "Invalid arguments.");
+        });
+    }
+
+    @Subcommand("recentlogs")
+    @Description("View the latest violations")
+    @CommandPermission("kauri.command.recentlogs")
+    public void onRecentLogs(Player player) {
+        player.sendMessage(Color.Green + "Finding recent violators...");
+        MenuCommand.getRecentViolatorsMenu(false).showMenu(player);
+    }
+
+    @Subcommand("reload")
+    @Description("Reload Kauri")
+    @CommandPermission("kauri.command.reload")
+    public void onReload(CommandSender sender) {
+        sender.sendMessage(Color.Red + "Reloading Kauri...");
+        Kauri.INSTANCE.reload();
+        sender.sendMessage(Color.Green + "Completed!");
+    }
+
+    @Subcommand("toggle")
+    @Description("Toggle a detection on or off")
+    @CommandPermission("kauri.command.toggle")
+    @Syntax("<check>")
+    @CommandCompletion("@checks")
+    public void onCommand(CommandSender sender, @Single String check) {
+        if(Check.isCheck(check)) {
+            CheckInfo checkInfo = Check.getCheckInfo(check.replace("_", " "));
+
+            String path = "checks." + checkInfo.name() + ".enabled";
+
+            boolean toggleState = !Kauri.INSTANCE.getConfig().getBoolean(path);
+
+            sender.sendMessage(Color.Gray + "Setting check state to "
+                    + (toggleState ? Color.Green : Color.Red) + toggleState + Color.Gray + "...");
+            sender.sendMessage(Color.Red + "Setting in config...");
+            Kauri.INSTANCE.getConfig().set(path, toggleState);
+            Kauri.INSTANCE.saveConfig();
+
+            sender.sendMessage(Color.Red + "Refreshing data objects with updated information...");
+            Kauri.INSTANCE.dataManager.dataMap.values().parallelStream()
+                    .forEach(data -> data.checkManager.checks.get(checkInfo.name()).enabled = toggleState);
+            sender.sendMessage(Color.Green + "Completed!");
+        } else sender.sendMessage(Color.Red + "\"" + check
+                .replace("_", " ") + "\" is not a check.");
+    }
+
+    @Subcommand("users")
+    @Description("View the online players")
+    @CommandPermission("kauri.command.users")
+    public void onUsersCmd(CommandSender sender) {
+        Kauri.INSTANCE.executor.execute(() -> {
+            sender.sendMessage(cc.funkemunky.api.utils.MiscUtils.line(Color.Dark_Gray));
+            sender.sendMessage(Color.Yellow + "Forge Users:");
+            sender.sendMessage(Kauri.INSTANCE.dataManager.dataMap.values().stream()
+                    .filter(data -> data.modData != null)
+                    .map(data -> data.getPlayer().getName())
+                    .collect(Collectors.joining(Color.Gray + ", " + Color.White)));
+            sender.sendMessage("");
+            sender.sendMessage(Color.Yellow + "Lunar Client Users:");
+            sender.sendMessage(Kauri.INSTANCE.dataManager.dataMap.values().stream()
+                    .filter(data -> data.usingLunar)
+                    .map(data -> data.getPlayer().getName())
+                    .collect(Collectors.joining(Color.Gray + ", " + Color.White)));
+            sender.sendMessage("");
+            sender.sendMessage(Color.Yellow + "Misc Users:");
+            sender.sendMessage(Kauri.INSTANCE.dataManager.dataMap.values().stream()
+                    .filter(data -> data.modData == null && !data.usingLunar)
+                    .map(data -> data.getPlayer().getName())
+                    .collect(Collectors.joining(Color.Gray + ", " + Color.White)));
+            sender.sendMessage(cc.funkemunky.api.utils.MiscUtils.line(Color.Dark_Gray));
         });
     }
 
