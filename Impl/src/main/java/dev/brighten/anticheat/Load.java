@@ -82,8 +82,6 @@ public class Load {
         register("Running tps task...");
         Kauri.INSTANCE.runTpsTask();
         register("Starting profiler...");
-        Kauri.INSTANCE.profiler = new ToggleableProfiler();
-        Kauri.INSTANCE.profiler.setEnabled(true);
         Kauri.INSTANCE.lastEnabled = new AtlasTimer(20);
         Kauri.INSTANCE.enabled = true;
         Kauri.INSTANCE.lastEnabled.reset();

@@ -53,7 +53,6 @@ public class Kauri extends JavaPlugin {
 
     public ScheduledExecutorService executor;
     public ScheduledExecutorService loggingThread;
-    public ToggleableProfiler profiler;
     public String LINK = "";
 
     public boolean enabled = false, usingPremium, usingAra;
@@ -118,8 +117,6 @@ public class Kauri extends JavaPlugin {
         //Clearing the checks.
         Check.checkClasses.clear();
         Check.checkSettings.clear();
-        profiler.setEnabled(false);
-        profiler = null;
         packetProcessor = null;
 
         MiscUtils.printToConsole("&7Clearing checks and cached entity information...");

@@ -1,11 +1,10 @@
 package dev.brighten.anticheat.commands;
 
-import cc.funkemunky.api.commands.ancmd.Command;
-import cc.funkemunky.api.commands.ancmd.CommandAdapter;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.RunUtils;
+import co.aikar.commands.annotation.*;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.logs.objects.Punishment;
@@ -14,48 +13,56 @@ import dev.brighten.anticheat.utils.Pastebin;
 import dev.brighten.anticheat.utils.menu.preset.ConfirmationMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Init
+@CommandAlias("kauri|anticheat")
+@CommandPermission("kauri.command")
 public class LogCommand {
 
-    @Command(name = "kauri.logs", description = "View the logs of a user.", display = "logs [player]",
-            usage = "/<command> [player]", aliases = {"logs"}, permission = "kauri.command.logs")
-    public void onCommand(CommandAdapter cmd) {
+    @Subcommand("logs")
+    @CommandPermission("kauri.command.logs")
+    @Syntax("[player]")
+    @Description("View the logs of a user")
+    public void onCommand(CommandSender sender, String[] args) {
         Kauri.INSTANCE.executor.execute(() -> {
-            if(cmd.getArgs().length == 0) {
-                if(cmd.getPlayer() != null) {
-                    LogsGUI gui = new LogsGUI(cmd.getPlayer());
+            if(args.length == 0) {
+                if(sender instanceof Player) {
+                    Player player = (Player) sender;
+                    LogsGUI gui = new LogsGUI(player);
                     RunUtils.task(() -> {
-                        gui.showMenu(cmd.getPlayer());
-                        cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                        gui.showMenu(player);
+                        sender.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
                                 .msg("opened-menu", "&aOpened menu."));
-                        cmd.getSender().sendMessage(Color.Green + "Opened menu.");
+                        sender.sendMessage(Color.Green + "Opened menu.");
                     }, Kauri.INSTANCE);
-                } else cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                } else sender.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
                         .msg("no-console-logs",
                                 "&cYou cannot view your own logs since you are not a player."));
             } else {
-                OfflinePlayer player = Bukkit.getOfflinePlayer(cmd.getArgs()[0]);
+                OfflinePlayer player = Bukkit.getOfflinePlayer(args[0]);
 
                 if(player == null) {
-                    cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                    sender.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
                             .msg("offline-player-not-found", "&cSomehow, out of hundreds of millions of"
                                     + "Minecraft accounts, you found one that doesn't exist."));
                     return;
                 }
 
-                if(cmd.getPlayer() != null) {
+                if(sender instanceof Player) {
                     LogsGUI gui = new LogsGUI(player);
                     RunUtils.task(() -> {
-                        gui.showMenu(cmd.getPlayer());
-                        cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                        gui.showMenu((Player) sender);
+                        sender.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
                                 .msg("opened-menu", "&aOpened menu."));
                     }, Kauri.INSTANCE);
-                } else cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                } else sender.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
                         .msg("logs-pastebin",
                                 "&aLogs: %pastebin%".replace("%pastebin%",
                                         getLogsFromUUID(player.getUniqueId()))));
@@ -63,46 +70,48 @@ public class LogCommand {
         });
     }
 
-    @Command(name = "kauri.logs.clear", display = "logs clear [player]", description = "Clear logs of a player",
-            usage = "/<command> [playerName]",  permission = "kauri.command.logs.clear")
-    public void onLogsClear(CommandAdapter cmd) {
-        if(cmd.getArgs().length > 0) {
-            OfflinePlayer player = Bukkit.getOfflinePlayer(cmd.getArgs()[0]);
+    @Subcommand("logs")
+    @CommandPermission("kauri.command.logs.clear")
+    @Syntax("[playerName]")
+    @Description("Clear logs of a player")
+    public void onLogsClear(CommandSender sender, String[] args) {
+        if(args.length > 0) {
+            OfflinePlayer player = Bukkit.getOfflinePlayer(args[0]);
 
             if(player == null) {
-                cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                sender.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
                         .msg("offline-player-not-found", "&cSomehow, out of hundreds of millions of"
                                 + "Minecraft accounts, you found one that doesn't exist."));
                 return;
             }
 
-            if(cmd.getPlayer() != null) {
+            if(sender instanceof Player) {
                 ConfirmationMenu menu = new ConfirmationMenu(
                         "Clear " + player.getName() + "'s logs?",
                         (pl, confirmed) -> {
                             if(confirmed) {
                                 Kauri.INSTANCE.executor.execute(() -> {
-                                    cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                                    sender.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
                                             .msg("clearing-logs", "&7Clearing logs from %player%...")
                                             .replace("%player%", player.getName()));
                                     Kauri.INSTANCE.loggerManager.clearLogs(player.getUniqueId());
-                                    cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                                    sender.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
                                             .msg("clear-logs-success", "&aLogs cleared!"));
                                 });
                             }
                         });
-                menu.showMenu(cmd.getPlayer());
+                menu.showMenu((Player)sender);
             } else {
                 Kauri.INSTANCE.executor.execute(() -> {
-                    cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                    sender.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
                             .msg("clearing-logs", "&7Clearing logs from %player%...")
                             .replace("%player%", player.getName()));
                     Kauri.INSTANCE.loggerManager.clearLogs(player.getUniqueId());
-                    cmd.getSender().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                    sender.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
                             .msg("clear-logs-success", "&aLogs cleared!"));
                 });
             }
-        } else cmd.getSender().sendMessage(Color.Red + "You must provide the name of a player.");
+        } else sender.sendMessage(Color.Red + "You must provide the name of a player.");
     }
 
     public static String getLogsFromUUID(UUID uuid) {

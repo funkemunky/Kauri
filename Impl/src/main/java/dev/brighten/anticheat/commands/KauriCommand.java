@@ -20,6 +20,7 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.Config;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.listeners.generalChecks.BukkitListener;
+import dev.brighten.anticheat.menu.PlayerInformationGUI;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.Pastebin;
 import dev.brighten.anticheat.utils.StringUtils;
@@ -302,13 +303,6 @@ public class KauriCommand extends BaseCommand {
                 "&eMemory &7(&f&oFree&7&o/&f&oTotal&7&o/&f&oAllocated&7)&8: &f%.2fGB&7/&f%.2fGB&7/&f%.2fGB"),
                 Runtime.getRuntime().freeMemory() / 1E9,
                 Runtime.getRuntime().totalMemory() / 1E9, Runtime.getRuntime().maxMemory() / 1E9);
-        val results = Kauri.INSTANCE.profiler.results(ResultsType.TOTAL);
-        MiscUtils.sendMessage(sender, getMsg("main.cpu-usage", "&eKauri CPU Usage&8: &f%.5f%%"),
-                results.keySet().stream()
-                        .filter(key -> !key.contains("check:"))
-                        .mapToDouble(key -> results.get(key).two / 1000000D)
-                        .filter(val -> !Double.isNaN(val) && !Double.isInfinite(val))
-                        .sum() / 50D * 100);
         StringUtils.Messages.LINE.send(sender);
     }
 
@@ -358,6 +352,32 @@ public class KauriCommand extends BaseCommand {
             player.sendMessage(Color.Red + Color.Italics + "Your inventory was full. Item dropped onto ground.");
         }
         player.sendMessage(Color.Green + "Added a magic wand to your inventory. Use it wisely.");
+    }
+
+    @Subcommand("info")
+    @Description("Get the information of a player.")
+    @Syntax("[player]")
+    @CommandPermission("kauri.command.info")
+    public void onCommand(Player player, String[] args) {
+        Kauri.INSTANCE.executor.execute(() -> {
+            if(args.length > 0) {
+                Player target = Bukkit.getPlayer(args[0]);
+
+                if(target != null) {
+                    ObjectData targetData = Kauri.INSTANCE.dataManager.getData(target);
+
+                    if(targetData != null) {
+                        PlayerInformationGUI info = new PlayerInformationGUI(targetData);
+
+                        info.showMenu(player);
+                        player.sendMessage(Color.Green + "Opened menu.");
+                    } else player
+                            .sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("data-error",
+                                    "&cThere was an error trying to find your data."));
+                } else player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                        .msg("player-not-online", "&cThe player provided is not online!"));
+            } else player.sendMessage(Color.Red + "Invalid arguments.");
+        });
     }
 
    public static List<Player> getTesters() {

@@ -1,8 +1,11 @@
 package dev.brighten.anticheat.commands;
 
-import cc.funkemunky.api.commands.ancmd.Command;
-import cc.funkemunky.api.commands.ancmd.CommandAdapter;
 import cc.funkemunky.api.utils.*;
+import co.aikar.commands.BaseCommand;
+import co.aikar.commands.annotation.CommandAlias;
+import co.aikar.commands.annotation.CommandPermission;
+import co.aikar.commands.annotation.Description;
+import co.aikar.commands.annotation.Subcommand;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckSettings;
@@ -24,6 +27,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
@@ -34,7 +38,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-public class MenuCommand {
+@Init
+@CommandAlias("kauri|anticheat")
+@CommandPermission("kauri.command")
+public class MenuCommand extends BaseCommand {
 
     private static ChestMenu main, categoryMenu;
     private static long lastReset;
@@ -57,15 +64,16 @@ public class MenuCommand {
         return new Button(false, MiscUtils.createItem(material, amount, name, lore), action);
     }
 
-    @Command(name = "kauri.menu", description = "Open the Kauri menu.", display = "menu", usage = "/<command>",
-            aliases = {"kauri.gui"}, playerOnly = true, permission = "kauri.command.menu")
-    public void onCommand(CommandAdapter cmd) {
-        getMain().showMenu(cmd.getPlayer());
+    @Subcommand("menu")
+    @Description("Open the Kauri menu.")
+    @CommandPermission("kauri.command.menu")
+    public void onCommand(Player player) {
+        getMain().showMenu(player);
         categoryMenu = getChecksCategoryMenu();
-        cmd.getPlayer().sendMessage(Color.Green + "Opened main menu.");
+        player.sendMessage(Color.Green + "Opened main menu.");
     }
 
-    private static BaseComponent[] freeMessage = new ComponentBuilder("We would appreciate if you purchased a " +
+    private static final BaseComponent[] freeMessage = new ComponentBuilder("We would appreciate if you purchased a " +
             "full version. It really helps to fund the development of Kauri for the longterm.")
             .color(ChatColor.GRAY)
             .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
@@ -423,9 +431,7 @@ public class MenuCommand {
     }
 
     private static String getLogsFromUUID(UUID uuid) {
-        Kauri.INSTANCE.profiler.start("cmd:logs");
         List<Log> logs = Kauri.INSTANCE.loggerManager.getLogs(uuid);
-        Kauri.INSTANCE.profiler.stop("cmd:logs");
 
         if (logs.size() == 0) return "No Logs";
 
