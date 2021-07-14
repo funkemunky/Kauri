@@ -26,8 +26,8 @@ public class Load {
         register("Kicking players online...");
         //Bukkit.getOnlinePlayers().forEach(player -> player.kickPlayer("Starting up..."));
         register("Starting thread pool...");
-        Kauri.INSTANCE.executor = Executors.newSingleThreadScheduledExecutor();
-        Kauri.INSTANCE.loggingThread = Executors.newSingleThreadExecutor();
+        Kauri.INSTANCE.executor = Executors.newSingleThreadExecutor();
+        Kauri.INSTANCE.loggingThread = Executors.newSingleThreadScheduledExecutor();
 
         register("Loading config...");
         Kauri.INSTANCE.saveDefaultConfig();

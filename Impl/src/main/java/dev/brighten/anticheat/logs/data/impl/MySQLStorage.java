@@ -5,6 +5,8 @@ import cc.funkemunky.api.utils.RunUtils;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.logs.data.DataStorage;
+import dev.brighten.anticheat.logs.data.config.MySQLConfig;
+import dev.brighten.anticheat.logs.data.sql.ExecutableStatement;
 import dev.brighten.anticheat.logs.data.sql.MySQL;
 import dev.brighten.anticheat.logs.data.sql.Query;
 import dev.brighten.anticheat.logs.objects.Log;
@@ -14,14 +16,16 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.sql.SQLException;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+import java.util.logging.Level;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class MySQLStorage implements DataStorage {
 
-    private List<Log> logs = new CopyOnWriteArrayList<>();
-    private List<Punishment> punishments = new CopyOnWriteArrayList<>();
-    private BukkitTask task;
+    private final Deque<Log> logs = new LinkedList<>();
+    private final Deque<Punishment> punishments = new LinkedList<>();
+    private ScheduledFuture<?> task;
 
     public MySQLStorage() {
         MySQL.init();
@@ -43,53 +47,73 @@ public class MySQLStorage implements DataStorage {
                 "`TIMESTAMP` LONG NOT NULL)").execute();
         Kauri.INSTANCE.loggingThread.execute(() -> {
             MiscUtils.printToConsole("&7Creating UUID index for SQL violations...");
-            Query.prepare("CREATE INDEX `UUID` ON `VIOLATIONS` (UUID)").execute();
+            Query.prepare("CREATE INDEX IF NOT EXISTS `UUID_1`ON `VIOLATIONS` (UUID)").execute();
             MiscUtils.printToConsole("&aCreated!");
             MiscUtils.printToConsole("&7Creating UUID index for SQL punishments...");
-            Query.prepare("CREATE INDEX `UUID` ON `PUNISHMENTS` (UUID)").execute();
+            Query.prepare("CREATE INDEX IF NOT EXISTS `UUID_2` ON `PUNISHMENTS` (UUID)").execute();
             MiscUtils.printToConsole("&aCreated!");
             MiscUtils.printToConsole("&a7 Creating TIME index for SQL violations...");
-            Query.prepare("CREATE INDEX `TIME` ON `VIOLATIONS` (`TIME`)").execute();
+            Query.prepare("CREATE INDEX IF NOT EXISTS `TIME_1` ON `VIOLATIONS` (`TIME`)").execute();
             MiscUtils.printToConsole("&a7 Creating CHECK index for SQL violations...");
-            Query.prepare("CREATE INDEX `CHECK` ON `VIOLATIONS` (`CHECK`)");
+            Query.prepare("CREATE INDEX IF NOT EXISTS `CHECK_1` ON `VIOLATIONS` (`CHECK`)");
             MiscUtils.printToConsole("&aCreated!");
         });
 
-        task = RunUtils.taskTimerAsync(() -> {
+        task = Kauri.INSTANCE.loggingThread.scheduleAtFixedRate(() -> {
             if(logs.size() > 0) {
-                for (Log log : logs) {
-                    try {
-                        Query.prepare("INSERT INTO `VIOLATIONS`" +
-                                " (`UUID`, `TIME`, `VL`, `CHECK`, `PING`, `TPS`, `INFO`) VALUES (?,?,?,?,?,?,?)")
-                                .append(log.uuid.toString()).append(log.timeStamp).append(log.vl)
+                synchronized (logs) {
+                    String values = IntStream.range(0, Math.min(150, logs.size())).mapToObj(i -> "(?,?,?,?,?,?,?)")
+                            .collect(Collectors.joining(","));
+
+                    ExecutableStatement statement = Query.prepare("INSERT INTO `VIOLATIONS` " +
+                            "(`UUID`, `TIME`, `VL`, `CHECK`, `PING`, `TPS`, `INFO`) VALUES " + values);
+                    Log log = null;
+                    int amount = 0;
+                    while((log = logs.pop()) != null) {
+                        statement = statement.append(log.uuid.toString()).append(log.timeStamp).append(log.vl)
                                 .append(log.checkName).append((int)log.ping).append(log.tps)
-                                .append(log.info)
-                                .execute();
-                    } catch(Exception e) {
-                        e.printStackTrace();
+                                .append(log.info);
+
+                        if(++amount >= 150) break;
                     }
-                    logs.remove(log);
+
+                    if(MySQLConfig.debugMessages)
+                        Kauri.INSTANCE.getLogger().log(Level.INFO, "Inserted " + amount
+                                + " logs into the database.");
+
+                    statement.execute();
                 }
             }
             if(punishments.size() > 0) {
-                for(Punishment punishment : punishments) {
-                    try {
-                        Query.prepare("INSERT INTO `PUNISHMENTS` (`UUID`,`TIME`,`CHECK`) VALUES (?,?,?)")
-                                .append(punishment.uuid.toString())
-                                .append(punishment.timeStamp).append(punishment.checkName)
-                                .execute();
-                    } catch(Exception e) {
-                        e.printStackTrace();
+                synchronized (punishments) {
+                    String values = IntStream.range(0, Math.min(punishments.size(), 150)).mapToObj(i -> "(?,?,?)")
+                            .collect(Collectors.joining(","));
+
+                    ExecutableStatement statement =
+                            Query.prepare("INSERT INTO `PUNISHMENTS` (`UUID`,`TIME`,`CHECK`) VALUES " + values);
+
+                    Punishment punishment = null;
+                    int amount = 0;
+                    while((punishment = punishments.pop()) != null) {
+                        statement = statement.append(punishment.uuid.toString()).append(punishment.uuid.toString())
+                                .append(punishment.timeStamp).append(punishment.checkName);
+
+                        if(++amount >= 150) break;
                     }
-                    punishments.remove(punishment);
+
+                    if(MySQLConfig.debugMessages)
+                        Kauri.INSTANCE.getLogger().log(Level.INFO, "Inserted " + amount
+                                + " punishments into the database.");
+
+                    statement.execute();
                 }
             }
-        }, Kauri.INSTANCE, 120L, 40L);
+        }, 3, 1, TimeUnit.SECONDS);
     }
 
     @Override
     public void shutdown() {
-        task.cancel();
+        task.cancel(false);
         task = null;
         logs.clear();
         punishments.clear();

@@ -22,4 +22,7 @@ public class MySQLConfig {
 
     @ConfigSetting(path = "database.mysql", name = "port", hide = true)
     public static int port = 3306;
+
+    @ConfigSetting(path = "database.mysql", name = "debugMessages")
+    public static boolean debugMessages = false;
 }

@@ -52,8 +52,8 @@ public class Kauri extends JavaPlugin {
     public Timer lastTickLag;
     public long lastTick;
 
-    public ScheduledExecutorService executor;
-    public ExecutorService loggingThread;
+    public ScheduledExecutorService loggingThread;
+    public ExecutorService executor;
     public String LINK = "";
 
     public boolean enabled = false, usingPremium, usingAra;
