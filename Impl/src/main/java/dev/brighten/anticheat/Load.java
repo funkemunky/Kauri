@@ -18,6 +18,7 @@ import dev.brighten.anticheat.processing.keepalive.KeepaliveProcessor;
 import dev.brighten.anticheat.utils.timer.impl.AtlasTimer;
 import dev.brighten.api.KauriAPI;
 import org.bukkit.Bukkit;
+
 import java.util.concurrent.Executors;
 
 public class Load {

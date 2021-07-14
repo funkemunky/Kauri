@@ -1,12 +1,7 @@
 package dev.brighten.anticheat.listeners.generalChecks;
 
 import cc.funkemunky.api.Atlas;
-import cc.funkemunky.api.events.AtlasListener;
-import cc.funkemunky.api.events.Listen;
-import cc.funkemunky.api.events.ListenerPriority;
-import cc.funkemunky.api.events.impl.PacketReceiveEvent;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.tinyprotocol.listener.PacketInfo;
 import cc.funkemunky.api.tinyprotocol.listener.functions.PacketListener;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInChatPacket;
 import cc.funkemunky.api.utils.ConfigSetting;

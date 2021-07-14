@@ -11,7 +11,6 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.check.api.Setting;
 import dev.brighten.anticheat.utils.timer.Timer;
-import dev.brighten.anticheat.utils.timer.impl.AtlasTimer;
 import dev.brighten.anticheat.utils.timer.impl.MillisTimer;
 import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import dev.brighten.api.check.CheckType;

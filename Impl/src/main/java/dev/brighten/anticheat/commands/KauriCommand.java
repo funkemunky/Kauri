@@ -1,8 +1,5 @@
 package dev.brighten.anticheat.commands;
 
-import cc.funkemunky.api.commands.ancmd.Command;
-import cc.funkemunky.api.commands.ancmd.CommandAdapter;
-import cc.funkemunky.api.profiling.ResultsType;
 import cc.funkemunky.api.reflections.types.WrappedClass;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
@@ -12,8 +9,8 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.BukkitCommandCompletions;
 import co.aikar.commands.BukkitCommandContexts;
 import co.aikar.commands.CommandHelp;
-import co.aikar.commands.annotation.*;
 import co.aikar.commands.annotation.Optional;
+import co.aikar.commands.annotation.*;
 import co.aikar.commands.bukkit.contexts.OnlinePlayer;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;

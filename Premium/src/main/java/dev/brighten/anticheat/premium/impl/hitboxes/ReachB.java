@@ -1,9 +1,7 @@
 package dev.brighten.anticheat.premium.impl.hitboxes;
 
-import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.world.CollisionBox;
@@ -25,7 +23,6 @@ import org.bukkit.util.Vector;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @CheckInfo(name = "Reach (B)", description = "Ensures the reach of a player is legitimate.",
         checkType = CheckType.HITBOX, punishVL = 8, planVersion = KauriVersion.ARA)
