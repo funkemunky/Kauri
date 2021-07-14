@@ -60,7 +60,7 @@ public class ReachA extends Check {
         RayCollision tray = new RayCollision(tovector, MathUtils.getDirection(torigin)),
                 fray = new RayCollision(forigin.toVector(), MathUtils.getDirection(forigin));
 
-        int hits = 0, misses = 0;
+        int hits = 0, misses = 0, hitboxHits = 0;
         double distance = Double.MAX_VALUE;
         for (KLocation tloc : targetLocs) {
             SimpleCollisionBox tbox = getHitbox(data.target, tloc).expand(data.playerVersion
@@ -82,14 +82,31 @@ public class ReachA extends Check {
                     break hitboxes;
                 }
 
-                SimpleCollisionBox expandedBox = tbox.copy().expand(0.2);
-                if(hitPoint == null && !tray.isIntersected(expandedBox) && !fray.isIntersected(expandedBox)) {
-                    if(++hitbox.buffer > 5) {
-                        hitbox.flag("b=%.1f m=%s", hitbox.buffer, misses);
-                    }
-                } else if(hitbox.buffer > 0) hitbox.buffer-= 0.2;
+                SimpleCollisionBox expandedBox = tbox.copy().expand(0.1);
+                if(hitPoint != null || tray.isIntersected(expandedBox) || fray.isIntersected(expandedBox))
+                    hitboxHits++;
             }
         }
+
+        hitboxes: {
+            Hitboxes hitbox = getHitboxDetection();
+
+            if(hitbox == null) {
+                Kauri.INSTANCE.getLogger().warning("Hitboxes is null within "
+                        + data.getPlayer().getName() + " Reach (A) detection!");
+                break hitboxes;
+            }
+
+            if(hitboxHits == 0) {
+                if(++hitbox.buffer > 5) {
+                    hitbox.vl++;
+                    hitbox.flag("b=%.1f m=%s", hitbox.buffer, misses);
+                }
+            } else if(hitbox.buffer > 0) hitbox.buffer-= 0.2;
+        }
+
+        if(hits > 0)
+        distance = Math.sqrt(distance) - 0.03; //We subtract 0.03 since our ray tracing isnt exactly 1-1
 
         if(data.lagInfo.lastPacketDrop.isPassed(3)) {
             if (distance > 3.15 && hits > 0 && distance != 69) {
@@ -100,7 +117,8 @@ public class ReachA extends Check {
             } else buffer -= buffer > 0 ? 0.1 : 0;
         } else buffer-= buffer > 0 ? 0.02 : 0;
 
-        debug("distance=%.3f boxes=%s buffer=%s", distance, targetLocs.size(), buffer);
+        debug("distance=%.3f h/m=%s,%s boxes=%s buffer=%s hbhits=%s",
+                distance, hits, misses, targetLocs.size(), buffer, hitboxHits);
     }
 
     private static SimpleCollisionBox getHitbox(Entity entity, KLocation loc) {
