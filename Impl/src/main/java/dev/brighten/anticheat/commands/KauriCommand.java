@@ -82,6 +82,7 @@ public class KauriCommand extends BaseCommand {
         }
     }
 
+    @CommandAlias("alerts")
     @Subcommand("alerts")
     @Syntax("")
     @CommandPermission("kauri.command.alerts")
@@ -98,6 +99,27 @@ public class KauriCommand extends BaseCommand {
                 Kauri.INSTANCE.dataManager.hasAlerts.remove(data);
                 player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("alerts-none",
                         "&cYou are no longer viewing cheat alerts."));
+            }
+        } else player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("data-error",
+                "&cThere was an error trying to find your data."));
+    }
+
+    @CommandAlias("alerts dev")
+    @Syntax("")
+    @CommandPermission("kauri.command.alerts.dev")
+    @Description("Toggle developer cheat alerts")
+    public void onDevAlertsMain(Player player) {
+        ObjectData data = Kauri.INSTANCE.dataManager.getData(player);
+
+        if(data != null) {
+            if(data.devAlerts = !data.devAlerts) {
+                Kauri.INSTANCE.dataManager.devAlerts.add(data);
+                player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("dev-alerts-on",
+                        "&aYou are now viewing developer cheat alerts."));
+            } else {
+                Kauri.INSTANCE.dataManager.devAlerts.remove(data);
+                player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("dev-alerts-none",
+                        "&cYou are no longer viewing developer cheat alerts."));
             }
         } else player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("data-error",
                 "&cThere was an error trying to find your data."));
@@ -148,11 +170,12 @@ public class KauriCommand extends BaseCommand {
                     .forEach(d -> d.boxDebuggers.remove(player));
             player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
                     .msg("debug-off", "&aTurned off your debugging."));
-        } else if(target != null) {
+        } else {
+            Player targetPlayer = target != null ? target.getPlayer() : player;
             if(check.equalsIgnoreCase("sniff")) {
-                val targetData = Kauri.INSTANCE.dataManager.getData(target.getPlayer());
+                val targetData = Kauri.INSTANCE.dataManager.getData(targetPlayer);
                 if(!targetData.sniffing) {
-                    player.sendMessage("Sniffing + " + target.getPlayer().getName());
+                    player.sendMessage("Sniffing + " + targetPlayer.getName());
                     targetData.sniffing = true;
                 } else {
                     player.sendMessage("Stopped sniff. Pasting...");
@@ -160,7 +183,7 @@ public class KauriCommand extends BaseCommand {
                     try {
                         player.sendMessage("Paste: " + Pastebin.makePaste(
                                 String.join("\n", targetData.sniffedPackets.toArray(new String[0])),
-                                "Sniffed from " + target.getPlayer().getName(), Pastebin.Privacy.UNLISTED));
+                                "Sniffed from " + targetPlayer.getName(), Pastebin.Privacy.UNLISTED));
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
@@ -169,14 +192,14 @@ public class KauriCommand extends BaseCommand {
             } else {
                 if(Check.isCheck(check.replace("_", " "))) {
                     data.debugging = check.replace("_", " ");
-                    data.debugged = target.getPlayer().getUniqueId();
+                    data.debugged = targetPlayer.getUniqueId();
 
                     player.sendMessage(Color.Green + "You are now debugging " + data.debugging
-                            + " on target " + target.getPlayer().getName() + "!");
+                            + " on target " + targetPlayer.getName() + "!");
                 } else player
                         .sendMessage(Color.Red + "The argument input \"" + check + "\" is not a check.");
             }
-        } else player.sendMessage(Color.Red + "Could not find a target to debug.");
+        }
     }
 
     @Subcommand("block")
