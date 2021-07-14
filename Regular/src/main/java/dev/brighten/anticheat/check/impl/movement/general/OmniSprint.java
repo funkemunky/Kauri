@@ -54,7 +54,7 @@ public class OmniSprint extends Check {
                     && data.playerInfo.lastTeleportTimer.isPassed(1)) {
                 if(++invalidBuffer > 6) {
                     vl+= 0.25f;
-                    flag("type=INVALID sprint=%s a=%.1f b=%s", angle, invalidBuffer);
+                    flag("type=INVALID sprint=%s a=%.1f b=%s", data.playerInfo.sprinting, angle, invalidBuffer);
                 }
             } else invalidBuffer = 0;
 

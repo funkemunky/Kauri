@@ -527,6 +527,29 @@ public class PacketProcessor {
                 data.playerInfo.inventoryId = packet.getId();
                 break;
             }
+            case Packet.Server.EXPLOSION: {
+                WrappedOutExplosionPacket packet = new WrappedOutExplosionPacket(object, data.getPlayer());
+
+                Vector vector = new Vector(packet.getMotionX(), packet.getMotionY(), packet.getMotionZ());
+                data.playerInfo.velocities.add(vector);
+                data.playerInfo.doingVelocity = true;
+                data.runKeepaliveAction(d -> {
+                    if(data.playerInfo.velocities.contains(vector)) {
+                        if(data.playerInfo.doingVelocity) {
+                            data.playerInfo.lastVelocity.reset();
+
+                            data.playerInfo.doingVelocity = false;
+                            data.playerInfo.lastVelocityTimestamp = System.currentTimeMillis();
+                            data.predictionService.velocity = true;
+                            data.playerInfo.velocityX = data.playerInfo.calcVelocityX = (float) packet.getX();
+                            data.playerInfo.velocityY = data.playerInfo.calcVelocityY = (float) packet.getY();
+                            data.playerInfo.velocityZ = data.playerInfo.calcVelocityZ = (float) packet.getZ();
+                        }
+                        data.playerInfo.velocities.remove(vector);
+                    }
+                }, 2);
+                break;
+            }
             case Packet.Server.ENTITY_VELOCITY: {
                 WrappedOutVelocityPacket packet = new WrappedOutVelocityPacket(object, data.getPlayer());
 

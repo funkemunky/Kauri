@@ -49,7 +49,7 @@ public class ReachA extends Check {
 
 
         List<KLocation> targetLocs = data.targetPastLocation
-                .getEstimatedLocation(timeStamp, (data.lagInfo.transPing + 2) * 50L, 100L);
+                .getEstimatedLocation(timeStamp, (data.lagInfo.transPing + 2) * 50L, 150L);
 
         KLocation torigin = data.playerInfo.to.clone(), forigin = data.playerInfo.from.clone();
 
@@ -100,6 +100,7 @@ public class ReachA extends Check {
             if(hitboxHits == 0) {
                 if(++hitbox.buffer > 5) {
                     hitbox.vl++;
+                    hitbox.buffer = 5;
                     hitbox.flag("b=%.1f m=%s", hitbox.buffer, misses);
                 }
             } else if(hitbox.buffer > 0) hitbox.buffer-= 0.2;
@@ -107,14 +108,16 @@ public class ReachA extends Check {
 
         if(hits > 0)
         distance = Math.sqrt(distance) - 0.03; //We subtract 0.03 since our ray tracing isnt exactly 1-1
+        else distance = -1;
 
         if(data.lagInfo.lastPacketDrop.isPassed(3)) {
-            if (distance > 3.15 && hits > 0 && distance != 69) {
+            if (distance > 3.15) {
                 if (++buffer > 6) {
+                    buffer = 6;
                     vl++;
                     flag("distance=%.2f buffer=%s", distance, buffer);
                 }
-            } else buffer -= buffer > 0 ? 0.1 : 0;
+            } else buffer -= buffer > 0 ? 0.05 : 0;
         } else buffer-= buffer > 0 ? 0.02 : 0;
 
         debug("distance=%.3f h/m=%s,%s boxes=%s buffer=%s hbhits=%s",

@@ -39,8 +39,8 @@ public class AutoclickerC extends Check {
                 if(armTicks == 1 && cps > 3) {
                     if(cps > 7) verbose.add();
                     if(verbose.value() > 15) {
-                        flag("arm=%s cps=%s lagging=%s", armTicks,
-                                MathUtils.round(cps, 3), data.lagInfo.lagging);
+                        flag("arm=%s cps=%.3f lagging=%s", armTicks,
+                                cps, data.lagInfo.lagging);
                     }
                 } else verbose.subtract(20);
                 debug("cps=%s arm=%s lagging=%s vl=%s", cps, armTicks, data.lagInfo.lagging, vl);

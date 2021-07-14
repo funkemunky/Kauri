@@ -39,7 +39,7 @@ public class BadPacketsN extends Check {
 
         if(lastSentTrans.isNotPassed(300L) && lastKeepAlive.isNotPassed(3000L)
                 && Kauri.INSTANCE.tps.getAverage() > 19.6
-                && ++flying > 30) {
+                && ++flying > 200) {
             vl++;
             flag("f=%s lKA=%s t=CANCEL", flying, lastKeepAlive.getPassed());
 
