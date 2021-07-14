@@ -60,6 +60,7 @@ public class FlyA extends Check {
                 vl++;
                 if(vl > 3)
                 flag("deltaY=%.4f predicted=%.4f", data.playerInfo.deltaY, predicted);
+                fixMovementBugs();
             } else if(vl > 0) vl-= 0.25;
             end = System.nanoTime() - start;
 

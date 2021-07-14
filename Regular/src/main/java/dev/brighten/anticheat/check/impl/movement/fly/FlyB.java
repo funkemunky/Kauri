@@ -60,6 +60,7 @@ public class FlyB extends Check {
                 if(++buffer > 2 || data.playerInfo.kAirTicks > 80) {
                     ++vl;
                     flag("dY=%.3f p=%.3f dx=%.3f", data.playerInfo.deltaY, predicted, data.playerInfo.deltaXZ);
+                    fixMovementBugs();
                 }
             } else buffer-= buffer > 0 ? 0.5f : 0;
 

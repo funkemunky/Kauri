@@ -88,6 +88,8 @@ public class SpeedA extends Check {
                     flag("p=%.1f%% dxz=%.3f aimove=%.3f tags=%s",
                             ratio, data.playerInfo.deltaXZ, data.predictionService.aiMoveSpeed, tags.build());
                 }
+                if(buffer >= 2)
+                fixMovementBugs();
             } else if(buffer > 0) buffer-= 0.25f;
             debug("ratio=%.1f tags=%s tp=%s buffer=%.1f", ratio, tags.build(),
                     data.playerInfo.liquidTimer.getPassed(), buffer);

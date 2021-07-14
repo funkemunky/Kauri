@@ -32,6 +32,8 @@ public class FlyC extends Check {
                     && MathUtils.getDelta(data.playerInfo.deltaY, maxHeight) > 0.01f) {
                 vl++;
                 flag("deltaY=%s maxHeight=%s", data.playerInfo.deltaY, maxHeight);
+
+                fixMovementBugs();
             } else if(vl > 0) vl-= 0.01f;
 
             debug("deltaY=%s above=%s", data.playerInfo.deltaY,

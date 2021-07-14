@@ -14,6 +14,7 @@ import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.discord.DiscordAPI;
+import dev.brighten.anticheat.utils.api.BukkitAPI;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import dev.brighten.api.KauriAPI;
@@ -250,6 +251,10 @@ public class Check implements KauriCheck {
 
     public boolean isPosition(WrappedInFlyingPacket packet) {
         return packet.isPos() && (data.playerInfo.deltaXZ > 0 || data.playerInfo.deltaY != 0);
+    }
+
+    public void fixMovementBugs() {
+        BukkitAPI.INSTANCE.setGliding(data.getPlayer(), false);
     }
 
     private String formatAlert(String toFormat, String info) {

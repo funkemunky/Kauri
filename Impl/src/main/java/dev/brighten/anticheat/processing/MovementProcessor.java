@@ -15,6 +15,7 @@ import dev.brighten.anticheat.listeners.api.impl.KeepaliveAcceptedEvent;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.MouseFilter;
 import dev.brighten.anticheat.utils.MovementUtils;
+import dev.brighten.anticheat.utils.api.BukkitAPI;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import lombok.val;
@@ -226,7 +227,8 @@ public class MovementProcessor {
         }
 
         data.playerInfo.inVehicle = data.getPlayer().getVehicle() != null;
-        data.playerInfo.gliding = PlayerUtils.isGliding(data.getPlayer());
+        if(data.playerInfo.gliding = BukkitAPI.INSTANCE.isGliding(data.getPlayer()))
+            data.playerInfo.lastGlideTimer.reset();
         data.playerInfo.riptiding = Atlas.getInstance().getBlockBoxManager()
                 .getBlockBox().isRiptiding(data.getPlayer());
         /* We only set the jumpheight on ground since there's no need to check for it while they're in the air.
@@ -471,6 +473,7 @@ public class MovementProcessor {
                 || data.playerInfo.webTimer.isNotPassed(8)
                 || data.playerInfo.liquidTimer.isNotPassed(8)
                 || data.playerInfo.onLadder
+                || data.playerInfo.lastGlideTimer.isNotPassed()
                 || (data.playerInfo.deltaXZ == 0 && data.playerInfo.deltaY == 0)
                 || data.blockInfo.roseBush
                 || data.playerInfo.doingVelocity
