@@ -30,6 +30,7 @@ public class LogCommand extends BaseCommand {
     @Subcommand("logs")
     @CommandPermission("kauri.command.logs")
     @Syntax("[player]")
+    @CommandCompletion("@players")
     @Description("View the logs of a user")
     public void onCommand(CommandSender sender, String[] args) {
         Kauri.INSTANCE.executor.execute(() -> {
@@ -71,9 +72,10 @@ public class LogCommand extends BaseCommand {
         });
     }
 
-    @Subcommand("logs")
+    @Subcommand("logs clear")
     @CommandPermission("kauri.command.logs.clear")
     @Syntax("[playerName]")
+    @CommandCompletion("@players")
     @Description("Clear logs of a player")
     public void onLogsClear(CommandSender sender, String[] args) {
         if(args.length > 0) {
