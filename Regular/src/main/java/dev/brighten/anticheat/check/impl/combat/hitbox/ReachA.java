@@ -111,7 +111,7 @@ public class ReachA extends Check {
         else distance = -1;
 
         if(data.lagInfo.lastPacketDrop.isPassed(3)) {
-            if (distance > 3.15) {
+            if (distance > 3.1) {
                 if (++buffer > 6) {
                     buffer = 6;
                     vl++;
