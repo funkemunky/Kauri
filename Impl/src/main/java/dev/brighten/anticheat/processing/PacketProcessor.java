@@ -195,6 +195,8 @@ public class PacketProcessor {
                             + packet.getYaw() + ";" + packet.getPitch() + ";" + packet.isGround()
                             +  ":@:" + timestamp);
                 }
+
+                data.playerInfo.lsneaking = data.playerInfo.sneaking;
                 break;
             }
             case Packet.Client.ENTITY_ACTION: {

@@ -6,7 +6,6 @@ import cc.funkemunky.api.utils.Priority;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckRegister;
 import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerA;
-import dev.brighten.anticheat.check.impl.combat.hitbox.ReachA;
 import dev.brighten.anticheat.check.impl.misc.ForceBan;
 import dev.brighten.anticheat.check.impl.movement.fly.FlyA;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallA;
@@ -27,7 +26,6 @@ public class FreeChecks implements CheckRegister {
         Check.register(new AutoclickerA());
         Check.register(new FlyA());
         Check.register(new NoFallA());
-        Check.register(new ReachA());
         Check.register(new SpeedA());
         Check.register(new BadPacketsA());
         Check.register(new BadPacketsB());

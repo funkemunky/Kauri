@@ -83,7 +83,7 @@ public class PlayerInformation {
     public long lastAttackTimeStamp;
 
     //actions
-    public boolean sneaking, sprinting, ridingJump, breakingBlock, flying, canFly, creative, inVehicle,
+    public boolean lsneaking, sneaking, sprinting, ridingJump, breakingBlock, flying, canFly, creative, inVehicle,
             gliding, riptiding, inventoryOpen, serverAllowedFlight, doingVelocity, doingTeleport;
     public int inventoryId = 0;
 

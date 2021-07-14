@@ -14,6 +14,7 @@ import dev.brighten.anticheat.check.impl.combat.hand.HandB;
 import dev.brighten.anticheat.check.impl.combat.hand.HandC;
 import dev.brighten.anticheat.check.impl.combat.hand.HandD;
 import dev.brighten.anticheat.check.impl.combat.hitbox.Hitboxes;
+import dev.brighten.anticheat.check.impl.combat.hitbox.ReachA;
 import dev.brighten.anticheat.check.impl.combat.killaura.*;
 import dev.brighten.anticheat.check.impl.movement.fly.*;
 import dev.brighten.anticheat.check.impl.movement.general.FastLadder;
@@ -49,6 +50,7 @@ public class RegularChecks implements CheckRegister {
        // Check.register(new FlyG());
         Check.register(new FastLadder());
         Check.register(new NoFallB());
+        Check.register(new ReachA());
         Check.register(new Hitboxes());
         Check.register(new AimA());
         Check.register(new AimB());

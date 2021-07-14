@@ -285,7 +285,9 @@ public class MenuCommand extends BaseCommand {
                     menu.buildInventory(false);
                     Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
                             .forEach(data -> {
-                                data.checkManager.checks.clear();
+                                synchronized (data.checkManager.checks) {
+                                    data.checkManager.checks.clear();
+                                }
                                 synchronized (data.checkManager.checkMethods) {
                                     data.checkManager.checkMethods.clear();
                                 }
@@ -314,7 +316,9 @@ public class MenuCommand extends BaseCommand {
                     menu.buildInventory(false);
                     Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
                             .forEach(data -> {
-                                data.checkManager.checks.clear();
+                                synchronized (data.checkManager.checks) {
+                                    data.checkManager.checks.clear();
+                                }
                                 synchronized (data.checkManager.checkMethods) {
                                     data.checkManager.checkMethods.clear();
                                 }
@@ -344,7 +348,9 @@ public class MenuCommand extends BaseCommand {
                     menu.buildInventory(false);
                     Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
                             .forEach(data -> {
-                                data.checkManager.checks.clear();
+                                synchronized (data.checkManager.checks) {
+                                    data.checkManager.checks.clear();
+                                }
                                 synchronized (data.checkManager.checkMethods) {
                                     data.checkManager.checkMethods.clear();
                                 }

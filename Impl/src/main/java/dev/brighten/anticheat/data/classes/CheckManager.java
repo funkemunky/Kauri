@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class CheckManager {
     private ObjectData objectData;
-    public Map<String, Check> checks = new ConcurrentHashMap<>();
+    public final Map<String, Check> checks = new HashMap<>();
     public final Map<Class<?>, List<WrappedCheck>> checkMethods = Collections.synchronizedMap(new HashMap<>());
 
     public CheckManager(ObjectData objectData) {
@@ -111,31 +111,33 @@ public class CheckManager {
         if(objectData.getPlayer()
                 .hasPermission("kauri.bypass")
                 && Config.bypassPermission) return;
-        Check.checkClasses.keySet().stream()
-                .map(clazz -> {
-                    CheckInfo settings = Check.checkClasses.get(clazz);
-                    Check check = clazz.getConstructor().newInstance();
-                    check.setData(objectData);
-                    CheckSettings checkSettings = Check.checkSettings.get(clazz);
-                    check.enabled = checkSettings.enabled;
-                    check.executable = checkSettings.executable;
-                    check.cancellable = checkSettings.cancellable;
-                    check.cancelMode = checkSettings.cancelMode;
-                    check.developer = settings.developer();
-                    check.name = settings.name();
-                    check.description = settings.description();
-                    check.punishVl = settings.punishVL();
-                    check.checkType = settings.checkType();
-                    check.maxVersion = settings.maxVersion();
-                    check.vlToFlag = settings.vlToFlag();
-                    check.minVersion = settings.minVersion();
-                    check.banExempt = objectData.getPlayer().hasPermission("kauri.bypass.ban");
-                    return check;
-                })
-                .forEach(check -> checks.put(check.name, check));
+        synchronized (checks) {
+            Check.checkClasses.keySet().stream()
+                    .map(clazz -> {
+                        CheckInfo settings = Check.checkClasses.get(clazz);
+                        Check check = clazz.getConstructor().newInstance();
+                        check.setData(objectData);
+                        CheckSettings checkSettings = Check.checkSettings.get(clazz);
+                        check.enabled = checkSettings.enabled;
+                        check.executable = checkSettings.executable;
+                        check.cancellable = checkSettings.cancellable;
+                        check.cancelMode = checkSettings.cancelMode;
+                        check.developer = settings.developer();
+                        check.name = settings.name();
+                        check.description = settings.description();
+                        check.punishVl = settings.punishVL();
+                        check.checkType = settings.checkType();
+                        check.maxVersion = settings.maxVersion();
+                        check.vlToFlag = settings.vlToFlag();
+                        check.minVersion = settings.minVersion();
+                        check.banExempt = objectData.getPlayer().hasPermission("kauri.bypass.ban");
+                        return check;
+                    })
+                    .forEach(check -> checks.put(check.name, check));
+        }
 
         synchronized (checkMethods) {
-            checks.keySet().stream().map(name -> checks.get(name)).forEach(check -> {
+            checks.keySet().stream().map(checks::get).forEach(check -> {
                 WrappedClass checkClass = new WrappedClass(check.getClass());
 
                 Arrays.stream(check.getClass().getDeclaredMethods())
