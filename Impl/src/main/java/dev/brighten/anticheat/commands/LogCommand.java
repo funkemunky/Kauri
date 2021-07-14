@@ -4,6 +4,7 @@ import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.RunUtils;
+import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.logs.objects.Log;
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
 @Init
 @CommandAlias("kauri|anticheat")
 @CommandPermission("kauri.command")
-public class LogCommand {
+public class LogCommand extends BaseCommand {
 
     @Subcommand("logs")
     @CommandPermission("kauri.command.logs")
