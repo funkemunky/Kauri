@@ -108,7 +108,7 @@ public class FlatfileStorage implements DataStorage {
                     statement.execute();
                 }
             }
-        }, 3, 1, TimeUnit.SECONDS);
+        }, 5, MySQLConfig.rateInSeconds, TimeUnit.SECONDS);
     }
 
     @Override
@@ -192,7 +192,9 @@ public class FlatfileStorage implements DataStorage {
 
     @Override
     public void addLog(Log log) {
-        logs.add(log);
+        synchronized (logs) {
+            logs.add(log);
+        }
     }
 
     @Override
@@ -205,7 +207,9 @@ public class FlatfileStorage implements DataStorage {
 
     @Override
     public void addPunishment(Punishment punishment) {
-        punishments.add(punishment);
+        synchronized (punishments) {
+            punishments.add(punishment);
+        }
     }
 
     @Override

@@ -23,6 +23,7 @@ import dev.brighten.anticheat.utils.timer.impl.AtlasTimer;
 import dev.brighten.api.KauriAPI;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -143,12 +144,17 @@ public class Kauri extends JavaPlugin {
         Check.checkSettings.clear();
         dataManager.dataMap.clear();
         entityProcessor.vehicles.clear();
+        loggerManager.storage.shutdown();
 
         Atlas.getInstance().initializeScanner(this, false, false);
 
         StringUtils.Messages.reload();
 
         loggerManager = new LoggerManager();
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            dataManager.createData(player);
+        }
 
         for (Runnable runnable : onReload) {
             runnable.run();

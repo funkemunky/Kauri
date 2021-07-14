@@ -108,7 +108,7 @@ public class MySQLStorage implements DataStorage {
                     statement.execute();
                 }
             }
-        }, 3, 1, TimeUnit.SECONDS);
+        }, 5, MySQLConfig.rateInSeconds, TimeUnit.SECONDS);
     }
 
     @Override

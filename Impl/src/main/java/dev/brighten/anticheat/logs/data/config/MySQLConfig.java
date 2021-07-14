@@ -25,4 +25,7 @@ public class MySQLConfig {
 
     @ConfigSetting(path = "database.mysql", name = "debugMessages")
     public static boolean debugMessages = false;
+
+    @ConfigSetting(path = "datebase.mysql", name = "insertionRate")
+    public static int rateInSeconds = 2;
 }
