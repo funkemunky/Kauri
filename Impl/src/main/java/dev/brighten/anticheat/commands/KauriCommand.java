@@ -160,7 +160,6 @@ public class KauriCommand extends BaseCommand {
         }
 
         if(check.equalsIgnoreCase("none")) {
-
             data.debugging = null;
             data.debugged = null;
             Kauri.INSTANCE.dataManager.debugging.remove(data);
@@ -205,7 +204,7 @@ public class KauriCommand extends BaseCommand {
     @Subcommand("block")
     @Description("Check the material type information")
     @CommandCompletion("@materials")
-    @Syntax("block [id,name]")
+    @Syntax("[id,name]")
     @CommandPermission("kauri.command.block")
     public void onBlock(CommandSender sender, @Optional String block) {
         Material material;
