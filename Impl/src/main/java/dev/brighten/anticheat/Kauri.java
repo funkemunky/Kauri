@@ -14,7 +14,6 @@ import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.discord.DiscordAPI;
 import dev.brighten.anticheat.listeners.api.EventHandler;
 import dev.brighten.anticheat.logs.LoggerManager;
-import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.processing.PacketProcessor;
 import dev.brighten.anticheat.processing.keepalive.KeepaliveProcessor;
 import dev.brighten.anticheat.utils.StringUtils;
@@ -42,7 +41,6 @@ public class Kauri extends JavaPlugin {
     public DataManager dataManager;
     public LoggerManager loggerManager;
     public KeepaliveProcessor keepaliveProcessor;
-    public EntityProcessor entityProcessor;
     public EventHandler eventHandler;
     public BukkitCommandManager commandManager;
 
@@ -119,12 +117,6 @@ public class Kauri extends JavaPlugin {
         Check.checkSettings.clear();
         packetProcessor = null;
 
-        MiscUtils.printToConsole("&7Clearing checks and cached entity information...");
-        entityProcessor.vehicles.clear(); //Clearing all registered vehicles.
-        entityProcessor.task.cancel();
-
-        entityProcessor = null;
-
         MiscUtils.printToConsole("&7Finshing up nullification...");
         Atlas.getInstance().getPluginCommandManagers().remove(this.getName());
         msgHandler = null;
@@ -143,7 +135,6 @@ public class Kauri extends JavaPlugin {
         Check.checkClasses.clear();
         Check.checkSettings.clear();
         dataManager.dataMap.clear();
-        entityProcessor.vehicles.clear();
         loggerManager.storage.shutdown();
         commandManager.unregisterCommands();
 

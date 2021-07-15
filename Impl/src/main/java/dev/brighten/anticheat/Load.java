@@ -12,7 +12,6 @@ import dev.brighten.anticheat.data.DataManager;
 import dev.brighten.anticheat.discord.DiscordAPI;
 import dev.brighten.anticheat.listeners.api.EventHandler;
 import dev.brighten.anticheat.logs.LoggerManager;
-import dev.brighten.anticheat.processing.EntityProcessor;
 import dev.brighten.anticheat.processing.PacketProcessor;
 import dev.brighten.anticheat.processing.keepalive.KeepaliveProcessor;
 import dev.brighten.anticheat.utils.timer.impl.AtlasTimer;
@@ -50,7 +49,6 @@ public class Load {
         register("Registering processors...");
         Kauri.INSTANCE.dataManager = new DataManager();
         Kauri.INSTANCE.keepaliveProcessor = new KeepaliveProcessor();
-        Kauri.INSTANCE.entityProcessor = EntityProcessor.start();
         Kauri.INSTANCE.packetProcessor = new PacketProcessor();
 
         register("Running scanner...");

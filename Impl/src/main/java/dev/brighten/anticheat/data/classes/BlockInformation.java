@@ -46,6 +46,9 @@ public class BlockInformation {
         }
     }
 
+    //Caching material
+    private final Material cobweb = XMaterial.COBWEB.parseMaterial(), rosebush = XMaterial.ROSE_BUSH.parseMaterial();
+
     public BlockInformation(ObjectData objectData) {
         this.objectData = objectData;
     }
@@ -54,17 +57,25 @@ public class BlockInformation {
         if(!Kauri.INSTANCE.enabled
                 || Kauri.INSTANCE.lastEnabled.isNotPassed(6))
             return;
+
+        double dy = Math.abs(objectData.playerInfo.deltaY);
+        double dh = objectData.playerInfo.deltaXZ;
+
+        if(dh == 0 && dy == 0) return;
+
         blocks.clear();
 
         onClimbable = onSlab = onStairs = onHalfBlock = inLiquid = inLava = inWater = inWeb = onSlime
                 = onIce = onSoulSand = blocksAbove = collidesVertically = bedNear = collidesHorizontally =
                 blocksNear = inBlock = miscNear = collidedWithEntity = blocksBelow = inPortal = false;
 
-        double dy = Math.abs(objectData.playerInfo.deltaY);
-        double dh = objectData.playerInfo.deltaXZ;
-
         if(dy > 2) dy = 2;
         if(dh > 2) dh = 2;
+
+        List<Entity> entities;
+
+        if(dh < 1 && dy < 1) entities = objectData.getPlayer().getNearbyEntities(1 + dh, 2 + dy, 1 + dh);
+        else entities = Collections.emptyList();
 
         int startX = Location.locToBlock(objectData.playerInfo.to.x - 0.3 - dh);
         int endX = Location.locToBlock(objectData.playerInfo.to.x + 0.3 + dh);
@@ -134,10 +145,10 @@ public class BlockInformation {
                                     CollisionBox blockBox = BlockData.getData(type)
                                             .getBox(block, objectData.playerVersion);
 
-                                    if(type.equals(XMaterial.COBWEB.parseMaterial()) && blockBox.isCollided(normalBox))
+                                    if(type.equals(cobweb) && blockBox.isCollided(normalBox))
                                         inWeb = true;
 
-                                    if(type.equals(XMaterial.ROSE_BUSH.parseMaterial()))
+                                    if(type.equals(rosebush))
                                         roseBush = true;
 
                                     if(normalBox.copy().offset(0, 0.6f, 0).isCollided(blockBox))
@@ -297,7 +308,7 @@ public class BlockInformation {
             return;
 
         CollisionHandler handler = new CollisionHandler(blocks,
-                Kauri.INSTANCE.entityProcessor.vehicles.getOrDefault(objectData.uuid, new HashSet<>()),
+                entities,
                 objectData.playerInfo.to, objectData);
 
         //Bukkit.broadcastMessage("chigga4");

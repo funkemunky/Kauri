@@ -1,10 +1,8 @@
 package dev.brighten.anticheat.check.impl.movement.general;
 
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.MathUtils;
-import dev.brighten.anticheat.check.api.Cancellable;
-import dev.brighten.anticheat.check.api.Check;
-import dev.brighten.anticheat.check.api.CheckInfo;
-import dev.brighten.anticheat.check.api.Event;
+import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.api.check.CheckType;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -18,23 +16,21 @@ public class OmniSprint extends Check {
 
     private int sprintBuffer, invalidBuffer;
 
-    @Event
-    public void onPlayerMove(PlayerMoveEvent event) {
-        double angle = MiscUtils.getAngle(event.getTo().clone(), event.getFrom().clone());
-        double deltaXZ = MathUtils.getHorizontalDistance(event.getTo(), event.getFrom());
+    @Packet
+    public void onFlying(WrappedInFlyingPacket packet) {
 
-        if(Math.abs(angle) > 95 || data.predictionService.key.contains("W")) return;
+        if(Math.abs(data.predictionService.motionYaw) > 95 || data.predictionService.key.contains("W")) return;
 
         omniSprint: {
-            if(!event.getPlayer().isSprinting() || !data.playerInfo.serverGround) break omniSprint;
+            if(!data.playerInfo.sprinting|| !data.playerInfo.serverGround) break omniSprint;
 
-            if(deltaXZ > 0.2
+            if(data.playerInfo.deltaXZ > 0.2
                     && !data.playerInfo.doingVelocity
                     && !data.playerInfo.generalCancel
                     && data.playerInfo.lastVelocity.isPassed(20)) {
                 if(++sprintBuffer > 3) {
                     vl++;
-                    flag("type=SPRINT a=%.1f b=%s", angle, sprintBuffer);
+                    flag("type=SPRINT a=%.1f b=%s", data.predictionService.motionYaw, sprintBuffer);
                 }
             }
         }
@@ -49,16 +45,17 @@ public class OmniSprint extends Check {
             if(speed > 0)
             base *= 1.2 * speed;
 
-            if(deltaXZ > base
+            if(data.playerInfo.deltaXZ > base
                     && data.playerInfo.lastVelocity.isPassed(20)
                     && data.playerInfo.lastTeleportTimer.isPassed(1)) {
                 if(++invalidBuffer > 6) {
                     vl+= 0.25f;
-                    flag("type=INVALID sprint=%s a=%.1f b=%s", data.playerInfo.sprinting, angle, invalidBuffer);
+                    flag("type=INVALID sprint=%s a=%.1f b=%s",
+                            data.playerInfo.sprinting, data.predictionService.motionYaw, invalidBuffer);
                 }
             } else invalidBuffer = 0;
 
-            debug("dxz=%.5f base=%.5f", deltaXZ, base);
+            debug("dxz=%.5f base=%.5f", data.playerInfo.deltaXZ, base);
         }
     }
 

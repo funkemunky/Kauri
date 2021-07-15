@@ -23,7 +23,7 @@ public class PredictionService {
     public double posX, posY, posZ, lPosX, lPosY, lPosZ, rmotionX, rmotionY, rmotionZ, lmotionX, lmotionZ, lmotionY;
     public double predX, predZ;
     public double aiMoveSpeed;
-    public float oldFriction;
+    public float oldFriction, motionYaw;
     public boolean flag, isBelowSpecial;
     public float walkSpeed = 0.1f, yaw, moveStrafing, moveForward;
 
@@ -206,75 +206,10 @@ public class PredictionService {
         return motionYaw;
     }
 
-    private void calcKey(float motionYaw, double mx, double mz) {
-        // of the Player
-
-        int direction = 6;
-
-        motionYaw -= yaw;
-
-        while (motionYaw > 360.0F)
-            motionYaw -= 360.0F;
-        while (motionYaw < 0.0F)
-            motionYaw += 360.0F;
-
-        motionYaw /= 45.0F; // converts the rotationYaw of the Motion to integers to get keys
-
-        float moveS = 0.0F; // is like the ClientSide moveStrafing moveForward
-        float moveF = 0.0F;
-        String key = "Nothing";
-
-        int precision = String.valueOf((int) Math.abs(posX > posZ ? posX : posX)).length();
-        precision = 15 - precision;
-        double preD = 1.2 * Math.pow(10, -Math.max(3, precision - 5));
-
-        if (Math.abs(Math.abs(mx) + Math.abs(mz)) > preD) {
-            direction = Math.round(motionYaw);
-
-            if (direction == 1) {
-                moveF = 1F;
-                moveS = -1F;
-                key = "W + D";
-            } else if (direction == 2) {
-                moveS = -1F;
-                key = "D";
-            } else if (direction == 3) {
-                moveF = -1F;
-                moveS = -1F;
-                key = "S + D";
-            } else if (direction == 4) {
-                moveF = -1F;
-                key = "S";
-            } else if (direction == 5) {
-                moveF = -1F;
-                moveS = 1F;
-                key = "S + A";
-            } else if (direction == 6) {
-                moveS = 1F;
-                key = "A";
-            } else if (direction == 7) {
-                moveF = 1F;
-                moveS = 1F;
-                key = "W + A";
-            } else if (direction == 8) {
-                moveF = 1F;
-                key = "W";
-            } else if (direction == 0) {
-                moveF = 1F;
-                key = "W";
-            }
-        }
-
-        moveF *= 0.9800000190734863F;
-        moveS *= 0.9800000190734863F;
-
-        moveStrafing = moveS;
-        moveForward = moveF;
-        this.key = key;
-    }
-
     private void calcKey(double mx, double mz) {
         float motionYaw = getMotionYaw(mx, mz);
+
+        this.motionYaw = motionYaw;
 
         int direction = 6;
 
@@ -286,45 +221,39 @@ public class PredictionService {
         float moveF = 0.0F;
         String key = "Nothing";
 
-        int precision = String.valueOf((int) Math.abs(posX > posZ ? posX : posX)).length();
-        precision = 15 - precision;
-        double preD = 1.2 * Math.pow(10, -Math.max(3, precision - 5));
+        direction = Math.round(motionYaw);
 
-        if (Math.abs(Math.abs(mx) + Math.abs(mz)) > preD) {
-            direction = Math.round(motionYaw);
-
-            if (direction == 1) {
-                moveF = 1F;
-                moveS = -1F;
-                key = "W + D";
-            } else if (direction == 2) {
-                moveS = -1F;
-                key = "D";
-            } else if (direction == 3) {
-                moveF = -1F;
-                moveS = -1F;
-                key = "S + D";
-            } else if (direction == 4) {
-                moveF = -1F;
-                key = "S";
-            } else if (direction == 5) {
-                moveF = -1F;
-                moveS = 1F;
-                key = "S + A";
-            } else if (direction == 6) {
-                moveS = 1F;
-                key = "A";
-            } else if (direction == 7) {
-                moveF = 1F;
-                moveS = 1F;
-                key = "W + A";
-            } else if (direction == 8) {
-                moveF = 1F;
-                key = "W";
-            } else if (direction == 0) {
-                moveF = 1F;
-                key = "W";
-            }
+        if (direction == 1) {
+            moveF = 1F;
+            moveS = -1F;
+            key = "W + D";
+        } else if (direction == 2) {
+            moveS = -1F;
+            key = "D";
+        } else if (direction == 3) {
+            moveF = -1F;
+            moveS = -1F;
+            key = "S + D";
+        } else if (direction == 4) {
+            moveF = -1F;
+            key = "S";
+        } else if (direction == 5) {
+            moveF = -1F;
+            moveS = 1F;
+            key = "S + A";
+        } else if (direction == 6) {
+            moveS = 1F;
+            key = "A";
+        } else if (direction == 7) {
+            moveF = 1F;
+            moveS = 1F;
+            key = "W + A";
+        } else if (direction == 8) {
+            moveF = 1F;
+            key = "W";
+        } else if (direction == 0) {
+            moveF = 1F;
+            key = "W";
         }
 
         moveF *= 0.9800000190734863F;
@@ -343,10 +272,6 @@ public class PredictionService {
 
     private void calc(boolean checkCollisions) {
         flag = true;
-        int precision = String.valueOf((int) Math.abs(posX > posZ ? posX : posX)).length();
-        precision = 10 - precision - (isBelowSpecial ? 4 : 0);
-        double preD = 1.2 * Math.pow(10, -Math.max(3, precision - 5));  // the motion deviates further and further from the coordinates 0 0 0. this value fix this
-
 //		if (openInv) { // i don't have an Event for it
 //			moveF = 0.0F;
 //			moveS = 0.0F;
@@ -354,7 +279,6 @@ public class PredictionService {
 //		}
 
         // 1337 is an value to see that nothing's changed
-        String diffString = "-1337";
         double diff = -1337;
         double closestdiff = 1337;
 
@@ -502,9 +426,8 @@ public class PredictionService {
                 if(Double.isNaN(diff) || Double.isInfinite(diff)) return;
 
                 // if the motion isn't correct this value can get out in flags
-                diffString = String.valueOf(diff);
 
-                if (diff < preD * preD) { // if the diff is small enough
+                if (diff < 1E-6) { // if the diff is small enough
                     flag = false;
                     //MiscUtils.testMessage(Color.Green + "(" + rmotionX + ", " + motionX + "); (" + rmotionZ + ", " + motionZ + ")");
 
