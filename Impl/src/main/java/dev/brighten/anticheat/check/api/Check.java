@@ -317,12 +317,6 @@ public class Check implements KauriCheck {
         }
     }
 
-    public void kickPlayer(String reason) {
-        Bukkit.getLogger().log(Level.INFO, "Kauri is kicking player" + data.getPlayer().getName() + " for: \""
-                + reason + "\"");
-        RunUtils.task(() -> data.getPlayer().kickPlayer(Color.translate(reason)));
-    }
-
     public void debug(String information, Object... variables) {
         if(Kauri.INSTANCE.dataManager.debugging.size() == 0) return;
 
@@ -332,6 +326,16 @@ public class Check implements KauriCheck {
                 .forEach(data -> data.getPlayer()
                         .sendMessage(Color.translate("&8[&c&lDEBUG&8] &7" + finalInformation)));
     }
+
+    /** Player utils **/
+
+    public void kickPlayer(String reason) {
+        Bukkit.getLogger().log(Level.INFO, "Kauri is kicking player" + data.getPlayer().getName() + " for: \""
+                + reason + "\"");
+        RunUtils.task(() -> data.getPlayer().kickPlayer(Color.translate(reason)));
+    }
+
+    /** Static members **/
 
     public static void registerChecks() {
 

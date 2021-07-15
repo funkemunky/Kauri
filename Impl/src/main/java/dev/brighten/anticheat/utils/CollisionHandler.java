@@ -24,7 +24,7 @@ import java.util.function.Consumer;
 
 @Getter
 public class CollisionHandler {
-	private List<Block> blocks = new CopyOnWriteArrayList<>();
+	private List<Block> blocks;
 	private List<Entity> entities;
 	private ObjectData data;
 	private KLocation location;
@@ -39,7 +39,7 @@ public class CollisionHandler {
 	private boolean debugging;
 
 	public CollisionHandler(List<Block> blocks, Collection<Entity> entities, KLocation to, ObjectData data) {
-		this.blocks.addAll(blocks);
+		this.blocks = blocks;
 		this.entities = new ArrayList<>(entities);
 		this.location = to;
 		this.data = data;

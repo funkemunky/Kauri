@@ -40,10 +40,18 @@ public class PotionProcessor {
     }
 
     public boolean hasPotionEffect(PotionEffectType type) {
-        return potionEffects.stream().anyMatch(effect -> effect.getType().equals(type));
+        for (PotionEffect potionEffect : potionEffects) {
+            if(potionEffect.getType().equals(type))
+                return true;
+        }
+        return false;
     }
 
     public Optional<PotionEffect> getEffectByType(PotionEffectType type) {
-        return potionEffects.stream().filter(effect -> effect.getType().equals(type)).findFirst();
+        for (PotionEffect potionEffect : potionEffects) {
+            if(potionEffect.getType().equals(type))
+                return Optional.of(potionEffect);
+        }
+        return Optional.empty();
     }
 }

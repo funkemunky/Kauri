@@ -145,6 +145,7 @@ public class Kauri extends JavaPlugin {
         dataManager.dataMap.clear();
         entityProcessor.vehicles.clear();
         loggerManager.storage.shutdown();
+        commandManager.unregisterCommands();
 
         Atlas.getInstance().initializeScanner(this, false, false);
 

@@ -86,10 +86,19 @@ public class Helper {
 		return null;
 	}
 
-	public static List<Block> blockCollisions(List<Block> blocks, CollisionBox box) {
-		return blocks.stream()
-				.filter(b -> BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion()).isCollided(box))
-				.collect(Collectors.toCollection(LinkedList::new));
+	public static List<Block> blockCollisions(List<Block> blocks, SimpleCollisionBox box) {
+		List<Block> collisions = new LinkedList<>();
+		for (Block b : blocks)
+			if (BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion()).isCollided(box))
+				collisions.add(b);
+		return collisions;
+	}
+
+	public static boolean isCollided(List<Block> blocks, SimpleCollisionBox box) {
+		for (Block b : blocks)
+			if (BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion()).isCollided(box))
+				return true;
+		return false;
 	}
 
 	public static boolean isCollided(SimpleCollisionBox toCheck, CollisionBox other) {

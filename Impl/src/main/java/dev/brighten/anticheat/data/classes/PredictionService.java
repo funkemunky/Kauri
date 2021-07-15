@@ -582,11 +582,4 @@ public class PredictionService {
     public static float sqrt_double(double p_76133_0_) {
         return (float) Math.sqrt(p_76133_0_);
     }
-
-    private static List<Block> blockCollisions(List<Block> blocks, SimpleCollisionBox box) {
-        return blocks.stream()
-                .filter(b -> Helper.isCollided(box,
-                        BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion())))
-                .collect(Collectors.toCollection(LinkedList::new));
-    }
 }
