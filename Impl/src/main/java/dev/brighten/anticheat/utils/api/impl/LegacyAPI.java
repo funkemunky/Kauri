@@ -11,6 +11,6 @@ public class LegacyAPI implements BukkitAPI {
 
     @Override
     public void setGliding(Player player, boolean state) {
-        player.setGliding(state);
+        
     }
 }

@@ -62,7 +62,7 @@ public class KillauraA extends Check {
                             || box.xMax % 1 != 0 || box.yMax % 1 != 0 || box.zMax % 1 != 0)
                         continue;
 
-                    Vector point = ray.collisionPoint(box.copy().shrink(0.001f, 0.001f, 0.001f));
+                    Vector point = ray.collisionPoint(box.copy().shrink(0.005f, 0.005f, 0.005f));
 
                     if (point != null && origin.toVector().distanceSquared(point) < dist - 0.2) {
                         rayCollidedOnBlock = true;
