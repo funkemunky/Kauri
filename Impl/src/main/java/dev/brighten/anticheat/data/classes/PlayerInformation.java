@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
 import java.util.Collections;
@@ -31,6 +32,7 @@ public class PlayerInformation {
     public float deltaYaw, deltaPitch, lDeltaYaw, lDeltaPitch;
     public long lastVelocityTimestamp;
     public Map<Location, Material> shitMap = new HashMap<>();
+    public List<Entity> nearbyEntities = Collections.emptyList();
     public Block blockBelow, blockOnTo;
     public Location setbackLocation = new Location(null, 0,0,0);
 

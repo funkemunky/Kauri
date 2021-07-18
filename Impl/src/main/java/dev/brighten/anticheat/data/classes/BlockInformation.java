@@ -72,11 +72,6 @@ public class BlockInformation {
         if(dy > 2) dy = 2;
         if(dh > 2) dh = 2;
 
-        List<Entity> entities;
-
-        if(dh < 1 && dy < 1) entities = objectData.getPlayer().getNearbyEntities(1 + dh, 2 + dy, 1 + dh);
-        else entities = Collections.emptyList();
-
         int startX = Location.locToBlock(objectData.playerInfo.to.x - 0.3 - dh);
         int endX = Location.locToBlock(objectData.playerInfo.to.x + 0.3 + dh);
         int startY = Location.locToBlock(objectData.playerInfo.to.y - 0.51 - dy);
@@ -308,7 +303,7 @@ public class BlockInformation {
             return;
 
         CollisionHandler handler = new CollisionHandler(blocks,
-                entities,
+                objectData.playerInfo.nearbyEntities,
                 objectData.playerInfo.to, objectData);
 
         //Bukkit.broadcastMessage("chigga4");
@@ -337,24 +332,23 @@ public class BlockInformation {
             handler.setSize(0.62f, 1.81f);
             handler.setOffset(-0.01f);
 
-            handler.getBlocks().stream().filter(block -> Materials.checkFlag(block.getType(), Materials.LIQUID))
-                    .forEach(block -> {
-                        objectData.boxDebuggers.forEach(pl -> {
-                            List<SimpleCollisionBox> boxes = new ArrayList<>();
-                             BlockData.getData(block.getType()).getBox(block, ProtocolVersion.getGameVersion())
-                                     .downCast(boxes);
+            for (Block block : handler.getBlocks()) {
+                objectData.boxDebuggers.forEach(pl -> {
+                    List<SimpleCollisionBox> boxes = new ArrayList<>();
+                    BlockData.getData(block.getType()).getBox(block, ProtocolVersion.getGameVersion())
+                            .downCast(boxes);
 
-                             boxes.forEach(sbox -> {
-                                 val max = sbox.max().subtract(block.getLocation().toVector());
-                                 val min = sbox.min().subtract(block.getLocation().toVector());
+                    boxes.forEach(sbox -> {
+                        val max = sbox.max().subtract(block.getLocation().toVector());
+                        val min = sbox.min().subtract(block.getLocation().toVector());
 
-                                 Vector subbed = max.subtract(min);
+                        Vector subbed = max.subtract(min);
 
-                                 pl.sendMessage("x=" + subbed.getX() + " y=" + subbed.getY() + " z=" + subbed.getZ());
-                             });
-
-                        });
+                        pl.sendMessage("x=" + subbed.getX() + " y=" + subbed.getY() + " z=" + subbed.getZ());
                     });
+
+                });
+            }
             handler.setSize(0.6, 1.8);
             handler.getCollisionBoxes().forEach(cb -> cb.draw(WrappedEnumParticle.FLAME, objectData.boxDebuggers));
         }

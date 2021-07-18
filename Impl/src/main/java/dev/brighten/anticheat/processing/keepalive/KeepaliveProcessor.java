@@ -9,6 +9,7 @@ import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -47,6 +48,11 @@ public class KeepaliveProcessor implements Runnable {
                     value.targetLoc = new KLocation(value.target.getLocation());
                 });
             }
+
+            double dh = value.playerInfo.deltaXZ, dy = Math.abs(value.playerInfo.deltaY);
+            if(dh < 1 && dy < 1)
+                value.playerInfo.nearbyEntities = value.getPlayer().getNearbyEntities(1 + dh, 2 + dy, 1 + dh);
+            else value.playerInfo.nearbyEntities = Collections.emptyList();
 
             TinyProtocolHandler.sendPacket(value.getPlayer(), packet);
             /*value.getThread().execute(() -> {
