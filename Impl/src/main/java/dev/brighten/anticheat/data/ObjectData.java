@@ -21,7 +21,6 @@ import dev.brighten.anticheat.processing.ClickProcessor;
 import dev.brighten.anticheat.processing.MovementProcessor;
 import dev.brighten.anticheat.processing.PotionProcessor;
 import dev.brighten.anticheat.processing.keepalive.KeepAlive;
-import dev.brighten.anticheat.utils.EntityLocation;
 import dev.brighten.anticheat.utils.PastLocation;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.TickTimer;
@@ -51,11 +50,10 @@ public class ObjectData implements Data {
     public UUID debugged;
 
     public long creation, lagTicks, noLagTicks;
-    public PastLocation targetPastLocation, entityLocPastLocation;
+    public PastLocation pastLocation, targetPastLocation;
     public LivingEntity target;
     public SimpleCollisionBox box = new SimpleCollisionBox();
     public ObjectData targetData;
-    public EntityLocation entityLocation;
     public CheckManager checkManager;
     public PlayerInformation playerInfo;
     public BlockInformation blockInfo;
@@ -91,6 +89,7 @@ public class ObjectData implements Data {
         creation = playerInfo.lastRespawn = System.currentTimeMillis();
         blockInfo = new BlockInformation(this);
         clickProcessor = new ClickProcessor(this);
+        pastLocation = new PastLocation();
         lagInfo = new LagInformation();
         targetPastLocation = new PastLocation();
         potionProcessor = new PotionProcessor(this);

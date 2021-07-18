@@ -14,7 +14,6 @@ import cc.funkemunky.api.utils.XMaterial;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.listeners.api.impl.KeepaliveAcceptedEvent;
-import dev.brighten.anticheat.utils.EntityLocation;
 import lombok.val;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
@@ -150,19 +149,11 @@ public class PacketProcessor {
                     if (packet.getEntity() instanceof LivingEntity) {
                         if (data.target != null && data.target.getEntityId() != packet.getId()) {
                             //Resetting location to prevent false positives.
-                            synchronized (data.targetPastLocation.previousLocations) {
-                                data.targetPastLocation.previousLocations.clear();
-                            }
+                            data.targetPastLocation.getPreviousLocations().clear();
                             data.playerInfo.lastTargetSwitch.reset();
-                            synchronized (data.entityLocPastLocation.previousLocations) {
-                                data.entityLocPastLocation.previousLocations.clear();
-                            }
-                            data.entityLocation = new EntityLocation(packet.getEntity().getUniqueId());
                             if (packet.getEntity() instanceof Player) {
                                 data.targetData = Kauri.INSTANCE.dataManager.getData((Player) packet.getEntity());
                             } else data.targetData = null;
-                        } else if(data.target == null) {
-                            data.entityLocation = new EntityLocation(packet.getEntity().getUniqueId());
                         }
 
                         if (data.target == null && packet.getEntity() instanceof Player)
@@ -609,59 +600,14 @@ public class PacketProcessor {
             case Packet.Server.LEGACY_REL_LOOK: {
                 WrappedOutRelativePosition packet = new WrappedOutRelativePosition(object, data.getPlayer());
 
-                if(data.target != null && data.target.getEntityId() == packet.getId()) {
-                    EntityLocation eloc = data.entityLocation;
-
-                    //We don't need to do version checking here. Atlas handles this for us.
-                    if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9)) {
-                        eloc.newX += (int)packet.getX() / 32D;
-                        eloc.newY += (int)packet.getY() / 32D;
-                        eloc.newZ += (int)packet.getZ() / 32D;
-                        eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
-                        eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
-                    } else {
-                        eloc.newX += (long)packet.getX() / 4096D;
-                        eloc.newY += (long)packet.getY() / 4096D;
-                        eloc.newZ += (long)packet.getZ() / 4096D;
-                        eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
-                        eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
-                    }
-
-                    eloc.interpolateLocations();
-
-                    for (KLocation interpolatedLocation : eloc.interpolatedLocations) {
-                        data.entityLocPastLocation.addLocation(interpolatedLocation);
-                    }
-                    data.playerInfo.lastTargetUpdate.reset();
-                }
-
-
+                //if(data.target != null && data.target.getEntityId() == packet.getId()) {
+                    //data.relTPastLocation.addLocation(packet);
+                //}
                 data.checkManager.runPacket(packet, timestamp);
                 break;
             }
             case Packet.Server.ENTITY_TELEPORT: {
                 WrappedOutEntityTeleportPacket packet = new WrappedOutEntityTeleportPacket(object, data.getPlayer());
-
-                if(data.target != null && data.target.getEntityId() == packet.entityId) {
-                    EntityLocation eloc = data.entityLocation;
-
-                    //We don't need to do version checking here. Atlas handles this for us.
-                    eloc.newX = eloc.x = packet.x;
-                    eloc.newY = eloc.y = packet.y;
-                    eloc.newZ = eloc.z = packet.z;
-                    eloc.newYaw = eloc.yaw = packet.yaw;
-                    eloc.newPitch = eloc.pitch = packet.pitch;
-
-                    //Clearing any old interpolated locations
-                    eloc.interpolatedLocations.clear();
-
-                    KLocation tploc = new KLocation(eloc.x, eloc.y, eloc.z, eloc.yaw, eloc.pitch,
-                            Kauri.INSTANCE.keepaliveProcessor.tick);
-                    eloc.interpolatedLocations.add(tploc);
-
-                    data.entityLocPastLocation.addLocation(tploc);
-                    data.playerInfo.lastTargetUpdate.reset();
-                }
 
                 data.checkManager.runPacket(packet, timestamp);
                 break;

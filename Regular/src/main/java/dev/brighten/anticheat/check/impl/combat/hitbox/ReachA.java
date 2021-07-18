@@ -40,16 +40,16 @@ public class ReachA extends Check {
     private Hitboxes hitboxDetection;
 
     @Packet
-    public void onFlying(WrappedInUseEntityPacket packet) {
+    public void onFlying(WrappedInUseEntityPacket packet, long timeStamp) {
         if(data.playerInfo.creative
-                || data.targetPastLocation.previousLocations.size() < 10
+                || data.targetPastLocation.getPreviousLocations().size() < 10
                 || packet.getAction() != WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK
                 || !allowedEntityTypes.contains(packet.getEntity().getType())) return;
 
 
 
         List<KLocation> targetLocs = data.targetPastLocation
-                .getEstimatedLocation(Kauri.INSTANCE.keepaliveProcessor.tick, data.lagInfo.transPing + 2, 3);
+                .getEstimatedLocation(timeStamp, (data.lagInfo.transPing + 2) * 50L, 150L);
 
         KLocation torigin = data.playerInfo.to.clone(), forigin = data.playerInfo.from.clone();
 

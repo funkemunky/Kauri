@@ -136,21 +136,6 @@ public class MiscUtils {
         }
     }
 
-    public static double getGrid(final Collection<Float> entry) {
-        double average = 0.0;
-        double min = 0.0, max = 0.0;
-
-        for (final double number : entry) {
-            if (number < min) min = number;
-            if (number > max) max = number;
-            average += number;
-        }
-
-        average /= entry.size();
-
-        return (max - average) - min;
-    }
-
     public static boolean isAnimated(HumanEntity entity) {
         Object itemInUse = MinecraftReflection.getItemInUse(entity);
 
@@ -217,7 +202,12 @@ public class MiscUtils {
     }
 
     //Args: Tuple (a) is low outliers, Tupe (B) is high outliers
-    public static Tuple<List<Double>, List<Double>> getOutliers(List<Double> values) {
+    public static Tuple<List<Double>, List<Double>> getOutliers(Collection<? extends Number> collection) {
+        List<Double> values = new ArrayList<>();
+
+        for (Number number : collection) {
+            values.add(number.doubleValue());
+        }
 
         if(values.size() < 4) return new Tuple<>(new ArrayList<>(), new ArrayList<>());
 
@@ -230,25 +220,6 @@ public class MiscUtils {
         val tuple = new Tuple<List<Double>, List<Double>>(new ArrayList<>(), new ArrayList<>());
 
         for (Double value : values) {
-            if(value < lowThreshold) tuple.one.add(value);
-            else if(value > highThreshold) tuple.two.add(value);
-        }
-
-        return tuple;
-    }
-
-    public static Tuple<List<Float>, List<Float>> getOutliersFloat(List<Float> values) {
-        if(values.size() < 4) return new Tuple<>(new ArrayList<>(), new ArrayList<>());
-
-        double q1 = getMedian(values.subList(0, values.size() / 2)),
-                q3 = getMedian(values.subList(values.size() / 2, values.size()));
-        double iqr = Math.abs(q1 - q3);
-
-        double lowThreshold = q1 - 1.5 * iqr, highThreshold = q3 + 1.5 * iqr;
-
-        val tuple = new Tuple<List<Float>, List<Float>>(new ArrayList<>(), new ArrayList<>());
-
-        for (Float value : values) {
             if(value < lowThreshold) tuple.one.add(value);
             else if(value > highThreshold) tuple.two.add(value);
         }

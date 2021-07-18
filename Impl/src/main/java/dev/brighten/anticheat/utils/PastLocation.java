@@ -1,18 +1,18 @@
 package dev.brighten.anticheat.utils;
 
 import cc.funkemunky.api.utils.KLocation;
-import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.data.ObjectData;
-import lombok.RequiredArgsConstructor;
 import org.bukkit.Location;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class PastLocation {
-    public final Deque<KLocation> previousLocations = new LinkedList<>();
+    private final Deque<KLocation> previousLocations = new LinkedList<>();
 
-    public KLocation getPreviousLocation(int time) {
+    public KLocation getPreviousLocation(long time) {
         synchronized (previousLocations) {
             return (this.previousLocations.stream()
                     .min(Comparator.comparing(loc -> Math.abs(time - loc.timeStamp)))
@@ -20,18 +20,12 @@ public class PastLocation {
         }
     }
 
-    public List<KLocation> getEstimatedLocation(int currentTime, int ping, int delta) {
+    public List<KLocation> getEstimatedLocation(long time, long ping, long delta) {
         synchronized (previousLocations) {
-            int tick = currentTime - ping;
-
-            List<KLocation> locs = new ArrayList<>();
-
-            for (KLocation previousLocation : previousLocations) {
-                if(Math.abs(tick - previousLocation.timeStamp) <= delta) {
-                    locs.add(previousLocation.clone());
-                }
-            }
-            return locs;
+            return this.previousLocations
+                    .stream()
+                    .filter(loc -> time - loc.timeStamp > 0 && Math.abs(time - loc.timeStamp - ping) < delta)
+                    .collect(Collectors.toList());
         }
     }
 
@@ -67,11 +61,17 @@ public class PastLocation {
         return previousLocations;
     }
 
+    public KLocation getLast() {
+        if(getPreviousLocations().size() == 0) return null;
+        return getPreviousLocations().getLast();
+    }
+
+    public KLocation getFirst() {
+        if(getPreviousLocations().size() == 0) return null;
+        return getPreviousLocations().getFirst();
+    }
+
     public void addLocation(KLocation location) {
-        KLocation loc = location.clone();
-        loc.timeStamp = Kauri.INSTANCE.keepaliveProcessor.tick;
-        synchronized (previousLocations) {
-            previousLocations.add(loc);
-        }
+        getPreviousLocations().add(location.clone());
     }
 }

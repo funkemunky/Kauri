@@ -21,7 +21,6 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -36,15 +35,14 @@ public class ReachB extends Check {
     private static boolean debug = false;
 
     @Packet
-    public void onFly(WrappedInFlyingPacket packet) {
+    public void onFly(WrappedInFlyingPacket packet, long timeStamp) {
         if(data.playerInfo.lastAttack.isNotPassed(0) && data.target != null) {
             if(data.playerInfo.creative
                     || data.playerInfo.serverPos
                     || data.playerInfo.doingTeleport) return;
 
-            List<KLocation> entityLocs = data.targetPastLocation.getEstimatedLocation(
-                    Kauri.INSTANCE.keepaliveProcessor.tick,
-                    data.lagInfo.transPing + 2, 2);
+            List<KLocation> entityLocs = data.targetPastLocation.getEstimatedLocation(timeStamp,
+                    (data.lagInfo.transPing + 2) * 50, 100L);
 
             double distance = 69, fdistance = 69, tdistance = 69;
             int misses = 0, collided = 0, fmisses = 0, tmisses = 0, fcollided = 0, tcollided = 0;
@@ -52,7 +50,7 @@ public class ReachB extends Check {
                     fromOrigin = data.getPlayer().getEyeLocation();
 
             toOrigin.setY(toOrigin.getY() + (data.playerInfo.sneaking ? 1.54 : 1.62));
-            List<KLocation> previousLocs = new ArrayList<>(data.targetPastLocation.previousLocations);
+            List<KLocation> previousLocs = new LinkedList<>(data.targetPastLocation.getPreviousLocations());
             for (int i = 0; i < entityLocs.size(); i++) {
                 KLocation loc = entityLocs.get(i);
 
