@@ -7,6 +7,7 @@ import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.handlers.PlayerSizeHandler;
 import cc.funkemunky.api.utils.objects.VariableValue;
 import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingList;
+import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import cc.funkemunky.api.utils.world.types.RayCollision;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
@@ -25,22 +26,22 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingDeque;
 
 public class MovementProcessor {
     private final ObjectData data;
 
-    public Deque<Float> yawGcdList = new ConcurrentEvictingList<>(60),
-            pitchGcdList = new ConcurrentEvictingList<>(60);
-    public float deltaX, deltaY, lastDeltaX, lastDeltaY, smoothYaw, smoothPitch, lsmoothYaw, lsmoothPitch;
-    public Tuple<List<Double>, List<Double>> yawOutliers, pitchOutliers;
-    public long lastCinematic;
+    public Deque<Float> yawGcdList = new EvictingList<>(45),
+            pitchGcdList = new EvictingList<>(45);
+    public float deltaX, deltaY, lastDeltaX, lastDeltaY;
     public float sensitivityX, sensitivityY, yawMode, pitchMode;
     public int sensXPercent, sensYPercent;
-    private MouseFilter mxaxis = new MouseFilter(), myaxis = new MouseFilter();
-    private float smoothCamFilterX, smoothCamFilterY, smoothCamYaw, smoothCamPitch;
-    private Timer lastReset = new TickTimer(2), generalProcess = new TickTimer(3);
+    public TickTimer lastCinematic = new TickTimer(2);
+    private Timer lastReset = new TickTimer(2);
     private GameMode lastGamemode;
+    public boolean accurateYawData;
     public static float offset = (int)Math.pow(2, 24);
     public static double groundOffset = 1 / 64.;
     private static String keepaliveAcceptListener = Kauri.INSTANCE.eventHandler
@@ -112,8 +113,6 @@ public class MovementProcessor {
         }
 
         data.playerInfo.to.timeStamp = timeStamp;
-        //Adding past location
-        data.pastLocation.addLocation(data.playerInfo.to);
 
         if(data.playerInfo.doingTeleport) data.playerInfo.lastTeleportTimer.reset();
 
@@ -280,84 +279,47 @@ public class MovementProcessor {
             origin.y+= data.playerInfo.sneaking ? 1.54 : 1.62;
 
             if(data.playerInfo.lastTeleportTimer.isPassed(1)) {
-                float yawGcd = MathUtils.round(data.playerInfo.yawGCD / offset, 5),
-                        pitchGcd = MathUtils.round(data.playerInfo.pitchGCD / offset, 5);
+                predictionHandling:
+                {
+                    float yawGcd = MathUtils.round(data.playerInfo.yawGCD / offset, 5),
+                            pitchGcd = MathUtils.round(data.playerInfo.pitchGCD / offset, 5);
 
-                //Adding gcd of yaw and pitch.
-                if (data.playerInfo.yawGCD > 160000 && data.playerInfo.yawGCD < 10500000)
-                    yawGcdList.add(yawGcd);
-                if (data.playerInfo.pitchGCD > 160000 && data.playerInfo.pitchGCD < 10500000)
-                    pitchGcdList.add(pitchGcd);
+                    //Adding gcd of yaw and pitch.
+                    if (data.playerInfo.yawGCD > 0x15f90 && data.playerInfo.yawGCD < 2E7) {
+                        yawGcdList.add(yawGcd);
+                    }
+                    if (data.playerInfo.pitchGCD > 0x15f90 && data.playerInfo.pitchGCD < 2E7)
+                        pitchGcdList.add(pitchGcd);
 
-                if (yawGcdList.size() > 3 && pitchGcdList.size() > 3) {
+                    if(yawGcdList.size() < 20 || pitchGcdList.size() < 20) {
+                        accurateYawData = false;
+                        break predictionHandling;
+                    }
+
+                    accurateYawData = true;
 
                     //Making sure to get shit within the std for a more accurate result.
                     if (lastReset.isPassed()) {
                         yawMode = MathUtils.getMode(yawGcdList);
                         pitchMode = MathUtils.getMode(pitchGcdList);
-                        yawOutliers = MiscUtils.getOutliers(yawGcdList);
-                        pitchOutliers = MiscUtils.getOutliers(pitchGcdList);
                         lastReset.reset();
                         sensXPercent = sensToPercent(sensitivityX = getSensitivityFromYawGCD(yawMode));
                         sensYPercent = sensToPercent(sensitivityY = getSensitivityFromPitchGCD(pitchMode));
                     }
 
+                    final double gx = MiscUtils.getGrid(yawGcdList), gy = MiscUtils.getGrid(pitchGcdList);
+
+                    if(gx < 0.005 || gy < 0.005) lastCinematic.reset();
 
                     lastDeltaX = deltaX;
                     lastDeltaY = deltaY;
                     deltaX = getExpiermentalDeltaX(data);
                     deltaY = getExpiermentalDeltaY(data);
-
-                    if ((data.playerInfo.pitchGCD < 1E5 || data.playerInfo.yawGCD < 1E5) && smoothCamFilterY < 1E6
-                            && smoothCamFilterX < 1E6 && timeStamp - data.creation > 1000L) {
-                        float f = sensitivityX * 0.6f + .2f;
-                        float f1 = f * f * f * 8;
-                        float f2 = deltaX * f1;
-                        float f3 = deltaY * f1;
-
-                        smoothCamFilterX = mxaxis.smooth(smoothCamYaw, .05f * f1);
-                        smoothCamFilterY = myaxis.smooth(smoothCamPitch, .05f * f1);
-
-                        this.smoothCamYaw += f2;
-                        this.smoothCamPitch += f3;
-
-                        f2 = smoothCamFilterX * 0.5f;
-                        f3 = smoothCamFilterY * 0.5f;
-
-                        //val clampedFrom = (Math.abs(data.playerInfo.from.yaw) > 360 ? data.playerInfo.from.yaw % 360 : data.playerInfo.from.yaw);
-                        val clampedFrom = MathUtils.yawTo180F(data.playerInfo.from.yaw);
-                        float pyaw = clampedFrom + f2 * .15f;
-                        float ppitch = data.playerInfo.from.pitch - f3 * .15f;
-
-                        this.lsmoothYaw = smoothYaw;
-                        this.lsmoothPitch = smoothPitch;
-                        this.smoothYaw = pyaw;
-                        this.smoothPitch = ppitch;
-
-                        float yaccel = Math.abs(data.playerInfo.deltaYaw) - Math.abs(data.playerInfo.lDeltaYaw),
-                                pAccel = Math.abs(data.playerInfo.deltaPitch) - Math.abs(data.playerInfo.lDeltaPitch);
-
-                        if (MathUtils.getDelta(smoothYaw, clampedFrom) > (yaccel > 0 ? (yaccel > 10 ? 3 : 2) : 0.1)
-                                || MathUtils.getDelta(smoothPitch, data.playerInfo.from.pitch) > (pAccel > 0 ? (yaccel > 10 ? 3 : 2) : 0.1)) {
-                            smoothCamYaw = smoothCamPitch = 0;
-                            data.playerInfo.cinematicMode = false;
-                            mxaxis.reset();
-                            myaxis.reset();
-                        } else data.playerInfo.cinematicMode = true;
-
-                        //MiscUtils.testMessage("pyaw=" + pyaw + " ppitch=" + ppitch + " yaw=" + data.playerInfo.to.yaw + " pitch=" + data.playerInfo.to.pitch);
-                    } else {
-                        mxaxis.reset();
-                        myaxis.reset();
-                        data.playerInfo.cinematicMode = false;
-                    }
                 }
             } else {
                 yawGcdList.clear();
                 pitchGcdList.clear();
             }
-        } else {
-            smoothCamYaw = smoothCamPitch = 0;
         }
 
         if (packet.isPos()) {
