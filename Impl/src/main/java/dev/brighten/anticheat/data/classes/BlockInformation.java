@@ -180,10 +180,6 @@ public class BlockInformation {
                                                 XMaterial.requestXMaterial(type.name(), data != (byte)0 //Just to save a bit on performance
                                                         && skulls.contains(type) ? 0 : data);
 
-                                        if(blockMaterial == null) {
-                                            continue;
-                                        }
-
                                         if(normalBox.copy().expand(0.1, 0, 0.1).expandMin(0, -1, 0)
                                                 .isIntersected(blockBox))
                                             blocksBelow = true;
@@ -206,6 +202,7 @@ public class BlockInformation {
                                         if(groundBox.isIntersected(blockBox)) {
                                             objectData.playerInfo.serverGround = true;
 
+                                            if(blockMaterial != null)
                                             switch (blockMaterial) {
                                                 case ICE:
                                                 case BLUE_ICE:
@@ -236,6 +233,7 @@ public class BlockInformation {
                                             if(Materials.checkFlag(type, Materials.STAIRS))
                                                 onStairs = true;
 
+                                            if(blockMaterial != null)
                                             switch(blockMaterial) {
                                                 case CAKE:
                                                 case BREWING_STAND:
