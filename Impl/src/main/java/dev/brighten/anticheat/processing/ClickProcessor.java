@@ -15,7 +15,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 public class ClickProcessor {
-    public EvictingList<Long> cpsList = new EvictingList<>(40);
+    public List<Long> cpsList = new EvictingList<>(40);
     @Getter
     private double std, mean, kurtosis, skewness, median, variance;
     @Getter
@@ -25,7 +25,7 @@ public class ClickProcessor {
     @Getter
     private List<Double> modes = new ArrayList<>();
     @Getter
-    private Tuple<List<Double>, List<Double>> outliersTuple = new Tuple<>(new ArrayList<>(), new ArrayList<>());
+    private Tuple<List<Long>, List<Long>> outliersTuple = new Tuple<>(new ArrayList<>(), new ArrayList<>());
 
     private TickTimer lastZeroCheck = new TickTimer(1);
 
@@ -54,7 +54,7 @@ public class ClickProcessor {
 
             zeros = cpsList.stream().filter(dt -> dt <= 2).count();
             if(cpsList.size() >= 20) {
-                outliersTuple = MiscUtils.getOutliers(cpsList);
+                outliersTuple = MiscUtils.getOutliersLong(cpsList);
                 outliers = (lowOutliers = outliersTuple.one.size()) + (highOutliers = outliersTuple.two.size());
             }
 

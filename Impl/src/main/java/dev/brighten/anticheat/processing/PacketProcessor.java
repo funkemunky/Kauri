@@ -47,11 +47,15 @@ public class PacketProcessor {
 
                 if(data == null || data.checkManager == null) return true;
 
-                if(outgoingPackets.contains(info.getType())) {
-                    processServer(data, info.getPacket(), info.getType(), info.getTimestamp());
-                } else if(incomingPackets.contains(info.getType())) {
-                    processClient(data, info.getPacket(), info.getType(), info.getTimestamp());
-                }
+               try {
+                   if(outgoingPackets.contains(info.getType())) {
+                       processServer(data, info.getPacket(), info.getType(), info.getTimestamp());
+                   } else if(incomingPackets.contains(info.getType())) {
+                       processClient(data, info.getPacket(), info.getType(), info.getTimestamp());
+                   }
+               } catch(Exception e) {
+                   e.printStackTrace();
+               }
                 return true;
             });
 
@@ -581,7 +585,7 @@ public class PacketProcessor {
                             }
                             data.playerInfo.velocities.remove(vector);
                         }
-                    }, 2);
+                    });
                 }
 
                 if(data.sniffing) {
@@ -614,9 +618,9 @@ public class PacketProcessor {
 
                     //We don't need to do version checking here. Atlas handles this for us.
                     if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9)) {
-                        eloc.newX += (int)packet.getX() / 32D;
-                        eloc.newY += (int)packet.getY() / 32D;
-                        eloc.newZ += (int)packet.getZ() / 32D;
+                        eloc.newX += (byte)packet.getX() / 32D;
+                        eloc.newY += (byte)packet.getY() / 32D;
+                        eloc.newZ += (byte)packet.getZ() / 32D;
                         eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
                         eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
                     } else {
@@ -629,8 +633,11 @@ public class PacketProcessor {
 
                     eloc.interpolateLocations();
 
-                    for (KLocation interpolatedLocation : eloc.interpolatedLocations) {
-                        data.entityLocPastLocation.addLocation(interpolatedLocation);
+                    for (int i = 0; i < eloc.interpolatedLocations.size(); i++) {
+                        KLocation loc = eloc.interpolatedLocations.get(i);
+                        loc.timeStamp+= i;
+
+                        data.entityLocPastLocation.addLocation(loc);
                     }
                     data.playerInfo.lastTargetUpdate.reset();
                 }

@@ -6,6 +6,7 @@ import dev.brighten.anticheat.logs.objects.Punishment;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public interface DataStorage {
 
@@ -26,6 +27,14 @@ public interface DataStorage {
     UUID getUUIDFromName(String name);
 
     String getNameFromUUID(UUID uuid);
+
+    void updateAlerts(UUID uuid, boolean alertsEnabled);
+
+    void updateDevAlerts(UUID uuid, boolean devAlertsEnabled);
+
+    void alertsStatus(UUID uuid, Consumer<Boolean> result);
+
+    void devAlertsStatus(UUID uuid, Consumer<Boolean> result);
 
     void shutdown();
 }

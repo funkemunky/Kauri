@@ -16,6 +16,7 @@ import dev.brighten.db.depends.com.mongodb.client.*;
 import dev.brighten.db.depends.com.mongodb.client.model.Aggregates;
 import dev.brighten.db.depends.com.mongodb.client.model.Filters;
 import dev.brighten.db.depends.com.mongodb.client.model.Indexes;
+import dev.brighten.db.depends.com.mongodb.client.model.Updates;
 import dev.brighten.dev.depends.org.bson.Document;
 import dev.brighten.dev.depends.org.bson.conversions.Bson;
 import org.bukkit.scheduler.BukkitTask;
@@ -27,7 +28,7 @@ import java.util.stream.Collectors;
 
 public class MongoStorage implements DataStorage {
 
-    private MongoCollection<Document> logsCollection, punishmentsCollection, nameUUIDCollection;
+    private MongoCollection<Document> logsCollection, punishmentsCollection, nameUUIDCollection, alertsCollection;
     private MongoDatabase database;
     private BukkitTask task;
 
@@ -52,6 +53,7 @@ public class MongoStorage implements DataStorage {
         logsCollection = database.getCollection("logs");
         punishmentsCollection = database.getCollection("punishments");
         nameUUIDCollection = database.getCollection("nameUuid");
+        alertsCollection = database.getCollection("alertsStatus");
 
         MiscUtils.printToConsole("&7Creating indexes for logs...");
         logsCollection.createIndex(Indexes.ascending("uuid"));
@@ -197,11 +199,81 @@ public class MongoStorage implements DataStorage {
 
     @Override
     public UUID getUUIDFromName(String name) {
+        Document doc = nameUUIDCollection.find(Filters.eq("name", name)).first();
+
+        if(doc != null) {
+            return UUID.fromString(doc.getString("uuid"));
+        }
+
         return null;
     }
 
     @Override
     public String getNameFromUUID(UUID uuid) {
+        Document doc = nameUUIDCollection.find(Filters.eq("uuid", uuid.toString())).first();
+
+        if(doc != null) {
+            return doc.getString("name");
+        }
+
         return null;
+    }
+
+    @Override
+    public void updateAlerts(UUID uuid, boolean alertsEnabled) {
+        Kauri.INSTANCE.loggingThread.execute(() -> {
+            Document doc = alertsCollection.find(Filters.eq("uuid", uuid.toString())).first();
+
+            if(doc == null) {
+                doc = new Document("uuid", uuid.toString());
+                doc.put("normal", alertsEnabled);
+                doc.put("dev", false);
+
+                alertsCollection.insertOne(doc);
+            } else {
+                alertsCollection.updateOne(Filters.eq("uuid", uuid.toString()),
+                        Updates.set("normal", alertsEnabled));
+            }
+        });
+    }
+
+    @Override
+    public void updateDevAlerts(UUID uuid, boolean devAlertsEnabled) {
+        Kauri.INSTANCE.loggingThread.execute(() -> {
+            Document doc = alertsCollection.find(Filters.eq("uuid", uuid.toString())).first();
+
+            if(doc == null) {
+                doc = new Document("uuid", uuid.toString());
+                doc.put("normal", false);
+                doc.put("dev", devAlertsEnabled);
+
+                alertsCollection.insertOne(doc);
+            } else {
+                alertsCollection.updateOne(Filters.eq("uuid", uuid.toString()),
+                        Updates.set("dev", devAlertsEnabled));
+            }
+        });
+    }
+
+    @Override
+    public void alertsStatus(UUID uuid, Consumer<Boolean> result) {
+        Kauri.INSTANCE.loggingThread.execute(() -> {
+            Document doc = alertsCollection.find(Filters.eq("uuid", uuid.toString())).first();
+
+            if(doc != null) {
+                result.accept(doc.getBoolean("normal"));
+            } else result.accept(false);
+        });
+    }
+
+    @Override
+    public void devAlertsStatus(UUID uuid, Consumer<Boolean> result) {
+        Kauri.INSTANCE.loggingThread.execute(() -> {
+            Document doc = alertsCollection.find(Filters.eq("uuid", uuid.toString())).first();
+
+            if(doc != null) {
+                result.accept(doc.getBoolean("dev"));
+            } else result.accept(false);
+        });
     }
 }

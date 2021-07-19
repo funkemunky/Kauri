@@ -47,9 +47,10 @@ public class KillauraA extends Check {
         RayCollision ray = new RayCollision(origin.toVector(), MathUtils.getDirection(origin));
 
         Vector targetPoint = ray.collisionPoint(targetBox);
-        double dist = origin.toVector().distanceSquared(targetPoint);
         //If the ray isn't collided, we might as well not run this check. Just a simple boxes on array check
         if(targetPoint == null) return;
+
+        double dist = origin.toVector().distanceSquared(targetPoint);
 
         boolean rayCollidedOnBlock = false;
 

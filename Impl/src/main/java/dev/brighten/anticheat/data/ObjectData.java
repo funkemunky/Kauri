@@ -29,6 +29,7 @@ import dev.brighten.api.check.CancelType;
 import dev.brighten.api.data.Data;
 import lombok.AllArgsConstructor;
 import lombok.val;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
@@ -83,19 +84,37 @@ public class ObjectData implements Data {
 
         player = Bukkit.getPlayer(uuid);
 
-        if(!Config.testMode) {
-            if(alerts = getPlayer().hasPermission("kauri.command.alerts"))
-                Kauri.INSTANCE.dataManager.hasAlerts.add(this);
-        }
         playerInfo = new PlayerInformation(this);
         creation = playerInfo.lastRespawn = System.currentTimeMillis();
         blockInfo = new BlockInformation(this);
         clickProcessor = new ClickProcessor(this);
         lagInfo = new LagInformation();
         targetPastLocation = new PastLocation();
+        entityLocPastLocation = new PastLocation();
         potionProcessor = new PotionProcessor(this);
         checkManager = new CheckManager(this);
         checkManager.addChecks();
+
+        //Alerts from database update
+        if(getPlayer().hasPermission("kauri.command.alerts")) {
+            Kauri.INSTANCE.loggerManager.storage.alertsStatus(uuid, result -> {
+                if(result) {
+                    Kauri.INSTANCE.dataManager.hasAlerts.add(ObjectData.this);
+                    getPlayer().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("alerts-on",
+                            "&aYou are now viewing cheat alerts."));
+                }
+            });
+        }
+
+        if(getPlayer().hasPermission("kauri.command.alerts.dev")) {
+            Kauri.INSTANCE.loggerManager.storage.devAlertsStatus(uuid, result -> {
+                if(result) {
+                    Kauri.INSTANCE.dataManager.devAlerts.add(ObjectData.this);
+                    getPlayer().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("dev-alerts-on",
+                            "&aYou are now viewing developer cheat alerts."));
+                }
+            });
+        }
 
         predictionService = new PredictionService(this);
         moveProcessor = new MovementProcessor(this);

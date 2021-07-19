@@ -46,8 +46,6 @@ public class ReachA extends Check {
                 || packet.getAction() != WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK
                 || !allowedEntityTypes.contains(packet.getEntity().getType())) return;
 
-
-
         List<KLocation> targetLocs = data.targetPastLocation
                 .getEstimatedLocation(Kauri.INSTANCE.keepaliveProcessor.tick, data.lagInfo.transPing + 2, 3);
 

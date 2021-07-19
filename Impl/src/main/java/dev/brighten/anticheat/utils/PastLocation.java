@@ -10,7 +10,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class PastLocation {
-    public final Deque<KLocation> previousLocations = new LinkedList<>();
+    public final LinkedList<KLocation> previousLocations = new LinkedList<>();
 
     public KLocation getPreviousLocation(int time) {
         synchronized (previousLocations) {
@@ -27,9 +27,25 @@ public class PastLocation {
             List<KLocation> locs = new ArrayList<>();
 
             for (KLocation previousLocation : previousLocations) {
-                if(Math.abs(tick - previousLocation.timeStamp) <= delta) {
+                if (Math.abs(tick - previousLocation.timeStamp) <= delta) {
                     locs.add(previousLocation.clone());
                 }
+            }
+            return locs;
+        }
+    }
+
+    public List<KLocation> getEstimatedLocation(int currentTime, int ping, int minAdd, int maxAdd) {
+        synchronized (previousLocations) {
+
+            List<KLocation> locs = new ArrayList<>();
+
+            int size = previousLocations.size();
+            int max = Math.min(previousLocations.size(), previousLocations.size() - ping - maxAdd),
+                    min = Math.max(0, size - Math.max(1, ping) - minAdd);
+
+            for (int i = max; i > min; i--) {
+                locs.add(previousLocations.get(i));
             }
             return locs;
         }
@@ -45,21 +61,23 @@ public class PastLocation {
     }
 
     public List<KLocation> getPreviousRange(long delta) {
-       synchronized (previousLocations) {
-           long stamp = System.currentTimeMillis();
+        synchronized (previousLocations) {
+            long stamp = System.currentTimeMillis();
 
-           return this.previousLocations.stream()
-                   .filter(loc -> stamp - loc.timeStamp < delta)
-                   .collect(Collectors.toList());
-       }
+            return this.previousLocations.stream()
+                    .filter(loc -> stamp - loc.timeStamp < delta)
+                    .collect(Collectors.toList());
+        }
     }
 
     public void addLocation(Location location) {
         synchronized (previousLocations) {
-            if(previousLocations.size() >= 20)
+            if (previousLocations.size() >= 20)
                 previousLocations.removeFirst();
 
-            previousLocations.add(new KLocation(location));
+            KLocation loc = new KLocation(location);
+            loc.timeStamp = Kauri.INSTANCE.keepaliveProcessor.tick;
+            previousLocations.add(loc);
         }
     }
 

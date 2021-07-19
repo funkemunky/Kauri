@@ -256,7 +256,7 @@ public class MiscUtils {
         return tuple;
     }
 
-    public static Tuple<List<Long>, List<Long>> getOutliersLong(Collection<Long> collection) {
+    public static Tuple<List<Long>, List<Long>> getOutliersLong(List<Long> collection) {
         List<Long> values = new ArrayList<>(collection);
 
         if(values.size() < 4) return new Tuple<>(new ArrayList<>(), new ArrayList<>());

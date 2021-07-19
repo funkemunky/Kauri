@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -45,6 +46,10 @@ public class FlatfileStorage implements DataStorage {
                 "`UUID` VARCHAR(64) NOT NULL," +
                 "`NAME` VARCHAR(16) NOT NULL," +
                 "`TIMESTAMP` LONG NOT NULL)").execute();
+
+        Query.prepare("create table if not exists `ALERTS` (`UUID` varchar(36) unique)").execute();
+        Query.prepare("create table if not exists `DEV_ALERTS` (UUID` varchar(36) unique)").execute();
+
         Kauri.INSTANCE.loggingThread.execute(() -> {
             MiscUtils.printToConsole("&7Creating UUID index for SQL violations...");
             Query.prepare("CREATE INDEX IF NOT EXISTS `UUID_1`ON `VIOLATIONS` (UUID)").execute();
@@ -270,5 +275,41 @@ public class FlatfileStorage implements DataStorage {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public void updateAlerts(UUID uuid, boolean alertsEnabled) {
+        Kauri.INSTANCE.loggingThread.execute(() -> {
+            if(alertsEnabled) {
+                Query.prepare("insert into `ALERTS` (`UUID`) ? ON DUPLICATE KEY UPDATE")
+                        .append(uuid.toString()).execute();
+            } else Query.prepare("delete from `ALERTS` where `UUID` = ?").append(uuid.toString()).execute();
+        });
+    }
+
+    @Override
+    public void updateDevAlerts(UUID uuid, boolean devAlertsEnabled) {
+        Kauri.INSTANCE.loggingThread.execute(() -> {
+            if(devAlertsEnabled) {
+                Query.prepare("insert into `DEV_ALERTS` (`UUID`) ? ON DUPLICATE KEY UPDATE")
+                        .append(uuid.toString()).execute();
+            } else Query.prepare("delete from `DEV_ALERTS` where `UUID` = ?").append(uuid.toString()).execute();
+        });
+    }
+
+    @Override
+    public void alertsStatus(UUID uuid, Consumer<Boolean> result) {
+        Kauri.INSTANCE.loggingThread.execute(() -> {
+            Query.prepare("select * from `ALERTS` where `UUID` = ?").append(uuid.toString())
+                    .executeSingle(rs -> result.accept(rs != null));
+        });
+    }
+
+    @Override
+    public void devAlertsStatus(UUID uuid, Consumer<Boolean> result) {
+        Kauri.INSTANCE.loggingThread.execute(() -> {
+            Query.prepare("select * from `DEV_ALERTS` where `UUID` = ?").append(uuid.toString())
+                    .executeSingle(rs -> result.accept(rs != null));
+        });
     }
 }

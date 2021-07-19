@@ -82,7 +82,6 @@ public class KauriCommand extends BaseCommand {
         }
     }
 
-    @CommandAlias("alerts")
     @Subcommand("alerts")
     @Syntax("")
     @CommandPermission("kauri.command.alerts")
@@ -100,11 +99,12 @@ public class KauriCommand extends BaseCommand {
                 player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("alerts-none",
                         "&cYou are no longer viewing cheat alerts."));
             }
+            Kauri.INSTANCE.loggerManager.storage.updateAlerts(data.getUUID(), data.alerts);
         } else player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("data-error",
                 "&cThere was an error trying to find your data."));
     }
 
-    @CommandAlias("alerts dev")
+    @Subcommand("alerts dev")
     @Syntax("")
     @CommandPermission("kauri.command.alerts.dev")
     @Description("Toggle developer cheat alerts")
@@ -121,27 +121,7 @@ public class KauriCommand extends BaseCommand {
                 player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("dev-alerts-none",
                         "&cYou are no longer viewing developer cheat alerts."));
             }
-        } else player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("data-error",
-                "&cThere was an error trying to find your data."));
-    }
-
-    @Subcommand("alerts dev")
-    @Syntax("")
-    @CommandPermission("kauri.command.alerts.dev")
-    @Description("Toggle developer cheat alerts")
-    public void onDevAlerts(Player player) {
-        ObjectData data = Kauri.INSTANCE.dataManager.getData(player);
-
-        if(data != null) {
-            if(data.devAlerts = !data.devAlerts) {
-                Kauri.INSTANCE.dataManager.devAlerts.add(data);
-                player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("dev-alerts-on",
-                        "&aYou are now viewing developer cheat alerts."));
-            } else {
-                Kauri.INSTANCE.dataManager.devAlerts.remove(data);
-                player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("dev-alerts-none",
-                        "&cYou are no longer viewing developer cheat alerts."));
-            }
+            Kauri.INSTANCE.loggerManager.storage.updateDevAlerts(data.getUUID(), data.devAlerts);
         } else player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("data-error",
                 "&cThere was an error trying to find your data."));
     }
@@ -342,6 +322,8 @@ public class KauriCommand extends BaseCommand {
 
     @Subcommand("lag player")
     @Description("view a player's connection info")
+    @Syntax("[player]")
+    @CommandCompletion("@players")
     @CommandPermission("kauri.command.lag.player")
     public void onLagPlayer(CommandSender sender, OnlinePlayer target) {
         ObjectData data = Kauri.INSTANCE.dataManager.getData(target.getPlayer());
@@ -374,9 +356,10 @@ public class KauriCommand extends BaseCommand {
         player.sendMessage(Color.Green + "Added a magic wand to your inventory. Use it wisely.");
     }
 
-    @Subcommand("info")
+    @Subcommand("info|pi|playerinfo")
     @Description("Get the information of a player.")
     @Syntax("[player]")
+    @CommandCompletion("@players")
     @CommandPermission("kauri.command.info")
     public void onCommand(Player player, String[] args) {
         Kauri.INSTANCE.executor.execute(() -> {
