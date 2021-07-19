@@ -44,7 +44,7 @@ public class ReachB extends Check {
 
             List<KLocation> entityLocs = data.entityLocPastLocation.getEstimatedLocation(
                     Kauri.INSTANCE.keepaliveProcessor.tick,
-                    data.lagInfo.transPing + 1, 1, 3);
+                    data.lagInfo.transPing + 2, 2);
 
             double distance = 69;
             int misses = 0, collided = 0;
@@ -79,8 +79,8 @@ public class ReachB extends Check {
                 return;
             }
 
-            if(collided > 1 && data.lagInfo.lastPacketDrop.isPassed(2)) {
-                if(distance > 3.1 &&
+            if(data.lagInfo.lastPacketDrop.isPassed(2)) {
+                if(distance > 3.02 &&
                         Kauri.INSTANCE.lastTickLag.isPassed(40)) {
                     if(++buffer > 4) {
                         vl++;
@@ -88,7 +88,7 @@ public class ReachB extends Check {
                                 distance, usedFrom, buffer, misses);
                         buffer = 4;
                     }
-                } else buffer-= buffer > 0 ? .2f : 0;
+                } else buffer-= buffer > 0 ? .1f : 0;
             }
 
             debug("distance=%.3f from=%s buffer=%.2f ticklag=%s collided=%s",

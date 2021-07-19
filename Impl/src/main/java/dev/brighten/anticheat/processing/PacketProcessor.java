@@ -585,7 +585,7 @@ public class PacketProcessor {
                             }
                             data.playerInfo.velocities.remove(vector);
                         }
-                    });
+                    }, 2);
                 }
 
                 if(data.sniffing) {

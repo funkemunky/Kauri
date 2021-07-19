@@ -26,6 +26,7 @@ public class VelocityA extends Check {
                 && !data.playerInfo.serverPos //We don't want to check on teleport
                 && !data.playerInfo.doingTeleport
                 && data.playerInfo.worldLoaded
+                && data.playerInfo.lastTeleportTimer.isPassed(2)
                 && !data.blockInfo.inWeb
                 && !data.blockInfo.onClimbable
                 && data.playerInfo.blockAboveTimer.isPassed(6)) {
@@ -39,8 +40,8 @@ public class VelocityA extends Check {
                     vl++;
                     flag("pct=%.1f%% buffer=%.1f", pct, buffer);
                 }
-                if (++vl > 15) flag("pct=" + MathUtils.round(pct, 2) + "%");
-            } else vl-= vl > 0 ? 0.25f : 0;
+                if (++vl > 15) flag("pct=" + MathUtils.round(pct, 2) + "%%");
+            } else buffer-= buffer > 0 ? 0.25f : 0;
 
             vY-= 0.08;
             vY*= 0.98;
