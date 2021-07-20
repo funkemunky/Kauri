@@ -10,17 +10,21 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.MiscUtils;
+import dev.brighten.anticheat.utils.SimpleAverage;
 import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
 
-@CheckInfo(name = "Autoclicker (F)", description = "Checks for a constant skew of values.", developer = true,
+import java.util.List;
+
+@CheckInfo(name = "Autoclicker (F)", description = "Looks for consistency between attack hits and miss hits.", developer = true,
         checkType = CheckType.AUTOCLICKER, minVersion = ProtocolVersion.V1_8, planVersion = KauriVersion.ARA)
 public class AutoclickerF extends Check {
 
     public int flying, lflying, buffer, attackTick;
 
-    public EvictingList<Integer> hitAverage = new EvictingList<>(15), noHitAvg = new EvictingList<>(15);
+    public SimpleAverage hitAverage = new SimpleAverage(20,0), noHitAvg = new SimpleAverage(20, 0);
+    public List<Integer> hitList = new EvictingList<>(20), noHitLit = new EvictingList<>(20);
 
     @Packet
     public void onFlying(WrappedInTransactionPacket packet) {
@@ -48,17 +52,22 @@ public class AutoclickerF extends Check {
         {
             if (flying > 10)
                 break checkProcessing;
-            if (data.playerInfo.breakingBlock || current - attackTick < 4)
+            if (data.playerInfo.breakingBlock || current - attackTick < 4) {
                 hitAverage.add(flying);
-            else noHitAvg.add(flying);
+                hitList.add(flying);
+            }
+            else {
+                noHitAvg.add(flying);
+                noHitLit.add(flying);
+            }
 
-            if (hitAverage.size() < 14 || noHitAvg.size() < 14) return;
+            if (hitAverage.getSize() < 14 || noHitAvg.getSize() < 14) break checkProcessing;
 
-            double hit = hitAverage.stream().mapToInt(v -> v).average().orElse(-1),
-                    nohit = noHitAvg.stream().mapToInt(v -> v).average().orElse(-1);
+            double hit = hitAverage.getAverage(),
+                    nohit = noHitAvg.getAverage();
 
             double delta = Math.abs(nohit - hit);
-            double std = MiscUtils.stdev(hitAverage), nstd = MiscUtils.stdev(noHitAvg);
+            double std = MiscUtils.stdev(hitList), nstd = MiscUtils.stdev(noHitLit);
             double stdDelta = Math.abs(std - nstd);
 
             if (delta < 0.05 && stdDelta < 0.08 && data.clickProcessor.getMean() <= 2) {

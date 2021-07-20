@@ -187,7 +187,7 @@ public class BlockInformation {
 
                                         SimpleCollisionBox box = objectData.box.copy();
 
-                                        box.expand(Math.abs(objectData.playerInfo.deltaX) + 0.1, -0.1,
+                                        box.expand(Math.abs(objectData.playerInfo.deltaX) + 0.1, -0.001,
                                                 Math.abs(objectData.playerInfo.deltaZ) + 0.1);
                                         if (Helper.isCollided(handler.getBlocks(), box))
                                             collidesHorizontally = true;

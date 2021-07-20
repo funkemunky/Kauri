@@ -32,26 +32,31 @@ public class AutoclickerE extends Check {
                 && data.clickProcessor.getMean() < 2.5) {
             tags.addTag("outliers");
             buffer++;
-        } else if(data.clickProcessor.getStd() < 0.5 && data.clickProcessor.getOutliers() <= 1) {
+        }
+        if(data.clickProcessor.getStd() < 0.5 && data.clickProcessor.getOutliers() <= 1) {
             buffer+= 0.75;
             tags.addTag("deviation");
-        } else if(data.clickProcessor.getKurtosis() < 0
+        }
+        if(data.clickProcessor.getKurtosis() < 0
                 && (data.clickProcessor.getOutliers() <= 1 || skewness < 0.1)
                 && data.clickProcessor.getMean() < 2.5) {
             buffer+= 0.75;
             tags.addTag("kurtosis");
-        } else if(skewness < 0.15 && data.clickProcessor.getMean() < 2.5) {
+        }
+        if(skewness < 0.15 && data.clickProcessor.getMean() < 2.5) {
             buffer+= 0.5f;
             tags.addTag("skew");
         }
 
         if(tags.getSize() > 0) {
-            if(buffer > 20) {
+            if(buffer > 30) {
                 vl++;
-                buffer = 15;
-                flag("tags=%s", tags.build());
+                buffer = 28;
+                flag("tags=%s k=%.2f o=%s sk=%.2f a=%.1f", tags.build(), data.clickProcessor.getKurtosis(),
+                        data.clickProcessor.getOutliers(), data.clickProcessor.getSkewness(),
+                        data.clickProcessor.getMean());
             }
-        } else if(buffer > 0) buffer-= 0.5f;
+        } else if(buffer > 0) buffer-= 0.75f;
 
         debug("tags=%s mean=%.2f skew=%.2f kurt=%.2f std=%.3f outliers=%s buffer=%.1f",
                 (tags.getSize() > 0 ? Color.Green : "") +tags.build() + Color.Gray, data.clickProcessor.getMean(),

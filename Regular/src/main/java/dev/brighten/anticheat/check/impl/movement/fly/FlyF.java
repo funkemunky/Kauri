@@ -21,7 +21,8 @@ public class FlyF extends Check {
                 ? Math.max(data.playerInfo.velocityY, data.playerInfo.jumpHeight)
                 : data.playerInfo.jumpHeight) + 0.001;
 
-        if(data.playerInfo.lastHalfBlock.isNotPassed(20)) max = Math.max(0.6, max);
+        if(data.playerInfo.lastHalfBlock.isNotPassed(20)
+                || data.blockInfo.collidesHorizontally) max = Math.max(0.5625, max);
 
         if(data.playerInfo.deltaY > max
                 && !data.blockInfo.roseBush

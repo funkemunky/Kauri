@@ -35,7 +35,7 @@ public class PastLocation {
         }
     }
 
-    public List<KLocation> getEstimatedLocation(int currentTime, int ping, int minAdd, int maxAdd) {
+    public List<KLocation> getEstimatedLocationByIndex(int ping, int minAdd, int maxAdd) {
         synchronized (previousLocations) {
 
             List<KLocation> locs = new ArrayList<>();
