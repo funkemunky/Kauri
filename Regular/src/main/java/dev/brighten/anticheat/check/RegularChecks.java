@@ -19,6 +19,7 @@ import dev.brighten.anticheat.check.impl.combat.killaura.*;
 import dev.brighten.anticheat.check.impl.movement.fly.*;
 import dev.brighten.anticheat.check.impl.movement.general.FastLadder;
 import dev.brighten.anticheat.check.impl.movement.general.OmniSprint;
+import dev.brighten.anticheat.check.impl.movement.general.Phase;
 import dev.brighten.anticheat.check.impl.movement.nofall.NoFallB;
 import dev.brighten.anticheat.check.impl.movement.speed.SpeedB;
 import dev.brighten.anticheat.check.impl.movement.speed.SpeedC;
@@ -84,5 +85,6 @@ public class RegularChecks implements CheckRegister {
         Check.register(new BookCrash());
         Check.register(new Infinity());
         Check.register(new BlockA());
+        Check.register(new Phase());
     }
 }

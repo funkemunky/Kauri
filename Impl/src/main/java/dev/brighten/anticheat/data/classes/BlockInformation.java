@@ -30,7 +30,7 @@ public class BlockInformation {
     private ObjectData objectData;
     public boolean onClimbable, onSlab, onStairs, onHalfBlock, inLiquid, inLava, inWater, inWeb, onSlime, onIce,
             onSoulSand, blocksAbove, collidesVertically, bedNear, collidesHorizontally, blocksNear, inBlock, miscNear,
-            collidedWithEntity, roseBush, inPortal, blocksBelow;
+            collidedWithEntity, roseBush, inPortal, blocksBelow, pistonNear;
     public float currentFriction, fromFriction;
     public CollisionHandler
             handler = new CollisionHandler(new ArrayList<>(), new ArrayList<>(), new KLocation(0,0,0), null);
@@ -65,7 +65,7 @@ public class BlockInformation {
 
         blocks.clear();
 
-        onClimbable = onSlab = onStairs = onHalfBlock = inLiquid = inLava = inWater = inWeb = onSlime
+        onClimbable = onSlab = onStairs = onHalfBlock = inLiquid = inLava = inWater = inWeb = onSlime = pistonNear
                 = onIce = onSoulSand = blocksAbove = collidesVertically = bedNear = collidesHorizontally =
                 blocksNear = inBlock = miscNear = collidedWithEntity = blocksBelow = inPortal = false;
 
@@ -226,6 +226,19 @@ public class BlockInformation {
                                             onClimbable = true;
                                         }
 
+                                        if(blockMaterial != null && normalBox.copy().expand(0.5, 0.5, 0.5)
+                                                .isCollided(blockBox)) {
+                                            switch (blockMaterial) {
+                                                case PISTON:
+                                                case PISTON_HEAD:
+                                                case MOVING_PISTON:
+                                                case STICKY_PISTON: {
+                                                    pistonNear = true;
+                                                    break;
+                                                }
+                                            }
+                                        }
+
                                         if(groundBox.copy().expand(0.5, 0.3, 0.5).isCollided(blockBox)) {
                                             if(Materials.checkFlag(type, Materials.SLABS))
                                                 onSlab = true;
@@ -350,7 +363,6 @@ public class BlockInformation {
             handler.getCollisionBoxes().forEach(cb -> cb.draw(WrappedEnumParticle.FLAME, objectData.boxDebuggers));
         }
 
-        this.handler.getBlocks().clear();
         this.handler.getEntities().clear();
         this.handler = null;
         this.handler = handler;

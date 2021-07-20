@@ -1,18 +1,29 @@
 package dev.brighten.anticheat.check.impl.movement.general;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.Helper;
-import cc.funkemunky.api.utils.KLocation;
-import cc.funkemunky.api.utils.Materials;
-import cc.funkemunky.api.utils.RunUtils;
+import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
+import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.world.BlockData;
+import cc.funkemunky.api.utils.world.CollisionBox;
+import cc.funkemunky.api.utils.world.types.RayCollision;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.processing.TagsBuilder;
 import dev.brighten.api.check.CheckType;
+import lombok.val;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 @CheckInfo(name = "Phase", description = "Ensures players cannot move through blocks.",
         checkType = CheckType.EXPLOIT, cancellable = true, executable = false, developer = true)
@@ -24,34 +35,132 @@ public class Phase extends Check {
         if(now - data.creation < 1200L || now - data.playerInfo.lastRespawn < 150L || data.playerInfo.serverPos)
             return;
 
-        Location setbackLocation = null;
+        Location setbackLocation = fromWhereShitAintBad == null
+                ? data.playerInfo.from.toLocation(data.getPlayer().getWorld())
+                : fromWhereShitAintBad.toLocation(data.getPlayer().getWorld());
         TagsBuilder tags = new TagsBuilder();
 
+        SimpleCollisionBox currentBox = data.box.copy().shrink(0.06255, 0.0625, 0.0625),
+                fromBox = new SimpleCollisionBox(data.playerInfo.from.toVector(), 0.6, 1.8)
+                        .shrink(0.0625, 0.0625, 0.0625);
+
+        SimpleCollisionBox concatted = Helper.wrap(currentBox, fromBox);
+
+        List<Block> blocks = dev.brighten.anticheat.utils.Helper.getBlocks(data.blockInfo.handler, concatted);
+
         phaseIntoBlock: {
-            SimpleCollisionBox currentBox = data.box,
-                    fromBox = new SimpleCollisionBox(data.playerInfo.from.toVector(), 0.6, 1.8);
+            if(data.playerInfo.creative) break phaseIntoBlock;
 
-            boolean didCollide =
-                    Helper.getBlocksNearby2(packet.getPlayer().getWorld(), fromBox, Materials.SOLID)
-                            .stream().anyMatch(block -> fromBox.isIntersected(BlockData.getData(block.getType())
-                            .getBox(block, data.playerVersion)));
+            List<Block> current = Helper.blockCollisions(blocks, fromBox),
+                    newb = Helper.blockCollisions(blocks, currentBox);
 
-            if(didCollide) {
-                debug("collided");
-                break phaseIntoBlock;
+            for (Block block : newb) {
+                if(!current.contains(block)) {
+                    Material type = block.getType();
+                    if(Materials.checkFlag(type, Materials.SOLID)
+                            && !Materials.checkFlag(type, Materials.STAIRS)) {
+                        tags.addTag("INTO_BLOCK");
+                        vl++;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        phaseThru: {
+            if(data.playerInfo.creative || currentBox.isCollided(fromBox)) break phaseThru;
+            
+            Vector to = data.playerInfo.to.toVector(), from = data.playerInfo.from.toVector();
+
+            to.add(new Vector(0, 1.8, 0));
+            from.add(new Vector(0, 1.8, 0));
+
+            double dist = to.distance(from);
+
+            Vector direction  = to.subtract(from);
+            RayCollision ray = new RayCollision(from, direction);
+
+            ray.draw(WrappedEnumParticle.CRIT, Collections.singleton(data.getPlayer()));
+
+            for (Block block : blocks) {
+                Material type = block.getType();
+                if(!Materials.checkFlag(type, Materials.SOLID) || Materials.checkFlag(type, Materials.STAIRS))
+                    continue;
+
+                CollisionBox box = BlockData.getData(type).getBox(block, data.playerVersion);
+
+                if(box instanceof SimpleCollisionBox) {
+                    Tuple<Double, Double> result = new Tuple<>(0., 0.);
+                    boolean intersected = RayCollision.intersect(ray, (SimpleCollisionBox) box);
+
+                    if(intersected && result.one <= dist) {
+                        tags.addTag("THROUGH_BLOCK");
+                        tags.addTag("material=" + type);
+                        break;
+                    }
+                } else {
+                    List<SimpleCollisionBox> downcasted = new ArrayList<>();
+
+                    box.downCast(downcasted);
+
+                    boolean flagged = false;
+                    for (SimpleCollisionBox sbox : downcasted) {
+                        Tuple<Double, Double> result = new Tuple<>(0., 0.);
+                        boolean intersected = RayCollision.intersect(ray, sbox);
+
+                        if(intersected && result.one <= dist) {
+                            flagged = true;
+                            break;
+                        }
+                    }
+
+                    if(flagged) {
+                        tags.addTag("THROUGH_BLOCK");
+                        tags.addTag("material=" + type);
+                        break;
+                    }
+                }
+            }
+        }
+
+        clip: {
+            if(data.playerInfo.canFly || data.playerInfo.creative) break clip;
+
+            SimpleCollisionBox clipBox = data.box.copy().expand(data.playerInfo.deltaXZ, 0, data.playerInfo.deltaXZ);
+            List<Block> collides = Helper.blockCollisions(data.blockInfo.blocks, clipBox);
+
+            boolean solid = false;
+
+            for (Block collide : collides) {
+                if(Materials.checkFlag(collide.getType(), Materials.SOLID)) {
+                    solid = true;
+                    break;
+                }
             }
 
-            String[] boxes = Helper.getBlocksNearby2(packet.getPlayer().getWorld(), currentBox, Materials.SOLID)
-                    .stream().filter(block -> fromBox.isIntersected(BlockData.getData(block.getType())
-                            .getBox(block, data.playerVersion))).map(block -> block.getType().name())
-                    .toArray(String[]::new);
+            double threshold = data.potionProcessor.hasPotionEffect(PotionEffectType.JUMP) ? 0.62 : 0.5;
 
-            if(boxes.length > 0) {
-                tags.addTag("INTO_BLOCK");
+            if(data.blockInfo.pistonNear) threshold = 0.95;
+            else if(!data.playerInfo.blockAboveTimer.isNotPassed(4)) {
+                threshold = 0.8;
+                if(data.playerInfo.iceTimer.isNotPassed(4)) threshold+= 0.4;
+            }
+            else if(data.playerInfo.jumped) threshold = 0.68;
+            else if(data.playerInfo.iceTimer.isNotPassed(4)) threshold = 0.6;
+
+            if(data.playerInfo.lastVelocity.isNotPassed(20))
+                threshold = Math.max(threshold, Math.hypot(data.playerInfo.velocityX, data.playerInfo.velocityZ) + 0.3);
+
+            Optional<PotionEffect> speed = data.potionProcessor.getEffectByType(PotionEffectType.SPEED);
+
+            if(speed.isPresent()) {
+                threshold*= 1.2 * (speed.get().getAmplifier() + 1);
+            }
+
+            if(data.playerInfo.deltaXZ > threshold) {
+                tags.addTag("CLIP");
                 vl++;
-                for (String box : boxes)
-                    tags.addTag(box);
-                setbackLocation = data.playerInfo.from.toLocation(data.getPlayer().getWorld());
+                tags.addTag(String.format("%.3f>-%.3f", data.playerInfo.deltaXZ, threshold));
             }
         }
 
@@ -62,6 +171,6 @@ public class Phase extends Check {
                 Location finalSetbackLocation = setbackLocation;
                 RunUtils.task(() -> data.getPlayer().teleport(finalSetbackLocation));
             }
-        }
+        } else fromWhereShitAintBad = data.playerInfo.from;
     }
 }

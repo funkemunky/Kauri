@@ -25,6 +25,7 @@ public class FlyC extends Check {
                     && !data.blockInfo.collidesHorizontally
                     && data.playerInfo.lClientGround
                     && !data.blockInfo.miscNear
+                    && !data.playerInfo.insideBlock
                     && data.playerInfo.blockAboveTimer.isPassed(6)
                     && data.playerInfo.lastBlockPlace.isPassed(20)
                     && data.playerInfo.lastHalfBlock.isPassed(4)
