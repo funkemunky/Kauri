@@ -38,7 +38,7 @@ public class OmniSprint extends Check {
         invalidMove: {
             if(data.playerInfo.groundTicks < 9 || !data.playerInfo.serverGround) break invalidMove;
 
-            double base = .2161;
+            double base = .235;
             int speed = data.potionProcessor.getEffectByType(PotionEffectType.SPEED)
                     .map(ef -> ef.getAmplifier() + 1).orElse(0);
 
@@ -50,8 +50,9 @@ public class OmniSprint extends Check {
                     && data.playerInfo.lastTeleportTimer.isPassed(1)) {
                 if(++invalidBuffer > 6) {
                     vl+= 0.25f;
-                    flag("type=INVALID sprint=%s a=%.1f b=%s",
-                            data.playerInfo.sprinting, data.predictionService.motionYaw, invalidBuffer);
+                    flag("type=INVALID sprint=%s a=%.1f b=%s delta=%.6f>-%.6f",
+                            data.playerInfo.sprinting, data.predictionService.motionYaw, invalidBuffer,
+                            data.playerInfo.deltaXZ, base);
                 }
             } else invalidBuffer = 0;
 

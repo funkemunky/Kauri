@@ -177,8 +177,7 @@ public class BlockInformation {
                                                 .offset(0, -.1, 0).expandMax(0, -1.2, 0);
                                         byte data = block.getData();
                                         XMaterial blockMaterial =
-                                                XMaterial.requestXMaterial(type.name(), data != (byte)0 //Just to save a bit on performance
-                                                        && skulls.contains(type) ? 0 : data);
+                                                XMaterial.requestXMaterial(type.name(), data);
 
                                         if(normalBox.copy().expand(0.1, 0, 0.1).expandMin(0, -1, 0)
                                                 .isIntersected(blockBox))
