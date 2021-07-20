@@ -18,20 +18,19 @@ import dev.brighten.api.check.CheckType;
         checkType = CheckType.INVENTORY, developer = true, planVersion = KauriVersion.ARA)
 public class InventoryA extends Check {
 
-    private Timer lastMove;
+    private int moveStreak;
     private int openInventory;
 
     @Override
     public void setData(ObjectData data) {
-        lastMove = new PlayerTimer(data);
         super.setData(data);
     }
 
     @Packet
     public void onWindow(WrappedInWindowClickPacket packet) {
-        if(lastMove.isNotPassed(1) && data.playerInfo.lastVelocity.isPassed(20))  {
+        if(moveStreak > 9 && data.playerInfo.lastVelocity.isPassed(20))  {
             vl++;
-            flag("slot=%s clickType=%s", packet.getSlot(), packet.getAction().name());
+            flag("slot=%s clickType=%s ms=%s", packet.getSlot(), packet.getAction().name(), moveStreak);
         }
     }
 
@@ -71,7 +70,7 @@ public class InventoryA extends Check {
                 && !data.getPlayer().isDead()
                 && data.playerInfo.lastTeleportTimer.isPassed(5)
                 && data.playerInfo.lastVelocity.isPassed(20)) {
-            lastMove.reset();
-        }
+            moveStreak++;
+        } else moveStreak = 0;
     }
 }
