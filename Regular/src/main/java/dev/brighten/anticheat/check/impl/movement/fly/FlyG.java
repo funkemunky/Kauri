@@ -38,6 +38,7 @@ public class FlyG extends Check {
                     max = 0.5625;
 
                 tags.addTag("GROUND_STEP");
+                tags.addTag("max=" + max);
             }
         }
 

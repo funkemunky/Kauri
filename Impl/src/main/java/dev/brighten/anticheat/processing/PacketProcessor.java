@@ -717,6 +717,8 @@ public class PacketProcessor {
                 data.playerInfo.doingTeleport = true;
                 data.playerInfo.posLocs.add(loc);
 
+                data.getPlayer().setSprinting(false);
+
                 if(data.sniffing) {
                     data.sniffedPackets.add(type + ":@:" + packet.getX() + ";"
                             + packet.getY() + ";" + packet.getZ() + ":@:" + timestamp);

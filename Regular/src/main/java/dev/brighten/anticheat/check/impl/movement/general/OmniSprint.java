@@ -22,7 +22,7 @@ public class OmniSprint extends Check {
         if(Math.abs(data.predictionService.motionYaw) > 95 || data.predictionService.key.contains("W")) return;
 
         omniSprint: {
-            if(!data.playerInfo.sprinting|| !data.playerInfo.serverGround) break omniSprint;
+            if(!data.playerInfo.sprinting || !data.playerInfo.serverGround) break omniSprint;
 
             if(data.playerInfo.deltaXZ > 0.2
                     && !data.playerInfo.doingVelocity

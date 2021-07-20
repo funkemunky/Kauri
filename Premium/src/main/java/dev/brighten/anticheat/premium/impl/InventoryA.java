@@ -28,7 +28,7 @@ public class InventoryA extends Check {
 
     @Packet
     public void onWindow(WrappedInWindowClickPacket packet) {
-        if(moveStreak > 9 && data.playerInfo.lastVelocity.isPassed(20))  {
+        if(moveStreak > 5 && data.playerInfo.lastVelocity.isPassed(20))  {
             vl++;
             flag("slot=%s clickType=%s ms=%s", packet.getSlot(), packet.getAction().name(), moveStreak);
         }
@@ -60,13 +60,10 @@ public class InventoryA extends Check {
     @Packet
     public void onFlyng(WrappedInFlyingPacket packet) {
         if(packet.isPos()
-                && (data.playerInfo.deltaXZ > 0 || data.playerInfo.deltaY != 0)
+                && data.playerInfo.deltaXZ > 0
                 && data.playerInfo.liquidTimer.isPassed(2)
                 && data.playerInfo.climbTimer.isPassed(3)
-                && (data.playerInfo.serverGround
-                || (data.predictionService.moveForward != 0
-                && data.playerInfo.deltaXZ > 0.2
-                && data.predictionService.moveStrafing != 0))
+                && (data.playerInfo.serverGround && data.playerInfo.clientGround)
                 && !data.getPlayer().isDead()
                 && data.playerInfo.lastTeleportTimer.isPassed(5)
                 && data.playerInfo.lastVelocity.isPassed(20)) {
