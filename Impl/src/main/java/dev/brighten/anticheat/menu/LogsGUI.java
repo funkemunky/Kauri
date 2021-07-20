@@ -101,7 +101,7 @@ public class LogsGUI extends ChestMenu {
 
         val punishments = Kauri.INSTANCE.loggerManager.getPunishments(player.getUniqueId());
 
-        Button getPastebin = new Button(false, new ItemBuilder(XMaterial.SKULL_ITEM.parseMaterial())
+        Button getPastebin = new Button(false, new ItemBuilder(XMaterial.PLAYER_HEAD.parseMaterial())
                 .amount(1)
                 .durability(3)
                 .owner(player.getName())

@@ -215,7 +215,7 @@ public class KauriCommand extends BaseCommand {
             sender.sendMessage(Color.Gold + Color.Bold + material.name() + Color.Gray + ":");
             sender.sendMessage("");
             sender.sendMessage(Color.translate("&eXMaterial: &f" + XMaterial
-                    .requestXMaterial(material.name(), (byte)0)));
+                    .matchXMaterial(material.name()).map(Enum::name).orElse("None")));
             sender.sendMessage(Color.translate("&eBitmask&7: &f" + Materials.getBitmask(material)));
             WrappedClass wrapped = new WrappedClass(Materials.class);
 

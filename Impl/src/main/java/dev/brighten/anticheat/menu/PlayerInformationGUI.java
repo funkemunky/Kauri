@@ -54,7 +54,7 @@ public class PlayerInformationGUI extends ChestMenu {
     }
 
     private ItemStack playerSkull() {
-        ItemBuilder vioItem = new ItemBuilder(XMaterial.SKULL_ITEM.parseMaterial());
+        ItemBuilder vioItem = new ItemBuilder(XMaterial.PLAYER_HEAD.parseMaterial());
 
         vioItem.amount(1);
         vioItem.durability(3);

@@ -165,11 +165,10 @@ public class MovementProcessor {
 
         data.blockInfo.fromFriction = data.blockInfo.currentFriction;
         if(data.playerInfo.blockBelow != null) {
-            val mat = XMaterial.requestXMaterial(
-                    data.playerInfo.blockBelow.getType().name(), data.playerInfo.blockBelow.getData());
+            val mat = XMaterial.matchXMaterial(
+                    data.playerInfo.blockBelow.getType().name());
 
-            if (mat != null)
-                data.blockInfo.currentFriction = BlockUtils.getFriction(mat);
+            mat.ifPresent(xMaterial -> data.blockInfo.currentFriction = BlockUtils.getFriction(xMaterial));
         }
 
         if(packet.isPos()) {

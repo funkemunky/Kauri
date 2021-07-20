@@ -269,7 +269,7 @@ public class MenuCommand extends BaseCommand {
         Button buttonEnabled = new Button(false,
                 new ItemBuilder(settings.enabled
                         ? XMaterial.LIME_DYE.parseMaterial()
-                        : XMaterial.ROSE_RED.parseMaterial()).amount(1)
+                        : XMaterial.RED_DYE.parseMaterial()).amount(1)
                         .durability(settings.enabled ? 10 : 8)
                         .name((settings.enabled ? Color.Green : Color.Gray) + "Enabled").build(),
                 (player, info) -> {
@@ -279,7 +279,7 @@ public class MenuCommand extends BaseCommand {
 
                     info.getButton().setStack(new ItemBuilder(settings.enabled
                             ? XMaterial.LIME_DYE.parseMaterial()
-                            : XMaterial.ROSE_RED.parseMaterial()).amount(1)
+                            : XMaterial.RED_DYE.parseMaterial()).amount(1)
                             .durability(settings.enabled ? 10 : 8)
                             .name((settings.enabled ? Color.Green : Color.Gray) + "Enabled").build());
                     menu.buildInventory(false);
@@ -300,7 +300,7 @@ public class MenuCommand extends BaseCommand {
         Button buttonExecutable = new Button(false,
                 new ItemBuilder(settings.executable
                         ? XMaterial.LIME_DYE.parseMaterial()
-                        : XMaterial.ROSE_RED.parseMaterial()).amount(1)
+                        : XMaterial.RED_DYE.parseMaterial()).amount(1)
                         .durability(settings.executable ? 10 : 8)
                         .name((settings.executable ? Color.Green : Color.Gray) + "Executable").build(),
                 (player, info) -> {
@@ -310,7 +310,7 @@ public class MenuCommand extends BaseCommand {
 
                     info.getButton().setStack(new ItemBuilder(settings.executable
                             ? XMaterial.LIME_DYE.parseMaterial()
-                            : XMaterial.ROSE_RED.parseMaterial()).amount(1)
+                            : XMaterial.RED_DYE.parseMaterial()).amount(1)
                             .durability(settings.executable ? 10 : 8)
                             .name((settings.executable ? Color.Green : Color.Gray) + "Executable").build());
                     menu.buildInventory(false);
@@ -331,7 +331,7 @@ public class MenuCommand extends BaseCommand {
         Button buttonCancellable = new Button(false,
                 settings.cancelMode != null ? new ItemBuilder(settings.cancellable
                         ? XMaterial.LIME_DYE.parseMaterial()
-                        : XMaterial.ROSE_RED.parseMaterial()).amount(1)
+                        : XMaterial.RED_DYE.parseMaterial()).amount(1)
                         .durability(settings.cancellable ? 10 : 8)
                         .name((settings.cancellable ? Color.Green : Color.Gray) + "Cancellable").build()
                         : new ItemBuilder(XMaterial.REDSTONE.parseMaterial())
@@ -403,7 +403,7 @@ public class MenuCommand extends BaseCommand {
                 if (name == null) name = "null";
                 Log vl = logs.get(uuid).get(0);
 
-                ItemBuilder builder = new ItemBuilder(XMaterial.SKULL_ITEM.parseMaterial());
+                ItemBuilder builder = new ItemBuilder(XMaterial.PLAYER_HEAD.parseMaterial());
 
                 builder.amount(1);
                 builder.durability(3);

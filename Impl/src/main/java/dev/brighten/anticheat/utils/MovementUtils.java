@@ -5,10 +5,13 @@ import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.data.ObjectData;
 import lombok.val;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
+
+import java.util.Optional;
 
 public class MovementUtils {
 
@@ -56,7 +59,10 @@ public class MovementUtils {
     }
 
     public static float getFriction(Block block) {
-        switch(XMaterial.requestXMaterial(block.getType().name(), block.getData())) {
+        Optional<XMaterial> matched = XMaterial.matchXMaterial(block.getType().name());
+
+        if(!matched.isPresent()) return 0.6f;
+        switch(matched.get()) {
             case SLIME_BLOCK:
                 return 0.8f;
             case ICE:

@@ -65,7 +65,8 @@ public class BlockInformation {
 
         blocks.clear();
 
-        onClimbable = onSlab = onStairs = onHalfBlock = inLiquid = inLava = inWater = inWeb = onSlime = pistonNear
+        onClimbable = objectData.playerInfo.serverGround = objectData.playerInfo.nearGround
+                = onSlab = onStairs = onHalfBlock = inLiquid = inLava = inWater = inWeb = onSlime = pistonNear
                 = onIce = onSoulSand = blocksAbove = collidesVertically = bedNear = collidesHorizontally =
                 blocksNear = inBlock = miscNear = collidedWithEntity = blocksBelow = inPortal = false;
 
@@ -176,8 +177,8 @@ public class BlockInformation {
                                         SimpleCollisionBox groundBox = normalBox.copy()
                                                 .offset(0, -.1, 0).expandMax(0, -1.2, 0);
                                         byte data = block.getData();
-                                        XMaterial blockMaterial =
-                                                XMaterial.requestXMaterial(type.name(), data);
+                                        Optional<XMaterial> blockMaterial =
+                                                XMaterial.matchXMaterial(type.name());
 
                                         if(normalBox.copy().expand(0.1, 0, 0.1).expandMin(0, -1, 0)
                                                 .isIntersected(blockBox))
@@ -198,11 +199,15 @@ public class BlockInformation {
                                         if (Helper.isCollided(handler.getBlocks(), box))
                                             collidesVertically = true;
 
+                                        if(groundBox.copy().expandMin(0, -0.4, 0).expand(0.2, 0, 0.2)
+                                                .isIntersected(blockBox))
+                                            objectData.playerInfo.nearGround = true;
+
                                         if(groundBox.isIntersected(blockBox)) {
                                             objectData.playerInfo.serverGround = true;
 
-                                            if(blockMaterial != null)
-                                            switch (blockMaterial) {
+                                            if(blockMaterial.isPresent())
+                                            switch (blockMaterial.get()) {
                                                 case ICE:
                                                 case BLUE_ICE:
                                                 case FROSTED_ICE:
@@ -222,13 +227,14 @@ public class BlockInformation {
                                         }
                                         if(objectData.playerInfo.deltaY > 0
                                                 && Materials.checkFlag(type, Materials.LADDER)
-                                                && normalBox.copy().expand(0.02f, 0, 0.02f).isCollided(blockBox)) {
+                                                && normalBox.copy().expand(0.02f, 0, 0.02f)
+                                                .isCollided(blockBox)) {
                                             onClimbable = true;
                                         }
 
-                                        if(blockMaterial != null && normalBox.copy().expand(0.5, 0.5, 0.5)
+                                        if(blockMaterial.isPresent() && normalBox.copy().expand(0.5, 0.5, 0.5)
                                                 .isCollided(blockBox)) {
-                                            switch (blockMaterial) {
+                                            switch (blockMaterial.get()) {
                                                 case PISTON:
                                                 case PISTON_HEAD:
                                                 case MOVING_PISTON:
@@ -245,12 +251,11 @@ public class BlockInformation {
                                             if(Materials.checkFlag(type, Materials.STAIRS))
                                                 onStairs = true;
 
-                                            if(blockMaterial != null)
-                                            switch(blockMaterial) {
+                                            if(blockMaterial.isPresent())
+                                            switch(blockMaterial.get()) {
                                                 case CAKE:
                                                 case BREWING_STAND:
                                                 case FLOWER_POT:
-                                                case SKULL:
                                                 case PLAYER_HEAD:
                                                 case PLAYER_WALL_HEAD:
                                                 case SKELETON_SKULL:
@@ -289,11 +294,11 @@ public class BlockInformation {
                                             }
                                         }
                                     } else if(blockBox.isCollided(normalBox)) {
-                                        XMaterial blockMaterial =
-                                                XMaterial.requestXMaterial(type.name(), block.getData());
+                                        Optional<XMaterial> blockMaterial =
+                                                XMaterial.matchXMaterial(type.name());
 
-                                        if(blockMaterial != null)
-                                            switch(blockMaterial) {
+                                        if(blockMaterial.isPresent())
+                                            switch(blockMaterial.get()) {
                                                 case END_PORTAL:
                                                 case NETHER_PORTAL: {
                                                     inPortal = true;
