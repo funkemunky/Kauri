@@ -10,6 +10,8 @@ import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.math.RollingAverageLong;
 import cc.funkemunky.api.utils.math.cond.MaxInteger;
+import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingList;
+import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingMap;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import cc.funkemunky.api.utils.world.CollisionBox;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
@@ -75,7 +77,7 @@ public class ObjectData implements Data {
     public Set<Player> boxDebuggers = new HashSet<>();
     private final List<CollisionBox> lookingAtBoxes = Collections.synchronizedList(new ArrayList<>());
     public final List<Action> keepAliveStamps = new CopyOnWriteArrayList<>();
-    public final List<CancelType> typesToCancel = Collections.synchronizedList(new EvictingList<>(10));
+    public final ConcurrentEvictingList<CancelType> typesToCancel = new ConcurrentEvictingList<>(10);
     public final Map<Long, Long> keepAlives = Collections.synchronizedMap(new HashMap<>());
     public final List<String> sniffedPackets = new CopyOnWriteArrayList<>();
     public final Map<Location, CollisionBox> ghostBlocks = Collections.synchronizedMap(new HashMap<>());

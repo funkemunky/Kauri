@@ -32,7 +32,8 @@ public class Phase extends Check {
             .filter(mat -> mat.name().contains("BANNER") || mat.name().contains("BREWING")).collect(Collectors.toSet()));
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long now) {
-        if(now - data.creation < 1200L || now - data.playerInfo.lastRespawn < 150L || data.playerInfo.serverPos)
+        if(now - data.creation < 1200L || now - data.playerInfo.lastRespawn < 150L
+                || data.playerInfo.serverPos || data.playerInfo.creative || data.playerInfo.canFly)
             return;
 
         Location setbackLocation = fromWhereShitAintBad == null
@@ -51,8 +52,10 @@ public class Phase extends Check {
         phaseIntoBlock: {
             if(data.playerInfo.creative) break phaseIntoBlock;
 
+            double dh = Math.min(0.08, data.playerInfo.deltaXZ / 5.);
+            double dy = Math.min(0.04, Math.abs(data.playerInfo.deltaY) / 10.);
             List<Block> current = Helper.blockCollisions(blocks, fromBox),
-                    newb = Helper.blockCollisions(blocks, currentBox);
+                    newb = Helper.blockCollisions(blocks, currentBox.copy().shrink(0.02,0,0.02).shrink(dh,dy,dh));
 
             for (Block block : newb) {
                 if(!current.contains(block)) {
@@ -61,6 +64,7 @@ public class Phase extends Check {
                             && !allowedMaterials.contains(type)
                             && !Materials.checkFlag(type, Materials.STAIRS)) {
                         tags.addTag("INTO_BLOCK");
+                        tags.addTag(String.format("hy[%.3f,%.3f]", dh, dy));
                         vl++;
                         break;
                     }
@@ -81,8 +85,6 @@ public class Phase extends Check {
             Vector direction  = to.subtract(from);
             RayCollision ray = new RayCollision(from, direction);
 
-            ray.draw(WrappedEnumParticle.CRIT, Collections.singleton(data.getPlayer()));
-
             for (Block block : blocks) {
                 Material type = block.getType();
                 if(!Materials.checkFlag(type, Materials.SOLID)
@@ -96,6 +98,7 @@ public class Phase extends Check {
                     boolean intersected = RayCollision.intersect(ray, (SimpleCollisionBox) box);
 
                     if(intersected && result.one <= dist) {
+                        vl++;
                         tags.addTag("THROUGH_BLOCK");
                         tags.addTag("material=" + type);
                         break;
