@@ -20,16 +20,16 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @CheckInfo(name = "Phase", description = "Ensures players cannot move through blocks.",
         checkType = CheckType.EXPLOIT, cancellable = true, executable = false, developer = true)
 public class Phase extends Check {
 
     private KLocation fromWhereShitAintBad = null;
+    private final Set<Material> allowedMaterials = Collections.unmodifiableSet(Arrays.stream(Material.values())
+            .filter(mat -> mat.name().contains("BANNER") || mat.name().contains("BREWING")).collect(Collectors.toSet()));
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long now) {
         if(now - data.creation < 1200L || now - data.playerInfo.lastRespawn < 150L || data.playerInfo.serverPos)
@@ -40,7 +40,7 @@ public class Phase extends Check {
                 : fromWhereShitAintBad.toLocation(data.getPlayer().getWorld());
         TagsBuilder tags = new TagsBuilder();
 
-        SimpleCollisionBox currentBox = data.box.copy().shrink(0.06255, 0.0625, 0.0625),
+        SimpleCollisionBox currentBox = data.box.copy().shrink(0.0625, 0.0625, 0.0625),
                 fromBox = new SimpleCollisionBox(data.playerInfo.from.toVector(), 0.6, 1.8)
                         .shrink(0.0625, 0.0625, 0.0625);
 
@@ -58,6 +58,7 @@ public class Phase extends Check {
                 if(!current.contains(block)) {
                     Material type = block.getType();
                     if(Materials.checkFlag(type, Materials.SOLID)
+                            && !allowedMaterials.contains(type)
                             && !Materials.checkFlag(type, Materials.STAIRS)) {
                         tags.addTag("INTO_BLOCK");
                         vl++;
@@ -84,7 +85,8 @@ public class Phase extends Check {
 
             for (Block block : blocks) {
                 Material type = block.getType();
-                if(!Materials.checkFlag(type, Materials.SOLID) || Materials.checkFlag(type, Materials.STAIRS))
+                if(!Materials.checkFlag(type, Materials.SOLID)
+                        || allowedMaterials.contains(type) || Materials.checkFlag(type, Materials.STAIRS))
                     continue;
 
                 CollisionBox box = BlockData.getData(type).getBox(block, data.playerVersion);

@@ -104,7 +104,7 @@ public class VelocityB extends Check {
                         double deltaX = Math.abs(tuple.two[0] - data.playerInfo.deltaX);
                         double deltaZ = Math.abs(tuple.two[1] - data.playerInfo.deltaZ);
 
-                        return (deltaX * deltaX + deltaZ * deltaZ) < 0.01;
+                        return (deltaX * deltaX + deltaZ * deltaZ) < 0.005;
                     })
                     .min(Comparator.comparing(tuple -> {
                         double deltaX = Math.abs(tuple.two[0] - data.playerInfo.deltaX);

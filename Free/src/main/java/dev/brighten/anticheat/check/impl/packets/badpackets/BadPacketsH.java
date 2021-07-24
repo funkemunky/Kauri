@@ -15,18 +15,20 @@ public class BadPacketsH extends Check {
     private boolean exempt;
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
+    public void onFlying(WrappedInFlyingPacket packet, long now ) {
         if(data.playerInfo.creative) return;
 
         if(!packet.isPos() && packet.isLook()) {
             if(data.playerInfo.from.yaw == data.playerInfo.to.yaw
                     && data.playerInfo.from.pitch == data.playerInfo.to.pitch) {
-                if(!exempt && data.playerInfo.lastTeleportTimer.isPassed(1)) {
+                if(!exempt && data.playerInfo.lastTeleportTimer.isPassed(1)
+                        && now - data.creation > 5000L
+                        && data.playerInfo.lastRespawnTimer.isPassed(10)) {
                     vl++;
                     flag("yaw=[%s,%s] p=[%s,%s]", data.playerInfo.to.yaw, data.playerInfo.from.yaw,
                             data.playerInfo.to.pitch, data.playerInfo.from.pitch);
                 }
-                exempt = true;
+                exempt = false;
             }
         }
     }

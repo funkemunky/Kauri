@@ -1,9 +1,11 @@
 package dev.brighten.anticheat.data;
 
+import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.handlers.ForgeHandler;
 import cc.funkemunky.api.handlers.ModData;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.math.RollingAverageLong;
@@ -77,6 +79,7 @@ public class ObjectData implements Data {
     public final Map<Long, Long> keepAlives = Collections.synchronizedMap(new HashMap<>());
     public final List<String> sniffedPackets = new CopyOnWriteArrayList<>();
     public final Map<Location, CollisionBox> ghostBlocks = Collections.synchronizedMap(new HashMap<>());
+    public final Map<Short, Runnable> instantTransaction = new HashMap<>();
 
     public ObjectData(UUID uuid) {
         this.uuid = uuid;
@@ -217,6 +220,19 @@ public class ObjectData implements Data {
 
     public int runKeepaliveAction(Consumer<KeepAlive> action) {
         return runKeepaliveAction(action, 0);
+    }
+
+    public void runInstantAction(Runnable runnable) {
+        short id = (short) ThreadLocalRandom.current().nextInt(Short.MIN_VALUE, Short.MAX_VALUE);
+
+        //Ensuring we don't have any duplicate IDS
+        while(Kauri.INSTANCE.keepaliveProcessor.keepAlives.containsKey(id)) {
+            id = (short) ThreadLocalRandom.current().nextInt(Short.MIN_VALUE, Short.MAX_VALUE);
+        }
+
+        TinyProtocolHandler.sendPacket(getPlayer(), new WrappedOutTransaction(0, id, false).getObject());
+
+        instantTransaction.put(id, runnable);
     }
 
     public int runKeepaliveAction(Consumer<KeepAlive> action, int later) {

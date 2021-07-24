@@ -48,7 +48,7 @@ public class KauriCommand extends BaseCommand {
 
         cc.registerCompletion("checks", (c) ->
             Check.checkClasses.values().stream().map(ci -> ci.name().replace(" ", "_"))
-                    .sorted(Comparator.comparing(s -> s)).collect(Collectors.toList()));
+                    .sorted(Comparator.comparing(s -> s, Comparator.reverseOrder())).collect(Collectors.toList()));
         cc.registerCompletion("materials", (c) -> Arrays.stream(Material.values()).map(Enum::name)
                 .collect(Collectors.toList()));
 

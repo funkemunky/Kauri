@@ -23,6 +23,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 public class PacketProcessor {
@@ -355,40 +356,43 @@ public class PacketProcessor {
 
                 if(packet.getId() == 0) {
 
-                    Kauri.INSTANCE.keepaliveProcessor.addResponse(data, packet.getAction());
+                    if(Kauri.INSTANCE.keepaliveProcessor.keepAlives.containsKey(packet.getAction())) {
+                        Kauri.INSTANCE.keepaliveProcessor.addResponse(data, packet.getAction());
 
-                    val optional = Kauri.INSTANCE.keepaliveProcessor.getResponse(data);
+                        val optional = Kauri.INSTANCE.keepaliveProcessor.getResponse(data);
 
-                    int current = Kauri.INSTANCE.keepaliveProcessor.tick;
+                        int current = Kauri.INSTANCE.keepaliveProcessor.tick;
 
-                    optional.ifPresent(ka -> {
-                        data.playerTicks++;
-                        data.lagInfo.lastTransPing = data.lagInfo.transPing;
-                        data.lagInfo.transPing = (current - ka.start);
+                        optional.ifPresent(ka -> {
+                            data.playerTicks++;
+                            data.lagInfo.lastTransPing = data.lagInfo.transPing;
+                            data.lagInfo.transPing = (current - ka.start);
 
-                        if (Math.abs(data.lagInfo.lastTransPing - data.lagInfo.transPing) > 1) {
-                            data.lagInfo.lastPingDrop.reset();
-                        }
-                        data.clickProcessor.onFlying(packet);
+                            if (Math.abs(data.lagInfo.lastTransPing - data.lagInfo.transPing) > 1) {
+                                data.lagInfo.lastPingDrop.reset();
+                            }
+                            data.clickProcessor.onFlying(packet);
 
-                        ka.getReceived(data.uuid).ifPresent(r -> {
-                            r.receivedStamp = data.lagInfo.recieved = timestamp;
-                            data.lagInfo.lmillisPing = data.lagInfo.millisPing;
-                            data.lagInfo.millisPing = r.receivedStamp - (data.lagInfo.start = ka.startStamp);
+                            ka.getReceived(data.uuid).ifPresent(r -> {
+                                r.receivedStamp = data.lagInfo.recieved = timestamp;
+                                data.lagInfo.lmillisPing = data.lagInfo.millisPing;
+                                data.lagInfo.millisPing = r.receivedStamp - (data.lagInfo.start = ka.startStamp);
+                            });
+
+                            KeepaliveAcceptedEvent e = Kauri.INSTANCE.eventHandler
+                                    .runEvent(new KeepaliveAcceptedEvent(data, ka));
+
+                            for (ObjectData.Action action : data.keepAliveStamps) {
+                                if (action.stamp > ka.start) continue;
+
+                                action.action.accept(ka);
+
+                                data.keepAliveStamps.remove(action);
+                            }
                         });
-
-                        KeepaliveAcceptedEvent e = Kauri.INSTANCE.eventHandler
-                                .runEvent(new KeepaliveAcceptedEvent(data, ka));
-
-                        for (ObjectData.Action action : data.keepAliveStamps) {
-                            if (action.stamp > ka.start) continue;
-
-                            action.action.accept(ka);
-
-                            data.keepAliveStamps.remove(action);
-                        }
-                    });
-                    data.lagInfo.lastClientTrans = timestamp;
+                        data.lagInfo.lastClientTrans = timestamp;
+                    } else Optional.ofNullable(data.instantTransaction.remove(packet.getAction()))
+                            .ifPresent(Runnable::run);
                 }
 
                 data.checkManager.runPacket(packet, timestamp);
@@ -546,7 +550,7 @@ public class PacketProcessor {
                 Vector vector = new Vector(packet.getMotionX(), packet.getMotionY(), packet.getMotionZ());
                 data.playerInfo.velocities.add(vector);
                 data.playerInfo.doingVelocity = true;
-                data.runKeepaliveAction(d -> {
+                data.runInstantAction(() -> {
                     if(data.playerInfo.velocities.contains(vector)) {
                         if(data.playerInfo.doingVelocity) {
                             data.playerInfo.lastVelocity.reset();
@@ -560,7 +564,7 @@ public class PacketProcessor {
                         }
                         data.playerInfo.velocities.remove(vector);
                     }
-                }, 2);
+                });
                 break;
             }
             case Packet.Server.ENTITY_VELOCITY: {
@@ -571,7 +575,7 @@ public class PacketProcessor {
                     Vector vector = new Vector(packet.getX(), packet.getY(), packet.getZ());
                     data.playerInfo.velocities.add(vector);
                     data.playerInfo.doingVelocity = true;
-                    data.runKeepaliveAction(d -> {
+                    data.runInstantAction(() -> {
                         if(data.playerInfo.velocities.contains(vector)) {
                             if(data.playerInfo.doingVelocity) {
                                 data.playerInfo.lastVelocity.reset();
@@ -585,7 +589,7 @@ public class PacketProcessor {
                             }
                             data.playerInfo.velocities.remove(vector);
                         }
-                    }, 2);
+                    });
                 }
 
                 if(data.sniffing) {

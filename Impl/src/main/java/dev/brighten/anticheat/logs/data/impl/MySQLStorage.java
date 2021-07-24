@@ -48,7 +48,7 @@ public class MySQLStorage implements DataStorage {
                 "`TIMESTAMP` LONG NOT NULL)").execute();
 
         Query.prepare("create table if not exists `ALERTS` (`UUID` varchar(36) unique)").execute();
-        Query.prepare("create table if not exists `DEV_ALERTS` (UUID` varchar(36) unique)").execute();
+        Query.prepare("create table if not exists `DEV_ALERTS` (`UUID` varchar(36) unique)").execute();
         Kauri.INSTANCE.loggingThread.execute(() -> {
             MiscUtils.printToConsole("&7Creating UUID index for SQL violations...");
             Query.prepare("CREATE INDEX IF NOT EXISTS `UUID_1`ON `VIOLATIONS` (UUID)").execute();

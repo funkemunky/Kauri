@@ -22,7 +22,7 @@ public class KeepaliveProcessor implements Runnable {
     public KeepAlive currentKeepalive;
     public int tick;
 
-    public final Map<Short, KeepAlive> keepAlives = new ConcurrentEvictingMap<>(30);
+    public final Map<Short, KeepAlive> keepAlives = new ConcurrentEvictingMap<>(60);
 
     public ConcurrentHashMap<UUID, Short> lastResponses = new ConcurrentHashMap<>();
 
