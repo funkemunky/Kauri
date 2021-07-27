@@ -75,7 +75,7 @@ public class BadPacketsN extends Check {
                 vl++;
                 flag("c=%s last=%s d=%s t=SKIP", current, lastTick, current - lastTick);
 
-                if(!isExecutable()) kickPlayer(String.format(Color.translate(kickString), "S " + current + ";" + lastTick));
+                if(!isExecutable()) kickPlayer(String.format(Color.translate(kickString), "S"));
             }
             debug("c=%s l=%s", current, lastTick);
             lastTick = current;
