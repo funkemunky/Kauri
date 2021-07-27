@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.processing.keepalive;
 
+import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import cc.funkemunky.api.utils.KLocation;
@@ -53,6 +54,12 @@ public class KeepaliveProcessor implements Runnable {
             if(dh < 1 && dy < 1)
                 value.playerInfo.nearbyEntities = value.getPlayer().getNearbyEntities(1 + dh, 2 + dy, 1 + dh);
             else value.playerInfo.nearbyEntities = Collections.emptyList();
+
+            //Checking for AtlasBungee stuff incase a player joined before a heartbeat check could be sent
+            //by Atlas
+            if(Atlas.getInstance().getBungeeManager().isBungee()) {
+                value.atlasBungeeInstalled = Atlas.getInstance().getBungeeManager().isAtlasBungeeInstalled();
+            }
 
             TinyProtocolHandler.sendPacket(value.getPlayer(), packet);
             /*value.getThread().execute(() -> {

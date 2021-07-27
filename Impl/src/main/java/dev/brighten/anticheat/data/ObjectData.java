@@ -70,7 +70,7 @@ public class ObjectData implements Data {
     public PotionProcessor potionProcessor;
     public ClickProcessor clickProcessor;
     public int hashCode, playerTicks;
-    public boolean banned;
+    public boolean banned, atlasBungeeInstalled;
     public ModData modData;
     public KLocation targetLoc;
     public ProtocolVersion playerVersion = ProtocolVersion.UNKNOWN;
@@ -99,6 +99,9 @@ public class ObjectData implements Data {
         potionProcessor = new PotionProcessor(this);
         checkManager = new CheckManager(this);
         checkManager.addChecks();
+
+        atlasBungeeInstalled = !Atlas.getInstance().getBungeeManager().isBungee()
+                || Atlas.getInstance().getBungeeManager().isAtlasBungeeInstalled();
 
         //Alerts from database update
         if(getPlayer().hasPermission("kauri.command.alerts")) {

@@ -17,6 +17,7 @@ import dev.brighten.anticheat.processing.keepalive.KeepaliveProcessor;
 import dev.brighten.anticheat.utils.timer.impl.AtlasTimer;
 import dev.brighten.api.KauriAPI;
 import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.concurrent.Executors;
 
@@ -72,9 +73,6 @@ public class Load {
         Kauri.INSTANCE.lastEnabled = new AtlasTimer(20);
         Kauri.INSTANCE.enabled = true;
         Kauri.INSTANCE.lastEnabled.reset();
-
-        register("Checking for compatibility errors...");
-        if(Atlas.getInstance().getBungeeManager().isBungee() && Atlas.getInstance().getBungeeManager().)
 
         //Creating data for online players as of now. We're running this sync so it only runs once server fully starts.
         RunUtils.taskLater(() -> Bukkit.getOnlinePlayers().forEach(pl -> Kauri.INSTANCE.dataManager.createData(pl)),
