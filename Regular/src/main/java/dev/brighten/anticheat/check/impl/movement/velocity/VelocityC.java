@@ -38,7 +38,7 @@ public class VelocityC extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if(data.playerInfo.lastVelocity.isNotPassed(0)) {
+        if(data.playerInfo.checkVelocity) {
             pvX = data.playerInfo.velocityX;
             pvZ = data.playerInfo.velocityZ;
             ticks = 0;

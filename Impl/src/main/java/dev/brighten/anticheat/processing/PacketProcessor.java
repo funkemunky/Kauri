@@ -203,6 +203,9 @@ public class PacketProcessor {
                 data.predictionService.onReceive(packet); //Processing for prediction service.
 
                 data.checkManager.runPacket(packet, timestamp);
+
+                //Resetting velocity check boolean
+                if(data.playerInfo.checkVelocity) data.playerInfo.checkVelocity = false;
                 if(data.sniffing) {
                     data.sniffedPackets.add(type + ":@:"
                             + packet.getX() + ";" + packet.getY() + ";" + packet.getZ() + ";"
@@ -557,6 +560,7 @@ public class PacketProcessor {
 
                             data.playerInfo.doingVelocity = false;
                             data.playerInfo.lastVelocityTimestamp = System.currentTimeMillis();
+                            data.playerInfo.checkVelocity = true;
                             data.predictionService.velocity = true;
                             data.playerInfo.velocityX = data.playerInfo.calcVelocityX = (float) packet.getX();
                             data.playerInfo.velocityY = data.playerInfo.calcVelocityY = (float) packet.getY();
@@ -581,6 +585,7 @@ public class PacketProcessor {
                                 data.playerInfo.lastVelocity.reset();
 
                                 data.playerInfo.doingVelocity = false;
+                                data.playerInfo.checkVelocity = false;
                                 data.playerInfo.lastVelocityTimestamp = System.currentTimeMillis();
                                 data.predictionService.velocity = true;
                                 data.playerInfo.velocityX = data.playerInfo.calcVelocityX = (float) packet.getX();

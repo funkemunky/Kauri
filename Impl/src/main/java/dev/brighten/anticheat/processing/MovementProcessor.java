@@ -49,7 +49,7 @@ public class MovementProcessor {
     public static double groundOffset = 1 / 64.;
     private static String keepaliveAcceptListener = Kauri.INSTANCE.eventHandler
             .listen(KeepaliveAcceptedEvent.class,  listner -> {
-                if(listner.getData().playerInfo.serverGround) {
+                if(listner.getData().playerInfo.serverGround || (listner.getData().playerInfo.nearGround && listner.getData().playerInfo.clientGround)) {
                     listner.getData().playerInfo.kGroundTicks++;
                     listner.getData().playerInfo.kAirTicks = 0;
                 } else {
@@ -203,6 +203,7 @@ public class MovementProcessor {
                         data.playerInfo.doingVelocity = false;
                         data.playerInfo.lastVelocityTimestamp = System.currentTimeMillis();
                         data.predictionService.velocity = true;
+                        data.playerInfo.checkVelocity = true;
                         data.playerInfo.velocityX = data.playerInfo.calcVelocityX = (float) velocity.getX();
                         data.playerInfo.velocityY = data.playerInfo.calcVelocityY = (float) velocity.getY();
                         data.playerInfo.velocityZ = data.playerInfo.calcVelocityZ = (float) velocity.getZ();

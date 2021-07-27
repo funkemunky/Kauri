@@ -17,7 +17,7 @@ public class VelocityA extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if(data.playerInfo.lastVelocity.isNotPassed(0)) //If we just recently took velocity,
+        if(data.playerInfo.checkVelocity) //If we just recently took velocity,
             vY = data.playerInfo.velocityY;
 
         //If any of these conditions aren't met, we don't want to make checking for vertical velocity.

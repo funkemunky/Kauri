@@ -54,6 +54,7 @@ public class FlyB extends Check {
                     && !data.playerInfo.serverPos
                     && data.playerInfo.lastVelocity.isPassed(3)
                     && !data.playerInfo.serverGround
+                    && data.playerInfo.climbTimer.isPassed(6)
                     && data.playerInfo.blockAboveTimer.isPassed(5)
                     && deltaPredict > 0.016) {
                 flagged = true;
