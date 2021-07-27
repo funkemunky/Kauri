@@ -73,6 +73,9 @@ public class Load {
         Kauri.INSTANCE.enabled = true;
         Kauri.INSTANCE.lastEnabled.reset();
 
+        register("Checking for compatibility errors...");
+        if(Atlas.getInstance().getBungeeManager().isBungee() && Atlas.getInstance().getBungeeManager().)
+
         //Creating data for online players as of now. We're running this sync so it only runs once server fully starts.
         RunUtils.taskLater(() -> Bukkit.getOnlinePlayers().forEach(pl -> Kauri.INSTANCE.dataManager.createData(pl)),
                 Kauri.INSTANCE, 1);

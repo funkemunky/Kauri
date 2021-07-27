@@ -226,8 +226,9 @@ public class BlockInformation {
                                             }
                                         }
                                         if(objectData.playerInfo.deltaY > 0
+                                                && objectData.playerVersion.isBelow(ProtocolVersion.V1_14)
                                                 && Materials.checkFlag(type, Materials.LADDER)
-                                                && normalBox.copy().expand(0.02f, 0, 0.02f)
+                                                && normalBox.copy().expand(0.2f, 0, 0.2f)
                                                 .isCollided(blockBox)) {
                                             onClimbable = true;
                                         }
@@ -338,7 +339,8 @@ public class BlockInformation {
         //Bukkit.broadcastMessage("chigga5");
         onHalfBlock = onSlab || onStairs || miscNear || bedNear;
 
-        if(objectData.playerInfo.deltaY <= 0) {
+        if((objectData.playerInfo.deltaY <= 0 || objectData.playerVersion.isOrAbove(ProtocolVersion.V1_14))
+                && !onClimbable) {
             onClimbable = objectData.playerInfo.blockOnTo != null
                     && BlockUtils.isClimbableBlock(objectData.playerInfo.blockOnTo);
         }

@@ -54,7 +54,7 @@ public class FlyB extends Check {
                     && !data.playerInfo.serverPos
                     && data.playerInfo.lastVelocity.isPassed(3)
                     && !data.playerInfo.serverGround
-                    && data.playerInfo.climbTimer.isPassed(6)
+                    && data.playerInfo.climbTimer.isPassed(15)
                     && data.playerInfo.blockAboveTimer.isPassed(5)
                     && deltaPredict > 0.016) {
                 flagged = true;
@@ -65,9 +65,9 @@ public class FlyB extends Check {
                 }
             } else buffer-= buffer > 0 ? 0.5f : 0;
 
-            debug((flagged ? Color.Green : "") +"pos=%s deltaY=%.3f predicted=%.3f ground=%s lpass=%s air=%s buffer=%.1f",
+            debug((flagged ? Color.Green : "") +"pos=%s deltaY=%.3f predicted=%.3f ground=%s lpass=%s cp=%s air=%s buffer=%.1f",
                     packet.getY(), data.playerInfo.deltaY, predicted, data.playerInfo.clientGround,
-                    data.playerInfo.liquidTimer.getPassed(), data.playerInfo.kAirTicks, buffer);
+                    data.playerInfo.liquidTimer.getPassed(), data.playerInfo.climbTimer.getPassed(), data.playerInfo.kAirTicks, buffer);
             lastPos = timeStamp;
         }
     }
