@@ -138,7 +138,7 @@ public class Check implements KauriCheck {
     protected long lastFlagRun = 0L;
 
     public void flag(boolean devAlerts, int resetVLTime, String information, Object... variables) {
-        if(!data.atlasBungeeInstalled) {
+        if(Atlas.getInstance().getBungeeManager().isBungee() && !data.atlasBungeeInstalled) {
             Bukkit.getLogger().log(Level.SEVERE, data.getPlayer().getName() + " would have flagged but " +
                     "AtlasBungee is not installed on your BungeeCord. Please download the appropriate version for" +
                     " Atlas v"+ Atlas.getInstance().getDescription().getVersion()
@@ -276,7 +276,7 @@ public class Check implements KauriCheck {
     }
 
     public void punish() {
-        if(!data.atlasBungeeInstalled) {
+        if(Atlas.getInstance().getBungeeManager().isBungee() && !data.atlasBungeeInstalled) {
             Bukkit.getLogger().log(Level.SEVERE, data.getPlayer().getName() + " would have been punished but " +
                     "AtlasBungee is not installed on your BungeeCord. Please download the appropriate version for" +
                     " Atlas v"+ Atlas.getInstance().getDescription().getVersion()
