@@ -633,10 +633,16 @@ public class PacketProcessor {
                         eloc.newZ += (byte)packet.getZ() / 32D;
                         eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
                         eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
-                    } else {
+                    } else if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_14)) {
                         eloc.newX += (long)packet.getX() / 4096D;
                         eloc.newY += (long)packet.getY() / 4096D;
                         eloc.newZ += (long)packet.getZ() / 4096D;
+                        eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
+                        eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
+                    } else {
+                        eloc.newX += (short)packet.getX() / 4096D;
+                        eloc.newY += (short)packet.getY() / 4096D;
+                        eloc.newZ += (short)packet.getZ() / 4096D;
                         eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
                         eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
                     }

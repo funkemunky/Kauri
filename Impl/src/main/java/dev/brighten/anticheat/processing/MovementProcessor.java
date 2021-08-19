@@ -392,18 +392,12 @@ public class MovementProcessor {
                 data.playerInfo.groundLoc = data.playerInfo.to;
         }
 
-        //Fixes glitch when logging in.
-        //We use the NMS (bukkit) version since their state is likely saved in a player data file in the world.
-        //This should prevent false positives from ability inaccuracies.
-        if (timeStamp - data.creation < 500L) {
-            if (data.playerInfo.canFly != data.getPlayer().getAllowFlight()) {
-                data.playerInfo.lastToggleFlight.reset();
-            }
-            data.playerInfo.canFly = data.getPlayer().getAllowFlight();
-            data.playerInfo.flying = data.getPlayer().isFlying();
+        if (data.playerInfo.canFly != data.getPlayer().getAllowFlight()) {
+            data.playerInfo.lastToggleFlight.reset();
         }
+        data.playerInfo.canFly = data.getPlayer().getAllowFlight();
+        data.playerInfo.flying = data.getPlayer().isFlying();
 
-        data.playerInfo.serverAllowedFlight = data.getPlayer().getAllowFlight();
         if (data.playerInfo.breakingBlock) data.playerInfo.lastBrokenBlock.reset();
 
         //Setting fallDistance

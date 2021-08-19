@@ -147,9 +147,9 @@ public class Phase extends Check {
             double threshold = data.potionProcessor.hasPotionEffect(PotionEffectType.JUMP) ? 0.62 : 0.5;
 
             if(data.blockInfo.pistonNear) threshold = 0.95;
-            else if(data.playerInfo.blockAboveTimer.isNotPassed(10)) {
+            else if(data.playerInfo.blockAboveTimer.isNotPassed(20)) {
                 threshold = 0.8;
-                if(data.playerInfo.iceTimer.isNotPassed(4)) threshold+= 0.4;
+                if(data.playerInfo.iceTimer.isNotPassed(20)) threshold+= 0.4;
             }
             else if(data.playerInfo.jumped) threshold = 0.68;
             else if(data.playerInfo.iceTimer.isNotPassed(4)) threshold = 0.6;

@@ -88,7 +88,7 @@ public class PlayerInformation {
 
     //actions
     public boolean lsneaking, sneaking, sprinting, ridingJump, breakingBlock, flying, canFly, creative, inVehicle,
-            gliding, riptiding, inventoryOpen, serverAllowedFlight, doingVelocity, doingTeleport;
+            gliding, riptiding, inventoryOpen, doingVelocity, doingTeleport;
     public int inventoryId = 0;
 
     //Keepalives
