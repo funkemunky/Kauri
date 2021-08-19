@@ -29,11 +29,12 @@ public class Phase extends Check {
 
     private KLocation fromWhereShitAintBad = null;
     private final Set<Material> allowedMaterials = Collections.unmodifiableSet(Arrays.stream(Material.values())
-            .filter(mat -> mat.name().contains("BANNER") || mat.name().contains("BREWING")).collect(Collectors.toSet()));
+            .filter(mat -> mat.name().contains("BANNER") || mat.name().contains("BREWING"))
+            .collect(Collectors.toSet()));
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long now) {
         if(now - data.creation < 1200L || now - data.playerInfo.lastRespawn < 150L
-                || data.playerInfo.serverPos || data.playerInfo.creative || data.playerInfo.canFly)
+                || !data.playerInfo.checkMovement || data.playerInfo.creative || data.playerInfo.canFly)
             return;
 
         Location setbackLocation = fromWhereShitAintBad == null

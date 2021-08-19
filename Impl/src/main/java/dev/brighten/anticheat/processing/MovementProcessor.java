@@ -20,6 +20,7 @@ import dev.brighten.anticheat.utils.api.BukkitAPI;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import lombok.val;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.potion.PotionEffectType;
@@ -194,6 +195,7 @@ public class MovementProcessor {
                     ? data.blockInfo.currentFriction * 0.91f : 0.91f;
         } else data.playerInfo.calcVelocityZ = 0;
 
+
         synchronized (data.playerInfo.velocities) {
             for (Vector velocity : data.playerInfo.velocities) {
                 if(Math.abs(velocity.getY() - data.playerInfo.deltaY) < 0.01) {
@@ -204,6 +206,7 @@ public class MovementProcessor {
                         data.playerInfo.lastVelocityTimestamp = System.currentTimeMillis();
                         data.predictionService.velocity = true;
                         data.playerInfo.checkVelocity = true;
+                        Bukkit.broadcastMessage("Set check to true (1)");
                         data.playerInfo.velocityX = data.playerInfo.calcVelocityX = (float) velocity.getX();
                         data.playerInfo.velocityY = data.playerInfo.calcVelocityY = (float) velocity.getY();
                         data.playerInfo.velocityZ = data.playerInfo.calcVelocityZ = (float) velocity.getZ();

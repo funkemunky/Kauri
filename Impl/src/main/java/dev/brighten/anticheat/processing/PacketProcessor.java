@@ -15,7 +15,9 @@ import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.listeners.api.impl.KeepaliveAcceptedEvent;
 import dev.brighten.anticheat.utils.EntityLocation;
+import dev.brighten.anticheat.utils.MovementUtils;
 import lombok.val;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -196,16 +198,18 @@ public class PacketProcessor {
                     data.lagInfo.lastPacketDrop.reset();
                 }
 
+                data.playerInfo.checkMovement = MovementUtils.checkMovement(data.getPlayer());
+
                 data.lagInfo.lastFlying = timestamp;
 
+                //Resetting velocity check boolean
+                if(data.playerInfo.checkVelocity) data.playerInfo.checkVelocity = false;
                 data.potionProcessor.onFlying(packet);
                 data.moveProcessor.process(packet, timestamp);
                 data.predictionService.onReceive(packet); //Processing for prediction service.
 
                 data.checkManager.runPacket(packet, timestamp);
 
-                //Resetting velocity check boolean
-                if(data.playerInfo.checkVelocity) data.playerInfo.checkVelocity = false;
                 if(data.sniffing) {
                     data.sniffedPackets.add(type + ":@:"
                             + packet.getX() + ";" + packet.getY() + ";" + packet.getZ() + ";"
@@ -561,6 +565,7 @@ public class PacketProcessor {
                             data.playerInfo.doingVelocity = false;
                             data.playerInfo.lastVelocityTimestamp = System.currentTimeMillis();
                             data.playerInfo.checkVelocity = true;
+                            Bukkit.broadcastMessage("Set check to true (2)");
                             data.predictionService.velocity = true;
                             data.playerInfo.velocityX = data.playerInfo.calcVelocityX = (float) packet.getX();
                             data.playerInfo.velocityY = data.playerInfo.calcVelocityY = (float) packet.getY();
@@ -585,7 +590,8 @@ public class PacketProcessor {
                                 data.playerInfo.lastVelocity.reset();
 
                                 data.playerInfo.doingVelocity = false;
-                                data.playerInfo.checkVelocity = false;
+                                data.playerInfo.checkVelocity = true;
+                                Bukkit.broadcastMessage("Set check to true (2)");
                                 data.playerInfo.lastVelocityTimestamp = System.currentTimeMillis();
                                 data.predictionService.velocity = true;
                                 data.playerInfo.velocityX = data.playerInfo.calcVelocityX = (float) packet.getX();

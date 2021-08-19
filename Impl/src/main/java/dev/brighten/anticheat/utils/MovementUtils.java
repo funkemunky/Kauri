@@ -1,5 +1,7 @@
 package dev.brighten.anticheat.utils;
 
+import cc.funkemunky.api.reflections.impl.MinecraftReflection;
+import cc.funkemunky.api.reflections.types.WrappedField;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.data.ObjectData;
@@ -37,6 +39,17 @@ public class MovementUtils {
         } catch(NullPointerException e) {
             return false;
         }
+    }
+
+    private static WrappedField checkMovement = ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9)
+            ? MinecraftReflection.playerConnection.getFieldByName("checkMovement")
+            : MinecraftReflection.playerConnection.getFieldByName("teleportPos");
+    public static boolean checkMovement(Player player) {
+        Object playerConnection = MinecraftReflection.getPlayerConnection(player);
+
+        if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9)) {
+            return checkMovement.get(playerConnection);
+        } else return (checkMovement.get(playerConnection) == null);
     }
 
     public static int getDepthStriderLevel(Player player) {
