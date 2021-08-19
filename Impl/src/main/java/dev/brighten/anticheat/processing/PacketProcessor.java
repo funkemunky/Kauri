@@ -201,9 +201,6 @@ public class PacketProcessor {
                 data.playerInfo.checkMovement = MovementUtils.checkMovement(data.getPlayer());
 
                 data.lagInfo.lastFlying = timestamp;
-
-                //Resetting velocity check boolean
-                if(data.playerInfo.checkVelocity) data.playerInfo.checkVelocity = false;
                 data.potionProcessor.onFlying(packet);
                 data.moveProcessor.process(packet, timestamp);
                 data.predictionService.onReceive(packet); //Processing for prediction service.
@@ -564,8 +561,7 @@ public class PacketProcessor {
 
                             data.playerInfo.doingVelocity = false;
                             data.playerInfo.lastVelocityTimestamp = System.currentTimeMillis();
-                            data.playerInfo.checkVelocity = true;
-                            Bukkit.broadcastMessage("Set check to true (2)");
+                            data.playerInfo.cva = data.playerInfo.cvb = data.playerInfo.cvc = true;
                             data.predictionService.velocity = true;
                             data.playerInfo.velocityX = data.playerInfo.calcVelocityX = (float) packet.getX();
                             data.playerInfo.velocityY = data.playerInfo.calcVelocityY = (float) packet.getY();
@@ -590,8 +586,7 @@ public class PacketProcessor {
                                 data.playerInfo.lastVelocity.reset();
 
                                 data.playerInfo.doingVelocity = false;
-                                data.playerInfo.checkVelocity = true;
-                                Bukkit.broadcastMessage("Set check to true (2)");
+                                data.playerInfo.cva = data.playerInfo.cvb = data.playerInfo.cvc = true;
                                 data.playerInfo.lastVelocityTimestamp = System.currentTimeMillis();
                                 data.predictionService.velocity = true;
                                 data.playerInfo.velocityX = data.playerInfo.calcVelocityX = (float) packet.getX();

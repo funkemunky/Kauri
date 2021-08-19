@@ -38,9 +38,10 @@ public class VelocityC extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if(data.playerInfo.checkVelocity) {
+        if(data.playerInfo.cvc) {
             pvX = data.playerInfo.velocityX;
             pvZ = data.playerInfo.velocityZ;
+            data.playerInfo.cvc = false;
             ticks = 0;
         }
         if((pvX != 0 || pvZ != 0) && (data.playerInfo.deltaX != 0

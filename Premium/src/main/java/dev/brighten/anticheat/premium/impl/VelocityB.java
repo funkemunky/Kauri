@@ -37,10 +37,11 @@ public class VelocityB extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if(data.playerInfo.checkVelocity) {
+        if(data.playerInfo.cvb) {
             pvX = data.playerInfo.velocityX;
             pvZ = data.playerInfo.velocityZ;
             ticks = 0;
+            data.playerInfo.cvb = false;
         }
         if((pvX != 0 || pvZ != 0) && (data.playerInfo.deltaX != 0
                 || data.playerInfo.deltaY != 0

@@ -205,8 +205,7 @@ public class MovementProcessor {
                         data.playerInfo.doingVelocity = false;
                         data.playerInfo.lastVelocityTimestamp = System.currentTimeMillis();
                         data.predictionService.velocity = true;
-                        data.playerInfo.checkVelocity = true;
-                        Bukkit.broadcastMessage("Set check to true (1)");
+                        data.playerInfo.cva = data.playerInfo.cvb = data.playerInfo.cvc = true;
                         data.playerInfo.velocityX = data.playerInfo.calcVelocityX = (float) velocity.getX();
                         data.playerInfo.velocityY = data.playerInfo.calcVelocityY = (float) velocity.getY();
                         data.playerInfo.velocityZ = data.playerInfo.calcVelocityZ = (float) velocity.getZ();
