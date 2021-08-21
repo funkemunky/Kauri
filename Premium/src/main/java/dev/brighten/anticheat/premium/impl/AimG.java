@@ -1,82 +1,45 @@
 package dev.brighten.anticheat.premium.impl;
 
-import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutPositionPacket;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
-import cc.funkemunky.api.utils.objects.evicting.EvictingMap;
-import dev.brighten.anticheat.Kauri;
+import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.KauriVersion;
-import dev.brighten.api.check.CheckType;
-import org.bukkit.Location;
+import dev.brighten.api.check.CheckType;;import java.util.List;
 
-import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
-
-@CheckInfo(name = "Aim (G)", description = "Spooky rotation check",
+@CheckInfo(name = "Aim (G)", description = "gcd fix patching",
         checkType = CheckType.AIM, punishVL = 30, developer = true, planVersion = KauriVersion.ARA)
 public class AimG extends Check {
 
-    private Map<Short, Float> ids = new EvictingMap<>(20);
-    private int yesTick = -1, buffer;
-    private boolean waited;
-    private float currentFloat;
+    private int buffer;
+    private List<Double> errors = new EvictingList<>(40);
     @Packet
-    public void onFlying(WrappedInTransactionPacket packet, int current) {
-        if(ids.containsKey(packet.getAction())) {
-            waited = false;
-            yesTick = current;
-            currentFloat = ids.get(packet.getAction());
+    public void onFlying(WrappedInFlyingPacket packet) {
+        if(!packet.isLook()) return;
 
-            //debug("p=%s", data.playerInfo.to.pitch);
+        double deltaYaw = data.playerInfo.from.yaw - data.playerInfo.to.yaw;
+
+        float sens = data.moveProcessor.sensitivityX;
+        float f = sens * 0.6F * 0.2F;
+        float gcd = f * f * f * 1.2F;
+        float f1 = data.moveProcessor.sensitivityY * 0.6F * 0.2F;
+        float gcd1 = f1 * f1 * f1 * 1.2F;
+
+        double error = Math.abs(deltaYaw % gcd), error1 = Math.abs(deltaYaw % gcd1);
+
+        if(!Double.isNaN(error))
+        errors.add(error);
+        if(!Double.isNaN(error1))
+        errors.add(error1);
+
+        if(errors.size() > 10) {
+            double std = MathUtils.stdev(errors);
+
+            double delta = Math.abs(std - error);
+            debug("delta=%s std=%s y=%s p=%s", delta, std, error, error1);
         }
-    }
 
-    private float teleportPitch = -1f;
-    @Packet
-    public void oonFlying(WrappedInFlyingPacket packet, int current) {
-        if(yesTick != -1) {
-            if(yesTick + 1 > current) {
-                //return;
-            }
-            if(current != yesTick) {
-                //debug("c=%s yt=%s", current, yesTick);
-                yesTick = -1;
-                currentFloat = 0;
-                return;
-            }
-
-            teleportPitch = packet.getPitch();
-
-            yesTick = -1;
-            debug("teleport=%s cf=%s", current, currentFloat);
-            currentFloat = 0;
-        } else if(packet.isLook() && teleportPitch != -1f) {
-            final double my = ((packet.getPitch() - teleportPitch) / data.moveProcessor.pitchMode)
-                    % (Math.abs(data.playerInfo.lDeltaPitch) / data.moveProcessor.pitchMode);
-
-            final double deltaY = Math.abs(Math.floor(my) - my);
-            debug("dY=%s pgcd=%s", deltaY, data.playerInfo.pitchGCD);
-            teleportPitch = -1f;
-        }
-    }
-
-    @Packet
-    public void onTrans(WrappedOutTransaction packet) {
-        if(Kauri.INSTANCE.keepaliveProcessor.tick % 10 == 0) {
-            float random = ThreadLocalRandom.current().nextInt(100, 800) / 100000f
-                    * (ThreadLocalRandom.current().nextBoolean() ? 1 : -1);
-            WrappedOutPositionPacket pos = new WrappedOutPositionPacket(new Location(
-                    packet.getPlayer().getWorld(), 0, 0, 0, 0, random),
-                    WrappedOutPositionPacket.EnumPlayerTeleportFlags.values());
-
-            TinyProtocolHandler.sendPacket(packet.getPlayer(), pos);
-
-            ids.put(packet.getAction(), random);
-        }
     }
 }

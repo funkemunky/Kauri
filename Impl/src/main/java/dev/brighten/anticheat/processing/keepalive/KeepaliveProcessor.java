@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class KeepaliveProcessor implements Runnable {
 
@@ -35,7 +36,13 @@ public class KeepaliveProcessor implements Runnable {
     public void run() {
         tick++;
         synchronized (keepAlives) {
-            currentKeepalive = new KeepAlive(tick);
+            short id = (short) ThreadLocalRandom.current().nextInt(Short.MIN_VALUE, Short.MAX_VALUE);
+
+            //Ensuring we don't have any duplicate IDS
+            while(Kauri.INSTANCE.keepaliveProcessor.keepAlives.containsKey(id)) {
+                id = (short) ThreadLocalRandom.current().nextInt(Short.MIN_VALUE, Short.MAX_VALUE);
+            }
+            currentKeepalive = new KeepAlive(tick, id);
             keepAlives.put(currentKeepalive.id, currentKeepalive);
         }
 
@@ -72,7 +79,7 @@ public class KeepaliveProcessor implements Runnable {
     }
 
     public Optional<KeepAlive> getKeepByTick(int tick) {
-        return keepAlives.values().parallelStream().filter(ka -> ka.start == tick).findFirst();
+        return keepAlives.values().stream().filter(ka -> ka.start == tick).findFirst();
     }
 
     public Optional<KeepAlive> getKeepById(short id) {

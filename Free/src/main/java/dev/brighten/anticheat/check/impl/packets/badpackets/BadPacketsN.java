@@ -71,7 +71,7 @@ public class BadPacketsN extends Check {
             lastTrans.reset();
             int current = response.get().start;
 
-            if (current - lastTick > 1 && lastTick != 0 && now - data.creation > 4000L) {
+            if (current - lastTick > 1 && lastTick != 0 && lastTick != 1 && now - data.creation > 4000L) {
                 vl++;
                 flag("c=%s last=%s d=%s t=SKIP", current, lastTick, current - lastTick);
 

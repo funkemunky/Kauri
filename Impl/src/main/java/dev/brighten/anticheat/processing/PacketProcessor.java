@@ -692,7 +692,6 @@ public class PacketProcessor {
             case Packet.Server.KEEP_ALIVE: {
                 WrappedOutKeepAlivePacket packet = new WrappedOutKeepAlivePacket(object, data.getPlayer());
 
-                data.keepAlives.put(packet.getTime(), timestamp);
                 data.lagInfo.lastKeepAlive = timestamp;
                 data.checkManager.runPacket(packet, timestamp);
                 break;

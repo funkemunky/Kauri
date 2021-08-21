@@ -15,9 +15,9 @@ public class KeepAlive {
     public final short id;
     public long startStamp;
 
-    public KeepAlive(int start) {
+    public KeepAlive(int start, short id) {
         this.start = start;
-        id = (short) (Kauri.INSTANCE.keepaliveProcessor.tick % 32767);
+        this.id = id;
     }
 
     public final Map<UUID, KAReceived> receivedKeepalive = new HashMap<>();
