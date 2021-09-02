@@ -7,7 +7,7 @@
     <groupId>dev.brighten.anticheat</groupId>
     <artifactId>Kauri</artifactId>
     <packaging>pom</packaging>
-    <version>2.15.0-PRE</version>
+    <version>2.15.0-PRE-b2</version>
     <modules>
         <module>API</module>
         <module>Impl</module>

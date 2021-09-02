@@ -29,6 +29,7 @@ public class ChatCheck {
 
     private final PacketListener chatCheckListener = Atlas.getInstance().getPacketProcessor()
             .process(Kauri.INSTANCE, EventPriority.HIGHEST, event -> {
+                if(!enabled) return true;
                 WrappedInChatPacket packet = new WrappedInChatPacket(event.getPacket(), event.getPlayer());
 
                 if(packet.getMessage().length() <= 0) return true;

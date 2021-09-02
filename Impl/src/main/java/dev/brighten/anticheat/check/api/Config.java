@@ -52,4 +52,7 @@ public class Config {
 
     @ConfigSetting(name = "bypassPerm")
     public static boolean bypassPermission = true;
+
+    @ConfigSetting(path = "alerts.advanced", name = "overrideCompatibilityWarnings")
+    public static boolean overrideCompat = false;
 }
