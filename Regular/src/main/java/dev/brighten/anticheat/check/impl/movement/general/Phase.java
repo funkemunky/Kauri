@@ -10,6 +10,7 @@ import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.check.api.Setting;
 import dev.brighten.anticheat.processing.TagsBuilder;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
@@ -31,6 +32,10 @@ public class Phase extends Check {
     private final Set<Material> allowedMaterials = Collections.unmodifiableSet(Arrays.stream(Material.values())
             .filter(mat -> mat.name().contains("BANNER") || mat.name().contains("BREWING"))
             .collect(Collectors.toSet()));
+
+    @Setting(name = "flagIntoChat")
+    private boolean flagIntoChat = false;
+
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long now) {
         if(now - data.creation < 1200L || now - data.playerInfo.lastRespawn < 150L

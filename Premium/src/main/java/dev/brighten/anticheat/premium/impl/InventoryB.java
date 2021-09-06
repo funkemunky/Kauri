@@ -24,6 +24,7 @@ public class InventoryB extends Check {
         if(packet.isPos()
                 && !data.playerInfo.serverPos
                 && data.playerInfo.inventoryOpen
+                && !data.playerInfo.flying
                 && !data.blockInfo.inLava
                 && !data.blockInfo.inWeb
                 && data.playerInfo.lastVelocity.isPassed(30)

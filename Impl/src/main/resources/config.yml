@@ -1,3 +1,469 @@
 # ######################################################## #
 #                    Kauri Configuration                   #
 # ######################################################## #
+
+# Configure which methods of storage Kauri will use for storing settings, logs, and other data.
+# If MySQL and Mongo are not used, Kauri will default to a local Kauri.db file using the SQLLite format for storage within
+# the plugin foilder.
+database:
+  mysql:
+    enabled: false
+    username: root
+    database: Kauri
+    password: password
+    ip: 127.0.0.1
+    port: 3306
+    # This will insert debug messages into console about MySQL insertion, among other things. Recommended to keep disabled unless
+    # otherwise instructed.
+    debugMessages: false
+    # Kauri uses a bulk insert to prevent overloading your database with queries. Change the rate insertion queries run with logs
+    # by second. Default insertion rate (recommended): every 2 seconds
+    insertionRate: 2
+  # Recommended to use Mongo 5.0 or newer.
+  mongo:
+    enabled: false
+    username: root
+    password: password
+    # You should configure your Mongo database to use login details, though some customers may not. Set to true to use
+    # your credentials.
+    requiresLoginDetails: false
+    database: Kauri
+    # This is the database in Mongo your credentials use to authenticate. This database will not be used for storing data.
+    authDatabase: admin
+    ip: 127.0.0.1
+    port: 27017
+
+# Configure the punishments system for Kauri.
+punishments:
+  # Configure the commands to be run. They will be run in sequential order.
+  # Placeholders: %name% (player name)
+  commands:
+    - kick %name% [Kauri] Unfair Advantage -s
+  # You can set the broadcast string to "none" to disable punishment broadcasting.
+  # Placeholders: %name% (player name)
+  broadcast: |-
+    §8§m-----------------------------------------------------
+    &e%name% &7was removed by &6Kauri &7because of an &fUnfair Advantage&7.§8§m-----------------------------------------------------
+  # Send the punishment commands to the bungee. Requires AtlasBungee for this feature to function.
+  bungeeCommand: false
+  # Broadcast the punishment across your servers. Requires AtlasBungee for this feature to function.
+  bungeeBroadcast: false
+# Configure how the cheat detection alerts for Kauri function.
+alerts:
+  # Send the alerts across servers. Requires AtlasBungee to function.
+  bungee: false
+  # The delay between alerts being broadcasted into chat in milliseconds.
+  delay: 500
+  # Print cheat detection alerts to console.
+  toConsole: true
+  # Should Kauri rubberband or cancel actions when a cheat is detected?
+  cancelCheats: true
+  # Sends messages to players of their own detections when alerts are disabled.
+  testMode: false
+  # The command that should be run when users click on the alert messages.
+  # Placeholders: %player% (player name)
+  clickCommand: teleport %player%
+  # Should detections marked as experimental flag at all?
+  dev: true
+  # Advanced alerts configuration. Do not change unless instructed to do so.
+  advanced:
+    # Set to true only if you are unable to install AtlasBungee onto your server when using BungeeCord and/or you are not
+    # using plugins like ViaVersion on your Bungeecord and don't want forge support.
+    overrideCompatibilityWarnings: false
+
+# General settings
+general:
+  # Which language file should we use?
+  language: english
+  # Protects your server against use of illegal characters to bypass chat filter or spam filters.
+  illegalCharacters:
+    enabled: true
+    # Whitelist specific characters from being blocked.
+    whitelisted: []
+    # Allow extended latin character sets to be used.
+    allowExtended: false
+    # Maximum message lengths allowed from players by character length.
+    messageLengthMax: 250
+  # Allow the use of the bungee command sending feature within Kauri using /bungeecmd to send commands to Bungeecord.
+  # Feature require AtlasBungee to be installed.
+  bungeeCmd: true
+# Should the kauri.bypass permission functionality be enabled or disabled?
+bypassPerm: true
+
+# Configure all the detections and their states here.
+# Enabled (whether or not the check is enabled); Executable (should this detection ban a player?);
+# Cancellable (should the detection cancel player actions?)
+checks:
+  Autoclicker (C):
+    enabled: true
+    executable: true
+    cancellable: false
+  Autoclicker (G):
+    enabled: true
+    executable: true
+    cancellable: false
+  Fly (B):
+    enabled: true
+    executable: true
+    cancellable: false
+  Fly (C):
+    enabled: true
+    executable: true
+    cancellable: false
+  Fly (D):
+    enabled: true
+    executable: true
+    cancellable: false
+  Fly (E):
+    enabled: true
+    executable: true
+    cancellable: false
+  Fly (F):
+    enabled: true
+    executable: true
+    cancellable: false
+  FastLadder:
+    enabled: true
+    executable: false
+    cancellable: false
+  NoFall (B):
+    enabled: true
+    executable: false
+    cancellable: false
+  Reach (A):
+    enabled: true
+    executable: true
+    cancellable: false
+  Hitboxes:
+    enabled: true
+    executable: true
+    cancellable: false
+  Aim (A):
+    enabled: true
+    executable: true
+    cancellable: false
+  Aim (B):
+    enabled: true
+    executable: true
+    cancellable: false
+  Aim (C):
+    enabled: false
+    executable: true
+    cancellable: false
+  Aim (D):
+    enabled: true
+    executable: true
+    cancellable: false
+  Aim (E):
+    enabled: false
+    executable: true
+    cancellable: false
+  Speed (B):
+    enabled: true
+    executable: true
+    cancellable: false
+  Speed (C):
+    enabled: false
+    executable: true
+    cancellable: false
+  Speed (D):
+    enabled: true
+    executable: true
+    cancellable: false
+  Killaura (A):
+    enabled: true
+    executable: true
+    cancellable: false
+  Killaura (B):
+    enabled: true
+    executable: true
+    cancellable: false
+  Killaura (C):
+    enabled: true
+    executable: true
+    cancellable: false
+  Killaura (D):
+    enabled: true
+    executable: true
+    cancellable: false
+  Killaura (E):
+    enabled: true
+    executable: true
+    cancellable: false
+  Killaura (F):
+    enabled: true
+    executable: true
+    cancellable: false
+  OmniSprint:
+    enabled: true
+    executable: true
+    cancellable: false
+  Timer (B):
+    enabled: true
+    executable: true
+    cancellable: false
+  Velocity (A):
+    enabled: true
+    executable: true
+    cancellable: false
+  Velocity (C):
+    enabled: true
+    executable: true
+    cancellable: false
+  Hand (A):
+    enabled: true
+    executable: false
+    cancellable: false
+  Hand (B):
+    enabled: true
+    executable: false
+    cancellable: false
+  Hand (C):
+    enabled: true
+    executable: true
+    cancellable: false
+  Hand (D):
+    enabled: false
+    executable: true
+    cancellable: false
+  BookOp:
+    enabled: true
+    executable: false
+    cancellable: false
+  BookEnchant:
+    enabled: true
+    executable: false
+    cancellable: false
+  PacketSpam:
+    enabled: true
+    executable: false
+    cancellable: false
+    settings:
+      whitelistedPackets:
+        - PacketPlayInChat
+        - PacketPlayInWindowClick
+        - PacketPlayInSetCreativeSlot
+        - PacketPlayInTransaction
+        - PacketPlayInKeepAlive
+      thresholds:
+        payloadBase: 25
+        generalBase: 80
+      disconnectChannel: true
+  SignOp:
+    enabled: true
+    executable: true
+    cancellable: false
+  LargeMove:
+    enabled: true
+    executable: true
+    cancellable: false
+    settings:
+      closeChannel: true
+      bukkitKick:
+        enabled: false
+        message: Illegal move
+      cancelPacket: true
+  SignCrash:
+    enabled: true
+    executable: true
+    cancellable: false
+  CreativeCrash:
+    enabled: true
+    executable: true
+    cancellable: false
+    settings:
+      closeChannel: true
+      bukkitKick:
+        enabled: false
+        message: Illegal packet
+      cancelPacket: true
+      impossibleItemCreate: true
+  BookCrash:
+    enabled: true
+    executable: true
+    cancellable: false
+  Infinity:
+    enabled: true
+    executable: true
+    cancellable: false
+  Block (A):
+    enabled: true
+    executable: true
+    cancellable: false
+  Phase:
+    enabled: true
+    executable: false
+    cancellable: true
+  Velocity (B):
+    enabled: true
+    executable: true
+    cancellable: false
+  Motion:
+    enabled: true
+    executable: true
+    cancellable: false
+  Aim (H):
+    enabled: true
+    executable: true
+    cancellable: false
+  Aim (I):
+    enabled: true
+    executable: true
+    cancellable: false
+  Aim (G):
+    enabled: true
+    executable: true
+    cancellable: false
+  Aim (J):
+    enabled: true
+    executable: true
+    cancellable: false
+  HealthSpoof:
+    enabled: true
+    executable: false
+    cancellable: false
+    settings:
+      crasher: false
+      healthToSpoof: 1.0
+  Autoclicker (D):
+    enabled: true
+    executable: false
+    cancellable: false
+  Autoclicker (F):
+    enabled: true
+    executable: true
+    cancellable: false
+  Autoclicker (E):
+    enabled: true
+    executable: true
+    cancellable: false
+  Inventory (A):
+    enabled: true
+    executable: true
+    cancellable: false
+  Inventory (B):
+    enabled: false
+    executable: true
+    cancellable: false
+  Inventory (C):
+    enabled: true
+    executable: true
+    cancellable: false
+  Autoclicker (H):
+    enabled: true
+    executable: true
+    cancellable: false
+  Autoclicker (I):
+    enabled: true
+    executable: true
+    cancellable: false
+  Autoclicker (J):
+    enabled: true
+    executable: true
+    cancellable: false
+  Autoclicker (A):
+    enabled: true
+    executable: true
+    cancellable: false
+    settings:
+      cpsToFlag: 22
+      cpsToBan: 28
+  Fly (A):
+    enabled: true
+    executable: true
+    cancellable: false
+  NoFall (A):
+    enabled: true
+    executable: false
+    cancellable: false
+  Speed (A):
+    enabled: true
+    executable: true
+    cancellable: false
+  BadPackets (A):
+    enabled: true
+    executable: true
+    cancellable: false
+  BadPackets (B):
+    enabled: true
+    executable: true
+    cancellable: false
+  BadPackets (C):
+    enabled: true
+    executable: true
+    cancellable: false
+  BadPackets (D):
+    enabled: true
+    executable: true
+    cancellable: false
+  BadPackets (E):
+    enabled: true
+    executable: true
+    cancellable: false
+  BadPackets (F):
+    enabled: true
+    executable: true
+    cancellable: false
+  BadPackets (G):
+    enabled: true
+    executable: true
+    cancellable: false
+  BadPackets (H):
+    enabled: true
+    executable: true
+    cancellable: false
+  BadPackets (I):
+    enabled: true
+    executable: true
+    cancellable: false
+  BadPackets (K):
+    enabled: true
+    executable: true
+    cancellable: false
+  BadPackets (L):
+    enabled: true
+    executable: true
+    cancellable: false
+  BadPackets (M):
+    enabled: true
+    executable: true
+    cancellable: false
+  BadPackets (N):
+    enabled: true
+    executable: false
+    cancellable: false
+    settings:
+      kickPlayer: true
+      strings:
+        kick: '[Kauri] Invalid packets (%s).'
+  Timer (A):
+    enabled: true
+    executable: true
+    cancellable: false
+  Velocity (D):
+    enabled: true
+    executable: true
+    cancellable: false
+  ForceBan:
+    enabled: true
+    executable: true
+    cancellable: false
+
+# Configure the Discord Webhook system.
+discord:
+  # Take the webhook url from your server and paste it in quotes here.
+  # Don't know where to start? Read Discord's guide: https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks
+  webhookUrl: "Insert URL here"
+  # Enable or disable this Discord Webhook system.
+  enabled: false
+  msgDelayInMillis: 2000
+  # Configure which Kauri actions you want sent into your webhook channel.
+  send:
+    # Log ban actions into your Discord webhook channel.
+    bans: true
+    # Log player flags int oyour Discord webhook channel.
+    alerts: false
+    # Prints a setup confirmation message into your Discord channel.
+    startMsg: false
+  # Should experimental checks flag into your Discord?
+  devAlerts: false

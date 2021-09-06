@@ -28,7 +28,7 @@ public class KillauraC extends Check {
 
         long delta = timeStamp - lastArm;
 
-        if(delta > 1000L
+        if(delta > 4000L
                 && data.lagInfo.lastPacketDrop.isPassed(10)
                 && !data.lagInfo.lagging) {
             vl++;

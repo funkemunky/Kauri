@@ -10,10 +10,7 @@ import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -24,7 +21,7 @@ public class KeepaliveProcessor implements Runnable {
     public KeepAlive currentKeepalive;
     public int tick;
 
-    public final Map<Short, KeepAlive> keepAlives = new ConcurrentEvictingMap<>(60);
+    public final Map<Short, KeepAlive> keepAlives = new ConcurrentHashMap<>();
 
     public ConcurrentHashMap<UUID, Short> lastResponses = new ConcurrentHashMap<>();
 
@@ -36,6 +33,9 @@ public class KeepaliveProcessor implements Runnable {
     public void run() {
         tick++;
         synchronized (keepAlives) {
+            if(tick % 20 == 0)
+                keepAlives.entrySet().stream().filter(entry -> tick - entry.getValue().start > 60)
+                        .forEach(entry -> keepAlives.remove(entry.getKey()));
             short id = (short) ThreadLocalRandom.current().nextInt(Short.MIN_VALUE, Short.MAX_VALUE);
 
             //Ensuring we don't have any duplicate IDS

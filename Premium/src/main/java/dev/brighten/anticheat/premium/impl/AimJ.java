@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
-@CheckInfo(name = "Aim (J)",  description = "Checks for weird stuffs", checkType = CheckType.AIM)
+@CheckInfo(name = "Aim (J)",  description = "Detects gcd patches -Rhys", checkType = CheckType.AIM)
 public class AimJ extends Check {
 
     private int threshold;
@@ -23,7 +23,6 @@ public class AimJ extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if(packet.isLook()) {
-            double sens = data.moveProcessor.sensitivityX;
 
             double o = MiscUtils.clampToVanilla(MovementProcessor.percentToSens(95),
                     data.playerInfo.to.pitch);
@@ -35,12 +34,8 @@ public class AimJ extends Check {
             if(Math.abs(pitch) != 90f && ((o > 0 && length > 0 && length < 8)
                     || (o == 0f && length > 0 && length < 6))) {
 
-                double trim = MathUtils.trim(8, pitch);
-
-                if(!MiscUtils.endsWith(trim, "5") && o < .5) {
-                    debug(Color.Green + "Flagging");
-                }
-                debug("trim=%s offset=%s", trim, o);
+                vl++;
+                flag("o=%s t=%s", o, length);
             }
         } else threshold = 0;
     }

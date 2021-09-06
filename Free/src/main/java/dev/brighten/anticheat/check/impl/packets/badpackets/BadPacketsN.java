@@ -19,9 +19,9 @@ import lombok.val;
 @CheckInfo(name = "BadPackets (N)", description = "Designed to patch disablers for Kauri.",
         checkType = CheckType.BADPACKETS, punishVL = 50, vlToFlag = 4, executable = false)
 public class BadPacketsN extends Check {
-
     @Setting(name  = "kickPlayer")
     private static boolean kickPlayer = true;
+
     private int flying, lastTick, noBuffer;
     private final Timer lastTrans = new TickTimer(), lastSentTrans = new MillisTimer(), lastKeepAlive = new TickTimer(),
             lastFlying = new TickTimer();
