@@ -55,4 +55,7 @@ public class Config {
 
     @ConfigSetting(path = "alerts.advanced", name = "overrideCompatibilityWarnings")
     public static boolean overrideCompat = false;
+
+    @ConfigSetting(name = "metrics")
+    public static boolean metrics = true;
 }

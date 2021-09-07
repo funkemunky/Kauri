@@ -17,12 +17,15 @@ import dev.brighten.anticheat.processing.PacketProcessor;
 import dev.brighten.anticheat.processing.keepalive.KeepaliveProcessor;
 import dev.brighten.anticheat.utils.timer.impl.AtlasTimer;
 import dev.brighten.api.KauriAPI;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.concurrent.Executors;
 
 public class Load {
+
+    private static final int pluginId = 12727; // Kauri bStats plugin ID
 
     public static void load() {
         register("Kicking players online...");
@@ -67,6 +70,11 @@ public class Load {
 
         register("Discord Webhooks...");
         if(DiscordAPI.INSTANCE != null) DiscordAPI.INSTANCE.load();
+
+        if(Config.metrics) {
+            register("Loading metrics...");
+            Metrics metrics = new Metrics(Kauri.INSTANCE, pluginId);
+        }
 
         register("Running tps task...");
         Kauri.INSTANCE.runTpsTask();
