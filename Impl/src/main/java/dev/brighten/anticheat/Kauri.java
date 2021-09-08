@@ -17,6 +17,7 @@ import dev.brighten.anticheat.logs.LoggerManager;
 import dev.brighten.anticheat.processing.PacketProcessor;
 import dev.brighten.anticheat.processing.keepalive.KeepaliveProcessor;
 import dev.brighten.anticheat.utils.StringUtils;
+import dev.brighten.anticheat.utils.SystemUtil;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.AtlasTimer;
 import dev.brighten.api.KauriAPI;
@@ -26,6 +27,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -151,6 +153,14 @@ public class Kauri extends JavaPlugin {
         for (Runnable runnable : onReload) {
             runnable.run();
             onReload.remove(runnable);
+        }
+    }
+
+    public void generateDefaultConfig() {
+        File configFile = new File(getDataFolder(), "config.yml");
+        if(!configFile.exists()){
+            configFile.getParentFile().mkdirs();
+            SystemUtil.copy(getResource("config.yml"), configFile);
         }
     }
 

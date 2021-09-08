@@ -35,7 +35,7 @@ public class Load {
         Kauri.INSTANCE.loggingThread = Executors.newSingleThreadScheduledExecutor();
 
         register("Loading config...");
-        Kauri.INSTANCE.saveDefaultConfig();
+        Kauri.INSTANCE.generateDefaultConfig();
 
         register("Loading API...");
         Kauri.INSTANCE.kauriAPI = new KauriAPI();

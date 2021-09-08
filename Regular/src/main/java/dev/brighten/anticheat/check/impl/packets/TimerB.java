@@ -18,7 +18,7 @@ import dev.brighten.api.check.CheckType;
 public class TimerB extends Check {
 
     private long lastFlying;
-    private double totalTimer = -1000;
+    private double totalTimer = -2000;
     private int buffer;
     private final SimpleAverage averageIncrease = new SimpleAverage(5, 0);
     private final Timer lastFlag = new TickTimer();
@@ -47,7 +47,7 @@ public class TimerB extends Check {
 
         double avgIncrease = averageIncrease.getAverage();
 
-        totalTimer = Math.max(totalTimer, -1000);
+        totalTimer = Math.max(totalTimer, -5000);
 
         if(totalTimer > 150) {
             if(++buffer > 3) {
