@@ -1,10 +1,10 @@
 # ######################################################## #
-#                    Kauri Configuration             #
+#                    Kauri Configuration                   #
 # ######################################################## #
-
+#
 # Configure which methods of storage Kauri will use for storing settings, logs, and other data.
-# If MySQL and Mongo are not used, Kauri will default to a local Kauri.db file using the SQLLite format for storage within
-# the plugin foilder.
+# If MySQL and Mongo are not used, Kauri will default to a local Kauri.db file using the SQLLite format
+# for storage within the plugin folder.
 database:
   mysql:
     enabled: false
@@ -13,79 +13,82 @@ database:
     password: password
     ip: 127.0.0.1
     port: 3306
-# This will insert debug messages into console about MySQL insertion, among other things. Recommended to keep disabled unless
-# otherwise instructed.
+  # This will insert debug messages into console about MySQL insertion, among other things.
+  # Recommended to keep disabled unless otherwise instructed.
     debugMessages: false
-# Kauri uses a bulk insert to prevent overloading your database with queries. Change the rate insertion queries run with logs
-# by second. Default insertion rate (recommended): every 2 seconds
+  # Kauri uses a bulk insert to prevent overloading your database with queries. Change the rate insertion queries run
+  # with logs by second. Default insertion rate (recommended): every 2 seconds
     insertionRate: 2
-# Recommended to use Mongo 5.0 or newer.
+  # Recommended to use Mongo 5.0 or newer.
   mongo:
     enabled: false
     username: root
     password: password
-# You should configure your Mongo database to use login details, though some customers may not. Set to true to use
-# your credentials.
+# You should configure your Mongo database to use login details, though some customers may not.
+# Set to true to use your credentials.
     requiresLoginDetails: false
     database: Kauri
-# This is the database in Mongo your credentials use to authenticate. This database will not be used for storing data.
+    # This is the database in Mongo your credentials use to authenticate.
+    # This database will not be used for storing data.
     authDatabase: admin
     ip: 127.0.0.1
     port: 27017
 
 # Configure the punishments system for Kauri.
 punishments:
-# Configure the commands to be run. They will be run in sequential order.
-# Placeholders: %name% (player name)
+  # Configure the commands to be run. They will be run in sequential order.
+  # Placeholders: %name% (player name)
   commands:
     - kick %name% [Kauri] Unfair Advantage -s
-# You can set the broadcast string to "none" to disable punishment broadcasting.
-# Placeholders: %name% (player name)
+  # You can set the broadcast string to "none" to disable punishment broadcasting.
+  # Placeholders: %name% (player name)
   broadcast: |-
     §8§m-----------------------------------------------------
-    &e%name% &7was removed by &6Kauri &7because of an &fUnfair Advantage&7.§8§m-----------------------------------------------------
-# Send the punishment commands to the bungee. Requires AtlasBungee for this feature to function.
+    &e%name% &7was removed by &6Kauri &7because of an &fUnfair Advantage&7.
+    §8§m-----------------------------------------------------
+  # Send the punishment commands to the bungee. Requires AtlasBungee for this feature to function.
   bungeeCommand: false
-# Broadcast the punishment across your servers. Requires AtlasBungee for this feature to function.
+  # Broadcast the punishment across your servers. Requires AtlasBungee for this feature to function.
   bungeeBroadcast: false
 # Configure how the cheat detection alerts for Kauri function.
 alerts:
-# Send the alerts across servers. Requires AtlasBungee to function.
+  # Send the alerts across servers. Requires AtlasBungee to function.
   bungee: false
-# The delay between alerts being broadcasted into chat in milliseconds.
+  # The delay between alerts being broadcasted into chat in milliseconds.
   delay: 500
-# Print cheat detection alerts to console.
+  # Print cheat detection alerts to console.
   toConsole: true
-# Should Kauri rubberband or cancel actions when a cheat is detected?
+  # Should Kauri rubberband or cancel actions when a cheat is detected?
   cancelCheats: true
-# Sends messages to players of their own detections when alerts are disabled.
+  # Sends messages to players of their own detections when alerts are disabled.
   testMode: false
-# The command that should be run when users click on the alert messages.
-# Placeholders: %player% (player name)
+  # The command that should be run when users click on the alert messages.
+  # Placeholders: %player% (player name)
   clickCommand: teleport %player%
-# Should detections marked as experimental flag at all?
+  # Should detections marked as experimental flag at all?
   dev: true
-# Advanced alerts configuration. Do not change unless instructed to do so.
+  # Advanced alerts configuration. Do not change unless instructed to do so.
   advanced:
-# Set to true only if you are unable to install AtlasBungee onto your server when using BungeeCord and/or you are not
-# using plugins like ViaVersion on your Bungeecord and don't want forge support.
+    # Set to true only if you are unable to install AtlasBungee onto your server when using BungeeCord and/or you
+    # are not using plugins like ViaVersion on your Bungeecord and don't want forge support.
+    # Recommended to keep disabled unless otherwise instructed.
     overrideCompatibilityWarnings: false
 
 # General settings
 general:
-# Which language file should we use?
+  # Which language file should we use?
   language: english
-# Protects your server against use of illegal characters to bypass chat filter or spam filters.
+  # Protects your server against use of illegal characters to bypass chat filter or spam filters.
   illegalCharacters:
     enabled: true
-# Whitelist specific characters from being blocked.
+    # Whitelist specific characters from being blocked.
     whitelisted: []
-# Allow extended latin character sets to be used.
+    # Allow extended latin character sets to be used.
     allowExtended: false
-# Maximum message lengths allowed from players by character length.
+    # Maximum message lengths allowed from players by character length.
     messageLengthMax: 250
-# Allow the use of the bungee command sending feature within Kauri using /bungeecmd to send commands to Bungeecord.
-# Feature require AtlasBungee to be installed.
+  # Allow the use of the bungee command sending feature within Kauri using /bungeecmd to send commands to Bungeecord.
+  # Feature require AtlasBungee to be installed.
   bungeeCmd: true
 # Should the kauri.bypass permission functionality be enabled or disabled?
 bypassPerm: true
@@ -239,15 +242,17 @@ checks:
     executable: false
     cancellable: false
     settings:
+      # Allows these packets to be bypassed for spam protection
       whitelistedPackets:
         - PacketPlayInChat
         - PacketPlayInWindowClick
         - PacketPlayInSetCreativeSlot
         - PacketPlayInTransaction
         - PacketPlayInKeepAlive
+      # The amount of packets per second before the detection flags
       thresholds:
-        payloadBase: 25
-        generalBase: 80
+        payloadBase: 25 # Only for PacketPlayInCustomPayload
+        generalBase: 80 # For every other incoming packet
       disconnectChannel: true
   SignOp:
     enabled: true
@@ -449,21 +454,25 @@ checks:
     executable: true
     cancellable: false
 
-# Configure the Discord Webhook system.
+  # Configure the Discord Webhook system.
 discord:
-# Take the webhook url from your server and paste it in quotes here.
-# Don't know where to start? Read Discord's guide: https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks
+  # Take the webhook url from your server and paste it in quotes here.
+  # Don't know where to start? Read Discord's guide: https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks
   webhookUrl: "Insert URL here"
-# Enable or disable this Discord Webhook system.
+  # Enable or disable this Discord Webhook system.
   enabled: false
   msgDelayInMillis: 2000
-# Configure which Kauri actions you want sent into your webhook channel.
+  # Configure which Kauri actions you want sent into your webhook channel.
   send:
-# Log ban actions into your Discord webhook channel.
+  # Log ban actions into your Discord webhook channel.
     bans: true
-# Log player flags int oyour Discord webhook channel.
+  # Log player flags int oyour Discord webhook channel.
     alerts: false
-# Prints a setup confirmation message into your Discord channel.
+  # Prints a setup confirmation message into your Discord channel.
     startMsg: false
-# Should experimental checks flag into your Discord?
+  # Should experimental checks flag into your Discord?
   devAlerts: false
+# Enable or disable bStats metrics. Collects limited information on machine specifications
+# and Spigot versions so I can better optimize and develop Kauri for you. Can be globally disabled
+# for all plugins in the config.yml within the plugins/metrics folder.
+metrics: true
