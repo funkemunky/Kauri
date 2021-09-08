@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.commands;
 
+import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.reflections.types.WrappedClass;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
@@ -264,7 +265,7 @@ public class KauriCommand extends BaseCommand {
                 + Color.White + delay + "ms" + Color.Gray + "...");
 
         Config.alertsDelay = delay;
-        Kauri.INSTANCE.getConfig().set("alerts.delay", delay);
+        Atlas.getInstance().getConfig(Kauri.INSTANCE).set("alerts.delay", delay);
         Kauri.INSTANCE.saveConfig();
         sender.sendMessage(Color.Green + "Delay set!");
     }
@@ -411,12 +412,12 @@ public class KauriCommand extends BaseCommand {
 
             String path = "checks." + checkInfo.name() + ".enabled";
 
-            boolean toggleState = !Kauri.INSTANCE.getConfig().getBoolean(path);
+            boolean toggleState = !Atlas.getInstance().getConfig(Kauri.INSTANCE).getBoolean(path);
 
             sender.sendMessage(Color.Gray + "Setting check state to "
                     + (toggleState ? Color.Green : Color.Red) + toggleState + Color.Gray + "...");
             sender.sendMessage(Color.Red + "Setting in config...");
-            Kauri.INSTANCE.getConfig().set(path, toggleState);
+            Atlas.getInstance().getConfig(Kauri.INSTANCE).set(path, toggleState);
             Kauri.INSTANCE.saveConfig();
 
             sender.sendMessage(Color.Red + "Refreshing data objects with updated information...");

@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.commands;
 
+import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.utils.*;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
@@ -274,7 +275,7 @@ public class MenuCommand extends BaseCommand {
                         .name((settings.enabled ? Color.Green : Color.Gray) + "Enabled").build(),
                 (player, info) -> {
                     settings.enabled = !settings.enabled;
-                    Kauri.INSTANCE.getConfig().set(enabled, settings.enabled);
+                    Atlas.getInstance().getConfig(Kauri.INSTANCE).set(enabled, settings.enabled);
                     Kauri.INSTANCE.saveConfig();
 
                     info.getButton().setStack(new ItemBuilder(settings.enabled
@@ -305,7 +306,7 @@ public class MenuCommand extends BaseCommand {
                         .name((settings.executable ? Color.Green : Color.Gray) + "Executable").build(),
                 (player, info) -> {
                     settings.executable = !settings.executable;
-                    Kauri.INSTANCE.getConfig().set(executable, settings.executable);
+                    Atlas.getInstance().getConfig(Kauri.INSTANCE).set(executable, settings.executable);
                     Kauri.INSTANCE.saveConfig();
 
                     info.getButton().setStack(new ItemBuilder(settings.executable
@@ -339,7 +340,7 @@ public class MenuCommand extends BaseCommand {
                 (player, info) -> {
                     if (settings.cancelMode == null) return;
                     settings.cancellable = !settings.cancellable;
-                    Kauri.INSTANCE.getConfig().set(cancellable, settings.cancellable);
+                    Atlas.getInstance().getConfig(Kauri.INSTANCE).set(cancellable, settings.cancellable);
                     Kauri.INSTANCE.saveConfig();
 
                     info.getButton().setStack(new ItemBuilder(XMaterial.INK_SAC.parseMaterial()).amount(1)

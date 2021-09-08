@@ -6,6 +6,9 @@ import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
+import cc.funkemunky.api.utils.config.Configuration;
+import cc.funkemunky.api.utils.config.ConfigurationProvider;
+import cc.funkemunky.api.utils.config.YamlConfiguration;
 import cc.funkemunky.api.utils.math.RollingAverageDouble;
 import co.aikar.commands.BukkitCommandManager;
 import dev.brighten.anticheat.check.api.Check;
@@ -21,6 +24,7 @@ import dev.brighten.anticheat.utils.SystemUtil;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.AtlasTimer;
 import dev.brighten.api.KauriAPI;
+import lombok.val;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -28,6 +32,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -131,8 +136,20 @@ public class Kauri extends JavaPlugin {
         MiscUtils.printToConsole("&aCompleted shutdown process.");
     }
 
+    public void saveConfig() {
+        Configuration config = Atlas.getInstance().getConfig(this);
+
+        val provider = ConfigurationProvider.getProvider(YamlConfiguration.class);
+        try {
+            File file = new File(getDataFolder(), "config.yml");
+            provider.save(config, file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void reload() {
-        Kauri.INSTANCE.reloadConfig();
+        Atlas.getInstance().registerConfig(this); //reloads config
 
         Check.checkClasses.clear();
         Check.checkSettings.clear();
@@ -153,14 +170,6 @@ public class Kauri extends JavaPlugin {
         for (Runnable runnable : onReload) {
             runnable.run();
             onReload.remove(runnable);
-        }
-    }
-
-    public void generateDefaultConfig() {
-        File configFile = new File(getDataFolder(), "config.yml");
-        if(!configFile.exists()){
-            configFile.getParentFile().mkdirs();
-            SystemUtil.copy(getResource("config.yml"), configFile);
         }
     }
 
