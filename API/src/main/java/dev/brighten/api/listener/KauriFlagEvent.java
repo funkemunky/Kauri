@@ -14,7 +14,7 @@ import org.bukkit.entity.Player;
 public class KauriFlagEvent extends AtlasEvent implements Cancellable {
 
     private boolean cancelled;
-    private final Player player;
-    private final KauriCheck check;
-    private final String information;
+    public final Player player;
+    public final KauriCheck check;
+    public final String information;
 }
