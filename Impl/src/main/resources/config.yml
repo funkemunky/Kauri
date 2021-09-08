@@ -24,8 +24,8 @@ database:
     enabled: false
     username: root
     password: password
-# You should configure your Mongo database to use login details, though some customers may not.
-# Set to true to use your credentials.
+    # You should configure your Mongo database to use login details, though some customers may not.
+    # Set to true to use your credentials.
     requiresLoginDetails: false
     database: Kauri
     # This is the database in Mongo your credentials use to authenticate.
@@ -453,8 +453,7 @@ checks:
     enabled: true
     executable: true
     cancellable: false
-
-  # Configure the Discord Webhook system.
+# Configure the Discord Webhook system.
 discord:
   # Take the webhook url from your server and paste it in quotes here.
   # Don't know where to start? Read Discord's guide: https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks
