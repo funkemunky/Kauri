@@ -7,25 +7,14 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.bukkit.entity.Player;
-import org.bukkit.event.HandlerList;
 
 @RequiredArgsConstructor
 @Getter
 @Setter
 public class KauriFlagEvent extends AtlasEvent implements Cancellable {
-    private static final HandlerList handlers = new HandlerList();
 
     private boolean cancelled;
-    //These are public for backwards compatibility.
-    public final Player player;
-    public final KauriCheck check;
-    public final String information;
-
-    public HandlerList getHandlers() {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
-        return handlers;
-    }
+    private final Player player;
+    private final KauriCheck check;
+    private final String information;
 }

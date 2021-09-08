@@ -292,9 +292,13 @@ public class Check implements KauriCheck {
 
         if(!executable || banExempt) return;
 
-        KauriPunishEvent punishEvent = new KauriPunishEvent(data.getPlayer(), this);
+        KauriPunishEvent punishEvent = new KauriPunishEvent(data.getPlayer(), this,
+                Config.broadcastMessage, Config.punishCommands);
 
         Atlas.getInstance().getEventManager().callEvent(punishEvent);
+
+        final List<String> punishCommands = punishEvent.getCommands();
+        final String broadcastMessage = punishEvent.getBroadcastMessage();
 
         if(!punishEvent.isCancelled()) {
             Kauri.INSTANCE.loggerManager.addPunishment(data, this);
@@ -302,28 +306,28 @@ public class Check implements KauriCheck {
                 if(!Config.broadcastMessage.equalsIgnoreCase("off")) {
                     if (!Config.bungeeBroadcast) {
                         RunUtils.task(() -> {
-                            if (!Config.broadcastMessage.equalsIgnoreCase("off")) {
-                                Bukkit.broadcastMessage(Color.translate(Config.broadcastMessage
+                            if (!broadcastMessage.equalsIgnoreCase("off")) {
+                                Bukkit.broadcastMessage(Color.translate(broadcastMessage
                                         .replace("%name%", data.getPlayer().getName())
                                         .replace("%check%", getName())));
                             }
                         }, Kauri.INSTANCE);
                     } else {
-                        BungeeAPI.broadcastMessage(Color.translate(Config.broadcastMessage
+                        BungeeAPI.broadcastMessage(Color.translate(broadcastMessage
                                 .replace("%name%", data.getPlayer().getName())).replace("%check%", getName()));
                     }
                 }
                 if(!Config.bungeePunishments) {
                     RunUtils.task(() -> {
                         ConsoleCommandSender sender = Bukkit.getConsoleSender();
-                        Config.punishCommands.
+                        punishCommands.
                                 forEach(cmd -> Bukkit.dispatchCommand(
                                         sender,
                                         cmd.replace("%name%", data.getPlayer().getName())));
                         vl = 0;
                     }, Kauri.INSTANCE);
                 } else {
-                    Config.punishCommands.
+                    punishCommands.
                             forEach(cmd -> BungeeAPI.sendCommand(cmd.replace("%name%", data.getPlayer().getName())));
                 }
                 data.banned = true;
