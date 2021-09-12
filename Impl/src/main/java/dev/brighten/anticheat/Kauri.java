@@ -136,20 +136,8 @@ public class Kauri extends JavaPlugin {
         MiscUtils.printToConsole("&aCompleted shutdown process.");
     }
 
-    public void saveConfig() {
-        Configuration config = Atlas.getInstance().getConfig(this);
-
-        val provider = ConfigurationProvider.getProvider(YamlConfiguration.class);
-        try {
-            File file = new File(getDataFolder(), "config.yml");
-            provider.save(config, file);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public void reload() {
-        Atlas.getInstance().registerConfig(this); //reloads config
+        reloadConfig();
 
         Check.checkClasses.clear();
         Check.checkSettings.clear();

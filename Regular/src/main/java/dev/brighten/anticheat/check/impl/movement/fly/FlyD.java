@@ -12,7 +12,6 @@ import dev.brighten.api.check.CheckType;
 @Cancellable(cancelType = CancelType.MOVEMENT)
 public class FlyD extends Check {
 
-    private double groundY = 1 / 64.;
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if(!packet.isPos()

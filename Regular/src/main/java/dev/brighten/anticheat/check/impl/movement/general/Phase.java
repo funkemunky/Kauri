@@ -153,6 +153,7 @@ public class Phase extends Check {
 
             if(data.blockInfo.pistonNear) threshold = 0.95;
             else if(data.playerInfo.blockAboveTimer.isNotPassed(20)) {
+                //TODO Fix under block falses
                 threshold = 0.8;
                 if(data.playerInfo.iceTimer.isNotPassed(20)) threshold+= 0.4;
             }

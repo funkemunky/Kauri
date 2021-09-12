@@ -4,16 +4,15 @@ import cc.funkemunky.api.utils.RunUtils;
 import dev.brighten.anticheat.Kauri;
 import org.bukkit.entity.Player;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class DataManager {
     public Map<UUID, ObjectData> dataMap = new ConcurrentHashMap<>();
-    public List<ObjectData> hasAlerts = new CopyOnWriteArrayList<>(), devAlerts = new CopyOnWriteArrayList<>(),
-            debugging = new CopyOnWriteArrayList<>();
+    public Set<ObjectData> hasAlerts = Collections.synchronizedSet(new HashSet<>()),
+            devAlerts = Collections.synchronizedSet(new HashSet<>()),
+            debugging = Collections.synchronizedSet(new HashSet<>());
 
     public DataManager() {
         RunUtils.taskTimerAsync(() -> {

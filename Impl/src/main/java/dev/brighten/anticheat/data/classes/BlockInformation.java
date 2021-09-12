@@ -37,14 +37,6 @@ public class BlockInformation {
     public final List<SimpleCollisionBox> aboveCollisions = Collections.synchronizedList(new ArrayList<>()),
             belowCollisions = Collections.synchronizedList(new ArrayList<>());
     public final List<Block> blocks = Collections.synchronizedList(new ArrayList<>());
-    private static final List<Material> skulls = new ArrayList<>();
-
-    static {
-        for (Material value : Material.values()) {
-            if(value.name().contains("SKULL"))
-                skulls.add(value);
-        }
-    }
 
     //Caching material
     private final Material cobweb = XMaterial.COBWEB.parseMaterial(), rosebush = XMaterial.ROSE_BUSH.parseMaterial();
@@ -61,8 +53,6 @@ public class BlockInformation {
         double dy = Math.abs(objectData.playerInfo.deltaY);
         double dh = objectData.playerInfo.deltaXZ;
 
-        if(dh == 0 && dy == 0) return;
-
         blocks.clear();
 
         onClimbable = objectData.playerInfo.serverGround = objectData.playerInfo.nearGround
@@ -73,12 +63,12 @@ public class BlockInformation {
         if(dy > 2) dy = 2;
         if(dh > 2) dh = 2;
 
-        int startX = Location.locToBlock(objectData.playerInfo.to.x - 0.6 - dh);
-        int endX = Location.locToBlock(objectData.playerInfo.to.x + 0.6 + dh);
-        int startY = Location.locToBlock(objectData.playerInfo.to.y - 0.51 - dy);
-        int endY = Location.locToBlock(objectData.playerInfo.to.y + 1.99 + dy);
-        int startZ = Location.locToBlock(objectData.playerInfo.to.z - 0.6 - dh);
-        int endZ = Location.locToBlock(objectData.playerInfo.to.z + 0.6 + dh);
+        int startX = Location.locToBlock(objectData.playerInfo.to.x - 1 - dh);
+        int endX = Location.locToBlock(objectData.playerInfo.to.x + 1 + dh);
+        int startY = Location.locToBlock(objectData.playerInfo.to.y - 1 - dy);
+        int endY = Location.locToBlock(objectData.playerInfo.to.y + 3 + dy);
+        int startZ = Location.locToBlock(objectData.playerInfo.to.z - 1 - dh);
+        int endZ = Location.locToBlock(objectData.playerInfo.to.z + 1 + dh);
 
         SimpleCollisionBox waterBox = objectData.box.copy().expand(0, -.38, 0);
 
@@ -122,14 +112,14 @@ public class BlockInformation {
                 Chunk chunk = world.getChunkAt(chunkx, chunkz);
                 if (chunk != null) {
                     int cz = chunkz << 4;
-                    int xstart = startX < cx ? cx : startX;
-                    int xend = endX < cx + 16 ? endX : cx + 16;
-                    int zstart = startZ < cz ? cz : startZ;
-                    int zend = endZ < cz + 16 ? endZ : cz + 16;
+                    int xstart = Math.max(startX, cx);
+                    int xend = Math.min(endX, cx + 16);
+                    int zstart = Math.max(startZ, cz);
+                    int zend = Math.min(endZ, cz + 16);
 
                     for (int x = xstart; x <= xend; ++x) {
                         for (int z = zstart; z <= zend; ++z) {
-                            for (int y = startY < 0 ? 0 : startY; y <= endY; ++y) {
+                            for (int y = Math.max(startY, 0); y <= endY; ++y) {
                                 if (it-- <= 0) {
                                     break start;
                                 }
@@ -176,7 +166,7 @@ public class BlockInformation {
                                     } else if(Materials.checkFlag(type, Materials.SOLID)) {
                                         SimpleCollisionBox groundBox = normalBox.copy()
                                                 .offset(0, -.1, 0).expandMax(0, -1.2, 0);
-                                        byte data = block.getData();
+
                                         Optional<XMaterial> blockMaterial =
                                                 XMaterial.matchXMaterial(type.name());
 

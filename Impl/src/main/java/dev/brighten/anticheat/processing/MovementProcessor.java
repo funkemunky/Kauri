@@ -76,7 +76,7 @@ public class MovementProcessor {
     public void process(WrappedInFlyingPacket packet, long timeStamp) {
         //We check if it's null and intialize the from and to as equal to prevent large deltas causing false positives since there
         //was no previous from (Ex: delta of 380 instead of 0.45 caused by jump jump in location from 0,0,0 to 380,0,0)
-        if (data.playerInfo.from == null) {
+        if (data.playerInfo.from == null && (packet.getX() != 0 || packet.getY() != 0 || packet.getZ() != 0)) {
             data.playerInfo.from
                     = data.playerInfo.to
                     = new KLocation(packet.getX(), packet.getY(), packet.getZ(), packet.getYaw(), packet.getPitch());
@@ -178,7 +178,7 @@ public class MovementProcessor {
                     data.playerInfo.to.x, data.playerInfo.to.y, data.playerInfo.to.z);
 
             if(timeStamp - data.creation > 400L) data.blockInfo.runCollisionCheck(); //run b4 everything else for use below.
-        }
+        } else if(timeStamp - data.creation < 3000L) data.blockInfo.runCollisionCheck();
 
         if(data.playerInfo.calcVelocityY > 0) {
             data.playerInfo.calcVelocityY-= 0.08f;

@@ -27,7 +27,7 @@ public class FlyB extends Check {
             boolean onGround = data.playerInfo.clientGround && data.blockInfo.blocksBelow;
             double predicted = onGround ? lDeltaY : (lDeltaY - 0.08) * mult;
 
-            if(data.playerInfo.lClientGround && !data.playerInfo.clientGround && data.playerInfo.deltaY > 0) {
+            if(data.playerInfo.lClientGround && !onGround && data.playerInfo.deltaY > 0) {
                 predicted = MovementUtils.getJumpHeight(data);
             }
 
@@ -60,14 +60,17 @@ public class FlyB extends Check {
                 flagged = true;
                 if(++buffer > 2 || data.playerInfo.kAirTicks > 80) {
                     ++vl;
-                    flag("dY=%.3f p=%.3f dx=%.3f", data.playerInfo.deltaY, predicted, data.playerInfo.deltaXZ);
+                    flag("dY=%.3f p=%.3f dx=%.3f", data.playerInfo.deltaY, predicted,
+                            data.playerInfo.deltaXZ);
                     fixMovementBugs();
                 }
             } else buffer-= buffer > 0 ? 0.5f : 0;
 
-            debug((flagged ? Color.Green : "") +"pos=%s deltaY=%.3f predicted=%.3f ground=%s lpass=%s cp=%s air=%s buffer=%.1f",
+            debug((flagged ? Color.Green : "")
+                            +"pos=%s deltaY=%.3f predicted=%.3f ground=%s lpass=%s cp=%s air=%s buffer=%.1f",
                     packet.getY(), data.playerInfo.deltaY, predicted, data.playerInfo.clientGround,
-                    data.playerInfo.liquidTimer.getPassed(), data.playerInfo.climbTimer.getPassed(), data.playerInfo.kAirTicks, buffer);
+                    data.playerInfo.liquidTimer.getPassed(), data.playerInfo.climbTimer.getPassed(),
+                    data.playerInfo.kAirTicks, buffer);
             lastPos = timeStamp;
         }
     }

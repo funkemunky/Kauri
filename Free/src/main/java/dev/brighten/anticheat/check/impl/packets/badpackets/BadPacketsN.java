@@ -6,18 +6,17 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import cc.funkemunky.api.utils.Color;
 import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.check.api.Check;
-import dev.brighten.anticheat.check.api.CheckInfo;
-import dev.brighten.anticheat.check.api.Packet;
-import dev.brighten.anticheat.check.api.Setting;
+import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.MillisTimer;
 import dev.brighten.anticheat.utils.timer.impl.TickTimer;
+import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
 
 @CheckInfo(name = "BadPackets (N)", description = "Designed to patch disablers for Kauri.",
         checkType = CheckType.BADPACKETS, punishVL = 50, vlToFlag = 4, executable = false)
+@Cancellable(cancelType = CancelType.MOVEMENT)
 public class BadPacketsN extends Check {
     @Setting(name  = "kickPlayer")
     private static boolean kickPlayer = true;
@@ -74,8 +73,6 @@ public class BadPacketsN extends Check {
             if (current - lastTick > 1 && lastTick != 0 && lastTick != 1 && now - data.creation > 4000L) {
                 vl++;
                 flag("c=%s last=%s d=%s t=SKIP", current, lastTick, current - lastTick);
-
-                if(!isExecutable()) kickPlayer(String.format(Color.translate(kickString), "S"));
             }
             debug("c=%s l=%s", current, lastTick);
             lastTick = current;

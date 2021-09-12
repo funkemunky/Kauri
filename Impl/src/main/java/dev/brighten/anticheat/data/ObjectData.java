@@ -107,6 +107,7 @@ public class ObjectData implements Data {
         if(getPlayer().hasPermission("kauri.command.alerts")) {
             Kauri.INSTANCE.loggerManager.storage.alertsStatus(uuid, result -> {
                 if(result) {
+                    alerts = true;
                     Kauri.INSTANCE.dataManager.hasAlerts.add(ObjectData.this);
                     getPlayer().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("alerts-on",
                             "&aYou are now viewing cheat alerts."));
@@ -118,6 +119,7 @@ public class ObjectData implements Data {
             Kauri.INSTANCE.loggerManager.storage.devAlertsStatus(uuid, result -> {
                 if(result) {
                     Kauri.INSTANCE.dataManager.devAlerts.add(ObjectData.this);
+                    devAlerts = true;
                     getPlayer().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("dev-alerts-on",
                             "&aYou are now viewing developer cheat alerts."));
                 }
