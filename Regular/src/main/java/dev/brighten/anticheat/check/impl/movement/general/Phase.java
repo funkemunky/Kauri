@@ -29,9 +29,15 @@ import java.util.stream.Collectors;
 public class Phase extends Check {
 
     private KLocation fromWhereShitAintBad = null;
-    private final Set<Material> allowedMaterials = Collections.unmodifiableSet(Arrays.stream(Material.values())
+    private static final Set<Material> allowedMaterials = EnumSet.noneOf(Material.class);
+
+    static {
+        Arrays.stream(Material.values())
             .filter(mat -> mat.name().contains("BANNER") || mat.name().contains("BREWING"))
-            .collect(Collectors.toSet()));
+                .forEach(allowedMaterials::add);
+
+        allowedMaterials.add(XMaterial.VINE.parseMaterial());
+    }
 
     @Setting(name = "flagIntoChat")
     private boolean flagIntoChat = false;

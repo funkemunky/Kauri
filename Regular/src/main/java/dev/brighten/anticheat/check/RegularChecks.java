@@ -7,8 +7,10 @@ import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckRegister;
 import dev.brighten.anticheat.check.impl.combat.aim.*;
+import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerB;
 import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerC;
 import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerG;
+import dev.brighten.anticheat.check.impl.combat.autoclicker.AutoclickerI;
 import dev.brighten.anticheat.check.impl.combat.hand.HandA;
 import dev.brighten.anticheat.check.impl.combat.hand.HandB;
 import dev.brighten.anticheat.check.impl.combat.hand.HandC;
@@ -41,8 +43,10 @@ public class RegularChecks implements CheckRegister {
 
     @Override
     public void registerChecks() {
+        Check.register(new AutoclickerB());
         Check.register(new AutoclickerC());
         Check.register(new AutoclickerG());
+        Check.register(new AutoclickerI());
         Check.register(new FlyB());
         Check.register(new FlyC());
         Check.register(new FlyD());

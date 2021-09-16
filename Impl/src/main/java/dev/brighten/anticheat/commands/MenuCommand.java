@@ -82,8 +82,8 @@ public class MenuCommand extends BaseCommand {
                             .color(ChatColor.GRAY).italic(true).create()))
             .event(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://funkemunky.cc/shop"))
             .create(),
-            fullMessage = new ComponentBuilder("Thanks for buying a full copy!").color(ChatColor.GREEN)
-                    .append("If you run a server that needs best in class combat detection, we suggesting trying ")
+            fullMessage = new ComponentBuilder("Thanks for buying a full copy! ").color(ChatColor.GREEN)
+                    .append("If you run a server that needs best-in-class combat detection, we suggest trying ")
                     .color(ChatColor.GRAY).append("Kauri Ara").color(ChatColor.GOLD).bold(true)
                     .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                             new ComponentBuilder("Opens https://funkemunky.cc/shop")

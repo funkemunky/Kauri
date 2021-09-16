@@ -548,7 +548,7 @@ public class PacketProcessor {
                 data.playerInfo.inventoryId = packet.getId();
                 break;
             }
-            case Packet.Server.EXPLOSION: {
+            /*case Packet.Server.EXPLOSION: {
                 WrappedOutExplosionPacket packet = new WrappedOutExplosionPacket(object, data.getPlayer());
 
                 Vector vector = new Vector(packet.getMotionX(), packet.getMotionY(), packet.getMotionZ());
@@ -571,7 +571,7 @@ public class PacketProcessor {
                     }
                 });
                 break;
-            }
+            }*/
             case Packet.Server.ENTITY_VELOCITY: {
                 WrappedOutVelocityPacket packet = new WrappedOutVelocityPacket(object, data.getPlayer());
 

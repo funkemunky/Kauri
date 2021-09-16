@@ -21,6 +21,7 @@ public class VelocityD extends Check {
         if(data.playerInfo.lastVelocity.isPassed(1)) return;
 
         if(data.playerInfo.deltaY < 0.001
+                && !data.playerInfo.generalCancel
                 && data.playerInfo.deltaY >= 0
                 && data.playerInfo.velocityY > 0.2) {
             buffer+= 3;

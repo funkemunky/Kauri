@@ -54,6 +54,7 @@ public class VelocityC extends Check {
             if(data.blockInfo.blocksNear
                     || data.blockInfo.blocksAbove
                     || data.blockInfo.inLiquid
+                    || data.playerInfo.creative
                     || data.lagInfo.lastPingDrop.isNotPassed(4)
                     || data.lagInfo.lastPacketDrop.isNotPassed(2)) {
                 pvX = pvZ = 0;
