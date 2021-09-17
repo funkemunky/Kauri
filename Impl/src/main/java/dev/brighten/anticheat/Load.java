@@ -73,7 +73,7 @@ public class Load {
 
         if(Config.metrics) {
             register("Loading metrics...");
-            Metrics metrics = new Metrics(Kauri.INSTANCE, pluginId);
+            Kauri.INSTANCE.metrics = new Metrics(Kauri.INSTANCE, pluginId);
         }
 
         register("Running tps task...");

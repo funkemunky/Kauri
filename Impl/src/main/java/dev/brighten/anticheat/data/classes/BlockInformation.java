@@ -180,13 +180,13 @@ public class BlockInformation {
 
                                         box.expand(Math.abs(objectData.playerInfo.deltaX) + 0.1, -0.001,
                                                 Math.abs(objectData.playerInfo.deltaZ) + 0.1);
-                                        if (Helper.isCollided(handler.getBlocks(), box))
+                                        if (blockBox.isCollided(box))
                                             collidesHorizontally = true;
 
                                         box = objectData.box.copy();
                                         box.expand(0, 0.1, 0);
 
-                                        if (Helper.isCollided(handler.getBlocks(), box))
+                                        if (blockBox.isCollided(box))
                                             collidesVertically = true;
 
                                         if(groundBox.copy().expandMin(0, -0.4, 0).expand(0.2, 0, 0.2)
@@ -239,9 +239,10 @@ public class BlockInformation {
                                         if(groundBox.copy().expand(0.5, 0.3, 0.5).isCollided(blockBox)) {
                                             if(Materials.checkFlag(type, Materials.SLABS))
                                                 onSlab = true;
+                                            else
                                             if(Materials.checkFlag(type, Materials.STAIRS))
                                                 onStairs = true;
-
+                                            else
                                             if(blockMaterial.isPresent())
                                             switch(blockMaterial.get()) {
                                                 case CAKE:

@@ -15,6 +15,7 @@ import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.processing.MovementProcessor;
 import lombok.val;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.HumanEntity;
@@ -34,6 +35,7 @@ public class MiscUtils {
     private final static Set<Class<?>> NUMBER_REFLECTED_PRIMITIVES;
 
     public static String deltaSymbol = "\u0394";
+    public static final List<UUID> testers = new ArrayList<>();
 
     static {
         Set<Class<?>> s = new HashSet<>();
@@ -109,7 +111,10 @@ public class MiscUtils {
     }
 
     public static void testMessage(String message) {
-        KauriCommand.getTesters().forEach(pl -> pl.sendMessage(Color.translate(message)));
+        final String colormsg = Color.translate(message);
+        for (UUID uuid : testers) {
+            Bukkit.getPlayer(uuid).sendMessage(colormsg);
+        }
     }
 
     public static void close(Closeable... closeables) {

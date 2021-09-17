@@ -84,6 +84,10 @@ public class DiscordAPI {
             client.close();
             client = null;
         }
+        lastDiscordSend.clear();
+        client = null;
+        author = null;
+        enabled = false;
         MiscUtils.printToConsole("&7Completed!");
     }
 

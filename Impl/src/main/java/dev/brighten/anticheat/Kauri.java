@@ -26,6 +26,7 @@ import dev.brighten.anticheat.utils.timer.impl.AtlasTimer;
 import dev.brighten.api.KauriAPI;
 import lombok.val;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
@@ -67,6 +68,7 @@ public class Kauri extends JavaPlugin {
     public KauriAPI kauriAPI;
 
     public boolean isNewer;
+    public Metrics metrics;
 
     public List<Runnable> onReload = new ArrayList<>();
 
@@ -107,11 +109,15 @@ public class Kauri extends JavaPlugin {
 
         MiscUtils.printToConsole("&7Unloading Discord Webhooks...");
         if(DiscordAPI.INSTANCE != null) DiscordAPI.INSTANCE.unload();
+        DiscordAPI.INSTANCE = null;
 
         MiscUtils.printToConsole("&7Unloading DataManager...");
         //Clearing the dataManager.
         dataManager.dataMap.values().forEach(ObjectData::unregister);
         dataManager.dataMap.clear();
+        dataManager.hasAlerts.clear();
+        dataManager.devAlerts.clear();
+        dataManager = null;
 
         MiscUtils.printToConsole("&7Stopping log process...");
         loggerManager.storage.shutdown();
@@ -125,12 +131,17 @@ public class Kauri extends JavaPlugin {
         packetProcessor = null;
 
         MiscUtils.printToConsole("&7Finshing up nullification...");
-        Atlas.getInstance().getPluginCommandManagers().remove(this.getName());
         msgHandler = null;
-        dataManager = null;
         onReload.clear();
         onReload = null;
+        KauriAPI.INSTANCE.service.shutdown();
+        KauriAPI.INSTANCE.dataManager = null;
+        KauriAPI.INSTANCE.exemptHandler = null;
+        KauriAPI.INSTANCE = null;
+        tps = null;
+        dev.brighten.anticheat.utils.MiscUtils.testers.clear();
         executor.shutdown(); //Shutting down threads.
+        metrics = null;
 
         INSTANCE = null;
         MiscUtils.printToConsole("&aCompleted shutdown process.");

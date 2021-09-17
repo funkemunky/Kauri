@@ -1,6 +1,5 @@
 package dev.brighten.anticheat.commands;
 
-import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.reflections.types.WrappedClass;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
@@ -40,8 +39,6 @@ import java.util.stream.Collectors;
 @CommandPermission("kauri.command")
 public class KauriCommand extends BaseCommand {
 
-    private static List<Player> testers = new ArrayList<>();
-
     public KauriCommand() {
         //Registering completions
         BukkitCommandCompletions cc = (BukkitCommandCompletions) Kauri.INSTANCE.commandManager
@@ -70,14 +67,14 @@ public class KauriCommand extends BaseCommand {
     @CommandPermission("kauri.command.test")
     @Description("Toggle test debug alerts")
     public void onTest(Player player) {
-        if(testers.contains(player)) {
-            if(testers.remove(player)) {
+        if(MiscUtils.testers.contains(player.getUniqueId())) {
+            if(MiscUtils.testers.remove(player.getUniqueId())) {
                 player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
                         .msg("tester-remove-success", "&cRemoved you from test messaging for developers."));
             } else player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
                     .msg("tester-remove-error", "&cThere was an error removing you from test messaging."));
         } else {
-            testers.add(player);
+            MiscUtils.testers.add(player.getUniqueId());
             player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
                     .msg("testers-added", "&aYou have been added to the test messaging list for developers."));
         }
@@ -454,10 +451,4 @@ public class KauriCommand extends BaseCommand {
             sender.sendMessage(cc.funkemunky.api.utils.MiscUtils.line(Color.Dark_Gray));
         });
     }
-
-   public static List<Player> getTesters() {
-       testers.stream().filter(Objects::isNull).forEach(testers::remove);
-
-       return testers;
-   }
 }
