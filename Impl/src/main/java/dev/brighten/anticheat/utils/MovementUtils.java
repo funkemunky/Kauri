@@ -41,9 +41,10 @@ public class MovementUtils {
         }
     }
 
-    private static WrappedField checkMovement = ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9)
+    private static final WrappedField checkMovement = ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9)
             ? MinecraftReflection.playerConnection.getFieldByName("checkMovement")
-            : MinecraftReflection.playerConnection.getFieldByName("teleportPos");
+            : MinecraftReflection.playerConnection.getFieldByName(ProtocolVersion.getGameVersion()
+            .isOrAbove(ProtocolVersion.v1_17) ? "y" : "teleportPos");
     public static boolean checkMovement(Player player) {
         Object playerConnection = MinecraftReflection.getPlayerConnection(player);
 

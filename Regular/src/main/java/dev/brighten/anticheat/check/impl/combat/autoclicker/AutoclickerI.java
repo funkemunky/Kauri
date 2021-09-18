@@ -11,7 +11,7 @@ import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Autoclicker (I)", description = "Checks for improper clicking from the client.",
-        checkType = CheckType.AUTOCLICKER, punishVL = 30, planVersion = KauriVersion.ARA)
+        checkType = CheckType.AUTOCLICKER, punishVL = 30, planVersion = KauriVersion.FULL)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerI extends Check {
 
