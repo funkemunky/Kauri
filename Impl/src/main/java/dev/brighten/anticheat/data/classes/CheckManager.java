@@ -4,6 +4,7 @@ import cc.funkemunky.api.events.AtlasEvent;
 import cc.funkemunky.api.reflections.types.WrappedClass;
 import cc.funkemunky.api.reflections.types.WrappedMethod;
 import cc.funkemunky.api.tinyprotocol.api.NMSObject;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.MiscUtils;
@@ -16,14 +17,16 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CheckManager {
     private ObjectData objectData;
     public final Map<String, Check> checks = new HashMap<>();
-    public final Map<Class<?>, List<WrappedCheck>> checkMethods = Collections.synchronizedMap(new HashMap<>());
+    public final Map<Class<?>, List<WrappedCheck>> checkMethods = new HashMap<>();
 
     public CheckManager(ObjectData objectData) {
         this.objectData = objectData;
     }
 
     public void runPacket(NMSObject object, long timeStamp) {
-        if(!checkMethods.containsKey(object.getClass())) return;
+        if(!checkMethods.containsKey(object.getClass())) {
+            return;
+        }
 
         val methods = checkMethods.get(object.getClass());
 
@@ -47,7 +50,9 @@ public class CheckManager {
     }
 
     public boolean runPacketCancellable(NMSObject object, long timeStamp) {
-        if(!checkMethods.containsKey(object.getClass())) return false;
+        if(!checkMethods.containsKey(object.getClass())) {
+            return true;
+        }
 
         val methods = checkMethods.get(object.getClass());
 
