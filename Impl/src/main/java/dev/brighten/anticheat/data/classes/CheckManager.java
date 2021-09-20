@@ -51,7 +51,7 @@ public class CheckManager {
 
     public boolean runPacketCancellable(NMSObject object, long timeStamp) {
         if(!checkMethods.containsKey(object.getClass())) {
-            return true;
+            return false;
         }
 
         val methods = checkMethods.get(object.getClass());
