@@ -25,6 +25,7 @@ public class NoFallB extends Check {
 
         // If they are saying they are on the ground
         if(data.playerInfo.clientGround
+                && data.playerInfo.lastBlockPlace.isPassed(4)
                 //And are no where near blocks
                 && !data.blockInfo.blocksBelow && !data.blockInfo.blocksNear
                 //And didn't collide with ghost blocks recently
@@ -35,6 +36,7 @@ public class NoFallB extends Check {
                 vl++;
                 flag("T=SPOOF_GROUND dy=%.2f y=%.1f", data.playerInfo.deltaY, data.playerInfo.to.y);
             }
+            fixMovementBugs();
         } else if(groundBuffer > 0) groundBuffer--;
 
         // If they are saying they are on the ground

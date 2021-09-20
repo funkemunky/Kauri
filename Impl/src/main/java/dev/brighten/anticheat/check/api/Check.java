@@ -262,6 +262,8 @@ public class Check implements KauriCheck {
 
     public void fixMovementBugs() {
         BukkitAPI.INSTANCE.setGliding(data.getPlayer(), false);
+        RunUtils.task(() -> data.blockInfo.blocks.forEach(b -> data.getPlayer()
+                .sendBlockChange(b.getLocation(), b.getType(), b.getData())));
     }
 
     private String formatAlert(String toFormat, String info) {
