@@ -8,6 +8,7 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 @CheckInfo(name = "Killaura (F)", description = "Checks for proper sprint motion mechanics.",
@@ -31,7 +32,8 @@ public class KillauraF extends Check {
             double deltaYes = Math.abs(data.playerInfo.deltaXZ - pxz),
                     deltaNo = Math.abs(data.playerInfo.deltaXZ - noxz);
 
-            if(deltaYes > 0.07 && deltaNo < 0.01) {
+            if(deltaYes > 0.07 && deltaNo < 0.01 && data.target != null
+                    && data.target.getType().equals(EntityType.PLAYER)) {
                 if(++buffer > 5) {
                      vl++;
                      flag("dy=%.3f dn=%.3f dxz=%.2f noxz=%.2f",

@@ -14,6 +14,7 @@ import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.utils.AxisAlignedBB;
 import dev.brighten.anticheat.utils.EntityLocation;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.AtlasTimer;
@@ -50,8 +51,6 @@ public class ReachB extends Check {
 
         if(eloc.x == 0 && eloc.y == 0 & eloc.z == 0) return;
 
-        RayCollision collision = new RayCollision(eyeLoc.toVector(), MathUtils.getDirection(eyeLoc));
-
         SimpleCollisionBox targetBox = (SimpleCollisionBox) EntityData
                 .getEntityBox(new Vector(eloc.x, eloc.y, eloc.z), data.target);
 
@@ -59,10 +58,12 @@ public class ReachB extends Check {
             targetBox = targetBox.expand(0.1, 0.1, 0.1);
         }
 
-        val intersect = collision.collisionPoint(targetBox);
+        AxisAlignedBB vanillaBox = new AxisAlignedBB(targetBox);
+
+        val intersect = vanillaBox.rayTrace(eyeLoc.toVector(), MathUtils.getDirection(eyeLoc), 10);
 
         if(intersect != null) {
-            double distance = eyeLoc.toVector().distance(intersect);
+            double distance = new Vector(intersect.x, intersect.y, intersect.z).distance(eyeLoc.toVector());
 
             if(distance > 3 && streak > 7 && sentTeleport && lastFlying.isNotPassed(1)) {
                 if(++buffer > 2) {
