@@ -2,6 +2,7 @@ package dev.brighten.anticheat.utils;
 
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathHelper;
+import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.Kauri;
 import lombok.RequiredArgsConstructor;
 
@@ -15,7 +16,7 @@ public class EntityLocation {
     public double newX, newY, newZ, x, y, z;
     public float newYaw, newPitch, yaw, pitch;
     public int increment = 0;
-    public List<KLocation> interpolatedLocations = new ArrayList<>();
+    public List<KLocation> interpolatedLocations = new EvictingList<>(8);
 
     public void interpolateLocations() {
         increment = 3;

@@ -235,6 +235,7 @@ public class ObjectData implements Data {
         //Ensuring we don't have any duplicate IDS
         while(Kauri.INSTANCE.keepaliveProcessor.keepAlives.containsKey(id)) {
             id = (short) ThreadLocalRandom.current().nextInt(Short.MIN_VALUE, Short.MAX_VALUE);
+            System.out.println("Duplicate " + id);
         }
 
         TinyProtocolHandler.sendPacket(getPlayer(), new WrappedOutTransaction(0, id, false).getObject());

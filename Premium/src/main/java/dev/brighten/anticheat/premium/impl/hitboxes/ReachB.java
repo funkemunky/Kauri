@@ -1,102 +1,155 @@
 package dev.brighten.anticheat.premium.impl.hitboxes;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
-import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutEntityTeleportPacket;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutRelativePosition;
 import cc.funkemunky.api.utils.KLocation;
-import cc.funkemunky.api.utils.world.CollisionBox;
+import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.world.EntityData;
+import cc.funkemunky.api.utils.world.types.RayCollision;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.check.api.*;
+import dev.brighten.anticheat.check.api.Check;
+import dev.brighten.anticheat.check.api.CheckInfo;
+import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.AxisAlignedBB;
-import dev.brighten.anticheat.utils.Vec3D;
+import dev.brighten.anticheat.utils.EntityLocation;
+import dev.brighten.anticheat.utils.MiscUtils;
+import dev.brighten.anticheat.utils.timer.Timer;
+import dev.brighten.anticheat.utils.timer.impl.AtlasTimer;
 import dev.brighten.api.KauriVersion;
-import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
-import dev.brighten.db.utils.Pair;
 import lombok.val;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.UUID;
 
-@CheckInfo(name = "Reach (B)", description = "Ensures the reach of a player is legitimate.",
-        checkType = CheckType.HITBOX, punishVL = 8, planVersion = KauriVersion.ARA, developer = true)
-@Cancellable(cancelType = CancelType.ATTACK)
+@CheckInfo(name = "Reach (B)", planVersion = KauriVersion.ARA, developer = true, checkType = CheckType.HITBOX)
 public class ReachB extends Check {
 
+    private EntityLocation eloc = new EntityLocation(UUID.randomUUID());
+    private Timer lastFlying = new AtlasTimer();
+    private int streak;
     private float buffer;
-
-    @Setting(name = "debug")
-    private static boolean debug = false;
+    private boolean sentTeleport, attacked;
 
     @Packet
-    public void onFly(WrappedInUseEntityPacket packet) {
-        if(data.target != null) {
-            if(data.playerInfo.creative) return;
+    public void onUse(WrappedInUseEntityPacket packet) {
+        if(data.target == null || packet.getAction() != WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)
+            return;
 
-            List<KLocation> entityLocs = data.entityLocPastLocation.getEstimatedLocation(
-                    Kauri.INSTANCE.keepaliveProcessor.tick,
-                    data.lagInfo.transPing + 2, 2);
+        //Updating new entity loc
+        if(data.target.getUniqueId() != eloc.uuid) {
+            eloc = new EntityLocation(data.target.getUniqueId());
+            sentTeleport = false;
+        }
 
-            double distance = 69;
-            int misses = 0, collided = 0;
-            Location toOrigin = data.playerInfo.to.toLocation(data.getPlayer().getWorld());
+        attacked = true;
+    }
 
-            toOrigin.setY(toOrigin.getY() + (data.playerInfo.sneaking ? 1.54 : 1.62));
-            for (int i = 0; i < entityLocs.size(); i++) {
-                KLocation loc = entityLocs.get(i);
+    @Packet
+    public void onFlying(WrappedInFlyingPacket packet) {
+        if(attacked) {
+            attacked = false;
+            KLocation eyeLoc = data.playerInfo.to.clone();
 
-                SimpleCollisionBox hitbox = (SimpleCollisionBox) getHitbox(data.target, loc);
+            eyeLoc.y+= data.playerInfo.sneaking ? 1.54f : 1.62f;
 
-                val copied = data.playerVersion.isBelow(ProtocolVersion.V1_9)
-                        ? hitbox.copy().expand(0.1) : hitbox;
-                AxisAlignedBB aabb = new AxisAlignedBB(copied);
-                if(debug) copied.draw(WrappedEnumParticle.FLAME, Bukkit.getOnlinePlayers());
-                Vec3D checkTo = aabb.rayTrace(toOrigin.toVector(), toOrigin.getDirection(), 10);
+            if(eloc.x == 0 && eloc.y == 0 & eloc.z == 0) return;
 
-                if(checkTo != null) {
-                    distance = Math.min(new Vector(checkTo.x, checkTo.y, checkTo.z)
-                            .distanceSquared(toOrigin.toVector()), distance);
-                    collided++;
-                } else misses++;
+            SimpleCollisionBox targetBox = (SimpleCollisionBox) EntityData
+                    .getEntityBox(new Vector(eloc.x, eloc.y, eloc.z), data.target);
+
+            if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) {
+                targetBox = targetBox.expand(0.1, 0.1, 0.1);
             }
 
-            if(distance != 69) distance = Math.sqrt(distance);
+            AxisAlignedBB vanillaBox = new AxisAlignedBB(targetBox);
 
-            boolean usedFrom = false;
+            val intersect = vanillaBox.rayTrace(eyeLoc.toVector(), MathUtils.getDirection(eyeLoc), 10);
 
-            if(collided == 0) {
-                buffer-= buffer > 0 ? 0.01f : 0;
-                debug("none collided: " + misses + ", " + entityLocs.size());
-                return;
-            }
+            if(intersect != null) {
+                double distance = new Vector(intersect.x, intersect.y, intersect.z).distance(eyeLoc.toVector());
 
-            if(data.lagInfo.lastPacketDrop.isPassed(2)) {
-                if(distance > 3.02 &&
-                        Kauri.INSTANCE.lastTickLag.isPassed(40)) {
+                if(distance > 3 && streak > 7 && sentTeleport && lastFlying.isNotPassed(1)) {
                     if(++buffer > 4) {
                         vl++;
-                        flag("distance=%.3f from=%s buffer=%.1f misses=%s",
-                                distance, usedFrom, buffer, misses);
-                        buffer = 4;
+                        flag("d=%.4f", distance);
+                        buffer = 2;
                     }
-                } else buffer-= buffer > 0 ? .1f : 0;
-            }
+                } else if(buffer > 0) buffer-= 0.1f;
+                debug("dist=%.2f", distance);
+            } else debug("didnt hit box: x=%.1f y=%.1f z=%.1f", eloc.x, eloc.y, eloc.z);
+        }
 
-            debug("distance=%.3f from=%s buffer=%.2f ticklag=%s collided=%s",
-                    distance, usedFrom, buffer, Kauri.INSTANCE.lastTickLag.getPassed(), collided);
+
+        eloc.interpolateLocation();
+        if(lastFlying.isNotPassed(1)) streak++;
+        else {
+            streak = 1;
+            sentTeleport = false;
+        }
+
+        lastFlying.reset();
+    }
+
+    @Packet
+    public void onEntity(WrappedOutRelativePosition packet, int now) {
+        if(data.target != null && data.target.getEntityId() == packet.getId()) {
+            data.runInstantAction(() -> {
+                //We don't need to do version checking here. Atlas handles this for us.
+                if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9)) {
+                    eloc.newX += (byte)packet.getX() / 32D;
+                    eloc.newY += (byte)packet.getY() / 32D;
+                    eloc.newZ += (byte)packet.getZ() / 32D;
+                    eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
+                    eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
+                } else if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_14)) {
+                    eloc.newX += (long)packet.getX() / 4096D;
+                    eloc.newY += (long)packet.getY() / 4096D;
+                    eloc.newZ += (long)packet.getZ() / 4096D;
+                    eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
+                    eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
+                } else {
+                    eloc.newX += (short)packet.getX() / 4096D;
+                    eloc.newY += (short)packet.getY() / 4096D;
+                    eloc.newZ += (short)packet.getZ() / 4096D;
+                    eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
+                    eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
+                }
+
+                eloc.increment = 3;
+            });
         }
     }
 
-    private static CollisionBox getHitbox(Entity entity, KLocation loc) {
-        return EntityData.getEntityBox(loc, entity);
+    @Packet
+    public void onTeleport(WrappedOutEntityTeleportPacket packet, int now) {
+        if(data.target != null && data.target.getEntityId() == packet.entityId) {
+
+            data.runInstantAction(() -> {
+                eloc.increment = 3;
+                //We don't need to do version checking here. Atlas handles this for us.
+                eloc.newX = eloc.x = packet.x;
+                eloc.newY = eloc.y = packet.y;
+                eloc.newZ = eloc.z = packet.z;
+                eloc.newYaw = eloc.yaw = packet.yaw;
+                eloc.newPitch = eloc.pitch = packet.pitch;
+
+                //Clearing any old interpolated locations
+                eloc.interpolatedLocations.clear();
+
+                sentTeleport = true;
+
+                debug("teleport: %s", MiscUtils.currentTick() - now);
+
+                KLocation tploc = new KLocation(eloc.x, eloc.y, eloc.z, eloc.yaw, eloc.pitch,
+                        Kauri.INSTANCE.keepaliveProcessor.tick);
+                eloc.interpolatedLocations.add(tploc);
+            });
+        }
     }
+
 }
