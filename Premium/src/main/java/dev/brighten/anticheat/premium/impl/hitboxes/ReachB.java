@@ -17,6 +17,7 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.AxisAlignedBB;
 import dev.brighten.anticheat.utils.EntityLocation;
 import dev.brighten.anticheat.utils.MiscUtils;
+import dev.brighten.anticheat.utils.Vec3D;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.AtlasTimer;
 import dev.brighten.api.KauriVersion;
@@ -53,9 +54,10 @@ public class ReachB extends Check {
     public void onFlying(WrappedInFlyingPacket packet) {
         if(attacked) {
             attacked = false;
-            KLocation eyeLoc = data.playerInfo.to.clone();
+            KLocation eyeLoc = data.playerInfo.to.clone(), eyeLocFrom = data.playerInfo.from.clone();
 
             eyeLoc.y+= data.playerInfo.sneaking ? 1.54f : 1.62f;
+            eyeLocFrom.y+= data.playerInfo.lsneaking ? 1.54f : 1.62f;
 
             if(eloc.x == 0 && eloc.y == 0 & eloc.z == 0) return;
 
@@ -69,10 +71,24 @@ public class ReachB extends Check {
             AxisAlignedBB vanillaBox = new AxisAlignedBB(targetBox);
 
             val intersect = vanillaBox.rayTrace(eyeLoc.toVector(), MathUtils.getDirection(eyeLoc), 10);
+            val intersect2 = vanillaBox
+                    .rayTrace(eyeLocFrom.toVector(), MathUtils.getDirection(eyeLocFrom), 10);
 
+            double distance = Double.MAX_VALUE;
+            boolean collided = false; //Using this to compare smaller numbers tha Double.MAX_VALUE. Slightly faster
             if(intersect != null) {
-                double distance = new Vector(intersect.x, intersect.y, intersect.z).distance(eyeLoc.toVector());
+                distance = intersect.distanceSquared(new Vec3D(eyeLoc.x, eyeLoc.y, eyeLoc.z));
+                collided = true;
+            }
 
+            if(intersect2 != null) {
+                distance = Math.min(distance, intersect2
+                        .distanceSquared(new Vec3D(eyeLocFrom.x, eyeLocFrom.y, eyeLocFrom.z)));
+                collided = true;
+            }
+
+            if(collided) {
+                distance = Math.sqrt(distance);
                 if(distance > 3 && streak > 7 && sentTeleport && lastFlying.isNotPassed(1)) {
                     if(++buffer > 4) {
                         vl++;
