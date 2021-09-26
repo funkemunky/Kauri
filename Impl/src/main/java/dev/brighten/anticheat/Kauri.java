@@ -128,6 +128,10 @@ public class Kauri extends JavaPlugin {
         //Clearing the checks.
         Check.checkClasses.clear();
         Check.checkSettings.clear();
+        Atlas.getInstance().getPacketProcessor().removeListener(packetProcessor.cancelListener);
+        Atlas.getInstance().getPacketProcessor().removeListener(packetProcessor.listener);
+        PacketProcessor.incomingPackets.clear();
+        PacketProcessor.outgoingPackets.clear();;
         packetProcessor = null;
 
         MiscUtils.printToConsole("&7Finshing up nullification...");

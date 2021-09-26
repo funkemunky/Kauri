@@ -330,7 +330,8 @@ public class Check implements KauriCheck {
                     }, Kauri.INSTANCE);
                 } else {
                     punishCommands.
-                            forEach(cmd -> BungeeAPI.sendCommand(cmd.replace("%name%", data.getPlayer().getName())));
+                            forEach(cmd -> BungeeAPI
+                                    .sendCommand(cmd.replace("%name%", data.getPlayer().getName())));
                 }
                 data.banned = true;
             }
@@ -348,7 +349,6 @@ public class Check implements KauriCheck {
     }
 
     /** Player utils **/
-
     public void kickPlayer(String reason) {
         Bukkit.getLogger().log(Level.INFO, "Kauri is kicking player" + data.getPlayer().getName() + " for: \""
                 + reason + "\"");
@@ -356,7 +356,6 @@ public class Check implements KauriCheck {
     }
 
     /** Static members **/
-
     public static void registerChecks() {
 
     }

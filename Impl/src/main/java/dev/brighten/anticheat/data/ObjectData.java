@@ -3,6 +3,7 @@ package dev.brighten.anticheat.data;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.handlers.ForgeHandler;
 import cc.funkemunky.api.handlers.ModData;
+import cc.funkemunky.api.reflections.impl.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
@@ -31,6 +32,7 @@ import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.data.Data;
+import io.netty.channel.Channel;
 import lombok.AllArgsConstructor;
 import lombok.val;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -233,12 +235,14 @@ public class ObjectData implements Data {
         short id = (short) ThreadLocalRandom.current().nextInt(Short.MIN_VALUE, Short.MAX_VALUE);
 
         //Ensuring we don't have any duplicate IDS
-        while(Kauri.INSTANCE.keepaliveProcessor.keepAlives.containsKey(id)) {
-            id = (short) ThreadLocalRandom.current().nextInt(Short.MIN_VALUE, Short.MAX_VALUE);
-            System.out.println("Duplicate " + id);
+        if(Kauri.INSTANCE.keepaliveProcessor.keepAlives.containsKey(id)) {
+            id++;
         }
 
-        TinyProtocolHandler.sendPacket(getPlayer(), new WrappedOutTransaction(0, id, false).getObject());
+
+        Channel channel = MinecraftReflection.getChannel(getPlayer());
+
+        channel.writeAndFlush(new WrappedOutTransaction(0, id, false).getObject());
 
         instantTransaction.put(id, runnable);
     }

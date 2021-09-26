@@ -30,7 +30,7 @@ import java.util.Set;
 
 public class PacketProcessor {
 
-    private static final Set<String> incomingPackets = new HashSet<>(), outgoingPackets = new HashSet<>();
+    public static final Set<String> incomingPackets = new HashSet<>(), outgoingPackets = new HashSet<>();
 
     static {
         new WrappedClass(Packet.Server.class).getFields().forEach(field -> {
@@ -44,7 +44,7 @@ public class PacketProcessor {
         });
     }
 
-    private final PacketListener listener = Atlas.getInstance().getPacketProcessor()
+    public final PacketListener listener = Atlas.getInstance().getPacketProcessor()
             .process(Kauri.INSTANCE, EventPriority.LOWEST, info -> {
                 ObjectData data = Kauri.INSTANCE.dataManager.getData(info.getPlayer());
 
@@ -62,7 +62,7 @@ public class PacketProcessor {
                 return true;
             });
 
-    private final PacketListener cancelListener = Atlas.getInstance().getPacketProcessor()
+    public final PacketListener cancelListener = Atlas.getInstance().getPacketProcessor()
             .process(Kauri.INSTANCE, EventPriority.NORMAL, info -> {
                 ObjectData data = Kauri.INSTANCE.dataManager.getData(info.getPlayer());
 

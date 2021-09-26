@@ -8,7 +8,6 @@ import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutRelativePosition;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.world.EntityData;
-import cc.funkemunky.api.utils.world.types.RayCollision;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
@@ -25,16 +24,19 @@ import dev.brighten.api.check.CheckType;
 import lombok.val;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayDeque;
+import java.util.Queue;
 import java.util.UUID;
 
 @CheckInfo(name = "Reach (B)", planVersion = KauriVersion.ARA, developer = true, checkType = CheckType.HITBOX)
 public class ReachB extends Check {
 
     private EntityLocation eloc = new EntityLocation(UUID.randomUUID());
-    private Timer lastFlying = new AtlasTimer();
+    private final Timer lastFlying = new AtlasTimer();
     private int streak;
     private float buffer;
     private boolean sentTeleport, attacked;
+    private final Queue<Runnable> queued = new ArrayDeque<>();
 
     @Packet
     public void onUse(WrappedInUseEntityPacket packet) {
@@ -96,6 +98,10 @@ public class ReachB extends Check {
                         buffer = 2;
                     }
                 } else if(buffer > 0) buffer-= 0.1f;
+
+                if(distance > 3 && eloc.newX == eloc.x && eloc.newY == eloc.y && eloc.newZ == eloc.z) {
+                    debug("Teleport packet did cause this");
+                }
                 debug("dist=%.2f", distance);
             } else debug("didnt hit box: x=%.1f y=%.1f z=%.1f", eloc.x, eloc.y, eloc.z);
         }
@@ -108,13 +114,18 @@ public class ReachB extends Check {
             sentTeleport = false;
         }
 
+        Runnable runnable = null;
+        while((runnable = queued.poll()) != null) {
+            data.runInstantAction(runnable);
+        }
+
         lastFlying.reset();
     }
 
     @Packet
     public void onEntity(WrappedOutRelativePosition packet, int now) {
         if(data.target != null && data.target.getEntityId() == packet.getId()) {
-            data.runInstantAction(() -> {
+            queued.add(() -> {
                 //We don't need to do version checking here. Atlas handles this for us.
                 if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9)) {
                     eloc.newX += (byte)packet.getX() / 32D;
@@ -144,9 +155,8 @@ public class ReachB extends Check {
     @Packet
     public void onTeleport(WrappedOutEntityTeleportPacket packet, int now) {
         if(data.target != null && data.target.getEntityId() == packet.entityId) {
-
-            data.runInstantAction(() -> {
-                eloc.increment = 3;
+            queued.add(() -> {
+                eloc.increment = 0;
                 //We don't need to do version checking here. Atlas handles this for us.
                 eloc.newX = eloc.x = packet.x;
                 eloc.newY = eloc.y = packet.y;
