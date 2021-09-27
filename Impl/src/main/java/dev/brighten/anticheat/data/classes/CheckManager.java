@@ -99,17 +99,20 @@ public class CheckManager {
         }
     }
 
-    public void runEvent(Object event) {
-        checkMethods.computeIfPresent(event.getClass(), (key, methods) -> {
+    public boolean runEvent(Object event) {
+        if(!checkMethods.containsKey(event.getClass())) return false;
 
-            for (WrappedCheck method : methods) {
-                if(!method.isPacket && method.check.enabled) {
-                    method.method.invoke(method.check, event);
-                }
+        val methods = checkMethods.get(event.getClass());
+
+        boolean cancelled = false;
+        for (WrappedCheck wrapped : methods) {
+            if(!wrapped.isPacket && wrapped.check.enabled) {
+                if(!wrapped.isBoolean) {
+                    wrapped.method.invoke(wrapped.check, event);
+                } else if(wrapped.method.invoke(wrapped.check, event)) cancelled = true;
             }
-
-            return methods;
-        });
+        }
+        return cancelled;
     }
 
     public void runEvent(AtlasEvent event) {
@@ -174,8 +177,7 @@ public class CheckManager {
                             if(method.getMethod().isAnnotationPresent(Packet.class)) {
                                 methods.sort(Comparator.comparing(m ->
                                         m.method.getMethod().getAnnotation(Packet.class).priority().getPriority()));
-                            } else if(method.getMethod()
-                                    .isAnnotationPresent(dev.brighten.anticheat.check.api.Event.class)) {
+                            } else {
                                 methods.sort(Comparator.comparing(m ->
                                         m.method.getMethod().getAnnotation(dev.brighten.anticheat.check.api.Event.class)
                                                 .priority().getPriority()));

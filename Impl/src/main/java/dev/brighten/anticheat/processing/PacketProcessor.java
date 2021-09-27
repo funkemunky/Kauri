@@ -56,6 +56,8 @@ public class PacketProcessor {
                    } else if(incomingPackets.contains(info.getType())) {
                        processClient(data, info.getPacket(), info.getType(), info.getTimestamp());
                    }
+
+                   if(data.checkManager.runEvent(info)) return false;
                } catch(Exception e) {
                    e.printStackTrace();
                }
