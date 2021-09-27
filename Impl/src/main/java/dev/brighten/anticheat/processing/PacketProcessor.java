@@ -88,6 +88,14 @@ public class PacketProcessor {
                         }
                         break;
                     }
+                    case Packet.Client.CREATIVE_SLOT: {
+                        val packet = new WrappedInSetCreativeSlotPacket(info.getPacket(), info.getPlayer());
+
+                        if(data.checkManager.runPacketCancellable(packet, info.getTimestamp())) {
+                            return false;
+                        }
+                        break;
+                    }
                     case Packet.Server.REL_LOOK:
                     case Packet.Server.REL_POSITION:
                     case Packet.Server.REL_POSITION_LOOK:
@@ -120,7 +128,7 @@ public class PacketProcessor {
                     }
                 }
                 return true;
-            }, Packet.Client.USE_ENTITY, Packet.Client.FLYING, Packet.Client.POSITION,
+            }, Packet.Client.USE_ENTITY, Packet.Client.FLYING, Packet.Client.POSITION, Packet.Client.CREATIVE_SLOT,
                     Packet.Client.POSITION_LOOK, Packet.Client.LOOK, Packet.Server.REL_LOOK,
                     Packet.Server.REL_POSITION, Packet.Server.REL_POSITION_LOOK, Packet.Server.LEGACY_REL_LOOK,
                     Packet.Server.LEGACY_REL_POSITION, Packet.Server.LEGACY_REL_POSITION_LOOK, Packet.Server.ENTITY,
@@ -449,6 +457,12 @@ public class PacketProcessor {
                 }
                 break;
             }
+            case Packet.Client.CUSTOM_PAYLOAD: {
+                WrappedInCustomPayload packet = new WrappedInCustomPayload(object, data.getPlayer());
+
+                data.checkManager.runPacket(packet, timestamp);
+                break;
+            }
             case Packet.Client.WINDOW_CLICK: {
                 WrappedInWindowClickPacket packet = new WrappedInWindowClickPacket(object, data.getPlayer());
 
@@ -548,13 +562,13 @@ public class PacketProcessor {
                 data.playerInfo.inventoryId = packet.getId();
                 break;
             }
-            /*case Packet.Server.EXPLOSION: {
+            case Packet.Server.EXPLOSION: {
                 WrappedOutExplosionPacket packet = new WrappedOutExplosionPacket(object, data.getPlayer());
 
                 Vector vector = new Vector(packet.getMotionX(), packet.getMotionY(), packet.getMotionZ());
                 data.playerInfo.velocities.add(vector);
                 data.playerInfo.doingVelocity = true;
-                data.runInstantAction(() -> {
+                data.runKeepaliveAction(keepalive -> {
                     if(data.playerInfo.velocities.contains(vector)) {
                         if(data.playerInfo.doingVelocity) {
                             data.playerInfo.lastVelocity.reset();
@@ -571,7 +585,7 @@ public class PacketProcessor {
                     }
                 });
                 break;
-            }*/
+            }
             case Packet.Server.ENTITY_VELOCITY: {
                 WrappedOutVelocityPacket packet = new WrappedOutVelocityPacket(object, data.getPlayer());
 
@@ -580,7 +594,7 @@ public class PacketProcessor {
                     Vector vector = new Vector(packet.getX(), packet.getY(), packet.getZ());
                     data.playerInfo.velocities.add(vector);
                     data.playerInfo.doingVelocity = true;
-                    data.runInstantAction(() -> {
+                    data.runKeepaliveAction(keepalive -> {
                         if(data.playerInfo.velocities.contains(vector)) {
                             if(data.playerInfo.doingVelocity) {
                                 data.playerInfo.lastVelocity.reset();
@@ -685,6 +699,12 @@ public class PacketProcessor {
                     data.entityLocPastLocation.addLocation(tploc);
                     data.playerInfo.lastTargetUpdate.reset();
                 }
+
+                data.checkManager.runPacket(packet, timestamp);
+                break;
+            }
+            case Packet.Server.CUSTOM_PAYLOAD: {
+                WrappedOutCustomPayload packet = new WrappedOutCustomPayload(object, data.getPlayer());
 
                 data.checkManager.runPacket(packet, timestamp);
                 break;

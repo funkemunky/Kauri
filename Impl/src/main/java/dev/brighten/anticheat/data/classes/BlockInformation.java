@@ -124,10 +124,10 @@ public class BlockInformation {
                                     break start;
                                 }
                                 Block block = chunk.getBlock(x & 15, y, z & 15);
-                                if (block.getType() != Material.AIR) {
+                                final Material type = block.getType();
+                                if (type != Material.AIR) {
                                     blocks.add(block);
 
-                                    final Material type = block.getType();
                                     CollisionBox blockBox = BlockData.getData(type)
                                             .getBox(block, objectData.playerVersion);
 

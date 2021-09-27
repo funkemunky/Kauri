@@ -37,7 +37,7 @@ public class NoFallB extends Check {
                 flag("T=SPOOF_GROUND dy=%.2f y=%.1f", data.playerInfo.deltaY, data.playerInfo.to.y);
             }
             fixMovementBugs();
-        } else if(groundBuffer > 0) groundBuffer--;
+        } else if(groundBuffer > 0) groundBuffer-= 2;
 
         // If they are saying they are on the ground
         if(!data.playerInfo.clientGround

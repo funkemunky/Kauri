@@ -99,6 +99,19 @@ public class CheckManager {
         }
     }
 
+    public void runEvent(Object event) {
+        checkMethods.computeIfPresent(event.getClass(), (key, methods) -> {
+
+            for (WrappedCheck method : methods) {
+                if(!method.isPacket && method.check.enabled) {
+                    method.method.invoke(method.check, event);
+                }
+            }
+
+            return methods;
+        });
+    }
+
     public void runEvent(AtlasEvent event) {
         if(!checkMethods.containsKey(event.getClass())) return;
 
@@ -117,32 +130,34 @@ public class CheckManager {
                 .hasPermission("kauri.bypass")
                 && Config.bypassPermission) return;
         synchronized (checks) {
-            Check.checkClasses.keySet().stream()
-                    .map(clazz -> {
-                        CheckInfo settings = Check.checkClasses.get(clazz);
-                        Check check = clazz.getConstructor().newInstance();
-                        check.setData(objectData);
-                        CheckSettings checkSettings = Check.checkSettings.get(clazz);
-                        check.enabled = checkSettings.enabled;
-                        check.executable = checkSettings.executable;
-                        check.cancellable = checkSettings.cancellable;
-                        check.cancelMode = checkSettings.cancelMode;
-                        check.developer = settings.developer();
-                        check.name = settings.name();
-                        check.description = settings.description();
-                        check.punishVl = settings.punishVL();
-                        check.checkType = settings.checkType();
-                        check.maxVersion = settings.maxVersion();
-                        check.vlToFlag = settings.vlToFlag();
-                        check.minVersion = settings.minVersion();
-                        check.banExempt = objectData.getPlayer().hasPermission("kauri.bypass.ban");
-                        return check;
-                    })
-                    .forEach(check -> checks.put(check.name, check));
+            for (Map.Entry<WrappedClass, CheckInfo> entry
+                    : Check.checkClasses.entrySet()) {
+                WrappedClass clazz = entry.getKey();
+                CheckInfo settings = entry.getValue();
+
+                Check check = clazz.getConstructor().newInstance();
+                check.setData(objectData);
+                CheckSettings checkSettings = Check.checkSettings.get(clazz);
+                check.enabled = checkSettings.enabled;
+                check.executable = checkSettings.executable;
+                check.cancellable = checkSettings.cancellable;
+                check.cancelMode = checkSettings.cancelMode;
+                check.developer = settings.developer();
+                check.name = settings.name();
+                check.description = settings.description();
+                check.punishVl = settings.punishVL();
+                check.checkType = settings.checkType();
+                check.maxVersion = settings.maxVersion();
+                check.vlToFlag = settings.vlToFlag();
+                check.minVersion = settings.minVersion();
+                check.banExempt = objectData.getPlayer().hasPermission("kauri.bypass.ban");
+
+                checks.put(check.name, check);
+            }
         }
 
         synchronized (checkMethods) {
-            checks.keySet().stream().map(checks::get).forEach(check -> {
+            checks.values().forEach(check -> {
                 WrappedClass checkClass = new WrappedClass(check.getClass());
 
                 Arrays.stream(check.getClass().getDeclaredMethods())
@@ -159,7 +174,8 @@ public class CheckManager {
                             if(method.getMethod().isAnnotationPresent(Packet.class)) {
                                 methods.sort(Comparator.comparing(m ->
                                         m.method.getMethod().getAnnotation(Packet.class).priority().getPriority()));
-                            } else {
+                            } else if(method.getMethod()
+                                    .isAnnotationPresent(dev.brighten.anticheat.check.api.Event.class)) {
                                 methods.sort(Comparator.comparing(m ->
                                         m.method.getMethod().getAnnotation(dev.brighten.anticheat.check.api.Event.class)
                                                 .priority().getPriority()));
