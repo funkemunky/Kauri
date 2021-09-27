@@ -240,9 +240,7 @@ public class ObjectData implements Data {
         }
 
 
-        Channel channel = MinecraftReflection.getChannel(getPlayer());
-
-        channel.writeAndFlush(new WrappedOutTransaction(0, id, false).getObject());
+        TinyProtocolHandler.sendPacket(getPlayer(), new WrappedOutTransaction(0, id, false).getObject());
 
         instantTransaction.put(id, runnable);
     }
