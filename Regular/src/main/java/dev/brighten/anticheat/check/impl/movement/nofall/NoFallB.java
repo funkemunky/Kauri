@@ -42,11 +42,9 @@ public class NoFallB extends Check {
         // If they are saying they are on the ground
         if(!data.playerInfo.clientGround
                 // Their bounding box is on the ground
-                && data.playerInfo.serverGround
-                && data.playerInfo.lastTeleportTimer.isPassed(1)
-                // And we can verify that their behavior is indicative of being grounded
-                && (data.playerInfo.to.y % divisor < 1E-6
-                        || Math.abs(data.playerInfo.deltaY) < 0.003)) {
+                && (data.playerInfo.serverGround
+                || (data.blockInfo.blocksBelow && data.playerInfo.to.y % divisor < 1E-6))
+                && data.playerInfo.lastTeleportTimer.isPassed(1)) {
             if((airBuffer +=10) > 30) {
                 vl++;
                 flag("T=SPOOF_AIR dy=%.2f y=%.1f", data.playerInfo.deltaY, data.playerInfo.to.y);

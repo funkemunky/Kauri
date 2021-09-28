@@ -11,7 +11,6 @@ import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.Tuple;
 import dev.brighten.anticheat.check.api.Check;
-import dev.brighten.anticheat.commands.KauriCommand;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.processing.MovementProcessor;
 import lombok.val;
@@ -141,6 +140,17 @@ public class MiscUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * This method can be used for getting the GCD without having to add the 2^24 offset
+     * @param current deltaYaw/deltaPitch without an offset added
+     * @param previous previous deltaYaw/deltaPitch without an offset added
+     * @return GCD of both inputs
+     */
+    public static double gcdSmall(double current, double previous) {
+        //The larger number has to be first.
+        return (Math.abs(previous) <= 0.0009765625) ? current : gcdSmall(previous, current % previous);
     }
 
     public static double getGrid(final Collection<Float> entry) {

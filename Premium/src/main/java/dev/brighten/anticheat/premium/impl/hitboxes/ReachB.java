@@ -2,6 +2,7 @@ package dev.brighten.anticheat.premium.impl.hitboxes;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutEntityTeleportPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutRelativePosition;
@@ -99,7 +100,7 @@ public class ReachB extends Check {
 
             if(collided) {
                 distance = Math.sqrt(distance);
-                if(distance > 3.02 && streak > 7 && sentTeleport && lastFlying.isNotPassed(2)) {
+                if(distance > 3.02 && streak > 3 && sentTeleport && lastFlying.isNotPassed(1)) {
                     if(++buffer > 2) {
                         vl++;
                         flag("d=%.4f", distance);
@@ -112,7 +113,7 @@ public class ReachB extends Check {
 
 
         eloc.interpolateLocation();
-        if(lastFlying.isNotPassed(2)) streak++;
+        if(lastFlying.isNotPassed(1)) streak++;
         else {
             streak = 1;
             sentTeleport = false;
@@ -122,7 +123,16 @@ public class ReachB extends Check {
     }
 
     @Packet
-    public void onEntity(WrappedOutRelativePosition packet, int now) {
+    public void onTrans(WrappedInTransactionPacket packet) {
+        if(lastFlying.isPassed(1)
+                && Kauri.INSTANCE.keepaliveProcessor.getKeepById(packet.getAction()).isPresent()) {
+            eloc.interpolateLocation();
+            attacked = false;
+        }
+    }
+
+    @Packet
+    public void onEntity(WrappedOutRelativePosition packet) {
         if(data.target != null && data.target.getEntityId() == packet.getId()) {
             data.runInstantAction(() -> {
                 //We don't need to do version checking here. Atlas handles this for us.
@@ -152,17 +162,29 @@ public class ReachB extends Check {
     }
 
     @Packet
-    public void onTeleport(WrappedOutEntityTeleportPacket packet, int now) {
+    public void onTeleport(WrappedOutEntityTeleportPacket packet) {
         if(data.target != null && data.target.getEntityId() == packet.entityId) {
             data.runInstantAction(() -> {
                 if(data.playerVersion.isOrAbove(ProtocolVersion.V1_9)) {
-                    eloc.increment = 0;
-                    //We don't need to do version checking here. Atlas handles this for us.
-                    eloc.newX = eloc.x = packet.x;
-                    eloc.newY = eloc.y = packet.y;
-                    eloc.newZ = eloc.z = packet.z;
-                    eloc.newYaw = eloc.yaw = packet.yaw;
-                    eloc.newPitch = eloc.pitch = packet.pitch;
+                    if (!(Math.abs(eloc.x - packet.x) >= 0.03125D)
+                            && !(Math.abs(eloc.y - packet.y) >= 0.015625D)
+                            && !(Math.abs(eloc.z - packet.z) >= 0.03125D)) {
+                        eloc.increment = 0;
+                        //We don't need to do version checking here. Atlas handles this for us.
+                        eloc.newX = eloc.x = packet.x;
+                        eloc.newY = eloc.y = packet.y;
+                        eloc.newZ = eloc.z = packet.z;
+                        eloc.newYaw = eloc.yaw = packet.yaw;
+                        eloc.newPitch = eloc.pitch = packet.pitch;
+                    } else {
+                        eloc.newX = packet.x;
+                        eloc.newY = packet.y;
+                        eloc.newZ = packet.z;
+                        eloc.newYaw = packet.yaw;
+                        eloc.newPitch = packet.pitch ;
+
+                        eloc.increment = 3;
+                    }
                 } else {
                     //We don't need to do version checking here. Atlas handles this for us.
                     eloc.newX = packet.x;
@@ -175,8 +197,6 @@ public class ReachB extends Check {
                 }
 
                 sentTeleport = true;
-
-                debug("teleport: %s", MiscUtils.currentTick() - now);
             });
         }
     }

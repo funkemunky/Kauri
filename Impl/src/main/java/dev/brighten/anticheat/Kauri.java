@@ -99,9 +99,8 @@ public class Kauri extends JavaPlugin {
 
         if(!reload) {
             kauriAPI = null;
-            MiscUtils.printToConsole("&7Unregistering Atlas and Bukkit listeners...");
+            MiscUtils.printToConsole("&7Unregistering Bukkit listeners...");
             HandlerList.unregisterAll(this); //Unregistering Bukkit listeners.
-            Atlas.getInstance().getEventManager().unregisterAll(this); //Unregistering Atlas listeners.
             MiscUtils.printToConsole("&7Unregistering commands...");
             //Unregister all commands starting with the arg "Kauri"
             commandManager.unregisterCommands();
