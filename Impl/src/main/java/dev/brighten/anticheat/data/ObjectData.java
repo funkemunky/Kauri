@@ -248,17 +248,19 @@ public class ObjectData implements Data {
         final Object packet = new WrappedOutTransaction(0, id, false).getObject();
 
         if(!flush) TinyProtocolHandler.sendPacket(getPlayer(), packet);
-        else {
-            if(ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_8)) {
-                TinyProtocol1_8 tp = (TinyProtocol1_8) TinyProtocolHandler.getInstance();
-                tp.sendPacket(tp.getChannel(player), packet);
-            } else {
-                TinyProtocol1_7 tp = (TinyProtocol1_7) TinyProtocolHandler.getInstance();
-                tp.sendPacket(tp.getChannel(player), packet);
-            }
-        }
+        else sendPacket(packet);
 
         instantTransaction.put(id, runnable);
+    }
+
+    public void sendPacket(Object packet) {
+        if(ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_8)) {
+            TinyProtocol1_8 tp = (TinyProtocol1_8) TinyProtocolHandler.getInstance();
+            tp.sendPacket(tp.getChannel(player), packet);
+        } else {
+            TinyProtocol1_7 tp = (TinyProtocol1_7) TinyProtocolHandler.getInstance();
+            tp.sendPacket(tp.getChannel(player), packet);
+        }
     }
 
     public int runKeepaliveAction(Consumer<KeepAlive> action, int later) {

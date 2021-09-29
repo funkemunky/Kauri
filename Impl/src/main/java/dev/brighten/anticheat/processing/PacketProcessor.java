@@ -45,10 +45,11 @@ public class PacketProcessor {
     }
 
     public final PacketListener listener = Atlas.getInstance().getPacketProcessor()
-            .process(Kauri.INSTANCE, EventPriority.LOWEST, info -> {
+            .process(Kauri.INSTANCE, EventPriority.NORMAL, info -> {
+                if(info.isCancelled()) return;
                 ObjectData data = Kauri.INSTANCE.dataManager.getData(info.getPlayer());
 
-                if(data == null || data.checkManager == null) return true;
+                if(data == null || data.checkManager == null) return;
 
                try {
                    if(outgoingPackets.contains(info.getType())) {
@@ -57,25 +58,24 @@ public class PacketProcessor {
                        processClient(data, info.getPacket(), info.getType(), info.getTimestamp());
                    }
 
-                   if(data.checkManager.runEvent(info)) return false;
+                   if(data.checkManager.runEvent(info)) info.setCancelled(true);
                } catch(Exception e) {
                    e.printStackTrace();
                }
-                return true;
             });
 
     public final PacketListener cancelListener = Atlas.getInstance().getPacketProcessor()
-            .process(Kauri.INSTANCE, EventPriority.NORMAL, info -> {
+            .process(Kauri.INSTANCE, EventPriority.LOW, info -> {
                 ObjectData data = Kauri.INSTANCE.dataManager.getData(info.getPlayer());
 
-                if(data == null || data.checkManager == null) return true;
+                if(data == null || data.checkManager == null) return;
 
                 switch(info.getType()) {
                     case Packet.Client.USE_ENTITY: {
                         val packet = new WrappedInUseEntityPacket(info.getPacket(), info.getPlayer());
 
                         if(data.checkManager.runPacketCancellable(packet, info.getTimestamp())) {
-                            return false;
+                            info.setCancelled(true);
                         }
                         break;
                     }
@@ -86,7 +86,7 @@ public class PacketProcessor {
                         val packet = new WrappedInFlyingPacket(info.getPacket(), info.getPlayer());
 
                         if(data.checkManager.runPacketCancellable(packet, info.getTimestamp())) {
-                            return false;
+                            info.setCancelled(true);
                         }
                         break;
                     }
@@ -94,7 +94,7 @@ public class PacketProcessor {
                         val packet = new WrappedInSetCreativeSlotPacket(info.getPacket(), info.getPlayer());
 
                         if(data.checkManager.runPacketCancellable(packet, info.getTimestamp())) {
-                            return false;
+                            info.setCancelled(true);
                         }
                         break;
                     }
@@ -108,7 +108,16 @@ public class PacketProcessor {
                         val packet = new WrappedOutRelativePosition(info.getPacket(), info.getPlayer());
 
                         if(data.checkManager.runPacketCancellable(packet, info.getTimestamp())) {
-                            return false;
+                            info.setCancelled(true);
+                        }
+                        break;
+                    }
+                    case Packet.Server.ENTITY_TELEPORT: {
+                        WrappedOutEntityTeleportPacket packet
+                                = new WrappedOutEntityTeleportPacket(info.getPacket(), data.getPlayer());
+
+                        if(data.checkManager.runPacketCancellable(packet, info.getTimestamp())) {
+                            info.setCancelled(true);
                         }
                         break;
                     }
@@ -116,7 +125,7 @@ public class PacketProcessor {
                         val packet = new WrappedOutTransaction(info.getPacket(), info.getPlayer());
 
                         if(data.checkManager.runPacketCancellable(packet, info.getTimestamp())) {
-                            return false;
+                            info.setCancelled(true);
                         }
                         break;
                     }
@@ -124,17 +133,16 @@ public class PacketProcessor {
                         val packet = new WrappedOutVelocityPacket(info.getPacket(), info.getPlayer());
 
                         if(data.checkManager.runPacketCancellable(packet, info.getTimestamp())) {
-                            return false;
+                            info.setCancelled(true);
                         }
                         break;
                     }
                 }
-                return true;
             }, Packet.Client.USE_ENTITY, Packet.Client.FLYING, Packet.Client.POSITION, Packet.Client.CREATIVE_SLOT,
                     Packet.Client.POSITION_LOOK, Packet.Client.LOOK, Packet.Server.REL_LOOK,
                     Packet.Server.REL_POSITION, Packet.Server.REL_POSITION_LOOK, Packet.Server.LEGACY_REL_LOOK,
                     Packet.Server.LEGACY_REL_POSITION, Packet.Server.LEGACY_REL_POSITION_LOOK, Packet.Server.ENTITY,
-                    Packet.Server.TRANSACTION, Packet.Server.ENTITY_VELOCITY);
+                    Packet.Server.TRANSACTION, Packet.Server.ENTITY_VELOCITY, Packet.Server.ENTITY_TELEPORT);
 
 
     public void processClient(ObjectData data, Object object, String type,
@@ -674,6 +682,10 @@ public class PacketProcessor {
                     data.playerInfo.lastTargetUpdate.reset();
                 }
 
+                if(data.sniffing) {
+                    data.sniffedPackets.add(type + ":@:" + packet.getId() + ";" + packet.getX() + ";" + packet.getY() + ";"
+                            + packet.getZ() + ";" + packet.getYaw() + ";" + packet.getPitch() + ":" + timestamp);
+                }
 
                 data.checkManager.runPacket(packet, timestamp);
                 break;
@@ -700,6 +712,11 @@ public class PacketProcessor {
 
                     data.entityLocPastLocation.addLocation(tploc);
                     data.playerInfo.lastTargetUpdate.reset();
+                }
+
+                if(data.sniffing) {
+                    data.sniffedPackets.add(type + ":@:" + packet.entityId + ";" + packet.x + ";" + packet.y + ";"
+                            + packet.z + ";" + packet.yaw + ";" + packet.pitch + ":" + timestamp);
                 }
 
                 data.checkManager.runPacket(packet, timestamp);

@@ -29,16 +29,16 @@ public class ChatCheck {
 
     private final PacketListener chatCheckListener = Atlas.getInstance().getPacketProcessor()
             .process(Kauri.INSTANCE, EventPriority.HIGHEST, event -> {
-                if(!enabled) return true;
+                if(!enabled) return;
                 WrappedInChatPacket packet = new WrappedInChatPacket(event.getPacket(), event.getPlayer());
 
-                if(packet.getMessage().length() <= 0) return true;
+                if(packet.getMessage().length() <= 0) return;
 
                 if(packet.getMessage().length() > lengthMax) {
                     event.getPlayer().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
                             .msg("msg-too-long",
                                     "&8[&6K&8] &cYour chat message was cancelled because it was too long."));
-                    return false;
+                    event.setCancelled(true);
                 }
 
                 int min = 0;
@@ -50,8 +50,7 @@ public class ChatCheck {
                     event.getPlayer().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
                             .msg("illegal-chars",
                                     "&8[&6K&8] &cYou are not allowed to use character \"" + c + "\"."));
-                    return false;
+                    event.setCancelled(true);
                 }
-                return true;
             }, Packet.Client.CHAT);
 }
