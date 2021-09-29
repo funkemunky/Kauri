@@ -15,6 +15,8 @@ public class AimI extends Check {
     private int buffer;
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
+        if(!packet.isLook()) return;
+
         final double pitch = data.playerInfo.to.pitch, lpitch = data.playerInfo.from.pitch;
 
         if(pitch == lpitch && pitch == 0 && data.moveProcessor.deltaX > 12) {

@@ -41,6 +41,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
@@ -222,15 +223,24 @@ public class Check implements KauriCheck {
 
                     TextComponent[] toSend = components.toArray(new TextComponent[0]);
 
-                    if(Config.testMode && (dev ? !data.devAlerts : !data.alerts))
+                    if(Config.testMode && (dev ? !Kauri.INSTANCE.dataManager.hasAlerts.contains(data.uuid.hashCode())
+                            : !Kauri.INSTANCE.dataManager.devAlerts.contains(data.uuid.hashCode())))
                         data.getPlayer().spigot().sendMessage(toSend);
 
                     if(Config.alertsConsole) MiscUtils.printToConsole(new TextComponent(toSend).toPlainText());
-                    if(!dev)
-                        Kauri.INSTANCE.dataManager.hasAlerts
-                                .forEach(data -> data.getPlayer().spigot().sendMessage(toSend));
-                    else Kauri.INSTANCE.dataManager.devAlerts
-                            .forEach(data -> data.getPlayer().spigot().sendMessage(toSend));
+                    if(!dev) {
+                        synchronized (Kauri.INSTANCE.dataManager.hasAlerts) {
+                            for (Integer data : Kauri.INSTANCE.dataManager.hasAlerts.toArray()) {
+                                Kauri.INSTANCE.dataManager.dataMap.get(data).getPlayer().spigot().sendMessage(toSend);
+                            }
+                        }
+                    } else {
+                        synchronized (Kauri.INSTANCE.dataManager.devAlerts) {
+                            for (Integer data : Kauri.INSTANCE.dataManager.devAlerts.toArray()) {
+                                Kauri.INSTANCE.dataManager.dataMap.get(data).getPlayer().spigot().sendMessage(toSend);
+                            }
+                        }
+                    }
                     lastAlert.reset();
                 }
 
@@ -339,13 +349,17 @@ public class Check implements KauriCheck {
     }
 
     public void debug(String information, Object... variables) {
-        if(Kauri.INSTANCE.dataManager.debugging.size() == 0) return;
+        if(data.debugging.size() == 0) return;
 
         final String finalInformation = String.format(information, variables);
-        Kauri.INSTANCE.dataManager.debugging.stream()
-                .filter(data -> data.debugged.equals(this.data.uuid) && data.debugging.equalsIgnoreCase(name))
-                .forEach(data -> data.getPlayer()
-                        .sendMessage(Color.translate("&8[&c&lDEBUG&8] &7" + finalInformation)));
+
+        synchronized (data.debugging) {
+            for (Map.Entry<UUID, String> entry : data.debugging.entrySet()) {
+                if(entry.getValue().equals(name))
+                Kauri.INSTANCE.dataManager.dataMap.get(entry.getKey().hashCode()).getPlayer()
+                        .sendMessage(Color.translate("&8[&c&lDEBUG&8] &7" + finalInformation));
+            }
+        }
     }
 
     /** Player utils **/

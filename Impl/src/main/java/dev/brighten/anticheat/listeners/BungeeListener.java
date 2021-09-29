@@ -29,10 +29,10 @@ public class BungeeListener implements AtlasListener, Listener {
     @Listen
     public void onBungee(BungeeReceiveEvent event) {
         if(!Config.bungeeAlerts || event.objects.length != 4) return;
-        UUID uuid = (UUID)event.objects[0];
-        String checkName = (String)event.objects[1];
-        CheckEntry entry = new CheckEntry(uuid, checkName);
-        Timer lastAlert;
+        final UUID uuid = (UUID)event.objects[0];
+        final String checkName = (String)event.objects[1];
+        final CheckEntry entry = new CheckEntry(uuid, checkName);
+        final Timer lastAlert;
         if(!lastAlertsMap.containsKey(entry)) {
             lastAlert = new AtlasTimer(MathUtils.millisToTicks(Config.alertsDelay));
             lastAlertsMap.put(entry, lastAlert);
@@ -41,16 +41,18 @@ public class BungeeListener implements AtlasListener, Listener {
         }
 
         if(lastAlert.isPassed(MathUtils.millisToTicks(Config.alertsDelay))) {
-            float vl = (float)event.objects[2];
-            String info = (String)event.objects[3];
+            final float vl = (float)event.objects[2];
+            final String info = (String)event.objects[3];
 
-            OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
+            final OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
 
-            String alert = Color.translate("&8[&6K&8] &f" + player.getName()
+            final String alert = Color.translate("&8[&6K&8] &f" + player.getName()
                     + " &7flagged &f" + checkName
                     + " &8(&e" + info + "&8) &8[&c" + vl + "&8]");
 
-            Kauri.INSTANCE.dataManager.hasAlerts.forEach(data -> data.getPlayer().sendMessage(alert));
+            for (int hashcode : Kauri.INSTANCE.dataManager.hasAlerts.toArray()) {
+                Kauri.INSTANCE.dataManager.dataMap.get(hashcode).getPlayer().sendMessage(alert);
+            }
             lastAlert.reset();
         }
     }

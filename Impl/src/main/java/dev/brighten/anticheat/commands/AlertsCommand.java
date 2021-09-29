@@ -19,16 +19,20 @@ public class AlertsCommand extends BaseCommand {
         ObjectData data = Kauri.INSTANCE.dataManager.getData(player);
 
         if(data != null) {
-            if(data.alerts = !data.alerts) {
-                Kauri.INSTANCE.dataManager.hasAlerts.add(data);
-                player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("alerts-on",
-                        "&aYou are now viewing cheat alerts."));
-            } else {
-                Kauri.INSTANCE.dataManager.hasAlerts.remove(data);
-                player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("alerts-none",
-                        "&cYou are no longer viewing cheat alerts."));
+            synchronized (Kauri.INSTANCE.dataManager.hasAlerts) {
+                boolean hasAlerts = Kauri.INSTANCE.dataManager.hasAlerts.contains(data.uuid.hashCode());
+
+                if(!hasAlerts) {
+                    Kauri.INSTANCE.dataManager.hasAlerts.add(data.uuid.hashCode());
+                    player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("alerts-on",
+                            "&aYou are now viewing cheat alerts."));
+                } else {
+                    Kauri.INSTANCE.dataManager.hasAlerts.remove(data.uuid.hashCode());
+                    player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("alerts-none",
+                            "&cYou are no longer viewing cheat alerts."));
+                }
+                Kauri.INSTANCE.loggerManager.storage.updateAlerts(data.getUUID(), hasAlerts);
             }
-            Kauri.INSTANCE.loggerManager.storage.updateAlerts(data.getUUID(), data.alerts);
         } else player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("data-error",
                 "&cThere was an error trying to find your data."));
     }
@@ -41,16 +45,19 @@ public class AlertsCommand extends BaseCommand {
         ObjectData data = Kauri.INSTANCE.dataManager.getData(player);
 
         if(data != null) {
-            if(data.devAlerts = !data.devAlerts) {
-                Kauri.INSTANCE.dataManager.devAlerts.add(data);
-                player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("dev-alerts-on",
-                        "&aYou are now viewing developer cheat alerts."));
-            } else {
-                Kauri.INSTANCE.dataManager.devAlerts.remove(data);
-                player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("dev-alerts-none",
-                        "&cYou are no longer viewing developer cheat alerts."));
+            synchronized (Kauri.INSTANCE.dataManager.devAlerts) {
+                boolean hasDevAlerts = Kauri.INSTANCE.dataManager.devAlerts.contains(data.uuid.hashCode());
+                if(!hasDevAlerts) {
+                    Kauri.INSTANCE.dataManager.devAlerts.add(data.uuid.hashCode());
+                    player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("dev-alerts-on",
+                            "&aYou are now viewing developer cheat alerts."));
+                } else {
+                    Kauri.INSTANCE.dataManager.devAlerts.remove(data.uuid.hashCode());
+                    player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("dev-alerts-none",
+                            "&cYou are no longer viewing developer cheat alerts."));
+                }
+                Kauri.INSTANCE.loggerManager.storage.updateDevAlerts(data.getUUID(), hasDevAlerts);
             }
-            Kauri.INSTANCE.loggerManager.storage.updateDevAlerts(data.getUUID(), data.devAlerts);
         } else player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("data-error",
                 "&cThere was an error trying to find your data."));
     }

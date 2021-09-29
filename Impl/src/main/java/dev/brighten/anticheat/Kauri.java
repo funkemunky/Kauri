@@ -58,6 +58,7 @@ public class Kauri extends JavaPlugin {
     public RollingAverageDouble tps = new RollingAverageDouble(4, 20);
     public Timer lastTickLag;
     public long lastTick;
+    public int currentTick;
 
     public ScheduledExecutorService loggingThread;
     public ExecutorService executor;
@@ -114,8 +115,10 @@ public class Kauri extends JavaPlugin {
 
         MiscUtils.printToConsole("&7Unloading DataManager...");
         //Clearing the dataManager.
-        dataManager.dataMap.values().forEach(ObjectData::unregister);
-        dataManager.dataMap.clear();
+        synchronized (dataManager.dataMap) {
+            dataManager.dataMap.valueCollection().forEach(ObjectData::unregister);
+            dataManager.dataMap.clear();
+        }
         dataManager.hasAlerts.clear();
         dataManager.devAlerts.clear();
         dataManager = null;
@@ -192,6 +195,7 @@ public class Kauri extends JavaPlugin {
         AtomicLong lastTimeStamp = new AtomicLong(0);
         RunUtils.taskTimer(() -> {
             ticks.getAndIncrement();
+            currentTick++;
             long currentTime = System.currentTimeMillis();
 
             if(currentTime - lastTick > 120) {

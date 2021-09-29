@@ -75,7 +75,7 @@ public class PlayerInformation {
     public boolean cinematicMode;
 
     //Gcd
-    public int yawGCD, pitchGCD, lastYawGCD, lastPitchGCD;
+    public float yawGCD, pitchGCD, lastYawGCD, lastPitchGCD;
 
     //Server Position
     public long lastServerPos, lastRespawn;

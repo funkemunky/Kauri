@@ -284,7 +284,7 @@ public class MenuCommand extends BaseCommand {
                             .durability(settings.enabled ? 10 : 8)
                             .name((settings.enabled ? Color.Green : Color.Gray) + "Enabled").build());
                     menu.buildInventory(false);
-                    Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
+                    Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.valueCollection()
                             .forEach(data -> {
                                 synchronized (data.checkManager.checks) {
                                     data.checkManager.checks.clear();
@@ -315,7 +315,7 @@ public class MenuCommand extends BaseCommand {
                             .durability(settings.executable ? 10 : 8)
                             .name((settings.executable ? Color.Green : Color.Gray) + "Executable").build());
                     menu.buildInventory(false);
-                    Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
+                    Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.valueCollection()
                             .forEach(data -> {
                                 synchronized (data.checkManager.checks) {
                                     data.checkManager.checks.clear();
@@ -347,7 +347,7 @@ public class MenuCommand extends BaseCommand {
                             .durability(settings.cancellable ? 10 : 8)
                             .name((settings.cancellable ? Color.Green : Color.Gray) + "Cancellable").build());
                     menu.buildInventory(false);
-                    Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
+                    Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.valueCollection()
                             .forEach(data -> {
                                 synchronized (data.checkManager.checks) {
                                     data.checkManager.checks.clear();

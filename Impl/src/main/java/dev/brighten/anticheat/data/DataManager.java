@@ -1,35 +1,29 @@
 package dev.brighten.anticheat.data;
 
-import cc.funkemunky.api.utils.RunUtils;
-import dev.brighten.anticheat.Kauri;
+import gnu.trove.impl.sync.TSynchronizedIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.TIntHashSet;
 import org.bukkit.entity.Player;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class DataManager {
-    public Map<UUID, ObjectData> dataMap = new ConcurrentHashMap<>();
-    public Set<ObjectData> hasAlerts = Collections.synchronizedSet(new HashSet<>()),
-            devAlerts = Collections.synchronizedSet(new HashSet<>()),
-            debugging = Collections.synchronizedSet(new HashSet<>());
+    public final TSynchronizedIntObjectMap<ObjectData> dataMap = new TSynchronizedIntObjectMap<>(new TIntObjectHashMap<>());
+    public final TIntHashSet hasAlerts = new TIntHashSet(),
+            devAlerts = new TIntHashSet();
 
     public DataManager() {
-        RunUtils.taskTimerAsync(() -> {
-            hasAlerts.clear();
-            dataMap.values().stream().filter(data -> data.alerts).forEach(hasAlerts::add);
-            debugging.clear();
-            dataMap.values().stream().filter(data -> data.debugging != null).forEach(debugging::add);
-        }, Kauri.INSTANCE, 60L, 30L);
     }
 
     public ObjectData getData(Player player) {
-        return dataMap.getOrDefault(player.getUniqueId(), null);
+        return dataMap.get(player.getUniqueId().hashCode());
+
     }
 
     public void createData(Player player) {
         ObjectData data = new ObjectData(player.getUniqueId());
 
-        dataMap.put(player.getUniqueId(), data);
+        dataMap.put(player.getUniqueId().hashCode(), data);
     }
 }

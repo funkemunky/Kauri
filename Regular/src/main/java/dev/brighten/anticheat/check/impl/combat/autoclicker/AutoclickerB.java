@@ -1,6 +1,5 @@
 package dev.brighten.anticheat.check.impl.combat.autoclicker;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.check.api.Cancellable;
@@ -9,34 +8,40 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
-import lombok.val;
+
+import java.util.List;
 
 @CheckInfo(name = "Autoclicker (B)", description = "Checks for common blocking patterns",
         developer = true, checkType = CheckType.AUTOCLICKER, punishVL = 35)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerB extends Check {
 
-    private int lastPlace, lastArm;
-    private EvictingList<Integer> tickDeltas = new EvictingList<>(10);
-
-    @Packet
-    public void onArm(WrappedInArmAnimationPacket packet, int currentTick) {
-        lastArm = currentTick;
-    }
+    private int lastPlace;
+    private final List<Integer> tickDeltas = new EvictingList<>(15);
 
     @Packet
     public void onBlockPlace(WrappedInBlockPlacePacket packet, int currentTick) {
         if(data.playerInfo.lookingAtBlock || data.playerInfo.breakingBlock) return;
-        int deltaArm = currentTick - lastArm;
+        int deltaPlace = currentTick - lastPlace;
 
-        tickDeltas.add(deltaArm);
+        tickDeltas.add(deltaPlace);
         if(tickDeltas.size() > 8) {
-            val summary = tickDeltas.stream().mapToInt(v -> v).summaryStatistics();
+            int max = -10000000, min = Integer.MAX_VALUE;
+            double average = 0;
+            int range, total = 0;
 
-            int range = summary.getMax() - summary.getMin();
-            double average = summary.getAverage();
+            for (Integer delta : tickDeltas) {
+                max = Math.max(delta, max);
+                min = Math.min(delta, min);
 
-            if(average < 2 && range <= 1) {
+                average+= delta;
+                total++;
+            }
+
+            average/= total;
+            range = max - min;
+
+            if(average < 3 && range <= 1) {
                 if(++vl > 12) {
                     flag("range=%s", range);
                 }
@@ -45,7 +50,7 @@ public class AutoclickerB extends Check {
             debug("range=%s average=%.1f vl=%.1f", range, average, vl);
         }
 
-        debug("deltaArm=%s", deltaArm);
+        debug("deltaArm=%s", deltaPlace);
         lastPlace = currentTick;
     }
 }

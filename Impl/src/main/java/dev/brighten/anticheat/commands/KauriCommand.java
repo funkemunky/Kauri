@@ -46,7 +46,7 @@ public class KauriCommand extends BaseCommand {
 
         cc.registerCompletion("checks", (c) ->
             Check.checkClasses.values().stream().map(ci -> ci.name().replace(" ", "_"))
-                    .sorted(Comparator.comparing(s -> s, Comparator.reverseOrder())).collect(Collectors.toList()));
+                    .collect(Collectors.toList()));
         cc.registerCompletion("materials", (c) -> Arrays.stream(Material.values()).map(Enum::name)
                 .collect(Collectors.toList()));
 
@@ -88,16 +88,20 @@ public class KauriCommand extends BaseCommand {
         ObjectData data = Kauri.INSTANCE.dataManager.getData(player);
 
         if(data != null) {
-            if(data.alerts = !data.alerts) {
-                Kauri.INSTANCE.dataManager.hasAlerts.add(data);
-                player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("alerts-on",
-                        "&aYou are now viewing cheat alerts."));
-            } else {
-                Kauri.INSTANCE.dataManager.hasAlerts.remove(data);
-                player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("alerts-none",
-                        "&cYou are no longer viewing cheat alerts."));
+            synchronized (Kauri.INSTANCE.dataManager.hasAlerts) {
+                boolean hasAlerts = Kauri.INSTANCE.dataManager.hasAlerts.contains(data.uuid.hashCode());
+
+                if(!hasAlerts) {
+                    Kauri.INSTANCE.dataManager.hasAlerts.add(data.uuid.hashCode());
+                    player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("alerts-on",
+                            "&aYou are now viewing cheat alerts."));
+                } else {
+                    Kauri.INSTANCE.dataManager.hasAlerts.remove(data.uuid.hashCode());
+                    player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("alerts-none",
+                            "&cYou are no longer viewing cheat alerts."));
+                }
+                Kauri.INSTANCE.loggerManager.storage.updateAlerts(data.getUUID(), hasAlerts);
             }
-            Kauri.INSTANCE.loggerManager.storage.updateAlerts(data.getUUID(), data.alerts);
         } else player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("data-error",
                 "&cThere was an error trying to find your data."));
     }
@@ -110,16 +114,19 @@ public class KauriCommand extends BaseCommand {
         ObjectData data = Kauri.INSTANCE.dataManager.getData(player);
 
         if(data != null) {
-            if(data.devAlerts = !data.devAlerts) {
-                Kauri.INSTANCE.dataManager.devAlerts.add(data);
-                player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("dev-alerts-on",
-                        "&aYou are now viewing developer cheat alerts."));
-            } else {
-                Kauri.INSTANCE.dataManager.devAlerts.remove(data);
-                player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("dev-alerts-none",
-                        "&cYou are no longer viewing developer cheat alerts."));
+            synchronized (Kauri.INSTANCE.dataManager.devAlerts) {
+                boolean hasDevAlerts = Kauri.INSTANCE.dataManager.devAlerts.contains(data.uuid.hashCode());
+                if(!hasDevAlerts) {
+                    Kauri.INSTANCE.dataManager.devAlerts.add(data.uuid.hashCode());
+                    player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("dev-alerts-on",
+                            "&aYou are now viewing developer cheat alerts."));
+                } else {
+                    Kauri.INSTANCE.dataManager.devAlerts.remove(data.uuid.hashCode());
+                    player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("dev-alerts-none",
+                            "&cYou are no longer viewing developer cheat alerts."));
+                }
+                Kauri.INSTANCE.loggerManager.storage.updateDevAlerts(data.getUUID(), hasDevAlerts);
             }
-            Kauri.INSTANCE.loggerManager.storage.updateDevAlerts(data.getUUID(), data.devAlerts);
         } else player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("data-error",
                 "&cThere was an error trying to find your data."));
     }
@@ -138,19 +145,21 @@ public class KauriCommand extends BaseCommand {
         }
 
         if(check.equalsIgnoreCase("none")) {
-            data.debugging = null;
-            data.debugged = null;
-            Kauri.INSTANCE.dataManager.debugging.remove(data);
+            for (ObjectData tdata : Kauri.INSTANCE.dataManager.dataMap.valueCollection()) {
+                synchronized (tdata.boxDebuggers) {
+                    tdata.boxDebuggers.remove(player);
+                }
+                synchronized (tdata.debugging) {
+                    tdata.debugging.remove(player.getUniqueId());
+                }
+            }
 
-            Kauri.INSTANCE.dataManager.dataMap.values().stream()
-                    .filter(d -> d.boxDebuggers.contains(player))
-                    .forEach(d -> d.boxDebuggers.remove(player));
             player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
                     .msg("debug-off", "&aTurned off your debugging."));
         } else {
-            Player targetPlayer = target != null ? target.getPlayer() : player;
+            final Player targetPlayer = target != null ? target.getPlayer() : player;
+            final ObjectData targetData = Kauri.INSTANCE.dataManager.getData(targetPlayer);
             if(check.equalsIgnoreCase("sniff")) {
-                val targetData = Kauri.INSTANCE.dataManager.getData(targetPlayer);
                 if(!targetData.sniffing) {
                     player.sendMessage("Sniffing + " + targetPlayer.getName());
                     targetData.sniffing = true;
@@ -168,8 +177,7 @@ public class KauriCommand extends BaseCommand {
                 }
             } else {
                 if(Check.isCheck(check.replace("_", " "))) {
-                    data.debugging = check.replace("_", " ");
-                    data.debugged = targetPlayer.getUniqueId();
+                    targetData.debugging.put(player.getUniqueId(), check.replace("_", " "));
 
                     player.sendMessage(Color.Green + "You are now debugging " + data.debugging
                             + " on target " + targetPlayer.getName() + "!");
@@ -418,7 +426,7 @@ public class KauriCommand extends BaseCommand {
             Kauri.INSTANCE.saveConfig();
 
             sender.sendMessage(Color.Red + "Refreshing data objects with updated information...");
-            Kauri.INSTANCE.dataManager.dataMap.values().parallelStream()
+            Kauri.INSTANCE.dataManager.dataMap.valueCollection().parallelStream()
                     .forEach(data -> data.checkManager.checks.get(checkInfo.name()).enabled = toggleState);
             sender.sendMessage(Color.Green + "Completed!");
         } else sender.sendMessage(Color.Red + "\"" + check
@@ -432,19 +440,19 @@ public class KauriCommand extends BaseCommand {
         Kauri.INSTANCE.executor.execute(() -> {
             sender.sendMessage(cc.funkemunky.api.utils.MiscUtils.line(Color.Dark_Gray));
             sender.sendMessage(Color.Yellow + "Forge Users:");
-            sender.sendMessage(Kauri.INSTANCE.dataManager.dataMap.values().stream()
+            sender.sendMessage(Kauri.INSTANCE.dataManager.dataMap.valueCollection().stream()
                     .filter(data -> data.modData != null)
                     .map(data -> data.getPlayer().getName())
                     .collect(Collectors.joining(Color.Gray + ", " + Color.White)));
             sender.sendMessage("");
             sender.sendMessage(Color.Yellow + "Lunar Client Users:");
-            sender.sendMessage(Kauri.INSTANCE.dataManager.dataMap.values().stream()
+            sender.sendMessage(Kauri.INSTANCE.dataManager.dataMap.valueCollection().stream()
                     .filter(data -> data.usingLunar)
                     .map(data -> data.getPlayer().getName())
                     .collect(Collectors.joining(Color.Gray + ", " + Color.White)));
             sender.sendMessage("");
             sender.sendMessage(Color.Yellow + "Misc Users:");
-            sender.sendMessage(Kauri.INSTANCE.dataManager.dataMap.values().stream()
+            sender.sendMessage(Kauri.INSTANCE.dataManager.dataMap.valueCollection().stream()
                     .filter(data -> data.modData == null && !data.usingLunar)
                     .map(data -> data.getPlayer().getName())
                     .collect(Collectors.joining(Color.Gray + ", " + Color.White)));

@@ -6,6 +6,8 @@ import cc.funkemunky.api.handlers.ModData;
 import cc.funkemunky.api.reflections.impl.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
+import cc.funkemunky.api.tinyprotocol.api.packets.channelhandler.TinyProtocol1_7;
+import cc.funkemunky.api.tinyprotocol.api.packets.channelhandler.TinyProtocol1_8;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.RunUtils;
@@ -51,11 +53,10 @@ public class ObjectData implements Data {
 
     public UUID uuid;
     private Player player;
-    public boolean alerts, devAlerts, sniffing, usingLunar;
+    public boolean sniffing, usingLunar;
 
     //Debugging
-    public String debugging;
-    public UUID debugged;
+    public final Map<UUID, String> debugging = new HashMap<>();
 
     public long creation, lagTicks, noLagTicks;
     public PastLocation targetPastLocation, entityLocPastLocation;
@@ -76,7 +77,7 @@ public class ObjectData implements Data {
     public ModData modData;
     public KLocation targetLoc;
     public ProtocolVersion playerVersion = ProtocolVersion.UNKNOWN;
-    public Set<Player> boxDebuggers = new HashSet<>();
+    public final Set<Player> boxDebuggers = new HashSet<>();
     private final List<CollisionBox> lookingAtBoxes = Collections.synchronizedList(new ArrayList<>());
     public final List<Action> keepAliveStamps = new CopyOnWriteArrayList<>();
     public final ConcurrentEvictingList<CancelType> typesToCancel = new ConcurrentEvictingList<>(10);
@@ -109,8 +110,9 @@ public class ObjectData implements Data {
         if(getPlayer().hasPermission("kauri.command.alerts")) {
             Kauri.INSTANCE.loggerManager.storage.alertsStatus(uuid, result -> {
                 if(result) {
-                    alerts = true;
-                    Kauri.INSTANCE.dataManager.hasAlerts.add(ObjectData.this);
+                    synchronized (Kauri.INSTANCE.dataManager.hasAlerts) {
+                        Kauri.INSTANCE.dataManager.hasAlerts.add(uuid.hashCode());
+                    }
                     getPlayer().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("alerts-on",
                             "&aYou are now viewing cheat alerts."));
                 }
@@ -120,8 +122,9 @@ public class ObjectData implements Data {
         if(getPlayer().hasPermission("kauri.command.alerts.dev")) {
             Kauri.INSTANCE.loggerManager.storage.devAlertsStatus(uuid, result -> {
                 if(result) {
-                    Kauri.INSTANCE.dataManager.devAlerts.add(ObjectData.this);
-                    devAlerts = true;
+                    synchronized (Kauri.INSTANCE.dataManager.devAlerts) {
+                        Kauri.INSTANCE.dataManager.devAlerts.add(uuid.hashCode());
+                    }
                     getPlayer().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("dev-alerts-on",
                             "&aYou are now viewing developer cheat alerts."));
                 }
@@ -163,15 +166,14 @@ public class ObjectData implements Data {
 
     public void unregister() {
         keepAliveStamps.clear();
-        Kauri.INSTANCE.dataManager.hasAlerts.remove(this);
-        Kauri.INSTANCE.dataManager.debugging.remove(this);
+        Kauri.INSTANCE.dataManager.hasAlerts.remove(uuid.hashCode());
+        Kauri.INSTANCE.dataManager.devAlerts.remove(uuid.hashCode());
         checkManager.checkMethods.clear();
         checkManager.checks.clear();
         checkManager = null;
         typesToCancel.clear();
         sniffedPackets.clear();
         keepAliveStamps.clear();
-        Kauri.INSTANCE.dataManager.dataMap.remove(uuid);
     }
 
     @Override
@@ -232,6 +234,10 @@ public class ObjectData implements Data {
     }
 
     public void runInstantAction(Runnable runnable) {
+        runInstantAction(runnable, false);
+    }
+
+    public void runInstantAction(Runnable runnable, boolean flush) {
         short id = (short) ThreadLocalRandom.current().nextInt(Short.MIN_VALUE, Short.MAX_VALUE);
 
         //Ensuring we don't have any duplicate IDS
@@ -239,8 +245,18 @@ public class ObjectData implements Data {
             id++;
         }
 
+        final Object packet = new WrappedOutTransaction(0, id, false).getObject();
 
-        TinyProtocolHandler.sendPacket(getPlayer(), new WrappedOutTransaction(0, id, false).getObject());
+        if(!flush) TinyProtocolHandler.sendPacket(getPlayer(), packet);
+        else {
+            if(ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_8)) {
+                TinyProtocol1_8 tp = (TinyProtocol1_8) TinyProtocolHandler.getInstance();
+                tp.sendPacket(tp.getChannel(player), packet);
+            } else {
+                TinyProtocol1_7 tp = (TinyProtocol1_7) TinyProtocolHandler.getInstance();
+                tp.sendPacket(tp.getChannel(player), packet);
+            }
+        }
 
         instantTransaction.put(id, runnable);
     }
@@ -278,7 +294,7 @@ public class ObjectData implements Data {
     public static void debugBoxes(boolean debugging, Player debugger, ObjectData... targets) {
         if(!debugging) {
             List<ObjectData> toRemove = targets.length == 0
-                    ? new ArrayList<>(Kauri.INSTANCE.dataManager.dataMap.values()) : Arrays.asList(targets);
+                    ? new ArrayList<>(Kauri.INSTANCE.dataManager.dataMap.valueCollection()) : Arrays.asList(targets);
 
             toRemove.stream()
                     .filter(d -> d.boxDebuggers.contains(debugger))
@@ -290,7 +306,7 @@ public class ObjectData implements Data {
 
     public static void debugBoxes(boolean debugging, Player debugger, UUID... targets) {
         debugBoxes(debugging, debugger, Arrays.stream(targets)
-                .map(uuid -> Kauri.INSTANCE.dataManager.dataMap.get(uuid)).filter(Objects::nonNull)
+                .map(uuid -> Kauri.INSTANCE.dataManager.dataMap.get(uuid.hashCode())).filter(Objects::nonNull)
                 .toArray(ObjectData[]::new));
     }
 

@@ -144,13 +144,15 @@ public class MiscUtils {
 
     /**
      * This method can be used for getting the GCD without having to add the 2^24 offset
-     * @param current deltaYaw/deltaPitch without an offset added
-     * @param previous previous deltaYaw/deltaPitch without an offset added
+     * @param current deltaYaw/deltaPitch without an offset added. Make sure its not negative.
+     * @param previous previous deltaYaw/deltaPitch without an offset added. Make sure its not negative.
      * @return GCD of both inputs
      */
-    public static double gcdSmall(double current, double previous) {
+    public static float gcdSmall(float current, float previous) {
+        if(current < previous) return gcdSmall(Math.abs(previous), Math.abs(current));
         //The larger number has to be first.
-        return (Math.abs(previous) <= 0.0009765625) ? current : gcdSmall(previous, current % previous);
+        return (Math.abs(previous) <= 0.001f) ? current : gcdSmall(previous,
+                current - (float)Math.floor(current / previous) * previous);
     }
 
     public static double getGrid(final Collection<Float> entry) {
@@ -247,6 +249,7 @@ public class MiscUtils {
         val tuple = new Tuple<List<Double>, List<Double>>(new ArrayList<>(), new ArrayList<>());
 
         for (Double value : values) {
+            if(value < lowThreshold) tuple.one.add(value);
             if(value < lowThreshold) tuple.one.add(value);
             else if(value > highThreshold) tuple.two.add(value);
         }

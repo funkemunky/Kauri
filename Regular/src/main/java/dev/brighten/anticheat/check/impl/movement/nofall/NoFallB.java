@@ -42,8 +42,7 @@ public class NoFallB extends Check {
         // If they are saying they are on the ground
         if(!data.playerInfo.clientGround
                 // Their bounding box is on the ground
-                && (data.playerInfo.serverGround
-                || (data.blockInfo.blocksBelow && data.playerInfo.to.y % divisor < 1E-6))
+                && (data.playerInfo.serverGround && data.playerInfo.to.y % divisor < 1E-6)
                 && data.playerInfo.lastTeleportTimer.isPassed(1)) {
             if((airBuffer +=10) > 30) {
                 vl++;

@@ -22,6 +22,7 @@ import dev.brighten.anticheat.utils.Vec3D;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.AtlasTimer;
 import dev.brighten.anticheat.utils.timer.impl.PlayerTimer;
+import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
@@ -34,8 +35,8 @@ import java.util.UUID;
 @CheckInfo(name = "Reach (B)", planVersion = KauriVersion.ARA, developer = true, checkType = CheckType.HITBOX)
 public class ReachB extends Check {
 
-    private EntityLocation eloc = new EntityLocation(UUID.randomUUID());
-    private Timer lastFlying;
+    private EntityLocation eloc = new EntityLocation(UUID.randomUUID()), eloc2 = new EntityLocation(UUID.randomUUID());
+    private Timer lastFlying = new TickTimer();
     private int streak;
     private float buffer;
     private boolean sentTeleport, attacked;
@@ -43,7 +44,6 @@ public class ReachB extends Check {
     @Override
     public void setData(ObjectData data) {
         super.setData(data);
-        lastFlying = new PlayerTimer(data);
     }
 
     @Packet
@@ -54,66 +54,63 @@ public class ReachB extends Check {
         //Updating new entity loc
         if(data.target.getUniqueId() != eloc.uuid) {
             eloc = new EntityLocation(data.target.getUniqueId());
+            eloc2 = new EntityLocation(data.target.getUniqueId());
             sentTeleport = false;
         }
 
-        attacked = true;
+        final KLocation eyeLoc = data.playerInfo.to.clone();
+
+        eyeLoc.y+= data.playerInfo.sneaking ? 1.54f : 1.62f;
+
+        if(eloc.x == 0 && eloc.y == 0 & eloc.z == 0) return;
+
+        SimpleCollisionBox targetBox = (SimpleCollisionBox) EntityData
+                .getEntityBox(new Vector(eloc.x, eloc.y, eloc.z), data.target),
+                targetBox2 = (SimpleCollisionBox) EntityData
+                        .getEntityBox(new Vector(eloc2.x, eloc2.y, eloc2.z), data.target);
+
+        if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) {
+            targetBox = targetBox.expand(0.1, 0.1, 0.1);
+            targetBox2 = targetBox2.expand(0.1, 0.1, 0.1);
+        }
+
+        final AxisAlignedBB vanillaBox = new AxisAlignedBB(targetBox), vanillaBox2 = new AxisAlignedBB(targetBox2);
+
+        Vec3D intersect = vanillaBox.rayTrace(eyeLoc.toVector(), MathUtils.getDirection(eyeLoc), 10),
+        intersect2 = vanillaBox2.rayTrace(eyeLoc.toVector(), MathUtils.getDirection(eyeLoc), 10);
+
+        double distance = Double.MAX_VALUE;
+        boolean collided = false; //Using this to compare smaller numbers than Double.MAX_VALUE. Slightly faster
+
+        if(intersect != null) {
+            distance = intersect.distanceSquared(new Vec3D(eyeLoc.x, eyeLoc.y, eyeLoc.z));
+            collided = true;
+        }
+
+        if(intersect2 != null) {
+            distance = Math.min(distance, intersect2.distanceSquared(new Vec3D(eyeLoc.x, eyeLoc.y, eyeLoc.z)));
+            collided = true;
+        }
+
+        if(collided) {
+            distance = Math.sqrt(distance);
+            if(distance > 3.02 && streak > 3 && sentTeleport && lastFlying.isNotPassed(1)) {
+                if(++buffer > 3) {
+                    vl++;
+                    flag("d=%.4f", distance);
+                    buffer = 3;
+                }
+            } else if(buffer > 0) buffer-= 0.05f;
+            debug("dist=%.2f b=%s s=%s st=%s lf=%s",
+                    distance, buffer, streak, sentTeleport, lastFlying.getPassed());
+        } else debug("didnt hit box: x=%.1f y=%.1f z=%.1f", eloc.x, eloc.y, eloc.z);
     }
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if(attacked) {
-            attacked = false;
-            KLocation eyeLoc = data.playerInfo.to.clone(), eyeLocFrom = data.playerInfo.from.clone();
-
-            eyeLoc.y+= data.playerInfo.sneaking ? 1.54f : 1.62f;
-            eyeLocFrom.y+= data.playerInfo.lsneaking ? 1.54f : 1.62f;
-
-            if(eloc.x == 0 && eloc.y == 0 & eloc.z == 0) return;
-
-            SimpleCollisionBox targetBox = (SimpleCollisionBox) EntityData
-                    .getEntityBox(new Vector(eloc.x, eloc.y, eloc.z), data.target);
-
-            if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) {
-                targetBox = targetBox.expand(0.1, 0.1, 0.1);
-            }
-
-            AxisAlignedBB vanillaBox = new AxisAlignedBB(targetBox);
-
-            val intersect = vanillaBox.rayTrace(eyeLoc.toVector(), MathUtils.getDirection(eyeLoc), 10);
-            val intersect2 = vanillaBox
-                    .rayTrace(eyeLocFrom.toVector(), MathUtils.getDirection(eyeLocFrom), 10);
-
-            double distance = Double.MAX_VALUE;
-            boolean collided = false; //Using this to compare smaller numbers than Double.MAX_VALUE. Slightly faster
-
-            if(intersect != null) {
-                distance = intersect.distanceSquared(new Vec3D(eyeLoc.x, eyeLoc.y, eyeLoc.z));
-                collided = true;
-            }
-
-            if(intersect2 != null) {
-                distance = Math.min(distance, intersect2
-                        .distanceSquared(new Vec3D(eyeLocFrom.x, eyeLocFrom.y, eyeLocFrom.z)));
-                collided = true;
-            }
-
-            if(collided) {
-                distance = Math.sqrt(distance);
-                if(distance > 3.02 && streak > 3 && sentTeleport && lastFlying.isNotPassed(1)) {
-                    if(++buffer > 2) {
-                        vl++;
-                        flag("d=%.4f", distance);
-                        buffer = 2;
-                    }
-                } else if(buffer > 0) buffer-= 0.02f;
-                debug("dist=%.2f b=%s s=%s st=%s lf=%s", distance, buffer, streak, sentTeleport, lastFlying.getPassed());
-            } else debug("didnt hit box: x=%.1f y=%.1f z=%.1f", eloc.x, eloc.y, eloc.z);
-        }
-
-
         eloc.interpolateLocation();
-        if(lastFlying.isNotPassed(1)) streak++;
+        eloc2.interpolateLocation();
+        if(lastFlying.isNotPassed(2)) streak++;
         else {
             streak = 1;
             sentTeleport = false;
@@ -127,6 +124,7 @@ public class ReachB extends Check {
         if(lastFlying.isPassed(1)
                 && Kauri.INSTANCE.keepaliveProcessor.getKeepById(packet.getAction()).isPresent()) {
             eloc.interpolateLocation();
+            eloc2.interpolateLocation();
             attacked = false;
         }
     }
@@ -157,12 +155,36 @@ public class ReachB extends Check {
                 }
 
                 eloc.increment = 3;
+            }, true);
+            data.runInstantAction(() -> {
+                //We don't need to do version checking here. Atlas handles this for us.
+                if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9)) {
+                    eloc2.newX += (byte)packet.getX() / 32D;
+                    eloc2.newY += (byte)packet.getY() / 32D;
+                    eloc2.newZ += (byte)packet.getZ() / 32D;
+                    eloc2.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
+                    eloc2.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
+                } else if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_14)) {
+                    eloc2.newX += (long)packet.getX() / 4096D;
+                    eloc2.newY += (long)packet.getY() / 4096D;
+                    eloc2.newZ += (long)packet.getZ() / 4096D;
+                    eloc2.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
+                    eloc2.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
+                } else {
+                    eloc2.newX += (short)packet.getX() / 4096D;
+                    eloc2.newY += (short)packet.getY() / 4096D;
+                    eloc2.newZ += (short)packet.getZ() / 4096D;
+                    eloc2.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
+                    eloc2.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
+                }
+
+                eloc2.increment = 3;
             });
         }
     }
 
     @Packet
-    public void onTeleport(WrappedOutEntityTeleportPacket packet) {
+    public void onTeleport(WrappedOutEntityTeleportPacket packet, long sent) {
         if(data.target != null && data.target.getEntityId() == packet.entityId) {
             data.runInstantAction(() -> {
                 if(data.playerVersion.isOrAbove(ProtocolVersion.V1_9)) {
@@ -196,6 +218,46 @@ public class ReachB extends Check {
                     eloc.increment = 3;
                 }
 
+                long delta = System.currentTimeMillis() - sent;
+
+                debug("teleport #1: %s", delta);
+                sentTeleport = true;
+            }, true);
+            data.runInstantAction(() -> {
+                if(data.playerVersion.isOrAbove(ProtocolVersion.V1_9)) {
+                    if (!(Math.abs(eloc2.x - packet.x) >= 0.03125D)
+                            && !(Math.abs(eloc2.y - packet.y) >= 0.015625D)
+                            && !(Math.abs(eloc2.z - packet.z) >= 0.03125D)) {
+                        eloc2.increment = 0;
+                        //We don't need to do version checking here. Atlas handles this for us.
+                        eloc2.newX = eloc2.x = packet.x;
+                        eloc2.newY = eloc2.y = packet.y;
+                        eloc2.newZ = eloc2.z = packet.z;
+                        eloc2.newYaw = eloc2.yaw = packet.yaw;
+                        eloc2.newPitch = eloc2.pitch = packet.pitch;
+                    } else {
+                        eloc2.newX = packet.x;
+                        eloc2.newY = packet.y;
+                        eloc2.newZ = packet.z;
+                        eloc2.newYaw = packet.yaw;
+                        eloc2.newPitch = packet.pitch ;
+
+                        eloc2.increment = 3;
+                    }
+                } else {
+                    //We don't need to do version checking here. Atlas handles this for us.
+                    eloc2.newX = packet.x;
+                    eloc2.newY = packet.y;
+                    eloc2.newZ = packet.z;
+                    eloc2.newYaw = packet.yaw;
+                    eloc2.newPitch = packet.pitch ;
+
+                    eloc2.increment = 3;
+                }
+
+                long delta = System.currentTimeMillis() - sent;
+
+                debug("teleport #2: %s", delta);
                 sentTeleport = true;
             });
         }

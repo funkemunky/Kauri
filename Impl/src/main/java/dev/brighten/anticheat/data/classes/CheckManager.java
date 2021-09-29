@@ -5,6 +5,7 @@ import cc.funkemunky.api.reflections.types.WrappedClass;
 import cc.funkemunky.api.reflections.types.WrappedMethod;
 import cc.funkemunky.api.tinyprotocol.api.NMSObject;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
+import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.MiscUtils;
@@ -30,7 +31,7 @@ public class CheckManager {
 
         val methods = checkMethods.get(object.getClass());
 
-        int currentTick = MiscUtils.currentTick();
+        int currentTick = Kauri.INSTANCE.currentTick;
         for (WrappedCheck wrapped : methods) {
             try {
                 if(!wrapped.isBoolean && wrapped.isPacket && wrapped.check.enabled && wrapped.isCompatible()) {
@@ -56,7 +57,7 @@ public class CheckManager {
 
         val methods = checkMethods.get(object.getClass());
 
-        int currentTick = MiscUtils.currentTick();
+        int currentTick = Kauri.INSTANCE.currentTick;
         boolean cancelled = false;
         for (WrappedCheck wrapped : methods) {
             if(!wrapped.isBoolean) continue;

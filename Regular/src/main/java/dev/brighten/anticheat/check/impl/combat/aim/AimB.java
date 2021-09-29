@@ -12,22 +12,24 @@ import dev.brighten.api.check.CheckType;
         checkType = CheckType.AIM, punishVL = 45)
 public class AimB extends Check {
 
+    private float buffer;
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if(packet.isLook()
                 && Math.abs(data.playerInfo.deltaPitch) > 1E-5) {
-            if(data.playerInfo.pitchGCD < 100000
-                    && !data.playerInfo.cinematicMode
+            if(data.playerInfo.pitchGCD < 0.007
+                    && data.moveProcessor.lastCinematic.isPassed(2)
                     && data.playerInfo.lastTeleportTimer.isPassed(1)
                     && Math.abs(data.playerInfo.to.pitch) < 80) {
-                if(++vl > 28) {
+                if(++buffer > 12) {
+                    vl++;
                     flag("offset=%s deltaPitch=%s", data.playerInfo.pitchGCD, data.playerInfo.deltaPitch);
                 }
-            } else vl-= vl > 0 ? 0.5 : 0;
+            } else buffer-= buffer > 0 ? 0.5f : 0;
             debug("gcd=%s cin=%s dpitch=%s ldp=%s pitch=%.2f lpitch=%.2f vl=%.1f",
                     data.playerInfo.pitchGCD,
                    data.playerInfo.cinematicMode, data.playerInfo.deltaPitch, data.playerInfo.lDeltaPitch,
-                    data.playerInfo.to.pitch, data.playerInfo.from.pitch, vl);
+                    data.playerInfo.to.pitch, data.playerInfo.from.pitch, buffer);
         }
     }
 }

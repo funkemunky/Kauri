@@ -20,11 +20,12 @@ public class AimJ extends Check {
 
     private int threshold;
     private List<Data> list = new EvictingList<>(5);
+    private static float sens = MovementProcessor.percentToSens(95);
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if(packet.isLook()) {
 
-            double o = MiscUtils.clampToVanilla(MovementProcessor.percentToSens(95),
+            double o = MiscUtils.clampToVanilla(sens,
                     data.playerInfo.to.pitch);
 
             float pitch = data.playerInfo.to.pitch;

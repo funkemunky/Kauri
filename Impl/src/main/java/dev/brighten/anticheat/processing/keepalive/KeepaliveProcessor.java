@@ -6,6 +6,7 @@ import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingMap;
+import cc.funkemunky.api.utils.objects.evicting.EvictingMap;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import org.bukkit.scheduler.BukkitTask;
@@ -21,7 +22,7 @@ public class KeepaliveProcessor implements Runnable {
     public KeepAlive currentKeepalive;
     public int tick;
 
-    public final Map<Short, KeepAlive> keepAlives = new ConcurrentHashMap<>();
+    public final Map<Short, KeepAlive> keepAlives = new EvictingMap<>(80);
 
     public ConcurrentHashMap<UUID, Short> lastResponses = new ConcurrentHashMap<>();
 
@@ -33,15 +34,10 @@ public class KeepaliveProcessor implements Runnable {
     public void run() {
         tick++;
         synchronized (keepAlives) {
-            if(tick % 20 == 0)
-                keepAlives.entrySet().stream().filter(entry -> tick - entry.getValue().start > 60)
-                        .forEach(entry -> keepAlives.remove(entry.getKey()));
-            short id = (short) ThreadLocalRandom.current().nextInt(Short.MIN_VALUE, Short.MAX_VALUE);
+            short id = (short) (tick > Short.MAX_VALUE ? tick % Short.MAX_VALUE : tick);
 
             //Ensuring we don't have any duplicate IDS
-            while(Kauri.INSTANCE.keepaliveProcessor.keepAlives.containsKey(id)) {
-                id = (short) ThreadLocalRandom.current().nextInt(Short.MIN_VALUE, Short.MAX_VALUE);
-            }
+
             currentKeepalive = new KeepAlive(tick, id);
             keepAlives.put(currentKeepalive.id, currentKeepalive);
         }
@@ -49,7 +45,7 @@ public class KeepaliveProcessor implements Runnable {
         WrappedOutTransaction packet = new WrappedOutTransaction(0, currentKeepalive.id, false);
 
         currentKeepalive.startStamp = System.currentTimeMillis();
-        for (ObjectData value : Kauri.INSTANCE.dataManager.dataMap.values()) {
+        for (ObjectData value : Kauri.INSTANCE.dataManager.dataMap.valueCollection()) {
             if(value.target != null) {
                 value.targetPastLocation.addLocation(value.target.getLocation());
                 value.runKeepaliveAction(ka -> {

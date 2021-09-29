@@ -19,9 +19,13 @@ public class AimE extends Check {
     public void process(WrappedInFlyingPacket packet) {
         if(!packet.isLook()) return;
 
-        final double yawGcd = data.playerInfo.yawGCD / MovementProcessor.offset,
-                pitchGCD = data.playerInfo.pitchGCD / MovementProcessor.offset;
-        if(MathUtils.getDelta(data.moveProcessor.sensXPercent, data.moveProcessor.sensYPercent) > 1
+        final double yawGcd = data.playerInfo.yawGCD,
+                pitchGCD = data.playerInfo.pitchGCD;
+
+        float modeToUse = Math.min(data.moveProcessor.yawMode, data.moveProcessor.pitchMode);
+        boolean goodGcd = Math.max(data.moveProcessor.yawMode, data.moveProcessor.pitchMode)
+                % modeToUse < 0.001;
+        if((MathUtils.getDelta(data.moveProcessor.sensXPercent, data.moveProcessor.sensYPercent) > 1 && !goodGcd)
                 || (MathUtils.getDelta(data.moveProcessor.yawMode, yawGcd) > 0.1
                 && MathUtils.getDelta(data.moveProcessor.pitchMode, pitchGCD) > 0.1)) {
             debug("sensitivity instability sx=%s sy=%s ym=%.2f pm=%.2f ygcd=%.2f pgcd=%.2f",
@@ -31,17 +35,17 @@ public class AimE extends Check {
         }
 
         final float deltaYaw = Math.abs(data.playerInfo.deltaYaw), deltaPitch = Math.abs(data.playerInfo.deltaPitch);
-        final double mx = (deltaYaw / data.moveProcessor.yawMode)
-                % (Math.abs(data.playerInfo.lDeltaYaw) / data.moveProcessor.yawMode);
-        final double my = (deltaPitch / data.moveProcessor.pitchMode)
-                % (Math.abs(data.playerInfo.lDeltaPitch) / data.moveProcessor.pitchMode);
+        final double mx = (deltaYaw / modeToUse)
+                % (Math.abs(data.playerInfo.lDeltaYaw) / modeToUse);
+        final double my = (deltaPitch / modeToUse)
+                % (Math.abs(data.playerInfo.lDeltaPitch) / modeToUse);
 
         final double deltaX = Math.abs(Math.floor(mx) - mx);
         final double deltaY = Math.abs(Math.floor(my) - my);
 
         final boolean shitX = deltaX > 0.08 && deltaX < 0.92, shitY = deltaY > 0.08 && deltaY < 0.92;
-        final boolean increase = data.playerInfo.deltaYaw > data.moveProcessor.yawMode
-                || data.playerInfo.deltaPitch > data.moveProcessor.pitchMode;
+        final boolean increase = data.playerInfo.deltaYaw > modeToUse
+                || data.playerInfo.deltaPitch > modeToUse;
         final boolean flag = (shitX && shitY) && (!increase || !data.playerInfo.cinematicMode);
 
         if(flag) {
