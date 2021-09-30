@@ -25,7 +25,7 @@ public class AimE extends Check {
         float modeToUse = Math.min(data.moveProcessor.yawMode, data.moveProcessor.pitchMode);
         boolean goodGcd = Math.max(data.moveProcessor.yawMode, data.moveProcessor.pitchMode)
                 % modeToUse < 0.001;
-        if((MathUtils.getDelta(data.moveProcessor.sensXPercent, data.moveProcessor.sensYPercent) > 1 && !goodGcd)
+        if((MathUtils.getDelta(data.moveProcessor.sensXPercent, data.moveProcessor.sensYPercent) < 1.5 || goodGcd)
                 || (MathUtils.getDelta(data.moveProcessor.yawMode, yawGcd) > 0.1
                 && MathUtils.getDelta(data.moveProcessor.pitchMode, pitchGCD) > 0.1)) {
             debug("sensitivity instability sx=%s sy=%s ym=%.2f pm=%.2f ygcd=%.2f pgcd=%.2f",

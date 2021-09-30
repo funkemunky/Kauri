@@ -17,11 +17,12 @@ import java.util.List;
 public class AutoclickerB extends Check {
 
     private int lastPlace;
+    private float buffer;
     private final List<Integer> tickDeltas = new EvictingList<>(15);
 
     @Packet
     public void onBlockPlace(WrappedInBlockPlacePacket packet, int currentTick) {
-        if(data.playerInfo.lookingAtBlock || data.playerInfo.breakingBlock) return;
+        if(data.playerInfo.breakingBlock || data.getPlayer().getItemInHand().getType().isBlock()) return;
         int deltaPlace = currentTick - lastPlace;
 
         tickDeltas.add(deltaPlace);
@@ -42,10 +43,11 @@ public class AutoclickerB extends Check {
             range = max - min;
 
             if(average < 3 && range <= 1) {
-                if(++vl > 12) {
+                if(++buffer > 12) {
+                    vl++;
                     flag("range=%s", range);
                 }
-            } else if(vl > 0) vl-= 0.5f;
+            } else if(vl > 0) buffer-= 0.5f;
 
             debug("range=%s average=%.1f vl=%.1f", range, average, vl);
         }
