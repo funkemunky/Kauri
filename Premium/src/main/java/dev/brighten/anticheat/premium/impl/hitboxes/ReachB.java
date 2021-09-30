@@ -36,7 +36,7 @@ import java.util.*;
 @CheckInfo(name = "Reach (B)", planVersion = KauriVersion.ARA, developer = true, checkType = CheckType.HITBOX)
 public class ReachB extends Check {
 
-    private EntityLocation eloc = new EntityLocation(UUID.randomUUID()), eloc2 = new EntityLocation(UUID.randomUUID());
+    private EntityLocation eloc = new EntityLocation(UUID.randomUUID());
     private Timer lastFlying = new TickTimer();
     private int streak;
     private float buffer;
@@ -55,7 +55,6 @@ public class ReachB extends Check {
         //Updating new entity loc
         if(data.target.getUniqueId() != eloc.uuid) {
             eloc = new EntityLocation(data.target.getUniqueId());
-            eloc2 = new EntityLocation(data.target.getUniqueId());
             sentTeleport = false;
         }
 
@@ -66,30 +65,21 @@ public class ReachB extends Check {
         if(eloc.x == 0 && eloc.y == 0 & eloc.z == 0) return;
 
         SimpleCollisionBox targetBox = (SimpleCollisionBox) EntityData
-                .getEntityBox(new Vector(eloc.x, eloc.y, eloc.z), data.target),
-                targetBox2 = (SimpleCollisionBox) EntityData
-                        .getEntityBox(new Vector(eloc2.x, eloc2.y, eloc2.z), data.target);
+                .getEntityBox(new Vector(eloc.x, eloc.y, eloc.z), data.target);
 
         if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) {
             targetBox = targetBox.expand(0.1, 0.1, 0.1);
-            targetBox2 = targetBox2.expand(0.1, 0.1, 0.1);
         }
 
-        final AxisAlignedBB vanillaBox = new AxisAlignedBB(targetBox), vanillaBox2 = new AxisAlignedBB(targetBox2);
+        final AxisAlignedBB vanillaBox = new AxisAlignedBB(targetBox);
 
-        Vec3D intersect = vanillaBox.rayTrace(eyeLoc.toVector(), MathUtils.getDirection(eyeLoc), 10),
-        intersect2 = vanillaBox2.rayTrace(eyeLoc.toVector(), MathUtils.getDirection(eyeLoc), 10);
+        Vec3D intersect = vanillaBox.rayTrace(eyeLoc.toVector(), MathUtils.getDirection(eyeLoc), 10);
 
         double distance = Double.MAX_VALUE;
         boolean collided = false; //Using this to compare smaller numbers than Double.MAX_VALUE. Slightly faster
 
         if(intersect != null) {
             distance = intersect.distanceSquared(new Vec3D(eyeLoc.x, eyeLoc.y, eyeLoc.z));
-            collided = true;
-        }
-
-        if(intersect2 != null) {
-            distance = Math.min(distance, intersect2.distanceSquared(new Vec3D(eyeLoc.x, eyeLoc.y, eyeLoc.z)));
             collided = true;
         }
 
@@ -110,7 +100,6 @@ public class ReachB extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         eloc.interpolateLocation();
-        eloc2.interpolateLocation();
         if(lastFlying.isNotPassed(2)) streak++;
         else {
             streak = 1;
@@ -125,114 +114,41 @@ public class ReachB extends Check {
         if(lastFlying.isPassed(1)
                 && Kauri.INSTANCE.keepaliveProcessor.getKeepById(packet.getAction()).isPresent()) {
             eloc.interpolateLocation();
-            eloc2.interpolateLocation();
             attacked = false;
         }
-    }
-
-    private boolean resentTeleport = false, sentSecondAction = false, resentRel = false, sentSecondAction2 = false;
-
-    @Packet
-    public boolean onEntityCancellable(WrappedOutRelativePosition packet, long sent) {
-        if(data.target != null && data.target.getEntityId() == packet.getId()) {
-            if(!resentRel) {
-                sentSecondAction2 = false;
-                data.runInstantAction(() -> {
-                    //We don't need to do version checking here. Atlas handles this for us.
-                    if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9)) {
-                        eloc.newX += (byte)packet.getX() / 32D;
-                        eloc.newY += (byte)packet.getY() / 32D;
-                        eloc.newZ += (byte)packet.getZ() / 32D;
-                        eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
-                        eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
-                    } else if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_14)) {
-                        eloc.newX += (long)packet.getX() / 4096D;
-                        eloc.newY += (long)packet.getY() / 4096D;
-                        eloc.newZ += (long)packet.getZ() / 4096D;
-                        eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
-                        eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
-                    } else {
-                        eloc.newX += (short)packet.getX() / 4096D;
-                        eloc.newY += (short)packet.getY() / 4096D;
-                        eloc.newZ += (short)packet.getZ() / 4096D;
-                        eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
-                        eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
-                    }
-
-                    eloc.increment = 3;
-
-                    long delta = System.currentTimeMillis() - sent;
-
-                    resentRel = false;
-                    debug("relmove #1: %s", delta);
-                });
-                
-                
-
-                resentRel = true;
-                if(!sentSecondAction2) {
-                    if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9)) {
-                        byte x = packet.getX(), y = packet.getY(), z = packet.getZ(), yaw =
-                                packet.getYaw(), pitch = packet.getPitch();
-
-                        TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutRelativePosition(packet.getId(),
-                                x / 32D, y / 32D, z / 32D, yaw / 256.0F * 360.0F,
-                                pitch / 256.0F * 360.0F, packet.isGround()).getObject());
-                    } else if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_14)) {
-                        long x = packet.getX(), y = packet.getY(), z = packet.getZ(), yaw =
-                                packet.getYaw(), pitch = packet.getPitch();
-
-                        TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutRelativePosition(packet.getId(),
-                                x / 4069D, y / 4069D, z / 4069D, yaw / 256.0F * 360.0F,
-                                pitch / 256.0F * 360.0F, packet.isGround()).getObject());
-                    } else {
-                        short x = packet.getX(), y = packet.getY(), z = packet.getZ(), yaw =
-                                packet.getYaw(), pitch = packet.getPitch();
-
-                        TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutRelativePosition(packet.getId(),
-                                x / 4069D, y / 4069D, z / 4069D, yaw / 256.0F * 360.0F,
-                                pitch / 256.0F * 360.0F, packet.isGround()).getObject());
-                    }
-                }
-                return true;
-            }
-        }
-        return false;
     }
 
     @Packet
     public void onEntity(WrappedOutRelativePosition packet, long sent) {
         if(data.target != null && data.target.getEntityId() == packet.getId()) {
-            if(!sentSecondAction2)
             data.runInstantAction(() -> {
                 //We don't need to do version checking here. Atlas handles this for us.
                 if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9)) {
-                    eloc2.newX += (byte)packet.getX() / 32D;
-                    eloc2.newY += (byte)packet.getY() / 32D;
-                    eloc2.newZ += (byte)packet.getZ() / 32D;
-                    eloc2.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
-                    eloc2.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
+                    eloc.newX += (byte)packet.getX() / 32D;
+                    eloc.newY += (byte)packet.getY() / 32D;
+                    eloc.newZ += (byte)packet.getZ() / 32D;
+                    eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
+                    eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
                 } else if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_14)) {
-                    eloc2.newX += (long)packet.getX() / 4096D;
-                    eloc2.newY += (long)packet.getY() / 4096D;
-                    eloc2.newZ += (long)packet.getZ() / 4096D;
-                    eloc2.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
-                    eloc2.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
+                    eloc.newX += (long)packet.getX() / 4096D;
+                    eloc.newY += (long)packet.getY() / 4096D;
+                    eloc.newZ += (long)packet.getZ() / 4096D;
+                    eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
+                    eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
                 } else {
-                    eloc2.newX += (short)packet.getX() / 4096D;
-                    eloc2.newY += (short)packet.getY() / 4096D;
-                    eloc2.newZ += (short)packet.getZ() / 4096D;
-                    eloc2.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
-                    eloc2.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
+                    eloc.newX += (short)packet.getX() / 4096D;
+                    eloc.newY += (short)packet.getY() / 4096D;
+                    eloc.newZ += (short)packet.getZ() / 4096D;
+                    eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
+                    eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
                 }
 
-                eloc2.increment = 3;
+                eloc.increment = 3;
 
                 long delta = System.currentTimeMillis() - sent;
 
                 debug("relmove #2: %s", delta);
             });
-            sentSecondAction2 = true;
         }
     }
 
@@ -240,99 +156,42 @@ public class ReachB extends Check {
 
     @Packet
     public void onTeleportSent(WrappedOutEntityTeleportPacket packet, long sent) {
-        if(!sentSecondAction)
         data.runInstantAction(() -> {
             if(data.playerVersion.isOrAbove(ProtocolVersion.V1_9)) {
-                if (!(Math.abs(eloc2.x - packet.x) >= 0.03125D)
-                        && !(Math.abs(eloc2.y - packet.y) >= 0.015625D)
-                        && !(Math.abs(eloc2.z - packet.z) >= 0.03125D)) {
-                    eloc2.increment = 0;
+                if (!(Math.abs(eloc.x - packet.x) >= 0.03125D)
+                        && !(Math.abs(eloc.y - packet.y) >= 0.015625D)
+                        && !(Math.abs(eloc.z - packet.z) >= 0.03125D)) {
+                    eloc.increment = 0;
                     //We don't need to do version checking here. Atlas handles this for us.
-                    eloc2.newX = eloc2.x = packet.x;
-                    eloc2.newY = eloc2.y = packet.y;
-                    eloc2.newZ = eloc2.z = packet.z;
-                    eloc2.newYaw = eloc2.yaw = packet.yaw;
-                    eloc2.newPitch = eloc2.pitch = packet.pitch;
+                    eloc.newX = eloc.x = packet.x;
+                    eloc.newY = eloc.y = packet.y;
+                    eloc.newZ = eloc.z = packet.z;
+                    eloc.newYaw = eloc.yaw = packet.yaw;
+                    eloc.newPitch = eloc.pitch = packet.pitch;
                 } else {
-                    eloc2.newX = packet.x;
-                    eloc2.newY = packet.y;
-                    eloc2.newZ = packet.z;
-                    eloc2.newYaw = packet.yaw;
-                    eloc2.newPitch = packet.pitch ;
+                    eloc.newX = packet.x;
+                    eloc.newY = packet.y;
+                    eloc.newZ = packet.z;
+                    eloc.newYaw = packet.yaw;
+                    eloc.newPitch = packet.pitch ;
 
-                    eloc2.increment = 3;
+                    eloc.increment = 3;
                 }
             } else {
                 //We don't need to do version checking here. Atlas handles this for us.
-                eloc2.newX = packet.x;
-                eloc2.newY = packet.y;
-                eloc2.newZ = packet.z;
-                eloc2.newYaw = packet.yaw;
-                eloc2.newPitch = packet.pitch ;
+                eloc.newX = packet.x;
+                eloc.newY = packet.y;
+                eloc.newZ = packet.z;
+                eloc.newYaw = packet.yaw;
+                eloc.newPitch = packet.pitch ;
 
-                eloc2.increment = 3;
+                eloc.increment = 3;
             }
 
             long delta = System.currentTimeMillis() - sent;
 
             debug("teleport #2: %s", delta);
         });
-
-        sentSecondAction = true;
-    }
-
-    @Packet
-    public boolean onTeleport(WrappedOutEntityTeleportPacket packet, long sent) {
-        if(data.target != null && data.target.getEntityId() == packet.entityId) {
-           
-           if(!resentTeleport) {
-               sentSecondAction = false;
-               data.runInstantAction(() -> {
-                   if(data.playerVersion.isOrAbove(ProtocolVersion.V1_9)) {
-                       if (!(Math.abs(eloc.x - packet.x) >= 0.03125D)
-                               && !(Math.abs(eloc.y - packet.y) >= 0.015625D)
-                               && !(Math.abs(eloc.z - packet.z) >= 0.03125D)) {
-                           eloc.increment = 0;
-                           //We don't need to do version checking here. Atlas handles this for us.
-                           eloc.newX = eloc.x = packet.x;
-                           eloc.newY = eloc.y = packet.y;
-                           eloc.newZ = eloc.z = packet.z;
-                           eloc.newYaw = eloc.yaw = packet.yaw;
-                           eloc.newPitch = eloc.pitch = packet.pitch;
-                       } else {
-                           eloc.newX = packet.x;
-                           eloc.newY = packet.y;
-                           eloc.newZ = packet.z;
-                           eloc.newYaw = packet.yaw;
-                           eloc.newPitch = packet.pitch ;
-
-                           eloc.increment = 3;
-                       }
-                   } else {
-                       //We don't need to do version checking here. Atlas handles this for us.
-                       eloc.newX = packet.x;
-                       eloc.newY = packet.y;
-                       eloc.newZ = packet.z;
-                       eloc.newYaw = packet.yaw;
-                       eloc.newPitch = packet.pitch ;
-
-                       eloc.increment = 3;
-                   }
-
-                   resentTeleport = false;
-                   long delta = System.currentTimeMillis() - sent;
-
-                   debug("teleport #1: %s", delta);
-               });
-
-               resentTeleport = true;
-               if(!sentSecondAction)
-               TinyProtocolHandler.sendPacket(data.getPlayer(), new WrappedOutEntityTeleportPacket(packet.entityId, packet.x, packet.y, packet.z,
-                       packet.yaw, packet.pitch, packet.onGround).getObject());
-               return true;
-           }
-        }
-        return false;
     }
 
 }
