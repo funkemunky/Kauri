@@ -119,7 +119,7 @@ public class ReachB extends Check {
     }
 
     @Packet
-    public void onEntity(WrappedOutRelativePosition packet, long sent) {
+    public void onEntity(WrappedOutRelativePosition packet) {
         if(data.target != null && data.target.getEntityId() == packet.getId()) {
             data.runInstantAction(() -> {
                 //We don't need to do version checking here. Atlas handles this for us.
@@ -144,10 +144,6 @@ public class ReachB extends Check {
                 }
 
                 eloc.increment = 3;
-
-                long delta = System.currentTimeMillis() - sent;
-
-                debug("relmove #2: %s", delta);
             });
         }
     }
@@ -155,7 +151,7 @@ public class ReachB extends Check {
     private List<WrappedOutEntityTeleportPacket> packets = new ArrayList<>();
 
     @Packet
-    public void onTeleportSent(WrappedOutEntityTeleportPacket packet, long sent) {
+    public void onTeleportSent(WrappedOutEntityTeleportPacket packet) {
         data.runInstantAction(() -> {
             if(data.playerVersion.isOrAbove(ProtocolVersion.V1_9)) {
                 if (!(Math.abs(eloc.x - packet.x) >= 0.03125D)
@@ -187,10 +183,6 @@ public class ReachB extends Check {
 
                 eloc.increment = 3;
             }
-
-            long delta = System.currentTimeMillis() - sent;
-
-            debug("teleport #2: %s", delta);
         });
     }
 
