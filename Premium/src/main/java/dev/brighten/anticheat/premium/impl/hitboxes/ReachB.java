@@ -37,13 +37,14 @@ import java.util.*;
 public class ReachB extends Check {
 
     private EntityLocation eloc = new EntityLocation(UUID.randomUUID());
-    private Timer lastFlying = new TickTimer();
+    private Timer lastFlying;
     private int streak;
     private float buffer;
     private boolean sentTeleport, attacked;
 
     @Override
     public void setData(ObjectData data) {
+        lastFlying = new PlayerTimer(data);
         super.setData(data);
     }
 
@@ -99,12 +100,13 @@ public class ReachB extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        eloc.interpolateLocation();
-        if(lastFlying.isNotPassed(2)) streak++;
+        if(lastFlying.isNotPassed(1)) streak++;
         else {
             streak = 1;
             sentTeleport = false;
         }
+
+        eloc.interpolateLocation();
 
         lastFlying.reset();
     }
