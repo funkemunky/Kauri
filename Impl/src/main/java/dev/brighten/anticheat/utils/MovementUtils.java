@@ -45,9 +45,7 @@ public class MovementUtils {
             ? MinecraftReflection.playerConnection.getFieldByName("checkMovement")
             : MinecraftReflection.playerConnection.getFieldByName(ProtocolVersion.getGameVersion()
             .isOrAbove(ProtocolVersion.v1_17) ? "y" : "teleportPos");
-    public static boolean checkMovement(Player player) {
-        Object playerConnection = MinecraftReflection.getPlayerConnection(player);
-
+    public static boolean checkMovement(Object playerConnection) {
         if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9)) {
             return checkMovement.get(playerConnection);
         } else return (checkMovement.get(playerConnection) == null);

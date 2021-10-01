@@ -121,29 +121,6 @@ public class MovementProcessor {
 
         if(data.playerInfo.doingTeleport) data.playerInfo.lastTeleportTimer.reset();
 
-        if (data.playerInfo.posLocs.size() > 0 && packet.isPos()) {
-            synchronized (data.playerInfo.posLocs) {
-                for (Iterator<KLocation> it = data.playerInfo.posLocs.iterator(); it.hasNext(); ) {
-                    KLocation loc = it.next();
-                    double dx = data.playerInfo.to.x - loc.x,
-                            dy = data.playerInfo.to.y - loc.y, dz = data.playerInfo.to.z - loc.z;
-                    double delta =  dx * dx + dy * dy + dz * dz;
-
-                    if(delta >= 0.25) continue;
-
-                    data.playerInfo.serverPos = true;
-                    data.playerInfo.lastServerPos = timeStamp;
-                    data.playerInfo.lastTeleportTimer.reset();
-                    data.playerInfo.inventoryOpen = false;
-                    data.playerInfo.doingTeleport = false;
-                    it.remove();
-                    break;
-                }
-            }
-        } else if (data.playerInfo.serverPos) {
-            data.playerInfo.serverPos = false;
-        }
-
         data.playerInfo.lClientGround = data.playerInfo.clientGround;
         data.playerInfo.clientGround = packet.isGround();
         //Setting the motion delta for use in checks to prevent repeated functions.
@@ -216,6 +193,14 @@ public class MovementProcessor {
                 }
             }
         }
+
+        if(data.playerInfo.checkMovement) data.playerInfo.moveTicks++;
+        else data.playerInfo.moveTicks = 0;
+
+        //Resetting serverPos back to false after its been processed for one tick in detections.
+        if(data.playerInfo.serverPos && !data.playerInfo.doingTeleport) data.playerInfo.serverPos = false;
+
+        data.playerInfo.doingTeleport = data.playerInfo.moveTicks == 0;
 
         if(packet.isPos() || packet.isLook()) {
             KLocation origin = data.playerInfo.to.clone();

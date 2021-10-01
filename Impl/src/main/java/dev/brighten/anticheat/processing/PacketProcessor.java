@@ -216,7 +216,7 @@ public class PacketProcessor {
                     data.lagInfo.lastPacketDrop.reset();
                 }
 
-                data.playerInfo.checkMovement = MovementUtils.checkMovement(data.getPlayer());
+                data.playerInfo.checkMovement = MovementUtils.checkMovement(data.playerConnection);
 
                 data.lagInfo.lastFlying = timestamp;
                 data.potionProcessor.onFlying(packet);

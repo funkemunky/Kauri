@@ -31,7 +31,7 @@ public class PlayerInformation {
             jumpHeight, totalHeight, baseSpeed;
     public float headYaw, headPitch;
     public float deltaYaw, deltaPitch, lDeltaYaw, lDeltaPitch;
-    public long lastVelocityTimestamp;
+    public long lastVelocityTimestamp, moveTicks;
     public Map<Location, Material> shitMap = new HashMap<>();
     public List<Entity> nearbyEntities = Collections.emptyList();
     public Block blockBelow, blockOnTo;
@@ -81,7 +81,7 @@ public class PlayerInformation {
     //Server Position
     public long lastServerPos, lastRespawn;
     public boolean serverPos;
-    public final List<KLocation> posLocs = Collections.synchronizedList(new EvictingList<>(5));
+    public final List<KLocation> posLocs = new EvictingList<>(3);
     public final List<Vector> velocities = Collections.synchronizedList(new EvictingList<>(5));
 
     //Attack

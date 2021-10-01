@@ -66,6 +66,7 @@ public class ObjectData implements Data {
     public EntityLocation entityLocation;
     public CheckManager checkManager;
     public PlayerInformation playerInfo;
+    public Object playerConnection;
     public BlockInformation blockInfo;
     public LagInformation lagInfo;
     public PredictionService predictionService;
@@ -102,6 +103,8 @@ public class ObjectData implements Data {
         potionProcessor = new PotionProcessor(this);
         checkManager = new CheckManager(this);
         checkManager.addChecks();
+
+        playerConnection = MinecraftReflection.getPlayerConnection(player);
 
         atlasBungeeInstalled = !Atlas.getInstance().getBungeeManager().isBungee()
                 || Atlas.getInstance().getBungeeManager().isAtlasBungeeInstalled();

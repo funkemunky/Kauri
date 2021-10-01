@@ -48,31 +48,27 @@ public class Phase extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long now) {
         if(now - data.creation < 1200L || now - data.playerInfo.lastRespawn < 150L
-                || !data.playerInfo.checkMovement
+                || data.playerInfo.doingTeleport
                 || data.playerInfo.creative || data.playerInfo.canFly) {
             if(!data.playerInfo.checkMovement)
-            debug("cant check movement: sp=%s lf=%s", data.playerInfo.serverPos, lastFlag.getPassed());
+            debug("cant check movement: sp=%s lf=%s", data.playerInfo.doingTeleport, lastFlag.getPassed());
             return;
         }
-
-        Location setbackLocation = fromWhereShitAintBad == null
-                ? data.playerInfo.from.toLocation(data.getPlayer().getWorld())
-                : fromWhereShitAintBad.toLocation(data.getPlayer().getWorld());
         TagsBuilder tags = new TagsBuilder();
 
-        SimpleCollisionBox currentBox = data.box.copy().shrink(0.04, 0.04, 0.04),
-                fromBox = new SimpleCollisionBox(data.playerInfo.from.toVector(), 0.6, 1.8)
-                        .shrink(0.04, 0.04, 0.04);
+        SimpleCollisionBox toUpdate = data.box.copy().shrink(0.0625, 0.0625, 0.0625),
+                playerBox = new SimpleCollisionBox(data.getPlayer().getLocation(), 0.6, 1.8)
+                        .shrink(0.0625, 0.0625, 0.0625);
 
-        SimpleCollisionBox concatted = Helper.wrap(currentBox, fromBox);
+        SimpleCollisionBox concatted = Helper.wrap(toUpdate, playerBox);
 
         List<Block> blocks = dev.brighten.anticheat.utils.Helper.getBlocks(data.blockInfo.handler, concatted);
 
         phaseIntoBlock: {
             if(data.playerInfo.creative) break phaseIntoBlock;
 
-            List<Block> current = Helper.blockCollisions(blocks, fromBox),
-                    newb = Helper.blockCollisions(blocks, currentBox.copy());
+            List<Block> current = Helper.blockCollisions(blocks, playerBox),
+                    newb = Helper.blockCollisions(blocks, toUpdate.copy());
 
             for (Block block : newb) {
                 if(!current.contains(block)) {
@@ -183,10 +179,8 @@ public class Phase extends Check {
         if(tags.getSize() > 0) {
             flag("tags=%s", tags.build());
 
-            if(setbackLocation != null) {
-                Location finalSetbackLocation = setbackLocation;
-                RunUtils.task(() -> data.getPlayer().teleport(finalSetbackLocation));
-            }
+            final Location from = data.playerInfo.from.toLocation(data.getPlayer().getWorld());
+            RunUtils.task(() -> data.getPlayer().teleport(from));
             lastFlag.reset();
         } else fromWhereShitAintBad = data.playerInfo.from;
     }
