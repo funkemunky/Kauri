@@ -160,17 +160,25 @@ public class BlockInformation {
                                     if(Materials.checkFlag(type, Materials.WATER)) {
                                         if(waterBox.isCollided(blockBox))
                                             inWater = inLiquid = true;
+
+                                        if(normalBox.copy().expand(0.4, 0, 0.4).expandMin(0, -1, 0)
+                                                .isIntersected(blockBox))
+                                            blocksBelow = true;
                                     } else if(Materials.checkFlag(type, Materials.LAVA)) {
                                         if(lavaBox.isCollided(blockBox))
                                             inLava = inLiquid = true;
+
+                                        if(normalBox.copy().expand(0.4, 0, 0.4).expandMin(0, -1, 0)
+                                                .isIntersected(blockBox))
+                                            blocksBelow = true;
                                     } else if(Materials.checkFlag(type, Materials.SOLID)) {
                                         SimpleCollisionBox groundBox = normalBox.copy()
-                                                .offset(0, -.1, 0).expandMax(0, -1.2, 0);
+                                                .offset(0, -.2, 0).expandMax(0, -1.2, 0);
 
                                         Optional<XMaterial> blockMaterial =
                                                 XMaterial.matchXMaterial(type.name());
 
-                                        if(normalBox.copy().expand(0.1, 0, 0.1).expandMin(0, -1, 0)
+                                        if(normalBox.copy().expand(0.4, 0, 0.4).expandMin(0, -1, 0)
                                                 .isIntersected(blockBox))
                                             blocksBelow = true;
 

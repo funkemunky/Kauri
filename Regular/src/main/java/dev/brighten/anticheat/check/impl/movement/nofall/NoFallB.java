@@ -39,15 +39,20 @@ public class NoFallB extends Check {
             fixMovementBugs();
         } else if(groundBuffer > 0) groundBuffer-= 2;
 
+
+        final boolean dground = data.playerInfo.to.y % divisor < 1E-4;
         // If they are saying they are on the ground
         if(!data.playerInfo.clientGround
                 // Their bounding box is on the ground
-                && (data.playerInfo.serverGround && data.playerInfo.to.y % divisor < 1E-6)
+                && ((data.playerInfo.serverGround || data.blockInfo.blocksBelow) && dground)
                 && data.playerInfo.lastTeleportTimer.isPassed(1)) {
             if((airBuffer +=10) > 30) {
                 vl++;
                 flag("T=SPOOF_AIR dy=%.2f y=%.1f", data.playerInfo.deltaY, data.playerInfo.to.y);
             }
         } else if(airBuffer > 0) airBuffer -= 4;
+
+        debug("c=%s s=%s bbelow=%s dg=%s dy=%.4f", data.playerInfo.clientGround, data.playerInfo.serverGround,
+                data.blockInfo.blocksBelow, dground, data.playerInfo.deltaY);
     }
 }

@@ -22,8 +22,12 @@ public class BadPacketsN extends Check {
     private static boolean kickPlayer = true;
 
     private int flying, lastTick, noBuffer;
+    private short lastId;
     private final Timer lastTrans = new TickTimer(), lastSentTrans = new MillisTimer(), lastKeepAlive = new TickTimer(),
             lastFlying = new TickTimer();
+
+    @Setting(name = "keepaliveKick")
+    private static boolean keepaliveKicking = true;
 
     @Setting(name = "strings.kick")
     private static String kickString = "[Kauri] Invalid packets (%s).";
@@ -42,7 +46,11 @@ public class BadPacketsN extends Check {
             vl++;
             flag("f=%s lKA=%s t=CANCEL", flying, lastKeepAlive.getPassed());
 
-            if(!isExecutable() && vl > 4) kickPlayer(String.format(Color.translate(kickString), "TN"));
+            if (!isExecutable() && vl > 4) kickPlayer(String.format(Color.translate(kickString), "TN"));
+        }
+
+        if(lastKeepAlive.isPassed(7000L)) {
+            kickPlayer("Network connection error.");
         }
 
         lastFlying.reset();
@@ -68,14 +76,19 @@ public class BadPacketsN extends Check {
         if (response.isPresent()) {
             flying = 0;
             lastTrans.reset();
-            int current = response.get().start;
+            val res = response.get();
+            short id = res.id;
+            int current = res.start;
 
-            if (current - lastTick > 1 && lastTick != 0 && lastTick != 1 && now - data.creation > 4000L) {
+            if (current - lastTick > 1
+                    && id - lastId > 1 && lastTick != 0 && lastTick != 1 && now - data.creation > 4000L) {
                 vl++;
-                flag("c=%s last=%s d=%s t=SKIP", current, lastTick, current - lastTick);
+                flag("c=%s/%s last=%s/%s d=%s t=SKIP",
+                        current, id, lastTick, lastId, current - lastTick);
             }
             debug("c=%s l=%s", current, lastTick);
             lastTick = current;
+            lastId = id;
         }
     }
 }

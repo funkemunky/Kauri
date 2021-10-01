@@ -35,6 +35,7 @@ public class PlayerInformation {
     public Map<Location, Material> shitMap = new HashMap<>();
     public List<Entity> nearbyEntities = Collections.emptyList();
     public Block blockBelow, blockOnTo;
+    public KLocation phaseLoc; //Dirty nasty
     public Location setbackLocation = new Location(null, 0,0,0);
 
     public PlayerInformation(ObjectData data) {

@@ -771,6 +771,8 @@ public class PacketProcessor {
                 data.playerInfo.doingTeleport = true;
                 data.playerInfo.posLocs.add(loc);
 
+                data.playerInfo.phaseLoc = loc.clone();
+
                 data.getPlayer().setSprinting(false);
 
                 if(data.sniffing) {

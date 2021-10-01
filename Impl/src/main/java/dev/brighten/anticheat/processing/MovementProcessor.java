@@ -27,6 +27,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.Deque;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -122,7 +123,8 @@ public class MovementProcessor {
 
         if (data.playerInfo.posLocs.size() > 0 && packet.isPos()) {
             synchronized (data.playerInfo.posLocs) {
-                for (KLocation loc : data.playerInfo.posLocs) {
+                for (Iterator<KLocation> it = data.playerInfo.posLocs.iterator(); it.hasNext(); ) {
+                    KLocation loc = it.next();
                     double dx = data.playerInfo.to.x - loc.x,
                             dy = data.playerInfo.to.y - loc.y, dz = data.playerInfo.to.z - loc.z;
                     double delta =  dx * dx + dy * dy + dz * dz;
@@ -134,8 +136,7 @@ public class MovementProcessor {
                     data.playerInfo.lastTeleportTimer.reset();
                     data.playerInfo.inventoryOpen = false;
                     data.playerInfo.doingTeleport = false;
-                    data.playerInfo.posLocs.remove(loc);
-
+                    it.remove();
                     break;
                 }
             }

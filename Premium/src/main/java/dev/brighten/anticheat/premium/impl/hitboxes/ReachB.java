@@ -185,6 +185,7 @@ public class ReachB extends Check {
 
                 eloc.increment = 3;
             }
+            sentTeleport = true;
         });
     }
 

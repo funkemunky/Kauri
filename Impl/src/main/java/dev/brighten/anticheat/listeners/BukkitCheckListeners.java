@@ -40,6 +40,7 @@ public class BukkitCheckListeners implements Listener {
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
         if(data != null) {
+            data.playerInfo.checkMovement = true;
             data.checkManager.runEvent(event);
         }
     }
