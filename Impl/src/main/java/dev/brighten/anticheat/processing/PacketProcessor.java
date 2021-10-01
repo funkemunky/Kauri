@@ -768,7 +768,6 @@ public class PacketProcessor {
                     loc.yaw+= data.playerInfo.to.yaw;
                 }
 
-                data.playerInfo.doingTeleport = true;
                 data.playerInfo.posLocs.add(loc);
 
                 data.playerInfo.phaseLoc = loc.clone();

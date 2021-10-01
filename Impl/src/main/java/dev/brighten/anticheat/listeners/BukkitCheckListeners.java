@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.listeners;
 
 import cc.funkemunky.api.utils.Init;
+import cc.funkemunky.api.utils.KLocation;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import org.bukkit.event.EventHandler;
@@ -46,6 +47,9 @@ public class BukkitCheckListeners implements Listener {
             data.playerInfo.doingTeleport = false;
             data.playerInfo.moveTicks = 0;
             data.playerInfo.lastTeleportTimer.reset();
+            data.playerInfo.to = data.playerInfo.from = new KLocation(event.getTo());
+            data.playerInfo.deltaX = data.playerInfo.deltaY = data.playerInfo.deltaZ = data.playerInfo.deltaXZ = 0;
+            data.playerInfo.deltaYaw = data.playerInfo.deltaPitch = 0;
             data.checkManager.runEvent(event);
         }
     }

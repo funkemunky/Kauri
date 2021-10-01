@@ -13,6 +13,7 @@ import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -89,7 +90,7 @@ public class Helper {
 	public static List<Block> blockCollisions(List<Block> blocks, SimpleCollisionBox box) {
 		List<Block> collisions = new LinkedList<>();
 		for (Block b : blocks)
-			if (BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion()).isCollided(box))
+			if (BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion()).isIntersected(box))
 				collisions.add(b);
 		return collisions;
 	}
@@ -149,9 +150,9 @@ public class Helper {
 
 	public static List<Block> getBlocksNearby(CollisionHandler handler, CollisionBox collisionBox) {
 		try {
-			return handler.getBlocks().stream().filter(b -> b.getType() != XMaterial.AIR.parseMaterial()
+			return handler.getBlocks().stream().filter(b -> b.getType() != Material.AIR
 					&& BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion())
-					.isCollided(collisionBox))
+					.isIntersected(collisionBox))
 					.collect(Collectors.toList());
 		} catch (NullPointerException e) {
 			return new ArrayList<>();

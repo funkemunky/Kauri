@@ -36,7 +36,7 @@ public class BlockInformation {
             handler = new CollisionHandler(new ArrayList<>(), new ArrayList<>(), new KLocation(0,0,0), null);
     public final List<SimpleCollisionBox> aboveCollisions = Collections.synchronizedList(new ArrayList<>()),
             belowCollisions = Collections.synchronizedList(new ArrayList<>());
-    public final List<Block> blocks = Collections.synchronizedList(new ArrayList<>());
+    public List<Block> blocks = Collections.synchronizedList(new ArrayList<>());
 
     //Caching material
     private final Material cobweb = XMaterial.COBWEB.parseMaterial(), rosebush = XMaterial.ROSE_BUSH.parseMaterial();
@@ -50,25 +50,26 @@ public class BlockInformation {
                 || Kauri.INSTANCE.lastEnabled.isNotPassed(6))
             return;
 
-        double dy = Math.abs(objectData.playerInfo.deltaY);
+        double dy = objectData.playerInfo.deltaY;
         double dh = objectData.playerInfo.deltaXZ;
 
-        blocks.clear();
+        blocks = new ArrayList<>();
 
         onClimbable = objectData.playerInfo.serverGround = objectData.playerInfo.nearGround
                 = onSlab = onStairs = onHalfBlock = inLiquid = inLava = inWater = inWeb = onSlime = pistonNear
                 = onIce = onSoulSand = blocksAbove = collidesVertically = bedNear = collidesHorizontally =
                 blocksNear = inBlock = miscNear = collidedWithEntity = blocksBelow = inPortal = false;
 
-        if(dy > 2) dy = 2;
-        if(dh > 2) dh = 2;
+        if(dy > 10) dy = 10;
+        else if(dy < -10) dy = -10;
+        if(dh > 10) dh = 10;
 
-        int startX = Location.locToBlock(objectData.playerInfo.to.x - 1 - dh);
-        int endX = Location.locToBlock(objectData.playerInfo.to.x + 1 + dh);
-        int startY = Location.locToBlock(objectData.playerInfo.to.y - 1 - dy);
-        int endY = Location.locToBlock(objectData.playerInfo.to.y + 3 + dy);
-        int startZ = Location.locToBlock(objectData.playerInfo.to.z - 1 - dh);
-        int endZ = Location.locToBlock(objectData.playerInfo.to.z + 1 + dh);
+        int startX = Location.locToBlock(objectData.playerInfo.to.x - 0.6 - dh);
+        int endX = Location.locToBlock(objectData.playerInfo.to.x + 0.7 + dh);
+        int startY = Location.locToBlock(objectData.playerInfo.to.y - 1f - dy);
+        int endY = Location.locToBlock(objectData.playerInfo.to.y + 2.5f + dy);
+        int startZ = Location.locToBlock(objectData.playerInfo.to.z - 0.6 - dh);
+        int endZ = Location.locToBlock(objectData.playerInfo.to.z + 0.6 + dh);
 
         SimpleCollisionBox waterBox = objectData.box.copy().expand(0, -.38, 0);
 
@@ -370,7 +371,6 @@ public class BlockInformation {
         }
 
         this.handler.getEntities().clear();
-        this.handler = null;
         this.handler = handler;
     }
 

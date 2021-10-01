@@ -75,67 +75,97 @@ public class MovementProcessor {
     }
 
     public void process(WrappedInFlyingPacket packet, long timeStamp) {
+        if(data.playerInfo.checkMovement) data.playerInfo.moveTicks++;
+        else data.playerInfo.moveTicks = 0;
+
+        //Resetting serverPos back to false after its been processed for one tick in detections.
+        if(data.playerInfo.serverPos && !data.playerInfo.doingTeleport) data.playerInfo.serverPos = false;
+
+        data.playerInfo.doingTeleport = data.playerInfo.moveTicks == 0;
         //We check if it's null and intialize the from and to as equal to prevent large deltas causing false positives since there
         //was no previous from (Ex: delta of 380 instead of 0.45 caused by jump jump in location from 0,0,0 to 380,0,0)
-        if (data.playerInfo.from == null && (packet.getX() != 0 || packet.getY() != 0 || packet.getZ() != 0)) {
-            data.playerInfo.from
-                    = data.playerInfo.to
-                    = new KLocation(packet.getX(), packet.getY(), packet.getZ(), packet.getYaw(), packet.getPitch());
-        } else {
-            data.playerInfo.from = new KLocation(
-                    data.playerInfo.to.x,
-                    data.playerInfo.to.y,
-                    data.playerInfo.to.z,
-                    data.playerInfo.to.yaw,
-                    data.playerInfo.to.pitch,
-                    data.playerInfo.to.timeStamp);
-        }
 
-        //We set the to x,y,z like this to prevent inaccurate data input. Because if it isnt a positional packet,
-        // it returns getX, getY, getZ as 0.
-        if (packet.getX() != 0 || packet.getY() != 0 || packet.getZ() != 0) {
-            data.playerInfo.to.x = packet.getX();
-            data.playerInfo.to.y = packet.getY();
-            data.playerInfo.to.z = packet.getZ();
-            //if this is the case, this assumes client movement in between therefore we have to calculate where ground would be.
-        } else if(packet.isGround() && !data.playerInfo.clientGround) { //this is the last ground
-            synchronized (data.blockInfo.belowCollisions) {
-                val optional = data.blockInfo.belowCollisions.stream()
-                        .filter(box -> Math.pow(box.yMax - data.playerInfo.to.y, 2) <= 9.0E-4D && data.box.copy()
-                                .offset(0, -.1, 0).isCollided(box)).findFirst();
+        if(!data.playerInfo.doingTeleport) {
+            if (data.playerInfo.from == null && (packet.getX() != 0 || packet.getY() != 0 || packet.getZ() != 0)) {
+                data.playerInfo.from
+                        = data.playerInfo.to
+                        = new KLocation(packet.getX(), packet.getY(), packet.getZ(), packet.getYaw(), packet.getPitch());
+            } else {
+                data.playerInfo.from = new KLocation(
+                        data.playerInfo.to.x,
+                        data.playerInfo.to.y,
+                        data.playerInfo.to.z,
+                        data.playerInfo.to.yaw,
+                        data.playerInfo.to.pitch,
+                        data.playerInfo.to.timeStamp);
+            }
 
-                if(optional.isPresent()) {
-                    data.playerInfo.to.y-= data.playerInfo.to.y - optional.get().yMax;
-                    data.playerInfo.clientGround = data.playerInfo.serverGround = true;
+            //We set the to x,y,z like this to prevent inaccurate data input. Because if it isnt a positional packet,
+            // it returns getX, getY, getZ as 0.
+            if (packet.getX() != 0 || packet.getY() != 0 || packet.getZ() != 0) {
+                data.playerInfo.to.x = packet.getX();
+                data.playerInfo.to.y = packet.getY();
+                data.playerInfo.to.z = packet.getZ();
+                //if this is the case, this assumes client movement in between therefore we have to calculate where ground would be.
+            } else if(packet.isGround() && !data.playerInfo.clientGround) { //this is the last ground
+                synchronized (data.blockInfo.belowCollisions) {
+                    val optional = data.blockInfo.belowCollisions.stream()
+                            .filter(box -> Math.pow(box.yMax - data.playerInfo.to.y, 2) <= 9.0E-4D && data.box.copy()
+                                    .offset(0, -.1, 0).isCollided(box)).findFirst();
+
+                    if(optional.isPresent()) {
+                        data.playerInfo.to.y-= data.playerInfo.to.y - optional.get().yMax;
+                        data.playerInfo.clientGround = data.playerInfo.serverGround = true;
+                    }
+                }
+            }
+
+            if(data.playerInfo.serverGround && data.playerInfo.lastMoveCancel.isPassed()) {
+                data.playerInfo.setbackLocation = new Location(data.getPlayer().getWorld(),
+                        data.playerInfo.to.x, data.playerInfo.to.y, data.playerInfo.to.z,
+                        data.playerInfo.to.yaw, data.playerInfo.to.pitch);
+            }
+
+            data.playerInfo.to.timeStamp = timeStamp;
+
+            data.playerInfo.lClientGround = data.playerInfo.clientGround;
+            data.playerInfo.clientGround = packet.isGround();
+            //Setting the motion delta for use in checks to prevent repeated functions.
+            data.playerInfo.lDeltaX = data.playerInfo.deltaX;
+            data.playerInfo.lDeltaY = data.playerInfo.deltaY;
+            data.playerInfo.lDeltaZ = data.playerInfo.deltaZ;
+            data.playerInfo.deltaX = data.playerInfo.to.x - data.playerInfo.from.x;
+            data.playerInfo.deltaY = data.playerInfo.to.y - data.playerInfo.from.y;
+            data.playerInfo.deltaZ = data.playerInfo.to.z - data.playerInfo.from.z;
+            data.playerInfo.lDeltaXZ = data.playerInfo.deltaXZ;
+            data.playerInfo.deltaXZ = MathUtils.hypot(data.playerInfo.deltaX, data.playerInfo.deltaZ);
+
+            data.playerInfo.blockOnTo = BlockUtils.getBlock(data.playerInfo.to.toLocation(data.getPlayer().getWorld()));
+            data.playerInfo.blockBelow = BlockUtils.getBlock(data.playerInfo.to.toLocation(data.getPlayer().getWorld())
+                    .subtract(0, 1, 0));
+
+            if(packet.isPos()) {
+                //We create a separate from BoundingBox for the predictionService since it should operate on pre-motion data.
+                data.box = PlayerSizeHandler.instance.bounds(data.getPlayer(),
+                        data.playerInfo.to.x, data.playerInfo.to.y, data.playerInfo.to.z);
+
+            }
+            data.blockInfo.runCollisionCheck();
+
+            if(packet.isPos() || packet.isLook()) {
+                KLocation origin = data.playerInfo.to.clone();
+                origin.y+= data.playerInfo.sneaking ? 1.54f : 1.62f;
+                RayCollision collision = new RayCollision(origin.toVector(), MathUtils.getDirection(origin));
+
+                synchronized (data.getLookingAtBoxes()) {
+                    data.getLookingAtBoxes().clear();
+                    data.getLookingAtBoxes().addAll(collision
+                            .boxesOnRay(data.getPlayer().getWorld(),
+                                    data.getPlayer().getGameMode().equals(GameMode.CREATIVE) ? 6.0 : 5.0));
+                    data.playerInfo.lookingAtBlock = data.getLookingAtBoxes().size() > 0;
                 }
             }
         }
-
-        if(data.playerInfo.serverGround && data.playerInfo.lastMoveCancel.isPassed()) {
-            data.playerInfo.setbackLocation = new Location(data.getPlayer().getWorld(),
-                    data.playerInfo.to.x, data.playerInfo.to.y, data.playerInfo.to.z,
-                    data.playerInfo.to.yaw, data.playerInfo.to.pitch);
-        }
-
-        data.playerInfo.to.timeStamp = timeStamp;
-
-        if(data.playerInfo.doingTeleport) data.playerInfo.lastTeleportTimer.reset();
-
-        data.playerInfo.lClientGround = data.playerInfo.clientGround;
-        data.playerInfo.clientGround = packet.isGround();
-        //Setting the motion delta for use in checks to prevent repeated functions.
-        data.playerInfo.lDeltaX = data.playerInfo.deltaX;
-        data.playerInfo.lDeltaY = data.playerInfo.deltaY;
-        data.playerInfo.lDeltaZ = data.playerInfo.deltaZ;
-        data.playerInfo.deltaX = data.playerInfo.to.x - data.playerInfo.from.x;
-        data.playerInfo.deltaY = data.playerInfo.to.y - data.playerInfo.from.y;
-        data.playerInfo.deltaZ = data.playerInfo.to.z - data.playerInfo.from.z;
-        data.playerInfo.lDeltaXZ = data.playerInfo.deltaXZ;
-        data.playerInfo.deltaXZ = MathUtils.hypot(data.playerInfo.deltaX, data.playerInfo.deltaZ);
-
-        data.playerInfo.blockOnTo = BlockUtils.getBlock(data.playerInfo.to.toLocation(data.getPlayer().getWorld()));
-        data.playerInfo.blockBelow = BlockUtils.getBlock(data.playerInfo.to.toLocation(data.getPlayer().getWorld())
-                .subtract(0, 1, 0));
 
         if(!data.getPlayer().getGameMode().equals(lastGamemode)) data.playerInfo.lastGamemodeTimer.reset();
         lastGamemode = data.getPlayer().getGameMode();
@@ -149,14 +179,6 @@ public class MovementProcessor {
 
             mat.ifPresent(xMaterial -> data.blockInfo.currentFriction = BlockUtils.getFriction(xMaterial));
         }
-
-        if(packet.isPos()) {
-            //We create a separate from BoundingBox for the predictionService since it should operate on pre-motion data.
-            data.box = PlayerSizeHandler.instance.bounds(data.getPlayer(),
-                    data.playerInfo.to.x, data.playerInfo.to.y, data.playerInfo.to.z);
-
-            if(timeStamp - data.creation > 400L) data.blockInfo.runCollisionCheck(); //run b4 everything else for use below.
-        } else if(timeStamp - data.creation < 3000L) data.blockInfo.runCollisionCheck();
 
         if(data.playerInfo.calcVelocityY > 0) {
             data.playerInfo.calcVelocityY-= 0.08f;
@@ -192,28 +214,193 @@ public class MovementProcessor {
                     break;
                 }
             }
-        }
 
-        if(data.playerInfo.checkMovement) data.playerInfo.moveTicks++;
-        else data.playerInfo.moveTicks = 0;
-
-        //Resetting serverPos back to false after its been processed for one tick in detections.
-        if(data.playerInfo.serverPos && !data.playerInfo.doingTeleport) data.playerInfo.serverPos = false;
-
-        data.playerInfo.doingTeleport = data.playerInfo.moveTicks == 0;
-
-        if(packet.isPos() || packet.isLook()) {
-            KLocation origin = data.playerInfo.to.clone();
-            origin.y+= data.playerInfo.sneaking ? 1.54f : 1.62f;
-            RayCollision collision = new RayCollision(origin.toVector(), MathUtils.getDirection(origin));
-
-            synchronized (data.getLookingAtBoxes()) {
-                data.getLookingAtBoxes().clear();
-                data.getLookingAtBoxes().addAll(collision
-                        .boxesOnRay(data.getPlayer().getWorld(),
-                                data.getPlayer().getGameMode().equals(GameMode.CREATIVE) ? 6.0 : 5.0));
-                data.playerInfo.lookingAtBlock = data.getLookingAtBoxes().size() > 0;
+            if(data.playerInfo.insideBlock = (data.playerInfo.blockOnTo != null && data.playerInfo.blockOnTo.getType()
+                    .equals(XMaterial.AIR.parseMaterial()))) {
+                data.playerInfo.lastInsideBlock.reset();
             }
+
+            //We set the yaw and pitch like this to prevent inaccurate data input. Like above, it will return both pitch
+            //and yaw as 0 if it isnt a look packet.
+            if(packet.isLook()) {
+                data.playerInfo.to.yaw = packet.getYaw();
+                data.playerInfo.to.pitch = packet.getPitch();
+            }
+
+            //Setting the angle delta for use in checks to prevent repeated functions.
+            data.playerInfo.lDeltaYaw = data.playerInfo.deltaYaw;
+            data.playerInfo.lDeltaPitch = data.playerInfo.deltaPitch;
+            data.playerInfo.deltaYaw = data.playerInfo.to.yaw
+                    - data.playerInfo.from.yaw;
+            data.playerInfo.deltaPitch = data.playerInfo.to.pitch - data.playerInfo.from.pitch;
+            if (packet.isLook()) {
+
+                data.playerInfo.lastPitchGCD = data.playerInfo.pitchGCD;
+                data.playerInfo.lastYawGCD = data.playerInfo.yawGCD;
+                data.playerInfo.yawGCD = MiscUtils
+                        .gcdSmall(data.playerInfo.deltaYaw, data.playerInfo.lDeltaYaw);
+                data.playerInfo.pitchGCD = MiscUtils
+                        .gcdSmall(data.playerInfo.deltaPitch, data.playerInfo.lDeltaPitch);
+
+                val origin = data.playerInfo.to.clone();
+
+                origin.y+= data.playerInfo.sneaking ? 1.54 : 1.62;
+
+                if(data.playerInfo.lastTeleportTimer.isPassed(1)) {
+                    predictionHandling:
+                    {
+                        float yawGcd = data.playerInfo.yawGCD,
+                                pitchGcd = data.playerInfo.pitchGCD;
+
+                        //Adding gcd of yaw and pitch.
+                        if (data.playerInfo.yawGCD > 0.01 && data.playerInfo.yawGCD < 1.2) {
+                            yawGcdList.add(yawGcd);
+                        }
+                        if (data.playerInfo.pitchGCD > 0.01 && data.playerInfo.pitchGCD < 1.2)
+                            pitchGcdList.add(pitchGcd);
+
+                        if(yawGcdList.size() < 20 || pitchGcdList.size() < 20) {
+                            accurateYawData = false;
+                            break predictionHandling;
+                        }
+
+                        accurateYawData = true;
+
+                        //Making sure to get shit within the std for a more accurate result.
+
+                        //Making sure to get shit within the std for a more accurate result.
+                        if (lastReset.isPassed()) {
+                            yawOutliers = MiscUtils.getOutliersFloat(yawGcdList);
+                            pitchOutliers = MiscUtils.getOutliersFloat(pitchGcdList);
+                            yawMode = MathUtils.getMode(yawGcdList);
+                            pitchMode = MathUtils.getMode(pitchGcdList);
+                            lastReset.reset();
+                            sensXPercent = sensToPercent(sensitivityX = getSensitivityFromYawGCD(yawMode));
+                            sensYPercent = sensToPercent(sensitivityY = getSensitivityFromPitchGCD(pitchMode));
+                        }
+
+
+                        lastDeltaX = deltaX;
+                        lastDeltaY = deltaY;
+                        deltaX = getExpiermentalDeltaX(data);
+                        deltaY = getExpiermentalDeltaY(data);
+
+                        if ((data.playerInfo.pitchGCD < 0.006 && data.playerInfo.yawGCD < 0.006) && smoothCamFilterY < 1E6
+                                && smoothCamFilterX < 1E6 && timeStamp - data.creation > 1000L) {
+                            float sens = MovementProcessor.percentToSens(95);
+                            float f = sens * 0.6f + .2f;
+                            float f1 = f * f * f * 8;
+                            float f2 = deltaX * f1;
+                            float f3 = deltaY * f1;
+
+                            smoothCamFilterX = mxaxis.smooth(smoothCamYaw, .05f * f1);
+                            smoothCamFilterY = myaxis.smooth(smoothCamPitch, .05f * f1);
+
+                            this.smoothCamYaw += f2;
+                            this.smoothCamPitch += f3;
+
+                            f2 = smoothCamFilterX * 0.5f;
+                            f3 = smoothCamFilterY * 0.5f;
+
+                            //val clampedFrom = (Math.abs(data.playerInfo.from.yaw) > 360 ? data.playerInfo.from.yaw % 360 : data.playerInfo.from.yaw);
+                            val clampedFrom = MathUtils.yawTo180F(data.playerInfo.from.yaw);
+                            float pyaw = clampedFrom + f2 * .15f;
+                            float ppitch = data.playerInfo.from.pitch - f3 * .15f;
+
+                            this.lsmoothYaw = smoothYaw;
+                            this.lsmoothPitch = smoothPitch;
+                            this.smoothYaw = pyaw;
+                            this.smoothPitch = ppitch;
+
+                            float yaccel = Math.abs(data.playerInfo.deltaYaw) - Math.abs(data.playerInfo.lDeltaYaw),
+                                    pAccel = Math.abs(data.playerInfo.deltaPitch) - Math.abs(data.playerInfo.lDeltaPitch);
+
+                            if (MathUtils.getDelta(smoothYaw, clampedFrom) > (yaccel > 0 ? (yaccel > 10 ? 2.5 : 1) : 0.3)
+                                    || MathUtils.getDelta(smoothPitch, data.playerInfo.from.pitch)
+                                    > (pAccel > 0 ? (pAccel > 10 ? 2.5 : 1) : 0.3)) {
+                                smoothCamYaw = smoothCamPitch = 0;
+                                data.playerInfo.cinematicMode = false;
+                                mxaxis.reset();
+                                myaxis.reset();
+                            } else data.playerInfo.cinematicMode = true;
+
+                            MiscUtils.testMessage("syaw=" + smoothYaw + " spitch=" + smoothPitch + " yaw=" + MathUtils.yawTo180F(data.playerInfo.from.yaw) + " pitch=" + data.playerInfo.from.pitch);
+                        } else {
+                            mxaxis.reset();
+                            myaxis.reset();
+                            data.playerInfo.cinematicMode = false;
+                        }
+
+                        lastDeltaX = deltaX;
+                        lastDeltaY = deltaY;
+                        deltaX = getExpiermentalDeltaX(data);
+                        deltaY = getExpiermentalDeltaY(data);
+                    }
+                } else {
+                    yawGcdList.clear();
+                    pitchGcdList.clear();
+                }
+            }
+            //Running jump check
+            if (!data.playerInfo.clientGround) {
+                if (!data.playerInfo.jumped && data.playerInfo.lClientGround
+                        && data.playerInfo.deltaY >= 0) {
+                    data.playerInfo.jumped = true;
+                } else {
+                    data.playerInfo.inAir = true;
+                    data.playerInfo.jumped = false;
+                }
+            } else data.playerInfo.jumped = data.playerInfo.inAir = false;
+
+            /* General Block Info */
+
+            //Setting if players were on blocks when on ground so it can be used with checks that check air things.
+            if (data.playerInfo.serverGround || data.playerInfo.clientGround || data.playerInfo.collided) {
+                data.playerInfo.wasOnIce = data.blockInfo.onIce;
+                data.playerInfo.wasOnSlime = data.blockInfo.onSlime;
+            }
+
+            if((data.playerInfo.onLadder = MovementUtils.isOnLadder(data))
+                    && (data.playerInfo.deltaY <= 0 || data.blockInfo.collidesHorizontally)) {
+                data.playerInfo.isClimbing = true;
+            }
+
+            //Checking if the player was collided with ghost blocks.
+            synchronized (data.ghostBlocks) {
+                SimpleCollisionBox boxToCheck = data.box.copy().expand(0.4f);
+                for (Location location : data.ghostBlocks.keySet()) {
+                    if(location.toVector().distanceSquared(data.playerInfo.to.toVector()) > 25) continue;
+
+                    if(data.ghostBlocks.get(location).isCollided(boxToCheck)) {
+                        data.playerInfo.lastGhostCollision.reset();
+                        break;
+                    }
+                }
+            }
+
+            //Checking if user is in liquid.
+            if (data.blockInfo.inLiquid) data.playerInfo.liquidTimer.reset();
+            //Half block ticking (slabs, stairs, bed, cauldron, etc.)
+            if (data.blockInfo.onHalfBlock) data.playerInfo.lastHalfBlock.reset();
+            //We dont check if theyre still on ice because this would be useless to checks that check a player in air too.
+            if (data.blockInfo.onIce) data.playerInfo.iceTimer.reset();
+            if (data.blockInfo.inWeb) data.playerInfo.webTimer.reset();
+            if (data.blockInfo.onClimbable) data.playerInfo.climbTimer.reset();
+            if (data.blockInfo.onSlime) data.playerInfo.slimeTimer.reset();
+            if (data.blockInfo.onSoulSand) data.playerInfo.soulSandTimer.reset();
+            if (data.blockInfo.blocksAbove) data.playerInfo.blockAboveTimer.reset();
+            if (data.blockInfo.collidedWithEntity) data.playerInfo.lastEntityCollision.reset();
+
+            //Player ground/air positioning ticks.
+            if (!data.playerInfo.clientGround) {
+                data.playerInfo.airTicks++;
+                data.playerInfo.groundTicks = 0;
+            } else {
+                data.playerInfo.groundTicks++;
+                data.playerInfo.airTicks = 0;
+            }
+
+            data.playerInfo.baseSpeed = MovementUtils.getBaseSpeed(data);
         }
 
         data.playerInfo.inVehicle = data.getPlayer().getVehicle() != null;
@@ -238,133 +425,6 @@ public class MovementProcessor {
                 || timeStamp - Kauri.INSTANCE.lastTick >
                 new VariableValue<>(110, 60, ProtocolVersion::isPaper).get();
 
-        if(data.playerInfo.insideBlock = (data.playerInfo.blockOnTo != null && data.playerInfo.blockOnTo.getType()
-                .equals(XMaterial.AIR.parseMaterial()))) {
-            data.playerInfo.lastInsideBlock.reset();
-        }
-
-        //We set the yaw and pitch like this to prevent inaccurate data input. Like above, it will return both pitch
-        //and yaw as 0 if it isnt a look packet.
-        if(packet.isLook()) {
-            data.playerInfo.to.yaw = packet.getYaw();
-            data.playerInfo.to.pitch = packet.getPitch();
-        }
-
-        //Setting the angle delta for use in checks to prevent repeated functions.
-        data.playerInfo.lDeltaYaw = data.playerInfo.deltaYaw;
-        data.playerInfo.lDeltaPitch = data.playerInfo.deltaPitch;
-        data.playerInfo.deltaYaw = data.playerInfo.to.yaw
-                - data.playerInfo.from.yaw;
-        data.playerInfo.deltaPitch = data.playerInfo.to.pitch - data.playerInfo.from.pitch;
-        if (packet.isLook()) {
-
-            data.playerInfo.lastPitchGCD = data.playerInfo.pitchGCD;
-            data.playerInfo.lastYawGCD = data.playerInfo.yawGCD;
-            data.playerInfo.yawGCD = MiscUtils
-                    .gcdSmall(data.playerInfo.deltaYaw, data.playerInfo.lDeltaYaw);
-            data.playerInfo.pitchGCD = MiscUtils
-                    .gcdSmall(data.playerInfo.deltaPitch, data.playerInfo.lDeltaPitch);
-
-            val origin = data.playerInfo.to.clone();
-
-            origin.y+= data.playerInfo.sneaking ? 1.54 : 1.62;
-
-            if(data.playerInfo.lastTeleportTimer.isPassed(1)) {
-                predictionHandling:
-                {
-                    float yawGcd = data.playerInfo.yawGCD,
-                            pitchGcd = data.playerInfo.pitchGCD;
-
-                    //Adding gcd of yaw and pitch.
-                    if (data.playerInfo.yawGCD > 0.01 && data.playerInfo.yawGCD < 1.2) {
-                        yawGcdList.add(yawGcd);
-                    }
-                    if (data.playerInfo.pitchGCD > 0.01 && data.playerInfo.pitchGCD < 1.2)
-                        pitchGcdList.add(pitchGcd);
-
-                    if(yawGcdList.size() < 20 || pitchGcdList.size() < 20) {
-                        accurateYawData = false;
-                        break predictionHandling;
-                    }
-
-                    accurateYawData = true;
-
-                    //Making sure to get shit within the std for a more accurate result.
-
-                    //Making sure to get shit within the std for a more accurate result.
-                    if (lastReset.isPassed()) {
-                        yawOutliers = MiscUtils.getOutliersFloat(yawGcdList);
-                        pitchOutliers = MiscUtils.getOutliersFloat(pitchGcdList);
-                        yawMode = MathUtils.getMode(yawGcdList);
-                        pitchMode = MathUtils.getMode(pitchGcdList);
-                        lastReset.reset();
-                        sensXPercent = sensToPercent(sensitivityX = getSensitivityFromYawGCD(yawMode));
-                        sensYPercent = sensToPercent(sensitivityY = getSensitivityFromPitchGCD(pitchMode));
-                    }
-
-
-                    lastDeltaX = deltaX;
-                    lastDeltaY = deltaY;
-                    deltaX = getExpiermentalDeltaX(data);
-                    deltaY = getExpiermentalDeltaY(data);
-
-                    if ((data.playerInfo.pitchGCD < 0.006 && data.playerInfo.yawGCD < 0.006) && smoothCamFilterY < 1E6
-                            && smoothCamFilterX < 1E6 && timeStamp - data.creation > 1000L) {
-                        float sens = MovementProcessor.percentToSens(95);
-                        float f = sens * 0.6f + .2f;
-                        float f1 = f * f * f * 8;
-                        float f2 = deltaX * f1;
-                        float f3 = deltaY * f1;
-
-                        smoothCamFilterX = mxaxis.smooth(smoothCamYaw, .05f * f1);
-                        smoothCamFilterY = myaxis.smooth(smoothCamPitch, .05f * f1);
-
-                        this.smoothCamYaw += f2;
-                        this.smoothCamPitch += f3;
-
-                        f2 = smoothCamFilterX * 0.5f;
-                        f3 = smoothCamFilterY * 0.5f;
-
-                        //val clampedFrom = (Math.abs(data.playerInfo.from.yaw) > 360 ? data.playerInfo.from.yaw % 360 : data.playerInfo.from.yaw);
-                        val clampedFrom = MathUtils.yawTo180F(data.playerInfo.from.yaw);
-                        float pyaw = clampedFrom + f2 * .15f;
-                        float ppitch = data.playerInfo.from.pitch - f3 * .15f;
-
-                        this.lsmoothYaw = smoothYaw;
-                        this.lsmoothPitch = smoothPitch;
-                        this.smoothYaw = pyaw;
-                        this.smoothPitch = ppitch;
-
-                        float yaccel = Math.abs(data.playerInfo.deltaYaw) - Math.abs(data.playerInfo.lDeltaYaw),
-                                pAccel = Math.abs(data.playerInfo.deltaPitch) - Math.abs(data.playerInfo.lDeltaPitch);
-
-                        if (MathUtils.getDelta(smoothYaw, clampedFrom) > (yaccel > 0 ? (yaccel > 10 ? 2.5 : 1) : 0.3)
-                                || MathUtils.getDelta(smoothPitch, data.playerInfo.from.pitch)
-                                > (pAccel > 0 ? (pAccel > 10 ? 2.5 : 1) : 0.3)) {
-                            smoothCamYaw = smoothCamPitch = 0;
-                            data.playerInfo.cinematicMode = false;
-                            mxaxis.reset();
-                            myaxis.reset();
-                        } else data.playerInfo.cinematicMode = true;
-
-                        MiscUtils.testMessage("syaw=" + smoothYaw + " spitch=" + smoothPitch + " yaw=" + MathUtils.yawTo180F(data.playerInfo.from.yaw) + " pitch=" + data.playerInfo.from.pitch);
-                    } else {
-                        mxaxis.reset();
-                        myaxis.reset();
-                        data.playerInfo.cinematicMode = false;
-                    }
-
-                    lastDeltaX = deltaX;
-                    lastDeltaY = deltaY;
-                    deltaX = getExpiermentalDeltaX(data);
-                    deltaY = getExpiermentalDeltaY(data);
-                }
-            } else {
-                yawGcdList.clear();
-                pitchGcdList.clear();
-            }
-        }
-
         if (packet.isPos()) {
             if (data.playerInfo.serverGround && data.playerInfo.groundTicks > 4)
                 data.playerInfo.groundLoc = data.playerInfo.to;
@@ -381,72 +441,13 @@ public class MovementProcessor {
         //Setting fallDistance
         if (!data.playerInfo.serverGround
                 && data.playerInfo.deltaY < 0
+                && !data.playerInfo.doingTeleport
                 && !data.blockInfo.onClimbable
                 && !data.blockInfo.inLiquid
                 && !data.blockInfo.inWeb) {
             data.playerInfo.fallDistance += -data.playerInfo.deltaY;
         } else data.playerInfo.fallDistance = 0;
 
-        //Running jump check
-        if (!data.playerInfo.clientGround) {
-            if (!data.playerInfo.jumped && data.playerInfo.lClientGround
-                    && data.playerInfo.deltaY >= 0) {
-                data.playerInfo.jumped = true;
-            } else {
-                data.playerInfo.inAir = true;
-                data.playerInfo.jumped = false;
-            }
-        } else data.playerInfo.jumped = data.playerInfo.inAir = false;
-
-        /* General Block Info */
-
-        //Setting if players were on blocks when on ground so it can be used with checks that check air things.
-        if (data.playerInfo.serverGround || data.playerInfo.clientGround || data.playerInfo.collided) {
-            data.playerInfo.wasOnIce = data.blockInfo.onIce;
-            data.playerInfo.wasOnSlime = data.blockInfo.onSlime;
-        }
-
-        if((data.playerInfo.onLadder = MovementUtils.isOnLadder(data))
-                && (data.playerInfo.deltaY <= 0 || data.blockInfo.collidesHorizontally)) {
-            data.playerInfo.isClimbing = true;
-        }
-
-        //Checking if the player was collided with ghost blocks.
-        synchronized (data.ghostBlocks) {
-            SimpleCollisionBox boxToCheck = data.box.copy().expand(0.4f);
-            for (Location location : data.ghostBlocks.keySet()) {
-                if(location.toVector().distanceSquared(data.playerInfo.to.toVector()) > 25) continue;
-
-                if(data.ghostBlocks.get(location).isCollided(boxToCheck)) {
-                    data.playerInfo.lastGhostCollision.reset();
-                    break;
-                }
-            }
-        }
-
-        //Checking if user is in liquid.
-        if (data.blockInfo.inLiquid) data.playerInfo.liquidTimer.reset();
-        //Half block ticking (slabs, stairs, bed, cauldron, etc.)
-        if (data.blockInfo.onHalfBlock) data.playerInfo.lastHalfBlock.reset();
-        //We dont check if theyre still on ice because this would be useless to checks that check a player in air too.
-        if (data.blockInfo.onIce) data.playerInfo.iceTimer.reset();
-        if (data.blockInfo.inWeb) data.playerInfo.webTimer.reset();
-        if (data.blockInfo.onClimbable) data.playerInfo.climbTimer.reset();
-        if (data.blockInfo.onSlime) data.playerInfo.slimeTimer.reset();
-        if (data.blockInfo.onSoulSand) data.playerInfo.soulSandTimer.reset();
-        if (data.blockInfo.blocksAbove) data.playerInfo.blockAboveTimer.reset();
-        if (data.blockInfo.collidedWithEntity) data.playerInfo.lastEntityCollision.reset();
-
-        //Player ground/air positioning ticks.
-        if (!data.playerInfo.clientGround) {
-            data.playerInfo.airTicks++;
-            data.playerInfo.groundTicks = 0;
-        } else {
-            data.playerInfo.groundTicks++;
-            data.playerInfo.airTicks = 0;
-        }
-
-        data.playerInfo.baseSpeed = MovementUtils.getBaseSpeed(data);
         /* General Cancel Booleans */
         boolean hasLevi = levitation != null && data.potionProcessor.hasPotionEffect(levitation);
 

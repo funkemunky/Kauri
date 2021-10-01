@@ -1,8 +1,9 @@
 package dev.brighten.anticheat.check.impl.movement.general;
 
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
 import cc.funkemunky.api.utils.*;
+import dev.brighten.anticheat.utils.Helper;
 import cc.funkemunky.api.utils.world.BlockData;
 import cc.funkemunky.api.utils.world.CollisionBox;
 import cc.funkemunky.api.utils.world.types.RayCollision;
@@ -47,20 +48,21 @@ public class Phase extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long now) {
-        if(now - data.creation < 1200L || now - data.playerInfo.lastRespawn < 150L
+        if(!packet.isPos() || now - data.creation < 800L || now - data.playerInfo.lastRespawn < 150L
                 || data.playerInfo.doingTeleport
                 || data.playerInfo.creative || data.playerInfo.canFly) {
-            if(!data.playerInfo.checkMovement)
-            debug("cant check movement: sp=%s lf=%s", data.playerInfo.doingTeleport, lastFlag.getPassed());
             return;
         }
+
         TagsBuilder tags = new TagsBuilder();
 
-        SimpleCollisionBox toUpdate = data.box.copy().shrink(0.0625, 0.0625, 0.0625),
+        SimpleCollisionBox
+                toUpdate = new SimpleCollisionBox(data.playerInfo.to.toVector(), 0.6,1.8)
+                .expand(-0.0625),
                 playerBox = new SimpleCollisionBox(data.getPlayer().getLocation(), 0.6, 1.8)
-                        .shrink(0.0625, 0.0625, 0.0625);
+                        .expand(-0.0625);
 
-        SimpleCollisionBox concatted = Helper.wrap(toUpdate, playerBox);
+        SimpleCollisionBox concatted = Helper.wrap(playerBox, toUpdate);
 
         List<Block> blocks = dev.brighten.anticheat.utils.Helper.getBlocks(data.blockInfo.handler, concatted);
 
@@ -68,7 +70,7 @@ public class Phase extends Check {
             if(data.playerInfo.creative) break phaseIntoBlock;
 
             List<Block> current = Helper.blockCollisions(blocks, playerBox),
-                    newb = Helper.blockCollisions(blocks, toUpdate.copy());
+                    newb = Helper.blockCollisions(blocks, toUpdate);
 
             for (Block block : newb) {
                 if(!current.contains(block)) {
@@ -79,13 +81,13 @@ public class Phase extends Check {
                         tags.addTag("INTO_BLOCK");
                         vl++;
                         break;
-                    }
+                    } else debug(type.name());
                 }
             }
         }
         
         phaseThru: {
-            if(data.playerInfo.creative) break phaseThru;
+            if(data.playerInfo.creative || playerBox.isIntersected(toUpdate)) break phaseThru;
             
             Vector to = data.playerInfo.to.toVector(), from = data.playerInfo.from.toVector();
 
@@ -116,7 +118,6 @@ public class Phase extends Check {
                         break;
                     }
 
-                    debug("intersected=%s o=%.2f d=%.1f", intersected, result.one, dist);
                 } else {
                     List<SimpleCollisionBox> downcasted = new ArrayList<>();
 
@@ -127,8 +128,6 @@ public class Phase extends Check {
                         Tuple<Double, Double> result = new Tuple<>(0., 0.);
                         boolean intersected = RayCollision.intersect(ray, sbox);
 
-                        debug("intersected=%s o=%.2f d=%.1f", intersected, result.one, dist);
-
                         if(intersected && result.one <= dist) {
                             flagged = true;
                             break;
@@ -136,6 +135,7 @@ public class Phase extends Check {
                     }
 
                     if(flagged) {
+                        vl++;
                         tags.addTag("THROUGH_BLOCK");
                         tags.addTag("material=" + type);
                         break;
@@ -146,8 +146,6 @@ public class Phase extends Check {
 
         clip: {
             if(data.playerInfo.canFly || data.playerInfo.creative) break clip;
-
-            SimpleCollisionBox clipBox = data.box.copy().expand(data.playerInfo.deltaXZ, 0, data.playerInfo.deltaXZ);
 
             double threshold = data.potionProcessor.hasPotionEffect(PotionEffectType.JUMP) ? 0.62 : 0.5;
 
@@ -170,17 +168,18 @@ public class Phase extends Check {
             }
 
             if(data.playerInfo.deltaXZ > threshold) {
-                //tags.addTag("CLIP");
-                //vl++;
-                //tags.addTag(String.format("%.3f>-%.3f", data.playerInfo.deltaXZ, threshold));
+                tags.addTag("CLIP");
+                vl++;
+                tags.addTag(String.format("%.3f>-%.3f", data.playerInfo.deltaXZ, threshold));
             }
         }
 
         if(tags.getSize() > 0) {
             flag("tags=%s", tags.build());
-
-            final Location from = data.playerInfo.from.toLocation(data.getPlayer().getWorld());
-            RunUtils.task(() -> data.getPlayer().teleport(from));
+            final Location finalSetbackLocation = data.playerInfo.from.toLocation(data.getPlayer().getWorld());
+            if(finalSetbackLocation != null) {
+                RunUtils.task(() -> data.getPlayer().teleport(finalSetbackLocation));
+            }
             lastFlag.reset();
         } else fromWhereShitAintBad = data.playerInfo.from;
     }
