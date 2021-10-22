@@ -33,16 +33,19 @@ public class AutoclickerE extends Check {
             tags.addTag("outliers");
             buffer++;
         }
+
         if(data.clickProcessor.getStd() < 0.5 && data.clickProcessor.getOutliers() <= 1) {
             buffer+= 0.75;
             tags.addTag("deviation");
         }
+
         if(data.clickProcessor.getKurtosis() < 0
                 && (data.clickProcessor.getOutliers() <= 1 || skewness < 0.1)
                 && data.clickProcessor.getMean() < 2.5) {
             buffer+= 0.75;
             tags.addTag("kurtosis");
         }
+
         if(skewness < 0.15 && data.clickProcessor.getMean() < 2.5) {
             buffer+= 0.5f;
             tags.addTag("skew");

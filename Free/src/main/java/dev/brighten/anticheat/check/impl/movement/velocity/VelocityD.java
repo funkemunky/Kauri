@@ -16,6 +16,7 @@ import dev.brighten.api.check.CheckType;
 public class VelocityD extends Check {
 
     private int buffer;
+
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if(data.playerInfo.lastVelocity.isPassed(1)) return;

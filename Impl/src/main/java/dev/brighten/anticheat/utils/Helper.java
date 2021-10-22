@@ -220,16 +220,19 @@ public class Helper {
 	}
 
 	public static List<CollisionBox> toCollisions(List<Block> blocks) {
-		return blocks.stream().map(b -> BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion())).collect(Collectors.toCollection(LinkedList::new));
+		return blocks.stream().map(b -> BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion()))
+				.collect(Collectors.toCollection(LinkedList::new));
 	}
 
 	public static List<SimpleCollisionBox> toCollisionsDowncasted(List<Block> blocks) {
 		List<SimpleCollisionBox> collisions = new LinkedList<>();
-		blocks.forEach(b -> BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion()).downCast(collisions));
+		blocks.forEach(b -> BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion())
+				.downCast(collisions));
 		return collisions;
 	}
 
-	public static List<CollisionBox> getCollisionsOnRay(RayCollision collision, World world, double distance, double resolution) {
+	public static List<CollisionBox> getCollisionsOnRay(RayCollision collision, World world,
+														double distance, double resolution) {
 		int amount = Math.round((float)(distance / resolution));
 		Location[] locs = new Location[Math.max(2, amount)]; //We do a max to prevent NegativeArraySizeException.
 		for (int i = 0; i < locs.length; i++) {
