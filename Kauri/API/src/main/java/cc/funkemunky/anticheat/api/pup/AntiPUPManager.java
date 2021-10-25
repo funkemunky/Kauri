@@ -2,7 +2,7 @@ package cc.funkemunky.anticheat.api.pup;
 
 import cc.funkemunky.anticheat.api.data.PlayerData;
 import cc.funkemunky.api.Atlas;
-import cc.funkemunky.api.database.DatabaseType;
+import cc.funkemunky.carbon.db.DatabaseType;
 
 import java.util.ArrayList;
 import java.util.List;

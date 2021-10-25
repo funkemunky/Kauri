@@ -14,7 +14,6 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-@Init
 public class AntiVPNListeners implements Listener {
 
     @ConfigSetting(path = "antivpn", name = "blockedCountries")

@@ -15,6 +15,7 @@ import cc.funkemunky.anticheat.impl.config.MiscSettings;
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.utils.BoundingBox;
 import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.TickTimer;
 import lombok.Getter;
 import lombok.Setter;
@@ -97,13 +98,12 @@ public class PlayerData {
         Kauri.getInstance().getCheckManager().loadChecksIntoData(this);
         Kauri.getInstance().getAntiPUPManager().loadMethodsIntoData(this);
 
-        Atlas.getInstance().getSchedular().scheduleAtFixedRate(() -> {
-            if(target != null) {
-                setEntityFrom(getEntityTo());
-                setEntityTo(new CustomLocation(getTarget().getLocation()));
-                getEntityPastLocation().addLocation(getEntityTo());
-            }
-        }, 50L, 50L, TimeUnit.MILLISECONDS);
+        RunUtils.taskTimer(() -> {
+            if(getTarget() == null) return;
+            setEntityFrom(getEntityTo());
+            setEntityTo(new CustomLocation(getTarget().getLocation()));
+            getEntityPastLocation().addLocation(getEntityTo());
+        },5,0);
     }
 
     public boolean isServerPos() {

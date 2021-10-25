@@ -73,8 +73,6 @@ public class Kauri extends JavaPlugin {
         saveDefaultConfig();
         saveDefaultMessages();
 
-        if (InputHandler.testMode == -69 && (Bukkit.getPluginManager().getPlugin("KauriLoader") == null || !Bukkit.getPluginManager().getPlugin("KauriLoader").isEnabled())) return;
-
 
         if(Bukkit.getVersion().contains("Paper")) {
             runningPaperSpigot = true;

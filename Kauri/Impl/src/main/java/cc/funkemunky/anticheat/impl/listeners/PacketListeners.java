@@ -201,14 +201,14 @@ public class PacketListeners implements AtlasListener {
                                 if(data.getTarget() != null && !data.getTarget().getUniqueId().equals(entity.getUniqueId())) {
                                     data.getEntityPastLocation().getPreviousLocations().clear();
                                     data.getLastTargetSwitch().reset();
-                                    data.setTargetBounds(ReflectionsUtil.getBoundingBox(data.getTarget()));
+                                    data.setTargetBounds(ReflectionsUtil.toBoundingBox(ReflectionsUtil.getBoundingBox(data.getTarget())));
                                 } else if(data.getTarget() == null) {
                                     wasNull = true;
                                 }
                                 data.setTarget((LivingEntity) entity);
 
                                 if(wasNull) {
-                                    data.setTargetBounds(ReflectionsUtil.getBoundingBox(data.getTarget()));
+                                    data.setTargetBounds(ReflectionsUtil.toBoundingBox(ReflectionsUtil.getBoundingBox(data.getTarget())));
                                 }
                                 if (entity instanceof Player) {
                                     PlayerData dataEntity = Kauri.getInstance().getDataManager().getPlayerData(entity.getUniqueId());

@@ -22,8 +22,10 @@ import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @CheckInfo(name = "HitBox", description = "Ensures that the player is not using any expanded form of a player hitbox.",
         type = CheckType.REACH, cancelType = CancelType.COMBAT)
@@ -32,7 +34,7 @@ import java.util.stream.Collectors;
 public class HitBox extends Check {
 
     private double vl;
-    private List<EntityType> allowedEntities = Arrays.asList(
+    private EnumSet<EntityType> allowedEntities = EnumSet.of(
             EntityType.ZOMBIE,
             EntityType.VILLAGER,
             EntityType.PLAYER,
@@ -56,12 +58,10 @@ public class HitBox extends Check {
                 && allowedEntities.contains(getData().getTarget().getType())
                 && !getData().isCreativeMode()) {
 
-            val rayTrace = move.getPastLocation()
-                    .getEstimatedLocation(0, move.getYawDelta() > 10 ? 100L : 50L)
-                    .stream()
-                    .map(loc ->
-                            loc.toLocation(getData().getPlayer().getWorld()).clone()
-                            .add(0, getData().getPlayer().getEyeHeight(), 0))
+            val rayTrace = Stream.of(getData().getMovementProcessor().getTo()
+                    .toLocation(getData().getPlayer().getWorld()).add(0, getData().getPlayer().getEyeHeight(), 0),
+                    getData().getMovementProcessor().getFrom().add(0, getData().getPlayer().getEyeHeight(), 0)
+                            .toLocation(getData().getPlayer().getWorld()))
                     .map(loc -> new RayTrace(loc.toVector(), loc.getDirection()))
                     .collect(Collectors.toList());
 
@@ -69,19 +69,21 @@ public class HitBox extends Check {
             rayTrace.stream().map(trace -> trace.traverse(3.2f, 0.1f)).forEach(vectors::addAll);
 
             val entityLocations = getData().getEntityPastLocation()
-                    .getEstimatedLocation(getData().getTransPing(), 150L)
+                    .getEstimatedLocation(getData().getTransPing() + 100L, 200L)
                     .stream()
                     .map(loc -> getHitbox(getData().getTarget(), loc))
                     .collect(Collectors.toList());
+
+            if(entityLocations.size() == 0) return;
 
             List<Vector> collided = new ArrayList<>();
             for (BoundingBox box : entityLocations) {
                 vectors.parallelStream().filter(box::collides).forEach(collided::add);
             }
 
-            if(collided.size() == 0) {
+            if(collided.size() == 0 && entityLocations.size() > 2) {
                 if(vl++ > 6) {
-                    flag("collided=0 ping=" + getData().getTransPing() + " vl=" + vl,
+                    flag("et=" + entityLocations.size() +  " collided=0 ping=" + getData().getTransPing() + " vl=" + vl,
                             true,
                             true,
                             AlertTier.HIGH);
@@ -101,7 +103,7 @@ public class HitBox extends Check {
         Vector dimensions = MiscUtils.entityDimensions
                 .getOrDefault(entity.getType(), new Vector(0.35F, 1.85F, 0.35F));
         return (new BoundingBox(l.toVector(), l.toVector()))
-                .grow(0.2f, 0.15F, 0.2f)
+                .grow(0.35f, 0.2F, 0.35f)
                 .grow((float)dimensions.getX(), 0.0F, (float)dimensions.getZ())
                 .add(0.0F, 0.0F, 0.0F, 0.0F, (float)dimensions.getY(), 0.0F);
     }

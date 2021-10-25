@@ -10,6 +10,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>API</artifactId>
+    <version>b14</version>
+
+    <repositories>
+        <repository>
+            <id>funkemunky-releases</id>
+            <url>https://nexus.funkemunky.cc/content/repositories/releases/</url>
+        </repository>
+    </repositories>
 
     <build>
         <plugins>
@@ -75,7 +83,7 @@
         <dependency>
             <groupId>cc.funkemunky.anticheat</groupId>
             <artifactId>Impl</artifactId>
-            <version>b2</version>
+            <version>b14</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
