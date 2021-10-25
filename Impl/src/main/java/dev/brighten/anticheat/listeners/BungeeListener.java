@@ -50,7 +50,7 @@ public class BungeeListener implements AtlasListener, Listener {
                     + " &7flagged &f" + checkName
                     + " &8(&e" + info + "&8) &8[&c" + vl + "&8]");
 
-            for (int hashcode : Kauri.INSTANCE.dataManager.hasAlerts.toArray()) {
+            for (int hashcode : Kauri.INSTANCE.dataManager.hasAlerts.toArray(new int[0])) {
                 Kauri.INSTANCE.dataManager.dataMap.get(hashcode).getPlayer().sendMessage(alert);
             }
             lastAlert.reset();

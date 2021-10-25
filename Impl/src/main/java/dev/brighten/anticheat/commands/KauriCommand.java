@@ -145,7 +145,7 @@ public class KauriCommand extends BaseCommand {
         }
 
         if(check.equalsIgnoreCase("none")) {
-            for (ObjectData tdata : Kauri.INSTANCE.dataManager.dataMap.valueCollection()) {
+            for (ObjectData tdata : Kauri.INSTANCE.dataManager.dataMap.values()) {
                 synchronized (tdata.boxDebuggers) {
                     tdata.boxDebuggers.remove(player);
                 }
@@ -426,7 +426,7 @@ public class KauriCommand extends BaseCommand {
             Kauri.INSTANCE.saveConfig();
 
             sender.sendMessage(Color.Red + "Refreshing data objects with updated information...");
-            Kauri.INSTANCE.dataManager.dataMap.valueCollection().parallelStream()
+            Kauri.INSTANCE.dataManager.dataMap.values().parallelStream()
                     .forEach(data -> data.checkManager.checks.get(checkInfo.name()).enabled = toggleState);
             sender.sendMessage(Color.Green + "Completed!");
         } else sender.sendMessage(Color.Red + "\"" + check
@@ -440,19 +440,19 @@ public class KauriCommand extends BaseCommand {
         Kauri.INSTANCE.executor.execute(() -> {
             sender.sendMessage(cc.funkemunky.api.utils.MiscUtils.line(Color.Dark_Gray));
             sender.sendMessage(Color.Yellow + "Forge Users:");
-            sender.sendMessage(Kauri.INSTANCE.dataManager.dataMap.valueCollection().stream()
+            sender.sendMessage(Kauri.INSTANCE.dataManager.dataMap.values().stream()
                     .filter(data -> data.modData != null)
                     .map(data -> data.getPlayer().getName())
                     .collect(Collectors.joining(Color.Gray + ", " + Color.White)));
             sender.sendMessage("");
             sender.sendMessage(Color.Yellow + "Lunar Client Users:");
-            sender.sendMessage(Kauri.INSTANCE.dataManager.dataMap.valueCollection().stream()
+            sender.sendMessage(Kauri.INSTANCE.dataManager.dataMap.values().stream()
                     .filter(data -> data.usingLunar)
                     .map(data -> data.getPlayer().getName())
                     .collect(Collectors.joining(Color.Gray + ", " + Color.White)));
             sender.sendMessage("");
             sender.sendMessage(Color.Yellow + "Misc Users:");
-            sender.sendMessage(Kauri.INSTANCE.dataManager.dataMap.valueCollection().stream()
+            sender.sendMessage(Kauri.INSTANCE.dataManager.dataMap.values().stream()
                     .filter(data -> data.modData == null && !data.usingLunar)
                     .map(data -> data.getPlayer().getName())
                     .collect(Collectors.joining(Color.Gray + ", " + Color.White)));

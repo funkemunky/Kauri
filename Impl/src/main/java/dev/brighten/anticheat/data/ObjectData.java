@@ -299,7 +299,7 @@ public class ObjectData implements Data {
     public static void debugBoxes(boolean debugging, Player debugger, ObjectData... targets) {
         if(!debugging) {
             List<ObjectData> toRemove = targets.length == 0
-                    ? new ArrayList<>(Kauri.INSTANCE.dataManager.dataMap.valueCollection()) : Arrays.asList(targets);
+                    ? new ArrayList<>(Kauri.INSTANCE.dataManager.dataMap.values()) : Arrays.asList(targets);
 
             toRemove.stream()
                     .filter(d -> d.boxDebuggers.contains(debugger))

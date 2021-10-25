@@ -230,13 +230,13 @@ public class Check implements KauriCheck {
                     if(Config.alertsConsole) MiscUtils.printToConsole(new TextComponent(toSend).toPlainText());
                     if(!dev) {
                         synchronized (Kauri.INSTANCE.dataManager.hasAlerts) {
-                            for (Integer data : Kauri.INSTANCE.dataManager.hasAlerts.toArray()) {
+                            for (int data : Kauri.INSTANCE.dataManager.hasAlerts.toArray(new int[0])) {
                                 Kauri.INSTANCE.dataManager.dataMap.get(data).getPlayer().spigot().sendMessage(toSend);
                             }
                         }
                     } else {
                         synchronized (Kauri.INSTANCE.dataManager.devAlerts) {
-                            for (Integer data : Kauri.INSTANCE.dataManager.devAlerts.toArray()) {
+                            for (int data : Kauri.INSTANCE.dataManager.devAlerts.toArray(new int[0])) {
                                 Kauri.INSTANCE.dataManager.dataMap.get(data).getPlayer().spigot().sendMessage(toSend);
                             }
                         }

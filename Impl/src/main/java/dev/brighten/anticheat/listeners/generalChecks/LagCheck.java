@@ -18,7 +18,7 @@ public class LagCheck extends AtlasEvent {
 
         //We do this to ensure no one is abusing fake lag attempts.
         long timeStamp = System.currentTimeMillis();
-        Kauri.INSTANCE.dataManager.dataMap.valueCollection()
+        Kauri.INSTANCE.dataManager.dataMap.values()
                 .parallelStream()
                 .forEach(data -> {
                     if(timeStamp - data.lagInfo.lastClientTrans > 10000L

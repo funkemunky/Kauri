@@ -1,17 +1,15 @@
 package dev.brighten.anticheat.data;
 
-import gnu.trove.impl.sync.TSynchronizedIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.set.TIntSet;
-import gnu.trove.set.hash.TIntHashSet;
+import cc.funkemunky.api.utils.it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import cc.funkemunky.api.utils.it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
+import cc.funkemunky.api.utils.it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import cc.funkemunky.api.utils.it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import org.bukkit.entity.Player;
 
-import java.util.*;
-
 public class DataManager {
-    public final TSynchronizedIntObjectMap<ObjectData> dataMap = new TSynchronizedIntObjectMap<>(new TIntObjectHashMap<>());
-    public final TIntHashSet hasAlerts = new TIntHashSet(),
-            devAlerts = new TIntHashSet();
+    public final Int2ObjectMap<ObjectData> dataMap = Int2ObjectMaps.synchronize(new Int2ObjectOpenHashMap<>());
+    public final IntOpenHashSet hasAlerts = new IntOpenHashSet(),
+            devAlerts = new IntOpenHashSet();
 
     public DataManager() {
     }

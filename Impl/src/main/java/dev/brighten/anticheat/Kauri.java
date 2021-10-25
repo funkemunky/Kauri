@@ -116,7 +116,7 @@ public class Kauri extends JavaPlugin {
         MiscUtils.printToConsole("&7Unloading DataManager...");
         //Clearing the dataManager.
         synchronized (dataManager.dataMap) {
-            dataManager.dataMap.valueCollection().forEach(ObjectData::unregister);
+            dataManager.dataMap.values().forEach(ObjectData::unregister);
             dataManager.dataMap.clear();
         }
         dataManager.hasAlerts.clear();

@@ -45,7 +45,7 @@ public class KeepaliveProcessor implements Runnable {
         WrappedOutTransaction packet = new WrappedOutTransaction(0, currentKeepalive.id, false);
 
         currentKeepalive.startStamp = System.currentTimeMillis();
-        for (ObjectData value : Kauri.INSTANCE.dataManager.dataMap.valueCollection()) {
+        for (ObjectData value : Kauri.INSTANCE.dataManager.dataMap.values()) {
             if(value.target != null) {
                 value.targetPastLocation.addLocation(value.target.getLocation());
                 value.runKeepaliveAction(ka -> {
