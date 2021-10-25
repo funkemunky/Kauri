@@ -11,6 +11,7 @@ import cc.funkemunky.api.tinyprotocol.packet.out.*;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.XMaterial;
+import cc.funkemunky.api.utils.math.IntVector;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.listeners.api.impl.KeepaliveAcceptedEvent;
@@ -299,7 +300,7 @@ public class PacketProcessor {
                     if(data.getPlayer().getItemInHand().getType().name().contains("BUCKET")) {
                         data.playerInfo.lastPlaceLiquid.reset();
                     }
-                    val pos = packet.getPosition();
+                    IntVector pos = packet.getBlockPosition();
                     val stack = packet.getItemStack();
 
                     if(pos.getX() == -1 && (pos.getY() == 255 || pos.getY() == -1)
@@ -326,8 +327,8 @@ public class PacketProcessor {
                 if(data.sniffing) {
                     data.sniffedPackets.add(type + ":@:" +
                             (packet.getItemStack() != null ? packet.getItemStack().toString() : "NULL")
-                            + ";(" + packet.getPosition().getX() + ","
-                            + packet.getPosition().getY() + "," + packet.getPosition().getZ() + ");"
+                            + ";(" + packet.getBlockPosition().getX() + ","
+                            + packet.getBlockPosition().getY() + "," + packet.getBlockPosition().getZ() + ");"
                             + packet.getFace().name() + ";"
                             + packet.getVecX() + "," + packet.getVecY() + "," + packet.getVecZ()
                             + ":@:" + timestamp);

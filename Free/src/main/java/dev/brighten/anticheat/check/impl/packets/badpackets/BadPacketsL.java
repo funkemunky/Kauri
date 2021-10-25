@@ -2,12 +2,12 @@ package dev.brighten.anticheat.check.impl.packets.badpackets;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
+import cc.funkemunky.api.utils.math.IntVector;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
-import lombok.val;
 
 import java.util.Optional;
 
@@ -18,7 +18,7 @@ public class BadPacketsL extends Check {
 
     @Packet
     public void onPlace(WrappedInBlockPlacePacket packet) {
-        val pos = packet.getPosition();
+        IntVector pos = packet.getBlockPosition();
         if((packet.getItemStack() == null
                 || (packet.getItemStack().getType().isBlock()
                 && !packet.getItemStack().getType().equals(packet.getPlayer().getItemInHand().getType())))

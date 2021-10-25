@@ -62,7 +62,8 @@ public class PredictionService {
                 MathHelper.floor_double(posY -  0.20000000298023224D), MathHelper.floor_double(posZ)));
 
         if(blockBelow != null) {
-            isBelowSpecial = XMaterial.SLIME_BLOCK.parseMaterial().equals(blockBelow.getType())
+            isBelowSpecial = (ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_8)
+                    && XMaterial.SLIME_BLOCK.parseMaterial().equals(blockBelow.getType()))
                     || XMaterial.SOUL_SAND.parseMaterial().equals(blockBelow.getType());
         }
 
@@ -97,7 +98,8 @@ public class PredictionService {
 
         if(blockBelow != null
                 && onGround) {
-            if(XMaterial.SLIME_BLOCK.parseMaterial().equals(blockBelow.getType())) {
+            if(ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_8)
+                    && XMaterial.SLIME_BLOCK.parseMaterial().equals(blockBelow.getType())) {
                 if(Math.abs(data.playerInfo.deltaY) < 0.1 && !data.playerInfo.sneaking) {
                     double shit = 0.4081 + Math.abs(data.playerInfo.deltaY) * 0.20000000298023224D;
 

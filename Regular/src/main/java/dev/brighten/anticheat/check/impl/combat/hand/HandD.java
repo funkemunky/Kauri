@@ -2,7 +2,9 @@ package dev.brighten.anticheat.check.impl.combat.hand;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.math.IntVector;
 import cc.funkemunky.api.utils.math.cond.MaxDouble;
 import cc.funkemunky.api.utils.world.types.RayCollision;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
@@ -12,7 +14,6 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
-import lombok.val;
 import org.bukkit.Location;
 
 @CheckInfo(name = "Hand (D)", description = "Checks if a player places a block without looking.",
@@ -26,7 +27,7 @@ public class HandD extends Check {
 
     @Packet
     public void onPlace(WrappedInBlockPlacePacket packet) {
-        val pos = packet.getPosition();
+        IntVector pos = packet.getBlockPosition();
         if(pos != null && (pos.getX() != -1 || pos.getY() != -1 || pos.getZ() != -1)) {
             loc = new Location(packet.getPlayer().getWorld(), pos.getX(), pos.getY(), pos.getZ());
 
@@ -38,7 +39,7 @@ public class HandD extends Check {
     public void onFlying(WrappedInFlyingPacket packet) {
         if(box != null && loc != null) {
 
-            val origin = data.playerInfo.to.clone();
+            KLocation origin = data.playerInfo.to.clone();
 
             origin.y+= data.playerInfo.sneaking ? 1.54 : 1.62;
 
