@@ -37,10 +37,6 @@ public class Load {
         register("Loading config...");
         Atlas.getInstance().registerConfig(Kauri.INSTANCE);
 
-        register("Loading API...");
-        Kauri.INSTANCE.kauriAPI = new KauriAPI();
-        Kauri.INSTANCE.eventHandler = new EventHandler();
-
         register("Loading commands...");
         Kauri.INSTANCE.commandManager = Atlas.getInstance().getBukkitCommandManager(Kauri.INSTANCE);
         Kauri.INSTANCE.commandManager.enableUnstableAPI("help");
@@ -55,6 +51,10 @@ public class Load {
         Kauri.INSTANCE.dataManager = new DataManager();
         Kauri.INSTANCE.keepaliveProcessor = new KeepaliveProcessor();
         Kauri.INSTANCE.packetProcessor = new PacketProcessor();
+
+        register("Loading API...");
+        Kauri.INSTANCE.kauriAPI = new KauriAPI();
+        Kauri.INSTANCE.eventHandler = new EventHandler();
 
         register("Running scanner...");
         Atlas.getInstance().initializeScanner(Kauri.INSTANCE, true, true);
