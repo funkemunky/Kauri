@@ -21,10 +21,10 @@ public class BadPacketsN extends Check {
     @Setting(name  = "kickPlayer")
     private static boolean kickPlayer = true;
 
-    private int flying, lastTick, noBuffer;
+    private int flying, flying2, lastTick, skipBuffer;
     private short lastId;
     private final Timer lastTrans = new TickTimer(), lastSentTrans = new MillisTimer(), lastKeepAlive = new TickTimer(),
-            lastFlying = new TickTimer();
+            lastFlying = new TickTimer(), lastSkipFlag = new TickTimer();
 
     @Setting(name = "keepaliveKick")
     private static boolean keepaliveKicking = true;
@@ -49,9 +49,9 @@ public class BadPacketsN extends Check {
             if (!isExecutable() && vl > 4) kickPlayer(String.format(Color.translate(kickString), "TN"));
         }
 
-        if(lastKeepAlive.isPassed(7000L)) {
+        if(lastKeepAlive.isPassed(7000L) && ++flying2 > 80) {
             kickPlayer("Network connection error.");
-        }
+        } else if(lastKeepAlive.isNotPassed(7000L)) flying2 = 0;
 
         lastFlying.reset();
     }
@@ -82,10 +82,13 @@ public class BadPacketsN extends Check {
 
             if (current - lastTick > 1
                     && id - lastId > 1 && lastTick != 0 && lastTick != 1 && now - data.creation > 4000L) {
-                vl++;
-                flag("c=%s/%s last=%s/%s d=%s t=SKIP",
-                        current, id, lastTick, lastId, current - lastTick);
-            }
+                if(++skipBuffer > 1) {
+                    vl++;
+                    flag("c=%s/%s last=%s/%s d=%s t=SKIP",
+                            current, id, lastTick, lastId, current - lastTick);
+                }
+                lastSkipFlag.reset();
+            } else if(lastSkipFlag.isPassed(140)) skipBuffer = 0;
             debug("c=%s l=%s", current, lastTick);
             lastTick = current;
             lastId = id;
