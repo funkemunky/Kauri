@@ -70,6 +70,8 @@ public class PlayerInformation {
         lastGhostCollision = new TickTimer(5);
         lastGlideTimer = new TickTimer(10);
         lastTargetUpdate = new TickTimer();
+        lastFlyingTimer = new TickTimer();
+        lastMoveTimer = new TickTimer();
     }
 
     //Cinematic
@@ -98,10 +100,11 @@ public class PlayerInformation {
     //ticks
     public int groundTicks, airTicks, kGroundTicks, kAirTicks;
     public Timer liquidTimer, webTimer, climbTimer, slimeTimer, iceTimer, blockAboveTimer, soulSandTimer;
-    public Timer lastBrokenBlock, lastVelocity, lastTargetSwitch, lastBlockPlace, lastBlockPlacePacket,
+    public Timer lastBrokenBlock, lastVelocity, lastTargetSwitch, lastBlockPlace, lastBlockPlacePacket, lastFlyingTimer,
             lastBlockDigPacket, lastToggleFlight, lastAttack, lastEntityCollision, lastMoveCancel, lastTargetUpdate,
             lastWindowClick, lastInsideBlock, lastHalfBlock, lastPlaceLiquid, lastUseItem, lastGhostCollision,
-            lastTeleportTimer, lastGamemodeTimer, lastRespawnTimer, lastChunkUnloaded, cinematicTimer, lastGlideTimer;
+            lastTeleportTimer, lastGamemodeTimer, lastRespawnTimer, lastChunkUnloaded, cinematicTimer, lastGlideTimer,
+            lastMoveTimer;
 
     public double velocityX, velocityY, velocityZ, calcVelocityX, calcVelocityY, calcVelocityZ;
 

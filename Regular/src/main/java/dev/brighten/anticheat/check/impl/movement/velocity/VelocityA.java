@@ -1,7 +1,9 @@
 package dev.brighten.anticheat.check.impl.movement.velocity;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.TickTimer;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -13,14 +15,26 @@ import dev.brighten.api.check.CheckType;
 @Cancellable
 public class VelocityA extends Check {
 
-    private double vY, buffer;
+    private double vY, cvY, buffer;
+    private TickTimer lastVelocity = new TickTimer(20);
+
+    @Packet
+    public void onVelocity(WrappedOutVelocityPacket packet) {
+        if(packet.getId() == data.getPlayer().getEntityId() && packet.getY() > 0.1) {
+           cvY = packet.getY();
+        }
+    }
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if (data.playerInfo.cva) { //If we just recently took velocity,
-            vY = data.playerInfo.velocityY;
-            data.playerInfo.cva = false;
-        }
+        //Make sure we don't have any false positives because of a lingering velocity check
+        if(cvY > 0 && vY == 0 && data.playerInfo.lastVelocity.isPassed(3 + data.lagInfo.transPing)) cvY = 0;
+
+        //Player just jumped into the air
+        if(!data.playerInfo.clientGround && data.playerInfo.lClientGround
+                && data.playerInfo.from.y % 1. == 0
+                && data.playerInfo.deltaY > 0)
+            vY = cvY;
 
         //If any of these conditions aren't met, we don't want to make checking for vertical velocity.
         if(vY > 0

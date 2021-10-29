@@ -75,6 +75,7 @@ public class MovementProcessor {
     }
 
     public void process(WrappedInFlyingPacket packet, long timeStamp) {
+        data.playerInfo.lastFlyingTimer.reset();
         if(data.playerInfo.checkMovement) data.playerInfo.moveTicks++;
         else data.playerInfo.moveTicks = 0;
 
@@ -148,7 +149,7 @@ public class MovementProcessor {
                 //We create a separate from BoundingBox for the predictionService since it should operate on pre-motion data.
                 data.box = PlayerSizeHandler.instance.bounds(data.getPlayer(),
                         data.playerInfo.to.x, data.playerInfo.to.y, data.playerInfo.to.z);
-
+                data.playerInfo.lastMoveTimer.reset();
             }
             data.blockInfo.runCollisionCheck();
 

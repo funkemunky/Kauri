@@ -19,6 +19,7 @@ public class BadPacketsE extends Check {
         if(!packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) return;
 
         if(attackTicks++ > 3
+                && data.playerInfo.lastFlyingTimer.isNotPassed(1)
                 && !data.lagInfo.lagging) {
             vl++;
             flag("has not swung since %s ticks", attackTicks);
