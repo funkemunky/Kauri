@@ -21,5 +21,4 @@ public @interface CheckInfo {
     CheckType checkType() default CheckType.SPEED;
     ProtocolVersion minVersion() default ProtocolVersion.V1_7;
     ProtocolVersion maxVersion() default ProtocolVersion.v1_17;
-
 }

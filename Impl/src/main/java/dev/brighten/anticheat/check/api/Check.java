@@ -14,6 +14,7 @@ import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.discord.DiscordAPI;
+import dev.brighten.anticheat.utils.Log;
 import dev.brighten.anticheat.utils.api.BukkitAPI;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.TickTimer;
@@ -83,20 +84,20 @@ public class Check implements KauriCheck {
         this.data = data;
     }
 
-    public static void register(Check check) {
-        if(!check.getClass().isAnnotationPresent(CheckInfo.class)) {
-            MiscUtils.printToConsole("Could not register "  + check.getClass().getSimpleName()
-                    + " because @CheckInfo was not present.");
+    public static void register(Class<?> checkRawClass) {
+        if(!checkRawClass.isAnnotationPresent(CheckInfo.class)) {
+            Log.warning("Attempted to register class {} without CheckInfo annotations",
+                    checkRawClass.getName());
             return;
         }
-        CheckInfo info = check.getClass().getAnnotation(CheckInfo.class);
+        CheckInfo info = checkRawClass.getAnnotation(CheckInfo.class);
         MiscUtils.printToConsole("Registering... " + info.name());
-        WrappedClass checkClass = new WrappedClass(check.getClass());
+        WrappedClass checkClass = new WrappedClass(checkRawClass);
         String name = info.name();
 
         CancelType type = null;
-        if(check.getClass().isAnnotationPresent(Cancellable.class))
-            type = check.getClass().getAnnotation(Cancellable.class).cancelType();
+        if(checkClass.getClass().isAnnotationPresent(Cancellable.class))
+            type = checkClass.getClass().getAnnotation(Cancellable.class).cancelType();
         CheckSettings settings = new CheckSettings(info.name(), info.description(), info.checkType(), type,
                 info.planVersion(), info.punishVL(), info.vlToFlag(), info.minVersion(), info.maxVersion());
 

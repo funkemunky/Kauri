@@ -5,6 +5,7 @@ import cc.funkemunky.api.utils.MathHelper;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.Kauri;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.entity.Entity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,10 +13,11 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 public class EntityLocation {
-    public final UUID uuid;
+    public final Entity entity;
     public double newX, newY, newZ, x, y, z;
     public float newYaw, newPitch, yaw, pitch;
     public int increment = 0;
+    public boolean sentTeleport = false;
     public List<KLocation> interpolatedLocations = new EvictingList<>(8);
 
     public void interpolateLocations() {

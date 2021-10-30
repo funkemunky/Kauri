@@ -183,12 +183,12 @@ public class PacketProcessor {
                             synchronized (data.entityLocPastLocation.previousLocations) {
                                 data.entityLocPastLocation.previousLocations.clear();
                             }
-                            data.entityLocation = new EntityLocation(packet.getEntity().getUniqueId());
+                            data.entityLocation = new EntityLocation(packet.getEntity());
                             if (packet.getEntity() instanceof Player) {
                                 data.targetData = Kauri.INSTANCE.dataManager.getData((Player) packet.getEntity());
                             } else data.targetData = null;
                         } else if(data.target == null) {
-                            data.entityLocation = new EntityLocation(packet.getEntity().getUniqueId());
+                            data.entityLocation = new EntityLocation(packet.getEntity());
                         }
 
                         if (data.target == null && packet.getEntity() instanceof Player)
@@ -772,6 +772,8 @@ public class PacketProcessor {
                 data.playerInfo.posLocs.add(loc);
 
                 data.playerInfo.phaseLoc = loc.clone();
+
+                data.playerInfo.lastTeleportTimer.reset();
 
                 data.getPlayer().setSprinting(false);
 

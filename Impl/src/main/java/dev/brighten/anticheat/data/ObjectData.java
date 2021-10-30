@@ -14,12 +14,9 @@ import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.math.RollingAverageLong;
 import cc.funkemunky.api.utils.math.cond.MaxInteger;
 import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingList;
-import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingMap;
-import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import cc.funkemunky.api.utils.world.CollisionBox;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.check.api.Config;
 import dev.brighten.anticheat.data.classes.BlockInformation;
 import dev.brighten.anticheat.data.classes.CheckManager;
 import dev.brighten.anticheat.data.classes.PlayerInformation;
@@ -34,10 +31,8 @@ import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.data.Data;
-import io.netty.channel.Channel;
 import lombok.AllArgsConstructor;
 import lombok.val;
-import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
@@ -103,6 +98,8 @@ public class ObjectData implements Data {
         potionProcessor = new PotionProcessor(this);
         checkManager = new CheckManager(this);
         checkManager.addChecks();
+
+        playerInfo.to = playerInfo.from = new KLocation(player.getLocation());
 
         playerConnection = MinecraftReflection.getPlayerConnection(player);
 

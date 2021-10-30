@@ -82,7 +82,6 @@ public class PlayerInformation {
 
     //Server Position
     public long lastServerPos, lastRespawn;
-    public boolean serverPos;
     public final List<KLocation> posLocs = new EvictingList<>(3);
     public final List<Vector> velocities = Collections.synchronizedList(new EvictingList<>(5));
 

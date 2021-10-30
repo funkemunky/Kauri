@@ -9,10 +9,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.SignChangeEvent;
-import org.bukkit.event.player.PlayerEditBookEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.*;
 
 @Init
 public class BukkitCheckListeners implements Listener {
@@ -36,20 +33,23 @@ public class BukkitCheckListeners implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onEvent(PlayerTeleportEvent event) {
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
         if(data != null) {
-            data.playerInfo.serverPos = true;
-            data.playerInfo.lastServerPos = System.currentTimeMillis();
-            data.playerInfo.inventoryOpen = false;
-            data.playerInfo.doingTeleport = false;
-            data.playerInfo.moveTicks = 0;
-            data.playerInfo.lastTeleportTimer.reset();
-            data.playerInfo.to = data.playerInfo.from = new KLocation(event.getTo());
-            data.playerInfo.deltaX = data.playerInfo.deltaY = data.playerInfo.deltaZ = data.playerInfo.deltaXZ = 0;
-            data.playerInfo.deltaYaw = data.playerInfo.deltaPitch = 0;
+            data.moveProcessor.moveTo(event.getTo());
+            data.checkManager.runEvent(event);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onEvent(PlayerRespawnEvent event) {
+        ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
+
+        if(data != null) {
+            data.moveProcessor.moveTo(event.getRespawnLocation());
             data.checkManager.runEvent(event);
         }
     }

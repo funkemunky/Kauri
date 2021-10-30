@@ -74,20 +74,38 @@ public class MovementProcessor {
         }
     }
 
+    public void moveTo(Location location) {
+        data.playerInfo.to.x = data.playerInfo.from.x = location.getX();
+        data.playerInfo.to.y = data.playerInfo.from.y = location.getY();
+        data.playerInfo.to.z = data.playerInfo.from.z = location.getZ();
+        data.playerInfo.to.yaw = data.playerInfo.from.yaw = location.getYaw();
+        data.playerInfo.to.pitch = data.playerInfo.from.pitch = location.getPitch();
+
+        data.playerInfo.deltaX = data.playerInfo.deltaY = data.playerInfo.deltaZ = data.playerInfo.deltaXZ
+                = data.playerInfo.lDeltaX = data.playerInfo.lDeltaY = data.playerInfo.lDeltaZ
+                = data.playerInfo.lDeltaXZ = 0;
+
+        data.playerInfo.deltaYaw = data.playerInfo.lDeltaYaw =
+                data.playerInfo.deltaPitch = data.playerInfo.lDeltaPitch = 0;
+        data.playerInfo.moveTicks = 0;
+        data.playerInfo.doingTeleport = data.playerInfo.inventoryOpen  = false;
+        data.playerInfo.lastTeleportTimer.reset();
+    }
+
     public void process(WrappedInFlyingPacket packet, long timeStamp) {
         data.playerInfo.lastFlyingTimer.reset();
         if(data.playerInfo.checkMovement) data.playerInfo.moveTicks++;
-        else data.playerInfo.moveTicks = 0;
-
-        //Resetting serverPos back to false after its been processed for one tick in detections.
-        if(data.playerInfo.serverPos && !data.playerInfo.doingTeleport) data.playerInfo.serverPos = false;
+        else {
+            data.playerInfo.lastTeleportTimer.reset();
+            data.playerInfo.moveTicks = 0;
+        }
 
         data.playerInfo.doingTeleport = data.playerInfo.moveTicks == 0;
         //We check if it's null and intialize the from and to as equal to prevent large deltas causing false positives since there
         //was no previous from (Ex: delta of 380 instead of 0.45 caused by jump jump in location from 0,0,0 to 380,0,0)
 
         if(!data.playerInfo.doingTeleport) {
-            if (data.playerInfo.from == null && (packet.getX() != 0 || packet.getY() != 0 || packet.getZ() != 0)) {
+            if (data.playerInfo.from == null && packet.isPos()) {
                 data.playerInfo.from
                         = data.playerInfo.to
                         = new KLocation(packet.getX(), packet.getY(), packet.getZ(), packet.getYaw(), packet.getPitch());
@@ -103,7 +121,7 @@ public class MovementProcessor {
 
             //We set the to x,y,z like this to prevent inaccurate data input. Because if it isnt a positional packet,
             // it returns getX, getY, getZ as 0.
-            if (packet.getX() != 0 || packet.getY() != 0 || packet.getZ() != 0) {
+            if (packet.isPos()) {
                 data.playerInfo.to.x = packet.getX();
                 data.playerInfo.to.y = packet.getY();
                 data.playerInfo.to.z = packet.getZ();
@@ -474,6 +492,8 @@ public class MovementProcessor {
                 || data.playerInfo.webTimer.isNotPassed(8)
                 || data.playerInfo.liquidTimer.isNotPassed(8)
                 || data.playerInfo.onLadder
+                || !data.playerInfo.checkMovement
+                || data.playerInfo.lastTeleportTimer.isNotPassed(1)
                 || data.playerInfo.lastGlideTimer.isNotPassed()
                 || (data.playerInfo.deltaXZ == 0 && data.playerInfo.deltaY == 0)
                 || data.blockInfo.roseBush

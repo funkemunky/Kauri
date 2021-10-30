@@ -2,7 +2,6 @@ package dev.brighten.anticheat;
 
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.config.MessageHandler;
-import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
@@ -19,7 +18,6 @@ import dev.brighten.anticheat.utils.timer.impl.AtlasTimer;
 import dev.brighten.api.KauriAPI;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.util.concurrent.Executors;
 

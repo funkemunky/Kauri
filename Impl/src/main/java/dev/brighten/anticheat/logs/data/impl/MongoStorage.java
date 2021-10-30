@@ -22,7 +22,7 @@ import dev.brighten.dev.depends.org.bson.conversions.Bson;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -32,8 +32,7 @@ public class MongoStorage implements DataStorage {
     private MongoDatabase database;
     private BukkitTask task;
 
-    private List<Log> logs = new CopyOnWriteArrayList<>();
-    private List<Punishment> punishments = new CopyOnWriteArrayList<>();
+    private Queue<Document> logs = new ConcurrentLinkedQueue<>(), punishments = new ConcurrentLinkedQueue<>();
 
     public MongoStorage() {
         MongoClient client;
@@ -65,23 +64,35 @@ public class MongoStorage implements DataStorage {
         MiscUtils.printToConsole("&aCompleted index creation!");
 
         task = RunUtils.taskTimerAsync(() -> {
-            if(logs.size() > 0) {
-                for (Log log : logs) {
-                    logsCollection.insertOne(new Document("uuid", log.uuid.toString())
-                            .append("time", log.timeStamp).append("check", log.checkName)
-                            .append("vl", (double)log.vl).append("info", log.info).append("ping", log.ping)
-                            .append("tps", log.tps));
-                    logs.remove(log);
-                }
+            Document doc = null;
+            int count = 0;
+            final List<Document> docsToInsert = new ArrayList<>();
+            while((doc = logs.poll()) != null) {
+                docsToInsert.add(doc);
+                if(++count >= MongoConfig.batchInsertMax)
+                    break;
             }
-            if(punishments.size() > 0) {
-                for(Punishment punishment : punishments) {
-                    punishmentsCollection.insertOne(new Document("uuid", punishment.uuid)
-                            .append("time", punishment.timeStamp).append("check", punishment.checkName));
-                    punishments.remove(punishment);
-                }
+
+            if(count > 0) {
+                logsCollection.insertMany(docsToInsert);
+                docsToInsert.clear();
+                count = 0;
+                doc = null;
             }
-        }, Kauri.INSTANCE, 120L, 40L);
+
+            while((doc = punishments.poll()) != null) {
+                docsToInsert.add(doc);
+                if(++count >= MongoConfig.batchInsertMax)
+                    break;
+            }
+
+            if(count > 0) {
+                punishmentsCollection.insertMany(docsToInsert);
+                docsToInsert.clear();
+                count = 0;
+                doc = null;
+            }
+        }, Kauri.INSTANCE, 120L, 20L);
     }
     @Override
     public List<Log> getLogs(UUID uuid, Check check, int arrayMin, int arrayMax, long timeFrom, long timeTo) {
@@ -171,7 +182,10 @@ public class MongoStorage implements DataStorage {
 
     @Override
     public void addLog(Log log) {
-        logs.add(log);
+        logs.add(new Document("uuid", log.uuid.toString())
+                .append("time", log.timeStamp).append("check", log.checkName)
+                .append("vl", (double)log.vl).append("info", log.info).append("ping", log.ping)
+                .append("tps", log.tps));
     }
 
     @Override
@@ -182,7 +196,8 @@ public class MongoStorage implements DataStorage {
 
     @Override
     public void addPunishment(Punishment punishment) {
-        punishments.add(punishment);
+        punishments.add(new Document("uuid", punishment.uuid)
+                .append("time", punishment.timeStamp).append("check", punishment.checkName));
     }
 
     @Override
