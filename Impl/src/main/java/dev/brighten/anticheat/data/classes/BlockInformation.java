@@ -36,7 +36,7 @@ public class BlockInformation {
             handler = new CollisionHandler(new ArrayList<>(), new ArrayList<>(), new KLocation(0,0,0), null);
     public final List<SimpleCollisionBox> aboveCollisions = Collections.synchronizedList(new ArrayList<>()),
             belowCollisions = Collections.synchronizedList(new ArrayList<>());
-    public List<Block> blocks = Collections.synchronizedList(new ArrayList<>());
+    public final List<Block> blocks = Collections.synchronizedList(new ArrayList<>());
 
     //Caching material
     private final Material cobweb = XMaterial.COBWEB.parseMaterial(), rosebush = XMaterial.ROSE_BUSH.parseMaterial();
@@ -53,7 +53,7 @@ public class BlockInformation {
         double dy = objectData.playerInfo.deltaY;
         double dh = objectData.playerInfo.deltaXZ;
 
-        blocks = new ArrayList<>();
+        blocks.clear();
 
         onClimbable = objectData.playerInfo.serverGround = objectData.playerInfo.nearGround
                 = onSlab = onStairs = onHalfBlock = inLiquid = inLava = inWater = inWeb = onSlime = pistonNear

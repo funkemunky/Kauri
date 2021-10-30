@@ -6,6 +6,7 @@ import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.world.BlockData;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.utils.FastTrig;
 import dev.brighten.anticheat.utils.Helper;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -196,7 +197,7 @@ public class PredictionService {
     }
 
     private float getMotionYaw(double mx, double mz) {
-        float motionYaw = (float) (Math.atan2(mz, mx) * 180.0D / Math.PI) - 90.0F; // is the rotationYaw from the Motion
+        float motionYaw = (float) (FastTrig.fast_atan2(mz, mx) * 180.0D / Math.PI) - 90.0F; // is the rotationYaw from the Motion
         // of the Player
 
         motionYaw -= yaw;
@@ -227,9 +228,7 @@ public class PredictionService {
         float moveF = 0.0F;
         String key = "Nothing";
 
-        int precision = String.valueOf((int) Math.abs(posX > posZ ? posX : posX)).length();
-        precision = 15 - precision;
-        double preD = 1.2 * Math.pow(10, -Math.max(3, precision - 5));
+        double preD = 1.2 * Math.pow(10, -3);
 
         if (Math.abs(Math.abs(mx) + Math.abs(mz)) > preD) {
             direction = Math.round(motionYaw);
@@ -291,9 +290,7 @@ public class PredictionService {
         float moveF = 0.0F;
         String key = "Nothing";
 
-        int precision = String.valueOf((int) Math.abs(posX > posZ ? posX : posX)).length();
-        precision = 15 - precision;
-        double preD = 1.2 * Math.pow(10, -Math.max(3, precision - 5));
+        double preD = 1.2 * Math.pow(10, -3);
 
         if (Math.abs(Math.abs(mx) + Math.abs(mz)) > preD) {
             direction = Math.round(motionYaw);
@@ -348,9 +345,7 @@ public class PredictionService {
 
     private void calc(boolean checkCollisions) {
         flag = true;
-        int precision = String.valueOf((int) Math.abs(posX > posZ ? posX : posX)).length();
-        precision = 10 - precision - (isBelowSpecial ? 4 : 0);
-        double preD = 1.2 * Math.pow(10, -Math.max(3, precision - 5));  // the motion deviates further and further from the coordinates 0 0 0. this value fix this
+        double preD = 1.2 * Math.pow(10, -3);  // the motion deviates further and further from the coordinates 0 0 0. this value fix this
 
 //		if (openInv) { // i don't have an Event for it
 //			moveF = 0.0F;
@@ -359,7 +354,6 @@ public class PredictionService {
 //		}
 
         // 1337 is an value to see that nothing's changed
-        String diffString = "-1337";
         double diff = -1337;
         double closestdiff = 1337;
 
@@ -505,9 +499,6 @@ public class PredictionService {
                 diff = (diffX * diffX) + (diffZ * diffZ);
 
                 if(Double.isNaN(diff) || Double.isInfinite(diff)) return;
-
-                // if the motion isn't correct this value can get out in flags
-                diffString = String.valueOf(diff);
 
                 if (diff < preD * preD) { // if the diff is small enough
                     flag = false;

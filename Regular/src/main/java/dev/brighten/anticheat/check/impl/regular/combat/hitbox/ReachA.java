@@ -20,6 +20,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.util.Vector;
 
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 
 @CheckInfo(name = "Reach (A)", checkType = CheckType.HITBOX, punishVL = 5, description = "A simple distance check.",
@@ -29,9 +30,8 @@ public class ReachA extends Check {
 
     private double buffer;
 
-    private static final List<EntityType> allowedEntityTypes = Arrays
-            .asList(EntityType.ZOMBIE, EntityType.SHEEP, EntityType.BLAZE,
-                    EntityType.SKELETON, EntityType.PLAYER, EntityType.VILLAGER, EntityType.IRON_GOLEM,
+    private static final EnumSet<EntityType> allowedEntityTypes = EnumSet.of(EntityType.ZOMBIE, EntityType.SHEEP,
+            EntityType.BLAZE, EntityType.SKELETON, EntityType.PLAYER, EntityType.VILLAGER, EntityType.IRON_GOLEM,
                     EntityType.WITCH, EntityType.COW, EntityType.CREEPER);
 
     private Hitboxes hitboxDetection;

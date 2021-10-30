@@ -34,6 +34,7 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.block.Block;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
@@ -273,8 +274,14 @@ public class Check implements KauriCheck {
 
     public void fixMovementBugs() {
         BukkitAPI.INSTANCE.setGliding(data.getPlayer(), false);
-        RunUtils.task(() -> data.blockInfo.blocks.forEach(b -> data.getPlayer()
-                .sendBlockChange(b.getLocation(), b.getType(), b.getData())));
+        RunUtils.task(() -> {
+            synchronized (data.blockInfo.blocks) {
+                for (Block b : data.blockInfo.blocks) {
+                    data.getPlayer()
+                            .sendBlockChange(b.getLocation(), b.getType(), b.getData());
+                }
+            }
+        });
     }
 
     private String formatAlert(String toFormat, String info) {

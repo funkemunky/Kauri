@@ -5,6 +5,7 @@ import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.utils.FastTrig;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
 import org.bukkit.Location;
@@ -51,7 +52,7 @@ public class Inertia extends Check {
         if (from != null && to != null) {
             double difX = to.getX() - from.getX();
             double difZ = to.getZ() - from.getZ();
-            return (Math.atan2(difZ, difX) * 180.0D / 3.141592653589793D) - 90.0F;
+            return (FastTrig.fast_atan2(difZ, difX) * 180.0D / 3.141592653589793D) - 90.0F;
         } else {
             return 0.0D;
         }

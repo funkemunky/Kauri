@@ -40,6 +40,7 @@ public class BukkitCheckListeners implements Listener {
 
         if(data != null) {
             data.moveProcessor.moveTo(event.getTo());
+            if(data.checkManager != null)
             data.checkManager.runEvent(event);
         }
     }
@@ -50,6 +51,7 @@ public class BukkitCheckListeners implements Listener {
 
         if(data != null) {
             data.moveProcessor.moveTo(event.getRespawnLocation());
+            if(data.checkManager != null)
             data.checkManager.runEvent(event);
         }
     }

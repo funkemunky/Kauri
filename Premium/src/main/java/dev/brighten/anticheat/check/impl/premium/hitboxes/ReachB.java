@@ -24,7 +24,9 @@ import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.PlayerTimer;
 import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
+import net.minecraft.world.entity.EntityLiving;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.util.Vector;
 
 import java.util.*;
@@ -39,6 +41,10 @@ public class ReachB extends Check {
     private boolean sentTeleport, attacked;
     private AimL aimDetection;
 
+    private static final EnumSet<EntityType> allowedEntityTypes = EnumSet.of(EntityType.ZOMBIE, EntityType.SHEEP,
+            EntityType.BLAZE, EntityType.SKELETON, EntityType.PLAYER, EntityType.VILLAGER, EntityType.IRON_GOLEM,
+            EntityType.WITCH, EntityType.COW, EntityType.CREEPER);
+
     @Override
     public void setData(ObjectData data) {
         lastFlying = new PlayerTimer(data);
@@ -47,7 +53,8 @@ public class ReachB extends Check {
 
     @Packet
     public void onUse(WrappedInUseEntityPacket packet) {
-        if(data.target == null || packet.getAction() != WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)
+        if(data.target == null || !allowedEntityTypes.contains(data.target.getType())
+                || packet.getAction() != WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)
             return;
 
         //Updating new entity loc
@@ -85,7 +92,7 @@ public class ReachB extends Check {
 
         if(collided) {
             distance = Math.sqrt(distance);
-            if(distance > 3.02 && streak > 3 && sentTeleport && lastFlying.isNotPassed(1)) {
+            if(distance > 3.02 && streak > 3 && eloc.sentTeleport && lastFlying.isNotPassed(1)) {
                 if(++buffer > 3) {
                     vl++;
                     flag("d=%.4f", distance);
@@ -162,6 +169,8 @@ public class ReachB extends Check {
     public void onEntity(WrappedOutRelativePosition packet) {
         Atlas.getInstance().getWorldInfo(data.getPlayer().getWorld()).getEntity(packet.getId())
                 .ifPresent(entity -> {
+                    if(!allowedEntityTypes.contains(entity.getType())) return;
+
                     EntityLocation eloc = entityLocationMap.computeIfAbsent(entity.getUniqueId(),
                             key -> new EntityLocation(entity));
                     runAction(entity, () -> {
@@ -193,13 +202,9 @@ public class ReachB extends Check {
 
     @Packet
     public void onTeleportSent(WrappedOutEntityTeleportPacket packet) {
-        Atlas.getInstance().getWorldInfo(data.getPlayer().getWorld()).getEntity(packet.entityId).ifPresent(entity -> {
-            if(entity.getName().contains("Block Reach")) {
-                debug("%s: x=%.3f y=%.3f z=%.3f", entity.getName(), packet.x, packet.y, packet.z);
-            }
-        });
         Atlas.getInstance().getWorldInfo(data.getPlayer().getWorld()).getEntity(packet.entityId)
                 .ifPresent(entity -> {
+                    if(!allowedEntityTypes.contains(entity.getType())) return;
                     EntityLocation eloc = entityLocationMap.computeIfAbsent(entity.getUniqueId(),
                             key -> new EntityLocation(entity));
                     runAction(entity, () -> {

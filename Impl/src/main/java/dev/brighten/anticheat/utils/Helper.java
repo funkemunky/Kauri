@@ -148,12 +148,24 @@ public class Helper {
 				.collect(Collectors.toCollection(LinkedList::new));
 	}
 
+	private static Material AIR = XMaterial.AIR.parseMaterial();
+
 	public static List<Block> getBlocksNearby(CollisionHandler handler, CollisionBox collisionBox) {
 		try {
-			return handler.getBlocks().stream().filter(b -> b.getType() != Material.AIR
-					&& BlockData.getData(b.getType()).getBox(b, ProtocolVersion.getGameVersion())
-					.isIntersected(collisionBox))
-					.collect(Collectors.toList());
+			final List<Block> blocks = new ArrayList<>();
+
+			for (Block block : handler.getBlocks()) {
+				final Material type = block.getType();
+
+				if(type.equals(AIR)
+						|| !BlockData.getData(type).getBox(block, ProtocolVersion.getGameVersion())
+						.isIntersected(collisionBox))
+					continue;
+
+				blocks.add(block);
+			}
+
+			return blocks;
 		} catch (NullPointerException e) {
 			return new ArrayList<>();
 		}
@@ -172,7 +184,7 @@ public class Helper {
 			for (int y = y1; y <= y2; y++)
 				for (int z = z1; z <= z2; z++)
 					if ((block = getBlockAt(world, x, y, z)) != null
-							&& block.getType()!= XMaterial.AIR.parseMaterial())
+							&& block.getType() != AIR)
 						if (Materials.checkFlag(block.getType(),mask))
 							blocks.add(block);
 		return blocks;
