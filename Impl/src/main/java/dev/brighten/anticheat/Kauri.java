@@ -89,16 +89,14 @@ public class Kauri extends JavaPlugin {
         keepaliveProcessor = null;
         Atlas.getInstance().getPacketProcessor().removeListeners(this);
 
-        if(!reload) {
-            kauriAPI = null;
-            MiscUtils.printToConsole("&7Unregistering Bukkit listeners...");
-            HandlerList.unregisterAll(this); //Unregistering Bukkit listeners.
-            MiscUtils.printToConsole("&7Unregistering commands...");
-            //Unregister all commands starting with the arg "Kauri"
-            commandManager.unregisterCommands();
-            MiscUtils.printToConsole("&7Shutting down all Bukkit tasks...");
-            Bukkit.getScheduler().cancelTasks(this); //Cancelling all Bukkit tasks for this plugin.
-        }
+        kauriAPI = null;
+        MiscUtils.printToConsole("&7Unregistering Bukkit listeners...");
+        HandlerList.unregisterAll(this); //Unregistering Bukkit listeners.
+        MiscUtils.printToConsole("&7Unregistering commands...");
+        //Unregister all commands starting with the arg "Kauri"
+        commandManager.unregisterCommands();
+        MiscUtils.printToConsole("&7Shutting down all Bukkit tasks...");
+        Bukkit.getScheduler().cancelTasks(this); //Cancelling all Bukkit tasks for this plugin.
 
         MiscUtils.printToConsole("&7Unloading Discord Webhooks...");
         if(DiscordAPI.INSTANCE != null) DiscordAPI.INSTANCE.unload();
@@ -147,28 +145,8 @@ public class Kauri extends JavaPlugin {
     }
 
     public void reload() {
-        reloadConfig();
-
-        Check.checkClasses.clear();
-        Check.checkSettings.clear();
-        dataManager.dataMap.clear();
-        loggerManager.storage.shutdown();
-        commandManager.unregisterCommands();
-
-        Atlas.getInstance().initializeScanner(this, false, false);
-
-        StringUtils.Messages.reload();
-
-        loggerManager = new LoggerManager();
-
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            dataManager.createData(player);
-        }
-
-        for (Runnable runnable : onReload) {
-            runnable.run();
-            onReload.remove(runnable);
-        }
+        unload(false);
+        load();
     }
 
     public void load() {

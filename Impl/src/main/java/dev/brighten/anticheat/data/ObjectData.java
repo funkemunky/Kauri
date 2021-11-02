@@ -11,9 +11,11 @@ import cc.funkemunky.api.tinyprotocol.api.packets.channelhandler.TinyProtocol1_8
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.RunUtils;
+import cc.funkemunky.api.utils.Tuple;
 import cc.funkemunky.api.utils.math.RollingAverageLong;
 import cc.funkemunky.api.utils.math.cond.MaxInteger;
 import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingList;
+import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import cc.funkemunky.api.utils.world.CollisionBox;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
@@ -81,6 +83,7 @@ public class ObjectData implements Data {
     public final List<String> sniffedPackets = new CopyOnWriteArrayList<>();
     public final Map<Location, CollisionBox> ghostBlocks = Collections.synchronizedMap(new HashMap<>());
     public final Map<Short, Runnable> instantTransaction = new HashMap<>();
+    public final EvictingList<Tuple<KLocation, Double>> pastLocations = new EvictingList<>(20);
 
     public ObjectData(UUID uuid) {
         this.uuid = uuid;

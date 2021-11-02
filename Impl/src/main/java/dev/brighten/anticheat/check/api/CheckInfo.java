@@ -15,7 +15,7 @@ public @interface CheckInfo {
     boolean executable() default true;
     boolean cancellable() default false;
     boolean developer() default false;
-    int punishVL() default 100;
+    int punishVL() default 50;
     KauriVersion planVersion() default KauriVersion.FULL;
     int vlToFlag() default -1;
     CheckType checkType() default CheckType.SPEED;

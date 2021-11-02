@@ -105,10 +105,11 @@ public class MovementProcessor {
         //was no previous from (Ex: delta of 380 instead of 0.45 caused by jump jump in location from 0,0,0 to 380,0,0)
 
         if(!data.playerInfo.doingTeleport) {
+
             if (data.playerInfo.from == null && packet.isPos()) {
                 data.playerInfo.from
                         = data.playerInfo.to
-                        = new KLocation(packet.getX(), packet.getY(), packet.getZ(), packet.getYaw(), packet.getPitch());
+                        = new KLocation(packet.getX(), packet.getY(), packet.getZ(), packet.getYaw(), packet.getPitch(), timeStamp);
             } else {
                 data.playerInfo.from = new KLocation(
                         data.playerInfo.to.x,
@@ -213,6 +214,18 @@ public class MovementProcessor {
             data.playerInfo.calcVelocityZ*= data.playerInfo.lClientGround
                     ? data.blockInfo.currentFriction * 0.91f : 0.91f;
         } else data.playerInfo.calcVelocityZ = 0;
+
+        //Setting player's previous locations
+        if(packet.isPos() && !data.playerInfo.doingTeleport & !data.playerInfo.canFly && !data.playerInfo.creative
+                && !data.playerInfo.inVehicle && timeStamp - data.creation > 500L) {
+
+            if(data.pastLocations.size() > 1) data.pastLocations.removeIf(t -> timeStamp - t.one.timeStamp > 1000);
+
+            synchronized (data.pastLocations) { //To prevent ConcurrentModificationExceptions
+                data.pastLocations.add(new Tuple<>(data.playerInfo.to.clone(),
+                        data.playerInfo.deltaXZ + Math.abs(data.playerInfo.deltaY)));
+            }
+        }
 
 
         synchronized (data.playerInfo.velocities) {
