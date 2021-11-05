@@ -66,26 +66,42 @@ public class MySQLStorage implements DataStorage {
         task = Kauri.INSTANCE.loggingThread.scheduleAtFixedRate(() -> {
             if(logs.size() > 0) {
                 synchronized (logs) {
-                    String values = IntStream.range(0, Math.min(150, logs.size())).mapToObj(i -> "(?,?,?,?,?,?,?)")
-                            .collect(Collectors.joining(","));
+                    final StringBuilder values = new StringBuilder();
 
-                    ExecutableStatement statement = Query.prepare("INSERT INTO `VIOLATIONS` " +
-                            "(`UUID`, `TIME`, `VL`, `CHECK`, `PING`, `TPS`, `INFO`) VALUES " + values);
+                    List<Object> objectsToInsert = new ArrayList<>();
                     Log log = null;
                     int amount = 0;
-                    while((log = logs.pop()) != null) {
-                        statement = statement.append(log.uuid.toString()).append(log.timeStamp).append(log.vl)
-                                .append(log.checkName).append((int)log.ping).append(log.tps)
-                                .append(log.info);
+                    while((log = logs.poll()) != null) {
+                        objectsToInsert.add(log.uuid.toString());
+                        objectsToInsert.add(log.timeStamp);
+                        objectsToInsert.add(log.vl);
+                        objectsToInsert.add(log.checkName);
+                        objectsToInsert.add((int)log.ping);
+                        objectsToInsert.add(log.tps);
+                        objectsToInsert.add(log.info);
 
                         if(++amount >= 150) break;
                     }
+
+                    for (int i = 0; i < amount; i++) {
+                        values.append(i > 0 ? "," : "").append("(?, ?, ?, ?, ?, ?, ?)");
+                    }
+
+                    String query = "INSERT INTO `VIOLATIONS` " +
+                            "(`UUID`, `TIME`, `VL`, `CHECK`, `PING`, `TPS`, `INFO`) VALUES" + values.toString();
+
+                    System.out.println(query);
+                    ExecutableStatement statement = Query.prepare(query)
+                            .append(objectsToInsert.toArray());
+
 
                     if(MySQLConfig.debugMessages)
                         Kauri.INSTANCE.getLogger().log(Level.INFO, "Inserted " + amount
                                 + " logs into the database.");
 
                     statement.execute();
+
+                    objectsToInsert.clear();
                 }
             }
             if(punishments.size() > 0) {

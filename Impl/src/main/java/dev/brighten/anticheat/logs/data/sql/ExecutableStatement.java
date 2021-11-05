@@ -58,6 +58,14 @@ public class ExecutableStatement {
     }
 
     @SneakyThrows
+    public ExecutableStatement append(Object... objects) {
+        for (Object obj : objects) {
+            statement.setObject(pos++, obj);
+        }
+        return this;
+    }
+
+    @SneakyThrows
     public ExecutableStatement append(String obj) {
         statement.setString(pos++, obj);
         return this;

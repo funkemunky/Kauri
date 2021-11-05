@@ -24,6 +24,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import java.io.Closeable;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Function;
@@ -91,6 +99,35 @@ public class MiscUtils {
         if(player instanceof Player) {
             ((Player)player).spigot().sendMessage(TextComponent.fromLegacyText(toSend));
         } else player.sendMessage(toSend);
+    }
+
+    /* Borrowed from FireFlyx ngxdev */
+    public static void download(File file, String from) throws Exception {
+        URL url = new URL(from);
+        InputStream stream = url.openStream();
+        ReadableByteChannel channel = Channels.newChannel(stream);
+        FileOutputStream out = new FileOutputStream(file);
+        out.getChannel().transferFrom(channel, 0L, Long.MAX_VALUE);
+    }
+
+    /* Borrowed from FireFlyx ngxdev */
+    public static ClassLoader injectorClassLoader = MiscUtils.class.getClassLoader();
+
+    /* Borrowed from FireFlyx ngxdev */
+    public static void injectURL(URL url) {
+        try {
+            URLClassLoader systemClassLoader = (URLClassLoader) injectorClassLoader;
+            Class<URLClassLoader> classLoaderClass = URLClassLoader.class;
+
+            try {
+                Method method = classLoaderClass.getDeclaredMethod("addURL", URL.class);
+                method.setAccessible(true);
+                method.invoke(systemClassLoader, url);
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
+        } catch (Exception e) {
+        }
     }
 
     public static double max(double... values) {

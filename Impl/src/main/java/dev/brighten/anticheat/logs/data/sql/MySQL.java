@@ -2,6 +2,8 @@ package dev.brighten.anticheat.logs.data.sql;
 
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.logs.data.config.MySQLConfig;
+import dev.brighten.anticheat.utils.MiscUtils;
+import lombok.SneakyThrows;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,6 +18,14 @@ public class MySQL {
     public static void init() {
         try {
             if (conn == null || conn.isClosed()) {
+                File mysqlLib = new File(Kauri.INSTANCE.getDataFolder(), "mysqllib.jar");
+
+                if(!mysqlLib.exists()) {
+                    Kauri.INSTANCE.getLogger().info("Downloading mysqllib.jar...");
+                    MiscUtils.download(mysqlLib, "https://nexus.funkemunky.cc/content/repositories/releases" +
+                            "/mysql/mysql-connector-java/8.0.22/mysql-connector-java-8.0.22.jar");
+                }
+                MiscUtils.injectURL(mysqlLib.toURI().toURL());
                 Class.forName("com.mysql.jdbc.Driver");
                 conn = DriverManager.getConnection("jdbc:mysql://" + MySQLConfig.ip
                                 + ":3306/?useSSL=true&autoReconnect=true",
@@ -33,10 +43,19 @@ public class MySQL {
         }
     }
 
+    @SneakyThrows
     public static void initSqlLite() {
+        File h2Driver = new File(Kauri.INSTANCE.getDataFolder(), "h2-driver.jar");
+
+        if(!h2Driver.exists()) {
+            Kauri.INSTANCE.getLogger().info("Downloading h2-driver.jar...");
+            MiscUtils.download(h2Driver, "https://nexus.funkemunky.cc/service/local/repositories/releases/" +
+                    "content/com/h2database/h2/1.4.199/h2-1.4.199.jar");
+        }
+        MiscUtils.injectURL(h2Driver.toURI().toURL());
         File dataFolder = new File(Kauri.INSTANCE.getDataFolder(), MySQLConfig.database + ".db");
         if (!dataFolder.exists()){
-            try {
+            try {//https://nexus.funkemunky.cc/service/local/repositories/releases/content/com/h2database/h2/1.4.199/h2-1.4.199.jar
                 if(dataFolder.createNewFile()) {
                     Kauri.INSTANCE.getLogger().info("Successfully created " + MySQLConfig.database + ".db" + " in Kauri folder!");
                 }
@@ -45,8 +64,8 @@ public class MySQL {
             }
         }
         try {
-            Class.forName("org.sqlite.JDBC");
-            conn = DriverManager.getConnection("jdbc:sqlite:" + dataFolder);
+            Class.forName("org.h2.JDBC");
+            conn = DriverManager.getConnection("jdbc:h2:" + dataFolder);
             conn.setAutoCommit(true);
             Query.use(conn);
             System.out.println("Connection to H2 SQlLite has been established.");

@@ -12,6 +12,7 @@ import dev.brighten.anticheat.logs.data.sql.Query;
 import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.logs.objects.Punishment;
 import lombok.val;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -26,7 +27,7 @@ public class FlatfileStorage implements DataStorage {
 
     private final Deque<Log> logs = new LinkedList<>();
     private final Deque<Punishment> punishments = new LinkedList<>();
-    private ScheduledFuture<?> task;
+    private BukkitTask task;
 
     public FlatfileStorage() {
         MySQL.initSqlLite();
@@ -64,61 +65,53 @@ public class FlatfileStorage implements DataStorage {
             MiscUtils.printToConsole("&aCreated!");
         });
 
-        task = Kauri.INSTANCE.loggingThread.scheduleAtFixedRate(() -> {
+        RunUtils.taskTimerAsync(() -> {
             if(logs.size() > 0) {
                 synchronized (logs) {
-                    String values = IntStream.range(0, Math.min(150, logs.size())).mapToObj(i -> "(?,?,?,?,?,?,?)")
-                            .collect(Collectors.joining(","));
+                    final StringBuilder values = new StringBuilder();
 
-                    ExecutableStatement statement = Query.prepare("INSERT INTO `VIOLATIONS` " +
-                            "(`UUID`, `TIME`, `VL`, `CHECK`, `PING`, `TPS`, `INFO`) VALUES " + values);
                     Log log = null;
                     int amount = 0;
-                    while((log = logs.pop()) != null) {
-                        statement = statement.append(log.uuid.toString()).append(log.timeStamp).append(log.vl)
-                                .append(log.checkName).append((int)log.ping).append(log.tps)
-                                .append(log.info);
+                    while((log = logs.poll()) != null) {
+                        Query.prepare("INSERT INTO `VIOLATIONS` " +
+                                "(`UUID`, `TIME`, `VL`, `CHECK`, `PING`, `TPS`, `INFO`) VALUES (?, ?, ?, ?, ?, ?, ?)")
+                                .append(log.uuid.toString()).append(log.timeStamp).append(log.vl).append(log.checkName)
+                                .append((int)log.ping).append(log.tps).append(log.info).execute();
 
                         if(++amount >= 150) break;
                     }
+
 
                     if(MySQLConfig.debugMessages)
                         Kauri.INSTANCE.getLogger().log(Level.INFO, "Inserted " + amount
                                 + " logs into the database.");
-
-                    statement.execute();
                 }
             }
             if(punishments.size() > 0) {
                 synchronized (punishments) {
-                    String values = IntStream.range(0, Math.min(punishments.size(), 150)).mapToObj(i -> "(?,?,?)")
-                            .collect(Collectors.joining(","));
-
-                    ExecutableStatement statement =
-                            Query.prepare("INSERT INTO `PUNISHMENTS` (`UUID`,`TIME`,`CHECK`) VALUES " + values);
 
                     Punishment punishment = null;
                     int amount = 0;
-                    while((punishment = punishments.pop()) != null) {
-                        statement = statement.append(punishment.uuid.toString()).append(punishment.uuid.toString())
-                                .append(punishment.timeStamp).append(punishment.checkName);
+                    while((punishment = punishments.poll()) != null) {
+                        Query.prepare("INSERT INTO `PUNISHMENTS` (`UUID`,`TIME`,`CHECK`)" +
+                                " VALUES(?,?,?)").append(punishment.uuid.toString()).append(punishment.uuid.toString())
+                                .append(punishment.timeStamp).append(punishment.checkName).execute();
+
+
 
                         if(++amount >= 150) break;
                     }
-
                     if(MySQLConfig.debugMessages)
                         Kauri.INSTANCE.getLogger().log(Level.INFO, "Inserted " + amount
                                 + " punishments into the database.");
-
-                    statement.execute();
                 }
             }
-        }, 5, MySQLConfig.rateInSeconds, TimeUnit.SECONDS);
+        }, Kauri.INSTANCE, 120L, 20L * MySQLConfig.rateInSeconds);
     }
 
     @Override
     public void shutdown() {
-        task.cancel(false);
+        task.cancel();
         task = null;
         logs.clear();
         punishments.clear();
