@@ -10,11 +10,22 @@ import java.util.function.Consumer;
 
 public interface DataStorage {
 
+    @Deprecated
     List<Log> getLogs(UUID uuid, Check check, int arrayMin, int arrayMax, long timeFrom, long timeTo);
 
+    @Deprecated
     List<Punishment> getPunishments(UUID uuid, int arrayMin, int arrayMax, long timeFrom, long timeTo);
 
+    @Deprecated
     List<Log> getHighestVL(UUID uuid, Check check, int limit, long timeFrom, long timeTo);
+
+    List<Log> getLogs(UUID uuid, DatabaseParameters params);
+
+    List<Log> getLogs(Check check, DatabaseParameters params);
+
+    List<Log> getLogs(UUID uuid, Check check, DatabaseParameters params);
+
+    List<Log> getHighestVL(UUID uuid, Check check, DatabaseParameters databaseParameters);
 
     void addLog(Log log);
 

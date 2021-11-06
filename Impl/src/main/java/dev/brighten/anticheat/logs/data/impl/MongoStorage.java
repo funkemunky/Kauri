@@ -5,6 +5,7 @@ import cc.funkemunky.api.utils.RunUtils;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.logs.data.DataStorage;
+import dev.brighten.anticheat.logs.data.DatabaseParameters;
 import dev.brighten.anticheat.logs.data.config.MongoConfig;
 import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.logs.objects.Punishment;
@@ -178,6 +179,26 @@ public class MongoStorage implements DataStorage {
                 });
 
         return new ArrayList<>(logsMax.values());
+    }
+
+    @Override
+    public List<Log> getLogs(UUID uuid, DatabaseParameters params) {
+        return null;
+    }
+
+    @Override
+    public List<Log> getLogs(Check check, DatabaseParameters params) {
+        return null;
+    }
+
+    @Override
+    public List<Log> getLogs(UUID uuid, Check check, DatabaseParameters params) {
+        return null;
+    }
+
+    @Override
+    public List<Log> getHighestVL(UUID uuid, Check check, DatabaseParameters databaseParameters) {
+        return null;
     }
 
     @Override

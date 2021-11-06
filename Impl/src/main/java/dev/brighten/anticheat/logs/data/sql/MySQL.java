@@ -4,12 +4,14 @@ import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.logs.data.config.MySQLConfig;
 import dev.brighten.anticheat.utils.MiscUtils;
 import lombok.SneakyThrows;
+import org.h2.jdbc.JdbcConnection;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 import java.util.logging.Level;
 
 public class MySQL {
@@ -48,6 +50,7 @@ public class MySQL {
         File h2Driver = new File(Kauri.INSTANCE.getDataFolder(), "h2-driver.jar");
 
         if(!h2Driver.exists()) {
+            h2Driver.createNewFile();
             Kauri.INSTANCE.getLogger().info("Downloading h2-driver.jar...");
             MiscUtils.download(h2Driver, "https://nexus.funkemunky.cc/service/local/repositories/releases/" +
                     "content/com/h2database/h2/1.4.199/h2-1.4.199.jar");
@@ -64,15 +67,16 @@ public class MySQL {
             }
         }
         try {
-            Class.forName("org.h2.JDBC");
-            conn = DriverManager.getConnection("jdbc:h2:" + dataFolder);
+            Class.forName("org.h2.Driver");
+            conn = new NonClosableConnection(new JdbcConnection("jdbc:h2:file:" +
+                    dataFolder.getAbsolutePath().replace(".db", ""), new Properties()));
             conn.setAutoCommit(true);
             Query.use(conn);
             System.out.println("Connection to H2 SQlLite has been established.");
         } catch (SQLException ex) {
             Kauri.INSTANCE.getLogger().log(Level.SEVERE,"SQLite exception on initialize", ex);
         } catch (ClassNotFoundException ex) {
-            Kauri.INSTANCE.getLogger().log(Level.SEVERE, "You need the SQLite JBDC library. Google it. Put it in /lib folder.");
+            Kauri.INSTANCE.getLogger().log(Level.SEVERE, "You need the H2 JBDC library. Google it. Put it in /lib folder.");
         }
     }
 

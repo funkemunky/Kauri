@@ -87,11 +87,8 @@ public class MySQLStorage implements DataStorage {
                         values.append(i > 0 ? "," : "").append("(?, ?, ?, ?, ?, ?, ?)");
                     }
 
-                    String query = "INSERT INTO `VIOLATIONS` " +
-                            "(`UUID`, `TIME`, `VL`, `CHECK`, `PING`, `TPS`, `INFO`) VALUES" + values.toString();
-
-                    System.out.println(query);
-                    ExecutableStatement statement = Query.prepare(query)
+                    ExecutableStatement statement = Query.prepare("INSERT INTO `VIOLATIONS` " +
+                            "(`UUID`, `TIME`, `VL`, `CHECK`, `PING`, `TPS`, `INFO`) VALUES" + values.toString())
                             .append(objectsToInsert.toArray());
 
 

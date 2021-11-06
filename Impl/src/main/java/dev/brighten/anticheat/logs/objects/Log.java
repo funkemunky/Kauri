@@ -16,7 +16,8 @@ public class Log {
     public UUID uuid;
     public String checkName, info;
     public float vl;
-    public long ping, timeStamp;
+    public int ping;
+    public long timeStamp;
     public double tps;
     private static WrappedClass logClass = new WrappedClass(Log.class);
 
