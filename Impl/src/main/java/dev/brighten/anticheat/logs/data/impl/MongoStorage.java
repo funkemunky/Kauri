@@ -118,7 +118,7 @@ public class MongoStorage implements DataStorage {
 
         return logs.stream()
                 .map(doc -> new Log(UUID.fromString(doc.getString("uuid")), doc.getString("check"),
-                        doc.getString("info"), doc.getDouble("vl").floatValue(), doc.getLong("ping"),
+                        doc.getString("info"), doc.getDouble("vl").floatValue(), doc.getInteger("ping"),
                         doc.getLong("time"), doc.getDouble("tps")))
                 .collect(Collectors.toList());
     }
@@ -166,7 +166,7 @@ public class MongoStorage implements DataStorage {
 
         logs.stream()
                 .map(doc -> new Log(uuid, doc.getString("check"), doc.getString("info"),
-                        doc.getDouble("vl").floatValue(), doc.getLong("ping"), doc.getLong("time"),
+                        doc.getDouble("vl").floatValue(), doc.getInteger("ping"), doc.getLong("time"),
                         doc.getDouble("tps")))
                 .forEach(log -> {
                     if(logsMax.containsKey(log.checkName)) {

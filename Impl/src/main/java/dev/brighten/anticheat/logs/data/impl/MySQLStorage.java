@@ -5,6 +5,7 @@ import cc.funkemunky.api.utils.RunUtils;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.logs.data.DataStorage;
+import dev.brighten.anticheat.logs.data.DatabaseParameters;
 import dev.brighten.anticheat.logs.data.config.MySQLConfig;
 import dev.brighten.anticheat.logs.data.sql.ExecutableStatement;
 import dev.brighten.anticheat.logs.data.sql.MySQL;
@@ -149,7 +150,7 @@ public class MySQLStorage implements DataStorage {
                     .execute(rs ->
                             logs.add(new Log(uuid,
                                     rs.getString("CHECK"), rs.getString("INFO"),
-                                    rs.getFloat("VL"), (long)rs.getInt("PING"),
+                                    rs.getFloat("VL"), rs.getInt("PING"),
                                     rs.getLong("TIME"), rs.getDouble("TPS"))));
         } else {
             Query.prepare("SELECT `UUID`, `TIME`, `VL`, `CHECK`, `PING`, `TPS`, `INFO` " +
@@ -159,7 +160,7 @@ public class MySQLStorage implements DataStorage {
                     .execute(rs -> {
                         logs.add(new Log(UUID.fromString(rs.getString("UUID")),
                                 rs.getString("CHECK"), rs.getString("INFO"),
-                                rs.getFloat("VL"), (long)rs.getInt("PING"),
+                                rs.getFloat("VL"), rs.getInt("PING"),
                                 rs.getLong("TIME"), rs.getDouble("TPS")));
                     });
         }
@@ -205,6 +206,26 @@ public class MySQLStorage implements DataStorage {
             } else logsMax.put(log.checkName, log);
         });
         return new ArrayList<>(logsMax.values());
+    }
+
+    @Override
+    public List<Log> getLogs(UUID uuid, DatabaseParameters params) {
+        return null;
+    }
+
+    @Override
+    public List<Log> getLogs(Check check, DatabaseParameters params) {
+        return null;
+    }
+
+    @Override
+    public List<Log> getLogs(UUID uuid, Check check, DatabaseParameters params) {
+        return null;
+    }
+
+    @Override
+    public List<Log> getHighestVL(UUID uuid, Check check, DatabaseParameters databaseParameters) {
+        return null;
     }
 
     @Override

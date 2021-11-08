@@ -1,4 +1,4 @@
-package dev.brighten.anticheat.check.impl.free.movement.speed;
+package dev.brighten.anticheat.check.impl.regular.movement.speed;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;

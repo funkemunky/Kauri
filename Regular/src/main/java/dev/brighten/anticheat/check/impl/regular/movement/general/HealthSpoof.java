@@ -1,4 +1,4 @@
-package dev.brighten.anticheat.check.impl.premium;
+package dev.brighten.anticheat.check.impl.regular.movement.general;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
@@ -50,8 +50,6 @@ public class HealthSpoof extends Check {
                     strings.add("[" + i + ": " + o.getWatchedObject() + ":"
                             + o.getDataValueId() + ":" + o.getFirstInt() + "]");
                 }
-
-                debug("metadata: " + String.join(",", strings));
 
                 object.setWatchedObject(crasher ? Float.NaN : (float)health);
                 List<Object> objects = new ArrayList<>();

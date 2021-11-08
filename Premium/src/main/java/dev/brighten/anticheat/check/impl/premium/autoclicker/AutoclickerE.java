@@ -42,12 +42,12 @@ public class AutoclickerE extends Check {
         if(data.clickProcessor.getKurtosis() < 0
                 && (data.clickProcessor.getOutliers() <= 1 || skewness < 0.1)
                 && data.clickProcessor.getMean() < 2.5) {
-            buffer+= 0.75;
+            buffer+= 0.45f;
             tags.addTag("kurtosis");
         }
 
         if(skewness < 0.15 && data.clickProcessor.getMean() < 2.5) {
-            buffer+= 0.5f;
+            buffer+= 0.45f;
             tags.addTag("skew");
         }
 

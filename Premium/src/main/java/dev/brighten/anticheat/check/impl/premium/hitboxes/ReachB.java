@@ -15,7 +15,8 @@ import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
-import dev.brighten.anticheat.check.impl.premium.AimL;
+import dev.brighten.anticheat.check.impl.premium.AimG;
+import dev.brighten.anticheat.check.impl.premium.KillauraH;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.AxisAlignedBB;
 import dev.brighten.anticheat.utils.EntityLocation;
@@ -24,7 +25,6 @@ import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.PlayerTimer;
 import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
-import net.minecraft.world.entity.EntityLiving;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.Vector;
@@ -39,7 +39,10 @@ public class ReachB extends Check {
     private int streak;
     private float buffer;
     private boolean sentTeleport, attacked;
-    private AimL aimDetection;
+    private AimG aimDetection;
+    private KillauraH killauraHDetection;
+
+    private final boolean debugBoxes = true;
 
     private static final EnumSet<EntityType> allowedEntityTypes = EnumSet.of(EntityType.ZOMBIE, EntityType.SHEEP,
             EntityType.BLAZE, EntityType.SKELETON, EntityType.PLAYER, EntityType.VILLAGER, EntityType.IRON_GOLEM,
@@ -104,10 +107,16 @@ public class ReachB extends Check {
         } else debug("didnt hit box: x=%.1f y=%.1f z=%.1f", eloc.x, eloc.y, eloc.z);
     }
 
-    private AimL getAimDetection() {
-        if(aimDetection == null) aimDetection = (AimL) data.checkManager.checks.get("Aim (L)");
+    private AimG getAimDetection() {
+        if(aimDetection == null) aimDetection = (AimG) data.checkManager.checks.get("Aim (G)");
 
         return aimDetection;
+    }
+
+    private KillauraH getKillauraDetection() {
+        if(killauraHDetection == null) killauraHDetection = (KillauraH) data.checkManager.checks.get("Killaura (H)");
+
+        return killauraHDetection;
     }
 
     @Packet
@@ -134,6 +143,7 @@ public class ReachB extends Check {
                 getAimDetection().setTargetLocation(new KLocation(eloc.x, eloc.y, eloc.z, eloc.yaw, eloc.pitch));
                 getAimDetection().streak = streak;
                 getAimDetection().sentTeleport = sentTeleport;
+                getKillauraDetection().setTargetLocation(new KLocation(eloc.x, eloc.y, eloc.z, eloc.yaw, eloc.pitch));
             }
         }
 
@@ -159,6 +169,8 @@ public class ReachB extends Check {
                 eloc.interpolateLocation();
                 if(data.target != null && eloc.entity.getUniqueId() == data.target.getUniqueId()) {
                     getAimDetection().setTargetLocation(new KLocation(eloc.x, eloc.y, eloc.z, eloc.yaw, eloc.pitch));
+                    getKillauraDetection()
+                            .setTargetLocation(new KLocation(eloc.x, eloc.y, eloc.z, eloc.yaw, eloc.pitch));
                     attacked = false;
                 }
             }

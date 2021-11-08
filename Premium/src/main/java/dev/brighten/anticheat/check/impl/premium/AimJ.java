@@ -13,16 +13,13 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
-@CheckInfo(name = "Aim (J)",  description = "Detects gcd patches -Rhys", checkType = CheckType.AIM)
+@CheckInfo(name = "Aim (J)",  description = "Detects gcd patches -Rhys", checkType = CheckType.AIM, vlToFlag = 5, developer = true)
 public class AimJ extends Check {
 
-    private int threshold;
-    private List<Data> list = new EvictingList<>(5);
     private static float sens = MovementProcessor.percentToSens(95);
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if(packet.isLook()) {
-
             double o = MiscUtils.clampToVanilla(sens,
                     data.playerInfo.to.pitch);
 
@@ -32,11 +29,10 @@ public class AimJ extends Check {
 
             if(Math.abs(pitch) != 90f && ((o > 0 && length > 0 && length < 8)
                     || (o == 0f && length > 0 && length < 6))) {
-
                 vl++;
-                flag("o=%s t=%s", o, length);
+                flag(40, "o=%s t=%s", o, length);
             }
-        } else threshold = 0;
+        }
     }
 
     @RequiredArgsConstructor
