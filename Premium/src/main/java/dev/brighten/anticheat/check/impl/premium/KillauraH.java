@@ -44,15 +44,19 @@ public class KillauraH extends Check {
                origin.y+= data.playerInfo.sneaking ? 1.54f : 1.62f;
 
                SimpleCollisionBox targetHitbox = (SimpleCollisionBox) EntityData
-                       .getEntityBox(targetLocation, data.target);
+                       .getEntityBox(targetLocation, data.target).shrink(0.05f, 0.05f, 0.05f);
 
                RayCollision collision = new RayCollision(origin.toVector(), MathUtils.getDirection(origin));
 
                val intersction = collision.collisionPoint(targetHitbox);
 
-               if(intersction != null && origin.toVector().distanceSquared(intersction) <= 9) {
+               if(intersction == null) break check;
+
+               double distance =  origin.toVector().distanceSquared(intersction);
+
+               if(distance <= 8.9f) {
                    vl++;
-                   flag("weird miss");
+                   flag("dist=%.3f", Math.sqrt(distance));
                }
            }
        }
