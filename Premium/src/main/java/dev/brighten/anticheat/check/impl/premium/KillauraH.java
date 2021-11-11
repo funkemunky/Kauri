@@ -6,6 +6,7 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.MiscUtils;
+import cc.funkemunky.api.utils.TickTimer;
 import cc.funkemunky.api.utils.world.CollisionBox;
 import cc.funkemunky.api.utils.world.EntityData;
 import cc.funkemunky.api.utils.world.types.RayCollision;
@@ -22,6 +23,7 @@ public class KillauraH extends Check {
     @Setter
     private KLocation targetLocation;
     private boolean didUse, didArm;
+    private TickTimer lastFlying = new TickTimer(5);
 
     @Packet
     public void onUse(WrappedInUseEntityPacket packet) {
@@ -36,6 +38,10 @@ public class KillauraH extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
        check: {
+           if(lastFlying.hasPassed(1)) {
+               didUse = didArm = false;
+               break check;
+           }
            if(targetLocation == null || data.target == null) break check;
 
            if(didArm && !didUse) {
@@ -61,6 +67,7 @@ public class KillauraH extends Check {
            }
        }
 
+       lastFlying.reset();
        didUse = didArm = false;
     }
 }
