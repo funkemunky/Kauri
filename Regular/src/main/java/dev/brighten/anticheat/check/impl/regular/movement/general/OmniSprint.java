@@ -1,11 +1,8 @@
 package dev.brighten.anticheat.check.impl.regular.movement.general;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.*;
-import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.api.check.CheckType;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.potion.PotionEffectType;
 

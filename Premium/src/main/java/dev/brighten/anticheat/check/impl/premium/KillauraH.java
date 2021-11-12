@@ -5,64 +5,80 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.TickTimer;
-import cc.funkemunky.api.utils.world.CollisionBox;
-import cc.funkemunky.api.utils.world.EntityData;
-import cc.funkemunky.api.utils.world.types.RayCollision;
+import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
-import lombok.Setter;
-import lombok.val;
+import dev.brighten.anticheat.utils.AxisAlignedBB;
+import dev.brighten.anticheat.utils.Vec3D;
+import dev.brighten.api.KauriVersion;
+import dev.brighten.api.check.DevStage;
+import lombok.Getter;
 
-@CheckInfo(name = "Killaura (H)", description = "Checks for weird misses")
+import java.util.ArrayList;
+import java.util.List;
+
+@CheckInfo(name = "Killaura (H)", description = "Checks for weird misses", 
+        devStage = DevStage.CANARY, planVersion = KauriVersion.ARA)
 public class KillauraH extends Check {
 
-    @Setter
-    private KLocation targetLocation;
+    @Getter
+    private final List<SimpleCollisionBox> targetLocations = new EvictingList<>(6);
     private boolean didUse, didArm;
-    private TickTimer lastFlying = new TickTimer(5);
+    private final TickTimer lastFlying = new TickTimer(5);
 
     @Packet
-    public void onUse(WrappedInUseEntityPacket packet) {
+    public void onUse(WrappedInUseEntityPacket packet, int tick) {
         didUse = true;
+        debug("%s: Did Use", tick);
     }
 
     @Packet
-    public void onArmAnimation(WrappedInArmAnimationPacket packet) {
+    public void onArmAnimation(WrappedInArmAnimationPacket packet, int tick) {
         didArm = true;
+        debug("%s: Did Arm", tick);
     }
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
+    public void onFlying(WrappedInFlyingPacket packet, int tick) {
        check: {
            if(lastFlying.hasPassed(1)) {
                didUse = didArm = false;
                break check;
            }
-           if(targetLocation == null || data.target == null) break check;
+           if(targetLocations.size() == 0 || data.target == null) {
+               debug("Null target");
+               break check;
+           }
 
            if(didArm && !didUse) {
-               KLocation origin = data.playerInfo.to.clone();
+               debug("%s: Reset Flying", tick);
+               KLocation origin = data.playerInfo.to.clone(), forigin = data.playerInfo.from.clone();
 
                origin.y+= data.playerInfo.sneaking ? 1.54f : 1.62f;
+               forigin.y+= data.playerInfo.lsneaking ? 1.54f : 1.62f;
 
-               SimpleCollisionBox targetHitbox = (SimpleCollisionBox) EntityData
-                       .getEntityBox(targetLocation, data.target).shrink(0.05f, 0.05f, 0.05f);
+               boolean missed = false;
+               for (SimpleCollisionBox targetHitbox : targetLocations) {
+                   AxisAlignedBB targetBox = new AxisAlignedBB(targetHitbox);
 
-               RayCollision collision = new RayCollision(origin.toVector(), MathUtils.getDirection(origin));
+                   Vec3D intersection = targetBox.rayTrace(origin.toVector(),
+                           MathUtils.getDirection(origin), 2.9), intersection2 =
+                           targetBox.rayTrace(forigin.toVector(), MathUtils.getDirection(forigin), 2.9);
 
-               val intersction = collision.collisionPoint(targetHitbox);
+                   if(intersection == null
+                           || intersection2 == null) {
+                       missed = true;
+                       debug("missed: %.3f, %.3f, %.3f", targetBox.minX, targetBox.minY, targetBox.minZ);
+                   } else debug("Did not miss: %.3f, %.3f, %.3f",
+                           targetBox.minX, targetBox.minY, targetBox.minZ);
+               }
 
-               if(intersction == null) break check;
-
-               double distance =  origin.toVector().distanceSquared(intersction);
-
-               if(distance <= 8.9f) {
+               if(!missed) {
                    vl++;
-                   flag("dist=%.3f", Math.sqrt(distance));
+                   flag();
                }
            }
        }

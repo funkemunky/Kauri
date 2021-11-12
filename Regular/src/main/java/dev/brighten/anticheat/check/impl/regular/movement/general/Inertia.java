@@ -7,11 +7,12 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.FastTrig;
 import dev.brighten.api.check.CheckType;
+import dev.brighten.api.check.DevStage;
 import lombok.val;
 import org.bukkit.Location;
 
 @CheckInfo(name = "Inertia", description = "Checks for the lack of proper motion coordinates with mouse movements.",
-        checkType = CheckType.GENERAL, developer = true)
+        checkType = CheckType.GENERAL, devStage = DevStage.CANARY)
 public class Inertia extends Check {
 
     private int buffer;

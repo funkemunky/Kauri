@@ -22,6 +22,7 @@ import dev.brighten.api.KauriAPI;
 import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
+import dev.brighten.api.check.DevStage;
 import dev.brighten.api.check.KauriCheck;
 import dev.brighten.api.listener.KauriCancelEvent;
 import dev.brighten.api.listener.KauriFlagEvent;
@@ -65,7 +66,7 @@ public class Check implements KauriCheck {
     @Setter
     public boolean enabled, executable, cancellable;
     @Getter
-    public boolean developer;
+    public DevStage devStage;
     @Getter
     @Setter
     public float vl, punishVl, vlToFlag;
@@ -124,6 +125,10 @@ public class Check implements KauriCheck {
         checkSettings.put(checkClass, settings);
         checkClasses.put(checkClass, info);
         MiscUtils.printToConsole("Registered check " + info.name());
+    }
+
+    public void flag() {
+        flag(false, "");
     }
 
     public void flag(String information, Object... variables) {
@@ -192,7 +197,7 @@ public class Check implements KauriCheck {
                 }
             }
 
-            boolean dev = devAlerts || (developer || vl <= vlToFlag) || Kauri.INSTANCE.getTps() < 18;
+            boolean dev = devAlerts || (!devStage.isRelease() || vl <= vlToFlag) || Kauri.INSTANCE.getTps() < 18;
             if(lastAlert.isPassed(resetVLTime)) vl = 0;
             final String info = finalInformation
                     .replace("%p", String.valueOf(data.lagInfo.transPing))
@@ -292,7 +297,8 @@ public class Check implements KauriCheck {
                 .replace("%check%", name)
                 .replace("%info%", info)
                 .replace("%sl%", String.valueOf(MathUtils.round(vl, 1)))
-                .replace("%experimental%", developer ? "&c(Experimental)" : ""));
+                .replace("%experimental%", !devStage.isRelease()
+                        ? "&c(" + devStage.getFormattedName() + ")" : ""));
     }
 
     public void punish() {
@@ -303,7 +309,7 @@ public class Check implements KauriCheck {
                     + "on: https://github.com/funkemunky/Atlas/releases");
             return;
         }
-        if(developer || punishVl == -1 || vl <= punishVl
+        if(devStage.isRelease() || punishVl == -1 || vl <= punishVl
                 || System.currentTimeMillis() - Kauri.INSTANCE.lastTick > 200L) return;
 
         DiscordAPI.INSTANCE.sendBan(data.getPlayer(),  this, banExempt);

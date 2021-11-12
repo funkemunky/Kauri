@@ -6,9 +6,10 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
+import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Aim (C)", description = "Checks for bad client rotations.", checkType = CheckType.AIM,
-        developer = true, enabled = false)
+        devStage = DevStage.BETA, enabled = false)
 public class AimC extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {

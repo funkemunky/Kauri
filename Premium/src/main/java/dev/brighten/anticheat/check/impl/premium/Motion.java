@@ -9,9 +9,10 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
+import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Motion", description = "motion check kind of thing.", checkType = CheckType.GENERAL,
-        developer = true, planVersion = KauriVersion.ARA)
+        devStage = DevStage.CANARY, planVersion = KauriVersion.ARA)
 @Cancellable(cancelType = CancelType.MOVEMENT)
 public class Motion extends Check {
 

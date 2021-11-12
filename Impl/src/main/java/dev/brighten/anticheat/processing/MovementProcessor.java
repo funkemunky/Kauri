@@ -6,7 +6,6 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.handlers.PlayerSizeHandler;
 import cc.funkemunky.api.utils.objects.VariableValue;
-import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingList;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import cc.funkemunky.api.utils.world.types.RayCollision;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
@@ -20,17 +19,13 @@ import dev.brighten.anticheat.utils.api.BukkitAPI;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import lombok.val;
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-import java.util.Deque;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.LinkedBlockingDeque;
 
 public class MovementProcessor {
     private final ObjectData data;

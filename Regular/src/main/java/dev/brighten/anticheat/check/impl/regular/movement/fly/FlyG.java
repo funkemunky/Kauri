@@ -8,9 +8,10 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.processing.TagsBuilder;
 import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
+import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Fly (G)", description = "Looks for impossible movements, commonly done by Step modules",
-        developer = true, checkType = CheckType.FLIGHT,
+        devStage = DevStage.CANARY, checkType = CheckType.FLIGHT,
         planVersion = KauriVersion.FULL)
 @Cancellable
 public class FlyG extends Check {

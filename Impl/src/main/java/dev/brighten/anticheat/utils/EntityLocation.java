@@ -7,9 +7,7 @@ import dev.brighten.anticheat.Kauri;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Entity;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 public class EntityLocation {
@@ -57,5 +55,25 @@ public class EntityLocation {
             this.y = d1;
             this.z = d2;
         }
+    }
+
+    public EntityLocation clone() {
+        final EntityLocation loc = new EntityLocation(entity);
+
+        loc.x = x;
+        loc.y = y;
+        loc.z = z;
+        loc.yaw = yaw;
+        loc.pitch = pitch;
+        loc.increment = increment;
+        loc.newX = newX;
+        loc.newY = newY;
+        loc.newZ = newZ;
+        loc.newYaw = newYaw;
+        loc.newPitch = newPitch;
+        loc.sentTeleport = sentTeleport;
+        loc.interpolatedLocations.addAll(interpolatedLocations);
+
+        return loc;
     }
 }

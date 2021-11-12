@@ -8,11 +8,12 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
+import dev.brighten.api.check.DevStage;
 
 import java.util.List;
 
 @CheckInfo(name = "Autoclicker (B)", description = "Checks for common blocking patterns",
-        developer = true, checkType = CheckType.AUTOCLICKER, punishVL = 35)
+        devStage = DevStage.CANARY, checkType = CheckType.AUTOCLICKER, punishVL = 35)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerB extends Check {
 

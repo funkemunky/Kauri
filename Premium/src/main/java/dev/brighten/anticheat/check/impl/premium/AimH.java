@@ -6,21 +6,19 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
+import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Aim (H)", description = "checks for large headsnaps.",
-        developer = true, checkType = CheckType.AIM, vlToFlag = 9, planVersion = KauriVersion.ARA)
+        devStage = DevStage.BETA, checkType = CheckType.AIM, vlToFlag = 9, planVersion = KauriVersion.ARA)
 public class AimH extends Check {
-    private double lastPosX, lastPosZ, lastHorizontalDistance;
+    private double lastHorizontalDistance;
 
     @Packet
     public void process(final WrappedInFlyingPacket packet, final long current) {
-        final double posX = packet.getX();
-        final double posZ = packet.getZ();
-
         final double horizontalDistance = data.playerInfo.deltaXZ;
 
         // Player moved
-        if (posX != lastPosX || posZ != lastPosZ) {
+        if (packet.isPos()) {
             final float deltaYaw = Math.abs(data.playerInfo.deltaYaw);
             final float deltaPitch = Math.abs(data.playerInfo.deltaPitch);
 

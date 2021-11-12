@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.check.impl.regular.packets;
 
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutPositionPacket;
@@ -11,9 +12,10 @@ import dev.brighten.anticheat.utils.SimpleAverage;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import dev.brighten.api.check.CheckType;
+import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Timer (B)", description = "Checks the rate of packets coming in.",
-        checkType = CheckType.BADPACKETS, vlToFlag = 20, developer = true)
+        checkType = CheckType.BADPACKETS, vlToFlag = 20, devStage = DevStage.CANARY)
 @Cancellable
 public class TimerB extends Check {
 
@@ -30,6 +32,7 @@ public class TimerB extends Check {
 
     @Packet
     public void onBlockPlace(WrappedInBlockPlacePacket packet) {
+        if(data.playerVersion.isOrAbove(ProtocolVersion.v1_17))
         totalTimer-= 50;
     }
 

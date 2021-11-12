@@ -1,7 +1,6 @@
 package dev.brighten.anticheat.listeners;
 
 import cc.funkemunky.api.utils.Init;
-import cc.funkemunky.api.utils.KLocation;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import org.bukkit.event.EventHandler;

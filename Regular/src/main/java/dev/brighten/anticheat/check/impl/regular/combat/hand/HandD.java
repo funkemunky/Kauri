@@ -14,10 +14,11 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
+import dev.brighten.api.check.DevStage;
 import org.bukkit.Location;
 
 @CheckInfo(name = "Hand (D)", description = "Checks if a player places a block without looking.",
-        checkType = CheckType.HAND, vlToFlag = 3, punishVL = 40, developer = true, enabled = false)
+        checkType = CheckType.HAND, vlToFlag = 3, punishVL = 40, devStage = DevStage.BETA, enabled = false)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class HandD extends Check {
 

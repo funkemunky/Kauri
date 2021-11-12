@@ -6,6 +6,7 @@ import cc.funkemunky.api.utils.club.minnced.discord.webhook.WebhookClientBuilder
 import cc.funkemunky.api.utils.club.minnced.discord.webhook.send.WebhookEmbed;
 import cc.funkemunky.api.utils.club.minnced.discord.webhook.send.WebhookEmbedBuilder;
 import cc.funkemunky.api.utils.club.minnced.discord.webhook.send.WebhookMessageBuilder;
+import dev.brighten.api.check.DevStage;
 import dev.brighten.api.check.KauriCheck;
 import org.bukkit.entity.Player;
 
@@ -95,7 +96,7 @@ public class DiscordAPI {
 
     public void sendBan(Player player, KauriCheck check, boolean exempt) {
         if(!enabled) return;
-        if(!sendBans || client == null || (!devAlerts && check.isDeveloper())) return;
+        if(!sendBans || client == null || (!devAlerts && check.getDevStage() != DevStage.STABLE)) return;
 
         lastDiscordSend.compute(player.getUniqueId(), (key, lastTime) -> {
             long now = System.currentTimeMillis();

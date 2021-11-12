@@ -6,10 +6,8 @@ import dev.brighten.api.check.KauriCheck;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.entity.Player;
-import org.bukkit.event.HandlerList;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Getter

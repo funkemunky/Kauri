@@ -7,7 +7,7 @@ public interface KauriCheck {
     String getDescription();
     boolean isEnabled();
     boolean isExecutable();
-    boolean isDeveloper();
+    DevStage getDevStage();
     KauriVersion getPlan();
     CheckType getCheckType();
     float getVl();

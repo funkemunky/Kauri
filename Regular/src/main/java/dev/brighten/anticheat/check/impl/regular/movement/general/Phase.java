@@ -1,9 +1,7 @@
 package dev.brighten.anticheat.check.impl.regular.movement.general;
 
-import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.*;
-import dev.brighten.anticheat.utils.Helper;
 import cc.funkemunky.api.utils.world.BlockData;
 import cc.funkemunky.api.utils.world.CollisionBox;
 import cc.funkemunky.api.utils.world.types.RayCollision;
@@ -13,10 +11,11 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.check.api.Setting;
 import dev.brighten.anticheat.processing.TagsBuilder;
+import dev.brighten.anticheat.utils.Helper;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import dev.brighten.api.check.CheckType;
-import lombok.val;
+import dev.brighten.api.check.DevStage;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -25,10 +24,9 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @CheckInfo(name = "Phase", description = "Ensures players cannot move through blocks.",
-        checkType = CheckType.EXPLOIT, cancellable = true, executable = false, developer = true)
+        checkType = CheckType.EXPLOIT, cancellable = true, executable = false, devStage = DevStage.CANARY)
 public class Phase extends Check {
 
     private KLocation fromWhereShitAintBad = null;

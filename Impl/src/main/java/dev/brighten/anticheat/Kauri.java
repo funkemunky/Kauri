@@ -16,14 +16,12 @@ import dev.brighten.anticheat.listeners.api.EventHandler;
 import dev.brighten.anticheat.logs.LoggerManager;
 import dev.brighten.anticheat.processing.PacketProcessor;
 import dev.brighten.anticheat.processing.keepalive.KeepaliveProcessor;
-import dev.brighten.anticheat.utils.StringUtils;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.AtlasTimer;
 import dev.brighten.api.KauriAPI;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 

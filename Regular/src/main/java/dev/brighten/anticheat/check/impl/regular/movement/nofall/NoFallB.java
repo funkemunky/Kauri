@@ -6,9 +6,10 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
+import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "NoFall (B)", description = "Looks for ground spoofing",
-        checkType = CheckType.NOFALL, punishVL = 12, executable = false, developer = true, vlToFlag = 2)
+        checkType = CheckType.NOFALL, punishVL = 12, executable = false, devStage = DevStage.BETA, vlToFlag = 2)
 @Cancellable
 public class NoFallB extends Check {
 

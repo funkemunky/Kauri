@@ -7,7 +7,6 @@ import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.data.ObjectData;
 import lombok.val;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;

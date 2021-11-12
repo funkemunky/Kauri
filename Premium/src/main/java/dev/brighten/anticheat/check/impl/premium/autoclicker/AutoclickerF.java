@@ -13,11 +13,13 @@ import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.SimpleAverage;
 import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
+import dev.brighten.api.check.DevStage;
 import lombok.val;
 
 import java.util.List;
 
-@CheckInfo(name = "Autoclicker (F)", description = "Looks for consistency between attack hits and miss hits.", developer = true,
+@CheckInfo(name = "Autoclicker (F)", description = "Looks for consistency between attack hits and miss hits.",
+        devStage = DevStage.CANARY,
         checkType = CheckType.AUTOCLICKER, minVersion = ProtocolVersion.V1_8, planVersion = KauriVersion.ARA)
 public class AutoclickerF extends Check {
 

@@ -7,8 +7,9 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
+import dev.brighten.api.check.DevStage;
 
-@CheckInfo(name = "BadPackets (H)", description = "Looks for invalid look packets", developer = true,
+@CheckInfo(name = "BadPackets (H)", description = "Looks for invalid look packets", devStage = DevStage.BETA,
         checkType = CheckType.BADPACKETS, planVersion = KauriVersion.FREE)
 public class BadPacketsH extends Check {
 

@@ -13,10 +13,11 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
+import dev.brighten.api.check.DevStage;
 import org.bukkit.util.Vector;
 
 @CheckInfo(name = "Killaura (A)", description = "Checks for block collisions on player hits.",
-        checkType = CheckType.KILLAURA, developer = true)
+        checkType = CheckType.KILLAURA, devStage = DevStage.CANARY)
 @Cancellable(cancelType = CancelType.ATTACK)
 public class KillauraA extends Check {
 

@@ -8,9 +8,10 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.processing.TagsBuilder;
 import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
+import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Autoclicker (E)", description = "Combined autoclicker check.",
-        checkType = CheckType.AUTOCLICKER, developer = true, planVersion = KauriVersion.ARA)
+        checkType = CheckType.AUTOCLICKER, devStage = DevStage.BETA, planVersion = KauriVersion.ARA)
 public class AutoclickerE extends Check {
 
     private float buffer;

@@ -143,7 +143,7 @@ public class CheckManager {
                 check.executable = checkSettings.executable;
                 check.cancellable = checkSettings.cancellable;
                 check.cancelMode = checkSettings.cancelMode;
-                check.developer = settings.developer();
+                check.devStage = settings.devStage();
                 check.name = settings.name();
                 check.description = settings.description();
                 check.punishVl = settings.punishVL();

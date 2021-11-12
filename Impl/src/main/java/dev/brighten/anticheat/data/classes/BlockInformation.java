@@ -13,7 +13,6 @@ import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.CollisionHandler;
-import dev.brighten.anticheat.utils.Helper;
 import lombok.val;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -23,8 +22,10 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 public class BlockInformation {
     private ObjectData objectData;
@@ -64,12 +65,12 @@ public class BlockInformation {
         else if(dy < -10) dy = -10;
         if(dh > 10) dh = 10;
 
-        int startX = Location.locToBlock(objectData.playerInfo.to.x - 0.3 - dh);
-        int endX = Location.locToBlock(objectData.playerInfo.to.x + 0.3 + dh);
+        int startX = Location.locToBlock(objectData.playerInfo.to.x - 0.45 - dh);
+        int endX = Location.locToBlock(objectData.playerInfo.to.x + 0.45 + dh);
         int startY = Location.locToBlock(objectData.playerInfo.to.y - 0.5 - dy);
         int endY = Location.locToBlock(objectData.playerInfo.to.y + 2 + dy);
-        int startZ = Location.locToBlock(objectData.playerInfo.to.z - 0.3 - dh);
-        int endZ = Location.locToBlock(objectData.playerInfo.to.z + 0.3 + dh);
+        int startZ = Location.locToBlock(objectData.playerInfo.to.z - 0.45 - dh);
+        int endZ = Location.locToBlock(objectData.playerInfo.to.z + 0.45 + dh);
 
         SimpleCollisionBox waterBox = objectData.box.copy().expand(0, -.38, 0);
 

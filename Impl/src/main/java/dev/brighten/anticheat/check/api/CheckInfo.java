@@ -3,6 +3,7 @@ package dev.brighten.anticheat.check.api;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
+import dev.brighten.api.check.DevStage;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -14,7 +15,7 @@ public @interface CheckInfo {
     boolean enabled() default true;
     boolean executable() default true;
     boolean cancellable() default false;
-    boolean developer() default false;
+    DevStage devStage() default DevStage.STABLE;
     int punishVL() default 50;
     KauriVersion planVersion() default KauriVersion.FULL;
     int vlToFlag() default -1;

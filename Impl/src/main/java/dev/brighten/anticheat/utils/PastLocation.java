@@ -2,8 +2,6 @@ package dev.brighten.anticheat.utils;
 
 import cc.funkemunky.api.utils.KLocation;
 import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.data.ObjectData;
-import lombok.RequiredArgsConstructor;
 import org.bukkit.Location;
 
 import java.util.*;

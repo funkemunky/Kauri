@@ -1,19 +1,18 @@
 package dev.brighten.anticheat.check.impl.premium;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.processing.MovementProcessor;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.api.check.CheckType;
+import dev.brighten.api.check.DevStage;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.List;
-
-@CheckInfo(name = "Aim (J)",  description = "Detects gcd patches -Rhys", checkType = CheckType.AIM, vlToFlag = 5, developer = true)
+@CheckInfo(name = "Aim (J)",  description = "Detects gcd patches -Rhys", checkType = CheckType.AIM, vlToFlag = 5,
+        devStage = DevStage.CANARY)
 public class AimJ extends Check {
 
     private static float sens = MovementProcessor.percentToSens(95);

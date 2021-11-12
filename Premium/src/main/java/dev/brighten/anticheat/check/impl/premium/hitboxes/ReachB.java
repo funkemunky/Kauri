@@ -25,16 +25,18 @@ import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.PlayerTimer;
 import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
+import dev.brighten.api.check.DevStage;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.Vector;
 
 import java.util.*;
 
-@CheckInfo(name = "Reach (B)", planVersion = KauriVersion.ARA, developer = true, checkType = CheckType.HITBOX)
+@CheckInfo(name = "Reach (B)", planVersion = KauriVersion.ARA, devStage = DevStage.CANARY, checkType = CheckType.HITBOX)
 public class ReachB extends Check {
 
-    private final Map<UUID, EntityLocation> entityLocationMap = new HashMap<>();
+    private final Map<UUID, EntityLocation> entityLocationMap = new HashMap<>(),
+            secondEntityLocationMap = new HashMap<>();
     private Timer lastFlying;
     private int streak;
     private float buffer;
@@ -139,12 +141,6 @@ public class ReachB extends Check {
             }
 
             eloc.interpolateLocation();
-            if(data.target != null && eloc.entity.getUniqueId() == data.target.getUniqueId()) {
-                getAimDetection().setTargetLocation(new KLocation(eloc.x, eloc.y, eloc.z, eloc.yaw, eloc.pitch));
-                getAimDetection().streak = streak;
-                getAimDetection().sentTeleport = sentTeleport;
-                getKillauraDetection().setTargetLocation(new KLocation(eloc.x, eloc.y, eloc.z, eloc.yaw, eloc.pitch));
-            }
         }
 
         lastFlying.reset();
@@ -169,8 +165,6 @@ public class ReachB extends Check {
                 eloc.interpolateLocation();
                 if(data.target != null && eloc.entity.getUniqueId() == data.target.getUniqueId()) {
                     getAimDetection().setTargetLocation(new KLocation(eloc.x, eloc.y, eloc.z, eloc.yaw, eloc.pitch));
-                    getKillauraDetection()
-                            .setTargetLocation(new KLocation(eloc.x, eloc.y, eloc.z, eloc.yaw, eloc.pitch));
                     attacked = false;
                 }
             }
@@ -182,6 +176,42 @@ public class ReachB extends Check {
         Atlas.getInstance().getWorldInfo(data.getPlayer().getWorld()).getEntity(packet.getId())
                 .ifPresent(entity -> {
                     if(!allowedEntityTypes.contains(entity.getType())) return;
+
+                    data.runKeepaliveAction(ka -> {
+                        EntityLocation eloc = secondEntityLocationMap.computeIfAbsent(entity.getUniqueId(),
+                                key -> new EntityLocation(entity));
+
+                        if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9)) {
+                            eloc.newX += (byte)packet.getX() / 32D;
+                            eloc.newY += (byte)packet.getY() / 32D;
+                            eloc.newZ += (byte)packet.getZ() / 32D;
+                            eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
+                            eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
+                        } else if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_14)) {
+                            eloc.newX += (long)packet.getX() / 4096D;
+                            eloc.newY += (long)packet.getY() / 4096D;
+                            eloc.newZ += (long)packet.getZ() / 4096D;
+                            eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
+                            eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
+                        } else {
+                            eloc.newX += (short)packet.getX() / 4096D;
+                            eloc.newY += (short)packet.getY() / 4096D;
+                            eloc.newZ += (short)packet.getZ() / 4096D;
+                            eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
+                            eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
+                        }
+                        eloc.increment = 3;
+                        eloc.interpolateLocations();
+                        if(data.target != null && entity.getEntityId() == data.target.getEntityId()) {
+
+                            eloc.interpolatedLocations.stream()
+                                    .map(kloc -> (SimpleCollisionBox)EntityData.getEntityBox(kloc, entity))
+                                    .forEach(box -> getKillauraDetection().getTargetLocations().add(box));
+
+                            //Clearing to ensure garbage collections clears this object.
+                            eloc.interpolatedLocations.clear();
+                        }
+                    }, -1);
 
                     EntityLocation eloc = entityLocationMap.computeIfAbsent(entity.getUniqueId(),
                             key -> new EntityLocation(entity));
@@ -217,6 +247,58 @@ public class ReachB extends Check {
         Atlas.getInstance().getWorldInfo(data.getPlayer().getWorld()).getEntity(packet.entityId)
                 .ifPresent(entity -> {
                     if(!allowedEntityTypes.contains(entity.getType())) return;
+                    data.runKeepaliveAction(ka -> {
+                        EntityLocation eloc = secondEntityLocationMap.computeIfAbsent(entity.getUniqueId(),
+                                key -> new EntityLocation(entity));
+
+                        if(data.playerVersion.isOrAbove(ProtocolVersion.V1_9)) {
+                            if (!(Math.abs(eloc.x - packet.x) >= 0.03125D)
+                                    && !(Math.abs(eloc.y - packet.y) >= 0.015625D)
+                                    && !(Math.abs(eloc.z - packet.z) >= 0.03125D)) {
+                                eloc.increment = 0;
+                                //We don't need to do version checking here. Atlas handles this for us.
+                                eloc.newX = eloc.x = packet.x;
+                                eloc.newY = eloc.y = packet.y;
+                                eloc.newZ = eloc.z = packet.z;
+                                eloc.newYaw = eloc.yaw = packet.yaw;
+                                eloc.newPitch = eloc.pitch = packet.pitch;
+                            } else {
+                                eloc.newX = packet.x;
+                                eloc.newY = packet.y;
+                                eloc.newZ = packet.z;
+                                eloc.newYaw = packet.yaw;
+                                eloc.newPitch = packet.pitch ;
+
+                                eloc.increment = 3;
+                                eloc.interpolateLocations();
+                            }
+                        } else {
+                            //We don't need to do version checking here. Atlas handles this for us.
+                            eloc.newX = packet.x;
+                            eloc.newY = packet.y;
+                            eloc.newZ = packet.z;
+                            eloc.newYaw = packet.yaw;
+                            eloc.newPitch = packet.pitch;
+
+                            eloc.increment = 3;
+                            eloc.interpolateLocations();
+                        }
+                        if(data.target != null && entity.getEntityId() == data.target.getEntityId()) {
+
+                            if(eloc.interpolatedLocations.size() > 0) {
+                                eloc.interpolatedLocations.stream()
+                                        .map(kloc -> (SimpleCollisionBox)EntityData.getEntityBox(kloc, entity))
+                                        .forEach(box -> getKillauraDetection().getTargetLocations().add(box));
+
+                            } else {
+                                getKillauraDetection().getTargetLocations()
+                                        .add((SimpleCollisionBox)EntityData
+                                                .getEntityBox(new KLocation(eloc.x, eloc.y, eloc.z), entity));
+                            }
+                            //Clearing to ensure garbage collections clears this object.
+                            eloc.interpolatedLocations.clear();
+                        }
+                    }, -1);
                     EntityLocation eloc = entityLocationMap.computeIfAbsent(entity.getUniqueId(),
                             key -> new EntityLocation(entity));
                     runAction(entity, () -> {

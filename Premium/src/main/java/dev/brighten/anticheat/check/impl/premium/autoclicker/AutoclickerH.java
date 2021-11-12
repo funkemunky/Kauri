@@ -8,9 +8,11 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
+import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Autoclicker (H)", description = "Checks for low standard deviation.",
-        checkType = CheckType.AUTOCLICKER, punishVL = 6, vlToFlag = 2, developer = true, planVersion = KauriVersion.ARA)
+        checkType = CheckType.AUTOCLICKER, punishVL = 6, vlToFlag = 2,
+        devStage = DevStage.CANARY, planVersion = KauriVersion.ARA)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerH extends Check {
 

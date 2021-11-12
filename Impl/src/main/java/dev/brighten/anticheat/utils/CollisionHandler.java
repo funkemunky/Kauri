@@ -19,7 +19,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 @Getter

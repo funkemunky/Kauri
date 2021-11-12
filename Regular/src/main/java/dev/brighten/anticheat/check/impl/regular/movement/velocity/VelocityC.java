@@ -1,6 +1,5 @@
 package dev.brighten.anticheat.check.impl.regular.movement.velocity;
 
-import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.utils.Tuple;
@@ -10,7 +9,6 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.HumanEntity;
 
 import java.util.ArrayList;
 import java.util.Comparator;

@@ -3,18 +3,11 @@ package dev.brighten.anticheat.data.classes;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.*;
-import cc.funkemunky.api.utils.world.BlockData;
-import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.FastTrig;
-import dev.brighten.anticheat.utils.Helper;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.potion.PotionEffectType;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class PredictionService {
 

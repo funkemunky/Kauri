@@ -6,9 +6,10 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
+import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Aim (A)", description = "Ensures that yaw and pitch acceleration is legitimate.",
-        checkType = CheckType.AIM, punishVL = 60, developer = true)
+        checkType = CheckType.AIM, punishVL = 60, devStage = DevStage.BETA)
 public class AimA extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {

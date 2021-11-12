@@ -7,7 +7,6 @@ import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.world.EntityData;
-import cc.funkemunky.api.utils.world.types.RayCollision;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Cancellable;
@@ -84,7 +83,6 @@ public class ReachA extends Check {
                     }
                     SimpleCollisionBox expandedBox = tbox.copy().expand(0.25);
 
-                    expandedBox.draw(WrappedEnumParticle.FLAME, Bukkit.getOnlinePlayers());
                     final AxisAlignedBB expanded = new AxisAlignedBB(expandedBox);
                     Vec3D intersect2 = expanded.rayTrace(torigin.toVector(), MathUtils.getDirection(torigin), 10),
                             intersect3 = expanded.rayTrace(forigin.toVector(), MathUtils.getDirection(forigin), 10);

@@ -5,15 +5,16 @@ import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.RunUtils;
-import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingMap;
 import cc.funkemunky.api.utils.objects.evicting.EvictingMap;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class KeepaliveProcessor implements Runnable {
 

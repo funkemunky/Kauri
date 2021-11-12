@@ -9,9 +9,10 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
+import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Killaura (G)", description = "Closing a window while attacking", checkType = CheckType.KILLAURA,
-        developer = true, punishVL = 2)
+        devStage = DevStage.CANARY, punishVL = 2)
 @Cancellable(cancelType = CancelType.MOVEMENT)
 public class KillauraG extends Check {
 
