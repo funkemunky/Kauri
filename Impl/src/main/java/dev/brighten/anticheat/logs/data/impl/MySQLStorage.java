@@ -34,7 +34,7 @@ public class MySQLStorage implements DataStorage {
         Query.prepare("CREATE TABLE IF NOT EXISTS `VIOLATIONS` (" +
                 "`UUID` VARCHAR(36) NOT NULL," +
                 "`TIME` LONG NOT NULL," +
-                "`VL` FLOAT NOT NULL," +
+                "`vl` FLOAT NOT NULL," +
                 "`CHECK` VARCHAR(32) NOT NULL," +
                 "`PING` SMALLINT NOT NULL," +
                 "`TPS` DOUBLE NOT NULL," +
@@ -89,7 +89,7 @@ public class MySQLStorage implements DataStorage {
                     }
 
                     ExecutableStatement statement = Query.prepare("INSERT INTO `VIOLATIONS` " +
-                            "(`UUID`, `TIME`, `VL`, `CHECK`, `PING`, `TPS`, `INFO`) VALUES" + values.toString())
+                            "(`UUID`, `TIME`, `vl`, `CHECK`, `PING`, `TPS`, `INFO`) VALUES" + values.toString())
                             .append(objectsToInsert.toArray());
 
 
@@ -143,7 +143,7 @@ public class MySQLStorage implements DataStorage {
         List<Log> logs = new ArrayList<>();
 
         if(uuid != null) {
-            Query.prepare("SELECT `TIME`, `VL`, `CHECK`, `PING`, `TPS`, `INFO` " +
+            Query.prepare("SELECT `TIME`, `vl`, `CHECK`, `PING`, `TPS`, `INFO` " +
                     "FROM `VIOLATIONS` WHERE `UUID` = ?"+ (check != null ? " AND WHERE `CHECK` = " + check.name : "")
                     + " AND `TIME` BETWEEN ? AND ? ORDER BY `TIME` DESC LIMIT ?,?")
                     .append(uuid.toString()).append(timeFrom).append(timeTo).append(arrayMin).append(arrayMax)
@@ -153,7 +153,7 @@ public class MySQLStorage implements DataStorage {
                                     rs.getFloat("VL"), rs.getInt("PING"),
                                     rs.getLong("TIME"), rs.getDouble("TPS"))));
         } else {
-            Query.prepare("SELECT `UUID`, `TIME`, `VL`, `CHECK`, `PING`, `TPS`, `INFO` " +
+            Query.prepare("SELECT `UUID`, `TIME`, `vl`, `CHECK`, `PING`, `TPS`, `INFO` " +
                     "FROM `VIOLATIONS`" + (check != null ? " WHERE `CHECK` = " + check.name + " AND" : " WHERE")
                     + " `TIME` BETWEEN ? AND ? ORDER BY `TIME` DESC LIMIT ?,?")
                     .append(timeFrom).append(timeTo).append(arrayMin).append(arrayMax)
@@ -197,35 +197,15 @@ public class MySQLStorage implements DataStorage {
         Map<String, Log> logsMax = new HashMap<>();
 
         logs.forEach(log -> {
-            if(logsMax.containsKey(log.checkName)) {
+            if (logsMax.containsKey(log.checkName)) {
                 Log toCheck = logsMax.get(log.checkName);
 
-                if(toCheck.vl < log.vl) {
+                if (toCheck.vl < log.vl) {
                     logsMax.put(log.checkName, log);
                 }
             } else logsMax.put(log.checkName, log);
         });
         return new ArrayList<>(logsMax.values());
-    }
-
-    @Override
-    public List<Log> getLogs(UUID uuid, DatabaseParameters params) {
-        return null;
-    }
-
-    @Override
-    public List<Log> getLogs(Check check, DatabaseParameters params) {
-        return null;
-    }
-
-    @Override
-    public List<Log> getLogs(UUID uuid, Check check, DatabaseParameters params) {
-        return null;
-    }
-
-    @Override
-    public List<Log> getHighestVL(UUID uuid, Check check, DatabaseParameters databaseParameters) {
-        return null;
     }
 
     @Override

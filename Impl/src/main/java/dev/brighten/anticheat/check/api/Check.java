@@ -40,6 +40,7 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
@@ -98,8 +99,9 @@ public class Check implements KauriCheck {
         String name = info.name();
 
         CancelType type = null;
-        if(checkClass.getClass().isAnnotationPresent(Cancellable.class))
-            type = checkClass.getClass().getAnnotation(Cancellable.class).cancelType();
+        if(checkRawClass.isAnnotationPresent(Cancellable.class)) {
+            type = checkRawClass.getAnnotation(Cancellable.class).cancelType();
+        }
         CheckSettings settings = new CheckSettings(info.name(), info.description(), info.checkType(), type,
                 info.planVersion(), info.punishVL(), info.vlToFlag(), info.minVersion(), info.maxVersion());
 

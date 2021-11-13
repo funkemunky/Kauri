@@ -8,9 +8,10 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.MovementUtils;
 import dev.brighten.api.check.CheckType;
+import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Fly (B)", description = "Looks for players going above a possible height limit",
-        checkType = CheckType.FLIGHT, vlToFlag = 4, punishVL = 15)
+        checkType = CheckType.FLIGHT, devStage = DevStage.CANARY, vlToFlag = 4, punishVL = 15)
 @Cancellable
 public class FlyB extends Check {
 

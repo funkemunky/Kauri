@@ -578,7 +578,7 @@ public class PacketProcessor {
                 Vector vector = new Vector(packet.getMotionX(), packet.getMotionY(), packet.getMotionZ());
                 data.playerInfo.velocities.add(vector);
                 data.playerInfo.doingVelocity = true;
-                data.runKeepaliveAction(keepalive -> {
+                data.runInstantAction(() -> {
                     if(data.playerInfo.velocities.contains(vector)) {
                         if(data.playerInfo.doingVelocity) {
                             data.playerInfo.lastVelocity.reset();
@@ -619,7 +619,7 @@ public class PacketProcessor {
                             }
                             data.playerInfo.velocities.remove(vector);
                         }
-                    });
+                    }, 1);
                 }
 
                 if(data.sniffing) {

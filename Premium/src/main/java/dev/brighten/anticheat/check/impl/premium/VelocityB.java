@@ -145,8 +145,9 @@ public class VelocityB extends Check {
                     vl++;
                     flag("pct=%.2f buffer=%.1f forward=%.2f strafe=%.2f",
                             ratio * 100, buffer, moveStrafe, moveForward);
+                    buffer = 31;
                 }
-            } else buffer-= buffer > 0 ? data.lagInfo.lastPacketDrop.isNotPassed(20) ? .5 : 0.25 : 0;
+            } else if(buffer > 0) buffer--;
 
             debug("ratio=%.3f dx=%.4f dz=%.4f buffer=%.1f ticks=%s strafe=%.2f forward=%.2f lastUse=%s " +
                             "found=%s lastV=%s", ratio, data.playerInfo.deltaX, data.playerInfo.deltaZ,

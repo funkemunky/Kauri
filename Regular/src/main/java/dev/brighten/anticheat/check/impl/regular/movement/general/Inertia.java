@@ -2,6 +2,7 @@ package dev.brighten.anticheat.check.impl.regular.movement.general;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.MathUtils;
+import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -13,6 +14,7 @@ import org.bukkit.Location;
 
 @CheckInfo(name = "Inertia", description = "Checks for the lack of proper motion coordinates with mouse movements.",
         checkType = CheckType.GENERAL, devStage = DevStage.CANARY)
+@Cancellable
 public class Inertia extends Check {
 
     private int buffer;

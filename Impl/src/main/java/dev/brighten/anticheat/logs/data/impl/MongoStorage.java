@@ -182,26 +182,6 @@ public class MongoStorage implements DataStorage {
     }
 
     @Override
-    public List<Log> getLogs(UUID uuid, DatabaseParameters params) {
-        return null;
-    }
-
-    @Override
-    public List<Log> getLogs(Check check, DatabaseParameters params) {
-        return null;
-    }
-
-    @Override
-    public List<Log> getLogs(UUID uuid, Check check, DatabaseParameters params) {
-        return null;
-    }
-
-    @Override
-    public List<Log> getHighestVL(UUID uuid, Check check, DatabaseParameters databaseParameters) {
-        return null;
-    }
-
-    @Override
     public void addLog(Log log) {
         logs.add(new Document("uuid", log.uuid.toString())
                 .append("time", log.timeStamp).append("check", log.checkName)

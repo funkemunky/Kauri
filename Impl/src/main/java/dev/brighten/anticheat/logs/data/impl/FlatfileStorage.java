@@ -2,6 +2,7 @@ package dev.brighten.anticheat.logs.data.impl;
 
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
+import com.avaje.ebean.text.TimeStringParser;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.logs.data.DataStorage;
@@ -33,7 +34,7 @@ public class FlatfileStorage implements DataStorage {
         Query.prepare("create table if not exists `violations` (" +
                 "`uuid` varchar(36) not null," +
                 "`time` timestamp not null," +
-                "`VL` float not null," +
+                "`vl` float not null," +
                 "`check` varchar(32) not null," +
                 "`ping` smallint not null," +
                 "`tps` double not null," +
@@ -95,7 +96,7 @@ public class FlatfileStorage implements DataStorage {
                     }
 
                     ExecutableStatement statement = Query.prepare("insert into `violations` " +
-                            "(`uuid`, `time`, `VL`, `check`, `ping`, `tps`, `info`) values" + values.toString())
+                            "(`uuid`, `time`, `vl`, `check`, `ping`, `tps`, `info`) values" + values.toString())
                             .append(objectsToInsert.toArray());
 
 
@@ -155,25 +156,26 @@ public class FlatfileStorage implements DataStorage {
         List<Log> logs = new ArrayList<>();
 
         if(uuid != null) {
-            Query.prepare("select `time`, `VL`, `check`, `ping`, `tps`, `info` " +
+            Query.prepare("select `time`, `vl`, `check`, `ping`, `tps`, `info` " +
                     "from `violations` where `uuid` = ?"+ (check != null ? " and where `check` = " + check.name : "")
                     + " and `time` between ? and ? order by `time` desc limit ?,?")
-                    .append(uuid.toString()).append(timeFrom).append(timeTo).append(arrayMin).append(arrayMax)
+                    .append(uuid.toString()).append(new Timestamp(timeFrom)).append(new Timestamp(timeTo))
+                    .append(arrayMin).append(arrayMax)
                     .execute(rs ->
                             logs.add(new Log(uuid,
                                     rs.getString("check"), rs.getString("info"),
                                     rs.getFloat("vl"), rs.getInt("ping"),
-                                    rs.getLong("time"), rs.getDouble("tps"))));
+                                    rs.getTimestamp("time").getTime(), rs.getDouble("tps"))));
         } else {
-            Query.prepare("select `uuid`, `time`, `VL`, `check`, `ping`, `tps`, `info` " +
+            Query.prepare("select `uuid`, `time`, `vl`, `check`, `ping`, `tps`, `info` " +
                     "from `violations`" + (check != null ? " where `check` = " + check.name + " and" : " where")
                     + " `time` between ? and ? order by `time` desc limit ?,?")
-                    .append(timeFrom).append(timeTo).append(arrayMin).append(arrayMax)
+                    .append(new Timestamp(timeFrom)).append(new Timestamp(timeTo)).append(arrayMin).append(arrayMax)
                     .execute(rs -> {
                         logs.add(new Log(UUID.fromString(rs.getString("uuid")),
                                 rs.getString("check"), rs.getString("info"),
                                 rs.getFloat("vl"), rs.getInt("ping"),
-                                rs.getLong("time"), rs.getDouble("tps")));
+                                rs.getTimestamp("time").getTime(), rs.getDouble("tps")));
                     });
         }
 
@@ -187,16 +189,17 @@ public class FlatfileStorage implements DataStorage {
         if(uuid != null) {
             Query.prepare("select `time`, `check` from `punishments` " +
                     "where `uuid` = ? and TIME between ? and ? order by `time` desc limit ?,?")
-                    .append(uuid.toString()).append(timeFrom).append(timeTo).append(arrayMin).append(arrayMax)
+                    .append(uuid.toString()).append(new Timestamp(timeFrom)).append(new Timestamp(timeTo)).append(arrayMin).append(arrayMax)
                     .execute(rs -> punishments
-                            .add(new Punishment(uuid, rs.getString("check"), rs.getLong("time"))));
+                            .add(new Punishment(uuid, rs.getString("check"),
+                                    rs.getTimestamp("time").getTime())));
         } else {
             Query.prepare("select `uuid`, `time`, `check` from `punishments` " +
                     "where TIME between ? and ? order by `time` desc limit ?,?")
-                    .append(timeFrom).append(timeTo).append(arrayMin).append(arrayMax)
+                    .append(new Timestamp(timeFrom)).append(new Timestamp(timeTo)).append(arrayMin).append(arrayMax)
                     .execute(rs -> punishments
                             .add(new Punishment(UUID.fromString(rs.getString("uuid")),
-                                    rs.getString("check"), rs.getLong("time"))));
+                                    rs.getString("check"), rs.getTimestamp("time").getTime())));
         }
 
         return punishments;
@@ -217,100 +220,6 @@ public class FlatfileStorage implements DataStorage {
                 }
             } else logsMax.put(log.checkName, log);
         });
-        return new ArrayList<>(logsMax.values());
-    }
-
-    @Override
-    public List<Log> getLogs(UUID uuid, DatabaseParameters params) {
-        List<Log> logs = new ArrayList<>();
-        Query.prepare("select * from `violations` where `uuid` = ?"
-                + (params.getTimeFrom() != -1 && params.getTimeTo() != -1 ? " and `time` between "
-                + params.getTimeFrom() + " and " + params.getTimeTo()
-                : (params.getTimeFrom() != -1
-                ? " and `time` >= " + params.getTimeFrom() : "")
-                + (params.getTimeTo() != -1
-                ? " and `time` <= " + params.getTimeTo() : ""))
-                + (params.getSkip() != -1 || params.getLimit() != -1 ? " order by `uuid` desc" : "")
-                + (params.getSkip() != -1 ? " skip " + params.getSkip() : "")
-                + (params.getLimit() != -1 ? " limit " + params.getLimit() : ""))
-                .append(uuid.toString()).execute(rs ->
-                logs.add(new Log(uuid,
-                        rs.getString("check"), rs.getString("info"),
-                        rs.getFloat("vl"), rs.getInt("ping"),
-                        rs.getLong("time"), rs.getDouble("tps"))));
-        return logs;
-    }
-
-    @Override
-    public List<Log> getLogs(Check check, DatabaseParameters params) {
-        List<Log> logs = new ArrayList<>();
-        Query.prepare("select * from `violations` where `check` = ?"
-                + (params.getTimeFrom() != -1 && params.getTimeTo() != -1 ? " and `time` between "
-                + params.getTimeFrom() + " and " + params.getTimeTo()
-                : (params.getTimeFrom() != -1
-                ? " and `time` >= " + params.getTimeFrom() : "")
-                + (params.getTimeTo() != -1
-                ? " and `time` <= " + params.getTimeTo() : ""))
-                + (params.getSkip() != -1 || params.getLimit() != -1 ? " order by `uuid` desc" : "")
-                + (params.getSkip() != -1 ? " skip " + params.getSkip() : "")
-                + (params.getLimit() != -1 ? " limit " + params.getLimit() : ""))
-                .append(check.name)
-                .execute(rs ->
-                        logs.add(new Log(UUID.fromString(rs.getString("uuid")),
-                                rs.getString("check"), rs.getString("info"),
-                                rs.getFloat("vl"), rs.getInt("ping"),
-                                rs.getLong("time"), rs.getDouble("tps"))));
-        return logs;
-    }
-
-    @Override
-    public List<Log> getLogs(UUID uuid, Check check, DatabaseParameters params) {
-        List<Log> logs = new ArrayList<>();
-        Query.prepare("select * from `violations` where `uuid` = ? and `check` = ?"
-                + (params.getTimeFrom() != -1 && params.getTimeTo() != -1 ? " and `time` between "
-                    + params.getTimeFrom() + " and " + params.getTimeTo()
-                : (params.getTimeFrom() != -1
-                    ? " and `time` >= " + params.getTimeFrom() : "")
-                + (params.getTimeTo() != -1
-                    ? " and `time` <= " + params.getTimeTo() : "")) 
-                + (params.getSkip() != -1 || params.getLimit() != -1 ? " order by `uuid` desc" : "")
-                + (params.getSkip() != -1 ? " skip " + params.getSkip() : "") 
-                + (params.getLimit() != -1 ? " limit " + params.getLimit() : ""))
-                .append(uuid.toString()).append(check.name)
-                .execute(rs ->
-                        logs.add(new Log(uuid,
-                                rs.getString("check"), rs.getString("info"),
-                                rs.getFloat("vl"), rs.getInt("ping"),
-                                rs.getLong("time"), rs.getDouble("tps"))));
-        return logs;
-    }
-
-    @Override
-    public List<Log> getHighestVL(UUID uuid, Check check, DatabaseParameters databaseParameters) {
-        List<Log> logsToSort = null;
-
-        if(uuid != null && check != null) {
-            logsToSort = getLogs(uuid, check, databaseParameters);
-        } else if(uuid != null) {
-            logsToSort = getLogs(uuid, databaseParameters);
-        }
-
-        Map<String, Log> logsMax = new HashMap<>();
-
-        if(logsToSort == null) return Collections.emptyList();
-
-        for (Log log : logsToSort) {
-            logsMax.compute(log.checkName, (key, value) -> {
-                if(value == null) {
-                    return log;
-                }
-
-                if(log.vl > value.vl)
-                    return log;
-
-                return value;
-            });
-        }
         return new ArrayList<>(logsMax.values());
     }
 
@@ -341,7 +250,7 @@ public class FlatfileStorage implements DataStorage {
         Kauri.INSTANCE.loggingThread.execute(() -> {
             Query.prepare("delete from `namecache` where `uuid` = ?").append(uuid.toString()).execute();
             Query.prepare("insert into `namecache` (`uuid`, `name`, `timestamp`) values (?, ?, ?)")
-                    .append(uuid.toString()).append(name).append(System.currentTimeMillis()).execute();
+                    .append(uuid.toString()).append(name).append(new Timestamp(System.currentTimeMillis())).execute();
         });
     }
 
@@ -356,7 +265,7 @@ public class FlatfileStorage implements DataStorage {
             if(uuidString != null) {
                 UUID uuid = UUID.fromString(rs.getString("uuid"));
 
-                if(System.currentTimeMillis() - rs.getLong("timestamp") > TimeUnit.DAYS.toMillis(1)) {
+                if(System.currentTimeMillis() - rs.getTimestamp("timestamp").getTime() > TimeUnit.DAYS.toMillis(1)) {
                     Kauri.INSTANCE.loggingThread.execute(() -> {
                         Query.prepare("delete from `namecache` where `uuid` = ?").append(uuidString).execute();
                         MiscUtils.printToConsole("Deleted " + uuidString + " from name cache (age > 1 day).");
@@ -382,7 +291,7 @@ public class FlatfileStorage implements DataStorage {
             String name = rs.getString("name");
 
             if(name != null) {
-                if(System.currentTimeMillis() - rs.getLong("timestamp") > TimeUnit.DAYS.toMillis(1)) {
+                if(System.currentTimeMillis() - rs.getTimestamp("timestamp").getTime() > TimeUnit.DAYS.toMillis(1)) {
                     Kauri.INSTANCE.loggingThread.execute(() -> {
                         Query.prepare("delete from `namecache` where `name` = ?").append(name).execute();
                         MiscUtils.printToConsole("Deleted " + name + " from name cache (age > 1 day).");

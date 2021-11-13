@@ -145,6 +145,7 @@ public class VelocityC extends Check {
                     vl++;
                     flag("pct=%.2f buffer=%.1f forward=%.2f strafe=%.2f",
                             ratio * 100, buffer, moveStrafe, moveForward);
+                    buffer = 31;
                 }
             } else buffer-= buffer > 0 ? data.lagInfo.lastPacketDrop.isNotPassed(20) ? .5 : 0.25 : 0;
 

@@ -3,11 +3,13 @@ package dev.brighten.anticheat.check.impl.free.movement.speed;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.math.cond.MaxInteger;
+import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 
 @CheckInfo(name = "Speed (C)", description = "General non-vanilla speed distance check")
+@Cancellable
 public class SpeedC extends Check {
 
     private MaxInteger verbose = new MaxInteger(40);
