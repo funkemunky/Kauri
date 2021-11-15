@@ -18,6 +18,7 @@ public class FlyI extends Check {
         if(!packet.isPos()) return;
 
         if(data.playerInfo.jumped && !data.blockInfo.blocksAbove
+                && !data.playerInfo.generalCancel
                 && data.playerInfo.liquidTimer.isPassed(3)
                 && data.playerInfo.lastVelocity.isPassed(2)
                 && data.playerInfo.climbTimer.isPassed(3)) {

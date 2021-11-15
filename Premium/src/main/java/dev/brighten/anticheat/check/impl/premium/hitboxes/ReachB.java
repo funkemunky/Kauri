@@ -22,10 +22,13 @@ import dev.brighten.anticheat.utils.AxisAlignedBB;
 import dev.brighten.anticheat.utils.EntityLocation;
 import dev.brighten.anticheat.utils.Vec3D;
 import dev.brighten.anticheat.utils.timer.Timer;
+import dev.brighten.anticheat.utils.timer.impl.MillisTimer;
 import dev.brighten.anticheat.utils.timer.impl.PlayerTimer;
+import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.Vector;
@@ -40,9 +43,12 @@ public class ReachB extends Check {
     private Timer lastFlying;
     private int streak;
     private float buffer;
-    private boolean sentTeleport, attacked;
+    private boolean sentTeleport, attacked, flying;
     private AimG aimDetection;
     private KillauraH killauraHDetection;
+    private Timer lastTransProblem = new MillisTimer(20);
+    private List<KLocation> targetLocs = new ArrayList<>();
+    private int addTicks;
 
     private final boolean debugBoxes = true;
 
@@ -97,16 +103,16 @@ public class ReachB extends Check {
 
         if(collided) {
             distance = Math.sqrt(distance);
-            if(distance > 3.02 && streak > 3 && eloc.sentTeleport && lastFlying.isNotPassed(1)) {
-                if(++buffer > 3) {
+            if(distance > 3.02 && lastTransProblem.isPassed(52) && streak > 3 && eloc.sentTeleport && lastFlying.isNotPassed(1)) {
+                if(++buffer > 2) {
                     vl++;
                     flag("d=%.4f", distance);
-                    buffer = 3;
+                    buffer = 2;
                 }
-            } else if(buffer > 0) buffer-= 0.05f;
-            debug("dist=%.2f b=%s s=%s st=%s lf=%s",
-                    distance, buffer, streak, sentTeleport, lastFlying.getPassed());
-        } else debug("didnt hit box: x=%.1f y=%.1f z=%.1f", eloc.x, eloc.y, eloc.z);
+            } else if(buffer > 0) buffer-= 0.1f;
+            debug("dist=%.2f b=%s s=%s st=%s lf=%s ld=%s lti=%s",
+                    distance, buffer, streak, sentTeleport, lastFlying.getPassed(), data.lagInfo.lastPingDrop.getPassed(), lastTransProblem.getPassed());
+        } else debug("didnt hit box: x=%.1f y=%.1f z=%.1f lti=%s", eloc.x, eloc.y, eloc.z, lastTransProblem.getPassed());
     }
 
     private AimG getAimDetection() {
@@ -123,6 +129,7 @@ public class ReachB extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
+        flying = true;
         if(lastFlying.isNotPassed(1)) streak++;
         else {
             streak = 1;
@@ -338,9 +345,16 @@ public class ReachB extends Check {
     }
 
     private void runAction(Entity entity, Runnable action) {
-        if(data.target != null && data.target.getUniqueId().equals(entity.getUniqueId()))
-            data.runInstantAction(action);
-        else data.runKeepaliveAction(keepalive -> action.run());
+        if(data.target != null && data.target.getUniqueId().equals(entity.getUniqueId())) {
+            data.runInstantAction(ia -> {
+                if(!ia.isEnd()) {
+                    action.run();
+                    flying = false;
+                } else if(flying) {
+                    lastTransProblem.reset();
+                }
+            });
+        } else data.runKeepaliveAction(keepalive -> action.run());
     }
 
 }

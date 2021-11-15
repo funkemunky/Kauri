@@ -14,6 +14,7 @@ import dev.brighten.anticheat.listeners.api.EventHandler;
 import dev.brighten.anticheat.logs.LoggerManager;
 import dev.brighten.anticheat.processing.PacketProcessor;
 import dev.brighten.anticheat.processing.keepalive.KeepaliveProcessor;
+import dev.brighten.anticheat.utils.ServerInjector;
 import dev.brighten.anticheat.utils.timer.impl.AtlasTimer;
 import dev.brighten.api.KauriAPI;
 import org.bstats.bukkit.Metrics;
@@ -49,6 +50,14 @@ public class Load {
         Kauri.INSTANCE.dataManager = new DataManager();
         Kauri.INSTANCE.keepaliveProcessor = new KeepaliveProcessor();
         Kauri.INSTANCE.packetProcessor = new PacketProcessor();
+
+        Kauri.INSTANCE.injector = new ServerInjector();
+
+        try {
+            Kauri.INSTANCE.injector.inject();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         register("Loading API...");
         Kauri.INSTANCE.kauriAPI = new KauriAPI();

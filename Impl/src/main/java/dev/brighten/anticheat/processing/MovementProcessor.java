@@ -461,7 +461,6 @@ public class MovementProcessor {
             data.playerInfo.lastToggleFlight.reset();
         }
         data.playerInfo.canFly = data.getPlayer().getAllowFlight();
-        data.playerInfo.flying = data.getPlayer().isFlying();
 
         if (data.playerInfo.breakingBlock) data.playerInfo.lastBrokenBlock.reset();
 

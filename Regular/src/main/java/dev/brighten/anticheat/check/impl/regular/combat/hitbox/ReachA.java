@@ -24,6 +24,7 @@ import org.bukkit.entity.EntityType;
 
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 
 @CheckInfo(name = "Reach (A)", checkType = CheckType.HITBOX, punishVL = 5, description = "A simple distance check.",
         planVersion = KauriVersion.FREE)
@@ -36,7 +37,6 @@ public class ReachA extends Check {
             EntityType.BLAZE, EntityType.SKELETON, EntityType.PLAYER, EntityType.VILLAGER, EntityType.IRON_GOLEM,
                     EntityType.WITCH, EntityType.COW, EntityType.CREEPER);
 
-    private Hitboxes hitboxDetection;
     private boolean attacked;
     @Packet
     public void onUse(WrappedInUseEntityPacket packet) {
@@ -74,13 +74,12 @@ public class ReachA extends Check {
                 } else misses++;
 
                 hitboxes: {
-                    Hitboxes hitbox = getHitboxDetection();
+                    Hitboxes hitbox = find(Hitboxes.class);
 
-                    if(hitbox == null) {
-                        Kauri.INSTANCE.getLogger().warning("Hitboxes is null within "
-                                + data.getPlayer().getName() + " Reach (A) detection!");
+                    if(hitbox == null || !hitbox.isEnabled()) {
                         break hitboxes;
                     }
+
                     SimpleCollisionBox expandedBox = tbox.copy().expand(0.25);
 
                     final AxisAlignedBB expanded = new AxisAlignedBB(expandedBox);
@@ -93,11 +92,11 @@ public class ReachA extends Check {
             }
 
             hitboxes: {
-                Hitboxes hitbox = getHitboxDetection();
+                Hitboxes hitbox = find(Hitboxes.class);
 
-                if(hitbox == null) {
-                    Kauri.INSTANCE.getLogger().warning("Hitboxes is null within "
-                            + data.getPlayer().getName() + " Reach (A) detection!");
+                if(hitbox == null || !hitbox.isEnabled()) {
+                    debug("Hitboxes is null within "
+                            + data.getPlayer().getName() + " Reach (A) detection! (" + (hitbox == null) + ")");
                     break hitboxes;
                 }
 
@@ -132,11 +131,5 @@ public class ReachA extends Check {
 
     private static SimpleCollisionBox getHitbox(Entity entity, KLocation loc) {
         return (SimpleCollisionBox) EntityData.getEntityBox(loc, entity);
-    }
-
-    private Hitboxes getHitboxDetection() {
-        if(hitboxDetection == null) hitboxDetection = (Hitboxes) data.checkManager.checks.get("Hitboxes");
-
-        return hitboxDetection;
     }
 }

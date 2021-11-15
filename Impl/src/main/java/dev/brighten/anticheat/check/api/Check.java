@@ -42,10 +42,7 @@ import org.bukkit.entity.Player;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
@@ -82,6 +79,19 @@ public class Check implements KauriCheck {
     public boolean exempt, banExempt;
 
     private final Timer lastAlert = new TickTimer(MathUtils.millisToTicks(Config.alertsDelay));
+
+    private final Map<Class<?>, Check> detectionCache = new HashMap<>();
+
+
+    public <T> T find(Class<? extends T> clazz) {
+        return (T) detectionCache.computeIfAbsent(clazz, key -> {
+            if(!clazz.isAnnotationPresent(CheckInfo.class)) {
+
+                return null;
+            }
+            return data.checkManager.checks.get(clazz.getAnnotation(CheckInfo.class).name());
+        });
+    }
 
     public void setData(ObjectData data) {
         this.data = data;

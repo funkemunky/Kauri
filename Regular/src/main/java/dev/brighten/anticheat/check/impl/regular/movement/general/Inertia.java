@@ -4,16 +4,12 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
-import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.FastTrig;
-import dev.brighten.api.check.CheckType;
-import dev.brighten.api.check.DevStage;
-import lombok.val;
 import org.bukkit.Location;
 
-@CheckInfo(name = "Inertia", description = "Checks for the lack of proper motion coordinates with mouse movements.",
-        checkType = CheckType.GENERAL, devStage = DevStage.CANARY)
+//@CheckInfo(name = "Inertia", description = "Checks for the lack of proper motion coordinates with mouse movements.",
+//        checkType = CheckType.GENERAL, devStage = DevStage.CANARY)
 @Cancellable
 public class Inertia extends Check {
 
@@ -25,8 +21,8 @@ public class Inertia extends Check {
             double dir = getDirection(data.playerInfo.from.toLocation(data.getPlayer().getWorld()),
                     data.playerInfo.to.toLocation(data.getPlayer().getWorld()));
 
-            val f = data.predictionService.moveForward;
-            val s = data.predictionService.moveStrafing;
+            double f = data.predictionService.forward;
+            double s = data.predictionService.strafe;
             if(f < 0) dir+= 180;
             if(s != 0) dir+=
                     (f != 0 ? (s > 0 ? 45 : -45) * (f < 0 ? -1 : 1) : (s > 0 ? 90 : -90));

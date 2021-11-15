@@ -16,6 +16,7 @@ import dev.brighten.anticheat.listeners.api.EventHandler;
 import dev.brighten.anticheat.logs.LoggerManager;
 import dev.brighten.anticheat.processing.PacketProcessor;
 import dev.brighten.anticheat.processing.keepalive.KeepaliveProcessor;
+import dev.brighten.anticheat.utils.ServerInjector;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.AtlasTimer;
 import dev.brighten.api.KauriAPI;
@@ -26,6 +27,8 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
@@ -42,6 +45,7 @@ public class Kauri extends JavaPlugin {
     public KeepaliveProcessor keepaliveProcessor;
     public EventHandler eventHandler;
     public BukkitCommandManager commandManager;
+    public ServerInjector injector;
 
     //Lag Information
     public RollingAverageDouble tps = new RollingAverageDouble(4, 20);
@@ -62,7 +66,7 @@ public class Kauri extends JavaPlugin {
     public boolean isNewer;
     public Metrics metrics;
 
-    public List<Runnable> onReload = new ArrayList<>();
+    public Deque<Runnable> onReload = new LinkedList<>(), onTickEnd = new LinkedList<>();
 
     public void onEnable() {
         MiscUtils.printToConsole(Color.Red + "Starting Kauri " + getDescription().getVersion() + "...");
@@ -99,6 +103,12 @@ public class Kauri extends JavaPlugin {
         MiscUtils.printToConsole("&7Unloading Discord Webhooks...");
         if(DiscordAPI.INSTANCE != null) DiscordAPI.INSTANCE.unload();
         DiscordAPI.INSTANCE = null;
+
+        try {
+            injector.eject();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         MiscUtils.printToConsole("&7Unloading DataManager...");
         //Clearing the dataManager.
@@ -184,5 +194,9 @@ public class Kauri extends JavaPlugin {
 
     public void onReload(Runnable runnable) {
         onReload.add(runnable);
+    }
+
+    public void onTickEnd(Runnable runnable) {
+        onTickEnd.add(runnable);
     }
 }

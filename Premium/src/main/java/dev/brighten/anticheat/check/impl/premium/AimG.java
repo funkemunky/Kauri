@@ -24,14 +24,14 @@ public class AimG extends Check {
     public int streak;
     public boolean sentTeleport;
 
-    private int abuffer, bbuffer, cbuffer, dbuffer;
-    private float lrp;
+    private int abuffer;
 
-    private List<Double> yawOffsets = new EvictingList<>(10), pitchOffsets = new EvictingList<>(10);
+    protected List<Double> yawOffsets = new EvictingList<>(10), pitchOffsets = new EvictingList<>(10);
 
     @Packet
     public void onUse(WrappedInUseEntityPacket packet) {
         if(packet.getAction() != WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK
+                || !sentTeleport
                 || targetLocation == null || streak < 3) return;
 
         KLocation origin = data.playerInfo.to.clone();
@@ -62,44 +62,8 @@ public class AimG extends Check {
         double std = MathUtils.stdev(yawOffsets);
         double pstd = MathUtils.stdev(pitchOffsets);
 
-        typeB: {
-            if(std < 1) {
-                if(data.playerInfo.deltaYaw > 0.2 && ++bbuffer > 8) {
-                    vl++;
-                    bbuffer = 8;
-                    flag("t=b y=%.2f dy=%.3f s=%.3f", offset[1], data.playerInfo.deltaYaw, std);
-                }
-            } else bbuffer = 0;
-        }
-
-        typeC: {
-            double min = Math.min(std, pstd);
-            double pct = Math.abs(std - pstd) / min * 100;
-
-            if(pct > 200 && min > 1.4) {
-                if(data.playerInfo.deltaYaw > 0.3 && ++cbuffer > 8) {
-                    vl++;
-                    flag("t=c pct=%.1f%%", pct);
-                    cbuffer = 8;
-                }
-            } else cbuffer = 0;
-        }
-
-        typeD: {
-            double deltaRot = rot[1] - lrp;
-
-            if(((deltaRot < 0 && data.playerInfo.deltaPitch < 0) || (deltaRot > 0 && data.playerInfo.deltaPitch > 0))
-                    && (data.playerInfo.deltaYaw > 0.3 || data.playerInfo.deltaXZ > 0.28) && pstd < 11) {
-                if(++dbuffer > 8) {
-                    vl++;
-                    flag("t=d");
-                    dbuffer = 9;
-                }
-            } else if(dbuffer > 0) dbuffer-= 2;
-            debug("b=%s po=%.4f pr=%.4f p=%.4f x=%.3f y=%.3f", dbuffer, offset[1],
-                    data.playerInfo.deltaPitch, deltaRot, std, pstd);
-        }
-
-        lrp = rot[1];
+        find(AimJ.class).runCheck(std, pstd, offset, rot);
+        find(AimK.class).runCheck(std, pstd, offset, rot);
+        find(AimL.class).runCheck(std, pstd, offset, rot);
     }
 }

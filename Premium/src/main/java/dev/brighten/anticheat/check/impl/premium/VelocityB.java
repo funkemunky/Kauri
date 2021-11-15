@@ -115,8 +115,8 @@ public class VelocityB extends Check {
                     }));
 
             if(!velocity.isPresent()) {
-                double s2 = data.predictionService.moveStrafing;
-                double f2 = data.predictionService.moveForward;
+                double s2 = data.predictionService.strafe;
+                double f2 = data.predictionService.forward;
 
                 moveStrafe = s2;
                 moveForward = f2;
@@ -135,7 +135,7 @@ public class VelocityB extends Check {
             double ratioX = data.playerInfo.deltaX / pvX, ratioZ = data.playerInfo.deltaZ / pvZ;
             double ratio = (Math.abs(ratioX) + Math.abs(ratioZ)) / 2;
 
-            if((ratio < 0.996 || ratio > 3) && pvX != 0
+            if((ratio < 0.996) && pvX != 0
                     && pvZ != 0
                     && timeStamp - data.creation > 3000L
                     && data.playerInfo.lastTeleportTimer.isPassed(1)
@@ -147,7 +147,7 @@ public class VelocityB extends Check {
                             ratio * 100, buffer, moveStrafe, moveForward);
                     buffer = 31;
                 }
-            } else if(buffer > 0) buffer--;
+            } else if(buffer > 0) buffer-= 0.5;
 
             debug("ratio=%.3f dx=%.4f dz=%.4f buffer=%.1f ticks=%s strafe=%.2f forward=%.2f lastUse=%s " +
                             "found=%s lastV=%s", ratio, data.playerInfo.deltaX, data.playerInfo.deltaZ,

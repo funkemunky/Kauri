@@ -31,7 +31,7 @@ public class InventoryB extends Check {
                 && data.playerInfo.lastVelocity.isPassed(30)
                 && !data.blockInfo.collidesHorizontally
                 && data.playerInfo.deltaXZ > 0.1
-                && (data.predictionService.moveStrafing != 0 || data.predictionService.moveForward != 0)) {
+                && (data.predictionService.strafe != 0 || data.predictionService.forward != 0)) {
             if(verbose++ > 10) {
                 vl++;
                 flag("key=[%s], dxz=%s", data.predictionService.key,

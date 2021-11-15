@@ -17,6 +17,10 @@
             <id>bintray-jcenter</id>
             <url>https://jcenter.bintray.com</url>
         </repository>
+        <repository>
+            <id>pledge-repo</id>
+            <url>https://raw.github.com/ThomasOM/Pledge/repository/</url>
+        </repository>
     </repositories>
 
     <build>

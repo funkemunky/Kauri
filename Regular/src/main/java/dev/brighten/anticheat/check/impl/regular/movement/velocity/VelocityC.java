@@ -115,8 +115,8 @@ public class VelocityC extends Check {
                     }));
 
             if(!velocity.isPresent()) {
-                double s2 = data.predictionService.moveStrafing;
-                double f2 = data.predictionService.moveForward;
+                double s2 = data.predictionService.strafe;
+                double f2 = data.predictionService.forward;
 
                 moveStrafe = s2;
                 moveForward = f2;
@@ -147,7 +147,7 @@ public class VelocityC extends Check {
                             ratio * 100, buffer, moveStrafe, moveForward);
                     buffer = 31;
                 }
-            } else buffer-= buffer > 0 ? data.lagInfo.lastPacketDrop.isNotPassed(20) ? .5 : 0.25 : 0;
+            } else buffer-= buffer > 0 ? data.lagInfo.lastPacketDrop.isNotPassed(20) ? 1 : 0.5 : 0;
 
             debug("ratio=%.3f dx=%.4f dz=%.4f buffer=%.1f ticks=%s strafe=%.2f forward=%.2f lastUse=%s " +
                             "found=%s lastV=%s", ratio, data.playerInfo.deltaX, data.playerInfo.deltaZ,

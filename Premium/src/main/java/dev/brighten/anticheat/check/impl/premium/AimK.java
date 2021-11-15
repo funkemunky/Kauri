@@ -6,21 +6,18 @@ import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
-@CheckInfo(name = "Aim (J)", description = "Statistical aim analysis",
+@CheckInfo(name = "Aim (K)", description = "Statistical aim analysis",
         checkType = CheckType.AIM, planVersion = KauriVersion.ARA, devStage = DevStage.CANARY)
-public class AimJ extends Check {
+public class AimK extends Check {
 
     private int buffer;
 
     public void runCheck(double std, double pstd, double[] offset, float[] rot) {
-        double min = Math.min(std, pstd);
-        double pct = Math.abs(std - pstd) / min * 100;
-
-        if(pct > 200 && min > 1.4) {
-            if(data.playerInfo.deltaYaw > 0.3 && ++buffer > 8) {
+        if(std < 1) {
+            if(data.playerInfo.deltaYaw > 0.2 && ++buffer > 8) {
                 vl++;
-                flag("t=c pct=%.1f%%", pct);
                 buffer = 8;
+                flag("t=b y=%.2f dy=%.3f s=%.3f", offset[1], data.playerInfo.deltaYaw, std);
             }
         } else buffer = 0;
     }

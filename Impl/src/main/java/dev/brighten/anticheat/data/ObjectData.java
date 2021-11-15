@@ -82,7 +82,7 @@ public class ObjectData implements Data {
     public final Map<Long, Long> keepAlives = Collections.synchronizedMap(new HashMap<>());
     public final List<String> sniffedPackets = new CopyOnWriteArrayList<>();
     public final Map<Location, CollisionBox> ghostBlocks = Collections.synchronizedMap(new HashMap<>());
-    public final Map<Short, Runnable> instantTransaction = new HashMap<>();
+    public final Map<Short, Tuple<InstantAction, Consumer<InstantAction>>> instantTransaction = new HashMap<>();
     public final EvictingList<Tuple<KLocation, Double>> pastLocations = new EvictingList<>(20);
 
     public ObjectData(UUID uuid) {
@@ -236,24 +236,40 @@ public class ObjectData implements Data {
         return runKeepaliveAction(action, 0);
     }
 
-    public void runInstantAction(Runnable runnable) {
+    public void runInstantAction(Consumer<InstantAction> runnable) {
         runInstantAction(runnable, false);
     }
 
-    public void runInstantAction(Runnable runnable, boolean flush) {
-        short id = (short) ThreadLocalRandom.current().nextInt(Short.MIN_VALUE, Short.MAX_VALUE);
+    public void runInstantAction(Consumer<InstantAction> runnable, boolean flush) {
+        short startId = (short) ThreadLocalRandom.current().nextInt(Short.MIN_VALUE, Short.MAX_VALUE),
+                endId = (short)(startId + 1);
 
         //Ensuring we don't have any duplicate IDS
-        if(Kauri.INSTANCE.keepaliveProcessor.keepAlives.containsKey(id)) {
-            id++;
+        while (Kauri.INSTANCE.keepaliveProcessor.keepAlives.containsKey(startId)
+                || Kauri.INSTANCE.keepaliveProcessor.keepAlives.containsKey(endId)) {
+            startId = (short) ThreadLocalRandom.current().nextInt(Short.MIN_VALUE, Short.MAX_VALUE);
+            endId = (short)(startId + (short)1);
         }
 
-        final Object packet = new WrappedOutTransaction(0, id, false).getObject();
+        final Object packet = new WrappedOutTransaction(0, startId, false).getObject();
+
+        InstantAction startAction = new InstantAction(startId, endId, false);
+        instantTransaction.put(startId, new Tuple<>(startAction, runnable));
 
         if(!flush) TinyProtocolHandler.sendPacket(getPlayer(), packet);
         else sendPacket(packet);
 
-        instantTransaction.put(id, runnable);
+
+        short finalEndId = endId, finalStartId = startId;
+        Kauri.INSTANCE.onTickEnd(() -> {
+            Object toSend = new WrappedOutTransaction(0, finalEndId, false).getObject();
+
+            InstantAction endAction = new InstantAction(finalStartId, finalEndId, true);
+            instantTransaction.put(finalEndId, new Tuple<>(endAction, runnable));
+
+            if(!flush) TinyProtocolHandler.sendPacket(getPlayer(), toSend);
+            else sendPacket(toSend);
+        });
     }
 
     public void sendPacket(Object packet) {
