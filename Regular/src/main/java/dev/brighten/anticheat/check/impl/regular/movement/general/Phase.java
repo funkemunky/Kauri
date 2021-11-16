@@ -46,7 +46,7 @@ public class Phase extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long now) {
-        if(!packet.isPos() || now - data.creation < 800L || now - data.playerInfo.lastRespawn < 150L
+        if(!packet.isPos() || now - data.creation < 800L || now - data.playerInfo.lastRespawn < 500L
                 || data.playerInfo.doingTeleport
                 || data.playerInfo.creative || data.playerInfo.canFly) {
             return;
@@ -157,7 +157,7 @@ public class Phase extends Check {
             else if(data.playerInfo.iceTimer.isNotPassed(4)) threshold = 0.6;
 
             if(data.playerInfo.lastVelocity.isNotPassed(20))
-                threshold = Math.max(threshold, Math.hypot(data.playerInfo.velocityX, data.playerInfo.velocityZ) + 0.3);
+                threshold = Math.max(threshold, data.playerInfo.velocityXZ + 0.3);
 
             Optional<PotionEffect> speed = data.potionProcessor.getEffectByType(PotionEffectType.SPEED);
 

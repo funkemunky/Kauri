@@ -105,7 +105,7 @@ public class PlayerInformation {
             lastTeleportTimer, lastGamemodeTimer, lastRespawnTimer, lastChunkUnloaded, cinematicTimer, lastGlideTimer,
             lastMoveTimer;
 
-    public double velocityX, velocityY, velocityZ, calcVelocityX, calcVelocityY, calcVelocityZ;
+    public double velocityX, velocityY, velocityZ, velocityXZ, calcVelocityX, calcVelocityY, calcVelocityZ;
 
     public WrappedEnumAnimation animation = WrappedEnumAnimation.NONE;
 

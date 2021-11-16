@@ -236,6 +236,7 @@ public class MovementProcessor {
                         data.playerInfo.velocityX = data.playerInfo.calcVelocityX = (float) velocity.getX();
                         data.playerInfo.velocityY = data.playerInfo.calcVelocityY = (float) velocity.getY();
                         data.playerInfo.velocityZ = data.playerInfo.calcVelocityZ = (float) velocity.getZ();
+                        data.playerInfo.velocityXZ = Math.hypot(data.playerInfo.velocityX, data.playerInfo.velocityZ);
                     }
                     data.playerInfo.velocities.remove(velocity);
                     break;

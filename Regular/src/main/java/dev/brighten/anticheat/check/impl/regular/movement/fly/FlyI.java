@@ -19,12 +19,13 @@ public class FlyI extends Check {
 
         if(data.playerInfo.jumped && !data.blockInfo.blocksAbove
                 && !data.playerInfo.generalCancel
+                && (!data.playerInfo.serverGround || !data.blockInfo.onHalfBlock)
                 && data.playerInfo.liquidTimer.isPassed(3)
                 && data.playerInfo.lastVelocity.isPassed(2)
                 && data.playerInfo.climbTimer.isPassed(3)) {
             double delta = Math.abs(data.playerInfo.jumpHeight - data.playerInfo.deltaY);
 
-            if(delta > 0.001) {
+            if(delta > 0.0001) {
                 vl++;
                 flag("j=%.4f dy=%.4f d=%.4f", data.playerInfo.jumpHeight, data.playerInfo.deltaY, delta);
             }

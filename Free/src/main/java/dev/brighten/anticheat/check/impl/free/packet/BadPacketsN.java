@@ -12,10 +12,11 @@ import dev.brighten.anticheat.utils.timer.impl.MillisTimer;
 import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
+import dev.brighten.api.check.DevStage;
 import lombok.val;
 
 @CheckInfo(name = "BadPackets (N)", description = "Designed to patch disablers for Kauri.",
-        checkType = CheckType.BADPACKETS, punishVL = 50, vlToFlag = 4, executable = false)
+        checkType = CheckType.BADPACKETS, devStage = DevStage.BETA, punishVL = 50, vlToFlag = 4, executable = false)
 @Cancellable(cancelType = CancelType.MOVEMENT)
 public class BadPacketsN extends Check {
     @Setting(name  = "kickPlayer")

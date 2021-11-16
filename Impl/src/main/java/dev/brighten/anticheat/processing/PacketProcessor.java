@@ -585,6 +585,8 @@ public class PacketProcessor {
                             data.playerInfo.velocityX = data.playerInfo.calcVelocityX = (float) packet.getX();
                             data.playerInfo.velocityY = data.playerInfo.calcVelocityY = (float) packet.getY();
                             data.playerInfo.velocityZ = data.playerInfo.calcVelocityZ = (float) packet.getZ();
+                            data.playerInfo.velocityXZ =
+                                    Math.hypot(data.playerInfo.velocityX, data.playerInfo.velocityZ);
                         }
                         data.playerInfo.velocities.remove(vector);
                     }
@@ -611,6 +613,8 @@ public class PacketProcessor {
                                 data.playerInfo.velocityX = data.playerInfo.calcVelocityX = (float) packet.getX();
                                 data.playerInfo.velocityY = data.playerInfo.calcVelocityY = (float) packet.getY();
                                 data.playerInfo.velocityZ = data.playerInfo.calcVelocityZ = (float) packet.getZ();
+                                data.playerInfo.velocityXZ = Math.hypot(data.playerInfo.velocityX,
+                                        data.playerInfo.velocityZ);
                             }
                             data.playerInfo.velocities.remove(vector);
                         }

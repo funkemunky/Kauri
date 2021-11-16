@@ -27,12 +27,13 @@ public class KillauraF extends Check {
             px*= 0.6;
             pz*= 0.6;
 
-            double pxz = Math.hypot(px, pz), noxz = data.playerInfo.lDeltaXZ;
+            double pxz = (px * px + pz * pz), noxz = Math.pow(data.playerInfo.lDeltaXZ, 2);
+            double deltaXZ = Math.pow(data.playerInfo.deltaXZ, 2);
 
-            double deltaYes = Math.abs(data.playerInfo.deltaXZ - pxz),
-                    deltaNo = Math.abs(data.playerInfo.deltaXZ - noxz);
+            double deltaYes = Math.abs(deltaXZ - pxz),
+                    deltaNo = Math.abs(deltaXZ - noxz);
 
-            if(deltaYes > 0.07 && deltaNo < 0.01 && data.target != null
+            if(deltaYes > 0.0049 && deltaNo < 0.0001 && data.target != null
                     && data.target.getType().equals(EntityType.PLAYER)) {
                 if(++buffer > 5) {
                      vl++;

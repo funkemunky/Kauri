@@ -10,7 +10,7 @@ import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Killaura (I)", description = "Looks for suspicious accuracy", checkType = CheckType.KILLAURA,
-        devStage = DevStage.CANARY, planVersion = KauriVersion.FREE)
+        devStage = DevStage.BETA, planVersion = KauriVersion.FREE)
 public class KillauraI extends Check {
 
     private int arm, useEntity, buffer;

@@ -13,7 +13,7 @@ import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Velocity (D)", description = "Checks if a player takes no velocity",
-        checkType = CheckType.VELOCITY, devStage = DevStage.BETA, punishVL = 3, planVersion = KauriVersion.FREE)
+        checkType = CheckType.VELOCITY, punishVL = 3, planVersion = KauriVersion.FREE)
 @Cancellable(cancelType = CancelType.MOVEMENT)
 public class VelocityD extends Check {
 

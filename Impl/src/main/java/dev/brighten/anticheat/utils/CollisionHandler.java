@@ -22,7 +22,8 @@ import java.util.*;
 import java.util.function.Consumer;
 
 @Getter
-public class CollisionHandler {
+public class
+CollisionHandler {
 	private List<Block> blocks;
 	private List<Entity> entities;
 	private ObjectData data;

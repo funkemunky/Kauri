@@ -35,7 +35,7 @@ import org.bukkit.util.Vector;
 
 import java.util.*;
 
-@CheckInfo(name = "Reach (B)", planVersion = KauriVersion.ARA, devStage = DevStage.CANARY, checkType = CheckType.HITBOX)
+@CheckInfo(name = "Reach (B)", planVersion = KauriVersion.ARA, devStage = DevStage.BETA, checkType = CheckType.HITBOX)
 public class ReachB extends Check {
 
     private final Map<UUID, EntityLocation> entityLocationMap = new HashMap<>(),
@@ -103,7 +103,8 @@ public class ReachB extends Check {
 
         if(collided) {
             distance = Math.sqrt(distance);
-            if(distance > 3.02 && lastTransProblem.isPassed(52) && streak > 3 && eloc.sentTeleport && lastFlying.isNotPassed(1)) {
+            if(distance > 3.02 && lastTransProblem.isPassed(52) && streak > 3 && eloc.sentTeleport
+                    && lastFlying.isNotPassed(1)) {
                 if(++buffer > 2) {
                     vl++;
                     flag("d=%.4f", distance);
@@ -111,8 +112,10 @@ public class ReachB extends Check {
                 }
             } else if(buffer > 0) buffer-= 0.1f;
             debug("dist=%.2f b=%s s=%s st=%s lf=%s ld=%s lti=%s",
-                    distance, buffer, streak, sentTeleport, lastFlying.getPassed(), data.lagInfo.lastPingDrop.getPassed(), lastTransProblem.getPassed());
-        } else debug("didnt hit box: x=%.1f y=%.1f z=%.1f lti=%s", eloc.x, eloc.y, eloc.z, lastTransProblem.getPassed());
+                    distance, buffer, streak, sentTeleport, lastFlying.getPassed(),
+                    data.lagInfo.lastPingDrop.getPassed(), lastTransProblem.getPassed());
+        } else debug("didnt hit box: x=%.1f y=%.1f z=%.1f lti=%s", eloc.x, eloc.y, eloc.z,
+                lastTransProblem.getPassed());
     }
 
     private AimG getAimDetection() {
@@ -210,9 +213,10 @@ public class ReachB extends Check {
                         eloc.increment = 3;
                         eloc.interpolateLocations();
                         if(data.target != null && entity.getEntityId() == data.target.getEntityId()) {
-
+                            final double toShrink = data.playerVersion.isOrAbove(ProtocolVersion.V1_9) ? 0.12 : 0.02;
                             eloc.interpolatedLocations.stream()
-                                    .map(kloc -> (SimpleCollisionBox)EntityData.getEntityBox(kloc, entity))
+                                    .map(kloc -> ((SimpleCollisionBox)EntityData.getEntityBox(kloc, entity))
+                                            .shrink(toShrink, toShrink, toShrink))
                                     .forEach(box -> getKillauraDetection().getTargetLocations().add(box));
 
                             //Clearing to ensure garbage collections clears this object.
@@ -292,9 +296,11 @@ public class ReachB extends Check {
                         }
                         if(data.target != null && entity.getEntityId() == data.target.getEntityId()) {
 
+                            final double toShrink = data.playerVersion.isOrAbove(ProtocolVersion.V1_9) ? 0.12 : 0.02;
                             if(eloc.interpolatedLocations.size() > 0) {
                                 eloc.interpolatedLocations.stream()
-                                        .map(kloc -> (SimpleCollisionBox)EntityData.getEntityBox(kloc, entity))
+                                        .map(kloc -> ((SimpleCollisionBox)EntityData.getEntityBox(kloc, entity))
+                                                .shrink(toShrink, toShrink, toShrink))
                                         .forEach(box -> getKillauraDetection().getTargetLocations().add(box));
 
                             } else {

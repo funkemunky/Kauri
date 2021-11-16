@@ -8,7 +8,6 @@ import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
-import dev.brighten.anticheat.utils.SimpleAverage;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import dev.brighten.api.check.CheckType;
@@ -19,11 +18,9 @@ import dev.brighten.api.check.DevStage;
 @Cancellable
 public class TimerB extends Check {
 
-    private long lastFlying;
-    private double totalTimer = -2000;
+    private long totalTimer = -1;
+    private final Timer lastFlag = new TickTimer(40);
     private int buffer;
-    private final SimpleAverage averageIncrease = new SimpleAverage(5, 0);
-    private final Timer lastFlag = new TickTimer();
 
     @Packet
     public void onTeleport(WrappedOutPositionPacket event) {
@@ -38,33 +35,25 @@ public class TimerB extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long now) {
-        long delta = now - lastFlying;
-
-        double before = totalTimer;
-        totalTimer+= 49.5;
-        totalTimer-= lastFlying == 0 ? 50 : delta;
-
-        double increase = totalTimer - before;
-
-        averageIncrease.add(increase);
-
-        double avgIncrease = averageIncrease.getAverage();
-
-        totalTimer = Math.max(totalTimer, -5000);
-
-        if(totalTimer > 150) {
-            if(++buffer > 3) {
-                vl++;
-                flag("t=%.1f aInc=%.1f", totalTimer, avgIncrease);
-            }
-            lastFlag.reset();
-            totalTimer = 0;
-        } else if(lastFlag.isPassed(120)) {
-            buffer = 0;
+        if(packet.isPos() && data.playerInfo.deltaX == 0
+                && data.playerInfo.deltaY == 0
+                && data.playerInfo.deltaZ == 0) {
+            totalTimer = now;
         }
+        else if(totalTimer == -1) totalTimer = now;
+        else totalTimer+= 50;
 
-        debug("delta=%sms total=%s inc=%s avgInc=%.1f", delta, totalTimer, increase, avgIncrease);
+        long threshold = now + 100, delta = totalTimer - threshold;
 
-        lastFlying = now;
+        if(totalTimer > threshold) {
+            if(++buffer > 1) {
+                vl++;
+                flag("p=%s;d=%s", data.lagInfo.lastPacketDrop.getPassed(), delta);
+            }
+            totalTimer = now - 20;
+            lastFlag.reset();
+        } else if(lastFlag.isPassed(120)) buffer = 0;
+
+        debug("d=%s, thr=%s, b=%s", delta, threshold, buffer);
     }
 }
