@@ -32,7 +32,7 @@ public class ChestMenu implements Menu {
     public Button[] contents;
     private CloseHandler closeHandler;
 
-    public ChestMenu(@NonNull String title, int size) {
+    public ChestMenu(String title, int size) {
         this.title = title.length() > 32 ? title.substring(0, 32) : title;
         if (size <= 0 || size > 6) {
             throw new IndexOutOfBoundsException("A menu can only have between 1 & 6 for a size (rows)");

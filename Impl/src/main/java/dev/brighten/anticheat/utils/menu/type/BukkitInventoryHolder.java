@@ -1,7 +1,6 @@
 package dev.brighten.anticheat.utils.menu.type;
 
 import dev.brighten.anticheat.utils.menu.Menu;
-import lombok.NonNull;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
@@ -22,7 +21,7 @@ public class BukkitInventoryHolder implements InventoryHolder {
         return menu;
     }
 
-    public void setMenu(@NonNull Menu menu) {
+    public void setMenu(Menu menu) {
         this.menu = menu;
     }
 
@@ -31,7 +30,7 @@ public class BukkitInventoryHolder implements InventoryHolder {
         return inventory;
     }
 
-    public void setInventory(@NonNull Inventory inventory) {
+    public void setInventory(Inventory inventory) {
         this.inventory = inventory;
     }
 }
