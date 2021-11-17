@@ -10,7 +10,6 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
-import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Velocity (D)", description = "Checks if a player takes no velocity",
         checkType = CheckType.VELOCITY, punishVL = 3, planVersion = KauriVersion.FREE)

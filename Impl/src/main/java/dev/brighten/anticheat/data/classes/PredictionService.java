@@ -1,16 +1,12 @@
 package dev.brighten.anticheat.data.classes;
 
 import cc.funkemunky.api.reflections.impl.MinecraftReflection;
-import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.*;
+import cc.funkemunky.api.utils.BlockUtils;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.FastTrig;
-import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.potion.PotionEffectType;
-
-import java.util.Optional;
 
 public class PredictionService {
 

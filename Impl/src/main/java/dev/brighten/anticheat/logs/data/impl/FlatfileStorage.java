@@ -2,11 +2,9 @@ package dev.brighten.anticheat.logs.data.impl;
 
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
-import com.avaje.ebean.text.TimeStringParser;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.logs.data.DataStorage;
-import dev.brighten.anticheat.logs.data.DatabaseParameters;
 import dev.brighten.anticheat.logs.data.config.MySQLConfig;
 import dev.brighten.anticheat.logs.data.sql.ExecutableStatement;
 import dev.brighten.anticheat.logs.data.sql.MySQL;

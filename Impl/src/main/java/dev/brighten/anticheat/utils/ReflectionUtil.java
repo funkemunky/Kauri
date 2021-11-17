@@ -1,10 +1,11 @@
 package dev.brighten.anticheat.utils;
 
 import dev.brighten.anticheat.Kauri;
+import sun.misc.Unsafe;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import sun.misc.Unsafe;
 
 @SuppressWarnings({"ConstantConditions", "unchecked"})
 public final class ReflectionUtil {

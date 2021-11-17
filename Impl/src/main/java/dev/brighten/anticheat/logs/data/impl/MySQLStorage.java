@@ -5,7 +5,6 @@ import cc.funkemunky.api.utils.RunUtils;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.logs.data.DataStorage;
-import dev.brighten.anticheat.logs.data.DatabaseParameters;
 import dev.brighten.anticheat.logs.data.config.MySQLConfig;
 import dev.brighten.anticheat.logs.data.sql.ExecutableStatement;
 import dev.brighten.anticheat.logs.data.sql.MySQL;

@@ -13,7 +13,6 @@ import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.XMaterial;
 import cc.funkemunky.api.utils.math.IntVector;
 import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.data.InstantAction;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.listeners.api.impl.KeepaliveAcceptedEvent;
 import dev.brighten.anticheat.utils.EntityLocation;

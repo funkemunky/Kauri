@@ -1,7 +1,6 @@
 package dev.brighten.anticheat.utils.menu.button;
 
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import org.bukkit.inventory.ItemStack;
 

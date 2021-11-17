@@ -26,10 +26,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -82,6 +80,15 @@ public class Kauri extends JavaPlugin {
     public void unload(boolean reload) {
         reload = false;
         enabled = reload;
+        MiscUtils.printToConsole("&7Unloading DataManager...");
+        //Clearing the dataManager.
+        synchronized (dataManager.dataMap) {
+            dataManager.dataMap.values().forEach(ObjectData::unregister);
+            dataManager.dataMap.clear();
+        }
+        dataManager.hasAlerts.clear();
+        dataManager.devAlerts.clear();
+        dataManager = null;
         MiscUtils.printToConsole("&7Unregistering Kauri API...");
         kauriAPI.service.shutdown();
         loggingThread.shutdown();
@@ -109,16 +116,6 @@ public class Kauri extends JavaPlugin {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        MiscUtils.printToConsole("&7Unloading DataManager...");
-        //Clearing the dataManager.
-        synchronized (dataManager.dataMap) {
-            dataManager.dataMap.values().forEach(ObjectData::unregister);
-            dataManager.dataMap.clear();
-        }
-        dataManager.hasAlerts.clear();
-        dataManager.devAlerts.clear();
-        dataManager = null;
 
         MiscUtils.printToConsole("&7Stopping log process...");
         loggerManager.storage.shutdown();

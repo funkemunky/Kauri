@@ -18,7 +18,6 @@ import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 import lombok.Getter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @CheckInfo(name = "Killaura (H)", description = "Checks for weird misses", 
