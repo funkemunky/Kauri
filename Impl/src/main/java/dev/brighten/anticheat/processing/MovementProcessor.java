@@ -195,6 +195,8 @@ public class MovementProcessor {
             mat.ifPresent(xMaterial -> data.blockInfo.currentFriction = BlockUtils.getFriction(xMaterial));
         }
 
+        if(data.playerInfo.nearGround || data.playerInfo.serverGround) data.playerInfo.nearGroundTimer.reset();
+
         if(data.playerInfo.calcVelocityY > 0) {
             data.playerInfo.calcVelocityY-= 0.08f;
             data.playerInfo.calcVelocityY*= 0.98f;

@@ -18,9 +18,8 @@ public class FlyD extends Check {
     public void onFlying(WrappedInFlyingPacket packet) {
         if(!packet.isPos()
                 || data.playerInfo.flightCancel
-                || data.playerInfo.nearGround
-                || data.playerInfo.lClientGround
-                || data.playerInfo.clientGround
+                || (data.playerInfo.nearGroundTimer.isNotPassed(3) && (data.playerInfo.lClientGround
+                || data.playerInfo.clientGround))
                 || data.playerInfo.lastVelocity.isNotPassed(3)
         ) return;
 

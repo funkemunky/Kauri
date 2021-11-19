@@ -40,13 +40,14 @@ public class TimerB extends Check {
                 && data.playerInfo.deltaZ == 0) {
             totalTimer = now;
         }
-        else if(totalTimer == -1) totalTimer = now;
+        else if(now - data.creation < 1000L) totalTimer = now;
+        else if(totalTimer == -1) totalTimer = now - 20;
         else totalTimer+= 50;
 
         long threshold = now + 100, delta = totalTimer - threshold;
 
         if(totalTimer > threshold) {
-            if(++buffer > 1) {
+            if(++buffer > 3) {
                 vl++;
                 flag("p=%s;d=%s", data.lagInfo.lastPacketDrop.getPassed(), delta);
             }
