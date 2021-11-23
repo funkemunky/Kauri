@@ -258,7 +258,6 @@ public class KauriCommand extends BaseCommand {
         player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
                 .msg("debug-boxes", "&aYou are now debugging the collisions of %players%.")
                 .replace("%players%", String.join(", ", debuggingPlayers)));
-
     }
 
     @Subcommand("delay")

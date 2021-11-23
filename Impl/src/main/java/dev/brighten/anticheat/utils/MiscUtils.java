@@ -68,7 +68,7 @@ public class MiscUtils {
         //Fixing users potentially misconfiguring forceban
         if(!ban.isExecutable()) ban.setExecutable(true);
 
-        ban.vl = 1;
+        ban.vl = 2;
         ban.flag("Banning user for: " + reason);
         ban.punish();
     }
