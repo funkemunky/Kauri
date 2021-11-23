@@ -142,8 +142,10 @@ public class FlatfileStorage implements DataStorage {
 
     @Override
     public void shutdown() {
-        task.cancel();
-        task = null;
+        if(task != null) {
+            task.cancel();
+            task = null;
+        }
         logs.clear();
         punishments.clear();
         MySQL.shutdown();

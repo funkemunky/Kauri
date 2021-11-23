@@ -49,8 +49,9 @@ public class ReachA extends Check {
                     || data.target == null
                     || !allowedEntityTypes.contains(data.target.getType())) break reachA;
 
-            List<KLocation> targetLocs = data.targetPastLocation
-                    .getEstimatedLocation(Kauri.INSTANCE.keepaliveProcessor.tick, data.lagInfo.transPing + 2, 2);
+            List<KLocation> targetLocs = data.entityLocPastLocation
+                    .getEstimatedLocation(Kauri.INSTANCE.keepaliveProcessor.tick,
+                            data.lagInfo.transPing + 2, 2);
 
             KLocation torigin = data.playerInfo.to.clone(), forigin = data.playerInfo.from.clone();
 
