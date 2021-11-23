@@ -160,18 +160,18 @@ public class ReachB extends Check {
                 && Kauri.INSTANCE.keepaliveProcessor.getKeepById(packet.getAction()).isPresent()) {
 
             for (Iterator<Map.Entry<UUID, EntityLocation>> it = entityLocationMap.entrySet().iterator();
-                 it.hasNext();) {
-                Map.Entry<UUID, EntityLocation> entry = it.next();
+                                                           it.hasNext();) {
+                    Map.Entry<UUID, EntityLocation> entry = it.next();
 
-                EntityLocation eloc = entry.getValue();
+                    EntityLocation eloc = entry.getValue();
 
-                if(eloc.entity == null) {
-                    it.remove();
-                    continue;
-                }
+                    if(eloc.entity == null) {
+                        it.remove();
+                        continue;
+                    }
 
-                eloc.interpolateLocation();
-                if(data.target != null && eloc.entity.getUniqueId() == data.target.getUniqueId()) {
+                    eloc.interpolateLocation();
+                    if(data.target != null && eloc.entity.getUniqueId() == data.target.getUniqueId()) {
                     getAimDetection().setTargetLocation(new KLocation(eloc.x, eloc.y, eloc.z, eloc.yaw, eloc.pitch));
                     attacked = false;
                 }

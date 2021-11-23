@@ -93,10 +93,12 @@ public class Kauri extends JavaPlugin {
         kauriAPI.service.shutdown();
         loggingThread.shutdown();
 
-        MiscUtils.printToConsole("Unregistering processors...");
+        MiscUtils.printToConsole("&7Unregistering processors...");
         keepaliveProcessor.stop();
         keepaliveProcessor = null;
         Atlas.getInstance().getPacketProcessor().removeListeners(this);
+
+        MiscUtils.printToConsole("&7Unregistering logging and database...");
 
         kauriAPI = null;
         MiscUtils.printToConsole("&7Unregistering Bukkit listeners...");

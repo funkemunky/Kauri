@@ -83,7 +83,9 @@ public class MySQL {
     public static void shutdown() {
         try {
             if(conn != null && !conn.isClosed()) {
-                conn.close();
+                if(conn instanceof NonClosableConnection) {
+                    ((NonClosableConnection)conn).shutdown();
+                } else conn.close();
                 conn = null;
             }
         } catch (Exception e) {
