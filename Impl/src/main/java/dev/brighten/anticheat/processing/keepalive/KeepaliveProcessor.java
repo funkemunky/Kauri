@@ -5,9 +5,13 @@ import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.RunUtils;
+import cc.funkemunky.api.utils.it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import cc.funkemunky.api.utils.it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
+import cc.funkemunky.api.utils.it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import cc.funkemunky.api.utils.objects.evicting.EvictingMap;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.utils.MiscUtils;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.Collections;
@@ -25,7 +29,7 @@ public class KeepaliveProcessor implements Runnable {
 
     public final Map<Short, KeepAlive> keepAlives = new EvictingMap<>(80);
 
-    public ConcurrentHashMap<UUID, Short> lastResponses = new ConcurrentHashMap<>();
+    final Int2ObjectMap<Short> lastResponses = Int2ObjectMaps.synchronize(new Int2ObjectOpenHashMap<>());
 
     public KeepaliveProcessor() {
         start();
@@ -55,9 +59,12 @@ public class KeepaliveProcessor implements Runnable {
             }
 
             double dh = value.playerInfo.deltaXZ, dy = Math.abs(value.playerInfo.deltaY);
-            if(dh < 1 && dy < 1)
-                value.playerInfo.nearbyEntities = value.getPlayer().getNearbyEntities(1 + dh, 2 + dy, 1 + dh);
-            else value.playerInfo.nearbyEntities = Collections.emptyList();
+            if(tick % 2 == 0) {
+                if(dh < 1 && dy < 1)
+                    value.playerInfo.nearbyEntities = MiscUtils
+                            .getNearbyEntities(value.getPlayer(), 1 + dh, 2 + dy);
+                else value.playerInfo.nearbyEntities = Collections.emptyList();
+            }
 
             //Checking for AtlasBungee stuff incase a player joined before a heartbeat check could be sent
             //by Atlas
@@ -66,12 +73,6 @@ public class KeepaliveProcessor implements Runnable {
             }
 
             TinyProtocolHandler.sendPacket(value.getPlayer(), packet);
-            /*value.getThread().execute(() -> {
-                for (Runnable runnable : value.tasksToRun) {
-                    runnable.run();
-                    value.tasksToRun.remove(runnable);
-                }
-            });*/
         }
     }
 
@@ -84,10 +85,10 @@ public class KeepaliveProcessor implements Runnable {
     }
 
     public Optional<KeepAlive> getResponse(ObjectData data) {
-        if(!lastResponses.containsKey(data.uuid))
+        if(!lastResponses.containsKey(data.uuid.hashCode()))
             return Optional.empty();
 
-        return getKeepById(lastResponses.get(data.uuid));
+        return getKeepById(lastResponses.get(data.uuid.hashCode()));
     }
 
     public void start() {
@@ -98,7 +99,7 @@ public class KeepaliveProcessor implements Runnable {
 
     public void addResponse(ObjectData data, short id) {
         getKeepById(id).ifPresent(ka -> {
-            lastResponses.put(data.uuid, id);
+            lastResponses.put(data.uuid.hashCode(), (Short)id);
             ka.received(data);
         });
     }

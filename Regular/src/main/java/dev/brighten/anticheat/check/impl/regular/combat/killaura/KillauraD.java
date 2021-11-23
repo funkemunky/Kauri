@@ -8,7 +8,7 @@ import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Killaura (D)", description = "Checks if a user attacks while inventory is open.",
-        checkType = CheckType.KILLAURA, devStage = DevStage.CANARY)
+        checkType = CheckType.KILLAURA, devStage = DevStage.ALPHA)
 public class KillauraD extends Check {
 
     @Packet

@@ -44,7 +44,8 @@ public class KauriCommand extends BaseCommand {
                 .getCommandCompletions();
 
         cc.registerCompletion("checks", (c) ->
-            Check.checkClasses.values().stream().map(ci -> ci.name().replace(" ", "_"))
+            Check.checkClasses.values().stream().sorted(Comparator.comparing(CheckInfo::name))
+                    .map(ci -> ci.name().replace(" ", "_"))
                     .collect(Collectors.toList()));
         cc.registerCompletion("materials", (c) -> Arrays.stream(Material.values()).map(Enum::name)
                 .collect(Collectors.toList()));
@@ -276,13 +277,13 @@ public class KauriCommand extends BaseCommand {
 
     @Subcommand("forceban")
     @Description("force ban a player")
-    @Syntax("<player>")
+    @Syntax("<player> [reason]")
     @CommandCompletion("@players")
     @CommandPermission("kauri.command.forceban")
-    public void onForceBan(CommandSender sender, OnlinePlayer target) {
+    public void onForceBan(CommandSender sender, OnlinePlayer target, @Optional @Split(" ") String reason) {
         ObjectData data = Kauri.INSTANCE.dataManager.getData(target.getPlayer().getPlayer());
 
-        MiscUtils.forceBanPlayer(data);
+        MiscUtils.forceBanPlayer(data, reason != null ? reason : "N/A");
         sender.sendMessage(Color.Green + "Force banned the player.");
     }
 

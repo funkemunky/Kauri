@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.utils;
 
+import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.reflections.impl.CraftReflection;
 import cc.funkemunky.api.reflections.impl.MinecraftReflection;
 import cc.funkemunky.api.reflections.types.WrappedField;
@@ -10,6 +11,7 @@ import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.Tuple;
+import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.processing.MovementProcessor;
@@ -18,6 +20,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -56,13 +59,17 @@ public class MiscUtils {
         NUMBER_REFLECTED_PRIMITIVES = s;
     }
 
-    public static void forceBanPlayer(ObjectData data) {
+    public static void forceBanPlayer(ObjectData data, String reason) {
         assert data.checkManager.checks.containsKey("ForceBan") : "Player " + data.getPlayer().getName()
                 + " does not have ForceBan detection loaded; cannot force ban.";
 
         Check ban = data.checkManager.checks.get("ForceBan");
 
-        ban.vl = 2;
+        //Fixing users potentially misconfiguring forceban
+        if(!ban.isExecutable()) ban.setExecutable(true);
+
+        ban.vl = 1;
+        ban.flag("Banning user for: " + reason);
         ban.punish();
     }
 
@@ -74,6 +81,24 @@ public class MiscUtils {
 
     public static boolean endsWith(double value, String string) {
         return String.valueOf(value).endsWith(string);
+    }
+
+    public static List<Entity> getNearbyEntities(Player player, double horz, double vert) {
+        final List<Entity> nearbyEntities = new ArrayList<>();
+
+        final SimpleCollisionBox playerBox = new SimpleCollisionBox(player.getLocation(), 0.6, 1.8);
+
+        for(Entity entity : Atlas.getInstance().getTrackedEntities().values()) {
+            if(!entity.getWorld().getUID().equals(player.getWorld().getUID())
+                    || player.getUniqueId().equals(entity.getUniqueId())) continue;
+
+            SimpleCollisionBox box = new SimpleCollisionBox(entity.getLocation(), horz * 2, vert / 2)
+                    .expandMin(0, -(vert / 2), 0);
+
+            if(box.isCollided(playerBox)) nearbyEntities.add(entity);
+        }
+
+        return nearbyEntities;
     }
 
     public static Float getMode(Collection<Float> collect) {

@@ -9,7 +9,7 @@ import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Fly (H)", description = "Checks for invalid downwards accelerations", checkType = CheckType.FLIGHT,
-        devStage = DevStage.CANARY)
+        devStage = DevStage.ALPHA)
 @Cancellable
 public class FlyH extends Check {
 

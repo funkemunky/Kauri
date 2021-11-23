@@ -2,6 +2,7 @@ package dev.brighten.anticheat.check.impl.regular.combat.hitbox;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
@@ -35,13 +36,28 @@ public class ReachA extends Check {
                     EntityType.WITCH, EntityType.COW, EntityType.CREEPER);
 
     private boolean attacked;
+    private int cancelTicks;
+    private int transBetweenFlying;
     @Packet
-    public void onUse(WrappedInUseEntityPacket packet) {
+    public boolean onUse(WrappedInUseEntityPacket packet) {
         if(packet.getAction() == WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK) attacked = true;
+
+        if(cancelTicks > 0) {
+            cancelTicks--;
+            return true;
+        }
+
+        return false;
+    }
+
+    @Packet
+    public void onTrans(WrappedInTransactionPacket packet) {
+        transBetweenFlying = 0;
     }
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
+        ++transBetweenFlying;
         reachA: {
             if(data.playerInfo.creative
                     || data.targetPastLocation.previousLocations.size() < 10
@@ -49,9 +65,10 @@ public class ReachA extends Check {
                     || data.target == null
                     || !allowedEntityTypes.contains(data.target.getType())) break reachA;
 
+
             List<KLocation> targetLocs = data.entityLocPastLocation
-                    .getEstimatedLocation(Kauri.INSTANCE.keepaliveProcessor.tick,
-                            data.lagInfo.transPing + 2, 2);
+                    .getEstimatedLocationByIndex(data.lagInfo.transPing + 1 + transBetweenFlying,
+                            3, 3);
 
             KLocation torigin = data.playerInfo.to.clone(), forigin = data.playerInfo.from.clone();
 
@@ -99,7 +116,8 @@ public class ReachA extends Check {
                 }
 
                 if(hitboxHits == 0) {
-                    if(++hitbox.buffer > 5) {
+                    if(System.currentTimeMillis() - data.lagInfo.lastClientTrans < 150L
+                            && data.lagInfo.lastPingDrop.isPassed(5) && ++hitbox.buffer > 5) {
                         hitbox.vl++;
                         hitbox.buffer = 5;
                         hitbox.flag("b=%.1f m=%s", hitbox.buffer, misses);
@@ -113,7 +131,10 @@ public class ReachA extends Check {
 
             if(data.lagInfo.lastPacketDrop.isPassed(3)) {
                 if (distance > 3.1) {
-                    if (++buffer > 6) {
+                    if(transBetweenFlying > 1 && buffer > 2) {
+                        cancelTicks = 10;
+                        debug("Set to 10 cancel ticks");
+                    } else if (++buffer > 6) {
                         buffer = 6;
                         vl++;
                         flag("distance=%.2f buffer=%s", distance, buffer);
@@ -121,8 +142,9 @@ public class ReachA extends Check {
                 } else buffer -= buffer > 0 ? 0.05 : 0;
             } else buffer-= buffer > 0 ? 0.02 : 0;
 
-            debug("distance=%.3f h/m=%s,%s boxes=%s buffer=%s hbhits=%s",
-                    distance, hits, misses, targetLocs.size(), buffer, hitboxHits);
+            debug("distance=%.3f h/m=%s,%s boxes=%s buffer=%s hbhits=%s dt=%s lct=%s",
+                    distance, hits, misses, targetLocs.size(), buffer, hitboxHits,
+                    transBetweenFlying, System.currentTimeMillis() - data.lagInfo.lastClientTrans);
         }
         attacked = false;
     }

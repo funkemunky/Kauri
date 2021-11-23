@@ -6,9 +6,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Getter
 public enum DevStage {
-    STABLE("Stable", true),
+    RELEASE("Release", true),
     BETA("Beta", false),
-    CANARY("Canary", false);
+    ALPHA("Alpha", false);
 
     final String formattedName;
     final boolean release;

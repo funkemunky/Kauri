@@ -96,7 +96,7 @@ public class DiscordAPI {
 
     public void sendBan(Player player, KauriCheck check, boolean exempt) {
         if(!enabled) return;
-        if(!sendBans || client == null || (!devAlerts && check.getDevStage() != DevStage.STABLE)) return;
+        if(!sendBans || client == null || (!devAlerts && check.getDevStage() != DevStage.RELEASE)) return;
 
         lastDiscordSend.compute(player.getUniqueId(), (key, lastTime) -> {
             long now = System.currentTimeMillis();

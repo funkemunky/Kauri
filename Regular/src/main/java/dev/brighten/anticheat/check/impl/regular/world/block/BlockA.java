@@ -9,7 +9,7 @@ import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 import org.bukkit.util.Vector;
 
-@CheckInfo(name = "Block (A)", description = "Checks for impossible scaffold sprinting.", devStage = DevStage.STABLE,
+@CheckInfo(name = "Block (A)", description = "Checks for impossible scaffold sprinting.", devStage = DevStage.RELEASE,
         checkType = CheckType.BLOCK)
 public class BlockA extends Check {
 

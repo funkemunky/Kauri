@@ -14,7 +14,7 @@ import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Inventory (B)", description = "Checks if a player moves while their inventory is open",
-        checkType = CheckType.INVENTORY, punishVL = 40, devStage = DevStage.CANARY, enabled = false,
+        checkType = CheckType.INVENTORY, punishVL = 40, devStage = DevStage.ALPHA, enabled = false,
         planVersion = KauriVersion.ARA)
 @Cancellable(cancelType = CancelType.MOVEMENT)
 public class InventoryB extends Check {

@@ -85,7 +85,6 @@ public class Check implements KauriCheck {
     public <T> T find(Class<? extends T> clazz) {
         return (T) detectionCache.computeIfAbsent(clazz, key -> {
             if(!clazz.isAnnotationPresent(CheckInfo.class)) {
-
                 return null;
             }
             return data.checkManager.checks.get(clazz.getAnnotation(CheckInfo.class).name());
@@ -157,13 +156,6 @@ public class Check implements KauriCheck {
     protected long lastFlagRun = 0L;
 
     public void flag(boolean devAlerts, int resetVLTime, String information, Object... variables) {
-        if(!Config.overrideCompat && Atlas.getInstance().getBungeeManager().isBungee() && !data.atlasBungeeInstalled) {
-            Bukkit.getLogger().log(Level.SEVERE, data.getPlayer().getName() + " would have flagged but " +
-                    "AtlasBungee is not installed on your BungeeCord. Please download the appropriate version for" +
-                    " Atlas v"+ Atlas.getInstance().getDescription().getVersion()
-                    + "on: https://github.com/funkemunky/Atlas/releases");
-            return;
-        }
         Kauri.INSTANCE.executor.execute(() -> {
             if(Kauri.INSTANCE.getTps() < 18)
                 vl = 0;
@@ -320,7 +312,11 @@ public class Check implements KauriCheck {
                     + "on: https://github.com/funkemunky/Atlas/releases");
             return;
         }
-        if(devStage.isRelease() || punishVl == -1 || vl <= punishVl
+        if(devStage.ordinal() > Arrays.stream(DevStage.values())
+                .filter(ds -> ds.name().equalsIgnoreCase(Config.minimumStageBan)).findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("\"" + Config.minimumStageBan
+                        + "\" is not a proper DevStage. Options: [Release, Beta, Alpha]")).ordinal()
+                || punishVl == -1 || vl <= punishVl
                 || System.currentTimeMillis() - Kauri.INSTANCE.lastTick > 200L) return;
 
         DiscordAPI.INSTANCE.sendBan(data.getPlayer(),  this, banExempt);

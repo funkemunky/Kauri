@@ -15,7 +15,7 @@ public @interface CheckInfo {
     boolean enabled() default true;
     boolean executable() default true;
     boolean cancellable() default false;
-    DevStage devStage() default DevStage.STABLE;
+    DevStage devStage() default DevStage.RELEASE;
     int punishVL() default 50;
     KauriVersion planVersion() default KauriVersion.FULL;
     int vlToFlag() default -1;

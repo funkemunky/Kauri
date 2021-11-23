@@ -9,7 +9,7 @@ import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Fly (I)", description = "Checks for invalid jump heights", checkType = CheckType.FLIGHT,
-        devStage = DevStage.CANARY)
+        devStage = DevStage.ALPHA)
 @Cancellable
 public class FlyI extends Check {
 

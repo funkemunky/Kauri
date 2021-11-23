@@ -19,7 +19,7 @@ import lombok.val;
 import java.util.List;
 
 @CheckInfo(name = "Autoclicker (F)", description = "Looks for consistency between attack hits and miss hits.",
-        devStage = DevStage.CANARY,
+        devStage = DevStage.ALPHA,
         checkType = CheckType.AUTOCLICKER, minVersion = ProtocolVersion.V1_8, planVersion = KauriVersion.ARA)
 public class AutoclickerF extends Check {
 

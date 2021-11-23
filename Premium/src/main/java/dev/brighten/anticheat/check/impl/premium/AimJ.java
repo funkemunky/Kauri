@@ -7,7 +7,7 @@ import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Aim (J)", description = "Statistical aim analysis",
-        checkType = CheckType.AIM, planVersion = KauriVersion.ARA, devStage = DevStage.CANARY)
+        checkType = CheckType.AIM, planVersion = KauriVersion.ARA, devStage = DevStage.ALPHA)
 public class AimJ extends Check {
 
     private int buffer;

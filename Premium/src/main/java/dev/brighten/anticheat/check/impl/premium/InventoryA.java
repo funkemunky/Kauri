@@ -11,7 +11,7 @@ import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Inventory (A)", description = "Checks if a player clicks in their inventory while moving.",
-        checkType = CheckType.INVENTORY, devStage = DevStage.CANARY, planVersion = KauriVersion.ARA)
+        checkType = CheckType.INVENTORY, devStage = DevStage.ALPHA, planVersion = KauriVersion.ARA)
 public class InventoryA extends Check {
 
     private int moveStreak;

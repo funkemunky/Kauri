@@ -26,7 +26,7 @@ import org.bukkit.util.Vector;
 import java.util.*;
 
 @CheckInfo(name = "Phase", description = "Ensures players cannot move through blocks.",
-        checkType = CheckType.EXPLOIT, cancellable = true, executable = false, devStage = DevStage.CANARY)
+        checkType = CheckType.EXPLOIT, cancellable = true, executable = false, devStage = DevStage.ALPHA)
 public class Phase extends Check {
 
     private KLocation fromWhereShitAintBad = null;

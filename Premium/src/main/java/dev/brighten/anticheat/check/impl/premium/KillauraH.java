@@ -21,7 +21,7 @@ import lombok.Getter;
 import java.util.List;
 
 @CheckInfo(name = "Killaura (H)", description = "Checks for weird misses", 
-        devStage = DevStage.CANARY, planVersion = KauriVersion.ARA, checkType = CheckType.KILLAURA)
+        devStage = DevStage.ALPHA, planVersion = KauriVersion.ARA, checkType = CheckType.KILLAURA)
 public class KillauraH extends Check {
 
     @Getter

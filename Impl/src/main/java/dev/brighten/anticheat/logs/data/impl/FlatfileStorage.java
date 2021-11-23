@@ -116,7 +116,7 @@ public class FlatfileStorage implements DataStorage {
                     int amount = 0;
                     while((punishment = punishments.poll()) != null) {
                         objectsToInsert.add(punishment.uuid.toString());
-                        objectsToInsert.add(new Timestamp(punishment.timeStamp));
+                        objectsToInsert.add(punishment.timeStamp);
                         objectsToInsert.add(punishment.checkName);
 
                         if(++amount >= 150) break;

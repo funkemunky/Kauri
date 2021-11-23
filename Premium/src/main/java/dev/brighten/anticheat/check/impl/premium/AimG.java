@@ -15,7 +15,7 @@ import lombok.Setter;
 import java.util.List;
 
 @CheckInfo(name = "Aim (G)", description = "Statistical aim analysis",
-        checkType = CheckType.AIM, planVersion = KauriVersion.ARA, devStage = DevStage.CANARY)
+        checkType = CheckType.AIM, planVersion = KauriVersion.ARA, devStage = DevStage.ALPHA)
 public class AimG extends Check {
 
     @Setter
