@@ -5,8 +5,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum KauriVersion {
     FREE("Free", 0, false),
-    FULL("Full", 45, false),
-    ARA("Ara", 8.99f, true);
+    FULL("Full", 20, false),
+    ARA("Ara", 9.99f, true);
     
     public final String name;
     public final float price;
