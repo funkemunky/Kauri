@@ -1,10 +1,7 @@
 package dev.brighten.anticheat.commands;
 
 import cc.funkemunky.api.reflections.types.WrappedClass;
-import cc.funkemunky.api.utils.Color;
-import cc.funkemunky.api.utils.Init;
-import cc.funkemunky.api.utils.Materials;
-import cc.funkemunky.api.utils.XMaterial;
+import cc.funkemunky.api.utils.*;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.BukkitCommandCompletions;
 import co.aikar.commands.BukkitCommandContexts;
@@ -33,7 +30,7 @@ import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
-@Init
+@Init(priority = Priority.LOW)
 @CommandAlias("kauri|anticheat")
 @CommandPermission("kauri.command")
 public class KauriCommand extends BaseCommand {

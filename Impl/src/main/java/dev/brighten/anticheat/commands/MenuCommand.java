@@ -27,6 +27,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
@@ -38,7 +39,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-@Init
+@Init(priority = Priority.LOW)
 @CommandAlias("kauri|anticheat")
 @CommandPermission("kauri.command")
 public class MenuCommand extends BaseCommand {
@@ -215,20 +216,29 @@ public class MenuCommand extends BaseCommand {
 
         menu.setParent(getChecksCategoryMenu());
 
-        for (int i = 0; i < values.size(); i++) {
-            CheckSettings val = values.get(i);
+        for (CheckSettings val : values) {
+            ItemBuilder checkMapBuilder = new ItemBuilder(val.enabled
+                    ? (val.cancellable ? XMaterial.FILLED_MAP.parseMaterial()
+                    : XMaterial.MAP.parseMaterial()) : XMaterial.PAPER.parseMaterial());
 
-            Button button = createButton(XMaterial.PAPER.parseMaterial(),
-                    1,
-                    (val.enabled ? "&a" : "&c") + val.name,
-                    (player, info) -> {
-                        ChestMenu toOpen = getCheckEdit(val);
+            if (val.executable) {
+                checkMapBuilder = checkMapBuilder.enchantment(Enchantment.DURABILITY, 1);
+            }
 
-                        toOpen.showMenu(player);
-                    }, "", "&f&oClick me &7to view configure check", "", "&eStatus:" ,
+            ItemStack item = checkMapBuilder.name((val.enabled ? "&a" : "&c") + val.name).lore("",
+                    "&f&oClick me &7to view configure check", "", "&eStatus:",
                     (val.enabled ? Color.Green : Color.Gray) + "Enabled",
                     (val.executable ? Color.Green : Color.Gray) + "Executable",
-                    (val.cancellable ? Color.Green : Color.Gray) + "Cancellable");
+                    (val.cancelMode != null
+                            ? (val.cancellable ? Color.Green : Color.Gray) + "Cancellable"
+                            : Color.Red + Color.Italics + "Cannot Cancel")).build();
+
+            Button button = new Button(false,
+                    item, (player, info) -> {
+                ChestMenu toOpen = getCheckEdit(val);
+
+                toOpen.showMenu(player);
+            });
             menu.addItem(button);
         }
 

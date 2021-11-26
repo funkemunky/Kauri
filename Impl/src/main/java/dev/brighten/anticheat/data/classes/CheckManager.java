@@ -129,7 +129,7 @@ public class CheckManager {
         assert objectData != null: "ObjectData is null in CheckManager";
         if(objectData.getPlayer()
                 .hasPermission("kauri.bypass")
-                && Config.bypassPermission) return;
+                && Config.flagBypassPerm) return;
         synchronized (checks) {
             for (Map.Entry<WrappedClass, CheckInfo> entry
                     : Check.checkClasses.entrySet()) {

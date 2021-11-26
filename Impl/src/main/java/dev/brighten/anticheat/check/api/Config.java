@@ -27,6 +27,9 @@ public class Config {
     @ConfigSetting(path = "punishments", name = "bungeeBroadcast")
     static boolean bungeeBroadcast = false;
 
+    @ConfigSetting(path = "punishments", name = "bypassPerm")
+    static boolean punishmentBypassPerm = true;
+
     @ConfigSetting(path = "punishments", name = "releaseStageMinimum")
     static String minimumStageBan = "Release";
 
@@ -54,8 +57,8 @@ public class Config {
     @ConfigSetting(path = "alerts", name = "dev", comment = "Alert for experimental checks.")
     public static boolean alertDev = true;
 
-    @ConfigSetting(name = "bypassPerm")
-    public static boolean bypassPermission = true;
+    @ConfigSetting(path = "alerts", name = "bypassPerm")
+    public static boolean flagBypassPerm = true;
 
     @ConfigSetting(path = "alerts.advanced", name = "overrideCompatibilityWarnings")
     public static boolean overrideCompat = false;

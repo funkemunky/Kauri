@@ -1,13 +1,14 @@
 package dev.brighten.anticheat.commands;
 
 import cc.funkemunky.api.utils.Init;
+import cc.funkemunky.api.utils.Priority;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import org.bukkit.entity.Player;
 
-@Init
+@Init(priority = Priority.LOW)
 @CommandAlias("alerts")
 @CommandPermission("kauri.command.alerts")
 public class AlertsCommand extends BaseCommand {

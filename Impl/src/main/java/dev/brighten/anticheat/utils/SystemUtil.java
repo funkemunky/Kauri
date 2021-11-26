@@ -1,11 +1,15 @@
 package dev.brighten.anticheat.utils;
 
+import dev.brighten.db.utils.security.GeneralUtils;
+import org.bukkit.entity.Player;
+
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.zip.CRC32;
 
@@ -39,7 +43,14 @@ public class SystemUtil {
         }
     }
 
+    public static byte[] nonce(Player player) {
+        if(player != null) {
+            player.sendMessage("This is important" + Math.random());
+            return player.getName().getBytes(StandardCharsets.UTF_8);
+        }
 
+        return "%%__NONCE__%%".getBytes(StandardCharsets.UTF_8);
+    }
 
     public static void addNativesPath(String pathToAdd) throws Exception {
         Field usrPathsField = ClassLoader.class.getDeclaredField("usr_paths");

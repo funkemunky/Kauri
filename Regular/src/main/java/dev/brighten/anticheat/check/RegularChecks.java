@@ -14,9 +14,9 @@ import dev.brighten.anticheat.utils.ClassScanner;
 public class RegularChecks implements CheckRegister {
 
     public RegularChecks() {
-        MiscUtils.printToConsole("&aThanks for purchasing Kauri Premium.");
-        registerChecks();
+        MiscUtils.printToConsole("&aThanks for purchasing Kauri Full.");
         Kauri.INSTANCE.usingPremium = true;
+        registerChecks();
     }
 
     @Override

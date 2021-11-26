@@ -36,13 +36,6 @@ public class Load {
         register("Loading config...");
         Atlas.getInstance().registerConfig(Kauri.INSTANCE);
 
-        register("Loading commands...");
-        Kauri.INSTANCE.commandManager = Atlas.getInstance().getBukkitCommandManager(Kauri.INSTANCE);
-        Kauri.INSTANCE.commandManager.enableUnstableAPI("help");
-
-        new CommandPropertiesManager(Kauri.INSTANCE.commandManager, Kauri.INSTANCE.getDataFolder(),
-                Kauri.INSTANCE.getResource("command-messages.properties"));
-
         register("Loading messages...");
         Kauri.INSTANCE.msgHandler = new MessageHandler(Kauri.INSTANCE);
 
@@ -65,6 +58,9 @@ public class Load {
 
         register("Running scanner...");
         Atlas.getInstance().initializeScanner(Kauri.INSTANCE, true, true);
+
+        new CommandPropertiesManager(Kauri.INSTANCE.commandManager, Kauri.INSTANCE.getDataFolder(),
+                Kauri.INSTANCE.getResource("command-messages.properties"));
 
         register("Registering logging...");
         Kauri.INSTANCE.loggerManager = new LoggerManager();

@@ -323,7 +323,7 @@ public class Check implements KauriCheck {
 
         vl = 0;
 
-        if(!executable || banExempt) return;
+        if(!executable || (banExempt && Config.punishmentBypassPerm)) return;
 
         KauriPunishEvent punishEvent = new KauriPunishEvent(data.getPlayer(), this,
                 Config.broadcastMessage, Config.punishCommands);
