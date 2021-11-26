@@ -35,7 +35,7 @@ public class FlyB extends Check {
             limit = Double.MAX_VALUE;
             return;
         }
-        if(data.playerInfo.serverGround) {
+        if(data.playerInfo.serverGround || data.playerInfo.lastBlockPlace.isNotPassed(1)) {
             vertical = 0;
 
             limit = MovementUtils.getTotalHeight(data.playerVersion, MovementUtils.getJumpHeight(data));

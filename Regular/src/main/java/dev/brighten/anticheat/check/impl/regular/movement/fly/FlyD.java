@@ -20,6 +20,7 @@ public class FlyD extends Check {
                 || data.playerInfo.flightCancel
                 || (data.playerInfo.nearGroundTimer.isNotPassed(3) && (data.playerInfo.lClientGround
                 || data.playerInfo.clientGround))
+                || data.playerInfo.lastBlockPlace.isNotPassed(3)
                 || data.playerInfo.lastVelocity.isNotPassed(3)
         ) return;
 
