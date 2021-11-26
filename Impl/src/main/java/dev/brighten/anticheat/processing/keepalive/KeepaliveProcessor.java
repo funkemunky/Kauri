@@ -26,6 +26,7 @@ public class KeepaliveProcessor implements Runnable {
 
     public KeepAlive currentKeepalive;
     public int tick;
+    public int totalPlayers, laggyPlayers;
 
     public final Map<Short, KeepAlive> keepAlives = new EvictingMap<>(80);
 
@@ -50,7 +51,12 @@ public class KeepaliveProcessor implements Runnable {
         WrappedOutTransaction packet = new WrappedOutTransaction(0, currentKeepalive.id, false);
 
         currentKeepalive.startStamp = System.currentTimeMillis();
+        totalPlayers = laggyPlayers = 0;
         for (ObjectData value : Kauri.INSTANCE.dataManager.dataMap.values()) {
+            totalPlayers++;
+
+            if(value.lagInfo.lastPingDrop.isNotPassed(2)
+                    || System.currentTimeMillis() - value.lagInfo.lastClientTrans > 135L) laggyPlayers++;
             if(value.target != null) {
                 value.targetPastLocation.addLocation(value.target.getLocation());
                 value.runKeepaliveAction(ka -> {
