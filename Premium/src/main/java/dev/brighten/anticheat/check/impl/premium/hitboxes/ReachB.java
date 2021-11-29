@@ -121,8 +121,8 @@ public class ReachB extends Check {
                     data.lagInfo.lastPingDrop.getPassed(), lastTransProblem.getPassed());
         } else {
             if(++hbuffer > 5) {
-                vl++;
-                find(HitboxesB.class).flag("%.1f;%.1f;%.1f", eloc.x, eloc.y, eloc.z);
+                find(HitboxesB.class).vl++;
+                find(HitboxesB.class).flag(120, "%.1f;%.1f;%.1f", eloc.x, eloc.y, eloc.z);
             }
             debug("didnt hit box: x=%.1f y=%.1f z=%.1f lti=%s", eloc.x, eloc.y, eloc.z,
                     lastTransProblem.getPassed());
