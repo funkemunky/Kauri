@@ -52,7 +52,7 @@ public class FlyA extends Check {
 
             boolean flagged = false;
             if(!data.playerInfo.flightCancel
-                    && data.playerInfo.lastBlockPlace.isNotPassed(5)
+                    && data.playerInfo.lastBlockPlace.isPassed(5)
                     && data.playerInfo.lastVelocity.isPassed(3)
                     && !data.playerInfo.serverGround
                     && data.playerInfo.climbTimer.isPassed(15)
@@ -68,10 +68,11 @@ public class FlyA extends Check {
             } else buffer-= buffer > 0 ? 0.5f : 0;
 
             debug((flagged ? Color.Green : "")
-                            +"pos=%s deltaY=%.3f predicted=%.3f ground=%s lpass=%s cp=%s air=%s buffer=%.1f",
-                    packet.getY(), data.playerInfo.deltaY, predicted, data.playerInfo.clientGround,
+                            +"pos=%s deltaY=%.3f predicted=%.3f d=%.3f ground=%s lpass=%s cp=%s air=%s buffer=%.1f sg=%s cb=%s fc=%s ",
+                    packet.getY(), data.playerInfo.deltaY, predicted, deltaPredict, onGround,
                     data.playerInfo.liquidTimer.getPassed(), data.playerInfo.climbTimer.getPassed(),
-                    data.playerInfo.kAirTicks, buffer);
+                    data.playerInfo.kAirTicks, buffer, data.playerInfo.serverGround,
+                    data.playerInfo.climbTimer.getPassed(), data.playerInfo.flightCancel);
             lastPos = timeStamp;
         }
     }

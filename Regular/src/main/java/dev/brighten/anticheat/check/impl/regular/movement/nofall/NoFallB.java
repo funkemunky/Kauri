@@ -41,7 +41,7 @@ public class NoFallB extends Check {
         } else if(groundBuffer > 0) groundBuffer-= 2;
 
 
-        final boolean dground = data.playerInfo.to.y % divisor < 1E-4;
+        final boolean dground = data.playerInfo.to.y % divisor < 1E-4 && data.playerInfo.nearGround;
         // If they are saying they are on the ground
         if(!data.playerInfo.clientGround
                 // Their bounding box is on the ground

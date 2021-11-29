@@ -30,7 +30,7 @@ public class FlyI extends Check {
                 flag("j=%.4f dy=%.4f d=%.4f", data.playerInfo.jumpHeight, data.playerInfo.deltaY, delta);
             }
 
-            debug("delta=%s", delta);
+            debug("delta=%s lba=%s", delta, data.playerInfo.blockAboveTimer.getPassed());
         }
     }
 }
