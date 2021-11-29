@@ -175,7 +175,7 @@ public class BlockInformation {
                                             blocksBelow = true;
                                     } else if(Materials.checkFlag(type, Materials.SOLID)) {
                                         SimpleCollisionBox groundBox = normalBox.copy()
-                                                .offset(0, -.2, 0).expandMax(0, -1.2, 0);
+                                                .offset(0, -.45, 0).expandMax(0, -1.2, 0);
 
                                         Optional<XMaterial> blockMaterial =
                                                 XMaterial.matchXMaterial(type.name());
@@ -203,7 +203,7 @@ public class BlockInformation {
                                                 .isIntersected(blockBox))
                                             objectData.playerInfo.nearGround = true;
 
-                                        if(groundBox.isIntersected(blockBox)) {
+                                        if(groundBox.isCollided(blockBox)) {
                                             objectData.playerInfo.serverGround = true;
 
                                             if(blockMaterial.isPresent())

@@ -9,7 +9,7 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "Hand (B)", description = "Checks for irregular block place packets.",
+@CheckInfo(name = "Hand (B)", description = "Checks for irregular block dig packets.",
         checkType = CheckType.HAND, punishVL = 30, executable = false)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class HandB extends Check {

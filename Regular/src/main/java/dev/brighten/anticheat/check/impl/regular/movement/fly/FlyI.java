@@ -17,7 +17,7 @@ public class FlyI extends Check {
     public void onFlying(WrappedInFlyingPacket packet) {
         if(!packet.isPos()) return;
 
-        if(data.playerInfo.jumped && !data.blockInfo.blocksAbove
+        if(data.playerInfo.jumped && data.playerInfo.blockAboveTimer.isPassed(2)
                 && !data.playerInfo.generalCancel
                 && (!data.playerInfo.serverGround || !data.blockInfo.onHalfBlock)
                 && data.playerInfo.liquidTimer.isPassed(3)

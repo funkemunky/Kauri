@@ -3,13 +3,16 @@ package dev.brighten.anticheat.check.impl.regular.world.block;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.KLocation;
+import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Block (B)", description = "Looks for weird block placement", checkType = CheckType.BLOCK,
         punishVL = 10)
+@Cancellable(cancelType = CancelType.PLACE)
 /* Taken from FireFlyX scaffold:b */
 public class BlockB extends Check {
 
