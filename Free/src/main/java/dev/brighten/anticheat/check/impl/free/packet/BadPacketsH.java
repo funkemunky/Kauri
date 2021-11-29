@@ -23,6 +23,7 @@ public class BadPacketsH extends Check {
             if(data.playerInfo.from.yaw == data.playerInfo.to.yaw
                     && data.playerInfo.from.pitch == data.playerInfo.to.pitch) {
                 if(!exempt && data.playerInfo.lastTeleportTimer.isPassed(1)
+                        && data.playerInfo.vehicleTimer.isPassed(1)
                         && now - data.creation > 5000L
                         && data.playerInfo.lastRespawnTimer.isPassed(10)) {
                     vl++;

@@ -24,6 +24,7 @@ import dev.brighten.anticheat.utils.Vec3D;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.MillisTimer;
 import dev.brighten.anticheat.utils.timer.impl.PlayerTimer;
+import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
@@ -39,11 +40,15 @@ public class ReachB extends Check {
     private final Map<UUID, EntityLocation> entityLocationMap = new HashMap<>(),
             secondEntityLocationMap = new HashMap<>();
     private Timer lastFlying;
-    private int streak;
+    public int streak;
     private float buffer;
-    private boolean sentTeleport, attacked, flying;
+    private int hbuffer;
+    public boolean sentTeleport;
+    private boolean attacked, flying;
     private AimG aimDetection;
     private KillauraH killauraHDetection;
+
+    public Timer lastAimOnTarget = new TickTimer();
     private Timer lastTransProblem = new MillisTimer(20);
     private List<KLocation> targetLocs = new ArrayList<>();
     private int addTicks;
@@ -95,11 +100,13 @@ public class ReachB extends Check {
         boolean collided = false; //Using this to compare smaller numbers than Double.MAX_VALUE. Slightly faster
 
         if(intersect != null) {
+            lastAimOnTarget.reset();
             distance = intersect.distanceSquared(new Vec3D(eyeLoc.x, eyeLoc.y, eyeLoc.z));
             collided = true;
         }
 
         if(collided) {
+            hbuffer = 0;
             distance = Math.sqrt(distance);
             if(distance > 3.02 && lastTransProblem.isPassed(52) && streak > 3 && eloc.sentTeleport
                     && lastFlying.isNotPassed(1)) {
@@ -112,8 +119,14 @@ public class ReachB extends Check {
             debug("dist=%.2f b=%s s=%s st=%s lf=%s ld=%s lti=%s",
                     distance, buffer, streak, sentTeleport, lastFlying.getPassed(),
                     data.lagInfo.lastPingDrop.getPassed(), lastTransProblem.getPassed());
-        } else debug("didnt hit box: x=%.1f y=%.1f z=%.1f lti=%s", eloc.x, eloc.y, eloc.z,
-                lastTransProblem.getPassed());
+        } else {
+            if(++hbuffer > 5) {
+                vl++;
+                find(HitboxesB.class).flag("%.1f;%.1f;%.1f", eloc.x, eloc.y, eloc.z);
+            }
+            debug("didnt hit box: x=%.1f y=%.1f z=%.1f lti=%s", eloc.x, eloc.y, eloc.z,
+                    lastTransProblem.getPassed());
+        }
     }
 
     private AimG getAimDetection() {
@@ -343,7 +356,7 @@ public class ReachB extends Check {
 
                             eloc.increment = 3;
                         }
-                        eloc.sentTeleport = true;
+                        sentTeleport = eloc.sentTeleport = true;
                     });
                 });
     }

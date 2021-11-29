@@ -143,7 +143,8 @@ public class Phase extends Check {
         }
 
         clip: {
-            if(data.playerInfo.canFly || data.playerInfo.creative) break clip;
+            if(data.playerInfo.canFly || data.playerInfo.creative
+                    || data.playerInfo.vehicleTimer.isNotPassed(2)) break clip;
 
             double threshold = data.potionProcessor.hasPotionEffect(PotionEffectType.JUMP) ? 0.62 : 0.5;
 

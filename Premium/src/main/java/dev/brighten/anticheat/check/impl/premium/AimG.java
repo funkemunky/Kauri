@@ -7,6 +7,9 @@ import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.check.impl.premium.hitboxes.ReachB;
+import dev.brighten.anticheat.utils.timer.Timer;
+import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
@@ -21,9 +24,6 @@ public class AimG extends Check {
     @Setter
     private KLocation targetLocation;
 
-    public int streak;
-    public boolean sentTeleport;
-
     private int abuffer;
 
     protected List<Double> yawOffsets = new EvictingList<>(10), pitchOffsets = new EvictingList<>(10);
@@ -31,8 +31,8 @@ public class AimG extends Check {
     @Packet
     public void onUse(WrappedInUseEntityPacket packet) {
         if(packet.getAction() != WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK
-                || !sentTeleport
-                || targetLocation == null || streak < 3) return;
+                || !find(ReachB.class).sentTeleport
+                || targetLocation == null || find(ReachB.class).streak < 3) return;
 
         KLocation origin = data.playerInfo.to.clone();
 

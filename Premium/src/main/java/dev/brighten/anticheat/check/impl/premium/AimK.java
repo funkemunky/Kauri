@@ -20,5 +20,7 @@ public class AimK extends Check {
                 flag("t=b y=%.2f dy=%.3f s=%.3f", offset[1], data.playerInfo.deltaYaw, std);
             }
         } else buffer = 0;
+
+        debug("%.3f,%s", std, buffer);
     }
 }
