@@ -11,7 +11,7 @@ import dev.brighten.anticheat.utils.timer.impl.PlayerTimer;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "FastLadder", description = "Ensures players do not go faster than legitimate speeds on ladders.",
-        checkType = CheckType.GENERAL, executable = false, punishVL = 20)
+        checkType = CheckType.GENERAL, executable = true, punishVL = 20)
 @Cancellable
 public class FastLadder extends Check {
 

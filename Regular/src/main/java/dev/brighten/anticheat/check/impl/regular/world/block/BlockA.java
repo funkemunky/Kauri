@@ -12,7 +12,7 @@ import dev.brighten.api.check.DevStage;
 import org.bukkit.util.Vector;
 
 @CheckInfo(name = "Block (A)", description = "Checks for impossible scaffold sprinting.", devStage = DevStage.RELEASE,
-        checkType = CheckType.BLOCK)
+        checkType = CheckType.BLOCK, executable = true, punishVL = 8)
 @Cancellable(cancelType = CancelType.PLACE)
 public class BlockA extends Check {
 

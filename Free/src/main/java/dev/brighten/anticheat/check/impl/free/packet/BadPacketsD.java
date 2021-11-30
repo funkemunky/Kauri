@@ -15,7 +15,7 @@ import org.bukkit.GameMode;
 
 @CheckInfo(name = "BadPackets (D)",
         description = "Checks for clients spoofing flight permissions.",
-        checkType = CheckType.BADPACKETS, punishVL = 10, planVersion = KauriVersion.FREE)
+        checkType = CheckType.BADPACKETS, punishVL = 10, planVersion = KauriVersion.FREE, executable = true)
 @Cancellable
 public class BadPacketsD extends Check {
 

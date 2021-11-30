@@ -34,7 +34,8 @@ import org.bukkit.util.Vector;
 
 import java.util.*;
 
-@CheckInfo(name = "Reach (B)", planVersion = KauriVersion.ARA, devStage = DevStage.BETA, checkType = CheckType.HITBOX)
+@CheckInfo(name = "Reach (B)", planVersion = KauriVersion.ARA, punishVL = 20, executable = true,
+        checkType = CheckType.HITBOX)
 public class ReachB extends Check {
 
     private final Map<UUID, EntityLocation> entityLocationMap = new HashMap<>(),

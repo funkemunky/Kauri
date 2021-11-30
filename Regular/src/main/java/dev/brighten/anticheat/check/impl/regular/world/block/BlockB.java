@@ -11,7 +11,7 @@ import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Block (B)", description = "Looks for weird block placement", checkType = CheckType.BLOCK,
-        punishVL = 10)
+        punishVL = 10, executable = true)
 @Cancellable(cancelType = CancelType.PLACE)
 /* Taken from FireFlyX scaffold:b */
 public class BlockB extends Check {

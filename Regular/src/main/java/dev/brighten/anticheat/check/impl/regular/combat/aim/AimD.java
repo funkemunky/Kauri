@@ -8,7 +8,8 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "Aim (D)", description = "Checks for the rounding of pitch.", checkType = CheckType.AIM, punishVL = 50)
+@CheckInfo(name = "Aim (D)", description = "Checks for the rounding of pitch.", checkType = CheckType.AIM
+        , punishVL = 12, executable = true)
 public class AimD extends Check {
 
     private MaxDouble verbose = new MaxDouble(100);

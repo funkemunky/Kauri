@@ -245,7 +245,7 @@ public class MovementProcessor {
                 }
             }
 
-            if(data.playerInfo.insideBlock = (data.playerInfo.blockOnTo != null && data.playerInfo.blockOnTo.getType()
+            if(data.playerInfo.insideBlock = (data.playerInfo.blockOnTo != null && !data.playerInfo.blockOnTo.getType()
                     .equals(XMaterial.AIR.parseMaterial()))) {
                 data.playerInfo.lastInsideBlock.reset();
             }

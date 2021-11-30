@@ -9,8 +9,7 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Aim (E)", description = "Checks if a player's rotation was not calculated using Minecraft math.",
-        checkType = CheckType.AIM,
-        enabled = false, punishVL = 6)
+        checkType = CheckType.AIM, punishVL = 15, executable = true)
 public class AimE extends Check {
 
     private int buffer;

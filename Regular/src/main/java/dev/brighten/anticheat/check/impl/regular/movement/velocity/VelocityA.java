@@ -11,7 +11,7 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Velocity (A)", description = "Checks for vertical velocity modifications.",
-        checkType = CheckType.VELOCITY, punishVL = 25)
+        checkType = CheckType.VELOCITY, punishVL = 25, executable = true)
 @Cancellable
 public class VelocityA extends Check {
 

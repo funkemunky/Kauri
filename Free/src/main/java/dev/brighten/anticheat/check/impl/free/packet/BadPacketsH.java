@@ -10,7 +10,7 @@ import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "BadPackets (H)", description = "Looks for invalid look packets", devStage = DevStage.BETA,
-        checkType = CheckType.BADPACKETS, planVersion = KauriVersion.FREE)
+        checkType = CheckType.BADPACKETS, planVersion = KauriVersion.FREE, executable = true)
 public class BadPacketsH extends Check {
 
     private boolean exempt;

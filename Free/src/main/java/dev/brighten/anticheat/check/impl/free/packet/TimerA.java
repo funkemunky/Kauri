@@ -38,11 +38,11 @@ public class TimerA extends Check {
         double averageInterval = simpleAvg.getAverage(), pct = 50 / averageInterval * 100;
 
         if(pct > 112) {
-            if(data.lagInfo.lastPacketDrop.isPassed(5) && ++buffer > 30) {
+            if(data.lagInfo.lastPacketDrop.isPassed(5) && ++buffer > 45) {
                 vl++;
                 flag("pct=%.1f%% avg=%.1f b=%s", pct, averageInterval, buffer);
             }
-        } else buffer = 0;
+        } else if(buffer > 0) buffer-= 8;
 
         debug("b=%s int=%s avg=%.1f pct=%.1f%%", buffer, delta, averageInterval, pct);
 

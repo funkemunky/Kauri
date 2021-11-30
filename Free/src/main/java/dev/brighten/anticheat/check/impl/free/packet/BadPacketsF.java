@@ -9,7 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.event.block.BlockPlaceEvent;
 
 @CheckInfo(name = "BadPackets (F)", description = "Checks if the block placed is the item in the player's hand.",
-        checkType = CheckType.BADPACKETS, punishVL = 2, planVersion = KauriVersion.FREE)
+        checkType = CheckType.BADPACKETS, punishVL = 2, planVersion = KauriVersion.FREE, executable = true)
 public class BadPacketsF extends Check {
 
     @Event

@@ -21,7 +21,7 @@ import lombok.Getter;
 import java.util.List;
 
 @CheckInfo(name = "Killaura (H)", description = "Checks for weird misses", 
-        devStage = DevStage.ALPHA, planVersion = KauriVersion.ARA, checkType = CheckType.KILLAURA)
+        devStage = DevStage.BETA, planVersion = KauriVersion.ARA, checkType = CheckType.KILLAURA)
 public class KillauraH extends Check {
 
     @Getter
@@ -78,7 +78,7 @@ public class KillauraH extends Check {
 
                if(!missed) {
                    vl++;
-                   flag();
+                   flag(120, "true;false");
                }
            }
        }

@@ -8,7 +8,7 @@ import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Autoclicker (A)", description = "A fast click check.", checkType = CheckType.AUTOCLICKER,
-        punishVL = 2, planVersion = KauriVersion.FULL)
+        punishVL = 2, planVersion = KauriVersion.FULL, executable = true)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerA extends Check {
 

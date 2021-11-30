@@ -152,6 +152,11 @@ public class FlatfileStorage implements DataStorage {
     }
 
     @Override
+    public void importFromFlatfile(Consumer<String> result) {
+
+    }
+
+    @Override
     public List<Log> getLogs(UUID uuid, Check check, int arrayMin, int arrayMax, long timeFrom, long timeTo) {
         List<Log> logs = new ArrayList<>();
 

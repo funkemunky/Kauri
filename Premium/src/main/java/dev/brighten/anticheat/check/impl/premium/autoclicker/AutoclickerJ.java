@@ -12,8 +12,8 @@ import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Autoclicker (J)", description = "Checks the kurtosis of a player's click pattern.",
-        checkType = CheckType.AUTOCLICKER, maxVersion = ProtocolVersion.V1_8_9, punishVL = 130, vlToFlag = 50,
-        devStage = DevStage.BETA, planVersion = KauriVersion.ARA)
+        checkType = CheckType.AUTOCLICKER, maxVersion = ProtocolVersion.V1_8_9, punishVL = 80, vlToFlag = 50
+        , planVersion = KauriVersion.ARA)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerJ extends Check {
 

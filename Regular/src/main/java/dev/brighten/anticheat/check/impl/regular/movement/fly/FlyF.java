@@ -10,7 +10,7 @@ import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
 @Cancellable
-@CheckInfo(name = "Fly (F)", description = "Checks if an individual flys faster than possible.",
+@CheckInfo(name = "Fly (F)", description = "Checks if an individual flys faster than possible.", executable = true,
         checkType = CheckType.FLIGHT, planVersion = KauriVersion.FULL, devStage = DevStage.RELEASE)
 public class FlyF extends Check {
 

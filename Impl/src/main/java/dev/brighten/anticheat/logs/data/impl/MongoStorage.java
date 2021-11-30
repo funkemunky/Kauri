@@ -6,13 +6,13 @@ import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.logs.data.DataStorage;
 import dev.brighten.anticheat.logs.data.config.MongoConfig;
+import dev.brighten.anticheat.logs.data.sql.MySQL;
+import dev.brighten.anticheat.logs.data.sql.Query;
 import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.logs.objects.Punishment;
-import dev.brighten.db.depends.com.mongodb.BasicDBObject;
-import dev.brighten.db.depends.com.mongodb.MongoClientSettings;
-import dev.brighten.db.depends.com.mongodb.MongoCredential;
-import dev.brighten.db.depends.com.mongodb.ServerAddress;
+import dev.brighten.db.depends.com.mongodb.*;
 import dev.brighten.db.depends.com.mongodb.client.*;
+import dev.brighten.db.depends.com.mongodb.client.MongoClient;
 import dev.brighten.db.depends.com.mongodb.client.model.Aggregates;
 import dev.brighten.db.depends.com.mongodb.client.model.Filters;
 import dev.brighten.db.depends.com.mongodb.client.model.Indexes;
@@ -23,6 +23,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -36,17 +37,24 @@ public class MongoStorage implements DataStorage {
 
     public MongoStorage() {
         MongoClient client;
-        if(MongoConfig.loginDetails) {
-            client = MongoClients.create(MongoClientSettings.builder().applyToClusterSettings(builder ->
-                    builder.hosts(Collections.singletonList(new ServerAddress(MongoConfig.ip, MongoConfig.port))))
-                    .credential(MongoCredential.createCredential(MongoConfig.username,
-                            MongoConfig.authDatabase.length() > 0 ? MongoConfig.authDatabase : MongoConfig.database,
-                            MongoConfig.password.toCharArray()))
-                    .build());
+
+        if(!MongoConfig.connectionURL.equals("This will override your connection details")) {
+            ConnectionString cs = new ConnectionString(MongoConfig.connectionURL);
+            MongoClientSettings settings = MongoClientSettings.builder().applyConnectionString(cs).build();
+            client = MongoClients.create(settings);
         } else {
-            client = MongoClients.create(MongoClientSettings.builder().applyToClusterSettings(builder ->
-                    builder.hosts(Collections.singletonList(new ServerAddress(MongoConfig.ip, MongoConfig.port))))
-                    .build());
+            if(MongoConfig.loginDetails) {
+                client = MongoClients.create(MongoClientSettings.builder().readPreference(ReadPreference.nearest()).applyToClusterSettings(builder ->
+                        builder.hosts(Collections.singletonList(new ServerAddress(MongoConfig.ip, MongoConfig.port))))
+                        .credential(MongoCredential.createCredential(MongoConfig.username,
+                                MongoConfig.authDatabase.length() > 0 ? MongoConfig.authDatabase : MongoConfig.database,
+                                MongoConfig.password.toCharArray()))
+                        .build());
+            } else {
+                client = MongoClients.create(MongoClientSettings.builder().applyToClusterSettings(builder ->
+                        builder.hosts(Collections.singletonList(new ServerAddress(MongoConfig.ip, MongoConfig.port))))
+                        .build());
+            }
         }
         database = client.getDatabase(MongoConfig.database);
         logsCollection = database.getCollection("logs");
@@ -151,6 +159,47 @@ public class MongoStorage implements DataStorage {
         logsCollection = null;
         punishmentsCollection = null;
         nameUUIDCollection = null;
+    }
+
+    /*
+     Query.prepare("create table if not exists `violations` (" +
+                "`uuid` varchar(36) not null," +
+                "`time` timestamp not null," +
+                "`vl` float not null," +
+                "`check` varchar(32) not null," +
+                "`ping` smallint not null," +
+                "`tps` double not null," +
+                "`info` text not null)").execute();
+        Query.prepare("create table if not exists `punishments` (" +
+                "`uuid` varchar(36) not null," +
+                "`time` long not null," +
+                "`check` varchar(32) not null)").execute();
+        Query.prepare("create table if not exists `namecache` (" +
+                "`uuid` varchar(32) not null," +
+                "`name` varchar(16) not null," +
+                "`timestamp` timestamp not null)").execute();
+     */
+    @Override
+    public void importFromFlatfile(Consumer<String> result) {
+        MySQL.initSqlLite();
+
+        result.accept("&cImporting violations from flatfile...");
+        AtomicLong count = new AtomicLong();
+        Query.prepare("select * from `violations`").execute(set -> {
+            Document doc = new Document("uuid", set.getString("uuid"))
+                    .append("time", set.getLong("time")).append("check", set.getString("check"))
+                    .append("vl", set.getFloat("vl"))
+                    .append("info", set.getString("info")).append("ping", set.getInt("ping"))
+                    .append("tps", set.getDouble("tps"));
+            Kauri.INSTANCE.loggingThread.execute(() -> logsCollection.insertOne(doc));
+            count.getAndIncrement();
+        });
+
+        result.accept("&aImported " + count.get() + " logs into Mongo.");
+
+        Query.prepare("select * from `punishments").execute(set -> {
+
+        });
     }
 
     @Override

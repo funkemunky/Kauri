@@ -65,8 +65,6 @@ public class Phase extends Check {
         List<Block> blocks = dev.brighten.anticheat.utils.Helper.getBlocks(data.blockInfo.handler, concatted);
 
         phaseIntoBlock: {
-            if(data.playerInfo.creative) break phaseIntoBlock;
-
             List<Block> current = Helper.blockCollisions(blocks, playerBox),
                     newb = Helper.blockCollisions(blocks, toUpdate);
 
@@ -85,7 +83,7 @@ public class Phase extends Check {
         }
         
         phaseThru: {
-            if(data.playerInfo.creative || playerBox.isIntersected(toUpdate)) break phaseThru;
+            if(playerBox.isIntersected(toUpdate)) break phaseThru;
             
             Vector to = data.playerInfo.to.toVector(), from = data.playerInfo.from.toVector();
 
@@ -139,37 +137,6 @@ public class Phase extends Check {
                         break;
                     }
                 }
-            }
-        }
-
-        clip: {
-            if(data.playerInfo.canFly || data.playerInfo.creative
-                    || data.playerInfo.vehicleTimer.isNotPassed(2)) break clip;
-
-            double threshold = data.potionProcessor.hasPotionEffect(PotionEffectType.JUMP) ? 0.62 : 0.5;
-
-            if(data.blockInfo.pistonNear) threshold = 0.95;
-            else if(data.playerInfo.blockAboveTimer.isNotPassed(20)) {
-                //TODO Fix under block falses
-                threshold = 0.8;
-                if(data.playerInfo.iceTimer.isNotPassed(20)) threshold+= 0.4;
-            }
-            else if(data.playerInfo.jumped) threshold = 0.68;
-            else if(data.playerInfo.iceTimer.isNotPassed(4)) threshold = 0.6;
-
-            if(data.playerInfo.lastVelocity.isNotPassed(20))
-                threshold = Math.max(threshold, data.playerInfo.velocityXZ + 0.3);
-
-            Optional<PotionEffect> speed = data.potionProcessor.getEffectByType(PotionEffectType.SPEED);
-
-            if(speed.isPresent()) {
-                threshold*= 1.2 * (speed.get().getAmplifier() + 1);
-            }
-
-            if(data.playerInfo.deltaXZ > threshold) {
-                tags.addTag("CLIP");
-                vl++;
-                tags.addTag(String.format("%.3f>-%.3f", data.playerInfo.deltaXZ, threshold));
             }
         }
 

@@ -9,7 +9,7 @@ import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Fly (E)", description = "Looks for consistent vertical acceleration",
-        checkType = CheckType.FLIGHT, devStage = DevStage.RELEASE)
+        checkType = CheckType.FLIGHT, devStage = DevStage.RELEASE, executable = true)
 @Cancellable
 public class FlyE extends Check {
 

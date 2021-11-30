@@ -9,7 +9,7 @@ import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "BadPackets (M)", description = "Checks for impossible pitch positions.",
-        checkType = CheckType.BADPACKETS, punishVL = 1, planVersion = KauriVersion.FREE)
+        checkType = CheckType.BADPACKETS, punishVL = 1, planVersion = KauriVersion.FREE, executable = true)
 public class BadPacketsM extends Check {
 
     @Packet

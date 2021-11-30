@@ -9,9 +9,10 @@ import dev.brighten.anticheat.utils.Pattern;
 import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
+import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Autoclicker (D)", description = "Checks for clicking oscillation.", planVersion = KauriVersion.ARA,
-        checkType = CheckType.AUTOCLICKER, punishVL = 15, executable = false, vlToFlag = 4)
+        checkType = CheckType.AUTOCLICKER, punishVL = 15, devStage = DevStage.BETA, vlToFlag = 4)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerD extends Check {
 

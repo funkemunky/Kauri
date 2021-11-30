@@ -18,7 +18,7 @@ import lombok.Setter;
 import java.util.List;
 
 @CheckInfo(name = "Aim (G)", description = "Statistical aim analysis",
-        checkType = CheckType.AIM, planVersion = KauriVersion.ARA, devStage = DevStage.ALPHA)
+        checkType = CheckType.AIM, planVersion = KauriVersion.ARA, punishVL = 20, executable = true)
 public class AimG extends Check {
 
     @Setter
@@ -61,6 +61,8 @@ public class AimG extends Check {
         if(yawOffsets.size() < 8 || pitchOffsets.size() < 8) return;
         double std = MathUtils.stdev(yawOffsets);
         double pstd = MathUtils.stdev(pitchOffsets);
+
+        debug("ys=%.3f ps=%.3f po=%.1f yo=%.1f", std, pstd, offset[1], offset[0]);
 
         find(AimJ.class).runCheck(std, pstd, offset, rot);
         find(AimK.class).runCheck(std, pstd, offset, rot);

@@ -12,7 +12,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 @CheckInfo(name = "Killaura (F)", description = "Checks for proper sprint motion mechanics.",
-        checkType = CheckType.KILLAURA)
+        checkType = CheckType.KILLAURA, executable = true)
 @Cancellable(cancelType = CancelType.ATTACK)
 public class KillauraF extends Check {
 

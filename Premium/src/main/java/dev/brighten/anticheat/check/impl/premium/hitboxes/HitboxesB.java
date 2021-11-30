@@ -5,7 +5,7 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
-@CheckInfo(name = "Hitboxes (B)", description = "Very sensitive hitboxes check", checkType = CheckType.HITBOX,
-        devStage = DevStage.ALPHA)
+@CheckInfo(name = "Hitboxes (B)", description = "Very sensitive hitboxes check", punishVL = 20,
+        checkType = CheckType.HITBOX, devStage = DevStage.ALPHA)
 public class HitboxesB extends Check {
 }

@@ -10,14 +10,13 @@ import dev.brighten.anticheat.utils.MovementUtils;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Fly (C)", description = "Checks for invalid jump heights.",
-        checkType = CheckType.FLIGHT, punishVL = 7, vlToFlag = 1)
+        checkType = CheckType.FLIGHT, punishVL = 7, vlToFlag = 1, executable = true)
 @Cancellable
 public class FlyC extends Check {
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
         if (packet.isPos()) {
-            float maxHeight = MovementUtils.getJumpHeight(data);
             if (!data.playerInfo.flightCancel
                     && data.playerInfo.jumped
                     && !data.playerInfo.wasOnSlime
@@ -29,9 +28,9 @@ public class FlyC extends Check {
                     && data.playerInfo.lastBlockPlace.isPassed(20)
                     && data.playerInfo.lastHalfBlock.isPassed(4)
                     && data.playerInfo.lastVelocity.isPassed(4)
-                    && MathUtils.getDelta(data.playerInfo.deltaY, maxHeight) > 0.01f) {
+                    && MathUtils.getDelta(data.playerInfo.deltaY, data.playerInfo.jumpHeight) > 0.01f) {
                 vl++;
-                flag("deltaY=%s maxHeight=%s", data.playerInfo.deltaY, maxHeight);
+                flag("deltaY=%.4f maxHeight=%.4f", data.playerInfo.deltaY, data.playerInfo.jumpHeight);
 
                 fixMovementBugs();
             } else if(vl > 0) vl-= 0.01f;

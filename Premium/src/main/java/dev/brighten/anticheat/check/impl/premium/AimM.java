@@ -7,7 +7,7 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
-@CheckInfo(name = "Aim (M)", description = "Aim snapping", checkType = CheckType.AIM, devStage = DevStage.ALPHA)
+@CheckInfo(name = "Aim (M)", description = "Aim snapping", checkType = CheckType.AIM, executable = true, punishVL = 25)
 public class AimM extends Check {
 
     private float buffer;

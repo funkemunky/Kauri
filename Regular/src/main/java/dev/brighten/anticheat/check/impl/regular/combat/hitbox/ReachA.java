@@ -24,8 +24,8 @@ import org.bukkit.entity.EntityType;
 import java.util.EnumSet;
 import java.util.List;
 
-@CheckInfo(name = "Reach (A)", checkType = CheckType.HITBOX, punishVL = 5, description = "A simple distance check.",
-        planVersion = KauriVersion.FREE)
+@CheckInfo(name = "Reach (A)", checkType = CheckType.HITBOX, punishVL = 7, description = "A simple distance check.",
+        planVersion = KauriVersion.FREE, executable = true)
 @Cancellable(cancelType = CancelType.ATTACK)
 public class ReachA extends Check {
 

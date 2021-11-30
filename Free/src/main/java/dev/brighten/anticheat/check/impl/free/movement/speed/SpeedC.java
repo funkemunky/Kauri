@@ -8,7 +8,7 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 
-@CheckInfo(name = "Speed (C)", description = "General non-vanilla speed distance check")
+@CheckInfo(name = "Speed (C)", description = "General non-vanilla speed distance check", executable = true)
 @Cancellable
 public class SpeedC extends Check {
 

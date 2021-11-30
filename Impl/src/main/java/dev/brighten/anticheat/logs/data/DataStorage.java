@@ -37,4 +37,6 @@ public interface DataStorage {
     void devAlertsStatus(UUID uuid, Consumer<Boolean> result);
 
     void shutdown();
+
+    void importFromFlatfile(Consumer<String> result);
 }

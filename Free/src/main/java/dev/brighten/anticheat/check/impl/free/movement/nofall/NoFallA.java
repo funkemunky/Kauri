@@ -11,7 +11,7 @@ import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "NoFall (A)", description = "Checks to make sure the ground packet from the client is legit",
-        checkType = CheckType.NOFALL, punishVL = 20, vlToFlag = 3, executable = false, planVersion = KauriVersion.FREE)
+        checkType = CheckType.NOFALL, punishVL = 20, vlToFlag = 3, executable = true, planVersion = KauriVersion.FREE)
 @Cancellable
 public class NoFallA extends Check {
 

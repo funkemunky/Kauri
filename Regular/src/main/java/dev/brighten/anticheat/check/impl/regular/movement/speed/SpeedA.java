@@ -12,8 +12,8 @@ import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 import org.bukkit.potion.PotionEffectType;
 
-@CheckInfo(name = "Speed (A)", description = "Minecraft code speed acceleration check.",
-        checkType = CheckType.SPEED, planVersion = KauriVersion.FREE, vlToFlag = 2)
+@CheckInfo(name = "Speed (A)", description = "Minecraft code speed acceleration check.", executable = true,
+        checkType = CheckType.SPEED, planVersion = KauriVersion.FREE, vlToFlag = 2, punishVL = 20)
 @Cancellable
 public class SpeedA extends Check {
 

@@ -13,8 +13,8 @@ public @interface CheckInfo {
     String name() default "yourmom";
     String description() default "No description provided.";
     boolean enabled() default true;
-    boolean executable() default true;
-    boolean cancellable() default false;
+    boolean executable() default false;
+    boolean cancellable() default true;
     DevStage devStage() default DevStage.RELEASE;
     int punishVL() default 50;
     KauriVersion planVersion() default KauriVersion.FULL;

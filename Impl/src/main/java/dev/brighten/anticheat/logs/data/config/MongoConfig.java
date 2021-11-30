@@ -29,6 +29,9 @@ public class MongoConfig {
     @ConfigSetting(path = "database.mongo", name = "port", hide = true)
     public static int port = 27017;
 
+    @ConfigSetting(path = "database.mongo", name = "connectionURL", hide = true)
+    public static String connectionURL = "This will override your connection details";
+
     @ConfigSetting(path = "database.mongo", name = "batchInsertMax")
     public static int batchInsertMax = 250;
 }

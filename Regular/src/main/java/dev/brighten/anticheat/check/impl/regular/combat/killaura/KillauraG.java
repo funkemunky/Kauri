@@ -12,7 +12,7 @@ import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Killaura (G)", description = "Closing a window while attacking", checkType = CheckType.KILLAURA,
-        devStage = DevStage.ALPHA, punishVL = 2)
+        punishVL = 2, executable = true)
 @Cancellable(cancelType = CancelType.MOVEMENT)
 public class KillauraG extends Check {
 

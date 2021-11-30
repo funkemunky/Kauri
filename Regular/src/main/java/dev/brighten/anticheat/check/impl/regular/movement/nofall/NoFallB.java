@@ -9,7 +9,7 @@ import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "NoFall (B)", description = "Looks for ground spoofing",
-        checkType = CheckType.NOFALL, punishVL = 12, executable = false, devStage = DevStage.BETA, vlToFlag = 2)
+        checkType = CheckType.NOFALL, punishVL = 12, executable = true, vlToFlag = 2)
 @Cancellable
 public class NoFallB extends Check {
 
@@ -35,7 +35,7 @@ public class NoFallB extends Check {
 
             if(groundBuffer > 35) {
                 vl++;
-                flag("T=SPOOF_GROUND dy=%.2f y=%.1f", data.playerInfo.deltaY, data.playerInfo.to.y);
+                flag(200, "T=SPOOF_GROUND dy=%.2f y=%.1f", data.playerInfo.deltaY, data.playerInfo.to.y);
             }
             fixMovementBugs();
         } else if(groundBuffer > 0) groundBuffer-= 2;
@@ -49,7 +49,7 @@ public class NoFallB extends Check {
                 && data.playerInfo.lastTeleportTimer.isPassed(1)) {
             if((airBuffer +=10) > 30) {
                 vl++;
-                flag("T=SPOOF_AIR dy=%.2f y=%.1f", data.playerInfo.deltaY, data.playerInfo.to.y);
+                flag(200, "T=SPOOF_AIR dy=%.2f y=%.1f", data.playerInfo.deltaY, data.playerInfo.to.y);
             }
         } else if(airBuffer > 0) airBuffer -= 4;
 

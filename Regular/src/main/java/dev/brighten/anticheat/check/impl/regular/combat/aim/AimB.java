@@ -8,7 +8,7 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Aim (B)", description = "Checks for common denominators in pitch difference.",
-        checkType = CheckType.AIM, punishVL = 45)
+        checkType = CheckType.AIM, punishVL = 45, executable = true)
 public class AimB extends Check {
 
     private float buffer;
