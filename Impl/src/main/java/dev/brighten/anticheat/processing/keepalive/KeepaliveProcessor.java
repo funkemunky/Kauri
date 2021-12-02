@@ -99,7 +99,7 @@ public class KeepaliveProcessor implements Runnable {
 
     public void start() {
         if(task == null) {
-            task = RunUtils.taskTimer(this, 0L, 0L);
+            task = RunUtils.taskTimer(this, Kauri.INSTANCE, 0L, 0L);
         }
     }
 

@@ -47,15 +47,6 @@ public class MySQL {
 
     @SneakyThrows
     public static void initSqlLite() {
-        File h2Driver = new File(Kauri.INSTANCE.getDataFolder(), "h2-driver.jar");
-
-        if(!h2Driver.exists()) {
-            h2Driver.createNewFile();
-            Kauri.INSTANCE.getLogger().info("Downloading h2-driver.jar...");
-            MiscUtils.download(h2Driver, "https://nexus.funkemunky.cc/service/local/repositories/releases/" +
-                    "content/com/h2database/h2/1.4.199/h2-1.4.199.jar");
-        }
-        MiscUtils.injectURL(h2Driver.toURI().toURL());
         File dataFolder = new File(Kauri.INSTANCE.getDataFolder(), MySQLConfig.database + ".db");
         if (!dataFolder.exists()){
             try {//https://nexus.funkemunky.cc/service/local/repositories/releases/content/com/h2database/h2/1.4.199/h2-1.4.199.jar

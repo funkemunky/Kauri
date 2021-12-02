@@ -16,7 +16,6 @@ import java.lang.annotation.Annotation;
 import java.util.Map;
 import java.util.logging.Level;
 
-@Init(priority = Priority.HIGH)
 public class CommandEditor {
     public CommandEditor() {
         CommandAlias oldAnnotation = KauriCommand.class.getAnnotation(CommandAlias.class);

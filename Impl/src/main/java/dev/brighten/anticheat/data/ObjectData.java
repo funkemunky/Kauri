@@ -96,6 +96,7 @@ public class ObjectData implements Data {
 
         player = Bukkit.getPlayer(uuid);
 
+        checkManager = new CheckManager(this);
         playerInfo = new PlayerInformation(this);
         creation = playerInfo.lastRespawn = System.currentTimeMillis();
         blockInfo = new BlockInformation(this);
@@ -104,8 +105,6 @@ public class ObjectData implements Data {
         targetPastLocation = new PastLocation();
         entityLocPastLocation = new PastLocation();
         potionProcessor = new PotionProcessor(this);
-        checkManager = new CheckManager(this);
-        checkManager.addChecks();
 
         playerInfo.to = playerInfo.from = new KLocation(player.getLocation());
 
@@ -148,11 +147,14 @@ public class ObjectData implements Data {
         }, Kauri.INSTANCE, 100L);
         Kauri.INSTANCE.executor.execute(() -> {
             playerVersion = TinyProtocolHandler.getProtocolVersion(getPlayer());
+            System.out.println(player.getName() + ": " + playerVersion.name());
         });
 
         getPlayer().getActivePotionEffects().forEach(pe -> {
             runKeepaliveAction(d -> this.potionProcessor.potionEffects.add(pe));
         });
+
+        checkManager.addChecks();
     }
 
     @Override
@@ -176,9 +178,11 @@ public class ObjectData implements Data {
         keepAliveStamps.clear();
         Kauri.INSTANCE.dataManager.hasAlerts.remove(uuid.hashCode());
         Kauri.INSTANCE.dataManager.devAlerts.remove(uuid.hashCode());
-        checkManager.checkMethods.clear();
-        checkManager.checks.clear();
-        checkManager = null;
+        if(checkManager != null) {
+            checkManager.checkMethods.clear();
+            checkManager.checks.clear();
+            checkManager = null;
+        }
         typesToCancel.clear();
         sniffedPackets.clear();
         keepAliveStamps.clear();

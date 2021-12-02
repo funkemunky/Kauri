@@ -297,9 +297,9 @@ public class ReachB extends Check {
             yaw = (float)(byte)packet.getYaw() / 256.0F * 360.0F;
             pitch = (float)(byte)packet.getPitch() / 256.0F * 360.0F;
         } else {
-            x = (short)packet.getX() / 32D;
-            y = (short)packet.getY() / 32D;
-            z = (short)packet.getZ() / 32D;
+            x = (short)packet.getX() / 4096D;
+            y = (short)packet.getY() / 4096D;
+            z = (short)packet.getZ() / 4096D;
             yaw = (float)(byte)packet.getYaw() / 256.0F * 360.0F;
             pitch = (float)(byte)packet.getPitch() / 256.0F * 360.0F;
         }
@@ -435,8 +435,8 @@ public class ReachB extends Check {
 
             queuedForResend.add(toCompare);
             resend.put(entity.getEntityId(), queuedForResend);
-            WrappedOutEntityTeleportPacket newPacket = new WrappedOutEntityTeleportPacket(packet.entityId, packet.x,
-                    packet.y, packet.z, packet.yaw, packet.pitch, packet.onGround);
+            WrappedOutEntityTeleportPacket newPacket = new WrappedOutEntityTeleportPacket( packet.entityId,
+                    packet.x, packet.y, packet.z, packet.yaw, packet.pitch, packet.onGround);
 
             RunUtils.task(() -> {
                 runAction(entity, () -> {

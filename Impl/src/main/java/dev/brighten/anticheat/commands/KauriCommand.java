@@ -374,8 +374,10 @@ public class KauriCommand extends BaseCommand {
                     if(targetData != null) {
                         PlayerInformationGUI info = new PlayerInformationGUI(targetData);
 
-                        info.showMenu(player);
-                        player.sendMessage(Color.Green + "Opened menu.");
+                        RunUtils.task(() -> {
+                            info.showMenu(player);
+                            player.sendMessage(Color.Green + "Opened menu.");
+                        }, Kauri.INSTANCE);
                     } else player
                             .sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("data-error",
                                     "&cThere was an error trying to find your data."));
