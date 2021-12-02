@@ -54,6 +54,8 @@ public class EntityLocation {
             this.x = d0;
             this.y = d1;
             this.z = d2;
+
+            interpolatedLocations.add(new KLocation(x, y, z, yaw, pitch, Kauri.INSTANCE.keepaliveProcessor.tick));
         }
     }
 

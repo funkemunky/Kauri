@@ -16,12 +16,14 @@ public class AimJ extends Check {
         double min = Math.min(std, pstd);
         double pct = Math.abs(std - pstd) / min * 100;
 
-        if(pct > 200 && min > 1.4) {
+        if(pct > 200 && min > 1.4 && std < 40) {
             if(data.playerInfo.deltaYaw > 0.3 && ++buffer > 8) {
                 vl++;
                 flag("t=c pct=%.1f%%", pct);
                 buffer = 8;
             }
         } else buffer = 0;
+
+        debug("[%s] pct=%.1f%% std=%.4f pstd=%.4f m=%.2f y=%.1f p=%.1f", buffer, pct, std, pstd, min, offset[0], offset[1]);
     }
 }

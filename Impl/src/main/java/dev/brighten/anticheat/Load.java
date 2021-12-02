@@ -2,6 +2,7 @@ package dev.brighten.anticheat;
 
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.config.MessageHandler;
+import cc.funkemunky.api.profiling.ToggleableProfiler;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
@@ -45,6 +46,8 @@ public class Load {
         Kauri.INSTANCE.packetProcessor = new PacketProcessor();
 
         Kauri.INSTANCE.injector = new ServerInjector();
+
+        Kauri.INSTANCE.kauriProfiler = new ToggleableProfiler();
 
         try {
             Kauri.INSTANCE.injector.inject();

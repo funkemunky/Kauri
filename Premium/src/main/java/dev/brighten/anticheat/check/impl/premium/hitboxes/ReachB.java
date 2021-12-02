@@ -2,6 +2,7 @@ package dev.brighten.anticheat.check.impl.premium.hitboxes;
 
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
+import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
@@ -9,9 +10,11 @@ import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutEntityTeleportPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutRelativePosition;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.world.EntityData;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
+import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -26,6 +29,7 @@ import dev.brighten.anticheat.utils.timer.impl.MillisTimer;
 import dev.brighten.anticheat.utils.timer.impl.PlayerTimer;
 import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import dev.brighten.api.KauriVersion;
+import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 import org.bukkit.entity.Entity;
@@ -36,6 +40,7 @@ import java.util.*;
 
 @CheckInfo(name = "Reach (B)", planVersion = KauriVersion.ARA, punishVL = 20, executable = true,
         checkType = CheckType.HITBOX)
+@Cancellable(cancelType = CancelType.ATTACK)
 public class ReachB extends Check {
 
     private final Map<UUID, EntityLocation> entityLocationMap = new HashMap<>(),
@@ -72,62 +77,7 @@ public class ReachB extends Check {
                 || packet.getAction() != WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)
             return;
 
-        //Updating new entity loc
-        EntityLocation eloc = entityLocationMap.get(data.target.getUniqueId());
-
-        if(eloc == null) {
-            debug("eloc is null");
-            return;
-        }
-
-        final KLocation eyeLoc = data.playerInfo.to.clone();
-
-        eyeLoc.y+= data.playerInfo.sneaking ? 1.54f : 1.62f;
-
-        if(eloc.x == 0 && eloc.y == 0 & eloc.z == 0) return;
-
-        SimpleCollisionBox targetBox = (SimpleCollisionBox) EntityData
-                .getEntityBox(new Vector(eloc.x, eloc.y, eloc.z), data.target);
-
-        if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) {
-            targetBox = targetBox.expand(0.1, 0.1, 0.1);
-        }
-
-        final AxisAlignedBB vanillaBox = new AxisAlignedBB(targetBox);
-
-        Vec3D intersect = vanillaBox.rayTrace(eyeLoc.toVector(), MathUtils.getDirection(eyeLoc), 10);
-
-        double distance = Double.MAX_VALUE;
-        boolean collided = false; //Using this to compare smaller numbers than Double.MAX_VALUE. Slightly faster
-
-        if(intersect != null) {
-            lastAimOnTarget.reset();
-            distance = intersect.distanceSquared(new Vec3D(eyeLoc.x, eyeLoc.y, eyeLoc.z));
-            collided = true;
-        }
-
-        if(collided) {
-            hbuffer = 0;
-            distance = Math.sqrt(distance);
-            if(distance > 3.02 && lastTransProblem.isPassed(52) && streak > 3 && eloc.sentTeleport
-                    && lastFlying.isNotPassed(1)) {
-                if(++buffer > 2) {
-                    vl++;
-                    flag("d=%.4f", distance);
-                    buffer = 2;
-                }
-            } else if(buffer > 0) buffer-= 0.1f;
-            debug("dist=%.2f b=%s s=%s st=%s lf=%s ld=%s lti=%s",
-                    distance, buffer, streak, sentTeleport, lastFlying.getPassed(),
-                    data.lagInfo.lastPingDrop.getPassed(), lastTransProblem.getPassed());
-        } else {
-            if(++hbuffer > 5) {
-                find(HitboxesB.class).vl++;
-                find(HitboxesB.class).flag(120, "%.1f;%.1f;%.1f", eloc.x, eloc.y, eloc.z);
-            }
-            debug("didnt hit box: x=%.1f y=%.1f z=%.1f lti=%s", eloc.x, eloc.y, eloc.z,
-                    lastTransProblem.getPassed());
-        }
+        attacked = true;
     }
 
     private AimG getAimDetection() {
@@ -145,12 +95,87 @@ public class ReachB extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         flying = true;
-        if(lastFlying.isNotPassed(1)) streak++;
+        if(lastFlying.isNotPassed(1) && System.currentTimeMillis() - data.lagInfo.lastClientTrans < 65L) streak++;
         else {
             streak = 1;
             sentTeleport = false;
         }
 
+        detection: {
+            if(!attacked) break detection;
+
+            attacked = false;
+
+            //Updating new entity loc
+            EntityLocation eloc = entityLocationMap.get(data.target.getUniqueId());
+
+            if(eloc == null) {
+                debug("eloc is null");
+                break detection;
+            }
+
+            final KLocation to = data.playerInfo.to.clone(), from = data.playerInfo.from.clone();
+
+            //debug("current loc: %.4f, %.4f, %.4f", eloc.x, eloc.y, eloc.z);
+
+            to.y+= data.playerInfo.sneaking ? 1.54f : 1.62f;
+            from.y+= data.playerInfo.lsneaking ? 1.54f : 1.62f;
+            if(eloc.x == 0 && eloc.y == 0 & eloc.z == 0) break detection;
+
+            SimpleCollisionBox targetBox = (SimpleCollisionBox) EntityData
+                    .getEntityBox(new Vector(eloc.x, eloc.y, eloc.z), data.target);
+
+            if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) {
+                targetBox = targetBox.expand(0.1, 0.1, 0.1);
+            }
+
+            final AxisAlignedBB vanillaBox = new AxisAlignedBB(targetBox);
+
+            Vec3D intersectTo = vanillaBox.rayTrace(to.toVector(), MathUtils.getDirection(to), 10),
+                    intersectFrom = vanillaBox.rayTrace(to.toVector(), MathUtils.getDirection(to), 10);
+
+            double distance = Double.MAX_VALUE;
+            boolean collided = false; //Using this to compare smaller numbers than Double.MAX_VALUE. Slightly faster
+
+            if(intersectTo != null) {
+                lastAimOnTarget.reset();
+                distance = Math.min(distance, intersectTo.distanceSquared(new Vec3D(to.x, to.y, to.z)));
+                collided = true;
+            }
+
+            if(intersectFrom != null) {
+                lastAimOnTarget.reset();
+                distance = Math.min(distance, intersectFrom.distanceSquared(new Vec3D(from.x, from.y, from.z)));
+                collided = true;
+            }
+
+            if(collided) {
+                hbuffer = 0;
+                distance = Math.sqrt(distance);
+                if(distance > 3.04 && lastTransProblem.isPassed(52)
+                        && lastFlying.isNotPassed(1)) {
+                    if(streak > 3 && sentTeleport) {
+                        if(++buffer > 1) {
+                            vl++;
+                            flag("d=%.4f ltp=%s", distance, lastTransProblem.getPassed());
+                            buffer = 1;
+                        }
+                    } else for(int i = 0 ; i < 2; i++) data.typesToCancel.add(CancelType.ATTACK);
+                } else if(buffer > 0) buffer-= 0.05f;
+                debug("dist=%.2f b=%s s=%s st=%s lf=%s ld=%s lti=%s",
+                        distance, buffer, streak, sentTeleport, lastFlying.getPassed(),
+                        data.lagInfo.lastPingDrop.getPassed(), lastTransProblem.getPassed());
+            } else {
+                if(streak > 3 && sentTeleport) {
+                    if (++hbuffer > 5) {
+                        find(HitboxesB.class).vl++;
+                        find(HitboxesB.class).flag(120, "%.1f;%.1f;%.1f", eloc.x, eloc.y, eloc.z);
+                    }
+                } else data.typesToCancel.add(CancelType.ATTACK);
+                debug("didnt hit box: x=%.1f y=%.1f z=%.1f lti=%s", eloc.x, eloc.y, eloc.z,
+                        lastTransProblem.getPassed());
+            }
+        }
         for (Iterator<Map.Entry<UUID, EntityLocation>> it = entityLocationMap.entrySet().iterator();
              it.hasNext();) {
             Map.Entry<UUID, EntityLocation> entry = it.next();
@@ -162,8 +187,14 @@ public class ReachB extends Check {
                 continue;
             }
 
+            if(eloc.increment == 0) continue;
+
+            /*if(data.target != null && eloc.entity.getEntityId() == data.target.getEntityId())
+                debug("Increment(%s): %.4f, %.4f, %.4f (%s)", eloc.increment,
+                        eloc.x, eloc.y, eloc.z, System.currentTimeMillis());*/
             eloc.interpolateLocation();
         }
+
 
         lastFlying.reset();
     }
@@ -171,6 +202,7 @@ public class ReachB extends Check {
     @Packet
     public void onTrans(WrappedInTransactionPacket packet) {
         if(lastFlying.isPassed(1)
+                && data.playerVersion.isOrAbove(ProtocolVersion.V1_9)
                 && Kauri.INSTANCE.keepaliveProcessor.getKeepById(packet.getAction()).isPresent()) {
 
             for (Iterator<Map.Entry<UUID, EntityLocation>> it = entityLocationMap.entrySet().iterator();
@@ -193,110 +225,233 @@ public class ReachB extends Check {
         }
     }
 
+    private Map<Integer, List<KLocation>> resend = new HashMap<>();
+
     @Packet
-    public void onEntity(WrappedOutRelativePosition packet) {
-        Atlas.getInstance().getWorldInfo(data.getPlayer().getWorld()).getEntity(packet.getId())
-                .ifPresent(entity -> {
-                    if(!allowedEntityTypes.contains(entity.getType())) return;
+    public boolean onEntity(WrappedOutRelativePosition packet) {
+        Optional<Entity> op = Atlas.getInstance().getWorldInfo(data.getPlayer().getWorld()).getEntity(packet.getId());
 
-                    data.runKeepaliveAction(ka -> {
-                        EntityLocation eloc = secondEntityLocationMap.computeIfAbsent(entity.getUniqueId(),
-                                key -> new EntityLocation(entity));
+        if(!op.isPresent()) return false;
 
-                        if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9)) {
-                            eloc.newX += (byte)packet.getX() / 32D;
-                            eloc.newY += (byte)packet.getY() / 32D;
-                            eloc.newZ += (byte)packet.getZ() / 32D;
-                            eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
-                            eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
-                        } else if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_14)) {
-                            eloc.newX += (int)packet.getX() / 4096D;
-                            eloc.newY += (int)packet.getY() / 4096D;
-                            eloc.newZ += (int)packet.getZ() / 4096D;
-                            eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
-                            eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
-                        } else {
-                            eloc.newX += (short)packet.getX() / 4096D;
-                            eloc.newY += (short)packet.getY() / 4096D;
-                            eloc.newZ += (short)packet.getZ() / 4096D;
-                            eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
-                            eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
-                        }
-                        eloc.increment = 3;
-                        eloc.interpolateLocations();
-                        if(data.target != null && entity.getEntityId() == data.target.getEntityId()) {
-                            final double toShrink = data.playerVersion.isOrAbove(ProtocolVersion.V1_9) ? 0.12 : 0.02;
-                            eloc.interpolatedLocations.stream()
-                                    .map(kloc -> ((SimpleCollisionBox)EntityData.getEntityBox(kloc, entity))
-                                            .shrink(toShrink, toShrink, toShrink))
-                                    .forEach(box -> getKillauraDetection().getTargetLocations().add(box));
+        Entity entity = op.get();
 
-                            //Clearing to ensure garbage collections clears this object.
-                            eloc.interpolatedLocations.clear();
-                        }
-                    }, -1);
+        if(!allowedEntityTypes.contains(entity.getType())) return false;
 
-                    EntityLocation eloc = entityLocationMap.computeIfAbsent(entity.getUniqueId(),
-                            key -> new EntityLocation(entity));
-                    runAction(entity, () -> {
-                        //We don't need to do version checking here. Atlas handles this for us.
-                        if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9)) {
-                            eloc.newX += (byte)packet.getX() / 32D;
-                            eloc.newY += (byte)packet.getY() / 32D;
-                            eloc.newZ += (byte)packet.getZ() / 32D;
-                            eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
-                            eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
-                        } else if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_14)) {
-                            eloc.newX += (int)packet.getX() / 4096D;
-                            eloc.newY += (int)packet.getY() / 4096D;
-                            eloc.newZ += (int)packet.getZ() / 4096D;
-                            eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
-                            eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
-                        } else {
-                            eloc.newX += (short)packet.getX() / 4096D;
-                            eloc.newY += (short)packet.getY() / 4096D;
-                            eloc.newZ += (short)packet.getZ() / 4096D;
-                            eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
-                            eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
-                        }
+        data.runKeepaliveAction(ka -> {
+            EntityLocation eloc = secondEntityLocationMap.computeIfAbsent(entity.getUniqueId(),
+                    key -> new EntityLocation(entity));
 
-                        eloc.increment = 3;
-                    });
+            if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9)) {
+                eloc.newX += (byte)packet.getX() / 32D;
+                eloc.newY += (byte)packet.getY() / 32D;
+                eloc.newZ += (byte)packet.getZ() / 32D;
+                eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
+                eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
+            } else if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_14)) {
+                eloc.newX += (int)packet.getX() / 4096D;
+                eloc.newY += (int)packet.getY() / 4096D;
+                eloc.newZ += (int)packet.getZ() / 4096D;
+                eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
+                eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
+            } else {
+                eloc.newX += (short)packet.getX() / 4096D;
+                eloc.newY += (short)packet.getY() / 4096D;
+                eloc.newZ += (short)packet.getZ() / 4096D;
+                eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
+                eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
+            }
+            eloc.increment = 3;
+            eloc.interpolateLocations();
+            if(data.target != null && entity.getEntityId() == data.target.getEntityId()) {
+                final double toShrink = data.playerVersion.isOrAbove(ProtocolVersion.V1_9) ? 0.12 : 0.02;
+                eloc.interpolatedLocations.stream()
+                        .map(kloc -> ((SimpleCollisionBox)EntityData.getEntityBox(kloc, entity))
+                                .shrink(toShrink, toShrink, toShrink))
+                        .forEach(box -> getKillauraDetection().getTargetLocations().add(box));
+
+                //Clearing to ensure garbage collections clears this object.
+                eloc.interpolatedLocations.clear();
+            }
+        }, -1);
+
+        List<KLocation> queuedForResend = resend.compute(entity.getEntityId(), (key, list) -> {
+            if(list == null) return new ArrayList<>();
+
+            return list;
         });
+
+
+        double x,y,z;
+        float yaw,pitch;
+
+        if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9)) {
+            x = (byte)packet.getX() / 32D;
+            y = (byte)packet.getY() / 32D;
+            z = (byte)packet.getZ() / 32D;
+            yaw = (float)(byte)packet.getYaw() / 256.0F * 360.0F;
+            pitch = (float)(byte)packet.getPitch() / 256.0F * 360.0F;
+        } else if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_14)) {
+            x = (int)packet.getX() / 4096D;
+            y = (int)packet.getY() / 4096D;
+            z = (int)packet.getZ() / 4096D;
+            yaw = (float)(byte)packet.getYaw() / 256.0F * 360.0F;
+            pitch = (float)(byte)packet.getPitch() / 256.0F * 360.0F;
+        } else {
+            x = (short)packet.getX() / 32D;
+            y = (short)packet.getY() / 32D;
+            z = (short)packet.getZ() / 32D;
+            yaw = (float)(byte)packet.getYaw() / 256.0F * 360.0F;
+            pitch = (float)(byte)packet.getPitch() / 256.0F * 360.0F;
+        }
+
+        KLocation toCompare = new KLocation(x, y, z, yaw, pitch);
+        Optional<KLocation> needsToCancel = queuedForResend.stream().filter(rp -> rp.toVector().distanceSquared(toCompare.toVector()) < 0.0001).findFirst();
+
+        if(!needsToCancel.isPresent()) {
+            EntityLocation eloc = entityLocationMap.computeIfAbsent(entity.getUniqueId(),
+                    key -> new EntityLocation(entity));
+
+            queuedForResend.add(toCompare);
+            resend.put(entity.getEntityId(), queuedForResend);
+            WrappedOutRelativePosition newPacket = new WrappedOutRelativePosition(packet.getId(), x,
+                    y, z, yaw, pitch, packet.isGround());
+            RunUtils.task(() -> {
+                runAction(entity, () -> {
+                    //We don't need to do version checking here. Atlas handles this for us.
+                    if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9)) {
+                        eloc.newX += (byte)packet.getX() / 32D;
+                        eloc.newY += (byte)packet.getY() / 32D;
+                        eloc.newZ += (byte)packet.getZ() / 32D;
+                        eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
+                        eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
+                    } else if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_14)) {
+                        eloc.newX += (int)packet.getX() / 4096D;
+                        eloc.newY += (int)packet.getY() / 4096D;
+                        eloc.newZ += (int)packet.getZ() / 4096D;
+                        eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
+                        eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
+                    } else {
+                        eloc.newX += (short)packet.getX() / 4096D;
+                        eloc.newY += (short)packet.getY() / 4096D;
+                        eloc.newZ += (short)packet.getZ() / 4096D;
+                        eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
+                        eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
+                    }
+
+                    eloc.increment = 3;
+
+                    /*if(data.target != null && data.target.getEntityId() == packet.getId())
+                    debug("Setting new posrot: %.4f, %.4f, %.4f, %s (%s)",
+                            eloc.newX, eloc.newY, eloc.newZ, eloc.increment, System.currentTimeMillis());*/
+                });
+                TinyProtocolHandler.sendPacket(data.getPlayer(),
+                        newPacket.getObject());
+            });
+
+            return true;
+        } else {
+            queuedForResend.remove(needsToCancel.get());
+            resend.put(entity.getEntityId(), queuedForResend);
+            return false;
+        }
     }
 
     @Packet
-    public void onTeleportSent(WrappedOutEntityTeleportPacket packet) {
-        Atlas.getInstance().getWorldInfo(data.getPlayer().getWorld()).getEntity(packet.entityId)
-                .ifPresent(entity -> {
-                    if(!allowedEntityTypes.contains(entity.getType())) return;
-                    data.runKeepaliveAction(ka -> {
-                        EntityLocation eloc = secondEntityLocationMap.computeIfAbsent(entity.getUniqueId(),
-                                key -> new EntityLocation(entity));
+    public boolean onTeleportSent(WrappedOutEntityTeleportPacket packet) {
+        Optional<Entity> op = Atlas.getInstance().getWorldInfo(data.getPlayer().getWorld()).getEntity(packet.entityId);
 
-                        if(data.playerVersion.isOrAbove(ProtocolVersion.V1_9)) {
-                            if (!(Math.abs(eloc.x - packet.x) >= 0.03125D)
-                                    && !(Math.abs(eloc.y - packet.y) >= 0.015625D)
-                                    && !(Math.abs(eloc.z - packet.z) >= 0.03125D)) {
-                                eloc.increment = 0;
-                                //We don't need to do version checking here. Atlas handles this for us.
-                                eloc.newX = eloc.x = packet.x;
-                                eloc.newY = eloc.y = packet.y;
-                                eloc.newZ = eloc.z = packet.z;
-                                eloc.newYaw = eloc.yaw = packet.yaw;
-                                eloc.newPitch = eloc.pitch = packet.pitch;
-                            } else {
-                                eloc.newX = packet.x;
-                                eloc.newY = packet.y;
-                                eloc.newZ = packet.z;
-                                eloc.newYaw = packet.yaw;
-                                eloc.newPitch = packet.pitch ;
+        if(!op.isPresent()) return false;
 
-                                eloc.increment = 3;
-                                eloc.interpolateLocations();
-                            }
-                        } else {
+        Entity entity = op.get();
+
+        if(!allowedEntityTypes.contains(entity.getType())) return false;
+        data.runKeepaliveAction(ka -> {
+            EntityLocation eloc = secondEntityLocationMap.computeIfAbsent(entity.getUniqueId(),
+                    key -> new EntityLocation(entity));
+
+            if(data.playerVersion.isOrAbove(ProtocolVersion.V1_9)) {
+                if (!(Math.abs(eloc.x - packet.x) >= 0.03125D)
+                        && !(Math.abs(eloc.y - packet.y) >= 0.015625D)
+                        && !(Math.abs(eloc.z - packet.z) >= 0.03125D)) {
+                    eloc.increment = 0;
+                    //We don't need to do version checking here. Atlas handles this for us.
+                    eloc.newX = eloc.x = packet.x;
+                    eloc.newY = eloc.y = packet.y;
+                    eloc.newZ = eloc.z = packet.z;
+                    eloc.newYaw = eloc.yaw = packet.yaw;
+                    eloc.newPitch = eloc.pitch = packet.pitch;
+                } else {
+                    eloc.newX = packet.x;
+                    eloc.newY = packet.y;
+                    eloc.newZ = packet.z;
+                    eloc.newYaw = packet.yaw;
+                    eloc.newPitch = packet.pitch;
+
+                    eloc.increment = 3;
+                    eloc.interpolateLocations();
+                }
+            } else {
+                //We don't need to do version checking here. Atlas handles this for us.
+                eloc.newX = packet.x;
+                eloc.newY = packet.y;
+                eloc.newZ = packet.z;
+                eloc.newYaw = packet.yaw;
+                eloc.newPitch = packet.pitch;
+
+                eloc.increment = 3;
+                eloc.interpolateLocations();
+            }
+            if(data.target != null && entity.getEntityId() == data.target.getEntityId()) {
+
+                final double toShrink = data.playerVersion.isOrAbove(ProtocolVersion.V1_9) ? 0.12 : 0.02;
+                if(eloc.interpolatedLocations.size() > 0) {
+                    eloc.interpolatedLocations.stream()
+                            .map(kloc -> ((SimpleCollisionBox)EntityData.getEntityBox(kloc, entity))
+                                    .shrink(toShrink, toShrink, toShrink))
+                            .forEach(box -> getKillauraDetection().getTargetLocations().add(box));
+
+                } else {
+                    getKillauraDetection().getTargetLocations()
+                            .add((SimpleCollisionBox)EntityData
+                                    .getEntityBox(new KLocation(eloc.x, eloc.y, eloc.z), entity));
+                }
+                //Clearing to ensure garbage collections clears this object.
+                eloc.interpolatedLocations.clear();
+            }
+        }, -1);
+        EntityLocation eloc = entityLocationMap.computeIfAbsent(entity.getUniqueId(),
+                key -> new EntityLocation(entity));
+
+        List<KLocation> queuedForResend = resend.compute(entity.getEntityId(), (key, list) -> {
+            if(list == null) return new ArrayList<>();
+
+            return list;
+        });
+        KLocation toCompare = new KLocation(packet.x, packet.y, packet.z, packet.yaw, packet.pitch);
+        Optional<KLocation> needsToCancel = queuedForResend.stream()
+                .filter(rp -> rp.toVector().distanceSquared(toCompare.toVector()) < 0.0001).findFirst();
+
+        if(!needsToCancel.isPresent()) {
+
+            queuedForResend.add(toCompare);
+            resend.put(entity.getEntityId(), queuedForResend);
+            WrappedOutEntityTeleportPacket newPacket = new WrappedOutEntityTeleportPacket(packet.entityId, packet.x,
+                    packet.y, packet.z, packet.yaw, packet.pitch, packet.onGround);
+
+            RunUtils.task(() -> {
+                runAction(entity, () -> {
+                    if(data.playerVersion.isOrAbove(ProtocolVersion.V1_9)) {
+                        if (!(Math.abs(eloc.x - packet.x) >= 0.03125D)
+                                && !(Math.abs(eloc.y - packet.y) >= 0.015625D)
+                                && !(Math.abs(eloc.z - packet.z) >= 0.03125D)) {
+                            eloc.increment = 0;
                             //We don't need to do version checking here. Atlas handles this for us.
+                            eloc.newX = eloc.x = packet.x;
+                            eloc.newY = eloc.y = packet.y;
+                            eloc.newZ = eloc.z = packet.z;
+                            eloc.newYaw = eloc.yaw = packet.yaw;
+                            eloc.newPitch = eloc.pitch = packet.pitch;
+                        } else {
                             eloc.newX = packet.x;
                             eloc.newY = packet.y;
                             eloc.newZ = packet.z;
@@ -304,74 +459,48 @@ public class ReachB extends Check {
                             eloc.newPitch = packet.pitch;
 
                             eloc.increment = 3;
-                            eloc.interpolateLocations();
                         }
-                        if(data.target != null && entity.getEntityId() == data.target.getEntityId()) {
+                    } else {
+                        //We don't need to do version checking here. Atlas handles this for us.
+                        eloc.newX = packet.x;
+                        eloc.newY = packet.y;
+                        eloc.newZ = packet.z;
+                        eloc.newYaw = packet.yaw;
+                        eloc.newPitch = packet.pitch;
 
-                            final double toShrink = data.playerVersion.isOrAbove(ProtocolVersion.V1_9) ? 0.12 : 0.02;
-                            if(eloc.interpolatedLocations.size() > 0) {
-                                eloc.interpolatedLocations.stream()
-                                        .map(kloc -> ((SimpleCollisionBox)EntityData.getEntityBox(kloc, entity))
-                                                .shrink(toShrink, toShrink, toShrink))
-                                        .forEach(box -> getKillauraDetection().getTargetLocations().add(box));
+                        eloc.increment = 3;
+                    }
 
-                            } else {
-                                getKillauraDetection().getTargetLocations()
-                                        .add((SimpleCollisionBox)EntityData
-                                                .getEntityBox(new KLocation(eloc.x, eloc.y, eloc.z), entity));
-                            }
-                            //Clearing to ensure garbage collections clears this object.
-                            eloc.interpolatedLocations.clear();
-                        }
-                    }, -1);
-                    EntityLocation eloc = entityLocationMap.computeIfAbsent(entity.getUniqueId(),
-                            key -> new EntityLocation(entity));
-                    runAction(entity, () -> {
-                        if(data.playerVersion.isOrAbove(ProtocolVersion.V1_9)) {
-                            if (!(Math.abs(eloc.x - packet.x) >= 0.03125D)
-                                    && !(Math.abs(eloc.y - packet.y) >= 0.015625D)
-                                    && !(Math.abs(eloc.z - packet.z) >= 0.03125D)) {
-                                eloc.increment = 0;
-                                //We don't need to do version checking here. Atlas handles this for us.
-                                eloc.newX = eloc.x = packet.x;
-                                eloc.newY = eloc.y = packet.y;
-                                eloc.newZ = eloc.z = packet.z;
-                                eloc.newYaw = eloc.yaw = packet.yaw;
-                                eloc.newPitch = eloc.pitch = packet.pitch;
-                            } else {
-                                eloc.newX = packet.x;
-                                eloc.newY = packet.y;
-                                eloc.newZ = packet.z;
-                                eloc.newYaw = packet.yaw;
-                                eloc.newPitch = packet.pitch ;
+                    /*if(data.target != null && data.target.getEntityId() == packet.entityId)
+                    debug("Setting new posrot: %.4f, %.4f, %.4f, %s (%s)",
+                            eloc.newX, eloc.newY, eloc.newZ, eloc.increment, System.currentTimeMillis());*/
 
-                                eloc.increment = 3;
-                            }
-                        } else {
-                            //We don't need to do version checking here. Atlas handles this for us.
-                            eloc.newX = packet.x;
-                            eloc.newY = packet.y;
-                            eloc.newZ = packet.z;
-                            eloc.newYaw = packet.yaw;
-                            eloc.newPitch = packet.pitch;
-
-                            eloc.increment = 3;
-                        }
-                        sentTeleport = eloc.sentTeleport = true;
-                    });
+                    sentTeleport = eloc.sentTeleport = true;
                 });
+                TinyProtocolHandler.sendPacket(data.getPlayer(), newPacket.getObject());
+            });
+            return true;
+        } else {
+            queuedForResend.remove(needsToCancel.get());
+            resend.put(entity.getEntityId(), queuedForResend);
+        }
+        return false;
     }
 
     private void runAction(Entity entity, Runnable action) {
         if(data.target != null && data.target.getUniqueId().equals(entity.getUniqueId())) {
             data.runInstantAction(ia -> {
                 if(!ia.isEnd()) {
-                    action.run();
                     flying = false;
                 } else if(flying) {
+                    sentTeleport = false;
                     lastTransProblem.reset();
                 }
-            });
+
+                if(ia.isEnd()) {
+                    action.run();
+                }
+            }, true);
         } else data.runKeepaliveAction(keepalive -> action.run());
     }
 

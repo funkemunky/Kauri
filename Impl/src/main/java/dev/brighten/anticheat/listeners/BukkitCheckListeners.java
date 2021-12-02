@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.*;
 
@@ -51,6 +52,15 @@ public class BukkitCheckListeners implements Listener {
         if(data != null) {
             data.moveProcessor.moveTo(event.getRespawnLocation());
             if(data.checkManager != null)
+            data.checkManager.runEvent(event);
+        }
+    }
+
+    @EventHandler
+    public void onBlock(BlockPlaceEvent event) {
+        ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
+
+        if(data != null) {
             data.checkManager.runEvent(event);
         }
     }

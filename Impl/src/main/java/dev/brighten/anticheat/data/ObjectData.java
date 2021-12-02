@@ -268,24 +268,17 @@ public class ObjectData implements Data {
             endId = (short)(startId + (short)1);
         }
 
-        final Object packet = new WrappedOutTransaction(0, startId, false).getObject();
-
         InstantAction startAction = new InstantAction(startId, endId, false);
         instantTransaction.put(startId, new Tuple<>(startAction, runnable));
 
-        if(!flush) TinyProtocolHandler.sendPacket(getPlayer(), packet);
-        else sendPacket(packet);
-
+        TinyProtocolHandler.sendPacket(getPlayer(), new WrappedOutTransaction(0, startId, false).getObject());
 
         short finalEndId = endId, finalStartId = startId;
         Kauri.INSTANCE.onTickEnd(() -> {
-            Object toSend = new WrappedOutTransaction(0, finalEndId, false).getObject();
-
             InstantAction endAction = new InstantAction(finalStartId, finalEndId, true);
             instantTransaction.put(finalEndId, new Tuple<>(endAction, runnable));
 
-            if(!flush) TinyProtocolHandler.sendPacket(getPlayer(), toSend);
-            else sendPacket(toSend);
+            TinyProtocolHandler.sendPacket(getPlayer(), new WrappedOutTransaction(0, finalEndId, false).getObject());
         });
     }
 

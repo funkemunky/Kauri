@@ -2,6 +2,7 @@ package dev.brighten.anticheat;
 
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.config.MessageHandler;
+import cc.funkemunky.api.profiling.ToggleableProfiler;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MiscUtils;
@@ -50,6 +51,7 @@ public class Kauri extends JavaPlugin {
     public Timer lastTickLag;
     public long lastTick;
     public int currentTick;
+    public ToggleableProfiler kauriProfiler;
 
     public ScheduledExecutorService loggingThread;
     public ExecutorService executor;
