@@ -147,7 +147,6 @@ public class ObjectData implements Data {
         }, Kauri.INSTANCE, 100L);
         Kauri.INSTANCE.executor.execute(() -> {
             playerVersion = TinyProtocolHandler.getProtocolVersion(getPlayer());
-            System.out.println(player.getName() + ": " + playerVersion.name());
         });
 
         getPlayer().getActivePotionEffects().forEach(pe -> {

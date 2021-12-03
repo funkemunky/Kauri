@@ -23,6 +23,7 @@ import dev.brighten.anticheat.check.impl.premium.KillauraH;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.AxisAlignedBB;
 import dev.brighten.anticheat.utils.EntityLocation;
+import dev.brighten.anticheat.utils.Helper;
 import dev.brighten.anticheat.utils.Vec3D;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.MillisTimer;
@@ -37,6 +38,8 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.util.Vector;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 @CheckInfo(name = "Reach (B)", planVersion = KauriVersion.ARA, punishVL = 20, executable = true,
         checkType = CheckType.HITBOX)
@@ -86,12 +89,6 @@ public class ReachB extends Check {
         return aimDetection;
     }
 
-    private KillauraH getKillauraDetection() {
-        if(killauraHDetection == null) killauraHDetection = (KillauraH) data.checkManager.checks.get("Killaura (H)");
-
-        return killauraHDetection;
-    }
-
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         flying = true;
@@ -121,27 +118,27 @@ public class ReachB extends Check {
             to.y+= data.playerInfo.sneaking ? 1.54f : 1.62f;
             from.y+= data.playerInfo.lsneaking ? 1.54f : 1.62f;
             if(eloc.x == 0 && eloc.y == 0 & eloc.z == 0) break detection;
+            double distance = Double.MAX_VALUE;
+            boolean collided = false; //Using this to compare smaller numbers than Double.MAX_VALUE. Slightly faster
 
-            SimpleCollisionBox targetBox = (SimpleCollisionBox) EntityData
-                    .getEntityBox(new Vector(eloc.x, eloc.y, eloc.z), data.target);
+            SimpleCollisionBox targetBox;
 
+            if(eloc.oldLocation != null) {
+                targetBox = Helper.wrap((SimpleCollisionBox) EntityData
+                        .getEntityBox(new Vector(eloc.newX, eloc.newY, eloc.newZ), data.target), (SimpleCollisionBox) EntityData
+                        .getEntityBox(eloc.oldLocation, data.target));
+                debug("old location isnt null");
+            } else {
+                targetBox = Helper.wrap(eloc.interpolatedLocations.stream().map(l -> (SimpleCollisionBox) EntityData
+                        .getEntityBox(l, data.target)).collect(Collectors.toList()));
+            }
             if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) {
                 targetBox = targetBox.expand(0.1, 0.1, 0.1);
             }
 
             final AxisAlignedBB vanillaBox = new AxisAlignedBB(targetBox);
 
-            Vec3D intersectTo = vanillaBox.rayTrace(to.toVector(), MathUtils.getDirection(to), 10),
-                    intersectFrom = vanillaBox.rayTrace(to.toVector(), MathUtils.getDirection(to), 10);
-
-            double distance = Double.MAX_VALUE;
-            boolean collided = false; //Using this to compare smaller numbers than Double.MAX_VALUE. Slightly faster
-
-            if(intersectTo != null) {
-                lastAimOnTarget.reset();
-                distance = Math.min(distance, intersectTo.distanceSquared(new Vec3D(to.x, to.y, to.z)));
-                collided = true;
-            }
+            Vec3D intersectFrom = vanillaBox.rayTrace(from.toVector(), MathUtils.getDirection(from), 10);
 
             if(intersectFrom != null) {
                 lastAimOnTarget.reset();
@@ -155,10 +152,10 @@ public class ReachB extends Check {
                 if(distance > 3.04 && lastTransProblem.isPassed(52)
                         && lastFlying.isNotPassed(1)) {
                     if(streak > 3 && sentTeleport) {
-                        if(++buffer > 1) {
+                        if(++buffer > 2) {
                             vl++;
                             flag("d=%.4f ltp=%s", distance, lastTransProblem.getPassed());
-                            buffer = 1;
+                            buffer = 2;
                         }
                     } else for(int i = 0 ; i < 2; i++) data.typesToCancel.add(CancelType.ATTACK);
                 } else if(buffer > 0) buffer-= 0.05f;
@@ -237,43 +234,6 @@ public class ReachB extends Check {
 
         if(!allowedEntityTypes.contains(entity.getType())) return false;
 
-        data.runKeepaliveAction(ka -> {
-            EntityLocation eloc = secondEntityLocationMap.computeIfAbsent(entity.getUniqueId(),
-                    key -> new EntityLocation(entity));
-
-            if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9)) {
-                eloc.newX += (byte)packet.getX() / 32D;
-                eloc.newY += (byte)packet.getY() / 32D;
-                eloc.newZ += (byte)packet.getZ() / 32D;
-                eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
-                eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
-            } else if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_14)) {
-                eloc.newX += (int)packet.getX() / 4096D;
-                eloc.newY += (int)packet.getY() / 4096D;
-                eloc.newZ += (int)packet.getZ() / 4096D;
-                eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
-                eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
-            } else {
-                eloc.newX += (short)packet.getX() / 4096D;
-                eloc.newY += (short)packet.getY() / 4096D;
-                eloc.newZ += (short)packet.getZ() / 4096D;
-                eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
-                eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
-            }
-            eloc.increment = 3;
-            eloc.interpolateLocations();
-            if(data.target != null && entity.getEntityId() == data.target.getEntityId()) {
-                final double toShrink = data.playerVersion.isOrAbove(ProtocolVersion.V1_9) ? 0.12 : 0.02;
-                eloc.interpolatedLocations.stream()
-                        .map(kloc -> ((SimpleCollisionBox)EntityData.getEntityBox(kloc, entity))
-                                .shrink(toShrink, toShrink, toShrink))
-                        .forEach(box -> getKillauraDetection().getTargetLocations().add(box));
-
-                //Clearing to ensure garbage collections clears this object.
-                eloc.interpolatedLocations.clear();
-            }
-        }, -1);
-
         List<KLocation> queuedForResend = resend.compute(entity.getEntityId(), (key, list) -> {
             if(list == null) return new ArrayList<>();
 
@@ -340,6 +300,22 @@ public class ReachB extends Check {
 
                     eloc.increment = 3;
 
+                    KillauraH detection = find(KillauraH.class);
+
+                    detection.getTargetLocations().clear();
+                    eloc.interpolatedLocations.clear();
+                    eloc.interpolatedLocations.addAll(eloc.getInterpolatedLocations());
+                    eloc.getInterpolatedLocations().stream()
+                            .map(kloc -> {
+                                SimpleCollisionBox box = (SimpleCollisionBox) EntityData.getEntityBox(kloc, entity);
+
+                                if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) {
+                                    return box.expand(0.1);
+                                }
+
+                                return box;
+                            }).forEach(detection.getTargetLocations()::add);
+
                     /*if(data.target != null && data.target.getEntityId() == packet.getId())
                     debug("Setting new posrot: %.4f, %.4f, %.4f, %s (%s)",
                             eloc.newX, eloc.newY, eloc.newZ, eloc.increment, System.currentTimeMillis());*/
@@ -365,60 +341,7 @@ public class ReachB extends Check {
         Entity entity = op.get();
 
         if(!allowedEntityTypes.contains(entity.getType())) return false;
-        data.runKeepaliveAction(ka -> {
-            EntityLocation eloc = secondEntityLocationMap.computeIfAbsent(entity.getUniqueId(),
-                    key -> new EntityLocation(entity));
 
-            if(data.playerVersion.isOrAbove(ProtocolVersion.V1_9)) {
-                if (!(Math.abs(eloc.x - packet.x) >= 0.03125D)
-                        && !(Math.abs(eloc.y - packet.y) >= 0.015625D)
-                        && !(Math.abs(eloc.z - packet.z) >= 0.03125D)) {
-                    eloc.increment = 0;
-                    //We don't need to do version checking here. Atlas handles this for us.
-                    eloc.newX = eloc.x = packet.x;
-                    eloc.newY = eloc.y = packet.y;
-                    eloc.newZ = eloc.z = packet.z;
-                    eloc.newYaw = eloc.yaw = packet.yaw;
-                    eloc.newPitch = eloc.pitch = packet.pitch;
-                } else {
-                    eloc.newX = packet.x;
-                    eloc.newY = packet.y;
-                    eloc.newZ = packet.z;
-                    eloc.newYaw = packet.yaw;
-                    eloc.newPitch = packet.pitch;
-
-                    eloc.increment = 3;
-                    eloc.interpolateLocations();
-                }
-            } else {
-                //We don't need to do version checking here. Atlas handles this for us.
-                eloc.newX = packet.x;
-                eloc.newY = packet.y;
-                eloc.newZ = packet.z;
-                eloc.newYaw = packet.yaw;
-                eloc.newPitch = packet.pitch;
-
-                eloc.increment = 3;
-                eloc.interpolateLocations();
-            }
-            if(data.target != null && entity.getEntityId() == data.target.getEntityId()) {
-
-                final double toShrink = data.playerVersion.isOrAbove(ProtocolVersion.V1_9) ? 0.12 : 0.02;
-                if(eloc.interpolatedLocations.size() > 0) {
-                    eloc.interpolatedLocations.stream()
-                            .map(kloc -> ((SimpleCollisionBox)EntityData.getEntityBox(kloc, entity))
-                                    .shrink(toShrink, toShrink, toShrink))
-                            .forEach(box -> getKillauraDetection().getTargetLocations().add(box));
-
-                } else {
-                    getKillauraDetection().getTargetLocations()
-                            .add((SimpleCollisionBox)EntityData
-                                    .getEntityBox(new KLocation(eloc.x, eloc.y, eloc.z), entity));
-                }
-                //Clearing to ensure garbage collections clears this object.
-                eloc.interpolatedLocations.clear();
-            }
-        }, -1);
         EntityLocation eloc = entityLocationMap.computeIfAbsent(entity.getUniqueId(),
                 key -> new EntityLocation(entity));
 
@@ -451,6 +374,8 @@ public class ReachB extends Check {
                             eloc.newZ = eloc.z = packet.z;
                             eloc.newYaw = eloc.yaw = packet.yaw;
                             eloc.newPitch = eloc.pitch = packet.pitch;
+                            eloc.interpolatedLocations.clear();
+                            eloc.interpolatedLocations.add(new KLocation(eloc.x, eloc.y, eloc.z, eloc.yaw, eloc.pitch));
                         } else {
                             eloc.newX = packet.x;
                             eloc.newY = packet.y;
@@ -459,6 +384,8 @@ public class ReachB extends Check {
                             eloc.newPitch = packet.pitch;
 
                             eloc.increment = 3;
+                            eloc.interpolatedLocations.clear();
+                            eloc.interpolatedLocations.addAll(eloc.getInterpolatedLocations());
                         }
                     } else {
                         //We don't need to do version checking here. Atlas handles this for us.
@@ -469,7 +396,22 @@ public class ReachB extends Check {
                         eloc.newPitch = packet.pitch;
 
                         eloc.increment = 3;
+                        eloc.interpolatedLocations.clear();
+                        eloc.interpolatedLocations.addAll(eloc.getInterpolatedLocations());
                     }
+
+                    KillauraH detection = find(KillauraH.class);
+                    detection.getTargetLocations().clear();
+                    eloc.getInterpolatedLocations().stream()
+                            .map(kloc -> {
+                                SimpleCollisionBox box = (SimpleCollisionBox) EntityData.getEntityBox(kloc, entity);
+
+                                if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) {
+                                    return box.expand(0.1);
+                                }
+
+                                return box;
+                            }).forEach(detection.getTargetLocations()::add);
 
                     /*if(data.target != null && data.target.getEntityId() == packet.entityId)
                     debug("Setting new posrot: %.4f, %.4f, %.4f, %s (%s)",
@@ -489,16 +431,24 @@ public class ReachB extends Check {
 
     private void runAction(Entity entity, Runnable action) {
         if(data.target != null && data.target.getUniqueId().equals(entity.getUniqueId())) {
+            AtomicLong start = new AtomicLong();
             data.runInstantAction(ia -> {
                 if(!ia.isEnd()) {
                     flying = false;
-                } else if(flying) {
-                    sentTeleport = false;
-                    lastTransProblem.reset();
+                    action.run();
+                    start.set(System.currentTimeMillis());
+                } else {
+                    entityLocationMap.computeIfPresent(entity.getUniqueId(), (key, eloc) -> {
+                        eloc.oldLocation = null;
+                        return eloc;
+                    });
+                    if(flying || System.currentTimeMillis() - start.get() > 4) {
+                        sentTeleport = false;
+                        lastTransProblem.reset();
+                    }
                 }
 
-                if(ia.isEnd()) {
-                    action.run();
+                if(!ia.isEnd()) {
                 }
             }, true);
         } else data.runKeepaliveAction(keepalive -> action.run());
