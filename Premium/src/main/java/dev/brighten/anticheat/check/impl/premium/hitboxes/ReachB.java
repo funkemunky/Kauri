@@ -115,8 +115,10 @@ public class ReachB extends Check {
 
             //debug("current loc: %.4f, %.4f, %.4f", eloc.x, eloc.y, eloc.z);
 
-            to.y+= data.playerInfo.sneaking ? 1.54f : 1.62f;
-            from.y+= data.playerInfo.lsneaking ? 1.54f : 1.62f;
+            to.y+= data.playerInfo.sneaking ? (ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_14)
+                    ? 1.27f : 1.54f) : 1.62f;
+            from.y+= data.playerInfo.lsneaking ? (ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_14)
+                    ? 1.27f : 1.54f) : 1.62f;
             if(eloc.x == 0 && eloc.y == 0 & eloc.z == 0) break detection;
             double distance = Double.MAX_VALUE;
             boolean collided = false; //Using this to compare smaller numbers than Double.MAX_VALUE. Slightly faster
@@ -125,20 +127,34 @@ public class ReachB extends Check {
 
             if(eloc.oldLocation != null) {
                 targetBox = Helper.wrap((SimpleCollisionBox) EntityData
-                        .getEntityBox(new Vector(eloc.newX, eloc.newY, eloc.newZ), data.target), (SimpleCollisionBox) EntityData
-                        .getEntityBox(eloc.oldLocation, data.target));
+                        .getEntityBox(new Vector(eloc.newX, eloc.newY, eloc.newZ), data.target),
+                        (SimpleCollisionBox) EntityData.getEntityBox(eloc.oldLocation, data.target));
                 debug("old location isnt null");
             } else {
                 targetBox = Helper.wrap(eloc.interpolatedLocations.stream().map(l -> (SimpleCollisionBox) EntityData
                         .getEntityBox(l, data.target)).collect(Collectors.toList()));
             }
+
+            if(targetBox == null) break detection;
             if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) {
                 targetBox = targetBox.expand(0.1, 0.1, 0.1);
+            } else {
+                targetBox = targetBox.expand(0.0325D);
             }
 
             final AxisAlignedBB vanillaBox = new AxisAlignedBB(targetBox);
 
             Vec3D intersectFrom = vanillaBox.rayTrace(from.toVector(), MathUtils.getDirection(from), 10);
+
+            if(ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_9)) {
+                Vec3D intersectTo = vanillaBox.rayTrace(to.toVector(), MathUtils.getDirection(to), 10);
+
+                if(intersectTo != null) {
+                    lastAimOnTarget.reset();
+                    distance = Math.min(distance, intersectTo.distanceSquared(new Vec3D(to.x, to.y, to.z)));
+                    collided = true;
+                }
+            }
 
             if(intersectFrom != null) {
                 lastAimOnTarget.reset();
@@ -149,7 +165,7 @@ public class ReachB extends Check {
             if(collided) {
                 hbuffer = 0;
                 distance = Math.sqrt(distance);
-                if(distance > 3.04 && lastTransProblem.isPassed(52)
+                if(distance > 3.02 && lastTransProblem.isPassed(52)
                         && lastFlying.isNotPassed(1)) {
                     if(streak > 3 && sentTeleport) {
                         if(++buffer > 2) {
@@ -186,9 +202,6 @@ public class ReachB extends Check {
 
             if(eloc.increment == 0) continue;
 
-            /*if(data.target != null && eloc.entity.getEntityId() == data.target.getEntityId())
-                debug("Increment(%s): %.4f, %.4f, %.4f (%s)", eloc.increment,
-                        eloc.x, eloc.y, eloc.z, System.currentTimeMillis());*/
             eloc.interpolateLocation();
         }
 
@@ -203,21 +216,19 @@ public class ReachB extends Check {
                 && Kauri.INSTANCE.keepaliveProcessor.getKeepById(packet.getAction()).isPresent()) {
 
             for (Iterator<Map.Entry<UUID, EntityLocation>> it = entityLocationMap.entrySet().iterator();
-                                                           it.hasNext();) {
-                    Map.Entry<UUID, EntityLocation> entry = it.next();
+                 it.hasNext();) {
+                Map.Entry<UUID, EntityLocation> entry = it.next();
 
-                    EntityLocation eloc = entry.getValue();
+                EntityLocation eloc = entry.getValue();
 
-                    if(eloc.entity == null) {
-                        it.remove();
-                        continue;
-                    }
-
-                    eloc.interpolateLocation();
-                    if(data.target != null && eloc.entity.getUniqueId() == data.target.getUniqueId()) {
-                    getAimDetection().setTargetLocation(new KLocation(eloc.x, eloc.y, eloc.z, eloc.yaw, eloc.pitch));
-                    attacked = false;
+                if(eloc.entity == null) {
+                    it.remove();
+                    continue;
                 }
+
+                if(eloc.increment == 0) continue;
+
+                eloc.interpolateLocation();
             }
         }
     }
@@ -265,7 +276,8 @@ public class ReachB extends Check {
         }
 
         KLocation toCompare = new KLocation(x, y, z, yaw, pitch);
-        Optional<KLocation> needsToCancel = queuedForResend.stream().filter(rp -> rp.toVector().distanceSquared(toCompare.toVector()) < 0.0001).findFirst();
+        Optional<KLocation> needsToCancel = queuedForResend.stream()
+                .filter(rp -> rp.toVector().distanceSquared(toCompare.toVector()) < 0.0001).findFirst();
 
         if(!needsToCancel.isPresent()) {
             EntityLocation eloc = entityLocationMap.computeIfAbsent(entity.getUniqueId(),
