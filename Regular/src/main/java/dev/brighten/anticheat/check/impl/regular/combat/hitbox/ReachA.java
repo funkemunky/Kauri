@@ -115,7 +115,7 @@ public class ReachA extends Check {
                     break hitboxes;
                 }
 
-                if(hitboxHits == 0) {
+                if(hitboxHits == 0 && misses > 1) {
                     if(System.currentTimeMillis() - data.lagInfo.lastClientTrans < 150L
                             && data.lagInfo.lastPingDrop.isPassed(5) && ++hitbox.buffer > 5) {
                         hitbox.vl++;

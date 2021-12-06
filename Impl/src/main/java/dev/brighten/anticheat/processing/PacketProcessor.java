@@ -80,6 +80,14 @@ public class PacketProcessor {
                         }
                         break;
                     }
+                    case Packet.Client.CUSTOM_PAYLOAD: {
+                        val packet = new WrappedInCustomPayload(info.getPacket(), info.getPlayer());
+
+                        if(data.checkManager.runPacketCancellable(packet, info.getTimestamp())) {
+                            info.setCancelled(true);
+                        }
+                        break;
+                    }
                     case Packet.Client.FLYING:
                     case Packet.Client.POSITION:
                     case Packet.Client.POSITION_LOOK:
@@ -140,7 +148,8 @@ public class PacketProcessor {
                     }
                 }
             }, Packet.Client.USE_ENTITY, Packet.Client.FLYING, Packet.Client.POSITION, Packet.Client.CREATIVE_SLOT,
-                    Packet.Client.POSITION_LOOK, Packet.Client.LOOK, Packet.Server.REL_LOOK,
+                    Packet.Client.POSITION_LOOK, Packet.Client.LOOK, Packet.Server.REL_LOOK, Packet.Client.WINDOW_CLICK,
+                    Packet.Client.CUSTOM_PAYLOAD, Packet.Client.CHAT, Packet.Client.ARM_ANIMATION,
                     Packet.Server.REL_POSITION, Packet.Server.REL_POSITION_LOOK, Packet.Server.LEGACY_REL_LOOK,
                     Packet.Server.LEGACY_REL_POSITION, Packet.Server.LEGACY_REL_POSITION_LOOK, Packet.Server.ENTITY,
                     Packet.Server.TRANSACTION, Packet.Server.ENTITY_VELOCITY, Packet.Server.ENTITY_TELEPORT);

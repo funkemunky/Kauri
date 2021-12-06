@@ -165,16 +165,15 @@ public class ReachB extends Check {
             if(collided) {
                 hbuffer = 0;
                 distance = Math.sqrt(distance);
-                if(distance > 3.02 && lastTransProblem.isPassed(52)
-                        && lastFlying.isNotPassed(1)) {
+                if(distance > 3.02 && lastTransProblem.isPassed(52)) {
                     if(streak > 3 && sentTeleport) {
                         if(++buffer > 2) {
                             vl++;
                             flag("d=%.4f ltp=%s", distance, lastTransProblem.getPassed());
                             buffer = 2;
                         }
-                    } else for(int i = 0 ; i < 2; i++) data.typesToCancel.add(CancelType.ATTACK);
-                } else if(buffer > 0) buffer-= 0.05f;
+                    }
+                } else if(buffer > 0) buffer-= 0.075f;
                 debug("dist=%.2f b=%s s=%s st=%s lf=%s ld=%s lti=%s",
                         distance, buffer, streak, sentTeleport, lastFlying.getPassed(),
                         data.lagInfo.lastPingDrop.getPassed(), lastTransProblem.getPassed());
@@ -370,7 +369,7 @@ public class ReachB extends Check {
 
             queuedForResend.add(toCompare);
             resend.put(entity.getEntityId(), queuedForResend);
-            WrappedOutEntityTeleportPacket newPacket = new WrappedOutEntityTeleportPacket( packet.entityId,
+            WrappedOutEntityTeleportPacket newPacket = new WrappedOutEntityTeleportPacket(packet.entityId,
                     packet.x, packet.y, packet.z, packet.yaw, packet.pitch, packet.onGround);
 
             RunUtils.task(() -> {
