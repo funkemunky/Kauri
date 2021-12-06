@@ -65,6 +65,8 @@ public class ReachA extends Check {
                     || data.target == null
                     || !allowedEntityTypes.contains(data.target.getType())) break reachA;
 
+            if(!data.getEntityLocation(data.target).sentTeleport) break reachA;
+
 
             List<KLocation> targetLocs = data.entityLocPastLocation
                     .getEstimatedLocationByIndex(data.lagInfo.transPing + 1 + transBetweenFlying,

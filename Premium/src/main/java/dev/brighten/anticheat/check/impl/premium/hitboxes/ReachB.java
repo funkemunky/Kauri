@@ -46,8 +46,7 @@ import java.util.stream.Collectors;
 @Cancellable(cancelType = CancelType.ATTACK)
 public class ReachB extends Check {
 
-    private final Map<UUID, EntityLocation> entityLocationMap = new HashMap<>(),
-            secondEntityLocationMap = new HashMap<>();
+    public final Map<UUID, EntityLocation> entityLocationMap = new HashMap<>();
     private Timer lastFlying;
     public int streak;
     private float buffer;
@@ -453,8 +452,7 @@ public class ReachB extends Check {
                         eloc.oldLocation = null;
                         return eloc;
                     });
-                    if(flying || System.currentTimeMillis() - start.get() > 4) {
-                        sentTeleport = false;
+                    if(System.currentTimeMillis() - start.get() > 4) {
                         lastTransProblem.reset();
                     }
                 }

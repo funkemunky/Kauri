@@ -745,6 +745,7 @@ public class PacketProcessor {
                             }
 
                             if(data.target != null && data.target.getEntityId() == packet.entityId) {
+                                eloc.sentTeleport = true;
                                 if(eloc.interpolatedLocations.size() > 1) {
                                     for (int i = 0; i < eloc.interpolatedLocations.size(); i++) {
                                         KLocation loc = eloc.interpolatedLocations.get(i);

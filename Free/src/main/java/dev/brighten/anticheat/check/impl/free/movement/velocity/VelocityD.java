@@ -34,7 +34,7 @@ public class VelocityD extends Check {
         }
 
         //if the player took velocity, we reset.
-        if(data.playerInfo.deltaY > 0 || !data.playerInfo.clientGround || !data.playerInfo.checkMovement) {
+        if(data.playerInfo.deltaY > 0 || !data.playerInfo.serverGround || !data.playerInfo.checkMovement) {
             vY = 0;
             buffer = 0;
             return;
@@ -45,7 +45,7 @@ public class VelocityD extends Check {
                 && data.playerInfo.webTimer.isPassed(4)
                 && data.playerInfo.lastMoveTimer.isNotPassed(2)
                 && data.lagInfo.lastPacketDrop.isPassed(5)) {
-            int threshold = Math.max(data.lagInfo.transPing, MathUtils.millisToTicks(data.lagInfo.ping)) + 3;
+            int threshold = Math.max(data.lagInfo.transPing, MathUtils.millisToTicks(data.lagInfo.ping)) + 2;
 
             if(++buffer > threshold) {
                 vl++;

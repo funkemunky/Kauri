@@ -8,6 +8,7 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.check.impl.premium.hitboxes.ReachB;
+import dev.brighten.anticheat.utils.EntityLocation;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import dev.brighten.api.KauriVersion;
@@ -21,20 +22,21 @@ import java.util.List;
         checkType = CheckType.AIM, planVersion = KauriVersion.ARA, punishVL = 20, executable = true)
 public class AimG extends Check {
 
-    @Setter
-    private KLocation targetLocation;
-
     private int abuffer;
 
     protected List<Double> yawOffsets = new EvictingList<>(10), pitchOffsets = new EvictingList<>(10);
 
     @Packet
     public void onUse(WrappedInUseEntityPacket packet) {
+        ReachB reach = find(ReachB.class);
         if(packet.getAction() != WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK
-                || !find(ReachB.class).sentTeleport
-                || targetLocation == null || find(ReachB.class).streak < 3) return;
+                || data.target == null || !reach.sentTeleport || reach.streak < 3
+                || !reach.entityLocationMap.containsKey(data.target.getUniqueId())) return;
 
-        KLocation origin = data.playerInfo.to.clone();
+        EntityLocation eloc = reach.entityLocationMap.get(data.target.getUniqueId());
+
+        KLocation origin = data.playerInfo.to.clone(),
+                targetLocation = new KLocation(eloc.x, eloc.y, eloc.z, eloc.yaw, eloc.pitch);
 
         origin.y+= data.playerInfo.sneaking ? 1.54f : 1.62f;
 
