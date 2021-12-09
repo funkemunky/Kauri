@@ -79,16 +79,16 @@ public class Check implements KauriCheck {
 
     private final Timer lastAlert = new TickTimer(MathUtils.millisToTicks(Config.alertsDelay));
 
-    private final Map<Class<?>, Check> detectionCache = new HashMap<>();
+    private final Map<Class<? extends Check>, Check> detectionCache = new HashMap<>();
 
 
-    public <T> T find(Class<? extends T> clazz) {
-        return (T) detectionCache.computeIfAbsent(clazz, key -> {
+    public <T extends Check> T find(Class<? extends T> clazz) {
+        return clazz.cast(detectionCache.computeIfAbsent(clazz, key -> {
             if(!clazz.isAnnotationPresent(CheckInfo.class)) {
                 return null;
             }
             return data.checkManager.checks.get(clazz.getAnnotation(CheckInfo.class).name());
-        });
+        }));
     }
 
     public void setData(ObjectData data) {
@@ -151,6 +151,14 @@ public class Check implements KauriCheck {
 
     public void flag(int resetVLTime, String information, Object... variables) {
         flag(false, resetVLTime, information, variables);
+    }
+
+    private String addPlaceHolders(String string) {
+        return string.replace("%player%", data.getPlayer().getName())
+                .replace("%check%", name)
+                .replace("%vl%", String.valueOf(MathUtils.round(vl, 1)))
+                .replace("%experimental%", !devStage.isRelease()
+                        ? "&c(" + devStage.getFormattedName() + ")" : "");
     }
 
     protected long lastFlagRun = 0L;
@@ -293,15 +301,10 @@ public class Check implements KauriCheck {
     }
 
     private String formatAlert(String toFormat, String info) {
-        return Color.translate(toFormat.replace("%desc%", String.join("\n",
-                MiscUtils
-                        .splitIntoLine(description, 20)))
-                .replace("%player%", data.getPlayer().getName())
-                .replace("%check%", name)
-                .replace("%info%", info)
-                .replace("%sl%", String.valueOf(MathUtils.round(vl, 1)))
-                .replace("%experimental%", !devStage.isRelease()
-                        ? "&c(" + devStage.getFormattedName() + ")" : ""));
+        return addPlaceHolders(Color.translate(toFormat.replace("%desc%", String.join("\n",
+                        MiscUtils
+                                .splitIntoLine(description, 20))))
+                .replace("%info%", info));
     }
 
     public void punish() {
