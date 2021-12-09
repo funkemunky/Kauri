@@ -12,12 +12,15 @@ import dev.brighten.api.check.DevStage;
         devStage = DevStage.ALPHA, vlToFlag = 3)
 public class Blink extends Check {
 
+    private int buffer = 0;
     @Packet
     public void onTrans(WrappedInTransactionPacket packet) {
         if(data.playerInfo.lastFlyingTimer.isPassed(
-                (data.playerVersion.isAbove(ProtocolVersion.V1_8_9) ? 30 : 10) + data.lagInfo.transPing)) {
-            vl++;
-            flag(40, "%s", data.playerInfo.lastFlyingTimer.getPassed());
-        }
+                (data.playerVersion.isAbove(ProtocolVersion.V1_8_9) ? 40 : 25) + data.lagInfo.transPing)) {
+            if(++buffer > 2) {
+                vl++;
+                flag(40, "%s", data.playerInfo.lastFlyingTimer.getPassed());
+            }
+        } else buffer = 0;
     }
 }
