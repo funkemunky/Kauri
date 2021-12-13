@@ -343,14 +343,11 @@ public class Check implements KauriCheck {
                     if (!Config.bungeeBroadcast) {
                         RunUtils.task(() -> {
                             if (!broadcastMessage.equalsIgnoreCase("off")) {
-                                Bukkit.broadcastMessage(Color.translate(broadcastMessage
-                                        .replace("%name%", data.getPlayer().getName())
-                                        .replace("%check%", getName())));
+                                Bukkit.broadcastMessage(Color.translate(addPlaceHolders(broadcastMessage)));
                             }
                         }, Kauri.INSTANCE);
                     } else {
-                        BungeeAPI.broadcastMessage(Color.translate(broadcastMessage
-                                .replace("%name%", data.getPlayer().getName())).replace("%check%", getName()));
+                        BungeeAPI.broadcastMessage(Color.translate(addPlaceHolders(broadcastMessage)));
                     }
                 }
                 if(!Config.bungeePunishments) {
@@ -359,13 +356,13 @@ public class Check implements KauriCheck {
                         punishCommands.
                                 forEach(cmd -> Bukkit.dispatchCommand(
                                         sender,
-                                        cmd.replace("%name%", data.getPlayer().getName())));
+                                        addPlaceHolders(cmd.replace("%name%", data.getPlayer().getName()))));
                         vl = 0;
                     }, Kauri.INSTANCE);
                 } else {
                     punishCommands.
                             forEach(cmd -> BungeeAPI
-                                    .sendCommand(cmd.replace("%name%", data.getPlayer().getName())));
+                                    .sendCommand(addPlaceHolders(cmd.replace("%name%", data.getPlayer().getName()))));
                 }
                 data.banned = true;
             }
