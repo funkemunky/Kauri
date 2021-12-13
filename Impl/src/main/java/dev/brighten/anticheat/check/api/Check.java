@@ -228,7 +228,7 @@ public class Check implements KauriCheck {
                     }
                     val text = createTxt(Kauri.INSTANCE.msgHandler.getLanguage().msg("cheat-alert",
                             "&8[&6&lKauri&8] &f%player% &7flagged &f%check%" +
-                                    " &8(&ex%sl%&8) %experimental%"), info);
+                                    " &8(&ex%vl%&8) %experimental%"), info);
 
                     text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] {
                             createTxt(Kauri.INSTANCE.msgHandler.getLanguage().msg("cheat-alert-hover",
@@ -278,10 +278,10 @@ public class Check implements KauriCheck {
     }
 
     private TextComponent createTxt(String txt) {
-        return new TextComponent(formatAlert(Color.translate(txt), ""));
+        return createTxt(txt, "");
     }
     private TextComponent createTxt(String txt, String info) {
-        return new TextComponent(formatAlert(Color.translate(txt), info));
+        return new TextComponent(TextComponent.fromLegacyText(Color.translate(formatAlert(txt, info))));
     }
 
     public boolean isPosition(WrappedInFlyingPacket packet) {
