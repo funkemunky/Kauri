@@ -74,21 +74,22 @@ public class Check implements KauriCheck {
     public CancelType cancelMode;
     @Getter
     private KauriVersion plan;
+    public List<String> executableCommands = new ArrayList<>();
 
     public boolean exempt, banExempt;
 
     private final Timer lastAlert = new TickTimer(MathUtils.millisToTicks(Config.alertsDelay));
 
-    private final Map<Class<?>, Check> detectionCache = new HashMap<>();
+    private final Map<Class<? extends Check>, Check> detectionCache = new HashMap<>();
 
 
-    public <T> T find(Class<? extends T> clazz) {
-        return (T) detectionCache.computeIfAbsent(clazz, key -> {
+    public <T extends Check> T find(Class<? extends T> clazz) {
+        return clazz.cast(detectionCache.computeIfAbsent(clazz, key -> {
             if(!clazz.isAnnotationPresent(CheckInfo.class)) {
                 return null;
             }
             return data.checkManager.checks.get(clazz.getAnnotation(CheckInfo.class).name());
-        });
+        }));
     }
 
     public void setData(ObjectData data) {
@@ -120,6 +121,12 @@ public class Check implements KauriCheck {
                 path + ".executable", Kauri.INSTANCE).get();
         settings.cancellable = new ConfigDefault<>(info.cancellable(),
                 path + ".cancellable", Kauri.INSTANCE).get();
+        settings.executableCommands = new ArrayList<>(new ConfigDefault<>(Arrays.asList("%global_commands%"),
+                path + ".commands", Kauri.INSTANCE).get());
+
+        runLoop(settings);
+
+        System.out.println(settings.executableCommands.toString());
 
         final String spath = path + ".settings.";
         checkClass.getFields(field -> Modifier.isStatic(field.getModifiers())
@@ -137,6 +144,17 @@ public class Check implements KauriCheck {
         MiscUtils.printToConsole("Registered check " + info.name());
     }
 
+    private static void runLoop(CheckSettings settings) {
+        for(String executableCommand : settings.executableCommands) {
+            if(executableCommand.equals("%global_commands%")) {
+                settings.executableCommands.remove(executableCommand);
+                settings.executableCommands.addAll(Config.punishCommands);
+                runLoop(settings);
+                break;
+            }
+        }
+    }
+
     public void flag() {
         flag(false, "");
     }
@@ -151,6 +169,14 @@ public class Check implements KauriCheck {
 
     public void flag(int resetVLTime, String information, Object... variables) {
         flag(false, resetVLTime, information, variables);
+    }
+
+    private String addPlaceHolders(String string) {
+        return string.replace("%player%", data.getPlayer().getName())
+                .replace("%check%", name)
+                .replace("%vl%", String.valueOf(MathUtils.round(vl, 1)))
+                .replace("%experimental%", !devStage.isRelease()
+                        ? "&c(" + devStage.getFormattedName() + ")" : "");
     }
 
     protected long lastFlagRun = 0L;
@@ -220,7 +246,7 @@ public class Check implements KauriCheck {
                     }
                     val text = createTxt(Kauri.INSTANCE.msgHandler.getLanguage().msg("cheat-alert",
                             "&8[&6&lKauri&8] &f%player% &7flagged &f%check%" +
-                                    " &8(&ex%sl%&8) %experimental%"), info);
+                                    " &8(&ex%vl%&8) %experimental%"), info);
 
                     text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] {
                             createTxt(Kauri.INSTANCE.msgHandler.getLanguage().msg("cheat-alert-hover",
@@ -270,10 +296,10 @@ public class Check implements KauriCheck {
     }
 
     private TextComponent createTxt(String txt) {
-        return new TextComponent(formatAlert(Color.translate(txt), ""));
+        return createTxt(txt, "");
     }
     private TextComponent createTxt(String txt, String info) {
-        return new TextComponent(formatAlert(Color.translate(txt), info));
+        return new TextComponent(TextComponent.fromLegacyText(Color.translate(formatAlert(txt, info))));
     }
 
     public boolean isPosition(WrappedInFlyingPacket packet) {
@@ -293,15 +319,10 @@ public class Check implements KauriCheck {
     }
 
     private String formatAlert(String toFormat, String info) {
-        return Color.translate(toFormat.replace("%desc%", String.join("\n",
-                MiscUtils
-                        .splitIntoLine(description, 20)))
-                .replace("%player%", data.getPlayer().getName())
-                .replace("%check%", name)
-                .replace("%info%", info)
-                .replace("%sl%", String.valueOf(MathUtils.round(vl, 1)))
-                .replace("%experimental%", !devStage.isRelease()
-                        ? "&c(" + devStage.getFormattedName() + ")" : ""));
+        return addPlaceHolders(Color.translate(toFormat.replace("%desc%", String.join("\n",
+                        MiscUtils
+                                .splitIntoLine(description, 20))))
+                .replace("%info%", info));
     }
 
     public void punish() {
@@ -326,7 +347,7 @@ public class Check implements KauriCheck {
         if(!executable || (banExempt && Config.punishmentBypassPerm)) return;
 
         KauriPunishEvent punishEvent = new KauriPunishEvent(data.getPlayer(), this,
-                Config.broadcastMessage, Config.punishCommands);
+                Config.broadcastMessage, executableCommands);
 
         Atlas.getInstance().getEventManager().callEvent(punishEvent);
 
@@ -340,14 +361,11 @@ public class Check implements KauriCheck {
                     if (!Config.bungeeBroadcast) {
                         RunUtils.task(() -> {
                             if (!broadcastMessage.equalsIgnoreCase("off")) {
-                                Bukkit.broadcastMessage(Color.translate(broadcastMessage
-                                        .replace("%name%", data.getPlayer().getName())
-                                        .replace("%check%", getName())));
+                                Bukkit.broadcastMessage(Color.translate(addPlaceHolders(broadcastMessage)));
                             }
                         }, Kauri.INSTANCE);
                     } else {
-                        BungeeAPI.broadcastMessage(Color.translate(broadcastMessage
-                                .replace("%name%", data.getPlayer().getName())).replace("%check%", getName()));
+                        BungeeAPI.broadcastMessage(Color.translate(addPlaceHolders(broadcastMessage)));
                     }
                 }
                 if(!Config.bungeePunishments) {
@@ -356,15 +374,18 @@ public class Check implements KauriCheck {
                         punishCommands.
                                 forEach(cmd -> Bukkit.dispatchCommand(
                                         sender,
-                                        cmd.replace("%name%", data.getPlayer().getName())));
+                                        addPlaceHolders(cmd.replace("%name%", data.getPlayer().getName()))));
                         vl = 0;
                     }, Kauri.INSTANCE);
                 } else {
                     punishCommands.
                             forEach(cmd -> BungeeAPI
-                                    .sendCommand(cmd.replace("%name%", data.getPlayer().getName())));
+                                    .sendCommand(addPlaceHolders(cmd.replace("%name%", data.getPlayer().getName()))));
                 }
                 data.banned = true;
+                RunUtils.taskLater(() -> {
+                    if(data != null) data.banned = false;
+                }, Kauri.INSTANCE, 10);
             }
         }
     }
