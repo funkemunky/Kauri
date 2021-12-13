@@ -7,6 +7,8 @@ import dev.brighten.api.check.CheckType;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class CheckSettings {
@@ -17,4 +19,5 @@ public class CheckSettings {
     public final KauriVersion plan;
     public final int punishVl, vlToFlag;
     public final ProtocolVersion minVersion, maxVersion;
+    public List<String> executableCommands;
 }

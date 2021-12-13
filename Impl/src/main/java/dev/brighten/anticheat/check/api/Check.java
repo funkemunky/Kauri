@@ -74,6 +74,7 @@ public class Check implements KauriCheck {
     public CancelType cancelMode;
     @Getter
     private KauriVersion plan;
+    private List<String> executableCommands = new ArrayList<>();
 
     public boolean exempt, banExempt;
 
@@ -81,14 +82,13 @@ public class Check implements KauriCheck {
 
     private final Map<Class<?>, Check> detectionCache = new HashMap<>();
 
-
     public <T> T find(Class<? extends T> clazz) {
-        return (T) detectionCache.computeIfAbsent(clazz, key -> {
+        return clazz.cast(detectionCache.computeIfAbsent(clazz, key -> {
             if(!clazz.isAnnotationPresent(CheckInfo.class)) {
                 return null;
             }
             return data.checkManager.checks.get(clazz.getAnnotation(CheckInfo.class).name());
-        });
+        }));
     }
 
     public void setData(ObjectData data) {
@@ -120,6 +120,8 @@ public class Check implements KauriCheck {
                 path + ".executable", Kauri.INSTANCE).get();
         settings.cancellable = new ConfigDefault<>(info.cancellable(),
                 path + ".cancellable", Kauri.INSTANCE).get();
+        settings.executableCommands = new ConfigDefault<>(Arrays.asList("%global_commands%"),
+                path + ".commands", Kauri.INSTANCE).get();
 
         final String spath = path + ".settings.";
         checkClass.getFields(field -> Modifier.isStatic(field.getModifiers())
