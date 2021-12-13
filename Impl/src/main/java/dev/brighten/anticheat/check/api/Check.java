@@ -74,6 +74,7 @@ public class Check implements KauriCheck {
     public CancelType cancelMode;
     @Getter
     private KauriVersion plan;
+    public List<String> executableCommands = new ArrayList<>();
 
     public boolean exempt, banExempt;
 
@@ -120,6 +121,12 @@ public class Check implements KauriCheck {
                 path + ".executable", Kauri.INSTANCE).get();
         settings.cancellable = new ConfigDefault<>(info.cancellable(),
                 path + ".cancellable", Kauri.INSTANCE).get();
+        settings.executableCommands = new ArrayList<>(new ConfigDefault<>(Arrays.asList("%global_commands%"),
+                path + ".commands", Kauri.INSTANCE).get());
+
+        runLoop(settings);
+
+        System.out.println(settings.executableCommands.toString());
 
         final String spath = path + ".settings.";
         checkClass.getFields(field -> Modifier.isStatic(field.getModifiers())
@@ -135,6 +142,17 @@ public class Check implements KauriCheck {
         checkSettings.put(checkClass, settings);
         checkClasses.put(checkClass, info);
         MiscUtils.printToConsole("Registered check " + info.name());
+    }
+
+    private static void runLoop(CheckSettings settings) {
+        for(String executableCommand : settings.executableCommands) {
+            if(executableCommand.equals("%global_commands%")) {
+                settings.executableCommands.remove(executableCommand);
+                settings.executableCommands.addAll(Config.punishCommands);
+                runLoop(settings);
+                break;
+            }
+        }
     }
 
     public void flag() {
@@ -329,7 +347,7 @@ public class Check implements KauriCheck {
         if(!executable || (banExempt && Config.punishmentBypassPerm)) return;
 
         KauriPunishEvent punishEvent = new KauriPunishEvent(data.getPlayer(), this,
-                Config.broadcastMessage, Config.punishCommands);
+                Config.broadcastMessage, executableCommands);
 
         Atlas.getInstance().getEventManager().callEvent(punishEvent);
 
@@ -365,6 +383,9 @@ public class Check implements KauriCheck {
                                     .sendCommand(addPlaceHolders(cmd.replace("%name%", data.getPlayer().getName()))));
                 }
                 data.banned = true;
+                RunUtils.taskLater(() -> {
+                    if(data != null) data.banned = false;
+                }, Kauri.INSTANCE, 10);
             }
         }
     }
