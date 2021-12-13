@@ -80,9 +80,10 @@ public class Check implements KauriCheck {
 
     private final Timer lastAlert = new TickTimer(MathUtils.millisToTicks(Config.alertsDelay));
 
-    private final Map<Class<?>, Check> detectionCache = new HashMap<>();
+    private final Map<Class<? extends Check>, Check> detectionCache = new HashMap<>();
 
-    public <T> T find(Class<? extends T> clazz) {
+
+    public <T extends Check> T find(Class<? extends T> clazz) {
         return clazz.cast(detectionCache.computeIfAbsent(clazz, key -> {
             if(!clazz.isAnnotationPresent(CheckInfo.class)) {
                 return null;
@@ -155,6 +156,14 @@ public class Check implements KauriCheck {
         flag(false, resetVLTime, information, variables);
     }
 
+    private String addPlaceHolders(String string) {
+        return string.replace("%player%", data.getPlayer().getName())
+                .replace("%check%", name)
+                .replace("%vl%", String.valueOf(MathUtils.round(vl, 1)))
+                .replace("%experimental%", !devStage.isRelease()
+                        ? "&c(" + devStage.getFormattedName() + ")" : "");
+    }
+
     protected long lastFlagRun = 0L;
 
     public void flag(boolean devAlerts, int resetVLTime, String information, Object... variables) {
@@ -222,7 +231,7 @@ public class Check implements KauriCheck {
                     }
                     val text = createTxt(Kauri.INSTANCE.msgHandler.getLanguage().msg("cheat-alert",
                             "&8[&6&lKauri&8] &f%player% &7flagged &f%check%" +
-                                    " &8(&ex%sl%&8) %experimental%"), info);
+                                    " &8(&ex%vl%&8) %experimental%"), info);
 
                     text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] {
                             createTxt(Kauri.INSTANCE.msgHandler.getLanguage().msg("cheat-alert-hover",
@@ -272,10 +281,10 @@ public class Check implements KauriCheck {
     }
 
     private TextComponent createTxt(String txt) {
-        return new TextComponent(formatAlert(Color.translate(txt), ""));
+        return createTxt(txt, "");
     }
     private TextComponent createTxt(String txt, String info) {
-        return new TextComponent(formatAlert(Color.translate(txt), info));
+        return new TextComponent(TextComponent.fromLegacyText(Color.translate(formatAlert(txt, info))));
     }
 
     public boolean isPosition(WrappedInFlyingPacket packet) {
@@ -295,15 +304,10 @@ public class Check implements KauriCheck {
     }
 
     private String formatAlert(String toFormat, String info) {
-        return Color.translate(toFormat.replace("%desc%", String.join("\n",
-                MiscUtils
-                        .splitIntoLine(description, 20)))
-                .replace("%player%", data.getPlayer().getName())
-                .replace("%check%", name)
-                .replace("%info%", info)
-                .replace("%sl%", String.valueOf(MathUtils.round(vl, 1)))
-                .replace("%experimental%", !devStage.isRelease()
-                        ? "&c(" + devStage.getFormattedName() + ")" : ""));
+        return addPlaceHolders(Color.translate(toFormat.replace("%desc%", String.join("\n",
+                        MiscUtils
+                                .splitIntoLine(description, 20))))
+                .replace("%info%", info));
     }
 
     public void punish() {
@@ -342,14 +346,11 @@ public class Check implements KauriCheck {
                     if (!Config.bungeeBroadcast) {
                         RunUtils.task(() -> {
                             if (!broadcastMessage.equalsIgnoreCase("off")) {
-                                Bukkit.broadcastMessage(Color.translate(broadcastMessage
-                                        .replace("%name%", data.getPlayer().getName())
-                                        .replace("%check%", getName())));
+                                Bukkit.broadcastMessage(Color.translate(addPlaceHolders(broadcastMessage)));
                             }
                         }, Kauri.INSTANCE);
                     } else {
-                        BungeeAPI.broadcastMessage(Color.translate(broadcastMessage
-                                .replace("%name%", data.getPlayer().getName())).replace("%check%", getName()));
+                        BungeeAPI.broadcastMessage(Color.translate(addPlaceHolders(broadcastMessage)));
                     }
                 }
                 if(!Config.bungeePunishments) {
@@ -358,13 +359,13 @@ public class Check implements KauriCheck {
                         punishCommands.
                                 forEach(cmd -> Bukkit.dispatchCommand(
                                         sender,
-                                        cmd.replace("%name%", data.getPlayer().getName())));
+                                        addPlaceHolders(cmd.replace("%name%", data.getPlayer().getName()))));
                         vl = 0;
                     }, Kauri.INSTANCE);
                 } else {
                     punishCommands.
                             forEach(cmd -> BungeeAPI
-                                    .sendCommand(cmd.replace("%name%", data.getPlayer().getName())));
+                                    .sendCommand(addPlaceHolders(cmd.replace("%name%", data.getPlayer().getName()))));
                 }
                 data.banned = true;
             }
