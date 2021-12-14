@@ -8,8 +8,8 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
-@CheckInfo(name = "Blink", description = "Invalid lag spikes", checkType = CheckType.GENERAL,
-        devStage = DevStage.ALPHA, vlToFlag = 3)
+//@CheckInfo(name = "Blink", description = "Invalid lag spikes", checkType = CheckType.GENERAL,
+//        devStage = DevStage.ALPHA, vlToFlag = 3)
 public class Blink extends Check {
 
     private int buffer = 0;
