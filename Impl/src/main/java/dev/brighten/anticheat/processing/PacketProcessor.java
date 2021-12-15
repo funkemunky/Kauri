@@ -154,6 +154,14 @@ public class PacketProcessor {
                         }
                         break;
                     }
+                    case Packet.Client.CHAT: {
+                        val packet = new WrappedInChatPacket(info.getPacket(), info.getPlayer());
+
+                        if(data.checkManager.runPacketCancellable(packet, info.getTimestamp())) {
+                            info.setCancelled(true);
+                        }
+                        break;
+                    }
                 }
             }, Packet.Client.USE_ENTITY, Packet.Client.FLYING, Packet.Client.POSITION, Packet.Client.CREATIVE_SLOT,
                     Packet.Client.POSITION_LOOK, Packet.Client.LOOK, Packet.Server.REL_LOOK, Packet.Client.WINDOW_CLICK,

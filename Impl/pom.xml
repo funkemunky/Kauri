@@ -55,15 +55,6 @@
                         </goals>
                         <configuration>
                             <minimizeJar>false</minimizeJar>
-                            <filters>
-                                <filter>
-                                    <artifact>dev.brighten.anticheat:Impl</artifact>
-                                    <excludes>
-                                        <exclude>dev/brighten/anticheat/classloader/**</exclude>
-                                        <exclude>dev/brighten/anticheat/utils/SystemUtil.class</exclude>
-                                    </excludes>
-                                </filter>
-                            </filters>
                             <relocations>
                                 <relocation>
                                     <pattern>org.bstats</pattern>

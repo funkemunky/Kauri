@@ -22,7 +22,7 @@ import dev.brighten.anticheat.check.impl.premium.AimG;
 import dev.brighten.anticheat.check.impl.premium.KillauraH;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.AxisAlignedBB;
-import dev.brighten.anticheat.utils.EntityLocation;
+import dev.brighten.anticheat.check.impl.premium.util.EntityLocation;
 import dev.brighten.anticheat.utils.Helper;
 import dev.brighten.anticheat.utils.Vec3D;
 import dev.brighten.anticheat.utils.timer.Timer;

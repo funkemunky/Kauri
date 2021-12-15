@@ -43,6 +43,7 @@ public class ClassScanner {
     public static Set<String> scanFile(Class<? extends Annotation> annotationClass) {
         return scanFile(annotationClass, new URL[]{Kauri.class.getProtectionDomain().getCodeSource().getLocation()});
     }
+
     public static Set<String> scanFile(Class<? extends Annotation> annotationClass, URL[] urls) {
         Set<URI> sources =  new HashSet<>();
         Set<String> plugins =  new HashSet<>();

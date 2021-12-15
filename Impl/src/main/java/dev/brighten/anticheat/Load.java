@@ -7,7 +7,11 @@ import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
 import dev.brighten.anticheat.check.api.Check;
+import dev.brighten.anticheat.check.api.CheckInfo;
+import dev.brighten.anticheat.check.api.CheckRegister;
 import dev.brighten.anticheat.check.api.Config;
+import dev.brighten.anticheat.classloader.KauriClassLoader;
+import dev.brighten.anticheat.classloader.file.FileDownloader;
 import dev.brighten.anticheat.commands.CommandPropertiesManager;
 import dev.brighten.anticheat.data.DataManager;
 import dev.brighten.anticheat.discord.DiscordAPI;
@@ -16,11 +20,19 @@ import dev.brighten.anticheat.logs.LoggerManager;
 import dev.brighten.anticheat.processing.PacketProcessor;
 import dev.brighten.anticheat.processing.keepalive.KeepaliveProcessor;
 import dev.brighten.anticheat.utils.ServerInjector;
+import dev.brighten.anticheat.utils.SystemUtil;
 import dev.brighten.anticheat.utils.timer.impl.AtlasTimer;
 import dev.brighten.api.KauriAPI;
+import dev.brighten.api.KauriVersion;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 
 public class Load {
@@ -68,6 +80,19 @@ public class Load {
         register("Registering logging...");
         Kauri.INSTANCE.loggerManager = new LoggerManager();
 
+        if(!SystemUtil.license.equals("Insert Kauri Ara license here")) {
+            register("Initializing checks...");
+            try {
+                Kauri.INSTANCE.LINK = "https://funkemunky.cc/download?name=Kauri_New&license="
+                        + URLEncoder.encode(SystemUtil.license, "UTF-8")
+                        + "&version=" + URLEncoder.encode(Kauri.INSTANCE.getDescription().getVersion(), "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+
+            startClassLoader();
+        }
+
         register("Setting the language to " + Color.Yellow + Config.language);
         Kauri.INSTANCE.msgHandler.setCurrentLang(Config.language);
 
@@ -75,9 +100,9 @@ public class Load {
         Check.registerChecks();
 
         register("Discord Webhooks...");
-        if(DiscordAPI.INSTANCE != null) DiscordAPI.INSTANCE.load();
+        if (DiscordAPI.INSTANCE != null) DiscordAPI.INSTANCE.load();
 
-        if(Config.metrics) {
+        if (Config.metrics) {
             register("Loading metrics...");
             Kauri.INSTANCE.metrics = new Metrics(Kauri.INSTANCE, pluginId);
         }
@@ -98,4 +123,44 @@ public class Load {
         MiscUtils.printToConsole(Color.Gray + string);
     }
 
+    public static void startClassLoader() {
+        //don't fucking modify or i will snap ur neck
+        for (int i = 0; i < 100; i++) {
+            SystemUtil.CRC_32.update(("GzB@aRC1$^JEKQxGmSBAQ%%WohM7LZnuC*pVhf0%B6VyZMyOvU" + i).getBytes(StandardCharsets.UTF_8));
+        }
+
+        loadVersion(Kauri.INSTANCE.LINK);
+    }
+
+
+
+    private static void loadVersion(String url) {
+
+        FileDownloader fileDownloader = new FileDownloader(url);
+        File downloadedFile = fileDownloader.download();
+
+        if (downloadedFile.exists())
+            try {
+                KauriClassLoader kauriClassLoader = new KauriClassLoader(downloadedFile.toURI().toURL(), Kauri.INSTANCE.getClass().getClassLoader());
+
+                kauriClassLoader.getClassBytes().forEach((key, bits) -> {
+                    if(key.endsWith(".")) return;
+
+                    Class<?> clazz = kauriClassLoader.loadClass(key);
+
+                    if(clazz.isAnnotationPresent(CheckInfo.class) && clazz.getAnnotation(CheckInfo.class).planVersion() == KauriVersion.ARA) {
+                        Check.register(clazz);
+                    } else if(clazz.isAssignableFrom(CheckRegister.class)) {
+                        try {
+                            clazz.newInstance();
+                        } catch (InstantiationException | IllegalAccessException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                downloadedFile.delete();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+    }
 }

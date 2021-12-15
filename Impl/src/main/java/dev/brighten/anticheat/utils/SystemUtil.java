@@ -1,22 +1,25 @@
 package dev.brighten.anticheat.utils;
 
-import dev.brighten.db.utils.security.GeneralUtils;
-import org.bukkit.entity.Player;
+import cc.funkemunky.api.utils.ConfigSetting;
+import cc.funkemunky.api.utils.Init;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.zip.CRC32;
 
+@Init
 public class SystemUtil {
 
     public static final CRC32 CRC_32 = new CRC32();
     private static final Class[] parameters = new Class[]{URL.class};
+    @ConfigSetting(name = "ara-license")
+    public static String license = "Insert Kauri Ara license here";
 
     public static void addPath(String s) throws Exception {
         File f = new File(s);
@@ -28,29 +31,7 @@ public class SystemUtil {
         method.invoke(urlClassLoader, u.toURL());
     }
 
-    public static void copy(InputStream in, File file) {
-        try {
-            OutputStream out = new FileOutputStream(file);
-            byte[] buf = new byte[1024];
-            int len;
-            while((len=in.read(buf))>0){
-                out.write(buf,0,len);
-            }
-            out.close();
-            in.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
-    public static byte[] nonce(Player player) {
-        if(player != null) {
-            player.sendMessage("This is important" + Math.random());
-            return player.getName().getBytes(StandardCharsets.UTF_8);
-        }
-
-        return "%%__NONCE__%%".getBytes(StandardCharsets.UTF_8);
-    }
 
     public static void addNativesPath(String pathToAdd) throws Exception {
         Field usrPathsField = ClassLoader.class.getDeclaredField("usr_paths");

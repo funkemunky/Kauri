@@ -52,18 +52,12 @@ public class TimerB extends Check {
                 / (double)Kauri.INSTANCE.keepaliveProcessor.totalPlayers) > 0.8;
 
         if(totalTimer > threshold) {
-            if((!isLagProblem
-                    || (data.lagInfo.lastPingDrop.isPassed(4) && System.currentTimeMillis() - data.lagInfo.lastClientTrans < 120L))) {
-                if (++buffer > 4) {
-                    vl++;
-                    flag("p=%s;d=%s", data.lagInfo.lastPacketDrop.getPassed(), delta);
-                }
-                totalTimer = now - 20;
-                lastFlag.reset();
-            } else {
-                totalTimer = now - 100;
-                if(buffer > 0) buffer--;
+            if (++buffer > 4) {
+                vl++;
+                flag("p=%s;d=%s", data.lagInfo.lastPacketDrop.getPassed(), delta);
             }
+            totalTimer = now - 20;
+            lastFlag.reset();
         } else if(lastFlag.isPassed(5000L)) buffer = 0;
 
         debug("d=%s, thr=%s, b=%s lp=%s cp=%s", delta, threshold, buffer,

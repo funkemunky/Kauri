@@ -39,8 +39,9 @@ public class KauriClassLoader extends URLClassLoader {
         //Decrypt the bytes using our CRC32 method
         encryptedClasses.forEach((name, bytes) -> {
 
-            String realName = name.replaceAll("/", ".").replaceAll("\\.class", "");
+            String realName = name.split("\\.class")[0].replaceAll("/", ".");
 
+            System.out.println(realName);
             byte[] nBytes = new byte[bytes.length];
 
             for (int i = 0; i < bytes.length; i++) {
