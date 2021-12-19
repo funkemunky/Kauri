@@ -21,5 +21,5 @@ public @interface CheckInfo {
     int vlToFlag() default -1;
     CheckType checkType() default CheckType.SPEED;
     ProtocolVersion minVersion() default ProtocolVersion.V1_7;
-    ProtocolVersion maxVersion() default ProtocolVersion.v1_17_1;
+    ProtocolVersion maxVersion() default ProtocolVersion.v1_18;
 }
