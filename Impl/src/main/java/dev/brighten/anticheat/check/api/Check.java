@@ -326,13 +326,6 @@ public class Check implements KauriCheck {
     }
 
     public void punish() {
-        if(!Config.overrideCompat && Atlas.getInstance().getBungeeManager().isBungee() && !data.atlasBungeeInstalled) {
-            Bukkit.getLogger().log(Level.SEVERE, data.getPlayer().getName() + " would have been punished but " +
-                    "AtlasBungee is not installed on your BungeeCord. Please download the appropriate version for" +
-                    " Atlas v"+ Atlas.getInstance().getDescription().getVersion()
-                    + "on: https://github.com/funkemunky/Atlas/releases");
-            return;
-        }
         if(devStage.ordinal() > Arrays.stream(DevStage.values())
                 .filter(ds -> ds.name().equalsIgnoreCase(Config.minimumStageBan)).findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("\"" + Config.minimumStageBan
