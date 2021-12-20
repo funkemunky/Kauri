@@ -111,16 +111,21 @@ public class Check implements KauriCheck {
         if(checkRawClass.isAnnotationPresent(Cancellable.class)) {
             type = checkRawClass.getAnnotation(Cancellable.class).cancelType();
         }
-        CheckSettings settings = new CheckSettings(info.name(), info.description(), info.checkType(), type,
-                info.planVersion(), info.punishVL(), info.vlToFlag(), info.minVersion(), info.maxVersion());
 
         String path = "checks." + name;
+        CheckSettings settings = new CheckSettings(info.name(), info.description(), info.checkType(), type,
+                info.planVersion(), info.minVersion(), info.maxVersion());
+
         settings.enabled = new ConfigDefault<>(info.enabled(),
                 path + ".enabled", Kauri.INSTANCE).get();
         settings.executable = new ConfigDefault<>(info.executable(),
                 path + ".executable", Kauri.INSTANCE).get();
         settings.cancellable = new ConfigDefault<>(info.cancellable(),
                 path + ".cancellable", Kauri.INSTANCE).get();
+        settings.vlToFlag = new ConfigDefault<>(info.vlToFlag(),
+                path + ".vlToFlag", Kauri.INSTANCE).get();
+        settings.punishVl = new ConfigDefault<>(info.punishVL(),
+                path + ".punishVl", Kauri.INSTANCE).get();
         settings.executableCommands = new ArrayList<>(new ConfigDefault<>(Arrays.asList("%global_commands%"),
                 path + ".commands", Kauri.INSTANCE).get());
 

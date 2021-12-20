@@ -17,7 +17,7 @@ public class CheckSettings {
     public final CheckType type;
     public final CancelType cancelMode;
     public final KauriVersion plan;
-    public final int punishVl, vlToFlag;
+    public int punishVl, vlToFlag;
     public final ProtocolVersion minVersion, maxVersion;
     public List<String> executableCommands;
 }
