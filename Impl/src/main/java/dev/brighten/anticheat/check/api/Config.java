@@ -18,7 +18,7 @@ public class Config {
     @ConfigSetting(path = "punishments", name = "broadcast",
             comment = "Set string to \"none\" if you want to disable broadcast.")
     static String broadcastMessage = MiscUtils.line(Color.Dark_Gray)
-            + "\n&e%name% &7was removed by &6Kauri &7because of an &fUnfair Advantage&7."
+            + "\n&e%player% &7was removed by &6Kauri &7because of an &fUnfair Advantage&7."
             + MiscUtils.line(Color.Dark_Gray);
 
     @ConfigSetting(path = "punishments", name = "bungeeCommand")
