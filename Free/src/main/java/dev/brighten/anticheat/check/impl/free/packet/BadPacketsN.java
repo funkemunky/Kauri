@@ -1,8 +1,10 @@
 package dev.brighten.anticheat.check.impl.free.packet;
 
+import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInKeepAlivePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutKeepAlivePacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import cc.funkemunky.api.utils.Color;
 import dev.brighten.anticheat.Kauri;
@@ -49,10 +51,16 @@ public class BadPacketsN extends Check {
 
             if (!isExecutable() && vl > 4) kickPlayer(String.format(Color.translate(kickString), "TN"));
         }
-
         if(lastKeepAlive.isPassed(7000L) && ++flying2 > 80) {
+            if(keepaliveKicking)
             kickPlayer("Network connection error.");
-        } else if(lastKeepAlive.isNotPassed(7000L)) flying2 = 0;
+            else flag("Has not sent keepalive since " + lastKeepAlive.getPassed() + "ms ago!");
+        } else {
+            if(lastKeepAlive.isPassed(4000L)) {
+                TinyProtocolHandler.sendPacket(packet.getPlayer(), new WrappedOutKeepAlivePacket(69L));
+            }
+            flying2 = 0;
+        }
 
         lastFlying.reset();
     }
