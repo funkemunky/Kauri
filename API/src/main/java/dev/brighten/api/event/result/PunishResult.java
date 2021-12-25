@@ -7,7 +7,8 @@ import java.util.List;
 
 @Builder
 @Getter
-public class PunishResult extends EventResult {
+public class PunishResult {
+    private boolean cancelled;
     private String broadcastMessage;
     private List<String> commands;
 }

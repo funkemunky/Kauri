@@ -6,6 +6,7 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class CancelResult extends EventResult {
+public class CancelResult {
+    private boolean cancelled;
     private CancelType type;
 }
