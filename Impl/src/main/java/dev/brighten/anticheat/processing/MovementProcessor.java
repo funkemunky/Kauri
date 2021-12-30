@@ -46,7 +46,7 @@ public class MovementProcessor {
     public static double groundOffset = 1 / 64.;
     private static String keepaliveAcceptListener = Kauri.INSTANCE.eventHandler
             .listen(KeepaliveAcceptedEvent.class,  listner -> {
-                if(listner.getData().playerInfo.serverGround || (listner.getData().playerInfo.nearGround && listner.getData().playerInfo.clientGround)) {
+                if(listner.getData().playerInfo.serverGround || listner.getData().playerInfo.clientGround) {
                     listner.getData().playerInfo.kGroundTicks++;
                     listner.getData().playerInfo.kAirTicks = 0;
                 } else {

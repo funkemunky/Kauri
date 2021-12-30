@@ -59,13 +59,13 @@ public class FlyA extends Check {
                     && data.playerInfo.blockAboveTimer.isPassed(5)
                     && deltaPredict > 0.016) {
                 flagged = true;
-                if(++buffer > 2 || data.playerInfo.kAirTicks > 80) {
+                if(++buffer > 2 || data.playerInfo.kAirTicks > 120) {
                     ++vl;
                     flag("dY=%.3f p=%.3f dx=%.3f", data.playerInfo.deltaY, predicted,
                             data.playerInfo.deltaXZ);
                     fixMovementBugs();
                 }
-            } else buffer-= buffer > 0 ? 0.5f : 0;
+            } else buffer-= buffer > 0 ? 0.25f : 0;
 
             debug((flagged ? Color.Green : "")
                             +"pos=%s deltaY=%.3f predicted=%.3f d=%.3f ground=%s lpass=%s cp=%s air=%s buffer=%.1f sg=%s cb=%s fc=%s ",
