@@ -79,7 +79,7 @@ public class Check implements KauriCheck {
 
     public boolean exempt, banExempt;
 
-    private final Timer lastAlert = new TickTimer(MathUtils.millisToTicks(Config.alertsDelay));
+    protected final Timer lastAlert = new TickTimer(MathUtils.millisToTicks(Config.alertsDelay));
 
     private final Map<Class<? extends Check>, Check> detectionCache = new HashMap<>();
 
