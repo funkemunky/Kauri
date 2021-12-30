@@ -78,8 +78,10 @@ public class KillauraH extends Check {
 
                if(!missed) {
                    vl++;
-                   flag(120, "true;false");
-               }
+                   if(vl > 2) {
+                       flag(120, "true;false");
+                   }
+               } else if(lastAlert.isPassed(120)) vl = 0;
            }
        }
 

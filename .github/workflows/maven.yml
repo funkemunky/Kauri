@@ -1,0 +1,20 @@
+on:
+  push:
+    branches: ["**"]
+ 
+jobs:
+  build:
+ 
+    runs-on: ubuntu-latest
+ 
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 17.0.2
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17.0
+ 
+      - name: Compile
+        run: mvn -B -Pclean install
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -63,9 +63,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>cc.funkemunky.utils</groupId>
-            <artifactId>AtlasBukkit</artifactId>
-            <version>1.11.0</version>
+            <groupId>cc.funkemunky.plugins</groupId>
+            <artifactId>Atlas</artifactId>
+            <version>1.11.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

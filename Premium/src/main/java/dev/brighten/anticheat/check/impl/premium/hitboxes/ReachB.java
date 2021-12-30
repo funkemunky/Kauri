@@ -38,6 +38,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.util.Vector;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -46,7 +47,7 @@ import java.util.stream.Collectors;
 @Cancellable(cancelType = CancelType.ATTACK)
 public class ReachB extends Check {
 
-    public final Map<UUID, EntityLocation> entityLocationMap = new HashMap<>();
+    public final Map<UUID, EntityLocation> entityLocationMap = new ConcurrentHashMap<>();
     private Timer lastFlying;
     public int streak;
     private float buffer;
@@ -182,7 +183,7 @@ public class ReachB extends Check {
                         find(HitboxesB.class).vl++;
                         find(HitboxesB.class).flag(120, "%.1f;%.1f;%.1f", eloc.x, eloc.y, eloc.z);
                     }
-                } else data.typesToCancel.add(CancelType.ATTACK);
+                }
                 debug("didnt hit box: x=%.1f y=%.1f z=%.1f lti=%s", eloc.x, eloc.y, eloc.z,
                         lastTransProblem.getPassed());
             }
@@ -285,54 +286,52 @@ public class ReachB extends Check {
             resend.put(entity.getEntityId(), queuedForResend);
             WrappedOutRelativePosition newPacket = new WrappedOutRelativePosition(packet.getId(), x,
                     y, z, yaw, pitch, packet.isGround());
-            RunUtils.task(() -> {
-                runAction(entity, () -> {
-                    //We don't need to do version checking here. Atlas handles this for us.
-                    if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9)) {
-                        eloc.newX += (byte)packet.getX() / 32D;
-                        eloc.newY += (byte)packet.getY() / 32D;
-                        eloc.newZ += (byte)packet.getZ() / 32D;
-                        eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
-                        eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
-                    } else if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_14)) {
-                        eloc.newX += (int)packet.getX() / 4096D;
-                        eloc.newY += (int)packet.getY() / 4096D;
-                        eloc.newZ += (int)packet.getZ() / 4096D;
-                        eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
-                        eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
-                    } else {
-                        eloc.newX += (short)packet.getX() / 4096D;
-                        eloc.newY += (short)packet.getY() / 4096D;
-                        eloc.newZ += (short)packet.getZ() / 4096D;
-                        eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
-                        eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
-                    }
+            runAction(entity, () -> {
+                //We don't need to do version checking here. Atlas handles this for us.
+                if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9)) {
+                    eloc.newX += (byte)packet.getX() / 32D;
+                    eloc.newY += (byte)packet.getY() / 32D;
+                    eloc.newZ += (byte)packet.getZ() / 32D;
+                    eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
+                    eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
+                } else if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_14)) {
+                    eloc.newX += (int)packet.getX() / 4096D;
+                    eloc.newY += (int)packet.getY() / 4096D;
+                    eloc.newZ += (int)packet.getZ() / 4096D;
+                    eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
+                    eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
+                } else {
+                    eloc.newX += (short)packet.getX() / 4096D;
+                    eloc.newY += (short)packet.getY() / 4096D;
+                    eloc.newZ += (short)packet.getZ() / 4096D;
+                    eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
+                    eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
+                }
 
-                    eloc.increment = 3;
+                eloc.increment = 3;
 
-                    KillauraH detection = find(KillauraH.class);
+                KillauraH detection = find(KillauraH.class);
 
-                    detection.getTargetLocations().clear();
-                    eloc.interpolatedLocations.clear();
-                    eloc.interpolatedLocations.addAll(eloc.getInterpolatedLocations());
-                    eloc.getInterpolatedLocations().stream()
-                            .map(kloc -> {
-                                SimpleCollisionBox box = (SimpleCollisionBox) EntityData.getEntityBox(kloc, entity);
+                detection.getTargetLocations().clear();
+                eloc.interpolatedLocations.clear();
+                eloc.interpolatedLocations.addAll(eloc.getInterpolatedLocations());
+                eloc.getInterpolatedLocations().stream()
+                        .map(kloc -> {
+                            SimpleCollisionBox box = (SimpleCollisionBox) EntityData.getEntityBox(kloc, entity);
 
-                                if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) {
-                                    return box.expand(0.1);
-                                }
+                            if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) {
+                                return box.expand(0.1);
+                            }
 
-                                return box;
-                            }).forEach(detection.getTargetLocations()::add);
+                            return box;
+                        }).forEach(detection.getTargetLocations()::add);
 
                     /*if(data.target != null && data.target.getEntityId() == packet.getId())
                     debug("Setting new posrot: %.4f, %.4f, %.4f, %s (%s)",
                             eloc.newX, eloc.newY, eloc.newZ, eloc.increment, System.currentTimeMillis());*/
-                });
-                TinyProtocolHandler.sendPacket(data.getPlayer(),
-                        newPacket.getObject());
             });
+            TinyProtocolHandler.sendPacket(data.getPlayer(),
+                    newPacket.getObject());
 
             return true;
         } else {

@@ -9,6 +9,7 @@ import cc.funkemunky.api.utils.world.CollisionBox;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.utils.ThreadHandler;
 import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -36,11 +37,13 @@ public class BukkitListener implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
+        ThreadHandler.addPlayer(event.getPlayer());
         Kauri.INSTANCE.dataManager.createData(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onLeave(PlayerQuitEvent event) {
+        ThreadHandler.removePlayer(event.getPlayer());
         //Removing if the player has debug access so there aren't any null objects left to cause problems later.
         if(event.getPlayer().hasPermission("kauri.debug"))
             ObjectData.debugBoxes(false, event.getPlayer());

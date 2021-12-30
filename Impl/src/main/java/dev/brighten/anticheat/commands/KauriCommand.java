@@ -18,6 +18,7 @@ import dev.brighten.anticheat.menu.PlayerInformationGUI;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.Pastebin;
 import dev.brighten.anticheat.utils.StringUtils;
+import dev.brighten.anticheat.utils.ThreadHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -301,6 +302,8 @@ public class KauriCommand extends BaseCommand {
         AtomicLong chunkCount = new AtomicLong(0);
         Bukkit.getWorlds().forEach(world -> chunkCount.addAndGet(world.getLoadedChunks().length));
         MiscUtils.sendMessage(sender, getMsg("main.chunks", "&eChunks&8: &f%s"), chunkCount.get());
+        MiscUtils.sendMessage(sender, getMsg("main.threads", "&eKauri Thread Count: &f%s"),
+                ThreadHandler.threadCount());
         MiscUtils.sendMessage(sender, getMsg("main.memory",
                 "&eMemory &7(&f&oFree&7&o/&f&oTotal&7&o/&f&oAllocated&7)&8: &f%.2fGB&7/&f%.2fGB&7/&f%.2fGB"),
                 Runtime.getRuntime().freeMemory() / 1E9,
