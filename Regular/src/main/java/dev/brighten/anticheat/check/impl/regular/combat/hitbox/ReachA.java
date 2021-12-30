@@ -9,10 +9,7 @@ import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.world.EntityData;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.check.api.Cancellable;
-import dev.brighten.anticheat.check.api.Check;
-import dev.brighten.anticheat.check.api.CheckInfo;
-import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.utils.AxisAlignedBB;
 import dev.brighten.anticheat.utils.Vec3D;
 import dev.brighten.api.KauriVersion;
@@ -38,6 +35,10 @@ public class ReachA extends Check {
     private boolean attacked;
     private int cancelTicks;
     private int transBetweenFlying;
+
+    @Setting(name = "maxDistance")
+    public static double reachThreshold = 3.1;
+
     @Packet
     public boolean onUse(WrappedInUseEntityPacket packet) {
         if(packet.getAction() == WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK) attacked = true;
@@ -132,7 +133,7 @@ public class ReachA extends Check {
             else distance = -1;
 
             if(data.lagInfo.lastPacketDrop.isPassed(3)) {
-                if (distance > 3.1) {
+                if (distance > reachThreshold) {
                     if(transBetweenFlying > 1 && buffer > 2) {
                         cancelTicks = 10;
                         debug("Set to 10 cancel ticks");
