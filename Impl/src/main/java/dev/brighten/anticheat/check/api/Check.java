@@ -28,9 +28,6 @@ import dev.brighten.api.event.KauriEvent;
 import dev.brighten.api.event.result.CancelResult;
 import dev.brighten.api.event.result.FlagResult;
 import dev.brighten.api.event.result.PunishResult;
-import dev.brighten.api.listener.KauriCancelEvent;
-import dev.brighten.api.listener.KauriFlagEvent;
-import dev.brighten.api.listener.KauriPunishEvent;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -216,7 +213,12 @@ public class Check implements KauriCheck {
                 CancelResult cancelResult = CancelResult.builder().cancelled(false).type(cancelMode).build();
 
                 for (KauriEvent event : events) {
-                    event.onCancel(data.getPlayer(), cancelResult.getType(), cancelResult.isCancelled());
+                   CancelResult current =
+                           event.onCancel(data.getPlayer(), cancelResult.getType(), cancelResult.isCancelled());
+
+                   cancelResult = CancelResult.builder().cancelled(current.isCancelled())
+                           .type(current.getType() != null ? current.getType() : cancelResult.getType())
+                           .build();
                 }
                 if(!cancelResult.isCancelled()) {
                     switch(cancelResult.getType()) {
@@ -360,8 +362,14 @@ public class Check implements KauriCheck {
                 .broadcastMessage(Config.broadcastMessage).commands(executableCommands).build();
 
         for(KauriEvent event : KauriAPI.INSTANCE.getAllEvents()) {
-            punishResult = event.onPunish(data.getPlayer(), this, punishResult.getBroadcastMessage(),
+            PunishResult current = event.onPunish(data.getPlayer(), this, punishResult.getBroadcastMessage(),
                     punishResult.getCommands(), punishResult.isCancelled());
+
+            punishResult = PunishResult.builder().cancelled(current.isCancelled())
+                    .commands(current.getCommands() != null ? current.getCommands() : punishResult.getCommands())
+                    .broadcastMessage(current.getBroadcastMessage() != null
+                            ? current.getBroadcastMessage() : punishResult.getBroadcastMessage())
+                    .build();
         }
 
         final String broadcastMessage = punishResult.getBroadcastMessage();

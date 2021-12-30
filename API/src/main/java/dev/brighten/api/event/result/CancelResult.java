@@ -7,6 +7,6 @@ import lombok.Getter;
 @Builder
 @Getter
 public class CancelResult {
-    private boolean cancelled;
+    private final boolean cancelled;
     private CancelType type;
 }

@@ -8,7 +8,7 @@ import java.util.List;
 @Builder
 @Getter
 public class PunishResult {
-    private boolean cancelled;
+    private final boolean cancelled;
     private String broadcastMessage;
     private List<String> commands;
 }
