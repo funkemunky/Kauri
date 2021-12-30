@@ -32,7 +32,6 @@ import dev.brighten.anticheat.processing.PotionProcessor;
 import dev.brighten.anticheat.processing.keepalive.KeepAlive;
 import dev.brighten.anticheat.utils.EntityLocation;
 import dev.brighten.anticheat.utils.PastLocation;
-import dev.brighten.anticheat.utils.SimpleAverage;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import dev.brighten.api.check.CancelType;
@@ -319,7 +318,7 @@ public class ObjectData implements Data {
         public boolean lagging;
         public Timer lastPacketDrop = new TickTimer(),
                 lastPingDrop = new TickTimer();
-        public SimpleAverage pingAverages = new SimpleAverage(10, 0);
+        public RollingAverageLong pingAverages = new RollingAverageLong(10, 0);
         public long lastFlying = 0;
     }
 

@@ -11,7 +11,6 @@ import org.bukkit.entity.Player;
 @RequiredArgsConstructor
 @Getter
 @Setter
-@Deprecated
 public class KauriFlagEvent extends AtlasEvent implements Cancellable {
 
     private boolean cancelled;

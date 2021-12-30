@@ -12,7 +12,6 @@ import java.util.List;
 
 @Getter
 @Setter
-@Deprecated
 public class KauriPunishEvent extends AtlasEvent implements Cancellable {
     private boolean cancelled;
     private final Player player;

@@ -2,7 +2,6 @@ package dev.brighten.anticheat.processing.keepalive;
 
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutKeepAlivePacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.RunUtils;
@@ -13,8 +12,6 @@ import cc.funkemunky.api.utils.objects.evicting.EvictingMap;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.MiscUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.Collections;
@@ -37,13 +34,6 @@ public class KeepaliveProcessor implements Runnable {
 
     public KeepaliveProcessor() {
         start();
-
-        //Keepalive task
-        RunUtils.taskTimerAsync(() -> {
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                TinyProtocolHandler.sendPacket(player, new WrappedOutKeepAlivePacket(69L));
-            }
-        }, Kauri.INSTANCE, 60L, 60L);
     }
 
     @Override

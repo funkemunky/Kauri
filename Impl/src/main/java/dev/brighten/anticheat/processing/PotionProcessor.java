@@ -22,7 +22,9 @@ public class PotionProcessor {
         for (PotionEffect effect : potionEffects) {
             if(packet.getPlayer().hasPotionEffect(effect.getType())) continue;
 
-            data.runKeepaliveAction(d -> data.potionProcessor.potionEffects.remove(effect));
+            data.runKeepaliveAction(d -> {
+                data.potionProcessor.potionEffects.remove(effect);
+            });
         }
     }
 

@@ -1,10 +1,8 @@
 package dev.brighten.anticheat.check.impl.free.packet;
 
-import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInKeepAlivePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutKeepAlivePacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import cc.funkemunky.api.utils.Color;
 import dev.brighten.anticheat.Kauri;
@@ -26,8 +24,7 @@ public class BadPacketsN extends Check {
 
     private int flying, flying2, lastTick, skipBuffer;
     private short lastId;
-    private final Timer lastTrans = new TickTimer(), lastSentTrans = new MillisTimer(),
-            lastKeepAlive = new TickTimer(), lastSentKeepAlive = new TickTimer(),
+    private final Timer lastTrans = new TickTimer(), lastSentTrans = new MillisTimer(), lastKeepAlive = new TickTimer(),
             lastFlying = new TickTimer(), lastSkipFlag = new TickTimer();
 
     @Setting(name = "keepaliveKick")
@@ -52,20 +49,12 @@ public class BadPacketsN extends Check {
 
             if (!isExecutable() && vl > 4) kickPlayer(String.format(Color.translate(kickString), "TN"));
         }
-        if(lastKeepAlive.isPassed(7000L)) {
-            if(lastSentKeepAlive.isNotPassed(7000L) && ++flying2 > 80) {
-                if (keepaliveKicking)
-                    kickPlayer("Network connection error.");
-                else flag("Has not sent keepalive since " + lastKeepAlive.getPassed() + "ms ago!");
-            }
-        } else flying2 = 0;
+
+        if(lastKeepAlive.isPassed(7000L) && ++flying2 > 80) {
+            kickPlayer("Network connection error.");
+        } else if(lastKeepAlive.isNotPassed(7000L)) flying2 = 0;
 
         lastFlying.reset();
-    }
-
-    @Packet
-    public void onOutKeepalive(WrappedOutKeepAlivePacket packet) {
-        lastSentKeepAlive.reset();
     }
 
     @Packet
