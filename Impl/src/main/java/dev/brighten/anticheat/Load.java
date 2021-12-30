@@ -6,6 +6,7 @@ import cc.funkemunky.api.profiling.ToggleableProfiler;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
+import cc.funkemunky.api.utils.com.google.common.util.concurrent.ThreadFactoryBuilder;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.CheckRegister;
@@ -21,6 +22,7 @@ import dev.brighten.anticheat.processing.PacketProcessor;
 import dev.brighten.anticheat.processing.keepalive.KeepaliveProcessor;
 import dev.brighten.anticheat.utils.ServerInjector;
 import dev.brighten.anticheat.utils.SystemUtil;
+import dev.brighten.anticheat.utils.ThreadHandler;
 import dev.brighten.anticheat.utils.timer.impl.AtlasTimer;
 import dev.brighten.api.KauriAPI;
 import dev.brighten.api.KauriVersion;
@@ -43,8 +45,13 @@ public class Load {
         register("Kicking players online...");
         //Bukkit.getOnlinePlayers().forEach(player -> player.kickPlayer("Starting up..."));
         register("Starting thread pool...");
-        Kauri.INSTANCE.executor = Executors.newSingleThreadExecutor();
+        Kauri.INSTANCE.executor = Executors.newCachedThreadPool(new ThreadFactoryBuilder()
+                .setNameFormat("Kauri Threads")
+                .setUncaughtExceptionHandler((t, e) -> RunUtils.task(e::printStackTrace, Kauri.INSTANCE))
+                .build());
         Kauri.INSTANCE.loggingThread = Executors.newSingleThreadScheduledExecutor();
+
+        Bukkit.getOnlinePlayers().forEach(ThreadHandler::addPlayer);
 
         register("Loading config...");
         Atlas.getInstance().registerConfig(Kauri.INSTANCE);
