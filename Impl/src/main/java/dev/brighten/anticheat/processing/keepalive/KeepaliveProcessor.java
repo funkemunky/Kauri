@@ -75,7 +75,7 @@ public class KeepaliveProcessor implements Runnable {
             }
 
             double dh = value.playerInfo.deltaXZ, dy = Math.abs(value.playerInfo.deltaY);
-            if(tick % 2 == 0) {
+            if(tick % 3 == 0) {
                 if(dh < 1 && dy < 1)
                     value.playerInfo.nearbyEntities = MiscUtils
                             .getNearbyEntities(value.getPlayer(), 1 + dh, 2 + dy);

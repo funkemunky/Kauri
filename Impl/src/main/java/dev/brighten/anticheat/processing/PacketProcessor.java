@@ -17,6 +17,7 @@ import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.listeners.api.impl.KeepaliveAcceptedEvent;
 import dev.brighten.anticheat.utils.EntityLocation;
 import dev.brighten.anticheat.utils.MovementUtils;
+import dev.brighten.anticheat.utils.ThreadHandler;
 import lombok.val;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;

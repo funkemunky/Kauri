@@ -90,7 +90,7 @@ public class MiscUtils {
 
         for(Entity entity : Atlas.getInstance().getTrackedEntities().values()) {
             if(!entity.getWorld().getUID().equals(player.getWorld().getUID())
-                    || player.getUniqueId().equals(entity.getUniqueId())) continue;
+                    || player.getEntityId() == entity.getEntityId()) continue;
 
             SimpleCollisionBox box = new SimpleCollisionBox(entity.getLocation(), horz * 2, vert / 2)
                     .expandMin(0, -(vert / 2), 0);
