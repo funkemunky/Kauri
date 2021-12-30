@@ -24,9 +24,10 @@ import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 import dev.brighten.api.check.KauriCheck;
-import dev.brighten.api.listener.KauriCancelEvent;
-import dev.brighten.api.listener.KauriFlagEvent;
-import dev.brighten.api.listener.KauriPunishEvent;
+import dev.brighten.api.event.KauriEvent;
+import dev.brighten.api.event.result.CancelResult;
+import dev.brighten.api.event.result.FlagResult;
+import dev.brighten.api.event.result.PunishResult;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -196,18 +197,31 @@ public class Check implements KauriCheck {
             lastFlagRun = System.currentTimeMillis();
 
             final String finalInformation = String.format(information, variables);
-            KauriFlagEvent event = new KauriFlagEvent(data.getPlayer(), this, finalInformation);
 
-            Atlas.getInstance().getEventManager().callEvent(event);
+            FlagResult currentResult = FlagResult.builder().cancelled(false).build();
 
-            if(event.isCancelled()) return;
+            final List<KauriEvent> events = KauriAPI.INSTANCE.getAllEvents();
+
+            for (KauriEvent allEvent : events) {
+                currentResult = allEvent
+                        .onFlag(data.getPlayer(), this, information, currentResult.isCancelled());
+            }
+
+            if(currentResult.isCancelled()) return;
 
             if(cancellable && cancelMode != null && vl > vlToFlag) {
-                KauriCancelEvent cancelEvent = new KauriCancelEvent(data.getPlayer(), cancelMode);
+                CancelResult cancelResult = CancelResult.builder().cancelled(false).type(cancelMode).build();
 
-                Atlas.getInstance().getEventManager().callEvent(cancelEvent);
-                if(!cancelEvent.isCancelled()) {
-                    switch(cancelEvent.getCancelType()) {
+                for (KauriEvent event : events) {
+                   CancelResult current =
+                           event.onCancel(data.getPlayer(), cancelResult.getType(), cancelResult.isCancelled());
+
+                   cancelResult = CancelResult.builder().cancelled(current.isCancelled())
+                           .type(current.getType() != null ? current.getType() : cancelResult.getType())
+                           .build();
+                }
+                if(!cancelResult.isCancelled()) {
+                    switch(cancelResult.getType()) {
                         case ATTACK: {
                             for(int i = 0 ; i < 2 ; i++) {
                                 synchronized (data.typesToCancel) {
@@ -344,15 +358,24 @@ public class Check implements KauriCheck {
 
         if(!executable || (banExempt && Config.punishmentBypassPerm)) return;
 
-        KauriPunishEvent punishEvent = new KauriPunishEvent(data.getPlayer(), this,
-                Config.broadcastMessage, executableCommands);
+        PunishResult punishResult = PunishResult.builder().cancelled(false)
+                .broadcastMessage(Config.broadcastMessage).commands(executableCommands).build();
 
-        Atlas.getInstance().getEventManager().callEvent(punishEvent);
+        for(KauriEvent event : KauriAPI.INSTANCE.getAllEvents()) {
+            PunishResult current = event.onPunish(data.getPlayer(), this, punishResult.getBroadcastMessage(),
+                    punishResult.getCommands(), punishResult.isCancelled());
 
-        final List<String> punishCommands = punishEvent.getCommands();
-        final String broadcastMessage = punishEvent.getBroadcastMessage();
+            punishResult = PunishResult.builder().cancelled(current.isCancelled())
+                    .commands(current.getCommands() != null ? current.getCommands() : punishResult.getCommands())
+                    .broadcastMessage(current.getBroadcastMessage() != null
+                            ? current.getBroadcastMessage() : punishResult.getBroadcastMessage())
+                    .build();
+        }
 
-        if(!punishEvent.isCancelled()) {
+        final String broadcastMessage = punishResult.getBroadcastMessage();
+        final List<String> punishCommands = punishResult.getCommands();
+
+        if(!punishResult.isCancelled()) {
             Kauri.INSTANCE.loggerManager.addPunishment(data, this);
             if(!data.banned) {
                 if(!Config.broadcastMessage.equalsIgnoreCase("off")) {
@@ -378,7 +401,8 @@ public class Check implements KauriCheck {
                 } else {
                     punishCommands.
                             forEach(cmd -> BungeeAPI
-                                    .sendCommand(addPlaceHolders(cmd.replace("%name%", data.getPlayer().getName()))));
+                                    .sendCommand(addPlaceHolders(cmd.replace("%name%",
+                                            data.getPlayer().getName()))));
                 }
                 data.banned = true;
                 RunUtils.taskLater(() -> {
