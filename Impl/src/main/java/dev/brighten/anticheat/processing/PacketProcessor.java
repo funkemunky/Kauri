@@ -365,7 +365,7 @@ public class PacketProcessor {
                     data.lagInfo.ping = timestamp - last;
 
                     data.lagInfo.pingAverages.add(data.lagInfo.ping);
-                    data.lagInfo.averagePing = data.lagInfo.pingAverages.getAverage();
+                    data.lagInfo.averagePing = Math.round(data.lagInfo.pingAverages.getAverage());
                 }
 
                 data.checkManager.runPacket(packet, timestamp);
@@ -799,6 +799,7 @@ public class PacketProcessor {
                 WrappedOutKeepAlivePacket packet = new WrappedOutKeepAlivePacket(object, data.getPlayer());
 
                 data.lagInfo.lastKeepAlive = timestamp;
+                data.keepAlives.put(packet.getTime(), System.currentTimeMillis());
                 data.checkManager.runPacket(packet, timestamp);
                 break;
             }
