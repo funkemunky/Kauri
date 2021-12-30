@@ -8,10 +8,7 @@ import dev.brighten.api.wrappers.WrappedKauri;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -24,7 +21,7 @@ public class KauriAPI {
     public WrappedDataManager dataManager;
     WrappedKauri kauriPlugin;
 
-    private Map<String, List<KauriEvent>> registeredEvents = new HashMap<>();
+    private final Map<String, List<KauriEvent>> registeredEvents = new HashMap<>();
 
     public KauriAPI() {
         INSTANCE = this;
@@ -52,5 +49,19 @@ public class KauriAPI {
             list.add(event);
             return list;
         });
+    }
+
+    public List<KauriEvent> getAllEvents() {
+        final List<KauriEvent> allEvents = new ArrayList<>();
+
+        synchronized (registeredEvents) {
+            for (List<KauriEvent> events : registeredEvents.values()) {
+                allEvents.addAll(events);
+            }
+        }
+
+        allEvents.sort(Comparator.comparing(e -> e.priority().getSlot()));
+
+        return allEvents;
     }
 }
