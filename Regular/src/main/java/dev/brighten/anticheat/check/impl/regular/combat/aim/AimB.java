@@ -14,7 +14,7 @@ public class AimB extends Check {
     private float buffer;
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        float modeToUse = Math.min(data.moveProcessor.yawMode, data.moveProcessor.pitchMode);
+        float modeToUse = data.moveProcessor.sensitivityMcp;
         boolean goodGcd = Math.max(data.moveProcessor.yawMode, data.moveProcessor.pitchMode)
                 % modeToUse < 0.001;
         if(packet.isLook()

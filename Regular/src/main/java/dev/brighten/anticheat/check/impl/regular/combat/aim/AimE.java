@@ -20,7 +20,7 @@ public class AimE extends Check {
         final double yawGcd = data.playerInfo.yawGCD,
                 pitchGCD = data.playerInfo.pitchGCD;
 
-        float modeToUse = Math.min(data.moveProcessor.yawMode, data.moveProcessor.pitchMode);
+        float modeToUse = data.moveProcessor.sensitivityMcp;
         boolean goodGcd = Math.max(data.moveProcessor.yawMode, data.moveProcessor.pitchMode)
                 % modeToUse < 0.001;
         if((MathUtils.getDelta(data.moveProcessor.sensXPercent, data.moveProcessor.sensYPercent) < 1.5 || goodGcd)
@@ -54,7 +54,7 @@ public class AimE extends Check {
         } else buffer = 0;
 
         debug((flag ? Color.Green + buffer + ": " : "") +"mx=%.2f my=%.2f dx=%.2f dy=%.2f s=%s inc=%s cin=%s",
-                mx, my, deltaX, deltaY, data.moveProcessor.sensitivityX, increase, data.playerInfo.cinematicMode);
+                mx, my, deltaX, deltaY, data.moveProcessor.sensitivityMcp, increase, data.playerInfo.cinematicMode);
     }
 }
 

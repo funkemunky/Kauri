@@ -12,6 +12,7 @@ import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.listeners.api.impl.KeepaliveAcceptedEvent;
+import dev.brighten.anticheat.utils.AimbotUtil;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.MouseFilter;
 import dev.brighten.anticheat.utils.MovementUtils;
@@ -34,7 +35,7 @@ public class MovementProcessor {
             pitchGcdList = new EvictingList<>(35);
     public float deltaX, deltaY, lastDeltaX, lastDeltaY, smoothYaw, smoothPitch, lsmoothYaw, lsmoothPitch;
     public Tuple<List<Float>, List<Float>> yawOutliers, pitchOutliers;
-    public float sensitivityX, sensitivityY, yawMode, pitchMode;
+    public float sensitivityX, sensitivityY, sensitivityMcp, yawMode, pitchMode;
     public int sensXPercent, sensYPercent;
     public TickTimer lastCinematic = new TickTimer(2);
     private MouseFilter mxaxis = new MouseFilter(), myaxis = new MouseFilter();
@@ -44,6 +45,7 @@ public class MovementProcessor {
     public boolean accurateYawData;
     public static float offset = (int)Math.pow(2, 24);
     public static double groundOffset = 1 / 64.;
+    public final EvictingList<Long> sensitivitySamples = new EvictingList<>(50);
     private static String keepaliveAcceptListener = Kauri.INSTANCE.eventHandler
             .listen(KeepaliveAcceptedEvent.class,  listner -> {
                 if(listner.getData().playerInfo.serverGround || listner.getData().playerInfo.clientGround) {
@@ -306,6 +308,21 @@ public class MovementProcessor {
                             lastReset.reset();
                             sensXPercent = sensToPercent(sensitivityX = getSensitivityFromYawGCD(yawMode));
                             sensYPercent = sensToPercent(sensitivityY = getSensitivityFromPitchGCD(pitchMode));
+
+                            table: {
+                                final float absolute = Math.max(yawGcd, pitchGcd);
+                                final float sensitivity = AimbotUtil.getSensitivityFromPitchGCD(absolute) * 200;
+
+                                final long rounded = (long) sensitivity;
+
+                                sensitivitySamples.add(rounded);
+
+                                if (sensitivitySamples.size() < 30) {
+                                    final long mode = MathUtils.getMode(sensitivitySamples);
+
+                                    sensitivityMcp = AimbotUtil.SENSITIVITY_MAP.getOrDefault((int) mode, -1.0F);
+                                }
+                            }
                         }
 
 
