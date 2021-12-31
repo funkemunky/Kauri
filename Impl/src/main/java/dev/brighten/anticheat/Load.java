@@ -87,7 +87,8 @@ public class Load {
         register("Registering logging...");
         Kauri.INSTANCE.loggerManager = new LoggerManager();
 
-        if(!SystemUtil.license.equals("Insert Kauri Ara license here")) {
+        if(SystemUtil.enabled
+                && !SystemUtil.license.equals("Insert Kauri Ara license here")) {
             register("Initializing checks...");
             try {
                 Kauri.INSTANCE.LINK = "https://funkemunky.cc/download?name=Kauri_New&license="

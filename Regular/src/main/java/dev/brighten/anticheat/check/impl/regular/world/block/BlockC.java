@@ -38,8 +38,7 @@ public class BlockC extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if(box != null && loc != null) {
-
+        if(box != null && loc != null && data.playerInfo.lastFlyingTimer.isPassed(1)) {
             KLocation origin = data.playerInfo.to.clone();
 
             origin.y+= data.playerInfo.sneaking ? 1.54 : 1.62;

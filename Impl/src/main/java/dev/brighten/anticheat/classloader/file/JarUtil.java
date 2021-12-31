@@ -1,5 +1,8 @@
 package dev.brighten.anticheat.classloader.file;
 
+import cc.funkemunky.api.utils.MiscUtils;
+import dev.brighten.anticheat.Kauri;
+
 import java.io.*;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -8,6 +11,7 @@ import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
 import java.util.zip.ZipInputStream;
 
 public class JarUtil {
@@ -26,7 +30,11 @@ public class JarUtil {
             }
             jar.close();
             return classes;
-        } catch (IOException e) {
+        } catch (ZipException e) {
+            MiscUtils.printToConsole("&cKauri Ara License is not valid!");
+            return null;
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
         return null;

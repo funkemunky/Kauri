@@ -247,6 +247,7 @@ public class PacketProcessor {
                 data.predictionService.onReceive(packet); //Processing for prediction service.
 
                 data.checkManager.runPacket(packet, timestamp);
+                data.playerInfo.lastFlyingTimer.reset();
 
                 if(data.sniffing) {
                     data.sniffedPackets.add(type + ":@:"

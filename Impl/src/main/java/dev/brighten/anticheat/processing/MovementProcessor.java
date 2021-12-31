@@ -88,7 +88,6 @@ public class MovementProcessor {
     }
 
     public void process(WrappedInFlyingPacket packet, long timeStamp) {
-        data.playerInfo.lastFlyingTimer.reset();
         if(data.playerInfo.checkMovement) data.playerInfo.moveTicks++;
         else {
             data.playerInfo.lastTeleportTimer.reset();
