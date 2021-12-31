@@ -94,7 +94,7 @@ public class MovementProcessor {
             data.playerInfo.moveTicks = 0;
         }
 
-        data.playerInfo.doingTeleport = data.playerInfo.moveTicks == 0;
+        data.playerInfo.doingTeleport = data.playerInfo.moveTicks == 0 || data.teleportsToConfirm > 0;
         //We check if it's null and intialize the from and to as equal to prevent large deltas causing false positives since there
         //was no previous from (Ex: delta of 380 instead of 0.45 caused by jump jump in location from 0,0,0 to 380,0,0)
 
@@ -371,7 +371,7 @@ public class MovementProcessor {
                 }
             }
             //Running jump check
-            if (!data.playerInfo.clientGround) {
+            if (!data.playerInfo.clientGround && !data.playerInfo.doingTeleport) {
                 if (!data.playerInfo.jumped && data.playerInfo.lClientGround
                         && data.playerInfo.deltaY >= 0) {
                     data.playerInfo.jumped = true;
@@ -432,7 +432,10 @@ public class MovementProcessor {
             data.playerInfo.baseSpeed = MovementUtils.getBaseSpeed(data);
         }
 
-        if(data.playerInfo.inVehicle = data.getPlayer().getVehicle() != null) data.playerInfo.vehicleTimer.reset();
+        if(data.playerInfo.inVehicle = data.getPlayer().getVehicle() != null) {
+            data.playerInfo.vehicleTimer.reset();
+            data.runKeepaliveAction(ka -> data.playerInfo.vehicleTimer.reset());
+        }
         if(data.playerInfo.gliding = BukkitAPI.INSTANCE.isGliding(data.getPlayer()))
             data.playerInfo.lastGlideTimer.reset();
         data.playerInfo.riptiding = Atlas.getInstance().getBlockBoxManager()
@@ -447,7 +450,6 @@ public class MovementProcessor {
 
         if(!data.playerInfo.worldLoaded)
             data.playerInfo.lastChunkUnloaded.reset();
-
 
         data.lagInfo.lagging = data.lagInfo.lagTicks.subtract() > 0
                 || !data.playerInfo.worldLoaded

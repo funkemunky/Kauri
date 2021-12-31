@@ -111,6 +111,8 @@ public class ReachB extends Check {
                 break detection;
             }
 
+            if(data.playerInfo.inVehicle) break detection;
+
             final KLocation to = data.playerInfo.to.clone(), from = data.playerInfo.from.clone();
 
             //debug("current loc: %.4f, %.4f, %.4f", eloc.x, eloc.y, eloc.z);

@@ -838,6 +838,11 @@ public class PacketProcessor {
                     loc.yaw+= data.playerInfo.to.yaw;
                 }
 
+                data.teleportsToConfirm++;
+
+                data.runInstantAction(ka -> {
+                    if(ka.isEnd()) data.teleportsToConfirm--;
+                });
                 data.playerInfo.posLocs.add(loc);
 
                 data.playerInfo.phaseLoc = loc.clone();

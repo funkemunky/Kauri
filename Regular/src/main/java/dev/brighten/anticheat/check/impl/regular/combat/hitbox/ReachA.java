@@ -63,6 +63,7 @@ public class ReachA extends Check {
             if(data.playerInfo.creative
                     || data.targetPastLocation.previousLocations.size() < 10
                     || !attacked
+                    || data.playerInfo.inVehicle
                     || data.target == null
                     || !allowedEntityTypes.contains(data.target.getType())) break reachA;
 
@@ -75,8 +76,10 @@ public class ReachA extends Check {
 
             KLocation torigin = data.playerInfo.to.clone(), forigin = data.playerInfo.from.clone();
 
-            torigin.y+= data.playerInfo.sneaking ? 1.54f : 1.62f;
-            forigin.y+= data.playerInfo.lsneaking ? 1.54f : 1.62f;
+            torigin.y+= data.playerInfo.sneaking ? (ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_14)
+                    ? 1.27f : 1.54f) : 1.62f;
+            forigin.y+= data.playerInfo.lsneaking ? (ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_14)
+                    ? 1.27f : 1.54f) : 1.62f;
 
             int hits = 0, misses = 0, hitboxHits = 0;
             double distance = Double.MAX_VALUE;

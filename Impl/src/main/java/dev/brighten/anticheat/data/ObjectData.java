@@ -90,6 +90,7 @@ public class ObjectData implements Data {
     public final Map<Location, CollisionBox> ghostBlocks = Collections.synchronizedMap(new HashMap<>());
     public final Map<Short, Tuple<InstantAction, Consumer<InstantAction>>> instantTransaction = new HashMap<>();
     public final EvictingList<Tuple<KLocation, Double>> pastLocations = new EvictingList<>(20);
+    public int teleportsToConfirm;
 
     public ObjectData(UUID uuid) {
         this.uuid = uuid;
