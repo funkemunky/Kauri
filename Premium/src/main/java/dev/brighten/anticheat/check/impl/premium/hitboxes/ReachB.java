@@ -92,7 +92,7 @@ public class ReachB extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         flying = true;
-        if(lastFlying.isNotPassed(1) && System.currentTimeMillis() - data.lagInfo.lastClientTrans < 65L) streak++;
+        if(lastFlying.isNotPassed(1)) streak++;
         else {
             streak = 1;
             sentTeleport = false;
