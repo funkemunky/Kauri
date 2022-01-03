@@ -2,10 +2,7 @@ package dev.brighten.anticheat.commands;
 
 import cc.funkemunky.api.reflections.types.WrappedClass;
 import cc.funkemunky.api.utils.*;
-import co.aikar.commands.BaseCommand;
-import co.aikar.commands.BukkitCommandCompletions;
-import co.aikar.commands.BukkitCommandContexts;
-import co.aikar.commands.CommandHelp;
+import co.aikar.commands.*;
 import co.aikar.commands.annotation.*;
 import co.aikar.commands.bukkit.contexts.OnlinePlayer;
 import dev.brighten.anticheat.Kauri;
@@ -50,6 +47,17 @@ public class KauriCommand extends BaseCommand {
                 .collect(Collectors.toList()));
 
         BukkitCommandContexts contexts = (BukkitCommandContexts) Kauri.INSTANCE.commandManager.getCommandContexts();
+
+        contexts.registerOptionalContext(Integer.class, c -> {
+            String arg = c.popFirstArg();
+
+            if(arg == null) return null;
+            try {
+                return Integer.parseInt(arg);
+            } catch(NumberFormatException e) {
+                throw new InvalidCommandArgument(String.format(Color.Red + "Argument \"%s\" is not an integer", arg));
+            }
+        });
     }
 
     @HelpCommand
@@ -392,13 +400,16 @@ public class KauriCommand extends BaseCommand {
     }
 
     @Subcommand("simlag")
+    @Syntax("[amount]")
     @Description("Simulate lag on the netty threads")
     @CommandPermission("kauri.command.simlag")
-    public void onSimLag(CommandSender sender) {
+    public void onSimLag(CommandSender sender, @Optional Integer amount) {
         PacketProcessor.simLag = !PacketProcessor.simLag;
+        if(amount != null)
+        PacketProcessor.amount = amount;
 
-        sender.sendMessage(Color.translate("&aSimLag: "
-                + (PacketProcessor.simLag ? "&aenabled" : "&cdisabled")));
+        sender.sendMessage(String.format(Color.translate("&aSimLag (%s): "
+                + (PacketProcessor.simLag ? "&aenabled" : "&cdisabled")), PacketProcessor.amount));
     }
 
     @Subcommand("recentlogs")

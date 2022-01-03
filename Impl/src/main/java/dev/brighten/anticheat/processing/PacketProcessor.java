@@ -36,6 +36,7 @@ import java.util.stream.IntStream;
 public class PacketProcessor {
 
     public static boolean simLag = false;
+    public static int amount = 500;
 
     public static final Set<String> incomingPackets = new HashSet<>(), outgoingPackets = new HashSet<>();
 
@@ -64,10 +65,10 @@ public class PacketProcessor {
                    } else if(incomingPackets.contains(info.getType())) {
                        processClient(data, info.getPacket(), info.getType(), info.getTimestamp());
 
-                       if(info.getType().equals(Packet.Client.FLYING)) {
-                           IntStream.range(0, 100).forEach(i -> {
+                       if(simLag && info.getType().equals(Packet.Client.FLYING)) {
+                           IntStream.range(0, amount).forEach(i -> {
                                try {
-                                   SecureRandom.getInstanceStrong().generateSeed(80);
+                                   SecureRandom.getInstanceStrong().generateSeed(500);
                                } catch (NoSuchAlgorithmException e) {
                                    e.printStackTrace();
                                }

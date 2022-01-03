@@ -3,6 +3,7 @@ package dev.brighten.anticheat.check.impl.regular.packets;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutPositionPacket;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Cancellable;
@@ -23,6 +24,7 @@ public class TimerB extends Check {
     private long totalTimer = -1;
     private final Timer lastFlag = new MillisTimer(2000L);
     private int buffer;
+    private boolean flying;
 
     @Packet
     public void onTeleport(WrappedOutPositionPacket event) {
@@ -36,13 +38,19 @@ public class TimerB extends Check {
     }
 
     @Packet
+    public void onTrans(WrappedInTransactionPacket packet) {
+        if(!flying && data.playerInfo.lastFlyingTimer.isPassed(100L))
+        totalTimer+= 50;
+        flying = false;
+    }
+
+    @Packet
     public void onFlying(WrappedInFlyingPacket packet, long now) {
-        if(packet.isPos() && data.playerInfo.deltaX == 0
-                && data.playerInfo.deltaY == 0
-                && data.playerInfo.deltaZ == 0) {
-            totalTimer = now;
+        flying = true;
+        if(totalTimer == -1) {
+            totalTimer = now - 50;
+            debug("Reset time");
         }
-        if(totalTimer == -1) totalTimer = now - 50;
         else totalTimer+= 50;
 
         long threshold = now + 100, delta = totalTimer - threshold;
@@ -56,6 +64,7 @@ public class TimerB extends Check {
                 flag("p=%s;d=%s", data.lagInfo.lastPacketDrop.getPassed(), delta);
             }
             totalTimer = now - 50;
+            debug("Reset time");
             lastFlag.reset();
         } else if(lastFlag.isPassed(5000L)) buffer = 0;
 
