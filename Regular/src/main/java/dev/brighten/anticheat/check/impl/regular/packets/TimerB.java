@@ -39,8 +39,11 @@ public class TimerB extends Check {
 
     @Packet
     public void onTrans(WrappedInTransactionPacket packet) {
-        if(!flying && data.playerInfo.lastFlyingTimer.isPassed(100L))
-        totalTimer+= 50;
+        if(totalTimer == -1) {
+            totalTimer = System.currentTimeMillis() - 50;
+            debug("Reset time");
+        } else if(!flying && data.playerInfo.lastFlyingTimer.isPassed(1))
+            totalTimer+= 50;
         flying = false;
     }
 
