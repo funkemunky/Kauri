@@ -26,11 +26,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
 import org.bukkit.util.Vector;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.IntStream;
 
 public class PacketProcessor {
+
+    public static boolean simLag = false;
 
     public static final Set<String> incomingPackets = new HashSet<>(), outgoingPackets = new HashSet<>();
 
@@ -58,6 +63,16 @@ public class PacketProcessor {
                        processServer(data, info.getPacket(), info.getType(), info.getTimestamp());
                    } else if(incomingPackets.contains(info.getType())) {
                        processClient(data, info.getPacket(), info.getType(), info.getTimestamp());
+
+                       if(info.getType().equals(Packet.Client.FLYING)) {
+                           IntStream.range(0, 100).forEach(i -> {
+                               try {
+                                   SecureRandom.getInstanceStrong().generateSeed(80);
+                               } catch (NoSuchAlgorithmException e) {
+                                   e.printStackTrace();
+                               }
+                           });
+                       }
                    }
 
                    if(data.checkManager.runEvent(info)) info.setCancelled(true);

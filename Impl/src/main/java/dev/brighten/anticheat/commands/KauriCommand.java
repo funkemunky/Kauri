@@ -15,6 +15,7 @@ import dev.brighten.anticheat.check.api.Config;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.listeners.generalChecks.BukkitListener;
 import dev.brighten.anticheat.menu.PlayerInformationGUI;
+import dev.brighten.anticheat.processing.PacketProcessor;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.Pastebin;
 import dev.brighten.anticheat.utils.StringUtils;
@@ -388,6 +389,16 @@ public class KauriCommand extends BaseCommand {
                         .msg("player-not-online", "&cThe player provided is not online!"));
             } else player.sendMessage(Color.Red + "Invalid arguments.");
         });
+    }
+
+    @Subcommand("simlag")
+    @Description("Simulate lag on the netty threads")
+    @CommandPermission("kauri.command.simlag")
+    public void onSimLag(CommandSender sender) {
+        PacketProcessor.simLag = !PacketProcessor.simLag;
+
+        sender.sendMessage(Color.translate("&aSimLag: "
+                + (PacketProcessor.simLag ? "&aenabled" : "&cdisabled")));
     }
 
     @Subcommand("recentlogs")

@@ -69,13 +69,10 @@ public class KeepaliveProcessor implements Runnable {
                     || System.currentTimeMillis() - value.lagInfo.lastClientTrans > 135L) laggyPlayers++;
             if(value.target != null) {
                 value.targetPastLocation.addLocation(value.target.getLocation());
-                value.runKeepaliveAction(ka -> {
-                    value.targetLoc = new KLocation(value.target.getLocation());
-                });
             }
 
             double dh = value.playerInfo.deltaXZ, dy = Math.abs(value.playerInfo.deltaY);
-            if(tick % 3 == 0) {
+            if(tick % 4 == 0) {
                 if(dh < 1 && dy < 1)
                     value.playerInfo.nearbyEntities = MiscUtils
                             .getNearbyEntities(value.getPlayer(), 1 + dh, 2 + dy);
