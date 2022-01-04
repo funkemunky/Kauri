@@ -18,7 +18,9 @@ public class SystemUtil {
 
     public static final CRC32 CRC_32 = new CRC32();
     private static final Class[] parameters = new Class[]{URL.class};
-    @ConfigSetting(name = "ara-license")
+    @ConfigSetting(path = "ara", name = "enabled")
+    public static boolean enabled = false;
+    @ConfigSetting(path = "ara", name = "license")
     public static String license = "Insert Kauri Ara license here";
 
     public static void addPath(String s) throws Exception {

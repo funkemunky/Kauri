@@ -29,7 +29,7 @@ public class BlockC extends Check {
     @Packet
     public void onPlace(WrappedInBlockPlacePacket packet) {
         IntVector pos = packet.getBlockPosition();
-        if(pos != null && (pos.getX() != -1 || pos.getY() != -1 || pos.getZ() != -1)) {
+        if(pos != null && (pos.getX() != -1 || (pos.getY() != -1 && pos.getY() != 255) || pos.getZ() != -1)) {
             loc = new Location(packet.getPlayer().getWorld(), pos.getX(), pos.getY(), pos.getZ());
 
             this.box = new SimpleCollisionBox(loc, 2, 1).expand(0.15, 0.15, 0.15);
@@ -38,8 +38,7 @@ public class BlockC extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if(box != null && loc != null) {
-
+        if(box != null && loc != null && data.playerInfo.lastFlyingTimer.isPassed(1)) {
             KLocation origin = data.playerInfo.to.clone();
 
             origin.y+= data.playerInfo.sneaking ? 1.54 : 1.62;

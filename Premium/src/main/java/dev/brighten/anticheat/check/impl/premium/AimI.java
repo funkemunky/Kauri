@@ -19,7 +19,8 @@ public class AimI extends Check {
 
         final double pitch = data.playerInfo.to.pitch, lpitch = data.playerInfo.from.pitch;
 
-        if(pitch == lpitch && pitch == 0 && data.moveProcessor.deltaX > 12) {
+        if(pitch == lpitch && pitch == 0 && !data.playerInfo.inVehicle
+                && data.playerInfo.lastTeleportTimer.isPassed(1) && data.moveProcessor.deltaX > 12) {
             if(++buffer > 3) {
                 vl++;
                 flag("deltaX=%s buffer=%s", data.moveProcessor.deltaX, buffer);

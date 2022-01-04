@@ -12,6 +12,8 @@ import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.listeners.api.impl.KeepaliveAcceptedEvent;
+import dev.brighten.anticheat.utils.AimbotUtil;
+import dev.brighten.anticheat.utils.FastTrig;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.MouseFilter;
 import dev.brighten.anticheat.utils.MovementUtils;
@@ -19,6 +21,7 @@ import dev.brighten.anticheat.utils.api.BukkitAPI;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import lombok.val;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.potion.PotionEffectType;
@@ -30,11 +33,11 @@ import java.util.List;
 public class MovementProcessor {
     private final ObjectData data;
 
-    public LinkedList<Float> yawGcdList = new EvictingList<>(35),
-            pitchGcdList = new EvictingList<>(35);
+    public LinkedList<Float> yawGcdList = new EvictingList<>(45),
+            pitchGcdList = new EvictingList<>(45);
     public float deltaX, deltaY, lastDeltaX, lastDeltaY, smoothYaw, smoothPitch, lsmoothYaw, lsmoothPitch;
     public Tuple<List<Float>, List<Float>> yawOutliers, pitchOutliers;
-    public float sensitivityX, sensitivityY, yawMode, pitchMode;
+    public float sensitivityX, sensitivityY, currentSensX, currentSensY, sensitivityMcp, yawMode, pitchMode;
     public int sensXPercent, sensYPercent;
     public TickTimer lastCinematic = new TickTimer(2);
     private MouseFilter mxaxis = new MouseFilter(), myaxis = new MouseFilter();
@@ -44,6 +47,7 @@ public class MovementProcessor {
     public boolean accurateYawData;
     public static float offset = (int)Math.pow(2, 24);
     public static double groundOffset = 1 / 64.;
+    public final EvictingList<Integer> sensitivitySamples = new EvictingList<>(50);
     private static String keepaliveAcceptListener = Kauri.INSTANCE.eventHandler
             .listen(KeepaliveAcceptedEvent.class,  listner -> {
                 if(listner.getData().playerInfo.serverGround || listner.getData().playerInfo.clientGround) {
@@ -88,14 +92,13 @@ public class MovementProcessor {
     }
 
     public void process(WrappedInFlyingPacket packet, long timeStamp) {
-        data.playerInfo.lastFlyingTimer.reset();
         if(data.playerInfo.checkMovement) data.playerInfo.moveTicks++;
         else {
             data.playerInfo.lastTeleportTimer.reset();
             data.playerInfo.moveTicks = 0;
         }
 
-        data.playerInfo.doingTeleport = data.playerInfo.moveTicks == 0;
+        data.playerInfo.doingTeleport = data.playerInfo.moveTicks == 0 || data.teleportsToConfirm > 0;
         //We check if it's null and intialize the from and to as equal to prevent large deltas causing false positives since there
         //was no previous from (Ex: delta of 380 instead of 0.45 caused by jump jump in location from 0,0,0 to 380,0,0)
 
@@ -263,8 +266,19 @@ public class MovementProcessor {
             data.playerInfo.deltaYaw = data.playerInfo.to.yaw
                     - data.playerInfo.from.yaw;
             data.playerInfo.deltaPitch = data.playerInfo.to.pitch - data.playerInfo.from.pitch;
-            if (packet.isLook()) {
 
+            if (packet.isLook()) {
+                float deltaYaw = Math.abs(data.playerInfo.deltaYaw), lastDeltaYaw = Math.abs(data.playerInfo.lDeltaYaw);
+                final double differenceYaw = Math.abs(data.playerInfo.deltaYaw - lastDeltaYaw);
+                final double differencePitch = Math.abs(data.playerInfo.deltaPitch - data.playerInfo.lDeltaPitch);
+
+                final double joltYaw = Math.abs(differenceYaw - deltaYaw);
+                final double joltPitch = Math.abs(differencePitch - data.playerInfo.deltaPitch);
+
+                final float yawThreshold = Math.max(1.0f, deltaYaw / 2f),
+                        pitchThreshold = Math.max(1.f, Math.abs(data.playerInfo.deltaPitch) / 2f);
+
+                if (joltYaw > yawThreshold && joltPitch > pitchThreshold) data.playerInfo.lastHighRate.reset();
                 data.playerInfo.lastPitchGCD = data.playerInfo.pitchGCD;
                 data.playerInfo.lastYawGCD = data.playerInfo.yawGCD;
                 data.playerInfo.yawGCD = MiscUtils
@@ -299,6 +313,8 @@ public class MovementProcessor {
                         //Making sure to get shit within the std for a more accurate result.
 
                         //Making sure to get shit within the std for a more accurate result.
+                        currentSensX = getSensitivityFromYawGCD(yawGcd);
+                        currentSensY = getSensitivityFromPitchGCD(pitchGcd);
                         if (lastReset.isPassed()) {
                             yawOutliers = MiscUtils.getOutliersFloat(yawGcdList);
                             pitchOutliers = MiscUtils.getOutliersFloat(pitchGcdList);
@@ -307,6 +323,16 @@ public class MovementProcessor {
                             lastReset.reset();
                             sensXPercent = sensToPercent(sensitivityX = getSensitivityFromYawGCD(yawMode));
                             sensYPercent = sensToPercent(sensitivityY = getSensitivityFromPitchGCD(pitchMode));
+
+                            table: {
+                                sensitivitySamples.add(Math.max(sensXPercent, sensYPercent));
+
+                                if (sensitivitySamples.size() > 30) {
+                                    final long mode = MathUtils.getMode(sensitivitySamples);
+
+                                    sensitivityMcp = AimbotUtil.SENSITIVITY_MAP.getOrDefault((int) mode, -1.0F);
+                                }
+                            }
                         }
 
 
@@ -372,7 +398,7 @@ public class MovementProcessor {
                 }
             }
             //Running jump check
-            if (!data.playerInfo.clientGround) {
+            if (!data.playerInfo.clientGround && !data.playerInfo.doingTeleport) {
                 if (!data.playerInfo.jumped && data.playerInfo.lClientGround
                         && data.playerInfo.deltaY >= 0) {
                     data.playerInfo.jumped = true;
@@ -433,7 +459,10 @@ public class MovementProcessor {
             data.playerInfo.baseSpeed = MovementUtils.getBaseSpeed(data);
         }
 
-        if(data.playerInfo.inVehicle = data.getPlayer().getVehicle() != null) data.playerInfo.vehicleTimer.reset();
+        if(data.playerInfo.inVehicle = data.getPlayer().getVehicle() != null) {
+            data.playerInfo.vehicleTimer.reset();
+            data.runKeepaliveAction(ka -> data.playerInfo.vehicleTimer.reset());
+        }
         if(data.playerInfo.gliding = BukkitAPI.INSTANCE.isGliding(data.getPlayer()))
             data.playerInfo.lastGlideTimer.reset();
         data.playerInfo.riptiding = Atlas.getInstance().getBlockBoxManager()
@@ -448,7 +477,6 @@ public class MovementProcessor {
 
         if(!data.playerInfo.worldLoaded)
             data.playerInfo.lastChunkUnloaded.reset();
-
 
         data.lagInfo.lagging = data.lagInfo.lagTicks.subtract() > 0
                 || !data.playerInfo.worldLoaded
@@ -551,28 +579,10 @@ public class MovementProcessor {
         return percent * .0070422534f;
     }
 
-    //Noncondensed
-    /*private static double getSensitivityFromYawGCD(double gcd) {
-        double stepOne = yawToF2(gcd) / 8;
-        double stepTwo = Math.cbrt(stepOne);
-        double stepThree = stepTwo - .2f;
-        return stepThree / .6f;
-    }*/
-
-    //Condensed
     public static float getSensitivityFromYawGCD(float gcd) {
-        return ((float)Math.cbrt(yawToF2(gcd) / 8f) - .2f) / .6f;
+        return ((float) Math.cbrt(yawToF2(gcd) / 8f) - .2f) / .6f;
     }
 
-    //Noncondensed
-    /*private static double getSensitivityFromPitchGCD(double gcd) {
-        double stepOne = pitchToF3(gcd) / 8;
-        double stepTwo = Math.cbrt(stepOne);
-        double stepThree = stepTwo - .2f;
-        return stepThree / .6f;
-    }*/
-
-    //Condensed
     private static float getSensitivityFromPitchGCD(float gcd) {
         return ((float)Math.cbrt(pitchToF3(gcd) / 8f) - .2f) / .6f;
     }

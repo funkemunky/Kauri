@@ -26,11 +26,17 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
 import org.bukkit.util.Vector;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.IntStream;
 
 public class PacketProcessor {
+
+    public static boolean simLag = false;
+    public static int amount = 500;
 
     public static final Set<String> incomingPackets = new HashSet<>(), outgoingPackets = new HashSet<>();
 
@@ -58,6 +64,16 @@ public class PacketProcessor {
                        processServer(data, info.getPacket(), info.getType(), info.getTimestamp());
                    } else if(incomingPackets.contains(info.getType())) {
                        processClient(data, info.getPacket(), info.getType(), info.getTimestamp());
+
+                       if(simLag && info.getType().equals(Packet.Client.FLYING)) {
+                           IntStream.range(0, amount).forEach(i -> {
+                               try {
+                                   SecureRandom.getInstanceStrong().generateSeed(500);
+                               } catch (NoSuchAlgorithmException e) {
+                                   e.printStackTrace();
+                               }
+                           });
+                       }
                    }
 
                    if(data.checkManager.runEvent(info)) info.setCancelled(true);
@@ -247,6 +263,7 @@ public class PacketProcessor {
                 data.predictionService.onReceive(packet); //Processing for prediction service.
 
                 data.checkManager.runPacket(packet, timestamp);
+                data.playerInfo.lastFlyingTimer.reset();
 
                 if(data.sniffing) {
                     data.sniffedPackets.add(type + ":@:"
@@ -837,6 +854,11 @@ public class PacketProcessor {
                     loc.yaw+= data.playerInfo.to.yaw;
                 }
 
+                data.teleportsToConfirm++;
+
+                data.runInstantAction(ka -> {
+                    if(ka.isEnd()) data.teleportsToConfirm--;
+                });
                 data.playerInfo.posLocs.add(loc);
 
                 data.playerInfo.phaseLoc = loc.clone();

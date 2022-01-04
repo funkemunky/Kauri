@@ -94,7 +94,6 @@ public class Kauri extends JavaPlugin {
         dataManager = null;
         MiscUtils.printToConsole("&7Unregistering Kauri API...");
         kauriAPI.service.shutdown();
-        loggingThread.shutdown();
 
         MiscUtils.printToConsole("&7Unregistering processors...");
         keepaliveProcessor.stop();
@@ -148,7 +147,9 @@ public class Kauri extends JavaPlugin {
         KauriAPI.INSTANCE = null;
         tps = null;
         dev.brighten.anticheat.utils.MiscUtils.testers.clear();
-        executor.shutdown(); //Shutting down threads.
+        //Shutting down threads.
+        executor.shutdown();
+        loggingThread.shutdown();
         metrics = null;
 
         INSTANCE = null;

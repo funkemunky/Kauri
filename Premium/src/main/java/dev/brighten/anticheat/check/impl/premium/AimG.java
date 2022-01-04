@@ -30,10 +30,12 @@ public class AimG extends Check {
     public void onUse(WrappedInUseEntityPacket packet) {
         ReachB reach = find(ReachB.class);
         if(packet.getAction() != WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK
-                || data.target == null || !reach.sentTeleport || reach.streak < 3
+                || data.target == null || reach.streak < 3
                 || !reach.entityLocationMap.containsKey(data.target.getUniqueId())) return;
 
         EntityLocation eloc = reach.entityLocationMap.get(data.target.getUniqueId());
+
+        if(!eloc.sentTeleport) return;
 
         KLocation origin = data.playerInfo.to.clone(),
                 targetLocation = new KLocation(eloc.x, eloc.y, eloc.z, eloc.yaw, eloc.pitch);

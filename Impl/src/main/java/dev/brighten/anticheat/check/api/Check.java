@@ -188,7 +188,7 @@ public class Check implements KauriCheck {
     protected long lastFlagRun = 0L;
 
     public void flag(boolean devAlerts, int resetVLTime, String information, Object... variables) {
-        Kauri.INSTANCE.executor.execute(() -> {
+        Kauri.INSTANCE.loggingThread.execute(() -> {
             if(Kauri.INSTANCE.getTps() < 18)
                 vl = 0;
 
@@ -345,71 +345,73 @@ public class Check implements KauriCheck {
     }
 
     public void punish() {
-        if(devStage.ordinal() > Arrays.stream(DevStage.values())
-                .filter(ds -> ds.name().equalsIgnoreCase(Config.minimumStageBan)).findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("\"" + Config.minimumStageBan
-                        + "\" is not a proper DevStage. Options: [Release, Beta, Alpha]")).ordinal()
-                || punishVl == -1 || vl <= punishVl
-                || System.currentTimeMillis() - Kauri.INSTANCE.lastTick > 200L) return;
+       Kauri.INSTANCE.loggingThread.execute(() -> {
+           if(devStage.ordinal() > Arrays.stream(DevStage.values())
+                   .filter(ds -> ds.name().equalsIgnoreCase(Config.minimumStageBan)).findFirst()
+                   .orElseThrow(() -> new IllegalArgumentException("\"" + Config.minimumStageBan
+                           + "\" is not a proper DevStage. Options: [Release, Beta, Alpha]")).ordinal()
+                   || punishVl == -1 || vl <= punishVl
+                   || System.currentTimeMillis() - Kauri.INSTANCE.lastTick > 200L) return;
 
-        DiscordAPI.INSTANCE.sendBan(data.getPlayer(),  this, banExempt);
+           DiscordAPI.INSTANCE.sendBan(data.getPlayer(),  this, banExempt);
 
-        vl = 0;
+           vl = 0;
 
-        if(!executable || (banExempt && Config.punishmentBypassPerm)) return;
+           if(!executable || (banExempt && Config.punishmentBypassPerm)) return;
 
-        PunishResult punishResult = PunishResult.builder().cancelled(false)
-                .broadcastMessage(Config.broadcastMessage).commands(executableCommands).build();
+           PunishResult punishResult = PunishResult.builder().cancelled(false)
+                   .broadcastMessage(Config.broadcastMessage).commands(executableCommands).build();
 
-        for(KauriEvent event : KauriAPI.INSTANCE.getAllEvents()) {
-            PunishResult current = event.onPunish(data.getPlayer(), this, punishResult.getBroadcastMessage(),
-                    punishResult.getCommands(), punishResult.isCancelled());
+           for(KauriEvent event : KauriAPI.INSTANCE.getAllEvents()) {
+               PunishResult current = event.onPunish(data.getPlayer(), this, punishResult.getBroadcastMessage(),
+                       punishResult.getCommands(), punishResult.isCancelled());
 
-            punishResult = PunishResult.builder().cancelled(current.isCancelled())
-                    .commands(current.getCommands() != null ? current.getCommands() : punishResult.getCommands())
-                    .broadcastMessage(current.getBroadcastMessage() != null
-                            ? current.getBroadcastMessage() : punishResult.getBroadcastMessage())
-                    .build();
-        }
+               punishResult = PunishResult.builder().cancelled(current.isCancelled())
+                       .commands(current.getCommands() != null ? current.getCommands() : punishResult.getCommands())
+                       .broadcastMessage(current.getBroadcastMessage() != null
+                               ? current.getBroadcastMessage() : punishResult.getBroadcastMessage())
+                       .build();
+           }
 
-        final String broadcastMessage = punishResult.getBroadcastMessage();
-        final List<String> punishCommands = punishResult.getCommands();
+           final String broadcastMessage = punishResult.getBroadcastMessage();
+           final List<String> punishCommands = punishResult.getCommands();
 
-        if(!punishResult.isCancelled()) {
-            Kauri.INSTANCE.loggerManager.addPunishment(data, this);
-            if(!data.banned) {
-                if(!Config.broadcastMessage.equalsIgnoreCase("off")) {
-                    if (!Config.bungeeBroadcast) {
-                        RunUtils.task(() -> {
-                            if (!broadcastMessage.equalsIgnoreCase("off")) {
-                                Bukkit.broadcastMessage(Color.translate(addPlaceHolders(broadcastMessage)));
-                            }
-                        }, Kauri.INSTANCE);
-                    } else {
-                        BungeeAPI.broadcastMessage(Color.translate(addPlaceHolders(broadcastMessage)));
-                    }
-                }
-                if(!Config.bungeePunishments) {
-                    RunUtils.task(() -> {
-                        ConsoleCommandSender sender = Bukkit.getConsoleSender();
-                        punishCommands.
-                                forEach(cmd -> Bukkit.dispatchCommand(
-                                        sender,
-                                        addPlaceHolders(cmd.replace("%name%", data.getPlayer().getName()))));
-                        vl = 0;
-                    }, Kauri.INSTANCE);
-                } else {
-                    punishCommands.
-                            forEach(cmd -> BungeeAPI
-                                    .sendCommand(addPlaceHolders(cmd.replace("%name%",
-                                            data.getPlayer().getName()))));
-                }
-                data.banned = true;
-                RunUtils.taskLater(() -> {
-                    if(data != null) data.banned = false;
-                }, Kauri.INSTANCE, 10);
-            }
-        }
+           if(!punishResult.isCancelled()) {
+               Kauri.INSTANCE.loggerManager.addPunishment(data, this);
+               if(!data.banned) {
+                   if(!Config.broadcastMessage.equalsIgnoreCase("off")) {
+                       if (!Config.bungeeBroadcast) {
+                           RunUtils.task(() -> {
+                               if (!broadcastMessage.equalsIgnoreCase("off")) {
+                                   Bukkit.broadcastMessage(Color.translate(addPlaceHolders(broadcastMessage)));
+                               }
+                           }, Kauri.INSTANCE);
+                       } else {
+                           BungeeAPI.broadcastMessage(Color.translate(addPlaceHolders(broadcastMessage)));
+                       }
+                   }
+                   if(!Config.bungeePunishments) {
+                       RunUtils.task(() -> {
+                           ConsoleCommandSender sender = Bukkit.getConsoleSender();
+                           punishCommands.
+                                   forEach(cmd -> Bukkit.dispatchCommand(
+                                           sender,
+                                           addPlaceHolders(cmd.replace("%name%", data.getPlayer().getName()))));
+                           vl = 0;
+                       }, Kauri.INSTANCE);
+                   } else {
+                       punishCommands.
+                               forEach(cmd -> BungeeAPI
+                                       .sendCommand(addPlaceHolders(cmd.replace("%name%",
+                                               data.getPlayer().getName()))));
+                   }
+                   data.banned = true;
+                   RunUtils.taskLater(() -> {
+                       if(data != null) data.banned = false;
+                   }, Kauri.INSTANCE, 10);
+               }
+           }
+       });
     }
 
     public void debug(String information, Object... variables) {
