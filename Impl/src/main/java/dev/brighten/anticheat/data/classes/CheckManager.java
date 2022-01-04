@@ -21,6 +21,7 @@ public class CheckManager {
         this.objectData = objectData;
     }
 
+    //TODO Use https://github.com/EsotericSoftware/reflectasm
     public void runPacket(NMSObject object, long timeStamp) {
         if(!checkMethods.containsKey(object.getClass())) {
             return;
