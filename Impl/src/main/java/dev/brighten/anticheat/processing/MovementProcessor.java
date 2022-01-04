@@ -46,7 +46,7 @@ public class MovementProcessor {
     public boolean accurateYawData;
     public static float offset = (int)Math.pow(2, 24);
     public static double groundOffset = 1 / 64.;
-    public final EvictingList<Long> sensitivitySamples = new EvictingList<>(50);
+    public final EvictingList<Integer> sensitivitySamples = new EvictingList<>(50);
     private static String keepaliveAcceptListener = Kauri.INSTANCE.eventHandler
             .listen(KeepaliveAcceptedEvent.class,  listner -> {
                 if(listner.getData().playerInfo.serverGround || listner.getData().playerInfo.clientGround) {
@@ -274,7 +274,10 @@ public class MovementProcessor {
                 final double joltYaw = Math.abs(differenceYaw - deltaYaw);
                 final double joltPitch = Math.abs(differencePitch - data.playerInfo.deltaPitch);
 
-                if (joltYaw > 1.0 && joltPitch > 1.0) data.playerInfo.lastHighRate.reset();
+                //float yawThreshold = Math.max(1.0, deltaYaw / 6), pitchThreshold =
+
+                //TODO debug this when going up and down to see what the threshold needs to be
+                if (joltYaw > 1.0 && joltPitch > 2.0) data.playerInfo.lastHighRate.reset();
                 data.playerInfo.lastPitchGCD = data.playerInfo.pitchGCD;
                 data.playerInfo.lastYawGCD = data.playerInfo.yawGCD;
                 data.playerInfo.yawGCD = MiscUtils
@@ -321,14 +324,9 @@ public class MovementProcessor {
                             sensYPercent = sensToPercent(sensitivityY = getSensitivityFromPitchGCD(pitchMode));
 
                             table: {
-                                final float absolute = Math.max(yawGcd, pitchGcd);
-                                final float sensitivity = AimbotUtil.getSensitivityFromPitchGCD(absolute) * 200;
+                                sensitivitySamples.add(Math.max(sensXPercent, sensYPercent));
 
-                                final long rounded = (long) sensitivity;
-
-                                sensitivitySamples.add(rounded);
-
-                                if (sensitivitySamples.size() < 30) {
+                                if (sensitivitySamples.size() > 30) {
                                     final long mode = MathUtils.getMode(sensitivitySamples);
 
                                     sensitivityMcp = AimbotUtil.SENSITIVITY_MAP.getOrDefault((int) mode, -1.0F);
