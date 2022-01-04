@@ -21,6 +21,7 @@ import dev.brighten.anticheat.utils.api.BukkitAPI;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import lombok.val;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.potion.PotionEffectType;
@@ -274,10 +275,10 @@ public class MovementProcessor {
                 final double joltYaw = Math.abs(differenceYaw - deltaYaw);
                 final double joltPitch = Math.abs(differencePitch - data.playerInfo.deltaPitch);
 
-                //float yawThreshold = Math.max(1.0, deltaYaw / 6), pitchThreshold =
+                final float yawThreshold = Math.max(1.0f, deltaYaw / 2f),
+                        pitchThreshold = Math.max(1.f, Math.abs(data.playerInfo.deltaPitch) / 2f);
 
-                //TODO debug this when going up and down to see what the threshold needs to be
-                if (joltYaw > 1.0 && joltPitch > 2.0) data.playerInfo.lastHighRate.reset();
+                if (joltYaw > yawThreshold && joltPitch > pitchThreshold) data.playerInfo.lastHighRate.reset();
                 data.playerInfo.lastPitchGCD = data.playerInfo.pitchGCD;
                 data.playerInfo.lastYawGCD = data.playerInfo.yawGCD;
                 data.playerInfo.yawGCD = MiscUtils

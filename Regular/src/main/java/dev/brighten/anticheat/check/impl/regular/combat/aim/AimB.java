@@ -37,13 +37,12 @@ public class AimB extends Check {
 
         if (gridX < 0.005 || gridY < 0.005) lastGrid.reset();
 
-        if (MathUtils.getDelta(sensitivity, data.moveProcessor.currentSensY) > 0.8
-                || MathUtils.getDelta(sensitivity, data.moveProcessor.currentSensX) > 0.8
-                || deltaX > 200
+        if (deltaX > 200
                 || deltaY > 200) {
             debug("sensitivity instability: mcp=%.4f, cx=%.4f, cy=%.4f, dx=%.1f, dy=%.1f",
                     data.moveProcessor.sensitivityMcp, data.moveProcessor.currentSensX,
                     data.moveProcessor.currentSensY, deltaX, deltaY);
+            if(buffer > 0) buffer--;
             return;
         }
 
@@ -54,7 +53,7 @@ public class AimB extends Check {
             if (data.playerInfo.pitchGCD < 0.007
                     && lastGrid.isPassed()
                     && data.playerInfo.lastHighRate.isNotPassed(3)) {
-                if (++buffer > 8) {
+                if (deltaPitch < 10 && ++buffer > 8) {
                     vl++;
                     flag("%s", data.playerInfo.pitchGCD);
                 }
