@@ -21,10 +21,11 @@ import dev.brighten.api.check.DevStage;
 @Cancellable
 public class TimerB extends Check {
 
-    private long totalTimer = -1;
-    private final Timer lastFlag = new MillisTimer(2000L);
+    private long totalTimer = -1, noLagStreak;
+    private final Timer lastFlag = new MillisTimer(2000L), lastFlyingAdd = new MillisTimer();
     private int buffer;
-    private boolean flying;
+    private long timeBeforeReset;
+    private boolean flying, justReset;
 
     @Packet
     public void onTeleport(WrappedOutPositionPacket event) {
@@ -33,45 +34,68 @@ public class TimerB extends Check {
 
     @Packet
     public void onBlockPlace(WrappedInBlockPlacePacket packet) {
+        //In versions 1.17 and newer, players will send an extra flying when right clicking
         if(data.playerVersion.isOrAbove(ProtocolVersion.v1_17))
         totalTimer-= 50;
     }
 
     @Packet
-    public void onTrans(WrappedInTransactionPacket packet) {
-        if(totalTimer == -1) {
-            totalTimer = System.currentTimeMillis() - 50;
-            debug("Reset time");
-        } else if(!flying && data.playerInfo.lastFlyingTimer.isPassed(1))
-            totalTimer+= 50;
-        flying = false;
-    }
-
-    @Packet
     public void onFlying(WrappedInFlyingPacket packet, long now) {
-        flying = true;
-        if(totalTimer == -1) {
-            totalTimer = now - 50;
-            debug("Reset time");
-        }
-        else totalTimer+= 50;
+        //Getting the amount of flyings that have occurred without lag.
+        if(lastFlyingAdd.isPassed(10))
+            noLagStreak++;
+        else noLagStreak = 0;
 
-        long threshold = now + 100, delta = totalTimer - threshold;
-
-        boolean isLagProblem = (Kauri.INSTANCE.keepaliveProcessor.laggyPlayers
-                / (double)Kauri.INSTANCE.keepaliveProcessor.totalPlayers) > 0.8;
-
-        if(totalTimer > threshold) {
-            if (++buffer > 4) {
-                vl++;
-                flag("p=%s;d=%s", data.lagInfo.lastPacketDrop.getPassed(), delta);
+        check: {
+            //This means we haven't started counting
+            if(totalTimer == -1) {
+                totalTimer = now - 50;
+                debug("Reset time");
             }
-            totalTimer = now - 50;
-            debug("Reset time");
-            lastFlag.reset();
-        } else if(lastFlag.isPassed(5000L)) buffer = 0;
+            //Every flying should take 50ms to send in between. So for every flying, we add 50ms to the totalTime.
+            else totalTimer+= 50;
 
-        debug("d=%s, thr=%s, b=%s lp=%s cp=%s", delta, threshold, buffer,
-                isLagProblem, (data.lagInfo.lastPingDrop.isPassed(4) && System.currentTimeMillis() - data.lagInfo.lastClientTrans < 120L));
+            //Only players using timer will add enough to reach this threshold in theory.
+            long threshold = now + 100, delta = totalTimer - threshold;
+
+            boolean isLagProblem = (Kauri.INSTANCE.keepaliveProcessor.laggyPlayers
+                    / (double)Kauri.INSTANCE.keepaliveProcessor.totalPlayers) > 0.8;
+
+            //We don't want the time to run away, especially on versions 1.9+ where flyings are not sent if players
+            //are standing still. We also want to ensure we aren't resetting when a player lags because this will cause
+            //false positives.
+            if(delta > 2000L
+                    && noLagStreak > 5) {
+                timeBeforeReset = totalTimer; //We are setting this just in case the player lags the next tick.
+                totalTimer = now - 50;
+                debug("Reset time");
+                justReset = true;
+            } else if(justReset) {
+                if(noLagStreak <= 1) {
+                    totalTimer = timeBeforeReset;
+                    debug("Restored previous time because lag");
+                }
+                justReset = false;
+            }
+
+            if(totalTimer > threshold
+                    //If most players on the server are lagging, it's very likely we have an unstable netty thread
+                    //and therefore cannot rely on this detection.
+                    && !isLagProblem) {
+                if (++buffer > 4) {
+                    vl++;
+                    flag("p=%s;d=%s", data.lagInfo.lastPacketDrop.getPassed(), delta);
+                }
+                totalTimer = now - 50;
+                debug("Reset time");
+                lastFlag.reset();
+            } else if(lastFlag.isPassed(5000L)) buffer = 0;
+
+            debug("d=%s, thr=%s, b=%s lp=%s cp=%s", delta, threshold, buffer,
+                    isLagProblem, (data.lagInfo.lastPingDrop.isPassed(4)
+                            && System.currentTimeMillis() - data.lagInfo.lastClientTrans < 120L));
+        }
+        flying = true;
+        lastFlyingAdd.reset();
     }
 }

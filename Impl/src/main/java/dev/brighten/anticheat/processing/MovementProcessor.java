@@ -13,6 +13,7 @@ import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.listeners.api.impl.KeepaliveAcceptedEvent;
 import dev.brighten.anticheat.utils.AimbotUtil;
+import dev.brighten.anticheat.utils.FastTrig;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.MouseFilter;
 import dev.brighten.anticheat.utils.MovementUtils;
@@ -31,11 +32,11 @@ import java.util.List;
 public class MovementProcessor {
     private final ObjectData data;
 
-    public LinkedList<Float> yawGcdList = new EvictingList<>(35),
-            pitchGcdList = new EvictingList<>(35);
+    public LinkedList<Float> yawGcdList = new EvictingList<>(45),
+            pitchGcdList = new EvictingList<>(45);
     public float deltaX, deltaY, lastDeltaX, lastDeltaY, smoothYaw, smoothPitch, lsmoothYaw, lsmoothPitch;
     public Tuple<List<Float>, List<Float>> yawOutliers, pitchOutliers;
-    public float sensitivityX, sensitivityY, sensitivityMcp, yawMode, pitchMode;
+    public float sensitivityX, sensitivityY, currentSensX, currentSensY, sensitivityMcp, yawMode, pitchMode;
     public int sensXPercent, sensYPercent;
     public TickTimer lastCinematic = new TickTimer(2);
     private MouseFilter mxaxis = new MouseFilter(), myaxis = new MouseFilter();
@@ -264,8 +265,16 @@ public class MovementProcessor {
             data.playerInfo.deltaYaw = data.playerInfo.to.yaw
                     - data.playerInfo.from.yaw;
             data.playerInfo.deltaPitch = data.playerInfo.to.pitch - data.playerInfo.from.pitch;
-            if (packet.isLook()) {
 
+            if (packet.isLook()) {
+                float deltaYaw = Math.abs(data.playerInfo.deltaYaw), lastDeltaYaw = Math.abs(data.playerInfo.lDeltaYaw);
+                final double differenceYaw = Math.abs(data.playerInfo.deltaYaw - lastDeltaYaw);
+                final double differencePitch = Math.abs(data.playerInfo.deltaPitch - data.playerInfo.lDeltaPitch);
+
+                final double joltYaw = Math.abs(differenceYaw - deltaYaw);
+                final double joltPitch = Math.abs(differencePitch - data.playerInfo.deltaPitch);
+
+                if (joltYaw > 1.0 && joltPitch > 1.0) data.playerInfo.lastHighRate.reset();
                 data.playerInfo.lastPitchGCD = data.playerInfo.pitchGCD;
                 data.playerInfo.lastYawGCD = data.playerInfo.yawGCD;
                 data.playerInfo.yawGCD = MiscUtils
@@ -300,6 +309,8 @@ public class MovementProcessor {
                         //Making sure to get shit within the std for a more accurate result.
 
                         //Making sure to get shit within the std for a more accurate result.
+                        currentSensX = getSensitivityFromYawGCD(yawGcd);
+                        currentSensY = getSensitivityFromPitchGCD(pitchGcd);
                         if (lastReset.isPassed()) {
                             yawOutliers = MiscUtils.getOutliersFloat(yawGcdList);
                             pitchOutliers = MiscUtils.getOutliersFloat(pitchGcdList);
@@ -569,28 +580,10 @@ public class MovementProcessor {
         return percent * .0070422534f;
     }
 
-    //Noncondensed
-    /*private static double getSensitivityFromYawGCD(double gcd) {
-        double stepOne = yawToF2(gcd) / 8;
-        double stepTwo = Math.cbrt(stepOne);
-        double stepThree = stepTwo - .2f;
-        return stepThree / .6f;
-    }*/
-
-    //Condensed
     public static float getSensitivityFromYawGCD(float gcd) {
-        return ((float)Math.cbrt(yawToF2(gcd) / 8f) - .2f) / .6f;
+        return ((float) Math.cbrt(yawToF2(gcd) / 8f) - .2f) / .6f;
     }
 
-    //Noncondensed
-    /*private static double getSensitivityFromPitchGCD(double gcd) {
-        double stepOne = pitchToF3(gcd) / 8;
-        double stepTwo = Math.cbrt(stepOne);
-        double stepThree = stepTwo - .2f;
-        return stepThree / .6f;
-    }*/
-
-    //Condensed
     private static float getSensitivityFromPitchGCD(float gcd) {
         return ((float)Math.cbrt(pitchToF3(gcd) / 8f) - .2f) / .6f;
     }

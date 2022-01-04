@@ -45,11 +45,14 @@ public class Load {
         register("Kicking players online...");
         //Bukkit.getOnlinePlayers().forEach(player -> player.kickPlayer("Starting up..."));
         register("Starting thread pool...");
-        Kauri.INSTANCE.executor = Executors.newCachedThreadPool(new ThreadFactoryBuilder()
-                .setNameFormat("Kauri Threads")
+        Kauri.INSTANCE.executor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder()
+                .setNameFormat("Kauri Misc Thread")
                 .setUncaughtExceptionHandler((t, e) -> RunUtils.task(e::printStackTrace, Kauri.INSTANCE))
                 .build());
-        Kauri.INSTANCE.loggingThread = Executors.newSingleThreadScheduledExecutor();
+        Kauri.INSTANCE.loggingThread = Executors.newScheduledThreadPool(2, new ThreadFactoryBuilder()
+                .setNameFormat("Kauri Logging Threads")
+                .setUncaughtExceptionHandler((t, e) -> RunUtils.task(e::printStackTrace, Kauri.INSTANCE))
+                .build());
 
         Bukkit.getOnlinePlayers().forEach(ThreadHandler::addPlayer);
 

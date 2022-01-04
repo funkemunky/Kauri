@@ -74,6 +74,7 @@ public class PlayerInformation {
         lastMoveTimer = new TickTimer();
         nearGroundTimer = new TickTimer();
         vehicleTimer = new TickTimer();
+        lastHighRate = new TickTimer(3);
     }
 
     //Cinematic
@@ -105,7 +106,7 @@ public class PlayerInformation {
             lastBlockDigPacket, lastToggleFlight, lastAttack, lastEntityCollision, lastMoveCancel, lastTargetUpdate,
             lastWindowClick, lastInsideBlock, lastHalfBlock, lastPlaceLiquid, lastUseItem, lastGhostCollision,
             lastTeleportTimer, lastGamemodeTimer, lastRespawnTimer, lastChunkUnloaded, cinematicTimer, lastGlideTimer,
-            lastMoveTimer, nearGroundTimer, vehicleTimer;
+            lastMoveTimer, nearGroundTimer, vehicleTimer, lastHighRate;
 
     public double velocityX, velocityY, velocityZ, velocityXZ, calcVelocityX, calcVelocityY, calcVelocityZ;
 
