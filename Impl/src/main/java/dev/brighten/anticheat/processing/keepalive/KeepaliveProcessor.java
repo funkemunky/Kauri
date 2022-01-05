@@ -37,13 +37,6 @@ public class KeepaliveProcessor implements Runnable {
 
     public KeepaliveProcessor() {
         start();
-
-        //Keepalive task
-        RunUtils.taskTimerAsync(() -> {
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                TinyProtocolHandler.sendPacket(player, new WrappedOutKeepAlivePacket(69L));
-            }
-        }, Kauri.INSTANCE, 60L, 60L);
     }
 
     @Override

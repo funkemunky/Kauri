@@ -52,13 +52,6 @@ public class BadPacketsN extends Check {
 
             if (!isExecutable() && vl > 4) kickPlayer(String.format(Color.translate(kickString), "TN"));
         }
-        if(lastKeepAlive.isPassed(7000L)) {
-            if(lastSentKeepAlive.isNotPassed(7000L) && ++flying2 > 80) {
-                if (keepaliveKicking)
-                    kickPlayer("Network connection error.");
-                else flag("Has not sent keepalive since " + lastKeepAlive.getPassed() + "ms ago!");
-            }
-        } else flying2 = 0;
 
         lastFlying.reset();
     }
