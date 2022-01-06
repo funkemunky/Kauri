@@ -63,7 +63,6 @@ public class Pastebin {
                     "" + Integer.toString(urlParameters.getBytes().length));
             connection.setRequestProperty("Content-Language", "en-US");
 
-            connection.setUseCaches(false);
             connection.setDoInput(true);
             connection.setDoOutput(true);
 

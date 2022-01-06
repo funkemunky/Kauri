@@ -115,7 +115,7 @@ public class LogCommand extends BaseCommand {
     }
 
     public static String getLogsFromUUID(UUID uuid) {
-        List<Log> logs = Kauri.INSTANCE.loggerManager.getLogs(uuid);
+        List<Log> logs = Kauri.INSTANCE.loggerManager.getLogs(uuid, null, 0, 2000, 0, System.currentTimeMillis());
         List<Punishment> punishments = Kauri.INSTANCE.loggerManager.getPunishments(uuid);
 
         if(logs.size() == 0) return "No Logs";

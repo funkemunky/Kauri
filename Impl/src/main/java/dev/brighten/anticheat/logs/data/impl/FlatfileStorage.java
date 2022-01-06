@@ -197,14 +197,14 @@ public class FlatfileStorage implements DataStorage {
                     .append(uuid.toString()).append(timeFrom).append(timeTo).append(arrayMin).append(arrayMax)
                     .execute(rs -> punishments
                             .add(new Punishment(uuid, rs.getString("check"),
-                                    rs.getTimestamp("time").getTime())));
+                                    rs.getLong("time"))));
         } else {
             Query.prepare("select `uuid`, `time`, `check` from `punishments` " +
                     "where TIME between ? and ? order by `time` desc limit ?,?")
                     .append(timeFrom).append(timeTo).append(arrayMin).append(arrayMax)
                     .execute(rs -> punishments
                             .add(new Punishment(UUID.fromString(rs.getString("uuid")),
-                                    rs.getString("check"), rs.getTimestamp("time").getTime())));
+                                    rs.getString("check"), rs.getLong("time"))));
         }
 
         return punishments;
