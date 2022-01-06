@@ -33,7 +33,6 @@ public class FlyD extends Check {
         }
         if(!packet.isPos()
                 || data.playerInfo.flightCancel
-                || data.blockInfo.nearLiquid
                 || (data.playerInfo.nearGroundTimer.isNotPassed(3) && (data.playerInfo.lClientGround
                 || data.playerInfo.clientGround))
                 || data.playerInfo.lastBlockPlace.isNotPassed(3)
