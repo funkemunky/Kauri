@@ -164,7 +164,7 @@ public class FlatfileStorage implements DataStorage {
             Query.prepare("select `time`, `vl`, `check`, `ping`, `tps`, `info` " +
                     "from `violations` where `uuid` = ?"+ (check != null ? " and where `check` = " + check.name : "")
                     + " and `time` between ? and ? order by `time` desc limit ?,?")
-                    .append(uuid.toString()).append(timeFrom).append(timeTo)
+                    .append(uuid.toString()).append(new Timestamp(timeFrom)).append(new Timestamp(timeTo))
                     .append(arrayMin).append(arrayMax)
                     .execute(rs ->
                             logs.add(new Log(uuid,
@@ -194,14 +194,14 @@ public class FlatfileStorage implements DataStorage {
         if(uuid != null) {
             Query.prepare("select `time`, `check` from `punishments` " +
                     "where `uuid` = ? and TIME between ? and ? order by `time` desc limit ?,?")
-                    .append(uuid.toString()).append(new Timestamp(timeFrom)).append(new Timestamp(timeTo)).append(arrayMin).append(arrayMax)
+                    .append(uuid.toString()).append(timeFrom).append(timeTo).append(arrayMin).append(arrayMax)
                     .execute(rs -> punishments
                             .add(new Punishment(uuid, rs.getString("check"),
                                     rs.getTimestamp("time").getTime())));
         } else {
             Query.prepare("select `uuid`, `time`, `check` from `punishments` " +
                     "where TIME between ? and ? order by `time` desc limit ?,?")
-                    .append(new Timestamp(timeFrom)).append(new Timestamp(timeTo)).append(arrayMin).append(arrayMax)
+                    .append(timeFrom).append(timeTo).append(arrayMin).append(arrayMax)
                     .execute(rs -> punishments
                             .add(new Punishment(UUID.fromString(rs.getString("uuid")),
                                     rs.getString("check"), rs.getTimestamp("time").getTime())));
