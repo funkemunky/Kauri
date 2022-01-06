@@ -164,7 +164,7 @@ public class FlatfileStorage implements DataStorage {
             Query.prepare("select `time`, `vl`, `check`, `ping`, `tps`, `info` " +
                     "from `violations` where `uuid` = ?"+ (check != null ? " and where `check` = " + check.name : "")
                     + " and `time` between ? and ? order by `time` desc limit ?,?")
-                    .append(uuid.toString()).append(new Timestamp(timeFrom)).append(new Timestamp(timeTo))
+                    .append(uuid.toString()).append(timeFrom).append(timeTo)
                     .append(arrayMin).append(arrayMax)
                     .execute(rs ->
                             logs.add(new Log(uuid,

@@ -19,9 +19,9 @@ public class FlyF extends Check {
     public void onPacket(WrappedInFlyingPacket packet) {
         if(data.playerInfo.deltaXZ == 0 && data.playerInfo.deltaY == 0) return;
 
-        double max = (data.playerInfo.lastVelocity.isNotPassed(20)
+        double max = Math.max(0.5001, (data.playerInfo.lastVelocity.isNotPassed(20)
                 ? Math.max(data.playerInfo.velocityY, data.playerInfo.jumpHeight)
-                : data.playerInfo.jumpHeight) + 0.001;
+                : data.playerInfo.jumpHeight) + 0.001);
 
         if(data.playerInfo.lastHalfBlock.isNotPassed(20)
                 || data.blockInfo.collidesHorizontally) max = Math.max(0.5625, max);
