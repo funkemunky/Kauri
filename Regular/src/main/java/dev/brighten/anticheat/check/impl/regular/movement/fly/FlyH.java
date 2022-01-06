@@ -21,6 +21,7 @@ public class FlyH extends Check {
         if(data.playerInfo.lastVelocity.isNotPassed(20)
                 || !data.playerInfo.checkMovement
                 || data.playerInfo.canFly
+                || data.playerInfo.doingTeleport
                 || data.playerInfo.creative
                 || data.blockInfo.blocksAbove)
             return;
