@@ -35,7 +35,8 @@ public class Phase extends Check {
 
     static {
         Arrays.stream(Material.values())
-            .filter(mat -> mat.name().contains("BANNER") || mat.name().contains("BREWING"))
+            .filter(mat -> mat.name().contains("BANNER") || mat.name().contains("BREWING")
+                    || mat.name().contains("CAULDRON"))
                 .forEach(allowedMaterials::add);
 
         allowedMaterials.add(XMaterial.VINE.parseMaterial());
