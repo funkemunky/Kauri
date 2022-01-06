@@ -6,6 +6,7 @@ import cc.funkemunky.api.utils.org.objectweb.asm.ClassReader;
 import cc.funkemunky.api.utils.org.objectweb.asm.tree.AnnotationNode;
 import cc.funkemunky.api.utils.org.objectweb.asm.tree.ClassNode;
 import dev.brighten.anticheat.Kauri;
+import org.bukkit.Bukkit;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -150,7 +151,7 @@ public class ClassScanner {
                 }
             }
         } catch (Exception e) {
-            //System.out.println("Failed to scan: " + in.toString());
+            //Bukkit.getLogger().info("Failed to scan: " + in.toString());
         }
         return null;
     }
@@ -163,7 +164,7 @@ public class ClassScanner {
 
             return classNode.name.replace('/', '.');
         } catch (Exception e) {
-            System.out.println("Failed to scan: " + in.toString());
+            Bukkit.getLogger().severe("Failed to scan: " + in.toString());
         }
         return null;
     }

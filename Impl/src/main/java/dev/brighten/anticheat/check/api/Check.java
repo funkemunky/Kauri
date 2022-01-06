@@ -132,8 +132,6 @@ public class Check implements KauriCheck {
 
         runLoop(settings);
 
-        System.out.println(settings.executableCommands.toString());
-
         final String spath = path + ".settings.";
         checkClass.getFields(field -> Modifier.isStatic(field.getModifiers())
                 && field.isAnnotationPresent(Setting.class))
