@@ -77,6 +77,11 @@ public class SpeedA extends Check {
                 moveFactor+= 0.05;
             }
 
+            if(data.blockInfo.pistonNear) {
+                tags.addTag("piston");
+                moveFactor += 1;
+            }
+
             double ratio = (data.playerInfo.deltaXZ - ldxz) / moveFactor * 100;
 
             if (ratio > 100.8
