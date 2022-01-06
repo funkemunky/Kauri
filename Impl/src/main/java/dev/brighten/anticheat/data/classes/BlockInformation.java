@@ -29,7 +29,8 @@ import java.util.Optional;
 
 public class BlockInformation {
     private ObjectData objectData;
-    public boolean onClimbable, onSlab, onStairs, onHalfBlock, inLiquid, inLava, inWater, inWeb, onSlime, onIce,
+    public boolean onClimbable, onSlab, onStairs, onHalfBlock, inLiquid,
+            nearLiquid, inLava, inWater, inWeb, onSlime, onIce,
             onSoulSand, blocksAbove, collidesVertically, bedNear, collidesHorizontally, blocksNear, inBlock, miscNear,
             collidedWithEntity, roseBush, inPortal, blocksBelow, pistonNear;
     public float currentFriction, fromFriction;
@@ -56,7 +57,7 @@ public class BlockInformation {
 
         blocks.clear();
 
-        onClimbable = objectData.playerInfo.serverGround = objectData.playerInfo.nearGround
+        onClimbable = objectData.playerInfo.serverGround = objectData.playerInfo.nearGround = nearLiquid
                 = onSlab = onStairs = onHalfBlock = inLiquid = inLava = inWater = inWeb = onSlime = pistonNear
                 = onIce = onSoulSand = blocksAbove = collidesVertically = bedNear = collidesHorizontally =
                 blocksNear = inBlock = miscNear = collidedWithEntity = blocksBelow = inPortal = false;
@@ -163,12 +164,16 @@ public class BlockInformation {
                                         if(waterBox.isCollided(blockBox))
                                             inWater = inLiquid = true;
 
+                                        nearLiquid = true;
+
                                         if(normalBox.copy().expand(0.4, 0, 0.4).expandMin(0, -1, 0)
                                                 .isIntersected(blockBox))
                                             blocksBelow = true;
                                     } else if(Materials.checkFlag(type, Materials.LAVA)) {
                                         if(lavaBox.isCollided(blockBox))
                                             inLava = inLiquid = true;
+
+                                        nearLiquid = true;
 
                                         if(normalBox.copy().expand(0.4, 0, 0.4).expandMin(0, -1, 0)
                                                 .isIntersected(blockBox))
