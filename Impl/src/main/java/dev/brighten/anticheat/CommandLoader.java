@@ -6,7 +6,7 @@ import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.Priority;
 
-@Init()
+@Init
 public class CommandLoader {
 
     public CommandLoader() {

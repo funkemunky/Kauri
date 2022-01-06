@@ -4,6 +4,7 @@ import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.logs.data.config.MySQLConfig;
 import dev.brighten.anticheat.utils.MiscUtils;
 import lombok.SneakyThrows;
+import org.bukkit.Bukkit;
 import org.h2.jdbc.JdbcConnection;
 
 import java.io.File;
@@ -37,10 +38,10 @@ public class MySQL {
                 Query.use(conn);
                 Query.prepare("CREATE DATABASE IF NOT EXISTS `" + MySQLConfig.database + "`").execute();
                 Query.prepare("USE `" + MySQLConfig.database + "`").execute();
-                System.out.println("Connection to MySQL has been established.");
+                Bukkit.getLogger().info("Connection to MySQL has been established.");
             }
         } catch (Exception e) {
-            System.out.println("Failed to load mysql: " + e.getMessage());
+            Bukkit.getLogger().severe("Failed to load mysql: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -63,7 +64,7 @@ public class MySQL {
                     dataFolder.getAbsolutePath().replace(".db", ""), new Properties()));
             conn.setAutoCommit(true);
             Query.use(conn);
-            System.out.println("Connection to H2 SQlLite has been established.");
+            Bukkit.getLogger().info("Connection to H2 SQlLite has been established.");
         } catch (SQLException ex) {
             Kauri.INSTANCE.getLogger().log(Level.SEVERE,"SQLite exception on initialize", ex);
         } catch (ClassNotFoundException ex) {

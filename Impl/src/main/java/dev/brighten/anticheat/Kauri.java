@@ -81,7 +81,6 @@ public class Kauri extends JavaPlugin {
     }
 
     public void unload(boolean reload) {
-        reload = false;
         enabled = reload;
         MiscUtils.printToConsole("&7Unloading DataManager...");
         //Clearing the dataManager.
@@ -99,7 +98,6 @@ public class Kauri extends JavaPlugin {
         keepaliveProcessor.stop();
         ThreadHandler.shutdown();
         keepaliveProcessor = null;
-        Atlas.getInstance().getPacketProcessor().removeListeners(this);
 
         MiscUtils.printToConsole("&7Unregistering logging and database...");
 
@@ -131,33 +129,39 @@ public class Kauri extends JavaPlugin {
         //Clearing the checks.
         Check.checkClasses.clear();
         Check.checkSettings.clear();
-        Atlas.getInstance().getPacketProcessor().removeListener(packetProcessor.cancelListener);
-        Atlas.getInstance().getPacketProcessor().removeListener(packetProcessor.listener);
-        PacketProcessor.incomingPackets.clear();
-        PacketProcessor.outgoingPackets.clear();;
+        Atlas.getInstance().getPacketProcessor().removeListeners(Kauri.INSTANCE);
+        if(!reload) {
+            PacketProcessor.incomingPackets.clear();
+            PacketProcessor.outgoingPackets.clear();
+        }
         packetProcessor = null;
 
         MiscUtils.printToConsole("&7Finshing up nullification...");
         msgHandler = null;
         onReload.clear();
+        if(!reload)
         onReload = null;
         KauriAPI.INSTANCE.service.shutdown();
         KauriAPI.INSTANCE.dataManager = null;
         KauriAPI.INSTANCE.exemptHandler = null;
         KauriAPI.INSTANCE = null;
+        if(!reload)
         tps = null;
         dev.brighten.anticheat.utils.MiscUtils.testers.clear();
         //Shutting down threads.
         executor.shutdown();
         loggingThread.shutdown();
         metrics = null;
+        Atlas.getInstance().getBukkitCommandManagers().remove(Kauri.INSTANCE.getDescription().getName());
+        commandManager = null;
 
-        INSTANCE = null;
+        if(!reload)
+            INSTANCE = null;
         MiscUtils.printToConsole("&aCompleted shutdown process.");
     }
 
     public void reload() {
-        unload(false);
+        unload(true);
         load();
     }
 

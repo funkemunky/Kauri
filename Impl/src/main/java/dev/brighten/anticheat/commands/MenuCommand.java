@@ -394,11 +394,9 @@ public class MenuCommand extends BaseCommand {
         if (fromMain)
             menu.setParent(main);
         try {
-            System.out.println("Getting logs...");
             Map<UUID, List<Log>> logs = Kauri.INSTANCE.loggerManager
                     .getLogsWithinTimeFrame(TimeUnit.HOURS.toMillis(2));
 
-            System.out.println("Sorting...");
             List<UUID> sortedIds = logs.keySet().stream()
                     .sorted(Comparator.comparing(key -> {
                         val logsList = logs.get(key);
@@ -406,7 +404,6 @@ public class MenuCommand extends BaseCommand {
                     }))
                     .collect(Collectors.toList());
 
-            System.out.println("Formatting...");
             for (int i = 0; i < Math.min(45, sortedIds.size()); i++) {
                 UUID uuid = sortedIds.get(i);
                 String name = MojangAPI.getUsername(uuid);

@@ -41,7 +41,6 @@ public class KauriClassLoader extends URLClassLoader {
 
             String realName = name.split("\\.class")[0].replaceAll("/", ".");
 
-            System.out.println(realName);
             byte[] nBytes = new byte[bytes.length];
 
             for (int i = 0; i < bytes.length; i++) {
