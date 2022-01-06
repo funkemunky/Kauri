@@ -8,13 +8,15 @@ import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "BadPackets (I)", checkType = CheckType.BADPACKETS, planVersion = KauriVersion.FREE,
-        executable = true, description = "Checks if the player is sending isFlying while not have allowedFlight.",
+        executable = true,
+        description = "Checks if the player is sending isFlying while not have allowedFlight.",
         punishVL = 1)
 public class BadPacketsI extends Check {
 
     @Packet
     public void onFlying(WrappedInAbilitiesPacket packet) {
-        if(packet.isFlying() && !packet.isAllowedFlight() && !data.lagInfo.lagging) {
+        if(packet.isFlying() && !packet.isAllowedFlight()
+                && !packet.getPlayer().getAllowFlight() && !data.lagInfo.lagging) {
             vl+= 2;
             flag("isFlying=" + packet.isFlying() + " allowed=" + packet.isAllowedFlight());
         }

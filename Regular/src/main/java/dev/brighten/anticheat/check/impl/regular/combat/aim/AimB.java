@@ -9,11 +9,12 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import dev.brighten.api.check.CheckType;
+import dev.brighten.api.check.DevStage;
 
 import java.util.List;
 
 @CheckInfo(name = "Aim (B)", description = "Checks for common denominators in pitch difference.",
-        checkType = CheckType.AIM, punishVL = 45, executable = true)
+        checkType = CheckType.AIM, punishVL = 45, devStage = DevStage.BETA)
 public class AimB extends Check {
 
     private float buffer;
