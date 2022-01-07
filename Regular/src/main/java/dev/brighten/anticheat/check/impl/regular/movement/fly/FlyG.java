@@ -28,7 +28,8 @@ public class FlyG extends Check {
         double max = data.playerInfo.jumpHeight;
         if(toGround) {
             if(!fromGround) {
-                if(data.playerInfo.lDeltaY > 0 && data.playerInfo.blockAboveTimer.isPassed(2)) {
+                if(data.playerInfo.lDeltaY > 0 && data.playerInfo.lastFenceBelow.isPassed(4)
+                        && data.playerInfo.blockAboveTimer.isPassed(2)) {
                     tags.addTag("INVALID_LANDING");
                     max = 0;
                 }
