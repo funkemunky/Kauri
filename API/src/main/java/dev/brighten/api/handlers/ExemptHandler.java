@@ -9,9 +9,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
+import static net.minecraft.server.v1_8_R3.WorldType.types;
+
 public class ExemptHandler {
 
-    private static Map<UUID, Exemption> exemptions = new HashMap<>();
+    private static final Map<UUID, Exemption> exemptions = new HashMap<>();
 
     @Deprecated
     public Exemption addExemption(UUID uuid, KauriCheck... checks) {
@@ -52,18 +54,18 @@ public class ExemptHandler {
         return removed;
     }
 
-    @Deprecated
-    public boolean isExempt(UUID uuid, KauriCheck... checks) {
-        if(!exemptions.containsKey(uuid)) return false;
-
-        return isExempt(uuid, Arrays.stream(checks).map(KauriCheck::getCheckType).toArray(CheckType[]::new));
-    }
-
-    public boolean isExempt(UUID uuid, CheckType... types) {
+    public boolean isExempt(UUID uuid, CheckType type) {
         Optional<Exemption> exemption = getPlayerExemption(uuid);
 
-        return exemption.map(exempt -> Arrays.stream(types).anyMatch(type -> exempt.getChecks().contains(type)))
-                .orElse(false);
+        return exemption.map(value -> value.getChecks().contains(type)).orElse(false);
+    }
+
+    public boolean isExempt(UUID uuid, CheckType... type) {
+        for (CheckType checkType : type) {
+            if(isExempt(uuid, checkType))
+                return true;
+        }
+        return false;
     }
 
     @Deprecated
