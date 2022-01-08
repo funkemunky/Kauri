@@ -615,8 +615,8 @@ public class PacketProcessor {
                 Vector vector = new Vector(packet.getMotionX(), packet.getMotionY(), packet.getMotionZ());
                 data.playerInfo.velocities.add(vector);
                 data.playerInfo.doingVelocity = true;
-                data.runKeepaliveAction(end -> {
-                    if(data.playerInfo.velocities.contains(vector)) {
+                data.runInstantAction(ka -> {
+                    if(ka.isEnd() && data.playerInfo.velocities.contains(vector)) {
                         if(data.playerInfo.doingVelocity) {
                             data.playerInfo.lastVelocity.reset();
 
@@ -632,7 +632,7 @@ public class PacketProcessor {
                         }
                         data.playerInfo.velocities.remove(vector);
                     }
-                }, 1);
+                });
                 break;
             }
             case Packet.Server.ENTITY_VELOCITY: {
@@ -643,8 +643,8 @@ public class PacketProcessor {
                     Vector vector = new Vector(packet.getX(), packet.getY(), packet.getZ());
                     data.playerInfo.velocities.add(vector);
                     data.playerInfo.doingVelocity = true;
-                    data.runKeepaliveAction(keepalive -> {
-                        if(data.playerInfo.velocities.contains(vector)) {
+                    data.runInstantAction(keepalive -> {
+                        if(keepalive.isEnd() && data.playerInfo.velocities.contains(vector)) {
                             if(data.playerInfo.doingVelocity) {
                                 data.playerInfo.lastVelocity.reset();
 
@@ -660,7 +660,7 @@ public class PacketProcessor {
                             }
                             data.playerInfo.velocities.remove(vector);
                         }
-                    }, 1);
+                    });
                 }
 
                 if(data.sniffing) {

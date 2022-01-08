@@ -475,6 +475,9 @@ public class MovementProcessor {
                     (float)data.playerInfo.jumpHeight);
         }
 
+        if(data.blockInfo.fenceBelow)
+            data.playerInfo.lastFenceBelow.reset();
+
         if(!data.playerInfo.worldLoaded)
             data.playerInfo.lastChunkUnloaded.reset();
 

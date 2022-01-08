@@ -31,7 +31,7 @@ public class BlockInformation {
     private ObjectData objectData;
     public boolean onClimbable, onSlab, onStairs, onHalfBlock, inLiquid, inLava, inWater, inWeb, onSlime, onIce,
             onSoulSand, blocksAbove, collidesVertically, bedNear, collidesHorizontally, blocksNear, inBlock, miscNear,
-            collidedWithEntity, roseBush, inPortal, blocksBelow, pistonNear;
+            collidedWithEntity, roseBush, inPortal, blocksBelow, pistonNear, fenceBelow;
     public float currentFriction, fromFriction;
     public CollisionHandler
             handler = new CollisionHandler(new ArrayList<>(), new ArrayList<>(), new KLocation(0,0,0), null);
@@ -56,7 +56,7 @@ public class BlockInformation {
 
         blocks.clear();
 
-        onClimbable = objectData.playerInfo.serverGround = objectData.playerInfo.nearGround
+        onClimbable = objectData.playerInfo.serverGround = objectData.playerInfo.nearGround = fenceBelow
                 = onSlab = onStairs = onHalfBlock = inLiquid = inLava = inWater = inWeb = onSlime = pistonNear
                 = onIce = onSoulSand = blocksAbove = collidesVertically = bedNear = collidesHorizontally =
                 blocksNear = inBlock = miscNear = collidedWithEntity = blocksBelow = inPortal = false;
@@ -156,6 +156,11 @@ public class BlockInformation {
                                             .isCollided(blockBox)) {
                                         synchronized (belowCollisions) {
                                             blockBox.downCast(belowCollisions);
+                                        }
+
+                                        if(Materials.checkFlag(type, Materials.FENCE)
+                                                || Materials.checkFlag(type, Materials.WALL)) {
+                                            fenceBelow = true;
                                         }
                                     }
 

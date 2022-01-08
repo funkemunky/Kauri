@@ -16,6 +16,7 @@ import dev.brighten.api.check.DevStage;
 public class FlyB extends Check {
 
     private double vertical, limit, velocityY, slimeY;
+    private boolean pistonBelow;
 
     @Packet
     public void onVelocity(WrappedOutVelocityPacket packet) {
@@ -35,8 +36,12 @@ public class FlyB extends Check {
             limit = Double.MAX_VALUE;
             return;
         }
+
+
         if(data.playerInfo.serverGround || data.playerInfo.lastBlockPlace.isNotPassed(1)) {
             vertical = 0;
+
+            pistonBelow = data.blockInfo.pistonNear && data.playerInfo.slimeTimer.isNotPassed(20);
 
             limit = MovementUtils.getTotalHeight(data.playerVersion, MovementUtils.getJumpHeight(data));
             if(data.playerInfo.lastVelocity.isPassed(3)) velocityY = 0;
@@ -50,7 +55,7 @@ public class FlyB extends Check {
 
             double limit = (this.limit + slimeY + velocityY) * 1.25;
 
-            if(vertical > limit) {
+            if(vertical > limit && !pistonBelow) {
                 vl++;
                 flag("%.3f>-%.3f", vertical, limit);
             }

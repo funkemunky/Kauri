@@ -76,6 +76,7 @@ public class Phase extends Check {
                             && !allowedMaterials.contains(type)
                             && !Materials.checkFlag(type, Materials.STAIRS)) {
                         tags.addTag("INTO_BLOCK");
+                        tags.addTag("material=" + type.name());
                         vl++;
                         break;
                     } else debug(type.name());
