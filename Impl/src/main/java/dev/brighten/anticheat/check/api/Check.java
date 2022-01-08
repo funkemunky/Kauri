@@ -178,6 +178,7 @@ public class Check implements KauriCheck {
     private String addPlaceHolders(String string) {
         return string.replace("%player%", data.getPlayer().getName())
                 .replace("%check%", name)
+                .replace("%name%", data.getPlayer().getName())
                 .replace("%vl%", String.valueOf(MathUtils.round(vl, 1)))
                 .replace("%experimental%", !devStage.isRelease()
                         ? "&c(" + devStage.getFormattedName() + ")" : "");
