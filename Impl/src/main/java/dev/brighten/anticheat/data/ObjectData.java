@@ -83,10 +83,10 @@ public class ObjectData implements Data {
     public Int2ObjectMap<EntityLocation> entityTracker = Int2ObjectMaps.synchronize(new Int2ObjectOpenHashMap<>());
     public final Set<Player> boxDebuggers = new HashSet<>();
     private final List<CollisionBox> lookingAtBoxes = Collections.synchronizedList(new ArrayList<>());
-    public final List<Action> keepAliveStamps = new CopyOnWriteArrayList<>();
-    public final ConcurrentEvictingList<CancelType> typesToCancel = new ConcurrentEvictingList<>(10);
+    public final List<Action> keepAliveStamps = Collections.synchronizedList(new ArrayList<>());
+    public final List<CancelType> typesToCancel = Collections.synchronizedList(new ArrayList<>());
     public final Map<Long, Long> keepAlives = Collections.synchronizedMap(new HashMap<>());
-    public final List<String> sniffedPackets = new CopyOnWriteArrayList<>();
+    public final List<String> sniffedPackets = Collections.synchronizedList(new ArrayList<>());
     public final Map<Location, CollisionBox> ghostBlocks = Collections.synchronizedMap(new HashMap<>());
     public final Map<Short, Tuple<InstantAction, Consumer<InstantAction>>> instantTransaction = new HashMap<>();
     public final EvictingList<Tuple<KLocation, Double>> pastLocations = new EvictingList<>(20);
@@ -185,6 +185,7 @@ public class ObjectData implements Data {
             checkManager = null;
         }
         typesToCancel.clear();
+        typesToCancel.clear();
         sniffedPackets.clear();
         keepAliveStamps.clear();
     }
@@ -203,7 +204,7 @@ public class ObjectData implements Data {
         return usingLunar;
     }
 
-    public synchronized List<CollisionBox> getLookingAtBoxes() {
+    public List<CollisionBox> getLookingAtBoxes() {
         return lookingAtBoxes;
     }
 
@@ -297,7 +298,7 @@ public class ObjectData implements Data {
         }
     }
 
-    public int runKeepaliveAction(Consumer<KeepAlive> action, int later) {
+    public synchronized int runKeepaliveAction(Consumer<KeepAlive> action, int later) {
         int id = Kauri.INSTANCE.keepaliveProcessor.currentKeepalive.start + later;
 
         keepAliveStamps.add(new Action(id, action));
@@ -305,6 +306,7 @@ public class ObjectData implements Data {
         return id;
     }
 
+    @Override
     public Player getPlayer() {
         if(player == null) {
             this.player = Bukkit.getPlayer(uuid);

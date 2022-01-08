@@ -3,15 +3,15 @@ package dev.brighten.api.handlers;
 import dev.brighten.api.check.CheckType;
 import lombok.Getter;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.security.SecureRandom;
+import java.util.*;
 
 public class Exemption {
     public final UUID uuid;
     @Getter
     private final Set<CheckType> checks;
+    private static SecureRandom randomizer = new SecureRandom();
+    private final Map<Long, ExemptParameter> exemptParameters = Collections.synchronizedMap(new HashMap<>());
 
     public Exemption(UUID uuid, CheckType... checks) {
         this.uuid = uuid;
@@ -25,5 +25,17 @@ public class Exemption {
 
     public void addChecks(CheckType... checks) {
         this.checks.addAll(Arrays.asList(checks));
+    }
+
+    public void removeChecks(CheckType... checks) {
+        Arrays.asList(checks).forEach(this.checks::remove);
+    }
+
+    public long addExemptParameter(ExemptParameter param) {
+        long key = randomizer.nextLong();
+
+        exemptParameters.put(key, param);
+
+        return key;
     }
 }

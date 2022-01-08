@@ -29,6 +29,7 @@ import org.bukkit.util.Vector;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.IntStream;
@@ -439,12 +440,14 @@ public class PacketProcessor {
                                 KeepaliveAcceptedEvent e = Kauri.INSTANCE.eventHandler
                                         .runEvent(new KeepaliveAcceptedEvent(data, ka));
 
-                                for (ObjectData.Action action : data.keepAliveStamps) {
+
+                                for (Iterator<ObjectData.Action> it = data.keepAliveStamps.iterator(); it.hasNext(); ) {
+                                    ObjectData.Action action = it.next();
                                     if (action.stamp > ka.start) continue;
 
                                     action.action.accept(ka);
 
-                                    data.keepAliveStamps.remove(action);
+                                    it.remove();
                                 }
                             });
                             data.lagInfo.lastClientTrans = timestamp;

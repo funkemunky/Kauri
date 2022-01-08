@@ -22,24 +22,41 @@ public class ExemptHandler {
                 .toArray(CheckType[]::new));
     }
 
+    /**
+     * Adds your array of CheckType enums to a Set. This set will be called to on every Check#flag.
+     * If the check's type matches, it will not flag.
+     * @param uuid java.utils.UUID
+     * @param checks dev.brighten.api.CheckType...
+     * @return dev.brighten.api.handlers.Exemption
+     */
     public Exemption addExemption(UUID uuid, CheckType... checks) {
-        Exemption exemption = new Exemption(uuid, checks);
+        return exemptions.compute(uuid, (key, exemption) -> {
+            if(exemption == null) {
+                return new Exemption(uuid, checks);
+            }
 
-        return exemptions.put(uuid, exemption);
+            exemption.addChecks(checks);
+
+            return exemption;
+        });
     }
 
-    //Adds temporary exception.
-    @Deprecated
-    public Exemption addExemption(UUID uuid, long millisLater, Consumer<Exemption> onRemove, KauriCheck... checks) {
-        Exemption exemption = addExemption(uuid, checks);
+    /**
+     * Removes all CheckType enums from Exemption object of the UUID provided.
+     * @param uuid java.utils.UUID
+     * @param checks dev.brighten.api.CheckType...
+     * @return dev.brighten.api.handlers.Exemption
+     */
+    public Exemption removeExemption(UUID uuid, CheckType... checks) {
+        return exemptions.compute(uuid, (key, exemption) -> {
+            if(exemption == null) {
+                return new Exemption(uuid, new CheckType[0]);
+            }
 
-        KauriAPI.INSTANCE.service.schedule(() -> {
-            exemptions.remove(uuid);
+            exemption.removeChecks(checks);
 
-            onRemove.accept(exemption);
-        }, millisLater, TimeUnit.MILLISECONDS);
-
-        return exemption;
+            return exemption;
+        });
     }
 
     //Will return false initally, and then true when completed.
@@ -48,7 +65,8 @@ public class ExemptHandler {
 
         AtomicBoolean removed = new AtomicBoolean(false);
         KauriAPI.INSTANCE.service.schedule(() -> {
-            exemptions.remove(uuid);
+            removeExemption(uuid, checks);
+            removed.set(true);
         }, timeLater, unitLater);
 
         return removed;
