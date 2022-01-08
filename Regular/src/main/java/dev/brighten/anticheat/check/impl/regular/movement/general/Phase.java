@@ -40,6 +40,7 @@ public class Phase extends Check {
                 .forEach(allowedMaterials::add);
 
         allowedMaterials.add(XMaterial.VINE.parseMaterial());
+        allowedMaterials.add(XMaterial.CAKE.parseMaterial());
     }
 
     @Setting(name = "flagIntoChat")

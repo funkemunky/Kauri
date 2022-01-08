@@ -46,7 +46,7 @@ public class NoFallB extends Check {
         if(!data.playerInfo.clientGround
                 // Their bounding box is on the ground
                 && ((data.playerInfo.serverGround || data.blockInfo.blocksBelow) && dground)
-                && data.playerInfo.lastTeleportTimer.isPassed(1)) {
+                && data.playerInfo.lastTeleportTimer.isPassed(2)) {
             if((airBuffer +=10) > 30) {
                 vl++;
                 flag(200, "T=SPOOF_AIR dy=%.2f y=%.1f", data.playerInfo.deltaY, data.playerInfo.to.y);
