@@ -17,6 +17,7 @@ import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.Pastebin;
 import dev.brighten.anticheat.utils.StringUtils;
 import dev.brighten.anticheat.utils.ThreadHandler;
+import dev.brighten.api.check.CheckType;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -43,6 +44,7 @@ public class KauriCommand extends BaseCommand {
             Check.checkClasses.values().stream().sorted(Comparator.comparing(CheckInfo::name))
                     .map(ci -> ci.name().replace(" ", "_"))
                     .collect(Collectors.toList()));
+        cc.registerCompletion("checkType", (c) -> Arrays.asList(CheckType.values()));
         cc.registerCompletion("materials", (c) -> Arrays.stream(Material.values()).map(Enum::name)
                 .collect(Collectors.toList()));
 
