@@ -61,13 +61,13 @@
             <groupId>dev.brighten.anticheat</groupId>
             <artifactId>Regular</artifactId>
             <version>${project.parent.version}</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>dev.brighten.anticheat</groupId>
             <artifactId>Impl</artifactId>
             <version>${project.parent.version}</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
