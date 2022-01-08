@@ -51,7 +51,8 @@ public class FlyF extends Check {
             flag("dY=%.3f max=%.3f", data.playerInfo.deltaY, max);
         }
 
-        debug("halfBlock=%s ticks=%s", data.playerInfo.lastHalfBlock.getPassed(), data.blockInfo.onHalfBlock);
+        debug("halfBlock=%s ticks=%s c/s=%s,%s", data.playerInfo.lastHalfBlock.getPassed(),
+                data.blockInfo.onHalfBlock, data.playerInfo.clientGround, data.playerInfo.serverGround);
     }
 
 }
