@@ -28,7 +28,10 @@ public class FlyH extends Check {
 
         final double ldeltaY = data.playerInfo.lDeltaY, deltaY = data.playerInfo.deltaY;
 
-        if(Math.abs(deltaY + ldeltaY) < 0.05 && data.playerInfo.slimeTimer.isPassed(5) && Math.abs(deltaY) > 0.2) {
+        if(Math.abs(deltaY + ldeltaY) < 0.05
+                && data.playerInfo.lastHalfBlock.isPassed(2)
+                && data.playerInfo.slimeTimer.isPassed(5)
+                && Math.abs(deltaY) > 0.2) {
             buffer+=15;
             if(buffer > 20) {
                 vl++;
