@@ -2,9 +2,7 @@ package dev.brighten.anticheat.processing.keepalive;
 
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutKeepAlivePacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
-import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import cc.funkemunky.api.utils.it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
@@ -13,15 +11,11 @@ import cc.funkemunky.api.utils.objects.evicting.EvictingMap;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.MiscUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class KeepaliveProcessor implements Runnable {
 

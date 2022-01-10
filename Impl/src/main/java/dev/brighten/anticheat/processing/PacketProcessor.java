@@ -10,6 +10,7 @@ import cc.funkemunky.api.tinyprotocol.packet.in.*;
 import cc.funkemunky.api.tinyprotocol.packet.out.*;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.RunUtils;
+import cc.funkemunky.api.utils.Tuple;
 import cc.funkemunky.api.utils.XMaterial;
 import cc.funkemunky.api.utils.math.IntVector;
 import dev.brighten.anticheat.Kauri;
@@ -552,6 +553,21 @@ public class PacketProcessor {
 
     public void processServer(ObjectData data, Object object, String type, long timestamp) {
         switch (type) {
+            case Packet.Server.MULTI_BLOCK_CHANGE: {
+                WrappedOutMultiBlockChangePacket packet =
+                        new WrappedOutMultiBlockChangePacket(object, data.getPlayer());
+
+                data.runKeepaliveAction(ka -> data.blockInfos.putAll(packet.getBlockUpdates()));
+                break;
+            }
+            case Packet.Server.BLOCK_CHANGE: {
+                WrappedOutBlockChange packet = new WrappedOutBlockChange(object, data.getPlayer());
+
+                data.runKeepaliveAction(ka -> data.blockInfos.put(new IntVector(packet.getPosition().getX(),
+                        packet.getPosition().getY(), packet.getPosition().getZ()),
+                        new Tuple<>(packet.getMaterial(), packet.getData())));
+                break;
+            }
             case Packet.Server.ABILITIES: {
                 WrappedOutAbilitiesPacket packet = new WrappedOutAbilitiesPacket(object, data.getPlayer());
 

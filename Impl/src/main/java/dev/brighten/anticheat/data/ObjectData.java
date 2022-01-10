@@ -12,9 +12,11 @@ import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.Tuple;
+import cc.funkemunky.api.utils.XMaterial;
 import cc.funkemunky.api.utils.it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import cc.funkemunky.api.utils.it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import cc.funkemunky.api.utils.it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import cc.funkemunky.api.utils.math.IntVector;
 import cc.funkemunky.api.utils.math.RollingAverageLong;
 import cc.funkemunky.api.utils.math.cond.MaxInteger;
 import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingList;
@@ -41,12 +43,14 @@ import lombok.AllArgsConstructor;
 import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadLocalRandom;
@@ -90,6 +94,7 @@ public class ObjectData implements Data {
     public final Map<Location, CollisionBox> ghostBlocks = Collections.synchronizedMap(new HashMap<>());
     public final Map<Short, Tuple<InstantAction, Consumer<InstantAction>>> instantTransaction = new HashMap<>();
     public final EvictingList<Tuple<KLocation, Double>> pastLocations = new EvictingList<>(20);
+    public final Map<IntVector, Tuple<XMaterial, Byte>> blockInfos = new ConcurrentHashMap<>();
     public int teleportsToConfirm;
 
     public ObjectData(UUID uuid) {
@@ -216,6 +221,8 @@ public class ObjectData implements Data {
     public ModData getForgeMods() {
         return modData;
     }
+
+    public Block
 
     public int[] getReceived() {
         int[] toReturn = new int[] {0, 0};
