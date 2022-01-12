@@ -108,6 +108,8 @@ public class MovementUtils {
             if(ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_8)) {
                 DEPTH = Enchantment.getByName("DEPTH_STRIDER");
             }
+
+            String test = "%%__USER__%%";
         } catch(Exception e) {
             DEPTH = null;
         }

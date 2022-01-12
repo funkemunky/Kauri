@@ -17,7 +17,6 @@ public class EntityLocation {
     public float newYaw, newPitch, yaw, pitch;
     public int increment = 0;
     public boolean sentTeleport = false;
-    public KLocation oldLocation, location;
     public List<KLocation> interpolatedLocations = new EvictingList<>(8);
 
     public void interpolateLocations() {
@@ -40,37 +39,7 @@ public class EntityLocation {
             interpolatedLocations.add(new KLocation(x, y, z, yaw, pitch, Kauri.INSTANCE.keepaliveProcessor.tick));
         }
     }
-
-    public List<KLocation> getInterpolatedLocations() {
-        int increment = 3;
-        oldLocation = new KLocation(x, y, z, yaw, pitch);
-        double x = this.x, y = this.y, z = this.z, newX = this.newX, newY = this.newY, newZ = this.newZ;
-        float yaw = this.yaw, pitch = this.pitch, newYaw = this.newYaw, newPitch = this.newPitch;
-        List<KLocation> locations = new ArrayList<>();
-        while(increment > 0) {
-            double d0 = x + (newX - x) / increment;
-            double d1 = y + (newY - y) / increment;
-            double d2 = z + (newZ - z) / increment;
-            double d3 = MathHelper.wrapAngleTo180_float(newYaw - yaw);
-
-            yaw = (float) ((double) yaw + d3 / (double) increment);
-            pitch = (float) ((double) pitch + (newPitch - (double) pitch) / (double) increment);
-
-            increment--;
-
-            x = d0;
-            y = d1;
-            z = d2;
-            locations.add(new KLocation(x, y, z, yaw, pitch, Kauri.INSTANCE.keepaliveProcessor.tick));
-        }
-
-        location = new KLocation(x, y, z, yaw, pitch);
-
-        return locations;
-    }
-
     public void interpolateLocation() {
-        oldLocation = new KLocation(x, y, z, yaw, pitch);
         if(increment > 0) {
             double d0 = x + (newX - x) / increment;
             double d1 = y + (newY - y) / increment;

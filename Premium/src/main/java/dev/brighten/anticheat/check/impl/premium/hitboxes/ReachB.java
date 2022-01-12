@@ -11,6 +11,7 @@ import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutRelativePosition;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.RunUtils;
+import cc.funkemunky.api.utils.it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import cc.funkemunky.api.utils.world.EntityData;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
@@ -129,12 +130,12 @@ public class ReachB extends Check {
 
             if(eloc.oldLocation != null) {
                 targetBox = Helper.wrap((SimpleCollisionBox) EntityData
-                        .getEntityBox(new Vector(eloc.newX, eloc.newY, eloc.newZ), data.target),
+                        .getEntityBox(new Vector(eloc.x, eloc.y, eloc.z), data.target),
                         (SimpleCollisionBox) EntityData.getEntityBox(eloc.oldLocation, data.target));
                 debug("old location isnt null");
             } else {
-                targetBox = Helper.wrap(eloc.interpolatedLocations.stream().map(l -> (SimpleCollisionBox) EntityData
-                        .getEntityBox(l, data.target)).collect(Collectors.toList()));
+                targetBox = (SimpleCollisionBox) EntityData
+                        .getEntityBox(new Vector(eloc.x, eloc.y, eloc.z), data.target);
             }
 
             if(targetBox == null) break detection;
@@ -234,7 +235,7 @@ public class ReachB extends Check {
         }
     }
 
-    private Map<Integer, List<KLocation>> resend = new HashMap<>();
+    private final Map<Integer, List<KLocation>> resend = new Int2ObjectOpenHashMap<>();
 
     @Packet
     public boolean onEntity(WrappedOutRelativePosition packet) {
@@ -285,6 +286,7 @@ public class ReachB extends Check {
                     key -> new EntityLocation(entity));
 
             queuedForResend.add(toCompare);
+            //TODO Check if we could just see if the target is this entity for optimization purposes and like not do that
             resend.put(entity.getEntityId(), queuedForResend);
             WrappedOutRelativePosition newPacket = new WrappedOutRelativePosition(packet.getId(), x,
                     y, z, yaw, pitch, packet.isGround());
@@ -317,7 +319,7 @@ public class ReachB extends Check {
                 detection.getTargetLocations().clear();
                 eloc.interpolatedLocations.clear();
                 eloc.interpolatedLocations.addAll(eloc.getInterpolatedLocations());
-                eloc.getInterpolatedLocations().stream()
+                eloc.interpolatedLocations.stream()
                         .map(kloc -> {
                             SimpleCollisionBox box = (SimpleCollisionBox) EntityData.getEntityBox(kloc, entity);
 
@@ -413,7 +415,7 @@ public class ReachB extends Check {
 
                     KillauraH detection = find(KillauraH.class);
                     detection.getTargetLocations().clear();
-                    eloc.getInterpolatedLocations().stream()
+                    eloc.interpolatedLocations.stream()
                             .map(kloc -> {
                                 SimpleCollisionBox box = (SimpleCollisionBox) EntityData.getEntityBox(kloc, entity);
 
@@ -456,9 +458,6 @@ public class ReachB extends Check {
                     if(System.currentTimeMillis() - start.get() > 4) {
                         lastTransProblem.reset();
                     }
-                }
-
-                if(!ia.isEnd()) {
                 }
             }, true);
         } else data.runKeepaliveAction(keepalive -> action.run());
