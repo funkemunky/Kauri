@@ -19,7 +19,7 @@ public class EntityLocation {
     public int increment = 0;
     public boolean sentTeleport = false;
     public KLocation oldLocation, location;
-    public List<KLocation> oldLocations = new EvictingList<>(8), interpolatedLocations = new EvictingList<>(8);
+    public List<KLocation> oldLocations = new EvictingList<>(2), interpolatedLocations = new EvictingList<>(8);
 
     public void interpolateLocations() {
         increment = 3;

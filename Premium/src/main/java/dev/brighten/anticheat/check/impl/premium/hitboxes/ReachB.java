@@ -129,8 +129,6 @@ public class ReachB extends Check {
 
                     if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) {
                         box = box.expand(0.1, 0.1, 0.1);
-                    } else {
-                        box = box.expand(0.0325D);
                     }
                     boxes.add(box);
                 }
@@ -140,12 +138,9 @@ public class ReachB extends Check {
 
                     if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) {
                         box = box.expand(0.1, 0.1, 0.1);
-                    } else {
-                        box = box.expand(0.0325D);
                     }
                     boxes.add(box);
                 }
-                debug("old location isnt null");
             } else {
                 for (KLocation oldLocation : eloc.interpolatedLocations) {
                     SimpleCollisionBox box = (SimpleCollisionBox)
@@ -153,17 +148,19 @@ public class ReachB extends Check {
 
                     if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) {
                         box = box.expand(0.1, 0.1, 0.1);
-                    } else {
-                        box = box.expand(0.0325D);
                     }
                     boxes.add(box);
                 }
+                debug("old location is null");
             }
 
             if(boxes.size() > 0)
             targetBox = Helper.wrap(boxes);
 
             if(targetBox == null) break detection;
+
+            if(data.playerVersion.isOrAbove(ProtocolVersion.V1_9))
+            targetBox = targetBox.expand(0.0325D);
 
             final AxisAlignedBB vanillaBox = new AxisAlignedBB(targetBox);
 
@@ -175,7 +172,7 @@ public class ReachB extends Check {
                 collided = true;
             }
 
-            if(collided) {
+            if(collided && eloc.oldLocations.size() > 0) {
                 hbuffer = 0;
                 distance = Math.sqrt(distance);
                 final double threshold = lastTransProblem.isNotPassed(50) ? 3.5 : 3.02;
@@ -425,7 +422,8 @@ public class ReachB extends Check {
                     start.set(System.currentTimeMillis());
                 } else {
                     action.run();
-                    if(System.currentTimeMillis() - start.get() > 4) {
+                    long delta = System.currentTimeMillis() - start.get();
+                    if(delta > 4) {
                         lastTransProblem.reset();
                     }
                 }

@@ -39,7 +39,7 @@ public class PastLocation {
             List<KLocation> locs = new ArrayList<>();
 
             int size = previousLocations.size() - 1;
-            int max = Math.min(size, previousLocations.size() - ping + maxAdd),
+            int max = Math.min(size, size - ping + maxAdd),
                     min = Math.max(0, size - Math.max(1, ping) - minAdd);
 
             for (int i = max; i > min; i--) {
