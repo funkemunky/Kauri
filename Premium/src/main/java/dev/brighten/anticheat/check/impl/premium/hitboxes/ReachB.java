@@ -91,13 +91,8 @@ public class ReachB extends Check {
     }
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
+    public void onFlying(WrappedInUseEntityPacket packet) {
         flying = true;
-        if(lastFlying.isNotPassed(1)) streak++;
-        else {
-            streak = 1;
-            sentTeleport = false;
-        }
 
         detection: {
             if(!attacked) break detection;
@@ -114,71 +109,85 @@ public class ReachB extends Check {
 
             if(data.playerInfo.inVehicle) break detection;
 
-            final KLocation to = data.playerInfo.to.clone(), from = data.playerInfo.from.clone();
+            final KLocation to = data.playerInfo.to.clone();
 
             //debug("current loc: %.4f, %.4f, %.4f", eloc.x, eloc.y, eloc.z);
 
             to.y+= data.playerInfo.sneaking ? (ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_14)
                     ? 1.27f : 1.54f) : 1.62f;
-            from.y+= data.playerInfo.lsneaking ? (ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_14)
-                    ? 1.27f : 1.54f) : 1.62f;
             if(eloc.x == 0 && eloc.y == 0 & eloc.z == 0) break detection;
             double distance = Double.MAX_VALUE;
             boolean collided = false; //Using this to compare smaller numbers than Double.MAX_VALUE. Slightly faster
 
-            SimpleCollisionBox targetBox;
+            SimpleCollisionBox targetBox = null;
 
-            if(eloc.oldLocation != null) {
-                targetBox = Helper.wrap((SimpleCollisionBox) EntityData
-                        .getEntityBox(new Vector(eloc.x, eloc.y, eloc.z), data.target),
-                        (SimpleCollisionBox) EntityData.getEntityBox(eloc.oldLocation, data.target));
+            List<SimpleCollisionBox> boxes = new ArrayList<>();
+            if(eloc.oldLocations.size() > 0) {
+                for (KLocation oldLocation : eloc.oldLocations) {
+                    SimpleCollisionBox box = (SimpleCollisionBox)
+                            EntityData.getEntityBox(oldLocation.toVector(), data.target);
+
+                    if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) {
+                        box = box.expand(0.1, 0.1, 0.1);
+                    } else {
+                        box = box.expand(0.0325D);
+                    }
+                    boxes.add(box);
+                }
+                for (KLocation oldLocation : eloc.interpolatedLocations) {
+                    SimpleCollisionBox box = (SimpleCollisionBox)
+                            EntityData.getEntityBox(oldLocation.toVector(), data.target);
+
+                    if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) {
+                        box = box.expand(0.1, 0.1, 0.1);
+                    } else {
+                        box = box.expand(0.0325D);
+                    }
+                    boxes.add(box);
+                }
                 debug("old location isnt null");
             } else {
-                targetBox = (SimpleCollisionBox) EntityData
-                        .getEntityBox(new Vector(eloc.x, eloc.y, eloc.z), data.target);
-            }
+                for (KLocation oldLocation : eloc.interpolatedLocations) {
+                    SimpleCollisionBox box = (SimpleCollisionBox)
+                            EntityData.getEntityBox(oldLocation.toVector(), data.target);
 
-            if(targetBox == null) break detection;
-            if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) {
-                targetBox = targetBox.expand(0.1, 0.1, 0.1);
-            } else {
-                targetBox = targetBox.expand(0.0325D);
-            }
-
-            final AxisAlignedBB vanillaBox = new AxisAlignedBB(targetBox);
-
-            Vec3D intersectFrom = vanillaBox.rayTrace(from.toVector(), MathUtils.getDirection(from), 10);
-
-            if(ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_9)) {
-                Vec3D intersectTo = vanillaBox.rayTrace(to.toVector(), MathUtils.getDirection(to), 10);
-
-                if(intersectTo != null) {
-                    lastAimOnTarget.reset();
-                    distance = Math.min(distance, intersectTo.distanceSquared(new Vec3D(to.x, to.y, to.z)));
-                    collided = true;
+                    if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) {
+                        box = box.expand(0.1, 0.1, 0.1);
+                    } else {
+                        box = box.expand(0.0325D);
+                    }
+                    boxes.add(box);
                 }
             }
 
-            if(intersectFrom != null) {
+            if(boxes.size() > 0)
+            targetBox = Helper.wrap(boxes);
+
+            if(targetBox == null) break detection;
+
+            final AxisAlignedBB vanillaBox = new AxisAlignedBB(targetBox);
+
+            Vec3D intersectTo = vanillaBox.rayTrace(to.toVector(), MathUtils.getDirection(to), 10);
+
+            if(intersectTo != null) {
                 lastAimOnTarget.reset();
-                distance = Math.min(distance, intersectFrom.distanceSquared(new Vec3D(from.x, from.y, from.z)));
+                distance = Math.min(distance, intersectTo.distanceSquared(new Vec3D(to.x, to.y, to.z)));
                 collided = true;
             }
 
             if(collided) {
                 hbuffer = 0;
                 distance = Math.sqrt(distance);
-                if(distance > 3.02 && lastTransProblem.isPassed(52)) {
-                    if(streak > 3 && sentTeleport) {
-                        if(++buffer > 2) {
-                            vl++;
-                            flag("d=%.4f ltp=%s", distance, lastTransProblem.getPassed());
-                            buffer = 2;
-                        }
+                final double threshold = lastTransProblem.isNotPassed(50) ? 3.5 : 3.02;
+                if(distance > threshold) {
+                    if(++buffer > 2) {
+                        vl++;
+                        flag("d=%.3f>-%.2f ltp=%s", distance, threshold, lastTransProblem.getPassed());
+                        buffer = 2;
                     }
                 } else if(buffer > 0) buffer-= 0.075f;
-                debug("dist=%.2f b=%s s=%s st=%s lf=%s ld=%s lti=%s",
-                        distance, buffer, streak, sentTeleport, lastFlying.getPassed(),
+                debug("dist=%.2f>-%.2f b=%s s=%s st=%s lf=%s ld=%s lti=%s",
+                        distance, threshold, buffer, streak, sentTeleport, lastFlying.getPassed(),
                         data.lagInfo.lastPingDrop.getPassed(), lastTransProblem.getPassed());
             } else {
                 if(streak > 3 && sentTeleport) {
@@ -191,48 +200,9 @@ public class ReachB extends Check {
                         lastTransProblem.getPassed());
             }
         }
-        for (Iterator<Map.Entry<UUID, EntityLocation>> it = entityLocationMap.entrySet().iterator();
-             it.hasNext();) {
-            Map.Entry<UUID, EntityLocation> entry = it.next();
-
-            EntityLocation eloc = entry.getValue();
-
-            if(eloc.entity == null) {
-                it.remove();
-                continue;
-            }
-
-            if(eloc.increment == 0) continue;
-
-            eloc.interpolateLocation();
-        }
 
 
         lastFlying.reset();
-    }
-
-    @Packet
-    public void onTrans(WrappedInTransactionPacket packet) {
-        if(lastFlying.isPassed(1)
-                && data.playerVersion.isOrAbove(ProtocolVersion.V1_9)
-                && Kauri.INSTANCE.keepaliveProcessor.getKeepById(packet.getAction()).isPresent()) {
-
-            for (Iterator<Map.Entry<UUID, EntityLocation>> it = entityLocationMap.entrySet().iterator();
-                 it.hasNext();) {
-                Map.Entry<UUID, EntityLocation> entry = it.next();
-
-                EntityLocation eloc = entry.getValue();
-
-                if(eloc.entity == null) {
-                    it.remove();
-                    continue;
-                }
-
-                if(eloc.increment == 0) continue;
-
-                eloc.interpolateLocation();
-            }
-        }
     }
 
     private final Map<Integer, List<KLocation>> resend = new Int2ObjectOpenHashMap<>();
@@ -314,11 +284,13 @@ public class ReachB extends Check {
 
                 eloc.increment = 3;
 
+                eloc.oldLocations.clear();
+                eloc.oldLocations.addAll(eloc.interpolatedLocations);
+
                 KillauraH detection = find(KillauraH.class);
 
                 detection.getTargetLocations().clear();
-                eloc.interpolatedLocations.clear();
-                eloc.interpolatedLocations.addAll(eloc.getInterpolatedLocations());
+                eloc.interpolateLocations();
                 eloc.interpolatedLocations.stream()
                         .map(kloc -> {
                             SimpleCollisionBox box = (SimpleCollisionBox) EntityData.getEntityBox(kloc, entity);
@@ -326,7 +298,6 @@ public class ReachB extends Check {
                             if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) {
                                 return box.expand(0.1);
                             }
-
                             return box;
                         }).forEach(detection.getTargetLocations()::add);
 
@@ -387,8 +358,9 @@ public class ReachB extends Check {
                             eloc.newZ = eloc.z = packet.z;
                             eloc.newYaw = eloc.yaw = packet.yaw;
                             eloc.newPitch = eloc.pitch = packet.pitch;
-                            eloc.interpolatedLocations.clear();
-                            eloc.interpolatedLocations.add(new KLocation(eloc.x, eloc.y, eloc.z, eloc.yaw, eloc.pitch));
+                            eloc.oldLocations.clear();
+                            eloc.oldLocations.addAll(eloc.interpolatedLocations);
+                            eloc.interpolateLocations();
                         } else {
                             eloc.newX = packet.x;
                             eloc.newY = packet.y;
@@ -397,8 +369,9 @@ public class ReachB extends Check {
                             eloc.newPitch = packet.pitch;
 
                             eloc.increment = 3;
-                            eloc.interpolatedLocations.clear();
-                            eloc.interpolatedLocations.addAll(eloc.getInterpolatedLocations());
+                            eloc.oldLocations.clear();
+                            eloc.oldLocations.addAll(eloc.interpolatedLocations);
+                            eloc.interpolateLocations();
                         }
                     } else {
                         //We don't need to do version checking here. Atlas handles this for us.
@@ -409,8 +382,9 @@ public class ReachB extends Check {
                         eloc.newPitch = packet.pitch;
 
                         eloc.increment = 3;
-                        eloc.interpolatedLocations.clear();
-                        eloc.interpolatedLocations.addAll(eloc.getInterpolatedLocations());
+                        eloc.oldLocations.clear();
+                        eloc.oldLocations.addAll(eloc.interpolatedLocations);
+                        eloc.interpolateLocations();
                     }
 
                     KillauraH detection = find(KillauraH.class);
@@ -448,13 +422,9 @@ public class ReachB extends Check {
             data.runInstantAction(ia -> {
                 if(!ia.isEnd()) {
                     flying = false;
-                    action.run();
                     start.set(System.currentTimeMillis());
                 } else {
-                    entityLocationMap.computeIfPresent(entity.getUniqueId(), (key, eloc) -> {
-                        eloc.oldLocation = null;
-                        return eloc;
-                    });
+                    action.run();
                     if(System.currentTimeMillis() - start.get() > 4) {
                         lastTransProblem.reset();
                     }
