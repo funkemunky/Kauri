@@ -220,8 +220,6 @@ public class MovementProcessor {
         if(packet.isPos() && !data.playerInfo.doingTeleport & !data.playerInfo.canFly && !data.playerInfo.creative
                 && !data.playerInfo.inVehicle && timeStamp - data.creation > 500L) {
 
-            if(data.pastLocations.size() > 1) data.pastLocations.removeIf(t -> timeStamp - t.one.timeStamp > 1000);
-
             synchronized (data.pastLocations) { //To prevent ConcurrentModificationExceptions
                 data.pastLocations.add(new Tuple<>(data.playerInfo.to.clone(),
                         data.playerInfo.deltaXZ + Math.abs(data.playerInfo.deltaY)));

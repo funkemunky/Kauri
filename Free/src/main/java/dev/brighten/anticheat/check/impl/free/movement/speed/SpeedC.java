@@ -38,6 +38,8 @@ public class SpeedC extends Check {
         if(data.playerInfo.lastBlockPlace.isNotPassed(10))
             baseSpeed+= 0.2;
 
+        if(data.playerInfo.baseSpeed < 0.2) return;
+
         if(data.playerInfo.deltaXZ > baseSpeed) {
             if(verbose.add(data.playerInfo.deltaXZ - baseSpeed > 0.45f ? 4 : 1) > 25
                     || data.playerInfo.deltaXZ - baseSpeed > 0.45f) {

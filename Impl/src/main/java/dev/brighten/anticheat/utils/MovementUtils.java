@@ -65,7 +65,9 @@ public class MovementUtils {
     }
 
     public static double getBaseSpeed(ObjectData data) {
-        return 0.2806 + (PlayerUtils.getPotionEffectLevel(data.getPlayer(), PotionEffectType.SPEED)
+        return 0.2806 + (data.potionProcessor.getEffectByType(PotionEffectType.SPEED)
+                .map(p -> p.getAmplifier() + 1)
+                .orElse(0)
                 * (data.playerInfo.clientGround ? 0.062 : 0.04)) + (data.getPlayer().getWalkSpeed() - 0.2) * 2.5;
     }
 

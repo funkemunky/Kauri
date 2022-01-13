@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.data.classes;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
+import cc.funkemunky.api.tinyprotocol.packet.types.MathHelper;
 import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.KLocation;
@@ -22,10 +23,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class BlockInformation {
     private ObjectData objectData;
@@ -38,9 +36,19 @@ public class BlockInformation {
     public final List<SimpleCollisionBox> aboveCollisions = Collections.synchronizedList(new ArrayList<>()),
             belowCollisions = Collections.synchronizedList(new ArrayList<>());
     public final List<Block> blocks = Collections.synchronizedList(new ArrayList<>());
-
+    private static EnumMap<Material, XMaterial> matchMaterial = new EnumMap<>(Material.class);
     //Caching material
     private final Material cobweb = XMaterial.COBWEB.parseMaterial(), rosebush = XMaterial.ROSE_BUSH.parseMaterial();
+
+    static {
+        for (Material mat : Material.values()) {
+            matchMaterial.put(mat, XMaterial.matchXMaterial(mat));
+        }
+    }
+
+    public static XMaterial getXMaterial(Material material) {
+        return matchMaterial.getOrDefault(material, null);
+    }
 
     public BlockInformation(ObjectData objectData) {
         this.objectData = objectData;
@@ -65,30 +73,30 @@ public class BlockInformation {
         else if(dy < -10) dy = -10;
         if(dh > 10) dh = 10;
 
-        int startX = Location.locToBlock(objectData.playerInfo.to.x - 0.45 - dh);
-        int endX = Location.locToBlock(objectData.playerInfo.to.x + 0.45 + dh);
-        int startY = Location.locToBlock(objectData.playerInfo.to.y - Math.max(1.1, 1.1 + dy));
-        int endY = Location.locToBlock(objectData.playerInfo.to.y + Math.max(2.6, 2.6 + dy));
-        int startZ = Location.locToBlock(objectData.playerInfo.to.z - 0.45 - dh);
-        int endZ = Location.locToBlock(objectData.playerInfo.to.z + 0.45 + dh);
+        int startX = Location.locToBlock(objectData.playerInfo.to.x - 1 - dh);
+        int endX = Location.locToBlock(objectData.playerInfo.to.x + 1 + dh);
+        int startY = Location.locToBlock(objectData.playerInfo.to.y - Math.max(0.51, 0.51 + Math.abs(dy)));
+        int endY = Location.locToBlock(objectData.playerInfo.to.y + Math.max(1.99, 1.99 + Math.abs(dy)));
+        int startZ = Location.locToBlock(objectData.playerInfo.to.z - 1 - dh);
+        int endZ = Location.locToBlock(objectData.playerInfo.to.z + 1 + dh);
 
         SimpleCollisionBox waterBox = objectData.box.copy().expand(0, -.38, 0);
 
-        waterBox.xMin = Math.floor(waterBox.xMin);
-        waterBox.yMin = Math.floor(waterBox.yMin);
-        waterBox.zMin = Math.floor(waterBox.zMin);
-        waterBox.xMax = Math.floor(waterBox.xMax + 1.);
-        waterBox.yMax = Math.floor(waterBox.yMax + 1.);
-        waterBox.zMax = Math.floor(waterBox.zMax + 1.);
+        waterBox.xMin = MathHelper.floor(waterBox.xMin);
+        waterBox.yMin = MathHelper.floor(waterBox.yMin);
+        waterBox.zMin = MathHelper.floor(waterBox.zMin);
+        waterBox.xMax = MathHelper.floor(waterBox.xMax + 1.);
+        waterBox.yMax = MathHelper.floor(waterBox.yMax + 1.);
+        waterBox.zMax = MathHelper.floor(waterBox.zMax + 1.);
 
         SimpleCollisionBox lavaBox = objectData.box.copy().expand(-.1f, -.4f, -.1f);
 
-        lavaBox.xMin = Math.floor(waterBox.xMin);
-        lavaBox.yMin = Math.floor(waterBox.yMin);
-        lavaBox.zMin = Math.floor(waterBox.zMin);
-        lavaBox.xMax = Math.floor(waterBox.xMax + 1.);
-        lavaBox.yMax = Math.floor(waterBox.yMax + 1.);
-        lavaBox.zMax = Math.floor(waterBox.zMax + 1.);
+        lavaBox.xMin = MathHelper.floor(waterBox.xMin);
+        lavaBox.yMin = MathHelper.floor(waterBox.yMin);
+        lavaBox.zMin = MathHelper.floor(waterBox.zMin);
+        lavaBox.xMax = MathHelper.floor(waterBox.xMax + 1.);
+        lavaBox.yMax = MathHelper.floor(waterBox.yMax + 1.);
+        lavaBox.zMax = MathHelper.floor(waterBox.zMax + 1.);
 
         SimpleCollisionBox normalBox = objectData.box.copy();
 
@@ -182,8 +190,7 @@ public class BlockInformation {
                                         SimpleCollisionBox groundBox = normalBox.copy()
                                                 .offset(0, -.45, 0).expandMax(0, -1.2, 0);
 
-                                        Optional<XMaterial> blockMaterial =
-                                                XMaterial.matchXMaterial(type.name());
+                                        XMaterial blockMaterial = getXMaterial(type);
 
                                         if(normalBox.copy().expand(0.4, 0, 0.4).expandMin(0, -1, 0)
                                                 .isIntersected(blockBox))
@@ -211,8 +218,8 @@ public class BlockInformation {
                                         if(groundBox.isCollided(blockBox)) {
                                             objectData.playerInfo.serverGround = true;
 
-                                            if(blockMaterial.isPresent())
-                                            switch (blockMaterial.get()) {
+                                            if(blockMaterial != null)
+                                            switch (blockMaterial) {
                                                 case ICE:
                                                 case BLUE_ICE:
                                                 case FROSTED_ICE:
@@ -238,13 +245,14 @@ public class BlockInformation {
                                             onClimbable = true;
                                         }
 
-                                        if(blockMaterial.isPresent() && normalBox.copy().expand(0.5, 0.5, 0.5)
-                                                .isCollided(blockBox)) {
-                                            switch (blockMaterial.get()) {
+                                        if(blockMaterial != null) {
+                                            switch (blockMaterial) {
                                                 case PISTON:
                                                 case PISTON_HEAD:
                                                 case MOVING_PISTON:
                                                 case STICKY_PISTON: {
+                                                    if(normalBox.copy().expand(0.5, 0.5, 0.5)
+                                                            .isCollided(blockBox))
                                                     pistonNear = true;
                                                     break;
                                                 }
@@ -258,8 +266,8 @@ public class BlockInformation {
                                             if(Materials.checkFlag(type, Materials.STAIRS))
                                                 onStairs = true;
                                             else
-                                            if(blockMaterial.isPresent())
-                                            switch(blockMaterial.get()) {
+                                            if(blockMaterial != null)
+                                            switch(blockMaterial) {
                                                 case CAKE:
                                                 case BREWING_STAND:
                                                 case FLOWER_POT:
@@ -301,11 +309,10 @@ public class BlockInformation {
                                             }
                                         }
                                     } else if(blockBox.isCollided(normalBox)) {
-                                        Optional<XMaterial> blockMaterial =
-                                                XMaterial.matchXMaterial(type.name());
+                                        XMaterial blockMaterial = getXMaterial(type);
 
-                                        if(blockMaterial.isPresent())
-                                            switch(blockMaterial.get()) {
+                                        if(blockMaterial != null)
+                                            switch(blockMaterial) {
                                                 case END_PORTAL:
                                                 case NETHER_PORTAL: {
                                                     inPortal = true;

@@ -177,10 +177,10 @@ public class ReachB extends Check {
                 distance = Math.sqrt(distance);
                 final double threshold = lastTransProblem.isNotPassed(50) ? 3.5 : 3.02;
                 if(distance > threshold) {
-                    if(++buffer > 2) {
+                    if(++buffer > 3) {
                         vl++;
                         flag("d=%.3f>-%.2f ltp=%s", distance, threshold, lastTransProblem.getPassed());
-                        buffer = 2;
+                        buffer = 3;
                     }
                 } else if(buffer > 0) buffer-= 0.075f;
                 debug("dist=%.2f>-%.2f b=%s s=%s st=%s lf=%s ld=%s lti=%s",

@@ -23,21 +23,19 @@ public class CheckManager {
 
     //TODO Use https://github.com/EsotericSoftware/reflectasm
     public void runPacket(NMSObject object, long timeStamp) {
-        if(!checkMethods.containsKey(object.getClass())) {
-            return;
-        }
-
         val methods = checkMethods.get(object.getClass());
+
+        if(methods == null) return;
 
         int currentTick = Kauri.INSTANCE.currentTick;
         for (WrappedCheck wrapped : methods) {
             try {
                 if(!wrapped.isBoolean && wrapped.isPacket && wrapped.check.enabled && wrapped.isCompatible()) {
-                    if(wrapped.oneParam) wrapped.method.getMethod().invoke(wrapped.check, object);
+                    if(wrapped.oneParam) wrapped.access.invoke(wrapped.check, wrapped.methodIndex, object);
                     else {
                         if(wrapped.isTimeStamp) {
-                            wrapped.method.getMethod().invoke(wrapped.check, object, timeStamp);
-                        } else wrapped.method.getMethod().invoke(wrapped.check, object, currentTick);
+                            wrapped.access.invoke(wrapped.check, wrapped.methodIndex, object, timeStamp);
+                        } else wrapped.access.invoke(wrapped.check, wrapped.methodIndex, object, currentTick);
                     }
                 }
             } catch(Exception e) {
@@ -49,11 +47,9 @@ public class CheckManager {
     }
 
     public boolean runPacketCancellable(NMSObject object, long timeStamp) {
-        if(!checkMethods.containsKey(object.getClass())) {
-            return false;
-        }
-
         val methods = checkMethods.get(object.getClass());
+
+        if(methods == null) return false;
 
         int currentTick = Kauri.INSTANCE.currentTick;
         boolean cancelled = false;
@@ -62,11 +58,11 @@ public class CheckManager {
             try {
                 if(wrapped.isPacket && wrapped.check.enabled && wrapped.isCompatible()) {
                     if(wrapped.oneParam) {
-                        if((boolean)wrapped.method.getMethod().invoke(wrapped.check, object)) cancelled = true;
+                        if((boolean)wrapped.access.invoke(wrapped.check, wrapped.methodIndex, object)) cancelled = true;
                     } else if(wrapped.isTimeStamp) {
-                        if((boolean)wrapped.method.getMethod().invoke(wrapped.check, object, timeStamp))
+                        if((boolean)wrapped.access.invoke(wrapped.check, wrapped.methodIndex, object, timeStamp))
                             cancelled = true;
-                    } else if((boolean)wrapped.method.getMethod().invoke(wrapped.check, object, currentTick))
+                    } else if((boolean)wrapped.access.invoke(wrapped.check, wrapped.methodIndex, object, currentTick))
                         cancelled = true;
                 }
             } catch(Exception e) {
@@ -80,14 +76,14 @@ public class CheckManager {
 
     public void runEvent(Event event) {
         synchronized (checkMethods) {
-            if(!checkMethods.containsKey(event.getClass())) return;
-
             val methods = checkMethods.get(event.getClass());
+
+            if(methods == null) return;
 
             for (WrappedCheck wrapped : methods) {
                 if(wrapped.isEvent && wrapped.check.enabled) {
                     try {
-                        wrapped.method.getMethod().invoke(wrapped.check, event);
+                        wrapped.access.invoke(wrapped.check, wrapped.methodIndex, event);
                     } catch(Exception e) {
                         cc.funkemunky.api.utils.MiscUtils
                                 .printToConsole("Error occurred in check " + wrapped.checkName);
@@ -99,16 +95,16 @@ public class CheckManager {
     }
 
     public boolean runEvent(Object event) {
-        if(!checkMethods.containsKey(event.getClass())) return false;
-
         val methods = checkMethods.get(event.getClass());
+
+        if(methods == null) return false;
 
         boolean cancelled = false;
         for (WrappedCheck wrapped : methods) {
             if(!wrapped.isPacket && wrapped.check.enabled) {
                 if(!wrapped.isBoolean) {
-                    wrapped.method.invoke(wrapped.check, event);
-                } else if(wrapped.method.invoke(wrapped.check, event)) cancelled = true;
+                    wrapped.access.invoke(wrapped.check, wrapped.methodIndex, event);
+                } else if((boolean)wrapped.access.invoke(wrapped.check, wrapped.methodIndex, event)) cancelled = true;
             }
         }
         return cancelled;
@@ -121,7 +117,7 @@ public class CheckManager {
 
         for (WrappedCheck wrapped : methods) {
             if(!wrapped.isPacket && wrapped.check.enabled) {
-                wrapped.method.invoke(wrapped.check, event);
+                wrapped.access.invoke(wrapped.check, wrapped.methodIndex, event);
             }
         }
     }
