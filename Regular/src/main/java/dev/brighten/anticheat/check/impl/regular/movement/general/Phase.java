@@ -49,7 +49,7 @@ public class Phase extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long now) {
         if(!packet.isPos() || now - data.creation < 800L || now - data.playerInfo.lastRespawn < 500L
-                || data.playerInfo.doingTeleport
+                || data.playerInfo.moveTicks == 0
                 || data.playerInfo.creative || data.playerInfo.canFly) {
             return;
         }

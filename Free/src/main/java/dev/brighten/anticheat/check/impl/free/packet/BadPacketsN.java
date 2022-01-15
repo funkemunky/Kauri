@@ -44,13 +44,17 @@ public class BadPacketsN extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
 
-        if(lastSentTrans.isNotPassed(300L) && lastKeepAlive.isNotPassed(3000L)
-                && Kauri.INSTANCE.tps.getAverage() > 19.6
-                && ++flying > 200) {
-            vl++;
-            flag("f=%s lKA=%s t=CANCEL", flying, lastKeepAlive.getPassed());
+        if(lastSentTrans.isNotPassed(300L) && Kauri.INSTANCE.tps.getAverage() > 19.6
+                && ++flying > 10 + (data.lagInfo.ping / 50.)) {
+            if(flying > 100) {
+                vl++;
+                flag("f=%s lKA=%s t=CANCEL", flying, lastKeepAlive.getPassed());
 
-            if (!isExecutable() && vl > 4) kickPlayer(String.format(Color.translate(kickString), "TN"));
+                if (!isExecutable() && vl > 4) kickPlayer(String.format(Color.translate(kickString), "TN"));
+            } else {
+                debug("Cancelling movement");
+                data.typesToCancel.add(CancelType.MOVEMENT);
+            }
         }
 
         lastFlying.reset();
