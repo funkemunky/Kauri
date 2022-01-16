@@ -47,8 +47,8 @@ public class FlyB extends Check {
             if(data.playerInfo.lastVelocity.isPassed(3)) velocityY = 0;
 
             if(data.playerInfo.wasOnSlime && data.playerInfo.clientGround) {
-                slimeY = MovementUtils.getTotalHeight(data.playerVersion, (float)Math.abs(data.playerInfo.deltaY));
-                debug("SLIME: sy=%.2f", slimeY);
+                slimeY = MovementUtils.getTotalHeight(data.playerVersion, (float)Math.abs(data.playerInfo.lDeltaY));
+                debug("SLIME: sy=%.2f dy=%.2f", slimeY, data.playerInfo.lDeltaY);
             } else if(data.playerInfo.slimeTimer.isPassed(4)) slimeY = 0;
         } else {
             vertical += data.playerInfo.deltaY;
