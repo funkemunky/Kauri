@@ -297,6 +297,15 @@ public class ReachB extends Check {
                             }
                             return box;
                         }).forEach(detection.getTargetLocations()::add);
+                eloc.oldLocations.stream()
+                        .map(kloc -> {
+                            SimpleCollisionBox box = (SimpleCollisionBox) EntityData.getEntityBox(kloc, entity);
+
+                            if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) {
+                                return box.expand(0.1);
+                            }
+                            return box;
+                        }).forEach(detection.getTargetLocations()::add);
 
                     /*if(data.target != null && data.target.getEntityId() == packet.getId())
                     debug("Setting new posrot: %.4f, %.4f, %.4f, %s (%s)",
@@ -394,6 +403,15 @@ public class ReachB extends Check {
                                     return box.expand(0.1);
                                 }
 
+                                return box;
+                            }).forEach(detection.getTargetLocations()::add);
+                    eloc.oldLocations.stream()
+                            .map(kloc -> {
+                                SimpleCollisionBox box = (SimpleCollisionBox) EntityData.getEntityBox(kloc, entity);
+
+                                if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) {
+                                    return box.expand(0.1);
+                                }
                                 return box;
                             }).forEach(detection.getTargetLocations()::add);
 
