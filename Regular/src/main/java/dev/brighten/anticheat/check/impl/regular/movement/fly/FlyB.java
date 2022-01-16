@@ -53,7 +53,7 @@ public class FlyB extends Check {
         } else {
             vertical += data.playerInfo.deltaY;
 
-            double limit = (this.limit + slimeY + velocityY) * 1.25;
+            double limit = (this.limit + slimeY + velocityY) * 1.4;
 
             if(vertical > limit && !pistonBelow) {
                 vl++;

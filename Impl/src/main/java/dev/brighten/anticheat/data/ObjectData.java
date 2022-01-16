@@ -76,7 +76,7 @@ public class ObjectData implements Data {
     public PotionProcessor potionProcessor;
     public ClickProcessor clickProcessor;
     public int hashCode, playerTicks;
-    public boolean banned, atlasBungeeInstalled;
+    public boolean banned, atlasBungeeInstalled, excuseNextFlying;
     public ModData modData;
     public KLocation targetLoc;
     public ProtocolVersion playerVersion = ProtocolVersion.UNKNOWN;

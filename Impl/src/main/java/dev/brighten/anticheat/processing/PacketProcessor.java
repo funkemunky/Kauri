@@ -251,19 +251,21 @@ public class PacketProcessor {
             case Packet.Client.LOOK: {
                 WrappedInFlyingPacket packet = new WrappedInFlyingPacket(object, data.getPlayer());
 
-                if (timestamp - data.lagInfo.lastFlying <= 15) {
-                    data.lagInfo.lastPacketDrop.reset();
+
+                if(!data.excuseNextFlying) {
+                    if (timestamp - data.lagInfo.lastFlying <= 15) {
+                        data.lagInfo.lastPacketDrop.reset();
+                    }
+
+                    data.playerInfo.checkMovement = MovementUtils.checkMovement(data.playerConnection);
+                    data.lagInfo.lastFlying = timestamp;
+                    data.potionProcessor.onFlying(packet);
+                    data.moveProcessor.process(packet, timestamp);
+                    data.predictionService.onReceive(packet); //Processing for prediction service.
+
+                    data.checkManager.runPacket(packet, timestamp);
+                    data.playerInfo.lastFlyingTimer.reset();
                 }
-
-                data.playerInfo.checkMovement = MovementUtils.checkMovement(data.playerConnection);
-
-                data.lagInfo.lastFlying = timestamp;
-                data.potionProcessor.onFlying(packet);
-                data.moveProcessor.process(packet, timestamp);
-                data.predictionService.onReceive(packet); //Processing for prediction service.
-
-                data.checkManager.runPacket(packet, timestamp);
-                data.playerInfo.lastFlyingTimer.reset();
 
                 if(data.sniffing) {
                     data.sniffedPackets.add(type + ":@:"
@@ -272,6 +274,7 @@ public class PacketProcessor {
                             +  ":@:" + timestamp);
                 }
 
+                data.excuseNextFlying = false;
                 data.playerInfo.lsneaking = data.playerInfo.sneaking;
                 break;
             }
@@ -328,6 +331,9 @@ public class PacketProcessor {
             }
             case Packet.Client.BLOCK_PLACE: {
                 WrappedInBlockPlacePacket packet = new WrappedInBlockPlacePacket(object, data.getPlayer());
+
+                if(data.playerVersion.isOrAbove(ProtocolVersion.v1_17))
+                    data.excuseNextFlying = true;
 
                 data.playerInfo.lastBlockPlacePacket.reset();
                 if (data.getPlayer().getItemInHand() != null) {
