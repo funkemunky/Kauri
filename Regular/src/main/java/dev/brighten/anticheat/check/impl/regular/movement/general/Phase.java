@@ -24,6 +24,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.*;
+import java.util.function.Function;
 
 @CheckInfo(name = "Phase", description = "Ensures players cannot move through blocks.",
         checkType = CheckType.EXPLOIT, cancellable = true, executable = false, devStage = DevStage.ALPHA)
@@ -33,6 +34,9 @@ public class Phase extends Check {
     private final Timer lastFlag = new TickTimer(5);
     private static final Set<Material> allowedMaterials = EnumSet.noneOf(Material.class);
 
+    @Setting(name = "blacklistedMaterials")
+    private static List<String> blacklistedMaterials = new ArrayList<>();
+
     static {
         Arrays.stream(Material.values())
             .filter(mat -> mat.name().contains("BANNER") || mat.name().contains("BREWING")
@@ -41,6 +45,12 @@ public class Phase extends Check {
 
         allowedMaterials.add(XMaterial.VINE.parseMaterial());
         allowedMaterials.add(XMaterial.CAKE.parseMaterial());
+    }
+
+    public Phase() {
+        blacklistedMaterials.stream().map(Material::getMaterial)
+                .filter(m -> !allowedMaterials.contains(m))
+                .forEach(allowedMaterials::add);
     }
 
     @Setting(name = "flagIntoChat")
