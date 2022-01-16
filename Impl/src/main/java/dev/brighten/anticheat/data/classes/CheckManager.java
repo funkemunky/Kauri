@@ -127,6 +127,11 @@ public class CheckManager {
         if(objectData.getPlayer()
                 .hasPermission("kauri.bypass")
                 && Config.flagBypassPerm) return;
+
+        //Whitelisting players with prefix for bedrock users
+        if(!Config.prefixWhitelist.equals("disabled")
+                && objectData.getPlayer().getName().startsWith(Config.prefixWhitelist)) return;
+
         synchronized (checks) {
             for (Map.Entry<WrappedClass, CheckInfo> entry
                     : Check.checkClasses.entrySet()) {
