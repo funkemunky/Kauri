@@ -16,9 +16,13 @@ import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 import lombok.val;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 
 @CheckInfo(name = "BadPackets (N)", description = "Designed to patch disablers for Kauri.",
-        checkType = CheckType.BADPACKETS, devStage = DevStage.BETA, punishVL = 50, vlToFlag = 4)
+        checkType = CheckType.BADPACKETS, devStage = DevStage.BETA, vlToFlag = 4)
 @Cancellable(cancelType = CancelType.MOVEMENT)
 public class BadPacketsN extends Check {
     @Setting(name  = "kickPlayer")
@@ -44,16 +48,36 @@ public class BadPacketsN extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
 
-        if(lastSentTrans.isNotPassed(300L) && lastKeepAlive.isNotPassed(3000L)
+        if(lastSentTrans.isNotPassed(300L)
+                && ++flying > 305 + (data.lagInfo.ping / 50.)
                 && Kauri.INSTANCE.tps.getAverage() > 19.6
-                && ++flying > 200) {
+                && lastKeepAlive.isNotPassed(4000L)) {
             vl++;
             flag("f=%s lKA=%s t=CANCEL", flying, lastKeepAlive.getPassed());
-
-            if (!isExecutable() && vl > 4) kickPlayer(String.format(Color.translate(kickString), "TN"));
         }
 
         lastFlying.reset();
+    }
+
+    @Event
+    public void onEvent(PlayerMoveEvent event) {
+        if(flying > 10) {
+            event.setCancelled(true);
+        }
+    }
+
+    @Event
+    public void onEvent(EntityDamageByEntityEvent event) {
+        if(flying > 10) {
+            event.setCancelled(true);
+        }
+    }
+
+    @Event
+    public void onEvent(PlayerInteractEvent event) {
+        if(flying > 10) {
+            event.setCancelled(true);
+        }
     }
 
     @Packet

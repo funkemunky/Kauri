@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
+//Duplicate class for obfuscation purposes
 public class EntityLocation {
     public final Entity entity;
     public double newX, newY, newZ, x, y, z;
@@ -18,7 +19,7 @@ public class EntityLocation {
     public int increment = 0;
     public boolean sentTeleport = false;
     public KLocation oldLocation, location;
-    public List<KLocation> interpolatedLocations = new EvictingList<>(8);
+    public List<KLocation> oldLocations = new EvictingList<>(2), interpolatedLocations = new EvictingList<>(8);
 
     public void interpolateLocations() {
         increment = 3;
@@ -43,7 +44,6 @@ public class EntityLocation {
 
     public List<KLocation> getInterpolatedLocations() {
         int increment = 3;
-        oldLocation = new KLocation(x, y, z, yaw, pitch);
         double x = this.x, y = this.y, z = this.z, newX = this.newX, newY = this.newY, newZ = this.newZ;
         float yaw = this.yaw, pitch = this.pitch, newYaw = this.newYaw, newPitch = this.newPitch;
         List<KLocation> locations = new ArrayList<>();
@@ -63,8 +63,6 @@ public class EntityLocation {
             z = d2;
             locations.add(new KLocation(x, y, z, yaw, pitch, Kauri.INSTANCE.keepaliveProcessor.tick));
         }
-
-        location = new KLocation(x, y, z, yaw, pitch);
 
         return locations;
     }

@@ -1,5 +1,8 @@
 package dev.brighten.anticheat.utils;
 
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
 public class FastTrig {
     /**
      * Fast approximation of 1.0 / sqrt(x).
@@ -18,8 +21,11 @@ public class FastTrig {
         return x;
     }
 
-    public static String user() {
-        return "%%__USER__%%";
+    public static String user(String user) {
+        user = "%%__USER__%%";
+        Player player = Bukkit.getPlayer(user);
+
+        return player.getName();
     }
 
     /**

@@ -71,8 +71,8 @@ public class ReachA extends Check {
 
 
             List<KLocation> targetLocs = data.entityLocPastLocation
-                    .getEstimatedLocationByIndex(data.lagInfo.transPing + 1 + transBetweenFlying,
-                            3, 3);
+                    .getEstimatedLocationByIndex(data.lagInfo.transPing + 2 + Math.max(1, transBetweenFlying),
+                            4, 4);
 
             KLocation torigin = data.playerInfo.to.clone(), forigin = data.playerInfo.from.clone();
 
@@ -135,18 +135,16 @@ public class ReachA extends Check {
                 distance = Math.sqrt(distance) - 0.03; //We subtract 0.03 since our ray tracing isnt exactly 1-1
             else distance = -1;
 
-            if(data.lagInfo.lastPacketDrop.isPassed(3)) {
-                if (distance > reachThreshold) {
-                    if(transBetweenFlying > 1 && buffer > 2) {
-                        cancelTicks = 10;
-                        debug("Set to 10 cancel ticks");
-                    } else if (++buffer > 6) {
-                        buffer = 6;
-                        vl++;
-                        flag("distance=%.2f buffer=%s", distance, buffer);
-                    }
-                } else buffer -= buffer > 0 ? 0.05 : 0;
-            } else buffer-= buffer > 0 ? 0.02 : 0;
+            if (distance > reachThreshold && hits > 1) {
+                if(transBetweenFlying > 1 && buffer > 2) {
+                    cancelTicks = 10;
+                    debug("Set to 10 cancel ticks");
+                } else if (++buffer > 6) {
+                    buffer = 6;
+                    vl++;
+                    flag("distance=%.2f buffer=%s", distance, buffer);
+                }
+            } else buffer -= buffer > 0 ? 0.075f : 0;
 
             debug("distance=%.3f h/m=%s,%s boxes=%s buffer=%s hbhits=%s dt=%s lct=%s",
                     distance, hits, misses, targetLocs.size(), buffer, hitboxHits,

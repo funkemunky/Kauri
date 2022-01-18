@@ -1,4 +1,4 @@
-package dev.brighten.anticheat.check.impl.premium;
+package dev.brighten.anticheat.check.impl.regular.combat.aim;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import dev.brighten.anticheat.check.api.Check;
@@ -9,7 +9,7 @@ import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Aim (H)", description = "checks for large headsnaps.",
-        devStage = DevStage.BETA, checkType = CheckType.AIM, vlToFlag = 9, planVersion = KauriVersion.ARA)
+        devStage = DevStage.BETA, checkType = CheckType.AIM, vlToFlag = 9, planVersion = KauriVersion.FULL)
 public class AimH extends Check {
     private double lastHorizontalDistance;
 
@@ -18,7 +18,7 @@ public class AimH extends Check {
         final double horizontalDistance = data.playerInfo.deltaXZ;
 
         // Player moved
-        if (packet.isPos()) {
+        if (packet.isPos() && !data.playerInfo.doingTeleport) {
             final float deltaYaw = Math.abs(data.playerInfo.deltaYaw);
             final float deltaPitch = Math.abs(data.playerInfo.deltaPitch);
 

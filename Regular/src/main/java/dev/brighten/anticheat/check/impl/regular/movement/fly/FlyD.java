@@ -17,20 +17,8 @@ import dev.brighten.api.check.DevStage;
 @Cancellable(cancelType = CancelType.MOVEMENT)
 public class FlyD extends Check {
 
-    private boolean blockPlace;
-    @Packet
-    public void onBlock(WrappedInBlockPlacePacket packet) {
-        if(data.playerVersion.isOrAbove(ProtocolVersion.v1_17)) {
-            blockPlace = true;
-        }
-    }
-
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if(blockPlace) {
-            blockPlace = false;
-            return;
-        }
         if(!packet.isPos()
                 || data.playerInfo.flightCancel
                 || (data.playerInfo.nearGroundTimer.isNotPassed(3) && (data.playerInfo.lClientGround

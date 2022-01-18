@@ -416,15 +416,17 @@ public class Check implements KauriCheck {
     public void debug(String information, Object... variables) {
         if(data.debugging.size() == 0) return;
 
-        final String finalInformation = String.format(information, variables);
+        Kauri.INSTANCE.loggingThread.execute(() -> {
+            final String finalInformation = String.format(information, variables);
 
-        synchronized (data.debugging) {
-            for (Map.Entry<UUID, String> entry : data.debugging.entrySet()) {
-                if(entry.getValue().equals(name))
-                Kauri.INSTANCE.dataManager.dataMap.get(entry.getKey().hashCode()).getPlayer()
-                        .sendMessage(Color.translate("&8[&c&lDEBUG&8] &7" + finalInformation));
+            synchronized (data.debugging) {
+                for (Map.Entry<UUID, String> entry : data.debugging.entrySet()) {
+                    if (entry.getValue().equals(name))
+                        Kauri.INSTANCE.dataManager.dataMap.get(entry.getKey().hashCode()).getPlayer()
+                                .sendMessage(Color.translate("&8[&c&lDEBUG&8] &7" + finalInformation));
+                }
             }
-        }
+        });
     }
 
     /** Player utils **/

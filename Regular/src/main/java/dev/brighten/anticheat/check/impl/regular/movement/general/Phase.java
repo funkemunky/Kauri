@@ -24,6 +24,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.*;
+import java.util.function.Function;
 
 @CheckInfo(name = "Phase", description = "Ensures players cannot move through blocks.",
         checkType = CheckType.EXPLOIT, cancellable = true, executable = false, devStage = DevStage.ALPHA)
@@ -32,6 +33,9 @@ public class Phase extends Check {
     private KLocation fromWhereShitAintBad = null;
     private final Timer lastFlag = new TickTimer(5);
     private static final Set<Material> allowedMaterials = EnumSet.noneOf(Material.class);
+
+    @Setting(name = "blacklistedMaterials")
+    private static List<String> blacklistedMaterials = new ArrayList<>();
 
     static {
         Arrays.stream(Material.values())
@@ -43,13 +47,19 @@ public class Phase extends Check {
         allowedMaterials.add(XMaterial.CAKE.parseMaterial());
     }
 
+    public Phase() {
+        blacklistedMaterials.stream().map(Material::getMaterial)
+                .filter(m -> !allowedMaterials.contains(m))
+                .forEach(allowedMaterials::add);
+    }
+
     @Setting(name = "flagIntoChat")
     private boolean flagIntoChat = false;
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long now) {
         if(!packet.isPos() || now - data.creation < 800L || now - data.playerInfo.lastRespawn < 500L
-                || data.playerInfo.doingTeleport
+                || data.playerInfo.moveTicks == 0
                 || data.playerInfo.creative || data.playerInfo.canFly) {
             return;
         }

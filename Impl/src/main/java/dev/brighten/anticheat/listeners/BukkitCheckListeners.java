@@ -11,6 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
@@ -27,6 +28,17 @@ public class BukkitCheckListeners implements Listener {
         if(data != null) {
             data.playerInfo.breakingBlock = event.getAction().equals(Action.LEFT_CLICK_BLOCK);
             data.checkManager.runEvent(event);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onDamage(EntityDamageByEntityEvent event) {
+        if(event.getDamager() instanceof Player) {
+            ObjectData data = Kauri.INSTANCE.dataManager.getData((Player) event.getDamager());
+
+            if(data != null) {
+                data.checkManager.runEvent(event);
+            }
         }
     }
 

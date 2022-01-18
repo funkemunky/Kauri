@@ -36,6 +36,9 @@ public class Config {
     @ConfigSetting(path = "alerts", name = "bungee", comment = "Sends alerts across servers.")
     public static boolean bungeeAlerts = false;
 
+    @ConfigSetting(path = "alerts", name = "prefixWhitelist", comment = "Whitelist users from alerts")
+    public static String prefixWhitelist = "disabled";
+
     @ConfigSetting(path = "alerts", name = "delay", comment = "The delay between alerts sending.")
     public static long alertsDelay = 500;
 

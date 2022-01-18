@@ -265,19 +265,21 @@ public class FlatfileStorage implements DataStorage {
             val rs = Query.prepare("select `uuid`, `timestamp` from `namecache` where `name` = ?")
                     .append(name).executeQuery();
 
-            String uuidString = rs.getString("uuid");
+           while(rs.next()) {
+               String uuidString = rs.getString("uuid");
 
-            if(uuidString != null) {
-                UUID uuid = UUID.fromString(rs.getString("uuid"));
+               if(uuidString != null) {
+                   UUID uuid = UUID.fromString(rs.getString("uuid"));
 
-                if(System.currentTimeMillis() - rs.getTimestamp("timestamp").getTime() > TimeUnit.DAYS.toMillis(1)) {
-                    Kauri.INSTANCE.loggingThread.execute(() -> {
-                        Query.prepare("delete from `namecache` where `uuid` = ?").append(uuidString).execute();
-                        MiscUtils.printToConsole("Deleted " + uuidString + " from name cache (age > 1 day).");
-                    });
-                }
-                return uuid;
-            }
+                   if(System.currentTimeMillis() - rs.getTimestamp("timestamp").getTime() > TimeUnit.DAYS.toMillis(1)) {
+                       Kauri.INSTANCE.loggingThread.execute(() -> {
+                           Query.prepare("delete from `namecache` where `uuid` = ?").append(uuidString).execute();
+                           MiscUtils.printToConsole("Deleted " + uuidString + " from name cache (age > 1 day).");
+                       });
+                   }
+                   return uuid;
+               }
+           }
         } catch (SQLException e) {
             RunUtils.task(e::printStackTrace);
         } catch(Exception e) {
@@ -293,17 +295,19 @@ public class FlatfileStorage implements DataStorage {
             val rs = Query.prepare("select `name` `timestamp` from `namecache` where `uuid` = ?")
                     .append(uuid.toString()).executeQuery();
 
-            String name = rs.getString("name");
+           while(rs.next()) {
+               String name = rs.getString("name");
 
-            if(name != null) {
-                if(System.currentTimeMillis() - rs.getTimestamp("timestamp").getTime() > TimeUnit.DAYS.toMillis(1)) {
-                    Kauri.INSTANCE.loggingThread.execute(() -> {
-                        Query.prepare("delete from `namecache` where `name` = ?").append(name).execute();
-                        MiscUtils.printToConsole("Deleted " + name + " from name cache (age > 1 day).");
-                    });
-                }
-                return name;
-            }
+               if(name != null) {
+                   if(System.currentTimeMillis() - rs.getTimestamp("timestamp").getTime() > TimeUnit.DAYS.toMillis(1)) {
+                       Kauri.INSTANCE.loggingThread.execute(() -> {
+                           Query.prepare("delete from `namecache` where `name` = ?").append(name).execute();
+                           MiscUtils.printToConsole("Deleted " + name + " from name cache (age > 1 day).");
+                       });
+                   }
+                   return name;
+               }
+           }
         } catch (SQLException e) {
             e.printStackTrace();
         }
