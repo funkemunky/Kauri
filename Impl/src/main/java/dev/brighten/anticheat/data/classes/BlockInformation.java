@@ -29,7 +29,7 @@ public class BlockInformation {
     private ObjectData objectData;
     public boolean onClimbable, onSlab, onStairs, onHalfBlock, inLiquid, inLava, inWater, inWeb, onSlime, onIce,
             onSoulSand, blocksAbove, collidesVertically, bedNear, collidesHorizontally, blocksNear, inBlock, miscNear,
-            collidedWithEntity, roseBush, inPortal, blocksBelow, pistonNear, fenceBelow;
+            collidedWithEntity, roseBush, inPortal, blocksBelow, pistonNear, fenceBelow, inScaffolding;
     public float currentFriction, fromFriction;
     public CollisionHandler
             handler = new CollisionHandler(new ArrayList<>(), new ArrayList<>(), new KLocation(0,0,0), null);
@@ -38,7 +38,9 @@ public class BlockInformation {
     public final List<Block> blocks = Collections.synchronizedList(new ArrayList<>());
     private static EnumMap<Material, XMaterial> matchMaterial = new EnumMap<>(Material.class);
     //Caching material
-    private final Material cobweb = XMaterial.COBWEB.parseMaterial(), rosebush = XMaterial.ROSE_BUSH.parseMaterial();
+    private final Material cobweb = XMaterial.COBWEB.parseMaterial(),
+            rosebush = XMaterial.ROSE_BUSH.parseMaterial(),
+            scaffolding = XMaterial.SCAFFOLDING.parseMaterial();
 
     static {
         for (Material mat : Material.values()) {
@@ -65,6 +67,7 @@ public class BlockInformation {
         blocks.clear();
 
         onClimbable = objectData.playerInfo.serverGround = objectData.playerInfo.nearGround = fenceBelow
+                = inScaffolding
                 = onSlab = onStairs = onHalfBlock = inLiquid = inLava = inWater = inWeb = onSlime = pistonNear
                 = onIce = onSoulSand = blocksAbove = collidesVertically = bedNear = collidesHorizontally =
                 blocksNear = inBlock = miscNear = collidedWithEntity = blocksBelow = inPortal = false;
@@ -146,6 +149,9 @@ public class BlockInformation {
 
                                     if(type.equals(rosebush))
                                         roseBush = true;
+                                    else if(type.equals(scaffolding) && blockBox.isCollided(normalBox)) {
+                                        inScaffolding = true;
+                                    }
 
                                     if(normalBox.copy().offset(0, 0.6f, 0).isCollided(blockBox))
                                         blocksAbove = true;

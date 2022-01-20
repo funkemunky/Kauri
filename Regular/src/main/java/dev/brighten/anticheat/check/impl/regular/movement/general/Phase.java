@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.check.impl.regular.movement.general;
 
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.world.BlockData;
@@ -45,6 +46,9 @@ public class Phase extends Check {
 
         allowedMaterials.add(XMaterial.VINE.parseMaterial());
         allowedMaterials.add(XMaterial.CAKE.parseMaterial());
+        if(ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_14)) {
+            allowedMaterials.add(XMaterial.SCAFFOLDING.parseMaterial());
+        }
     }
 
     public Phase() {
@@ -68,9 +72,9 @@ public class Phase extends Check {
 
         SimpleCollisionBox
                 toUpdate = new SimpleCollisionBox(data.playerInfo.to.toVector(), 0.6,1.8)
-                .expand(-0.0625),
+                .expand(-0.0825),
                 playerBox = new SimpleCollisionBox(data.getPlayer().getLocation(), 0.6, 1.8)
-                        .expand(-0.0625);
+                        .expand(-0.0825);
 
         SimpleCollisionBox concatted = Helper.wrap(playerBox, toUpdate);
 

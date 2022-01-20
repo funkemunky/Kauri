@@ -326,6 +326,7 @@ public class Check implements KauriCheck {
 
     public void fixMovementBugs() {
         BukkitAPI.INSTANCE.setGliding(data.getPlayer(), false);
+        if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.v1_18))
         RunUtils.task(() -> {
             synchronized (data.blockInfo.blocks) {
                 for (Block b : data.blockInfo.blocks) {
