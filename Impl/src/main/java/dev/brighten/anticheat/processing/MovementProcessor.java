@@ -533,6 +533,7 @@ public class MovementProcessor {
                 || data.playerInfo.liquidTimer.isNotPassed(8)
                 || data.playerInfo.onLadder
                 || data.blockInfo.inScaffolding
+                || data.blockInfo.inHoney
                 || !data.playerInfo.checkMovement
                 || data.playerInfo.lastTeleportTimer.isNotPassed(1)
                 || data.playerInfo.lastGlideTimer.isNotPassed()
