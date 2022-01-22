@@ -70,7 +70,7 @@ public class ReachA extends Check {
             if(!data.getEntityLocation(data.target).sentTeleport) break reachA;
 
 
-            List<KLocation> targetLocs = data.entityLocPastLocation
+            List<KLocation> targetLocs = data.targetPastLocation
                     .getEstimatedLocationByIndex(data.lagInfo.transPing + 2 + Math.max(1, transBetweenFlying),
                             4, 4);
 

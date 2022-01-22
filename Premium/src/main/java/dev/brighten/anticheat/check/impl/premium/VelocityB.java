@@ -41,6 +41,7 @@ public class VelocityB extends Check {
             pvX = data.playerInfo.velocityX;
             pvZ = data.playerInfo.velocityZ;
             ticks = 0;
+            debug("pvX=%.2f pvZ=%.2f", pvX, pvZ);
             data.playerInfo.cvb = false;
         }
         if((pvX != 0 || pvZ != 0) && (data.playerInfo.deltaX != 0
@@ -57,6 +58,9 @@ public class VelocityB extends Check {
                     || data.lagInfo.lastPacketDrop.isNotPassed(2)) {
                 pvX = pvZ = 0;
                 buffer-= buffer > 0 ? 1 : 0;
+                debug("[%.2f] bn=%s lpd=%s lpacket=%s ba=%s", buffer, data.blockInfo.blocksNear,
+                        data.lagInfo.lastPingDrop.getPassed(), data.lagInfo.lastPacketDrop.getPassed(),
+                        data.blockInfo.blocksAbove);
                 return;
             }
 

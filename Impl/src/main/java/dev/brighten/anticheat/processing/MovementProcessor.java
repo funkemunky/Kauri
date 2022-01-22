@@ -232,7 +232,6 @@ public class MovementProcessor {
                 if(Math.abs(velocity.getY() - data.playerInfo.deltaY) < 0.01) {
                     if(data.playerInfo.doingVelocity) {
                         data.playerInfo.lastVelocity.reset();
-
                         data.playerInfo.doingVelocity = false;
                         data.playerInfo.lastVelocityTimestamp = System.currentTimeMillis();
                         data.predictionService.velocity = true;

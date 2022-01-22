@@ -19,6 +19,7 @@ import dev.brighten.anticheat.utils.EntityLocation;
 import dev.brighten.anticheat.utils.MovementUtils;
 import dev.brighten.anticheat.utils.ThreadHandler;
 import lombok.val;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -621,24 +622,24 @@ public class PacketProcessor {
                 Vector vector = new Vector(packet.getMotionX(), packet.getMotionY(), packet.getMotionZ());
                 data.playerInfo.velocities.add(vector);
                 data.playerInfo.doingVelocity = true;
-                data.runInstantAction(ka -> {
-                    if(ka.isEnd() && data.playerInfo.velocities.contains(vector)) {
+                data.runKeepaliveAction(keepalive -> {
+                    if(data.playerInfo.velocities.contains(vector)) {
                         if(data.playerInfo.doingVelocity) {
                             data.playerInfo.lastVelocity.reset();
 
                             data.playerInfo.doingVelocity = false;
-                            data.playerInfo.lastVelocityTimestamp = System.currentTimeMillis();
                             data.playerInfo.cva = data.playerInfo.cvb = data.playerInfo.cvc = true;
+                            data.playerInfo.lastVelocityTimestamp = System.currentTimeMillis();
                             data.predictionService.velocity = true;
                             data.playerInfo.velocityX = data.playerInfo.calcVelocityX = (float) packet.getX();
                             data.playerInfo.velocityY = data.playerInfo.calcVelocityY = (float) packet.getY();
                             data.playerInfo.velocityZ = data.playerInfo.calcVelocityZ = (float) packet.getZ();
-                            data.playerInfo.velocityXZ =
-                                    Math.hypot(data.playerInfo.velocityX, data.playerInfo.velocityZ);
+                            data.playerInfo.velocityXZ = Math.hypot(data.playerInfo.velocityX,
+                                    data.playerInfo.velocityZ);
                         }
                         data.playerInfo.velocities.remove(vector);
                     }
-                });
+                }, 1);
                 break;
             }
             case Packet.Server.ENTITY_VELOCITY: {
@@ -649,8 +650,8 @@ public class PacketProcessor {
                     Vector vector = new Vector(packet.getX(), packet.getY(), packet.getZ());
                     data.playerInfo.velocities.add(vector);
                     data.playerInfo.doingVelocity = true;
-                    data.runInstantAction(keepalive -> {
-                        if(keepalive.isEnd() && data.playerInfo.velocities.contains(vector)) {
+                    data.runKeepaliveAction(keepalive -> {
+                        if(data.playerInfo.velocities.contains(vector)) {
                             if(data.playerInfo.doingVelocity) {
                                 data.playerInfo.lastVelocity.reset();
 
@@ -666,7 +667,7 @@ public class PacketProcessor {
                             }
                             data.playerInfo.velocities.remove(vector);
                         }
-                    });
+                    }, 1);
                 }
 
                 if(data.sniffing) {

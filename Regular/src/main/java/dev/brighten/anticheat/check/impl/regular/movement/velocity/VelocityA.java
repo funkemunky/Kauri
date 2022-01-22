@@ -15,26 +15,17 @@ import dev.brighten.api.check.CheckType;
 @Cancellable
 public class VelocityA extends Check {
 
-    private double vY, cvY, buffer;
-    private TickTimer lastVelocity = new TickTimer(20);
-
-    @Packet
-    public void onVelocity(WrappedOutVelocityPacket packet) {
-        if(packet.getId() == data.getPlayer().getEntityId() && packet.getY() > 0.1) {
-           cvY = packet.getY();
-        }
-    }
+    private double vY, buffer;
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        //Make sure we don't have any false positives because of a lingering velocity check
-        if(cvY > 0 && vY == 0 && data.playerInfo.lastVelocity.isPassed(3 + data.lagInfo.transPing)) cvY = 0;
 
         //Player just jumped into the air
-        if(!data.playerInfo.clientGround && data.playerInfo.lClientGround
-                && data.playerInfo.from.y % 1. == 0
-                && data.playerInfo.deltaY > 0)
-            vY = cvY;
+        if(data.playerInfo.cva) {
+            if(data.playerInfo.velocityY > 0.1)
+                vY = data.playerInfo.velocityY;
+            data.playerInfo.cva = false;
+        }
 
         //If any of these conditions aren't met, we don't want to make checking for vertical velocity.
         if(vY > 0
@@ -47,7 +38,7 @@ public class VelocityA extends Check {
 
             double pct = data.playerInfo.deltaY / vY * 100;
 
-            if ((pct < 99.999 || pct > 300)
+            if ((pct < 99.999 || pct > 400)
                     && !data.playerInfo.lastBlockPlace.isNotPassed(5)
                     && !data.blockInfo.blocksAbove) {
                 if(++buffer > 15) {
@@ -55,7 +46,7 @@ public class VelocityA extends Check {
                     flag("pct=%.1f%% buffer=%.1f", pct, buffer);
                 }
                 if (++vl > 15) flag("pct=" + MathUtils.round(pct, 2) + "%%");
-            } else buffer-= buffer > 0 ? 0.25f : 0;
+            } else buffer-= buffer > 0 ? 0.5 : 0;
 
             vY-= 0.08;
             vY*= 0.98;
@@ -67,7 +58,7 @@ public class VelocityA extends Check {
                     || data.blockInfo.collidesVertically) vY = 0;
 
 
-            debug("pct=" + pct + " vl=" + vl);
+            debug("pct=" + pct + " vl=" + buffer);
         } else vY = 0;
     }
 }
