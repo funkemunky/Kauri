@@ -137,6 +137,7 @@ public class BlockInformation {
                                 if (it-- <= 0) {
                                     break start;
                                 }
+                                if(y > 255 || y < 0) continue;
                                 Block block = chunk.getBlock(x & 15, y, z & 15);
                                 final Material type = block.getType();
                                 if (type != Material.AIR) {

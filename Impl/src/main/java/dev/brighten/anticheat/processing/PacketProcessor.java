@@ -222,9 +222,6 @@ public class PacketProcessor {
                                 data.targetPastLocation.previousLocations.clear();
                             }
                             data.playerInfo.lastTargetSwitch.reset();
-                            synchronized (data.entityLocPastLocation.previousLocations) {
-                                data.entityLocPastLocation.previousLocations.clear();
-                            }
                             if (packet.getEntity() instanceof Player) {
                                 data.targetData = Kauri.INSTANCE.dataManager.getData((Player) packet.getEntity());
                             } else data.targetData = null;
@@ -695,116 +692,11 @@ public class PacketProcessor {
             case Packet.Server.LEGACY_REL_LOOK: {
                 WrappedOutRelativePosition packet = new WrappedOutRelativePosition(object, data.getPlayer());
 
-                Atlas.getInstance().getWorldInfo(data.getPlayer().getWorld())
-                        .getEntity(packet.getId()).ifPresent(entity -> {
-                            EntityLocation eloc = data.getEntityLocation(entity);
-
-                            //We don't need to do version checking here. Atlas handles this for us.
-                            if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9)) {
-                                eloc.newX += (byte)packet.getX() / 32D;
-                                eloc.newY += (byte)packet.getY() / 32D;
-                                eloc.newZ += (byte)packet.getZ() / 32D;
-                                eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
-                                eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
-                            } else if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_14)) {
-                                eloc.newX += (int)packet.getX() / 4096D;
-                                eloc.newY += (int)packet.getY() / 4096D;
-                                eloc.newZ += (int)packet.getZ() / 4096D;
-                                eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
-                                eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
-                            } else {
-                                eloc.newX += (short)packet.getX() / 4096D;
-                                eloc.newY += (short)packet.getY() / 4096D;
-                                eloc.newZ += (short)packet.getZ() / 4096D;
-                                eloc.newYaw += (float)(byte)packet.getYaw() / 256.0F * 360.0F;
-                                eloc.newPitch += (float)(byte)packet.getPitch() / 256.0F * 360.0F;
-                            }
-
-                            eloc.interpolateLocations();
-
-                            if(data.target != null && data.target.getEntityId() == packet.getId()) {
-                                for (int i = 0; i < eloc.interpolatedLocations.size(); i++) {
-                                    KLocation loc = eloc.interpolatedLocations.get(i);
-                                    loc.timeStamp+= i;
-
-                                    data.entityLocPastLocation.addLocation(loc);
-                                }
-                                data.playerInfo.lastTargetUpdate.reset();
-                            }
-
-                            if(data.sniffing) {
-                                data.sniffedPackets.add(type + ":@:" + packet.getId() + ";" + packet.getX() + ";"
-                                        + packet.getY() + ";" + packet.getZ() + ";" + packet.getYaw() + ";"
-                                        + packet.getPitch() + ":" + timestamp);
-                            }
-                        });
-
                 data.checkManager.runPacket(packet, timestamp);
                 break;
             }
             case Packet.Server.ENTITY_TELEPORT: {
                 WrappedOutEntityTeleportPacket packet = new WrappedOutEntityTeleportPacket(object, data.getPlayer());
-
-                Atlas.getInstance().getWorldInfo(packet.getPlayer().getWorld()).getEntity(packet.entityId)
-                        .ifPresent(entity -> {
-                            EntityLocation eloc = data.getEntityLocation(entity);
-
-                            //We don't need to do version checking here. Atlas handles this for us.
-                            if(data.playerVersion.isOrAbove(ProtocolVersion.V1_9)) {
-                                if (!(Math.abs(eloc.x - packet.x) >= 0.03125D)
-                                        && !(Math.abs(eloc.y - packet.y) >= 0.015625D)
-                                        && !(Math.abs(eloc.z - packet.z) >= 0.03125D)) {
-                                    eloc.increment = 0;
-                                    //We don't need to do version checking here. Atlas handles this for us.
-                                    eloc.newX = eloc.x = packet.x;
-                                    eloc.newY = eloc.y = packet.y;
-                                    eloc.newZ = eloc.z = packet.z;
-                                    eloc.newYaw = eloc.yaw = packet.yaw;
-                                    eloc.newPitch = eloc.pitch = packet.pitch;
-                                    eloc.interpolatedLocations.clear();
-                                    eloc.interpolatedLocations
-                                            .add(new KLocation(eloc.newX, eloc.newY, eloc.newZ,
-                                                    eloc.newYaw, eloc.newPitch, Kauri.INSTANCE.keepaliveProcessor.tick));
-                                } else {
-                                    eloc.newX = packet.x;
-                                    eloc.newY = packet.y;
-                                    eloc.newZ = packet.z;
-                                    eloc.newYaw = packet.yaw;
-                                    eloc.newPitch = packet.pitch ;
-
-                                    eloc.increment = 3;
-                                    eloc.interpolateLocations();
-                                }
-                            } else {
-                                //We don't need to do version checking here. Atlas handles this for us.
-                                eloc.newX = packet.x;
-                                eloc.newY = packet.y;
-                                eloc.newZ = packet.z;
-                                eloc.newYaw = packet.yaw;
-                                eloc.newPitch = packet.pitch;
-
-                                eloc.increment = 3;
-                                eloc.interpolateLocations();
-                            }
-
-                            if(data.target != null && data.target.getEntityId() == packet.entityId) {
-                                eloc.sentTeleport = true;
-                                if(eloc.interpolatedLocations.size() > 1) {
-                                    for (int i = 0; i < eloc.interpolatedLocations.size(); i++) {
-                                        KLocation loc = eloc.interpolatedLocations.get(i);
-                                        loc.timeStamp+= i;
-
-                                        data.entityLocPastLocation.addLocation(loc);
-                                    }
-                                } else if(eloc.interpolatedLocations.size() > 0) {
-                                    data.entityLocPastLocation.addLocation(eloc.interpolatedLocations.get(0));
-                                }
-                                data.playerInfo.lastTargetUpdate.reset();
-                            }
-
-                            //Clearing any old interpolated locations
-                            eloc.interpolatedLocations.clear();
-                        });
 
                 if(data.sniffing) {
                     data.sniffedPackets.add(type + ":@:" + packet.entityId + ";" + packet.x + ";" + packet.y + ";"

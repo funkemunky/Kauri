@@ -62,7 +62,7 @@ public class ObjectData implements Data {
     public final Map<UUID, String> debugging = new HashMap<>();
 
     public long creation, lagTicks, noLagTicks;
-    public PastLocation targetPastLocation, entityLocPastLocation;
+    public PastLocation targetPastLocation;
     public LivingEntity target;
     public SimpleCollisionBox box = new SimpleCollisionBox();
     public ObjectData targetData;
@@ -105,7 +105,6 @@ public class ObjectData implements Data {
         clickProcessor = new ClickProcessor(this);
         lagInfo = new LagInformation();
         targetPastLocation = new PastLocation();
-        entityLocPastLocation = new PastLocation();
         potionProcessor = new PotionProcessor(this);
 
         playerInfo.to = playerInfo.from = new KLocation(player.getLocation());
