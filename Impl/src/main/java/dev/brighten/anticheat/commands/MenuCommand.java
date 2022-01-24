@@ -225,19 +225,120 @@ public class MenuCommand extends BaseCommand {
                 checkMapBuilder = checkMapBuilder.enchantment(Enchantment.DURABILITY, 1);
             }
 
+            String enabled = "checks." + val.name + ".enabled";
+            String executable = "checks." + val.name + ".executable";
+            String cancellable = "checks." + val.name + ".cancellable";
+
             ItemStack item = checkMapBuilder.name((val.enabled ? "&a" : "&c") + val.name).lore("",
-                    "&f&oClick me &7to view configure check", "", "&eStatus:",
+                    "&eStatus:",
                     (val.enabled ? Color.Green : Color.Gray) + "Enabled",
                     (val.executable ? Color.Green : Color.Gray) + "Executable",
                     (val.cancelMode != null
                             ? (val.cancellable ? Color.Green : Color.Gray) + "Cancellable"
-                            : Color.Red + Color.Italics + "Cannot Cancel")).build();
+                            : Color.Red + Color.Italics + "Cannot Cancel"), "",
+                    "&f&oShift + Left Click &7&oto toggle detection",
+                    "&f&oShift + Right Click &7&oto toggle executable",
+                    "&f&oMiddle Click &7&oto toggle cancelling").build();
 
             Button button = new Button(false,
                     item, (player, info) -> {
-                ChestMenu toOpen = getCheckEdit(val);
+                switch(info.getClickType()) {
+                    //Toggle the detectio on/off.
+                    case SHIFT_LEFT: {
+                        val.enabled = !val.enabled;
 
-                toOpen.showMenu(player);
+                        Kauri.INSTANCE.getConfig().set(enabled, val.enabled);
+                        Kauri.INSTANCE.saveConfig();
+                        info.getButton().setStack(new ItemBuilder(val.enabled
+                                ? (val.cancellable ? XMaterial.FILLED_MAP.parseMaterial()
+                                : XMaterial.MAP.parseMaterial()) : XMaterial.PAPER.parseMaterial())
+                                .name((val.enabled ? "&a" : "&c") + val.name).lore("",
+                                        "&eStatus:",
+                                        (val.enabled ? Color.Green : Color.Gray) + "Enabled",
+                                        (val.executable ? Color.Green : Color.Gray) + "Executable",
+                                        (val.cancelMode != null
+                                                ? (val.cancellable ? Color.Green : Color.Gray) + "Cancellable"
+                                                : Color.Red + Color.Italics + "Cannot Cancel"), "",
+                                        "&f&oShift + Left Click &7&oto toggle detection",
+                                        "&f&oShift + Right Click &7&oto toggle executable",
+                                        "&f&oMiddle Click &7&oto toggle cancelling").build());
+                        menu.buildInventory(false);
+
+                        Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
+                                .forEach(data -> {
+                                    if(!val.enabled) {
+                                        data.checkManager.checks.remove(val.name);
+                                    } else {
+                                        data.checkManager.checks.clear();
+                                        data.checkManager.addChecks();
+                                    }
+                                }));
+                        break;
+                    }
+                    case SHIFT_RIGHT: {
+                        val.executable = !val.executable;
+
+                        Kauri.INSTANCE.getConfig().set(executable, val.executable);
+                        Kauri.INSTANCE.saveConfig();
+
+                        info.getButton().setStack(new ItemBuilder(val.enabled
+                                ? (val.cancellable ? XMaterial.FILLED_MAP.parseMaterial()
+                                : XMaterial.MAP.parseMaterial()) : XMaterial.PAPER.parseMaterial())
+                                .name((val.enabled ? "&a" : "&c") + val.name).lore("",
+                                        "&eStatus:",
+                                        (val.enabled ? Color.Green : Color.Gray) + "Enabled",
+                                        (val.executable ? Color.Green : Color.Gray) + "Executable",
+                                        (val.cancelMode != null
+                                                ? (val.cancellable ? Color.Green : Color.Gray) + "Cancellable"
+                                                : Color.Red + Color.Italics + "Cannot Cancel"), "",
+                                        "&f&oShift + Left Click &7&oto toggle detection",
+                                        "&f&oShift + Right Click &7&oto toggle executable",
+                                        "&f&oMiddle Click &7&oto toggle cancelling").build());
+                        menu.buildInventory(false);
+
+                        Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
+                                .forEach(data -> data.checkManager.checks.computeIfPresent(val.name, (name, check) -> {
+                                    check.executable = val.executable;
+                                    return check;
+                                })));
+                        break;
+                    }
+                    case MIDDLE: {
+                        val.cancellable = !val.cancellable;
+
+                        Kauri.INSTANCE.getConfig().set(cancellable, val.cancellable);
+                        Kauri.INSTANCE.saveConfig();
+
+                        info.getButton().setStack(new ItemBuilder(val.enabled
+                                ? (val.cancellable ? XMaterial.FILLED_MAP.parseMaterial()
+                                : XMaterial.MAP.parseMaterial()) : XMaterial.PAPER.parseMaterial())
+                                .name((val.enabled ? "&a" : "&c") + val.name).lore("",
+                                        "&eStatus:",
+                                        (val.enabled ? Color.Green : Color.Gray) + "Enabled",
+                                        (val.executable ? Color.Green : Color.Gray) + "Executable",
+                                        (val.cancelMode != null
+                                                ? (val.cancellable ? Color.Green : Color.Gray) + "Cancellable"
+                                                : Color.Red + Color.Italics + "Cannot Cancel"), "",
+                                        "&f&oShift + Left Click &7&oto toggle detection",
+                                        "&f&oShift + Right Click &7&oto toggle executable",
+                                        "&f&oMiddle Click &7&oto toggle cancelling").build());
+                        menu.buildInventory(false);
+
+                        Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
+                                .forEach(data -> data.checkManager.checks.computeIfPresent(val.name, (name, check) -> {
+                                    check.cancellable = val.cancellable;
+                                    return check;
+                                })));
+
+                        break;
+                    }
+                    default: {
+                        ChestMenu toOpen = getCheckEdit(val);
+
+                        toOpen.showMenu(player);
+                        break;
+                    }
+                }
             });
             menu.addItem(button);
         }

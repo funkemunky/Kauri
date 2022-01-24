@@ -14,14 +14,24 @@ import java.util.*;
 
 public class CheckManager {
     private ObjectData objectData;
+    /**
+     * Stores checkName, Check
+     */
     public final Map<String, Check> checks = new HashMap<>();
     public final Map<Class<?>, List<WrappedCheck>> checkMethods = new HashMap<>();
+
 
     public CheckManager(ObjectData objectData) {
         this.objectData = objectData;
     }
 
     //TODO Use https://github.com/EsotericSoftware/reflectasm
+
+    /**
+     *
+     * @param object (packet wrapper) NMSObject
+     * @param timeStamp Long time of packet received
+     */
     public void runPacket(NMSObject object, long timeStamp) {
         val methods = checkMethods.get(object.getClass());
 
