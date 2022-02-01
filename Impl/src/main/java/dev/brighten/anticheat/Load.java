@@ -160,6 +160,10 @@ public class Load {
                     Class<?> clazz = kauriClassLoader.loadClass(key);
 
                     if(clazz.isAnnotationPresent(CheckInfo.class) && clazz.getAnnotation(CheckInfo.class).planVersion() == KauriVersion.ARA) {
+                        if(!Kauri.INSTANCE.usingAra) {
+                            MiscUtils.printToConsole("&aThanks for purchasing Kauri Ara.");
+                            Kauri.INSTANCE.usingAra = true;
+                        }
                         Check.register(clazz);
                     } else if(clazz.isAssignableFrom(CheckRegister.class)) {
                         try {
