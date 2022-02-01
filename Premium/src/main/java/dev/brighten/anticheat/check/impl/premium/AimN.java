@@ -7,10 +7,12 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.check.impl.premium.hitboxes.ReachB;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.TickTimer;
+import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
-@CheckInfo(name = "Aim (N)", description = "Unnatural aim timing", checkType = CheckType.AIM, devStage = DevStage.ALPHA)
+@CheckInfo(name = "Aim (N)", description = "Unnatural aim timing", checkType = CheckType.AIM,
+        devStage = DevStage.ALPHA, planVersion = KauriVersion.ARA)
 public class AimN extends Check {
     private Timer lastLook = new TickTimer();
     private int buffer;
