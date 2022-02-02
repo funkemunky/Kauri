@@ -11,7 +11,7 @@ import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Hand (D)", description = "Checks for a player not swinging their arm while attacking",
-        checkType = CheckType.HAND, punishVL = 10, executable = true)
+        checkType = CheckType.HAND, punishVL = 7, executable = true)
 @Cancellable(cancelType = CancelType.ATTACK)
 public class HandD extends Check {
 

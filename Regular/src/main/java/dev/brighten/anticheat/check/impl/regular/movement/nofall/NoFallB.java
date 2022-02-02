@@ -9,7 +9,7 @@ import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "NoFall (B)", description = "Looks for ground spoofing",
-        checkType = CheckType.NOFALL, punishVL = 12, executable = true, vlToFlag = 2)
+        checkType = CheckType.NOFALL, punishVL = 9, executable = true, vlToFlag = 2)
 @Cancellable
 public class NoFallB extends Check {
 

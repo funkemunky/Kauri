@@ -11,7 +11,7 @@ import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Fly (B)", description = "Looks for players going above a possible height limit",
-        checkType = CheckType.FLIGHT, devStage = DevStage.RELEASE, vlToFlag = 4, punishVL = 15, executable = true)
+        checkType = CheckType.FLIGHT, devStage = DevStage.RELEASE, vlToFlag = 4, punishVL = 7, executable = true)
 @Cancellable
 public class FlyB extends Check {
 

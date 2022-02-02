@@ -10,7 +10,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.Optional;
 
-@CheckInfo(name = "Speed (D)", description = "Clip check", executable = true, punishVL = 30, cancellable = true)
+@CheckInfo(name = "Speed (D)", description = "Clip check", executable = true, punishVL = 20, cancellable = true)
 @Cancellable
 public class SpeedD extends Check {
 

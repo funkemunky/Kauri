@@ -11,7 +11,7 @@ import org.bukkit.Location;
 import org.bukkit.event.block.BlockPlaceEvent;
 
 @CheckInfo(name = "Block (C)", description = "Checks if a player places a block without looking.",
-        checkType = CheckType.BLOCK, vlToFlag = 3, punishVL = 15, devStage = DevStage.BETA, executable = true)
+        checkType = CheckType.BLOCK, vlToFlag = 3, punishVL = 9, devStage = DevStage.BETA, executable = true)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class BlockC extends Check {
 

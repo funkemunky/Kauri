@@ -10,7 +10,7 @@ import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Hand (B)", description = "Checks for irregular block dig packets.",
-        checkType = CheckType.HAND, punishVL = 20, executable = true)
+        checkType = CheckType.HAND, punishVL = 5, executable = true)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class HandB extends Check {
 

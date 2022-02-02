@@ -10,7 +10,7 @@ import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Killaura (B)", description = "Detects when clients sent use packets at same time as flying packets.",
-        checkType = CheckType.KILLAURA, punishVL = 10, executable = true)
+        checkType = CheckType.KILLAURA, punishVL = 5, executable = true)
 @Cancellable(cancelType = CancelType.ATTACK)
 public class KillauraB extends Check {
 

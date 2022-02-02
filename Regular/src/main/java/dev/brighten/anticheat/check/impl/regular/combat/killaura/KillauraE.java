@@ -12,7 +12,7 @@ import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Killaura (E)", description = "Checks if a player attacks before blocking.",
-        checkType = CheckType.KILLAURA, punishVL = 20, vlToFlag = 6, executable = true)
+        checkType = CheckType.KILLAURA, punishVL = 12, vlToFlag = 6, executable = true)
 @Cancellable(cancelType = CancelType.ATTACK)
 public class KillauraE extends Check {
 

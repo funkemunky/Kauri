@@ -14,7 +14,7 @@ import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Autoclicker (C)", description = "Checks for blatant blocking patterns.",
-        checkType = CheckType.AUTOCLICKER, devStage = DevStage.ALPHA, punishVL = 200, maxVersion = ProtocolVersion.V1_8_9)
+        checkType = CheckType.AUTOCLICKER, devStage = DevStage.ALPHA, punishVL = 30, maxVersion = ProtocolVersion.V1_8_9)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerC extends Check {
 

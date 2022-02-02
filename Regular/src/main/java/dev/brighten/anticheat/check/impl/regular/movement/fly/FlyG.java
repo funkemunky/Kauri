@@ -11,7 +11,7 @@ import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Fly (G)", description = "Looks for impossible movements, commonly done by Step modules",
-        devStage = DevStage.ALPHA, checkType = CheckType.FLIGHT,
+        devStage = DevStage.ALPHA, checkType = CheckType.FLIGHT, punishVL = 12,
         planVersion = KauriVersion.FULL)
 @Cancellable
 public class FlyG extends Check {

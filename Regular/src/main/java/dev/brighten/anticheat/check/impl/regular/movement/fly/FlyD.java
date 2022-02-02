@@ -13,7 +13,7 @@ import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Fly (D)", description = "Air modification check", checkType = CheckType.FLIGHT,
-        devStage = DevStage.BETA, executable = true)
+        devStage = DevStage.BETA, executable = true, punishVL = 3)
 @Cancellable(cancelType = CancelType.MOVEMENT)
 public class FlyD extends Check {
 

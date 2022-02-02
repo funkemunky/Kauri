@@ -9,7 +9,7 @@ import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Autoclicker (G)", description = "Checks for outliers in clicks.",
-        checkType = CheckType.AUTOCLICKER, vlToFlag = 4, punishVL = 18)
+        checkType = CheckType.AUTOCLICKER, vlToFlag = 4, punishVL = 12)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class AutoclickerG extends Check {
 

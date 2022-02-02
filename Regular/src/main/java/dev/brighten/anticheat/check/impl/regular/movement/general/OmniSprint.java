@@ -7,7 +7,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.potion.PotionEffectType;
 
 @CheckInfo(name = "OmniSprint", description = "Checks for sprinting in illegal directions.",
-        checkType = CheckType.GENERAL, vlToFlag = 15, punishVL = 50)
+        checkType = CheckType.GENERAL, vlToFlag = 15, punishVL = 20)
 @Cancellable
 public class OmniSprint extends Check {
 

@@ -9,7 +9,7 @@ import dev.brighten.api.check.CheckType;
 import org.bukkit.block.Block;
 import org.bukkit.event.block.BlockPlaceEvent;
 
-@CheckInfo(name = "Block (D)", checkType = CheckType.BLOCK, description = "Unusual block placement", punishVL = 10)
+@CheckInfo(name = "Block (D)", checkType = CheckType.BLOCK, description = "Unusual block placement", punishVL = 6)
 @Cancellable(cancelType = CancelType.PLACE)
 public class BlockD extends Check {
 
