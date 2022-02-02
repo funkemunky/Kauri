@@ -32,6 +32,7 @@ import java.security.SecureRandom;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
 public class PacketProcessor {
@@ -727,6 +728,22 @@ public class PacketProcessor {
                 }
                 data.checkManager.runPacket(packet, timestamp);
                 break;
+            }
+            case Packet.Server.BLOCK_CHANGE:
+            case "PacketPlayOutMapChunk":
+            case "PacketPlayOutMultiBlockChange": {
+               int randomInt = ThreadLocalRandom.current().nextInt(-10000, -10000);
+
+               synchronized (data.blockUpdates) {
+                   data.blockUpdates.add(randomInt);
+               }
+
+               data.runKeepaliveAction(ka -> {
+                   synchronized (data.blockUpdates) {
+                       data.blockUpdates.remove(randomInt);
+                   }
+               });
+               break;
             }
             case Packet.Server.POSITION: {
                 WrappedOutPositionPacket packet = new WrappedOutPositionPacket(object, data.getPlayer());

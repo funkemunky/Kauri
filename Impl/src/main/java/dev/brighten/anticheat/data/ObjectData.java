@@ -12,9 +12,7 @@ import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.Tuple;
-import cc.funkemunky.api.utils.it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import cc.funkemunky.api.utils.it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
-import cc.funkemunky.api.utils.it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import cc.funkemunky.api.utils.it.unimi.dsi.fastutil.ints.*;
 import cc.funkemunky.api.utils.math.RollingAverageLong;
 import cc.funkemunky.api.utils.math.cond.MaxInteger;
 import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingList;
@@ -82,6 +80,7 @@ public class ObjectData implements Data {
     public ProtocolVersion playerVersion = ProtocolVersion.UNKNOWN;
     public Int2ObjectMap<EntityLocation> entityTracker = Int2ObjectMaps.synchronize(new Int2ObjectOpenHashMap<>());
     public final Set<Player> boxDebuggers = new HashSet<>();
+    public final IntSet blockUpdates = new IntArraySet();
     private final List<CollisionBox> lookingAtBoxes = Collections.synchronizedList(new ArrayList<>());
     public final List<Action> keepAliveStamps = new CopyOnWriteArrayList<>();
     public final ConcurrentEvictingList<CancelType> typesToCancel = new ConcurrentEvictingList<>(10);

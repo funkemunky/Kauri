@@ -24,7 +24,7 @@ public class PlayerInformation {
     public boolean serverGround, lServerGround, lClientGround, clientGround, nearGround,
             collided, insideBlock, lookingAtBlock,
             onLadder, isClimbing, usingItem, wasOnIce, wasOnSlime, jumped, inAir, worldLoaded;
-    public boolean generalCancel, flightCancel, checkMovement;
+    public boolean generalCancel, flightCancel, checkMovement, doingBlockUpdate;
     public boolean cva, cvb, cvc;
     public float fallDistance;
     public double deltaY, lDeltaY, deltaX, lDeltaX, deltaZ, lDeltaZ, deltaXZ, lDeltaXZ,

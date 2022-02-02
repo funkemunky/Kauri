@@ -18,7 +18,7 @@ public class FlyG extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if(!packet.isPos()) return;
+        if(!packet.isPos() || data.playerInfo.doingBlockUpdate) return;
 
         boolean toGround = data.playerInfo.clientGround && data.playerInfo.serverGround;
         boolean fromGround = data.playerInfo.lClientGround && data.playerInfo.lServerGround;

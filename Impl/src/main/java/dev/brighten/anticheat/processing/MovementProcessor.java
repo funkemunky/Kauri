@@ -97,9 +97,12 @@ public class MovementProcessor {
             data.playerInfo.moveTicks = 0;
         }
 
-        if((data.playerInfo.doingTeleport = (data.playerInfo.moveTicks == 0 || data.teleportsToConfirm > 0))) {
+        if(data.playerInfo.moveTicks == 0 || data.teleportsToConfirm > 0) {
+            data.playerInfo.doingTeleport = true;
             data.playerInfo.lastTeleportTimer.reset();
-        }
+        } else data.playerInfo.doingTeleport = false;
+
+        data.playerInfo.doingBlockUpdate = data.blockUpdates.size() > 0;
         //We check if it's null and intialize the from and to as equal to prevent large deltas causing false positives since there
         //was no previous from (Ex: delta of 380 instead of 0.45 caused by jump jump in location from 0,0,0 to 380,0,0)
 
@@ -512,6 +515,7 @@ public class MovementProcessor {
         data.playerInfo.generalCancel = data.getPlayer().getAllowFlight()
                 || data.playerInfo.creative
                 || hasLevi
+                || data.playerInfo.doingBlockUpdate
                 || data.getPlayer().isSleeping()
                 || data.playerInfo.lastGhostCollision.isNotPassed()
                 || data.playerInfo.doingTeleport
@@ -520,7 +524,7 @@ public class MovementProcessor {
                 || data.playerInfo.gliding
                 || data.playerInfo.lastPlaceLiquid.isNotPassed(5)
                 || data.playerInfo.inVehicle
-                || (data.playerInfo.lastChunkUnloaded.isNotPassed(35)
+                || ((data.playerInfo.lastChunkUnloaded.isNotPassed(35) || data.playerInfo.doingBlockUpdate)
                 && MathUtils.getDelta(-0.098, data.playerInfo.deltaY) < 0.0001)
                 || timeStamp - data.playerInfo.lastRespawn < 2500L
                 || data.playerInfo.lastToggleFlight.isNotPassed(40)

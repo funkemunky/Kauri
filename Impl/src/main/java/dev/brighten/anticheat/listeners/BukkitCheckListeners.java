@@ -16,7 +16,7 @@ import org.bukkit.event.player.*;
 @Init
 public class BukkitCheckListeners implements Listener {
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onInteract(PlayerInteractEvent event) {
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
@@ -26,7 +26,7 @@ public class BukkitCheckListeners implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onDamage(EntityDamageByEntityEvent event) {
         if(event.getDamager() instanceof Player) {
             ObjectData data = Kauri.INSTANCE.dataManager.getData((Player) event.getDamager());
@@ -37,7 +37,7 @@ public class BukkitCheckListeners implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onMove(PlayerMoveEvent event) {
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
@@ -69,7 +69,7 @@ public class BukkitCheckListeners implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onBlock(BlockPlaceEvent event) {
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
@@ -78,7 +78,7 @@ public class BukkitCheckListeners implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onBookEdit(PlayerEditBookEvent event) {
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
@@ -87,7 +87,7 @@ public class BukkitCheckListeners implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onEvent(SignChangeEvent event) {
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
