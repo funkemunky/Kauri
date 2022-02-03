@@ -16,7 +16,7 @@ import java.util.zip.CRC32;
 @Init
 public class SystemUtil {
 
-    public static final CRC32 CRC_32 = new CRC32();
+    public static CRC32 CRC_32 = new CRC32();
     private static final Class[] parameters = new Class[]{URL.class};
     @ConfigSetting(path = "ara", name = "enabled")
     public static boolean enabled = false;

@@ -732,7 +732,7 @@ public class PacketProcessor {
             case Packet.Server.BLOCK_CHANGE:
             case "PacketPlayOutMapChunk":
             case "PacketPlayOutMultiBlockChange": {
-               int randomInt = ThreadLocalRandom.current().nextInt(-10000, -10000);
+               int randomInt = ThreadLocalRandom.current().nextInt(-10000, 10000);
 
                synchronized (data.blockUpdates) {
                    data.blockUpdates.add(randomInt);

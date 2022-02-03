@@ -18,6 +18,7 @@ import dev.brighten.anticheat.logs.LoggerManager;
 import dev.brighten.anticheat.processing.PacketProcessor;
 import dev.brighten.anticheat.processing.keepalive.KeepaliveProcessor;
 import dev.brighten.anticheat.utils.ServerInjector;
+import dev.brighten.anticheat.utils.SystemUtil;
 import dev.brighten.anticheat.utils.ThreadHandler;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.AtlasTimer;
@@ -34,6 +35,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.zip.CRC32;
 
 public class Kauri extends JavaPlugin {
 
@@ -134,6 +136,11 @@ public class Kauri extends JavaPlugin {
             PacketProcessor.incomingPackets.clear();
             PacketProcessor.outgoingPackets.clear();
         }
+
+        if(reload) {
+            SystemUtil.CRC_32 = new CRC32();
+        }
+
         packetProcessor = null;
 
         MiscUtils.printToConsole("&7Finshing up nullification...");
