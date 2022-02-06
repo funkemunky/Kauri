@@ -32,7 +32,7 @@ public class HandA extends Check {
 
     @Packet
     public void flying(WrappedInFlyingPacket packet, long current) {
-        if(data.playerInfo.lastTeleportTimer.isPassed(0))
+        if(data.playerInfo.lastTeleportTimer.isPassed(0) && !data.excuseNextFlying)
             lastFlying = current;
     }
 }

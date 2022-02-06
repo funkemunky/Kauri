@@ -64,7 +64,7 @@ public class TimerB extends Check {
             //We don't want the time to run away, especially on versions 1.9+ where flyings are not sent if players
             //are standing still. We also want to ensure we aren't resetting when a player lags because this will cause
             //false positives.
-            if(delta > 2000L
+            if(Math.abs(delta) > 2000L
                     && noLagStreak > 5) {
                 timeBeforeReset = totalTimer; //We are setting this just in case the player lags the next tick.
                 totalTimer = now - 50;

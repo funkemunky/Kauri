@@ -59,6 +59,10 @@ public class MiscUtils {
         NUMBER_REFLECTED_PRIMITIVES = s;
     }
 
+    public static boolean isSameLocation(KLocation one, KLocation two) {
+        return one.x == two.x && one.y == two.y && one.z == two.z;
+    }
+
     public static void forceBanPlayer(ObjectData data, String reason) {
         assert data.checkManager.checks.containsKey("ForceBan") : "Player " + data.getPlayer().getName()
                 + " does not have ForceBan detection loaded; cannot force ban.";

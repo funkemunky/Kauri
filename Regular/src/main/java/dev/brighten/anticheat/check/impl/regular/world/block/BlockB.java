@@ -22,7 +22,7 @@ public class BlockB extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timestamp) {
-        if(data.playerInfo.creative) return;
+        if(data.playerInfo.creative || data.excuseNextFlying) return;
 
         if(place) {
             long delta = timestamp - lastPlace;

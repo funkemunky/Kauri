@@ -8,6 +8,7 @@ import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.api.packets.channelhandler.TinyProtocol1_7;
 import cc.funkemunky.api.tinyprotocol.api.packets.channelhandler.TinyProtocol1_8;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.RunUtils;
@@ -62,6 +63,7 @@ public class ObjectData implements Data {
     public long creation, lagTicks, noLagTicks;
     public PastLocation targetPastLocation;
     public LivingEntity target;
+    public KLocation lastFlying;
     public SimpleCollisionBox box = new SimpleCollisionBox();
     public ObjectData targetData;
     public CheckManager checkManager;

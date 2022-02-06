@@ -16,6 +16,7 @@ import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.listeners.api.impl.KeepaliveAcceptedEvent;
 import dev.brighten.anticheat.utils.EntityLocation;
+import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.MovementUtils;
 import dev.brighten.anticheat.utils.ThreadHandler;
 import lombok.val;
@@ -250,7 +251,12 @@ public class PacketProcessor {
             case Packet.Client.LOOK: {
                 WrappedInFlyingPacket packet = new WrappedInFlyingPacket(object, data.getPlayer());
 
-
+                if(data.playerVersion.isOrAbove(ProtocolVersion.v1_17)
+                        && packet.isPos() && packet.isLook()
+                        && MiscUtils.isSameLocation(new KLocation(packet.getX(), packet.getY(), packet.getZ()),
+                        data.playerInfo.to)) {
+                    data.excuseNextFlying = true;
+                }
                 if(!data.excuseNextFlying) {
                     if (timestamp - data.lagInfo.lastFlying <= 15) {
                         data.lagInfo.lastPacketDrop.reset();
@@ -275,6 +281,8 @@ public class PacketProcessor {
 
                 data.excuseNextFlying = false;
                 data.playerInfo.lsneaking = data.playerInfo.sneaking;
+
+                data.lastFlying = new KLocation(packet.getX(), packet.getY(), packet.getZ());
                 break;
             }
             case Packet.Client.ENTITY_ACTION: {
@@ -330,9 +338,6 @@ public class PacketProcessor {
             }
             case Packet.Client.BLOCK_PLACE: {
                 WrappedInBlockPlacePacket packet = new WrappedInBlockPlacePacket(object, data.getPlayer());
-
-                if(data.playerVersion.isOrAbove(ProtocolVersion.v1_17))
-                    data.excuseNextFlying = true;
 
                 data.playerInfo.lastBlockPlacePacket.reset();
                 if (data.getPlayer().getItemInHand() != null) {

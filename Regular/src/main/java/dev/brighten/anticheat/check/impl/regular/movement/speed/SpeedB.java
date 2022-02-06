@@ -16,6 +16,7 @@ public class SpeedB extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(data.playerInfo.deltaXZ > 0
+                && !data.excuseNextFlying
                 && !data.playerInfo.generalCancel) {
             if(data.playerInfo.airTicks > 2 && !data.playerInfo.lClientGround && !data.playerInfo.clientGround) {
                 double accelX = data.playerInfo.deltaX - data.playerInfo.lDeltaX;

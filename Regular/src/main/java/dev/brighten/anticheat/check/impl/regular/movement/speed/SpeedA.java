@@ -23,6 +23,7 @@ public class SpeedA extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
+        if(data.excuseNextFlying) return;
         checkProccesing:
         {
             if (!packet.isPos())

@@ -515,6 +515,7 @@ public class MovementProcessor {
         data.playerInfo.generalCancel = data.getPlayer().getAllowFlight()
                 || data.playerInfo.creative
                 || hasLevi
+                || data.excuseNextFlying
                 || data.playerInfo.doingBlockUpdate
                 || data.getPlayer().isSleeping()
                 || data.playerInfo.lastGhostCollision.isNotPassed()
