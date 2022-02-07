@@ -1,4 +1,4 @@
-package dev.brighten.anticheat.check.impl.regular.combat.hitbox;
+package dev.brighten.anticheat.check.impl.free.combat;
 
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;

@@ -1,4 +1,4 @@
-package dev.brighten.anticheat.check.impl.regular.combat.hitbox;
+package dev.brighten.anticheat.check.impl.free.combat;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
@@ -8,7 +8,6 @@ import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.world.EntityData;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
-import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.utils.AxisAlignedBB;
 import dev.brighten.anticheat.utils.Vec3D;
@@ -22,7 +21,7 @@ import java.util.EnumSet;
 import java.util.List;
 
 @CheckInfo(name = "Reach (A)", checkType = CheckType.HITBOX, punishVL = 7, description = "A simple distance check.",
-        planVersion = KauriVersion.FULL, executable = true)
+        planVersion = KauriVersion.FREE, executable = true)
 @Cancellable(cancelType = CancelType.ATTACK)
 public class ReachA extends Check {
 

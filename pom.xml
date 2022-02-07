@@ -14,6 +14,7 @@
         <module>Premium</module>
         <module>Regular</module>
         <module>Free</module>
+        <module>Base</module>
     </modules>
 
     <repositories>
@@ -60,6 +61,12 @@
             <groupId>org.github.spigot</groupId>
             <artifactId>1.17</artifactId>
             <version>1.17</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>me.mat1337.loader</groupId>
+            <artifactId>loader</artifactId>
+            <version>4.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

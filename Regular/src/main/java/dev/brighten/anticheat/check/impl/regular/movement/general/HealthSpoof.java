@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @CheckInfo(name = "HealthSpoof", description = "Spoofs the health of players.", checkType = CheckType.GENERAL,
-        executable = false, maxVersion = ProtocolVersion.V1_12_2, planVersion = KauriVersion.ARA)
+        executable = false, maxVersion = ProtocolVersion.V1_12_2, planVersion = KauriVersion.FULL)
 public class HealthSpoof extends Check {
 
     private static boolean newer = ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_9);

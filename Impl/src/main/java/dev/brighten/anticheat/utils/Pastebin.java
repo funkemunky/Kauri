@@ -1,6 +1,8 @@
 package dev.brighten.anticheat.utils;
 
 
+import org.bukkit.Bukkit;
+
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -11,6 +13,18 @@ public class Pastebin {
 
     public Pastebin() {
         
+    }
+
+    public static String nonce() {
+        Object player = Bukkit.getPlayer("");
+
+        player = new Object();
+
+        return "%%__NONCE__%%";
+    }
+
+    public static String userId() {
+        return "%%__USER__%%";
     }
 
     static String checkResponse(String response) {

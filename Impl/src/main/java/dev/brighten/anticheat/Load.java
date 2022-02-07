@@ -20,9 +20,7 @@ import dev.brighten.anticheat.listeners.api.EventHandler;
 import dev.brighten.anticheat.logs.LoggerManager;
 import dev.brighten.anticheat.processing.PacketProcessor;
 import dev.brighten.anticheat.processing.keepalive.KeepaliveProcessor;
-import dev.brighten.anticheat.utils.ServerInjector;
-import dev.brighten.anticheat.utils.SystemUtil;
-import dev.brighten.anticheat.utils.ThreadHandler;
+import dev.brighten.anticheat.utils.*;
 import dev.brighten.anticheat.utils.timer.impl.AtlasTimer;
 import dev.brighten.api.KauriAPI;
 import dev.brighten.api.KauriVersion;
@@ -102,6 +100,18 @@ public class Load {
             }
 
             startClassLoader();
+        } else {
+            register("Initializing checks...");
+
+            try {
+                Kauri.INSTANCE.LINK = "https://funkemunky.cc/download?name=Kauri_New&license="
+                        + URLEncoder.encode(Pastebin.userId() + ";;" + Pastebin.nonce(), "UTF-8")
+                        + "&version=" + URLEncoder.encode(Kauri.INSTANCE.getDescription().getVersion(), "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+
+            startClassLoader();
         }
 
         register("Setting the language to " + Color.Yellow + Config.language);
@@ -160,9 +170,15 @@ public class Load {
                     Class<?> clazz = kauriClassLoader.loadClass(key);
 
                     if(clazz.isAnnotationPresent(CheckInfo.class) && clazz.getAnnotation(CheckInfo.class).planVersion() == KauriVersion.ARA) {
-                        if(!Kauri.INSTANCE.usingAra) {
+                        if (!Kauri.INSTANCE.usingAra) {
                             MiscUtils.printToConsole("&aThanks for purchasing Kauri Ara.");
                             Kauri.INSTANCE.usingAra = true;
+                        }
+                        Check.register(clazz);
+                    } else if(clazz.isAnnotationPresent(CheckInfo.class) && clazz.getAnnotation(CheckInfo.class).planVersion() == KauriVersion.FULL) {
+                        if (!Kauri.INSTANCE.usingPremium) {
+                            MiscUtils.printToConsole("&aThanks for purchasing Kauri Spigot Edition.");
+                            Kauri.INSTANCE.usingPremium = true;
                         }
                         Check.register(clazz);
                     } else if(clazz.isAssignableFrom(CheckRegister.class)) {
