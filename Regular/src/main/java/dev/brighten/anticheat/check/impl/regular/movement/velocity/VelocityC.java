@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @CheckInfo(name = "Velocity (C)", description = "A simple horizontal velocity check.", checkType = CheckType.VELOCITY,
-        vlToFlag = 10, executable = true)
+        vlToFlag = 5, punishVL = 20, executable = true)
 @Cancellable
 public class VelocityC extends Check {
 

@@ -45,11 +45,10 @@ public class VelocityA extends Check {
                     vl++;
                     flag("pct=%.1f%% buffer=%.1f", pct, buffer);
                 }
-                if (++vl > 15) flag("pct=" + MathUtils.round(pct, 2) + "%%");
             } else buffer-= buffer > 0 ? 0.5 : 0;
 
-            vY-= 0.08;
-            vY*= 0.98;
+            buffer-= 0.08;
+            buffer*= 0.98;
 
             //If any of these conditions are met, we might as well stop checking for velocity.
             if(vY < 0.005 //While this is a 1.8.9 and below only thing, we might as well stop checking.
@@ -59,6 +58,6 @@ public class VelocityA extends Check {
 
 
             debug("pct=" + pct + " vl=" + buffer);
-        } else vY = 0;
+        } else buffer = 0;
     }
 }

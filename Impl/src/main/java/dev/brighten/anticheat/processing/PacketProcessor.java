@@ -30,9 +30,7 @@ import org.bukkit.util.Vector;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
@@ -434,6 +432,21 @@ public class PacketProcessor {
                             data.lagInfo.lastTransPing = data.lagInfo.transPing;
                             data.lagInfo.transPing = (current - ka.start);
 
+                            if(data.instantTransaction.size() > 0) {
+                                Deque<Short> toRemove = new LinkedList<>();
+                                data.instantTransaction.forEach((key, tuple) -> {
+                                    if((timestamp - tuple.one.getStamp()) > data.lagInfo.transPing * 52L + 750L) {
+                                        tuple.two.accept(tuple.one);
+                                        toRemove.add(key);
+                                    }
+                                });
+
+                                Short key = null;
+                                while((key = toRemove.poll()) != null) {
+                                    data.instantTransaction.remove(key);
+                                }
+                            }
+
                             if (Math.abs(data.lagInfo.lastTransPing - data.lagInfo.transPing) > 1) {
                                 data.lagInfo.lastPingDrop.reset();
                             }
@@ -739,14 +752,10 @@ public class PacketProcessor {
             case "PacketPlayOutMultiBlockChange": {
                int randomInt = ThreadLocalRandom.current().nextInt(-10000, 10000);
 
-               synchronized (data.blockUpdates) {
-                   data.blockUpdates.add(randomInt);
-               }
+               data.blockUpdates++;
 
                data.runKeepaliveAction(ka -> {
-                   synchronized (data.blockUpdates) {
-                       data.blockUpdates.remove(randomInt);
-                   }
+                   if(data.blockUpdates > 0) data.blockUpdates--;
                });
                break;
             }

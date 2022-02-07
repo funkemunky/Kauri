@@ -9,9 +9,10 @@ import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
+import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Velocity (D)", description = "Checks if a player takes no velocity",
-        checkType = CheckType.VELOCITY, punishVL = 3, planVersion = KauriVersion.FREE, executable = true)
+        checkType = CheckType.VELOCITY, punishVL = 3, planVersion = KauriVersion.FREE, executable = true, devStage = DevStage.BETA)
 @Cancellable(cancelType = CancelType.MOVEMENT)
 public class VelocityD extends Check {
 

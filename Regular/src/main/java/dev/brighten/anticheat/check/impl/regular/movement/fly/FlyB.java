@@ -38,7 +38,8 @@ public class FlyB extends Check {
         }
 
 
-        if(data.playerInfo.serverGround || data.playerInfo.lastBlockPlace.isNotPassed(1)) {
+        if(data.playerInfo.serverGround || packet.getY() % (0.015625) == 0
+                || data.playerInfo.lastBlockPlace.isNotPassed(1)) {
             vertical = 0;
 
             pistonBelow = data.blockInfo.pistonNear && data.playerInfo.slimeTimer.isNotPassed(20);
@@ -53,7 +54,7 @@ public class FlyB extends Check {
         } else {
             vertical += data.playerInfo.deltaY;
 
-            double limit = (this.limit + slimeY + velocityY) * 1.4;
+            double limit = (this.limit + slimeY + velocityY) * 1.6;
 
             if(vertical > limit && !pistonBelow) {
                 vl++;

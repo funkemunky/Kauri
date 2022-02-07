@@ -26,6 +26,8 @@ public class NoFallB extends Check {
 
         // If they are saying they are on the ground
         if(data.playerInfo.clientGround
+                && !data.playerInfo.doingBlockUpdate
+                && !data.playerInfo.serverGround
                 && data.playerInfo.lastBlockPlace.isPassed(4)
                 //And are no where near blocks
                 && !data.blockInfo.blocksBelow && !data.blockInfo.blocksNear

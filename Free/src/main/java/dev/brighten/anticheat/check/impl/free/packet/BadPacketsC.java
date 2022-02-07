@@ -10,7 +10,7 @@ import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "BadPackets (C)", description = "Checks for players who send slot packets at the same time as flying.",
-        checkType = CheckType.BADPACKETS, punishVL = 20, planVersion = KauriVersion.FREE, executable = true)
+        checkType = CheckType.BADPACKETS, punishVL = 10, planVersion = KauriVersion.FREE, executable = true)
 @Cancellable
 public class BadPacketsC extends Check {
 

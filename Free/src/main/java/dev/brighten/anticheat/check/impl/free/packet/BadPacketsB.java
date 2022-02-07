@@ -10,7 +10,7 @@ import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "BadPackets (B)", description = "Checks for the spamming of sneak changes.",
-        checkType = CheckType.BADPACKETS, punishVL = 40, planVersion = KauriVersion.FREE, executable = true)
+        checkType = CheckType.BADPACKETS, punishVL = 10, planVersion = KauriVersion.FREE, executable = true)
 @Cancellable
 public class BadPacketsB extends Check {
 

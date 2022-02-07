@@ -23,6 +23,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -63,9 +64,13 @@ public class MongoStorage implements DataStorage {
         alertsCollection = database.getCollection("alertsStatus");
 
         MiscUtils.printToConsole("&7Creating indexes for logs...");
-        logsCollection.createIndex(Indexes.ascending("uuid"));
-        logsCollection.createIndex(Indexes.ascending("check"));
-        logsCollection.createIndex(Indexes.ascending("vl"));
+        AtomicInteger indexes = new AtomicInteger();
+        logsCollection.listIndexes().forEach((Consumer<? super Document>) doc -> indexes.getAndIncrement());
+        if(indexes.get() < 2) {
+            logsCollection.createIndex(Indexes.ascending("uuid"));
+            logsCollection.createIndex(Indexes.ascending("check"));
+            logsCollection.createIndex(Indexes.ascending("vl"));
+        }
         MiscUtils.printToConsole("&aCompleted index creation!");
         MiscUtils.printToConsole("&7Creating index for punishments...");
         punishmentsCollection.createIndex(Indexes.ascending("uuid"));

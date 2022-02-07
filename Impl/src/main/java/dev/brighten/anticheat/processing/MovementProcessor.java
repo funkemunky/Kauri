@@ -102,7 +102,11 @@ public class MovementProcessor {
             data.playerInfo.lastTeleportTimer.reset();
         } else data.playerInfo.doingTeleport = false;
 
-        data.playerInfo.doingBlockUpdate = data.blockUpdates.size() > 0;
+        data.playerInfo.doingBlockUpdate = data.blockUpdates > 0;
+
+        if(data.playerInfo.doingBlockUpdate) {
+            data.playerInfo.lastGhostCollision.reset();
+        }
         //We check if it's null and intialize the from and to as equal to prevent large deltas causing false positives since there
         //was no previous from (Ex: delta of 380 instead of 0.45 caused by jump jump in location from 0,0,0 to 380,0,0)
 

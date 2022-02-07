@@ -82,7 +82,7 @@ public class ObjectData implements Data {
     public ProtocolVersion playerVersion = ProtocolVersion.UNKNOWN;
     public Int2ObjectMap<EntityLocation> entityTracker = Int2ObjectMaps.synchronize(new Int2ObjectOpenHashMap<>());
     public final Set<Player> boxDebuggers = new HashSet<>();
-    public final IntSet blockUpdates = new IntArraySet();
+    public int blockUpdates;
     private final List<CollisionBox> lookingAtBoxes = Collections.synchronizedList(new ArrayList<>());
     public final List<Action> keepAliveStamps = new CopyOnWriteArrayList<>();
     public final ConcurrentEvictingList<CancelType> typesToCancel = new ConcurrentEvictingList<>(10);

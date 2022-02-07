@@ -48,8 +48,8 @@ public class TimerB extends Check {
 
         check: {
             //This means we haven't started counting
-            if(totalTimer == -1) {
-                totalTimer = now - 50;
+            if(totalTimer == -1 || now - data.creation < 2000L) {
+                totalTimer = now - 100;
                 debug("Reset time");
             }
             //Every flying should take 50ms to send in between. So for every flying, we add 50ms to the totalTime.
