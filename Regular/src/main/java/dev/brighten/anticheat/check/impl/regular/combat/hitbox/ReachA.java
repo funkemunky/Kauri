@@ -22,7 +22,7 @@ import java.util.EnumSet;
 import java.util.List;
 
 @CheckInfo(name = "Reach (A)", checkType = CheckType.HITBOX, punishVL = 7, description = "A simple distance check.",
-        planVersion = KauriVersion.FREE, executable = true)
+        planVersion = KauriVersion.FULL, executable = true)
 @Cancellable(cancelType = CancelType.ATTACK)
 public class ReachA extends Check {
 
@@ -66,8 +66,6 @@ public class ReachA extends Check {
                     || data.playerInfo.inVehicle
                     || data.target == null
                     || !allowedEntityTypes.contains(data.target.getType())) break reachA;
-
-            if(!data.getEntityLocation(data.target).sentTeleport) break reachA;
 
 
             List<KLocation> targetLocs = data.targetPastLocation

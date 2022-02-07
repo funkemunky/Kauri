@@ -105,22 +105,6 @@ public class BadPacketsN extends Check {
         if (response.isPresent()) {
             flying = 0;
             lastTrans.reset();
-            val res = response.get();
-            short id = res.id;
-            int current = res.start;
-
-            if (current - lastTick > 1
-                    && id - lastId > 1 && lastTick != 0 && lastTick != 1 && now - data.creation > 4000L) {
-                if(++skipBuffer > 1) {
-                    vl++;
-                    flag("c=%s/%s last=%s/%s d=%s t=SKIP",
-                            current, id, lastTick, lastId, current - lastTick);
-                }
-                lastSkipFlag.reset();
-            } else if(lastSkipFlag.isPassed(140)) skipBuffer = 0;
-            debug("c=%s l=%s", current, lastTick);
-            lastTick = current;
-            lastId = id;
         }
     }
 }

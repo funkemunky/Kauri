@@ -249,65 +249,62 @@ public class Check implements KauriCheck {
             final String info = finalInformation
                     .replace("%p", String.valueOf(data.lagInfo.transPing))
                     .replace("%t", String.valueOf(MathUtils.round(Kauri.INSTANCE.getTps(), 2)));
-            if (Kauri.INSTANCE.lastTickLag.isPassed()
-                    && System.currentTimeMillis() - Kauri.INSTANCE.lastTick < 100L) {
-                if(vl > 0) Kauri.INSTANCE.loggerManager.addLog(data, this, info);
+            if(vl > 0) Kauri.INSTANCE.loggerManager.addLog(data, this, info);
 
-                if (lastAlert.isPassed(MathUtils.millisToTicks(Config.alertsDelay))) {
-                    //Sending Discord webhook alert
-                    if(DiscordAPI.INSTANCE != null)
-                        DiscordAPI.INSTANCE.sendFlag(data.getPlayer(), this, dev, vl);
-                    List<TextComponent> components = new ArrayList<>();
+            if (lastAlert.isPassed(MathUtils.millisToTicks(Config.alertsDelay))) {
+                //Sending Discord webhook alert
+                if(DiscordAPI.INSTANCE != null)
+                    DiscordAPI.INSTANCE.sendFlag(data.getPlayer(), this, dev, vl);
+                List<TextComponent> components = new ArrayList<>();
 
-                    if(dev) {
-                        components.add(new TextComponent(createTxt("&8[&cDev&8] ")));
-                    }
-                    val text = createTxt(Kauri.INSTANCE.msgHandler.getLanguage().msg("cheat-alert",
-                            "&8[&6&lKauri&8] &f%player% &7flagged &f%check%" +
-                                    " &8(&ex%vl%&8) %experimental%"), info);
-
-                    text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] {
-                            createTxt(Kauri.INSTANCE.msgHandler.getLanguage().msg("cheat-alert-hover",
-                                    "&eDescription&8: &f%desc%" +
-                                            "\n&eInfo: &f%info%\n&r\n&7&oClick to teleport to player."), info)}));
-                    text.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-                            formatAlert("/" + Config.alertCommand, info)));
-
-                    components.add(text);
-
-                    TextComponent[] toSend = components.toArray(new TextComponent[0]);
-
-                    if(Config.testMode && (dev ? !Kauri.INSTANCE.dataManager.hasAlerts.contains(data.uuid.hashCode())
-                            : !Kauri.INSTANCE.dataManager.devAlerts.contains(data.uuid.hashCode())))
-                        data.getPlayer().spigot().sendMessage(toSend);
-
-                    if(Config.alertsConsole) MiscUtils.printToConsole(new TextComponent(toSend).toPlainText());
-                    if(!dev) {
-                        synchronized (Kauri.INSTANCE.dataManager.hasAlerts) {
-                            for (int data : Kauri.INSTANCE.dataManager.hasAlerts.toArray(new int[0])) {
-                                Kauri.INSTANCE.dataManager.dataMap.get(data).getPlayer().spigot().sendMessage(toSend);
-                            }
-                        }
-                    } else {
-                        synchronized (Kauri.INSTANCE.dataManager.devAlerts) {
-                            for (int data : Kauri.INSTANCE.dataManager.devAlerts.toArray(new int[0])) {
-                                Kauri.INSTANCE.dataManager.dataMap.get(data).getPlayer().spigot().sendMessage(toSend);
-                            }
-                        }
-                    }
-                    lastAlert.reset();
+                if(dev) {
+                    components.add(new TextComponent(createTxt("&8[&cDev&8] ")));
                 }
+                val text = createTxt(Kauri.INSTANCE.msgHandler.getLanguage().msg("cheat-alert",
+                        "&8[&6&lKauri&8] &f%player% &7flagged &f%check%" +
+                                " &8(&ex%vl%&8) %experimental%"), info);
 
-                punish();
+                text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] {
+                        createTxt(Kauri.INSTANCE.msgHandler.getLanguage().msg("cheat-alert-hover",
+                                "&eDescription&8: &f%desc%" +
+                                        "\n&eInfo: &f%info%\n&r\n&7&oClick to teleport to player."), info)}));
+                text.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                        formatAlert("/" + Config.alertCommand, info)));
 
-                if (Config.bungeeAlerts) {
-                    try {
-                        Atlas.getInstance().getBungeeManager()
-                                .sendObjects("override", data.getPlayer().getUniqueId(), name,
-                                        MathUtils.round(vl, 2), info);
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                components.add(text);
+
+                TextComponent[] toSend = components.toArray(new TextComponent[0]);
+
+                if(Config.testMode && (dev ? !Kauri.INSTANCE.dataManager.hasAlerts.contains(data.uuid.hashCode())
+                        : !Kauri.INSTANCE.dataManager.devAlerts.contains(data.uuid.hashCode())))
+                    data.getPlayer().spigot().sendMessage(toSend);
+
+                if(Config.alertsConsole) MiscUtils.printToConsole(new TextComponent(toSend).toPlainText());
+                if(!dev) {
+                    synchronized (Kauri.INSTANCE.dataManager.hasAlerts) {
+                        for (int data : Kauri.INSTANCE.dataManager.hasAlerts.toArray(new int[0])) {
+                            Kauri.INSTANCE.dataManager.dataMap.get(data).getPlayer().spigot().sendMessage(toSend);
+                        }
                     }
+                } else {
+                    synchronized (Kauri.INSTANCE.dataManager.devAlerts) {
+                        for (int data : Kauri.INSTANCE.dataManager.devAlerts.toArray(new int[0])) {
+                            Kauri.INSTANCE.dataManager.dataMap.get(data).getPlayer().spigot().sendMessage(toSend);
+                        }
+                    }
+                }
+                lastAlert.reset();
+            }
+
+            punish();
+
+            if (Config.bungeeAlerts) {
+                try {
+                    Atlas.getInstance().getBungeeManager()
+                            .sendObjects("override", data.getPlayer().getUniqueId(), name,
+                                    MathUtils.round(vl, 2), info);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         });
