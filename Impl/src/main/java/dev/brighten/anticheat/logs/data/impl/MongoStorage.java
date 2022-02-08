@@ -299,9 +299,7 @@ public class MongoStorage implements DataStorage {
                 doc.put("dev", false);
 
                 alertsCollection.insertOne(doc);
-                System.out.println("update 1");
             } else {
-                System.out.println("update 2");
                 alertsCollection.updateOne(Filters.eq("uuid", uuid.toString()),
                         Updates.set("normal", alertsEnabled));
             }

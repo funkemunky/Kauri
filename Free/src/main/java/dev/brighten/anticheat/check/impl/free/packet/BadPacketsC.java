@@ -18,7 +18,7 @@ public class BadPacketsC extends Check {
 
     @Packet
     public void use(WrappedInHeldItemSlotPacket packet, long current) {
-        if(current - lastFlying < 10) {
+        if(current - lastFlying < 10 && data.lagInfo.lastPacketDrop.isPassed(2)) {
             vl++;
             if(vl > 11) {
                 flag("delta=%s", current - lastFlying);

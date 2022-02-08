@@ -125,10 +125,8 @@ public class ObjectData implements Data {
                     getPlayer().sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("alerts-on",
                             "&aYou are now viewing cheat alerts."));
                 }
-                System.out.println("Result: " + result);
             });
-            System.out.println("No result return");
-        } else System.out.println("no perm");
+        }
 
         if(getPlayer().hasPermission("kauri.command.alerts.dev")) {
             Kauri.INSTANCE.loggerManager.storage.devAlertsStatus(uuid, result -> {

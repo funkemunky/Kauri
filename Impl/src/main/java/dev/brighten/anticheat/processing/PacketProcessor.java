@@ -754,8 +754,8 @@ public class PacketProcessor {
                data.blockUpdates++;
                data.playerInfo.lastGhostCollision.reset();
 
-               data.runKeepaliveAction(ka -> {
-                   if(data.blockUpdates > 0) data.blockUpdates--;
+               data.runInstantAction(ka -> {
+                   if(ka.isEnd() && data.blockUpdates > 0) data.blockUpdates--;
                });
                break;
             }
