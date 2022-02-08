@@ -58,6 +58,9 @@ public class VelocityC extends Check {
                 pvX = pvZ = 0;
                 buffer-= buffer > 0 ? 1 : 0;
                 return;
+            } else if(data.playerInfo.doingBlockUpdate) {
+                pvX = pvZ = 0;
+                return;
             }
 
             if(data.playerInfo.lClientGround) {

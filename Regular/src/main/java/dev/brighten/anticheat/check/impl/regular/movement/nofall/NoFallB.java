@@ -32,7 +32,7 @@ public class NoFallB extends Check {
                 //And are no where near blocks
                 && !data.blockInfo.blocksBelow && !data.blockInfo.blocksNear
                 //And didn't collide with ghost blocks recently
-                && data.playerInfo.lastGhostCollision.isPassed(20)) {
+                && data.playerInfo.lastGhostCollision.isPassed(6)) {
             groundBuffer+= 15;
 
             if(groundBuffer > 35) {

@@ -13,7 +13,7 @@ import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Fly (D)", description = "Air modification check", checkType = CheckType.FLIGHT,
-        devStage = DevStage.BETA, executable = true, punishVL = 3)
+        devStage = DevStage.BETA, executable = true, punishVL = 5, vlToFlag = 2)
 @Cancellable(cancelType = CancelType.MOVEMENT)
 public class FlyD extends Check {
 
@@ -23,6 +23,7 @@ public class FlyD extends Check {
                 || data.playerInfo.flightCancel
                 || (data.playerInfo.nearGroundTimer.isNotPassed(3) && (data.playerInfo.lClientGround
                 || data.playerInfo.clientGround))
+                || data.playerInfo.lastGhostCollision.isNotPassed(3)
                 || data.playerInfo.lastBlockPlace.isNotPassed(3)
                 || data.playerInfo.lastVelocity.isNotPassed(8)
         ) return;

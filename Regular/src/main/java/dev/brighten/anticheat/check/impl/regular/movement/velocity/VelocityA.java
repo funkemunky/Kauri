@@ -25,6 +25,9 @@ public class VelocityA extends Check {
             if(data.playerInfo.velocityY > 0.1)
                 vY = data.playerInfo.velocityY;
             data.playerInfo.cva = false;
+        }  else if(data.playerInfo.doingBlockUpdate) {
+            vY = 0;
+            return;
         }
 
         //If any of these conditions aren't met, we don't want to make checking for vertical velocity.

@@ -39,7 +39,7 @@ public class FlyB extends Check {
 
 
         if(data.playerInfo.serverGround || packet.getY() % (0.015625) == 0
-                || data.playerInfo.lastBlockPlace.isNotPassed(1)) {
+                || data.playerInfo.lastGhostCollision.isNotPassed(1)) {
             vertical = 0;
 
             pistonBelow = data.blockInfo.pistonNear && data.playerInfo.slimeTimer.isNotPassed(20);

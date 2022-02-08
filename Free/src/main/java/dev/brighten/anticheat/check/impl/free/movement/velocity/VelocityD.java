@@ -39,7 +39,7 @@ public class VelocityD extends Check {
         }
 
         //if the player took velocity, we reset.
-        if(data.playerInfo.deltaY > 0 || !data.playerInfo.serverGround || !data.playerInfo.checkMovement) {
+        if(data.playerInfo.deltaY > 0 || data.playerInfo.doingBlockUpdate || !data.playerInfo.serverGround || !data.playerInfo.checkMovement) {
             vY = 0;
             buffer = 0;
             return;

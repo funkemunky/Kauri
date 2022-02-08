@@ -100,7 +100,7 @@ public class Load {
             }
 
             startClassLoader();
-        } else {
+        } else if(!Check.isCheck("Hitboxes")) {
             register("Initializing checks...");
 
             try {

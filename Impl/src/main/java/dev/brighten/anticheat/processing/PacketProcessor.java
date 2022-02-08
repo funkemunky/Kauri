@@ -748,11 +748,11 @@ public class PacketProcessor {
                 break;
             }
             case Packet.Server.BLOCK_CHANGE:
-            case "PacketPlayOutMapChunk":
             case "PacketPlayOutMultiBlockChange": {
                int randomInt = ThreadLocalRandom.current().nextInt(-10000, 10000);
 
                data.blockUpdates++;
+               data.playerInfo.lastGhostCollision.reset();
 
                data.runKeepaliveAction(ka -> {
                    if(data.blockUpdates > 0) data.blockUpdates--;

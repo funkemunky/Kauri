@@ -107,7 +107,7 @@ public class KauriCommand extends BaseCommand {
                     player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("alerts-none",
                             "&cYou are no longer viewing cheat alerts."));
                 }
-                Kauri.INSTANCE.loggerManager.storage.updateAlerts(data.getUUID(), hasAlerts);
+                Kauri.INSTANCE.loggerManager.storage.updateAlerts(data.getUUID(), !hasAlerts);
             }
         } else player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("data-error",
                 "&cThere was an error trying to find your data."));
@@ -132,7 +132,7 @@ public class KauriCommand extends BaseCommand {
                     player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("dev-alerts-none",
                             "&cYou are no longer viewing developer cheat alerts."));
                 }
-                Kauri.INSTANCE.loggerManager.storage.updateDevAlerts(data.getUUID(), hasDevAlerts);
+                Kauri.INSTANCE.loggerManager.storage.updateDevAlerts(data.getUUID(), !hasDevAlerts);
             }
         } else player.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage().msg("data-error",
                 "&cThere was an error trying to find your data."));
@@ -417,7 +417,7 @@ public class KauriCommand extends BaseCommand {
     @CommandPermission("kauri.command.recentlogs")
     public void onRecentLogs(Player player) {
         player.sendMessage(Color.Green + "Finding recent violators...");
-        MenuCommand.getRecentViolatorsMenu(false).showMenu(player);
+        Kauri.INSTANCE.executor.execute(() -> MenuCommand.getRecentViolatorsMenu(false).showMenu(player));
     }
 
     @Subcommand("reload")

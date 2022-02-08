@@ -62,6 +62,9 @@ public class VelocityB extends Check {
                         data.lagInfo.lastPingDrop.getPassed(), data.lagInfo.lastPacketDrop.getPassed(),
                         data.blockInfo.blocksAbove);
                 return;
+            } else if(data.playerInfo.doingBlockUpdate) {
+                pvX = pvZ = 0;
+                return;
             }
 
             if(data.playerInfo.lClientGround) {

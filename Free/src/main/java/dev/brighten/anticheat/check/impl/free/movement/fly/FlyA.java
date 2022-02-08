@@ -25,7 +25,8 @@ public class FlyA extends Check {
         if(packet.isPos() && (data.playerInfo.deltaXZ > 0 || data.playerInfo.deltaY != 0)) {
             //We check if the player is in ground, since theoretically the y should be zero.
             double lDeltaY = data.playerInfo.lClientGround ? 0 : data.playerInfo.lDeltaY;
-            boolean onGround = data.playerInfo.clientGround && data.blockInfo.blocksBelow;
+            boolean onGround = data.playerInfo.clientGround
+                    && (data.blockInfo.blocksBelow || data.playerInfo.lastGhostCollision.isNotPassed(8));
             double predicted = onGround ? lDeltaY : (lDeltaY - 0.08) * mult;
 
             if(data.playerInfo.lClientGround && !onGround && data.playerInfo.deltaY > 0) {
@@ -55,11 +56,12 @@ public class FlyA extends Check {
                     && data.playerInfo.lastBlockPlace.isPassed(5)
                     && data.playerInfo.lastVelocity.isPassed(3)
                     && !data.playerInfo.serverGround
+                    && !data.playerInfo.lastGhostCollision.isPassed(3)
                     && data.playerInfo.climbTimer.isPassed(15)
                     && data.playerInfo.blockAboveTimer.isPassed(5)
                     && deltaPredict > 0.016) {
                 flagged = true;
-                if(++buffer > 2) {
+                if(++buffer > 3) {
                     ++vl;
                     flag("dY=%.3f p=%.3f dx=%.3f", data.playerInfo.deltaY, predicted,
                             data.playerInfo.deltaXZ);
