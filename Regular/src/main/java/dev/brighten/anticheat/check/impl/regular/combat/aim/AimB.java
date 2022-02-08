@@ -14,7 +14,7 @@ import dev.brighten.api.check.DevStage;
 import java.util.List;
 
 @CheckInfo(name = "Aim (B)", description = "Checks for common denominators in pitch difference.",
-        checkType = CheckType.AIM, punishVL = 45, devStage = DevStage.BETA)
+        checkType = CheckType.AIM, punishVL = 20, devStage = DevStage.RELEASE)
 public class AimB extends Check {
 
     private float buffer;

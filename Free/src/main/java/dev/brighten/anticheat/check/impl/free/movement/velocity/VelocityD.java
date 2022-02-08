@@ -11,8 +11,8 @@ import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
-@CheckInfo(name = "Velocity (D)", description = "Checks if a player takes no velocity",
-        checkType = CheckType.VELOCITY, punishVL = 3, planVersion = KauriVersion.FREE, executable = true, devStage = DevStage.BETA)
+@CheckInfo(name = "Velocity (D)", description = "Checks if a player responded to velocity",
+        checkType = CheckType.VELOCITY, punishVL = 5, planVersion = KauriVersion.FREE, devStage = DevStage.BETA)
 @Cancellable(cancelType = CancelType.MOVEMENT)
 public class VelocityD extends Check {
 
@@ -26,40 +26,44 @@ public class VelocityD extends Check {
     @Packet
     public void onVelocity(WrappedOutVelocityPacket packet) {
         if(packet.getId() == data.getPlayer().getEntityId() && packet.getY() > 0.1) {
-            vY = packet.getY();
-            lastVelocity.reset();
+            data.runKeepaliveAction(ka -> {
+                vY = packet.getY();
+                lastVelocity.reset();
+            });
         }
     }
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if(vY <= 0) {
-            buffer = 0;
-            return;
-        }
+        if(vY <= 0) return;
 
-        //if the player took velocity, we reset.
-        if(data.playerInfo.deltaY > 0 || data.playerInfo.doingBlockUpdate || !data.playerInfo.serverGround || !data.playerInfo.checkMovement) {
+        //Player took velocity
+        if(Math.abs(data.playerInfo.deltaY - vY) < 1E-4) {
+            if(buffer > 0) buffer--;
+            debug("Reset velocity: dy=%.4f vy=%.4f", data.playerInfo.deltaY, vY);
             vY = 0;
-            buffer = 0;
             return;
         }
 
-        if(data.playerInfo.blockAboveTimer.isPassed(4)
-                && lastVelocity.isPassed(data.lagInfo.transPing + 3)
-                && data.playerInfo.liquidTimer.isPassed(4)
-                && data.playerInfo.webTimer.isPassed(4)
-                && data.playerInfo.lastMoveTimer.isNotPassed(2)
-                && data.lagInfo.lastPacketDrop.isPassed(5)) {
+        //All potential causes of false positives
+        if(data.playerInfo.doingBlockUpdate
+                || data.playerInfo.webTimer.isNotPassed(3)
+                || data.playerInfo.liquidTimer.isNotPassed(3)
+                || data.playerInfo.slimeTimer.isNotPassed(2)
+                || data.blockInfo.inScaffolding
+                || data.blockInfo.inHoney
+                || data.playerInfo.blockAboveTimer.isNotPassed(2)) {
+            vY = 0;
+            debug("Potential false flag");
+            return;
+        }
 
-            if(++buffer > bufferThreshold) {
+        if(lastVelocity.isPassed(4)) {
+            if(++buffer > 2) {
                 vl++;
-                flag("v=%.3f dy=%.3f g=%s", vY, data.playerInfo.deltaY, data.playerInfo.clientGround);
-                vY = 0;
-                buffer = 0;
+                flag("lv=%s", lastVelocity.getPassed());
             }
-
-            debug("Flagged: " + buffer);
-        } else buffer = 0;
+            vY = 0;
+        }
     }
 }
