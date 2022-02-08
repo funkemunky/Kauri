@@ -318,7 +318,7 @@ public class FlatfileStorage implements DataStorage {
     public void updateAlerts(UUID uuid, boolean alertsEnabled) {
         Kauri.INSTANCE.loggingThread.execute(() -> {
             if(alertsEnabled) {
-                Query.prepare("insert into `alerts` (`uuid`) ? ON DUPLICATE KEY UPDATE")
+                Query.prepare("insert into `alerts` (`uuid`) values (?)")
                         .append(uuid.toString()).execute();
             } else Query.prepare("delete from `alerts` where `uuid` = ?").append(uuid.toString()).execute();
         });
@@ -328,7 +328,7 @@ public class FlatfileStorage implements DataStorage {
     public void updateDevAlerts(UUID uuid, boolean devAlertsEnabled) {
         Kauri.INSTANCE.loggingThread.execute(() -> {
             if(devAlertsEnabled) {
-                Query.prepare("insert into `dev_alerts` (`uuid`) ? ON DUPLICATE KEY UPDATE")
+                Query.prepare("insert into `dev_alerts` (`uuid`) values (?)")
                         .append(uuid.toString()).execute();
             } else Query.prepare("delete from `dev_alerts` where `uuid` = ?").append(uuid.toString()).execute();
         });
@@ -337,16 +337,24 @@ public class FlatfileStorage implements DataStorage {
     @Override
     public void alertsStatus(UUID uuid, Consumer<Boolean> result) {
         Kauri.INSTANCE.loggingThread.execute(() -> {
-            Query.prepare("select * from `alerts` where `uuid` = ?").append(uuid.toString())
-                    .executeSingle(rs -> result.accept(rs != null));
+            try {
+                result.accept(Query.prepare("select * from `alerts` where `uuid` = ?").append(uuid.toString())
+                        .executeQuery().next());
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         });
     }
 
     @Override
     public void devAlertsStatus(UUID uuid, Consumer<Boolean> result) {
         Kauri.INSTANCE.loggingThread.execute(() -> {
-            Query.prepare("select * from `dev_alerts` where `uuid` = ?").append(uuid.toString())
-                    .executeSingle(rs -> result.accept(rs != null));
+            try {
+                result.accept(Query.prepare("select * from `dev_alerts` where `uuid` = ?").append(uuid.toString())
+                        .executeQuery().next());
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         });
     }
 }

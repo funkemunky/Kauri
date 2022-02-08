@@ -294,7 +294,7 @@ public class MySQLStorage implements DataStorage {
     public void updateAlerts(UUID uuid, boolean alertsEnabled) {
         Kauri.INSTANCE.loggingThread.execute(() -> {
             if(alertsEnabled) {
-                Query.prepare("insert into `ALERTS` (`UUID`) ? ON DUPLICATE KEY UPDATE")
+                Query.prepare("insert into `ALERTS` (`UUID`) values (?)")
                         .append(uuid.toString()).execute();
             } else Query.prepare("delete from `ALERTS` where `UUID` = ?").append(uuid.toString()).execute();
         });
@@ -304,7 +304,7 @@ public class MySQLStorage implements DataStorage {
     public void updateDevAlerts(UUID uuid, boolean devAlertsEnabled) {
         Kauri.INSTANCE.loggingThread.execute(() -> {
             if(devAlertsEnabled) {
-                Query.prepare("insert into `DEV_ALERTS` (`UUID`) ? ON DUPLICATE KEY UPDATE")
+                Query.prepare("insert into `DEV_ALERTS` (`UUID`) values (?)")
                         .append(uuid.toString()).execute();
             } else Query.prepare("delete from `DEV_ALERTS` where `UUID` = ?").append(uuid.toString()).execute();
         });
