@@ -23,7 +23,9 @@ public class MySQLConfig {
     @ConfigSetting(path = "database.mysql", name = "port", hide = true)
     public static int port = 3306;
 
-    @ConfigSetting(path = "database.mysql", name = "debugMessages")
+    @ConfigSetting(path = "database.mysql", name = "debugMessages",
+            comment = "This will insert debug messages into console about MySQL insertion, among other things.\n" +
+            "Recommended to keep disabled unless otherwise instructed.")
     public static boolean debugMessages = false;
 
     @ConfigSetting(path = "database.mysql", name = "insertionRate")

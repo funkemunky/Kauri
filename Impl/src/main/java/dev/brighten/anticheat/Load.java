@@ -26,6 +26,7 @@ import dev.brighten.api.KauriAPI;
 import dev.brighten.api.KauriVersion;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
+import org.simpleyaml.configuration.comments.CommentType;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -55,7 +56,14 @@ public class Load {
         Bukkit.getOnlinePlayers().forEach(ThreadHandler::addPlayer);
 
         register("Loading config...");
-        Atlas.getInstance().registerConfig(Kauri.INSTANCE);
+        Atlas.getInstance().registerConfig(Kauri.INSTANCE)
+                .setComment("", "# ######################################################## #\n" +
+                "#                    Kauri Configuration                   #\n" +
+                "# ######################################################## #\n" +
+                "#\n" +
+                "# Configure which methods of storage Kauri will use for storing settings, logs, and other data.\n" +
+                "# If MySQL and Mongo are not used, Kauri will default to a local Kauri.db file using the SQLLite format\n" +
+                "# for storage within the plugin folder.", CommentType.BLOCK);
 
         register("Loading messages...");
         Kauri.INSTANCE.msgHandler = new MessageHandler(Kauri.INSTANCE);
