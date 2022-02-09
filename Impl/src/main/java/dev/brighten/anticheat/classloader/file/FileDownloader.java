@@ -31,7 +31,7 @@ public class FileDownloader {
         try {
             this.link = new URL(link);
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+
         }
     }
 
@@ -57,20 +57,18 @@ public class FileDownloader {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+
         } finally {
             if (inputStream != null) {
                 try {
                     inputStream.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
                 }
             }
             if (fos != null) {
                 try {
                     fos.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
                 }
             }
         }

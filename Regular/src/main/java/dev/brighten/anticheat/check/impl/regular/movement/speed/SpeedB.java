@@ -33,6 +33,7 @@ public class SpeedB extends Check {
             //Calculating the direction/angle change between last and current location
             double deltaAngle = Math.abs(angle - lastAngle);
 
+            //1.5 is a guessed number based on past experience. Could be tighter or it could false flag.
             if(deltaAngle > 1.5f) {
                 if(++buffer > 4) {
                     vl++;
