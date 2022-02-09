@@ -78,7 +78,6 @@ public class MiscUtils {
 
         ban.vl = 2;
         ban.flag("Banning user for: " + reason);
-        ban.punish();
     }
 
     public static float clampToVanilla(float s, float angle) {

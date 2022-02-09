@@ -22,7 +22,9 @@ import dev.brighten.api.check.DevStage;
 public class TimerB extends Check {
 
     private long totalTimer = -1, noLagStreak;
-    private final Timer lastFlag = new MillisTimer(2000L), lastFlyingAdd = new MillisTimer();
+    private final Timer lastFlag = new MillisTimer(2000L),
+            lastReset = new TickTimer(),
+            lastFlyingAdd = new MillisTimer();
     private int buffer;
     private long timeBeforeReset;
     private boolean flying, justReset;
@@ -48,9 +50,9 @@ public class TimerB extends Check {
 
         check: {
             //This means we haven't started counting
-            if(totalTimer == -1 || now - data.creation < 2000L) {
-                totalTimer = now - 100;
-                debug("Reset time");
+            if(totalTimer == -1) {
+                totalTimer = data.creation - 50;
+                debug("Set base time");
             }
             //Every flying should take 50ms to send in between. So for every flying, we add 50ms to the totalTime.
             else totalTimer+= 50;
@@ -67,7 +69,8 @@ public class TimerB extends Check {
             if(Math.abs(delta) > 2000L
                     && noLagStreak > 5) {
                 timeBeforeReset = totalTimer; //We are setting this just in case the player lags the next tick.
-                totalTimer = now - 50;
+                totalTimer = now - 100;
+                lastReset.reset();
                 debug("Reset time");
                 justReset = true;
             } else if(justReset) {
@@ -84,9 +87,9 @@ public class TimerB extends Check {
                     && !isLagProblem) {
                 if (++buffer > 4) {
                     vl++;
-                    flag("p=%s;d=%s", data.lagInfo.lastPacketDrop.getPassed(), delta);
+                    flag("p=%s;d=%s;r=%s", data.lagInfo.lastPacketDrop.getPassed(), delta, lastReset.getPassed());
                 }
-                totalTimer = now - 50;
+                totalTimer = now - 80;
                 debug("Reset time");
                 lastFlag.reset();
             } else if(lastFlag.isPassed(5000L)) buffer = 0;

@@ -24,17 +24,6 @@ public class NoFallA extends Check {
                 ? Math.abs(data.playerInfo.deltaY) > 0.007
                 : data.playerInfo.deltaY == 0 && data.playerInfo.lDeltaY == 0;
 
-        if(data.playerInfo.deltaY < 0 && data.playerInfo.clientGround && flag) {
-            for (SimpleCollisionBox sBox : data.blockInfo.belowCollisions) {
-                double minDelta = sBox.yMax - data.playerInfo.from.y;
-
-                if(MathUtils.getDelta(data.playerInfo.deltaY, minDelta) < 1E-7) {
-                    flag = false;
-                    break;
-                }
-            }
-        }
-
         if(!data.playerInfo.flightCancel
                 && data.playerInfo.lastHalfBlock.isPassed(4)
                 && !data.blockInfo.onSlime

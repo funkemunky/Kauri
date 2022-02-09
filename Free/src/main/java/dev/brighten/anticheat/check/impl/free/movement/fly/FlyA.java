@@ -25,7 +25,8 @@ public class FlyA extends Check {
         if(packet.isPos() && (data.playerInfo.deltaXZ > 0 || data.playerInfo.deltaY != 0)) {
             //We check if the player is in ground, since theoretically the y should be zero.
             double lDeltaY = data.playerInfo.lClientGround ? 0 : data.playerInfo.lDeltaY;
-            boolean onGround = data.playerInfo.clientGround;
+            boolean onGround = data.playerInfo.clientGround && (data.playerInfo.nearGround
+                    || data.playerInfo.doingBlockUpdate);
             double predicted = onGround ? lDeltaY : (lDeltaY - 0.08) * mult;
 
             if(data.playerInfo.lClientGround && !onGround && data.playerInfo.deltaY > 0) {

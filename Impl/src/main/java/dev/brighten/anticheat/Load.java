@@ -88,37 +88,39 @@ public class Load {
         register("Registering logging...");
         Kauri.INSTANCE.loggerManager = new LoggerManager();
 
-        if(SystemUtil.enabled
-                && !SystemUtil.license.equals("Insert Kauri Ara license here")) {
-            register("Initializing checks...");
-            try {
-                Kauri.INSTANCE.LINK = "https://funkemunky.cc/download?name=Kauri_New&license="
-                        + URLEncoder.encode(SystemUtil.license, "UTF-8")
-                        + "&version=" + URLEncoder.encode(Kauri.INSTANCE.getDescription().getVersion(), "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+        Kauri.INSTANCE.executor.execute(() -> {
+            if(SystemUtil.enabled
+                    && !SystemUtil.license.equals("Insert Kauri Ara license here")) {
+                register("Initializing checks...");
+                try {
+                    Kauri.INSTANCE.LINK = "https://funkemunky.cc/download?name=Kauri_New&license="
+                            + URLEncoder.encode(SystemUtil.license, "UTF-8")
+                            + "&version=" + URLEncoder.encode(Kauri.INSTANCE.getDescription().getVersion(), "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+
+                startClassLoader();
+            } else if(!Check.isCheck("Hitboxes")) {
+                register("Initializing checks...");
+
+                try {
+                    Kauri.INSTANCE.LINK = "https://funkemunky.cc/download?name=Kauri_New&license="
+                            + URLEncoder.encode(Pastebin.userId() + ";;" + Pastebin.nonce(), "UTF-8")
+                            + "&version=" + URLEncoder.encode(Kauri.INSTANCE.getDescription().getVersion(), "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+
+                startClassLoader();
             }
-
-            startClassLoader();
-        } else if(!Check.isCheck("Hitboxes")) {
-            register("Initializing checks...");
-
-            try {
-                Kauri.INSTANCE.LINK = "https://funkemunky.cc/download?name=Kauri_New&license="
-                        + URLEncoder.encode(Pastebin.userId() + ";;" + Pastebin.nonce(), "UTF-8")
-                        + "&version=" + URLEncoder.encode(Kauri.INSTANCE.getDescription().getVersion(), "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-
-            startClassLoader();
-        }
-
-        register("Setting the language to " + Color.Yellow + Config.language);
-        Kauri.INSTANCE.msgHandler.setCurrentLang(Config.language);
+        });
 
         register("Registering checks...");
         Check.registerChecks();
+
+        register("Setting the language to " + Color.Yellow + Config.language);
+        Kauri.INSTANCE.msgHandler.setCurrentLang(Config.language);
 
         register("Discord Webhooks...");
         if (DiscordAPI.INSTANCE != null) DiscordAPI.INSTANCE.load();
