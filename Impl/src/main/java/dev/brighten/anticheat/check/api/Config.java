@@ -24,7 +24,7 @@ public class Config {
     @ConfigSetting(path = "punishments", name = "bungeeCommand")
     static boolean bungeePunishments = false;
 
-    @ConfigSetting(path = "no-premium-uuid")
+    @ConfigSetting(name = "no-premium-uuid")
     public static boolean noPremiumUUID = false;
 
     @ConfigSetting(path = "punishments", name = "bungeeBroadcast")

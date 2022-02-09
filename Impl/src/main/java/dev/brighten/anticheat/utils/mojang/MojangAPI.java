@@ -1,11 +1,14 @@
 package dev.brighten.anticheat.utils.mojang;
 
 import dev.brighten.anticheat.Kauri;
+import dev.brighten.anticheat.check.api.Config;
 import dev.brighten.db.utils.json.JSONArray;
 import dev.brighten.db.utils.json.JSONException;
 import dev.brighten.db.utils.json.JSONObject;
 import dev.brighten.db.utils.json.JsonReader;
 import lombok.val;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -67,19 +70,26 @@ public class MojangAPI {
     }
 
     public static UUID lookupUUID(String playername) {
-        try {
-            JSONObject object = JsonReader
-                    .readJsonFromUrl("https://api.mojang.com/users/profiles/minecraft/" + playername);
+        if (!Config.noPremiumUUID) {
+            try {
+                JSONObject object = JsonReader
+                        .readJsonFromUrl("https://api.mojang.com/users/profiles/minecraft/" + playername);
 
-            if(object.has("id")) {
-                UUID uuid = formatFromMojangUUID(object.getString("id"));
+                if (object.has("id")) {
+                    UUID uuid = formatFromMojangUUID(object.getString("id"));
 
-                return uuid;
+                    return uuid;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                //Empty catch clause
             }
-        } catch (IOException | JSONException e) {
-            e.printStackTrace();
         }
 
+        OfflinePlayer player = Bukkit.getOfflinePlayer(playername);
+
+        if(player != null) return player.getUniqueId();
         return null;
     }
 
