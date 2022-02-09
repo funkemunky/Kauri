@@ -63,18 +63,27 @@ public class MongoStorage implements DataStorage {
         nameUUIDCollection = database.getCollection("nameUuid");
         alertsCollection = database.getCollection("alertsStatus");
 
-        MiscUtils.printToConsole("&7Creating indexes for logs...");
-        AtomicInteger indexes = new AtomicInteger();
-        logsCollection.listIndexes().forEach((Consumer<? super Document>) doc -> indexes.getAndIncrement());
-        if(indexes.get() < 2) {
-            logsCollection.createIndex(Indexes.ascending("uuid"));
-            logsCollection.createIndex(Indexes.ascending("check"));
-            logsCollection.createIndex(Indexes.ascending("vl"));
-        }
-        MiscUtils.printToConsole("&aCompleted index creation!");
-        MiscUtils.printToConsole("&7Creating index for punishments...");
-        punishmentsCollection.createIndex(Indexes.ascending("uuid"));
-        MiscUtils.printToConsole("&aCompleted index creation!");
+        Kauri.INSTANCE.loggingThread.execute(() -> {
+            AtomicInteger indexes = new AtomicInteger();
+            logsCollection.listIndexes().forEach((Consumer<? super Document>) doc -> indexes.getAndIncrement());
+            if(indexes.get() < 4) {
+                MiscUtils.printToConsole("&7Creating indexes for logs...");
+                MiscUtils.printToConsole("&oCreating uuid index...");
+                logsCollection.createIndex(Indexes.ascending("uuid"));
+                MiscUtils.printToConsole("&oCreating check index...");
+                logsCollection.createIndex(Indexes.ascending("check"));
+                MiscUtils.printToConsole("&oCreating vl index...");
+                logsCollection.createIndex(Indexes.ascending("vl"));
+                MiscUtils.printToConsole("&aCompleted index creation!");
+            }
+            indexes.set(0);
+            logsCollection.listIndexes().forEach((Consumer<? super Document>) doc -> indexes.getAndIncrement());
+            if(indexes.get() < 2) {
+                MiscUtils.printToConsole("&7Creating index for punishments...");
+                punishmentsCollection.createIndex(Indexes.ascending("uuid"));
+                MiscUtils.printToConsole("&aCompleted index creation!");
+            }
+        });
 
         task = RunUtils.taskTimerAsync(() -> {
             Document doc = null;

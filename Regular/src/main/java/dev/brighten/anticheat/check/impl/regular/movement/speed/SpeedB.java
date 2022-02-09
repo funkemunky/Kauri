@@ -4,9 +4,10 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.api.check.CheckType;
+import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Speed (B)", description = "Looks for direction changing in air, primarily AirStrafe.",
-        checkType = CheckType.SPEED, punishVL = 8, vlToFlag = 2, executable = true)
+        checkType = CheckType.SPEED, punishVL = 10, vlToFlag = 2, devStage = DevStage.ALPHA)
 @Cancellable
 public class SpeedB extends Check {
 
@@ -33,15 +34,16 @@ public class SpeedB extends Check {
             //Calculating the direction/angle change between last and current location
             double deltaAngle = Math.abs(angle - lastAngle);
 
-            //1.5 is a guessed number based on past experience. Could be tighter or it could false flag.
-            if(deltaAngle > 1.5f) {
+            //2.5 is a guessed number based on past experience. Could be tighter or it could false flag.
+            if((deltaAngle > 5.5f && data.playerInfo.deltaXZ > 0.2) || deltaAngle % 45. < 0.01) {
                 if(++buffer > 4) {
                     vl++;
                     flag("d=%.2f a=%.1f at=%s", deltaAngle, angle, data.playerInfo.airTicks);
                 }
             } else if(buffer > 0) buffer-= 0.5f;
 
-            debug("b=%.1f a=%.1f d=%.2f at=%s", buffer, angle, deltaAngle, data.playerInfo.airTicks);
+            debug("b=%.1f a=%.1f d=%.2f at=%s dxz=%.2f", buffer, angle, deltaAngle,
+                    data.playerInfo.airTicks, data.playerInfo.deltaXZ);
         }
         lastAngle = angle;
     }
