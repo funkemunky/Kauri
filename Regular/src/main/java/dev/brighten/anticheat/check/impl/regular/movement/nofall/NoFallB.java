@@ -33,14 +33,15 @@ public class NoFallB extends Check {
                 && !data.blockInfo.blocksBelow && !data.blockInfo.blocksNear
                 //And didn't collide with ghost blocks recently
                 && data.playerInfo.lastGhostCollision.isPassed(6)) {
-            groundBuffer+= 15;
+            groundBuffer+= 4;
 
-            if(groundBuffer > 35) {
+            if(groundBuffer > 19) {
                 vl++;
+                groundBuffer = 25;
                 flag(200, "T=SPOOF_GROUND dy=%.2f y=%.1f", data.playerInfo.deltaY, data.playerInfo.to.y);
             }
             fixMovementBugs();
-        } else if(groundBuffer > 0) groundBuffer-= 2;
+        } else if(groundBuffer > 0) groundBuffer-= 1;
 
 
         final boolean dground = data.playerInfo.to.y % divisor < 1E-4 && data.playerInfo.nearGround;
