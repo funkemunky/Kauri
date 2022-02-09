@@ -56,7 +56,7 @@ public class FlyA extends Check {
                     && data.playerInfo.lastBlockPlace.isPassed(5)
                     && data.playerInfo.lastVelocity.isPassed(3)
                     && !data.playerInfo.serverGround
-                    && !data.playerInfo.lastGhostCollision.isPassed(3)
+                    && data.playerInfo.lastGhostCollision.isPassed(3)
                     && data.playerInfo.climbTimer.isPassed(15)
                     && data.playerInfo.blockAboveTimer.isPassed(5)
                     && deltaPredict > 0.016) {

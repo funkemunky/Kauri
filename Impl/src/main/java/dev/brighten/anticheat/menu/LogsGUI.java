@@ -27,31 +27,36 @@ public class LogsGUI extends ChestMenu {
     private List<Log> logs = new ArrayList<>();
     private BukkitTask updaterTask;
     private AtomicInteger currentPage = new AtomicInteger(1);
-    private OfflinePlayer player;
+    private UUID player;
+    private String playerName;
     private Player shown;
     private Set<String> filtered = new HashSet<>();
 
-    public LogsGUI(OfflinePlayer player) {
+    public LogsGUI(String name, UUID player) {
         super("Violations", 6);
 
         this.player = player;
         updateLogs();
+        
+        this.playerName = name;
+        this.player = player;
 
-        setTitle(Color.Gray + player.getName() + "'s Logs");
+        setTitle(Color.Gray + name + "'s Logs");
 
         setButtons(1);
         buildInventory(true);
     }
 
-    public LogsGUI(OfflinePlayer player, int page) {
-        super(player.getName() + "'s Logs", 6);
+    public LogsGUI(String name, UUID player, int page) {
+        super(name + "'s Logs", 6);
 
+        this.playerName = name;
         this.player = player;
         currentPage.set(page);
         updateLogs();
         setButtons(page);
 
-        setTitle(Color.Gray + player.getName() + "'s Logs");
+        setTitle(Color.Gray + name + "'s Logs");
 
         buildInventory(true);
     }
@@ -99,32 +104,32 @@ public class LogsGUI extends ChestMenu {
             setItem(50, next);
         } else setItem(50, new FillerButton());
 
-        val punishments = Kauri.INSTANCE.loggerManager.getPunishments(player.getUniqueId());
+        val punishments = Kauri.INSTANCE.loggerManager.getPunishments(player);
 
         Button getPastebin = new Button(false, new ItemBuilder(XMaterial.PLAYER_HEAD.parseMaterial())
                 .amount(1)
                 .durability(3)
-                .owner(player.getName())
-                .name(Color.Red + player.getName())
+                .owner(playerName)
+                .name(Color.Red + playerName)
                 .lore("", "&7Page: &f" + page, "", "&6Punishments&8: &f" + punishments.size(), "",
                         "&e&oLeft click &7&oto view a summary of logs.",
                         (shown == null || shown.hasPermission("kauri.logs.share")
                                 ? "&e&oRight Click &7&oto get an &f&ounlisted &7&opastebin link of the logs."
                                 : "&c&o(No Permission) &e&o&mRight Click &7&o&mto get an &f&o&munlisted &7&o&mpastebin link of the logs."),
                         (shown == null || shown.hasPermission("kauri.logs.clear")
-                                ? "&e&oShift Left Click &7&oto &f&oclear &7&othe logs of " + player.getName()
-                                : "&c&o(No Permission) &e&o&mShift Right Click &7&o&mto &f&o&mclear &7&o&mthe logs of " + player.getName())).build(),
+                                ? "&e&oShift Left Click &7&oto &f&oclear &7&othe logs of " + playerName
+                                : "&c&o(No Permission) &e&o&mShift Right Click &7&o&mto &f&o&mclear &7&o&mthe logs of " + playerName)).build(),
                 (player, info) -> {
                     if (player.hasPermission("kauri.logs.share")) {
                         if (info.getClickType().isRightClick()) {
                             runFunction(info, "kauri.logs.share", () -> {
                                 close(player);
                                 player.sendMessage(Color.Green + "Logs: "
-                                        + LogCommand.getLogsFromUUID(LogsGUI.this.player.getUniqueId()));
+                                        + LogCommand.getLogsFromUUID(LogsGUI.this.player));
                             });
                         } else if (info.getClickType().isLeftClick() && info.getClickType().isShiftClick()) {
                             runFunction(info, "kauri.logs.clear",
-                                    () -> player.performCommand("kauri logs clear " + this.player.getName()));
+                                    () -> player.performCommand("kauri logs clear " + this.playerName));
                         } else if (info.getClickType().isLeftClick()) {
                             getSummary().showMenu(player);
                         }
@@ -174,7 +179,7 @@ public class LogsGUI extends ChestMenu {
     }
 
     private ChestMenu getSummary() {
-        ChestMenu summary = new ChestMenu(player.getName() + "'s Summary", 6);
+        ChestMenu summary = new ChestMenu(playerName + "'s Summary", 6);
 
         summary.setParent(this);
         Map<String, List<Log>> sortedLogs = new HashMap<>();
@@ -274,7 +279,7 @@ public class LogsGUI extends ChestMenu {
     }
 
     private void updateLogs() {
-        logs = Kauri.INSTANCE.loggerManager.getLogs(player.getUniqueId())
+        logs = Kauri.INSTANCE.loggerManager.getLogs(player)
                 .stream()
                 .sorted(Comparator.comparing(log -> log.timeStamp, Comparator.reverseOrder()))
                 .collect(Collectors.toList());

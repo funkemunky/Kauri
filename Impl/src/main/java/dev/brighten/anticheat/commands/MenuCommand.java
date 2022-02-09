@@ -520,11 +520,12 @@ public class MenuCommand extends BaseCommand {
                 builder.lore("", "&eCheck&7: &f" + vl.checkName, "&eVL&7: &f" + vl.vl, "&ePing&7: &f" + vl.ping,
                         "&eTPS&7: &f" + MathUtils.round(vl.tps, 2), "",
                         "&f&oShift-Left Click &7&oto view logs.");
+                String finalName = name;
                 menu.addItem(new Button(false, builder.build(),
                         (target, info) -> {
                             if (info.getClickType().equals(ClickType.SHIFT_LEFT)
                                     && target.hasPermission("kauri.command.logs")) {
-                                LogsGUI gui = new LogsGUI(Bukkit.getOfflinePlayer(uuid));
+                                LogsGUI gui = new LogsGUI(finalName, uuid);
                                 menu.setParent(null);
                                 menu.close(target);
                                 gui.setParent(info.getMenu());

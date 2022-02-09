@@ -9,6 +9,7 @@ import dev.brighten.anticheat.logs.objects.Punishment;
 import dev.brighten.anticheat.menu.LogsGUI;
 import dev.brighten.anticheat.utils.Pastebin;
 import dev.brighten.anticheat.utils.menu.preset.ConfirmationMenu;
+import dev.brighten.anticheat.utils.mojang.MojangAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -34,7 +35,7 @@ public class LogCommand extends BaseCommand {
             if(args.length == 0) {
                 if(sender instanceof Player) {
                     Player player = (Player) sender;
-                    LogsGUI gui = new LogsGUI(player);
+                    LogsGUI gui = new LogsGUI(player.getName(), player.getUniqueId());
                     RunUtils.task(() -> {
                         gui.showMenu(player);
                         sender.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
@@ -45,7 +46,7 @@ public class LogCommand extends BaseCommand {
                         .msg("no-console-logs",
                                 "&cYou cannot view your own logs since you are not a player."));
             } else {
-                OfflinePlayer player = Bukkit.getOfflinePlayer(args[0]);
+                UUID player = MojangAPI.lookupUUID(args[0]);
 
                 if(player == null) {
                     sender.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
@@ -55,7 +56,7 @@ public class LogCommand extends BaseCommand {
                 }
 
                 if(sender instanceof Player) {
-                    LogsGUI gui = new LogsGUI(player);
+                    LogsGUI gui = new LogsGUI(sender.getName(), player);
                     RunUtils.task(() -> {
                         gui.showMenu((Player) sender);
                         sender.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
@@ -63,8 +64,8 @@ public class LogCommand extends BaseCommand {
                     }, Kauri.INSTANCE);
                 } else sender.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
                         .msg("logs-pastebin",
-                                "&aLogs: %pastebin%".replace("%pastebin%",
-                                        getLogsFromUUID(player.getUniqueId()))));
+                                "&aLogs: %pastebin%").replace("%pastebin%",
+                                getLogsFromUUID(player)));
             }
         });
     }

@@ -747,17 +747,30 @@ public class PacketProcessor {
                 data.checkManager.runPacket(packet, timestamp);
                 break;
             }
-            case Packet.Server.BLOCK_CHANGE:
+            case Packet.Server.BLOCK_CHANGE: {
+                WrappedOutBlockChange blockChange = new WrappedOutBlockChange(object, data.getPlayer());
+
+                Location loc = new Location(data.getPlayer().getWorld(), blockChange.getPosition().getX(),
+                        blockChange.getPosition().getY(), blockChange.getPosition().getZ());
+
+                if(loc.distanceSquared(data.getPlayer().getLocation()) < 25) {
+                    data.blockUpdates++;
+                    data.playerInfo.lastGhostCollision.reset();
+
+                    data.runInstantAction(ka -> {
+                        if (ka.isEnd() && data.blockUpdates > 0) data.blockUpdates--;
+                    });
+                }
+                break;
+            }
             case "PacketPlayOutMultiBlockChange": {
-               int randomInt = ThreadLocalRandom.current().nextInt(-10000, 10000);
+                data.blockUpdates++;
+                data.playerInfo.lastGhostCollision.reset();
 
-               data.blockUpdates++;
-               data.playerInfo.lastGhostCollision.reset();
-
-               data.runInstantAction(ka -> {
-                   if(ka.isEnd() && data.blockUpdates > 0) data.blockUpdates--;
-               });
-               break;
+                data.runInstantAction(ka -> {
+                    if(ka.isEnd() && data.blockUpdates > 0) data.blockUpdates--;
+                });
+                break;
             }
             case Packet.Server.POSITION: {
                 WrappedOutPositionPacket packet = new WrappedOutPositionPacket(object, data.getPlayer());
