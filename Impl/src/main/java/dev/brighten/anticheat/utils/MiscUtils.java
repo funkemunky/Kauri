@@ -261,6 +261,10 @@ public class MiscUtils {
         return MathUtils.yawTo180D(playerRotation.getX() - expectedRotation.getX());
     }
 
+    public static double getAngle(KLocation loc1, KLocation loc2) {
+        return getAngle(loc1.toLocation(null), loc2.toLocation(null));
+    }
+
     public static float distanceBetweenAngles(float a, float b) {
         final float first = a % 360;
         final float second = b % 360;

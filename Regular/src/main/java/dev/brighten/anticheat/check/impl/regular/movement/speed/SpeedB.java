@@ -1,44 +1,47 @@
 package dev.brighten.anticheat.check.impl.regular.movement.speed;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import dev.brighten.anticheat.check.api.Cancellable;
-import dev.brighten.anticheat.check.api.Check;
-import dev.brighten.anticheat.check.api.CheckInfo;
-import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.check.api.*;
+import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "Speed (B)", description = "Checks for changing in air which should be impossible.",
+@CheckInfo(name = "Speed (B)", description = "Looks for direction changing in air, primarily AirStrafe.",
         checkType = CheckType.SPEED, punishVL = 8, vlToFlag = 2, executable = true)
 @Cancellable
 public class SpeedB extends Check {
 
-    private float verbose;
+    private double lastAngle;
+    private float buffer;
+
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if(data.playerInfo.deltaXZ > 0
-                && !data.excuseNextFlying
-                && !data.playerInfo.generalCancel) {
-            if(data.playerInfo.airTicks > 2 && !data.playerInfo.lClientGround && !data.playerInfo.clientGround) {
-                double accelX = data.playerInfo.deltaX - data.playerInfo.lDeltaX;
-                double accelZ = data.playerInfo.deltaZ - data.playerInfo.lDeltaZ;
-                double hypot = (accelX * accelX) + (accelZ * accelZ);
+    public void onFlying(WrappedInFlyingPacket packet) {
+        //This gets the movement direction of the player. We want the absolute value to prevent false positives.
+        //from 180 to -180, which doing a delta check would be 360, but really the angle difference is less than 1.
+        double angle = Math.abs(MiscUtils.getAngle(data.playerInfo.to, data.playerInfo.from));
 
-                if(hypot > 0.01 //0.1*0.1
-                        && !data.blockInfo.blocksNear
-                        && data.playerInfo.lastVelocity.isPassed(8)
-                        && !data.blockInfo.inLiquid
-                        && data.playerInfo.lastHalfBlock.isPassed(10)
-                        && (accelX > -0.0049 || accelZ > -0.0049) //0.07*0.07
-                        && data.playerInfo.lastBlockPlace.isPassed(7)) {
-                    if(verbose++ > 2) {
-                        vl++;
-                        flag("x=%.3f z=%.3f",
-                                accelX, accelZ);
-                    }
-                } else verbose-= verbose > 0 ? 0.2f : 0;
+        detection: {
+            //If player is on the ground or just came off the ground, we return
+            if(data.playerInfo.clientGround || data.playerInfo.airTicks < 3) break detection;
 
-                debug("x=" + accelX + " z=" + accelZ + " vl=" + verbose);
-            } else if(verbose > 0) verbose-= 0.1f;
-        } else if(verbose > 0) verbose-= 0.05f;
+            //These are situations other than ground which the player can change direction.
+            //Timers are calculated in ticks; 1 = 50ms
+            if(data.playerInfo.liquidTimer.isNotPassed(3)
+                    || data.playerInfo.lastVelocity.isNotPassed(2)
+                    || data.playerInfo.webTimer.isNotPassed(3))
+                break detection;
+
+            //Calculating the direction/angle change between last and current location
+            double deltaAngle = Math.abs(angle - lastAngle);
+
+            if(deltaAngle > 1.5f) {
+                if(++buffer > 4) {
+                    vl++;
+                    flag("d=%.2f a=%.1f at=%s", deltaAngle, angle, data.playerInfo.airTicks);
+                }
+            } else if(buffer > 0) buffer-= 0.5f;
+
+            debug("b=%.1f a=%.1f d=%.2f at=%s", buffer, angle, deltaAngle, data.playerInfo.airTicks);
+        }
+        lastAngle = angle;
     }
 }

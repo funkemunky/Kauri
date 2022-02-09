@@ -10,19 +10,18 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "NoFall (A)", description = "Checks to make sure the ground packet from the client is legit",
-        checkType = CheckType.NOFALL, punishVL = 20, vlToFlag = 3, executable = true, planVersion = KauriVersion.FREE)
+@CheckInfo(name = "NoFall (A)", description = "Looks for impossible location updates compared to ground.",
+        checkType = CheckType.NOFALL, punishVL = 12, vlToFlag = 2, executable = true, planVersion = KauriVersion.FREE)
 @Cancellable
 public class NoFallA extends Check {
 
+    private float buffer;
+
     @Packet
-    public void onPacket(WrappedInFlyingPacket packet, long timeStamp) {
+    public void onPacket(WrappedInFlyingPacket packet) {
 
         boolean flag = data.playerInfo.clientGround
-                ? data.playerInfo.deltaY != 0
-                && (Math.abs(data.playerInfo.deltaY) >= Math.abs(data.playerInfo.lDeltaY))
-                && !data.playerInfo.serverGround
-                && data.playerInfo.lastBlockPlace.isPassed(10)
+                ? Math.abs(data.playerInfo.deltaY) > 0.007
                 : data.playerInfo.deltaY == 0 && data.playerInfo.lDeltaY == 0;
 
         if(data.playerInfo.deltaY < 0 && data.playerInfo.clientGround && flag) {
@@ -39,17 +38,20 @@ public class NoFallA extends Check {
         if(!data.playerInfo.flightCancel
                 && data.playerInfo.lastHalfBlock.isPassed(4)
                 && !data.blockInfo.onSlime
+                && !data.blockInfo.inScaffolding
+                && !data.blockInfo.inHoney
                 && !data.blockInfo.blocksAbove
-                && data.playerInfo.lastBlockPlace.isPassed(8)
+                && data.playerInfo.lastGhostCollision.isPassed(2)
                 && data.playerInfo.lastVelocity.isPassed(4)
                 && (data.playerInfo.deltaY != 0 || data.playerInfo.deltaXZ > 0)
                 && data.playerInfo.blockAboveTimer.isPassed(10)
                 && flag) {
 
-            if(++vl > 2) {
-                flag("ground=" + data.playerInfo.clientGround + " deltaY=" + data.playerInfo.deltaY);
+            if(++buffer > 2) {
+                vl++;
+                flag("g=%s dy=%.4f", data.playerInfo.clientGround, data.playerInfo.deltaY);
             }
-        } else vl-= vl > 0 ? 0.2f : 0;
+        } else buffer-= buffer > 0 ? 0.25f : 0;
 
         debug("ground=" + data.playerInfo.clientGround + " collides=" + data.playerInfo.serverGround
                 + " deltaY=" + data.playerInfo.deltaY + " vl=" + vl);
