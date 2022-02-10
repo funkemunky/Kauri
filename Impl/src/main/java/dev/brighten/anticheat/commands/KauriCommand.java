@@ -21,6 +21,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Modifier;
@@ -291,6 +292,19 @@ public class KauriCommand extends BaseCommand {
 
         MiscUtils.forceBanPlayer(data, reason != null ? reason : "N/A");
         sender.sendMessage(Color.Green + "Force banned the player.");
+    }
+
+    @Subcommand("bugreport")
+    @Description("get information for reporting bugs")
+    @CommandPermission("kauri.command.bugreport")
+    public void onBugReport(CommandSender sender) {
+        StringBuilder plugins = new StringBuilder("Plugins: ");
+
+        for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
+            plugins.append("\n- ").append(plugin.getName()).append(", ").append(plugin.getDescription().getVersion());
+        }
+
+        //Bukkit.get
     }
 
     private static String getMsg(String name, String def) {
