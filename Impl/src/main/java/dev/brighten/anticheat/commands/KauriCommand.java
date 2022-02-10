@@ -23,7 +23,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -298,13 +298,43 @@ public class KauriCommand extends BaseCommand {
     @Description("get information for reporting bugs")
     @CommandPermission("kauri.command.bugreport")
     public void onBugReport(CommandSender sender) {
-        StringBuilder plugins = new StringBuilder("Plugins: ");
+        Kauri.INSTANCE.executor.execute(() -> {
+            StringBuilder txt = new StringBuilder("Plugins: ");
 
-        for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
-            plugins.append("\n- ").append(plugin.getName()).append(", ").append(plugin.getDescription().getVersion());
-        }
+            for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
+                txt.append("\n- ").append(plugin.getName()).append(", ").append(plugin.getDescription().getVersion());
+            }
 
-        //Bukkit.get
+            final String separatorLine = cc.funkemunky.api.utils.MiscUtils.lineNoStrike();
+            txt.append("\n").append(separatorLine).append("\nConfig:\n");
+
+            try {
+                String line = null;
+                BufferedReader br = new BufferedReader(new FileReader(
+                        Kauri.INSTANCE.getDataFolder().getPath() + File.separatorChar + "config.yml"));
+
+                while((line = br.readLine()) != null) {
+                    txt.append("\n").append(line);
+                }
+
+                txt.append("\n").append(separatorLine).append("\nLatest Log:");
+
+                br = new BufferedReader(new FileReader("logs" + File.separatorChar + "latest.log"));
+                while ((line = br.readLine()) != null) {
+                    txt.append("\n").append(line);
+                }
+
+                txt.append("\n").append(separatorLine);
+
+                sender.sendMessage(getMsg("command-bugreport-paste", "&aBug Report Information: &f%pastebin%")
+                        .replace("%pastebin%", Pastebin.makePaste(txt.toString(), "Bug Report Paste by "
+                                        + sender.getName(),
+                                Pastebin.Privacy.UNLISTED)));
+            } catch (IOException e) {
+                sender.sendMessage(getMsg("unknown-error", "An unknown error occurred. Check console."));
+                e.printStackTrace();
+            }
+        });
     }
 
     private static String getMsg(String name, String def) {
