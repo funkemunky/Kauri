@@ -37,7 +37,7 @@ public class NoFallB extends Check {
 
             if(groundBuffer > 19) {
                 vl++;
-                groundBuffer = 25;
+                groundBuffer = 19;
                 flag(200, "T=SPOOF_GROUND dy=%.2f y=%.1f", data.playerInfo.deltaY, data.playerInfo.to.y);
             }
             fixMovementBugs();
