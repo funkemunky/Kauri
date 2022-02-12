@@ -28,7 +28,8 @@ import java.util.*;
 import java.util.function.Function;
 
 @CheckInfo(name = "Phase", description = "Ensures players cannot move through blocks.",
-        checkType = CheckType.EXPLOIT, cancellable = true, executable = false, devStage = DevStage.ALPHA)
+        checkType = CheckType.EXPLOIT, cancellable = true, enabled = false, executable = false,
+        devStage = DevStage.ALPHA)
 public class Phase extends Check {
 
     private KLocation fromWhereShitAintBad = null;
