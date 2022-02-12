@@ -15,15 +15,16 @@ import dev.brighten.api.check.CheckType;
 public class BadPacketsC extends Check {
 
     private long lastFlying;
+    private int buffer;
 
     @Packet
     public void use(WrappedInHeldItemSlotPacket packet, long current) {
         if(current - lastFlying < 10 && data.lagInfo.lastPacketDrop.isPassed(2)) {
-            vl++;
-            if(vl > 11) {
+            if(++buffer > 11) {
+                vl++;
                 flag("delta=%s", current - lastFlying);
             }
-        } else if(vl > 0) vl--;
+        } else if(buffer > 0) buffer--;
     }
 
     @Packet

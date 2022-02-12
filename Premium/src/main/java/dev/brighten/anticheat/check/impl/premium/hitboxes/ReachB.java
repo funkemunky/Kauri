@@ -91,6 +91,59 @@ public class ReachB extends Check {
     }
 
     @Packet
+    public void onFlying(WrappedInFlyingPacket packet) {
+        flying = true;
+        if(lastFlying.isNotPassed(1)) streak++;
+        else {
+            streak = 1;
+            sentTeleport = false;
+        }
+
+        for (Iterator<Map.Entry<UUID, EntityLocation>> it = entityLocationMap.entrySet().iterator();
+             it.hasNext();) {
+            Map.Entry<UUID, EntityLocation> entry = it.next();
+
+            EntityLocation eloc = entry.getValue();
+
+            if(eloc.entity == null) {
+                it.remove();
+                continue;
+            }
+
+            if(eloc.increment == 0) continue;
+
+            eloc.interpolateLocation();
+        }
+
+
+        lastFlying.reset();
+    }
+
+    @Packet
+    public void onTrans(WrappedInTransactionPacket packet) {
+        if(lastFlying.isPassed(1)
+                && data.playerVersion.isOrAbove(ProtocolVersion.V1_9)
+                && Kauri.INSTANCE.keepaliveProcessor.getKeepById(packet.getAction()).isPresent()) {
+
+            for (Iterator<Map.Entry<UUID, EntityLocation>> it = entityLocationMap.entrySet().iterator();
+                 it.hasNext();) {
+                Map.Entry<UUID, EntityLocation> entry = it.next();
+
+                EntityLocation eloc = entry.getValue();
+
+                if(eloc.entity == null) {
+                    it.remove();
+                    continue;
+                }
+
+                if(eloc.increment == 0) continue;
+
+                eloc.interpolateLocation();
+            }
+        }
+    }
+
+    @Packet
     public void onFlying(WrappedInUseEntityPacket packet) {
         flying = true;
 
@@ -247,7 +300,8 @@ public class ReachB extends Check {
             KillauraH detection = find(KillauraH.class);
 
             detection.getTargetLocations().clear();
-            eloc.interpolateLocations();
+            eloc.interpolatedLocations.clear();
+            eloc.interpolatedLocations.addAll(eloc.getInterpolatedLocations());
             eloc.interpolatedLocations.stream()
                     .map(kloc -> {
                         SimpleCollisionBox box = (SimpleCollisionBox) EntityData.getEntityBox(kloc, entity);
@@ -301,7 +355,8 @@ public class ReachB extends Check {
                     eloc.newPitch = eloc.pitch = packet.pitch;
                     eloc.oldLocations.clear();
                     eloc.oldLocations.addAll(eloc.interpolatedLocations);
-                    eloc.interpolateLocations();
+                    eloc.interpolatedLocations.clear();
+                    eloc.interpolatedLocations.addAll(eloc.getInterpolatedLocations());
                 } else {
                     eloc.newX = packet.x;
                     eloc.newY = packet.y;
@@ -312,7 +367,8 @@ public class ReachB extends Check {
                     eloc.increment = 3;
                     eloc.oldLocations.clear();
                     eloc.oldLocations.addAll(eloc.interpolatedLocations);
-                    eloc.interpolateLocations();
+                    eloc.interpolatedLocations.clear();
+                    eloc.interpolatedLocations.addAll(eloc.getInterpolatedLocations());
                 }
             } else {
                 //We don't need to do version checking here. Atlas handles this for us.
@@ -325,7 +381,8 @@ public class ReachB extends Check {
                 eloc.increment = 3;
                 eloc.oldLocations.clear();
                 eloc.oldLocations.addAll(eloc.interpolatedLocations);
-                eloc.interpolateLocations();
+                eloc.interpolatedLocations.clear();
+                eloc.interpolatedLocations.addAll(eloc.getInterpolatedLocations());
             }
 
             KillauraH detection = find(KillauraH.class);

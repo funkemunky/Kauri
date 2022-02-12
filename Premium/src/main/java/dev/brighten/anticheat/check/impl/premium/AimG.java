@@ -9,6 +9,7 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.check.impl.premium.hitboxes.ReachB;
 import dev.brighten.anticheat.check.impl.premium.util.EntityLocation;
+import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import dev.brighten.api.KauriVersion;
@@ -30,12 +31,10 @@ public class AimG extends Check {
     public void onUse(WrappedInUseEntityPacket packet) {
         ReachB reach = find(ReachB.class);
         if(packet.getAction() != WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK
-                || data.target == null || reach.streak < 3
+                || data.target == null
                 || !reach.entityLocationMap.containsKey(data.target.getUniqueId())) return;
 
         EntityLocation eloc = reach.entityLocationMap.get(data.target.getUniqueId());
-
-        if(!eloc.sentTeleport) return;
 
         KLocation origin = data.playerInfo.to.clone(),
                 targetLocation = new KLocation(eloc.x, eloc.y, eloc.z, eloc.yaw, eloc.pitch);
