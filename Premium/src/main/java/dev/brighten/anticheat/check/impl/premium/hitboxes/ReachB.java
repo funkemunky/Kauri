@@ -2,7 +2,6 @@ package dev.brighten.anticheat.check.impl.premium.hitboxes;
 
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
-import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
@@ -10,8 +9,6 @@ import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutEntityTeleportPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutRelativePosition;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.RunUtils;
-import cc.funkemunky.api.utils.it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import cc.funkemunky.api.utils.world.EntityData;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
@@ -33,15 +30,12 @@ import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
-import dev.brighten.api.check.DevStage;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.util.Vector;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 @CheckInfo(name = "Reach (B)", planVersion = KauriVersion.ARA, punishVL = 6, executable = true,
         checkType = CheckType.HITBOX)
@@ -54,16 +48,10 @@ public class ReachB extends Check {
     private float buffer;
     private int hbuffer;
     public boolean sentTeleport;
-    private boolean attacked, flying;
     private AimG aimDetection;
-    private KillauraH killauraHDetection;
 
     public Timer lastAimOnTarget = new TickTimer();
-    private Timer lastTransProblem = new MillisTimer(20);
-    private List<KLocation> targetLocs = new ArrayList<>();
-    private int addTicks;
-
-    private final boolean debugBoxes = true;
+    private final Timer lastTransProblem = new MillisTimer(20);
 
     private static final EnumSet<EntityType> allowedEntityTypes = EnumSet.of(EntityType.ZOMBIE, EntityType.SHEEP,
             EntityType.BLAZE, EntityType.SKELETON, EntityType.PLAYER, EntityType.VILLAGER, EntityType.IRON_GOLEM,
@@ -75,15 +63,6 @@ public class ReachB extends Check {
         super.setData(data);
     }
 
-    @Packet
-    public void onUse(WrappedInUseEntityPacket packet) {
-        if(data.target == null || !allowedEntityTypes.contains(data.target.getType())
-                || packet.getAction() != WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)
-            return;
-
-        attacked = true;
-    }
-
     private AimG getAimDetection() {
         if(aimDetection == null) aimDetection = (AimG) data.checkManager.checks.get("Aim (G)");
 
@@ -92,7 +71,6 @@ public class ReachB extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        flying = true;
         if(lastFlying.isNotPassed(1)) streak++;
         else {
             streak = 1;
@@ -145,12 +123,8 @@ public class ReachB extends Check {
 
     @Packet
     public void onFlying(WrappedInUseEntityPacket packet) {
-        flying = true;
-
         detection: {
-            if(!attacked) break detection;
-
-            attacked = false;
+            if(data.playerInfo.inVehicle || data.playerInfo.creative) break detection;
 
             //Updating new entity loc
             EntityLocation eloc = entityLocationMap.get(data.target.getUniqueId());
@@ -159,8 +133,6 @@ public class ReachB extends Check {
                 debug("eloc is null");
                 break detection;
             }
-
-            if(data.playerInfo.inVehicle) break detection;
 
             final KLocation to = data.playerInfo.to.clone();
 
@@ -254,8 +226,6 @@ public class ReachB extends Check {
 
         lastFlying.reset();
     }
-
-    private final Map<Integer, List<KLocation>> resend = new Int2ObjectOpenHashMap<>();
 
     @Packet
     public boolean onEntity(WrappedOutRelativePosition packet) {
@@ -421,7 +391,6 @@ public class ReachB extends Check {
             AtomicLong start = new AtomicLong();
             data.runInstantAction(ia -> {
                 if(!ia.isEnd()) {
-                    flying = false;
                     start.set(System.currentTimeMillis());
                 } else {
                     action.run();
