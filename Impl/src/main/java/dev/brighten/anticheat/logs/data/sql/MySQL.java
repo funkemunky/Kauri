@@ -21,14 +21,6 @@ public class MySQL {
     public static void init() {
         try {
             if (conn == null || conn.isClosed()) {
-                File mysqlLib = new File(Kauri.INSTANCE.getDataFolder(), "mysqllib.jar");
-
-                if(!mysqlLib.exists()) {
-                    Kauri.INSTANCE.getLogger().info("Downloading mysqllib.jar...");
-                    MiscUtils.download(mysqlLib, "https://nexus.funkemunky.cc/content/repositories/releases" +
-                            "/mysql/mysql-connector-java/8.0.22/mysql-connector-java-8.0.22.jar");
-                }
-                MiscUtils.injectURL(mysqlLib.toURI().toURL());
                 Class.forName("com.mysql.jdbc.Driver");
                 conn = DriverManager.getConnection("jdbc:mysql://" + MySQLConfig.ip
                                 + ":3306/?useSSL=true&autoReconnect=true",
