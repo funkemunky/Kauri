@@ -114,6 +114,10 @@ public class Load {
 
                 startClassLoader();
             }
+
+            //Creating data for online players as of now. We're running this sync so it only runs once server fully starts.
+            RunUtils.taskLater(() -> Bukkit.getOnlinePlayers().forEach(pl -> Kauri.INSTANCE.dataManager.createData(pl)),
+                    Kauri.INSTANCE, 30);
         });
 
         register("Registering checks...");
@@ -136,10 +140,6 @@ public class Load {
         Kauri.INSTANCE.lastEnabled = new AtlasTimer(20);
         Kauri.INSTANCE.enabled = true;
         Kauri.INSTANCE.lastEnabled.reset();
-
-        //Creating data for online players as of now. We're running this sync so it only runs once server fully starts.
-        RunUtils.taskLater(() -> Bukkit.getOnlinePlayers().forEach(pl -> Kauri.INSTANCE.dataManager.createData(pl)),
-                Kauri.INSTANCE, 1);
     }
 
     private static void register(String string) {
