@@ -101,7 +101,7 @@ public class Load {
                 }
 
                 startClassLoader();
-            } else if(!Check.isCheck("Hitboxes")) {
+            } else if(!Check.isCheck("AimA")) {
                 register("Initializing checks...");
 
                 try {

@@ -266,11 +266,14 @@ public class MenuCommand extends BaseCommand {
 
                         Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
                                 .forEach(data -> {
-                                    if(!val.enabled) {
-                                        data.checkManager.checks.remove(val.name);
+                                    Check check = data.checkManager.checks.get(val.name);
+
+                                    if(check == null) {
+                                        Kauri.INSTANCE.getLogger()
+                                                .warning("Check " + val.name + " is null for player "
+                                                        + data.getPlayer());
                                     } else {
-                                        data.checkManager.checks.clear();
-                                        data.checkManager.addChecks();
+                                        check.enabled = val.enabled;
                                     }
                                 }));
                         break;
@@ -297,10 +300,17 @@ public class MenuCommand extends BaseCommand {
                         menu.buildInventory(false);
 
                         Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
-                                .forEach(data -> data.checkManager.checks.computeIfPresent(val.name, (name, check) -> {
-                                    check.executable = val.executable;
-                                    return check;
-                                })));
+                                .forEach(data -> {
+                                    Check check = data.checkManager.checks.get(val.name);
+
+                                    if(check == null) {
+                                        Kauri.INSTANCE.getLogger()
+                                                .warning("Check " + val.name + " is null for player "
+                                                        + data.getPlayer());
+                                    } else {
+                                        check.executable = val.executable;
+                                    }
+                                }));
                         break;
                     }
                     case MIDDLE: {
@@ -325,10 +335,17 @@ public class MenuCommand extends BaseCommand {
                         menu.buildInventory(false);
 
                         Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
-                                .forEach(data -> data.checkManager.checks.computeIfPresent(val.name, (name, check) -> {
-                                    check.cancellable = val.cancellable;
-                                    return check;
-                                })));
+                                .forEach(data -> {
+                                    Check check = data.checkManager.checks.get(val.name);
+
+                                    if(check == null) {
+                                        Kauri.INSTANCE.getLogger()
+                                                .warning("Check " + val.name + " is null for player "
+                                                        + data.getPlayer());
+                                    } else {
+                                        check.cancellable = val.cancellable;
+                                    }
+                                }));
 
                         break;
                     }
@@ -396,14 +413,15 @@ public class MenuCommand extends BaseCommand {
                     menu.buildInventory(false);
                     Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
                             .forEach(data -> {
-                                synchronized (data.checkManager.checks) {
-                                    data.checkManager.checks.clear();
+                                Check check = data.checkManager.checks.get(settings.name);
+
+                                if(check == null) {
+                                    Kauri.INSTANCE.getLogger()
+                                            .warning("Check " + settings.name + " is null for player "
+                                                    + data.getPlayer());
+                                } else {
+                                    check.enabled = settings.enabled;
                                 }
-                                synchronized (data.checkManager.checkMethods) {
-                                    data.checkManager.checkMethods.clear();
-                                }
-                                data.checkManager.addChecks();
-                                data.creation = System.currentTimeMillis();
                             }));
                     menu.setParent(getChecksMenu(settings.type));
                 });
@@ -427,14 +445,15 @@ public class MenuCommand extends BaseCommand {
                     menu.buildInventory(false);
                     Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
                             .forEach(data -> {
-                                synchronized (data.checkManager.checks) {
-                                    data.checkManager.checks.clear();
+                                Check check = data.checkManager.checks.get(settings.name);
+
+                                if(check == null) {
+                                    Kauri.INSTANCE.getLogger()
+                                            .warning("Check " + settings.name + " is null for player "
+                                                    + data.getPlayer());
+                                } else {
+                                    check.executable = settings.executable;
                                 }
-                                synchronized (data.checkManager.checkMethods) {
-                                    data.checkManager.checkMethods.clear();
-                                }
-                                data.checkManager.addChecks();
-                                data.creation = System.currentTimeMillis();
                             }));
                     menu.setParent(getChecksMenu(settings.type));
                 });
@@ -459,14 +478,15 @@ public class MenuCommand extends BaseCommand {
                     menu.buildInventory(false);
                     Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
                             .forEach(data -> {
-                                synchronized (data.checkManager.checks) {
-                                    data.checkManager.checks.clear();
+                                Check check = data.checkManager.checks.get(settings.name);
+
+                                if(check == null) {
+                                    Kauri.INSTANCE.getLogger()
+                                            .warning("Check " + settings.name + " is null for player "
+                                                    + data.getPlayer());
+                                } else {
+                                    check.cancellable = settings.cancellable;
                                 }
-                                synchronized (data.checkManager.checkMethods) {
-                                    data.checkManager.checkMethods.clear();
-                                }
-                                data.checkManager.addChecks();
-                                data.creation = System.currentTimeMillis();
                             }));
                     menu.setParent(getChecksMenu(settings.type));
                 });
