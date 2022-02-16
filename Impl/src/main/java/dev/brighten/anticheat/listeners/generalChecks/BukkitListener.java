@@ -6,6 +6,7 @@ import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumParticle;
 import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.world.BlockData;
 import cc.funkemunky.api.utils.world.CollisionBox;
+import cc.funkemunky.api.utils.world.state.BlockStateManager;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
@@ -76,6 +77,16 @@ public class BukkitListener implements Listener {
                 event.getPlayer().sendMessage(sbox.min().toString());
                 event.getPlayer().sendMessage(sbox.max().toString());
                 event.getPlayer().sendMessage("x=" + subbed.getX() + " y=" + subbed.getY() + " z=" + subbed.getZ());
+            }
+
+            if(BlockUtils.isDoor(event.getClickedBlock())) {
+                int direction = (int) BlockStateManager.getInterface("facing", event.getClickedBlock());
+                boolean open = (boolean) BlockStateManager.getInterface("open", event.getClickedBlock());
+                boolean hinge = (boolean) BlockStateManager.getInterface("hinge", event.getClickedBlock());
+                boolean topOrBelow = (boolean) BlockStateManager.getInterface("top", event.getClickedBlock());
+
+                event.getPlayer().sendMessage(String.format("dir=%s open=%s hinge=%s top=%s",
+                        direction, open, hinge, topOrBelow));
             }
 
             box.draw(WrappedEnumParticle.FLAME, Collections.singleton(event.getPlayer()));
