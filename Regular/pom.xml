@@ -67,7 +67,7 @@
             <groupId>dev.brighten.anticheat</groupId>
             <artifactId>Base</artifactId>
             <version>${project.parent.version}</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

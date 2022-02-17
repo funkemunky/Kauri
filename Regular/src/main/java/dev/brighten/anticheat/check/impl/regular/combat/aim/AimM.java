@@ -13,24 +13,16 @@ import dev.brighten.api.check.DevStage;
 public class AimM extends Check {
 
     private float buffer;
-    private float ldeltaY;
+    private double ldeltaY;
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if(!packet.isLook()) return;
 
-        float delta = Math.abs(ldeltaY - data.moveProcessor.deltaY);
+        double deltaXY = Math.hypot(data.moveProcessor.deltaX, data.moveProcessor.deltaY);
+        double accel = Math.abs(ldeltaY - deltaXY);
 
-        if(delta > 45 &&
-                ((ldeltaY < 0 && data.moveProcessor.deltaY >= 0)
-                        || (ldeltaY >= 0 && data.moveProcessor.deltaY < 0))) {
-            if(++buffer > 10) {
-                vl++;
-                flag("%.3f;%.1f;%.1f;%.1f",delta, data.moveProcessor.deltaY, ldeltaY, data.moveProcessor.deltaX);
-            }
-        } else if(buffer > 0) buffer-= 0.75f;
+        debug("d=%.4f p=%.4f b=%s", accel, deltaXY, buffer);
 
-        debug("d=%.4f p=%.4f b=%s", delta, data.moveProcessor.deltaY, buffer);
-
-        ldeltaY = data.moveProcessor.deltaY;
+        ldeltaY = deltaXY;
     }
 }
