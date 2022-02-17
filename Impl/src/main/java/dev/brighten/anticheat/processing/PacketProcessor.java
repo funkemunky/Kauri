@@ -758,7 +758,7 @@ public class PacketProcessor {
                     data.playerInfo.lastGhostCollision.reset();
 
                     data.runInstantAction(ka -> {
-                        if (ka.isEnd() && data.blockUpdates > 0) data.blockUpdates--;
+                        if (ka.isEnd()) data.blockUpdates--;
                     });
                 }
                 break;
@@ -768,7 +768,7 @@ public class PacketProcessor {
                 data.playerInfo.lastGhostCollision.reset();
 
                 data.runInstantAction(ka -> {
-                    if(ka.isEnd() && data.blockUpdates > 0) data.blockUpdates--;
+                    if(ka.isEnd()) data.blockUpdates--;
                 });
                 break;
             }
