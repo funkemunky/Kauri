@@ -85,12 +85,17 @@ public class Check implements KauriCheck {
 
 
     public <T extends Check> T find(Class<? extends T> clazz) {
-        return clazz.cast(detectionCache.computeIfAbsent(clazz, key -> {
+        Check check = detectionCache.computeIfAbsent(clazz, key -> {
             if(!clazz.isAnnotationPresent(CheckInfo.class)) {
                 return null;
             }
             return data.checkManager.checks.get(clazz.getAnnotation(CheckInfo.class).name());
-        }));
+        });
+
+        if(check != null)
+        return clazz.cast(check);
+
+        return null;
     }
 
     public void setData(ObjectData data) {
