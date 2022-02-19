@@ -4,20 +4,26 @@ import cc.funkemunky.api.utils.*;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import dev.brighten.anticheat.Kauri;
+import dev.brighten.anticheat.check.api.Check;
+import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.logs.objects.Punishment;
 import dev.brighten.anticheat.menu.LogsGUI;
 import dev.brighten.anticheat.utils.Pastebin;
 import dev.brighten.anticheat.utils.menu.preset.ConfirmationMenu;
 import dev.brighten.anticheat.utils.mojang.MojangAPI;
+import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.io.UnsupportedEncodingException;
+import java.io.*;
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Init(priority = Priority.LOW)
@@ -46,7 +52,8 @@ public class LogCommand extends BaseCommand {
                         .msg("no-console-logs",
                                 "&cYou cannot view your own logs since you are not a player."));
             } else {
-                UUID player = MojangAPI.lookupUUID(args[0]);
+                UUID player = Optional.ofNullable(Bukkit.getOfflinePlayer(args[0]))
+                        .map(OfflinePlayer::getUniqueId).orElse(null);
 
                 if(player == null) {
                     sender.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
@@ -69,6 +76,38 @@ public class LogCommand extends BaseCommand {
             }
         });
     }
+
+    @Subcommand("logs web")
+    @CommandPermission("kauri.command.logs")
+    @Syntax("[player]")
+    @CommandCompletion("@players")
+    @Description("View the logs of a user")
+    public void onLogsWeb(CommandSender sender, String[] args) {
+        Kauri.INSTANCE.executor.execute(() -> {
+            if(args.length == 0) {
+                if(sender instanceof Player) {
+                    Player player = (Player) sender;
+
+                    runWebLog(sender, player);
+
+                } else sender.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                        .msg("no-console-logs",
+                                "&cYou cannot view your own logs since you are not a player."));
+            } else {
+                OfflinePlayer player = Bukkit.getOfflinePlayer(args[0]);
+
+                if(player == null) {
+                    sender.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                            .msg("offline-player-not-found", "&cSomehow, out of hundreds of millions of"
+                                    + "Minecraft accounts, you found one that doesn't exist."));
+                    return;
+                }
+
+                runWebLog(sender, player);
+            }
+        });
+    }
+
 
     @Subcommand("logs clear")
     @CommandPermission("kauri.command.logs.clear")
@@ -113,6 +152,71 @@ public class LogCommand extends BaseCommand {
                 });
             }
         } else sender.sendMessage(Color.Red + "You must provide the name of a player.");
+    }
+
+    private void runWebLog(CommandSender sender, OfflinePlayer target) {
+        val logs = Kauri.INSTANCE.loggerManager.getLogs(target.getUniqueId());
+        Map<String, Integer> violations = new HashMap<>();
+        for (Log log : logs) {
+            violations.compute(log.checkName, (name, count) -> {
+               if(count == null) {
+                   return 1;
+               }
+
+               return count + 1;
+            });
+        }
+
+
+        StringBuilder url = new StringBuilder("http://localhost/api/kauri?uuid=" + target.getUniqueId().toString().replaceAll("-", "") + (violations.keySet().size() > 0 ? "&violations=" : ""));
+
+        if (violations.keySet().size() > 0) {
+            for (String key : violations.keySet()) {
+                if (Check.isCheck(key)) {
+                    CheckInfo check = Check.getCheckInfo(key);
+                    int vl = violations.get(key), maxVL = check.punishVL();
+                    boolean developer = !check.devStage().isRelease();
+
+                    String toAppend = key + ":" + vl + ":" + maxVL + ":" + developer + ";";
+                    toAppend = toAppend.replaceAll(" ", "%20");
+
+                    url.append(toAppend);
+
+                }
+            }
+
+            if (violations.keySet().size() > 0) {
+                url.deleteCharAt(url.length() - 1);
+            }
+
+            String finalURL = "http://localhost/api/kauri/cache/%id%";
+
+            try {
+                URL url2Run = new URL(url.toString());
+                //%3F
+                BufferedReader reader = new BufferedReader(new InputStreamReader(url2Run
+                        .openConnection().getInputStream(), Charset.forName("UTF-8")));
+
+                finalURL = finalURL.replace("%id%", readAll(reader));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            sender.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
+                    .msg("logs.viewWeb", "&aView the log here&7: &f%url%")
+                    .replace("%url%", finalURL));
+        } else {
+            sender.sendMessage(Color.translate("&cPlayer has no logs."));
+        }
+    }
+
+    private static String readAll(Reader rd) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        int cp;
+        while ((cp = rd.read()) != -1) {
+            sb.append((char) cp);
+        }
+        return sb.toString();
     }
 
     public static String getLogsFromUUID(UUID uuid) {
