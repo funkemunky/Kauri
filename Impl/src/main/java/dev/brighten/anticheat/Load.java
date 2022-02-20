@@ -33,6 +33,7 @@ import java.net.MalformedURLException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 
 public class Load {
@@ -88,37 +89,44 @@ public class Load {
         register("Registering logging...");
         Kauri.INSTANCE.loggerManager = new LoggerManager();
 
-        Kauri.INSTANCE.executor.execute(() -> {
-            if(SystemUtil.enabled
-                    && !SystemUtil.license.equals("Insert Kauri Ara license here")) {
-                register("Initializing checks...");
-                try {
-                    Kauri.INSTANCE.LINK = "https://funkemunky.cc/download?name=Kauri_New&license="
-                            + URLEncoder.encode(SystemUtil.license, "UTF-8")
-                            + "&version=" + URLEncoder.encode(Kauri.INSTANCE.getDescription().getVersion(), "UTF-8");
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
+        try {
+            Kauri.INSTANCE.executor.submit(() -> {
+                if(SystemUtil.enabled
+                        && !SystemUtil.license.equals("Insert Kauri Ara license here")) {
+                    register("Initializing checks...");
+                    try {
+                        Kauri.INSTANCE.LINK = "https://funkemunky.cc/download?name=Kauri_New&license="
+                                + URLEncoder.encode(SystemUtil.license, "UTF-8")
+                                + "&version=" + URLEncoder.encode(Kauri.INSTANCE.getDescription().getVersion(), "UTF-8");
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+
+                    startClassLoader();
+                } else if(!Check.isCheck("AimA")) {
+                    register("Initializing checks...");
+
+                    try {
+                        Kauri.INSTANCE.LINK = "https://funkemunky.cc/download?name=Kauri_New&license="
+                                + URLEncoder.encode(Pastebin.userId() + ";;" + Pastebin.nonce(), "UTF-8")
+                                + "&version=" + URLEncoder.encode(Kauri.INSTANCE.getDescription().getVersion(), "UTF-8");
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+
+                    startClassLoader();
                 }
 
-                startClassLoader();
-            } else if(!Check.isCheck("AimA")) {
-                register("Initializing checks...");
-
-                try {
-                    Kauri.INSTANCE.LINK = "https://funkemunky.cc/download?name=Kauri_New&license="
-                            + URLEncoder.encode(Pastebin.userId() + ";;" + Pastebin.nonce(), "UTF-8")
-                            + "&version=" + URLEncoder.encode(Kauri.INSTANCE.getDescription().getVersion(), "UTF-8");
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
-
-                startClassLoader();
-            }
-
-            //Creating data for online players as of now. We're running this sync so it only runs once server fully starts.
-            RunUtils.taskLater(() -> Bukkit.getOnlinePlayers().forEach(pl -> Kauri.INSTANCE.dataManager.createData(pl)),
-                    Kauri.INSTANCE, 30);
-        });
+                //Creating data for online players as of now. We're running this sync so it only runs once server fully starts.
+                RunUtils.taskLater(() -> Bukkit.getOnlinePlayers().forEach(pl -> Kauri.INSTANCE.dataManager.createData(pl)),
+                        Kauri.INSTANCE, 30);
+            }).get();
+        } catch (InterruptedException e) {
+            MiscUtils.printToConsole("&cSomething went wrong on startup");
+            //Empty catch block
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
 
         register("Registering checks...");
         Check.registerChecks();

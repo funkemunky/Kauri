@@ -168,7 +168,7 @@ public class LogCommand extends BaseCommand {
         }
 
 
-        StringBuilder url = new StringBuilder("http://localhost/api/kauri?uuid=" + target.getUniqueId().toString().replaceAll("-", "") + (violations.keySet().size() > 0 ? "&violations=" : ""));
+        StringBuilder url = new StringBuilder("https://funkemunky.cc/api/kauri?uuid=" + target.getUniqueId().toString().replaceAll("-", "") + (violations.keySet().size() > 0 ? "&violations=" : ""));
 
         if (violations.keySet().size() > 0) {
             for (String key : violations.keySet()) {
@@ -189,7 +189,7 @@ public class LogCommand extends BaseCommand {
                 url.deleteCharAt(url.length() - 1);
             }
 
-            String finalURL = "http://localhost/api/kauri/cache/%id%";
+            String finalURL = "https://funkemunky.cc/api/kauri/cache/%id%";
 
             try {
                 URL url2Run = new URL(url.toString());

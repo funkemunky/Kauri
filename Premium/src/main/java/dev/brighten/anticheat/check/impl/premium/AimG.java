@@ -70,5 +70,6 @@ public class AimG extends Check {
         find(AimJ.class).runCheck(std, pstd, offset, rot);
         find(AimK.class).runCheck(std, pstd, offset, rot);
         find(AimL.class).runCheck(std, pstd, offset, rot);
+        find(AimO.class).runCheck(std, pstd, offset, rot);
     }
 }
