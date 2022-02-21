@@ -33,6 +33,7 @@ public class CheckManager {
      * @param timeStamp Long time of packet received
      */
     public void runPacket(NMSObject object, long timeStamp) {
+        if(objectData.bypassing) return;
         val methods = checkMethods.get(object.getClass());
 
         if(methods == null) return;
@@ -57,6 +58,7 @@ public class CheckManager {
     }
 
     public boolean runPacketCancellable(NMSObject object, long timeStamp) {
+        if(objectData.bypassing) return false;
         val methods = checkMethods.get(object.getClass());
 
         if(methods == null) return false;
@@ -85,6 +87,7 @@ public class CheckManager {
     }
 
     public void runEvent(Event event) {
+        if(objectData.bypassing) return;
         synchronized (checkMethods) {
             val methods = checkMethods.get(event.getClass());
 
@@ -105,6 +108,7 @@ public class CheckManager {
     }
 
     public boolean runEvent(Object event) {
+        if(objectData.bypassing) return false;
         val methods = checkMethods.get(event.getClass());
 
         if(methods == null) return false;
@@ -121,7 +125,7 @@ public class CheckManager {
     }
 
     public void runEvent(AtlasEvent event) {
-        if(!checkMethods.containsKey(event.getClass())) return;
+        if(objectData.bypassing || !checkMethods.containsKey(event.getClass())) return;
 
         val methods = checkMethods.get(event.getClass());
 

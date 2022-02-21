@@ -64,6 +64,7 @@ public class ObjectData implements Data {
     public PastLocation targetPastLocation;
     public LivingEntity target;
     public KLocation lastFlying;
+    public boolean bypassing;
     public SimpleCollisionBox box = new SimpleCollisionBox();
     public ObjectData targetData;
     public CheckManager checkManager;

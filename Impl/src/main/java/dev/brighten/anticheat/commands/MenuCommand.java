@@ -27,6 +27,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -527,7 +528,8 @@ public class MenuCommand extends BaseCommand {
 
             for (int i = 0; i < Math.min(45, sortedIds.size()); i++) {
                 UUID uuid = sortedIds.get(i);
-                String name = MojangAPI.getUsername(uuid);
+                String name = Optional.ofNullable(Bukkit.getOfflinePlayer(uuid)).map(OfflinePlayer::getName)
+                        .orElse(MojangAPI.getUsername(uuid));
                 if (name == null) name = "null";
                 Log vl = logs.get(uuid).get(0);
 

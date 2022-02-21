@@ -17,6 +17,7 @@ import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.Pastebin;
 import dev.brighten.anticheat.utils.StringUtils;
 import dev.brighten.anticheat.utils.ThreadHandler;
+import dev.brighten.anticheat.utils.menu.Menu;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -461,7 +462,11 @@ public class KauriCommand extends BaseCommand {
     @CommandPermission("kauri.command.recentlogs")
     public void onRecentLogs(Player player) {
         player.sendMessage(Color.Green + "Finding recent violators...");
-        Kauri.INSTANCE.executor.execute(() -> MenuCommand.getRecentViolatorsMenu(false).showMenu(player));
+        Kauri.INSTANCE.executor.execute(() -> {
+            Menu menu = MenuCommand.getRecentViolatorsMenu(false);
+
+            RunUtils.task(() -> menu.showMenu(player));
+        });
     }
 
     @Subcommand("reload")
