@@ -1,8 +1,6 @@
 package dev.brighten.anticheat.check.impl.free.combat;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
@@ -31,37 +29,19 @@ public class ReachA extends Check {
             EntityType.BLAZE, EntityType.SKELETON, EntityType.PLAYER, EntityType.VILLAGER, EntityType.IRON_GOLEM,
                     EntityType.WITCH, EntityType.COW, EntityType.CREEPER);
 
-    private boolean attacked;
-    private int cancelTicks;
     private int transBetweenFlying;
 
     @Setting(name = "maxDistance")
     public static double reachThreshold = 3.1;
 
     @Packet
-    public boolean onUse(WrappedInUseEntityPacket packet) {
-        if(packet.getAction() == WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK) attacked = true;
+    public void onUse(WrappedInUseEntityPacket packet) {
+        if(packet.getAction() != WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK) return;
 
-        if(cancelTicks > 0) {
-            cancelTicks--;
-            return true;
-        }
-
-        return false;
-    }
-
-    @Packet
-    public void onTrans(WrappedInTransactionPacket packet) {
-        transBetweenFlying = 0;
-    }
-
-    @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
         ++transBetweenFlying;
         reachA: {
             if(data.playerInfo.creative
                     || data.targetPastLocation.previousLocations.size() < 10
-                    || !attacked
                     || data.playerInfo.inVehicle
                     || data.target == null
                     || !allowedEntityTypes.contains(data.target.getType())) break reachA;
@@ -133,11 +113,8 @@ public class ReachA extends Check {
             else distance = -1;
 
             if (distance > reachThreshold && hits > 1) {
-                if(transBetweenFlying > 1 && buffer > 2) {
-                    cancelTicks = 10;
-                    debug("Set to 10 cancel ticks");
-                } else if (++buffer > 6) {
-                    buffer = 6;
+                if(++buffer > 5) {
+                    buffer = 5;
                     vl++;
                     flag("distance=%.2f buffer=%s", distance, buffer);
                 }
@@ -147,7 +124,6 @@ public class ReachA extends Check {
                     distance, hits, misses, targetLocs.size(), buffer, hitboxHits,
                     transBetweenFlying, System.currentTimeMillis() - data.lagInfo.lastClientTrans);
         }
-        attacked = false;
     }
 
     private static SimpleCollisionBox getHitbox(Entity entity, KLocation loc) {
