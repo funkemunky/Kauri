@@ -15,19 +15,20 @@ import dev.brighten.api.check.DevStage;
 public class AimO extends Check {
 
     private int buffer;
-    private final SimpleAverage angleAverage = new SimpleAverage(10, 0);
+    private final SimpleAverage angleAverage = new SimpleAverage(15, 0);
 
     public void runCheck(double std, double pstd, double[] offset, float[] rot) {
         double deltaXAvg = angleAverage.getAverage();
 
-        double weightedStd = std / Math.min(3.8, (deltaXAvg * 0.04));
+        double weightedStd = std / Math.max(0.01, Math.min(3.8, (deltaXAvg * 0.04)));
 
-        if(weightedStd < 1) {
-            if(++buffer > 5) {
+        if(weightedStd < 1 && std > 0 && deltaXAvg > 8) {
+            if(++buffer > 8) {
+                buffer = 8;
                 vl++;
                 flag("w=%.3f std=%.1f avg=%.1f", weightedStd, std, deltaXAvg);
             }
-        } else if(buffer > 0) buffer--;
+        } else if(buffer > 0) buffer-= 3;
         debug("w=%.3f std=%.1f b=%s avg=%.1f", weightedStd, std, buffer, deltaXAvg);
     }
 
