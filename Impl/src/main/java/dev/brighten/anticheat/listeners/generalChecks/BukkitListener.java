@@ -98,6 +98,8 @@ public class BukkitListener implements Listener {
     public void onBlockPlace(BlockPlaceEvent event) {
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
+        if(data == null || event.getBlockPlaced() == null) return;
+
         if(event.isCancelled()) {
             data.ghostBlocks.put(event.getBlockPlaced().getLocation(),
                     BlockData.getData(event.getBlockPlaced().getType())

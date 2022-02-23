@@ -52,8 +52,7 @@ public class LogCommand extends BaseCommand {
                         .msg("no-console-logs",
                                 "&cYou cannot view your own logs since you are not a player."));
             } else {
-                UUID player = Optional.ofNullable(Bukkit.getOfflinePlayer(args[0]))
-                        .map(OfflinePlayer::getUniqueId).orElse(null);
+                OfflinePlayer player = Bukkit.getOfflinePlayer(args[0]);
 
                 if(player == null) {
                     sender.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
@@ -63,7 +62,7 @@ public class LogCommand extends BaseCommand {
                 }
 
                 if(sender instanceof Player) {
-                    LogsGUI gui = new LogsGUI(sender.getName(), player);
+                    LogsGUI gui = new LogsGUI(player.getName(), player.getUniqueId());
                     RunUtils.task(() -> {
                         gui.showMenu((Player) sender);
                         sender.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
@@ -72,7 +71,7 @@ public class LogCommand extends BaseCommand {
                 } else sender.sendMessage(Kauri.INSTANCE.msgHandler.getLanguage()
                         .msg("logs-pastebin",
                                 "&aLogs: %pastebin%").replace("%pastebin%",
-                                getLogsFromUUID(player)));
+                                getLogsFromUUID(player.getUniqueId())));
             }
         });
     }

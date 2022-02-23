@@ -79,8 +79,8 @@ public class BlockInformation {
 
         int startX = Location.locToBlock(objectData.playerInfo.to.x - 1 - dh);
         int endX = Location.locToBlock(objectData.playerInfo.to.x + 1 + dh);
-        int startY = Location.locToBlock(objectData.playerInfo.to.y - Math.max(0.51, 0.51 + Math.abs(dy)));
-        int endY = Location.locToBlock(objectData.playerInfo.to.y + Math.max(1.99, 1.99 + Math.abs(dy)));
+        int startY = Location.locToBlock(objectData.playerInfo.to.y - Math.max(0.6, 0.6 + Math.abs(dy)));
+        int endY = Location.locToBlock(objectData.playerInfo.to.y + Math.max(2.1, 2.1 + Math.abs(dy)));
         int startZ = Location.locToBlock(objectData.playerInfo.to.z - 1 - dh);
         int endZ = Location.locToBlock(objectData.playerInfo.to.z + 1 + dh);
 
