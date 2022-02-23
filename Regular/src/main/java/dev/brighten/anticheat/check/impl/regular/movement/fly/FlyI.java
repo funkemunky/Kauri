@@ -13,30 +13,6 @@ import dev.brighten.api.check.DevStage;
 @Cancellable
 public class FlyI extends Check {
 
-    /*
-    if (!packet.isPos()
-				|| !canCheckMovement()
-				|| (isAccurateOnGround(packet) && data.enviorment.inLiquid.wasNotReset())
-				|| (isAccurateOnGround(packet) && data.enviorment.inLiquid.wasReset())
-				|| data.timers.lastFlightToggle.hasNotPassed(10)
-				|| data.timers.lastBlockGlitch.hasNotPassed(5)
-				|| data.enviorment.onLadder.hasNotPassed(2)
-				|| data.velocity.deltaV != 0
-				|| data.movement.deltaV != 0) {
-			debug("RESET");
-			hoverFails = 0;
-			return;
-		}
-
-		if (hoverFails++ == 6) {
-			hoverFails = 0;
-			if (data.timers.join.hasPassed(20)) {
-				if (fail()) setback(1);
-			}
-		}
-		debug("%s | V: %s", hoverFails, data.movement.deltaV);
-     */
-
     private int buffer;
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
