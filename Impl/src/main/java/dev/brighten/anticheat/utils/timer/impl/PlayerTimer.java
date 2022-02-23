@@ -6,6 +6,7 @@ import dev.brighten.anticheat.utils.timer.Timer;
 public class PlayerTimer implements Timer {
 
     private long currentTick;
+    private int resetStreak;
     private final long defaultPassed;
     private final ObjectData data;
 
@@ -45,6 +46,11 @@ public class PlayerTimer implements Timer {
     }
 
     @Override
+    public int getResetStreak() {
+        return resetStreak;
+    }
+
+    @Override
     public long getPassed() {
         return data.playerTicks - currentTick;
     }
@@ -56,6 +62,8 @@ public class PlayerTimer implements Timer {
 
     @Override
     public void reset() {
+        if(getPassed() <= 1) resetStreak++;
+        else resetStreak = 0;
         currentTick = data.playerTicks;
     }
 }

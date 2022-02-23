@@ -12,6 +12,8 @@ public interface Timer {
 
     boolean isReset();
 
+    int getResetStreak();
+
     long getPassed();
 
     long getCurrent();

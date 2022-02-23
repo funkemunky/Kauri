@@ -5,6 +5,7 @@ import dev.brighten.anticheat.utils.timer.Timer;
 public class MillisTimer implements Timer {
 
     private long currentStamp;
+    private int resetStreak;
     private final long defaultPassed;
 
     public MillisTimer(long defaultPassed) {
@@ -41,6 +42,11 @@ public class MillisTimer implements Timer {
     }
 
     @Override
+    public int getResetStreak() {
+        return resetStreak;
+    }
+
+    @Override
     public long getPassed() {
         return System.currentTimeMillis() - currentStamp;
     }
@@ -52,6 +58,9 @@ public class MillisTimer implements Timer {
 
     @Override
     public void reset() {
+        if(getPassed() <= 60L) resetStreak++;
+        else resetStreak = 0;
+
         currentStamp = System.currentTimeMillis();
     }
 }

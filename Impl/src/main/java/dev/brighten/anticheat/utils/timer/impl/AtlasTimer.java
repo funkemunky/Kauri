@@ -6,6 +6,7 @@ import dev.brighten.anticheat.utils.timer.Timer;
 public class AtlasTimer implements Timer {
 
     private long currentStamp, defaultPassed;
+    private int resetStreak;
 
     public AtlasTimer(long defaultPassed) {
         this.defaultPassed = defaultPassed;
@@ -41,6 +42,11 @@ public class AtlasTimer implements Timer {
     }
 
     @Override
+    public int getResetStreak() {
+        return resetStreak;
+    }
+
+    @Override
     public long getPassed() {
         return Atlas.getInstance().getCurrentTicks() - currentStamp;
     }
@@ -52,6 +58,9 @@ public class AtlasTimer implements Timer {
 
     @Override
     public void reset() {
+        if(getPassed() <= 1) resetStreak++;
+        else resetStreak = 0;
+
         currentStamp = Atlas.getInstance().getCurrentTicks();
     }
 }
