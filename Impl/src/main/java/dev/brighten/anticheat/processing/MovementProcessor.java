@@ -453,7 +453,7 @@ public class MovementProcessor {
             if (data.blockInfo.collidedWithEntity) data.playerInfo.lastEntityCollision.reset();
 
             //Player ground/air positioning ticks.
-            if (!data.playerInfo.clientGround) {
+            if (!data.playerInfo.serverGround) {
                 data.playerInfo.airTicks++;
                 data.playerInfo.groundTicks = 0;
             } else {

@@ -197,7 +197,7 @@ public class BlockInformation {
                                             blocksBelow = true;
                                     } else if(Materials.checkFlag(type, Materials.SOLID)) {
                                         SimpleCollisionBox groundBox = normalBox.copy()
-                                                .offset(0, -.45, 0).expandMax(0, -1.2, 0);
+                                                .offset(0, -.49, 0).expandMax(0, -1.2, 0);
 
                                         XMaterial blockMaterial = getXMaterial(type);
 
