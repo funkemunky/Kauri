@@ -50,8 +50,8 @@ public class VelocityA extends Check {
                 }
             } else buffer-= buffer > 0 ? 0.5 : 0;
 
-            buffer-= 0.08;
-            buffer*= 0.98;
+            vY-= 0.08;
+            vY*= 0.98;
 
             //If any of these conditions are met, we might as well stop checking for velocity.
             if(vY < 0.005 //While this is a 1.8.9 and below only thing, we might as well stop checking.
@@ -59,8 +59,7 @@ public class VelocityA extends Check {
                     || data.blockInfo.collidesHorizontally
                     || data.blockInfo.collidesVertically) vY = 0;
 
-
             debug("pct=" + pct + " vl=" + buffer);
-        } else buffer = 0;
+        } else if(buffer > 0) buffer-= 0.5;
     }
 }

@@ -35,6 +35,7 @@ import org.bukkit.entity.EntityType;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
 @CheckInfo(name = "Reach (B)", planVersion = KauriVersion.ARA, punishVL = 6, executable = true,
@@ -52,6 +53,7 @@ public class ReachB extends Check {
 
     public Timer lastAimOnTarget = new TickTimer();
     private final Timer lastTransProblem = new MillisTimer(20);
+    private final Queue<Entity> attacks = new LinkedBlockingQueue<>();
 
     private static final EnumSet<EntityType> allowedEntityTypes = EnumSet.of(EntityType.ZOMBIE, EntityType.SHEEP,
             EntityType.BLAZE, EntityType.SKELETON, EntityType.PLAYER, EntityType.VILLAGER, EntityType.IRON_GOLEM,
@@ -70,6 +72,14 @@ public class ReachB extends Check {
     }
 
     @Packet
+    public void onUse(WrappedInUseEntityPacket packet) {
+        if(packet.getAction() == WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK
+                && allowedEntityTypes.contains(packet.getEntity().getType())) {
+            attacks.add(packet.getEntity());
+        }
+    }
+
+    @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if(lastFlying.isNotPassed(1)) streak++;
         else {
@@ -77,149 +87,117 @@ public class ReachB extends Check {
             sentTeleport = false;
         }
 
-        for (Iterator<Map.Entry<UUID, EntityLocation>> it = entityLocationMap.entrySet().iterator();
-             it.hasNext();) {
-            Map.Entry<UUID, EntityLocation> entry = it.next();
-
-            EntityLocation eloc = entry.getValue();
-
-            if(eloc.entity == null) {
-                it.remove();
-                continue;
-            }
-
-            if(eloc.increment == 0) continue;
-
-            eloc.interpolateLocation();
-        }
-
-
-        lastFlying.reset();
-    }
-
-    @Packet
-    public void onTrans(WrappedInTransactionPacket packet) {
-        if(lastFlying.isPassed(1)
-                && data.playerVersion.isOrAbove(ProtocolVersion.V1_9)
-                && Kauri.INSTANCE.keepaliveProcessor.getKeepById(packet.getAction()).isPresent()) {
-
-            for (Iterator<Map.Entry<UUID, EntityLocation>> it = entityLocationMap.entrySet().iterator();
-                 it.hasNext();) {
-                Map.Entry<UUID, EntityLocation> entry = it.next();
-
-                EntityLocation eloc = entry.getValue();
-
-                if(eloc.entity == null) {
-                    it.remove();
-                    continue;
-                }
-
-                if(eloc.increment == 0) continue;
-
-                eloc.interpolateLocation();
-            }
-        }
-    }
-
-    @Packet
-    public void onFlying(WrappedInUseEntityPacket packet) {
+        entityLocationMap.values().forEach(EntityLocation::interpolateLocation);
+        
         detection: {
-            if(data.playerInfo.inVehicle || data.playerInfo.creative) break detection;
-
-            //Updating new entity loc
-            EntityLocation eloc = entityLocationMap.get(data.target.getUniqueId());
-
-            if(eloc == null) {
-                debug("eloc is null");
+            if(data.playerInfo.creative || data.playerInfo.inVehicle) {
+                attacks.clear();
                 break detection;
             }
+            Entity target;
+            
+            while((target = attacks.poll()) != null) {
+                //Updating new entity loc
+                EntityLocation eloc = entityLocationMap.get(target.getUniqueId());
 
-            final KLocation to = data.playerInfo.to.clone();
-
-            //debug("current loc: %.4f, %.4f, %.4f", eloc.x, eloc.y, eloc.z);
-
-            to.y+= data.playerInfo.sneaking ? (ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_14)
-                    ? 1.27f : 1.54f) : 1.62f;
-            if(eloc.x == 0 && eloc.y == 0 & eloc.z == 0) break detection;
-            double distance = Double.MAX_VALUE;
-            boolean collided = false; //Using this to compare smaller numbers than Double.MAX_VALUE. Slightly faster
-
-            SimpleCollisionBox targetBox = null;
-
-            List<SimpleCollisionBox> boxes = new ArrayList<>();
-            if(eloc.oldLocations.size() > 0) {
-                for (KLocation oldLocation : eloc.oldLocations) {
-                    SimpleCollisionBox box = (SimpleCollisionBox)
-                            EntityData.getEntityBox(oldLocation.toVector(), data.target);
-
-                    if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) {
-                        box = box.expand(0.1, 0.1, 0.1);
-                    }
-                    boxes.add(box);
+                if(eloc == null) {
+                    debug("eloc is null");
+                    break detection;
                 }
-                for (KLocation oldLocation : eloc.interpolatedLocations) {
-                    SimpleCollisionBox box = (SimpleCollisionBox)
-                            EntityData.getEntityBox(oldLocation.toVector(), data.target);
 
-                    if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) {
-                        box = box.expand(0.1, 0.1, 0.1);
+                final KLocation to = data.playerInfo.to.clone(), from = data.playerInfo.from.clone();
+
+                //debug("current loc: %.4f, %.4f, %.4f", eloc.x, eloc.y, eloc.z);
+
+                to.y+= data.playerInfo.sneaking ? (ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_14)
+                        ? 1.27f : 1.54f) : 1.62f;
+                from.y+= data.playerInfo.sneaking ? (ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_14)
+                        ? 1.27f : 1.54f) : 1.62f;
+                
+                if(eloc.x == 0 && eloc.y == 0 & eloc.z == 0) break detection;
+                double distance = Double.MAX_VALUE;
+                boolean collided = false; //Using this to compare smaller numbers than Double.MAX_VALUE. Slightly faster
+
+                List<SimpleCollisionBox> boxes = new ArrayList<>();
+                if(eloc.oldLocations.size() > 0) {
+                    for (KLocation oldLocation : eloc.oldLocations) {
+                        SimpleCollisionBox box = (SimpleCollisionBox)
+                                EntityData.getEntityBox(oldLocation.toVector(), target);
+
+                        if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) {
+                            box = box.expand(0.1);
+                        } else box = box.expand(0.0325);
+                        boxes.add(box);
                     }
-                    boxes.add(box);
-                }
-            } else {
-                for (KLocation oldLocation : eloc.interpolatedLocations) {
-                    SimpleCollisionBox box = (SimpleCollisionBox)
-                            EntityData.getEntityBox(oldLocation.toVector(), data.target);
+                    for (KLocation oldLocation : eloc.interpolatedLocations) {
+                        SimpleCollisionBox box = (SimpleCollisionBox)
+                                EntityData.getEntityBox(oldLocation.toVector(), target);
 
-                    if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) {
-                        box = box.expand(0.1, 0.1, 0.1);
+                        if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) {
+                            box = box.expand(0.1);
+                        } else box = box.expand(0.0325);
+                        boxes.add(box);
                     }
-                    boxes.add(box);
-                }
-                debug("old location is null");
-            }
+                } else {
+                    for (KLocation oldLocation : eloc.interpolatedLocations) {
+                        SimpleCollisionBox box = (SimpleCollisionBox)
+                                EntityData.getEntityBox(oldLocation.toVector(), target);
 
-            if(boxes.size() > 0)
-            targetBox = Helper.wrap(boxes);
-
-            if(targetBox == null) break detection;
-
-            if(data.playerVersion.isOrAbove(ProtocolVersion.V1_9))
-            targetBox = targetBox.expand(0.0325D);
-
-            final AxisAlignedBB vanillaBox = new AxisAlignedBB(targetBox);
-
-            Vec3D intersectTo = vanillaBox.rayTrace(to.toVector(), MathUtils.getDirection(to), 10);
-
-            if(intersectTo != null) {
-                lastAimOnTarget.reset();
-                distance = Math.min(distance, intersectTo.distanceSquared(new Vec3D(to.x, to.y, to.z)));
-                collided = true;
-            }
-
-            if(collided && eloc.oldLocations.size() > 0) {
-                hbuffer = 0;
-                distance = Math.sqrt(distance);
-                final double threshold = lastTransProblem.isNotPassed(50) ? 3.5 : 3.02;
-                if(distance > threshold) {
-                    if(++buffer > 3) {
-                        vl++;
-                        flag("d=%.3f>-%.2f ltp=%s", distance, threshold, lastTransProblem.getPassed());
-                        buffer = 3;
-                    }
-                } else if(buffer > 0) buffer-= 0.075f;
-                debug("dist=%.2f>-%.2f b=%s s=%s st=%s lf=%s ld=%s lti=%s",
-                        distance, threshold, buffer, streak, sentTeleport, lastFlying.getPassed(),
-                        data.lagInfo.lastPingDrop.getPassed(), lastTransProblem.getPassed());
-            } else {
-                if(streak > 3 && sentTeleport) {
-                    if (++hbuffer > 5) {
-                        find(HitboxesB.class).vl++;
-                        find(HitboxesB.class).flag(120, "%.1f;%.1f;%.1f", eloc.x, eloc.y, eloc.z);
+                        if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) {
+                            box = box.expand(0.1);
+                        } else box = box.expand(0.0325);
+                        boxes.add(box);
                     }
                 }
-                debug("didnt hit box: x=%.1f y=%.1f z=%.1f lti=%s", eloc.x, eloc.y, eloc.z,
-                        lastTransProblem.getPassed());
+
+                if(boxes.size() == 0) break detection;
+
+                int hits = 0;
+
+                for (SimpleCollisionBox targetBox : boxes) {
+                    final AxisAlignedBB vanillaBox = new AxisAlignedBB(targetBox);
+
+                    Vec3D intersectTo = vanillaBox.rayTrace(to.toVector(), MathUtils.getDirection(to), 10),
+                            intersectFrom = vanillaBox.rayTrace(from.toVector(),
+                                    MathUtils.getDirection(from), 10);
+
+                    if(intersectTo != null) {
+                        lastAimOnTarget.reset();
+                        hits++;
+                        distance = Math.min(distance, intersectTo.distanceSquared(new Vec3D(to.x, to.y, to.z)));
+                        collided = true;
+                    }
+                    if(intersectFrom != null) {
+                        lastAimOnTarget.reset();
+                        hits++;
+                        distance = Math.min(distance, intersectFrom.distanceSquared(new Vec3D(to.x, to.y, to.z)));
+                        collided = true;
+                    }
+                }
+
+                if(collided) {
+                    hbuffer = 0;
+                    distance = Math.sqrt(distance);
+                    if(distance > 3.001) {
+                        if(++buffer > 1.2) {
+                            vl++;
+                            flag("d=%.3f>-3.001 ltp=%s", distance, lastTransProblem.getPassed());
+                            buffer = Math.min(2, buffer);
+                        }
+                    } else if(buffer > 0) buffer-= 0.05f;
+                    debug("dist=%.2f>-3.001 hits-%s b=%s s=%s st=%s lf=%s ld=%s lti=%s",
+                            distance, hits, buffer, streak, sentTeleport, lastFlying.getPassed(),
+                            data.lagInfo.lastPingDrop.getPassed(), lastTransProblem.getPassed());
+                } else {
+                    if(streak > 3 && sentTeleport) {
+                        if (++hbuffer > 5) {
+                            find(HitboxesB.class).vl++;
+                            find(HitboxesB.class).flag(120, "%.1f;%.1f;%.1f", eloc.x, eloc.y, eloc.z);
+                        }
+                    }
+                    debug("didnt hit box: x=%.1f y=%.1f z=%.1f lti=%s", eloc.x, eloc.y, eloc.z,
+                            lastTransProblem.getPassed());
+                }
             }
         }
 
@@ -264,15 +242,12 @@ public class ReachB extends Check {
 
             eloc.increment = 3;
 
-            eloc.oldLocations.clear();
-            eloc.oldLocations.addAll(eloc.interpolatedLocations);
+            eloc.interpolatedLocations.clear();
 
             KillauraH detection = find(KillauraH.class);
 
             detection.getTargetLocations().clear();
-            eloc.interpolatedLocations.clear();
-            eloc.interpolatedLocations.addAll(eloc.getInterpolatedLocations());
-            eloc.interpolatedLocations.stream()
+            eloc.getInterpolatedLocations().stream()
                     .map(kloc -> {
                         SimpleCollisionBox box = (SimpleCollisionBox) EntityData.getEntityBox(kloc, entity);
 
@@ -291,7 +266,7 @@ public class ReachB extends Check {
                         return box;
                     }).forEach(detection.getTargetLocations()::add);
 
-                    /*if(data.target != null && data.target.getEntityId() == packet.getId())
+                    /*if(target != null && target.getEntityId() == packet.getId())
                     debug("Setting new posrot: %.4f, %.4f, %.4f, %s (%s)",
                             eloc.newX, eloc.newY, eloc.newZ, eloc.increment, System.currentTimeMillis());*/
         });
@@ -323,10 +298,7 @@ public class ReachB extends Check {
                     eloc.newZ = eloc.z = packet.z;
                     eloc.newYaw = eloc.yaw = packet.yaw;
                     eloc.newPitch = eloc.pitch = packet.pitch;
-                    eloc.oldLocations.clear();
-                    eloc.oldLocations.addAll(eloc.interpolatedLocations);
                     eloc.interpolatedLocations.clear();
-                    eloc.interpolatedLocations.addAll(eloc.getInterpolatedLocations());
                 } else {
                     eloc.newX = packet.x;
                     eloc.newY = packet.y;
@@ -335,10 +307,7 @@ public class ReachB extends Check {
                     eloc.newPitch = packet.pitch;
 
                     eloc.increment = 3;
-                    eloc.oldLocations.clear();
-                    eloc.oldLocations.addAll(eloc.interpolatedLocations);
                     eloc.interpolatedLocations.clear();
-                    eloc.interpolatedLocations.addAll(eloc.getInterpolatedLocations());
                 }
             } else {
                 //We don't need to do version checking here. Atlas handles this for us.
@@ -349,15 +318,11 @@ public class ReachB extends Check {
                 eloc.newPitch = packet.pitch;
 
                 eloc.increment = 3;
-                eloc.oldLocations.clear();
-                eloc.oldLocations.addAll(eloc.interpolatedLocations);
-                eloc.interpolatedLocations.clear();
-                eloc.interpolatedLocations.addAll(eloc.getInterpolatedLocations());
             }
 
             KillauraH detection = find(KillauraH.class);
             detection.getTargetLocations().clear();
-            eloc.interpolatedLocations.stream()
+            eloc.getInterpolatedLocations().stream()
                     .map(kloc -> {
                         SimpleCollisionBox box = (SimpleCollisionBox) EntityData.getEntityBox(kloc, entity);
 
@@ -377,7 +342,7 @@ public class ReachB extends Check {
                         return box;
                     }).forEach(detection.getTargetLocations()::add);
 
-                    /*if(data.target != null && data.target.getEntityId() == packet.entityId)
+                    /*if(target != null && target.getEntityId() == packet.entityId)
                     debug("Setting new posrot: %.4f, %.4f, %.4f, %s (%s)",
                             eloc.newX, eloc.newY, eloc.newZ, eloc.increment, System.currentTimeMillis());*/
 
@@ -387,20 +352,10 @@ public class ReachB extends Check {
     }
 
     private void runAction(Entity entity, Runnable action) {
-        if(data.target != null && data.target.getUniqueId().equals(entity.getUniqueId())) {
-            AtomicLong start = new AtomicLong();
-            data.runInstantAction(ia -> {
-                if(!ia.isEnd()) {
-                    start.set(System.currentTimeMillis());
-                } else {
-                    action.run();
-                    long delta = System.currentTimeMillis() - start.get();
-                    if(delta > 4) {
-                        lastTransProblem.reset();
-                    }
-                }
-            }, true);
-        } else data.runKeepaliveAction(keepalive -> action.run());
+        data.runKeepaliveAction(keepalive -> action.run());
+        data.runKeepaliveAction(keepalive -> {
+            entityLocationMap.get(entity.getUniqueId()).oldLocations.clear();
+        }, 1);
     }
 
 }
