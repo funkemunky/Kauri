@@ -29,8 +29,6 @@ public class ReachA extends Check {
             EntityType.BLAZE, EntityType.SKELETON, EntityType.PLAYER, EntityType.VILLAGER, EntityType.IRON_GOLEM,
                     EntityType.WITCH, EntityType.COW, EntityType.CREEPER);
 
-    private int transBetweenFlying;
-
     @Setting(name = "maxDistance")
     public static double reachThreshold = 3.1;
 
@@ -38,7 +36,6 @@ public class ReachA extends Check {
     public void onUse(WrappedInUseEntityPacket packet) {
         if(packet.getAction() != WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK) return;
 
-        ++transBetweenFlying;
         reachA: {
             if(data.playerInfo.creative
                     || data.targetPastLocation.previousLocations.size() < 10
@@ -48,7 +45,7 @@ public class ReachA extends Check {
 
 
             List<KLocation> targetLocs = data.targetPastLocation
-                    .getEstimatedLocationByIndex(data.lagInfo.transPing + 2 + Math.max(1, transBetweenFlying),
+                    .getEstimatedLocationByIndex(data.lagInfo.transPing + 2,
                             4, 4);
 
             KLocation torigin = data.playerInfo.to.clone(), forigin = data.playerInfo.from.clone();
@@ -120,9 +117,10 @@ public class ReachA extends Check {
                 }
             } else buffer -= buffer > 0 ? 0.075f : 0;
 
-            debug("distance=%.3f h/m=%s,%s boxes=%s buffer=%s hbhits=%s dt=%s lct=%s",
+            debug("distance=%.3f h/m=%s,%s boxes=%s buffer=%s hbhits=%s lct=%s lts=%s",
                     distance, hits, misses, targetLocs.size(), buffer, hitboxHits,
-                    transBetweenFlying, System.currentTimeMillis() - data.lagInfo.lastClientTrans);
+                    System.currentTimeMillis() - data.lagInfo.lastClientTrans,
+                    data.playerInfo.lastTargetSwitch.getPassed());
         }
     }
 

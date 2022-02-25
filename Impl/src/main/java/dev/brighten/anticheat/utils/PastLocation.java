@@ -87,6 +87,9 @@ public class PastLocation {
         KLocation loc = location.clone();
         loc.timeStamp = Kauri.INSTANCE.keepaliveProcessor.tick;
         synchronized (previousLocations) {
+            if (previousLocations.size() >= 20)
+                previousLocations.removeFirst();
+
             previousLocations.add(loc);
         }
     }
