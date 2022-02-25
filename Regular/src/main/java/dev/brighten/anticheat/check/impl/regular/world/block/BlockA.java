@@ -17,6 +17,7 @@ import org.bukkit.util.Vector;
 public class BlockA extends Check {
 
     private int buffer;
+
     @Packet
     public void onBlock(WrappedInBlockPlacePacket event) {
         Vector dir = new Vector(event.getFace().getAdjacentX(),

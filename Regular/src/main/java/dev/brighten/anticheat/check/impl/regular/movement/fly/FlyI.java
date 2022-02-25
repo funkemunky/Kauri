@@ -9,7 +9,7 @@ import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Fly (I)", description = "Checks for bad hovering.",
-        checkType = CheckType.FLIGHT, devStage = DevStage.ALPHA, punishVL = 8)
+        checkType = CheckType.FLIGHT, devStage = DevStage.BETA, punishVL = 8)
 @Cancellable
 public class FlyI extends Check {
 

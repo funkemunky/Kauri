@@ -28,6 +28,7 @@ public class NoFallB extends Check {
         if(data.playerInfo.clientGround
                 && !data.playerInfo.doingBlockUpdate
                 && !data.playerInfo.serverGround
+                && data.playerInfo.vehicleTimer.isPassed(20)
                 && data.playerInfo.lastBlockPlace.isPassed(4)
                 //And are no where near blocks
                 && !data.blockInfo.blocksBelow && !data.blockInfo.blocksNear
@@ -48,6 +49,7 @@ public class NoFallB extends Check {
         // If they are saying they are on the ground
         if(!data.playerInfo.clientGround
                 // Their bounding box is on the ground
+                && data.playerInfo.vehicleTimer.isPassed(20)
                 && ((data.playerInfo.serverGround || data.blockInfo.blocksBelow) && dground)
                 && data.playerInfo.lastTeleportTimer.isPassed(2)) {
             if((airBuffer +=10) > 30) {

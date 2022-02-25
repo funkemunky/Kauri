@@ -12,7 +12,7 @@ import dev.brighten.api.check.DevStage;
 @Cancellable
 @CheckInfo(name = "Fly (F)", description = "Checks if an individual flys faster than possible.", executable = true,
         punishVL = 5,
-        checkType = CheckType.FLIGHT, planVersion = KauriVersion.FULL, devStage = DevStage.RELEASE)
+        checkType = CheckType.FLIGHT, planVersion = KauriVersion.FULL)
 public class FlyF extends Check {
 
     private double slimeY = 0;
