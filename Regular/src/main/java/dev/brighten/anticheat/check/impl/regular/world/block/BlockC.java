@@ -77,9 +77,6 @@ public class BlockC extends Check {
             final SimpleCollisionBox box = tuple.two;
             final Block block = tuple.one;
 
-            Kauri.INSTANCE.executor.execute(() ->
-                    box.draw(WrappedEnumParticle.FLAME, Collections.singleton(data.getPlayer())));
-
             final KLocation to = data.playerInfo.to.clone(), from = data.playerInfo.from.clone();
 
             to.y+= data.playerInfo.sneaking ? (ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_14)

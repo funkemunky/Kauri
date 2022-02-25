@@ -61,6 +61,7 @@ public class PacketProcessor {
                 if(data == null || data.checkManager == null) return;
 
                try {
+                   if(info.getType().equals(Packet.Client.USE_ENTITY)) System.out.println("Use entity");
                    if(outgoingPackets.contains(info.getType())) {
                        processServer(data, info.getPacket(), info.getType(), info.getTimestamp());
                    } else if(incomingPackets.contains(info.getType())) {
@@ -88,7 +89,7 @@ public class PacketProcessor {
                 ObjectData data = Kauri.INSTANCE.dataManager.getData(info.getPlayer());
 
                 if(data == null || data.checkManager == null) return;
-
+                        if(info.getType().equals(Packet.Client.USE_ENTITY)) System.out.println("Use entity 2");
                 switch(info.getType()) {
                     case Packet.Client.USE_ENTITY: {
                         val packet = new WrappedInUseEntityPacket(info.getPacket(), info.getPlayer());
@@ -181,7 +182,7 @@ public class PacketProcessor {
                         break;
                     }
                 }
-            }, Packet.Client.USE_ENTITY, Packet.Client.FLYING, Packet.Client.POSITION, Packet.Client.CREATIVE_SLOT,
+            }, Packet.Client.FLYING, Packet.Client.POSITION, Packet.Client.CREATIVE_SLOT,
                     Packet.Client.POSITION_LOOK, Packet.Client.LOOK, Packet.Server.REL_LOOK, Packet.Client.WINDOW_CLICK,
                     Packet.Client.CUSTOM_PAYLOAD, Packet.Client.CHAT, Packet.Client.ARM_ANIMATION,
                     Packet.Client.WINDOW_CLICK,
