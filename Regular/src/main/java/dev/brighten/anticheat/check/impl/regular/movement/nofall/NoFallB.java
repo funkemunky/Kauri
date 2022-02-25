@@ -19,7 +19,7 @@ public class NoFallB extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timestamp) {
-        if(!data.playerInfo.doingTeleport
+        if(data.playerInfo.doingTeleport
                 || data.playerInfo.canFly
                 || data.playerInfo.creative
                 || timestamp - data.creation < 2000L) return; // If we are waiting for them to teleport, don't check.

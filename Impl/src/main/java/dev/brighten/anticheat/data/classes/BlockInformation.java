@@ -220,7 +220,7 @@ public class BlockInformation {
                                         if (blockBox.isCollided(box))
                                             collidesVertically = true;
 
-                                        if(groundBox.copy().expandMin(0, -0.4, 0).expand(0.2, 0, 0.2)
+                                        if(groundBox.copy().expandMin(0, -0.8, 0).expand(0.2, 0, 0.2)
                                                 .isIntersected(blockBox))
                                             objectData.playerInfo.nearGround = true;
 
@@ -368,29 +368,13 @@ public class BlockInformation {
         }
 
         if(objectData.boxDebuggers.size() > 0) {
-            handler.setSize(0.62f, 1.81f);
-            handler.setOffset(-0.01f);
-
-            for (Block block : handler.getBlocks()) {
-                objectData.boxDebuggers.forEach(pl -> {
-                    List<SimpleCollisionBox> boxes = new ArrayList<>();
-                    BlockData.getData(block.getType()).getBox(block, ProtocolVersion.getGameVersion())
-                            .downCast(boxes);
-
-                    boxes.forEach(sbox -> {
-                        val max = sbox.max().subtract(block.getLocation().toVector());
-                        val min = sbox.min().subtract(block.getLocation().toVector());
-
-                        Vector subbed = max.subtract(min);
-
-                        pl.sendMessage("x=" + subbed.getX() + " y=" + subbed.getY() + " z=" + subbed.getZ());
-                    });
-
-                });
-            }
-            handler.setSize(0.6, 1.8);
+            handler.setSize(4, 4);
+            handler.setOffset(-1);
             handler.getCollisionBoxes().forEach(cb -> cb.draw(WrappedEnumParticle.FLAME, objectData.boxDebuggers));
         }
+
+        handler.setSize(0.6f, 1.8f);
+        handler.setOffset(0f);
 
         this.handler.getEntities().clear();
         this.handler = handler;
