@@ -146,7 +146,6 @@ public class VelocityB extends Check {
                     && pvZ != 0
                     && timeStamp - data.creation > 3000L
                     && data.playerInfo.lastTeleportTimer.isPassed(1)
-                    && !data.getPlayer().getItemInHand().getType().isEdible()
                     && !data.blockInfo.blocksNear) {
                 if(data.playerInfo.lastUseItem.isPassed(2) && ++buffer > 30) {
                     vl++;
