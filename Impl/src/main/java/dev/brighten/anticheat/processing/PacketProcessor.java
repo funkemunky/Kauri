@@ -797,9 +797,7 @@ public class PacketProcessor {
 
                 data.teleportsToConfirm++;
 
-                data.runInstantAction(ka -> {
-                    if(ka.isEnd()) data.teleportsToConfirm--;
-                });
+                data.runKeepaliveAction(ka -> data.teleportsToConfirm--);
                 data.playerInfo.posLocs.add(loc);
 
                 data.playerInfo.phaseLoc = loc.clone();

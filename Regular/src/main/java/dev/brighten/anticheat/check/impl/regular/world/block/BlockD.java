@@ -23,7 +23,7 @@ public class BlockD extends Check {
         double distance = data.getPlayer().getLocation().distance(b.getLocation());
         double ab_distance = data.getPlayer().getLocation().distance(ba.getLocation()) + 0.3;
 
-        if (distance >= 1.3 && distance > ab_distance && ypos <= 0.5) {
+        if (distance >= 1.4 && distance > ab_distance && ypos <= 0.5) {
             vl++;
             flag(300, "d:%.4f, ad:%.4f y=%.1f", distance, ab_distance, ypos);
         }
