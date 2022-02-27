@@ -12,18 +12,11 @@ import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.Tuple;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.Updates;
-import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.processing.MovementProcessor;
-import dev.brighten.db.utils.json.JSONException;
-import dev.brighten.db.utils.json.JSONObject;
-import dev.brighten.db.utils.json.JsonReader;
 import lombok.val;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -188,6 +181,7 @@ public class MiscUtils {
 
     public static void close(Closeable... closeables) {
         try {
+            for (Closeable closeable : closeables) if (closeable != null) closeable.close();
             for (Closeable closeable : closeables) if (closeable != null) closeable.close();
         } catch (Exception e) {
             e.printStackTrace();

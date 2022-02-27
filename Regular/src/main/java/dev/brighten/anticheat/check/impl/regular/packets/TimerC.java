@@ -50,10 +50,8 @@ public class TimerC extends Check {
             if (this.balance > 45000000L && data.playerInfo.moveTicks > 60) {
 
                 if (this.buffer++ > 7) {
-                    this.flag(
-                            "buffer=" + this.buffer,
-                            "balance=" + this.balance
-                    );
+                    vl++;
+                    flag("buffer=%.1f balance=%s", buffer, balance);
                 }
 
                 this.lastFlag = now;
