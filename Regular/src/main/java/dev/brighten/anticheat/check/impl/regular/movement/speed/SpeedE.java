@@ -1,6 +1,8 @@
 package dev.brighten.anticheat.check.impl.regular.movement.speed;
 
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.tinyprotocol.packet.types.MathHelper;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.check.api.Cancellable;
@@ -15,6 +17,12 @@ import lombok.Getter;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
+
 @CheckInfo(name = "Speed (E)", description = "Motion check - Rhys", checkType = CheckType.SPEED,
         devStage = DevStage.ALPHA, punishVL = 40)
 @Cancellable
@@ -22,6 +30,28 @@ public class SpeedE extends Check {
 
     private double threshold;
     private WrappedInFlyingPacket lastFlying, lastLastLast;
+    private final Map<Short, Motion> velocities = new HashMap<>();
+
+    @Packet
+    public void onVelocity(WrappedOutVelocityPacket packet) {
+        synchronized (velocities) {
+            short id = (short) ThreadLocalRandom.current().nextInt(Short.MIN_VALUE, Short.MAX_VALUE);
+
+            //Ensuring there are no duplicates
+            while(velocities.containsKey(id)) {
+                id = (short) ThreadLocalRandom.current().nextInt(Short.MIN_VALUE, Short.MAX_VALUE);
+            }
+
+            velocities.put(id, new Motion(packet.getX(), 0, packet.getZ()));
+
+            short finalId = id;
+            data.runKeepaliveAction(ka -> {
+                synchronized (velocities) {
+                    velocities.remove(finalId);
+                }
+            }, 3);
+        }
+    }
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
@@ -77,102 +107,114 @@ public class SpeedE extends Check {
 
             iteration:
             {
+                synchronized (velocities) {
+                    final List<Short> velocityKeys = new ArrayList<>();
 
-                // Yes this looks retarded but its brute forcing every possible thing.
-                for (int f = -1; f < 2; f++) {
-                    for (int s = -1; s < 2; s++) {
-                        for (int sp = 0; sp < 2; sp++) {
-                            for (int jp = 0; jp < 2; jp++) {
-                                for (int ui = 0; ui < 2; ui++) {
-                                    for (int hs = 0; hs < 2; hs++) {
-                                        for (int sn = 0; sn < 2; sn++) {
+                    velocityKeys.add((short)-1);
+                    velocityKeys.addAll(velocities.keySet());
+                    // Yes this looks retarded but its brute forcing every possible thing.
+                    for (int f = -1; f < 2; f++) {
+                        for (int s = -1; s < 2; s++) {
+                            for(int fmath = 0 ; fmath < 2 ; fmath++) {
+                                for (int sp = 0; sp < 2; sp++) {
+                                    for(short v : velocityKeys) {
+                                        for (int jp = 0; jp < 2; jp++) {
+                                            for (int ui = 0; ui < 2; ui++) {
+                                                for (int hs = 0; hs < 2; hs++) {
+                                                    for (int sn = 0; sn < 2; sn++) {
 
-                                            final boolean sprint = sp == 0;
-                                            final boolean jump = jp == 0;
-                                            final boolean using = ui == 0;
-                                            final boolean hitSlowdown = hs == 0;
+                                                        final boolean sprint = sp == 0;
+                                                        final boolean jump = jp == 0;
+                                                        final boolean using = ui == 0;
+                                                        final boolean fastMath = fmath == 0;
+                                                        final boolean hitSlowdown = hs == 0;
+                                                        final boolean checkVelocity = v != (short)-1;
 
-                                            final boolean ground = lastFlying.isGround();
-                                            final boolean sneaking = sn == 0;
+                                                        final boolean ground = lastFlying.isGround();
+                                                        final boolean sneaking = sn == 0;
 
-                                            float forward = f;
-                                            float strafe = s;
+                                                        float forward = f;
+                                                        float strafe = s;
 
-                                            if (using) {
-                                                forward *= 0.2D;
-                                                strafe *= 0.2D;
-                                            }
+                                                        if (using) {
+                                                            forward *= 0.2D;
+                                                            strafe *= 0.2D;
+                                                        }
 
-                                            if (sneaking) {
-                                                forward *= (float) 0.3D;
-                                                strafe *= (float) 0.3D;
-                                            }
+                                                        if (sneaking) {
+                                                            forward *= (float) 0.3D;
+                                                            strafe *= (float) 0.3D;
+                                                        }
 
-                                            forward *= 0.98F;
-                                            strafe *= 0.98F;
+                                                        forward *= 0.98F;
+                                                        strafe *= 0.98F;
 
-                                            final Motion motion = new Motion(
-                                                    data.playerInfo.lDeltaX,
-                                                    0.0D,
-                                                    data.playerInfo.lDeltaZ
-                                            );
+                                                        final Motion motion = !checkVelocity ? new Motion(
+                                                                data.playerInfo.lDeltaX,
+                                                                0.0D,
+                                                                data.playerInfo.lDeltaZ
+                                                        ) : velocities.get(v);
 
-                                            if (lastLastLast.isGround()) {
-                                                motion.getMotionX().multiply(0.6F * 0.91F);
-                                                motion.getMotionZ().multiply(0.6F * 0.91F);
-                                            } else {
-                                                motion.getMotionX().multiply(0.91F);
-                                                motion.getMotionZ().multiply(0.91F);
-                                            }
+                                                        if (lastLastLast.isGround()) {
+                                                            motion.getMotionX().multiply(0.6F * 0.91F);
+                                                            motion.getMotionZ().multiply(0.6F * 0.91F);
+                                                        } else {
+                                                            motion.getMotionX().multiply(0.91F);
+                                                            motion.getMotionZ().multiply(0.91F);
+                                                        }
 
-                                            if (hitSlowdown) {
-                                                motion.getMotionX().multiply(0.6D);
-                                                motion.getMotionZ().multiply(0.6D);
-                                            }
+                                                        if (hitSlowdown) {
+                                                            motion.getMotionX().multiply(0.6D);
+                                                            motion.getMotionZ().multiply(0.6D);
+                                                        }
 
-                                            motion.round();
+                                                        if(data.playerVersion.isBelow(ProtocolVersion.V1_9))
+                                                        motion.round();
 
-                                            if (jump && sprint) {
-                                                final float radians = data.playerInfo.to.yaw
-                                                        * 0.017453292F;
+                                                        if (jump && sprint) {
+                                                            final float radians = data.playerInfo.to.yaw
+                                                                    * 0.017453292F;
 
-                                                motion.getMotionX().subtract(MathHelper.sin(radians) * 0.2F);
-                                                motion.getMotionZ().add(MathHelper.cos(radians) * 0.2F);
-                                            }
+                                                            motion.getMotionX().subtract(sin(fastMath, radians) * 0.2F);
+                                                            motion.getMotionZ().add(cos(fastMath, radians) * 0.2F);
+                                                        }
 
-                                            float slipperiness = 0.91F;
-                                            if (ground) slipperiness = 0.6F * 0.91F;
+                                                        float slipperiness = 0.91F;
+                                                        if (ground) slipperiness = 0.6F * 0.91F;
 
-                                            float moveSpeed = (float) attributeSpeed;
-                                            if (sprint) moveSpeed += moveSpeed * 0.30000001192092896D;
+                                                        float moveSpeed = (float) attributeSpeed;
+                                                        if (sprint) moveSpeed += moveSpeed * 0.30000001192092896D;
 
-                                            final float moveFlyingFriction;
+                                                        final float moveFlyingFriction;
 
-                                            if (ground) {
-                                                final float moveSpeedMultiplier = 0.16277136F /
-                                                        (slipperiness * slipperiness * slipperiness);
+                                                        if (ground) {
+                                                            final float moveSpeedMultiplier = 0.16277136F /
+                                                                    (slipperiness * slipperiness * slipperiness);
 
-                                                moveFlyingFriction = moveSpeed * moveSpeedMultiplier;
-                                            } else {
-                                                moveFlyingFriction = (float)
-                                                        (sprint ? ((double) 0.02F + (double) 0.02F * 0.3D) : 0.02F);
-                                            }
+                                                            moveFlyingFriction = moveSpeed * moveSpeedMultiplier;
+                                                        } else {
+                                                            moveFlyingFriction = (float)
+                                                                    (sprint ? ((double) 0.02F + (double) 0.02F * 0.3D) : 0.02F);
+                                                        }
 
-                                            motion.apply(this.moveFlying(
-                                                    forward, strafe,
-                                                    moveFlyingFriction
-                                            ));
+                                                        motion.apply(this.moveFlying(fastMath,
+                                                                forward, strafe,
+                                                                moveFlyingFriction
+                                                        ));
 
-                                            motion.getMotionY().set(0.0);
+                                                        motion.getMotionY().set(0.0);
 
-                                            final double distance = realMotion.distanceSquared(motion);
+                                                        final double distance = realMotion.distanceSquared(motion);
 
-                                            if (distance < smallest) {
-                                                smallest = distance;
-                                                predicted = motion;
+                                                        if (distance < smallest) {
+                                                            smallest = distance;
+                                                            predicted = motion;
 
-                                                if (distance < 1E-8) {
-                                                    break iteration;
+                                                            if (distance < 1E-8) {
+                                                                break iteration;
+                                                            }
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
@@ -196,6 +238,8 @@ public class SpeedE extends Check {
             } else {
                 this.threshold -= this.threshold > 0 ? .005 : 0;
             }
+
+            debug("(%.2f) o=" + smallest, threshold);
         }
 
         lastLastLast = lastFlying;
@@ -215,6 +259,10 @@ public class SpeedE extends Check {
          */
         public Motion() {
 
+        }
+
+        public Motion(Vector vector) {
+            this(vector.getX(), vector.getY(), vector.getZ());
         }
 
         /**
@@ -269,7 +317,8 @@ public class SpeedE extends Check {
         }
     }
 
-    private MoveFlyingResult moveFlying(final float moveForward, final float moveStrafe, final float friction) {
+    private MoveFlyingResult moveFlying(final boolean fastMath,
+                                        final float moveForward, final float moveStrafe, final float friction) {
         float diagonal = moveStrafe * moveStrafe + moveForward * moveForward;
 
         float moveFlyingFactorX = 0.0F;
@@ -289,8 +338,8 @@ public class SpeedE extends Check {
 
             final float rotationYaw = data.playerInfo.to.yaw;
 
-            final float f1 = MathHelper.sin(rotationYaw * (float) Math.PI / 180.0F);
-            final float f2 = MathHelper.cos(rotationYaw * (float) Math.PI / 180.0F);
+            final float f1 = sin(fastMath, rotationYaw * (float) Math.PI / 180.0F);
+            final float f2 = cos(fastMath, rotationYaw * (float) Math.PI / 180.0F);
 
             final float factorX = strafe * f2 - forward * f1;
             final float factorZ = forward * f2 + strafe * f1;
@@ -302,6 +351,35 @@ public class SpeedE extends Check {
         return new MoveFlyingResult(moveFlyingFactorX, moveFlyingFactorZ);
     }
 
+    private static final float[] SIN_TABLE_FAST = new float[4096];
+    private static final float[] SIN_TABLE = new float[65536];
+
+    private static float sin(boolean fastMath, float p_76126_0_) {
+        return fastMath ? SIN_TABLE_FAST[(int) (p_76126_0_ * 651.8986F) & 4095]
+                : SIN_TABLE[(int) (p_76126_0_ * 10430.378F) & 65535];
+    }
+
+    private static float cos(boolean fastMath, float p_76134_0_) {
+        return fastMath ? SIN_TABLE_FAST[(int) ((p_76134_0_ + ((float) Math.PI / 2F)) * 651.8986F) & 4095]
+                : SIN_TABLE[(int) (p_76134_0_ * 10430.378F + 16384.0F) & 65535];
+    }
+
+    static {
+        int i;
+
+        for (i = 0; i < 65536; ++i) {
+            SIN_TABLE[i] = (float) Math.sin((double) i * Math.PI * 2.0D / 65536.0D);
+        }
+
+        for (i = 0; i < 4096; ++i) {
+            SIN_TABLE_FAST[i] = (float) Math.sin(((float) i + 0.5F) / 4096.0F * ((float) Math.PI * 2F));
+        }
+
+        for (i = 0; i < 360; i += 90) {
+            SIN_TABLE_FAST[(int) ((float) i * 11.377778F) & 4095] = (float) Math
+                    .sin((float) i * 0.017453292F);
+        }
+    }
 
     @Getter
     @AllArgsConstructor
@@ -314,7 +392,6 @@ public class SpeedE extends Check {
         return data.playerInfo.liquidTimer.isNotPassed(2)
                 || data.blockInfo.collidesHorizontally
                 || data.playerInfo.slimeTimer.isNotPassed(2)
-                || data.playerInfo.lastVelocity.isNotPassed(5)
                 || data.playerInfo.iceTimer.isNotPassed(2)
                 || data.playerInfo.blockAboveTimer.isNotPassed(3);
     }
