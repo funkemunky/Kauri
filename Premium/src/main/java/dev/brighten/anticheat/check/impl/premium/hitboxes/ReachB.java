@@ -7,6 +7,7 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutEntityTeleportPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutRelativePosition;
+import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.world.EntityData;
@@ -92,6 +93,7 @@ public class ReachB extends Check {
         detection: {
             if(data.playerInfo.creative || data.playerInfo.inVehicle) {
                 attacks.clear();
+                debug("creative");
                 break detection;
             }
             Entity target;
@@ -114,7 +116,10 @@ public class ReachB extends Check {
                 from.y+= data.playerInfo.sneaking ? (ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_14)
                         ? 1.27f : 1.54f) : 1.62f;
                 
-                if(eloc.x == 0 && eloc.y == 0 & eloc.z == 0) break detection;
+                if(eloc.x == 0 && eloc.y == 0 & eloc.z == 0) {
+                    debug("eloc is all 0 wtf");
+                    break detection;
+                }
                 double distance = Double.MAX_VALUE;
                 boolean collided = false; //Using this to compare smaller numbers than Double.MAX_VALUE. Slightly faster
 
@@ -185,7 +190,8 @@ public class ReachB extends Check {
                             buffer = Math.min(2, buffer);
                         }
                     } else if(buffer > 0) buffer-= 0.05f;
-                    debug("dist=%.2f>-3.001 hits-%s b=%s s=%s st=%s lf=%s ld=%s lti=%s",
+                    debug((distance > 3.001 ? Color.Green : "")
+                                    +"dist=%.2f>-3.001 hits-%s b=%s s=%s st=%s lf=%s ld=%s lti=%s",
                             distance, hits, buffer, streak, sentTeleport, lastFlying.getPassed(),
                             data.lagInfo.lastPingDrop.getPassed(), lastTransProblem.getPassed());
                 } else {
@@ -352,10 +358,18 @@ public class ReachB extends Check {
     }
 
     private void runAction(Entity entity, Runnable action) {
-        data.runKeepaliveAction(keepalive -> action.run());
-        data.runKeepaliveAction(keepalive -> {
-            entityLocationMap.get(entity.getUniqueId()).oldLocations.clear();
-        }, 1);
+        if(data.target != null && data.target.getEntityId() == entity.getEntityId()) {
+            data.runInstantAction(ia -> {
+                if(!ia.isEnd()) {
+                    action.run();
+                } else entityLocationMap.get(entity.getUniqueId()).oldLocations.clear();
+            });
+        } else {
+            data.runKeepaliveAction(keepalive -> action.run());
+            data.runKeepaliveAction(keepalive -> {
+                entityLocationMap.get(entity.getUniqueId()).oldLocations.clear();
+            }, 1);
+        }
     }
 
 }

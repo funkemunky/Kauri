@@ -432,17 +432,18 @@ public class PacketProcessor {
                             data.lagInfo.transPing = (current - ka.start);
 
                             if(data.instantTransaction.size() > 0) {
-                                Deque<Short> toRemove = new LinkedList<>();
-                                data.instantTransaction.forEach((key, tuple) -> {
-                                    if((timestamp - tuple.one.getStamp()) > data.lagInfo.transPing * 52L + 750L) {
-                                        tuple.two.accept(tuple.one);
-                                        toRemove.add(key);
+                                synchronized (data.instantTransaction) {
+                                    Deque<Short> toRemove = new LinkedList<>();
+                                    data.instantTransaction.forEach((key, tuple) -> {
+                                        if((timestamp - tuple.one.getStamp()) > data.lagInfo.transPing * 52L + 750L) {
+                                            tuple.two.accept(tuple.one);
+                                            toRemove.add(key);
+                                        }
+                                    });
+                                    Short key = null;
+                                    while((key = toRemove.poll()) != null) {
+                                        data.instantTransaction.remove(key);
                                     }
-                                });
-
-                                Short key = null;
-                                while((key = toRemove.poll()) != null) {
-                                    data.instantTransaction.remove(key);
                                 }
                             }
 
