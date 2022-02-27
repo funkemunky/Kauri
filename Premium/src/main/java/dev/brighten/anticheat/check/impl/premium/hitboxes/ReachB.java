@@ -184,7 +184,7 @@ public class ReachB extends Check {
                     hbuffer = 0;
                     distance = Math.sqrt(distance);
                     if(distance > 3.001) {
-                        if(++buffer > 1.2) {
+                        if(++buffer > 2) {
                             vl++;
                             flag("d=%.3f>-3.001 ltp=%s", distance, lastTransProblem.getPassed());
                             buffer = Math.min(2, buffer);
@@ -195,11 +195,9 @@ public class ReachB extends Check {
                             distance, hits, buffer, streak, sentTeleport, lastFlying.getPassed(),
                             data.lagInfo.lastPingDrop.getPassed(), lastTransProblem.getPassed());
                 } else {
-                    if(streak > 3 && sentTeleport) {
-                        if (++hbuffer > 5) {
-                            find(HitboxesB.class).vl++;
-                            find(HitboxesB.class).flag(120, "%.1f;%.1f;%.1f", eloc.x, eloc.y, eloc.z);
-                        }
+                    if (++hbuffer > 5) {
+                        find(HitboxesB.class).vl++;
+                        find(HitboxesB.class).flag(120, "%.1f;%.1f;%.1f", eloc.x, eloc.y, eloc.z);
                     }
                     debug("didnt hit box: x=%.1f y=%.1f z=%.1f lti=%s", eloc.x, eloc.y, eloc.z,
                             lastTransProblem.getPassed());
