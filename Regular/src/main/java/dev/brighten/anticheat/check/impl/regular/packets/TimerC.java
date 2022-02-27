@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.check.impl.regular.packets;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutPositionPacket;
 import dev.brighten.anticheat.check.api.Check;
@@ -10,7 +11,8 @@ import dev.brighten.api.check.CheckType;
 
 import java.util.concurrent.TimeUnit;
 
-@CheckInfo(name = "Timer (C)", checkType = CheckType.BADPACKETS, enabled = true)
+@CheckInfo(name = "Timer (C)", description = "Timer Check - Rhys", punishVL = 20,
+        checkType = CheckType.BADPACKETS)
 public class TimerC extends Check {
 
     private long lastNanos = -1L;
@@ -26,6 +28,15 @@ public class TimerC extends Check {
         this.balance -= TimeUnit.MILLISECONDS.toNanos(
                 250L + data.lagInfo.transPing*50L
         );
+    }
+
+    @Packet
+    public void onBlockPlace(WrappedInBlockPlacePacket packet) {
+        //In versions 1.17 and newer, players will send an extra flying when right clicking
+        if(data.playerVersion.isOrAbove(ProtocolVersion.v1_17))
+            this.balance -= TimeUnit.MILLISECONDS.toNanos(
+                    250L + data.lagInfo.transPing*50L
+            );
     }
 
     @Packet

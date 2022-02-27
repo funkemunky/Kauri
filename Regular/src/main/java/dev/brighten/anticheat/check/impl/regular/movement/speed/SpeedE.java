@@ -15,8 +15,8 @@ import lombok.Getter;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-@CheckInfo(name = "Speed (E)", description = "Motion check", checkType = CheckType.SPEED,
-        devStage = DevStage.ALPHA, punishVL = 12)
+@CheckInfo(name = "Speed (E)", description = "Motion check - Rhys", checkType = CheckType.SPEED,
+        devStage = DevStage.ALPHA, punishVL = 40)
 @Cancellable
 public class SpeedE extends Check {
 
