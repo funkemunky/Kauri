@@ -24,13 +24,15 @@ import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 @CheckInfo(name = "Speed (E)", description = "Motion check - Rhys", checkType = CheckType.SPEED,
-        devStage = DevStage.ALPHA, punishVL = 40)
+        devStage = DevStage.ALPHA, punishVL = 30)
 @Cancellable
 public class SpeedE extends Check {
 
     private double threshold;
     private WrappedInFlyingPacket lastFlying, lastLastLast;
     private final Map<Short, Motion> velocities = new HashMap<>();
+
+    private static final boolean[] TRUE_FALSE = new boolean[]{true, false};
 
     @Packet
     public void onVelocity(WrappedOutVelocityPacket packet) {
@@ -115,23 +117,16 @@ public class SpeedE extends Check {
                     // Yes this looks retarded but its brute forcing every possible thing.
                     for (int f = -1; f < 2; f++) {
                         for (int s = -1; s < 2; s++) {
-                            for(int fmath = 0 ; fmath < 2 ; fmath++) {
-                                for (int sp = 0; sp < 2; sp++) {
+                            for(boolean fastMath : TRUE_FALSE) {
+                                for(boolean sprint : TRUE_FALSE) {
                                     for(short v : velocityKeys) {
-                                        for (int jp = 0; jp < 2; jp++) {
-                                            for (int ui = 0; ui < 2; ui++) {
-                                                for (int hs = 0; hs < 2; hs++) {
-                                                    for (int sn = 0; sn < 2; sn++) {
+                                        for(boolean jump : TRUE_FALSE) {
+                                            for(boolean using : TRUE_FALSE) {
+                                                for(boolean hitSlowdown : TRUE_FALSE) {
+                                                    for(boolean sneaking : TRUE_FALSE) {
 
-                                                        final boolean sprint = sp == 0;
-                                                        final boolean jump = jp == 0;
-                                                        final boolean using = ui == 0;
-                                                        final boolean fastMath = fmath == 0;
-                                                        final boolean hitSlowdown = hs == 0;
                                                         final boolean checkVelocity = v != (short)-1;
-
                                                         final boolean ground = lastFlying.isGround();
-                                                        final boolean sneaking = sn == 0;
 
                                                         float forward = f;
                                                         float strafe = s;
@@ -175,8 +170,10 @@ public class SpeedE extends Check {
                                                             final float radians = data.playerInfo.to.yaw
                                                                     * 0.017453292F;
 
-                                                            motion.getMotionX().subtract(sin(fastMath, radians) * 0.2F);
-                                                            motion.getMotionZ().add(cos(fastMath, radians) * 0.2F);
+                                                            motion.getMotionX()
+                                                                    .subtract(sin(fastMath, radians) * 0.2F);
+                                                            motion.getMotionZ()
+                                                                    .add(cos(fastMath, radians) * 0.2F);
                                                         }
 
                                                         float slipperiness = 0.91F;
@@ -194,7 +191,8 @@ public class SpeedE extends Check {
                                                             moveFlyingFriction = moveSpeed * moveSpeedMultiplier;
                                                         } else {
                                                             moveFlyingFriction = (float)
-                                                                    (sprint ? ((double) 0.02F + (double) 0.02F * 0.3D) : 0.02F);
+                                                                    (sprint ? ((double) 0.02F
+                                                                            + (double) 0.02F * 0.3D) : 0.02F);
                                                         }
 
                                                         motion.apply(this.moveFlying(fastMath,
