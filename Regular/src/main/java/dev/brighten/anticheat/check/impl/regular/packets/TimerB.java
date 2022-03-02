@@ -44,7 +44,7 @@ public class TimerB extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long now) {
         //Getting the amount of flyings that have occurred without lag.
-        if(lastFlyingAdd.isPassed(10))
+        if(lastFlyingAdd.isPassed(10) && now - data.lagInfo.lastClientTrans < 100L)
             noLagStreak++;
         else noLagStreak = 0;
 
@@ -69,7 +69,7 @@ public class TimerB extends Check {
             if(Math.abs(delta) > 2000L
                     && noLagStreak > 5) {
                 timeBeforeReset = totalTimer; //We are setting this just in case the player lags the next tick.
-                totalTimer = now - 100;
+                totalTimer = now - 1000;
                 lastReset.reset();
                 debug("Reset time");
                 justReset = true;
