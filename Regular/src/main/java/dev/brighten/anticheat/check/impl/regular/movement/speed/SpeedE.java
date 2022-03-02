@@ -229,9 +229,10 @@ public class SpeedE extends Check {
             if (data.playerInfo.lastTeleportTimer.isNotPassed(2)) break check;
 
             if (smallest > 1E-6
+                    && data.playerInfo.lastVelocity.isPassed(1)
                     && data.playerInfo.deltaXZ > .2 && !this.ignore()) {
 
-                if (this.threshold++ > 12) {
+                if (this.threshold++ > 5) {
                     vl++;
                     this.flag("offset=" + smallest);
                 }
