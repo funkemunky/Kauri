@@ -131,6 +131,9 @@ public class SpeedE extends Check {
                                                         float forward = f;
                                                         float strafe = s;
 
+                                                        //Impossible to sprint while not going forward
+                                                        if(forward <= 0) sprint = false;
+
                                                         if (using) {
                                                             forward *= 0.2D;
                                                             strafe *= 0.2D;

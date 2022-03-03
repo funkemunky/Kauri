@@ -60,6 +60,6 @@ public class VelocityA extends Check {
                     || data.blockInfo.collidesVertically) vY = 0;
 
             debug("pct=" + pct + " vl=" + buffer);
-        } else if(buffer > 0) buffer-= 0.5;
+        }
     }
 }
