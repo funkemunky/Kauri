@@ -33,7 +33,7 @@ public class PotionProcessor {
                     .forEach(data.potionProcessor.potionEffects::remove);
             data.potionProcessor.potionEffects
                     .add(new PotionEffect(type, packet.duration, packet.amplifier,
-                            (packet.flags & 1) == 1, (packet.flags & 2) == 2));
+                            (packet.flags & 1) == 1));
         });
     }
 
