@@ -6,18 +6,16 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 
 import java.util.EnumSet;
 
 @CheckInfo(name = "Hand (E)", description = "Incorrect interaction", checkType = CheckType.HAND, punishVL = 0)
 public class HandE extends Check {
 
-    private static EnumSet<EntityType> allowedEntities = EnumSet.of(EntityType.PLAYER, EntityType.ZOMBIE,
-            EntityType.VILLAGER, EntityType.SKELETON);
-
     @Packet
     public void onUse(WrappedInUseEntityPacket packet) {
-        if(!allowedEntities.contains(packet.getEntity().getType()) || packet.getVec() == null) return;
+        if(!(packet.getEntity() instanceof Player) || packet.getVec() == null) return;
         double x = Math.abs(packet.getVec().a), y = Math.abs(packet.getVec().b), z = Math.abs(packet.getVec().c);
 
         debug("x=%.2f y=%.2f z=%.2f", x, y, z);
