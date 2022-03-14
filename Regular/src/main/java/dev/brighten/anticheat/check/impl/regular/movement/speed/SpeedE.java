@@ -168,6 +168,7 @@ public class SpeedE extends Check {
 
                                                         if(data.playerVersion.isBelow(ProtocolVersion.V1_9))
                                                         motion.round();
+                                                        else motion.round19();
 
                                                         if (jump && sprint) {
                                                             final float radians = data.playerInfo.to.yaw
@@ -306,6 +307,12 @@ public class SpeedE extends Check {
             if (Math.abs(this.motionX.get()) < 0.005D) this.motionX.set(0.0D);
             if (Math.abs(this.motionY.get()) < 0.005D) this.motionY.set(0.0D);
             if (Math.abs(this.motionZ.get()) < 0.005D) this.motionZ.set(0.0D);
+        }
+
+        public void round19() {
+            if (Math.abs(this.motionX.get()) < 0.003D) this.motionX.set(0.0D);
+            if (Math.abs(this.motionY.get()) < 0.003D) this.motionY.set(0.0D);
+            if (Math.abs(this.motionZ.get()) < 0.003D) this.motionZ.set(0.0D);
         }
 
         public double distanceSquared(final Motion other) {
