@@ -14,20 +14,16 @@ import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.MillisTimer;
 import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import dev.brighten.api.check.CheckType;
-import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Timer (B)", description = "Checks the rate of packets coming in.",
         checkType = CheckType.BADPACKETS, vlToFlag = 5, punishVL = 12)
 @Cancellable
 public class TimerB extends Check {
 
-    private long totalTimer = -1, noLagStreak;
+    private long totalTimer = -1;
     private final Timer lastFlag = new MillisTimer(2000L),
-            lastReset = new TickTimer(),
-            lastFlyingAdd = new MillisTimer();
+            lastReset = new TickTimer();
     private int buffer;
-    private long timeBeforeReset;
-    private boolean flying, justReset;
 
     @Packet
     public void onTeleport(WrappedOutPositionPacket event) {
@@ -41,14 +37,24 @@ public class TimerB extends Check {
         totalTimer-= 50;
     }
 
+    //Fixes the problem with 1.9 where PacketPlayInFlying isn't always sent by the client and it therefore
+    //can infinitely never flag if a user was cheating on a 1.9+ client.
+    @Packet
+    public void onTransaction(WrappedInTransactionPacket packet, long now) {
+        if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) return;
+
+        Kauri.INSTANCE.keepaliveProcessor.getKeepById(packet.getAction()).ifPresent(ka -> {
+            long delta = now - ka.startStamp;
+
+            //We want to make sure the player isn't lagging before we reset their timer.
+            if(delta < 1095L && totalTimer - (now + 100) > 3000L) {
+                totalTimer = now - 300;
+            }
+        });
+    }
+
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long now) {
-        //Getting the amount of flyings that have occurred without lag.
-        if((lastFlyingAdd.isPassed(10)
-                && lastFlyingAdd.isNotPassed(70)))
-            noLagStreak++;
-        else noLagStreak = 0;
-
         check: {
             //This means we haven't started counting
             if(totalTimer == -1) {
@@ -63,25 +69,6 @@ public class TimerB extends Check {
 
             boolean isLagProblem = (Kauri.INSTANCE.keepaliveProcessor.laggyPlayers
                     / (double)Kauri.INSTANCE.keepaliveProcessor.totalPlayers) > 0.8;
-
-            //We don't want the time to run away, especially on versions 1.9+ where flyings are not sent if players
-            //are standing still. We also want to ensure we aren't resetting when a player lags because this will cause
-            //false positives.
-            if(Math.abs(delta) > 2000L
-                    && data.playerVersion.isOrAbove(ProtocolVersion.V1_9)
-                    && noLagStreak > 5) {
-                timeBeforeReset = totalTimer; //We are setting this just in case the player lags the next tick.
-                totalTimer = now - 1000;
-                lastReset.reset();
-                debug("Reset time");
-                justReset = true;
-            } else if(justReset) {
-                if(noLagStreak <= 1) {
-                    totalTimer = timeBeforeReset;
-                    debug("Restored previous time because lag");
-                }
-                justReset = false;
-            }
 
             if(totalTimer > threshold
                     //If most players on the server are lagging, it's very likely we have an unstable netty thread
@@ -100,7 +87,5 @@ public class TimerB extends Check {
                     isLagProblem, (data.lagInfo.lastPingDrop.isPassed(4)
                             && System.currentTimeMillis() - data.lagInfo.lastClientTrans < 120L));
         }
-        flying = true;
-        lastFlyingAdd.reset();
     }
 }
