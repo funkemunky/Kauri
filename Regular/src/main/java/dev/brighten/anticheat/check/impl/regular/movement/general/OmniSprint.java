@@ -1,7 +1,9 @@
 package dev.brighten.anticheat.check.impl.regular.movement.general;
 
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import dev.brighten.anticheat.check.api.*;
+import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.api.check.CheckType;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.potion.PotionEffectType;
@@ -17,6 +19,11 @@ public class OmniSprint extends Check {
     public void onFlying(WrappedInFlyingPacket packet) {
 
         if(Math.abs(data.predictionService.motionYaw) > 95 || data.predictionService.key.contains("W")) return;
+
+        double angle = Math.abs( MiscUtils.getAngle(data.playerInfo.to, data.playerInfo.from));
+
+        if(angle < 100 || (data.playerInfo.lastEntityCollision.isNotPassed(4)
+                && data.playerVersion.isOrAbove(ProtocolVersion.V1_9))) return;
 
         omniSprint: {
             if(!data.playerInfo.sprinting || !data.playerInfo.serverGround) break omniSprint;

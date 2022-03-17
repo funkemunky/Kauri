@@ -6,6 +6,7 @@ import dev.brighten.anticheat.utils.MiscUtils;
 import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
 import org.h2.jdbc.JdbcConnection;
+import org.h2.mvstore.MVStoreException;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,8 +53,16 @@ public class MySQL {
         }
         try {
             Class.forName("org.h2.Driver");
-            conn = new NonClosableConnection(new JdbcConnection("jdbc:h2:file:" +
-                    dataFolder.getAbsolutePath().replace(".db", ""), new Properties()));
+            try {
+                conn = new NonClosableConnection(DriverManager.getConnection("jdbc:h2:file:" +
+                        dataFolder.getAbsolutePath().replace(".db", ""), "sa", ""));
+            } catch(MVStoreException e) {
+                dataFolder.delete();
+                dataFolder.createNewFile();
+
+                conn = new NonClosableConnection(DriverManager.getConnection("jdbc:h2:file:" +
+                        dataFolder.getAbsolutePath().replace(".db", ""), "sa", ""));
+            }
             conn.setAutoCommit(true);
             Query.use(conn);
             Bukkit.getLogger().info("Connection to H2 SQlLite has been established.");
