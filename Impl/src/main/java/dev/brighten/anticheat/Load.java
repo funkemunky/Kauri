@@ -56,7 +56,7 @@ public class Load {
         Bukkit.getOnlinePlayers().forEach(ThreadHandler::addPlayer);
 
         register("Loading config...");
-        Atlas.getInstance().registerConfig(Kauri.INSTANCE);
+        Kauri.INSTANCE.saveDefaultConfig();
 
         register("Loading messages...");
         Kauri.INSTANCE.msgHandler = new MessageHandler(Kauri.INSTANCE);

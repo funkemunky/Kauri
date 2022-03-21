@@ -183,10 +183,10 @@ public class ReachB extends Check {
                 if(collided) {
                     hbuffer = 0;
                     distance = Math.sqrt(distance);
-                    if(distance > 3.001) {
+                    if(distance > 3.05) {
                         if(++buffer > 2) {
                             vl++;
-                            flag("d=%.3f>-3.001 ltp=%s", distance, lastTransProblem.getPassed());
+                            flag("d=%.3f>-3.05 ltp=%s", distance, lastTransProblem.getPassed());
                             buffer = Math.min(2, buffer);
                         }
                     } else if(buffer > 0) buffer-= 0.05f;

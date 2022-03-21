@@ -23,8 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
-@CheckInfo(name = "Speed (E)", description = "Motion check - Rhys", checkType = CheckType.SPEED,
-        devStage = DevStage.ALPHA, punishVL = 30)
+//@CheckInfo(name = "Speed (E)", description = "Motion check - Rhys", checkType = CheckType.SPEED,
+//        devStage = DevStage.ALPHA, punishVL = 30)
 @Cancellable
 public class SpeedE extends Check {
 

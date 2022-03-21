@@ -2,10 +2,8 @@ package dev.brighten.anticheat.logs.data.sql;
 
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.logs.data.config.MySQLConfig;
-import dev.brighten.anticheat.utils.MiscUtils;
 import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
-import org.h2.jdbc.JdbcConnection;
 import org.h2.mvstore.MVStoreException;
 
 import java.io.File;
@@ -41,27 +39,24 @@ public class MySQL {
 
     @SneakyThrows
     public static void initSqlLite() {
-        File dataFolder = new File(Kauri.INSTANCE.getDataFolder(), MySQLConfig.database + ".db");
+        File dataFolder = new File(Kauri.INSTANCE.getDataFolder(), MySQLConfig.database);
         if (!dataFolder.exists()){
-            try {//https://nexus.funkemunky.cc/service/local/repositories/releases/content/com/h2database/h2/1.4.199/h2-1.4.199.jar
-                if(dataFolder.createNewFile()) {
-                    Kauri.INSTANCE.getLogger().info("Successfully created " + MySQLConfig.database + ".db" + " in Kauri folder!");
-                }
-            } catch (IOException e) {
-                Kauri.INSTANCE.getLogger().log(Level.SEVERE, "File write error: "+MySQLConfig.database+".db");
+            //https://nexus.funkemunky.cc/service/local/repositories/releases/content/com/h2database/h2/1.4.199/h2-1.4.199.jar
+            if(dataFolder.mkdirs()) {
+                Kauri.INSTANCE.getLogger().info("Successfully created " + MySQLConfig.database + " in Kauri folder!");
             }
         }
         try {
             Class.forName("org.h2.Driver");
             try {
-                conn = new NonClosableConnection(DriverManager.getConnection("jdbc:h2:file:" +
-                        dataFolder.getAbsolutePath().replace(".db", ""), "sa", ""));
+                conn = new NonClosableConnection(DriverManager.getConnection("jdbc:h2:" +
+                        dataFolder.getAbsolutePath(), "sa", ""));
             } catch(MVStoreException e) {
                 dataFolder.delete();
                 dataFolder.createNewFile();
 
-                conn = new NonClosableConnection(DriverManager.getConnection("jdbc:h2:file:" +
-                        dataFolder.getAbsolutePath().replace(".db", ""), "sa", ""));
+                conn = new NonClosableConnection(DriverManager.getConnection("jdbc:h2:" +
+                        dataFolder.getAbsolutePath(), "sa", ""));
             }
             conn.setAutoCommit(true);
             Query.use(conn);
