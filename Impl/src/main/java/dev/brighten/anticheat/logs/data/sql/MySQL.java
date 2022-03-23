@@ -4,7 +4,7 @@ import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.logs.data.config.MySQLConfig;
 import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
-import org.h2.mvstore.MVStoreException;
+import org.h2.jdbc.JdbcConnection;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,25 +39,18 @@ public class MySQL {
 
     @SneakyThrows
     public static void initSqlLite() {
-        File dataFolder = new File(Kauri.INSTANCE.getDataFolder(), MySQLConfig.database);
-        if (!dataFolder.exists()){
-            //https://nexus.funkemunky.cc/service/local/repositories/releases/content/com/h2database/h2/1.4.199/h2-1.4.199.jar
-            if(dataFolder.mkdirs()) {
-                Kauri.INSTANCE.getLogger().info("Successfully created " + MySQLConfig.database + " in Kauri folder!");
+        File dataFolder = new File(Kauri.INSTANCE.getDataFolder(), MySQLConfig.database + ".db");
+        try {//https://nexus.funkemunky.cc/service/local/repositories/releases/content/com/h2database/h2/1.4.199/h2-1.4.199.jar
+            if(dataFolder.createNewFile()) {
+                Kauri.INSTANCE.getLogger().info("Successfully created " + MySQLConfig.database + ".db" + " in Kauri folder!");
             }
+        } catch (IOException e) {
+            Kauri.INSTANCE.getLogger().log(Level.SEVERE, "File write error: " + MySQLConfig.database + ".db");
         }
         try {
             Class.forName("org.h2.Driver");
-            try {
-                conn = new NonClosableConnection(DriverManager.getConnection("jdbc:h2:" +
-                        dataFolder.getAbsolutePath(), "sa", ""));
-            } catch(MVStoreException e) {
-                dataFolder.delete();
-                dataFolder.createNewFile();
-
-                conn = new NonClosableConnection(DriverManager.getConnection("jdbc:h2:" +
-                        dataFolder.getAbsolutePath(), "sa", ""));
-            }
+            conn = new NonClosableConnection(new JdbcConnection("jdbc:h2:file:" +
+                    dataFolder.getAbsolutePath().replace(".db", ""), new Properties()));
             conn.setAutoCommit(true);
             Query.use(conn);
             Bukkit.getLogger().info("Connection to H2 SQlLite has been established.");
