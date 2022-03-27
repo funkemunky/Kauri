@@ -14,10 +14,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @NoArgsConstructor
 public class PlayerInformation {
@@ -86,7 +83,7 @@ public class PlayerInformation {
 
     //Server Position
     public long lastServerPos, lastRespawn;
-    public final List<KLocation> posLocs = new EvictingList<>(3);
+    public final List<KLocation> posLocs = new ArrayList<>();
     public final List<Vector> velocities = Collections.synchronizedList(new EvictingList<>(5));
 
     //Attack

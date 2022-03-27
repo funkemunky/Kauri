@@ -27,6 +27,7 @@ import org.bukkit.Location;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -88,7 +89,6 @@ public class MovementProcessor {
                 data.playerInfo.deltaPitch = data.playerInfo.lDeltaPitch = 0;
         data.playerInfo.moveTicks = 0;
         data.playerInfo.doingTeleport = data.playerInfo.inventoryOpen  = false;
-        data.playerInfo.lastTeleportTimer.reset();
     }
 
     public void process(WrappedInFlyingPacket packet, long timeStamp) {
@@ -97,9 +97,8 @@ public class MovementProcessor {
             data.playerInfo.moveTicks = 0;
         }
 
-        if(data.playerInfo.moveTicks == 0 || data.teleportsToConfirm > 0) {
+        if(data.playerInfo.moveTicks == 0) {
             data.playerInfo.doingTeleport = true;
-            data.playerInfo.lastTeleportTimer.reset();
         } else data.playerInfo.doingTeleport = false;
 
         data.playerInfo.doingBlockUpdate = data.blockUpdates > 0;
@@ -175,6 +174,32 @@ public class MovementProcessor {
                 data.box = PlayerSizeHandler.instance.bounds(data.getPlayer(),
                         data.playerInfo.to.x, data.playerInfo.to.y, data.playerInfo.to.z);
                 data.playerInfo.lastMoveTimer.reset();
+
+                //Looking for teleport packets
+                if(packet.isLook() && !data.playerInfo.clientGround) {
+                    synchronized (data.playerInfo.posLocs) {
+                        Iterator<KLocation> iterator = data.playerInfo.posLocs.iterator();
+
+                        //Iterating through the ArrayList to find a potential teleport. We can't remove from the list
+                        //without causing a CME unless we use Iterator#remove().
+                        while(iterator.hasNext()) {
+                            KLocation posLoc = iterator.next();
+
+                            double distance = MiscUtils.getDistanceWithoutRoot(data.playerInfo.to, posLoc);
+
+                            if(distance < 1E-9) {
+                                data.playerInfo.lastTeleportTimer.reset();
+                                iterator.remove();
+                                break;
+                            }
+                        }
+
+                        //Ensuring the list doesn't overflow with old locations, a potential crash exploit.
+                        if(data.teleportsToConfirm == 0 && data.playerInfo.posLocs.size() > 0) {
+                            data.playerInfo.posLocs.clear();
+                        }
+                    }
+                }
             }
             data.blockInfo.runCollisionCheck();
 

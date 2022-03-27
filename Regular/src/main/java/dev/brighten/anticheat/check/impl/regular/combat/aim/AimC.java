@@ -19,6 +19,7 @@ public class AimC extends Check {
                     && data.playerInfo.lDeltaYaw > 0
                     && data.moveProcessor.sensitivityX < 0.65
                     && data.playerInfo.lDeltaYaw < 30
+                    && data.playerInfo.lastTeleportTimer.isPassed(1)
                     && !data.playerInfo.doingTeleport) {
                 vl++;
                 if(vl > 1) {

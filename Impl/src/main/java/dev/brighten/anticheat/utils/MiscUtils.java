@@ -79,6 +79,12 @@ public class MiscUtils {
         return angle - (angle % f2);
     }
 
+    public static double getDistanceWithoutRoot(KLocation one, KLocation two) {
+        double deltaX = one.x - two.x, deltaY = one.y - two.y, deltaZ = one.z - two.z;
+
+        return (deltaX * deltaX) + (deltaY * deltaY) + (deltaZ * deltaZ);
+    }
+
     public static boolean endsWith(double value, String string) {
         return String.valueOf(value).endsWith(string);
     }

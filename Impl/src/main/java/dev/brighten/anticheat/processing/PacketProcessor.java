@@ -797,12 +797,12 @@ public class PacketProcessor {
 
                 data.teleportsToConfirm++;
 
-                data.runKeepaliveAction(ka -> data.teleportsToConfirm--);
-                data.playerInfo.posLocs.add(loc);
+                data.runKeepaliveAction(ka -> data.teleportsToConfirm--, 2);
+                synchronized (data.playerInfo.posLocs) {
+                    data.playerInfo.posLocs.add(loc);
+                }
 
                 data.playerInfo.phaseLoc = loc.clone();
-
-                data.playerInfo.lastTeleportTimer.reset();
 
                 data.getPlayer().setSprinting(false);
 
