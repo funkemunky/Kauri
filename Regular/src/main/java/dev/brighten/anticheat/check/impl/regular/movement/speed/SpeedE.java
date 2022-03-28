@@ -1,7 +1,9 @@
 package dev.brighten.anticheat.check.impl.regular.movement.speed;
 
+import cc.funkemunky.api.reflections.impl.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.tinyprotocol.packet.types.MathHelper;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
@@ -10,6 +12,8 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.math.DoubleValue;
+import dev.brighten.anticheat.utils.timer.Timer;
+import dev.brighten.anticheat.utils.timer.impl.MillisTimer;
 import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 import lombok.AllArgsConstructor;
@@ -17,58 +21,56 @@ import lombok.Getter;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-//@CheckInfo(name = "Speed (E)", description = "Motion check - Rhys", checkType = CheckType.SPEED,
-//        devStage = DevStage.ALPHA, punishVL = 30)
+@CheckInfo(name = "Speed (E)", description = "Motion check - Rhys", checkType = CheckType.SPEED,
+        devStage = DevStage.ALPHA, punishVL = 30)
 @Cancellable
 public class SpeedE extends Check {
 
     private double threshold;
     private WrappedInFlyingPacket lastFlying, lastLastLast;
-    private final Map<Short, Motion> velocities = new HashMap<>();
+    private Timer flyingTimer = new MillisTimer(), transactionTimer = new MillisTimer();
 
     private static final boolean[] TRUE_FALSE = new boolean[]{true, false};
 
     @Packet
-    public void onVelocity(WrappedOutVelocityPacket packet) {
-        synchronized (velocities) {
-            short id = (short) ThreadLocalRandom.current().nextInt(Short.MIN_VALUE, Short.MAX_VALUE);
-
-            //Ensuring there are no duplicates
-            while(velocities.containsKey(id)) {
-                id = (short) ThreadLocalRandom.current().nextInt(Short.MIN_VALUE, Short.MAX_VALUE);
-            }
-
-            velocities.put(id, new Motion(packet.getX(), 0, packet.getZ()));
-
-            short finalId = id;
-            data.runKeepaliveAction(ka -> {
-                synchronized (velocities) {
-                    velocities.remove(finalId);
-                }
-            }, 3);
-        }
+    public void onTransaction(WrappedInTransactionPacket packet) {
+        transactionTimer.isPassed();
     }
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
-        check: {
+        check:
+        {
             if (!packet.isPos()) break check;
 
             if (lastFlying == null
                     || lastLastLast == null || !packet.isPos()
+                    // If previous flyings aren't positions, can cause accuracy issues. Client can
+                    // truncate distances if they're too small (bad for us).
                     || !lastFlying.isPos() || !lastLastLast.isPos()
                     || !data.playerInfo.worldLoaded
-                    || data.playerInfo.moveTicks < 5
-                    || !data.playerInfo.checkMovement) {
+                    // If blockBelow is null, we will not be able to account for movement on ground.
+                    || data.playerInfo.blockBelow == null
+                    || data.playerInfo.moveTicks < 5 // If player recently teleported
+                    // Velocity isn't accounted for right now due to reliance on client-server interactions.
+                    || data.playerInfo.lastVelocity.isNotPassed(2)
+                    // Server wouldn't be checking their movement in this instance
+                    || !data.playerInfo.checkMovement
+                    // Do not check on recent teleports
+                    || data.playerInfo.lastTeleportTimer.isNotPassed(1)) {
                 break check;
             }
 
+            // 1.9 checking for lack of positional sending
+            if(data.playerVersion.isOrAbove(ProtocolVersion.V1_9) &&
+                transactionTimer.isNotPassed(100L) && flyingTimer.isPassed(100L)) {
+                break check;
+            }
+
+            // Ladders change the horizontal movement.
             if (data.playerInfo.climbTimer.isNotPassed(3)) {
                 this.threshold -= this.threshold > 0 ? .3 : 0;
                 break check;
@@ -90,132 +92,148 @@ public class SpeedE extends Check {
             final double maxX = boundingBox.xMax;
             final double maxZ = boundingBox.zMax;
 
+            // If the player is interacting with blocks horizontally, it will cause false positives
+            // as we do not account for block collisions in distance yet.
             if ((testCollision(minX) || this.testCollision(minZ)
                     || this.testCollision(maxX) || this.testCollision(maxZ))) {
                 this.threshold -= this.threshold > 0 ? .25 : 0;
                 break check;
             }
 
-            if(data.potionProcessor.hasPotionEffect(PotionEffectType.SPEED))
+            if (data.potionProcessor.hasPotionEffect(PotionEffectType.SPEED))
                 attributeSpeed += data.potionProcessor.getEffectByType(PotionEffectType.SPEED)
-                        .map(pe -> pe.getAmplifier() + 1).orElse(0) * 0.2D * attributeSpeed;
+                        .map(pe -> pe.getAmplifier() + 1).orElse(0) * 0.20000000298023224 * attributeSpeed;
 
-            if(data.potionProcessor.hasPotionEffect(PotionEffectType.SLOW))
+            if (data.potionProcessor.hasPotionEffect(PotionEffectType.SLOW))
                 attributeSpeed += data.potionProcessor.getEffectByType(PotionEffectType.SLOW)
-                        .map(pe -> pe.getAmplifier() + 1).orElse(0) * -.15D * attributeSpeed;
+                        .map(pe -> pe.getAmplifier() + 1).orElse(0) * -0.15000000596046448 * attributeSpeed;
 
-            Motion predicted;
+            Motion predicted = null;
             double smallest = java.lang.Double.MAX_VALUE;
+
+            int jumpAmp = data.potionProcessor.getEffectByType(PotionEffectType.JUMP).map(ef -> ef.getAmplifier() + 1)
+                    .orElse(0);
 
             iteration:
             {
-                synchronized (velocities) {
-                    final List<Short> velocityKeys = new ArrayList<>();
+                // Yes this looks retarded but its brute forcing every possible thing.
+                for (int f = -1; f < 2; f++) {
+                    for (int s = -1; s < 2; s++) {
+                        for (boolean fastMath : TRUE_FALSE) {
+                            for (boolean sprint : TRUE_FALSE) {
+                                for (boolean jump : TRUE_FALSE) {
+                                    for (boolean using : TRUE_FALSE) {
+                                        for (boolean hitSlowdown : TRUE_FALSE) {
+                                            for (boolean sneaking : TRUE_FALSE) {
 
-                    velocityKeys.add((short)-1);
-                    velocityKeys.addAll(velocities.keySet());
-                    // Yes this looks retarded but its brute forcing every possible thing.
-                    for (int f = -1; f < 2; f++) {
-                        for (int s = -1; s < 2; s++) {
-                            for(boolean fastMath : TRUE_FALSE) {
-                                for(boolean sprint : TRUE_FALSE) {
-                                    for(short v : velocityKeys) {
-                                        for(boolean jump : TRUE_FALSE) {
-                                            for(boolean using : TRUE_FALSE) {
-                                                for(boolean hitSlowdown : TRUE_FALSE) {
-                                                    for(boolean sneaking : TRUE_FALSE) {
+                                                final boolean ground = lastFlying.isGround();
 
-                                                        final boolean checkVelocity = v != (short)-1;
-                                                        final boolean ground = lastFlying.isGround();
+                                                float forward = f;
+                                                float strafe = s;
 
-                                                        float forward = f;
-                                                        float strafe = s;
+                                                //Impossible to sprint while not going forward
+                                                if (forward <= 0) sprint = false;
 
-                                                        //Impossible to sprint while not going forward
-                                                        if(forward <= 0) sprint = false;
+                                                if (using) {
+                                                    forward *= 0.2D;
+                                                    strafe *= 0.2D;
+                                                }
 
-                                                        if (using) {
-                                                            forward *= 0.2D;
-                                                            strafe *= 0.2D;
-                                                        }
+                                                if (sneaking) {
+                                                    forward *= (float) 0.3D;
+                                                    strafe *= (float) 0.3D;
+                                                }
 
-                                                        if (sneaking) {
-                                                            forward *= (float) 0.3D;
-                                                            strafe *= (float) 0.3D;
-                                                        }
+                                                forward *= 0.98F;
+                                                strafe *= 0.98F;
 
-                                                        forward *= 0.98F;
-                                                        strafe *= 0.98F;
+                                                final Motion motion = new Motion(
+                                                        data.playerInfo.lDeltaX,
+                                                        0.0D,
+                                                        data.playerInfo.lDeltaZ
+                                                );
 
-                                                        final Motion motion = !checkVelocity ? new Motion(
-                                                                data.playerInfo.lDeltaX,
-                                                                0.0D,
-                                                                data.playerInfo.lDeltaZ
-                                                        ) : velocities.get(v);
+                                                if (data.playerVersion.isBelow(ProtocolVersion.V1_9))
+                                                    motion.round();
+                                                else motion.round19();
 
-                                                        if (lastLastLast.isGround()) {
-                                                            motion.getMotionX().multiply(0.6F * 0.91F);
-                                                            motion.getMotionZ().multiply(0.6F * 0.91F);
-                                                        } else {
-                                                            motion.getMotionX().multiply(0.91F);
-                                                            motion.getMotionZ().multiply(0.91F);
-                                                        }
+                                                if (lastLastLast.isGround()) {
+                                                    motion.getMotionX().multiply(0.6F * 0.91F);
+                                                    motion.getMotionZ().multiply(0.6F * 0.91F);
+                                                } else {
+                                                    motion.getMotionX().multiply(0.91F);
+                                                    motion.getMotionZ().multiply(0.91F);
 
-                                                        if (hitSlowdown) {
-                                                            motion.getMotionX().multiply(0.6D);
-                                                            motion.getMotionZ().multiply(0.6D);
-                                                        }
+                                                    if(data.playerInfo.clientGround) {
+                                                        motion.getMotionY().set(0);
+                                                    } else {
+                                                        motion.getMotionY().subtract(0.08);
+                                                        motion.getMotionY().multiply(0.9800000190734863);
+                                                    }
+                                                }
 
-                                                        if(data.playerVersion.isBelow(ProtocolVersion.V1_9))
-                                                        motion.round();
-                                                        else motion.round19();
+                                                if (hitSlowdown) {
+                                                    motion.getMotionX().multiply(0.6D);
+                                                    motion.getMotionZ().multiply(0.6D);
+                                                }
 
-                                                        if (jump && sprint) {
-                                                            final float radians = data.playerInfo.to.yaw
-                                                                    * 0.017453292F;
+                                                if (ground && jump && sprint) {
+                                                    final float radians = data.playerInfo.to.yaw
+                                                            * 0.017453292F;
 
-                                                            motion.getMotionX()
-                                                                    .subtract(sin(fastMath, radians) * 0.2F);
-                                                            motion.getMotionZ()
-                                                                    .add(cos(fastMath, radians) * 0.2F);
-                                                        }
+                                                    motion.getMotionX()
+                                                            .subtract(sin(fastMath, radians) * 0.2F);
+                                                    motion.getMotionZ()
+                                                            .add(cos(fastMath, radians) * 0.2F);
+                                                    motion.getMotionY().set(0.42f + (jumpAmp * 0.1));
+                                                }
 
-                                                        float slipperiness = 0.91F;
-                                                        if (ground) slipperiness = 0.6F * 0.91F;
+                                                float slipperiness = 0.91F;
+                                                if (ground) slipperiness = MinecraftReflection
+                                                        .getFriction(data.playerInfo.blockBelow) * 0.91F;
 
-                                                        float moveSpeed = (float) attributeSpeed;
-                                                        if (sprint) moveSpeed += moveSpeed * 0.30000001192092896D;
+                                                float moveSpeed = (float) attributeSpeed;
+                                                if (sprint) moveSpeed += moveSpeed * 0.30000001192092896D;
 
-                                                        final float moveFlyingFriction;
+                                                final float moveFlyingFriction;
 
-                                                        if (ground) {
-                                                            final float moveSpeedMultiplier = 0.16277136F /
-                                                                    (slipperiness * slipperiness * slipperiness);
+                                                if (ground) {
+                                                    final float moveSpeedMultiplier = 0.16277136F /
+                                                            (slipperiness * slipperiness * slipperiness);
 
-                                                            moveFlyingFriction = moveSpeed * moveSpeedMultiplier;
-                                                        } else {
-                                                            moveFlyingFriction = (float)
-                                                                    (sprint ? ((double) 0.02F
-                                                                            + (double) 0.02F * 0.3D) : 0.02F);
-                                                        }
+                                                    moveFlyingFriction = moveSpeed * moveSpeedMultiplier;
+                                                } else {
+                                                    moveFlyingFriction = (float)
+                                                            (sprint ? ((double) 0.02F
+                                                                    + (double) 0.02F * 0.3D) : 0.02F);
+                                                }
 
-                                                        motion.apply(this.moveFlying(fastMath,
-                                                                forward, strafe,
-                                                                moveFlyingFriction
-                                                        ));
+                                                motion.apply(this.moveFlying(fastMath,
+                                                        forward, strafe,
+                                                        moveFlyingFriction
+                                                ));
 
-                                                        motion.getMotionY().set(0.0);
+                                                //Web math
+                                                if(data.blockInfo.inWeb) {
+                                                    motion.motionX.multiply(0.25);
+                                                    motion.motionY.multiply(0.05000000074505806);
+                                                    motion.motionZ.multiply(0.25);
+                                                } else if(data.blockInfo.onSoulSand) {
+                                                    motion.motionX.multiply(0.4);
+                                                    motion.motionZ.multiply(0.4);
+                                                }
 
-                                                        final double distance = realMotion.distanceSquared(motion);
+                                                double motionY = motion.motionY.get();
+                                                motion.motionY.set(0);
+                                                final double distance = realMotion.distanceSquared(motion);
 
-                                                        if (distance < smallest) {
-                                                            smallest = distance;
-                                                            predicted = motion;
+                                                if (distance < smallest) {
+                                                    smallest = distance;
+                                                    motion.motionY.set(motionY);
+                                                    predicted = motion;
 
-                                                            if (distance < 1E-8) {
-                                                                break iteration;
-                                                            }
-                                                        }
+                                                    if (distance < 1E-8) {
+                                                        break iteration;
                                                     }
                                                 }
                                             }
@@ -228,10 +246,7 @@ public class SpeedE extends Check {
                 }
             }
 
-            if (data.playerInfo.lastTeleportTimer.isNotPassed(2)) break check;
-
             if (smallest > 1E-6
-                    && data.playerInfo.lastVelocity.isPassed(1)
                     && data.playerInfo.deltaXZ > .2 && !this.ignore()) {
 
                 if (this.threshold++ > 5) {
@@ -242,14 +257,16 @@ public class SpeedE extends Check {
                 this.threshold -= this.threshold > 0 ? .005 : 0;
             }
 
-            debug("(%.2f) o=" + smallest, threshold);
+            if(predicted != null)
+            debug("(%.2f) o=%s dy=%.4f py=%.4f", threshold, smallest, data.playerInfo.deltaY,
+                    predicted.getMotionY());
+            else debug("predicted was null");
         }
 
         lastLastLast = lastFlying;
         lastFlying = packet;
-
+        flyingTimer.reset();
     }
-
 
 
     @Getter
@@ -400,8 +417,7 @@ public class SpeedE extends Check {
     boolean ignore() {
         return data.playerInfo.liquidTimer.isNotPassed(2)
                 || data.blockInfo.collidesHorizontally
-                || data.playerInfo.slimeTimer.isNotPassed(2)
-                || data.playerInfo.iceTimer.isNotPassed(2)
+                || data.playerInfo.webTimer.isNotPassed(4)
                 || data.playerInfo.blockAboveTimer.isNotPassed(3);
     }
 
