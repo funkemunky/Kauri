@@ -60,6 +60,7 @@ public class KeepaliveProcessor implements Runnable {
 
             if(value.lagInfo.lastPingDrop.isNotPassed(2)
                     || System.currentTimeMillis() - value.lagInfo.lastClientTrans > 135L) laggyPlayers++;
+
             if(value.target != null) {
                 value.targetPastLocation.addLocation(value.target.getLocation());
             }
