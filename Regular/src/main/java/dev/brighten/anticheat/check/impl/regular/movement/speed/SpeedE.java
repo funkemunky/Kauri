@@ -134,6 +134,9 @@ public class SpeedE extends Check {
                                                 //Impossible to sprint while not going forward
                                                 if (forward <= 0) sprint = false;
 
+                                                forward *= 0.98F;
+                                                strafe *= 0.98F;
+
                                                 if (using) {
                                                     forward *= 0.2D;
                                                     strafe *= 0.2D;
@@ -143,9 +146,6 @@ public class SpeedE extends Check {
                                                     forward *= (float) 0.3D;
                                                     strafe *= (float) 0.3D;
                                                 }
-
-                                                forward *= 0.98F;
-                                                strafe *= 0.98F;
 
                                                 final Motion motion = new Motion(
                                                         data.playerInfo.lDeltaX,
@@ -246,7 +246,7 @@ public class SpeedE extends Check {
                 }
             }
 
-            if (smallest > 1E-6
+            if (smallest > 1E-5
                     && data.playerInfo.deltaXZ > .2 && !this.ignore()) {
 
                 if (this.threshold++ > 5) {

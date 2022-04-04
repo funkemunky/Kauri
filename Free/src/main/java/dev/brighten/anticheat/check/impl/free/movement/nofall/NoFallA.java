@@ -27,6 +27,7 @@ public class NoFallA extends Check {
         if(!data.playerInfo.flightCancel
                 && data.playerInfo.lastHalfBlock.isPassed(4)
                 && !data.blockInfo.onSlime
+                && data.playerInfo.moveTicks > 2
                 && !data.blockInfo.fenceBelow
                 && !data.blockInfo.inScaffolding
                 && !data.blockInfo.inHoney

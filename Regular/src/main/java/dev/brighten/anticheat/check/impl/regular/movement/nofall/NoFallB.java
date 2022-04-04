@@ -21,8 +21,10 @@ public class NoFallB extends Check {
     public void onFlying(WrappedInFlyingPacket packet, long timestamp) {
         if(data.playerInfo.doingTeleport
                 || data.playerInfo.lastTeleportTimer.isNotPassed(3)
+                || data.playerInfo.moveTicks < 2
                 || data.playerInfo.canFly
                 || data.playerInfo.creative
+                || !packet.isPos()
                 || timestamp - data.creation < 2000L) return; // If we are waiting for them to teleport, don't check.
 
         // If they are saying they are on the ground
