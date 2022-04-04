@@ -17,9 +17,9 @@ import dev.brighten.anticheat.listeners.api.EventHandler;
 import dev.brighten.anticheat.logs.LoggerManager;
 import dev.brighten.anticheat.processing.PacketProcessor;
 import dev.brighten.anticheat.processing.keepalive.KeepaliveProcessor;
-import dev.brighten.anticheat.processing.thread.ThreadHandler;
 import dev.brighten.anticheat.utils.ServerInjector;
 import dev.brighten.anticheat.utils.SystemUtil;
+import dev.brighten.anticheat.utils.ThreadHandler;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.AtlasTimer;
 import dev.brighten.api.KauriAPI;
@@ -98,7 +98,7 @@ public class Kauri extends JavaPlugin {
 
         MiscUtils.printToConsole("&7Unregistering processors...");
         keepaliveProcessor.stop();
-        ThreadHandler.INSTANCE.shutdown();
+        ThreadHandler.shutdown();
         keepaliveProcessor = null;
 
         MiscUtils.printToConsole("&7Unregistering logging and database...");

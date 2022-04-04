@@ -13,11 +13,10 @@ import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.listeners.generalChecks.BukkitListener;
 import dev.brighten.anticheat.menu.PlayerInformationGUI;
 import dev.brighten.anticheat.processing.PacketProcessor;
-import dev.brighten.anticheat.processing.thread.PlayerThread;
-import dev.brighten.anticheat.processing.thread.ThreadHandler;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.Pastebin;
 import dev.brighten.anticheat.utils.StringUtils;
+import dev.brighten.anticheat.utils.ThreadHandler;
 import dev.brighten.anticheat.utils.menu.Menu;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -357,14 +356,8 @@ public class KauriCommand extends BaseCommand {
         AtomicLong chunkCount = new AtomicLong(0);
         Bukkit.getWorlds().forEach(world -> chunkCount.addAndGet(world.getLoadedChunks().length));
         MiscUtils.sendMessage(sender, getMsg("main.chunks", "&eChunks&8: &f%s"), chunkCount.get());
-        MiscUtils.sendMessage(sender, getMsg("main.threads", "&eKauri Threads: &f%s"),
-                ThreadHandler.INSTANCE.threadCount());
-        int currentThread = 1;
-        for (PlayerThread service : ThreadHandler.INSTANCE.getServices()) {
-            MiscUtils.sendMessage(sender, getMsg("main.threads.list", "&8- &f%name%&7: &c%count%")
-                    .replace("%name%", "Kauri Player Thread " + currentThread)
-                    .replace("%count%", String.valueOf(service.getCount())));
-        }
+        MiscUtils.sendMessage(sender, getMsg("main.threads", "&eKauri Thread Count: &f%s"),
+                ThreadHandler.threadCount());
         MiscUtils.sendMessage(sender, getMsg("main.memory",
                 "&eMemory &7(&f&oFree&7&o/&f&oTotal&7&o/&f&oAllocated&7)&8: &f%.2fGB&7/&f%.2fGB&7/&f%.2fGB"),
                 Runtime.getRuntime().freeMemory() / 1E9,

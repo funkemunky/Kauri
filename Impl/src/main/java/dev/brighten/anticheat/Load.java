@@ -53,6 +53,8 @@ public class Load {
                 .setUncaughtExceptionHandler((t, e) -> RunUtils.task(e::printStackTrace, Kauri.INSTANCE))
                 .build());
 
+        Bukkit.getOnlinePlayers().forEach(ThreadHandler::addPlayer);
+
         register("Loading config...");
         Kauri.INSTANCE.saveDefaultConfig();
 
