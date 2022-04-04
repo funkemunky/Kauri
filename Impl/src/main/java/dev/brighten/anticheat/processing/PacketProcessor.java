@@ -15,14 +15,11 @@ import cc.funkemunky.api.utils.math.IntVector;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.listeners.api.impl.KeepaliveAcceptedEvent;
-import dev.brighten.anticheat.utils.EntityLocation;
+import dev.brighten.anticheat.processing.thread.ThreadHandler;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.MovementUtils;
-import dev.brighten.anticheat.utils.ThreadHandler;
 import lombok.val;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
@@ -31,7 +28,6 @@ import org.bukkit.util.Vector;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
 public class PacketProcessor {
@@ -60,27 +56,29 @@ public class PacketProcessor {
 
                 if(data == null || data.checkManager == null) return;
 
-               try {
-                   if(outgoingPackets.contains(info.getType())) {
-                       processServer(data, info.getPacket(), info.getType(), info.getTimestamp());
-                   } else if(incomingPackets.contains(info.getType())) {
-                       processClient(data, info.getPacket(), info.getType(), info.getTimestamp());
+                ThreadHandler.INSTANCE.getThread(data).runTask(() -> {
+                    try {
+                        if(outgoingPackets.contains(info.getType())) {
+                            processServer(data, info.getPacket(), info.getType(), info.getTimestamp());
+                        } else if(incomingPackets.contains(info.getType())) {
+                            processClient(data, info.getPacket(), info.getType(), info.getTimestamp());
 
-                       if(simLag && info.getType().equals(Packet.Client.FLYING)) {
-                           IntStream.range(0, amount).forEach(i -> {
-                               try {
-                                   SecureRandom.getInstanceStrong().generateSeed(500);
-                               } catch (NoSuchAlgorithmException e) {
-                                   e.printStackTrace();
-                               }
-                           });
-                       }
-                   }
+                            if(simLag && info.getType().equals(Packet.Client.FLYING)) {
+                                IntStream.range(0, amount).forEach(i -> {
+                                    try {
+                                        SecureRandom.getInstanceStrong().generateSeed(500);
+                                    } catch (NoSuchAlgorithmException e) {
+                                        e.printStackTrace();
+                                    }
+                                });
+                            }
+                        }
 
-                   if(data.checkManager.runEvent(info)) info.setCancelled(true);
-               } catch(Exception e) {
-                   e.printStackTrace();
-               }
+                        if(data.checkManager.runEvent(info)) info.setCancelled(true);
+                    } catch(Exception e) {
+                        e.printStackTrace();
+                    }
+                });
             });
 
     public final PacketListener cancelListener = Atlas.getInstance().getPacketProcessor()
