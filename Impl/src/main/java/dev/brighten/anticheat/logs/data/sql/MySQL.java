@@ -49,8 +49,8 @@ public class MySQL {
         }
         try {
             Class.forName("org.h2.Driver");
-            conn = new NonClosableConnection(new JdbcConnection("jdbc:h2:file:" +
-                    dataFolder.getAbsolutePath().replace(".db", ""), new Properties()));
+            conn = new NonClosableConnection(DriverManager.getConnection ("jdbc:h2:file:" +
+                    dataFolder.getAbsolutePath().replace(".db", "")));
             conn.setAutoCommit(true);
             Query.use(conn);
             Bukkit.getLogger().info("Connection to H2 SQlLite has been established.");
