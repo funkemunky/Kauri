@@ -64,6 +64,14 @@ public class SpeedA extends Check {
 
                 drag = data.getClientVersion().isOrAbove(ProtocolVersion.V1_13) ? 0.9f : 0.8f;
                 moveFactor = 0.034;
+
+                if(data.playerInfo.liquidTimer.getResetStreak() < 3) {
+                    tags.addTag("water-enter");
+                    moveFactor*= 1.35;
+                }
+            } else if(data.playerInfo.liquidTimer.isNotPassed(3)) {
+                moveFactor*= 1.35;
+                tags.addTag("water-leave");
             }
 
             if(data.playerInfo.lastTeleportTimer.isNotPassed(6)
@@ -80,7 +88,19 @@ public class SpeedA extends Check {
 
             if(data.blockInfo.pistonNear) {
                 tags.addTag("piston");
-                moveFactor += 1;
+                moveFactor+= 1;
+            }
+
+            if(data.blockInfo.inWeb
+                    //Ensuring they aren't just entering or leaving web
+                    && data.playerInfo.webTimer.getResetStreak() > 1) {
+                tags.addTag("web");
+                moveFactor*= 0.4;
+            }
+
+            if(data.blockInfo.onSoulSand) {
+                tags.addTag("soulsand");
+                moveFactor*= 0.75;
             }
 
             double ratio = (data.playerInfo.deltaXZ - ldxz) / moveFactor * 100;
