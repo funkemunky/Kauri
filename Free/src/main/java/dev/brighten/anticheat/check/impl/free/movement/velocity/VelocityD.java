@@ -22,7 +22,7 @@ public class VelocityD extends Check {
 
     private int buffer;
     private Timer lastVelocity = new TickTimer();
-    private List<Velocity> velocityY = Collections.synchronizedList(new ArrayList<>());
+    private final List<Velocity> velocityY = new ArrayList<>();
 
     @Setting(name = "bufferThreshold")
     private static int bufferThreshold = 3;
@@ -30,8 +30,10 @@ public class VelocityD extends Check {
     @Packet
     public void onVelocity(WrappedOutVelocityPacket packet) {
         if(packet.getId() == data.getPlayer().getEntityId() && packet.getY() > 0.1) {
-            data.runKeepaliveAction(ka ->
-                    velocityY.add(new Velocity(packet.getY())));
+            synchronized (velocityY) {
+                data.runKeepaliveAction(ka ->
+                        velocityY.add(new Velocity(packet.getY())));
+            }
         }
     }
 
@@ -39,48 +41,50 @@ public class VelocityD extends Check {
     public void onFlying(WrappedInFlyingPacket packet, long now) {
         if(velocityY.size() == 0) return;
 
-        var toRemove = velocityY.stream()
-                .filter(t -> Math.abs(data.playerInfo.deltaY - t.getVelocity()) < 0.001)
-                .iterator();
+       synchronized (velocityY) {
+           var toRemove = velocityY.stream()
+                   .filter(t -> Math.abs(data.playerInfo.deltaY - t.getVelocity()) < 0.001)
+                   .iterator();
 
-        while(toRemove.hasNext()) {
-            Velocity velocity = toRemove.next();
+           while(toRemove.hasNext()) {
+               Velocity velocity = toRemove.next();
 
-            if(buffer > 0) buffer--;
-            debug("Reset velocity: dy=%.4f vy=%.4f b=%s",
-                    data.playerInfo.deltaY, velocity.getVelocity(), buffer);
+               if(buffer > 0) buffer--;
+               debug("Reset velocity: dy=%.4f vy=%.4f b=%s",
+                       data.playerInfo.deltaY, velocity.getVelocity(), buffer);
 
-            //Removing
-            toRemove.remove();
+               //Removing
+               toRemove.remove();
 
-        }
+           }
 
-        //All potential causes of false positives
-        if(data.playerInfo.doingBlockUpdate
-                || data.playerInfo.webTimer.isNotPassed(3)
-                || data.playerInfo.liquidTimer.isNotPassed(3)
-                || data.playerInfo.slimeTimer.isNotPassed(2)
-                || data.blockInfo.inScaffolding
-                || data.blockInfo.inHoney
-                || data.playerInfo.blockAboveTimer.isNotPassed(2)) {
-            debug("Potential false flag");
-            return;
-        }
+           //All potential causes of false positives
+           if(data.playerInfo.doingBlockUpdate
+                   || data.playerInfo.webTimer.isNotPassed(3)
+                   || data.playerInfo.liquidTimer.isNotPassed(3)
+                   || data.playerInfo.slimeTimer.isNotPassed(2)
+                   || data.blockInfo.inScaffolding
+                   || data.blockInfo.inHoney
+                   || data.playerInfo.blockAboveTimer.isNotPassed(2)) {
+               debug("Potential false flag");
+               return;
+           }
 
-        toRemove = velocityY.stream().filter(t -> now - t.getTimestamp() > 500)
-                .iterator();
+           toRemove = velocityY.stream().filter(t -> now - t.getTimestamp() > 500)
+                   .iterator();
 
-        if(toRemove.hasNext()) {
-            List<String> velocities = new ArrayList<>();
-            while(toRemove.hasNext()) {
-                velocities.add(String.valueOf(toRemove.next().getVelocity()));
-                toRemove.remove();
-            }
-            if(++buffer > 2) {
-                vl++;
-                flag("lv=%s;v=[%s]", lastVelocity.getPassed(), String.join(";", velocities));
-            }
-        }
+           if(toRemove.hasNext()) {
+               List<String> velocities = new ArrayList<>();
+               while(toRemove.hasNext()) {
+                   velocities.add(String.valueOf(toRemove.next().getVelocity()));
+                   toRemove.remove();
+               }
+               if(++buffer > 2) {
+                   vl++;
+                   flag("lv=%s;v=[%s]", lastVelocity.getPassed(), String.join(";", velocities));
+               }
+           }
+       }
     }
 
     @Getter
