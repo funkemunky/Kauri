@@ -25,7 +25,12 @@ public class NoFallB extends Check {
                 || data.playerInfo.canFly
                 || data.playerInfo.creative
                 || !packet.isPos()
-                || timestamp - data.creation < 2000L) return; // If we are waiting for them to teleport, don't check.
+                || timestamp - data.creation < 2000L) {
+            //Subtracting buffers
+            if(groundBuffer > 0) groundBuffer--;
+            if(airBuffer > 0) airBuffer--;
+            return; // If we are waiting for them to teleport, don't check.
+        }
 
         // If they are saying they are on the ground
         if(data.playerInfo.clientGround
@@ -45,7 +50,7 @@ public class NoFallB extends Check {
                 flag(200, "T=SPOOF_GROUND dy=%.2f y=%.1f", data.playerInfo.deltaY, data.playerInfo.to.y);
             }
             fixMovementBugs();
-        } else if(groundBuffer > 0) groundBuffer-= 1;
+        } else if(groundBuffer > 0) groundBuffer--;
 
 
         final boolean dground = data.playerInfo.to.y % divisor < 1E-4 && data.playerInfo.nearGround;

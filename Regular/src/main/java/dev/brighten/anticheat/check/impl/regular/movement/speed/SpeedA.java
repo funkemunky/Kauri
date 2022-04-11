@@ -111,10 +111,11 @@ public class SpeedA extends Check {
                     && data.playerInfo.lastVelocity.isPassed(2)
                     && data.playerInfo.liquidTimer.isPassed(2)
                     && !data.playerInfo.generalCancel) {
-                if((buffer+= ratio > 400 ? 2 : 1) > 4 || ratio > 1500) {
+                if(++buffer > 2 || ratio > 200) {
                     vl++;
-                    flag("p=%.1f%% dxz=%.3f aimove=%.3f tags=%s",
-                            ratio, data.playerInfo.deltaXZ, data.predictionService.aiMoveSpeed, tags.build());
+                    flag("p=%.1f%% dxz=%.3f a/g=%s,%s aimove=%.3f tags=%s",
+                            ratio, data.playerInfo.deltaXZ, data.playerInfo.airTicks, data.playerInfo.groundTicks,
+                            data.predictionService.aiMoveSpeed, tags.build());
                 }
                 if(buffer >= 2)
                 fixMovementBugs();

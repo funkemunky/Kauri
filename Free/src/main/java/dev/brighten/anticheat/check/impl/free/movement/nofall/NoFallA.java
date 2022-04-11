@@ -19,32 +19,33 @@ public class NoFallA extends Check {
 
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
+        if (data.playerInfo.generalCancel
+                || !packet.isPos()
+                || (data.playerInfo.deltaXZ == 0 && data.playerInfo.deltaY == 0)) {
+            if(buffer > 0) buffer-= 0.5f;
+            return;
+        }
 
-        boolean flag = data.playerInfo.clientGround
-                ? Math.abs(data.playerInfo.deltaY) > 0.007
-                : data.playerInfo.deltaY == 0 && data.playerInfo.lDeltaY == 0;
+        boolean onGround = packet.isGround();
+        boolean flag = false;
 
-        if(!data.playerInfo.flightCancel
-                && data.playerInfo.lastHalfBlock.isPassed(4)
-                && !data.blockInfo.onSlime
-                && data.playerInfo.moveTicks > 2
-                && !data.blockInfo.fenceBelow
-                && !data.blockInfo.inScaffolding
-                && !data.blockInfo.inHoney
-                && !data.blockInfo.blocksAbove
-                && data.playerInfo.lastGhostCollision.isPassed(2)
-                && data.playerInfo.lastVelocity.isPassed(4)
-                && (data.playerInfo.deltaY != 0 || data.playerInfo.deltaXZ > 0)
-                && data.playerInfo.blockAboveTimer.isPassed(10)
-                && flag) {
+        if(onGround) {
+            flag = Math.abs(data.playerInfo.deltaY) > 0.0051
+                    && (data.playerInfo.deltaY >= 0
+                    // If player has touchdown, would be nasties
+                    || (data.playerInfo.deltaY <= data.playerInfo.lDeltaY));
+        } else {
+            flag = data.playerInfo.deltaY == 0 && data.playerInfo.lDeltaY == 0;
+        }
 
-            if(++buffer > 2) {
+        if(flag) {
+            if(++buffer > 1) {
                 vl++;
-                flag("g=%s dy=%.4f", data.playerInfo.clientGround, data.playerInfo.deltaY);
+                flag("g=%s;dy=%.4f;ldy=%.4f", onGround, data.playerInfo.deltaY, data.playerInfo.lDeltaY);
             }
-        } else buffer-= buffer > 0 ? 0.25f : 0;
+        } else if(buffer > 0) buffer-= 0.25f;
 
-        debug("ground=" + data.playerInfo.clientGround + " collides=" + data.playerInfo.serverGround
-                + " deltaY=" + data.playerInfo.deltaY + " vl=" + vl);
+        debug("[%.1f] g=%s;dy=%.4f;ldy=%.4f",
+                buffer, onGround, data.playerInfo.deltaY, data.playerInfo.lDeltaY);
     }
 }
