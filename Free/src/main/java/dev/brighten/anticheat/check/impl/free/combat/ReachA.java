@@ -26,14 +26,13 @@ public class ReachA extends Check {
 
     private double buffer;
 
-    private static final EnumSet<EntityType> allowedEntityTypes = EnumSet.of(EntityType.ZOMBIE, EntityType.SHEEP,
-            EntityType.BLAZE, EntityType.SKELETON, EntityType.PLAYER, EntityType.VILLAGER, EntityType.IRON_GOLEM,
-                    EntityType.WITCH, EntityType.COW, EntityType.CREEPER);
+    private static final EnumSet<EntityType> allowedEntityTypes = EnumSet.of(EntityType.ZOMBIE,
+            EntityType.BLAZE, EntityType.SKELETON, EntityType.PLAYER, EntityType.VILLAGER,
+                    EntityType.WITCH, EntityType.CREEPER);
 
     @Setting(name = "maxDistance")
     public static double reachThreshold = 3.1;
-    
-    private final Queue<Entity> attacks = new LinkedList<>();
+
     @Packet
     public void onUse(WrappedInUseEntityPacket packet) {
         reachA:
@@ -56,7 +55,9 @@ public class ReachA extends Check {
 
             double distance = Double.MAX_VALUE;
             for (KLocation tloc : targetLocs) {
-                double current = MiscUtils.getDistanceWithoutRoot(torigin, tloc);
+                KLocation copy = tloc.clone();
+                copy.y = 0;
+                double current = MiscUtils.getDistanceWithoutRoot(torigin, copy);
 
                 //If the calculated distance is smaller, we want to set it until we reach the smallest distance
                 if(distance > current) {
@@ -64,14 +65,7 @@ public class ReachA extends Check {
                 }
             }
 
-            SimpleCollisionBox box = getHitbox(data.target, new KLocation(0,0,0));
-
-            if(ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9)) {
-                box = box.expand(0.1);
-            }
-
-            double horizontalDistance = box.min().setY(0).distance(box.max().setY(0));
-            distance = Math.sqrt(distance) - horizontalDistance;
+            distance = Math.sqrt(distance) - (data.playerVersion.isBelow(ProtocolVersion.V1_9) ? 0.4 : 0.3);
 
             if (distance > reachThreshold) {
                 if (++buffer > 5) {
@@ -81,8 +75,8 @@ public class ReachA extends Check {
                 }
             } else buffer -= buffer > 0 ? 0.075f : 0;
 
-            debug("distance=%.3f boxes=%s hdist=%.3f buffer=%s lct=%s lts=%s",
-                    distance, targetLocs.size(), horizontalDistance, buffer,
+            debug("distance=%.3f boxes=%s buffer=%s lct=%s lts=%s",
+                    distance, targetLocs.size(), buffer,
                     System.currentTimeMillis() - data.lagInfo.lastClientTrans,
                     data.playerInfo.lastTargetSwitch.getPassed());
         }
