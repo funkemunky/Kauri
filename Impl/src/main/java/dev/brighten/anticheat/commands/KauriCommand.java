@@ -8,6 +8,7 @@ import co.aikar.commands.bukkit.contexts.OnlinePlayer;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
+import dev.brighten.anticheat.check.api.CheckSettings;
 import dev.brighten.anticheat.check.api.Config;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.listeners.generalChecks.BukkitListener;
@@ -496,17 +497,19 @@ public class KauriCommand extends BaseCommand {
 
             String path = "checks." + checkInfo.name() + ".enabled";
 
-            boolean toggleState = !Kauri.INSTANCE.getConfig().getBoolean(path);
+            CheckSettings settings = Check.getCheckSettings(check.replace("_", " "));
+
+            settings.enabled = !settings.enabled;
 
             sender.sendMessage(Color.Gray + "Setting check state to "
-                    + (toggleState ? Color.Green : Color.Red) + toggleState + Color.Gray + "...");
+                    + (settings.enabled ? Color.Green : Color.Red) + settings.enabled + Color.Gray + "...");
             sender.sendMessage(Color.Red + "Setting in config...");
-            Kauri.INSTANCE.getConfig().set(path, toggleState);
+            Kauri.INSTANCE.getConfig().set(path, settings.enabled);
             Kauri.INSTANCE.saveConfig();
 
             sender.sendMessage(Color.Red + "Refreshing data objects with updated information...");
-            Kauri.INSTANCE.dataManager.dataMap.values().parallelStream()
-                    .forEach(data -> data.checkManager.checks.get(checkInfo.name()).enabled = toggleState);
+            Kauri.INSTANCE.dataManager.dataMap.values()
+                    .forEach(data -> data.checkManager.checks.get(checkInfo.name()).enabled = settings.enabled);
             sender.sendMessage(Color.Green + "Completed!");
         } else sender.sendMessage(Color.Red + "\"" + check
                 .replace("_", " ") + "\" is not a check.");
