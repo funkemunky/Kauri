@@ -15,14 +15,14 @@ import lombok.var;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@CheckInfo(name = "Velocity (D)", description = "Checks if a player responded to velocity",
-        checkType = CheckType.VELOCITY, punishVL = 5, planVersion = KauriVersion.FREE, devStage = DevStage.BETA)
+//@CheckInfo(name = "Velocity (D)", description = "Checks if a player responded to velocity",
+//        checkType = CheckType.VELOCITY, punishVL = 5, planVersion = KauriVersion.FREE, devStage = DevStage.BETA)
 @Cancellable(cancelType = CancelType.MOVEMENT)
 public class VelocityD extends Check {
 
     private int buffer;
-    private Timer lastVelocity = new TickTimer();
-    private List<Velocity> velocityY = Collections.synchronizedList(new ArrayList<>());
+    private final Timer lastVelocity = new TickTimer();
+    private final List<Velocity> velocityY = Collections.synchronizedList(new ArrayList<>());
 
     @Setting(name = "bufferThreshold")
     private static int bufferThreshold = 3;
@@ -30,8 +30,11 @@ public class VelocityD extends Check {
     @Packet
     public void onVelocity(WrappedOutVelocityPacket packet) {
         if(packet.getId() == data.getPlayer().getEntityId() && packet.getY() > 0.1) {
-            data.runKeepaliveAction(ka ->
-                    velocityY.add(new Velocity(packet.getY())));
+            data.runKeepaliveAction(ka -> {
+                synchronized (velocityY) {
+                    velocityY.add(new Velocity(packet.getY()));
+                }
+            });
         }
     }
 
