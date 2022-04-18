@@ -1,4 +1,4 @@
-package dev.brighten.anticheat.check.impl.premium.autoclicker.packets;
+package dev.brighten.anticheat.check.impl.regular.packets;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
