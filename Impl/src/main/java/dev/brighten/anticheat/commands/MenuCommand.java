@@ -243,120 +243,129 @@ public class MenuCommand extends BaseCommand {
 
             Button button = new Button(false,
                     item, (player, info) -> {
-                switch(info.getClickType()) {
-                    //Toggle the detectio on/off.
-                    case SHIFT_LEFT: {
-                        val.enabled = !val.enabled;
+                Kauri.INSTANCE.executor.execute(() -> {
+                    switch(info.getClickType()) {
+                        //Toggle the detectio on/off.
+                        case SHIFT_LEFT: {
+                            val.enabled = !val.enabled;
 
-                        Kauri.INSTANCE.getConfig().set(enabled, val.enabled);
-                        Kauri.INSTANCE.saveConfig();
-                        info.getButton().setStack(new ItemBuilder(val.enabled
-                                ? (val.cancellable ? XMaterial.FILLED_MAP.parseMaterial()
-                                : XMaterial.MAP.parseMaterial()) : XMaterial.PAPER.parseMaterial())
-                                .name((val.enabled ? "&a" : "&c") + val.name).lore("",
-                                        "&eStatus:",
-                                        (val.enabled ? Color.Green : Color.Gray) + "Enabled",
-                                        (val.executable ? Color.Green : Color.Gray) + "Executable",
-                                        (val.cancelMode != null
-                                                ? (val.cancellable ? Color.Green : Color.Gray) + "Cancellable"
-                                                : Color.Red + Color.Italics + "Cannot Cancel"), "",
-                                        "&f&oShift + Left Click &7&oto toggle detection",
-                                        "&f&oShift + Right Click &7&oto toggle executable",
-                                        "&f&oMiddle Click &7&oto toggle cancelling").build());
-                        menu.buildInventory(false);
+                            Kauri.INSTANCE.getConfig().set(enabled, val.enabled);
+                            Kauri.INSTANCE.saveConfig();
+                            info.getButton().setStack(new ItemBuilder(val.enabled
+                                    ? (val.cancellable ? XMaterial.FILLED_MAP.parseMaterial()
+                                    : XMaterial.MAP.parseMaterial()) : XMaterial.PAPER.parseMaterial())
+                                    .name((val.enabled ? "&a" : "&c") + val.name).lore("",
+                                            "&eStatus:",
+                                            (val.enabled ? Color.Green : Color.Gray) + "Enabled",
+                                            (val.executable ? Color.Green : Color.Gray) + "Executable",
+                                            (val.cancelMode != null
+                                                    ? (val.cancellable ? Color.Green : Color.Gray) + "Cancellable"
+                                                    : Color.Red + Color.Italics + "Cannot Cancel"), "",
+                                            "&f&oShift + Left Click &7&oto toggle detection",
+                                            "&f&oShift + Right Click &7&oto toggle executable",
+                                            "&f&oMiddle Click &7&oto toggle cancelling").build());
+                            menu.buildInventory(false);
 
-                        Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
-                                .forEach(data -> {
-                                    Check check = data.checkManager.checks.get(val.name);
+                            synchronized (Kauri.INSTANCE.dataManager.dataMap) {
+                                Kauri.INSTANCE.dataManager.dataMap.values()
+                                        .forEach(data -> {
+                                            Check check = data.checkManager.checks.get(val.name);
 
-                                    if(check == null) {
-                                        Kauri.INSTANCE.getLogger()
-                                                .warning("Check " + val.name + " is null for player "
-                                                        + data.getPlayer());
-                                    } else {
-                                        check.enabled = val.enabled;
-                                    }
-                                }));
-                        break;
+                                            if(check == null) {
+                                                Kauri.INSTANCE.getLogger()
+                                                        .warning("Check " + val.name + " is null for player "
+                                                                + data.getPlayer());
+                                            } else {
+                                                check.enabled = val.enabled;
+                                            }
+                                        });
+                            }
+                            break;
+                        }
+                        case SHIFT_RIGHT: {
+                            val.executable = !val.executable;
+
+                            Kauri.INSTANCE.getConfig().set(executable, val.executable);
+                            Kauri.INSTANCE.saveConfig();
+
+                            info.getButton().setStack(new ItemBuilder(val.enabled
+                                    ? (val.cancellable ? XMaterial.FILLED_MAP.parseMaterial()
+                                    : XMaterial.MAP.parseMaterial()) : XMaterial.PAPER.parseMaterial())
+                                    .name((val.enabled ? "&a" : "&c") + val.name).lore("",
+                                            "&eStatus:",
+                                            (val.enabled ? Color.Green : Color.Gray) + "Enabled",
+                                            (val.executable ? Color.Green : Color.Gray) + "Executable",
+                                            (val.cancelMode != null
+                                                    ? (val.cancellable ? Color.Green : Color.Gray) + "Cancellable"
+                                                    : Color.Red + Color.Italics + "Cannot Cancel"), "",
+                                            "&f&oShift + Left Click &7&oto toggle detection",
+                                            "&f&oShift + Right Click &7&oto toggle executable",
+                                            "&f&oMiddle Click &7&oto toggle cancelling").build());
+                            menu.buildInventory(false);
+
+                            synchronized (Kauri.INSTANCE.dataManager.dataMap) {
+                                Kauri.INSTANCE.dataManager.dataMap.values()
+                                        .forEach(data -> {
+                                            Check check = data.checkManager.checks.get(val.name);
+
+                                            if(check == null) {
+                                                Kauri.INSTANCE.getLogger()
+                                                        .warning("Check " + val.name + " is null for player "
+                                                                + data.getPlayer());
+                                            } else {
+                                                check.executable = val.executable;
+                                            }
+                                        });
+                            }
+
+                            break;
+                        }
+                        case MIDDLE: {
+                            val.cancellable = !val.cancellable;
+
+                            Kauri.INSTANCE.getConfig().set(cancellable, val.cancellable);
+                            Kauri.INSTANCE.saveConfig();
+
+                            info.getButton().setStack(new ItemBuilder(val.enabled
+                                    ? (val.cancellable ? XMaterial.FILLED_MAP.parseMaterial()
+                                    : XMaterial.MAP.parseMaterial()) : XMaterial.PAPER.parseMaterial())
+                                    .name((val.enabled ? "&a" : "&c") + val.name).lore("",
+                                            "&eStatus:",
+                                            (val.enabled ? Color.Green : Color.Gray) + "Enabled",
+                                            (val.executable ? Color.Green : Color.Gray) + "Executable",
+                                            (val.cancelMode != null
+                                                    ? (val.cancellable ? Color.Green : Color.Gray) + "Cancellable"
+                                                    : Color.Red + Color.Italics + "Cannot Cancel"), "",
+                                            "&f&oShift + Left Click &7&oto toggle detection",
+                                            "&f&oShift + Right Click &7&oto toggle executable",
+                                            "&f&oMiddle Click &7&oto toggle cancelling").build());
+                            menu.buildInventory(false);
+
+                            synchronized (Kauri.INSTANCE.dataManager.dataMap) {
+                                Kauri.INSTANCE.dataManager.dataMap.values()
+                                        .forEach(data -> {
+                                            Check check = data.checkManager.checks.get(val.name);
+
+                                            if(check == null) {
+                                                Kauri.INSTANCE.getLogger()
+                                                        .warning("Check " + val.name + " is null for player "
+                                                                + data.getPlayer());
+                                            } else {
+                                                check.cancellable = val.cancellable;
+                                            }
+                                        });
+                            }
+
+                            break;
+                        }
+                        default: {
+                            ChestMenu toOpen = getCheckEdit(val);
+
+                            toOpen.showMenu(player);
+                            break;
+                        }
                     }
-                    case SHIFT_RIGHT: {
-                        val.executable = !val.executable;
-
-                        Kauri.INSTANCE.getConfig().set(executable, val.executable);
-                        Kauri.INSTANCE.saveConfig();
-
-                        info.getButton().setStack(new ItemBuilder(val.enabled
-                                ? (val.cancellable ? XMaterial.FILLED_MAP.parseMaterial()
-                                : XMaterial.MAP.parseMaterial()) : XMaterial.PAPER.parseMaterial())
-                                .name((val.enabled ? "&a" : "&c") + val.name).lore("",
-                                        "&eStatus:",
-                                        (val.enabled ? Color.Green : Color.Gray) + "Enabled",
-                                        (val.executable ? Color.Green : Color.Gray) + "Executable",
-                                        (val.cancelMode != null
-                                                ? (val.cancellable ? Color.Green : Color.Gray) + "Cancellable"
-                                                : Color.Red + Color.Italics + "Cannot Cancel"), "",
-                                        "&f&oShift + Left Click &7&oto toggle detection",
-                                        "&f&oShift + Right Click &7&oto toggle executable",
-                                        "&f&oMiddle Click &7&oto toggle cancelling").build());
-                        menu.buildInventory(false);
-
-                        Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
-                                .forEach(data -> {
-                                    Check check = data.checkManager.checks.get(val.name);
-
-                                    if(check == null) {
-                                        Kauri.INSTANCE.getLogger()
-                                                .warning("Check " + val.name + " is null for player "
-                                                        + data.getPlayer());
-                                    } else {
-                                        check.executable = val.executable;
-                                    }
-                                }));
-                        break;
-                    }
-                    case MIDDLE: {
-                        val.cancellable = !val.cancellable;
-
-                        Kauri.INSTANCE.getConfig().set(cancellable, val.cancellable);
-                        Kauri.INSTANCE.saveConfig();
-
-                        info.getButton().setStack(new ItemBuilder(val.enabled
-                                ? (val.cancellable ? XMaterial.FILLED_MAP.parseMaterial()
-                                : XMaterial.MAP.parseMaterial()) : XMaterial.PAPER.parseMaterial())
-                                .name((val.enabled ? "&a" : "&c") + val.name).lore("",
-                                        "&eStatus:",
-                                        (val.enabled ? Color.Green : Color.Gray) + "Enabled",
-                                        (val.executable ? Color.Green : Color.Gray) + "Executable",
-                                        (val.cancelMode != null
-                                                ? (val.cancellable ? Color.Green : Color.Gray) + "Cancellable"
-                                                : Color.Red + Color.Italics + "Cannot Cancel"), "",
-                                        "&f&oShift + Left Click &7&oto toggle detection",
-                                        "&f&oShift + Right Click &7&oto toggle executable",
-                                        "&f&oMiddle Click &7&oto toggle cancelling").build());
-                        menu.buildInventory(false);
-
-                        Kauri.INSTANCE.executor.execute(() -> Kauri.INSTANCE.dataManager.dataMap.values()
-                                .forEach(data -> {
-                                    Check check = data.checkManager.checks.get(val.name);
-
-                                    if(check == null) {
-                                        Kauri.INSTANCE.getLogger()
-                                                .warning("Check " + val.name + " is null for player "
-                                                        + data.getPlayer());
-                                    } else {
-                                        check.cancellable = val.cancellable;
-                                    }
-                                }));
-
-                        break;
-                    }
-                    default: {
-                        ChestMenu toOpen = getCheckEdit(val);
-
-                        toOpen.showMenu(player);
-                        break;
-                    }
-                }
+                });
             });
             menu.addItem(button);
         }

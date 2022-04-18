@@ -491,25 +491,30 @@ public class KauriCommand extends BaseCommand {
     @Syntax("<check>")
     @CommandCompletion("@checks")
     public void onCommand(CommandSender sender, @Single String check) {
-        if(Check.isCheck(check)) {
-            CheckInfo checkInfo = Check.getCheckInfo(check.replace("_", " "));
+        Kauri.INSTANCE.executor.execute(() -> {
+            if(Check.isCheck(check)) {
+                CheckInfo checkInfo = Check.getCheckInfo(check.replace("_", " "));
 
-            String path = "checks." + checkInfo.name() + ".enabled";
+                String path = "checks." + checkInfo.name() + ".enabled";
 
-            boolean toggleState = !Kauri.INSTANCE.getConfig().getBoolean(path);
+                boolean toggleState = !Kauri.INSTANCE.getConfig().getBoolean(path);
 
-            sender.sendMessage(Color.Gray + "Setting check state to "
-                    + (toggleState ? Color.Green : Color.Red) + toggleState + Color.Gray + "...");
-            sender.sendMessage(Color.Red + "Setting in config...");
-            Kauri.INSTANCE.getConfig().set(path, toggleState);
-            Kauri.INSTANCE.saveConfig();
+                sender.sendMessage(Color.Gray + "Setting check state to "
+                        + (toggleState ? Color.Green : Color.Red) + toggleState + Color.Gray + "...");
+                sender.sendMessage(Color.Red + "Setting in config...");
+                Kauri.INSTANCE.getConfig().set(path, toggleState);
+                Kauri.INSTANCE.saveConfig();
 
-            sender.sendMessage(Color.Red + "Refreshing data objects with updated information...");
-            Kauri.INSTANCE.dataManager.dataMap.values().parallelStream()
-                    .forEach(data -> data.checkManager.checks.get(checkInfo.name()).enabled = toggleState);
-            sender.sendMessage(Color.Green + "Completed!");
-        } else sender.sendMessage(Color.Red + "\"" + check
-                .replace("_", " ") + "\" is not a check.");
+                sender.sendMessage(Color.Red + "Refreshing data objects with updated information...");
+                synchronized (Kauri.INSTANCE.dataManager.dataMap) {
+                    Kauri.INSTANCE.dataManager.dataMap.values().iterator()
+                            .forEachRemaining(data ->
+                                    data.checkManager.checks.get(checkInfo.name()).enabled = toggleState);
+                }
+                sender.sendMessage(Color.Green + "Completed!");
+            } else sender.sendMessage(Color.Red + "\"" + check
+                    .replace("_", " ") + "\" is not a check.");
+        });
     }
 
     @Subcommand("users")

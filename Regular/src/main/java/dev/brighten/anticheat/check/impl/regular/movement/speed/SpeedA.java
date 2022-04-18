@@ -9,6 +9,7 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.processing.TagsBuilder;
 import dev.brighten.api.KauriVersion;
+import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 import org.bukkit.potion.PotionEffectType;
 
@@ -111,11 +112,14 @@ public class SpeedA extends Check {
                     && data.playerInfo.lastVelocity.isPassed(2)
                     && data.playerInfo.liquidTimer.isPassed(2)
                     && !data.playerInfo.generalCancel) {
-                if(++buffer > 2 || ratio > 200) {
+                if(++buffer > 2) {
                     vl++;
                     flag("p=%.1f%% dxz=%.3f a/g=%s,%s aimove=%.3f tags=%s",
                             ratio, data.playerInfo.deltaXZ, data.playerInfo.airTicks, data.playerInfo.groundTicks,
                             data.predictionService.aiMoveSpeed, tags.build());
+                } else if(ratio > 250) {
+                    cancelAction(CancelType.MOVEMENT);
+                    debug("Cancelled user movement: %.1f", ratio);
                 }
                 if(buffer >= 2)
                 fixMovementBugs();

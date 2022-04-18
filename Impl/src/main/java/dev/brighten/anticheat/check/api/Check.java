@@ -214,39 +214,7 @@ public class Check implements KauriCheck {
             if(currentResult.isCancelled()) return;
 
             if(cancellable && cancelMode != null && vl > vlToFlag) {
-                CancelResult cancelResult = CancelResult.builder().cancelled(false).type(cancelMode).build();
-
-                for (KauriEvent event : events) {
-                   CancelResult current =
-                           event.onCancel(data.getPlayer(), cancelResult.getType(), cancelResult.isCancelled());
-
-                   cancelResult = CancelResult.builder().cancelled(current.isCancelled())
-                           .type(current.getType() != null ? current.getType() : cancelResult.getType())
-                           .build();
-                }
-                if(!cancelResult.isCancelled()) {
-                    switch(cancelResult.getType()) {
-                        case ATTACK: {
-                            for(int i = 0 ; i < 2 ; i++) {
-                                synchronized (data.typesToCancel) {
-                                    data.typesToCancel.add(cancelMode);
-                                }
-                            }
-                            break;
-                        }
-                        case INVENTORY: {
-                            TinyProtocolHandler.sendPacket(data.getPlayer(),
-                                    new WrappedOutCloseWindowPacket(data.playerInfo.inventoryId));
-                            break;
-                        }
-                        default: {
-                            synchronized (data.typesToCancel) {
-                                data.typesToCancel.add(cancelMode);
-                            }
-                            break;
-                        }
-                    }
-                }
+                cancelAction(cancelMode);
             }
 
             boolean dev = devAlerts || (!devStage.isRelease() || vl <= vlToFlag) || Kauri.INSTANCE.getTps() < 18;
@@ -325,6 +293,37 @@ public class Check implements KauriCheck {
     public boolean isPosition(WrappedInFlyingPacket packet) {
         return packet.isPos() && (data.playerInfo.deltaXZ > 0 || data.playerInfo.deltaY != 0);
     }
+
+    public void cancelAction(CancelType type) {
+        cancelAction(type, false);
+    }
+
+    public void cancelAction(CancelType type, boolean overrideUserSetting) {
+        if(!cancellable && !overrideUserSetting) return;
+
+        switch(type) {
+            case ATTACK: {
+                for(int i = 0 ; i < 2 ; i++) {
+                    synchronized (data.typesToCancel) {
+                        data.typesToCancel.add(cancelMode);
+                    }
+                }
+                break;
+            }
+            case INVENTORY: {
+                TinyProtocolHandler.sendPacket(data.getPlayer(),
+                        new WrappedOutCloseWindowPacket(data.playerInfo.inventoryId));
+                break;
+            }
+            default: {
+                synchronized (data.typesToCancel) {
+                    data.typesToCancel.add(cancelMode);
+                }
+                break;
+            }
+        }
+    }
+
 
     public void fixMovementBugs() {
         BukkitAPI.INSTANCE.setGliding(data.getPlayer(), false);
