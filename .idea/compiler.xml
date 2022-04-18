@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Annotation profile for Kauri" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.20/lombok-1.18.20.jar" />
+        </processorPath>
+        <module name="Impl" />
+        <module name="Premium" />
+        <module name="API" />
+        <module name="Free" />
+        <module name="Regular" />
+      </profile>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="Base" />
+      </profile>
+    </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="API" options="-XDignore.symbol.file" />
+      <module name="Free" options="-XDignore.symbol.file" />
+      <module name="Impl" options="-XDignore.symbol.file" />
+      <module name="Premium" options="-XDignore.symbol.file" />
+      <module name="Regular" options="-XDignore.symbol.file" />
+    </option>
+  </component>
+</project>
