@@ -99,9 +99,9 @@ public class SpeedA extends Check {
                 moveFactor*= 0.4;
             }
 
-            if(data.blockInfo.onSoulSand) {
+            if(data.blockInfo.onSoulSand && data.playerInfo.lClientGround) {
                 tags.addTag("soulsand");
-                moveFactor*= 0.75;
+                moveFactor*= 0.88;
             }
 
             double ratio = (data.playerInfo.deltaXZ - ldxz) / moveFactor * 100;

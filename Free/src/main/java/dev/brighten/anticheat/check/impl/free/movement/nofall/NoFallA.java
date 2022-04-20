@@ -32,12 +32,19 @@ public class NoFallA extends Check {
 
         if(onGround) {
             flag = Math.abs(data.playerInfo.deltaY) > 0.0051
+                    // Precautionary since it causes falses with onGround = false
+                    && data.playerInfo.slimeTimer.isPassed(2)
                     && data.playerInfo.blockAboveTimer.isPassed(3)
                     && (data.playerInfo.deltaY >= 0
                     // If player has touchdown, would be nasties
                     || (data.playerInfo.deltaY <= data.playerInfo.lDeltaY));
         } else {
-            flag = data.playerInfo.deltaY == 0 && data.playerInfo.lDeltaY == 0;
+            flag = data.playerInfo.deltaY == 0
+                    && data.playerInfo.lDeltaY == 0
+                    // Player can move around in air but not be on the ground if sneaking
+                    && data.playerInfo.climbTimer.isPassed(3)
+                    // For some reason causes false positives on slime blocks
+                    && data.playerInfo.slimeTimer.isPassed(2);
         }
 
         if(flag) {
