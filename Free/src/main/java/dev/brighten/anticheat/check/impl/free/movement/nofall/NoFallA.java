@@ -32,6 +32,7 @@ public class NoFallA extends Check {
 
         if(onGround) {
             flag = Math.abs(data.playerInfo.deltaY) > 0.0051
+                    && data.playerInfo.blockAboveTimer.isPassed(3)
                     && (data.playerInfo.deltaY >= 0
                     // If player has touchdown, would be nasties
                     || (data.playerInfo.deltaY <= data.playerInfo.lDeltaY));
