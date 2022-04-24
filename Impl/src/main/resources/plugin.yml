@@ -3,7 +3,7 @@ main: dev.brighten.anticheat.Kauri
 description: The best solution for the cheater problems of today.
 author: "funkemunky"
 depend: [Atlas]
-softdepend: [LunarClientAPI]
+softdepend: [LunarClient-API]
 api-version: "1.13"
 version: ${project.version}
 permissions:
