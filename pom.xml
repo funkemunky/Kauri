@@ -22,6 +22,10 @@
             <id>funkemunky-releases</id>
             <url>https://nexus.funkemunky.cc/content/repositories/releases/</url>
         </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io/</url>
+        </repository>
     </repositories>
 
     <build>
@@ -70,9 +74,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>gg.manny</groupId>
-            <artifactId>lunar-client-api</artifactId>
-            <version>1.1</version>
+            <groupId>com.github.lunarclient</groupId>
+            <artifactId>bukkitapi</artifactId>
+            <version>1.0.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
