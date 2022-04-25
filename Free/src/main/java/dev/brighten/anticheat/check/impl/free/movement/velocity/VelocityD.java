@@ -2,7 +2,6 @@ package dev.brighten.anticheat.check.impl.free.movement.velocity;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
-import cc.funkemunky.api.utils.Tuple;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.TickTimer;
@@ -13,7 +12,7 @@ import dev.brighten.api.check.DevStage;
 import lombok.Getter;
 import lombok.var;
 
-import java.util.*;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
@@ -35,6 +34,7 @@ public class VelocityD extends Check {
             data.runKeepaliveAction(ka -> {
                 synchronized (velocityY) {
                     velocityY.add(new Velocity(packet.getY()));
+                    lastVelocity.reset();
                 }
             });
         }
@@ -46,7 +46,6 @@ public class VelocityD extends Check {
 
         var toRemove = velocityY.stream()
                 .filter(t -> Math.abs(data.playerInfo.deltaY - t.getVelocity()) < 0.001)
-                .map(t -> new Tuple<>(t, velocityY.indexOf(t)))
                 .collect(Collectors.toList());
 
         if(toRemove.size() > 0) {
@@ -56,9 +55,11 @@ public class VelocityD extends Check {
                     data.playerInfo.deltaY, buffer);
 
             //Removing
-            for (Tuple<Velocity, Integer> i : toRemove) {
-                toRemove.remove((int)i.two);
+            for (Velocity v : toRemove) {
+                velocityY.remove(v);
             }
+            toRemove.clear();
+            return;
         }
 
         //All potential causes of false positives
@@ -73,20 +74,19 @@ public class VelocityD extends Check {
             return;
         }
 
-        toRemove = velocityY.stream().filter(t -> now - t.getTimestamp() > 500)
-                .map(t -> new Tuple<>(t, velocityY.indexOf(t)))
+        toRemove = velocityY.stream().filter(t -> now - t.getTimestamp() > 4000L)
                 .collect(Collectors.toList());
 
         if(toRemove.size() > 0) {
-            List<String> velocities = new ArrayList<>();
-            for (Tuple<Velocity, Integer> i : toRemove) {
-                velocities.add(String.valueOf(i.one.getVelocity()));
-                velocityY.remove((int)i.two);
+            for (Velocity v : toRemove) {
+                velocityY.remove(v);
             }
 
+            toRemove.clear();
+        } else if(velocityY.size() > 0 && lastVelocity.isPassed(2000L)) {
             if(++buffer > 2) {
                 vl++;
-                flag("lv=%s;v=[%s]", lastVelocity.getPassed(), String.join(";", velocities));
+                flag("lv=%s s=%s", lastVelocity.getPassed(), velocityY.size());
             }
         }
     }

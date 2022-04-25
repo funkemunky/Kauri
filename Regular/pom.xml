@@ -61,7 +61,7 @@
             <groupId>dev.brighten.anticheat</groupId>
             <artifactId>Free</artifactId>
             <version>${project.parent.version}</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>dev.brighten.anticheat</groupId>

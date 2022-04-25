@@ -41,9 +41,10 @@ public class Hitboxes extends Check {
                     || data.targetPastLocation.previousLocations.size() < 10
                     || data.playerInfo.inVehicle
                     || data.target == null
-                    || !allowedEntityTypes.contains(data.target.getType())) break Hitboxes;
-
-
+                    || !allowedEntityTypes.contains(data.target.getType())) {
+                debug("broken: " + data.targetPastLocation.previousLocations.size());
+                break Hitboxes;
+            }
             List<KLocation> targetLocs = data.targetPastLocation
                     .getEstimatedLocationByIndex(data.lagInfo.transPing + 2,
                             4, 4);
@@ -58,7 +59,7 @@ public class Hitboxes extends Check {
             for (KLocation tloc : targetLocs) {
                 SimpleCollisionBox tbox = getHitbox(data.target, tloc).expand(data.playerVersion
                         .isBelow(ProtocolVersion.V1_9) ? 0.1 : 0);
-                final AxisAlignedBB vanillaBox = new AxisAlignedBB(tbox.expand(0.25));
+                final AxisAlignedBB vanillaBox = new AxisAlignedBB(tbox.expand(0.15));
 
                 Vec3D intersectTo = vanillaBox.rayTrace(torigin.toVector(),
                         MathUtils.getDirection(torigin), 10),
@@ -67,7 +68,7 @@ public class Hitboxes extends Check {
 
                 if(intersectTo != null || intersecFrom != null) {
                     if(buffer > 0) buffer-= 0.2;
-                    debug("missed: %.1f", buffer);
+                    debug("hit: %.1f", buffer);
                     return;
                 }
             }
@@ -77,7 +78,7 @@ public class Hitboxes extends Check {
                 vl++;
                 flag("");
             }
-            debug("hit: %.1f", buffer);
+            debug("missed: %.1f", buffer);
         }
     }
 
