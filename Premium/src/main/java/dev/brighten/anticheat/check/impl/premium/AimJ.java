@@ -9,9 +9,7 @@ import dev.brighten.api.check.DevStage;
 @CheckInfo(name = "Aim (J)", description = "Statistical aim analysis",
         checkType = CheckType.AIM, planVersion = KauriVersion.ARA, devStage = DevStage.ALPHA)
 public class AimJ extends Check {
-
     private int buffer;
-
     public void runCheck(double std, double pstd, double[] offset, float[] rot) {
         double min = Math.min(std, pstd);
         double pct = Math.abs(std - pstd) / min * 100;

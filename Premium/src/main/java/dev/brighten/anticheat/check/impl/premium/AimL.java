@@ -1,10 +1,8 @@
 package dev.brighten.anticheat.check.impl.premium;
 
-import cc.funkemunky.api.utils.math.RollingAverage;
 import cc.funkemunky.api.utils.math.RollingAverageDouble;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
-import dev.brighten.anticheat.utils.SimpleAverage;
 import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
@@ -16,7 +14,7 @@ public class AimL extends Check {
     private int buffer;
     private float lrp;
     private double lstd, lpstd;
-    private RollingAverageDouble stdDelta = new RollingAverageDouble(3, 0);
+    private final RollingAverageDouble stdDelta = new RollingAverageDouble(3, 0);
 
     public void runCheck(double std, double pstd, double[] offset, float[] rot) {
         double deltaRot = rot[1] - lrp;

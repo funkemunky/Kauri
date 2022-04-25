@@ -1,17 +1,14 @@
 package dev.brighten.anticheat.check.impl.premium;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
-import dev.brighten.anticheat.check.impl.premium.hitboxes.ReachB;
-import dev.brighten.anticheat.check.impl.premium.util.EntityLocation;
+import dev.brighten.anticheat.utils.EntityLocation;
 import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
-import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Aim (M)", description = "Aim snapping", checkType = CheckType.AIM, executable = true,
         planVersion = KauriVersion.ARA, punishVL = 25)
@@ -26,17 +23,16 @@ public class AimM extends Check {
         double deltaXY = Math.hypot(data.moveProcessor.deltaX, data.moveProcessor.deltaY);
 
         check: {
-            if(data.playerInfo.lastAttack.isPassed(30L)) break check;
-            ReachB reach = find(ReachB.class);
-            if(data.target == null
-                    || !reach.entityLocationMap.containsKey(data.target.getUniqueId())) break check;
+            if(data.playerInfo.lastAttack.isPassed(30L)
+                    || data.target == null) break check;
 
-            EntityLocation eloc = reach.entityLocationMap.get(data.target.getUniqueId());
+            EntityLocation eloc = data.entityLocationProcessor.getEntityLocation(data.target).orElse(null);
+
+            if(eloc == null) return;
 
             KLocation origin = data.playerInfo.to.clone(),
                     targetLocation = new KLocation(eloc.x, eloc.y, eloc.z, eloc.yaw, eloc.pitch);
 
-            origin.y+= data.playerInfo.sneaking ? 1.54f : 1.62f;
 
             double[] offset = MathUtils.getOffsetFromLocation(origin.toLocation(data.getPlayer().getWorld()),
                     targetLocation.toLocation(data.getPlayer().getWorld()));

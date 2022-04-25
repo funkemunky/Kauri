@@ -33,7 +33,7 @@ public class Hitboxes extends Check {
     public static double reachThreshold = 3.1;
 
     @Packet
-    public void onUse(WrappedInUseEntityPacket packet) {
+    public void onUse(WrappedInUseEntityPacket packet, long now) {
         if(packet.getAction() != WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK) return;
 
         Hitboxes: {
@@ -41,9 +41,10 @@ public class Hitboxes extends Check {
                     || data.targetPastLocation.previousLocations.size() < 10
                     || data.playerInfo.inVehicle
                     || data.target == null
-                    || !allowedEntityTypes.contains(data.target.getType())) break Hitboxes;
-
-
+                    || !allowedEntityTypes.contains(data.target.getType())) {
+                debug("broken: " + data.targetPastLocation.previousLocations.size());
+                break Hitboxes;
+            }
             List<KLocation> targetLocs = data.targetPastLocation
                     .getEstimatedLocationByIndex(data.lagInfo.transPing + 2,
                             4, 4);
@@ -55,72 +56,29 @@ public class Hitboxes extends Check {
             forigin.y+= data.playerInfo.lsneaking ? (ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_14)
                     ? 1.27f : 1.54f) : 1.62f;
 
-            int hits = 0, misses = 0, hitboxHits = 0;
-            double distance = Double.MAX_VALUE;
             for (KLocation tloc : targetLocs) {
                 SimpleCollisionBox tbox = getHitbox(data.target, tloc).expand(data.playerVersion
                         .isBelow(ProtocolVersion.V1_9) ? 0.1 : 0);
-                final AxisAlignedBB vanillaBox = new AxisAlignedBB(tbox);
-                Vec3D intersect = vanillaBox.rayTrace(torigin.toVector(), MathUtils.getDirection(torigin), 10);
+                final AxisAlignedBB vanillaBox = new AxisAlignedBB(tbox.expand(0.15));
 
-                if(intersect != null) {
-                    hits++;
-                    distance = Math.min(distance, intersect.distanceSquared(new Vec3D(torigin.x, torigin.y, torigin.z)));
-                } else misses++;
+                Vec3D intersectTo = vanillaBox.rayTrace(torigin.toVector(),
+                        MathUtils.getDirection(torigin), 10),
+                        intersecFrom = vanillaBox.rayTrace(forigin.toVector(),
+                                MathUtils.getDirection(forigin), 10);
 
-                hitboxes: {
-                    Hitboxes hitbox = find(Hitboxes.class);
-
-                    if(hitbox == null || !hitbox.isEnabled()) {
-                        break hitboxes;
-                    }
-
-                    SimpleCollisionBox expandedBox = tbox.copy().expand(0.25);
-
-                    final AxisAlignedBB expanded = new AxisAlignedBB(expandedBox);
-                    Vec3D intersect2 = expanded.rayTrace(torigin.toVector(), MathUtils.getDirection(torigin), 10),
-                            intersect3 = expanded.rayTrace(forigin.toVector(), MathUtils.getDirection(forigin), 10);
-
-                    if(intersect != null || intersect2 != null || intersect3 != null)
-                        hitboxHits++;
+                if(intersectTo != null || intersecFrom != null) {
+                    if(buffer > 0) buffer-= 0.2;
+                    debug("hit: %.1f", buffer);
+                    return;
                 }
             }
 
-            hitboxes: {
-                Hitboxes hitbox = find(Hitboxes.class);
-
-                if(hitbox == null || !hitbox.isEnabled()) {
-                    debug("Hitboxes is null within "
-                            + data.getPlayer().getName() + " Reach (A) detection! (" + (hitbox == null) + ")");
-                    break hitboxes;
-                }
-
-                if(hitboxHits == 0 && misses > 1) {
-                    if(System.currentTimeMillis() - data.lagInfo.lastClientTrans < 150L
-                            && data.lagInfo.lastPingDrop.isPassed(5) && ++hitbox.buffer > 5) {
-                        hitbox.vl++;
-                        hitbox.buffer = 5;
-                        hitbox.flag("b=%.1f m=%s", hitbox.buffer, misses);
-                    }
-                } else if(hitbox.buffer > 0) hitbox.buffer-= 0.2;
+            if(now - data.lagInfo.lastClientTrans < 150L
+                    && data.lagInfo.lastPingDrop.isPassed(5) && ++buffer > 5) {
+                vl++;
+                flag("");
             }
-
-            if(hits > 0)
-                distance = Math.sqrt(distance) - 0.03; //We subtract 0.03 since our ray tracing isnt exactly 1-1
-            else distance = -1;
-
-            if (distance > reachThreshold && hits > 1) {
-                if(++buffer > 5) {
-                    buffer = 5;
-                    vl++;
-                    flag("distance=%.2f buffer=%s", distance, buffer);
-                }
-            } else buffer -= buffer > 0 ? 0.075f : 0;
-
-            debug("distance=%.3f h/m=%s,%s boxes=%s buffer=%s hbhits=%s lct=%s lts=%s",
-                    distance, hits, misses, targetLocs.size(), buffer, hitboxHits,
-                    System.currentTimeMillis() - data.lagInfo.lastClientTrans,
-                    data.playerInfo.lastTargetSwitch.getPassed());
+            debug("missed: %.1f", buffer);
         }
     }
 
