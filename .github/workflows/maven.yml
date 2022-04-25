@@ -21,6 +21,6 @@ jobs:
         with:
           name: Artifacts
           path: |
-            Premium/target/Premium-*.jar
-            Regular/target/Regular-*.jar
-            API/target/API-*.jar
+            Premium-*.jar
+            Regular-*.jar
+            API-*.jar
