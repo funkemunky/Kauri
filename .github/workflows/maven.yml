@@ -15,6 +15,11 @@ jobs:
           java-version: 17.0
  
       - name: Compile
-        run: mvn -B -Pclean install
+        run: mvn -B clean package -DskipTests
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Collect artifacts
+         uses: actions/upload-artifact@v2
+         with:
+            name: generated-artifacts
+            path: Premium/target/*.jar
