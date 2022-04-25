@@ -3,7 +3,7 @@ on:
     branches: ["**"]
  
 jobs:
-  CI/CD:
+  CI:
  
     runs-on: ubuntu-latest
  
