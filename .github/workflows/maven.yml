@@ -21,15 +21,8 @@ jobs:
       - name: Upload Ara
         uses: actions/upload-artifact@v2
         with:
-          name: Ara
-          path: Premium/target/Premium-*.jar
-      - name: Upload Spigot
-        uses: actions/upload-artifact@v2
-        with:
-          name: Spigot
-          path: Regular/target/Regular-*.jar
-      - name: Upload API
-        uses: actions/upload-artifact@v2
-        with:
-          name: API
-          path: API/target/API-*.jar
+          name: Artifacts
+          path: |
+            Premium/target/Premium-*.jar
+            Regular/target/Regular-*.jar
+            API/target/API-*.jar
