@@ -14,7 +14,6 @@
         <module>Premium</module>
         <module>Regular</module>
         <module>Free</module>
-        <module>Base</module>
     </modules>
 
     <repositories>

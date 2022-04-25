@@ -252,6 +252,9 @@ public class PacketProcessor {
                         data.playerInfo.to)) {
                     data.excuseNextFlying = true;
                 }
+
+                data.entityLocationProcessor.onFlying();
+
                 if(!data.excuseNextFlying) {
                     if (timestamp - data.lagInfo.lastFlying <= 15) {
                         data.lagInfo.lastPacketDrop.reset();
@@ -707,6 +710,7 @@ public class PacketProcessor {
             case Packet.Server.LEGACY_REL_LOOK: {
                 WrappedOutRelativePosition packet = new WrappedOutRelativePosition(object, data.getPlayer());
 
+                data.entityLocationProcessor.onRelPosition(packet);
                 data.checkManager.runPacket(packet, timestamp);
                 break;
             }
@@ -717,6 +721,8 @@ public class PacketProcessor {
                     data.sniffedPackets.add(type + ":@:" + packet.entityId + ";" + packet.x + ";" + packet.y + ";"
                             + packet.z + ";" + packet.yaw + ";" + packet.pitch + ":" + timestamp);
                 }
+
+                data.entityLocationProcessor.onTeleportSent(packet);
 
                 data.checkManager.runPacket(packet, timestamp);
                 break;

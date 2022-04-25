@@ -8,13 +8,10 @@ import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.api.packets.channelhandler.TinyProtocol1_7;
 import cc.funkemunky.api.tinyprotocol.api.packets.channelhandler.TinyProtocol1_8;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.Tuple;
-import cc.funkemunky.api.utils.it.unimi.dsi.fastutil.ints.*;
-import cc.funkemunky.api.utils.math.RollingAverageLong;
 import cc.funkemunky.api.utils.math.cond.MaxInteger;
 import cc.funkemunky.api.utils.objects.evicting.ConcurrentEvictingList;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
@@ -26,10 +23,10 @@ import dev.brighten.anticheat.data.classes.CheckManager;
 import dev.brighten.anticheat.data.classes.PlayerInformation;
 import dev.brighten.anticheat.data.classes.PredictionService;
 import dev.brighten.anticheat.processing.ClickProcessor;
+import dev.brighten.anticheat.processing.EntityLocationProcessor;
 import dev.brighten.anticheat.processing.MovementProcessor;
 import dev.brighten.anticheat.processing.PotionProcessor;
 import dev.brighten.anticheat.processing.keepalive.KeepAlive;
-import dev.brighten.anticheat.utils.EntityLocation;
 import dev.brighten.anticheat.utils.PastLocation;
 import dev.brighten.anticheat.utils.SimpleAverage;
 import dev.brighten.anticheat.utils.timer.Timer;
@@ -40,8 +37,6 @@ import lombok.AllArgsConstructor;
 import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -64,6 +59,7 @@ public class ObjectData implements Data {
     public PastLocation targetPastLocation;
     public LivingEntity target;
     public KLocation lastFlying;
+    public EntityLocationProcessor entityLocationProcessor;
     public boolean bypassing;
     public SimpleCollisionBox box = new SimpleCollisionBox();
     public ObjectData targetData;
@@ -79,9 +75,7 @@ public class ObjectData implements Data {
     public int hashCode, playerTicks;
     public boolean banned, atlasBungeeInstalled, excuseNextFlying;
     public ModData modData;
-    public KLocation targetLoc;
     public ProtocolVersion playerVersion = ProtocolVersion.UNKNOWN;
-    public Int2ObjectMap<EntityLocation> entityTracker = Int2ObjectMaps.synchronize(new Int2ObjectOpenHashMap<>());
     public final Set<Player> boxDebuggers = new HashSet<>();
     public int blockUpdates;
     private final List<CollisionBox> lookingAtBoxes = Collections.synchronizedList(new ArrayList<>());
@@ -108,6 +102,7 @@ public class ObjectData implements Data {
         lagInfo = new LagInformation();
         targetPastLocation = new PastLocation();
         potionProcessor = new PotionProcessor(this);
+        entityLocationProcessor = new EntityLocationProcessor(this);
 
         playerInfo.to = playerInfo.from = new KLocation(player.getLocation());
 
@@ -241,18 +236,6 @@ public class ObjectData implements Data {
 
     public long getRandomLong(long baseNumber, long bound) {
         return baseNumber + ThreadLocalRandom.current().nextLong(bound);
-    }
-
-    public EntityLocation getEntityLocation(Entity entity) {
-        return entityTracker.compute(entity.getEntityId(), (key, entityLoc) -> {
-            if(entityLoc == null) {
-                return new EntityLocation(entity);
-            } else if(entityLoc.entity == null || entityLoc.entity.getUniqueId() != entity.getUniqueId()) {
-                return new EntityLocation(entity);
-            }
-
-            return entityLoc;
-        });
     }
 
     public int runKeepaliveAction(Consumer<KeepAlive> action) {
