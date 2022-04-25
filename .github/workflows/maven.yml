@@ -18,8 +18,18 @@ jobs:
         run: mvn -B clean package -DskipTests
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Collect artifacts
+      - name: Upload Ara
         uses: actions/upload-artifact@v2
         with:
-          name: generated-artifacts
-          path: Premium/target/*.jar
+          name: Ara
+          path: Premium/target/Premium-*.jar
+      - name: Upload Spigot
+        uses: actions/upload-artifact@v2
+        with:
+          name: Spigot
+          path: Regular/target/Regular-*.jar
+      - name: Upload API
+        uses: actions/upload-artifact@v2
+        with:
+          name: API
+          path: API/target/API-*.jar
