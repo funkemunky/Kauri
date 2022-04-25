@@ -19,8 +19,15 @@ jobs:
       - name: Upload Ara
         uses: actions/upload-artifact@v2
         with:
-          name: Artifacts
-          path: |
-            Premium-*.jar
-            Regular-*.jar
-            API-*.jar
+          name: Kauri Ara
+          path: Premium/target/Premium-*.jar
+      - name: Upload Spigot
+        uses: actions/upload-artifact@v2
+        with:
+          name: Kauri Spigot Edition
+          path: Regular/target/Regular-*.jar
+      - name: Upload API
+        uses: actions/upload-artifact@v2
+        with:
+          name: Kauri API
+          path: API/target/API-*.jar
