@@ -23,7 +23,7 @@ public class FlyA extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
         if(packet.isPos() && (data.playerInfo.deltaXZ > 0 || data.playerInfo.deltaY != 0)) {
-            //We check if the player is in ground, since theoretically the y should be zero.
+            /* We check if the player is in ground, since theoretically the y should be zero. */
             double lDeltaY = data.playerInfo.lClientGround ? 0 : data.playerInfo.lDeltaY;
             boolean onGround = data.playerInfo.clientGround;
             double predicted = onGround ? lDeltaY : (lDeltaY - 0.08) * mult;
@@ -32,10 +32,10 @@ public class FlyA extends Check {
                 predicted = MovementUtils.getJumpHeight(data);
             }
 
-            //Basically, this bug would only occur if the client's movement is less than a certain amount.
-            //If it is, it won't send any position packet. Usually this only occurs when the magnitude
-            //of motionY is less than 0.005 and it rounds it to 0.
-            //The easiest way I found to produce this oddity is by putting myself in a corner and just jumping.
+         /* Basically, this bug would only occur if the client's movement is less than a certain amount.
+            If it is, it won't send any position packet. Usually this only occurs when the magnitude
+            of motionY is less than 0.005 and it rounds it to 0.
+            The easiest way I found to produce this oddity is by putting myself in a corner and just jumping. */
             if(Math.abs(predicted) < 0.005
                     && ProtocolVersion.getGameVersion().isBelow(ProtocolVersion.V1_9)) {
                 predicted = 0;
