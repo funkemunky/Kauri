@@ -8,7 +8,7 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "BadPackets (M)", description = "Checks for impossible pitch positions.",
-        checkType = CheckType.BADPACKETS, punishVL = 1, planVersion = KauriVersion.FREE, executable = true)
+        checkType = CheckType.BADPACKETS, punishVL = 1, executable = true)
 public class BadPacketsM extends Check {
 
     @Packet

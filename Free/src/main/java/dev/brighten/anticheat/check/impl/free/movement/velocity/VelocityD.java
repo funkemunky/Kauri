@@ -16,7 +16,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 @CheckInfo(name = "Velocity (D)", description = "Checks if a player responded to velocity",
-        checkType = CheckType.VELOCITY, punishVL = 5, planVersion = KauriVersion.FREE, devStage = DevStage.BETA)
+        checkType = CheckType.VELOCITY, punishVL = 5, devStage = DevStage.BETA)
 @Cancellable(cancelType = CancelType.MOVEMENT)
 public class VelocityD extends Check {
 

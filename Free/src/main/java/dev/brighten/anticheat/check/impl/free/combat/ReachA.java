@@ -16,7 +16,7 @@ import java.util.EnumSet;
 import java.util.List;
 
 @CheckInfo(name = "Reach (A)", checkType = CheckType.HITBOX, punishVL = 4, description = "A simple distance check.",
-        planVersion = KauriVersion.FREE, executable = true)
+        executable = true)
 @Cancellable(cancelType = CancelType.ATTACK)
 public class ReachA extends Check {
 
