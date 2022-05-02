@@ -5,9 +5,9 @@ import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.Priority;
-import cc.funkemunky.api.utils.co.aikar.commands.BaseCommand;
-import cc.funkemunky.api.utils.co.aikar.commands.annotation.CommandAlias;
-import cc.funkemunky.api.utils.co.aikar.commands.annotation.CommandPermission;
+import co.aikar.commands.BaseCommand;
+import co.aikar.commands.annotation.CommandAlias;
+import co.aikar.commands.annotation.CommandPermission;
 import org.bukkit.entity.Player;
 
 @Init(priority = Priority.LOW)

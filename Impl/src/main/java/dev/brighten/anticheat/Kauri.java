@@ -8,7 +8,7 @@ import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.math.RollingAverageDouble;
-import cc.funkemunky.api.utils.co.aikar.commands.BukkitCommandManager;
+import co.aikar.commands.BukkitCommandManager;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.data.DataManager;
 import dev.brighten.anticheat.data.ObjectData;
