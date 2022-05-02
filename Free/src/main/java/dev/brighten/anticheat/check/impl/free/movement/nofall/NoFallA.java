@@ -1,8 +1,6 @@
 package dev.brighten.anticheat.check.impl.free.movement.nofall;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -22,7 +20,9 @@ public class NoFallA extends Check {
     public void onPacket(WrappedInFlyingPacket packet) {
         if (data.playerInfo.generalCancel
                 || !packet.isPos()
-                || (data.playerInfo.deltaXZ == 0 && data.playerInfo.deltaY == 0)) {
+                || (data.playerInfo.deltaXZ == 0 && data.playerInfo.deltaY == 0)
+                || data.blockInfo.inWater /*Add a pose check to the inwater check for more accurate values*/
+                || (data.blockInfo.onStairs && data.playerInfo.deltaY == 0.5)) {
             if(buffer > 0) buffer-= 0.5f;
             return;
         }
