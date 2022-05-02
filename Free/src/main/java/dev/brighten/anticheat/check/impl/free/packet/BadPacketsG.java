@@ -8,7 +8,7 @@ import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "BadPackets (G)", description = "Looks for impossible dropping of items",
         checkType = CheckType.BADPACKETS,
-        punishVL = 10, planVersion = KauriVersion.FREE, executable = true)
+        punishVL = 10, executable = true)
 public class BadPacketsG extends Check {
 
     private long lastItemDrop;
