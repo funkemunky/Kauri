@@ -7,11 +7,10 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.EntityLocation;
-import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Aim (M)", description = "Aim snapping", checkType = CheckType.AIM, executable = true,
-        planVersion = KauriVersion.ARA, punishVL = 25)
+        punishVL = 25)
 public class AimM extends Check {
 
     private float buffer;

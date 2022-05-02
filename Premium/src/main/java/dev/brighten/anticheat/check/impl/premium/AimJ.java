@@ -2,12 +2,11 @@ package dev.brighten.anticheat.check.impl.premium;
 
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
-import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Aim (J)", description = "Statistical aim analysis",
-        checkType = CheckType.AIM, planVersion = KauriVersion.ARA, devStage = DevStage.ALPHA)
+        checkType = CheckType.AIM, devStage = DevStage.ALPHA)
 public class AimJ extends Check {
     private int buffer;
     public void runCheck(double std, double pstd, double[] offset, float[] rot) {

@@ -13,7 +13,6 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.AxisAlignedBB;
 import dev.brighten.anticheat.utils.Vec3D;
-import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 import lombok.Getter;
@@ -21,7 +20,7 @@ import lombok.Getter;
 import java.util.List;
 
 @CheckInfo(name = "Killaura (H)", description = "Checks for weird misses", 
-        devStage = DevStage.BETA, planVersion = KauriVersion.ARA, checkType = CheckType.KILLAURA)
+        devStage = DevStage.BETA, checkType = CheckType.KILLAURA)
 public class KillauraH extends Check {
 
     @Getter

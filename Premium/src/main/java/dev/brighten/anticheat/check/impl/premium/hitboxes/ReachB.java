@@ -17,7 +17,6 @@ import dev.brighten.anticheat.utils.EntityLocation;
 import dev.brighten.anticheat.utils.Vec3D;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.TickTimer;
-import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 import org.bukkit.entity.Entity;
@@ -26,7 +25,7 @@ import org.bukkit.entity.EntityType;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
-@CheckInfo(name = "Reach (B)", planVersion = KauriVersion.ARA, punishVL = 6, executable = true,
+@CheckInfo(name = "Reach (B)", punishVL = 6, executable = true,
         checkType = CheckType.HITBOX)
 @Cancellable(cancelType = CancelType.ATTACK)
 public class ReachB extends Check {

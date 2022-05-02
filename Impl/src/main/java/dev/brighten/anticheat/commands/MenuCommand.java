@@ -17,7 +17,6 @@ import dev.brighten.anticheat.utils.menu.button.ClickAction;
 import dev.brighten.anticheat.utils.menu.preset.button.FillerButton;
 import dev.brighten.anticheat.utils.menu.type.impl.ChestMenu;
 import dev.brighten.anticheat.utils.mojang.MojangAPI;
-import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
 import net.md_5.bungee.api.ChatColor;

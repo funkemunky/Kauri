@@ -3,12 +3,11 @@ package dev.brighten.anticheat.check.impl.premium;
 import cc.funkemunky.api.utils.math.RollingAverageDouble;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
-import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Aim (L)", description = "Statistical aim analysis",
-        checkType = CheckType.AIM, planVersion = KauriVersion.ARA, devStage = DevStage.ALPHA)
+        checkType = CheckType.AIM, devStage = DevStage.ALPHA)
 public class AimL extends Check {
 
     private int buffer;
