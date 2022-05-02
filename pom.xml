@@ -7,13 +7,11 @@
     <groupId>dev.brighten.anticheat</groupId>
     <artifactId>Kauri</artifactId>
     <packaging>pom</packaging>
-    <version>2.18.1</version>
+    <version>2.18.2</version>
     <modules>
         <module>API</module>
         <module>Impl</module>
-        <module>Premium</module>
-        <module>Regular</module>
-        <module>Free</module>
+        <module>Detections</module>
     </modules>
 
     <repositories>

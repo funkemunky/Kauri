@@ -19,13 +19,11 @@ import dev.brighten.anticheat.utils.api.BukkitAPI;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import dev.brighten.api.KauriAPI;
-import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 import dev.brighten.api.check.KauriCheck;
 import dev.brighten.api.event.KauriEvent;
-import dev.brighten.api.event.result.CancelResult;
 import dev.brighten.api.event.result.FlagResult;
 import dev.brighten.api.event.result.PunishResult;
 import lombok.Getter;
@@ -73,8 +71,6 @@ public class Check implements KauriCheck {
     public CheckType checkType;
 
     public CancelType cancelMode;
-    @Getter
-    private KauriVersion plan;
     public List<String> executableCommands = new ArrayList<>();
 
     public boolean exempt, banExempt;
@@ -119,8 +115,8 @@ public class Check implements KauriCheck {
         }
 
         String path = "checks." + name;
-        CheckSettings settings = new CheckSettings(info.name(), info.description(), info.checkType(), type,
-                info.planVersion(), info.minVersion(), info.maxVersion());
+        CheckSettings settings = new CheckSettings(info.name(), info.description(), info.checkType(),
+                info.devStage(), type, info.minVersion(), info.maxVersion());
 
         settings.enabled = new ConfigDefault<>(info.enabled(),
                 path + ".enabled", Kauri.INSTANCE).get();
