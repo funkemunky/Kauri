@@ -11,7 +11,7 @@ import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "BadPackets (A)", description = "Checks for blockDig and blockPlace times.",
-        checkType = CheckType.BADPACKETS, punishVL = 12, planVersion = KauriVersion.FREE, executable = true)
+        checkType = CheckType.BADPACKETS, punishVL = 12, executable = true)
 @Cancellable(cancelType = CancelType.INTERACT)
 public class BadPacketsA extends Check {
 

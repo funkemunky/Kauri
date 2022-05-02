@@ -6,7 +6,7 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
-@CheckInfo(name = "BadPackets (I)", checkType = CheckType.BADPACKETS, planVersion = KauriVersion.FREE,
+@CheckInfo(name = "BadPackets (I)", checkType = CheckType.BADPACKETS,
         executable = true,
         description = "Checks if the player is sending isFlying while not have allowedFlight.",
         punishVL = 1)

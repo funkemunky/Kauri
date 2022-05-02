@@ -12,7 +12,7 @@ import dev.brighten.anticheat.utils.MovementUtils;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Fly (A)", description = "Checks for improper acceleration.", checkType = CheckType.FLIGHT,
-        vlToFlag = 4, punishVL = 15, planVersion = KauriVersion.FREE, executable = true)
+        vlToFlag = 4, punishVL = 15, executable = true)
 @Cancellable
 public class FlyA extends Check {
 
