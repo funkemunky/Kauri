@@ -19,7 +19,9 @@ public class NoFallA extends Check {
     public void onPacket(WrappedInFlyingPacket packet) {
         if (data.playerInfo.generalCancel
                 || !packet.isPos()
-                || (data.playerInfo.deltaXZ == 0 && data.playerInfo.deltaY == 0)) {
+                || (data.playerInfo.deltaXZ == 0 && data.playerInfo.deltaY == 0)
+                || data.blockInfo.inWater
+                || (data.blockInfo.onStairs && data.playerInfo.deltaY == 0.5)) {
             if(buffer > 0) buffer-= 0.5f;
             return;
         }
