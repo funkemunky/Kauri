@@ -14,6 +14,12 @@ import dev.brighten.api.check.DevStage;
 public class FlyI extends Check {
 
     private int buffer;
+
+    /*
+        T1: add net.minecraft.world.entity.Entity.getPose() to check if player is really swimming (1.14 - latest)
+         if not set to false cause then the player cant really swim
+     */
+
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if(!packet.isPos()
@@ -24,6 +30,7 @@ public class FlyI extends Check {
                 || data.playerInfo.lastVelocity.isNotPassed(1)
                 || data.playerInfo.doingVelocity
                 || data.playerInfo.deltaY != 0
+                || (data.blockInfo.inWater /* && Todo: T1 */)
                 || data.playerInfo.climbTimer.isNotPassed(2)) {
             buffer = 0;
             debug("Resetting buffer");
