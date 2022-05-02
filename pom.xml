@@ -11,9 +11,7 @@
     <modules>
         <module>API</module>
         <module>Impl</module>
-        <module>Premium</module>
-        <module>Regular</module>
-        <module>Free</module>
+        <module>Detections</module>
     </modules>
 
     <repositories>
