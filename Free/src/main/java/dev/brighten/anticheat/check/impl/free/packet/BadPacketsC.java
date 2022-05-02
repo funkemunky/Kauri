@@ -9,7 +9,7 @@ import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "BadPackets (C)", description = "Checks for players who send slot packets at the same time as flying.",
-        checkType = CheckType.BADPACKETS, punishVL = 10, planVersion = KauriVersion.FREE, executable = true)
+        checkType = CheckType.BADPACKETS, punishVL = 10, executable = true)
 @Cancellable
 public class BadPacketsC extends Check {
 

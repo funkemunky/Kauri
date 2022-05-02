@@ -9,7 +9,7 @@ import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "NoFall (A)", description = "Looks for impossible location updates compared to ground.",
-        checkType = CheckType.NOFALL, devStage = DevStage.ALPHA, punishVL = 12, vlToFlag = 2, executable = true, planVersion = KauriVersion.FREE)
+        checkType = CheckType.NOFALL, devStage = DevStage.ALPHA, punishVL = 12, vlToFlag = 2, executable = true)
 @Cancellable
 public class NoFallA extends Check {
 

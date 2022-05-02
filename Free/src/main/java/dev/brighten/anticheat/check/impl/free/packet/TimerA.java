@@ -17,7 +17,7 @@ import dev.brighten.api.check.CheckType;
  * using Timer.
  */
 @CheckInfo(name = "Timer (A)", description = "Checks the rate of packets coming in.",
-        checkType = CheckType.BADPACKETS, vlToFlag = 2, punishVL = 10, planVersion = KauriVersion.FREE)
+        checkType = CheckType.BADPACKETS, vlToFlag = 2, punishVL = 10)
 @Cancellable
 public class TimerA extends Check {
 

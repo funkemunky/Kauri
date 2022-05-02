@@ -1,12 +1,10 @@
 package dev.brighten.anticheat.check.impl.free.packet;
 
-import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInKeepAlivePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutKeepAlivePacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
-import cc.funkemunky.api.utils.Color;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.utils.timer.Timer;
@@ -17,7 +15,6 @@ import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 import lombok.val;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
