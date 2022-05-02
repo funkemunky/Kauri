@@ -171,6 +171,9 @@ public class ObjectData implements Data {
         checkManager.addChecks();
     }
 
+    /**
+     * Clears all information that will prevent ObjectData from being removed by GC
+     */
     public void unregister() {
         keepAliveStamps.clear();
         Kauri.INSTANCE.dataManager.hasAlerts.remove(uuid.hashCode());
