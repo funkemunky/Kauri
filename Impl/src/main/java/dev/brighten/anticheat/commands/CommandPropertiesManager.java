@@ -21,9 +21,9 @@
  */
 package dev.brighten.anticheat.commands;
 
-import co.aikar.commands.BukkitCommandManager;
-import co.aikar.commands.Locales;
-import co.aikar.locales.MessageKey;
+import cc.funkemunky.api.utils.co.aikar.commands.BukkitCommandManager;
+import cc.funkemunky.api.utils.co.aikar.commands.Locales;
+import cc.funkemunky.api.utils.co.aikar.locales.MessageKey;
 
 import java.io.*;
 import java.util.Properties;
