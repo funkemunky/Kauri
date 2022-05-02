@@ -71,8 +71,6 @@ public class Check implements KauriCheck {
     public CheckType checkType;
 
     public CancelType cancelMode;
-    @Getter
-    private KauriVersion plan;
     public List<String> executableCommands = new ArrayList<>();
 
     public boolean exempt, banExempt;
@@ -117,8 +115,8 @@ public class Check implements KauriCheck {
         }
 
         String path = "checks." + name;
-        CheckSettings settings = new CheckSettings(info.name(), info.description(), info.checkType(), type,
-                info.planVersion(), info.minVersion(), info.maxVersion());
+        CheckSettings settings = new CheckSettings(info.name(), info.description(), info.checkType(),
+                info.devStage(), type, info.minVersion(), info.maxVersion());
 
         settings.enabled = new ConfigDefault<>(info.enabled(),
                 path + ".enabled", Kauri.INSTANCE).get();
