@@ -17,16 +17,16 @@ jobs:
         run: mvn -B clean package -DskipTests
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Upload Ara
+      - name: Upload Kauri
         uses: actions/upload-artifact@v2
         with:
-          name: Kauri Ara
-          path: Premium/target/Premium-*.jar
-      - name: Upload Spigot
+          name: Kauri with Detections
+          path: Detections/target/Detections-*.jar
+      - name: Upload Kauri without Detections
         uses: actions/upload-artifact@v2
         with:
-          name: Kauri Spigot Edition
-          path: Regular/target/Regular-*.jar
+          name: Kauri Without Detections
+          path: Impl/target/Impl-*.jar
       - name: Upload API
         uses: actions/upload-artifact@v2
         with:
