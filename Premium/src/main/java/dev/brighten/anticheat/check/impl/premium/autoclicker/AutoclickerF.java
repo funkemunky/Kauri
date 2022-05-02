@@ -11,7 +11,6 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.SimpleAverage;
-import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 import lombok.val;
@@ -20,7 +19,7 @@ import java.util.List;
 
 @CheckInfo(name = "Autoclicker (F)", description = "Looks for consistency between attack hits and miss hits.",
         devStage = DevStage.ALPHA,
-        checkType = CheckType.AUTOCLICKER, minVersion = ProtocolVersion.V1_8, planVersion = KauriVersion.ARA)
+        checkType = CheckType.AUTOCLICKER, minVersion = ProtocolVersion.V1_8)
 public class AutoclickerF extends Check {
 
     public int flying, lflying, buffer, attackTick;

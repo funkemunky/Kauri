@@ -8,14 +8,13 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.EntityLocation;
-import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 
 import java.util.List;
 import java.util.Optional;
 
 @CheckInfo(name = "Aim (G)", description = "Statistical aim analysis",
-        checkType = CheckType.AIM, planVersion = KauriVersion.ARA, punishVL = 20, executable = true)
+        checkType = CheckType.AIM, punishVL = 20, executable = true)
 public class AimG extends Check {
 
     private int abuffer;

@@ -7,7 +7,6 @@ import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
-import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 import org.bukkit.enchantments.Enchantment;
 
@@ -17,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @CheckInfo(name = "Velocity (B)", description = "A horizontal velocity check.", checkType = CheckType.VELOCITY,
-        punishVL = 40, vlToFlag = 15, planVersion = KauriVersion.ARA, executable = true)
+        punishVL = 40, vlToFlag = 15, executable = true)
 @Cancellable
 public class VelocityB extends Check {
 

@@ -6,12 +6,11 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.data.ObjectData;
-import dev.brighten.api.KauriVersion;
 import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Inventory (A)", description = "Checks if a player clicks in their inventory while moving.",
-        checkType = CheckType.INVENTORY, devStage = DevStage.ALPHA, planVersion = KauriVersion.ARA)
+        checkType = CheckType.INVENTORY, devStage = DevStage.ALPHA)
 public class InventoryA extends Check {
 
     private int moveStreak;
