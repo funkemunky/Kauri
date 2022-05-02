@@ -17,7 +17,7 @@ import dev.brighten.anticheat.utils.menu.button.ClickAction;
 import dev.brighten.anticheat.utils.menu.preset.button.FillerButton;
 import dev.brighten.anticheat.utils.menu.type.impl.ChestMenu;
 import dev.brighten.anticheat.utils.mojang.MojangAPI;
-import dev.brighten.api.KauriVersion;
+import dev.brighten.api.KauriAPI;
 import dev.brighten.api.check.CheckType;
 import lombok.val;
 import net.md_5.bungee.api.ChatColor;
@@ -75,25 +75,6 @@ public class MenuCommand extends BaseCommand {
         player.sendMessage(Color.Green + "Opened main menu.");
     }
 
-    private static final BaseComponent[] freeMessage = new ComponentBuilder("We would appreciate if you purchased a " +
-            "full version. It really helps to fund the development of Kauri for the longterm.")
-            .color(ChatColor.GRAY)
-            .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                    new ComponentBuilder("Opens https://funkemunky.cc/shop")
-                            .color(ChatColor.GRAY).italic(true).create()))
-            .event(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://funkemunky.cc/shop"))
-            .create(),
-            fullMessage = new ComponentBuilder("Thanks for buying a full copy! ").color(ChatColor.GREEN)
-                    .append("If you run a server that needs best-in-class combat detection, we suggest trying ")
-                    .color(ChatColor.GRAY).append("Kauri Ara").color(ChatColor.GOLD).bold(true)
-                    .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                            new ComponentBuilder("Opens https://funkemunky.cc/shop")
-                                    .color(ChatColor.GRAY).italic(true).create()))
-                    .event(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://funkemunky.cc/shop"))
-                    .create(),
-            araMessage = new ComponentBuilder("Thanks for purchasing Kauri Ara!")
-                    .color(ChatColor.GREEN).create();
-
     private static ChestMenu getMainMenu() {
         ChestMenu menu = new ChestMenu(Color.Gold + "Kauri Menu", 3);
 
@@ -101,7 +82,6 @@ public class MenuCommand extends BaseCommand {
                 (player, info) -> categoryMenu.showMenu(player),
                 "", "&7Toggle Kauri checks on or off."));
 
-        KauriVersion plan = KauriVersion.getPlan();
         menu.setItem(13, createButton(XMaterial.ENCHANTED_BOOK.parseMaterial(), 1, "&cKauri Anticheat",
                 (player, info) -> {
                     switch (info.getClickType()) {
@@ -119,16 +99,11 @@ public class MenuCommand extends BaseCommand {
                         case SHIFT_LEFT: {
                             menu.setParent(null);
                             menu.close(player);
-                            if (plan.equals(KauriVersion.FREE)) {
-                                player.spigot().sendMessage(freeMessage);
-                            } else if (plan.equals(KauriVersion.FULL)) {
-                                player.spigot().sendMessage(fullMessage);
-                            } else player.spigot().sendMessage(araMessage);
                             break;
                         }
                     }
                 },
-                getKauriLore(plan)));
+                getKauriLore()));
         menu.setItem(15, createButton(XMaterial.PAPER.parseMaterial(), 1, "&cView Recent Violators",
                 (player, info) -> {
                     player.sendMessage(Color.Gray + "Loading menu...");
@@ -139,20 +114,11 @@ public class MenuCommand extends BaseCommand {
         return menu;
     }
 
-    private static String[] getKauriLore(KauriVersion plan) {
-        if (plan.equals(KauriVersion.FREE)) {
-            return new String[]{"", "&7You are using &6Kauri Anticheat v" +
-                    KauriVersion.getVersion(),
-                    "", "&7Your Plan: &e" + plan.name,
-                    "", "&cYou are currently using a &oFREE TRIAL&c",
-                    "", "&e&oLeft click &7&oto purchase a full version.",
-                    "&e&oRight Click &7&oclick to get support."};
-        } else {
-            return new String[]{"", "&7You are using &6Kauri Anticheat v" +
-                    KauriVersion.getVersion(),
-                    "", "&7Your Plan: &e" + plan.name + "&o($" + plan.price + (plan.monthly ? " a month" : "") + ")",
-                    "", "&e&oRight Click &7&oclick to get support."};
-        }
+    private static String[] getKauriLore() {
+        return new String[]{"", "&7You are using &6Kauri Anticheat v" +
+                KauriAPI.INSTANCE.getVersion(),
+                "", "&7Your Plan: &eFree",
+                "&e&oRight Click &7&oclick to get support."};
     }
 
     private static ChestMenu getChecksCategoryMenu() {
@@ -379,7 +345,7 @@ public class MenuCommand extends BaseCommand {
 
         menu.fill(new FillerButton());
         //Setting up middle book item
-        String title = Color.Yellow + "Kauri Plans" + Color.Gray + ": " + Color.White + returnPlans(settings.plan);
+        String title = Color.Yellow + "Check State: " + Color.White + settings.devStage;
         List<String> description = Arrays.asList(MiscUtils
                 .splitIntoLine(Color.translate(settings.description), 35));
 
@@ -507,17 +473,6 @@ public class MenuCommand extends BaseCommand {
         menu.setItem(23, buttonCancellable);
 
         return menu;
-    }
-
-    private static String returnPlans(KauriVersion version) {
-        List<String> plans = new ArrayList<>();
-        for (KauriVersion value : KauriVersion.values()) {
-            plans.add((KauriVersion.getPlan().equals(value) ? Color.Green : Color.White) + value.name);
-            if (value.equals(version))
-                break;
-        }
-
-        return String.join(Color.Gray + ", ", plans);
     }
 
     public static ChestMenu getRecentViolatorsMenu(boolean fromMain) {
