@@ -1,4 +1,4 @@
-package dev.brighten.anticheat.check.impl.movement.nofall;
+package dev.brighten.anticheat.check.impl.free.movement.nofall;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import dev.brighten.anticheat.check.api.Cancellable;
