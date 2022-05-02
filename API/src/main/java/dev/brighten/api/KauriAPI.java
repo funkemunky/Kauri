@@ -51,6 +51,10 @@ public class KauriAPI {
         });
     }
 
+    public String getVersion() {
+        return KauriAPI.INSTANCE.kauriPlugin.getPlugin().getDescription().getVersion();
+    }
+
     public List<KauriEvent> getAllEvents() {
         final List<KauriEvent> allEvents = new ArrayList<>();
 
