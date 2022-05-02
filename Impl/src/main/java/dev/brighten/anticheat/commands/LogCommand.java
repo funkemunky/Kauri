@@ -1,8 +1,8 @@
 package dev.brighten.anticheat.commands;
 
 import cc.funkemunky.api.utils.*;
-import cc.funkemunky.api.utils.co.aikar.commands.BaseCommand;
-import cc.funkemunky.api.utils.co.aikar.commands.annotation.*;
+import co.aikar.commands.BaseCommand;
+import co.aikar.commands.annotation.*;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -11,6 +11,7 @@ import dev.brighten.anticheat.logs.objects.Punishment;
 import dev.brighten.anticheat.menu.LogsGUI;
 import dev.brighten.anticheat.utils.Pastebin;
 import dev.brighten.anticheat.utils.menu.preset.ConfirmationMenu;
+import dev.brighten.anticheat.utils.mojang.MojangAPI;
 import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -22,6 +23,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Init(priority = Priority.LOW)

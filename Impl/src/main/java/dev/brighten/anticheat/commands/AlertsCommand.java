@@ -2,8 +2,8 @@ package dev.brighten.anticheat.commands;
 
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.Priority;
-import cc.funkemunky.api.utils.co.aikar.commands.BaseCommand;
-import cc.funkemunky.api.utils.co.aikar.commands.annotation.*;
+import co.aikar.commands.BaseCommand;
+import co.aikar.commands.annotation.*;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import org.bukkit.entity.Player;
