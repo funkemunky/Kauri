@@ -25,10 +25,10 @@ public class BlockE extends Check {
                 && data.playerInfo.serverGround
                 && data.playerInfo.lastBlockPlace.isNotPassed(15)) {
             vl++;
-            flag("deltaXZ=%s sqAccel=%s", deltaXZ, accelXZ);
+            flag("deltaXZ=%s accelXZ=%s", deltaXZ, accelXZ);
         }
 
-        debug("deltaXZ=%s sqAccel=%s", deltaXZ, accelXZ);
+        debug("deltaXZ=%s accelXZ=%s", deltaXZ, accelXZ);
     }
 
 }
