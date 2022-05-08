@@ -15,12 +15,17 @@ public class NoFallA extends Check {
 
     private float buffer;
 
+    /*
+         T1: add net.minecraft.world.entity.Entity.getPose() to check if player is really swimming (1.14 - latest)
+         if not set to false cause then the player cant really swim
+     */
+
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
         if (data.playerInfo.generalCancel
                 || !packet.isPos()
                 || (data.playerInfo.deltaXZ == 0 && data.playerInfo.deltaY == 0)
-                || data.blockInfo.inWater
+                || (data.blockInfo.inWater /* && Todo: T1 */)
                 || (data.blockInfo.onStairs && data.playerInfo.deltaY == 0.5)) {
             if(buffer > 0) buffer-= 0.5f;
             return;
