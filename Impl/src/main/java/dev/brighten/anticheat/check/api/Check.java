@@ -24,6 +24,7 @@ import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 import dev.brighten.api.check.KauriCheck;
 import dev.brighten.api.event.KauriEvent;
+import dev.brighten.api.event.result.CancelResult;
 import dev.brighten.api.event.result.FlagResult;
 import dev.brighten.api.event.result.PunishResult;
 import lombok.Getter;
@@ -296,6 +297,22 @@ public class Check implements KauriCheck {
 
     public void cancelAction(CancelType type, boolean overrideUserSetting) {
         if(!cancellable && !overrideUserSetting) return;
+
+        final List<KauriEvent> events = KauriAPI.INSTANCE.getAllEvents();
+
+
+        CancelResult currentResult = CancelResult.builder().cancelled(false).build();
+
+        // Calling all events
+        for (KauriEvent allEvent : events) {
+            currentResult = allEvent
+                    .onCancel(data.getPlayer(), type, currentResult.isCancelled());
+        }
+
+        // Did an API call say we should cancel this? Then we will cancel
+        if(currentResult.isCancelled()) {
+            return;
+        }
 
         switch(type) {
             case ATTACK: {
