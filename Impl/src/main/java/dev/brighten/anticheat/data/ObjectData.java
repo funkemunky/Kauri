@@ -175,6 +175,7 @@ public class ObjectData implements Data {
         keepAliveStamps.clear();
         Kauri.INSTANCE.dataManager.hasAlerts.remove(uuid.hashCode());
         Kauri.INSTANCE.dataManager.devAlerts.remove(uuid.hashCode());
+        Kauri.INSTANCE.dataManager.dataMap.remove(uuid.hashCode());
         if(checkManager != null) {
             checkManager.checkMethods.clear();
             checkManager.checks.clear();
