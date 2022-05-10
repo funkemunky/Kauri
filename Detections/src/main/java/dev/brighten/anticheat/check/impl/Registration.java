@@ -13,7 +13,6 @@ import dev.brighten.anticheat.utils.ClassScanner;
 public class Registration implements CheckRegister {
 
     public Registration() {
-        MiscUtils.printToConsole("&aLoading Kauri Free checks...");
         registerChecks();
     }
 
