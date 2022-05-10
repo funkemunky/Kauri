@@ -20,6 +20,7 @@ import dev.brighten.anticheat.utils.ServerInjector;
 import dev.brighten.anticheat.utils.timer.impl.AtlasTimer;
 import dev.brighten.api.KauriAPI;
 import org.bstats.bukkit.Metrics;
+import org.bukkit.Bukkit;
 
 import java.util.concurrent.Executors;
 
@@ -94,6 +95,8 @@ public class Load {
         Kauri.INSTANCE.lastEnabled = new AtlasTimer(20);
         Kauri.INSTANCE.enabled = true;
         Kauri.INSTANCE.lastEnabled.reset();
+
+        Bukkit.getOnlinePlayers().forEach(Kauri.INSTANCE.dataManager::createData);
     }
 
     private static void register(String string) {

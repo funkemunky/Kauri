@@ -15,6 +15,7 @@ public class BlockE extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
+        if(!packet.isPos() || !packet.isLook()) return;
         final double deltaXZ = data.playerInfo.deltaXZ;
         final double accelXZ = Math.abs(deltaXZ - data.playerInfo.lDeltaXZ);
 
