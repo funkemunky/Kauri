@@ -48,8 +48,8 @@ public class Load {
         Kauri.INSTANCE.msgHandler = new MessageHandler(Kauri.INSTANCE);
 
         register("Registering processors...");
-        Kauri.INSTANCE.dataManager = new DataManager();
         Kauri.INSTANCE.keepaliveProcessor = new KeepaliveProcessor();
+        Kauri.INSTANCE.dataManager = new DataManager();
         Kauri.INSTANCE.packetProcessor = new PacketProcessor();
 
         Kauri.INSTANCE.injector = new ServerInjector();

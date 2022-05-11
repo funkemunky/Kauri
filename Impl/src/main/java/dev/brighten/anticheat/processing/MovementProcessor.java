@@ -103,6 +103,16 @@ public class MovementProcessor {
 
         data.playerInfo.doingBlockUpdate = data.blockUpdates > 0;
 
+        if(timeStamp - data.lagInfo.lastClientTrans > 1000L) {
+            for (ObjectData.Action action : data.keepAliveStamps) {
+                if (System.currentTimeMillis() - action.stamp > 1000L) continue;
+
+                action.action.accept(Kauri.INSTANCE.keepaliveProcessor.currentKeepalive);
+
+                data.keepAliveStamps.remove(action);
+            }
+        }
+
         if(data.playerInfo.doingBlockUpdate) {
             data.playerInfo.lastGhostCollision.reset();
         }

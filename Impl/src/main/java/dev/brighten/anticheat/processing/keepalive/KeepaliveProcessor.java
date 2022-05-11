@@ -69,7 +69,7 @@ public class KeepaliveProcessor implements Runnable {
 
             double dh = value.playerInfo.deltaXZ, dy = Math.abs(value.playerInfo.deltaY);
             if(tick % 5 == 0) {
-                if(dh < 1 && dy < 1)
+                if (dh < 1 && dy < 1)
                     value.playerInfo.nearbyEntities = value.getPlayer()
                             .getNearbyEntities(2 + dh, 3 + dy, 2 + dh);
                 else value.playerInfo.nearbyEntities = Collections.emptyList();
