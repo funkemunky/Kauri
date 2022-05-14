@@ -74,7 +74,7 @@ public class BlockC extends Check {
         Tuple<Block, SimpleCollisionBox> tuple;
 
         while((tuple = blockPlacements.poll()) != null) {
-            final SimpleCollisionBox box = tuple.two;
+            final SimpleCollisionBox box = tuple.two.copy().expand(0.025);
             final Block block = tuple.one;
 
             final KLocation to = data.playerInfo.to.clone(), from = data.playerInfo.from.clone();
@@ -86,8 +86,8 @@ public class BlockC extends Check {
 
             final RayCollision rayTo = new RayCollision(to.toVector(),
                     MathUtils.getDirection(to)),
-                    rayFrom = new RayCollision(data.playerInfo.from.toVector(),
-                            MathUtils.getDirection(data.playerInfo.from));
+                    rayFrom = new RayCollision(from.toVector(),
+                            MathUtils.getDirection(from));
 
             final boolean collided = rayTo.isCollided(box) || rayFrom.isCollided(box);
 
@@ -98,7 +98,7 @@ public class BlockC extends Check {
                             to.x, to.y, to.z, to.yaw, from.pitch,
                             block.getLocation().getX(), block.getLocation().getY(), block.getLocation().getZ());
                 }
-            } else verbose.subtract(0.5);
+            } else verbose.subtract(0.33);
 
             debug("collided=%s verbose=%s", collided, verbose.value());
         }
