@@ -555,9 +555,8 @@ public class MovementProcessor {
                 || data.playerInfo.creative
                 || hasLevi
                 || data.excuseNextFlying
-                || data.playerInfo.doingBlockUpdate
                 || data.getPlayer().isSleeping()
-                || data.playerInfo.lastGhostCollision.isNotPassed()
+                || (data.playerInfo.lastGhostCollision.isNotPassed() && data.playerInfo.lastBlockPlace.isPassed(2))
                 || data.playerInfo.doingTeleport
                 || data.playerInfo.lastTeleportTimer.isNotPassed(1)
                 || data.playerInfo.riptiding

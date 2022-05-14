@@ -55,10 +55,9 @@ public class FlyA extends Check {
 
             boolean flagged = false;
             if(!data.playerInfo.flightCancel
-                    && data.playerInfo.lastBlockPlace.isPassed(5)
+                    && data.playerInfo.lastBlockPlace.isPassed(1)
                     && data.playerInfo.lastVelocity.isPassed(3)
-                    && !data.playerInfo.serverGround
-                    && data.playerInfo.lastGhostCollision.isPassed(3)
+                    && (!data.playerInfo.clientGround || !data.playerInfo.serverGround)
                     && data.playerInfo.climbTimer.isPassed(15)
                     && data.playerInfo.blockAboveTimer.isPassed(5)
                     && deltaPredict > 0.016) {
@@ -72,11 +71,13 @@ public class FlyA extends Check {
             } else buffer-= buffer > 0 ? 0.25f : 0;
 
             debug((flagged ? Color.Green : "")
-                            +"pos=%s deltaY=%.3f predicted=%.3f d=%.3f ground=%s lpass=%s cp=%s air=%s buffer=%.1f sg=%s cb=%s fc=%s ",
+                            +"pos=%s deltaY=%.3f predicted=%.3f d=%.3f ground=%s lpass=%s cp=%s air=%s buffer=%.1f s" +
+                            "g=%s cb=%s fc=%s gc=%s",
                     packet.getY(), data.playerInfo.deltaY, predicted, deltaPredict, onGround,
                     data.playerInfo.liquidTimer.getPassed(), data.playerInfo.climbTimer.getPassed(),
                     data.playerInfo.kAirTicks, buffer, data.playerInfo.serverGround,
-                    data.playerInfo.climbTimer.getPassed(), data.playerInfo.flightCancel);
+                    data.playerInfo.climbTimer.getPassed(), data.playerInfo.flightCancel,
+                    data.playerInfo.generalCancel);
             lastPos = timeStamp;
         }
     }
