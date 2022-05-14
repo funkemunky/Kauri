@@ -38,7 +38,6 @@ public class NoFallB extends Check {
         if(data.playerInfo.clientGround
                 && !data.playerInfo.doingBlockUpdate
                 && !data.playerInfo.serverGround
-                && data.playerInfo.to.y % divisor >= 1E-4
                 && data.playerInfo.vehicleTimer.isPassed(20)
                 && data.playerInfo.lastBlockPlace.isPassed(4)
                 //And are no where near blocks
