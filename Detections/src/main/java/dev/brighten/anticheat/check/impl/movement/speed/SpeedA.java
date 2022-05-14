@@ -98,7 +98,9 @@ public class SpeedA extends Check {
                 moveFactor*= 0.4;
             }
 
-            if(data.blockInfo.onSoulSand && data.playerInfo.lClientGround) {
+            if(data.blockInfo.onSoulSand && data.playerInfo.lClientGround
+                    //Ensuring the player is actually standing on the block and recieving slow
+                    && packet.getY() % (1) == 0.875) {
                 tags.addTag("soulsand");
                 moveFactor*= 0.88;
             }
