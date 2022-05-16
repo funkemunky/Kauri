@@ -7,10 +7,8 @@ import cc.funkemunky.api.reflections.types.WrappedField;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.types.MathHelper;
 import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumAnimation;
-import cc.funkemunky.api.utils.Color;
-import cc.funkemunky.api.utils.KLocation;
-import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.Tuple;
+import cc.funkemunky.api.utils.*;
+import cc.funkemunky.api.utils.world.CollisionBox;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.data.ObjectData;
@@ -19,6 +17,8 @@ import lombok.val;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
@@ -77,6 +77,54 @@ public class MiscUtils {
         float f = (s * 0.6f + .2f);
         float f2 = f * f * f * 1.2f;
         return angle - (angle % f2);
+    }
+
+    public static boolean isInMaterialBB(World world, SimpleCollisionBox entityBox, XMaterial xmaterial) {
+        int startX = MathHelper.floor(entityBox.xMin);
+        int startY = MathHelper.floor(entityBox.yMin);
+        int startZ = MathHelper.floor(entityBox.zMin);
+        int endX = MathHelper.floor(entityBox.xMax + 1D);
+        int endY = MathHelper.floor(entityBox.yMax + 1D);
+        int endZ = MathHelper.floor(entityBox.zMax + 1D);
+
+        for(int x = startX ; x < endX ; x++) {
+            for(int y = startY ; y < endY ; y++) {
+                for(int z = startZ ; z < endZ ; z++) {
+                    Location loc = new Location(world, x, y, z);
+                    Optional<Block> op = BlockUtils.getBlockAsync(loc);
+
+                    if(op.isPresent()) {
+                        if(XMaterial.matchXMaterial(op.get().getType()).equals(xmaterial))
+                            return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public static boolean isInMaterialBB(World world, SimpleCollisionBox entityBox, int bitmask) {
+        int startX = MathHelper.floor(entityBox.xMin);
+        int startY = MathHelper.floor(entityBox.yMin);
+        int startZ = MathHelper.floor(entityBox.zMin);
+        int endX = MathHelper.floor(entityBox.xMax + 1D);
+        int endY = MathHelper.floor(entityBox.yMax + 1D);
+        int endZ = MathHelper.floor(entityBox.zMax + 1D);
+
+        for(int x = startX ; x < endX ; x++) {
+            for(int y = startY ; y < endY ; y++) {
+                for(int z = startZ ; z < endZ ; z++) {
+                    Location loc = new Location(world, x, y, z);
+                    Optional<Block> op = BlockUtils.getBlockAsync(loc);
+
+                    if(op.isPresent()) {
+                        if(Materials.checkFlag(op.get().getType(), bitmask))
+                            return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     public static double getDistanceWithoutRoot(KLocation one, KLocation two) {
