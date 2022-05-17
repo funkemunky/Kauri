@@ -2,7 +2,7 @@ package dev.brighten.anticheat.logs;
 
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
-import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.commands.data.ObjectData;
 import dev.brighten.anticheat.logs.data.DataStorage;
 import dev.brighten.anticheat.logs.data.config.MongoConfig;
 import dev.brighten.anticheat.logs.data.config.MySQLConfig;

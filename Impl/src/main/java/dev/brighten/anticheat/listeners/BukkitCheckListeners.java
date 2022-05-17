@@ -2,7 +2,7 @@ package dev.brighten.anticheat.listeners;
 
 import cc.funkemunky.api.utils.Init;
 import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.commands.data.ObjectData;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

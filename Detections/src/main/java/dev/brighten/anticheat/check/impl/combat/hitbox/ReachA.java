@@ -34,6 +34,7 @@ public class ReachA extends Check {
         reachA:
         {
             if (data.playerInfo.creative
+                    || packet.getAction() != WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK
                     || data.target == null
                     || data.target.getUniqueId() != data.target.getUniqueId()
                     || data.targetPastLocation.previousLocations.size() < 10

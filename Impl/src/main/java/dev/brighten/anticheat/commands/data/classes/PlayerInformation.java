@@ -1,9 +1,9 @@
-package dev.brighten.anticheat.data.classes;
+package dev.brighten.anticheat.commands.data.classes;
 
 import cc.funkemunky.api.tinyprotocol.packet.types.enums.WrappedEnumAnimation;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
-import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.commands.data.ObjectData;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.PlayerTimer;
 import dev.brighten.anticheat.utils.timer.impl.TickTimer;

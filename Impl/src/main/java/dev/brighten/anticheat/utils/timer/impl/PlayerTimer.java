@@ -1,6 +1,6 @@
 package dev.brighten.anticheat.utils.timer.impl;
 
-import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.commands.data.ObjectData;
 import dev.brighten.anticheat.utils.timer.Timer;
 
 public class PlayerTimer implements Timer {

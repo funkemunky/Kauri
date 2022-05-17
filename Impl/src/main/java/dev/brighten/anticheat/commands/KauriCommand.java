@@ -9,7 +9,7 @@ import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Config;
-import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.commands.data.ObjectData;
 import dev.brighten.anticheat.listeners.generalChecks.BukkitListener;
 import dev.brighten.anticheat.menu.PlayerInformationGUI;
 import dev.brighten.anticheat.processing.PacketProcessor;

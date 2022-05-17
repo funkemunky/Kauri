@@ -1,4 +1,4 @@
-package dev.brighten.anticheat.data.classes;
+package dev.brighten.anticheat.commands.data.classes;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.types.MathHelper;
@@ -12,16 +12,15 @@ import cc.funkemunky.api.utils.world.CollisionBox;
 import cc.funkemunky.api.utils.world.EntityData;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.commands.data.ObjectData;
 import dev.brighten.anticheat.utils.CollisionHandler;
-import lombok.val;
+import dev.brighten.anticheat.utils.MiscUtils;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
-import org.bukkit.util.Vector;
 
 import java.util.*;
 
@@ -104,6 +103,10 @@ public class BlockInformation {
 
         SimpleCollisionBox normalBox = objectData.box.copy();
 
+        inWater = MiscUtils.isInMaterialBB(objectData.getPlayer().getWorld(), waterBox, Materials.WATER);
+        inLava = MiscUtils.isInMaterialBB(objectData.getPlayer().getWorld(), lavaBox, Materials.LAVA);
+        inLiquid = inWater || inLava;
+
         objectData.playerInfo.worldLoaded = true;
         objectData.playerInfo.lServerGround = objectData.playerInfo.serverGround;
         synchronized (belowCollisions) {
@@ -181,21 +184,7 @@ public class BlockInformation {
                                         }
                                     }
 
-                                    if(Materials.checkFlag(type, Materials.WATER)) {
-                                        if(waterBox.isCollided(blockBox))
-                                            inWater = inLiquid = true;
-
-                                        if(normalBox.copy().expand(0.4, 0, 0.4).expandMin(0, -1, 0)
-                                                .isIntersected(blockBox))
-                                            blocksBelow = true;
-                                    } else if(Materials.checkFlag(type, Materials.LAVA)) {
-                                        if(lavaBox.isCollided(blockBox))
-                                            inLava = inLiquid = true;
-
-                                        if(normalBox.copy().expand(0.4, 0, 0.4).expandMin(0, -1, 0)
-                                                .isIntersected(blockBox))
-                                            blocksBelow = true;
-                                    } else if(Materials.checkFlag(type, Materials.SOLID)) {
+                                    if(Materials.checkFlag(type, Materials.SOLID)) {
                                         SimpleCollisionBox groundBox = normalBox.copy()
                                                 .offset(0, -.49, 0).expandMax(0, -1.2, 0);
 

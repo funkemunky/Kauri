@@ -1,7 +1,7 @@
 package dev.brighten.anticheat.processing;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInEntityActionPacket;
-import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.commands.data.ObjectData;
 
 public class ActionProcessor {
 

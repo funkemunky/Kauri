@@ -9,7 +9,7 @@ import cc.funkemunky.api.utils.world.BlockData;
 import cc.funkemunky.api.utils.world.CollisionBox;
 import cc.funkemunky.api.utils.world.EntityData;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
-import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.commands.data.ObjectData;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;

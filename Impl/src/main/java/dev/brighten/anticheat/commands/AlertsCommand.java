@@ -5,7 +5,7 @@ import cc.funkemunky.api.utils.Priority;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.commands.data.ObjectData;
 import org.bukkit.entity.Player;
 
 @Init(priority = Priority.LOW)

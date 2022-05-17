@@ -1,9 +1,9 @@
-package dev.brighten.anticheat.data.classes;
+package dev.brighten.anticheat.commands.data.classes;
 
 import cc.funkemunky.api.reflections.impl.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.BlockUtils;
-import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.commands.data.ObjectData;
 import dev.brighten.anticheat.utils.FastTrig;
 import org.bukkit.block.Block;
 import org.bukkit.potion.PotionEffectType;
@@ -131,7 +131,7 @@ public class PredictionService {
             double keyedMotion = cforward * cforward + cstrafe + cstrafe;
 
             if(keyedMotion >= 1.0E-4F) {
-                keyedMotion = motionForward / Math.min(1.0, Math.sqrt(keyedMotion));
+                keyedMotion = motionForward / Math.max(1.0, Math.sqrt(keyedMotion));
                 cforward*= keyedMotion;
                 cstrafe*= keyedMotion;
 

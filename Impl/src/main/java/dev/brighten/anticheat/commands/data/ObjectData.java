@@ -1,4 +1,4 @@
-package dev.brighten.anticheat.data;
+package dev.brighten.anticheat.commands.data;
 
 import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.handlers.ForgeHandler;
@@ -18,10 +18,10 @@ import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import cc.funkemunky.api.utils.world.CollisionBox;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.data.classes.BlockInformation;
-import dev.brighten.anticheat.data.classes.CheckManager;
-import dev.brighten.anticheat.data.classes.PlayerInformation;
-import dev.brighten.anticheat.data.classes.PredictionService;
+import dev.brighten.anticheat.commands.data.classes.BlockInformation;
+import dev.brighten.anticheat.commands.data.classes.CheckManager;
+import dev.brighten.anticheat.commands.data.classes.PlayerInformation;
+import dev.brighten.anticheat.commands.data.classes.PredictionService;
 import dev.brighten.anticheat.processing.ClickProcessor;
 import dev.brighten.anticheat.processing.EntityLocationProcessor;
 import dev.brighten.anticheat.processing.MovementProcessor;

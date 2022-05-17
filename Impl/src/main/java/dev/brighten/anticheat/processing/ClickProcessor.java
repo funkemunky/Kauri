@@ -5,7 +5,7 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import cc.funkemunky.api.utils.TickTimer;
 import cc.funkemunky.api.utils.Tuple;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
-import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.commands.data.ObjectData;
 import dev.brighten.anticheat.utils.MiscUtils;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

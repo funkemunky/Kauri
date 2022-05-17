@@ -10,7 +10,7 @@ import cc.funkemunky.api.utils.com.google.common.util.concurrent.ThreadFactoryBu
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.Config;
 import dev.brighten.anticheat.commands.CommandPropertiesManager;
-import dev.brighten.anticheat.data.DataManager;
+import dev.brighten.anticheat.commands.data.DataManager;
 import dev.brighten.anticheat.discord.DiscordAPI;
 import dev.brighten.anticheat.listeners.api.EventHandler;
 import dev.brighten.anticheat.logs.LoggerManager;

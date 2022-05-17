@@ -1,4 +1,4 @@
-package dev.brighten.anticheat.data.classes;
+package dev.brighten.anticheat.commands.data.classes;
 
 import cc.funkemunky.api.events.AtlasEvent;
 import cc.funkemunky.api.reflections.types.WrappedClass;
@@ -6,7 +6,7 @@ import cc.funkemunky.api.reflections.types.WrappedMethod;
 import cc.funkemunky.api.tinyprotocol.api.NMSObject;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.*;
-import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.commands.data.ObjectData;
 import lombok.val;
 import org.bukkit.event.Event;
 

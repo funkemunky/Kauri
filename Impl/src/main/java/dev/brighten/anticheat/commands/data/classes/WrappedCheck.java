@@ -1,4 +1,4 @@
-package dev.brighten.anticheat.data.classes;
+package dev.brighten.anticheat.commands.data.classes;
 
 import cc.funkemunky.api.reflections.types.WrappedMethod;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
