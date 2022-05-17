@@ -35,6 +35,7 @@ public class SpeedE extends Check {
             if(!packet.isPos()
                     || data.playerInfo.generalCancel
                     || data.playerInfo.onLadder
+                    || data.playerInfo.lastVelocity.isNotPassed(1)
                     || data.blockInfo.inLiquid
                     || data.blockInfo.collidesHorizontally) break check;
             double smallestDelta = Double.MAX_VALUE;
@@ -45,77 +46,111 @@ public class SpeedE extends Check {
                 for(int s = -1; s < 2 ; s++) {
                     for(boolean sprinting : TRUE_FALSE) {
                         for(boolean fastMath : TRUE_FALSE) {
-                            for(boolean jumped : TRUE_FALSE) {
-                                float forward = f * 0.98f, strafe = s * 0.98f;
-                                float aiMoveSpeed = data.getPlayer().getWalkSpeed() / 2f;
-                                float drag = 0.91f;
-                                double lmotionX = data.playerInfo.lDeltaX, lmotionZ = data.playerInfo.lDeltaZ;
+                            for(boolean attack : TRUE_FALSE) {
+                                for(boolean using : TRUE_FALSE) {
+                                    for (boolean sneaking : TRUE_FALSE) {
+                                        for (boolean jumped : TRUE_FALSE) {
 
-                                //The "1" will effectively remove lastFriction from the equation
-                                lmotionX*= (lastLastClientGround ? 0.6 : 1) * 0.91;
-                                lmotionZ*= (lastLastClientGround ? 0.6 : 1) * 0.91;
+                                            //Skipping impossible scenarios
+                                            if ((f <= 0 && sprinting)
+                                                    || (sprinting && sneaking)) continue;
 
-                                //Running multiplication done after previous prediction
-                                if(data.playerVersion.isOrAbove(ProtocolVersion.V1_9)) {
-                                    if(Math.abs(lmotionX) < 0.003)
-                                        lmotionX = 0;
-                                    if(Math.abs(lmotionZ) < 0.003)
-                                        lmotionZ = 0;
-                                } else {
-                                    if(Math.abs(lmotionX) < 0.005)
-                                        lmotionX = 0;
-                                    if(Math.abs(lmotionZ) < 0.005)
-                                        lmotionZ = 0;
-                                }
+                                            float forward = f, strafe = s;
 
-                                if(sprinting) aiMoveSpeed+= aiMoveSpeed * 0.3f;
+                                            if (sneaking) {
+                                                forward *= 0.3;
+                                                strafe *= 0.3;
+                                            }
 
-                                if(data.potionProcessor.hasPotionEffect(PotionEffectType.SPEED))
-                                    aiMoveSpeed+= (data.potionProcessor.getEffectByType(PotionEffectType.SPEED).get()
-                                            .getAmplifier() + 1) * (double)0.2f * aiMoveSpeed;
-                                if(data.potionProcessor.hasPotionEffect(PotionEffectType.SLOW))
-                                    aiMoveSpeed+= (data.potionProcessor.getEffectByType(PotionEffectType.SLOW).get()
-                                            .getAmplifier() + 1) * (double)-0.15f * aiMoveSpeed;
+                                            if(using) {
+                                                forward*= 0.2;
+                                                strafe*= 0.2;
+                                            }
 
-                                float f5;
-                                if(onGround) {
-                                    drag*= friction;
+                                            //Multiplying by 0.98 like in client
+                                            forward*= 0.98;
+                                            strafe*= 0.98;
 
-                                    f5 = aiMoveSpeed * (0.16277136F / MiscUtils.pow(drag, 3));
+                                            float aiMoveSpeed = data.getPlayer().getWalkSpeed() / 2f;
+                                            float drag = 0.91f;
+                                            double lmotionX = data.playerInfo.lDeltaX, lmotionZ = data.playerInfo.lDeltaZ;
 
-                                    if (sprinting && jumped) {
-                                        float rot = data.playerInfo.to.yaw * 0.017453292F;
-                                        lmotionX -= sin(fastMath, rot) * 0.2F;
-                                        lmotionZ += cos(fastMath, rot) * 0.2F;
+                                            //The "1" will effectively remove lastFriction from the equation
+                                            lmotionX *= (lastLastClientGround ? 0.6 : 1) * 0.91;
+                                            lmotionZ *= (lastLastClientGround ? 0.6 : 1) * 0.91;
+
+                                            //Running multiplication done after previous prediction
+                                            if (data.playerVersion.isOrAbove(ProtocolVersion.V1_9)) {
+                                                if (Math.abs(lmotionX) < 0.003)
+                                                    lmotionX = 0;
+                                                if (Math.abs(lmotionZ) < 0.003)
+                                                    lmotionZ = 0;
+                                            } else {
+                                                if (Math.abs(lmotionX) < 0.005)
+                                                    lmotionX = 0;
+                                                if (Math.abs(lmotionZ) < 0.005)
+                                                    lmotionZ = 0;
+                                            }
+
+                                            // Attack slowdown
+                                            if(attack) {
+                                                lmotionX*= 0.6;
+                                                lmotionZ*= 0.6;
+                                            }
+
+                                            if (sprinting) aiMoveSpeed += aiMoveSpeed * 0.3f;
+
+                                            if (data.potionProcessor.hasPotionEffect(PotionEffectType.SPEED))
+                                                aiMoveSpeed += (data.potionProcessor.getEffectByType(PotionEffectType.SPEED)
+                                                        .get()
+                                                        .getAmplifier() + 1) * (double) 0.2f * aiMoveSpeed;
+                                            if (data.potionProcessor.hasPotionEffect(PotionEffectType.SLOW))
+                                                aiMoveSpeed += (data.potionProcessor.getEffectByType(PotionEffectType.SLOW)
+                                                        .get()
+                                                        .getAmplifier() + 1) * (double) -0.15f * aiMoveSpeed;
+
+                                            float f5;
+                                            if (onGround) {
+                                                drag *= friction;
+
+                                                f5 = aiMoveSpeed * (0.16277136F / MiscUtils.pow(drag, 3));
+
+                                                if (sprinting && jumped) {
+                                                    float rot = data.playerInfo.to.yaw * 0.017453292F;
+                                                    lmotionX -= sin(fastMath, rot) * 0.2F;
+                                                    lmotionZ += cos(fastMath, rot) * 0.2F;
+                                                }
+
+                                            } else f5 = sprinting ? 0.026f : 0.02f;
+
+                                            double keyedMotion = forward * forward + strafe * strafe;
+
+                                            if (keyedMotion >= 1.0E-4F) {
+                                                keyedMotion = f5 / Math.max(1.0, Math.sqrt(keyedMotion));
+                                                forward *= keyedMotion;
+                                                strafe *= keyedMotion;
+
+                                                final float yawSin = sin(fastMath,
+                                                        data.playerInfo.to.yaw * (float) Math.PI / 180.F),
+                                                        yawCos = cos(fastMath,
+                                                                data.playerInfo.to.yaw * (float) Math.PI / 180.F);
+
+                                                lmotionX += (strafe * yawCos - forward * yawSin);
+                                                lmotionZ += (forward * yawCos + strafe * yawSin);
+                                            }
+
+                                            double delta = Math.pow(data.playerInfo.deltaX - lmotionX, 2)
+                                                    + Math.pow(data.playerInfo.deltaZ - lmotionZ, 2);
+
+                                            if (delta < smallestDelta) {
+                                                smallestDelta = delta;
+                                                pmotionx = lmotionX;
+                                                pmotionz = lmotionZ;
+                                            }
+                                            smallestDelta = Math.min(delta, smallestDelta);
+                                        }
                                     }
-
-                                } else f5 = sprinting ? 0.026f : 0.02f;
-
-                                double keyedMotion = forward * forward + strafe * strafe;
-
-                                if(keyedMotion >= 1.0E-4F) {
-                                    keyedMotion = f5 / Math.max(1.0, Math.sqrt(keyedMotion));
-                                    forward*= keyedMotion;
-                                    strafe*= keyedMotion;
-
-                                    final float yawSin = sin(fastMath,
-                                            data.playerInfo.to.yaw * (float)Math.PI / 180.F),
-                                            yawCos = cos(fastMath,
-                                                    data.playerInfo.to.yaw * (float) Math.PI / 180.F);
-
-                                    lmotionX+= (strafe * yawCos - forward * yawSin);
-                                    lmotionZ+= (forward * yawCos + strafe * yawSin);
                                 }
-
-                                double delta = Math.pow(data.playerInfo.deltaX - lmotionX, 2)
-                                        + Math.pow(data.playerInfo.deltaZ - lmotionZ, 2);
-
-                                if(delta < smallestDelta) {
-                                    smallestDelta = delta;
-                                    pmotionx = lmotionX;
-                                    pmotionz = lmotionZ;
-                                }
-                                smallestDelta = Math.min(delta, smallestDelta);
                             }
                         }
                     }
@@ -126,6 +161,7 @@ public class SpeedE extends Check {
 
             if(data.playerInfo.deltaXZ > pmotion && smallestDelta > 1E-4 && data.playerInfo.deltaXZ > 0.1) {
                if(++buffer > 2) {
+                   buffer = Math.min(3.5f, buffer); //Ensuring we don't have a run-away buffer
                    vl++;
                    flag("d=%.4f pm=%.3f dx=%.3f", smallestDelta, pmotion, data.playerInfo.deltaXZ);
                }
