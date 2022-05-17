@@ -563,6 +563,15 @@ public class PacketProcessor {
                 }
                 break;
             }
+            case Packet.Client.STEER_VEHICLE: {
+                WrappedInSteerVehiclePacket packet = new WrappedInSteerVehiclePacket(object, data.getPlayer());
+
+                if(data.getPlayer().isInsideVehicle() && packet.isUnmount()) {
+                    data.playerInfo.vehicleTimer.reset();
+                    data.playerInfo.inVehicle = false;
+                }
+                break;
+            }
             default: {
                 if(data.sniffing) {
                     data.sniffedPackets.add(type + ":@:" + timestamp);
