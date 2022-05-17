@@ -569,6 +569,7 @@ public class PacketProcessor {
                 if(data.getPlayer().isInsideVehicle() && packet.isUnmount()) {
                     data.playerInfo.vehicleTimer.reset();
                     data.playerInfo.inVehicle = false;
+                    data.getPlayer().sendMessage("Dismounted");
                 }
                 break;
             }
@@ -708,6 +709,23 @@ public class PacketProcessor {
                 data.playerInfo.headYaw = packet.getPlayer().getLocation().getYaw();
                 data.playerInfo.headPitch = packet.getPlayer().getLocation().getPitch();
                 data.checkManager.runPacket(packet, timestamp);
+                break;
+            }
+            case Packet.Server.ATTACH: {
+                WrappedOutAttachEntity packet = new WrappedOutAttachEntity(object, data.getPlayer());
+
+                if(packet.getHoldingEntityId() != -1) {
+                    data.playerInfo.inVehicle = true;
+                    data.playerInfo.vehicleTimer.reset();
+                } else {
+                    data.playerInfo.inVehicle = false;
+                    data.playerInfo.vehicleTimer.reset();
+                }
+
+                if(data.sniffing) {
+                    data.sniffedPackets.add(type + ":@:" + packet.getHoldingEntityId()
+                            + ";" + packet.getAttachedEntityId());
+                }
                 break;
             }
             case Packet.Server.REL_LOOK:

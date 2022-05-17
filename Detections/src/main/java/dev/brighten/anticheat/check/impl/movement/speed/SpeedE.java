@@ -15,7 +15,7 @@ import org.bukkit.potion.PotionEffectType;
 @CheckInfo(name = "Speed (E)", description = "Motion prediction detection", devStage = DevStage.ALPHA)
 public class SpeedE extends Check {
     private boolean lastLastClientGround;
-    private float lastFriction = 0.6f;
+    private float buffer;
 
     private static boolean[] TRUE_FALSE = new boolean[] {true, false};
     private static float[] VALUES = new float[] {-0.98f, 0f, 0.98f};
@@ -124,16 +124,17 @@ public class SpeedE extends Check {
 
             double pmotion = Math.hypot(pmotionx, pmotionz);
 
-            if(data.playerInfo.deltaXZ > pmotion && smallestDelta > 1E-5 && data.playerInfo.deltaXZ > 0.1) {
-                vl++;
-                flag("d=%.4f pm=%.3f dx=%.3f", smallestDelta, pmotion, data.playerInfo.deltaXZ);
-            }
+            if(data.playerInfo.deltaXZ > pmotion && smallestDelta > 1E-4 && data.playerInfo.deltaXZ > 0.1) {
+               if(++buffer > 2) {
+                   vl++;
+                   flag("d=%.4f pm=%.3f dx=%.3f", smallestDelta, pmotion, data.playerInfo.deltaXZ);
+               }
+            } else if(buffer > 0) buffer-= 0.1f;
 
-            debug("smallest=%s", smallestDelta);
+            debug("smallest=%s b=%.1f", smallestDelta, buffer);
         }
 
         lastLastClientGround = data.playerInfo.lClientGround;
-        lastFriction = friction;
     }
 
     private static final float[] SIN_TABLE_FAST = new float[4096];

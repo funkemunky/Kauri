@@ -497,10 +497,11 @@ public class MovementProcessor {
             data.playerInfo.baseSpeed = MovementUtils.getBaseSpeed(data);
         }
 
-        if(data.playerInfo.inVehicle = data.getPlayer().getVehicle() != null) {
+        if(data.playerInfo.inVehicle) {
             data.playerInfo.vehicleTimer.reset();
             data.runKeepaliveAction(ka -> data.playerInfo.vehicleTimer.reset());
         }
+
         if(data.playerInfo.gliding = BukkitAPI.INSTANCE.isGliding(data.getPlayer()))
             data.playerInfo.lastGlideTimer.reset();
         data.playerInfo.riptiding = Atlas.getInstance().getBlockBoxManager()
@@ -559,6 +560,7 @@ public class MovementProcessor {
                 || data.playerInfo.lastTeleportTimer.isNotPassed(1)
                 || data.playerInfo.riptiding
                 || data.playerInfo.gliding
+                || data.playerInfo.vehicleTimer.isNotPassed(3)
                 || data.playerInfo.lastPlaceLiquid.isNotPassed(5)
                 || data.playerInfo.inVehicle
                 || ((data.playerInfo.lastChunkUnloaded.isNotPassed(35) || data.playerInfo.doingBlockUpdate)
