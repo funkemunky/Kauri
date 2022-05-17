@@ -12,7 +12,8 @@ import dev.brighten.api.check.DevStage;
 import org.bukkit.block.Block;
 import org.bukkit.potion.PotionEffectType;
 
-@CheckInfo(name = "Speed (E)", description = "Motion prediction detection", devStage = DevStage.RELEASE)
+@CheckInfo(name = "Speed (E)", description = "Motion prediction detection", devStage = DevStage.RELEASE,
+        punishVL = 15, vlToFlag = 1)
 public class SpeedE extends Check {
     private boolean lastLastClientGround;
     private float buffer;
