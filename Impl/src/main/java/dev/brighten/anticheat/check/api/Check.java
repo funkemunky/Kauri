@@ -12,7 +12,7 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutCloseWindowPacket;
 import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.commands.data.ObjectData;
+import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.discord.DiscordAPI;
 import dev.brighten.anticheat.utils.Log;
 import dev.brighten.anticheat.utils.api.BukkitAPI;

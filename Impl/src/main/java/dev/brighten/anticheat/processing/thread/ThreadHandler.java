@@ -3,7 +3,7 @@ package dev.brighten.anticheat.processing.thread;
 import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.com.google.common.util.concurrent.ThreadFactoryBuilder;
 import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.commands.data.ObjectData;
+import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.MiscUtils;
 import lombok.Getter;
 import org.bukkit.entity.Player;

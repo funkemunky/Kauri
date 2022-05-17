@@ -4,7 +4,7 @@ import cc.funkemunky.api.handlers.ForgeHandler;
 import cc.funkemunky.api.handlers.ModData;
 import cc.funkemunky.api.utils.*;
 import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.commands.data.ObjectData;
+import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.utils.menu.button.Button;
 import dev.brighten.anticheat.utils.menu.type.impl.ChestMenu;

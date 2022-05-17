@@ -1,4 +1,4 @@
-package dev.brighten.anticheat.commands.data.classes;
+package dev.brighten.anticheat.data.classes;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.types.MathHelper;
@@ -12,7 +12,7 @@ import cc.funkemunky.api.utils.world.CollisionBox;
 import cc.funkemunky.api.utils.world.EntityData;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.commands.data.ObjectData;
+import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.CollisionHandler;
 import dev.brighten.anticheat.utils.MiscUtils;
 import org.bukkit.Chunk;

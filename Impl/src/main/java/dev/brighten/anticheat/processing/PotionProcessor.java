@@ -2,7 +2,7 @@ package dev.brighten.anticheat.processing;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutEntityEffectPacket;
-import dev.brighten.anticheat.commands.data.ObjectData;
+import dev.brighten.anticheat.data.ObjectData;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.bukkit.potion.PotionEffect;

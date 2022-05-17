@@ -1,4 +1,4 @@
-package dev.brighten.anticheat.commands.data;
+package dev.brighten.anticheat.data;
 
 import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.it.unimi.dsi.fastutil.ints.Int2ObjectMap;

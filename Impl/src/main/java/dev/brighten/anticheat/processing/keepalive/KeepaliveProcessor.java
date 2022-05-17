@@ -9,7 +9,7 @@ import cc.funkemunky.api.utils.it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import cc.funkemunky.api.utils.it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import cc.funkemunky.api.utils.objects.evicting.EvictingMap;
 import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.commands.data.ObjectData;
+import dev.brighten.anticheat.data.ObjectData;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.Collections;
@@ -93,7 +93,7 @@ public class KeepaliveProcessor implements Runnable {
 
     public void start() {
         if(task == null) {
-            task = RunUtils.taskTimer(this, Kauri.INSTANCE, 0L, 0L);
+            task = RunUtils.taskTimer(this, Kauri.INSTANCE, 20L, 0L);
         }
     }
 

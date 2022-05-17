@@ -1,7 +1,7 @@
 package dev.brighten.anticheat.processing.keepalive;
 
 import dev.brighten.anticheat.Kauri;
-import dev.brighten.anticheat.commands.data.ObjectData;
+import dev.brighten.anticheat.data.ObjectData;
 import lombok.RequiredArgsConstructor;
 
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package dev.brighten.anticheat.commands.data;
+package dev.brighten.anticheat.data;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
