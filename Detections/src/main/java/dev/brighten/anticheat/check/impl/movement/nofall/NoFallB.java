@@ -6,7 +6,6 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
-import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "NoFall (B)", description = "Looks for ground spoofing",
         checkType = CheckType.NOFALL, punishVL = 9, executable = true, vlToFlag = 2)
@@ -56,7 +55,7 @@ public class NoFallB extends Check {
         } else if(groundBuffer > 0) groundBuffer--;
 
 
-        final boolean dground = data.playerInfo.to.y % divisor < 1E-4 && data.playerInfo.nearGround;
+        final boolean dground = Math.abs(data.playerInfo.to.y) % divisor < 1E-4 && data.playerInfo.nearGround;
         // If they are saying they are on the ground
         if(!data.playerInfo.clientGround
                 // Their bounding box is on the ground
