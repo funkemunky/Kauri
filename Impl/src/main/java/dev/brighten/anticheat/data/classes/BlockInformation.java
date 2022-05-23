@@ -136,11 +136,11 @@ public class BlockInformation {
 
                     for (int x = xstart; x <= xend; ++x) {
                         for (int z = zstart; z <= zend; ++z) {
-                            for (int y = Math.max(startY, 0); y <= endY; ++y) {
+                            for (int y = Math.max(-50, startY); y <= endY; ++y) {
                                 if (it-- <= 0) {
                                     break start;
                                 }
-                                if(y > 255 || y < 0) continue;
+                                if(y > 400 || y < -50) continue;
                                 Block block = chunk.getBlock(x & 15, y, z & 15);
                                 final Material type = block.getType();
                                 if (type != Material.AIR) {
@@ -279,6 +279,7 @@ public class BlockInformation {
                                                 case CREEPER_WALL_HEAD:
                                                 case DRAGON_WALL_HEAD:
                                                 case WITHER_SKELETON_SKULL:
+                                                case LANTERN:
                                                 case SKELETON_WALL_SKULL:
                                                 case WITHER_SKELETON_WALL_SKULL:
                                                 case SNOW: {

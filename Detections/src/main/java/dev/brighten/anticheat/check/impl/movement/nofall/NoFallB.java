@@ -25,6 +25,7 @@ public class NoFallB extends Check {
                 || data.playerInfo.canFly
                 || data.playerInfo.slimeTimer.isNotPassed(3)
                 || data.playerInfo.creative
+                || data.blockInfo.miscNear
                 || data.playerInfo.climbTimer.isNotPassed(3)
                 || !packet.isPos()
                 || timestamp - data.creation < 2000L) {
