@@ -16,7 +16,7 @@ public class BadPacketsH extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long now ) {
-        if(data.playerInfo.creative) return;
+        if(data.playerInfo.creative || data.playerInfo.inVehicle) return;
 
         if(!packet.isPos() && packet.isLook()) {
             if(data.playerInfo.from.yaw == data.playerInfo.to.yaw
@@ -32,6 +32,8 @@ public class BadPacketsH extends Check {
                 exempt = false;
             }
         } else exempt = true;
+
+        debug("v=%s bv=%s", data.playerInfo.inVehicle, data.getPlayer().isInsideVehicle());
     }
 
     @Packet
