@@ -20,13 +20,14 @@ public class NoFallA extends Check {
          if not set to false cause then the player cant really swim
      */
 
+    private static double divisor = 1. / 64.;
+
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
         if (data.playerInfo.generalCancel
                 || !packet.isPos()
                 || (data.playerInfo.deltaXZ == 0 && data.playerInfo.deltaY == 0)
-                || (data.blockInfo.inWater /* && Todo: T1 */)
-                || (data.blockInfo.onStairs && data.playerInfo.deltaY == 0.5)) {
+                || (data.blockInfo.inWater /* && Todo: T1 */)) {
             if(buffer > 0) buffer-= 0.5f;
             return;
         }
@@ -40,6 +41,8 @@ public class NoFallA extends Check {
                     && data.playerInfo.slimeTimer.isPassed(2)
                     && data.playerInfo.blockAboveTimer.isPassed(3)
                     && (data.playerInfo.deltaY >= 0
+                    && (Math.abs(data.playerInfo.to.y) % divisor != 0
+                    || Math.abs(data.playerInfo.deltaY) % divisor != 0)
                     // If player has touchdown, would be nasties
                     || (data.playerInfo.deltaY <= data.playerInfo.lDeltaY));
         } else {
