@@ -75,9 +75,6 @@ public class Load {
         register("Registering logging...");
         Kauri.INSTANCE.loggerManager = new LoggerManager();
 
-        register("Registering checks...");
-        Check.registerChecks();
-
         register("Setting the language to " + Color.Yellow + Config.language);
         Kauri.INSTANCE.msgHandler.setCurrentLang(Config.language);
 

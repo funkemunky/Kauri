@@ -26,7 +26,6 @@ public class NoFallB extends Check {
                 || data.playerInfo.creative
                 || data.blockInfo.miscNear
                 || data.playerInfo.climbTimer.isNotPassed(3)
-                || !packet.isPos()
                 || timestamp - data.creation < 2000L) {
             //Subtracting buffers
             if(groundBuffer > 0) groundBuffer--;

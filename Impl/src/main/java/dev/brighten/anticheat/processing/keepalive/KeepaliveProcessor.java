@@ -20,7 +20,7 @@ public class KeepaliveProcessor implements Runnable {
 
     private BukkitTask task;
 
-    public KeepAlive currentKeepalive;
+    public KeepAlive currentKeepalive = new KeepAlive(0, (short)0);
     public int tick;
     public int totalPlayers, laggyPlayers;
 

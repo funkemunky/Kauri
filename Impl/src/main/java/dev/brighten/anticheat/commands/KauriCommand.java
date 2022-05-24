@@ -189,7 +189,7 @@ public class KauriCommand extends BaseCommand {
                 if(Check.isCheck(check.replace("_", " "))) {
                     targetData.debugging.put(player.getUniqueId(), check.replace("_", " "));
 
-                    player.sendMessage(Color.Green + "You are now debugging " + data.debugging
+                    player.sendMessage(Color.Green + "You are now debugging " + check
                             + " on target " + targetPlayer.getName() + "!");
                 } else player
                         .sendMessage(Color.Red + "The argument input \"" + check + "\" is not a check.");
