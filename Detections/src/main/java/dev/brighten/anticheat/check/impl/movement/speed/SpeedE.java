@@ -161,7 +161,7 @@ public class SpeedE extends Check {
             double pmotion = Math.hypot(pmotionx, pmotionz);
 
             if(data.playerInfo.deltaXZ > pmotion && smallestDelta > 1E-4 && data.playerInfo.deltaXZ > 0.1) {
-               if(++buffer > 2) {
+               if(++buffer > 3) {
                    buffer = Math.min(3.5f, buffer); //Ensuring we don't have a run-away buffer
                    vl++;
                    flag("d=%.4f pm=%.3f dx=%.3f", smallestDelta, pmotion, data.playerInfo.deltaXZ);
