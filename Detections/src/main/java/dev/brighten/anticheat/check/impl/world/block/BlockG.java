@@ -1,10 +1,8 @@
 package dev.brighten.anticheat.check.impl.world.block;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import dev.brighten.anticheat.check.api.Check;
-import dev.brighten.anticheat.check.api.CheckInfo;
-import dev.brighten.anticheat.check.api.Event;
-import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.check.api.*;
+import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 import org.bukkit.block.BlockFace;
@@ -12,6 +10,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 
 @CheckInfo(name = "Block (G)", description = "Checks for bad scaffold rotations", checkType = CheckType.BLOCK,
         devStage = DevStage.ALPHA)
+@Cancellable(cancelType = CancelType.PLACE)
 public class BlockG extends Check {
 
     private int aimCount = 0, lastAimCount;

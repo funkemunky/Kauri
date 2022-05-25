@@ -5,12 +5,13 @@ import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Block (E)", description = "Checks for invalid block place motions.", executable = true,
         checkType = CheckType.BLOCK, punishVL = 5, devStage = DevStage.ALPHA)
-@Cancellable
+@Cancellable(cancelType = CancelType.PLACE)
 public class BlockE extends Check {
 
     @Packet
