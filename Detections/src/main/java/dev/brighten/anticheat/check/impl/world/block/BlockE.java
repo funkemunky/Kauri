@@ -28,7 +28,7 @@ public class BlockE extends Check {
                 && (data.playerInfo.deltaYaw > 1 || data.playerInfo.deltaPitch > 1)
                 && data.playerInfo.groundTicks < 18
                 && data.playerInfo.serverGround
-                && !data.predictionService.key.contains("W")
+                && data.predictionService.key.contains("S")
                 && data.playerInfo.lastBlockPlace.isNotPassed(15)) {
 
             if (verbose.add() > 2) {
