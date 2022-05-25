@@ -5,6 +5,8 @@ import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.utils.timer.Timer;
+import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
@@ -13,21 +15,24 @@ import dev.brighten.api.check.DevStage;
 @Cancellable
 public class BadPacketsE extends Check {
 
-    private boolean lastGround, lastPacketWasStationary;
+    private boolean lastGround;
+    private int noPosTicks;
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long now) {
         if(!packet.isPos()) {
-            if(lastPacketWasStationary
+            if(++noPosTicks > 1
                     && now - data.creation > 2000L
                     && data.playerInfo.lastTeleportTimer.isPassed(2)
                     && lastGround != packet.isGround()
+                    && !data.playerInfo.serverGround
                     && !data.playerInfo.doingBlockUpdate) {
                 vl++;
                 flag("g=%s,%s", lastGround, packet.isGround());
             }
-            lastPacketWasStationary = true;
-        } else lastPacketWasStationary = false;
+        } else {
+            noPosTicks = 0;
+        }
 
         lastGround = packet.isGround();
     }
