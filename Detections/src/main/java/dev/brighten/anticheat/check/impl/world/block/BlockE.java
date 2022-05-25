@@ -11,7 +11,7 @@ import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Block (E)", description = "Checks for invalid block place motions.", executable = true,
-        checkType = CheckType.BLOCK, punishVL = 5, devStage = DevStage.ALPHA)
+        checkType = CheckType.BLOCK, punishVL = 5, devStage = DevStage.BETA)
 @Cancellable(cancelType = CancelType.PLACE)
 public class BlockE extends Check {
 
@@ -28,6 +28,7 @@ public class BlockE extends Check {
                 && (data.playerInfo.deltaYaw > 1 || data.playerInfo.deltaPitch > 1)
                 && data.playerInfo.groundTicks < 18
                 && data.playerInfo.serverGround
+                && !data.predictionService.key.contains("W")
                 && data.playerInfo.lastBlockPlace.isNotPassed(15)) {
 
             if (verbose.add() > 2) {
@@ -38,7 +39,7 @@ public class BlockE extends Check {
             verbose.subtract(0.025);
         }
 
-        debug("deltaXZ=%s accelXZ=%s", deltaXZ, accelXZ);
+        debug("deltaXZ=%s accelXZ=%s key=%s", deltaXZ, accelXZ, data.predictionService.key);
     }
 
 }
