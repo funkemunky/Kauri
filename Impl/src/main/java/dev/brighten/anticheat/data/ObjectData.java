@@ -252,8 +252,9 @@ public class ObjectData implements Data {
                 endId = (short)(startId + 1);
 
         //Ensuring we don't have any duplicate IDS
-        while (Kauri.INSTANCE.keepaliveProcessor.keepAlives.containsKey(startId)
-                || Kauri.INSTANCE.keepaliveProcessor.keepAlives.containsKey(endId)) {
+        val map = Kauri.INSTANCE.keepaliveProcessor.keepAlives.asMap();
+        while (map.containsKey(startId)
+                || map.containsKey(endId)) {
             startId = (short) ThreadLocalRandom.current().nextInt(Short.MIN_VALUE, Short.MAX_VALUE);
             endId = (short)(startId + (short)1);
         }

@@ -8,6 +8,8 @@ import cc.funkemunky.api.utils.it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import cc.funkemunky.api.utils.it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import cc.funkemunky.api.utils.it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import cc.funkemunky.api.utils.objects.evicting.EvictingMap;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import org.bukkit.scheduler.BukkitTask;
@@ -15,6 +17,7 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 public class KeepaliveProcessor implements Runnable {
 
@@ -24,7 +27,8 @@ public class KeepaliveProcessor implements Runnable {
     public int tick;
     public int totalPlayers, laggyPlayers;
 
-    public final Map<Short, KeepAlive> keepAlives = new EvictingMap<>(80);
+    public final Cache<Short, KeepAlive> keepAlives = CacheBuilder.newBuilder().concurrencyLevel(4)
+            .expireAfterWrite(15, TimeUnit.SECONDS).build();
 
     final Int2ObjectMap<Short> lastResponses = Int2ObjectMaps.synchronize(new Int2ObjectOpenHashMap<>());
 
@@ -77,11 +81,11 @@ public class KeepaliveProcessor implements Runnable {
     }
 
     public Optional<KeepAlive> getKeepByTick(int tick) {
-        return keepAlives.values().stream().filter(ka -> ka.start == tick).findFirst();
+        return keepAlives.asMap().values().stream().filter(ka -> ka.start == tick).findFirst();
     }
 
     public Optional<KeepAlive> getKeepById(short id) {
-        return Optional.ofNullable(keepAlives.get(id));
+        return Optional.ofNullable(keepAlives.getIfPresent(id));
     }
 
     public Optional<KeepAlive> getResponse(ObjectData data) {
