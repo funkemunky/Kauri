@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.check.impl.world.block;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.utils.math.cond.MaxDouble;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -14,6 +15,8 @@ import dev.brighten.api.check.DevStage;
 @Cancellable(cancelType = CancelType.PLACE)
 public class BlockE extends Check {
 
+    public final MaxDouble verbose = new MaxDouble(5);
+
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if (!packet.isPos() || !packet.isLook()) return;
@@ -26,8 +29,13 @@ public class BlockE extends Check {
                 && data.playerInfo.groundTicks < 18
                 && data.playerInfo.serverGround
                 && data.playerInfo.lastBlockPlace.isNotPassed(15)) {
-            vl++;
-            flag("deltaXZ=%s accelXZ=%s", deltaXZ, accelXZ);
+
+            if (verbose.add() > 2) {
+                vl++;
+                flag("deltaXZ=%s accelXZ=%s", deltaXZ, accelXZ);
+            }
+        } else {
+            verbose.subtract(0.025);
         }
 
         debug("deltaXZ=%s accelXZ=%s", deltaXZ, accelXZ);
