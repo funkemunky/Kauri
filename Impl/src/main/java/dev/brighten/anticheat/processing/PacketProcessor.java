@@ -420,7 +420,7 @@ public class PacketProcessor {
                 WrappedInTransactionPacket packet = new WrappedInTransactionPacket(object, data.getPlayer());
 
                 if(packet.getId() == 0) {
-                    if(Kauri.INSTANCE.keepaliveProcessor.keepAlives.containsKey(packet.getAction())) {
+                    if(Kauri.INSTANCE.keepaliveProcessor.keepAlives.getIfPresent(packet.getAction()) != null) {
                         Kauri.INSTANCE.keepaliveProcessor.addResponse(data, packet.getAction());
 
                         val optional = Kauri.INSTANCE.keepaliveProcessor.getResponse(data);
