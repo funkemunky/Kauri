@@ -18,6 +18,8 @@ public class NoSlowA extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
+        if (data.playerInfo.generalCancel) return;
+
         final double deltaXZ = data.playerInfo.deltaXZ;
 
         if (deltaXZ > 0.1 && data.playerInfo.inWebTimer.isPassed(20)) {
