@@ -39,6 +39,7 @@ public class PlayerInformation {
 
         liquidTimer = new TickTimer(50);
         webTimer = new TickTimer(40);
+        inWebTimer = new TickTimer();
         climbTimer = new TickTimer(40);
         slimeTimer = new TickTimer(75);
         iceTimer = new TickTimer(45);
@@ -99,7 +100,7 @@ public class PlayerInformation {
 
     //ticks
     public int groundTicks, airTicks, kGroundTicks, kAirTicks;
-    public Timer liquidTimer, webTimer, climbTimer, slimeTimer, iceTimer, blockAboveTimer, soulSandTimer;
+    public Timer liquidTimer, webTimer, inWebTimer, climbTimer, slimeTimer, iceTimer, blockAboveTimer, soulSandTimer;
     public Timer lastBrokenBlock, lastVelocity, lastTargetSwitch, lastBlockPlace, lastBlockPlacePacket, lastFlyingTimer,
             lastBlockDigPacket, lastToggleFlight, lastAttack, lastEntityCollision, lastMoveCancel, lastTargetUpdate,
             lastWindowClick, lastInsideBlock, lastHalfBlock, lastPlaceLiquid, lastUseItem, lastGhostCollision,
