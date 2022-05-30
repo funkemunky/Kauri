@@ -59,7 +59,8 @@ public class NoFallB extends Check {
         if(!data.playerInfo.clientGround
                 // Their bounding box is on the ground
                 && data.playerInfo.vehicleTimer.isPassed(20)
-                && ((data.playerInfo.serverGround || data.blockInfo.blocksBelow) && dground)
+                && ((data.playerInfo.serverGround || data.blockInfo.blocksBelow)
+                    && dground && !data.blockInfo.onHalfBlock)
                 && data.playerInfo.lastTeleportTimer.isPassed(2)) {
             if((airBuffer +=10) > 30) {
                 vl++;
@@ -67,7 +68,7 @@ public class NoFallB extends Check {
             }
         } else if(airBuffer > 0) airBuffer -= 4;
 
-        debug("c=%s s=%s bbelow=%s dg=%s dy=%.4f", data.playerInfo.clientGround, data.playerInfo.serverGround,
+        debug("c=%s s=%s bbelow=%s dg=%s dy=%s", data.playerInfo.clientGround, data.playerInfo.serverGround,
                 data.blockInfo.blocksBelow, dground, data.playerInfo.deltaY);
     }
 }

@@ -16,7 +16,7 @@ import org.bukkit.potion.PotionEffectType;
         punishVL = 15, vlToFlag = 1)
 public class SpeedE extends Check {
     private boolean lastLastClientGround;
-    private float buffer;
+    private float buffer, lfriction;
 
     private static boolean[] TRUE_FALSE = new boolean[] {true, false};
     private static float[] VALUES = new float[] {-0.98f, 0f, 0.98f};
@@ -31,6 +31,8 @@ public class SpeedE extends Check {
         if(underBlock == null) return;
 
         float friction = MinecraftReflection.getFriction(underBlock);
+
+        debug("friction=%.3f material=%s", friction, underBlock.getType().name());
 
         check: {
             if(!packet.isPos()
@@ -77,8 +79,8 @@ public class SpeedE extends Check {
                                             double lmotionX = data.playerInfo.lDeltaX, lmotionZ = data.playerInfo.lDeltaZ;
 
                                             //The "1" will effectively remove lastFriction from the equation
-                                            lmotionX *= (lastLastClientGround ? 0.6 : 1) * 0.91;
-                                            lmotionZ *= (lastLastClientGround ? 0.6 : 1) * 0.91;
+                                            lmotionX *= (lastLastClientGround ? lfriction: 1) * 0.91;
+                                            lmotionZ *= (lastLastClientGround ? lfriction : 1) * 0.91;
 
                                             //Running multiplication done after previous prediction
                                             if (data.playerVersion.isOrAbove(ProtocolVersion.V1_9)) {
@@ -171,6 +173,7 @@ public class SpeedE extends Check {
             debug("smallest=%s b=%.1f", smallestDelta, buffer);
         }
 
+        lfriction = friction;
         lastLastClientGround = data.playerInfo.lClientGround;
     }
 
