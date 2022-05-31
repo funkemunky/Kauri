@@ -38,6 +38,7 @@ public class SpeedE extends Check {
             if(!packet.isPos()
                     || data.playerInfo.generalCancel
                     || data.playerInfo.onLadder
+                    || data.playerInfo.lastEntityCollision.isNotPassed(2)
                     || data.playerInfo.lastVelocity.isNotPassed(1)
                     || data.blockInfo.inLiquid
                     || data.blockInfo.collidesHorizontally) break check;
