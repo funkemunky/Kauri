@@ -30,6 +30,7 @@ public class FlyI extends Check {
                 || data.playerInfo.lastVelocity.isNotPassed(1)
                 || data.playerInfo.doingVelocity
                 || data.playerInfo.deltaY != 0
+                || data.playerInfo.canUseElytra
                 || (data.blockInfo.inWater /* && Todo: T1 */)
                 || data.playerInfo.climbTimer.isNotPassed(2)) {
             buffer = 0;

@@ -40,6 +40,7 @@ public class NoFallA extends Check {
                     // Precautionary since it causes falses with onGround = false
                     && data.playerInfo.slimeTimer.isPassed(2)
                     && data.playerInfo.blockAboveTimer.isPassed(3)
+                    && !data.playerInfo.serverGround
                     && (data.playerInfo.deltaY >= 0
                     && (Math.abs(data.playerInfo.to.y) % divisor != 0
                     || Math.abs(data.playerInfo.deltaY) % divisor != 0)

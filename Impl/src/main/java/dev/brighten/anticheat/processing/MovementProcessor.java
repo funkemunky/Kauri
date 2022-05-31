@@ -510,6 +510,17 @@ public class MovementProcessor {
 
         if(data.playerInfo.gliding = BukkitAPI.INSTANCE.isGliding(data.getPlayer()))
             data.playerInfo.lastGlideTimer.reset();
+
+        /*
+         * Unfortunately, in Java Edition the client does not actually send when the player stops gliding.
+         * It only sends when they start gliding. So basically, for some checks we need to see if they even have
+         * the ability to glide at all.
+         */
+        if(data.playerVersion.isOrAbove(ProtocolVersion.V1_9)) {
+            data.playerInfo.canUseElytra = data.getPlayer().getInventory()
+                    .getChestplate() == XMaterial.ELYTRA.parseItem();
+        }
+
         data.playerInfo.riptiding = Atlas.getInstance().getBlockBoxManager()
                 .getBlockBox().isRiptiding(data.getPlayer());
         /* We only set the jumpheight on ground since there's no need to check for it while they're in the air.

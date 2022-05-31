@@ -18,6 +18,7 @@ public class FlyD extends Check {
     public void onFlying(WrappedInFlyingPacket packet) {
         if (!packet.isPos()
                 || data.playerInfo.flightCancel
+                || data.playerInfo.canUseElytra
                 || (data.playerInfo.nearGroundTimer.isNotPassed(3) && (data.playerInfo.lClientGround
                 || data.playerInfo.clientGround))
                 || data.playerInfo.lastBlockPlace.isNotPassed(1)

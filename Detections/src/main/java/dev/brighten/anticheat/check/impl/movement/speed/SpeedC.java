@@ -19,6 +19,7 @@ public class SpeedC extends Check {
     public void onPacket(WrappedInFlyingPacket packet) {
         if(!packet.isPos()
                 || data.playerInfo.generalCancel
+                || data.playerInfo.canUseElytra
                 || data.playerInfo.lastVelocity.isNotPassed(25)) {
             if(data.playerInfo.generalCancel)verbose.subtract();
             return;

@@ -30,6 +30,7 @@ public class FlyB extends Check {
         if (data.playerInfo.generalCancel
                 || data.playerInfo.liquidTimer.isNotPassed(2)
                 || data.playerInfo.canFly
+                || data.playerInfo.canUseElytra
                 || data.playerInfo.creative
                 || data.playerInfo.climbTimer.isNotPassed(2)) {
             vertical = 0;
