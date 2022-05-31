@@ -22,6 +22,7 @@ public class FlyH extends Check {
                 || !data.playerInfo.checkMovement
                 || data.playerInfo.canFly
                 || data.playerInfo.doingBlockUpdate
+                || data.playerInfo.canUseElytra
                 || data.playerInfo.doingTeleport
                 || data.playerInfo.lastTeleportTimer.isNotPassed(2)
                 || data.playerInfo.creative
