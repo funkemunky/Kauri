@@ -44,7 +44,7 @@ public class SpeedE extends Check {
       
         check: 
         {
-            if(!packet.isPos()
+            if (!packet.isPos()
                     || data.playerInfo.generalCancel
                     || data.playerInfo.onLadder
                     || data.playerInfo.lastEntityCollision.isNotPassed(2)
