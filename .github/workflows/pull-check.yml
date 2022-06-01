@@ -17,3 +17,8 @@ jobs:
         run: mvn -B clean package -DskipTests
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload Kauri
+        uses: actions/upload-artifact@v2
+        with:
+          name: Kauri with Detections
+          path: Detections/target/Detections-*.jar
