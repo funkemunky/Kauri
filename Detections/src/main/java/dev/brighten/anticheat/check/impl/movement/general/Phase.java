@@ -160,7 +160,7 @@ public class Phase extends Check {
 
         if(tags.getSize() > 0) {
             flag("tags=%s", tags.build());
-            final Location finalSetbackLocation = data.playerInfo.from.toLocation(data.getPlayer().getWorld());
+            final Location finalSetbackLocation = fromWhereShitAintBad.toLocation(data.getPlayer().getWorld());
             if(finalSetbackLocation != null) {
                 RunUtils.task(() -> data.getPlayer().teleport(finalSetbackLocation));
             }
