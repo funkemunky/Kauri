@@ -59,12 +59,12 @@ public class Phase extends Check {
     }
 
     @Setting(name = "flagIntoChat")
-    private boolean flagIntoChat = false;
+    private static boolean flagIntoChat = false;
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long now) {
-        if(!packet.isPos() || now - data.creation < 800L || now - data.playerInfo.lastRespawn < 500L
-                || data.playerInfo.moveTicks == 0
+        if(!packet.isPos() || now - data.creation < 800L || ((now - data.playerInfo.lastRespawn < 500L
+                || data.playerInfo.moveTicks == 0) && lastFlag.isPassed(12))
                 || data.playerInfo.creative || data.playerInfo.canFly) {
             return;
         }
@@ -159,12 +159,17 @@ public class Phase extends Check {
         }
 
         if(tags.getSize() > 0) {
-            flag("tags=%s", tags.build());
+            if(flagIntoChat)
+                flag("tags=%s", tags.build());
+
+            if(fromWhereShitAintBad == null) fromWhereShitAintBad = data.playerInfo.from;
+
             final Location finalSetbackLocation = fromWhereShitAintBad.toLocation(data.getPlayer().getWorld());
             if(finalSetbackLocation != null) {
                 RunUtils.task(() -> data.getPlayer().teleport(finalSetbackLocation));
             }
             lastFlag.reset();
-        } else fromWhereShitAintBad = data.playerInfo.from;
+        } else if(lastFlag.isPassed(5) && !data.blockInfo.collidesHorizontally)
+            fromWhereShitAintBad = data.playerInfo.from;
     }
 }
