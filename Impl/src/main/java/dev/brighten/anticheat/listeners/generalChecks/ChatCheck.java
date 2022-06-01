@@ -7,6 +7,7 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInChatPacket;
 import cc.funkemunky.api.utils.ConfigSetting;
 import cc.funkemunky.api.utils.Init;
 import dev.brighten.anticheat.Kauri;
+import dev.brighten.api.KauriAPI;
 import org.bukkit.event.EventPriority;
 
 import java.util.ArrayList;
@@ -30,6 +31,9 @@ public class ChatCheck {
     private final PacketListener chatCheckListener = Atlas.getInstance().getPacketProcessor()
             .process(Kauri.INSTANCE, EventPriority.HIGHEST, event -> {
                 if(!enabled) return;
+                //Packet exemption check
+                if(KauriAPI.INSTANCE.getPacketExemptedPlayers().contains(event.getPlayer().getUniqueId())) return;
+
                 WrappedInChatPacket packet = new WrappedInChatPacket(event.getPacket(), event.getPlayer());
 
                 if(packet.getMessage().length() <= 0) return;
