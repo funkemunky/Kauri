@@ -66,6 +66,8 @@ public class FlyA extends Check {
                     flag("dY=%.3f p=%.3f dx=%.3f", data.playerInfo.deltaY, predicted,
                             data.playerInfo.deltaXZ);
                     fixMovementBugs();
+
+                    if(buffer > 6) buffer = 6;
                 }
             } else buffer-= buffer > 0 ? 0.25f : 0;
 
