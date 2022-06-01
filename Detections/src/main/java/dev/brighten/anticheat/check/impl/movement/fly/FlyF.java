@@ -5,6 +5,7 @@ import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
+import dev.brighten.anticheat.utils.MovementUtils;
 import dev.brighten.api.check.CheckType;
 
 @Cancellable
@@ -27,7 +28,8 @@ public class FlyF extends Check {
                 || data.blockInfo.collidesHorizontally) max = Math.max(0.5625, max);
 
         if(data.playerInfo.wasOnSlime && data.playerInfo.clientGround && data.playerInfo.nearGround) {
-            slimeY = Math.abs(data.playerInfo.deltaY);
+            //Fixes false when jumping onto slime from a large height
+            slimeY = MovementUtils.getTotalHeight(data.playerVersion, (float)Math.abs(data.playerInfo.lDeltaY));
             max = Math.max(max, slimeY);
             debug("SLIME: sy=%.2f", slimeY);
         } else if(data.playerInfo.wasOnSlime && data.playerInfo.airTicks > 2) {
