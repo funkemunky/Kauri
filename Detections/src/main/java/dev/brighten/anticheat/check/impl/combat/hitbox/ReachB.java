@@ -136,7 +136,7 @@ public class ReachB extends Check {
                 if(intersectFrom != null) {
                     lastAimOnTarget.reset();
                     hits++;
-                    distance = Math.min(distance, intersectFrom.distanceSquared(new Vec3D(to.x, to.y, to.z)));
+                    distance = Math.min(distance, intersectFrom.distanceSquared(new Vec3D(from.x, from.y, from.z)));
                     collided = true;
                 }
             }
