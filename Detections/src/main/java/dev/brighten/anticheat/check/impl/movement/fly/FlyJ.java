@@ -23,19 +23,16 @@ public class FlyJ extends Check {
 
         final double deltaYabs = Math.abs(data.playerInfo.deltaY);
         final double lDeltaYabs = Math.abs(data.playerInfo.lDeltaY);
+        final double accel = Math.abs(deltaYabs - lDeltaYabs);
 
-        if (deltaYabs <= 0.001 && deltaYabs == lDeltaYabs) {
+        if ((data.playerInfo.deltaY > 0 && accel <= 0.00001) || (deltaYabs <= 0.001 && deltaYabs == lDeltaYabs)) {
             if (buffer.add() > 5) {
-                flag("T: Hover");
-            }
-        } else if (data.playerInfo.deltaY > 0 && Math.abs(deltaYabs - lDeltaYabs) <= 0.00001) {
-            if (buffer.add() > 5) {
-                flag("T: UP");
+                flag();
             }
         } else {
             buffer.subtract(0.5);
         }
 
-        debug("deltaY=%s lDeltaY=%s buffer=%s", deltaYabs, lDeltaYabs, buffer.value());
+        debug("deltaY=%s lDeltaY=%s accel=%s buffer=%s", deltaYabs, lDeltaYabs, accel, buffer.value());
     }
 }
