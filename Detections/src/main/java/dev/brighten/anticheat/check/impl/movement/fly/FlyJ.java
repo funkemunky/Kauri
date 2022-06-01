@@ -27,6 +27,7 @@ public class FlyJ extends Check {
 
         if ((data.playerInfo.deltaY > 0 && accel <= 0.00001) || (deltaYabs <= 0.001 && deltaYabs == lDeltaYabs)) {
             if (buffer.add() > 5) {
+                vl++;
                 flag();
             }
         } else {
