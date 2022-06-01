@@ -4,6 +4,7 @@ import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.Init;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.api.KauriAPI;
 import dev.brighten.api.check.CancelType;
 import lombok.val;
 import org.bukkit.entity.Player;
@@ -23,6 +24,9 @@ public class CancelListeners implements Listener {
     /** Cancels for MOVEMENT **/
     @EventHandler(priority = EventPriority.MONITOR)
     public void onEvent(PlayerMoveEvent event) {
+        //Packet exemption check
+        if(KauriAPI.INSTANCE.getPacketExemptedPlayers().contains(event.getPlayer().getUniqueId())) return;
+
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
         if(data != null && data.typesToCancel.size() > 0) {
@@ -48,6 +52,9 @@ public class CancelListeners implements Listener {
     public void onEvent(EntityDamageByEntityEvent event) {
         if(!(event.getDamager() instanceof Player)) return;
 
+        //Packet exemption check
+        if(KauriAPI.INSTANCE.getPacketExemptedPlayers().contains(event.getDamager().getUniqueId())) return;
+
         ObjectData data = Kauri.INSTANCE.dataManager.getData((Player)event.getDamager());
 
         if(data != null && data.typesToCancel.size() > 0) {
@@ -66,6 +73,9 @@ public class CancelListeners implements Listener {
     /** Cancels for PLACE **/
     @EventHandler(priority = EventPriority.MONITOR)
     public void onEvent(BlockPlaceEvent event) {
+        //Packet exemption check
+        if(KauriAPI.INSTANCE.getPacketExemptedPlayers().contains(event.getPlayer().getUniqueId())) return;
+
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
         if(data != null && data.typesToCancel.size() > 0) {
@@ -84,6 +94,8 @@ public class CancelListeners implements Listener {
     /** Cancels for BREAK **/
     @EventHandler(priority = EventPriority.MONITOR)
     public void onEvent(BlockBreakEvent event) {
+        //Packet exemption check
+        if(KauriAPI.INSTANCE.getPacketExemptedPlayers().contains(event.getPlayer().getUniqueId())) return;
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
         if(data != null && data.typesToCancel.size() > 0) {
@@ -103,6 +115,8 @@ public class CancelListeners implements Listener {
     //Done for block and sword interact stuff.
     @EventHandler(priority = EventPriority.MONITOR)
     public void onEvent(PlayerInteractEvent event) {
+        //Packet exemption check
+        if(KauriAPI.INSTANCE.getPacketExemptedPlayers().contains(event.getPlayer().getUniqueId())) return;
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
         if(data != null && data.typesToCancel.size() > 0) {
@@ -123,6 +137,9 @@ public class CancelListeners implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onEvent(EntityInteractEvent event) {
         if(!(event.getEntity() instanceof Player)) return;
+
+        //Packet exemption check
+        if(KauriAPI.INSTANCE.getPacketExemptedPlayers().contains(event.getEntity().getUniqueId())) return;
 
         ObjectData data = Kauri.INSTANCE.dataManager.getData((Player)event.getEntity());
 
