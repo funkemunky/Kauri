@@ -1,31 +1,37 @@
 package dev.brighten.anticheat.check.impl.combat.killaura;
 
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
+import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.TickTimer;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
+import cc.funkemunky.api.utils.world.EntityData;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.AxisAlignedBB;
+import dev.brighten.anticheat.utils.EntityLocation;
 import dev.brighten.anticheat.utils.Vec3D;
 import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @CheckInfo(name = "Killaura (H)", description = "Checks for weird misses", 
         devStage = DevStage.BETA, checkType = CheckType.KILLAURA)
 public class KillauraH extends Check {
 
     @Getter
-    private final List<SimpleCollisionBox> targetLocations = new EvictingList<>(6);
     private boolean didUse, didArm;
+    private float buffer;
     private final TickTimer lastFlying = new TickTimer(5);
 
     @Packet
@@ -47,40 +53,56 @@ public class KillauraH extends Check {
                didUse = didArm = false;
                break check;
            }
-           if(targetLocations.size() == 0 || data.target == null) {
+
+           if(data.target == null) {
                debug("Null target");
                break check;
            }
 
-           if(didArm && !didUse) {
-               debug("%s: Reset Flying", tick);
-               KLocation origin = data.playerInfo.to.clone(), forigin = data.playerInfo.from.clone();
+           Optional<EntityLocation> op = data.entityLocationProcessor.getEntityLocation(data.target);
 
-               origin.y+= data.playerInfo.sneaking ? 1.54f : 1.62f;
-               forigin.y+= data.playerInfo.lsneaking ? 1.54f : 1.62f;
+           if(op.isPresent()) {
+               EntityLocation entityLoc = op.get();
 
-               boolean missed = false;
-               for (SimpleCollisionBox targetHitbox : targetLocations) {
-                   AxisAlignedBB targetBox = new AxisAlignedBB(targetHitbox);
+               if(entityLoc.interpolatedLocations.size() == 0) break check;
 
-                   Vec3D intersection = targetBox.rayTrace(origin.toVector(),
-                           MathUtils.getDirection(origin), 2.9), intersection2 =
-                           targetBox.rayTrace(forigin.toVector(), MathUtils.getDirection(forigin), 2.9);
+               double expander = data.playerVersion.isOrAbove(ProtocolVersion.V1_9) ? 0 : 0.1;
+               List<SimpleCollisionBox> targetLocations = entityLoc.interpolatedLocations.stream()
+                       .map(l -> ((SimpleCollisionBox)EntityData.getEntityBox(l, data.target)).expand(expander))
+                       .collect(Collectors.toList());
 
-                   if(intersection == null
-                           || intersection2 == null) {
-                       missed = true;
-                       debug("missed: %.3f, %.3f, %.3f", targetBox.minX, targetBox.minY, targetBox.minZ);
-                   } else debug("Did not miss: %.3f, %.3f, %.3f",
-                           targetBox.minX, targetBox.minY, targetBox.minZ);
-               }
+               if (didArm && !didUse) {
+                   debug("%s: Reset Flying", tick);
+                   KLocation origin = data.playerInfo.to.clone(), forigin = data.playerInfo.from.clone();
 
-               if(!missed) {
-                   vl++;
-                   if(vl > 2) {
-                       flag(120, "true;false");
+                   origin.y += data.playerInfo.sneaking ? 1.54f : 1.62f;
+                   forigin.y += data.playerInfo.lsneaking ? 1.54f : 1.62f;
+
+                   boolean missed = false;
+                   for (SimpleCollisionBox targetHitbox : targetLocations) {
+                       AxisAlignedBB targetBox = new AxisAlignedBB(targetHitbox);
+
+                       Vec3D intersection = targetBox.rayTrace(origin.toVector(),
+                               MathUtils.getDirection(origin), 2.95), intersection2 =
+                               targetBox.rayTrace(forigin.toVector(), MathUtils.getDirection(forigin),2.95);
+
+                       if (intersection == null
+                               || intersection2 == null) {
+                           missed = true;
+                           debug("missed: %.3f, %.3f, %.3f", targetBox.minX, targetBox.minY, targetBox.minZ);
+                       } else debug("Did not miss: %.3f, %.3f, %.3f",
+                               targetBox.minX, targetBox.minY, targetBox.minZ);
                    }
-               } else if(lastAlert.isPassed(120)) vl = 0;
+
+                   if (!missed) {
+                       buffer++;
+                       debug(Color.Green + "Didn't miss!");
+                       if (buffer > 1) {
+                           vl++;
+                           flag(120, "true;false");
+                       }
+                   } else if(buffer > 0) buffer-= 0.5f;
+               } else if(buffer > 0) buffer-= 0.005f;
            }
        }
 
