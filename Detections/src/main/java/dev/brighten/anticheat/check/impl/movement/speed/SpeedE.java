@@ -43,6 +43,7 @@ public class SpeedE extends Check {
         //MinecraftReflection.getFriction thinks soulsand's friction is 0.6
         if(data.blockInfo.onSoulSand && packet.getY() % (1) == 0.875) {
             friction = 0.4f;
+            lfriction = 0.4f;
         }
       
         check: 
