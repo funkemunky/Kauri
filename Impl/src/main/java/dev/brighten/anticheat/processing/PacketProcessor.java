@@ -61,6 +61,7 @@ public class PacketProcessor {
                 if(KauriAPI.INSTANCE.getPacketExemptedPlayers().contains(data.uuid)) return;
 
                 ThreadHandler.INSTANCE.getThread(data).runTask(() -> {
+                    if (data.checkManager == null) return;
                     try {
                         if(outgoingPackets.contains(info.getType())) {
                             processServer(data, info.getPacket(), info.getType(), info.getTimestamp());
