@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.check.impl.packet.badpacket;
 
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInSteerVehiclePacket;
 import dev.brighten.anticheat.check.api.Check;
@@ -9,7 +10,7 @@ import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "BadPackets (H)", description = "Looks for invalid look packets", devStage = DevStage.BETA,
-        checkType = CheckType.BADPACKETS, executable = true, punishVL = 9)
+        checkType = CheckType.BADPACKETS, executable = true, punishVL = 9, maxVersion = ProtocolVersion.v1_16_5)
 public class BadPacketsH extends Check {
 
     private boolean exempt;
