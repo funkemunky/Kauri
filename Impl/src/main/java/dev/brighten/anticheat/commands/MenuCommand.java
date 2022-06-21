@@ -12,6 +12,7 @@ import dev.brighten.anticheat.check.api.CheckSettings;
 import dev.brighten.anticheat.logs.objects.Log;
 import dev.brighten.anticheat.menu.LogsGUI;
 import dev.brighten.anticheat.utils.Pastebin;
+import dev.brighten.anticheat.utils.menu.Menu;
 import dev.brighten.anticheat.utils.menu.button.Button;
 import dev.brighten.anticheat.utils.menu.button.ClickAction;
 import dev.brighten.anticheat.utils.menu.preset.button.FillerButton;
@@ -107,7 +108,10 @@ public class MenuCommand extends BaseCommand {
         menu.setItem(15, createButton(XMaterial.PAPER.parseMaterial(), 1, "&cView Recent Violators",
                 (player, info) -> {
                     player.sendMessage(Color.Gray + "Loading menu...");
-                    getRecentViolatorsMenu(true).showMenu(player);
+                    Kauri.INSTANCE.executor.execute(() -> {
+                        Menu violatorsMenu = MenuCommand.getRecentViolatorsMenu(true);
+                        RunUtils.task(() -> violatorsMenu.showMenu(player));
+                    });
                 }, "", "&7View players who flagged checks recently."));
 
         menu.fill(new FillerButton());
@@ -511,12 +515,16 @@ public class MenuCommand extends BaseCommand {
                         (target, info) -> {
                             if (info.getClickType().equals(ClickType.SHIFT_LEFT)
                                     && target.hasPermission("kauri.command.logs")) {
-                                LogsGUI gui = new LogsGUI(finalName, uuid);
-                                menu.setParent(null);
-                                menu.close(target);
-                                gui.setParent(info.getMenu());
-                                menu.setParent(main);
-                                gui.showMenu(target);
+                                Kauri.INSTANCE.executor.execute(() -> {
+                                    LogsGUI gui = new LogsGUI(finalName, uuid);
+                                    RunUtils.task(() -> {
+                                        menu.setParent(null);
+                                        menu.close(target);
+                                        gui.setParent(info.getMenu());
+                                        menu.setParent(main);
+                                        gui.showMenu(target);
+                                    });
+                                });
                             }
                         }));
             }
