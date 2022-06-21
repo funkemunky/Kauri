@@ -81,11 +81,13 @@ public class SpeedA extends Check {
                 moveFactor*= 5;
             }
 
+            //In 1.9+, entity collisions add acceleration to their movement.
             if(data.playerInfo.lastEntityCollision.isNotPassed(2)) {
                 tags.addTag("entity-collision");
                 moveFactor+= 0.05;
             }
 
+            //Pistons have the ability to move players 1 whole block
             if(data.blockInfo.pistonNear) {
                 tags.addTag("piston");
                 moveFactor+= 1;
@@ -118,13 +120,14 @@ public class SpeedA extends Check {
                     flag("p=%.1f%% dxz=%.3f a/g=%s,%s aimove=%.3f tags=%s",
                             ratio, data.playerInfo.deltaXZ, data.playerInfo.airTicks, data.playerInfo.groundTicks,
                             data.predictionService.aiMoveSpeed, tags.build());
+                    buffer = Math.min(5, buffer); //Preventing runaway flagging
                 } else if(ratio > 250) {
                     cancelAction(CancelType.MOVEMENT);
                     debug("Cancelled user movement: %.1f", ratio);
                 }
                 if(buffer >= 2)
                 fixMovementBugs();
-            } else if(buffer > 0) buffer-= 0.25f;
+            } else if(buffer > 0) buffer-= 0.2f;
             debug("ratio=%.1f tags=%s tp=%s buffer=%.1f", ratio, tags.build(),
                     data.playerInfo.liquidTimer.getPassed(), buffer);
 

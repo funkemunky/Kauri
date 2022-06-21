@@ -26,7 +26,6 @@ public class NoFallB extends Check {
                 || data.playerInfo.creative
                 || data.blockInfo.miscNear
                 || data.playerInfo.climbTimer.isNotPassed(3)
-                || !packet.isPos()
                 || timestamp - data.creation < 2000L) {
             //Subtracting buffers
             if(groundBuffer > 0) groundBuffer--;
@@ -55,12 +54,13 @@ public class NoFallB extends Check {
         } else if(groundBuffer > 0) groundBuffer--;
 
 
-        final boolean dground = data.playerInfo.to.y % divisor < 1E-4 && data.playerInfo.nearGround;
+        final boolean dground = Math.abs(data.playerInfo.to.y) % divisor < 1E-4 && data.playerInfo.nearGround;
         // If they are saying they are on the ground
         if(!data.playerInfo.clientGround
                 // Their bounding box is on the ground
                 && data.playerInfo.vehicleTimer.isPassed(20)
-                && ((data.playerInfo.serverGround || data.blockInfo.blocksBelow) && dground)
+                && ((data.playerInfo.serverGround || data.blockInfo.blocksBelow)
+                    && dground && !data.blockInfo.onHalfBlock)
                 && data.playerInfo.lastTeleportTimer.isPassed(2)) {
             if((airBuffer +=10) > 30) {
                 vl++;
@@ -68,7 +68,7 @@ public class NoFallB extends Check {
             }
         } else if(airBuffer > 0) airBuffer -= 4;
 
-        debug("c=%s s=%s bbelow=%s dg=%s dy=%.4f", data.playerInfo.clientGround, data.playerInfo.serverGround,
+        debug("c=%s s=%s bbelow=%s dg=%s dy=%s", data.playerInfo.clientGround, data.playerInfo.serverGround,
                 data.blockInfo.blocksBelow, dground, data.playerInfo.deltaY);
     }
 }

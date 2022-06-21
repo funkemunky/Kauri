@@ -21,6 +21,7 @@ public class KauriAPI {
     public WrappedDataManager dataManager;
     WrappedKauri kauriPlugin;
 
+    private final Set<UUID> packetExemptedPlayers = new HashSet<>();
     private final Map<String, List<KauriEvent>> registeredEvents = new HashMap<>();
 
     public KauriAPI() {
@@ -67,5 +68,21 @@ public class KauriAPI {
         allEvents.sort(Comparator.comparing(e -> e.priority().getSlot()));
 
         return allEvents;
+    }
+
+    public Set<UUID> getPacketExemptedPlayers() {
+        return packetExemptedPlayers;
+    }
+
+    public void packetExemptPlayer(UUID uuid) {
+        synchronized (packetExemptedPlayers) {
+            packetExemptedPlayers.add(uuid);
+        }
+    }
+
+    public void removePacketExemption(UUID uuid) {
+        synchronized (packetExemptedPlayers) {
+            packetExemptedPlayers.remove(uuid);
+        }
     }
 }

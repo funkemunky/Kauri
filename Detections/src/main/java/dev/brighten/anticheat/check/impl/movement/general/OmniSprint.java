@@ -5,6 +5,7 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.api.check.CheckType;
+import org.bukkit.GameMode;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.potion.PotionEffectType;
 
@@ -40,7 +41,7 @@ public class OmniSprint extends Check {
         }
 
         invalidMove: {
-            if(data.playerInfo.groundTicks < 9 || !data.playerInfo.serverGround) break invalidMove;
+            if(data.playerInfo.groundTicks < 9 || !data.playerInfo.serverGround || data.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) break invalidMove;
 
             double base = .235;
             int speed = data.potionProcessor.getEffectByType(PotionEffectType.SPEED)

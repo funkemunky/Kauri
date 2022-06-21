@@ -18,6 +18,7 @@ public class SpeedD extends Check {
     public void onFlying(WrappedInFlyingPacket packet, long now) {
         if(!packet.isPos() || now - data.creation < 800L || now - data.playerInfo.lastRespawn < 500L
                 || data.playerInfo.lastTeleportTimer.isPassed(1)
+                || data.playerInfo.canUseElytra
                 || data.playerInfo.doingTeleport ||data.playerInfo.canFly || data.playerInfo.creative
                 || data.playerInfo.vehicleTimer.isNotPassed(2)) return;
 

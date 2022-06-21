@@ -1,8 +1,5 @@
 package dev.brighten.anticheat.check.impl.movement.fly;
 
-import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockDigPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
@@ -19,13 +16,16 @@ public class FlyD extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if(!packet.isPos()
+        if (!packet.isPos()
                 || data.playerInfo.flightCancel
+                || data.playerInfo.canUseElytra
+                || data.playerInfo.doingBlockUpdate
                 || (data.playerInfo.nearGroundTimer.isNotPassed(3) && (data.playerInfo.lClientGround
                 || data.playerInfo.clientGround))
                 || data.playerInfo.lastBlockPlace.isNotPassed(1)
                 || data.playerInfo.lastVelocity.isNotPassed(8)
-        ) return;
+        )
+            return;
 
         if(data.playerInfo.deltaY > data.playerInfo.lDeltaY) {
             vl++;

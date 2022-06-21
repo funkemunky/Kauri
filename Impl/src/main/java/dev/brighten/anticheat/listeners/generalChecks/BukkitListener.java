@@ -11,6 +11,7 @@ import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.processing.thread.ThreadHandler;
+import dev.brighten.api.KauriAPI;
 import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -53,6 +54,9 @@ public class BukkitListener implements Listener {
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
+        //Packet exemption check
+        if(KauriAPI.INSTANCE.getPacketExemptedPlayers().contains(event.getPlayer().getUniqueId())) return;
+
         if(event.getClickedBlock() == null || !event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) return;
 
         if(event.getItem() != null && event.getItem().isSimilar(MAGIC_WAND)) {
@@ -95,6 +99,9 @@ public class BukkitListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onBlockPlace(BlockPlaceEvent event) {
+        //Packet exemption check
+        if(KauriAPI.INSTANCE.getPacketExemptedPlayers().contains(event.getPlayer().getUniqueId())) return;
+
         ObjectData data = Kauri.INSTANCE.dataManager.getData(event.getPlayer());
 
         if(data == null || event.getBlockPlaced() == null) return;
@@ -108,6 +115,9 @@ public class BukkitListener implements Listener {
 
     @EventHandler
     public void onEntityInteract(PlayerInteractEntityEvent event) {
+        //Packet exemption check
+        if(KauriAPI.INSTANCE.getPacketExemptedPlayers().contains(event.getPlayer().getUniqueId())) return;
+
         if(event.getPlayer().getItemInHand() == null
                 || !event.getPlayer().getItemInHand().isSimilar(MAGIC_WAND)) return;
         if(MiscUtils.entityDimensions.containsKey(event.getRightClicked().getType())) {

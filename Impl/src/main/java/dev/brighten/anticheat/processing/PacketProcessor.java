@@ -18,6 +18,7 @@ import dev.brighten.anticheat.listeners.api.impl.KeepaliveAcceptedEvent;
 import dev.brighten.anticheat.processing.thread.ThreadHandler;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.MovementUtils;
+import dev.brighten.api.KauriAPI;
 import lombok.val;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
@@ -56,6 +57,9 @@ public class PacketProcessor {
 
                 if(data == null || data.checkManager == null) return;
 
+                //Packet exemption check
+                if(KauriAPI.INSTANCE.getPacketExemptedPlayers().contains(data.uuid)) return;
+
                 ThreadHandler.INSTANCE.getThread(data).runTask(() -> {
                     try {
                         if(outgoingPackets.contains(info.getType())) {
@@ -86,6 +90,10 @@ public class PacketProcessor {
                 ObjectData data = Kauri.INSTANCE.dataManager.getData(info.getPlayer());
 
                 if(data == null || data.checkManager == null) return;
+
+                //Packet exemption check
+                if(KauriAPI.INSTANCE.getPacketExemptedPlayers().contains(data.uuid)) return;
+
                 switch(info.getType()) {
                     case Packet.Client.USE_ENTITY: {
                         val packet = new WrappedInUseEntityPacket(info.getPacket(), info.getPlayer());
@@ -420,7 +428,7 @@ public class PacketProcessor {
                 WrappedInTransactionPacket packet = new WrappedInTransactionPacket(object, data.getPlayer());
 
                 if(packet.getId() == 0) {
-                    if(Kauri.INSTANCE.keepaliveProcessor.keepAlives.containsKey(packet.getAction())) {
+                    if(Kauri.INSTANCE.keepaliveProcessor.keepAlives.getIfPresent(packet.getAction()) != null) {
                         Kauri.INSTANCE.keepaliveProcessor.addResponse(data, packet.getAction());
 
                         val optional = Kauri.INSTANCE.keepaliveProcessor.getResponse(data);

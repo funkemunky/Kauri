@@ -30,6 +30,7 @@ public class FlyB extends Check {
         if (data.playerInfo.generalCancel
                 || data.playerInfo.liquidTimer.isNotPassed(2)
                 || data.playerInfo.canFly
+                || data.playerInfo.canUseElytra
                 || data.playerInfo.creative
                 || data.playerInfo.climbTimer.isNotPassed(2)) {
             vertical = 0;
@@ -38,7 +39,7 @@ public class FlyB extends Check {
         }
 
 
-        if(data.playerInfo.serverGround || packet.getY() % (0.015625) == 0
+        if((data.playerInfo.serverGround && data.playerInfo.clientGround)
                 || data.playerInfo.lastGhostCollision.isNotPassed(1)) {
             vertical = 0;
 

@@ -8,9 +8,10 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.EntityLocation;
 import dev.brighten.api.check.CheckType;
+import dev.brighten.api.check.DevStage;
 
-@CheckInfo(name = "Aim (M)", description = "Aim snapping", checkType = CheckType.AIM, executable = true,
-        punishVL = 25)
+@CheckInfo(name = "Aim (M)", description = "Aim snapping", checkType = CheckType.AIM,
+        punishVL = 25, devStage = DevStage.ALPHA)
 public class AimM extends Check {
 
     private float buffer;
