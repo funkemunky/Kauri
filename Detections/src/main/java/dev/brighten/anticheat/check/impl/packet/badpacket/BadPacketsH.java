@@ -10,14 +10,14 @@ import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "BadPackets (H)", description = "Looks for invalid look packets", devStage = DevStage.BETA,
-        checkType = CheckType.BADPACKETS, executable = true, punishVL = 9, maxVersion = ProtocolVersion.v1_18_2)
+        checkType = CheckType.BADPACKETS, executable = true, punishVL = 9, maxVersion = ProtocolVersion.v1_16_5)
 public class BadPacketsH extends Check {
 
     private boolean exempt;
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long now ) {
-        if(data.playerInfo.creative) return;
+        if(data.playerInfo.creative || data.playerInfo.inVehicle) return;
 
         if(!packet.isPos() && packet.isLook()) {
             if(data.playerInfo.from.yaw == data.playerInfo.to.yaw
@@ -33,6 +33,8 @@ public class BadPacketsH extends Check {
                 exempt = false;
             }
         } else exempt = true;
+
+        debug("v=%s bv=%s", data.playerInfo.inVehicle, data.getPlayer().isInsideVehicle());
     }
 
     @Packet
