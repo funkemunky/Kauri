@@ -1,6 +1,6 @@
 package dev.brighten.anticheat.check.impl.combat.autoclicker;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerBlockPlacement;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
@@ -22,7 +22,7 @@ public class AutoclickerB extends Check {
     private final List<Integer> tickDeltas = new EvictingList<>(15);
 
     @Packet
-    public void onBlockPlace(WrappedInBlockPlacePacket packet, int currentTick) {
+    public void onBlockPlace(WrapperPlayClientPlayerBlockPlacement packet, int currentTick) {
         if(data.playerInfo.breakingBlock || data.getPlayer().getItemInHand().getType().isBlock()) return;
         int deltaPlace = currentTick - lastPlace;
 

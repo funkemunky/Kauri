@@ -1,6 +1,6 @@
 package dev.brighten.anticheat.check.impl.movement.fly;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -15,7 +15,7 @@ public class FlyF extends Check {
 
     private double slimeY = 0;
     @Packet
-    public void onPacket(WrappedInFlyingPacket packet) {
+    public void onPacket(WrapperPlayClientPlayerFlying packet) {
         if(data.playerInfo.deltaXZ == 0 && data.playerInfo.deltaY == 0) return;
 
         double max = Math.max((data.playerInfo.clientGround && data.playerInfo.serverGround)

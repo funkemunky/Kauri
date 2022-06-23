@@ -1,7 +1,7 @@
 package dev.brighten.anticheat.check.impl.combat.killaura;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientAnimation;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -16,12 +16,12 @@ public class KillauraI extends Check {
     private int arm, useEntity, buffer, validAmount;
 
     @Packet
-    public void onUse(WrappedInUseEntityPacket packet) {
+    public void onUse(WrapperPlayClientInteractEntity packet) {
         useEntity++;
     }
 
     @Packet
-    public void onArm(WrappedInArmAnimationPacket packet) {
+    public void onArm(WrapperPlayClientAnimation packet) {
         if(data.playerInfo.deltaXZ > 0.21 && data.target != null
                 && MathUtils.getDelta(data.target.getVelocity().getY(), -0.078) > 0.001) validAmount++;
         if(++arm >= 14) {

@@ -1,8 +1,8 @@
 package dev.brighten.anticheat.check.impl.packet.badpacket;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInAbilitiesPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutAbilitiesPacket;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerAbilities;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerAbilities;
 import cc.funkemunky.api.utils.RunUtils;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Cancellable;
@@ -21,8 +21,8 @@ public class BadPacketsD extends Check {
     boolean serverAllowed, clientAllowed;
 
     @Packet
-    public void server(WrappedOutAbilitiesPacket packet) {
-        if(packet.isAllowedFlight()) {
+    public void server(WrapperPlayServerPlayerAbilities packet) {
+        if(packet.isFlightAllowed()) {
             serverAllowed = true;
         } else if(!clientAllowed) {
             serverAllowed = false;
@@ -30,16 +30,18 @@ public class BadPacketsD extends Check {
     }
 
     @Packet
-    public void client(WrappedInAbilitiesPacket packet) {
-        if(packet.isAllowedFlight()) {
-            clientAllowed = true;
-        } else if(!serverAllowed) {
-            clientAllowed = false;
-        }
+    public void client(WrapperPlayClientPlayerAbilities packet) {
+        packet.isFlightAllowed().ifPresent(canFly -> {
+            if(canFly) {
+                clientAllowed = true;
+            } else if(!serverAllowed) {
+                clientAllowed = false;
+            }
+        });
     }
 
     @Packet
-    public void flying(WrappedInFlyingPacket packet, long timeStamp) {
+    public void flying(WrapperPlayClientPlayerFlying packet, long timeStamp) {
         if(timeStamp - data.creation < 1000L) {
             serverAllowed = data.getPlayer().getAllowFlight();
             clientAllowed = data.getPlayer().getAllowFlight();

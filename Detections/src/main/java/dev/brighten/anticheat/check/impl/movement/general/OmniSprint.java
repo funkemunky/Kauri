@@ -1,7 +1,7 @@
 package dev.brighten.anticheat.check.impl.movement.general;
 
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.api.check.CheckType;
@@ -17,7 +17,7 @@ public class OmniSprint extends Check {
     private int sprintBuffer, invalidBuffer;
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
+    public void onFlying(WrapperPlayClientPlayerFlying packet) {
 
         if(Math.abs(data.predictionService.motionYaw) > 95 || data.predictionService.key.contains("W")) return;
 

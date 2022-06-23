@@ -1,6 +1,6 @@
 package dev.brighten.anticheat.check.impl.movement.general;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -24,8 +24,8 @@ public class FastLadder extends Check {
     }
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
-        if(packet.isPos()
+    public void onFlying(WrapperPlayClientPlayerFlying packet) {
+        if(packet.hasPositionChanged()
                 && data.playerInfo.lastVelocity.isPassed(10)
                 && data.blockInfo.onClimbable
                 && !data.playerInfo.generalCancel) {

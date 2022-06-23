@@ -1,6 +1,6 @@
 package dev.brighten.anticheat.check.impl.combat.aim;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
@@ -22,8 +22,8 @@ public class AimG extends Check {
     protected List<Double> yawOffsets = new EvictingList<>(10), pitchOffsets = new EvictingList<>(10);
 
     @Packet
-    public void onUse(WrappedInUseEntityPacket packet) {
-        if(packet.getAction() != WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK
+    public void onUse(WrapperPlayClientInteractEntity packet) {
+        if(packet.getAction() != WrapperPlayClientInteractEntity.InteractAction.ATTACK
                 || data.target == null) return;
 
         Optional<EntityLocation> opLoc = data.entityLocationProcessor.getEntityLocation(data.target);

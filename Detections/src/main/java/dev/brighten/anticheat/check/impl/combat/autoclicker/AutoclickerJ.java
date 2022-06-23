@@ -1,7 +1,7 @@
 package dev.brighten.anticheat.check.impl.combat.autoclicker;
 
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientAnimation;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -18,7 +18,7 @@ public class AutoclickerJ extends Check {
     private long lastArm;
 
     @Packet
-    public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
+    public void onArm(WrapperPlayClientAnimation packet, long timeStamp) {
         if(data.playerInfo.breakingBlock
                 || data.playerInfo.lookingAtBlock
                 || data.clickProcessor.isNotReady()

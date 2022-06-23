@@ -1,6 +1,6 @@
 package dev.brighten.anticheat.check.impl.combat.killaura;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.world.CollisionBox;
@@ -24,9 +24,9 @@ public class KillauraA extends Check {
     private int buffer;
 
     @Packet
-    public void onUse(WrappedInUseEntityPacket packet) {
+    public void onUse(WrapperPlayClientInteractEntity packet) {
         if(data.target == null
-                || packet.getAction() != WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)
+                || packet.getAction() != WrapperPlayClientInteractEntity.InteractAction.ATTACK)
             return;
 
         //We can't run this check if we have no block boxes to check!

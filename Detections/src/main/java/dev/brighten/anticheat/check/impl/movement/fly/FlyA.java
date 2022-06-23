@@ -1,19 +1,15 @@
 package dev.brighten.anticheat.check.impl.movement.fly;
 
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
-import dev.brighten.anticheat.processing.TagsBuilder;
 import dev.brighten.anticheat.utils.MovementUtils;
-import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
-import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Fly (A)", description = "Checks for improper acceleration.", checkType = CheckType.FLIGHT,
         vlToFlag = 4, punishVL = 15, executable = true)
@@ -24,8 +20,8 @@ public class FlyA extends Check {
     private float buffer;
     private static double mult = 0.98f;
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if(packet.isPos() && (data.playerInfo.deltaXZ > 0 || data.playerInfo.deltaY != 0)) {
+    public void onFlying(WrapperPlayClientPlayerFlying packet, long timeStamp) {
+        if(packet.hasPositionChanged() && (data.playerInfo.deltaXZ > 0 || data.playerInfo.deltaY != 0)) {
             /* We check if the player is in ground, since theoretically the y should be zero. */
             double lDeltaY = data.playerInfo.lClientGround ? 0 : data.playerInfo.lDeltaY;
             boolean onGround = data.playerInfo.clientGround;
@@ -74,7 +70,7 @@ public class FlyA extends Check {
             debug((flagged ? Color.Green : "")
                             +"pos=%s deltaY=%.3f predicted=%.3f d=%.3f ground=%s lpass=%s cp=%s air=%s buffer=%.1f s" +
                             "g=%s cb=%s fc=%s gc=%s",
-                    packet.getY(), data.playerInfo.deltaY, predicted, deltaPredict, onGround,
+                    packet.getLocation().getY(), data.playerInfo.deltaY, predicted, deltaPredict, onGround,
                     data.playerInfo.liquidTimer.getPassed(), data.playerInfo.climbTimer.getPassed(),
                     data.playerInfo.kAirTicks, buffer, data.playerInfo.serverGround,
                     data.playerInfo.climbTimer.getPassed(), data.playerInfo.flightCancel,

@@ -1,7 +1,7 @@
 package dev.brighten.anticheat.check.impl.combat.killaura;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -18,7 +18,7 @@ public class KillauraB extends Check {
     private int buffer;
 
     @Packet
-    public void use(WrappedInUseEntityPacket packet, long current) {
+    public void use(WrapperPlayClientInteractEntity packet, long current) {
         if(current - lastFlying < 10 && data.lagInfo.lastPacketDrop.isPassed(1)) {
             if(++buffer > 7) {
                 vl++;
@@ -28,7 +28,7 @@ public class KillauraB extends Check {
     }
 
     @Packet
-    public void flying(WrappedInFlyingPacket packet, long current) {
+    public void flying(WrapperPlayClientPlayerFlying packet, long current) {
         if(data.playerInfo.lastTeleportTimer.isPassed(0))
         lastFlying = current;
     }

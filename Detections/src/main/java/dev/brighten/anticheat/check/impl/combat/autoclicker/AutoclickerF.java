@@ -1,5 +1,7 @@
 package dev.brighten.anticheat.check.impl.combat.autoclicker;
 
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientAnimation;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
@@ -37,12 +39,12 @@ public class AutoclickerF extends Check {
     }
 
     @Packet
-    public void onUse(WrappedInUseEntityPacket packet, int current) {
+    public void onUse(WrapperPlayClientInteractEntity packet, int current) {
         attackTick = current;
     }
 
     @Packet
-    public void onArm(WrappedInArmAnimationPacket packet, int current) {
+    public void onArm(WrapperPlayClientAnimation packet, int current) {
         if(data.playerInfo.breakingBlock
                 || data.playerInfo.lookingAtBlock
                 || data.playerInfo.lastBrokenBlock.isNotPassed(5)

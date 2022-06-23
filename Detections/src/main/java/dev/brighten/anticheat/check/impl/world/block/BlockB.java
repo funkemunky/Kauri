@@ -1,7 +1,7 @@
 package dev.brighten.anticheat.check.impl.world.block;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerBlockPlacement;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import cc.funkemunky.api.utils.KLocation;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
@@ -21,7 +21,7 @@ public class BlockB extends Check {
     private float buffer;
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long timestamp) {
+    public void onFlying(WrapperPlayClientPlayerFlying packet, long timestamp) {
         if(data.playerInfo.creative || data.excuseNextFlying) return;
 
         if(place) {
@@ -37,7 +37,7 @@ public class BlockB extends Check {
     }
 
     @Packet
-    public void onBlockPlace(WrappedInBlockPlacePacket packet, long timestamp) {
+    public void onBlockPlace(WrapperPlayClientPlayerBlockPlacement packet, long timestamp) {
         if(data.pastLocations.isEmpty()) return;
 
         KLocation lastMovePacket = data.pastLocations.getLast().one;

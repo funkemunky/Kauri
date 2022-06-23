@@ -1,6 +1,6 @@
 package dev.brighten.anticheat.check.impl.packet.timer;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -26,7 +26,7 @@ public class TimerA extends Check {
     private SimpleAverage simpleAvg = new SimpleAverage(20, 50);
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long now) {
+    public void onFlying(WrapperPlayClientPlayerFlying packet, long now) {
         if(data.playerInfo.doingTeleport || data.playerInfo.lastTeleportTimer.isNotPassed(1)) return;
 
         long delta = now - lastFlying;

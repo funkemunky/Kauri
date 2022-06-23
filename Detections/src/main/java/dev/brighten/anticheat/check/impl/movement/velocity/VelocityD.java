@@ -1,9 +1,7 @@
 package dev.brighten.anticheat.check.impl.movement.velocity;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
-import cc.funkemunky.api.utils.Tuple;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityVelocity;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.TickTimer;
@@ -12,12 +10,8 @@ import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 import lombok.Getter;
 import lombok.var;
-import org.bukkit.enchantments.Enchantment;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
@@ -34,11 +28,11 @@ public class VelocityD extends Check {
     private static int bufferThreshold = 3;
 
     @Packet
-    public void onVelocity(WrappedOutVelocityPacket packet) {
-        if(packet.getId() == data.getPlayer().getEntityId() && packet.getY() > 0.1) {
+    public void onVelocity(WrapperPlayServerEntityVelocity packet) {
+        if(packet.getEntityId() == data.getPlayer().getEntityId() && packet.getVelocity().getY() > 0.1) {
             data.runKeepaliveAction(ka -> {
                 synchronized (velocityY) {
-                    velocityY.add(new Velocity(packet.getY()));
+                    velocityY.add(new Velocity(packet.getVelocity().getY()));
                     lastVelocity.reset();
                 }
             });
@@ -46,7 +40,7 @@ public class VelocityD extends Check {
     }
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long now) {
+    public void onFlying(WrapperPlayClientPlayerFlying packet, long now) {
         if(velocityY.size() == 0) return;
 
         var toRemove = velocityY.stream()

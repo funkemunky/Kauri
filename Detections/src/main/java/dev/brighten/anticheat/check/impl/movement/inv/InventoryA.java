@@ -1,7 +1,7 @@
 package dev.brighten.anticheat.check.impl.movement.inv;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInWindowClickPacket;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -21,18 +21,18 @@ public class InventoryA extends Check {
     }
 
     @Packet
-    public void onWindow(WrappedInWindowClickPacket packet) {
+    public void onWindow(WrapperPlayClientClickWindow packet) {
         if(data.playerInfo.lastFlyingTimer.isPassed(2)) moveStreak = 0;
         if(moveStreak > 5 && data.playerInfo.lastVelocity.isPassed(20))  {
             vl++;
-            flag("slot=%s clickType=%s ms=%s o=%s", packet.getSlot(), packet.getAction().name(), moveStreak,
+            flag("slot=%s clickType=%s ms=%s o=%s", packet.getSlot(), packet.getWindowClickType().name(), moveStreak,
                     data.playerInfo.inventoryOpen);
         }
     }
 
     @Packet
-    public void onFlyng(WrappedInFlyingPacket packet) {
-        if(packet.isPos()
+    public void onFlyng(WrapperPlayClientPlayerFlying packet) {
+        if(packet.hasPositionChanged()
                 && data.playerInfo.deltaXZ > 0
                 && data.playerInfo.liquidTimer.isPassed(2)
                 && data.playerInfo.climbTimer.isPassed(3)

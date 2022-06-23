@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.check.impl.combat.aim;
 
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -13,8 +14,8 @@ public class AimI extends Check {
 
     private int buffer;
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
-        if(!packet.isLook()) return;
+    public void onFlying(WrapperPlayClientPlayerFlying packet) {
+        if(!packet.hasRotationChanged()) return;
 
         final double pitch = data.playerInfo.to.pitch, lpitch = data.playerInfo.from.pitch;
 

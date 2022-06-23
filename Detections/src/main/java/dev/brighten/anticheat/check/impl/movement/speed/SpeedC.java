@@ -1,6 +1,6 @@
 package dev.brighten.anticheat.check.impl.movement.speed;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.math.cond.MaxInteger;
 import dev.brighten.anticheat.check.api.Cancellable;
@@ -16,8 +16,8 @@ public class SpeedC extends Check {
     private MaxInteger verbose = new MaxInteger(40);
 
     @Packet
-    public void onPacket(WrappedInFlyingPacket packet) {
-        if(!packet.isPos()
+    public void onPacket(WrapperPlayClientPlayerFlying packet) {
+        if(!packet.hasPositionChanged()
                 || data.playerInfo.generalCancel
                 || data.playerInfo.canUseElytra
                 || data.playerInfo.lastVelocity.isNotPassed(25)) {

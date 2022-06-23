@@ -1,7 +1,7 @@
 package dev.brighten.anticheat.check.impl.movement.speed;
 
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.PlayerUtils;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
@@ -22,11 +22,11 @@ public class SpeedA extends Check {
     private float buffer;
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
+    public void onFlying(WrapperPlayClientPlayerFlying packet) {
         if(data.excuseNextFlying) return;
         checkProccesing:
         {
-            if (!packet.isPos())
+            if (!packet.hasPositionChanged())
                 break checkProccesing;
 
             float drag = friction;
@@ -102,7 +102,7 @@ public class SpeedA extends Check {
 
             if(data.blockInfo.onSoulSand && data.playerInfo.lClientGround
                     //Ensuring the player is actually standing on the block and recieving slow
-                    && packet.getY() % (1) == 0.875) {
+                    && packet.getLocation().getY() % 1 == 0.875) {
                 tags.addTag("soulsand");
                 moveFactor*= 0.88;
             }

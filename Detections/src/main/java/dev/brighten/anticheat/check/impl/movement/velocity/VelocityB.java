@@ -1,7 +1,7 @@
 package dev.brighten.anticheat.check.impl.movement.velocity;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import cc.funkemunky.api.utils.Tuple;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
@@ -27,15 +27,15 @@ public class VelocityB extends Check {
     private static final double[] moveValues = new double[] {-0.98, 0, 0.98};
 
     @Packet
-    public void onUseEntity(WrappedInUseEntityPacket packet) {
+    public void onUseEntity(WrapperPlayClientInteractEntity packet) {
         if(!useEntity
-                && packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) {
+                && packet.getAction().equals(WrapperPlayClientInteractEntity.InteractAction.ATTACK)) {
             useEntity = true;
         }
     }
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
+    public void onFlying(WrapperPlayClientPlayerFlying packet, long timeStamp) {
         if(data.playerInfo.cvb) {
             pvX = data.playerInfo.velocityX;
             pvZ = data.playerInfo.velocityZ;

@@ -1,6 +1,8 @@
 package dev.brighten.anticheat.utils;
 
 import cc.funkemunky.api.Atlas;
+import cc.funkemunky.api.com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import cc.funkemunky.api.com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import cc.funkemunky.api.reflections.impl.CraftReflection;
 import cc.funkemunky.api.reflections.impl.MinecraftReflection;
 import cc.funkemunky.api.reflections.types.WrappedField;

@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.check.impl.combat.autoclicker;
 
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientAnimation;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
@@ -20,7 +21,7 @@ public class AutoclickerD extends Check {
     private Pattern pattern = new Pattern();
 
     @Packet
-    public void onClick(WrappedInArmAnimationPacket packet, long timeStamp) {
+    public void onClick(WrapperPlayClientAnimation packet, long timeStamp) {
         if(!data.playerInfo.breakingBlock
                 && !data.playerInfo.lookingAtBlock
                 && data.playerInfo.lastBrokenBlock.isPassed(5)

@@ -1,6 +1,6 @@
 package dev.brighten.anticheat.check.impl.world.block;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import cc.funkemunky.api.utils.math.cond.MaxDouble;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
@@ -18,8 +18,8 @@ public class BlockE extends Check {
     public final MaxDouble verbose = new MaxDouble(5);
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
-        if (!packet.isPos() || !packet.isLook()) return;
+    public void onFlying(WrapperPlayClientPlayerFlying packet) {
+        if (!packet.hasPositionChanged() || !packet.hasRotationChanged()) return;
         final double deltaXZ = data.playerInfo.deltaXZ;
         final double accelXZ = Math.abs(deltaXZ - data.playerInfo.lDeltaXZ);
 

@@ -1,12 +1,11 @@
 package dev.brighten.anticheat.check.impl.movement.fly;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
-import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Fly (E)", description = "Looks for consistent vertical acceleration",
         checkType = CheckType.FLIGHT, punishVL = 8, executable = true)
@@ -15,8 +14,8 @@ public class FlyE extends Check {
 
     private int buffer;
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
-        if(!packet.isPos() || data.playerInfo.flightCancel || data.excuseNextFlying) return;
+    public void onFlying(WrapperPlayClientPlayerFlying packet) {
+        if(!packet.hasPositionChanged() || data.playerInfo.flightCancel || data.excuseNextFlying) return;
 
         double accel = Math.abs(data.playerInfo.deltaY - data.playerInfo.lDeltaY);
 

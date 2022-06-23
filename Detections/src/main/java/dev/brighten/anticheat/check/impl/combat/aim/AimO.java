@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.check.impl.combat.aim;
 
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -31,7 +32,7 @@ public class AimO extends Check {
     }
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
+    public void onFlying(WrapperPlayClientPlayerFlying packet) {
         angleAverage.add(Math.abs(data.moveProcessor.deltaX));
     }
 }

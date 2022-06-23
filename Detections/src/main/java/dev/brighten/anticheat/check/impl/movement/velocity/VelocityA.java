@@ -1,9 +1,6 @@
 package dev.brighten.anticheat.check.impl.movement.velocity;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
-import cc.funkemunky.api.utils.MathUtils;
-import cc.funkemunky.api.utils.TickTimer;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -18,7 +15,7 @@ public class VelocityA extends Check {
     private double vY, buffer;
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
+    public void onFlying(WrapperPlayClientPlayerFlying packet) {
 
         //Player just jumped into the air
         if(data.playerInfo.cva) {

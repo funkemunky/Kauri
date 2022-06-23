@@ -1,7 +1,7 @@
 package dev.brighten.anticheat.check.impl.packet.badpacket;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockDigPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerBlockPlacement;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerDigging;
 import cc.funkemunky.api.utils.BlockUtils;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
@@ -18,7 +18,7 @@ public class BadPacketsA extends Check {
     private long lastBlockPlace;
 
     @Packet
-    public void onDig(WrappedInBlockDigPacket packet, long timeStamp) {
+    public void onDig(WrapperPlayClientPlayerDigging packet, long timeStamp) {
         if(timeStamp - lastBlockPlace < 5 && !data.lagInfo.lagging
                 && data.lagInfo.lastPacketDrop.isPassed(5)) {
             if(vl++ > 4) {
@@ -28,8 +28,8 @@ public class BadPacketsA extends Check {
     }
 
     @Packet
-    public void onPlace(WrappedInBlockPlacePacket packet, long timeStamp) {
-        if(packet.getPlayer().getItemInHand() != null
-                && BlockUtils.isTool(packet.getPlayer().getItemInHand())) lastBlockPlace = timeStamp;
+    public void onPlace(WrapperPlayClientPlayerBlockPlacement packet, long timeStamp) {
+        if(data.getPlayer().getItemInHand() != null
+                && BlockUtils.isTool(data.getPlayer().getItemInHand())) lastBlockPlace = timeStamp;
     }
 }

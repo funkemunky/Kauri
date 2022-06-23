@@ -1,6 +1,6 @@
 package dev.brighten.anticheat.check.impl.packet.badpacket;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInHeldItemSlotPacket;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientHeldItemChange;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -13,7 +13,7 @@ public class BadPacketsK extends Check {
     private int lastSlot = -1, buffer;
 
     @Packet
-    public void onHeld(WrappedInHeldItemSlotPacket packet) {
+    public void onHeld(WrapperPlayClientHeldItemChange packet) {
         if(lastSlot != -1 && lastSlot == packet.getSlot() && data.lagInfo.lastPacketDrop.isPassed(2)) {
             if(++buffer > 3) {
                 vl++;

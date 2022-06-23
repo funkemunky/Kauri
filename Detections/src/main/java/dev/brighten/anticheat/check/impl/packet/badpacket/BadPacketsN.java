@@ -1,10 +1,10 @@
 package dev.brighten.anticheat.check.impl.packet.badpacket;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInKeepAlivePacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutKeepAlivePacket;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutTransaction;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientKeepAlive;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerKeepAlive;
+import cc.funkemunky.api.utils.trans.WrappedClientboundTransactionPacket;
+import cc.funkemunky.api.utils.trans.WrappedServerboundTransactionPacket;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.utils.timer.Timer;
@@ -43,7 +43,7 @@ public class BadPacketsN extends Check {
     }
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
+    public void onFlying(WrapperPlayClientPlayerFlying packet) {
 
         if(lastSentTrans.isNotPassed(300L)
                 && ++flying > 305 + (data.lagInfo.ping / 50.)
@@ -78,26 +78,26 @@ public class BadPacketsN extends Check {
     }
 
     @Packet
-    public void onOutKeepalive(WrappedOutKeepAlivePacket packet) {
+    public void onOutKeepalive(WrapperPlayServerKeepAlive packet) {
         lastSentKeepAlive.reset();
     }
 
     @Packet
-    public void onKeepalive(WrappedInKeepAlivePacket packet) {
+    public void onKeepalive(WrapperPlayClientKeepAlive packet) {
         lastKeepAlive.reset();
     }
 
     @Packet
-    public void onOutTrans(WrappedOutTransaction packet) {
+    public void onOutTrans(WrappedClientboundTransactionPacket packet) {
         lastSentTrans.reset();
     }
 
     @Packet
-    public void onTransaction(WrappedInTransactionPacket packet, long now) {
-        if(packet.getId() != 0) return;
+    public void onTransaction(WrappedServerboundTransactionPacket packet, long now) {
+        if(packet.getWindow() != 0) return;
 
         val response
-                = Kauri.INSTANCE.keepaliveProcessor.getKeepById(packet.getAction());
+                = Kauri.INSTANCE.keepaliveProcessor.getKeepById(packet.getActionId());
 
         if (response.isPresent()) {
             flying = 0;

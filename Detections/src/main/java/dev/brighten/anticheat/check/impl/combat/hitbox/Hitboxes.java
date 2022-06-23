@@ -1,7 +1,7 @@
 package dev.brighten.anticheat.check.impl.combat.hitbox;
 
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.world.EntityData;
@@ -32,8 +32,8 @@ public class Hitboxes extends Check {
     public static double reachThreshold = 3.1;
 
     @Packet
-    public void onUse(WrappedInUseEntityPacket packet, long now) {
-        if(packet.getAction() != WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK) return;
+    public void onUse(WrapperPlayClientInteractEntity packet, long now) {
+        if(packet.getAction() != WrapperPlayClientInteractEntity.InteractAction.ATTACK) return;
 
         Hitboxes: {
             if(data.playerInfo.creative

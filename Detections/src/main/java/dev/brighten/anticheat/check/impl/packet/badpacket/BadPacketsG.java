@@ -1,6 +1,7 @@
 package dev.brighten.anticheat.check.impl.packet.badpacket;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockDigPacket;
+import cc.funkemunky.api.com.github.retrooper.packetevents.protocol.player.DiggingAction;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerDigging;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -14,8 +15,9 @@ public class BadPacketsG extends Check {
     private long lastItemDrop;
     private int verbose;
     @Packet
-    public void onPacket(WrappedInBlockDigPacket packet, long timeStamp) {
-        if(packet.getAction().equals(WrappedInBlockDigPacket.EnumPlayerDigType.DROP_ITEM)) {
+    public void onPacket(WrapperPlayClientPlayerDigging packet, long timeStamp) {
+        if(packet.getAction().equals(DiggingAction.DROP_ITEM)
+                || packet.getAction().equals(DiggingAction.DROP_ITEM_STACK)) {
             long delta = timeStamp - lastItemDrop;
 
             if(delta < 35) {

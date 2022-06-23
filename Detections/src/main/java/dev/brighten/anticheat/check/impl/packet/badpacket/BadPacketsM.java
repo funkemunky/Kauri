@@ -1,6 +1,6 @@
 package dev.brighten.anticheat.check.impl.packet.badpacket;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -12,10 +12,10 @@ import dev.brighten.api.check.CheckType;
 public class BadPacketsM extends Check {
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
-        if(packet.isLook() && Math.abs(packet.getPitch()) > 90) {
+    public void onFlying(WrapperPlayClientPlayerFlying packet) {
+        if(packet.hasRotationChanged() && Math.abs(packet.getLocation().getPitch()) > 90) {
             vl++;
-            flag("pitch=%s", MathUtils.round(packet.getPitch(), 2));
+            flag("pitch=%s", MathUtils.round(packet.getLocation().getPitch(), 2));
         }
     }
 }

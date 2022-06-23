@@ -1,7 +1,7 @@
 package dev.brighten.anticheat.check.impl.world.hand;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientAnimation;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -17,8 +17,8 @@ public class HandD extends Check {
     private int attackTicks;
 
     @Packet
-    public void onFlying(WrappedInUseEntityPacket packet) {
-        if(!packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) return;
+    public void onFlying(WrapperPlayClientInteractEntity packet) {
+        if(!packet.getAction().equals(WrapperPlayClientInteractEntity.InteractAction.ATTACK)) return;
 
         if(attackTicks++ > 3
                 && data.playerInfo.lastFlyingTimer.isNotPassed(1)
@@ -29,7 +29,7 @@ public class HandD extends Check {
     }
 
     @Packet
-    public void onFlying(WrappedInArmAnimationPacket packet) {
+    public void onFlying(WrapperPlayClientAnimation packet) {
         attackTicks = 0;
     }
 }

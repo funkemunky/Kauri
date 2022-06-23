@@ -1,6 +1,6 @@
 package dev.brighten.anticheat.check.impl.movement.general;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
@@ -16,8 +16,8 @@ public class Inertia extends Check {
     private int buffer;
 
     @Packet
-    public void onPacket(WrappedInFlyingPacket packet) {
-        if(packet.isPos() && packet.isLook()) {
+    public void onPacket(WrapperPlayClientPlayerFlying packet) {
+        if(packet.hasPositionChanged() && packet.hasRotationChanged()) {
             double dir = getDirection(data.playerInfo.from.toLocation(data.getPlayer().getWorld()),
                     data.playerInfo.to.toLocation(data.getPlayer().getWorld()));
 

@@ -1,6 +1,6 @@
 package dev.brighten.anticheat.check.impl.packet.badpacket;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInAbilitiesPacket;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerAbilities;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -13,11 +13,13 @@ import dev.brighten.api.check.CheckType;
 public class BadPacketsI extends Check {
 
     @Packet
-    public void onFlying(WrappedInAbilitiesPacket packet) {
-        if(packet.isFlying() && !packet.isAllowedFlight()
-                && !packet.getPlayer().getAllowFlight() && !data.lagInfo.lagging) {
-            vl+= 2;
-            flag("isFlying=" + packet.isFlying() + " allowed=" + packet.isAllowedFlight());
-        }
+    public void onFlying(WrapperPlayClientPlayerAbilities packet) {
+        packet.isFlightAllowed().ifPresent(allowed -> {
+            if(packet.isFlying() && !allowed
+                    && !data.getPlayer().getAllowFlight() && !data.lagInfo.lagging) {
+                vl+= 2;
+                flag("isFlying=" + packet.isFlying() + " allowed=" + allowed);
+            }
+        });
     }
 }

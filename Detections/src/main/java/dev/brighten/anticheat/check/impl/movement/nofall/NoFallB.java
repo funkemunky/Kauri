@@ -1,6 +1,6 @@
 package dev.brighten.anticheat.check.impl.movement.nofall;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -17,7 +17,7 @@ public class NoFallB extends Check {
     private int airBuffer, groundBuffer;
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long timestamp) {
+    public void onFlying(WrapperPlayClientPlayerFlying packet, long timestamp) {
         if(data.playerInfo.doingTeleport
                 || data.playerInfo.lastTeleportTimer.isNotPassed(3)
                 || data.playerInfo.moveTicks < 2

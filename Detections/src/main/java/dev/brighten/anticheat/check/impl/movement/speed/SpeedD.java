@@ -1,6 +1,6 @@
 package dev.brighten.anticheat.check.impl.movement.speed;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -15,8 +15,8 @@ import java.util.Optional;
 public class SpeedD extends Check {
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long now) {
-        if(!packet.isPos() || now - data.creation < 800L || now - data.playerInfo.lastRespawn < 500L
+    public void onFlying(WrapperPlayClientPlayerFlying packet, long now) {
+        if(!packet.hasPositionChanged() || now - data.creation < 800L || now - data.playerInfo.lastRespawn < 500L
                 || data.playerInfo.lastTeleportTimer.isPassed(1)
                 || data.playerInfo.canUseElytra
                 || data.playerInfo.doingTeleport ||data.playerInfo.canFly || data.playerInfo.creative

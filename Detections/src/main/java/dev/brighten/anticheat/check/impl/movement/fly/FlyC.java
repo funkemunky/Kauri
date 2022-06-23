@@ -1,12 +1,11 @@
 package dev.brighten.anticheat.check.impl.movement.fly;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
-import dev.brighten.anticheat.utils.MovementUtils;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Fly (C)", description = "Checks for invalid jump heights.",
@@ -15,8 +14,8 @@ import dev.brighten.api.check.CheckType;
 public class FlyC extends Check {
 
     @Packet
-    public void onPacket(WrappedInFlyingPacket packet) {
-        if (packet.isPos()) {
+    public void onPacket(WrapperPlayClientPlayerFlying packet) {
+        if (packet.hasPositionChanged()) {
             if (!data.playerInfo.flightCancel
                     && data.playerInfo.jumped
                     && !data.playerInfo.wasOnSlime

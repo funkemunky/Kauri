@@ -1,6 +1,6 @@
 package dev.brighten.anticheat.check.impl.combat.killaura;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -12,8 +12,8 @@ import dev.brighten.api.check.DevStage;
 public class KillauraD extends Check {
 
     @Packet
-    public void onPacket(WrappedInFlyingPacket packet) {
-        if((packet.isPos() || packet.isLook())
+    public void onPacket(WrapperPlayClientPlayerFlying packet) {
+        if((packet.hasPositionChanged() || packet.hasRotationChanged())
                 && data.playerInfo.lastWindowClick.isNotPassed(3)
                 && data.playerInfo.lastAttack.isNotPassed(1)
                 && data.playerInfo.inventoryOpen) {

@@ -1,6 +1,6 @@
 package dev.brighten.anticheat.check.impl.movement.speed;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -14,7 +14,7 @@ public class SpeedB extends Check {
 
     private float verbose;
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
+    public void onFlying(WrapperPlayClientPlayerFlying packet, long timeStamp) {
         if(data.playerInfo.deltaXZ > 0
                 && !data.excuseNextFlying
                 && !data.playerInfo.generalCancel) {

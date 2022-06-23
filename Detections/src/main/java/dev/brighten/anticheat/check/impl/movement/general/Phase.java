@@ -1,7 +1,7 @@
 package dev.brighten.anticheat.check.impl.movement.general;
 
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.*;
 import cc.funkemunky.api.utils.world.BlockData;
 import cc.funkemunky.api.utils.world.CollisionBox;
@@ -20,12 +20,9 @@ import dev.brighten.api.check.DevStage;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.*;
-import java.util.function.Function;
 
 @CheckInfo(name = "Phase", description = "Ensures players cannot move through blocks.",
         checkType = CheckType.EXPLOIT, cancellable = true, enabled = false, executable = false,
@@ -62,8 +59,8 @@ public class Phase extends Check {
     private static boolean flagIntoChat = false;
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long now) {
-        if(!packet.isPos() || now - data.creation < 800L || ((now - data.playerInfo.lastRespawn < 500L
+    public void onFlying(WrapperPlayClientPlayerFlying packet, long now) {
+        if(!packet.hasPositionChanged() || now - data.creation < 800L || ((now - data.playerInfo.lastRespawn < 500L
                 || data.playerInfo.moveTicks == 0) && lastFlag.isPassed(12))
                 || data.playerInfo.creative || data.playerInfo.canFly) {
             return;

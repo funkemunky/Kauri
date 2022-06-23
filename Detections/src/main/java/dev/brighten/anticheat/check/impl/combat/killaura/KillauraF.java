@@ -1,7 +1,7 @@
 package dev.brighten.anticheat.check.impl.combat.killaura;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -20,7 +20,7 @@ public class KillauraF extends Check {
     private boolean attack;
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
+    public void onFlying(WrapperPlayClientPlayerFlying packet) {
         if(attack && data.playerInfo.sprinting) {
             double px = data.playerInfo.lDeltaX, pz = data.playerInfo.lDeltaZ;
 
@@ -49,9 +49,9 @@ public class KillauraF extends Check {
     }
 
     @Packet
-    public void onUse(WrappedInUseEntityPacket packet) {
-        if(packet.getAction() == WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK
-                && packet.getEntity() instanceof Player) {
+    public void onUse(WrapperPlayClientInteractEntity packet) {
+        if(packet.getAction() == WrapperPlayClientInteractEntity.InteractAction.ATTACK
+                && data.target instanceof Player) {
             attack = true;
         }
     }

@@ -1,6 +1,6 @@
 package dev.brighten.anticheat.check.impl.world.block;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerBlockPlacement;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
@@ -19,11 +19,11 @@ public class BlockA extends Check {
     private int buffer;
 
     @Packet
-    public void onBlock(WrappedInBlockPlacePacket event) {
-        Vector dir = new Vector(event.getFace().getAdjacentX(),
-                0, event.getFace().getAdjacentZ()),
-                opposite = new Vector(event.getFace().opposite().getAdjacentX(),
-                        0, event.getFace().opposite().getAdjacentZ());
+    public void onBlock(WrapperPlayClientPlayerBlockPlacement packet) {
+        Vector dir = new Vector(packet.getFace().getModX(),
+                0, packet.getFace().getModZ()),
+                opposite = new Vector(packet.getFace().getOppositeFace().getModX(),
+                        0, packet.getFace().getOppositeFace().getModZ());
 
         //Getting place block
         Vector delta = new Vector(data.playerInfo.deltaX, data.playerInfo.deltaY, data.playerInfo.deltaZ);
@@ -31,8 +31,8 @@ public class BlockA extends Check {
         double dist = delta.distance(dir), dist2 = opposite.distance(MathUtils.getDirection(data.playerInfo.to).setY(0));
         boolean check = dist <= 1 && dist > 0.7 && dist2 >= 0.5 && dist2 < 1;
 
-        if(check && event.getFace().getAdjacentY() == 0
-                && event.getPlayer().getItemInHand().getType().isBlock()
+        if(check && packet.getFace().getModY() == 0
+                && data.getPlayer().getItemInHand().getType().isBlock()
                 && data.playerInfo.sprinting) {
             if((buffer+= 4) > 15) {
                 vl++;

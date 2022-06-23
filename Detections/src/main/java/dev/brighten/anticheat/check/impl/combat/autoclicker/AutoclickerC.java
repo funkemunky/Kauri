@@ -1,9 +1,10 @@
 package dev.brighten.anticheat.check.impl.combat.autoclicker;
 
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientAnimation;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerBlockPlacement;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
+import cc.funkemunky.api.io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.math.cond.MaxDouble;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
@@ -25,7 +26,7 @@ public class AutoclickerC extends Check {
     private MaxDouble verbose = new MaxDouble(40);
 
     @Packet
-    public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
+    public void onArm(WrapperPlayClientAnimation packet, long timeStamp) {
         if(data.playerInfo.breakingBlock || data.playerInfo.lookingAtBlock) return;
         cps = 1000D / (timeStamp - lastArm);
         lastArm = timeStamp;
@@ -33,7 +34,7 @@ public class AutoclickerC extends Check {
     }
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
+    public void onFlying(WrapperPlayClientPlayerFlying packet) {
         if(blocked) {
             if(armTicks > 0) {
                 if(armTicks == 1 && cps > 3) {
@@ -51,8 +52,10 @@ public class AutoclickerC extends Check {
     }
 
     @Packet
-    public void onPlace(WrappedInBlockPlacePacket packet) {
-        if(packet.getItemStack() == null || !packet.getItemStack().getType().name().contains("SWORD")) return;
+    public void onPlace(WrapperPlayClientPlayerBlockPlacement packet) {
+        if(packet.getItemStack()
+                .map(i -> SpigotConversionUtil.toBukkitItemStack(i).getType().name().contains("SWORD"))
+                .orElse(false)) return;
         blocked = true;
     }
 }

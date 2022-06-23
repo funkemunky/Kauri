@@ -1,14 +1,13 @@
 package dev.brighten.anticheat.check.impl.combat.killaura;
 
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientAnimation;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
 import cc.funkemunky.api.utils.TickTimer;
-import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import cc.funkemunky.api.utils.world.EntityData;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.check.api.Check;
@@ -35,19 +34,19 @@ public class KillauraH extends Check {
     private final TickTimer lastFlying = new TickTimer(5);
 
     @Packet
-    public void onUse(WrappedInUseEntityPacket packet, int tick) {
+    public void onUse(WrapperPlayClientInteractEntity packet, int tick) {
         didUse = true;
         debug("%s: Did Use", tick);
     }
 
     @Packet
-    public void onArmAnimation(WrappedInArmAnimationPacket packet, int tick) {
+    public void onArmAnimation(WrapperPlayClientAnimation packet, int tick) {
         didArm = true;
         debug("%s: Did Arm", tick);
     }
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet, int tick) {
+    public void onFlying(WrapperPlayClientPlayerFlying packet, int tick) {
        check: {
            if(lastFlying.hasPassed(1)) {
                didUse = didArm = false;

@@ -1,8 +1,9 @@
 package dev.brighten.anticheat.check.impl.combat.hitbox;
 
+import cc.funkemunky.api.Atlas;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
@@ -40,15 +41,20 @@ public class ReachB extends Check {
             EntityType.WITCH, EntityType.COW, EntityType.CREEPER);
 
     @Packet
-    public void onUse(WrappedInUseEntityPacket packet) {
-        if(packet.getAction() == WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK
-                && allowedEntityTypes.contains(packet.getEntity().getType())) {
-            attacks.add(packet.getEntity());
+    public void onUse(WrapperPlayClientInteractEntity packet) {
+        Entity entity = Atlas.getInstance().getWorldInfo(data.getPlayer().getWorld())
+                .getEntityOrLock(packet.getEntityId()).orElse(null);
+
+        if(entity == null) return;
+
+        if(packet.getAction() == WrapperPlayClientInteractEntity.InteractAction.ATTACK
+                && allowedEntityTypes.contains(entity.getType())) {
+            attacks.add(entity);
         }
     }
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
+    public void onFlying(WrapperPlayClientPlayerFlying packet) {
         if(data.playerInfo.creative || data.playerInfo.inVehicle) {
             attacks.clear();
             debug("creative or in vehicle");

@@ -1,7 +1,7 @@
 package dev.brighten.anticheat.check.impl.packet.badpacket;
 
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInSteerVehiclePacket;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -16,10 +16,10 @@ public class BadPacketsH extends Check {
     private boolean exempt;
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long now ) {
+    public void onFlying(WrapperPlayClientPlayerFlying packet, long now ) {
         if(data.playerInfo.creative || data.playerInfo.inVehicle) return;
 
-        if(!packet.isPos() && packet.isLook()) {
+        if(!packet.hasPositionChanged() && packet.hasRotationChanged()) {
             if(data.playerInfo.from.yaw == data.playerInfo.to.yaw
                     && data.playerInfo.from.pitch == data.playerInfo.to.pitch) {
                 if(!exempt && data.playerInfo.lastTeleportTimer.isPassed(1)

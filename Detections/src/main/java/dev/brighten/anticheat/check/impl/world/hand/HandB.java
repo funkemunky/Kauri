@@ -1,7 +1,7 @@
 package dev.brighten.anticheat.check.impl.world.hand;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockDigPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerDigging;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -17,7 +17,7 @@ public class HandB extends Check {
     private long lastFlying;
 
     @Packet
-    public void onDig(WrappedInBlockDigPacket packet, long timeStamp) {
+    public void onDig(WrapperPlayClientPlayerDigging packet, long timeStamp) {
         long delta = timeStamp - lastFlying;
 
         if(!data.lagInfo.lagging && data.lagInfo.lastPacketDrop.isPassed(5) && delta < 10) {
@@ -30,7 +30,7 @@ public class HandB extends Check {
     }
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long current) {
+    public void onFlying(WrapperPlayClientPlayerFlying packet, long current) {
         if(data.playerInfo.lastTeleportTimer.isPassed(0))
             lastFlying = current;
     }

@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.check.impl.combat.aim;
 
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -13,11 +14,11 @@ public class AimH extends Check {
     private double lastHorizontalDistance;
 
     @Packet
-    public void process(final WrappedInFlyingPacket packet, final long current) {
+    public void process(final WrapperPlayClientPlayerFlying packet, final long current) {
         final double horizontalDistance = data.playerInfo.deltaXZ;
 
         // Player moved
-        if (packet.isPos() && !data.playerInfo.doingTeleport) {
+        if (packet.hasPositionChanged() && !data.playerInfo.doingTeleport) {
             final float deltaYaw = Math.abs(data.playerInfo.deltaYaw);
             final float deltaPitch = Math.abs(data.playerInfo.deltaPitch);
 

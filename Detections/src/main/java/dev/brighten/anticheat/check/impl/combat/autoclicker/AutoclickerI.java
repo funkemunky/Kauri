@@ -1,7 +1,7 @@
 package dev.brighten.anticheat.check.impl.combat.autoclicker;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientAnimation;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -18,7 +18,7 @@ public class AutoclickerI extends Check {
     private int buffer;
 
     @Packet
-    public void use(WrappedInArmAnimationPacket packet, long now) {
+    public void use(WrapperPlayClientAnimation packet, long now) {
         long delta = now - lastFlying;
 
         if(delta < 10 && now - lastArm > 30 && data.lagInfo.lastPacketDrop.isPassed(1)) {
@@ -33,7 +33,7 @@ public class AutoclickerI extends Check {
     }
 
     @Packet
-    public void flying(WrappedInFlyingPacket packet, long now) {
+    public void flying(WrapperPlayClientPlayerFlying packet, long now) {
         if(data.playerInfo.lastTeleportTimer.isPassed(0) && now - lastFlying > 30)
         lastFlying = now;
     }

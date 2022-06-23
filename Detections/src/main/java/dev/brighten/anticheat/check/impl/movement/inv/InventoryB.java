@@ -1,7 +1,7 @@
 package dev.brighten.anticheat.check.impl.movement.inv;
 
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutCloseWindowPacket;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Cancellable;
@@ -20,8 +20,8 @@ public class InventoryB extends Check {
     private int verbose;
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
-        if(packet.isPos()
+    public void onFlying(WrapperPlayClientPlayerFlying packet) {
+        if(packet.hasPositionChanged()
                 && data.playerInfo.inventoryOpen
                 && !data.playerInfo.flying
                 && !data.blockInfo.inLava
@@ -34,7 +34,7 @@ public class InventoryB extends Check {
                 vl++;
                 flag("key=[%s], dxz=%s", data.predictionService.key,
                         MathUtils.round(data.playerInfo.deltaXZ, 2));
-                if(cancellable) TinyProtocolHandler.sendPacket(packet.getPlayer(),
+                if(cancellable) TinyProtocolHandler.sendPacket(data.getPlayer(),
                         new WrappedOutCloseWindowPacket(data.playerInfo.inventoryId).getObject());
             }
         } else verbose = 0;

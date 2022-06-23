@@ -1,7 +1,7 @@
 package dev.brighten.anticheat.check.impl.combat.hitbox;
 
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.world.EntityData;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
@@ -30,11 +30,11 @@ public class ReachA extends Check {
     public static double reachThreshold = 3.1;
 
     @Packet
-    public void onUse(WrappedInUseEntityPacket packet) {
+    public void onUse(WrapperPlayClientInteractEntity packet) {
         reachA:
         {
             if (data.playerInfo.creative
-                    || packet.getAction() != WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK
+                    || packet.getAction() != WrapperPlayClientInteractEntity.InteractAction.ATTACK
                     || data.target == null
                     || data.target.getUniqueId() != data.target.getUniqueId()
                     || data.targetPastLocation.previousLocations.size() < 10

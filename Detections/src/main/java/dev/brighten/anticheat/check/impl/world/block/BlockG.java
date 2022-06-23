@@ -1,6 +1,6 @@
 package dev.brighten.anticheat.check.impl.world.block;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
@@ -18,8 +18,8 @@ public class BlockG extends Check {
     private int buffer;
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
-        if(packet.isLook()) {
+    public void onFlying(WrapperPlayClientPlayerFlying packet) {
+        if(packet.hasRotationChanged()) {
             aimCount++;
             rotChange+= Math.abs(data.playerInfo.deltaYaw) + Math.abs(data.playerInfo.deltaPitch);
         }

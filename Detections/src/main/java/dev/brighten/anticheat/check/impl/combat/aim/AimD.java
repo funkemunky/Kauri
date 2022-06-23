@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.check.impl.combat.aim;
 
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.math.cond.MaxDouble;
 import dev.brighten.anticheat.check.api.Check;
@@ -14,8 +15,8 @@ public class AimD extends Check {
     private MaxDouble verbose = new MaxDouble(100);
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
-        if(packet.isLook() && Math.abs(data.playerInfo.deltaPitch) >= 0.5f) {
+    public void onFlying(WrapperPlayClientPlayerFlying packet) {
+        if(packet.hasRotationChanged() && Math.abs(data.playerInfo.deltaPitch) >= 0.5f) {
 
             float shit1 = data.playerInfo.deltaPitch % 0.1f, shit2 = data.playerInfo.deltaPitch % 0.05f;
             if(data.playerInfo.deltaPitch > 0 && Math.abs(data.playerInfo.deltaPitch) < 100

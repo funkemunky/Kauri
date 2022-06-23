@@ -1,14 +1,13 @@
 package dev.brighten.anticheat.check.impl.movement.speed;
 
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import cc.funkemunky.api.reflections.impl.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.MathHelper;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
-import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.api.check.DevStage;
 import org.bukkit.block.Block;
 import org.bukkit.potion.PotionEffectType;
@@ -26,7 +25,7 @@ public class SpeedE extends Check {
     private static float[] VALUES = new float[]{-0.98f, 0f, 0.98f};
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
+    public void onFlying(WrapperPlayClientPlayerFlying packet) {
 
         Block underBlock = BlockUtils.getBlock(data.playerInfo.to
                 .toLocation(data.getPlayer().getWorld())
@@ -42,7 +41,7 @@ public class SpeedE extends Check {
 
         check:
         {
-            if (!packet.isPos()
+            if (!packet.hasPositionChanged()
                     || data.playerInfo.generalCancel
                     || data.playerInfo.onLadder
                     || data.playerInfo.lastEntityCollision.isNotPassed(2)

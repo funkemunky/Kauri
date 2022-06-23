@@ -1,6 +1,6 @@
 package dev.brighten.anticheat.check.impl.movement.nofall;
 
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
@@ -23,16 +23,16 @@ public class NoFallA extends Check {
     private static double divisor = 1. / 64.;
 
     @Packet
-    public void onPacket(WrappedInFlyingPacket packet) {
+    public void onPacket(WrapperPlayClientPlayerFlying packet) {
         if (data.playerInfo.generalCancel
-                || !packet.isPos()
+                || !packet.hasPositionChanged()
                 || (data.playerInfo.deltaXZ == 0 && data.playerInfo.deltaY == 0)
                 || (data.blockInfo.inWater /* && Todo: T1 */)) {
             if(buffer > 0) buffer-= 0.5f;
             return;
         }
 
-        boolean onGround = packet.isGround();
+        boolean onGround = packet.isOnGround();
         boolean flag = false;
 
         if(onGround) {

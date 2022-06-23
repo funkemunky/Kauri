@@ -1,10 +1,10 @@
 package dev.brighten.anticheat.check.impl.packet.timer;
 
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerBlockPlacement;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerPositionAndLook;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInBlockPlacePacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutPositionPacket;
+import cc.funkemunky.api.utils.trans.WrappedServerboundTransactionPacket;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
@@ -26,12 +26,12 @@ public class TimerB extends Check {
     private int buffer;
 
     @Packet
-    public void onTeleport(WrappedOutPositionPacket event) {
+    public void onTeleport(WrapperPlayServerPlayerPositionAndLook event) {
         totalTimer-= 50;
     }
 
     @Packet
-    public void onBlockPlace(WrappedInBlockPlacePacket packet) {
+    public void onBlockPlace(WrapperPlayClientPlayerBlockPlacement packet) {
         //In versions 1.17 and newer, players will send an extra flying when right clicking
         if(data.playerVersion.isOrAbove(ProtocolVersion.v1_17))
         totalTimer-= 50;
@@ -40,10 +40,10 @@ public class TimerB extends Check {
     //Fixes the problem with 1.9 where PacketPlayInFlying isn't always sent by the client and it therefore
     //can infinitely never flag if a user was cheating on a 1.9+ client.
     @Packet
-    public void onTransaction(WrappedInTransactionPacket packet, long now) {
+    public void onTransaction(WrappedServerboundTransactionPacket packet, long now) {
         if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) return;
 
-        Kauri.INSTANCE.keepaliveProcessor.getKeepById(packet.getAction()).ifPresent(ka -> {
+        Kauri.INSTANCE.keepaliveProcessor.getKeepById(packet.getActionId()).ifPresent(ka -> {
             long delta = now - ka.startStamp;
 
             //We want to make sure the player isn't lagging before we reset their timer.
@@ -54,7 +54,7 @@ public class TimerB extends Check {
     }
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet, long now) {
+    public void onFlying(WrapperPlayClientPlayerFlying packet, long now) {
         check: {
             //This means we haven't started counting
             if(totalTimer == -1) {

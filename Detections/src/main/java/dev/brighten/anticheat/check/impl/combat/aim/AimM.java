@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.check.impl.combat.aim;
 
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
@@ -17,8 +18,8 @@ public class AimM extends Check {
     private float buffer;
     private double ldeltaY;
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
-        if(!packet.isLook()) return;
+    public void onFlying(WrapperPlayClientPlayerFlying packet) {
+        if(!packet.hasRotationChanged()) return;
 
         double deltaXY = Math.hypot(data.moveProcessor.deltaX, data.moveProcessor.deltaY);
 
