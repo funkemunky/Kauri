@@ -4,6 +4,7 @@ import cc.funkemunky.api.events.AtlasEvent;
 import cc.funkemunky.api.reflections.types.WrappedClass;
 import cc.funkemunky.api.reflections.types.WrappedMethod;
 import cc.funkemunky.api.tinyprotocol.api.NMSObject;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.*;
 import dev.brighten.anticheat.data.ObjectData;
@@ -32,7 +33,7 @@ public class CheckManager {
      * @param object (packet wrapper) NMSObject
      * @param timeStamp Long time of packet received
      */
-    public void runPacket(NMSObject object, long timeStamp) {
+    public void runPacket(PacketWrapper<?> object, long timeStamp) {
         if(objectData.bypassing) return;
         val methods = checkMethods.get(object.getClass());
 
@@ -57,7 +58,7 @@ public class CheckManager {
         }
     }
 
-    public boolean runPacketCancellable(NMSObject object, long timeStamp) {
+    public boolean runPacketCancellable(PacketWrapper<?> object, long timeStamp) {
         if(objectData.bypassing) return false;
         val methods = checkMethods.get(object.getClass());
 

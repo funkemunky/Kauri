@@ -12,6 +12,15 @@ import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.XMaterial;
 import cc.funkemunky.api.utils.math.IntVector;
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.PacketListenerPriority;
+import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
+import com.github.retrooper.packetevents.util.Vector3i;
+import com.github.retrooper.packetevents.wrapper.play.client.*;
+import com.github.retrooper.packetevents.wrapper.play.server.*;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.listeners.api.impl.KeepaliveAcceptedEvent;
@@ -19,11 +28,14 @@ import dev.brighten.anticheat.processing.thread.ThreadHandler;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.MovementUtils;
 import dev.brighten.api.KauriAPI;
+import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import lombok.val;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import java.security.NoSuchAlgorithmException;
@@ -36,506 +48,462 @@ public class PacketProcessor {
     public static boolean simLag = false;
     public static int amount = 500;
 
-    public static final Set<String> incomingPackets = new HashSet<>(), outgoingPackets = new HashSet<>();
-
     static {
-        new WrappedClass(Packet.Server.class).getFields().forEach(field -> {
-            String packet = field.get(null);
-            outgoingPackets.add(packet);
-        });
 
-        new WrappedClass(Packet.Client.class).getFields().forEach(field -> {
-            String packet = field.get(null);
-            incomingPackets.add(packet);
-        });
-    }
-
-    public final PacketListener listener = Atlas.getInstance().getPacketProcessor()
-            .process(Kauri.INSTANCE, EventPriority.NORMAL, info -> {
-                if(info.isCancelled()) return;
-                ObjectData data = Kauri.INSTANCE.dataManager.getData(info.getPlayer());
+        PacketEvents.getAPI().getEventManager().registerListener(new com.github.retrooper.packetevents.event.PacketListener() {
+            @Override
+            public void onPacketReceive(PacketReceiveEvent event) {
+                ObjectData data = Kauri.INSTANCE.dataManager.getData((Player)event.getPlayer());
 
                 if(data == null || data.checkManager == null) return;
 
                 //Packet exemption check
                 if(KauriAPI.INSTANCE.getPacketExemptedPlayers().contains(data.uuid)) return;
+
+
+                if(data.checkManager.runEvent(event)) event.setCancelled(true);
+
+                if(simLag && event.getPacketType() == PacketType.Play.Client.PLAYER_FLYING) {
+                    IntStream.range(0, amount).forEach(i -> {
+                        try {
+                            SecureRandom.getInstanceStrong().generateSeed(500);
+                        } catch (NoSuchAlgorithmException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                }
+
+                if(event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
+                    WrapperPlayClientInteractEntity packet = new WrapperPlayClientInteractEntity(event);
+
+                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
+                        event.setCancelled(true);
+                    }
+                } else if(event.getPacketType() == PacketType.Play.Client.PLUGIN_MESSAGE) {
+                    WrapperPlayClientPluginMessage packet = new WrapperPlayClientPluginMessage(event);
+
+                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
+                        event.setCancelled(true);
+                    }
+                } else if(event.getPacketType() == PacketType.Play.Client.CLICK_WINDOW) {
+                    WrapperPlayClientClickWindow packet = new WrapperPlayClientClickWindow(event);
+
+                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
+                        event.setCancelled(true);
+                    }
+                } else if(event.getPacketType() == PacketType.Play.Client.PLAYER_FLYING
+                        || event.getPacketType() == PacketType.Play.Client.PLAYER_POSITION
+                        || event.getPacketType() == PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION
+                        || event.getPacketType() == PacketType.Play.Client.PLAYER_ROTATION) {
+                    WrapperPlayClientPlayerFlying packet = new WrapperPlayClientPlayerFlying(event);
+
+                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
+                        event.setCancelled(true);
+                    }
+                } else if(event.getPacketType() == PacketType.Play.Client.CREATIVE_INVENTORY_ACTION) {
+                    WrapperPlayClientCreativeInventoryAction packet = new WrapperPlayClientCreativeInventoryAction(event);
+
+                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
+                        event.setCancelled(true);
+                    }
+                } else if(event.getPacketType() == PacketType.Play.Client.USE_ITEM) {
+                    WrapperPlayClientUseItem packet = new WrapperPlayClientUseItem(event);
+
+                    if (data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
+                        event.setCancelled(true);
+                    }
+                } else if(event.getPacketType() == PacketType.Play.Client.CHAT_MESSAGE) {
+                    WrapperPlayClientChatMessage packet = new WrapperPlayClientChatMessage(event);
+
+                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
+                        event.setCancelled(true);
+                    }
+                }
 
                 ThreadHandler.INSTANCE.getThread(data).runTask(() -> {
                     if (data.checkManager == null) return;
                     try {
-                        if(outgoingPackets.contains(info.getType())) {
-                            processServer(data, info.getPacket(), info.getType(), info.getTimestamp());
-                        } else if(incomingPackets.contains(info.getType())) {
-                            processClient(data, info.getPacket(), info.getType(), info.getTimestamp());
-
-                            if(simLag && info.getType().equals(Packet.Client.FLYING)) {
-                                IntStream.range(0, amount).forEach(i -> {
-                                    try {
-                                        SecureRandom.getInstanceStrong().generateSeed(500);
-                                    } catch (NoSuchAlgorithmException e) {
-                                        e.printStackTrace();
-                                    }
-                                });
-                            }
-                        }
-
-                        if(data.checkManager.runEvent(info)) info.setCancelled(true);
+                        processClient(data, event);
                     } catch(Exception e) {
                         e.printStackTrace();
                     }
                 });
-            });
+            }
 
-    public final PacketListener cancelListener = Atlas.getInstance().getPacketProcessor()
-            .process(Kauri.INSTANCE, EventPriority.LOW, info -> {
-                ObjectData data = Kauri.INSTANCE.dataManager.getData(info.getPlayer());
+            @Override
+            public void onPacketSend(PacketSendEvent event) {
+                ObjectData data = Kauri.INSTANCE.dataManager.getData((Player)event.getPlayer());
 
                 if(data == null || data.checkManager == null) return;
 
                 //Packet exemption check
                 if(KauriAPI.INSTANCE.getPacketExemptedPlayers().contains(data.uuid)) return;
 
-                switch(info.getType()) {
-                    case Packet.Client.USE_ENTITY: {
-                        val packet = new WrappedInUseEntityPacket(info.getPacket(), info.getPlayer());
 
-                        if(data.checkManager.runPacketCancellable(packet, info.getTimestamp())) {
-                            info.setCancelled(true);
-                        }
-                        break;
+                if(data.checkManager.runEvent(event)) event.setCancelled(true);
+
+                if(event.getPacketType() == PacketType.Play.Server.ENTITY_MOVEMENT) {
+                    WrapperPlayServerEntityMovement packet = new WrapperPlayServerEntityMovement(event);
+
+                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
+                        event.setCancelled(true);
                     }
-                    case Packet.Client.CUSTOM_PAYLOAD: {
-                        val packet = new WrappedInCustomPayload(info.getPacket(), info.getPlayer());
+                } else if(event.getPacketType() == PacketType.Play.Server.ENTITY_RELATIVE_MOVE) {
+                    WrapperPlayServerEntityRelativeMove packet = new WrapperPlayServerEntityRelativeMove(event);
 
-                        if(data.checkManager.runPacketCancellable(packet, info.getTimestamp())) {
-                            info.setCancelled(true);
-                        }
-                        break;
+                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
+                        event.setCancelled(true);
                     }
-                    case Packet.Client.WINDOW_CLICK: {
-                        val packet = new WrappedInWindowClickPacket(info.getPacket(), info.getPlayer());
+                } else if(event.getPacketType() == PacketType.Play.Server.ENTITY_RELATIVE_MOVE_AND_ROTATION) {
+                    WrapperPlayServerEntityRelativeMoveAndRotation packet = new WrapperPlayServerEntityRelativeMoveAndRotation(event);
 
-                        if(data.checkManager.runPacketCancellable(packet, info.getTimestamp())) {
-                            info.setCancelled(true);
-                        }
-                        break;
+                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
+                        event.setCancelled(true);
                     }
-                    case Packet.Client.FLYING:
-                    case Packet.Client.POSITION:
-                    case Packet.Client.POSITION_LOOK:
-                    case Packet.Client.LOOK: {
-                        val packet = new WrappedInFlyingPacket(info.getPacket(), info.getPlayer());
+                } else if(event.getPacketType() == PacketType.Play.Server.ENTITY_HEAD_LOOK) {
+                    WrapperPlayServerEntityHeadLook packet = new WrapperPlayServerEntityHeadLook(event);
 
-                        if(data.checkManager.runPacketCancellable(packet, info.getTimestamp())) {
-                            info.setCancelled(true);
-                        }
-                        break;
+                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
+                        event.setCancelled(true);
                     }
-                    case Packet.Client.CREATIVE_SLOT: {
-                        val packet = new WrappedInSetCreativeSlotPacket(info.getPacket(), info.getPlayer());
+                } else if(event.getPacketType() == PacketType.Play.Server.ENTITY_TELEPORT) {
+                    WrapperPlayServerEntityTeleport packet = new WrapperPlayServerEntityTeleport(event);
 
-                        if(data.checkManager.runPacketCancellable(packet, info.getTimestamp())) {
-                            info.setCancelled(true);
-                        }
-                        break;
+                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
+                        event.setCancelled(true);
                     }
-                    case Packet.Server.REL_LOOK:
-                    case Packet.Server.REL_POSITION:
-                    case Packet.Server.REL_POSITION_LOOK:
-                    case Packet.Server.ENTITY:
-                    case Packet.Server.LEGACY_REL_LOOK:
-                    case Packet.Server.LEGACY_REL_POSITION:
-                    case Packet.Server.LEGACY_REL_POSITION_LOOK: {
-                        val packet = new WrappedOutRelativePosition(info.getPacket(), info.getPlayer());
+                } else if(event.getPacketType() == PacketType.Play.Server.PING) {
+                    WrapperPlayServerPing packet = new WrapperPlayServerPing(event);
 
-                        if(data.checkManager.runPacketCancellable(packet, info.getTimestamp())) {
-                            info.setCancelled(true);
-                        }
-                        break;
+                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
+                        event.setCancelled(true);
                     }
-                    case Packet.Server.ENTITY_TELEPORT: {
-                        WrappedOutEntityTeleportPacket packet
-                                = new WrappedOutEntityTeleportPacket(info.getPacket(), data.getPlayer());
+                } else if(event.getPacketType() == PacketType.Play.Server.ENTITY_VELOCITY) {
+                    WrapperPlayServerEntityVelocity packet = new WrapperPlayServerEntityVelocity(event);
 
-                        if(data.checkManager.runPacketCancellable(packet, info.getTimestamp())) {
-                            info.setCancelled(true);
-                        }
-                        break;
-                    }
-                    case Packet.Server.TRANSACTION: {
-                        val packet = new WrappedOutTransaction(info.getPacket(), info.getPlayer());
-
-                        if(data.checkManager.runPacketCancellable(packet, info.getTimestamp())) {
-                            info.setCancelled(true);
-                        }
-                        break;
-                    }
-                    case Packet.Server.ENTITY_VELOCITY: {
-                        val packet = new WrappedOutVelocityPacket(info.getPacket(), info.getPlayer());
-
-                        if(data.checkManager.runPacketCancellable(packet, info.getTimestamp())) {
-                            info.setCancelled(true);
-                        }
-                        break;
-                    }
-                    case Packet.Client.CHAT: {
-                        val packet = new WrappedInChatPacket(info.getPacket(), info.getPlayer());
-
-                        if(data.checkManager.runPacketCancellable(packet, info.getTimestamp())) {
-                            info.setCancelled(true);
-                        }
-                        break;
+                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
+                        event.setCancelled(true);
                     }
                 }
-            }, Packet.Client.FLYING, Packet.Client.POSITION, Packet.Client.CREATIVE_SLOT,
-                    Packet.Client.POSITION_LOOK, Packet.Client.LOOK, Packet.Server.REL_LOOK, Packet.Client.WINDOW_CLICK,
-                    Packet.Client.CUSTOM_PAYLOAD, Packet.Client.CHAT, Packet.Client.ARM_ANIMATION,
-                    Packet.Client.WINDOW_CLICK,
-                    Packet.Server.REL_POSITION, Packet.Server.REL_POSITION_LOOK, Packet.Server.LEGACY_REL_LOOK,
-                    Packet.Server.LEGACY_REL_POSITION, Packet.Server.LEGACY_REL_POSITION_LOOK, Packet.Server.ENTITY,
-                    Packet.Server.TRANSACTION, Packet.Server.ENTITY_VELOCITY, Packet.Server.ENTITY_TELEPORT);
+            }
+        }, PacketListenerPriority.HIGH);
+    }
 
 
-    public void processClient(ObjectData data, Object object, String type,
-                                           long timestamp) {
-        switch (type) {
-            case Packet.Client.ABILITIES: {
-                WrappedInAbilitiesPacket packet = new WrappedInAbilitiesPacket(object, data.getPlayer());
+    public void processClient(ObjectData data, PacketReceiveEvent event) {
+        long timestamp = event.getTimestamp();
+        PacketTypeCommon type = event.getPacketType();
 
-                if(data.playerInfo.canFly)
+        if(type == PacketType.Play.Client.PLAYER_ABILITIES) {
+             WrapperPlayClientPlayerAbilities packet = new WrapperPlayClientPlayerAbilities(event);
+
+            if(data.playerInfo.canFly)
                 data.playerInfo.flying = packet.isFlying();
 
-                data.checkManager.runPacket(packet, timestamp);
-                if(data.sniffing) {
-                    data.sniffedPackets.add(type + ":@:"
-                            + packet.getWalkSpeed() + ";" + packet.getFlySpeed() + ";" + packet.isAllowedFlight()
-                            + ";" + packet.isCreativeMode() + "; " + packet.isInvulnerable() + ";" + packet.isFlying()
-                            + ":@:" + timestamp);
-                }
-                break;
+            data.checkManager.runPacket(packet, timestamp);
+            if(data.sniffing) {
+                data.sniffedPackets.add(type + ":@:"
+                        + packet.getWalkSpeed() + ";" + packet.getFlySpeed() + ";" + packet.isFlightAllowed()
+                        + ";" + packet.isInCreativeMode() + "; " + packet.isInGodMode() + ";" + packet.isFlying()
+                        + ":@:" + timestamp);
             }
-            case Packet.Client.USE_ENTITY: {
-                WrappedInUseEntityPacket packet = new WrappedInUseEntityPacket(object, data.getPlayer());
+        } else if(type == PacketType.Play.Client.INTERACT_ENTITY) {
+            WrapperPlayClientInteractEntity packet = new WrapperPlayClientInteractEntity(event);
 
-                if (packet.getAction().equals(WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK)) {
-                    data.playerInfo.lastAttack.reset();
-                    data.playerInfo.lastAttackTimeStamp = timestamp;
+            Entity entity = Atlas.getInstance().getWorldInfo(data.getPlayer().getWorld())
+                    .getEntityOrLock(packet.getEntityId()).orElse(null);
 
-                    if (packet.getEntity() instanceof LivingEntity) {
-                        if (data.target != null && data.target.getEntityId() != packet.getId()) {
-                            //Resetting location to prevent false positives.
-                            synchronized (data.targetPastLocation.previousLocations) {
-                                data.targetPastLocation.previousLocations.clear();
-                            }
-                            data.playerInfo.lastTargetSwitch.reset();
-                            if (packet.getEntity() instanceof Player) {
-                                data.targetData = Kauri.INSTANCE.dataManager.getData((Player) packet.getEntity());
-                            } else data.targetData = null;
+            if (packet.getAction() == WrapperPlayClientInteractEntity.InteractAction.ATTACK) {
+                data.playerInfo.lastAttack.reset();
+                data.playerInfo.lastAttackTimeStamp = timestamp;
+
+                if (entity instanceof LivingEntity) {
+                    if (data.target != null && data.target.getEntityId() != packet.getEntityId()) {
+                        //Resetting location to prevent false positives.
+                        synchronized (data.targetPastLocation.previousLocations) {
+                            data.targetPastLocation.previousLocations.clear();
                         }
-
-                        if (data.target == null && packet.getEntity() instanceof Player)
-                            data.targetData = Kauri.INSTANCE.dataManager.getData((Player) packet.getEntity());
-                        data.target = (LivingEntity) packet.getEntity();
+                        data.playerInfo.lastTargetSwitch.reset();
+                        if (entity instanceof Player) {
+                            data.targetData = Kauri.INSTANCE.dataManager.getData((Player) entity);
+                        } else data.targetData = null;
                     }
-                    data.predictionService.hit = true;
+
+                    if (data.target == null && entity instanceof Player)
+                        data.targetData = Kauri.INSTANCE.dataManager.getData((Player) entity);
+                    data.target = (LivingEntity) entity;
+                }
+                data.predictionService.hit = true;
+                data.playerInfo.usingItem = false;
+            }
+            if(entity != null)
+                data.checkManager.runPacket(packet, timestamp);
+
+            if(data.sniffing) {
+                data.sniffedPackets.add(type + ":@:" + packet.getEntityId() + ";" + packet.getAction().name()
+                        + ":@:" + timestamp);
+            }
+        } else if(type == PacketType.Play.Client.PLAYER_FLYING
+                || type == PacketType.Play.Client.PLAYER_POSITION
+                || type == PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION
+                || type == PacketType.Play.Client.PLAYER_ROTATION) {
+            WrapperPlayClientPlayerFlying packet = new WrapperPlayClientPlayerFlying(event);
+            if(data.playerVersion.isOrAbove(ProtocolVersion.v1_17)
+                    && packet.hasPositionChanged() && packet.hasRotationChanged()
+                    && MiscUtils.isSameLocation(new KLocation(packet.getLocation().getX(),
+                            packet.getLocation().getY(), packet.getLocation().getZ()),
+                    data.playerInfo.to)) {
+                data.excuseNextFlying = true;
+            }
+
+            data.entityLocationProcessor.onFlying();
+
+            if(!data.excuseNextFlying) {
+                if (timestamp - data.lagInfo.lastFlying <= 15) {
+                    data.lagInfo.lastPacketDrop.reset();
+                }
+
+                data.playerInfo.checkMovement = MovementUtils.checkMovement(data.playerConnection);
+                data.lagInfo.lastFlying = timestamp;
+                data.potionProcessor.onFlying(packet);
+                data.moveProcessor.process(packet, timestamp);
+                data.predictionService.onReceive(packet); //Processing for prediction service.
+
+                data.checkManager.runPacket(packet, timestamp);
+                data.playerInfo.lastFlyingTimer.reset();
+            }
+
+            if(data.sniffing) {
+                data.sniffedPackets.add(type + ":@:"
+                        + packet.getLocation().getX() + ";" + packet.getLocation().getY() + ";"
+                        + packet.getLocation().getZ() + ";" + packet.getLocation().getYaw() + ";"
+                        + packet.getLocation().getPitch() + ";" + packet.isOnGround() +  ":@:" + timestamp);
+            }
+
+            data.excuseNextFlying = false;
+            data.playerInfo.lsneaking = data.playerInfo.sneaking;
+
+            data.lastFlying = new KLocation(packet.getLocation().getX(), packet.getLocation().getY(),
+                    packet.getLocation().getZ());
+        } else if(type == PacketType.Play.Client.ENTITY_ACTION) {
+            WrapperPlayClientEntityAction packet = new WrapperPlayClientEntityAction(event);
+
+            ActionProcessor.process(data, packet);
+            data.checkManager.runPacket(packet, timestamp);
+
+            //MiscUtils.testMessage(data.getPlayer().getName() + ": " + packet.getAction());
+            if(data.sniffing) {
+                data.sniffedPackets.add(type + ":@:" + packet.getAction().name()
+                        + ":@:" + timestamp);
+            }
+        } else if(type == PacketType.Play.Client.PLAYER_DIGGING) {
+            WrapperPlayClientPlayerDigging packet = new WrapperPlayClientPlayerDigging(event);
+
+            data.playerInfo.lastBlockDigPacket.reset();
+            switch (packet.getAction()) {
+                case START_DIGGING: {
                     data.playerInfo.usingItem = false;
+                    break;
                 }
-                if(packet.getEntity() != null)
-                data.checkManager.runPacket(packet, timestamp);
-
-                if(data.sniffing) {
-                    data.sniffedPackets.add(type + ":@:" + packet.getId() + ";" + packet.getAction().name()
-                            + ":@:" + timestamp);
+                case FINISHED_DIGGING: {
+                    data.playerInfo.usingItem = false;
+                    break;
                 }
-                break;
+                case CANCELLED_DIGGING: {
+                    data.playerInfo.usingItem = false;
+                    break;
+                }
+                case RELEASE_USE_ITEM: {
+                    data.playerInfo.usingItem = false;
+                    break;
+                }
+                case DROP_ITEM_STACK:
+                case DROP_ITEM: {
+                    data.playerInfo.usingItem = false;
+                    data.predictionService.dropItem = true;
+                    break;
+                }
             }
-            case Packet.Client.FLYING:
-            case Packet.Client.POSITION:
-            case Packet.Client.POSITION_LOOK:
-            case Packet.Client.LOOK: {
-                WrappedInFlyingPacket packet = new WrappedInFlyingPacket(object, data.getPlayer());
-
-                if(data.playerVersion.isOrAbove(ProtocolVersion.v1_17)
-                        && packet.isPos() && packet.isLook()
-                        && MiscUtils.isSameLocation(new KLocation(packet.getX(), packet.getY(), packet.getZ()),
-                        data.playerInfo.to)) {
-                    data.excuseNextFlying = true;
-                }
-
-                data.entityLocationProcessor.onFlying();
-
-                if(!data.excuseNextFlying) {
-                    if (timestamp - data.lagInfo.lastFlying <= 15) {
-                        data.lagInfo.lastPacketDrop.reset();
-                    }
-
-                    data.playerInfo.checkMovement = MovementUtils.checkMovement(data.playerConnection);
-                    data.lagInfo.lastFlying = timestamp;
-                    data.potionProcessor.onFlying(packet);
-                    data.moveProcessor.process(packet, timestamp);
-                    data.predictionService.onReceive(packet); //Processing for prediction service.
-
-                    data.checkManager.runPacket(packet, timestamp);
-                    data.playerInfo.lastFlyingTimer.reset();
-                }
-
-                if(data.sniffing) {
-                    data.sniffedPackets.add(type + ":@:"
-                            + packet.getX() + ";" + packet.getY() + ";" + packet.getZ() + ";"
-                            + packet.getYaw() + ";" + packet.getPitch() + ";" + packet.isGround()
-                            +  ":@:" + timestamp);
-                }
-
-                data.excuseNextFlying = false;
-                data.playerInfo.lsneaking = data.playerInfo.sneaking;
-
-                data.lastFlying = new KLocation(packet.getX(), packet.getY(), packet.getZ());
-                break;
+            if(data.sniffing) {
+                data.sniffedPackets.add(type + ":@:" +
+                        packet.getAction().name() + ";" + packet.getFace().name() + ";"
+                        + "(" + packet.getBlockPosition().getX() + ","
+                        + packet.getBlockPosition().getY() + "," + packet.getBlockPosition().getZ() + ")"
+                        + ":@:" + timestamp);
             }
-            case Packet.Client.ENTITY_ACTION: {
-                WrappedInEntityActionPacket packet = new WrappedInEntityActionPacket(object, data.getPlayer());
+            data.checkManager.runPacket(packet, timestamp);
+        } else if (type == PacketType.Play.Client.PLAYER_BLOCK_PLACEMENT) {
+            WrapperPlayClientPlayerBlockPlacement packet = new WrapperPlayClientPlayerBlockPlacement(event);
 
-                ActionProcessor.process(data, packet);
-                data.checkManager.runPacket(packet, timestamp);
+            ItemStack bukkitStack = packet.getItemStack().map(SpigotConversionUtil::toBukkitItemStack)
+                    .orElse(null);
 
-                //MiscUtils.testMessage(data.getPlayer().getName() + ": " + packet.getAction());
-                if(data.sniffing) {
-                    data.sniffedPackets.add(type + ":@:" + packet.getAction().name()
-                            + ":@:" + timestamp);
+            data.playerInfo.lastBlockPlacePacket.reset();
+
+            if (data.getPlayer().getItemInHand() != null) {
+                if (data.getPlayer().getItemInHand().getType().name().contains("BUCKET")) {
+                    data.playerInfo.lastPlaceLiquid.reset();
                 }
-                break;
-            }
-            case Packet.Client.BLOCK_DIG: {
-                WrappedInBlockDigPacket packet = new WrappedInBlockDigPacket(object, data.getPlayer());
+                Vector3i pos = packet.getBlockPosition();
 
-                data.playerInfo.lastBlockDigPacket.reset();
-                switch (packet.getAction()) {
-                    case START_DESTROY_BLOCK: {
-                        data.playerInfo.usingItem = false;
-                        break;
-                    }
-                    case STOP_DESTROY_BLOCK: {
-                        data.playerInfo.usingItem = false;
-                        break;
-                    }
-                    case ABORT_DESTROY_BLOCK: {
-                        data.playerInfo.usingItem = false;
-                        break;
-                    }
-                    case RELEASE_USE_ITEM: {
-                        data.playerInfo.usingItem = false;
-                        break;
-                    }
-                    case DROP_ALL_ITEMS:
-                    case DROP_ITEM: {
-                        data.playerInfo.usingItem = false;
-                        data.predictionService.dropItem = true;
-                        break;
-                    }
-                }
-                if(data.sniffing) {
-                    data.sniffedPackets.add(type + ":@:" +
-                            packet.getAction().name() + ";" + packet.getDirection().name() + ";"
-                            + "(" + packet.getPosition().getX() + ","
-                            + packet.getPosition().getY() + "," + packet.getPosition().getZ() + ")"
-                            + ":@:" + timestamp);
-                }
-                data.checkManager.runPacket(packet, timestamp);
-                break;
-            }
-            case Packet.Client.BLOCK_PLACE: {
-                WrappedInBlockPlacePacket packet = new WrappedInBlockPlacePacket(object, data.getPlayer());
-
-                data.playerInfo.lastBlockPlacePacket.reset();
-                if (data.getPlayer().getItemInHand() != null) {
-                    if(data.getPlayer().getItemInHand().getType().name().contains("BUCKET")) {
-                        data.playerInfo.lastPlaceLiquid.reset();
-                    }
-                    IntVector pos = packet.getBlockPosition();
-                    val stack = packet.getItemStack();
-
-                    if(pos.getX() == -1 && (pos.getY() == 255 || pos.getY() == -1)
-                            && pos.getZ() == -1 && stack != null
-                            && (stack.getType().name().contains("SWORD")
-                            || stack.getType().equals(XMaterial.BOW.parseMaterial()))) {
+                if (bukkitStack != null) {
+                    if (pos.getX() == -1 && (pos.getY() == 255 || pos.getY() == -1)
+                            && pos.getZ() == -1
+                            && (bukkitStack.getType().name().contains("SWORD")
+                            || bukkitStack.getType().equals(XMaterial.BOW.parseMaterial()))) {
                         data.playerInfo.usingItem = true;
                         data.playerInfo.lastUseItem.reset();
-                    } else if(stack != null) {
-                        if(stack.getType().isBlock() && stack.getType().getId() != 0) {
-                            data.playerInfo.lastBlockPlace.reset();
-                            Location loc = new Location(
-                                    data.getPlayer().getWorld(), pos.getX(), pos.getY(), pos.getZ());
+                    } else if (bukkitStack.getType().isBlock() && bukkitStack.getType().getId() != 0) {
+                        data.playerInfo.lastBlockPlace.reset();
+                        Location loc = new Location(
+                                data.getPlayer().getWorld(), pos.getX(), pos.getY(), pos.getZ());
 
-                            data.playerInfo.shitMap.put(loc, stack.getType());
+                        data.playerInfo.shitMap.put(loc, bukkitStack.getType());
 
-                            RunUtils.taskLater(() -> data.runKeepaliveAction(ka -> {
-                                data.playerInfo.shitMap.remove(loc);
-                            }), 1);
-                           // MiscUtils.testMessage(data.getPlayer().getItemInHand().getType().name());
+                        RunUtils.taskLater(() -> data.runKeepaliveAction(ka -> {
+                            data.playerInfo.shitMap.remove(loc);
+                        }), 1);
+                        // MiscUtils.testMessage(data.getPlayer().getItemInHand().getType().name());
+                    }
+                }
+            }
+
+            data.checkManager.runPacket(packet, timestamp);
+
+            if (data.sniffing) {
+                data.sniffedPackets.add(type + ":@:" +
+                        (bukkitStack != null ? bukkitStack.getType().name() : "")
+                        + ";(" + packet.getBlockPosition().getX() + ","
+                        + packet.getBlockPosition().getY() + "," + packet.getBlockPosition().getZ() + ");"
+                        + packet.getFace().name() + ";"
+                        + packet.getCursorPosition().getX() + "," + packet.getCursorPosition().getY()
+                        + "," + packet.getCursorPosition().getZ()
+                        + ":@:" + timestamp);
+            }
+        } else if(type == PacketType.Play.Client.KEEP_ALIVE) {
+            WrapperPlayClientKeepAlive packet = new WrapperPlayClientKeepAlive(event);
+
+            long id = packet.getId();
+
+            if(data.keepAlives.containsKey(id)) {
+                long last = data.keepAlives.get(id);
+
+                data.lagInfo.lastPing = data.lagInfo.ping;
+                data.lagInfo.ping = timestamp - last;
+
+                data.lagInfo.pingAverages.add(data.lagInfo.ping);
+                data.lagInfo.averagePing = Math.round(data.lagInfo.pingAverages.getAverage());
+            }
+
+            data.checkManager.runPacket(packet, timestamp);
+            if(data.sniffing) {
+                data.sniffedPackets.add(type + ":@:" + id + ":@:" + timestamp);
+            }
+        } else if(type == PacketType.Play.Client.ADVANCEMENT_TAB) {
+            WrapperPlayClientAdvancementTab packet = new WrapperPlayClientAdvancementTab(event);
+
+            if(packet.getAction() == WrapperPlayClientAdvancementTab.Action.OPENED_TAB) {
+                data.playerInfo.inventoryOpen = true;
+            }
+
+            data.checkManager.runPacket(packet, timestamp);
+
+            if(data.sniffing) {
+                data.sniffedPackets.add(type + ":@:" + packet.getAction().name()
+                        + ":@:" + timestamp);
+            }
+        } else if(type == PacketType.Play.Client.PONG) {
+            WrapperPlayClientPong packet = new WrapperPlayClientPong(event);
+
+            long id = packet.getId();
+
+            if(Kauri.INSTANCE.keepaliveProcessor.keepAlives.getIfPresent((int)id) != null) {
+                Kauri.INSTANCE.keepaliveProcessor.addResponse(data, packet.getId());
+
+                val optional = Kauri.INSTANCE.keepaliveProcessor.getResponse(data);
+
+                long current = Kauri.INSTANCE.keepaliveProcessor.tick;
+
+                optional.ifPresent(ka -> {
+                    data.playerTicks++;
+                    data.lagInfo.lastTransPing = data.lagInfo.transPing;
+                    data.lagInfo.transPing = (int)(current - ka.start);
+
+                    if(data.instantTransaction.size() > 0) {
+                        synchronized (data.instantTransaction) {
+                            Deque<Short> toRemove = new LinkedList<>();
+                            data.instantTransaction.forEach((key, tuple) -> {
+                                if((timestamp - tuple.one.getStamp()) > data.lagInfo.transPing * 52L + 750L) {
+                                    tuple.two.accept(tuple.one);
+                                    toRemove.add(key);
+                                }
+                            });
+                            Short key = null;
+                            while((key = toRemove.poll()) != null) {
+                                data.instantTransaction.remove(key);
+                            }
                         }
                     }
-                }
-                if(data.sniffing) {
-                    data.sniffedPackets.add(type + ":@:" +
-                            (packet.getItemStack() != null ? packet.getItemStack().toString() : "NULL")
-                            + ";(" + packet.getBlockPosition().getX() + ","
-                            + packet.getBlockPosition().getY() + "," + packet.getBlockPosition().getZ() + ");"
-                            + packet.getFace().name() + ";"
-                            + packet.getVecX() + "," + packet.getVecY() + "," + packet.getVecZ()
-                            + ":@:" + timestamp);
-                }
 
-                data.checkManager.runPacket(packet, timestamp);
-                break;
-            }
-            case Packet.Client.KEEP_ALIVE: {
-                WrappedInKeepAlivePacket packet = new WrappedInKeepAlivePacket(object, data.getPlayer());
-
-                long time = packet.getTime();
-
-                if(data.keepAlives.containsKey(time)) {
-                    long last = data.keepAlives.get(time);
-
-                    data.lagInfo.lastPing = data.lagInfo.ping;
-                    data.lagInfo.ping = timestamp - last;
-
-                    data.lagInfo.pingAverages.add(data.lagInfo.ping);
-                    data.lagInfo.averagePing = Math.round(data.lagInfo.pingAverages.getAverage());
-                }
-
-                data.checkManager.runPacket(packet, timestamp);
-                if(data.sniffing) {
-                    data.sniffedPackets.add(type + ":@:" + time + ":@:" + timestamp);
-                }
-                break;
-            }
-            case Packet.Client.CLIENT_COMMAND: {
-                WrappedInClientCommandPacket packet = new WrappedInClientCommandPacket(object, data.getPlayer());
-
-                if(packet.getCommand()
-                        .equals(WrappedInClientCommandPacket.EnumClientCommand.OPEN_INVENTORY_ACHIEVEMENT)) {
-                    data.playerInfo.inventoryOpen = true;
-                }
-
-                data.checkManager.runPacket(packet, timestamp);
-
-                if(data.sniffing) {
-                    data.sniffedPackets.add(type + ":@:" + packet.getCommand().name()
-                            + ":@:" + timestamp);
-                }
-                break;
-            }
-            case Packet.Client.TRANSACTION: {
-                WrappedInTransactionPacket packet = new WrappedInTransactionPacket(object, data.getPlayer());
-
-                if(packet.getId() == 0) {
-                    if(Kauri.INSTANCE.keepaliveProcessor.keepAlives.getIfPresent(packet.getAction()) != null) {
-                        Kauri.INSTANCE.keepaliveProcessor.addResponse(data, packet.getAction());
-
-                        val optional = Kauri.INSTANCE.keepaliveProcessor.getResponse(data);
-
-                        int current = Kauri.INSTANCE.keepaliveProcessor.tick;
-
-                        optional.ifPresent(ka -> {
-                            data.playerTicks++;
-                            data.lagInfo.lastTransPing = data.lagInfo.transPing;
-                            data.lagInfo.transPing = (current - ka.start);
-
-                            if(data.instantTransaction.size() > 0) {
-                                synchronized (data.instantTransaction) {
-                                    Deque<Short> toRemove = new LinkedList<>();
-                                    data.instantTransaction.forEach((key, tuple) -> {
-                                        if((timestamp - tuple.one.getStamp()) > data.lagInfo.transPing * 52L + 750L) {
-                                            tuple.two.accept(tuple.one);
-                                            toRemove.add(key);
-                                        }
-                                    });
-                                    Short key = null;
-                                    while((key = toRemove.poll()) != null) {
-                                        data.instantTransaction.remove(key);
-                                    }
-                                }
-                            }
-
-                            if (Math.abs(data.lagInfo.lastTransPing - data.lagInfo.transPing) > 1) {
-                                data.lagInfo.lastPingDrop.reset();
-                            }
-                            data.clickProcessor.onFlying(packet);
-
-                            ka.getReceived(data.uuid).ifPresent(r -> {
-                                r.receivedStamp = data.lagInfo.recieved = timestamp;
-                                data.lagInfo.lmillisPing = data.lagInfo.millisPing;
-                                data.lagInfo.millisPing = r.receivedStamp - (data.lagInfo.start = ka.startStamp);
-                            });
-
-                            KeepaliveAcceptedEvent e = Kauri.INSTANCE.eventHandler
-                                    .runEvent(new KeepaliveAcceptedEvent(data, ka));
-
-                            for (ObjectData.Action action : data.keepAliveStamps) {
-                                if (action.stamp > ka.start) continue;
-
-                                action.action.accept(ka);
-
-                                data.keepAliveStamps.remove(action);
-                            }
-                        });
-                        data.lagInfo.lastClientTrans = timestamp;
-                    } else {
-                        Optional.ofNullable(data.instantTransaction.remove(packet.getAction()))
-                                .ifPresent(t -> t.two.accept(t.one));
+                    if (Math.abs(data.lagInfo.lastTransPing - data.lagInfo.transPing) > 1) {
+                        data.lagInfo.lastPingDrop.reset();
                     }
-                }
+                    data.clickProcessor.onFlying();
 
-                data.checkManager.runPacket(packet, timestamp);
-                if(data.sniffing) {
-                    data.sniffedPackets.add(type + ":@:" + packet.getAction() + ";" + packet.getId()
-                            + ":@:" + timestamp);
-                }
-                break;
-            }
-            case Packet.Client.ARM_ANIMATION: {
-                WrappedInArmAnimationPacket packet = new WrappedInArmAnimationPacket(object, data.getPlayer());
+                    ka.getReceived(data.uuid).ifPresent(r -> {
+                        r.receivedStamp = data.lagInfo.recieved = timestamp;
+                        data.lagInfo.lmillisPing = data.lagInfo.millisPing;
+                        data.lagInfo.millisPing = r.receivedStamp - (data.lagInfo.start = ka.startStamp);
+                    });
 
-                data.clickProcessor.onArm(packet, timestamp);
-                data.checkManager.runPacket(packet, timestamp);
-                if(data.sniffing) {
-                    data.sniffedPackets.add(type + ":@:" + timestamp);
-                }
-                break;
-            }
-            case Packet.Client.SETTINGS: {
-                WrappedInSettingsPacket packet = new WrappedInSettingsPacket(object, data.getPlayer());
+                    KeepaliveAcceptedEvent e = Kauri.INSTANCE.eventHandler
+                            .runEvent(new KeepaliveAcceptedEvent(data, ka));
 
-                data.checkManager.runPacket(packet, timestamp);
-                break;
-            }
-            case Packet.Client.HELD_ITEM_SLOT: {
-                WrappedInHeldItemSlotPacket packet = new WrappedInHeldItemSlotPacket(object, data.getPlayer());
+                    for (ObjectData.Action action : data.keepAliveStamps) {
+                        if (action.stamp > ka.start) continue;
 
-                data.playerInfo.usingItem = false;
-                data.checkManager.runPacket(packet, timestamp);
-                if(data.sniffing) {
-                    data.sniffedPackets.add(type + ":@:" +
-                           packet.getSlot()
-                            + ":@:" + timestamp);
-                }
-                break;
-            }
-            case Packet.Client.TAB_COMPLETE: {
-                WrappedInTabComplete packet = new WrappedInTabComplete(object, data.getPlayer());
+                        action.action.accept(ka);
 
-                if(packet.getMessage().startsWith("/yourmom")) {
-                    WrappedOutTabComplete tabComplete;
-                    if(ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_13)) {
-                        tabComplete = new WrappedOutTabComplete(0, packet.getMessage(), "gay", "homo");
-                    } else {
-                        tabComplete = new WrappedOutTabComplete("gay", "homo");
+                        data.keepAliveStamps.remove(action);
                     }
-
-                    TinyProtocolHandler.sendPacket(data.getPlayer(), tabComplete.getObject());
-                }
-                break;
+                });
+                data.lagInfo.lastClientTrans = timestamp;
+            } else {
+                Optional.ofNullable(data.instantTransaction.remove((int)packet.getId()))
+                        .ifPresent(t -> t.two.accept(t.one));
             }
+
+            data.checkManager.runPacket(packet, timestamp);
+            if(data.sniffing) {
+                data.sniffedPackets.add(type + ":@:" + packet.getId()
+                        + ":@:" + timestamp);
+            }
+        } else if(type == PacketType.Play.Client.ANIMATION) {
+            WrapperPlayClientAnimation packet = new WrapperPlayClientAnimation(event);
+
+            data.clickProcessor.onArm(packet, timestamp);
+            data.checkManager.runPacket(packet, timestamp);
+            if(data.sniffing) {
+                data.sniffedPackets.add(type + ":@:" + timestamp);
+            }
+        } else if(type == PacketType.Play.Client.CLIENT_SETTINGS) {
+            WrapperPlayClientSettings packet = new WrapperPlayClientSettings(event);
+
+            data.checkManager.runPacket(packet, timestamp);
+        } else if(type == PacketType.Play.Client.HELD_ITEM_CHANGE) {
+            WrapperPlayClientHeldItemChange packet = new WrapperPlayClientHeldItemChange(event);
+
+            data.playerInfo.usingItem = false;
+            data.checkManager.runPacket(packet, timestamp);
+            if(data.sniffing) {
+                data.sniffedPackets.add(type + ":@:" +
+                        packet.getSlot()
+                        + ":@:" + timestamp);
+            }
+        }
+
+
+        switch (type) {
             case Packet.Client.CUSTOM_PAYLOAD: {
                 WrappedInCustomPayload packet = new WrappedInCustomPayload(object, data.getPlayer());
 

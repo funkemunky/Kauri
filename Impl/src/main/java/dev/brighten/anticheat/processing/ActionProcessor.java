@@ -1,11 +1,12 @@
 package dev.brighten.anticheat.processing;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInEntityActionPacket;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientEntityAction;
 import dev.brighten.anticheat.data.ObjectData;
 
 public class ActionProcessor {
 
-    public static void process(ObjectData data, WrappedInEntityActionPacket packet) {
+    public static void process(ObjectData data, WrapperPlayClientEntityAction packet) {
         switch(packet.getAction()) {
             case START_SNEAKING:
                 data.playerInfo.sneaking = true;
@@ -15,10 +16,10 @@ public class ActionProcessor {
                 data.playerInfo.sneaking = false;
                 data.predictionService.sneaking = false;
                 break;
-            case START_RIDING_JUMP:
+            case START_JUMPING_WITH_HORSE:
                 data.playerInfo.ridingJump = true;
                 break;
-            case STOP_RIDING_JUMP:
+            case STOP_JUMPING_WITH_HORSE:
                 data.playerInfo.ridingJump = false;
                 break;
             case START_SPRINTING:

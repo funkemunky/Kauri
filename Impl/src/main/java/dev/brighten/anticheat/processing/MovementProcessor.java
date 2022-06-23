@@ -9,6 +9,7 @@ import cc.funkemunky.api.utils.objects.VariableValue;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import cc.funkemunky.api.utils.world.types.RayCollision;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.listeners.api.impl.KeepaliveAcceptedEvent;
@@ -89,7 +90,7 @@ public class MovementProcessor {
         data.playerInfo.doingTeleport = data.playerInfo.inventoryOpen  = false;
     }
 
-    public void process(WrappedInFlyingPacket packet, long timeStamp) {
+    public void process(WrapperPlayClientPlayerFlying packet, long timeStamp) {
         if(data.playerInfo.checkMovement) data.playerInfo.moveTicks++;
         else {
             data.playerInfo.moveTicks = 0;
@@ -117,12 +118,13 @@ public class MovementProcessor {
         //We check if it's null and intialize the from and to as equal to prevent large deltas causing false positives since there
         //was no previous from (Ex: delta of 380 instead of 0.45 caused by jump jump in location from 0,0,0 to 380,0,0)
 
+        com.github.retrooper.packetevents.protocol.world.Location loc = packet.getLocation();
         if(data.playerInfo.moveTicks > 0) {
 
-            if (data.playerInfo.from == null && packet.isPos()) {
+            if (data.playerInfo.from == null && packet.hasPositionChanged()) {
                 data.playerInfo.from
                         = data.playerInfo.to
-                        = new KLocation(packet.getX(), packet.getY(), packet.getZ(), packet.getYaw(), packet.getPitch(), timeStamp);
+                        = new KLocation(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch(), timeStamp);
             } else {
                 data.playerInfo.from = new KLocation(
                         data.playerInfo.to.x,
@@ -135,12 +137,12 @@ public class MovementProcessor {
 
             //We set the to x,y,z like this to prevent inaccurate data input. Because if it isnt a positional packet,
             // it returns getX, getY, getZ as 0.
-            if (packet.isPos()) {
-                data.playerInfo.to.x = packet.getX();
-                data.playerInfo.to.y = packet.getY();
-                data.playerInfo.to.z = packet.getZ();
+            if (packet.hasPositionChanged()) {
+                data.playerInfo.to.x = loc.getX();
+                data.playerInfo.to.y = loc.getY();
+                data.playerInfo.to.z = loc.getZ();
                 //if this is the case, this assumes client movement in between therefore we have to calculate where ground would be.
-            } else if(packet.isGround() && !data.playerInfo.clientGround) { //this is the last ground
+            } else if(packet.isOnGround() && !data.playerInfo.clientGround) { //this is the last ground
                 synchronized (data.blockInfo.belowCollisions) {
                     val optional = data.blockInfo.belowCollisions.stream()
                             .filter(box -> Math.pow(box.yMax - data.playerInfo.to.y, 2) <= 9.0E-4D && data.box.copy()
@@ -162,7 +164,7 @@ public class MovementProcessor {
             data.playerInfo.to.timeStamp = timeStamp;
 
             data.playerInfo.lClientGround = data.playerInfo.clientGround;
-            data.playerInfo.clientGround = packet.isGround();
+            data.playerInfo.clientGround = packet.isOnGround();
             //Setting the motion delta for use in checks to prevent repeated functions.
             data.playerInfo.lDeltaX = data.playerInfo.deltaX;
             data.playerInfo.lDeltaY = data.playerInfo.deltaY;
@@ -177,14 +179,14 @@ public class MovementProcessor {
             data.playerInfo.blockBelow = BlockUtils.getBlock(data.playerInfo.to.toLocation(data.getPlayer().getWorld())
                     .subtract(0, 1, 0));
 
-            if(packet.isPos()) {
+            if(packet.hasPositionChanged()) {
                 //We create a separate from BoundingBox for the predictionService since it should operate on pre-motion data.
                 data.box = PlayerSizeHandler.instance.bounds(data.getPlayer(),
                         data.playerInfo.to.x, data.playerInfo.to.y, data.playerInfo.to.z);
                 data.playerInfo.lastMoveTimer.reset();
 
                 //Looking for teleport packets
-                if(packet.isLook() && !data.playerInfo.clientGround) {
+                if(packet.hasRotationChanged() && !data.playerInfo.clientGround) {
                     synchronized (data.playerInfo.posLocs) {
                         Iterator<KLocation> iterator = data.playerInfo.posLocs.iterator();
 
@@ -211,7 +213,7 @@ public class MovementProcessor {
             }
             data.blockInfo.runCollisionCheck();
 
-            if(packet.isPos() || packet.isLook()) {
+            if(packet.hasPositionChanged() || packet.hasRotationChanged()) {
                 KLocation origin = data.playerInfo.to.clone();
                 origin.y+= data.playerInfo.sneaking ? 1.54f : 1.62f;
                 RayCollision collision = new RayCollision(origin.toVector(), MathUtils.getDirection(origin));
@@ -257,7 +259,7 @@ public class MovementProcessor {
         } else data.playerInfo.calcVelocityZ = 0;
 
         //Setting player's previous locations
-        if(packet.isPos() && !data.playerInfo.doingTeleport & !data.playerInfo.canFly && !data.playerInfo.creative
+        if(packet.hasPositionChanged() && !data.playerInfo.doingTeleport & !data.playerInfo.canFly && !data.playerInfo.creative
                 && !data.playerInfo.inVehicle && timeStamp - data.creation > 500L) {
 
             synchronized (data.pastLocations) { //To prevent ConcurrentModificationExceptions
@@ -293,9 +295,9 @@ public class MovementProcessor {
 
             //We set the yaw and pitch like this to prevent inaccurate data input. Like above, it will return both pitch
             //and yaw as 0 if it isnt a look packet.
-            if(packet.isLook()) {
-                data.playerInfo.to.yaw = packet.getYaw();
-                data.playerInfo.to.pitch = packet.getPitch();
+            if(packet.hasRotationChanged()) {
+                data.playerInfo.to.yaw = loc.getYaw();
+                data.playerInfo.to.pitch = loc.getPitch();
             }
 
             //Setting the angle delta for use in checks to prevent repeated functions.
@@ -305,7 +307,7 @@ public class MovementProcessor {
                     - data.playerInfo.from.yaw;
             data.playerInfo.deltaPitch = data.playerInfo.to.pitch - data.playerInfo.from.pitch;
 
-            if (packet.isLook()) {
+            if (packet.hasRotationChanged()) {
                 float deltaYaw = Math.abs(data.playerInfo.deltaYaw), lastDeltaYaw = Math.abs(data.playerInfo.lDeltaYaw);
                 final double differenceYaw = Math.abs(data.playerInfo.deltaYaw - lastDeltaYaw);
                 final double differencePitch = Math.abs(data.playerInfo.deltaPitch - data.playerInfo.lDeltaPitch);
@@ -519,7 +521,7 @@ public class MovementProcessor {
                 .getBlockBox().isRiptiding(data.getPlayer());
         /* We only set the jumpheight on ground since there's no need to check for it while they're in the air.
          * If we did check while it was in the air, there would be false positives in the checks that use it. */
-        if (packet.isGround() || data.playerInfo.serverGround || data.playerInfo.lClientGround) {
+        if (packet.isOnGround() || data.playerInfo.serverGround || data.playerInfo.lClientGround) {
             data.playerInfo.jumpHeight = MovementUtils.getJumpHeight(data);
             data.playerInfo.totalHeight = MovementUtils.getTotalHeight(data.playerVersion,
                     (float)data.playerInfo.jumpHeight);
@@ -536,7 +538,7 @@ public class MovementProcessor {
                 || timeStamp - Kauri.INSTANCE.lastTick >
                 new VariableValue<>(110, 60, ProtocolVersion::isPaper).get();
 
-        if (packet.isPos()) {
+        if (packet.hasPositionChanged()) {
             if (data.playerInfo.serverGround && data.playerInfo.groundTicks > 4)
                 data.playerInfo.groundLoc = data.playerInfo.to;
         }

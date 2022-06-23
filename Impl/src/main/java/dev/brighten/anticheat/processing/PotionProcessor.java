@@ -2,6 +2,7 @@ package dev.brighten.anticheat.processing;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutEntityEffectPacket;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import dev.brighten.anticheat.data.ObjectData;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -18,9 +19,9 @@ public class PotionProcessor {
 
     public List<PotionEffect> potionEffects = new CopyOnWriteArrayList<>();
 
-    public void onFlying(WrappedInFlyingPacket packet) {
+    public void onFlying(WrapperPlayClientPlayerFlying packet) {
         for (PotionEffect effect : potionEffects) {
-            if(packet.getPlayer().hasPotionEffect(effect.getType())) continue;
+            if(data.getPlayer().hasPotionEffect(effect.getType())) continue;
 
             data.runKeepaliveAction(d -> data.potionProcessor.potionEffects.remove(effect));
         }

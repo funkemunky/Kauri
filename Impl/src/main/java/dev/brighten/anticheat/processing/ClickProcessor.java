@@ -5,6 +5,8 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInTransactionPacket;
 import cc.funkemunky.api.utils.TickTimer;
 import cc.funkemunky.api.utils.Tuple;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientAnimation;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPong;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.MiscUtils;
 import lombok.Getter;
@@ -35,11 +37,11 @@ public class ClickProcessor {
     private final ObjectData data;
     private int flyingTicks;
 
-    public void onFlying(WrappedInTransactionPacket packet) {
+    public void onFlying() {
         flyingTicks++;
     }
 
-    public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
+    public void onArm(WrapperPlayClientAnimation packet, long timeStamp) {
         long delta = flyingTicks;
 
         if(data.playerInfo.breakingBlock) cpsList.clear();

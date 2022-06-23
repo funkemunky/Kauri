@@ -11,11 +11,11 @@ import java.util.UUID;
 
 public class KeepAlive {
 
-    public final int start;
-    public final short id;
+    public final long start;
+    public final int id;
     public long startStamp;
 
-    public KeepAlive(int start, short id) {
+    public KeepAlive(long start, int id) {
         this.start = start;
         this.id = id;
     }
@@ -33,7 +33,7 @@ public class KeepAlive {
     @RequiredArgsConstructor
     public static class KAReceived {
         public final ObjectData data;
-        public final int stamp;
+        public final long stamp;
         public long receivedStamp;
     }
 }

@@ -8,6 +8,7 @@ import cc.funkemunky.api.utils.it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import cc.funkemunky.api.utils.it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import cc.funkemunky.api.utils.it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import cc.funkemunky.api.utils.objects.evicting.EvictingMap;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPing;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import dev.brighten.anticheat.Kauri;
@@ -24,13 +25,13 @@ public class KeepaliveProcessor implements Runnable {
     private BukkitTask task;
 
     public KeepAlive currentKeepalive = new KeepAlive(0, (short)0);
-    public int tick;
+    public long tick;
     public int totalPlayers, laggyPlayers;
 
-    public final Cache<Short, KeepAlive> keepAlives = CacheBuilder.newBuilder().concurrencyLevel(4)
+    public final Cache<Integer, KeepAlive> keepAlives = CacheBuilder.newBuilder().concurrencyLevel(4)
             .expireAfterWrite(15, TimeUnit.SECONDS).build();
 
-    final Int2ObjectMap<Short> lastResponses = Int2ObjectMaps.synchronize(new Int2ObjectOpenHashMap<>());
+    final Int2ObjectMap<Integer> lastResponses = Int2ObjectMaps.synchronize(new Int2ObjectOpenHashMap<>());
 
     public KeepaliveProcessor() {
         start();
@@ -40,15 +41,16 @@ public class KeepaliveProcessor implements Runnable {
     public void run() {
         tick++;
         synchronized (keepAlives) {
-            short id = (short) (tick > Short.MAX_VALUE ? tick % Short.MAX_VALUE : tick);
+            if(tick > Integer.MAX_VALUE - 1) {
+                tick = 0;
+            }
 
-            //Ensuring we don't have any duplicate IDS
-
+            int id = (int) tick;
             currentKeepalive = new KeepAlive(tick, id);
             keepAlives.put(currentKeepalive.id, currentKeepalive);
         }
 
-        WrappedOutTransaction packet = new WrappedOutTransaction(0, currentKeepalive.id, false);
+        WrapperPlayServerPing packet = new WrapperPlayServerPing(currentKeepalive.id);
 
         currentKeepalive.startStamp = System.currentTimeMillis();
         totalPlayers = laggyPlayers = 0;
@@ -84,7 +86,7 @@ public class KeepaliveProcessor implements Runnable {
         return keepAlives.asMap().values().stream().filter(ka -> ka.start == tick).findFirst();
     }
 
-    public Optional<KeepAlive> getKeepById(short id) {
+    public Optional<KeepAlive> getKeepById(int id) {
         return Optional.ofNullable(keepAlives.getIfPresent(id));
     }
 
@@ -101,9 +103,9 @@ public class KeepaliveProcessor implements Runnable {
         }
     }
 
-    public void addResponse(ObjectData data, short id) {
+    public void addResponse(ObjectData data, int id) {
         getKeepById(id).ifPresent(ka -> {
-            lastResponses.put(data.uuid.hashCode(), (Short)id);
+            lastResponses.put(data.uuid.hashCode(), (Integer)id);
             ka.received(data);
         });
     }

@@ -3,6 +3,7 @@ package dev.brighten.anticheat.data.classes;
 import cc.funkemunky.api.reflections.impl.MinecraftReflection;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.BlockUtils;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.FastTrig;
 import org.bukkit.block.Block;
@@ -24,7 +25,7 @@ public class PredictionService {
         this.data = data;
     }
 
-    public void onReceive(WrappedInFlyingPacket packet) {
+    public void onReceive(WrapperPlayClientPlayerFlying packet) {
         error = true; //Will be stay true if something went wrong
 
         if(data.playerInfo.to == null || data.playerInfo.from == null) return;
@@ -39,7 +40,7 @@ public class PredictionService {
         onGround = data.playerInfo.lClientGround;
 
         //Calculations
-        if(packet.isPos()) {
+        if(packet.hasPositionChanged()) {
             //Checking for other conditions that may cause us problems
             if(velocity) {
                 lmotionX = data.playerInfo.velocityX;
