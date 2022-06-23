@@ -1,6 +1,7 @@
 package dev.brighten.anticheat;
 
 import cc.funkemunky.api.Atlas;
+import cc.funkemunky.api.com.github.retrooper.packetevents.PacketEvents;
 import cc.funkemunky.api.config.MessageHandler;
 import cc.funkemunky.api.profiling.ToggleableProfiler;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
@@ -76,6 +77,13 @@ public class Kauri extends JavaPlugin {
         INSTANCE = this;
 
         load(); //Everything in one method so we can use it in other places like when reloading.
+
+        int i = 0;
+        while(!PacketEvents.getAPI().isLoaded() && i < 60) {
+            System.out.println("API IS NOT LOADED");
+
+            i++;
+        }
     }
 
     public void onDisable() {

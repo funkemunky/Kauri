@@ -47,6 +47,10 @@ public class KeepaliveProcessor implements Runnable {
         currentKeepalive.startStamp = System.currentTimeMillis();
         totalPlayers = laggyPlayers = 0;
         for (ObjectData value : Kauri.INSTANCE.dataManager.dataMap.values()) {
+            if(value.getPlayer() == null) {
+                System.out.println("Player is null");
+                continue;
+            }
             WrappedClientboundTransactionPacket packet = new WrappedClientboundTransactionPacket
                     (value.getPlayer(), currentKeepalive.id, 0, false);
 

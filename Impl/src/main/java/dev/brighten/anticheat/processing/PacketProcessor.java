@@ -1,29 +1,24 @@
 package dev.brighten.anticheat.processing;
 
 import cc.funkemunky.api.Atlas;
-import cc.funkemunky.api.com.github.retrooper.packetevents.protocol.teleport.RelativeFlag;
-import cc.funkemunky.api.com.github.retrooper.packetevents.util.Vector3d;
-import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import cc.funkemunky.api.reflections.types.WrappedClass;
-import cc.funkemunky.api.tinyprotocol.api.Packet;
-import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
-import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
-import cc.funkemunky.api.tinyprotocol.listener.functions.PacketListener;
-import cc.funkemunky.api.tinyprotocol.packet.in.*;
-import cc.funkemunky.api.tinyprotocol.packet.out.*;
-import cc.funkemunky.api.utils.KLocation;
-import cc.funkemunky.api.utils.RunUtils;
-import cc.funkemunky.api.utils.XMaterial;
-import cc.funkemunky.api.utils.math.IntVector;
 import cc.funkemunky.api.com.github.retrooper.packetevents.PacketEvents;
 import cc.funkemunky.api.com.github.retrooper.packetevents.event.PacketListenerPriority;
 import cc.funkemunky.api.com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import cc.funkemunky.api.com.github.retrooper.packetevents.event.PacketSendEvent;
 import cc.funkemunky.api.com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import cc.funkemunky.api.com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
+import cc.funkemunky.api.com.github.retrooper.packetevents.protocol.teleport.RelativeFlag;
+import cc.funkemunky.api.com.github.retrooper.packetevents.util.Vector3d;
 import cc.funkemunky.api.com.github.retrooper.packetevents.util.Vector3i;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.*;
 import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.server.*;
+import cc.funkemunky.api.io.github.retrooper.packetevents.util.SpigotConversionUtil;
+import cc.funkemunky.api.tinyprotocol.api.Packet;
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
+import cc.funkemunky.api.utils.KLocation;
+import cc.funkemunky.api.utils.RunUtils;
+import cc.funkemunky.api.utils.XMaterial;
 import cc.funkemunky.api.utils.trans.WrappedClientboundTransactionPacket;
 import cc.funkemunky.api.utils.trans.WrappedServerboundTransactionPacket;
 import dev.brighten.anticheat.Kauri;
@@ -33,7 +28,6 @@ import dev.brighten.anticheat.processing.thread.ThreadHandler;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.MovementUtils;
 import dev.brighten.api.KauriAPI;
-import cc.funkemunky.api.io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import lombok.val;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -44,7 +38,9 @@ import org.bukkit.util.Vector;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.*;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 public class PacketProcessor {
@@ -56,6 +52,8 @@ public class PacketProcessor {
         PacketEvents.getAPI().getEventManager().registerListener(new cc.funkemunky.api.com.github.retrooper.packetevents.event.PacketListener() {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
+                if(event.getPlayer() == null) return;
+
                 ObjectData data = Kauri.INSTANCE.dataManager.getData((Player)event.getPlayer());
 
                 if(data == null || data.checkManager == null) return;
@@ -63,8 +61,10 @@ public class PacketProcessor {
                 //Packet exemption check
                 if(KauriAPI.INSTANCE.getPacketExemptedPlayers().contains(data.uuid)) return;
 
-
-                if(data.checkManager.runEvent(event)) event.setCancelled(true);
+                if(data.checkManager.runEvent(event)) {
+                    event.setCancelled(true);
+                    System.out.println("Cancelled packet: " + event.getPacketType().getName());
+                }
 
                 if(simLag && event.getPacketType() == PacketType.Play.Client.PLAYER_FLYING) {
                     IntStream.range(0, amount).forEach(i -> {
@@ -135,6 +135,7 @@ public class PacketProcessor {
 
             @Override
             public void onPacketSend(PacketSendEvent event) {
+                if(event.getPlayer() == null) return;
                 ObjectData data = Kauri.INSTANCE.dataManager.getData((Player)event.getPlayer());
 
                 if(data == null || data.checkManager == null) return;
