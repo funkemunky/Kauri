@@ -108,6 +108,7 @@ public class Kauri extends JavaPlugin {
         keepaliveProcessor.stop();
         ThreadHandler.INSTANCE.shutdown();
         keepaliveProcessor = null;
+        PacketEvents.getAPI().getEventManager().unregisterAllListeners();
 
         MiscUtils.printToConsole("&7Unregistering logging and database...");
 
