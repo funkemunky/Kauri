@@ -1,7 +1,7 @@
 package dev.brighten.anticheat.processing;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInEntityActionPacket;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientEntityAction;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientEntityAction;
 import dev.brighten.anticheat.data.ObjectData;
 
 public class ActionProcessor {

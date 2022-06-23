@@ -132,10 +132,6 @@ public class Kauri extends JavaPlugin {
         Check.checkClasses.clear();
         Check.checkSettings.clear();
         Atlas.getInstance().getPacketProcessor().removeListeners(Kauri.INSTANCE);
-        if(!reload) {
-            PacketProcessor.incomingPackets.clear();
-            PacketProcessor.outgoingPackets.clear();
-        }
 
         if(reload) {
             SystemUtil.CRC_32 = new CRC32();

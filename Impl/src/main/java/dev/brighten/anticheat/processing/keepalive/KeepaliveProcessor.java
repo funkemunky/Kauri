@@ -8,7 +8,9 @@ import cc.funkemunky.api.utils.it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import cc.funkemunky.api.utils.it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import cc.funkemunky.api.utils.it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import cc.funkemunky.api.utils.objects.evicting.EvictingMap;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPing;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPing;
+import cc.funkemunky.api.utils.trans.WrappedClientboundTransactionPacket;
+import com.github.retrooper.packetevents.PacketEvents;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import dev.brighten.anticheat.Kauri;
@@ -28,10 +30,10 @@ public class KeepaliveProcessor implements Runnable {
     public long tick;
     public int totalPlayers, laggyPlayers;
 
-    public final Cache<Integer, KeepAlive> keepAlives = CacheBuilder.newBuilder().concurrencyLevel(4)
+    public final Cache<Short, KeepAlive> keepAlives = CacheBuilder.newBuilder().concurrencyLevel(4)
             .expireAfterWrite(15, TimeUnit.SECONDS).build();
 
-    final Int2ObjectMap<Integer> lastResponses = Int2ObjectMaps.synchronize(new Int2ObjectOpenHashMap<>());
+    final Int2ObjectMap<Short> lastResponses = Int2ObjectMaps.synchronize(new Int2ObjectOpenHashMap<>());
 
     public KeepaliveProcessor() {
         start();
@@ -41,20 +43,19 @@ public class KeepaliveProcessor implements Runnable {
     public void run() {
         tick++;
         synchronized (keepAlives) {
-            if(tick > Integer.MAX_VALUE - 1) {
-                tick = 0;
-            }
+            short id = (short) (tick > Short.MAX_VALUE ? tick % Short.MAX_VALUE : tick);
 
-            int id = (int) tick;
             currentKeepalive = new KeepAlive(tick, id);
             keepAlives.put(currentKeepalive.id, currentKeepalive);
         }
 
-        WrapperPlayServerPing packet = new WrapperPlayServerPing(currentKeepalive.id);
-
         currentKeepalive.startStamp = System.currentTimeMillis();
         totalPlayers = laggyPlayers = 0;
         for (ObjectData value : Kauri.INSTANCE.dataManager.dataMap.values()) {
+            WrappedClientboundTransactionPacket packet = new WrappedClientboundTransactionPacket
+                    (value.getPlayer(), currentKeepalive.id, 0, false);
+
+
             totalPlayers++;
 
             if(value.lagInfo.lastPingDrop.isNotPassed(2)
@@ -64,7 +65,7 @@ public class KeepaliveProcessor implements Runnable {
                 value.targetPastLocation.addLocation(value.target.getLocation());
             }
 
-            TinyProtocolHandler.sendPacket(value.getPlayer(), packet);
+            PacketEvents.getAPI().getPlayerManager().sendPacket(value.getPlayer(), packet);
 
             double dh = value.playerInfo.deltaXZ, dy = Math.abs(value.playerInfo.deltaY);
             if(tick % 5 == 0) {
@@ -103,9 +104,9 @@ public class KeepaliveProcessor implements Runnable {
         }
     }
 
-    public void addResponse(ObjectData data, int id) {
+    public void addResponse(ObjectData data, short id) {
         getKeepById(id).ifPresent(ka -> {
-            lastResponses.put(data.uuid.hashCode(), (Integer)id);
+            lastResponses.put(data.uuid.hashCode(), (Short)id);
             ka.received(data);
         });
     }

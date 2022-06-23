@@ -84,7 +84,7 @@ public class ObjectData implements Data {
     public final Map<Long, Long> keepAlives = Collections.synchronizedMap(new HashMap<>());
     public final List<String> sniffedPackets = new CopyOnWriteArrayList<>();
     public final Map<Location, CollisionBox> ghostBlocks = Collections.synchronizedMap(new HashMap<>());
-    public final Map<Integer, Tuple<InstantAction, Consumer<InstantAction>>> instantTransaction = new HashMap<>();
+    public final Map<Short, Tuple<InstantAction, Consumer<InstantAction>>> instantTransaction = new HashMap<>();
     public final EvictingList<Tuple<KLocation, Double>> pastLocations = new EvictingList<>(20);
     public int teleportsToConfirm;
 
@@ -214,8 +214,8 @@ public class ObjectData implements Data {
         return modData;
     }
 
-    public int[] getReceived() {
-        int[] toReturn = new int[] {0, 0};
+    public long[] getReceived() {
+        long[] toReturn = new long[] {0, 0};
         val op = Kauri.INSTANCE.keepaliveProcessor.getResponse(this);
 
         if(op.isPresent()) {
@@ -239,7 +239,7 @@ public class ObjectData implements Data {
         return baseNumber + ThreadLocalRandom.current().nextLong(bound);
     }
 
-    public int runKeepaliveAction(Consumer<KeepAlive> action) {
+    public long runKeepaliveAction(Consumer<KeepAlive> action) {
         return runKeepaliveAction(action, 0);
     }
 
@@ -283,8 +283,8 @@ public class ObjectData implements Data {
         }
     }
 
-    public int runKeepaliveAction(Consumer<KeepAlive> action, int later) {
-        int id = Kauri.INSTANCE.keepaliveProcessor.currentKeepalive.start + later;
+    public long runKeepaliveAction(Consumer<KeepAlive> action, long later) {
+        long id = Kauri.INSTANCE.keepaliveProcessor.currentKeepalive.start + later;
 
         keepAliveStamps.add(new Action(id, action));
 
@@ -339,7 +339,7 @@ public class ObjectData implements Data {
 
     @AllArgsConstructor
     public static class Action {
-        public int stamp;
+        public long stamp;
         public Consumer<KeepAlive> action;
     }
 }

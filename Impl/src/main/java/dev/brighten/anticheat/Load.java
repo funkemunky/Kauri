@@ -7,7 +7,7 @@ import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.github.retrooper.packetevents.PacketEvents;
+import cc.funkemunky.api.com.github.retrooper.packetevents.PacketEvents;
 import dev.brighten.anticheat.check.api.Config;
 import dev.brighten.anticheat.commands.CommandPropertiesManager;
 import dev.brighten.anticheat.data.DataManager;
@@ -19,7 +19,7 @@ import dev.brighten.anticheat.processing.keepalive.KeepaliveProcessor;
 import dev.brighten.anticheat.utils.ServerInjector;
 import dev.brighten.anticheat.utils.timer.impl.AtlasTimer;
 import dev.brighten.api.KauriAPI;
-import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
+import cc.funkemunky.api.io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 

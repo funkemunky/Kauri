@@ -26,7 +26,6 @@ public class PlayerInformation {
     public float fallDistance;
     public double deltaY, lDeltaY, deltaX, lDeltaX, deltaZ, lDeltaZ, deltaXZ, lDeltaXZ,
             jumpHeight, totalHeight, baseSpeed;
-    public float headYaw, headPitch;
     public float deltaYaw, deltaPitch, lDeltaYaw, lDeltaPitch;
     public long lastVelocityTimestamp, moveTicks;
     public Map<Location, Material> shitMap = new HashMap<>();

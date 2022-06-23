@@ -9,7 +9,7 @@ import cc.funkemunky.api.utils.objects.VariableValue;
 import cc.funkemunky.api.utils.objects.evicting.EvictingList;
 import cc.funkemunky.api.utils.world.types.RayCollision;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.listeners.api.impl.KeepaliveAcceptedEvent;
@@ -118,7 +118,7 @@ public class MovementProcessor {
         //We check if it's null and intialize the from and to as equal to prevent large deltas causing false positives since there
         //was no previous from (Ex: delta of 380 instead of 0.45 caused by jump jump in location from 0,0,0 to 380,0,0)
 
-        com.github.retrooper.packetevents.protocol.world.Location loc = packet.getLocation();
+        cc.funkemunky.api.com.github.retrooper.packetevents.protocol.world.Location loc = packet.getLocation();
         if(data.playerInfo.moveTicks > 0) {
 
             if (data.playerInfo.from == null && packet.hasPositionChanged()) {

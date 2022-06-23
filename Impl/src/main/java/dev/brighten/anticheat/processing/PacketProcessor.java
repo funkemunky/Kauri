@@ -1,6 +1,9 @@
 package dev.brighten.anticheat.processing;
 
 import cc.funkemunky.api.Atlas;
+import cc.funkemunky.api.com.github.retrooper.packetevents.protocol.teleport.RelativeFlag;
+import cc.funkemunky.api.com.github.retrooper.packetevents.util.Vector3d;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import cc.funkemunky.api.reflections.types.WrappedClass;
 import cc.funkemunky.api.tinyprotocol.api.Packet;
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
@@ -12,15 +15,17 @@ import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.XMaterial;
 import cc.funkemunky.api.utils.math.IntVector;
-import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.event.PacketListenerPriority;
-import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
-import com.github.retrooper.packetevents.util.Vector3i;
-import com.github.retrooper.packetevents.wrapper.play.client.*;
-import com.github.retrooper.packetevents.wrapper.play.server.*;
+import cc.funkemunky.api.com.github.retrooper.packetevents.PacketEvents;
+import cc.funkemunky.api.com.github.retrooper.packetevents.event.PacketListenerPriority;
+import cc.funkemunky.api.com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import cc.funkemunky.api.com.github.retrooper.packetevents.event.PacketSendEvent;
+import cc.funkemunky.api.com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import cc.funkemunky.api.com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
+import cc.funkemunky.api.com.github.retrooper.packetevents.util.Vector3i;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.*;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.server.*;
+import cc.funkemunky.api.utils.trans.WrappedClientboundTransactionPacket;
+import cc.funkemunky.api.utils.trans.WrappedServerboundTransactionPacket;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.listeners.api.impl.KeepaliveAcceptedEvent;
@@ -28,13 +33,12 @@ import dev.brighten.anticheat.processing.thread.ThreadHandler;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.MovementUtils;
 import dev.brighten.api.KauriAPI;
-import io.github.retrooper.packetevents.util.SpigotConversionUtil;
+import cc.funkemunky.api.io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import lombok.val;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventPriority;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
@@ -48,9 +52,8 @@ public class PacketProcessor {
     public static boolean simLag = false;
     public static int amount = 500;
 
-    static {
-
-        PacketEvents.getAPI().getEventManager().registerListener(new com.github.retrooper.packetevents.event.PacketListener() {
+    public PacketProcessor() {
+        PacketEvents.getAPI().getEventManager().registerListener(new cc.funkemunky.api.com.github.retrooper.packetevents.event.PacketListener() {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
                 ObjectData data = Kauri.INSTANCE.dataManager.getData((Player)event.getPlayer());
@@ -188,7 +191,6 @@ public class PacketProcessor {
             }
         }, PacketListenerPriority.HIGH);
     }
-
 
     public void processClient(ObjectData data, PacketReceiveEvent event) {
         long timestamp = event.getTimestamp();
@@ -412,71 +414,73 @@ public class PacketProcessor {
                 data.sniffedPackets.add(type + ":@:" + packet.getAction().name()
                         + ":@:" + timestamp);
             }
-        } else if(type == PacketType.Play.Client.PONG) {
-            WrapperPlayClientPong packet = new WrapperPlayClientPong(event);
+        } else if(type == PacketType.Play.Client.PONG || type == PacketType.Play.Client.WINDOW_CONFIRMATION) {
+            WrappedServerboundTransactionPacket packet = new WrappedServerboundTransactionPacket(new PacketWrapper<>(event));
 
-            long id = packet.getId();
+            if(packet.getWindow() == 0) {
+                short id = packet.getActionId();
 
-            if(Kauri.INSTANCE.keepaliveProcessor.keepAlives.getIfPresent((int)id) != null) {
-                Kauri.INSTANCE.keepaliveProcessor.addResponse(data, packet.getId());
+                if(Kauri.INSTANCE.keepaliveProcessor.keepAlives.getIfPresent(id) != null) {
+                    Kauri.INSTANCE.keepaliveProcessor.addResponse(data, id);
 
-                val optional = Kauri.INSTANCE.keepaliveProcessor.getResponse(data);
+                    val optional = Kauri.INSTANCE.keepaliveProcessor.getResponse(data);
 
-                long current = Kauri.INSTANCE.keepaliveProcessor.tick;
+                    long current = Kauri.INSTANCE.keepaliveProcessor.tick;
 
-                optional.ifPresent(ka -> {
-                    data.playerTicks++;
-                    data.lagInfo.lastTransPing = data.lagInfo.transPing;
-                    data.lagInfo.transPing = (int)(current - ka.start);
+                    optional.ifPresent(ka -> {
+                        data.playerTicks++;
+                        data.lagInfo.lastTransPing = data.lagInfo.transPing;
+                        data.lagInfo.transPing = (int)(current - ka.start);
 
-                    if(data.instantTransaction.size() > 0) {
-                        synchronized (data.instantTransaction) {
-                            Deque<Short> toRemove = new LinkedList<>();
-                            data.instantTransaction.forEach((key, tuple) -> {
-                                if((timestamp - tuple.one.getStamp()) > data.lagInfo.transPing * 52L + 750L) {
-                                    tuple.two.accept(tuple.one);
-                                    toRemove.add(key);
+                        if(data.instantTransaction.size() > 0) {
+                            synchronized (data.instantTransaction) {
+                                Deque<Short> toRemove = new LinkedList<>();
+                                data.instantTransaction.forEach((key, tuple) -> {
+                                    if((timestamp - tuple.one.getStamp()) > data.lagInfo.transPing * 52L + 750L) {
+                                        tuple.two.accept(tuple.one);
+                                        toRemove.add(key);
+                                    }
+                                });
+                                Short key = null;
+                                while((key = toRemove.poll()) != null) {
+                                    data.instantTransaction.remove(key);
                                 }
-                            });
-                            Short key = null;
-                            while((key = toRemove.poll()) != null) {
-                                data.instantTransaction.remove(key);
                             }
                         }
-                    }
 
-                    if (Math.abs(data.lagInfo.lastTransPing - data.lagInfo.transPing) > 1) {
-                        data.lagInfo.lastPingDrop.reset();
-                    }
-                    data.clickProcessor.onFlying();
+                        if (Math.abs(data.lagInfo.lastTransPing - data.lagInfo.transPing) > 1) {
+                            data.lagInfo.lastPingDrop.reset();
+                        }
+                        data.clickProcessor.onFlying();
 
-                    ka.getReceived(data.uuid).ifPresent(r -> {
-                        r.receivedStamp = data.lagInfo.recieved = timestamp;
-                        data.lagInfo.lmillisPing = data.lagInfo.millisPing;
-                        data.lagInfo.millisPing = r.receivedStamp - (data.lagInfo.start = ka.startStamp);
+                        ka.getReceived(data.uuid).ifPresent(r -> {
+                            r.receivedStamp = data.lagInfo.recieved = timestamp;
+                            data.lagInfo.lmillisPing = data.lagInfo.millisPing;
+                            data.lagInfo.millisPing = r.receivedStamp - (data.lagInfo.start = ka.startStamp);
+                        });
+
+                        KeepaliveAcceptedEvent e = Kauri.INSTANCE.eventHandler
+                                .runEvent(new KeepaliveAcceptedEvent(data, ka));
+
+                        for (ObjectData.Action action : data.keepAliveStamps) {
+                            if (action.stamp > ka.start) continue;
+
+                            action.action.accept(ka);
+
+                            data.keepAliveStamps.remove(action);
+                        }
                     });
-
-                    KeepaliveAcceptedEvent e = Kauri.INSTANCE.eventHandler
-                            .runEvent(new KeepaliveAcceptedEvent(data, ka));
-
-                    for (ObjectData.Action action : data.keepAliveStamps) {
-                        if (action.stamp > ka.start) continue;
-
-                        action.action.accept(ka);
-
-                        data.keepAliveStamps.remove(action);
-                    }
-                });
-                data.lagInfo.lastClientTrans = timestamp;
-            } else {
-                Optional.ofNullable(data.instantTransaction.remove((int)packet.getId()))
-                        .ifPresent(t -> t.two.accept(t.one));
+                    data.lagInfo.lastClientTrans = timestamp;
+                } else {
+                    Optional.ofNullable(data.instantTransaction.remove(packet.getActionId()))
+                            .ifPresent(t -> t.two.accept(t.one));
+                }
             }
 
             data.checkManager.runPacket(packet, timestamp);
             if(data.sniffing) {
-                data.sniffedPackets.add(type + ":@:" + packet.getId()
-                        + ":@:" + timestamp);
+                data.sniffedPackets.add(type + ":@:" + packet.getActionId() + ":@:" + packet.getWindow()
+                        + ":@:" + packet.isAccept() + ":@:" + timestamp);
             }
         } else if(type == PacketType.Play.Client.ANIMATION) {
             WrapperPlayClientAnimation packet = new WrapperPlayClientAnimation(event);
@@ -500,133 +504,139 @@ public class PacketProcessor {
                         packet.getSlot()
                         + ":@:" + timestamp);
             }
-        }
+        } else if(type == PacketType.Play.Client.PLUGIN_MESSAGE) {
+            WrapperPlayClientPluginMessage packet = new WrapperPlayClientPluginMessage(event);
 
+            data.checkManager.runPacket(packet, timestamp);
+        } else if(type == PacketType.Play.Client.CLICK_WINDOW) {
+            WrapperPlayClientClickWindow packet = new WrapperPlayClientClickWindow(event);
 
-        switch (type) {
-            case Packet.Client.CUSTOM_PAYLOAD: {
-                WrappedInCustomPayload packet = new WrappedInCustomPayload(object, data.getPlayer());
+            data.playerInfo.usingItem = false;
+            data.playerInfo.lastWindowClick.reset();
+            data.checkManager.runPacket(packet, timestamp);
 
-                data.checkManager.runPacket(packet, timestamp);
-                break;
+            if(data.sniffing) {
+                data.sniffedPackets.add(type + ":@:" +
+                        packet.getWindowClickType().name() + ";" + packet.getButton() + ";" + packet.getWindowId()
+                        + ";" + (packet.getCarriedItemStack() != null ? packet.getCarriedItemStack().toString() : "NULL")
+                        + ";" + packet.getButton() + ";" + packet.getSlot()
+                        + ":@:" + timestamp);
             }
-            case Packet.Client.WINDOW_CLICK: {
-                WrappedInWindowClickPacket packet = new WrappedInWindowClickPacket(object, data.getPlayer());
+        } else if(type == PacketType.Play.Client.CLOSE_WINDOW) {
+            WrapperPlayClientCloseWindow packet = new WrapperPlayClientCloseWindow(event);
 
-                data.playerInfo.usingItem = false;
-                data.playerInfo.lastWindowClick.reset();
-                data.checkManager.runPacket(packet, timestamp);
+            data.playerInfo.usingItem = false;
+            data.playerInfo.inventoryOpen = false;
 
-                if(data.sniffing) {
-                    data.sniffedPackets.add(type + ":@:" +
-                            packet.getAction().name() + ";" + packet.getButton() + ";" + packet.getId()
-                            + ";" + (packet.getItem() != null ? packet.getItem().toString() : "NULL")
-                            + ";" + packet.getMode() + ";" + packet.getCounter()
-                            + ":@:" + timestamp);
-                }
-                break;
+            data.checkManager.runPacket(packet, timestamp);
+
+            if(data.sniffing) {
+                data.sniffedPackets.add(type + ":@:" + timestamp);
             }
-            case Packet.Client.CLOSE_WINDOW: {
-                WrappedInCloseWindowPacket packet
-                        = new WrappedInCloseWindowPacket(object, data.getPlayer());
+        } else if(type == PacketType.Play.Client.STEER_VEHICLE) {
+            WrapperPlayClientSteerVehicle packet = new WrapperPlayClientSteerVehicle(event);
 
-                data.playerInfo.usingItem = false;
-                data.playerInfo.inventoryOpen = false;
+            if(data.getPlayer().isInsideVehicle() && packet.isUnmount()) {
+                data.playerInfo.vehicleTimer.reset();
+                data.playerInfo.inVehicle = false;
+                data.getPlayer().sendMessage("Dismounted");
+            } else if(data.getPlayer().isInsideVehicle()) data.getPlayer().sendMessage("Mounted");
 
-                data.checkManager.runPacket(packet, timestamp);
-
-                if(data.sniffing) {
-                    data.sniffedPackets.add(type + ":@:" + timestamp);
-                }
-                break;
+            if(data.sniffing) {
+                data.sniffedPackets.add(type + ":@:" + packet.isUnmount() + ";" + packet.getForward()
+                        + ";" + packet.getSideways() + ";" + packet.isJump() + ";" + timestamp);
             }
-            case Packet.Client.STEER_VEHICLE: {
-                WrappedInSteerVehiclePacket packet = new WrappedInSteerVehiclePacket(object, data.getPlayer());
-
-                if(data.getPlayer().isInsideVehicle() && packet.isUnmount()) {
-                    data.playerInfo.vehicleTimer.reset();
-                    data.playerInfo.inVehicle = false;
-                    data.getPlayer().sendMessage("Dismounted");
-                } else if(data.getPlayer().isInsideVehicle()) data.getPlayer().sendMessage("Mounted");
-
-                if(data.sniffing) {
-                    data.sniffedPackets.add(type + ":@:" + packet.isUnmount() + ";" + packet.getForward()
-                            + ";" + packet.getSideways() + ";" + packet.isJump() + ";" + timestamp);
-                }
-                break;
-            }
-            default: {
-                if(data.sniffing) {
-                    data.sniffedPackets.add(type + ":@:" + timestamp);
-                }
-                break;
+        } else {
+            if(data.sniffing) {
+                data.sniffedPackets.add(type + ":@:" + timestamp);
             }
         }
     }
 
-    public void processServer(ObjectData data, Object object, String type, long timestamp) {
-        switch (type) {
-            case Packet.Server.ABILITIES: {
-                WrappedOutAbilitiesPacket packet = new WrappedOutAbilitiesPacket(object, data.getPlayer());
+    public void processServer(ObjectData data, PacketSendEvent event) {
+        long timestamp = event.getTimestamp();
+        PacketTypeCommon type = event.getPacketType();
 
-                data.playerInfo.flying = packet.isFlying();
-                data.checkManager.runPacket(packet, timestamp);
-                break;
-            }
-            case Packet.Server.RESPAWN: {
-                WrappedOutRespawnPacket packet = new WrappedOutRespawnPacket(object, data.getPlayer());
+        if(type == PacketType.Play.Server.PLAYER_ABILITIES) {
+            WrapperPlayServerPlayerAbilities packet = new WrapperPlayServerPlayerAbilities(event);
 
+            data.playerInfo.flying = packet.isFlying();
+            data.checkManager.runPacket(packet, timestamp);
+        } else if(type == PacketType.Play.Server.RESPAWN) {
+            WrapperPlayServerRespawn packet = new WrapperPlayServerRespawn(event);
+
+            data.playerInfo.lastRespawn = timestamp;
+            data.playerInfo.lastRespawnTimer.reset();
+            data.runKeepaliveAction(d -> {
                 data.playerInfo.lastRespawn = timestamp;
                 data.playerInfo.lastRespawnTimer.reset();
-                data.runKeepaliveAction(d -> {
-                    data.playerInfo.lastRespawn = timestamp;
-                    data.playerInfo.lastRespawnTimer.reset();
-                });
+            });
 
+            data.checkManager.runPacket(packet, timestamp);
+        } else if (type == PacketType.Play.Server.HELD_ITEM_CHANGE) {
+            WrapperPlayServerHeldItemChange packet = new WrapperPlayServerHeldItemChange(event);
+
+            data.checkManager.runPacket(packet, timestamp);
+        } else if(type == PacketType.Play.Server.ENTITY_EFFECT) {
+            WrapperPlayServerEntityEffect packet = new WrapperPlayServerEntityEffect(event);
+
+            if(packet.getEntityId() == data.getPlayer().getEntityId()) {
+                data.potionProcessor.onPotionEffect(packet);
                 data.checkManager.runPacket(packet, timestamp);
-                break;
             }
-            case Packet.Server.HELD_ITEM: {
-                WrappedOutHeldItemSlot packet = new WrappedOutHeldItemSlot(object, data.getPlayer());
+        } else if(type == PacketType.Play.Server.ENTITY_METADATA) {
+            WrapperPlayServerEntityMetadata packet = new WrapperPlayServerEntityMetadata(event);
 
-                data.checkManager.runPacket(packet, timestamp);
-                break;
-            }
-            case Packet.Server.ENTITY_EFFECT: {
-                WrappedOutEntityEffectPacket packet = new WrappedOutEntityEffectPacket(object, data.getPlayer());
+            data.checkManager.runPacket(packet, timestamp);
+        } else if(type == PacketType.Play.Server.CLOSE_WINDOW) {
+            WrapperPlayServerCloseWindow packet = new WrapperPlayServerCloseWindow(event);
 
-                if(packet.entityId == data.getPlayer().getEntityId()) {
-                    data.potionProcessor.onPotionEffect(packet);
-                    data.checkManager.runPacket(packet, timestamp);
+            data.playerInfo.inventoryOpen = false;
+            data.playerInfo.inventoryId = 0;
+
+            data.checkManager.runPacket(packet, timestamp);
+        } else if(type == PacketType.Play.Server.OPEN_WINDOW) {
+            WrapperPlayServerOpenWindow packet = new WrapperPlayServerOpenWindow(event);
+
+            data.playerInfo.inventoryOpen = true;
+            data.playerInfo.inventoryId = packet.getContainerId();
+            data.checkManager.runPacket(packet, timestamp);
+        } else if(type == PacketType.Play.Server.EXPLOSION) {
+            WrapperPlayServerExplosion packet = new WrapperPlayServerExplosion(event);
+
+            Vector vector = new Vector(packet.getPlayerMotion().getX(), packet.getPlayerMotion().getY(),
+                    packet.getPlayerMotion().getZ());
+            data.playerInfo.velocities.add(vector);
+            data.playerInfo.doingVelocity = true;
+            data.runInstantAction(keepalive -> {
+                if(keepalive.isEnd() && data.playerInfo.velocities.contains(vector)) {
+                    if(data.playerInfo.doingVelocity) {
+                        data.playerInfo.lastVelocity.reset();
+
+                        data.playerInfo.doingVelocity = false;
+                        data.playerInfo.cva = data.playerInfo.cvb = data.playerInfo.cvc = true;
+                        data.playerInfo.lastVelocityTimestamp = System.currentTimeMillis();
+                        data.predictionService.velocity = true;
+                        data.playerInfo.velocityX = data.playerInfo.calcVelocityX = (float) vector.getX();
+                        data.playerInfo.velocityY = data.playerInfo.calcVelocityY = (float) vector.getY();
+                        data.playerInfo.velocityZ = data.playerInfo.calcVelocityZ = (float) vector.getZ();
+                        data.playerInfo.velocityXZ = Math.hypot(data.playerInfo.velocityX,
+                                data.playerInfo.velocityZ);
+                    }
+                    data.playerInfo.velocities.remove(vector);
                 }
-                break;
-            }
-            case Packet.Server.ENTITY_METADATA: {
-                WrappedOutEntityMetadata packet = new WrappedOutEntityMetadata(object, data.getPlayer());
+            });
 
-                data.checkManager.runPacket(packet, timestamp);
-                break;
-            }
-            case Packet.Server.CLOSE_WINDOW: {
-                WrappedOutCloseWindowPacket packet = new WrappedOutCloseWindowPacket(object, data.getPlayer());
-                data.playerInfo.inventoryOpen = false;
-                data.playerInfo.inventoryId = 0;
+            data.checkManager.runPacket(packet, timestamp);
+        } else if(type == PacketType.Play.Server.ENTITY_VELOCITY) {
+            WrapperPlayServerEntityVelocity packet = new WrapperPlayServerEntityVelocity(event);
 
-                data.checkManager.runPacket(packet, timestamp);
-                break;
-            }
-            case Packet.Server.OPEN_WINDOW: {
-                WrappedOutOpenWindow packet = new WrappedOutOpenWindow(object, data.getPlayer());
+            Vector3d velocity = packet.getVelocity();
 
-                data.checkManager.runPacket(packet, timestamp);
-                data.playerInfo.inventoryOpen = true;
-                data.playerInfo.inventoryId = packet.getId();
-                break;
-            }
-            case Packet.Server.EXPLOSION: {
-                WrappedOutExplosionPacket packet = new WrappedOutExplosionPacket(object, data.getPlayer());
-
-                Vector vector = new Vector(packet.getMotionX(), packet.getMotionY(), packet.getMotionZ());
+            if(packet.getEntityId() == data.getPlayer().getEntityId()) {
+                //Setting velocity action.
+                Vector vector = new Vector(packet.getVelocity().getX(), packet.getVelocity().getY(),
+                        packet.getVelocity().getZ());
                 data.playerInfo.velocities.add(vector);
                 data.playerInfo.doingVelocity = true;
                 data.runInstantAction(keepalive -> {
@@ -638,194 +648,145 @@ public class PacketProcessor {
                             data.playerInfo.cva = data.playerInfo.cvb = data.playerInfo.cvc = true;
                             data.playerInfo.lastVelocityTimestamp = System.currentTimeMillis();
                             data.predictionService.velocity = true;
-                            data.playerInfo.velocityX = data.playerInfo.calcVelocityX = (float) packet.getX();
-                            data.playerInfo.velocityY = data.playerInfo.calcVelocityY = (float) packet.getY();
-                            data.playerInfo.velocityZ = data.playerInfo.calcVelocityZ = (float) packet.getZ();
+                            data.playerInfo.velocityX = data.playerInfo.calcVelocityX = (float) velocity.getX();
+                            data.playerInfo.velocityY = data.playerInfo.calcVelocityY = (float) velocity.getY();
+                            data.playerInfo.velocityZ = data.playerInfo.calcVelocityZ = (float) velocity.getZ();
                             data.playerInfo.velocityXZ = Math.hypot(data.playerInfo.velocityX,
                                     data.playerInfo.velocityZ);
                         }
                         data.playerInfo.velocities.remove(vector);
                     }
                 });
-                break;
-            }
-            case Packet.Server.ENTITY_VELOCITY: {
-                WrappedOutVelocityPacket packet = new WrappedOutVelocityPacket(object, data.getPlayer());
-
-                if (packet.getId() == data.getPlayer().getEntityId()) {
-                    //Setting velocity action.
-                    Vector vector = new Vector(packet.getX(), packet.getY(), packet.getZ());
-                    data.playerInfo.velocities.add(vector);
-                    data.playerInfo.doingVelocity = true;
-                    data.runInstantAction(keepalive -> {
-                        if(keepalive.isEnd() && data.playerInfo.velocities.contains(vector)) {
-                            if(data.playerInfo.doingVelocity) {
-                                data.playerInfo.lastVelocity.reset();
-
-                                data.playerInfo.doingVelocity = false;
-                                data.playerInfo.cva = data.playerInfo.cvb = data.playerInfo.cvc = true;
-                                data.playerInfo.lastVelocityTimestamp = System.currentTimeMillis();
-                                data.predictionService.velocity = true;
-                                data.playerInfo.velocityX = data.playerInfo.calcVelocityX = (float) packet.getX();
-                                data.playerInfo.velocityY = data.playerInfo.calcVelocityY = (float) packet.getY();
-                                data.playerInfo.velocityZ = data.playerInfo.calcVelocityZ = (float) packet.getZ();
-                                data.playerInfo.velocityXZ = Math.hypot(data.playerInfo.velocityX,
-                                        data.playerInfo.velocityZ);
-                            }
-                            data.playerInfo.velocities.remove(vector);
-                        }
-                    });
-                }
 
                 if(data.sniffing) {
-                    data.sniffedPackets.add(type + ":@:" + packet.getId() + ";"
-                            + packet.getX() + ";" + packet.getY() + ";" + packet.getZ()
+                    data.sniffedPackets.add(type + ":@:" + packet.getEntityId() + ";"
+                            + velocity.getX() + ";" + velocity.getY() + ";" + velocity.getZ()
                             + ":@:" + timestamp);
                 }
                 data.checkManager.runPacket(packet, timestamp);
-                break;
             }
-            case Packet.Server.ENTITY_HEAD_ROTATION: {
-                WrappedOutEntityHeadRotation packet = new WrappedOutEntityHeadRotation(object, data.getPlayer());
+        } else if(type == PacketType.Play.Server.ATTACH_ENTITY) {
+            WrapperPlayServerAttachEntity packet = new WrapperPlayServerAttachEntity(event);
 
-                data.playerInfo.headYaw = packet.getPlayer().getLocation().getYaw();
-                data.playerInfo.headPitch = packet.getPlayer().getLocation().getPitch();
-                data.checkManager.runPacket(packet, timestamp);
-                break;
+            if(packet.getHoldingId() != -1) {
+                data.playerInfo.inVehicle = true;
+                data.playerInfo.vehicleTimer.reset();
+            } else {
+                data.playerInfo.inVehicle = false;
+                data.playerInfo.vehicleTimer.reset();
             }
-            case Packet.Server.ATTACH: {
-                WrappedOutAttachEntity packet = new WrappedOutAttachEntity(object, data.getPlayer());
 
-                if(packet.getHoldingEntityId() != -1) {
-                    data.playerInfo.inVehicle = true;
-                    data.playerInfo.vehicleTimer.reset();
-                } else {
-                    data.playerInfo.inVehicle = false;
-                    data.playerInfo.vehicleTimer.reset();
-                }
-
-                if(data.sniffing) {
-                    data.sniffedPackets.add(type + ":@:" + packet.getHoldingEntityId()
-                            + ";" + packet.getAttachedEntityId());
-                }
-                break;
+            if(data.sniffing) {
+                data.sniffedPackets.add(type + ":@:" + packet.getHoldingId()
+                        + ";" + packet.getAttachedId());
             }
-            case Packet.Server.REL_LOOK:
-            case Packet.Server.REL_POSITION:
-            case Packet.Server.REL_POSITION_LOOK:
-            case Packet.Server.ENTITY:
-            case Packet.Server.LEGACY_REL_POSITION_LOOK:
-            case Packet.Server.LEGACY_REL_POSITION:
-            case Packet.Server.LEGACY_REL_LOOK: {
-                WrappedOutRelativePosition packet = new WrappedOutRelativePosition(object, data.getPlayer());
+        } else if(type == PacketType.Play.Server.ENTITY_RELATIVE_MOVE_AND_ROTATION ) {
+            WrapperPlayServerEntityRelativeMoveAndRotation packet = new WrapperPlayServerEntityRelativeMoveAndRotation(event);
 
-                data.entityLocationProcessor.onRelPosition(packet);
-                data.checkManager.runPacket(packet, timestamp);
-                break;
+            data.entityLocationProcessor.onRelPosition(packet);
+            data.checkManager.runPacket(packet, timestamp);
+        } else if(type == PacketType.Play.Server.ENTITY_ROTATION) {
+            WrapperPlayServerEntityRotation packet = new WrapperPlayServerEntityRotation(event);
+
+            data.entityLocationProcessor.onRelPosition(packet);
+            data.checkManager.runPacket(packet, timestamp);
+        } else if(type == PacketType.Play.Server.ENTITY_RELATIVE_MOVE) {
+            WrapperPlayServerEntityRelativeMove packet = new WrapperPlayServerEntityRelativeMove(event);
+
+            data.entityLocationProcessor.onRelPosition(packet);
+            data.checkManager.runPacket(packet, timestamp);
+        } else if(type == PacketType.Play.Server.ENTITY_TELEPORT) {
+            WrapperPlayServerEntityTeleport packet = new WrapperPlayServerEntityTeleport(event);
+
+            if(data.sniffing) {
+                Vector3d pos = packet.getPosition();
+                data.sniffedPackets.add(type + ":@:" + packet.getEntityId() + ";" + pos.getX() + ";" + pos.getY() + ";"
+                        + pos.getZ() + ";" + packet.getYaw() + ";" + packet.getPitch() + ":" + timestamp);
             }
-            case Packet.Server.ENTITY_TELEPORT: {
-                WrappedOutEntityTeleportPacket packet = new WrappedOutEntityTeleportPacket(object, data.getPlayer());
 
-                if(data.sniffing) {
-                    data.sniffedPackets.add(type + ":@:" + packet.entityId + ";" + packet.x + ";" + packet.y + ";"
-                            + packet.z + ";" + packet.yaw + ";" + packet.pitch + ":" + timestamp);
-                }
+            data.entityLocationProcessor.onTeleportSent(packet);
 
-                data.entityLocationProcessor.onTeleportSent(packet);
+            data.checkManager.runPacket(packet, timestamp);
+        } else if(type == PacketType.Play.Server.PLUGIN_MESSAGE) {
+            WrapperPlayServerPluginMessage packet = new WrapperPlayServerPluginMessage(event);
 
-                data.checkManager.runPacket(packet, timestamp);
-                break;
+            data.checkManager.runPacket(packet, timestamp);
+        } else if(type == PacketType.Play.Server.KEEP_ALIVE) {
+            WrapperPlayServerKeepAlive packet = new WrapperPlayServerKeepAlive(event);
+
+            data.lagInfo.lastKeepAlive = timestamp;
+            data.keepAlives.put(packet.getId(), System.currentTimeMillis());
+            data.checkManager.runPacket(packet, timestamp);
+        } else if(type == PacketType.Play.Server.PING || type == PacketType.Play.Server.WINDOW_CONFIRMATION) {
+            WrappedClientboundTransactionPacket
+                    packet = new WrappedClientboundTransactionPacket(new PacketWrapper<>(event));
+
+            if(data.sniffing) {
+                data.sniffedPackets.add(type + ":@:" + packet.getWindow() + ";"
+                        + packet.getActionId() + ":@:" + timestamp);
             }
-            case Packet.Server.CUSTOM_PAYLOAD: {
-                WrappedOutCustomPayload packet = new WrappedOutCustomPayload(object, data.getPlayer());
 
-                data.checkManager.runPacket(packet, timestamp);
-                break;
-            }
-            case Packet.Server.KEEP_ALIVE: {
-                WrappedOutKeepAlivePacket packet = new WrappedOutKeepAlivePacket(object, data.getPlayer());
+            data.checkManager.runPacket(packet, timestamp);
+        } else if(type == PacketType.Play.Server.BLOCK_CHANGE) {
+            WrapperPlayServerBlockChange packet = new WrapperPlayServerBlockChange(event);
 
-                data.lagInfo.lastKeepAlive = timestamp;
-                data.keepAlives.put(packet.getTime(), System.currentTimeMillis());
-                data.checkManager.runPacket(packet, timestamp);
-                break;
-            }
-            case Packet.Server.TRANSACTION: {
-                WrappedOutTransaction packet = new WrappedOutTransaction(object, data.getPlayer());
+            Location loc = new Location(data.getPlayer().getWorld(), packet.getBlockPosition().getX(),
+                    packet.getBlockPosition().getY(), packet.getBlockPosition().getZ());
 
-                if(data.sniffing) {
-                    data.sniffedPackets.add(type + ":@:" + packet.getId() + ";"
-                            + packet.getAction() + ":@:" + timestamp);
-                }
-                data.checkManager.runPacket(packet, timestamp);
-                break;
-            }
-            case Packet.Server.BLOCK_CHANGE: {
-                WrappedOutBlockChange blockChange = new WrappedOutBlockChange(object, data.getPlayer());
-
-                Location loc = new Location(data.getPlayer().getWorld(), blockChange.getPosition().getX(),
-                        blockChange.getPosition().getY(), blockChange.getPosition().getZ());
-
-                if(loc.distanceSquared(data.getPlayer().getLocation()) < 25) {
-                    data.blockUpdates++;
-                    data.playerInfo.lastGhostCollision.reset();
-
-                    data.runKeepaliveAction(ka -> {
-                        data.blockUpdates--;
-                    });
-                }
-                break;
-            }
-            case "PacketPlayOutMultiBlockChange": {
+            if(loc.distanceSquared(data.getPlayer().getLocation()) < 25) {
                 data.blockUpdates++;
                 data.playerInfo.lastGhostCollision.reset();
 
                 data.runKeepaliveAction(ka -> {
                     data.blockUpdates--;
                 });
-                break;
             }
-            case Packet.Server.POSITION: {
-                WrappedOutPositionPacket packet = new WrappedOutPositionPacket(object, data.getPlayer());
+        } else if(type == PacketType.Play.Server.MULTI_BLOCK_CHANGE) {
+            data.blockUpdates++;
+            data.playerInfo.lastGhostCollision.reset();
 
-                KLocation loc = new KLocation(packet.getX(), packet.getY(), packet.getZ(),
-                        packet.getYaw(), packet.getPitch());
+            data.runKeepaliveAction(ka -> {
+                data.blockUpdates--;
+            });
+        } else if(type == PacketType.Play.Server.PLAYER_POSITION_AND_LOOK) {
+            WrapperPlayServerPlayerPositionAndLook packet = new WrapperPlayServerPlayerPositionAndLook(event);
 
-                int i = 0;
-                if(packet.getFlags().contains(WrappedOutPositionPacket.EnumPlayerTeleportFlags.X)) {
-                    loc.x+= data.playerInfo.to.x;
-                }
-                if(packet.getFlags().contains(WrappedOutPositionPacket.EnumPlayerTeleportFlags.Y)) {
-                    loc.y+= data.playerInfo.to.y;
-                }
-                if(packet.getFlags().contains(WrappedOutPositionPacket.EnumPlayerTeleportFlags.Z)) {
-                    loc.z+= data.playerInfo.to.z;
-                }
-                if(packet.getFlags().contains(WrappedOutPositionPacket.EnumPlayerTeleportFlags.X_ROT)) {
-                    loc.pitch+= data.playerInfo.to.pitch;
-                }
-                if(packet.getFlags().contains(WrappedOutPositionPacket.EnumPlayerTeleportFlags.Y_ROT)) {
-                    loc.yaw+= data.playerInfo.to.yaw;
-                }
+            KLocation loc = new KLocation(packet.getX(), packet.getY(), packet.getZ(),
+                    packet.getYaw(), packet.getPitch());
 
-                data.teleportsToConfirm++;
-
-                data.runKeepaliveAction(ka -> data.teleportsToConfirm--, 2);
-                synchronized (data.playerInfo.posLocs) {
-                    data.playerInfo.posLocs.add(loc);
-                }
-
-                data.playerInfo.phaseLoc = loc.clone();
-
-                data.getPlayer().setSprinting(false);
-
-                if(data.sniffing) {
-                    data.sniffedPackets.add(type + ":@:" + packet.getX() + ";"
-                            + packet.getY() + ";" + packet.getZ() + ":@:" + timestamp);
-                }
-                data.checkManager.runPacket(packet, timestamp);
-                break;
+            int i = 0;
+            if(packet.getRelativeFlags().isSet(RelativeFlag.X.getMask())) {
+                loc.x+= data.playerInfo.to.x;
             }
+            if(packet.getRelativeFlags().isSet(RelativeFlag.Y.getMask())) {
+                loc.y+= data.playerInfo.to.y;
+            }
+            if(packet.getRelativeFlags().isSet(RelativeFlag.Z.getMask())) {
+                loc.z+= data.playerInfo.to.z;
+            }
+            if(packet.getRelativeFlags().isSet(RelativeFlag.YAW.getMask())) {
+                loc.yaw+= data.playerInfo.to.yaw;
+            }
+            if(packet.getRelativeFlags().isSet(RelativeFlag.PITCH.getMask())) {
+                loc.pitch+= data.playerInfo.to.pitch;
+            }
+
+            data.teleportsToConfirm++;
+
+            data.runKeepaliveAction(ka -> data.teleportsToConfirm--, 2);
+            synchronized (data.playerInfo.posLocs) {
+                data.playerInfo.posLocs.add(loc);
+            }
+
+            data.playerInfo.phaseLoc = loc.clone();
+
+            data.getPlayer().setSprinting(false);
+
+            if(data.sniffing) {
+                data.sniffedPackets.add(type + ":@:" + packet.getX() + ";"
+                        + packet.getY() + ";" + packet.getZ() + ":@:" + timestamp);
+            }
+            data.checkManager.runPacket(packet, timestamp);
         }
     }
 

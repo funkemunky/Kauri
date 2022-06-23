@@ -12,10 +12,10 @@ import java.util.UUID;
 public class KeepAlive {
 
     public final long start;
-    public final int id;
+    public final short id;
     public long startStamp;
 
-    public KeepAlive(long start, int id) {
+    public KeepAlive(long start, short id) {
         this.start = start;
         this.id = id;
     }
