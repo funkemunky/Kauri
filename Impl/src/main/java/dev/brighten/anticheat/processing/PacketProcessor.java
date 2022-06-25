@@ -48,152 +48,6 @@ public class PacketProcessor {
     public static boolean simLag = false;
     public static int amount = 500;
 
-    public PacketProcessor() {
-        PacketEvents.getAPI().getEventManager().registerListener(
-                new cc.funkemunky.api.com.github.retrooper.packetevents.event.PacketListener() {
-            @Override
-            public void onPacketReceive(PacketReceiveEvent event) {
-                if(event.getPlayer() == null) return;
-
-                ObjectData data = Kauri.INSTANCE.dataManager.getData((Player)event.getPlayer());
-
-                if(data == null || data.checkManager == null) return;
-
-                //Packet exemption check
-                if(KauriAPI.INSTANCE.getPacketExemptedPlayers().contains(data.uuid)) return;
-
-                if(data.checkManager.runEvent(event)) {
-                    event.setCancelled(true);
-                    System.out.println("Cancelled packet: " + event.getPacketType().getName());
-                }
-
-                if(simLag && event.getPacketType() == PacketType.Play.Client.PLAYER_FLYING) {
-                    IntStream.range(0, amount).forEach(i -> {
-                        try {
-                            SecureRandom.getInstanceStrong().generateSeed(500);
-                        } catch (NoSuchAlgorithmException e) {
-                            e.printStackTrace();
-                        }
-                    });
-                }
-
-                if(event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
-                    WrapperPlayClientInteractEntity packet = new WrapperPlayClientInteractEntity(event);
-
-                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
-                        event.setCancelled(true);
-                    }
-                } else if(event.getPacketType() == PacketType.Play.Client.PLUGIN_MESSAGE) {
-                    WrapperPlayClientPluginMessage packet = new WrapperPlayClientPluginMessage(event);
-
-                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
-                        event.setCancelled(true);
-                    }
-                } else if(event.getPacketType() == PacketType.Play.Client.CLICK_WINDOW) {
-                    WrapperPlayClientClickWindow packet = new WrapperPlayClientClickWindow(event);
-
-                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
-                        event.setCancelled(true);
-                    }
-                } else if(event.getPacketType() == PacketType.Play.Client.PLAYER_FLYING
-                        || event.getPacketType() == PacketType.Play.Client.PLAYER_POSITION
-                        || event.getPacketType() == PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION
-                        || event.getPacketType() == PacketType.Play.Client.PLAYER_ROTATION) {
-                    WrapperPlayClientPlayerFlying packet = new WrapperPlayClientPlayerFlying(event);
-
-                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
-                        event.setCancelled(true);
-                    }
-                } else if(event.getPacketType() == PacketType.Play.Client.CREATIVE_INVENTORY_ACTION) {
-                    WrapperPlayClientCreativeInventoryAction packet = new WrapperPlayClientCreativeInventoryAction(event);
-
-                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
-                        event.setCancelled(true);
-                    }
-                } else if(event.getPacketType() == PacketType.Play.Client.USE_ITEM) {
-                    WrapperPlayClientUseItem packet = new WrapperPlayClientUseItem(event);
-
-                    if (data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
-                        event.setCancelled(true);
-                    }
-                } else if(event.getPacketType() == PacketType.Play.Client.CHAT_MESSAGE) {
-                    WrapperPlayClientChatMessage packet = new WrapperPlayClientChatMessage(event);
-
-                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
-                        event.setCancelled(true);
-                    }
-                }
-
-                ThreadHandler.INSTANCE.getThread(data).runTask(() -> {
-                    if (data.checkManager == null) return;
-                    try {
-                        processClient(data, event);
-                    } catch(Exception e) {
-                        e.printStackTrace();
-                    }
-                });
-            }
-
-            @Override
-            public void onPacketSend(PacketSendEvent event) {
-                if(event.getPlayer() == null) return;
-                ObjectData data = Kauri.INSTANCE.dataManager.getData((Player)event.getPlayer());
-
-                if(data == null || data.checkManager == null) return;
-
-                //Packet exemption check
-                if(KauriAPI.INSTANCE.getPacketExemptedPlayers().contains(data.uuid)) return;
-
-
-                if(data.checkManager.runEvent(event)) event.setCancelled(true);
-
-                if(event.getPacketType() == PacketType.Play.Server.ENTITY_MOVEMENT) {
-                    WrapperPlayServerEntityMovement packet = new WrapperPlayServerEntityMovement(event);
-
-                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
-                        event.setCancelled(true);
-                    }
-                } else if(event.getPacketType() == PacketType.Play.Server.ENTITY_RELATIVE_MOVE) {
-                    WrapperPlayServerEntityRelativeMove packet = new WrapperPlayServerEntityRelativeMove(event);
-
-                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
-                        event.setCancelled(true);
-                    }
-                } else if(event.getPacketType() == PacketType.Play.Server.ENTITY_RELATIVE_MOVE_AND_ROTATION) {
-                    WrapperPlayServerEntityRelativeMoveAndRotation packet = new WrapperPlayServerEntityRelativeMoveAndRotation(event);
-
-                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
-                        event.setCancelled(true);
-                    }
-                } else if(event.getPacketType() == PacketType.Play.Server.ENTITY_HEAD_LOOK) {
-                    WrapperPlayServerEntityHeadLook packet = new WrapperPlayServerEntityHeadLook(event);
-
-                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
-                        event.setCancelled(true);
-                    }
-                } else if(event.getPacketType() == PacketType.Play.Server.ENTITY_TELEPORT) {
-                    WrapperPlayServerEntityTeleport packet = new WrapperPlayServerEntityTeleport(event);
-
-                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
-                        event.setCancelled(true);
-                    }
-                } else if(event.getPacketType() == PacketType.Play.Server.PING) {
-                    WrapperPlayServerPing packet = new WrapperPlayServerPing(event);
-
-                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
-                        event.setCancelled(true);
-                    }
-                } else if(event.getPacketType() == PacketType.Play.Server.ENTITY_VELOCITY) {
-                    WrapperPlayServerEntityVelocity packet = new WrapperPlayServerEntityVelocity(event);
-
-                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
-                        event.setCancelled(true);
-                    }
-                }
-            }
-        }, PacketListenerPriority.HIGH);
-    }
-
     public void processClient(ObjectData data, PacketReceiveEvent event) {
         long timestamp = event.getTimestamp();
         PacketTypeCommon type = event.getPacketType();
@@ -417,7 +271,7 @@ public class PacketProcessor {
                         + ":@:" + timestamp);
             }
         } else if(type == PacketType.Play.Client.PONG || type == PacketType.Play.Client.WINDOW_CONFIRMATION) {
-            WrappedServerboundTransactionPacket packet = new WrappedServerboundTransactionPacket(new PacketWrapper<>(event));
+            WrappedServerboundTransactionPacket packet = new WrappedServerboundTransactionPacket(event);
 
             if(packet.getWindow() == 0) {
                 short id = packet.getActionId();
@@ -718,16 +572,6 @@ public class PacketProcessor {
 
             data.lagInfo.lastKeepAlive = timestamp;
             data.keepAlives.put(packet.getId(), System.currentTimeMillis());
-            data.checkManager.runPacket(packet, timestamp);
-        } else if(type == PacketType.Play.Server.PING || type == PacketType.Play.Server.WINDOW_CONFIRMATION) {
-            WrappedClientboundTransactionPacket
-                    packet = new WrappedClientboundTransactionPacket(new PacketWrapper<>(event));
-
-            if(data.sniffing) {
-                data.sniffedPackets.add(type + ":@:" + packet.getWindow() + ";"
-                        + packet.getActionId() + ":@:" + timestamp);
-            }
-
             data.checkManager.runPacket(packet, timestamp);
         } else if(type == PacketType.Play.Server.BLOCK_CHANGE) {
             WrapperPlayServerBlockChange packet = new WrapperPlayServerBlockChange(event);

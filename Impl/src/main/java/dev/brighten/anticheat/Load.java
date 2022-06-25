@@ -1,6 +1,7 @@
 package dev.brighten.anticheat;
 
 import cc.funkemunky.api.Atlas;
+import cc.funkemunky.api.com.github.retrooper.packetevents.PacketEvents;
 import cc.funkemunky.api.config.MessageHandler;
 import cc.funkemunky.api.profiling.ToggleableProfiler;
 import cc.funkemunky.api.utils.Color;
@@ -11,6 +12,7 @@ import dev.brighten.anticheat.check.api.Config;
 import dev.brighten.anticheat.commands.CommandPropertiesManager;
 import dev.brighten.anticheat.data.DataManager;
 import dev.brighten.anticheat.discord.DiscordAPI;
+import dev.brighten.anticheat.listeners.PacketListener;
 import dev.brighten.anticheat.listeners.api.EventHandler;
 import dev.brighten.anticheat.logs.LoggerManager;
 import dev.brighten.anticheat.processing.PacketProcessor;
@@ -50,6 +52,7 @@ public class Load {
         Kauri.INSTANCE.keepaliveProcessor = new KeepaliveProcessor();
         Kauri.INSTANCE.dataManager = new DataManager();
         Kauri.INSTANCE.packetProcessor = new PacketProcessor();
+        PacketEvents.getAPI().getEventManager().registerListener(new PacketListener());
 
 
         Kauri.INSTANCE.injector = new ServerInjector();
