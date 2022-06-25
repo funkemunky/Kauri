@@ -10,6 +10,7 @@ import cc.funkemunky.api.com.github.retrooper.packetevents.protocol.packettype.P
 import cc.funkemunky.api.com.github.retrooper.packetevents.protocol.teleport.RelativeFlag;
 import cc.funkemunky.api.com.github.retrooper.packetevents.util.Vector3d;
 import cc.funkemunky.api.com.github.retrooper.packetevents.util.Vector3i;
+import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.client.*;
 import cc.funkemunky.api.com.github.retrooper.packetevents.wrapper.play.server.*;
 import cc.funkemunky.api.io.github.retrooper.packetevents.util.SpigotConversionUtil;
@@ -23,6 +24,7 @@ import cc.funkemunky.api.utils.trans.WrappedServerboundTransactionPacket;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.listeners.api.impl.KeepaliveAcceptedEvent;
+import dev.brighten.anticheat.processing.thread.ThreadHandler;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.MovementUtils;
 import dev.brighten.api.KauriAPI;
@@ -34,9 +36,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 public class PacketProcessor {
 
@@ -57,7 +62,76 @@ public class PacketProcessor {
                 //Packet exemption check
                 if(KauriAPI.INSTANCE.getPacketExemptedPlayers().contains(data.uuid)) return;
 
-                processClient(data, event);
+                if(data.checkManager.runEvent(event)) {
+                    event.setCancelled(true);
+                    System.out.println("Cancelled packet: " + event.getPacketType().getName());
+                }
+
+                if(simLag && event.getPacketType() == PacketType.Play.Client.PLAYER_FLYING) {
+                    IntStream.range(0, amount).forEach(i -> {
+                        try {
+                            SecureRandom.getInstanceStrong().generateSeed(500);
+                        } catch (NoSuchAlgorithmException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                }
+
+                if(event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
+                    WrapperPlayClientInteractEntity packet = new WrapperPlayClientInteractEntity(event);
+
+                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
+                        event.setCancelled(true);
+                    }
+                } else if(event.getPacketType() == PacketType.Play.Client.PLUGIN_MESSAGE) {
+                    WrapperPlayClientPluginMessage packet = new WrapperPlayClientPluginMessage(event);
+
+                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
+                        event.setCancelled(true);
+                    }
+                } else if(event.getPacketType() == PacketType.Play.Client.CLICK_WINDOW) {
+                    WrapperPlayClientClickWindow packet = new WrapperPlayClientClickWindow(event);
+
+                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
+                        event.setCancelled(true);
+                    }
+                } else if(event.getPacketType() == PacketType.Play.Client.PLAYER_FLYING
+                        || event.getPacketType() == PacketType.Play.Client.PLAYER_POSITION
+                        || event.getPacketType() == PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION
+                        || event.getPacketType() == PacketType.Play.Client.PLAYER_ROTATION) {
+                    WrapperPlayClientPlayerFlying packet = new WrapperPlayClientPlayerFlying(event);
+
+                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
+                        event.setCancelled(true);
+                    }
+                } else if(event.getPacketType() == PacketType.Play.Client.CREATIVE_INVENTORY_ACTION) {
+                    WrapperPlayClientCreativeInventoryAction packet = new WrapperPlayClientCreativeInventoryAction(event);
+
+                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
+                        event.setCancelled(true);
+                    }
+                } else if(event.getPacketType() == PacketType.Play.Client.USE_ITEM) {
+                    WrapperPlayClientUseItem packet = new WrapperPlayClientUseItem(event);
+
+                    if (data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
+                        event.setCancelled(true);
+                    }
+                } else if(event.getPacketType() == PacketType.Play.Client.CHAT_MESSAGE) {
+                    WrapperPlayClientChatMessage packet = new WrapperPlayClientChatMessage(event);
+
+                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
+                        event.setCancelled(true);
+                    }
+                }
+
+                ThreadHandler.INSTANCE.getThread(data).runTask(() -> {
+                    if (data.checkManager == null) return;
+                    try {
+                        processClient(data, event);
+                    } catch(Exception e) {
+                        e.printStackTrace();
+                    }
+                });
             }
 
             @Override
@@ -70,7 +144,52 @@ public class PacketProcessor {
                 //Packet exemption check
                 if(KauriAPI.INSTANCE.getPacketExemptedPlayers().contains(data.uuid)) return;
 
-                processServer(data, event);
+
+                if(data.checkManager.runEvent(event)) event.setCancelled(true);
+
+                if(event.getPacketType() == PacketType.Play.Server.ENTITY_MOVEMENT) {
+                    WrapperPlayServerEntityMovement packet = new WrapperPlayServerEntityMovement(event);
+
+                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
+                        event.setCancelled(true);
+                    }
+                } else if(event.getPacketType() == PacketType.Play.Server.ENTITY_RELATIVE_MOVE) {
+                    WrapperPlayServerEntityRelativeMove packet = new WrapperPlayServerEntityRelativeMove(event);
+
+                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
+                        event.setCancelled(true);
+                    }
+                } else if(event.getPacketType() == PacketType.Play.Server.ENTITY_RELATIVE_MOVE_AND_ROTATION) {
+                    WrapperPlayServerEntityRelativeMoveAndRotation packet = new WrapperPlayServerEntityRelativeMoveAndRotation(event);
+
+                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
+                        event.setCancelled(true);
+                    }
+                } else if(event.getPacketType() == PacketType.Play.Server.ENTITY_HEAD_LOOK) {
+                    WrapperPlayServerEntityHeadLook packet = new WrapperPlayServerEntityHeadLook(event);
+
+                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
+                        event.setCancelled(true);
+                    }
+                } else if(event.getPacketType() == PacketType.Play.Server.ENTITY_TELEPORT) {
+                    WrapperPlayServerEntityTeleport packet = new WrapperPlayServerEntityTeleport(event);
+
+                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
+                        event.setCancelled(true);
+                    }
+                } else if(event.getPacketType() == PacketType.Play.Server.PING) {
+                    WrapperPlayServerPing packet = new WrapperPlayServerPing(event);
+
+                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
+                        event.setCancelled(true);
+                    }
+                } else if(event.getPacketType() == PacketType.Play.Server.ENTITY_VELOCITY) {
+                    WrapperPlayServerEntityVelocity packet = new WrapperPlayServerEntityVelocity(event);
+
+                    if(data.checkManager.runPacketCancellable(packet, event.getTimestamp())) {
+                        event.setCancelled(true);
+                    }
+                }
             }
         }, PacketListenerPriority.HIGH);
     }
@@ -298,7 +417,7 @@ public class PacketProcessor {
                         + ":@:" + timestamp);
             }
         } else if(type == PacketType.Play.Client.PONG || type == PacketType.Play.Client.WINDOW_CONFIRMATION) {
-            WrappedServerboundTransactionPacket packet = new WrappedServerboundTransactionPacket(event);
+            WrappedServerboundTransactionPacket packet = new WrappedServerboundTransactionPacket(new PacketWrapper<>(event));
 
             if(packet.getWindow() == 0) {
                 short id = packet.getActionId();
@@ -602,7 +721,7 @@ public class PacketProcessor {
             data.checkManager.runPacket(packet, timestamp);
         } else if(type == PacketType.Play.Server.PING || type == PacketType.Play.Server.WINDOW_CONFIRMATION) {
             WrappedClientboundTransactionPacket
-                    packet = new WrappedClientboundTransactionPacket(event);
+                    packet = new WrappedClientboundTransactionPacket(new PacketWrapper<>(event));
 
             if(data.sniffing) {
                 data.sniffedPackets.add(type + ":@:" + packet.getWindow() + ";"
