@@ -64,7 +64,7 @@ public class KeepaliveProcessor implements Runnable {
                 value.targetPastLocation.addLocation(value.target.getLocation());
             }
 
-            PacketEvents.getAPI().getPlayerManager().sendPacket(value.getPlayer(), packet);
+            PacketEvents.getAPI().getPlayerManager().sendPacket(value.getPlayer(), packet.getPacket());
 
             double dh = value.playerInfo.deltaXZ, dy = Math.abs(value.playerInfo.deltaY);
             if(tick % 5 == 0) {
