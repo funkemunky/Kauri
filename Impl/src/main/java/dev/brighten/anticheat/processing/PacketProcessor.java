@@ -44,7 +44,8 @@ public class PacketProcessor {
     public static int amount = 500;
 
     public PacketProcessor() {
-        PacketEvents.getAPI().getEventManager().registerListener(new cc.funkemunky.api.com.github.retrooper.packetevents.event.PacketListener() {
+        PacketEvents.getAPI().getEventManager().registerListener(
+                new cc.funkemunky.api.com.github.retrooper.packetevents.event.PacketListener() {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
                 if(event.getPlayer() == null) return;
