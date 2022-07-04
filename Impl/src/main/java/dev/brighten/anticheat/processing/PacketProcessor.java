@@ -61,6 +61,7 @@ public class PacketProcessor {
                 if(KauriAPI.INSTANCE.getPacketExemptedPlayers().contains(data.uuid)) return;
 
                 ThreadHandler.INSTANCE.getThread(data).runTask(() -> {
+                    if (data.checkManager == null) return;
                     try {
                         if(outgoingPackets.contains(info.getType())) {
                             processServer(data, info.getPacket(), info.getType(), info.getTimestamp());
@@ -578,6 +579,11 @@ public class PacketProcessor {
                     data.playerInfo.vehicleTimer.reset();
                     data.playerInfo.inVehicle = false;
                     data.getPlayer().sendMessage("Dismounted");
+                } else if(data.getPlayer().isInsideVehicle()) data.getPlayer().sendMessage("Mounted");
+
+                if(data.sniffing) {
+                    data.sniffedPackets.add(type + ":@:" + packet.isUnmount() + ";" + packet.getForward()
+                            + ";" + packet.getSideways() + ";" + packet.isJump() + ";" + timestamp);
                 }
                 break;
             }

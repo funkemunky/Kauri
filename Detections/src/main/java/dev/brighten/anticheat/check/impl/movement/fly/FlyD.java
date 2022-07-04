@@ -19,6 +19,7 @@ public class FlyD extends Check {
         if (!packet.isPos()
                 || data.playerInfo.flightCancel
                 || data.playerInfo.canUseElytra
+                || data.playerInfo.doingBlockUpdate
                 || (data.playerInfo.nearGroundTimer.isNotPassed(3) && (data.playerInfo.lClientGround
                 || data.playerInfo.clientGround))
                 || data.playerInfo.lastBlockPlace.isNotPassed(1)
