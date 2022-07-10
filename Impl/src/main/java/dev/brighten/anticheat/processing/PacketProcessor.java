@@ -578,8 +578,7 @@ public class PacketProcessor {
                 if(data.getPlayer().isInsideVehicle() && packet.isUnmount()) {
                     data.playerInfo.vehicleTimer.reset();
                     data.playerInfo.inVehicle = false;
-                    data.getPlayer().sendMessage("Dismounted");
-                } else if(data.getPlayer().isInsideVehicle()) data.getPlayer().sendMessage("Mounted");
+                }
 
                 if(data.sniffing) {
                     data.sniffedPackets.add(type + ":@:" + packet.isUnmount() + ";" + packet.getForward()
