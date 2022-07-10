@@ -39,7 +39,7 @@ public class FlyB extends Check {
         }
 
 
-        if((data.playerInfo.serverGround && data.playerInfo.clientGround)
+        if(data.playerInfo.serverGround || data.playerInfo.clientGround
                 || data.playerInfo.lastGhostCollision.isNotPassed(1)) {
             vertical = 0;
 
