@@ -23,6 +23,7 @@ public class BadPacketsE extends Check {
                     && now - data.creation > 2000L
                     && data.playerInfo.lastTeleportTimer.isPassed(2)
                     && lastGround != packet.isOnGround()
+                    && data.playerInfo.vehicleTimer.isPassed(2)
                     && !data.playerInfo.serverGround
                     && !data.playerInfo.doingBlockUpdate) {
                 vl++;

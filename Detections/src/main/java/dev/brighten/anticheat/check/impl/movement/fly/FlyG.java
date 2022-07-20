@@ -44,7 +44,9 @@ public class FlyG extends Check {
             }
         }
 
-        if(data.playerInfo.deltaY > max && tags.getSize() > 0 && !data.playerInfo.flightCancel) {
+        if(data.playerInfo.deltaY > max && tags.getSize() > 0
+                && data.playerInfo.lastEntityCollision.isPassed(1)
+                && !data.playerInfo.flightCancel) {
             vl++;
             flag("t=" + tags.build());
         }
