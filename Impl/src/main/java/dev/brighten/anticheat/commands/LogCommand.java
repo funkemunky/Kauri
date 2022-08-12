@@ -1,8 +1,8 @@
 package dev.brighten.anticheat.commands;
 
 import cc.funkemunky.api.utils.*;
-import co.aikar.commands.BaseCommand;
-import co.aikar.commands.annotation.*;
+import cc.funkemunky.api.co.aikar.commands.BaseCommand;
+import cc.funkemunky.api.co.aikar.commands.annotation.*;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
