@@ -10,6 +10,7 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.MiscUtils;
+import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.DevStage;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -204,6 +205,8 @@ public class SpeedE extends Check {
                     buffer = Math.min(3.5f, buffer); //Ensuring we don't have a run-away buffer
                     vl++;
                     flag("d=%.4f pm=%.3f dx=%.3f", smallestDelta, pmotion, data.playerInfo.deltaXZ);
+                } else if(buffer > 1) {
+                    cancelAction(CancelType.MOVEMENT);
                 }
             } else if (buffer > 0) buffer -= 0.1f;
 
