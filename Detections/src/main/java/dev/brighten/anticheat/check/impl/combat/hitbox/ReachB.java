@@ -34,21 +34,23 @@ public class ReachB extends Check {
 
     public Timer lastAimOnTarget = new TickTimer();
     private final Queue<Entity> attacks = new LinkedBlockingQueue<>();
+    private long lastUse;
 
     private static final EnumSet<EntityType> allowedEntityTypes = EnumSet.of(EntityType.ZOMBIE, EntityType.SHEEP,
             EntityType.BLAZE, EntityType.SKELETON, EntityType.PLAYER, EntityType.VILLAGER, EntityType.IRON_GOLEM,
             EntityType.WITCH, EntityType.COW, EntityType.CREEPER);
 
     @Packet
-    public void onUse(WrappedInUseEntityPacket packet) {
+    public void onUse(WrappedInUseEntityPacket packet, long current) {
         if(packet.getAction() == WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK
                 && allowedEntityTypes.contains(packet.getEntity().getType())) {
             attacks.add(packet.getEntity());
+            lastUse = current;
         }
     }
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
+    public void onFlying(WrappedInFlyingPacket packet, long current) {
         if(data.playerInfo.creative || data.playerInfo.inVehicle) {
             attacks.clear();
             debug("creative or in vehicle");
@@ -85,35 +87,14 @@ public class ReachB extends Check {
             boolean collided = false; //Using this to compare smaller numbers than Double.MAX_VALUE. Slightly faster
 
             List<SimpleCollisionBox> boxes = new ArrayList<>();
-            if(eloc.oldLocations.size() > 0) {
-                for (KLocation oldLocation : eloc.oldLocations) {
-                    SimpleCollisionBox box = (SimpleCollisionBox)
-                            EntityData.getEntityBox(oldLocation.toVector(), target);
+            for (KLocation oldLocation : eloc.interpolatedLocations) {
+                SimpleCollisionBox box = (SimpleCollisionBox)
+                        EntityData.getEntityBox(oldLocation.toVector(), target);
 
-                    if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) {
-                        box = box.expand(0.1);
-                    } else box = box.expand(0.0325);
-                    boxes.add(box);
-                }
-                for (KLocation oldLocation : eloc.interpolatedLocations) {
-                    SimpleCollisionBox box = (SimpleCollisionBox)
-                            EntityData.getEntityBox(oldLocation.toVector(), target);
-
-                    if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) {
-                        box = box.expand(0.1);
-                    } else box = box.expand(0.0325);
-                    boxes.add(box);
-                }
-            } else {
-                for (KLocation oldLocation : eloc.interpolatedLocations) {
-                    SimpleCollisionBox box = (SimpleCollisionBox)
-                            EntityData.getEntityBox(oldLocation.toVector(), target);
-
-                    if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) {
-                        box = box.expand(0.1);
-                    } else box = box.expand(0.0325);
-                    boxes.add(box);
-                }
+                if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) {
+                    box = box.expand(0.1);
+                } else box = box.expand(0.0325);
+                boxes.add(box);
             }
 
             if(boxes.size() == 0) return;
@@ -152,9 +133,9 @@ public class ReachB extends Check {
                     }
                 } else if(buffer > 0) buffer-= 0.05f;
                 debug((distance > 3.001 ? Color.Green : "")
-                                +"dist=%.2f>-3.001 hits-%s b=%s ld=%s",
+                                +"dist=%.2f>-3.001 hits-%s b=%s ld=%s deltaUse=%sms lastProblem=%s",
                         distance, hits, buffer,
-                        data.lagInfo.lastPingDrop.getPassed());
+                        data.lagInfo.lastPingDrop.getPassed(), current - lastUse, data.entityLocationProcessor.lastProblem.getPassed());
             } else {
                 if (++hbuffer > 5) {
                     find(HitboxesB.class).vl++;

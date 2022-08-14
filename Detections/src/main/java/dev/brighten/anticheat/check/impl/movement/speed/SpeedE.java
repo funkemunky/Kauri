@@ -10,6 +10,7 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.api.check.DevStage;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.potion.PotionEffectType;
 
@@ -39,6 +40,10 @@ public class SpeedE extends Check {
 
         float friction = MinecraftReflection.getFriction(underBlock),
                 lfriction = MinecraftReflection.getFriction(lastUnderBlock);
+
+        if(underBlock.getType() == Material.AIR || lastUnderBlock.getType() == Material.AIR) {
+            friction = lfriction = 0.6f;
+        }
 
         check:
         {
