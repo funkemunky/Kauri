@@ -5,6 +5,7 @@ import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.MathHelper;
+import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -19,6 +20,7 @@ import org.bukkit.potion.PotionEffectType;
  */
 @CheckInfo(name = "Speed (E)", description = "Motion prediction detection", devStage = DevStage.RELEASE,
         punishVL = 15, vlToFlag = 1)
+@Cancellable
 public class SpeedE extends Check {
     private boolean lastLastClientGround;
     private float buffer;

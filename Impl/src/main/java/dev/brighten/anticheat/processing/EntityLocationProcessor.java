@@ -168,17 +168,22 @@ public class EntityLocationProcessor {
         if(data.target != null && data.target.getEntityId() == entity.getEntityId()) {
             AtomicLong start = new AtomicLong();
             data.runInstantAction(ia -> {
-                if(ia.isEnd()) {
+                if(!ia.isEnd()) {
                     long delta = System.currentTimeMillis() - start.get();
 
                     if(delta > 10) {
                         lastProblem.reset();
                     }
                     action.run();
-                } else start.set(System.currentTimeMillis());
+                } else {
+                    entityLocationMap.get(entity.getUniqueId()).oldLocations.clear();
+                    start.set(System.currentTimeMillis());
+                }
             });
         } else {
             data.runKeepaliveAction(keepalive -> action.run());
+            data.runKeepaliveAction(keepalive ->
+                    entityLocationMap.get(entity.getUniqueId()).oldLocations.clear(), 1);
         }
     }
 }

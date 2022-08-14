@@ -19,7 +19,8 @@ public class EntityLocation {
     public int increment = 0;
     public boolean sentTeleport = false;
     public KLocation oldLocation, location;
-    public List<KLocation> interpolatedLocations = new EvictingList<>(4);
+    public List<KLocation> oldLocations = new EvictingList<>(3),
+            interpolatedLocations = new EvictingList<>(3);
 
     public void interpolateLocations() {
         increment = 3;
@@ -69,6 +70,7 @@ public class EntityLocation {
 
     public void interpolateLocation() {
         oldLocation = new KLocation(x, y, z, yaw, pitch);
+        oldLocations.add(oldLocation);
         if(increment > 0) {
             double d0 = x + (newX - x) / increment;
             double d1 = y + (newY - y) / increment;
