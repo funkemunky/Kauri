@@ -243,7 +243,7 @@ public class PacketProcessor {
                         if (data.target == null && packet.getEntity() instanceof Player)
                             data.targetData = Kauri.INSTANCE.dataManager.getData((Player) packet.getEntity());
                         data.target = (LivingEntity) packet.getEntity();
-                    }
+                    } else data.target = null;
                     data.predictionService.hit = true;
                     data.playerInfo.usingItem = false;
                 }
