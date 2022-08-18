@@ -2,9 +2,9 @@ package dev.brighten.anticheat.commands;
 
 import cc.funkemunky.api.reflections.types.WrappedClass;
 import cc.funkemunky.api.utils.*;
-import co.aikar.commands.*;
-import co.aikar.commands.annotation.*;
-import co.aikar.commands.bukkit.contexts.OnlinePlayer;
+import cc.funkemunky.api.co.aikar.commands.*;
+import cc.funkemunky.api.co.aikar.commands.annotation.*;
+import cc.funkemunky.api.co.aikar.commands.bukkit.contexts.OnlinePlayer;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;

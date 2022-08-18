@@ -1,11 +1,11 @@
 package dev.brighten.anticheat.commands;
 
 import cc.funkemunky.api.utils.*;
-import co.aikar.commands.BaseCommand;
-import co.aikar.commands.annotation.CommandAlias;
-import co.aikar.commands.annotation.CommandPermission;
-import co.aikar.commands.annotation.Description;
-import co.aikar.commands.annotation.Subcommand;
+import cc.funkemunky.api.co.aikar.commands.BaseCommand;
+import cc.funkemunky.api.co.aikar.commands.annotation.CommandAlias;
+import cc.funkemunky.api.co.aikar.commands.annotation.CommandPermission;
+import cc.funkemunky.api.co.aikar.commands.annotation.Description;
+import cc.funkemunky.api.co.aikar.commands.annotation.Subcommand;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckSettings;

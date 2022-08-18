@@ -5,11 +5,14 @@ import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.MathHelper;
+import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.anticheat.utils.MiscUtils;
+import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.DevStage;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.potion.PotionEffectType;
 
@@ -18,6 +21,7 @@ import org.bukkit.potion.PotionEffectType;
  */
 @CheckInfo(name = "Speed (E)", description = "Motion prediction detection", devStage = DevStage.RELEASE,
         punishVL = 15, vlToFlag = 1)
+@Cancellable
 public class SpeedE extends Check {
     private boolean lastLastClientGround;
     private float buffer;
@@ -39,6 +43,10 @@ public class SpeedE extends Check {
 
         float friction = MinecraftReflection.getFriction(underBlock),
                 lfriction = MinecraftReflection.getFriction(lastUnderBlock);
+
+        if(underBlock.getType() == Material.AIR || lastUnderBlock.getType() == Material.AIR) {
+            friction = lfriction = 0.6f;
+        }
 
         check:
         {
@@ -197,6 +205,8 @@ public class SpeedE extends Check {
                     buffer = Math.min(3.5f, buffer); //Ensuring we don't have a run-away buffer
                     vl++;
                     flag("d=%.4f pm=%.3f dx=%.3f", smallestDelta, pmotion, data.playerInfo.deltaXZ);
+                } else if(buffer > 1) {
+                    cancelAction(CancelType.MOVEMENT);
                 }
             } else if (buffer > 0) buffer -= 0.1f;
 

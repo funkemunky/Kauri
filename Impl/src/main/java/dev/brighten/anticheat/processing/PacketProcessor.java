@@ -126,6 +126,13 @@ public class PacketProcessor {
                     case Packet.Client.LOOK: {
                         val packet = new WrappedInFlyingPacket(info.getPacket(), info.getPlayer());
 
+                        if(packet.getX() > 3.0E7 || packet.getY() > 3.0E7 || packet.getZ() > 3.0E7
+                                || packet.getYaw() > 100000 || packet.getPitch() > 100000) {
+                            data.getPlayer().kickPlayer("Bad boy");
+                            info.setCancelled(true);
+                            return;
+                        }
+
                         if(data.checkManager.runPacketCancellable(packet, info.getTimestamp())) {
                             info.setCancelled(true);
                         }
@@ -236,7 +243,7 @@ public class PacketProcessor {
                         if (data.target == null && packet.getEntity() instanceof Player)
                             data.targetData = Kauri.INSTANCE.dataManager.getData((Player) packet.getEntity());
                         data.target = (LivingEntity) packet.getEntity();
-                    }
+                    } else data.target = null;
                     data.predictionService.hit = true;
                     data.playerInfo.usingItem = false;
                 }

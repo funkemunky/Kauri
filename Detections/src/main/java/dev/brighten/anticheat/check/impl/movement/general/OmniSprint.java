@@ -30,6 +30,7 @@ public class OmniSprint extends Check {
             if(!data.playerInfo.sprinting || !data.playerInfo.serverGround) break omniSprint;
 
             if(data.playerInfo.deltaXZ > 0.2
+                    && data.playerInfo.lastAttack.isPassed(2)
                     && !data.playerInfo.doingVelocity
                     && !data.playerInfo.generalCancel
                     && data.playerInfo.lastVelocity.isPassed(20)) {

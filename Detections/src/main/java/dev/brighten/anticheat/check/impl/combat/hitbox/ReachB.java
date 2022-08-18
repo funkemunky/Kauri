@@ -6,6 +6,7 @@ import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInUseEntityPacket;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.MathUtils;
+import cc.funkemunky.api.utils.Tuple;
 import cc.funkemunky.api.utils.world.EntityData;
 import cc.funkemunky.api.utils.world.types.SimpleCollisionBox;
 import dev.brighten.anticheat.check.api.Cancellable;
@@ -33,32 +34,34 @@ public class ReachB extends Check {
     private int hbuffer;
 
     public Timer lastAimOnTarget = new TickTimer();
-    private final Queue<Entity> attacks = new LinkedBlockingQueue<>();
+    private final Queue<Tuple<KLocation, Entity>> attacks = new LinkedBlockingQueue<>();
+    private long lastUse;
 
     private static final EnumSet<EntityType> allowedEntityTypes = EnumSet.of(EntityType.ZOMBIE, EntityType.SHEEP,
             EntityType.BLAZE, EntityType.SKELETON, EntityType.PLAYER, EntityType.VILLAGER, EntityType.IRON_GOLEM,
             EntityType.WITCH, EntityType.COW, EntityType.CREEPER);
 
     @Packet
-    public void onUse(WrappedInUseEntityPacket packet) {
+    public void onUse(WrappedInUseEntityPacket packet, long current) {
         if(packet.getAction() == WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK
                 && allowedEntityTypes.contains(packet.getEntity().getType())) {
-            attacks.add(packet.getEntity());
+            attacks.add(new Tuple<>(data.playerInfo.to.clone(), packet.getEntity()));
+            lastUse = current;
         }
     }
 
     @Packet
-    public void onFlying(WrappedInFlyingPacket packet) {
+    public void onFlying(WrappedInFlyingPacket packet, long current) {
         if(data.playerInfo.creative || data.playerInfo.inVehicle) {
             attacks.clear();
             debug("creative or in vehicle");
            return;
         }
-        Entity target;
+        Tuple<KLocation, Entity> target;
 
         while((target = attacks.poll()) != null) {
             //Updating new entity loc
-            Optional<EntityLocation> optionalEloc = data.entityLocationProcessor.getEntityLocation(target);
+            Optional<EntityLocation> optionalEloc = data.entityLocationProcessor.getEntityLocation(target.two);
 
             if(!optionalEloc.isPresent()) {
                 debug("eloc is null");
@@ -67,15 +70,12 @@ public class ReachB extends Check {
 
             final EntityLocation eloc = optionalEloc.get();
 
-            final KLocation to = data.playerInfo.to.clone(), from = data.playerInfo.from.clone();
+            final KLocation to = target.one;
 
             //debug("current loc: %.4f, %.4f, %.4f", eloc.x, eloc.y, eloc.z);
 
             to.y+= data.playerInfo.sneaking ? (ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_14)
                     ? 1.27f : 1.54f) : 1.62f;
-            from.y+= data.playerInfo.sneaking ? (ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_14)
-                    ? 1.27f : 1.54f) : 1.62f;
-
             if(eloc.x == 0 && eloc.y == 0 & eloc.z == 0) {
                 debug("eloc is all 0 wtf");
                 return;
@@ -88,29 +88,29 @@ public class ReachB extends Check {
             if(eloc.oldLocations.size() > 0) {
                 for (KLocation oldLocation : eloc.oldLocations) {
                     SimpleCollisionBox box = (SimpleCollisionBox)
-                            EntityData.getEntityBox(oldLocation.toVector(), target);
+                            EntityData.getEntityBox(oldLocation.toVector(), target.two);
 
                     if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) {
-                        box = box.expand(0.1);
+                        box = box.expand(0.1325);
                     } else box = box.expand(0.0325);
                     boxes.add(box);
                 }
                 for (KLocation oldLocation : eloc.interpolatedLocations) {
                     SimpleCollisionBox box = (SimpleCollisionBox)
-                            EntityData.getEntityBox(oldLocation.toVector(), target);
+                            EntityData.getEntityBox(oldLocation.toVector(), target.two);
 
                     if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) {
-                        box = box.expand(0.1);
+                        box = box.expand(0.1325);
                     } else box = box.expand(0.0325);
                     boxes.add(box);
                 }
             } else {
                 for (KLocation oldLocation : eloc.interpolatedLocations) {
                     SimpleCollisionBox box = (SimpleCollisionBox)
-                            EntityData.getEntityBox(oldLocation.toVector(), target);
+                            EntityData.getEntityBox(oldLocation.toVector(), target.two);
 
                     if(data.playerVersion.isBelow(ProtocolVersion.V1_9)) {
-                        box = box.expand(0.1);
+                        box = box.expand(0.1325);
                     } else box = box.expand(0.0325);
                     boxes.add(box);
                 }
@@ -123,20 +123,12 @@ public class ReachB extends Check {
             for (SimpleCollisionBox targetBox : boxes) {
                 final AxisAlignedBB vanillaBox = new AxisAlignedBB(targetBox);
 
-                Vec3D intersectTo = vanillaBox.rayTrace(to.toVector(), MathUtils.getDirection(to), 10),
-                        intersectFrom = vanillaBox.rayTrace(from.toVector(),
-                                MathUtils.getDirection(from), 10);
+                Vec3D intersectTo = vanillaBox.rayTrace(to.toVector(), MathUtils.getDirection(to), 10);
 
                 if(intersectTo != null) {
                     lastAimOnTarget.reset();
                     hits++;
                     distance = Math.min(distance, intersectTo.distanceSquared(new Vec3D(to.x, to.y, to.z)));
-                    collided = true;
-                }
-                if(intersectFrom != null) {
-                    lastAimOnTarget.reset();
-                    hits++;
-                    distance = Math.min(distance, intersectFrom.distanceSquared(new Vec3D(from.x, from.y, from.z)));
                     collided = true;
                 }
             }
@@ -152,9 +144,9 @@ public class ReachB extends Check {
                     }
                 } else if(buffer > 0) buffer-= 0.05f;
                 debug((distance > 3.001 ? Color.Green : "")
-                                +"dist=%.2f>-3.001 hits-%s b=%s ld=%s",
+                                +"dist=%.2f>-3.001 hits-%s b=%s ld=%s deltaUse=%sms lastProblem=%s",
                         distance, hits, buffer,
-                        data.lagInfo.lastPingDrop.getPassed());
+                        data.lagInfo.lastPingDrop.getPassed(), current - lastUse, data.entityLocationProcessor.lastProblem.getPassed());
             } else {
                 if (++hbuffer > 5) {
                     find(HitboxesB.class).vl++;

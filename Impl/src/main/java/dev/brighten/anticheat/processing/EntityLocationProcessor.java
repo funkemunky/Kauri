@@ -8,12 +8,14 @@ import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.EntityLocation;
 import dev.brighten.anticheat.utils.timer.Timer;
 import dev.brighten.anticheat.utils.timer.impl.MillisTimer;
+import dev.brighten.anticheat.utils.timer.impl.TickTimer;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 @RequiredArgsConstructor
 public class EntityLocationProcessor {
@@ -21,7 +23,7 @@ public class EntityLocationProcessor {
     private final ObjectData data;
 
     private final Map<UUID, EntityLocation> entityLocationMap = new ConcurrentHashMap<>();
-    private final Timer lastFlying = new MillisTimer();
+    public final Timer lastFlying = new MillisTimer(), lastProblem = new TickTimer();
     public int streak;
 
     private static final EnumSet<EntityType> allowedEntityTypes = EnumSet.of(EntityType.ZOMBIE, EntityType.SHEEP,
@@ -96,8 +98,6 @@ public class EntityLocationProcessor {
             }
 
             eloc.increment = 3;
-
-            eloc.interpolatedLocations.clear();
         });
     }
 
@@ -131,7 +131,6 @@ public class EntityLocationProcessor {
                     eloc.newZ = eloc.z = packet.z;
                     eloc.newYaw = eloc.yaw = packet.yaw;
                     eloc.newPitch = eloc.pitch = packet.pitch;
-                    eloc.interpolatedLocations.clear();
                 } else {
                     eloc.newX = packet.x;
                     eloc.newY = packet.y;
@@ -140,7 +139,6 @@ public class EntityLocationProcessor {
                     eloc.newPitch = packet.pitch;
 
                     eloc.increment = 3;
-                    eloc.interpolatedLocations.clear();
                 }
             } else {
                 //We don't need to do version checking here. Atlas handles this for us.
@@ -168,10 +166,19 @@ public class EntityLocationProcessor {
      */
     private void runAction(Entity entity, Runnable action) {
         if(data.target != null && data.target.getEntityId() == entity.getEntityId()) {
+            AtomicLong start = new AtomicLong();
             data.runInstantAction(ia -> {
                 if(!ia.isEnd()) {
+                    long delta = System.currentTimeMillis() - start.get();
+
+                    if(delta > 10) {
+                        lastProblem.reset();
+                    }
                     action.run();
-                } else entityLocationMap.get(entity.getUniqueId()).oldLocations.clear();
+                } else {
+                    entityLocationMap.get(entity.getUniqueId()).oldLocations.clear();
+                    start.set(System.currentTimeMillis());
+                }
             });
         } else {
             data.runKeepaliveAction(keepalive -> action.run());
