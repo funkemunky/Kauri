@@ -14,7 +14,7 @@ public class Log {
         log(Level.INFO, info, objects);
     }
 
-    public static void warning(String warning, Object... objects) {
+    public static void warn(String warning, Object... objects) {
         log(Level.WARNING, warning, objects);
     }
 

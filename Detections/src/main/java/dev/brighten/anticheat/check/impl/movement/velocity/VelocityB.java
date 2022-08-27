@@ -15,8 +15,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-@CheckInfo(name = "Velocity (B)", description = "A horizontal velocity check.", checkType = CheckType.VELOCITY,
-        punishVL = 40, vlToFlag = 15, executable = true)
+@CheckInfo(name = "Velocity (B)", description = "A simple horizontal velocity check.", checkType = CheckType.VELOCITY,
+        vlToFlag = 5, punishVL = 20, executable = true)
 @Cancellable
 public class VelocityB extends Check {
 
@@ -36,12 +36,11 @@ public class VelocityB extends Check {
 
     @Packet
     public void onFlying(WrappedInFlyingPacket packet, long timeStamp) {
-        if(data.playerInfo.cvb) {
-            pvX = data.playerInfo.velocityX;
+        if(data.playerInfo.cvc) {
             pvZ = data.playerInfo.velocityZ;
+            pvX = data.playerInfo.velocityX;
+            data.playerInfo.cvc = false;
             ticks = 0;
-            debug("pvX=%.2f pvZ=%.2f", pvX, pvZ);
-            data.playerInfo.cvb = false;
         }
         if((pvX != 0 || pvZ != 0) && (data.playerInfo.deltaX != 0
                 || data.playerInfo.deltaY != 0
@@ -53,13 +52,11 @@ public class VelocityB extends Check {
             if(data.blockInfo.blocksNear
                     || data.blockInfo.blocksAbove
                     || data.blockInfo.inLiquid
+                    || data.playerInfo.creative
                     || data.lagInfo.lastPingDrop.isNotPassed(4)
                     || data.lagInfo.lastPacketDrop.isNotPassed(2)) {
                 pvX = pvZ = 0;
                 buffer-= buffer > 0 ? 1 : 0;
-                debug("[%.2f] bn=%s lpd=%s lpacket=%s ba=%s", buffer, data.blockInfo.blocksNear,
-                        data.lagInfo.lastPingDrop.getPassed(), data.lagInfo.lastPacketDrop.getPassed(),
-                        data.blockInfo.blocksAbove);
                 return;
             } else if(data.playerInfo.doingBlockUpdate) {
                 pvX = pvZ = 0;
@@ -111,7 +108,7 @@ public class VelocityB extends Check {
                         double deltaX = Math.abs(tuple.two[0] - data.playerInfo.deltaX);
                         double deltaZ = Math.abs(tuple.two[1] - data.playerInfo.deltaZ);
 
-                        return (deltaX * deltaX + deltaZ * deltaZ) < 0.005;
+                        return (deltaX * deltaX + deltaZ * deltaZ) < 0.01;
                     })
                     .min(Comparator.comparing(tuple -> {
                         double deltaX = Math.abs(tuple.two[0] - data.playerInfo.deltaX);
@@ -141,10 +138,11 @@ public class VelocityB extends Check {
             double ratioX = data.playerInfo.deltaX / pvX, ratioZ = data.playerInfo.deltaZ / pvZ;
             double ratio = (Math.abs(ratioX) + Math.abs(ratioZ)) / 2;
 
-            if((ratio < 0.996) && pvX != 0
+            if((ratio < 0.85 || ratio > 3) && pvX != 0
                     && pvZ != 0
                     && timeStamp - data.creation > 3000L
                     && data.playerInfo.lastTeleportTimer.isPassed(1)
+                    && !data.getPlayer().getItemInHand().getType().isEdible()
                     && !data.blockInfo.blocksNear) {
                 if(data.playerInfo.lastUseItem.isPassed(2) && ++buffer > 30) {
                     vl++;
@@ -152,7 +150,7 @@ public class VelocityB extends Check {
                             ratio * 100, buffer, moveStrafe, moveForward);
                     buffer = 31;
                 }
-            } else if(buffer > 0) buffer-= 0.5;
+            } else buffer-= buffer > 0 ? data.lagInfo.lastPacketDrop.isNotPassed(20) ? 1 : 0.5 : 0;
 
             debug("ratio=%.3f dx=%.4f dz=%.4f buffer=%.1f ticks=%s strafe=%.2f forward=%.2f lastUse=%s " +
                             "found=%s lastV=%s", ratio, data.playerInfo.deltaX, data.playerInfo.deltaZ,

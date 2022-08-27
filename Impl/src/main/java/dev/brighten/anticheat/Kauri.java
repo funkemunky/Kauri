@@ -12,6 +12,7 @@ import cc.funkemunky.api.co.aikar.commands.BukkitCommandManager;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.data.DataManager;
 import dev.brighten.anticheat.data.ObjectData;
+import dev.brighten.anticheat.depends.MavenLibrary;
 import dev.brighten.anticheat.discord.DiscordAPI;
 import dev.brighten.anticheat.listeners.api.EventHandler;
 import dev.brighten.anticheat.logs.LoggerManager;
@@ -37,6 +38,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.zip.CRC32;
 
+@MavenLibrary(groupId = "om.esotericsoftware", artifactId = "reflectasm", version = "1.11.9")
 public class Kauri extends JavaPlugin {
 
     public static Kauri INSTANCE;

@@ -11,18 +11,6 @@
 
     <artifactId>Impl</artifactId>
 
-    <repositories>
-        <repository>
-            <name>jcenter</name>
-            <id>bintray-jcenter</id>
-            <url>https://jcenter.bintray.com</url>
-        </repository>
-        <repository>
-            <id>pledge-repo</id>
-            <url>https://raw.github.com/ThomasOM/Pledge/repository/</url>
-        </repository>
-    </repositories>
-
     <build>
         <plugins>
             <plugin>
@@ -92,7 +80,7 @@
             <groupId>com.esotericsoftware</groupId>
             <artifactId>reflectasm</artifactId>
             <version>1.11.9</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

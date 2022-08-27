@@ -19,7 +19,7 @@ import org.bukkit.potion.PotionEffectType;
 /**
  * I yoinked the idea from Tecnio
  */
-@CheckInfo(name = "Speed (E)", description = "Motion prediction detection", devStage = DevStage.RELEASE,
+@CheckInfo(name = "Speed (E)", description = "Motion prediction detection", devStage = DevStage.BETA,
         punishVL = 15, vlToFlag = 1)
 @Cancellable
 public class SpeedE extends Check {

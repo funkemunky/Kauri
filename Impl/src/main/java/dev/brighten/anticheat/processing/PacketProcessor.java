@@ -61,30 +61,28 @@ public class PacketProcessor {
                 //Packet exemption check
                 if(KauriAPI.INSTANCE.getPacketExemptedPlayers().contains(data.uuid)) return;
 
-                ThreadHandler.INSTANCE.getThread(data).runTask(() -> {
-                    if (data.checkManager == null) return;
-                    try {
-                        if(outgoingPackets.contains(info.getType())) {
-                            processServer(data, info.getPacket(), info.getType(), info.getTimestamp());
-                        } else if(incomingPackets.contains(info.getType())) {
-                            processClient(data, info.getPacket(), info.getType(), info.getTimestamp());
+                if (data.checkManager == null) return;
+                try {
+                    if(outgoingPackets.contains(info.getType())) {
+                        processServer(data, info.getPacket(), info.getType(), info.getTimestamp());
+                    } else if(incomingPackets.contains(info.getType())) {
+                        processClient(data, info.getPacket(), info.getType(), info.getTimestamp());
 
-                            if(simLag && info.getType().equals(Packet.Client.FLYING)) {
-                                IntStream.range(0, amount).forEach(i -> {
-                                    try {
-                                        SecureRandom.getInstanceStrong().generateSeed(500);
-                                    } catch (NoSuchAlgorithmException e) {
-                                        e.printStackTrace();
-                                    }
-                                });
-                            }
+                        if(simLag && info.getType().equals(Packet.Client.FLYING)) {
+                            IntStream.range(0, amount).forEach(i -> {
+                                try {
+                                    SecureRandom.getInstanceStrong().generateSeed(500);
+                                } catch (NoSuchAlgorithmException e) {
+                                    e.printStackTrace();
+                                }
+                            });
                         }
-
-                        if(data.checkManager.runEvent(info)) info.setCancelled(true);
-                    } catch(Exception e) {
-                        e.printStackTrace();
                     }
-                });
+
+                    if(data.checkManager.runEvent(info)) info.setCancelled(true);
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
             });
 
     public final PacketListener cancelListener = Atlas.getInstance().getPacketProcessor()
