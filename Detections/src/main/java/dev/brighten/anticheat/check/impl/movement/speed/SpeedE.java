@@ -57,12 +57,23 @@ public class SpeedE extends Check {
                     || data.playerInfo.lastVelocity.isNotPassed(1)
                     || data.blockInfo.inLiquid
                     || data.blockInfo.collidesHorizontally) break check;
+
             double smallestDelta = Double.MAX_VALUE;
+
+            double lmotionX = data.playerInfo.lDeltaX, lmotionZ = data.playerInfo.lDeltaZ;
+
+            //The "1" will effectively remove lastFriction from the equation
+            lmotionX *= (lastLastClientGround ? lfriction : 1) * 0.9100000262260437D;
+            lmotionZ *= (lastLastClientGround ? lfriction : 1) * 0.9100000262260437D;
+
+            if(((lmotionX * lmotionX) + (lmotionZ * lmotionZ)) < 0.0025 && data.playerInfo.deltaXZ < 0.2)
+                break check;
 
             double pmotionx = 0, pmotionz = 0;
             boolean onGround = data.playerInfo.lClientGround;
             loop:
             {
+
                 for (int f = -1; f < 2; f++) {
                     for (int s = -1; s < 2; s++) {
                         for (boolean sprinting : TRUE_FALSE) {
@@ -91,11 +102,6 @@ public class SpeedE extends Check {
                                                 double aiMoveSpeed = data.getPlayer().getWalkSpeed() / 2;
 
                                                 float drag = 0.91f;
-                                                double lmotionX = data.playerInfo.lDeltaX, lmotionZ = data.playerInfo.lDeltaZ;
-
-                                                //The "1" will effectively remove lastFriction from the equation
-                                                lmotionX *= (lastLastClientGround ? lfriction : 1) * 0.9100000262260437D;
-                                                lmotionZ *= (lastLastClientGround ? lfriction : 1) * 0.9100000262260437D;
 
                                                 //Running multiplication done after previous prediction
                                                 if (data.playerVersion.isOrAbove(ProtocolVersion.V1_9)) {

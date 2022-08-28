@@ -57,6 +57,8 @@ public class FlyA extends Check {
             if(!data.playerInfo.flightCancel
                     && data.playerInfo.lastBlockPlace.isPassed(1)
                     && data.playerInfo.lastVelocity.isPassed(3)
+                    && (data.playerInfo.lastHalfBlock.isPassed(2)
+                    || data.playerInfo.airTicks > 4 || data.playerInfo.groundTicks > 7)
                     && data.playerInfo.climbTimer.isPassed(15)
                     && data.playerInfo.blockAboveTimer.isPassed(5)
                     && deltaPredict > 0.016) {
@@ -72,8 +74,8 @@ public class FlyA extends Check {
             } else buffer-= buffer > 0 ? 0.25f : 0;
 
             debug((flagged ? Color.Green : "")
-                            +"pos=%s deltaY=%.3f predicted=%.3f d=%.3f ground=%s lpass=%s cp=%s air=%s buffer=%.1f s" +
-                            "g=%s cb=%s fc=%s gc=%s",
+                            + "pos=%s deltaY=%.3f predicted=%.3f d=%.3f ground=%s lpass=%s cp=%s air=%s buffer=%.1f s"
+                            + "g=%s cb=%s fc=%s gc=%s",
                     packet.getY(), data.playerInfo.deltaY, predicted, deltaPredict, onGround,
                     data.playerInfo.liquidTimer.getPassed(), data.playerInfo.climbTimer.getPassed(),
                     data.playerInfo.kAirTicks, buffer, data.playerInfo.serverGround,
