@@ -85,6 +85,8 @@ public class SpeedE extends Check {
 
                                                 float forward = f, strafe = s;
 
+                                                if(sprinting && f <= 0) continue;
+
                                                 if (sneaking) {
                                                     forward *= 0.3;
                                                     strafe *= 0.3;
