@@ -101,7 +101,7 @@ public class Check implements KauriCheck {
 
     public static void register(Class<?> checkRawClass) {
         if(!checkRawClass.isAnnotationPresent(CheckInfo.class)) {
-            Log.warning("Attempted to register class {} without CheckInfo annotations",
+            Log.warn("Attempted to register class {} without CheckInfo annotations",
                     checkRawClass.getName());
             return;
         }

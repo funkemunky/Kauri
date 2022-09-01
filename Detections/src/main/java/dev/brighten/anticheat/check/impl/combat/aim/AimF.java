@@ -9,7 +9,7 @@ import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Aim (H)", description = "checks for large headsnaps.",
         devStage = DevStage.BETA, checkType = CheckType.AIM, vlToFlag = 9)
-public class AimH extends Check {
+public class AimF extends Check {
     private double lastHorizontalDistance;
 
     @Packet

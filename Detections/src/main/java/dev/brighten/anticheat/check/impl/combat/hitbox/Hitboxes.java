@@ -57,7 +57,7 @@ public class Hitboxes extends Check {
 
             for (KLocation tloc : targetLocs) {
                 SimpleCollisionBox tbox = getHitbox(data.target, tloc).expand(data.playerVersion
-                        .isBelow(ProtocolVersion.V1_9) ? 0.1 : 0);
+                        .isBelow(ProtocolVersion.V1_9) ? 0.1325 : 0.0325);
                 final AxisAlignedBB vanillaBox = new AxisAlignedBB(tbox.expand(0.15));
 
                 Vec3D intersectTo = vanillaBox.rayTrace(torigin.toVector(),

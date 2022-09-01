@@ -62,7 +62,7 @@ public class ReachA extends Check {
                 }
             }
 
-            distance = Math.sqrt(distance) - (data.playerVersion.isBelow(ProtocolVersion.V1_9) ? 0.4 : 0.3);
+            distance = Math.sqrt(distance) - (data.playerVersion.isBelow(ProtocolVersion.V1_9) ? 0.4325 : 0.3325);
 
             if (distance > reachThreshold) {
                 if (++buffer > 5) {

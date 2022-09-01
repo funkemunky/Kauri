@@ -8,6 +8,7 @@ import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.listener.functions.PacketListener;
 import cc.funkemunky.api.tinyprotocol.packet.in.*;
 import cc.funkemunky.api.tinyprotocol.packet.out.*;
+import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.XMaterial;
@@ -60,30 +61,28 @@ public class PacketProcessor {
                 //Packet exemption check
                 if(KauriAPI.INSTANCE.getPacketExemptedPlayers().contains(data.uuid)) return;
 
-                ThreadHandler.INSTANCE.getThread(data).runTask(() -> {
-                    if (data.checkManager == null) return;
-                    try {
-                        if(outgoingPackets.contains(info.getType())) {
-                            processServer(data, info.getPacket(), info.getType(), info.getTimestamp());
-                        } else if(incomingPackets.contains(info.getType())) {
-                            processClient(data, info.getPacket(), info.getType(), info.getTimestamp());
+                if (data.checkManager == null) return;
+                try {
+                    if(outgoingPackets.contains(info.getType())) {
+                        processServer(data, info.getPacket(), info.getType(), info.getTimestamp());
+                    } else if(incomingPackets.contains(info.getType())) {
+                        processClient(data, info.getPacket(), info.getType(), info.getTimestamp());
 
-                            if(simLag && info.getType().equals(Packet.Client.FLYING)) {
-                                IntStream.range(0, amount).forEach(i -> {
-                                    try {
-                                        SecureRandom.getInstanceStrong().generateSeed(500);
-                                    } catch (NoSuchAlgorithmException e) {
-                                        e.printStackTrace();
-                                    }
-                                });
-                            }
+                        if(simLag && info.getType().equals(Packet.Client.FLYING)) {
+                            IntStream.range(0, amount).forEach(i -> {
+                                try {
+                                    SecureRandom.getInstanceStrong().generateSeed(500);
+                                } catch (NoSuchAlgorithmException e) {
+                                    e.printStackTrace();
+                                }
+                            });
                         }
-
-                        if(data.checkManager.runEvent(info)) info.setCancelled(true);
-                    } catch(Exception e) {
-                        e.printStackTrace();
                     }
-                });
+
+                    if(data.checkManager.runEvent(info)) info.setCancelled(true);
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
             });
 
     public final PacketListener cancelListener = Atlas.getInstance().getPacketProcessor()

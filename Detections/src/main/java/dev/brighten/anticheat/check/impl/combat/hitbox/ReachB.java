@@ -136,7 +136,7 @@ public class ReachB extends Check {
             if(collided) {
                 hbuffer = 0;
                 distance = Math.sqrt(distance);
-                if(distance > 3.05) {
+                if(distance > 3.0001) {
                     if(++buffer > 2) {
                         vl++;
                         flag("d=%.3f>-3.05", distance);
