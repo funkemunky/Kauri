@@ -349,7 +349,7 @@ public class BlockInformation {
 
             if(entityBox == null) continue;
 
-            if(entityBox.isCollided(normalBox.copy().offset(0, -.1, 0)))
+            if(entityBox.isCollided(normalBox.copy().offset(0, -.25, 0)))
                 objectData.playerInfo.serverGround = true;
 
             if(entityBox.isCollided(normalBox))

@@ -588,6 +588,7 @@ public class MovementProcessor {
                 || data.blockInfo.inScaffolding
                 || data.blockInfo.inHoney
                 || !data.playerInfo.checkMovement
+                || data.teleportsToConfirm > 0
                 || data.playerInfo.lastTeleportTimer.isNotPassed(1)
                 || data.playerInfo.lastGlideTimer.isNotPassed()
                 || (data.playerInfo.deltaXZ == 0 && data.playerInfo.deltaY == 0)

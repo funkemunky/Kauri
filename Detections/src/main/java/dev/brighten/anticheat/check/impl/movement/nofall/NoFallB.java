@@ -57,6 +57,7 @@ public class NoFallB extends Check {
         final boolean dground = Math.abs(data.playerInfo.to.y) % divisor < 1E-4 && data.playerInfo.nearGround;
         // If they are saying they are on the ground
         if(!data.playerInfo.clientGround
+                && !data.blockInfo.inWeb
                 // Their bounding box is on the ground
                 && data.playerInfo.vehicleTimer.isPassed(20)
                 && ((data.playerInfo.serverGround || data.blockInfo.blocksBelow)
