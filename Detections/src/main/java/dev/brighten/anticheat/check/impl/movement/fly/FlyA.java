@@ -2,18 +2,14 @@ package dev.brighten.anticheat.check.impl.movement.fly;
 
 import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
-import cc.funkemunky.api.tinyprotocol.packet.out.WrappedOutVelocityPacket;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
-import dev.brighten.anticheat.processing.TagsBuilder;
 import dev.brighten.anticheat.utils.MovementUtils;
-import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
-import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Fly (A)", description = "Checks for improper acceleration.", checkType = CheckType.FLIGHT,
         vlToFlag = 4, punishVL = 15, executable = true)
@@ -55,6 +51,7 @@ public class FlyA extends Check {
 
             boolean flagged = false;
             if(!data.playerInfo.flightCancel
+                    && !data.blockInfo.fenceNear
                     && data.playerInfo.lastBlockPlace.isPassed(1)
                     && data.playerInfo.lastVelocity.isPassed(3)
                     && (data.playerInfo.lastHalfBlock.isPassed(2)

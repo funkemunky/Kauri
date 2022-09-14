@@ -28,7 +28,8 @@ public class BlockInformation {
     private ObjectData objectData;
     public boolean onClimbable, onSlab, onStairs, onHalfBlock, inLiquid, inLava, inWater, inWeb, onSlime, onIce,
             onSoulSand, blocksAbove, collidesVertically, bedNear, collidesHorizontally, blocksNear, inBlock, miscNear,
-            collidedWithEntity, roseBush, inPortal, blocksBelow, pistonNear, fenceBelow, inScaffolding, inHoney;
+            collidedWithEntity, roseBush, inPortal, blocksBelow, fenceNear,
+            pistonNear, fenceBelow, inScaffolding, inHoney;
     public float currentFriction, fromFriction;
     public CollisionHandler
             handler = new CollisionHandler(new ArrayList<>(), new ArrayList<>(), new KLocation(0,0,0), null);
@@ -67,7 +68,7 @@ public class BlockInformation {
         blocks.clear();
 
         onClimbable = objectData.playerInfo.serverGround = objectData.playerInfo.nearGround = fenceBelow
-                = inScaffolding = inHoney
+                = inScaffolding = inHoney = fenceNear
                 = onSlab = onStairs = onHalfBlock = inLiquid = inLava = inWater = inWeb = onSlime = pistonNear
                 = onIce = onSoulSand = blocksAbove = collidesVertically = bedNear = collidesHorizontally =
                 blocksNear = inBlock = miscNear = collidedWithEntity = blocksBelow = inPortal = false;
@@ -78,8 +79,8 @@ public class BlockInformation {
 
         int startX = Location.locToBlock(objectData.playerInfo.to.x - 1 - dh);
         int endX = Location.locToBlock(objectData.playerInfo.to.x + 1 + dh);
-        int startY = Location.locToBlock(objectData.playerInfo.to.y - Math.max(0.6, 0.6 + Math.abs(dy)));
-        int endY = Location.locToBlock(objectData.playerInfo.to.y + Math.max(2.1, 2.1 + Math.abs(dy)));
+        int startY = Location.locToBlock(objectData.playerInfo.to.y - Math.max(1, 1 + Math.abs(dy)));
+        int endY = Location.locToBlock(objectData.playerInfo.to.y + Math.max(2.4, 2.4 + Math.abs(dy)));
         int startZ = Location.locToBlock(objectData.playerInfo.to.z - 1 - dh);
         int endZ = Location.locToBlock(objectData.playerInfo.to.z + 1 + dh);
 
@@ -184,6 +185,13 @@ public class BlockInformation {
                                         }
                                     }
 
+                                    if(normalBox.copy().expand(0.25, 0, 0.25)
+                                            .offset(0, -0.8, 0).isCollided(blockBox)
+                                            && (Materials.checkFlag(type, Materials.FENCE)
+                                            || Materials.checkFlag(type, Materials.WALL))) {
+                                        fenceNear = true;
+                                    }
+
                                     if(Materials.checkFlag(type, Materials.SOLID)) {
                                         SimpleCollisionBox groundBox = normalBox.copy()
                                                 .offset(0, -.49, 0).expandMax(0, -1.2, 0);
@@ -257,7 +265,7 @@ public class BlockInformation {
                                             }
                                         }
 
-                                        if(groundBox.copy().expand(0.5, 0.3, 0.5).isCollided(blockBox)) {
+                                        if(groundBox.copy().expand(0.5, 0.6, 0.5).isCollided(blockBox)) {
                                             if(Materials.checkFlag(type, Materials.SLABS))
                                                 onSlab = true;
                                             else
