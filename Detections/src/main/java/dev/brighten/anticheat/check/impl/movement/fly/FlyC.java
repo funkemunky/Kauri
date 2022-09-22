@@ -6,7 +6,6 @@ import dev.brighten.anticheat.check.api.Cancellable;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
-import dev.brighten.anticheat.utils.MovementUtils;
 import dev.brighten.api.check.CheckType;
 
 @CheckInfo(name = "Fly (C)", description = "Checks for invalid jump heights.",
@@ -23,7 +22,7 @@ public class FlyC extends Check {
                     && !data.blockInfo.collidesHorizontally
                     && data.playerInfo.lClientGround
                     && !data.blockInfo.miscNear
-                    && data.playerInfo.lastGhostCollision.isNotPassed(1)
+                    && data.playerInfo.lastGhostCollision.isPassed(1)
                     && !data.playerInfo.insideBlock
                     && data.playerInfo.blockAboveTimer.isPassed(6)
                     && data.playerInfo.lastBlockPlace.isPassed(20)
