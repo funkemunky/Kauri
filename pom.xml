@@ -77,6 +77,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.199</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.github.spigot</groupId>
             <artifactId>1.13.2</artifactId>
             <version>1.13.2</version>

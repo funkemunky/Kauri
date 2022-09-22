@@ -40,6 +40,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.zip.CRC32;
 
 @MavenLibrary(groupId = "com.esotericsoftware", artifactId = "reflectasm", version = "1.11.9")
+@MavenLibrary(groupId = "com.h2database", artifactId = "h2", version = "1.4.199")
 public class Kauri extends JavaPlugin {
 
     public static Kauri INSTANCE;
