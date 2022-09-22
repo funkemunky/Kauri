@@ -11,7 +11,7 @@ import dev.brighten.api.check.CheckType;
 import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Block (F)", description = "Checks for safewalk like movement.", executable = true,
-        checkType = CheckType.BLOCK, punishVL = 5, devStage = DevStage.ALPHA)
+        checkType = CheckType.BLOCK, punishVL = 5, devStage = DevStage.BETA)
 @Cancellable(cancelType = CancelType.PLACE)
 public class BlockF extends Check {
 

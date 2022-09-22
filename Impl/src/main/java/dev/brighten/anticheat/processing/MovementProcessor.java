@@ -478,7 +478,13 @@ public class MovementProcessor {
             if (data.blockInfo.onHalfBlock) data.playerInfo.lastHalfBlock.reset();
             //We dont check if theyre still on ice because this would be useless to checks that check a player in air too.
             if (data.blockInfo.onIce) data.playerInfo.iceTimer.reset();
-            if (data.blockInfo.inWeb) data.playerInfo.webTimer.reset();
+
+            if (data.blockInfo.inWeb){
+                data.playerInfo.webTimer.reset();
+            } else {
+                data.playerInfo.inWebTimer.reset();
+            }
+
             if (data.blockInfo.onClimbable) data.playerInfo.climbTimer.reset();
             if (data.blockInfo.onSlime) data.playerInfo.slimeTimer.reset();
             if (data.blockInfo.onSoulSand) data.playerInfo.soulSandTimer.reset();
