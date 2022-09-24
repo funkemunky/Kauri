@@ -6,7 +6,6 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
-import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Fly (E)", description = "Looks for consistent vertical acceleration",
         checkType = CheckType.FLIGHT, punishVL = 8, executable = true)

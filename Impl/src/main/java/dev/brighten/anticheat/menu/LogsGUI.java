@@ -12,7 +12,6 @@ import dev.brighten.anticheat.utils.menu.type.impl.ChestMenu;
 import dev.brighten.db.utils.Pair;
 import lombok.val;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.ItemMeta;

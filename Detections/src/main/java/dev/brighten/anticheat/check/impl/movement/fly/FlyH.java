@@ -6,7 +6,6 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
-import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Fly (H)", description = "Checks for invalid downwards accelerations", checkType = CheckType.FLIGHT,
         punishVL = 10, executable = true)

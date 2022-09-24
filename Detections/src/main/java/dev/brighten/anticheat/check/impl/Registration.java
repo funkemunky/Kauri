@@ -2,7 +2,6 @@ package dev.brighten.anticheat.check.impl;
 
 import cc.funkemunky.api.reflections.types.WrappedClass;
 import cc.funkemunky.api.utils.Init;
-import cc.funkemunky.api.utils.MiscUtils;
 import cc.funkemunky.api.utils.Priority;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;

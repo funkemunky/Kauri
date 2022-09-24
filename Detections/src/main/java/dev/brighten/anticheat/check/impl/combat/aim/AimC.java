@@ -13,16 +13,16 @@ import dev.brighten.api.check.DevStage;
 public class AimC extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if(packet.isLook() && data.moveProcessor.deltaX > 0) {
+        if (packet.isLook() && data.moveProcessor.deltaX > 0) {
             float deltaYaw = MathUtils.getAngleDelta(data.playerInfo.to.yaw, data.playerInfo.from.yaw);
-            if(deltaYaw > 320
+            if (deltaYaw > 320
                     && data.playerInfo.lDeltaYaw > 0
                     && data.moveProcessor.sensitivityX < 0.65
                     && data.playerInfo.lDeltaYaw < 30
                     && data.playerInfo.lastTeleportTimer.isPassed(1)
                     && !data.playerInfo.doingTeleport) {
                 vl++;
-                if(vl > 1) {
+                if (vl > 1) {
                     flag("yaw=%.3f", deltaYaw);
                 }
             } else vl-= vl > 0 ? 0.005 : 0;

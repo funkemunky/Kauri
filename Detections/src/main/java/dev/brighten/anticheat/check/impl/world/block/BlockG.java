@@ -27,7 +27,6 @@ public class BlockG extends Check {
 
     @Event
     public void onBlockPlace(BlockPlaceEvent event) {
-        BlockFace face = event.getBlockPlaced().getFace(event.getBlockAgainst());
         if((Math.abs(aimCount - lastAimCount) <= 1 && aimCount > 2 && rotChange > 100)
                 || (aimCount <= 5 && rotChange > 300
                 && event.getPlayer().getLocation().distanceSquared(event.getBlockPlaced().getLocation()) <= 4

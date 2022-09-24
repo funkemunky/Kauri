@@ -90,7 +90,7 @@ public class Check implements KauriCheck {
         });
 
         if(check != null)
-        return clazz.cast(check);
+            return clazz.cast(check);
 
         return null;
     }

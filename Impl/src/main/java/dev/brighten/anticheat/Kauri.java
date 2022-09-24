@@ -152,13 +152,13 @@ public class Kauri extends JavaPlugin {
         msgHandler = null;
         onReload.clear();
         if(!reload)
-        onReload = null;
+            onReload = null;
         KauriAPI.INSTANCE.service.shutdown();
         KauriAPI.INSTANCE.dataManager = null;
         KauriAPI.INSTANCE.exemptHandler = null;
         KauriAPI.INSTANCE = null;
         if(!reload)
-        tps = null;
+            tps = null;
         dev.brighten.anticheat.utils.MiscUtils.testers.clear();
         //Shutting down threads.
         executor.shutdown();

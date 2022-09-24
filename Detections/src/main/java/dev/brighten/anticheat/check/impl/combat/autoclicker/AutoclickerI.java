@@ -35,6 +35,6 @@ public class AutoclickerI extends Check {
     @Packet
     public void flying(WrappedInFlyingPacket packet, long now) {
         if(data.playerInfo.lastTeleportTimer.isPassed(0) && now - lastFlying > 30)
-        lastFlying = now;
+            lastFlying = now;
     }
 }

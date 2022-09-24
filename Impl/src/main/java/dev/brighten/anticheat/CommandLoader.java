@@ -4,7 +4,6 @@ import cc.funkemunky.api.Atlas;
 import cc.funkemunky.api.utils.Color;
 import cc.funkemunky.api.utils.Init;
 import cc.funkemunky.api.utils.MiscUtils;
-import cc.funkemunky.api.utils.Priority;
 
 @Init
 public class CommandLoader {

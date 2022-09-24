@@ -34,7 +34,7 @@ public class TimerA extends Check {
     public void onBlockPlace(WrappedInBlockPlacePacket packet) {
         //In versions 1.17 and newer, players will send an extra flying when right clicking
         if(data.playerVersion.isOrAbove(ProtocolVersion.v1_17))
-        totalTimer-= 50;
+            totalTimer-= 50;
     }
 
     //Fixes the problem with 1.9 where PacketPlayInFlying isn't always sent by the client and it therefore
