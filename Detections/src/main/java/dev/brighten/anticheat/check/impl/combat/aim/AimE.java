@@ -13,36 +13,35 @@ import dev.brighten.api.check.CheckType;
 import java.util.List;
 import java.util.Optional;
 
-@CheckInfo(name = "Aim (G)", description = "Statistical aim analysis",
+@CheckInfo(name = "Aim (E)", description = "Statistical aim analysis.",
         checkType = CheckType.AIM, punishVL = 20, executable = true)
 public class AimE extends Check {
-
     private int abuffer;
-
-    protected List<Double> yawOffsets = new EvictingList<>(10), pitchOffsets = new EvictingList<>(10);
+    protected List<Double> yawOffsets = new EvictingList<>(10);
+    protected List<Double> pitchOffsets = new EvictingList<>(10);
 
     @Packet
     public void onUse(WrappedInUseEntityPacket packet) {
-        if(packet.getAction() != WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK
+        if (packet.getAction() != WrappedInUseEntityPacket.EnumEntityUseAction.ATTACK
                 || data.target == null) return;
 
         Optional<EntityLocation> opLoc = data.entityLocationProcessor.getEntityLocation(data.target);
 
-        if(!opLoc.isPresent()) return;
+        if (!opLoc.isPresent()) return;
 
         final EntityLocation eloc = opLoc.get();
 
         KLocation origin = data.playerInfo.to.clone(),
                 targetLocation = new KLocation(eloc.x, eloc.y, eloc.z, eloc.yaw, eloc.pitch);
 
-        origin.y+= data.playerInfo.sneaking ? 1.54f : 1.62f;
+        origin.y += data.playerInfo.sneaking ? 1.54f : 1.62f;
 
         double[] offset = MathUtils.getOffsetFromLocation(origin.toLocation(data.getPlayer().getWorld()),
                 targetLocation.toLocation(data.getPlayer().getWorld()));
 
         // Running the TypeG detection itself
-        if(offset[0] == 0D) {
-            if(data.playerInfo.deltaYaw > 0.2 && ++abuffer > 5) {
+        if (offset[0] == 0D) {
+            if (data.playerInfo.deltaYaw > 0.2 && ++abuffer > 5) {
                 vl++;
                 abuffer = 5;
                 flag("t=a y=%.2f dy=%.3f", offset[1], data.playerInfo.deltaYaw);
@@ -53,7 +52,7 @@ public class AimE extends Check {
         yawOffsets.add(offset[0]);
         pitchOffsets.add(offset[1]);
 
-        if(yawOffsets.size() < 8 || pitchOffsets.size() < 8) return;
+        if (yawOffsets.size() < 8 || pitchOffsets.size() < 8) return;
 
         debug("po=%.1f yo=%.1f", offset[1], offset[0]);
     }
