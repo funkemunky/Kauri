@@ -19,8 +19,8 @@ import java.util.*;
 @NoArgsConstructor
 public class PlayerInformation {
     public boolean serverGround, lServerGround, lClientGround, clientGround, nearGround,
-            collided, insideBlock, lookingAtBlock,
-            onLadder, isClimbing, usingItem, wasOnIce, wasOnSlime, jumped, inAir, worldLoaded;
+            collided, insideBlock, lookingAtBlock, onLadder, isClimbing, usingItem,
+            wasOnIce, wasOnSlime, jumped, inAir, worldLoaded;
     public boolean generalCancel, flightCancel, checkMovement, doingBlockUpdate, canUseElytra;
     public boolean cva, cvb, cvc;
     public float fallDistance;
@@ -42,10 +42,12 @@ public class PlayerInformation {
         inWebTimer = new TickTimer();
         climbTimer = new TickTimer(40);
         slimeTimer = new TickTimer(75);
+        viaSlimeTimer = new TickTimer(75);
+        honeyTimer = new TickTimer();
         iceTimer = new TickTimer(45);
         blockAboveTimer = new TickTimer(50);
-        soulSandTimer =new TickTimer( 40);
-        lastBrokenBlock = new TickTimer( 5);
+        soulSandTimer =new TickTimer(40);
+        lastBrokenBlock = new TickTimer(5);
         lastVelocity = new PlayerTimer(data);
         lastTargetSwitch = new TickTimer(3);
         lastBlockPlace = new TickTimer(10);
@@ -105,7 +107,7 @@ public class PlayerInformation {
             lastBlockDigPacket, lastToggleFlight, lastAttack, lastEntityCollision, lastMoveCancel, lastTargetUpdate,
             lastWindowClick, lastInsideBlock, lastHalfBlock, lastPlaceLiquid, lastUseItem, lastGhostCollision,
             lastTeleportTimer, lastGamemodeTimer, lastRespawnTimer, lastChunkUnloaded, cinematicTimer, lastGlideTimer,
-            lastMoveTimer, nearGroundTimer, vehicleTimer, lastHighRate, lastFenceBelow;
+            lastMoveTimer, nearGroundTimer, vehicleTimer, lastHighRate, lastFenceBelow, honeyTimer, viaSlimeTimer;
 
     public double velocityX, velocityY, velocityZ, velocityXZ, calcVelocityX, calcVelocityY, calcVelocityZ;
 

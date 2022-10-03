@@ -487,6 +487,8 @@ public class MovementProcessor {
 
             if (data.blockInfo.onClimbable) data.playerInfo.climbTimer.reset();
             if (data.blockInfo.onSlime) data.playerInfo.slimeTimer.reset();
+            if (data.blockInfo.onViaSlime) data.playerInfo.viaSlimeTimer.reset();
+            if (data.blockInfo.inHoney) data.playerInfo.honeyTimer.reset();
             if (data.blockInfo.onSoulSand) data.playerInfo.soulSandTimer.reset();
             if (data.blockInfo.blocksAbove) data.playerInfo.blockAboveTimer.reset();
             if (data.blockInfo.collidedWithEntity) data.playerInfo.lastEntityCollision.reset();

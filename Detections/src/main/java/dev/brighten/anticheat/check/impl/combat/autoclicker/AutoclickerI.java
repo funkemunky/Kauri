@@ -1,5 +1,6 @@
 package dev.brighten.anticheat.check.impl.combat.autoclicker;
 
+import cc.funkemunky.api.tinyprotocol.api.ProtocolVersion;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInArmAnimationPacket;
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import dev.brighten.anticheat.check.api.Cancellable;
@@ -19,14 +20,19 @@ public class AutoclickerI extends Check {
 
     @Packet
     public void use(WrappedInArmAnimationPacket packet, long now) {
+        //ViaRewind delays packets, which falses this check.
+        if (ProtocolVersion.getGameVersion().isOrAbove(ProtocolVersion.V1_9)
+                && data.playerVersion.isBelow(ProtocolVersion.V1_9))
+            return;
+
         long delta = now - lastFlying;
 
-        if(delta < 10 && now - lastArm > 30 && data.lagInfo.lastPacketDrop.isPassed(1)) {
-            if(++buffer > 6) {
+        if (delta < 10 && now - lastArm > 30 && data.lagInfo.lastPacketDrop.isPassed(1)) {
+            if (++buffer > 6) {
                 vl++;
                 flag("delta=%s buffer=%s", delta, buffer);
             }
-        } else if(buffer > 0) buffer--;
+        } else if (buffer > 0) buffer--;
 
         debug("delta=%s buffer=%s", delta, buffer);
         lastArm = now;
@@ -34,7 +40,7 @@ public class AutoclickerI extends Check {
 
     @Packet
     public void flying(WrappedInFlyingPacket packet, long now) {
-        if(data.playerInfo.lastTeleportTimer.isPassed(0) && now - lastFlying > 30)
+        if (data.playerInfo.lastTeleportTimer.isPassed(0) && now - lastFlying > 30)
             lastFlying = now;
     }
 }

@@ -13,8 +13,14 @@ import dev.brighten.api.check.CheckType;
 @Cancellable
 public class FlyC extends Check {
 
+    private static final double divisor = 1/64.;
+
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
+        if (data.playerInfo.to.y % divisor == 0 
+                && data.playerInfo.from.y % divisor == 0)
+            return;
+
         if (packet.isPos()) {
             if (!data.playerInfo.flightCancel
                     && data.playerInfo.jumped
@@ -23,17 +29,18 @@ public class FlyC extends Check {
                     && data.playerInfo.lClientGround
                     && !data.blockInfo.miscNear
                     && data.playerInfo.lastGhostCollision.isPassed(1)
+                    && !data.blockInfo.onBoat
                     && !data.playerInfo.insideBlock
                     && data.playerInfo.blockAboveTimer.isPassed(6)
+                    && data.playerInfo.honeyTimer.isPassed(20)
                     && data.playerInfo.lastBlockPlace.isPassed(20)
-                    && data.playerInfo.lastHalfBlock.isPassed(4)
                     && data.playerInfo.lastVelocity.isPassed(4)
                     && MathUtils.getDelta(data.playerInfo.deltaY, data.playerInfo.jumpHeight) > 0.01f) {
                 vl++;
                 flag("deltaY=%.4f maxHeight=%.4f", data.playerInfo.deltaY, data.playerInfo.jumpHeight);
 
                 fixMovementBugs();
-            } else if(vl > 0) vl-= 0.01f;
+            } else if (vl > 0) vl -= 0.01f;
 
             debug("deltaY=%s above=%s", data.playerInfo.deltaY,
                     data.playerInfo.blockAboveTimer.getPassed());

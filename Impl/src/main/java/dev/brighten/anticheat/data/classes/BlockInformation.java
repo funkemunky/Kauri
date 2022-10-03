@@ -15,12 +15,14 @@ import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.utils.CollisionHandler;
 import dev.brighten.anticheat.utils.MiscUtils;
+
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 
 import java.util.*;
 
@@ -28,8 +30,8 @@ public class BlockInformation {
     private ObjectData objectData;
     public boolean onClimbable, onSlab, onStairs, onHalfBlock, inLiquid, inLava, inWater, inWeb, onSlime, onIce,
             onSoulSand, blocksAbove, collidesVertically, bedNear, collidesHorizontally, blocksNear, inBlock, miscNear,
-            collidedWithEntity, roseBush, inPortal, blocksBelow, fenceNear,
-            pistonNear, fenceBelow, inScaffolding, inHoney;
+            collidedWithEntity, roseBush, inPortal, blocksBelow, fenceNear, onBoat, boatNear,
+            pistonNear, fenceBelow, inScaffolding, inHoney, onViaSlime;
     public float currentFriction, fromFriction;
     public CollisionHandler
             handler = new CollisionHandler(new ArrayList<>(), new ArrayList<>(), new KLocation(0,0,0), null);
@@ -68,7 +70,7 @@ public class BlockInformation {
         blocks.clear();
 
         onClimbable = objectData.playerInfo.serverGround = objectData.playerInfo.nearGround = fenceBelow
-                = inScaffolding = inHoney = fenceNear
+                = inScaffolding = inHoney = onViaSlime = fenceNear = onBoat = boatNear
                 = onSlab = onStairs = onHalfBlock = inLiquid = inLava = inWater = inWeb = onSlime = pistonNear
                 = onIce = onSoulSand = blocksAbove = collidesVertically = bedNear = collidesHorizontally =
                 blocksNear = inBlock = miscNear = collidedWithEntity = blocksBelow = inPortal = false;
@@ -150,10 +152,14 @@ public class BlockInformation {
                                     CollisionBox blockBox = BlockData.getData(type)
                                             .getBox(block, objectData.playerVersion);
 
+                                    //We subtract 0.0001 to prevent Kauri from thinking the player is in web
+                                    //when they're actually on the edge of a block above the web.
+                                    if(blockBox.isCollided(normalBox.copy().expand(0, -0.0001, 0))
+                                            && type.equals(cobweb))
+                                        inWeb = true;
+
                                     if(blockBox.isCollided(normalBox)) {
-                                        if(type.equals(cobweb))
-                                            inWeb = true;
-                                        else if(type.equals(scaffolding)) inScaffolding = true;
+                                        if(type.equals(scaffolding)) inScaffolding = true;
                                         else if(type.equals(honey)) inHoney = true;
                                     }
 
@@ -224,25 +230,33 @@ public class BlockInformation {
                                         if(groundBox.isCollided(blockBox)) {
                                             objectData.playerInfo.serverGround = true;
 
-                                            if(blockMaterial != null)
-                                            switch (blockMaterial) {
-                                                case ICE:
-                                                case BLUE_ICE:
-                                                case FROSTED_ICE:
-                                                case PACKED_ICE: {
-                                                    onIce = true;
-                                                    break;
-                                                }
-                                                case SOUL_SAND: {
-                                                    onSoulSand = true;
-                                                    break;
-                                                }
-                                                case SLIME_BLOCK: {
-                                                    onSlime = true;
-                                                    break;
-                                                }
+                                            // ViaBackwards changes honey blocks to slime blocks for clients < 1.15.
+                                            if(groundBox.isCollided(blockBox) && objectData.playerVersion.isBelow(ProtocolVersion.v1_15)
+                                                    && type.equals(honey)) {
+                                                onSlime = true;
+                                                onViaSlime = true;
                                             }
+
+                                            if(blockMaterial != null)
+                                                switch (blockMaterial) {
+                                                    case ICE:
+                                                    case BLUE_ICE:
+                                                    case FROSTED_ICE:
+                                                    case PACKED_ICE: {
+                                                        onIce = true;
+                                                        break;
+                                                    }
+                                                    case SOUL_SAND: {
+                                                        onSoulSand = true;
+                                                        break;
+                                                    }
+                                                    case SLIME_BLOCK: {
+                                                        onSlime = true;
+                                                        break;
+                                                    }
+                                                }
                                         }
+
                                         if(objectData.playerInfo.deltaY > 0
                                                 && objectData.playerVersion.isBelow(ProtocolVersion.V1_14)
                                                 && Materials.checkFlag(type, Materials.LADDER)
@@ -259,7 +273,7 @@ public class BlockInformation {
                                                 case STICKY_PISTON: {
                                                     if(normalBox.copy().expand(0.5, 0.5, 0.5)
                                                             .isCollided(blockBox))
-                                                    pistonNear = true;
+                                                        pistonNear = true;
                                                     break;
                                                 }
                                             }
@@ -273,47 +287,47 @@ public class BlockInformation {
                                                 onStairs = true;
                                             else
                                             if(blockMaterial != null)
-                                            switch(blockMaterial) {
-                                                case CAKE:
-                                                case BREWING_STAND:
-                                                case FLOWER_POT:
-                                                case PLAYER_HEAD:
-                                                case PLAYER_WALL_HEAD:
-                                                case SKELETON_SKULL:
-                                                case CREEPER_HEAD:
-                                                case DRAGON_HEAD:
-                                                case ZOMBIE_HEAD:
-                                                case ZOMBIE_WALL_HEAD:
-                                                case CREEPER_WALL_HEAD:
-                                                case DRAGON_WALL_HEAD:
-                                                case WITHER_SKELETON_SKULL:
-                                                case LANTERN:
-                                                case SKELETON_WALL_SKULL:
-                                                case WITHER_SKELETON_WALL_SKULL:
-                                                case SNOW: {
-                                                    miscNear = true;
-                                                    break;
+                                                switch(blockMaterial) {
+                                                    case CAKE:
+                                                    case BREWING_STAND:
+                                                    case FLOWER_POT:
+                                                    case PLAYER_HEAD:
+                                                    case PLAYER_WALL_HEAD:
+                                                    case SKELETON_SKULL:
+                                                    case CREEPER_HEAD:
+                                                    case DRAGON_HEAD:
+                                                    case ZOMBIE_HEAD:
+                                                    case ZOMBIE_WALL_HEAD:
+                                                    case CREEPER_WALL_HEAD:
+                                                    case DRAGON_WALL_HEAD:
+                                                    case WITHER_SKELETON_SKULL:
+                                                    case LANTERN:
+                                                    case SKELETON_WALL_SKULL:
+                                                    case WITHER_SKELETON_WALL_SKULL:
+                                                    case SNOW: {
+                                                        miscNear = true;
+                                                        break;
+                                                    }
+                                                    case BLACK_BED:
+                                                    case BLUE_BED:
+                                                    case BROWN_BED:
+                                                    case CYAN_BED:
+                                                    case GRAY_BED:
+                                                    case GREEN_BED:
+                                                    case LIME_BED:
+                                                    case MAGENTA_BED:
+                                                    case ORANGE_BED:
+                                                    case PINK_BED:
+                                                    case PURPLE_BED:
+                                                    case RED_BED:
+                                                    case WHITE_BED:
+                                                    case YELLOW_BED:
+                                                    case LIGHT_BLUE_BED:
+                                                    case LIGHT_GRAY_BED: {
+                                                        bedNear = true;
+                                                        break;
+                                                    }
                                                 }
-                                                case BLACK_BED:
-                                                case BLUE_BED:
-                                                case BROWN_BED:
-                                                case CYAN_BED:
-                                                case GRAY_BED:
-                                                case GREEN_BED:
-                                                case LIME_BED:
-                                                case MAGENTA_BED:
-                                                case ORANGE_BED:
-                                                case PINK_BED:
-                                                case PURPLE_BED:
-                                                case RED_BED:
-                                                case WHITE_BED:
-                                                case YELLOW_BED:
-                                                case LIGHT_BLUE_BED:
-                                                case LIGHT_GRAY_BED: {
-                                                    bedNear = true;
-                                                    break;
-                                                }
-                                            }
                                         }
                                     } else if(blockBox.isCollided(normalBox)) {
                                         XMaterial blockMaterial = getXMaterial(type);
@@ -354,7 +368,14 @@ public class BlockInformation {
 
             if(entityBox.isCollided(normalBox))
                 collidedWithEntity = true;
+
+            if(entityBox.isCollided(normalBox) && entity.getType() == EntityType.BOAT)
+                onBoat = true;
         }
+
+        if(MiscUtils.getNearbyEntities(objectData.getPlayer(), 1.5, 1.5).stream()
+                .anyMatch(entity -> entity.getType() == EntityType.BOAT))
+            boatNear = true;
 
         //Bukkit.broadcastMessage("chigga5");
         onHalfBlock = onSlab || onStairs || miscNear || bedNear;
