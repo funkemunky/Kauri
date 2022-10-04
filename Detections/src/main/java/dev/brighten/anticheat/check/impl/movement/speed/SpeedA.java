@@ -68,12 +68,6 @@ public class SpeedA extends Check {
                 drag = data.getClientVersion().isOrAbove(ProtocolVersion.V1_13) ? 0.9f : 0.8f;
                 moveFactor = 0.034;
 
-                // Fixes false with sudden horizontial movement.
-                if (!data.playerInfo.clientGround && ldxz == 0.0f) {
-                    tags.addTag("water-treading");
-                    moveFactor += 0.03;
-                }
-
                 if (data.playerInfo.liquidTimer.getResetStreak() < 3) {
                     tags.addTag("water-enter");
                     moveFactor *= 1.35;
@@ -112,6 +106,7 @@ public class SpeedA extends Check {
                 tags.addTag("web-leave");
                 moveFactor += 0.15;
                 moveFactor *= 0.4;
+
                 //Fixes a potential false positive when entering and leaving a web too fast.
                 if (data.playerInfo.webTimer.getResetStreak() == 0) {
                     tags.addTag("web-enter-leave");
@@ -137,6 +132,7 @@ public class SpeedA extends Check {
             if (ratio > 100.1
                     && !data.blockInfo.inScaffolding
                     && data.playerInfo.viaSlimeTimer.isPassed(8)
+                    && data.playerInfo.liquidTimer.isPassed(2)
                     && data.playerInfo.lastVelocity.isPassed(2)
                     && !data.playerInfo.generalCancel) {
                 if (++buffer > 2) {
