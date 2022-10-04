@@ -17,7 +17,7 @@ public class FlyD extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
         if (!packet.isPos()
-                || data.blockInfo.onBoat
+                || data.blockInfo.boatNear
                 || data.playerInfo.flightCancel
                 || data.playerInfo.canUseElytra
                 || data.playerInfo.lastEntityCollision.isNotPassed(1)
