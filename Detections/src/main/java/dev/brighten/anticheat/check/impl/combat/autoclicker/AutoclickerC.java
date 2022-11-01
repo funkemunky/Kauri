@@ -22,7 +22,7 @@ public class AutoclickerC extends Check {
     private double cps;
     private boolean blocked;
     private int armTicks;
-    private MaxDouble verbose = new MaxDouble(40);
+    private final MaxDouble verbose = new MaxDouble(40);
 
     @Packet
     public void onArm(WrappedInArmAnimationPacket packet, long timeStamp) {
