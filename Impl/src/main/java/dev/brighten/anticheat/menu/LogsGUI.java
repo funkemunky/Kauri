@@ -123,9 +123,9 @@ public class LogsGUI extends ChestMenu {
                     if (player.hasPermission("kauri.logs.share")) {
                         if (info.getClickType().isRightClick()) {
                             runFunction(info, "kauri.logs.share", () -> {
-                                close(player);
                                 player.sendMessage(Color.Green + "Logs: "
                                         + LogCommand.getLogsFromUUID(LogsGUI.this.player));
+                                RunUtils.taskLater(() -> close(player), 1);
                             });
                         } else if (info.getClickType().isLeftClick() && info.getClickType().isShiftClick()) {
                             runFunction(info, "kauri.logs.clear",
