@@ -13,14 +13,14 @@ import dev.brighten.api.check.DevStage;
 public class AimA extends Check {
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if(packet.isLook()) {
+        if (packet.isLook()) {
             float yawAccel = MathUtils.getDelta(data.playerInfo.lDeltaYaw, data.playerInfo.deltaYaw);
             float pitchAccel = MathUtils.getDelta(data.playerInfo.lDeltaPitch, data.playerInfo.deltaPitch);
 
-            if(yawAccel < 1E-3 && pitchAccel < 1E-4
+            if (yawAccel < 1E-3 && pitchAccel < 1E-4
                     && (data.playerInfo.deltaPitch > 0 || yawAccel > 0)
                     && (data.moveProcessor.deltaX > 2 || data.moveProcessor.deltaY > 2)) {
-                if(vl++ > 20) {
+                if (vl++ > 20) {
                     flag("yawAccel=%s pitchAccel=%s", yawAccel, pitchAccel);
                 }
             } else vl-= vl > 0 ? 2 : 0;

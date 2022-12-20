@@ -72,6 +72,8 @@ public class Hitboxes extends Check {
                 }
             }
 
+            if (targetLocs.isEmpty()) return;
+
             if(now - data.lagInfo.lastClientTrans < 150L
                     && data.lagInfo.lastPingDrop.isPassed(5) && ++buffer > 5) {
                 vl++;

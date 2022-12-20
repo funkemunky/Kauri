@@ -2,7 +2,6 @@ package dev.brighten.anticheat.check.impl.combat.aim;
 
 import cc.funkemunky.api.tinyprotocol.packet.in.WrappedInFlyingPacket;
 import cc.funkemunky.api.utils.Color;
-import cc.funkemunky.api.utils.MathUtils;
 import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
@@ -24,13 +23,12 @@ public class AimB extends Check {
     public void process(WrappedInFlyingPacket packet) {
         if (!packet.isLook()) return;
 
-        float sensitivity = data.moveProcessor.sensitivityMcp;
         final float deltaYaw = Math.abs(data.playerInfo.deltaYaw),
                 deltaPitch = Math.abs(data.playerInfo.deltaPitch);
         final float deltaX = deltaYaw / data.moveProcessor.yawMode,
                 deltaY = deltaPitch / data.moveProcessor.pitchMode;
 
-        if(data.moveProcessor.yawGcdList.size() < 40)
+        if (data.moveProcessor.yawGcdList.size() < 40)
            return;
 
         final double gridX = getGrid(data.moveProcessor.yawGcdList),
@@ -38,12 +36,11 @@ public class AimB extends Check {
 
         if (gridX < 0.005 || gridY < 0.005) lastGrid.reset();
 
-        if (deltaX > 200
-                || deltaY > 200) {
+        if (deltaX > 200 || deltaY > 200) {
             debug("sensitivity instability: mcp=%.4f, cx=%.4f, cy=%.4f, dx=%.1f, dy=%.1f",
                     data.moveProcessor.sensitivityMcp, data.moveProcessor.currentSensX,
                     data.moveProcessor.currentSensY, deltaX, deltaY);
-            if(buffer > 0) buffer--;
+            if (buffer > 0) buffer--;
             return;
         }
 

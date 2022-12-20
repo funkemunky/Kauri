@@ -6,9 +6,8 @@ import dev.brighten.anticheat.check.api.Check;
 import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CheckType;
-import dev.brighten.api.check.DevStage;
 
-@CheckInfo(name = "Fly (H)", description = "Checks for invalid downwards accelerations", checkType = CheckType.FLIGHT,
+@CheckInfo(name = "Fly (H)", description = "Checks for invalid downwards accelerations.", checkType = CheckType.FLIGHT,
         punishVL = 10, executable = true)
 @Cancellable
 public class FlyH extends Check {
@@ -18,7 +17,8 @@ public class FlyH extends Check {
     //Electrum is sexy if he was of age.
     @Packet
     public void onFlying(WrappedInFlyingPacket packet) {
-        if(data.playerInfo.lastVelocity.isNotPassed(20)
+        if (data.playerInfo.lastVelocity.isNotPassed(20)
+                || data.playerInfo.honeyTimer.isNotPassed(12)
                 || !data.playerInfo.checkMovement
                 || data.playerInfo.canFly
                 || data.playerInfo.doingBlockUpdate
@@ -29,14 +29,15 @@ public class FlyH extends Check {
                 || data.blockInfo.blocksAbove)
             return;
 
-        final double ldeltaY = data.playerInfo.lDeltaY, deltaY = data.playerInfo.deltaY;
+        final double ldeltaY = data.playerInfo.lDeltaY,
+                deltaY = data.playerInfo.deltaY;
 
-        if(Math.abs(deltaY + ldeltaY) < 0.05
+        if (Math.abs(deltaY + ldeltaY) < 0.05
                 && data.playerInfo.lastHalfBlock.isPassed(2)
                 && data.playerInfo.slimeTimer.isPassed(5)
                 && Math.abs(deltaY) > 0.2) {
-            buffer+=15;
-            if(buffer > 20) {
+            buffer += 15;
+            if (buffer > 20) {
                 vl++;
                 flag("dy=%.1f ldy=%.1f t=same", deltaY, ldeltaY);
                 buffer = 20; //Making sure the buffer doesn't go too high

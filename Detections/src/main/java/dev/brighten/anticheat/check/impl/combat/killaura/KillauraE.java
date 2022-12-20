@@ -9,7 +9,6 @@ import dev.brighten.anticheat.check.api.CheckInfo;
 import dev.brighten.anticheat.check.api.Packet;
 import dev.brighten.api.check.CancelType;
 import dev.brighten.api.check.CheckType;
-import dev.brighten.api.check.DevStage;
 
 @CheckInfo(name = "Killaura (E)", description = "Checks if a player attacks before blocking.",
         checkType = CheckType.KILLAURA, punishVL = 12, vlToFlag = 6, executable = true)

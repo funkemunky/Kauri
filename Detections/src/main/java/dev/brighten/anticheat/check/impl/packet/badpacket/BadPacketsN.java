@@ -25,11 +25,10 @@ public class BadPacketsN extends Check {
     @Setting(name  = "kickPlayer")
     private static boolean kickPlayer = true;
 
-    private int flying, flying2, lastTick, skipBuffer;
-    private short lastId;
+    private int flying;
     private final Timer lastTrans = new TickTimer(), lastSentTrans = new MillisTimer(),
             lastKeepAlive = new TickTimer(), lastSentKeepAlive = new TickTimer(),
-            lastFlying = new TickTimer(), lastSkipFlag = new TickTimer();
+            lastFlying = new TickTimer();
 
     @Setting(name = "keepaliveKick")
     private static boolean keepaliveKicking = true;

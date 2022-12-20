@@ -90,7 +90,6 @@ CollisionHandler {
 	}
 
 	public void intersectsWithFuture(int bitMask, Consumer<Boolean> intersects) {
-		String bitMaskString = String.valueOf(bitMask) + "%%__NONCE__%%";
 		this.intersects.add(new Triad<>(new Double[] {width, height, shift}, bitMask, intersects));
 	}
 

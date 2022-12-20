@@ -8,7 +8,6 @@ import cc.funkemunky.api.tinyprotocol.api.TinyProtocolHandler;
 import cc.funkemunky.api.tinyprotocol.listener.functions.PacketListener;
 import cc.funkemunky.api.tinyprotocol.packet.in.*;
 import cc.funkemunky.api.tinyprotocol.packet.out.*;
-import cc.funkemunky.api.utils.BlockUtils;
 import cc.funkemunky.api.utils.KLocation;
 import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.XMaterial;
@@ -16,7 +15,6 @@ import cc.funkemunky.api.utils.math.IntVector;
 import dev.brighten.anticheat.Kauri;
 import dev.brighten.anticheat.data.ObjectData;
 import dev.brighten.anticheat.listeners.api.impl.KeepaliveAcceptedEvent;
-import dev.brighten.anticheat.processing.thread.ThreadHandler;
 import dev.brighten.anticheat.utils.MiscUtils;
 import dev.brighten.anticheat.utils.MovementUtils;
 import dev.brighten.api.KauriAPI;
@@ -209,7 +207,7 @@ public class PacketProcessor {
                 WrappedInAbilitiesPacket packet = new WrappedInAbilitiesPacket(object, data.getPlayer());
 
                 if(data.playerInfo.canFly)
-                data.playerInfo.flying = packet.isFlying();
+                    data.playerInfo.flying = packet.isFlying();
 
                 data.checkManager.runPacket(packet, timestamp);
                 if(data.sniffing) {
@@ -247,7 +245,7 @@ public class PacketProcessor {
                     data.playerInfo.usingItem = false;
                 }
                 if(packet.getEntity() != null)
-                data.checkManager.runPacket(packet, timestamp);
+                    data.checkManager.runPacket(packet, timestamp);
 
                 if(data.sniffing) {
                     data.sniffedPackets.add(type + ":@:" + packet.getId() + ";" + packet.getAction().name()

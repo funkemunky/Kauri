@@ -62,6 +62,8 @@ public class ReachA extends Check {
                 }
             }
 
+            if (targetLocs.isEmpty()) return;
+
             distance = Math.sqrt(distance) - (data.playerVersion.isBelow(ProtocolVersion.V1_9) ? 0.4325 : 0.3325);
 
             if (distance > reachThreshold) {

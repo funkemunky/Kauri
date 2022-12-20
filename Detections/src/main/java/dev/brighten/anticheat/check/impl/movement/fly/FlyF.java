@@ -9,41 +9,42 @@ import dev.brighten.anticheat.utils.MovementUtils;
 import dev.brighten.api.check.CheckType;
 
 @Cancellable
-@CheckInfo(name = "Fly (F)", description = "Checks if an individual flys faster than possible.", executable = true,
-        punishVL = 5,
-        checkType = CheckType.FLIGHT)
+@CheckInfo(name = "Fly (F)", description = "Checks if an individual flies faster than possible.",
+        executable = true, punishVL = 5, checkType = CheckType.FLIGHT)
 public class FlyF extends Check {
 
     private double slimeY = 0;
+
     @Packet
     public void onPacket(WrappedInFlyingPacket packet) {
-        if(data.playerInfo.deltaXZ == 0 && data.playerInfo.deltaY == 0) return;
+        if (data.playerInfo.deltaXZ == 0 && data.playerInfo.deltaY == 0) return;
 
         double max = Math.max((data.playerInfo.clientGround && data.playerInfo.serverGround)
                 ? 0.6001 : 0.5001, (data.playerInfo.lastVelocity.isNotPassed(20)
                 ? Math.max(data.playerInfo.velocityY, data.playerInfo.jumpHeight)
                 : data.playerInfo.jumpHeight) + 0.001);
 
-        if(data.playerInfo.lastHalfBlock.isNotPassed(20)
+        if (data.playerInfo.lastHalfBlock.isNotPassed(20)
                 || data.blockInfo.collidesHorizontally) max = Math.max(0.5625, max);
 
-        if(data.playerInfo.wasOnSlime && data.playerInfo.clientGround && data.playerInfo.nearGround) {
+        if (data.playerInfo.wasOnSlime && data.playerInfo.clientGround && data.playerInfo.nearGround) {
             //Fixes false when jumping onto slime from a large height
             slimeY = MovementUtils.getTotalHeight(data.playerVersion, (float)Math.abs(data.playerInfo.lDeltaY));
             max = Math.max(max, slimeY);
             debug("SLIME: sy=%.2f", slimeY);
-        } else if(data.playerInfo.wasOnSlime && data.playerInfo.airTicks > 2) {
+        } else if (data.playerInfo.wasOnSlime && data.playerInfo.airTicks > 2) {
             slimeY-= 0.08f;
             slimeY*= 0.98f;
 
             debug("SLIME ACCEL: sy=%.2f", slimeY);
             max = Math.max(max, slimeY);
-        } else if(!data.playerInfo.wasOnSlime && slimeY != 0) {
+        } else if (!data.playerInfo.wasOnSlime && slimeY != 0) {
             slimeY = 0;
         }
 
-        if(data.playerInfo.deltaY > max
+        if (data.playerInfo.deltaY > max
                 && !data.blockInfo.roseBush
+                && !data.blockInfo.boatNear
                 && data.playerInfo.lastVelocity.isPassed(2)
                 && !data.playerInfo.doingVelocity
                 && data.playerInfo.slimeTimer.isPassed(10)

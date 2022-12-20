@@ -27,8 +27,6 @@ public class ClickProcessor {
     @Getter
     private Tuple<List<Long>, List<Long>> outliersTuple = new Tuple<>(new ArrayList<>(), new ArrayList<>());
 
-    private TickTimer lastZeroCheck = new TickTimer(1);
-
     @Getter
     private boolean notReady;
 

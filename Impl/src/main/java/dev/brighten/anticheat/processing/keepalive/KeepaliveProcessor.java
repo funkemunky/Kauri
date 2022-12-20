@@ -7,7 +7,6 @@ import cc.funkemunky.api.utils.RunUtils;
 import cc.funkemunky.api.utils.it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import cc.funkemunky.api.utils.it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import cc.funkemunky.api.utils.it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import cc.funkemunky.api.utils.objects.evicting.EvictingMap;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import dev.brighten.anticheat.Kauri;
@@ -15,7 +14,6 @@ import dev.brighten.anticheat.data.ObjectData;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.Collections;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 

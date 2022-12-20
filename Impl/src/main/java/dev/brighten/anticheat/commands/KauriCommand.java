@@ -458,7 +458,7 @@ public class KauriCommand extends BaseCommand {
     public void onSimLag(CommandSender sender, @Optional Integer amount) {
         PacketProcessor.simLag = !PacketProcessor.simLag;
         if(amount != null)
-        PacketProcessor.amount = amount;
+            PacketProcessor.amount = amount;
 
         sender.sendMessage(String.format(Color.translate("&aSimLag (%s): "
                 + (PacketProcessor.simLag ? "&aenabled" : "&cdisabled")), PacketProcessor.amount));
