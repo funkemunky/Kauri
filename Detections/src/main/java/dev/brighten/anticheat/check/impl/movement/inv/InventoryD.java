@@ -18,7 +18,7 @@ public class InventoryD extends Check {
     public void onWindow(WrappedInWindowClickPacket packet) {
         if (data.playerInfo.generalCancel) return;
 
-        if (!data.playerInfo.inventoryOpen) {
+        if (packet.getId() == 0 && !data.playerInfo.inventoryOpen) {
             vl++;
             flag(80, "id=%s", packet.getId());
         }
