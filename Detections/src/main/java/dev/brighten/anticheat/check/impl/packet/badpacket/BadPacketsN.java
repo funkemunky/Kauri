@@ -52,6 +52,7 @@ public class BadPacketsN extends Check {
 
                 //I have no clue what I am doing nor do I know how retarded this is
                 //but this works?? somehow?
+                // seems to detect most verus disablers but haven't tested it properly on production
                 || (data.lagInfo.transPing < 65
                         && ++flying > 100
                         && Kauri.INSTANCE.tps.getAverage() > 19.6
