@@ -1,3 +1,7 @@
+
+> [!CAUTION]
+> This is a deprecated version of Kauri, and has been archived as of June 16, 2025. See https://github.com/funkemunky/KauriV3 for future development.
+
 # Kauri Anticheat
 
 Get it on Spigot: https://www.spigotmc.org/resources/kauri-anticheat-best-in-class-performance-destroy-cheaters-1-7-10-1-18-1.101667/
